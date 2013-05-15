@@ -12,6 +12,11 @@ struct f2_tempsprite
 class taitof2_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TAITOF2_INTERRUPT6
+	};
+
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_sprite_extension(*this, "sprite_ext"),
@@ -151,7 +156,6 @@ public:
 	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
 	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
-	TIMER_CALLBACK_MEMBER(taitof2_interrupt6);
 	void reset_driveout_sound_region();
 	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer );
@@ -160,6 +164,9 @@ public:
 	void taitof2_update_sprites_active_area(  );
 	void draw_roz_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority);
 	void taito_f2_tc360_spritemixdraw(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
+	UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

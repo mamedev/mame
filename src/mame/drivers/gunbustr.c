@@ -52,14 +52,21 @@
 
 /*********************************************************************/
 
-TIMER_CALLBACK_MEMBER(gunbustr_state::gunbustr_interrupt5)
+void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(5, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_GUNBUSTR_INTERRUPT5:
+		m_maincpu->set_input_line(5, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gunbustr_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), timer_expired_delegate(FUNC(gunbustr_state::gunbustr_interrupt5),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_GUNBUSTR_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -142,7 +149,7 @@ READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(gunbustr_state::gunbustr_interrupt5),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_GUNBUSTR_INTERRUPT5);
 }
 
 

@@ -69,6 +69,19 @@ void fgoal_state::palette_init()
 }
 
 
+void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTERRUPT:
+		interrupt_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in fgoal_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 {
 	int scanline;
@@ -86,7 +99,7 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 	if (scanline > 256)
 		scanline = 0;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(fgoal_state::interrupt_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT);
 }
 
 
@@ -339,7 +352,7 @@ void fgoal_state::machine_start()
 
 void fgoal_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(fgoal_state::interrupt_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_INTERRUPT);
 
 	m_xpos = 0;
 	m_ypos = 0;

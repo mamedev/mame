@@ -119,6 +119,19 @@ INTERRUPT_GEN_MEMBER(capbowl_state::capbowl_interrupt)
  *
  *************************************/
 
+void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_CAPBOWL_UPDATE:
+		capbowl_update(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in capbowl_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(capbowl_state::capbowl_update)
 {
 	int scanline = param;
@@ -126,7 +139,7 @@ TIMER_CALLBACK_MEMBER(capbowl_state::capbowl_update)
 	machine().primary_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(capbowl_state::capbowl_update),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_CAPBOWL_UPDATE, scanline);
 }
 
 
@@ -338,7 +351,7 @@ void capbowl_state::machine_start()
 
 void capbowl_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(capbowl_state::capbowl_update),this), 32);
+	timer_set(machine().primary_screen->time_until_pos(32), TIMER_CAPBOWL_UPDATE, 32);
 
 	m_blitter_addr = 0;
 	m_last_trackball_val[0] = 0;

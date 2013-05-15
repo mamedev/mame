@@ -238,6 +238,11 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 class gticlub_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ_OFF
+	};
+
 	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
@@ -273,12 +278,14 @@ public:
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
-	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<eeprom_device> m_eeprom;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -718,9 +725,16 @@ static const sharc_config sharc_cfg =
 };
 
 
-TIMER_CALLBACK_MEMBER(gticlub_state::irq_off)
+void gticlub_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_audiocpu->set_input_line(param, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ_OFF:
+		m_audiocpu->set_input_line(param, CLEAR_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gticlub_state::device_timer");
+	}
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )
@@ -729,7 +743,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(gticlub_state::irq_off),state), line);
+	state->timer_set(attotime::from_usec(5), gticlub_state::TIMER_IRQ_OFF, line);
 }
 
 static const k056800_interface gticlub_k056800_interface =

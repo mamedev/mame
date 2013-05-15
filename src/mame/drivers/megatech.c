@@ -213,6 +213,21 @@ READ8_MEMBER(mtech_state::megatech_cart_select_r )
 }
 
 
+void mtech_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_Z80_RUN_STATE:
+		megatech_z80_run_state(ptr, param);
+		break;
+	case TIMER_Z80_STOP_STATE:
+		megatech_z80_stop_state(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mtech_state::device_timer");
+	}
+}
+
 
 TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 {
@@ -266,7 +281,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	if (game_region)
 	{
 		{
-			machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(mtech_state::megatech_z80_run_state),this), param);
+			timer_set(attotime::zero, TIMER_Z80_RUN_STATE, param);
 		}
 	}
 	else
@@ -281,7 +296,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 
 void mtech_state::megatech_select_game(int gameno)
 {
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(mtech_state::megatech_z80_stop_state),this), gameno);
+	timer_set(attotime::zero, TIMER_Z80_STOP_STATE, gameno);
 }
 
 WRITE8_MEMBER(mtech_state::megatech_cart_select_w )

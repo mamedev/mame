@@ -31,6 +31,11 @@ Todo:
 class esh_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ_STOP
+	};
+
 	esh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
@@ -52,8 +57,10 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
-	TIMER_CALLBACK_MEMBER(irq_stop);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -282,16 +289,23 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx1", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
-TIMER_CALLBACK_MEMBER(esh_state::irq_stop)
+void esh_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ_STOP:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in esh_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
 {
 	// IRQ
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(esh_state::irq_stop),this));
+	timer_set(attotime::from_usec(50), TIMER_IRQ_STOP);
 }
 
 void esh_state::machine_start()

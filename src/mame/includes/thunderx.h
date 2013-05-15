@@ -8,6 +8,11 @@
 class thunderx_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_THUNDERX_FIRQ
+	};
+
 	thunderx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
@@ -58,10 +63,12 @@ public:
 	DECLARE_MACHINE_RESET(thunderx);
 	UINT32 screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(scontra_interrupt);
-	TIMER_CALLBACK_MEMBER(thunderx_firq_callback);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
 	void calculate_collisions(  );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

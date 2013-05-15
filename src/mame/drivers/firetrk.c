@@ -55,6 +55,19 @@ INTERRUPT_GEN_MEMBER(firetrk_state::firetrk_interrupt)
 }
 
 
+void firetrk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_PERIODIC:
+		periodic_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in firetrk_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(firetrk_state::periodic_callback)
 {
 	int scanline = param;
@@ -67,7 +80,7 @@ TIMER_CALLBACK_MEMBER(firetrk_state::periodic_callback)
 	if (scanline > 262)
 		scanline = 0;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(firetrk_state::periodic_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
 }
 
 

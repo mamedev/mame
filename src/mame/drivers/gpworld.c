@@ -47,6 +47,11 @@ Dumping Notes:
 class gpworld_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ_STOP
+	};
+
 	gpworld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
@@ -74,11 +79,13 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
-	TIMER_CALLBACK_MEMBER(irq_stop);
 	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -429,9 +436,16 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(gpworld_state::irq_stop)
+void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ_STOP:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gpworld_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
@@ -446,7 +460,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(gpworld_state::irq_stop),this));
+	timer_set(attotime::from_usec(100), TIMER_IRQ_STOP);
 }
 
 static const gfx_layout gpworld_tile_layout =

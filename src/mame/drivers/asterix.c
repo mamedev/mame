@@ -66,15 +66,22 @@ READ8_MEMBER(asterix_state::asterix_sound_r)
 	return m_k053260->k053260_r(space, 2 + offset);
 }
 
-TIMER_CALLBACK_MEMBER(asterix_state::nmi_callback)
+void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_NMI:
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in asterix_state::device_timer");
+	}
 }
 
 WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(asterix_state::nmi_callback),this));
+	timer_set(attotime::from_usec(5), TIMER_NMI);
 }
 
 WRITE16_MEMBER(asterix_state::sound_irq_w)

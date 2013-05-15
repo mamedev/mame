@@ -473,16 +473,22 @@ DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
   Toaplan games
 ***************************************************************************/
 
-
-TIMER_CALLBACK_MEMBER(toaplan2_state::toaplan2_raise_irq)
+void toaplan2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(param, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_RAISE_IRQ:
+		m_maincpu->set_input_line(param, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in toaplan2_state::device_timer");
+	}
 }
 
 void toaplan2_state::toaplan2_vblank_irq(int irq_line)
 {
 	// the IRQ appears to fire at line 0xe6
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0xe6), timer_expired_delegate(FUNC(toaplan2_state::toaplan2_raise_irq),this), irq_line);
+	timer_set(machine().primary_screen->time_until_pos(0xe6), TIMER_RAISE_IRQ, irq_line);
 }
 
 INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(1); }

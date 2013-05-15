@@ -78,6 +78,18 @@ WRITE8_MEMBER(toypop_state::toypop_sound_interrupt_disable_w)
 	m_sound_irq_mask = 0;
 }
 
+void toypop_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_NAMCOIO_RUN:
+		namcoio_run(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in toypop_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(toypop_state::namcoio_run)
 {
 	device_t *io58xx = machine().device("58xx");
@@ -108,13 +120,13 @@ INTERRUPT_GEN_MEMBER(toypop_state::toypop_main_vblank_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))        /* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(toypop_state::namcoio_run),this));
+		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN);
 
 	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(toypop_state::namcoio_run),this), 1);
+		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
 
 	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(toypop_state::namcoio_run),this), 2);
+		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 2);
 
 }
 

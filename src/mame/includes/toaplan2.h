@@ -13,6 +13,11 @@
 class toaplan2_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RAISE_IRQ
+	};
+
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
@@ -145,4 +150,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_device> m_eeprom;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

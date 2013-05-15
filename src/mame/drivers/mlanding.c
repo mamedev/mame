@@ -33,6 +33,11 @@ TODO:
 class mlanding_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DMA_COMPLETE
+	};
+
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -95,9 +100,11 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(dma_complete);
 	int start_dma();
 	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -306,9 +313,16 @@ WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 	m_adpcm_trigger ^= 1;
 }
 
-TIMER_CALLBACK_MEMBER(mlanding_state::dma_complete)
+void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_dma_active = 0;
+	switch (id)
+	{
+	case TIMER_DMA_COMPLETE:
+		m_dma_active = 0;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mlanding_state::device_timer");
+	}
 }
 
 /* TODO: this uses many bits */
@@ -322,7 +336,7 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	if (pixels)
 	{
 		m_dma_active = 1;
-		machine().scheduler().timer_set(attotime::from_msec(20), timer_expired_delegate(FUNC(mlanding_state::dma_complete),this));
+		timer_set(attotime::from_msec(20), TIMER_DMA_COMPLETE);
 	}
 
 	// 0 (falling edge?) starts cpus in this order:

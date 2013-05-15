@@ -18,6 +18,12 @@ TODO:
 class destroyr_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DESTROYR_DIAL,
+		TIMER_DESTROYR_FRAME
+	};
+
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_nuram"),
@@ -55,6 +61,9 @@ public:
 	UINT32 screen_update_destroyr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(destroyr_dial_callback);
 	TIMER_CALLBACK_MEMBER(destroyr_frame_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -124,6 +133,23 @@ UINT32 destroyr_state::screen_update_destroyr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+
+void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_DESTROYR_DIAL:
+		destroyr_dial_callback(ptr, param);
+		break;
+	case TIMER_DESTROYR_FRAME:
+		destroyr_frame_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in destroyr_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_dial_callback)
 {
 	int dial = param;
@@ -150,14 +176,14 @@ TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_frame_callback)
 	m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(ioport("PADDLE")->read()), timer_expired_delegate(FUNC(destroyr_state::destroyr_dial_callback),this));
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(destroyr_state::destroyr_frame_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(ioport("PADDLE")->read()), TIMER_DESTROYR_DIAL);
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
 }
 
 
 void destroyr_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(destroyr_state::destroyr_frame_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_DESTROYR_FRAME);
 
 	m_cursor = 0;
 	m_wavemod = 0;

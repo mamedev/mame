@@ -21,6 +21,12 @@ Etched in copper on top of board:
 class flyball_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_FLYBALL_JOYSTICK,
+		TIMER_FLYBALL_QUARTER
+	};
+
 	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
@@ -64,6 +70,9 @@ public:
 	UINT32 screen_update_flyball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(flyball_joystick_callback);
 	TIMER_CALLBACK_MEMBER(flyball_quarter_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -132,6 +141,22 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 }
 
 
+void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_FLYBALL_JOYSTICK:
+		flyball_joystick_callback(ptr, param);
+		break;
+	case TIMER_FLYBALL_QUARTER:
+		flyball_quarter_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in flyball_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(flyball_state::flyball_joystick_callback)
 {
 	int potsense = param;
@@ -157,12 +182,12 @@ TIMER_CALLBACK_MEMBER(flyball_state::flyball_quarter_callback)
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
-			machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline + i), timer_expired_delegate(FUNC(flyball_state::flyball_joystick_callback),this), potsense[i]);
+			timer_set(machine().primary_screen->time_until_pos(scanline + i), TIMER_FLYBALL_JOYSTICK, potsense[i]);
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(flyball_state::flyball_quarter_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_FLYBALL_QUARTER, scanline);
 
 	m_potsense = 0;
 	m_potmask = 0;
@@ -396,7 +421,7 @@ void flyball_state::machine_reset()
 
 	m_maincpu->reset();
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(flyball_state::flyball_quarter_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_FLYBALL_QUARTER);
 
 	m_pitcher_vert = 0;
 	m_pitcher_horz = 0;

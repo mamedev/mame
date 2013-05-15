@@ -14,6 +14,11 @@ struct tempsprite
 class galastrm_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_GALASTRM_INTERRUPT6
+	};
+
 	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
@@ -52,11 +57,13 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
-	TIMER_CALLBACK_MEMBER(galastrm_interrupt6);
 	void galastrm_exit();
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

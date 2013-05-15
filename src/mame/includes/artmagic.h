@@ -8,6 +8,11 @@
 class artmagic_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ_OFF
+	};
+
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
@@ -54,9 +59,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

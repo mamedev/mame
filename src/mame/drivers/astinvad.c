@@ -44,6 +44,12 @@ enum
 class astinvad_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INT_OFF,
+		TIMER_INT_GEN
+	};
+
 	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -87,6 +93,9 @@ public:
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
 	void plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -231,6 +240,22 @@ UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
+void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INT_OFF:
+		kamikaze_int_off(ptr, param);
+		break;
+	case TIMER_INT_GEN:
+		kamizake_int_gen(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in astinvad_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -245,13 +270,13 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 	m_int_timer->adjust(machine().primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	machine().scheduler().timer_set(attotime::from_double(300 * 0.1e-6), timer_expired_delegate(FUNC(astinvad_state::kamikaze_int_off),this));
+	timer_set(attotime::from_double(300 * 0.1e-6), TIMER_INT_OFF);
 }
 
 
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamizake_int_gen),this));
+	m_int_timer = timer_alloc(TIMER_INT_GEN);
 	m_int_timer->adjust(machine().primary_screen->time_until_pos(128), 128);
 
 	save_item(NAME(m_screen_flip));

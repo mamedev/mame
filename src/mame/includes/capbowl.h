@@ -9,6 +9,11 @@
 class capbowl_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_CAPBOWL_UPDATE
+	};
+
 	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rowaddress(*this, "rowaddress"),
@@ -47,4 +52,7 @@ public:
 	TIMER_CALLBACK_MEMBER(capbowl_update);
 	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
 	DECLARE_WRITE_LINE_MEMBER(firqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

@@ -54,11 +54,17 @@ INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(galastrm_state::galastrm_interrupt6)
+void galastrm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(6, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_GALASTRM_INTERRUPT6:
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in galastrm_state::device_timer");
+	}
 }
-
 
 
 WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
@@ -156,7 +162,7 @@ READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 
 WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(galastrm_state::galastrm_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_GALASTRM_INTERRUPT6);
 }
 
 /***********************************************************

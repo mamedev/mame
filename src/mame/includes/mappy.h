@@ -3,6 +3,14 @@
 class mappy_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SUPERPAC_IO_RUN,
+		TIMER_PACNPAL_IO_RUN,
+		TIMER_PHOZON_IO_RUN,
+		TIMER_MAPPY_IO_RUN
+	};
+
 	mappy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -74,4 +82,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_subcpu2;
 	optional_device<dac_device> m_dac;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

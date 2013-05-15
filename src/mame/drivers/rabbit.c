@@ -89,6 +89,11 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 class rabbit_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BLIT_DONE
+	};
+
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_viewregs0(*this, "viewregs0"),
@@ -140,7 +145,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_rabbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rabbit_vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(rabbit_blit_done);
 	inline void get_rabbit_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rabbit_clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -149,6 +153,9 @@ public:
 	void rabbit_do_blit();
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -561,9 +568,16 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-TIMER_CALLBACK_MEMBER(rabbit_state::rabbit_blit_done)
+void rabbit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_BLIT_DONE:
+		m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in rabbit_state::device_timer");
+	}
 }
 
 void rabbit_state::rabbit_do_blit()
@@ -610,7 +624,7 @@ void rabbit_state::rabbit_do_blit()
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(rabbit_state::rabbit_blit_done),this));
+					timer_set(attotime::from_usec(500), TIMER_BLIT_DONE);
 					return;
 				}
 

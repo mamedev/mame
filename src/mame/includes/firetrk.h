@@ -33,6 +33,11 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 class firetrk_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_PERIODIC
+	};
+
 	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
@@ -123,6 +128,9 @@ public:
 	void check_collision(firetrk_state *state, int which);
 	void set_service_mode(int enable);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

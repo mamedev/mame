@@ -132,11 +132,19 @@ WRITE16_MEMBER(artmagic_state::control_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(artmagic_state::irq_off)
+void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_hack_irq = 0;
-	update_irq_state(machine());
+	switch (id)
+	{
+	case TIMER_IRQ_OFF:
+		m_hack_irq = 0;
+		update_irq_state(machine());
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in artmagic_state::device_timer");
+	}
 }
+
 
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
@@ -146,7 +154,7 @@ READ16_MEMBER(artmagic_state::ultennis_hack_r)
 	{
 		m_hack_irq = 1;
 		update_irq_state(machine());
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(artmagic_state::irq_off),this));
+		timer_set(attotime::from_usec(1), TIMER_IRQ_OFF);
 	}
 	return ioport("300000")->read();
 }

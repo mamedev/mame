@@ -1,6 +1,11 @@
 class toypop_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NAMCOIO_RUN
+	};
+
 	toypop_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -62,4 +67,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

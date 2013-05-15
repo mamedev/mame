@@ -3,6 +3,11 @@
 class fgoal_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	fgoal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
@@ -51,4 +56,7 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	int intensity(int bits);
 	unsigned video_ram_address(  );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
