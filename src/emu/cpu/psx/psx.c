@@ -198,6 +198,37 @@ WRITE32_MEMBER( psxcpu_device::berr_w )
 	m_berr = 1;
 }
 
+READ32_MEMBER( psxcpu_device::exp_base_r )
+{
+	return m_exp_base;
+}
+
+WRITE32_MEMBER( psxcpu_device::exp_base_w )
+{
+	COMBINE_DATA( &m_exp_base ); // TODO: check byte writes
+
+	m_exp_base = 0x1f000000 | ( m_exp_base & 0xffffff );
+}
+
+UINT32 psxcpu_device::exp_base()
+{
+	return m_exp_base;
+}
+
+READ32_MEMBER( psxcpu_device::exp_config_r )
+{
+	return m_exp_config;
+}
+
+WRITE32_MEMBER( psxcpu_device::exp_config_w )
+{
+	UINT32 old = m_exp_config;
+
+	COMBINE_DATA( &m_exp_config ); // TODO: check byte writes
+
+	m_exp_config &= 0xaf1fffff;
+}
+
 READ32_MEMBER( psxcpu_device::ram_config_r )
 {
 	return m_ram_config;
@@ -207,7 +238,7 @@ WRITE32_MEMBER( psxcpu_device::ram_config_w )
 {
 	UINT32 old = m_ram_config;
 
-	COMBINE_DATA( &m_ram_config );
+	COMBINE_DATA( &m_ram_config ); // TODO: check byte writes
 
 	if( ( ( m_ram_config ^ old ) & 0xff00 ) != 0 )
 	{
@@ -224,12 +255,24 @@ WRITE32_MEMBER( psxcpu_device::rom_config_w )
 {
 	UINT32 old = m_rom_config;
 
-	COMBINE_DATA( &m_rom_config );
+	COMBINE_DATA( &m_rom_config ); // TODO: check byte writes
 
 	if( ( ( m_rom_config ^ old ) & 0x001f0000 ) != 0 )
 	{
 		update_rom_config();
 	}
+}
+
+READ32_HANDLER( psxcpu_device::com_delay_r )
+{
+	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
+	return m_com_delay;
+}
+
+WRITE32_HANDLER( psxcpu_device::com_delay_w )
+{
+	COMBINE_DATA( &m_com_delay ); // TODO: check byte writes
+	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
 READ32_MEMBER( psxcpu_device::biu_r )
@@ -241,7 +284,7 @@ WRITE32_MEMBER( psxcpu_device::biu_w )
 {
 	UINT32 old = m_biu;
 
-	COMBINE_DATA( &m_biu );
+	COMBINE_DATA( &m_biu ); // TODO: check byte writes
 
 	if( ( old & ( BIU_RAM | BIU_DS ) ) != ( m_biu & ( BIU_RAM | BIU_DS ) ) )
 	{
@@ -1633,7 +1676,10 @@ int psxcpu_device::store_data_address_breakpoint( UINT32 address )
 static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
-	AM_RANGE(0x1f801000, 0x1f80100f) AM_RAM
+	AM_RANGE(0x1f801000, 0x1f801003) AM_READWRITE( exp_base_r, exp_base_w )
+	AM_RANGE(0x1f801004, 0x1f801007) AM_RAM
+	AM_RANGE(0x1f801008, 0x1f80100b) AM_READWRITE( exp_config_r, exp_config_w )
+	AM_RANGE(0x1f80100c, 0x1f80100f) AM_RAM
 	AM_RANGE(0x1f801010, 0x1f801013) AM_READWRITE( rom_config_r, rom_config_w )
 	AM_RANGE(0x1f801014, 0x1f80101f) AM_RAM
 	/* 1f801014 spu delay */
@@ -3299,18 +3345,6 @@ READ8_HANDLER( psxcpu_device::cd_r )
 WRITE8_HANDLER( psxcpu_device::cd_w )
 {
 	m_cd_write_handler( space, offset, data, mem_mask );
-}
-
-WRITE32_HANDLER( psxcpu_device::com_delay_w )
-{
-	COMBINE_DATA( &m_com_delay );
-	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
-}
-
-READ32_HANDLER( psxcpu_device::com_delay_r )
-{
-	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
-	return m_com_delay;
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )

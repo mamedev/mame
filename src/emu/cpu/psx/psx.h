@@ -151,6 +151,14 @@ public:
 	DECLARE_WRITE32_MEMBER( berr_w );
 	DECLARE_READ32_MEMBER( berr_r );
 
+	UINT32 exp_base();
+
+	DECLARE_WRITE32_MEMBER( exp_base_w );
+	DECLARE_READ32_MEMBER( exp_base_r );
+
+	DECLARE_WRITE32_MEMBER( exp_config_w );
+	DECLARE_READ32_MEMBER( exp_config_r );
+
 	DECLARE_WRITE32_MEMBER( ram_config_w );
 	DECLARE_READ32_MEMBER( ram_config_r );
 
@@ -241,6 +249,8 @@ protected:
 	UINT32 m_bad_byte_address_mask;
 	UINT32 m_bad_half_address_mask;
 	UINT32 m_bad_word_address_mask;
+	UINT32 m_exp_base;
+	UINT32 m_exp_config;
 	UINT32 m_ram_config;
 	UINT32 m_rom_config;
 

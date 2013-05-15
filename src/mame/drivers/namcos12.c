@@ -1045,18 +1045,17 @@ public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
-		m_sharedram(*this, "sharedram") ,
+		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram")
 	{
 	}
 
 	required_device<rtc4543_device> m_rtc;
-	required_shared_ptr<UINT32> m_sharedram;
-	UINT32 m_n_bankoffset;
+	required_shared_ptr<UINT16> m_sharedram;
+	UINT16 m_n_bankoffset;
 
 	UINT32 m_n_dmaoffset;
-	UINT32 m_n_dmabias;
 	UINT32 m_n_tektagdmaoffset;
 	int m_has_tektagt_dma;
 
@@ -1069,20 +1068,17 @@ public:
 	int m_s12_setstate;
 	int m_s12_setnum;
 	int m_s12_settings[8];
-	DECLARE_WRITE32_MEMBER(sharedram_w);
-	DECLARE_READ32_MEMBER(sharedram_r);
-	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
-	DECLARE_READ16_MEMBER(sharedram_sub_r);
-	DECLARE_WRITE32_MEMBER(bankoffset_w);
-	DECLARE_WRITE32_MEMBER(dmaoffset_w);
-	DECLARE_WRITE32_MEMBER(s12_dma_bias_w);
-	DECLARE_WRITE32_MEMBER(system11gun_w);
-	DECLARE_READ32_MEMBER(system11gun_r);
-	DECLARE_WRITE32_MEMBER(tektagt_protection_1_w);
-	DECLARE_READ32_MEMBER(tektagt_protection_1_r);
-	DECLARE_WRITE32_MEMBER(tektagt_protection_2_w);
-	DECLARE_READ32_MEMBER(tektagt_protection_2_r);
-	DECLARE_READ32_MEMBER(tektagt_protection_3_r);
+	DECLARE_WRITE16_MEMBER(sharedram_w);
+	DECLARE_READ16_MEMBER(sharedram_r);
+	DECLARE_WRITE16_MEMBER(bankoffset_w);
+	DECLARE_WRITE16_MEMBER(dmaoffset_w);
+	DECLARE_WRITE16_MEMBER(system11gun_w);
+	DECLARE_READ16_MEMBER(system11gun_r);
+	DECLARE_WRITE16_MEMBER(tektagt_protection_1_w);
+	DECLARE_READ16_MEMBER(tektagt_protection_1_r);
+	DECLARE_WRITE16_MEMBER(tektagt_protection_2_w);
+	DECLARE_READ16_MEMBER(tektagt_protection_2_r);
+	DECLARE_READ16_MEMBER(tektagt_protection_3_r);
 	DECLARE_READ8_MEMBER(s12_mcu_p8_r);
 	DECLARE_READ8_MEMBER(s12_mcu_pa_r);
 	DECLARE_WRITE8_MEMBER(s12_mcu_pa_w);
@@ -1093,13 +1089,11 @@ public:
 	DECLARE_READ8_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ8_MEMBER(s12_mcu_gun_v_r);
 	DECLARE_DRIVER_INIT(namcos12);
-	DECLARE_DRIVER_INIT(ghlpanic);
 	DECLARE_DRIVER_INIT(ptblank2);
 	DECLARE_MACHINE_RESET(namcos12);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
-	void system11gun_install(  );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -1117,33 +1111,19 @@ inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char
 	}
 }
 
-WRITE32_MEMBER(namcos12_state::sharedram_w)
+WRITE16_MEMBER(namcos12_state::sharedram_w)
 {
 	verboselog(1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &m_sharedram[ offset ] );
 }
 
-READ32_MEMBER(namcos12_state::sharedram_r)
+READ16_MEMBER(namcos12_state::sharedram_r)
 {
 	verboselog(1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
 	return m_sharedram[ offset ];
 }
 
-WRITE16_MEMBER(namcos12_state::sharedram_sub_w)
-{
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
-
-	COMBINE_DATA(&shared16[BYTE_XOR_LE(offset)]);
-}
-
-READ16_MEMBER(namcos12_state::sharedram_sub_r)
-{
-	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
-
-	return shared16[BYTE_XOR_LE(offset)];
-}
-
-WRITE32_MEMBER(namcos12_state::bankoffset_w)
+WRITE16_MEMBER(namcos12_state::bankoffset_w)
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
 	if( strcmp( machine().system().name, "golgo13" ) == 0 ||
@@ -1168,16 +1148,16 @@ WRITE32_MEMBER(namcos12_state::bankoffset_w)
 	verboselog(1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
 
-WRITE32_MEMBER(namcos12_state::dmaoffset_w)
+WRITE16_MEMBER(namcos12_state::dmaoffset_w)
 {
-	if( ACCESSING_BITS_0_15 )
+	m_n_dmaoffset = ( offset * 2 ) | ( data << 16 );
+
+	/// HACK: it's unclear how exp_cfg & exp_base really play a part in this.
+	if( m_maincpu->exp_base() == 0x1f300000 )
 	{
-		m_n_dmaoffset = ( offset * 4 ) | ( data << 16 );
+		m_n_dmaoffset |= 0x80000000;
 	}
-	if( ACCESSING_BITS_16_31 )
-	{
-		m_n_dmaoffset = ( ( offset * 4 ) + 2 ) | ( data & 0xffff0000 );
-	}
+
 	verboselog(1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
@@ -1201,7 +1181,7 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
 		verboselog(1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
 	}
-	else if( ( m_n_dmaoffset >= 0x80000000 ) || ( m_n_dmabias == 0x1f300000 ) )
+	else if( m_n_dmaoffset >= 0x80000000 )
 	{
 		n_region = "maincpu:rom";
 		n_offset = m_n_dmaoffset & 0x003fffff;
@@ -1249,24 +1229,35 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 	irq1_line_pulse( *machine().device( "sub" ) );
 }
 
-WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
-{
-	m_n_dmabias = data;
-}
-
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
-	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)          /* banking */
-	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram") /* shared ram?? */
+	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE16(bankoffset_w, 0x0000ffff)          /* banking */
+	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE16(sharedram_r, sharedram_w, 0xffffffff) /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE(dmaoffset_w)  /* dma */
+	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE16(dmaoffset_w, 0xffffffff)  /* dma */
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 ADDRESS_MAP_END
 
-WRITE32_MEMBER(namcos12_state::system11gun_w)
+static ADDRESS_MAP_START( ptblank2_map, AS_PROGRAM, 32, namcos12_state )
+	AM_IMPORT_FROM( namcos12_map )
+
+	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(system11gun_r, 0xffffffff)
+	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(system11gun_w, 0xffffffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tektagt_map, AS_PROGRAM, 32, namcos12_state )
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE16(tektagt_protection_1_r, tektagt_protection_1_w, 0xffffffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_READWRITE16(tektagt_protection_2_r, tektagt_protection_2_w, 0xffffffff)
+	AM_RANGE(0x1f700000, 0x1f700003) AM_READ16(tektagt_protection_3_r, 0xffffffff)
+
+	AM_IMPORT_FROM( namcos12_map )
+ADDRESS_MAP_END
+
+WRITE16_MEMBER(namcos12_state::system11gun_w)
 {
-	if( ACCESSING_BITS_0_15 )
+	switch( offset )
 	{
+	case 0:
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
@@ -1278,88 +1269,129 @@ WRITE32_MEMBER(namcos12_state::system11gun_w)
 		/* start 2 */
 		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
 
-
 		verboselog(1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
-	}
-	if( ACCESSING_BITS_16_31 )
-	{
+		break;
+
+	case 1:
 		verboselog(2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
+		break;
 	}
 }
 
-READ32_MEMBER(namcos12_state::system11gun_r)
+READ16_MEMBER(namcos12_state::system11gun_r)
 {
-	UINT32 data = 0;
+	UINT16 data = 0;
+
 	switch( offset )
 	{
 	case 0:
 		data = ioport("LIGHT0_X")->read();
 		break;
-	case 1:
-		data = ( ioport("LIGHT0_Y")->read() ) | ( ( ioport("LIGHT0_Y")->read() + 1 ) << 16 );
-		break;
+
 	case 2:
+		data = ioport("LIGHT0_Y")->read();
+		break;
+
+	case 3:
+		 data = ioport("LIGHT0_Y")->read() + 1;
+		break;
+
+	case 4:
 		data = ioport("LIGHT1_X")->read();
 		break;
-	case 3:
-		data = ( ioport("LIGHT1_Y")->read() ) | ( ( ioport("LIGHT1_Y")->read() + 1 ) << 16 );
+
+	case 6:
+		data = ioport("LIGHT1_Y")->read();
+		break;
+
+	case 7:
+		data = ioport("LIGHT1_Y")->read() + 1;
 		break;
 	}
 	verboselog(2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-void namcos12_state::system11gun_install(  )
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos12_state::system11gun_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos12_state::system11gun_r),this));
-}
-
-WRITE32_MEMBER(namcos12_state::tektagt_protection_1_w)
+WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
 {
 	// Second dma offset or protection ref values write
-	m_n_tektagdmaoffset = data;
-	if(m_ttt_cnt != 2)
-		m_ttt_val[m_ttt_cnt++] = data;
+
+	switch(offset)
+	{
+	case 0:
+		m_n_tektagdmaoffset = data;
+
+		if(m_ttt_cnt != 2)
+			m_ttt_val[m_ttt_cnt] = data;
+		break;
+	case 1:
+		m_n_tektagdmaoffset |= data << 16;
+
+		if(m_ttt_cnt != 2)
+			m_ttt_val[m_ttt_cnt++] |= data << 16;
+		break;
+	}
 }
 
-READ32_MEMBER(namcos12_state::tektagt_protection_1_r)
+READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
 {
-	// Reads are either ignored or bit 15 is tested for a busy flag
-	return 0x8000;
+	switch(offset)
+	{
+	case 0:
+		// Reads are either ignored or bit 15 is tested for a busy flag
+		return 0x8000;
+	}
+
+	return 0;
 }
 
-WRITE32_MEMBER(namcos12_state::tektagt_protection_2_w)
+WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
 {
-	// Writes are 0 or rand(), only used as a "start prot value write" trigger
-	m_ttt_cnt = 0;
+	switch( offset )
+	{
+	case 0:
+		// Writes are 0 or rand(), only used as a "start prot value write" trigger
+		m_ttt_cnt = 0;
+	}
 }
 
-READ32_MEMBER(namcos12_state::tektagt_protection_2_r)
+READ16_MEMBER(namcos12_state::tektagt_protection_2_r)
 {
-	UINT32 *ttt_val = m_ttt_val;
-	UINT32 data = 0;
+	if( m_ttt_cnt == 2 )
+	{
+		if( m_ttt_val[0] == 0x806d2c24 && m_ttt_val[1] == 0xd5545715 )
+		{
+			if( offset == 0 )
+				return 0x36e2;
+		}
+		else if( m_ttt_val[0] == 0x804c2c84 && m_ttt_val[1] == 0xd5545615 )
+		{
+			if( offset == 0 )
+				return 0x2651;
+		}
+		else if( m_ttt_val[0] == 0x2aaba8e6 && m_ttt_val[1] == 0x00820040 )
+		{
+			if( offset == 1 )
+				return 0x4186;
+		}
+		else if( m_ttt_val[0] == 0x2aaba592 && m_ttt_val[1] == 0x01780544 )
+		{
+			if( offset == 1 )
+				return 0x3c7d;
+		}
+		else
+		{
+			if(((m_ttt_val[1] >> 16) & 0xff) == 0xa9)
+				return 0x552e;
+		}
+	}
 
-	if(((ttt_val[0] >> 16) & 0xff) == 0x6d)
-		data |= 0x000036e2;
-
-	if(((ttt_val[0] >> 16) & 0xff) == 0x4c)
-		data |= 0x00002651;
-
-	if(((ttt_val[1] >> 16) & 0xff) == 0x82)
-		data |= 0x41860000;
-
-	if(((ttt_val[1] >> 16) & 0xff) == 0x78)
-		data |= 0x3c7d0000;
-
-	if(((ttt_val[1] >> 16) & 0xff) == 0xa9)
-		data |= 0x552e0000;
-
-	return data;
+	return 0;
 }
 
-READ32_MEMBER(namcos12_state::tektagt_protection_3_r)
+READ16_MEMBER(namcos12_state::tektagt_protection_3_r)
 {
+	m_has_tektagt_dma = 1;
 	// Always ignored
 	return 0;
 }
@@ -1367,25 +1399,9 @@ READ32_MEMBER(namcos12_state::tektagt_protection_3_r)
 MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bankoffset_w(space,0,0,0xffffffff);
-
-	space.install_write_handler(0x1f801000, 0x1f801003, write32_delegate(FUNC(namcos12_state::s12_dma_bias_w),this));
+	bankoffset_w(space,0,0,0xffff);
 
 	m_has_tektagt_dma = 0;
-
-
-	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac" ) == 0 ||
-		strcmp( machine().system().name, "tektagtac1" ) == 0 ||
-		strcmp( machine().system().name, "tektagtub" ) == 0 ||
-		strcmp( machine().system().name, "tektagtjb" ) == 0 ||
-		strcmp( machine().system().name, "tektagtja" ) == 0 )
-	{
-		m_has_tektagt_dma = 1;
-		space.install_readwrite_handler(0x1fb00000, 0x1fb00003, read32_delegate(FUNC(namcos12_state::tektagt_protection_1_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_1_w),this));
-		space.install_readwrite_handler(0x1fb80000, 0x1fb80003, read32_delegate(FUNC(namcos12_state::tektagt_protection_2_r),this), write32_delegate(FUNC(namcos12_state::tektagt_protection_2_w),this));
-		space.install_read_handler(0x1f700000, 0x1f700003, read32_delegate(FUNC(namcos12_state::tektagt_protection_3_r),this));
-	}
 
 	if( strcmp( machine().system().name, "tektagt" ) == 0 ||
 		strcmp( machine().system().name, "tektagtac" ) == 0 ||
@@ -1409,7 +1425,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 		strcmp( machine().system().name, "truckk" ) == 0 ||
 		strcmp( machine().system().name, "ghlpanic" ) == 0 )
 	{
-		/* this is based on guesswork, it might not even be keycus. */
+		/* HACK: this is based on guesswork, it might not even be keycus. */
 		UINT8 *rom = memregion( "maincpu:rom" )->base() + 0x20280;
 		UINT8 *ram = m_ram->pointer() + 0x10000;
 
@@ -1420,7 +1436,7 @@ MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(sharedram_sub_r, sharedram_sub_w )
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
@@ -1577,12 +1593,10 @@ DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 
 	m_n_tektagdmaoffset = 0;
 	m_n_dmaoffset = 0;
-	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
 	membank( "bank1" )->set_entry( 0 );
 
 	save_item( NAME(m_n_dmaoffset) );
-	save_item( NAME(m_n_dmabias) );
 	save_item( NAME(m_n_bankoffset) );
 }
 
@@ -1590,17 +1604,8 @@ DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 {
 	DRIVER_INIT_CALL(namcos12);
 
-	/* patch out wait for dma 5 to complete */
+	/* HACK: patch out wait for dma 5 to complete */
 	*( (UINT32 *)( memregion( "maincpu:rom" )->base() + 0x331c4 ) ) = 0;
-
-	system11gun_install();
-}
-
-DRIVER_INIT_MEMBER(namcos12_state,ghlpanic)
-{
-	DRIVER_INIT_CALL(namcos12);
-
-	system11gun_install();
 }
 
 static MACHINE_CONFIG_START( coh700, namcos12_state )
@@ -1636,6 +1641,17 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tektagt, coh700 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( tektagt_map )
+MACHINE_CONFIG_END
+
 
 static INPUT_PORTS_START( namcos12 )
 	PORT_START("DSW")
@@ -2773,18 +2789,18 @@ GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12_state, namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC037 */
 GAME( 1999, pacapp,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC038 */
-GAME( 1999, ptblank2,  0,        coh700,   ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
-GAME( 1999, gunbarl,   ptblank2, coh700,   ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
+GAME( 1999, ptblank2,  0,        ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
+GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2, namcos12_state, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
 GAME( 1999, sws99,     0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC043 */
-GAME( 1999, tektagt,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", GAME_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtac, tektagt,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 1)", GAME_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtac1,tektagt,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 2)", GAME_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtub, tektagt,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", GAME_IMPERFECT_SOUND ) /* KC044 */
-GAME( 1999, tektagtjb, tektagt,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
-GAME( 1999, tektagtja, tektagt,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
-GAME( 1999, ghlpanic,  0,        coh700,   ghlpanic, namcos12_state, ghlpanic, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
+GAME( 1999, tektagt,   0,        tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", GAME_IMPERFECT_SOUND ) /* KC044 */
+GAME( 1999, tektagtac, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 1)", GAME_IMPERFECT_SOUND ) /* KC044 */
+GAME( 1999, tektagtac1,tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1, set 2)", GAME_IMPERFECT_SOUND ) /* KC044 */
+GAME( 1999, tektagtub, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.B)", GAME_IMPERFECT_SOUND ) /* KC044 */
+GAME( 1999, tektagtjb, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.B)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
+GAME( 1999, tektagtja, tektagt,  tektagt,  namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Japan, TEG1/VER.A3)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC044 */
+GAME( 1999, ghlpanic,  0,        ptblank2, ghlpanic, namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Ghoul Panic (Asia, OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
 GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion 2 (Japan, PKS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC046 */
-GAME( 1999, mrdrillr,  0,        coh700,   namcos124w, namcos12_state,namcos12,ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
+GAME( 1999, mrdrillr,  0,        coh700,   namcos124w,namcos12_state,namcos12,ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
