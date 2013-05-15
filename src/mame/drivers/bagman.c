@@ -943,5 +943,5 @@ GAME( 1982, bagmans2, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, 
 GAME( 1984, sbagman,  0,       bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation", "Super Bagman", 0 )
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
 GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", 0 )
-GAME( 1984, botanic,  0,       botanic, botanic, driver_device, 0,       ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
+GAME( 1984, botanic,  0,       botanic, botanic, driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", 0 ) // the game was made by Itisa, there is a Spanish original (not yet dumped)
 GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", 0 )
