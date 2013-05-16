@@ -7,7 +7,7 @@
     THIS SYSTEM IS NOT EMULATED!!!
 
     68340 based system like MPU5/SC4?
-    used by JPM (Post SEGA buyouT)? + Others? Manufactured by Heber Ltd.
+    used by JPM (Post SEGA buyout)? + Others? Manufactured by Heber Ltd.
 
     this seems very close to astrafr.c
     (although these contain more text)
