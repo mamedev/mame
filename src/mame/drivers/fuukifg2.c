@@ -444,7 +444,7 @@ void fuuki16_state::machine_reset()
 	const rectangle &visarea = machine().primary_screen->visible_area();
 
 	timer_set(machine().primary_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
-	timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_LEVEL_1_INTERRUPT);
+	timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
 	m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 
