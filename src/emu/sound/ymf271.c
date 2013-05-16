@@ -1742,8 +1742,8 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 		m_ext_read_handler(*this),
 		m_ext_write_handler(*this)
 {
-	memset(m_slots, 0, sizeof(&m_slots));
-	memset(m_groups, 0, sizeof(&m_groups));
+	memset(m_slots, 0, sizeof(m_slots));
+	memset(m_groups, 0, sizeof(m_groups));
 }
 
 //-------------------------------------------------
