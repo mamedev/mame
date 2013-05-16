@@ -1214,10 +1214,16 @@ Addresses found at @0x510, cpu2
 
 WRITE8_MEMBER(dkong_state::M58817_command_w)
 {
-	device_t *device = machine().device("tms");
-	tms5110_ctl_w(device, space, 0, data & 0x0f);
-	tms5110_pdc_w(device, (data>>4) & 0x01);
+	tms5110_device *tms5110 = machine().device<tms5110_device>("tms");
+	tms5110->ctl_w(space, 0, data & 0x0f);
+	tms5110->pdc_w((data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
+}
+
+READ8_DEVICE_HANDLER(M58817_status_r)
+{
+	m58817_device *m58817 = (m58817_device *) device;
+	return m58817->status_r(space, offset, mem_mask);
 }
 
 
@@ -1415,7 +1421,7 @@ MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 	MCFG_LATCH8_ADD( "virtual_p1" ) /* virtual latch for port A */
 	MCFG_LATCH8_INVERT( 0x80 )      /* signal is inverted       */
 	MCFG_LATCH8_DEVREAD(7, "ls259.6h", latch8_r, 3)
-	MCFG_LATCH8_DEVREAD(6, "tms", m58817_status_r, 0)
+	MCFG_LATCH8_DEVREAD(6, "tms", M58817_status_r, 0)
 
 	/* tms memory controller */
 	MCFG_DEVICE_ADD("m58819", M58819, 0)

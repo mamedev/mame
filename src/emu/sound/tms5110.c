@@ -64,7 +64,6 @@
 #include "tms5110.h"
 
 #define MAX_SAMPLE_CHUNK        512
-#define FIFO_SIZE               64 // TODO: technically the tms51xx chips don't have a fifo at all
 
 /* Variants */
 
@@ -84,240 +83,106 @@
 #define CTL_STATE_OUTPUT        (1)
 #define CTL_STATE_NEXT_OUTPUT   (2)
 
-struct tms5110_state
-{
-	/* coefficient tables */
-	int variant;                /* Variant of the 5110 - see tms5110.h */
-
-	/* coefficient tables */
-	const struct tms5100_coeffs *coeff;
-
-	/* these contain data that describes the 64 bits FIFO */
-	UINT8 fifo[FIFO_SIZE];
-	UINT8 fifo_head;
-	UINT8 fifo_tail;
-	UINT8 fifo_count;
-
-	/* these contain global status bits */
-	UINT8 PDC;
-	UINT8 CTL_pins;
-	UINT8 speaking_now;
-	UINT8 talk_status;
-	UINT8 state;
-
-	/* Rom interface */
-	UINT32 address;
-	UINT8  next_is_address;
-	UINT8  schedule_dummy_read;
-	UINT8  addr_bit;
-
-	/* external callback */
-	int (*M0_callback)(device_t *);
-	void (*set_load_address)(device_t *, int);
-
-	/* callbacks */
-	devcb_resolved_write_line m0_func;      /* the M0 line */
-	devcb_resolved_write_line m1_func;      /* the M1 line */
-	devcb_resolved_write8 addr_func;        /* Write to ADD1,2,4,8 - 4 address bits */
-	devcb_resolved_read_line data_func;     /* Read one bit from ADD8/Data - voice data */
-	devcb_resolved_write_line romclk_func;  /* rom clock - Only used to drive the data lines */
-
-
-	device_t *device;
-
-	/* these contain data describing the current and previous voice frames */
-	UINT16 old_energy;
-	UINT16 old_pitch;
-	INT32 old_k[10];
-
-	UINT16 new_energy;
-	UINT16 new_pitch;
-	INT32 new_k[10];
-
-
-	/* these are all used to contain the current state of the sound generation */
-	UINT16 current_energy;
-	UINT16 current_pitch;
-	INT32 current_k[10];
-
-	UINT16 target_energy;
-	UINT16 target_pitch;
-	INT32 target_k[10];
-
-	UINT8 interp_count;       /* number of interp periods (0-7) */
-	UINT8 sample_count;       /* sample number within interp (0-24) */
-	INT32 pitch_count;
-
-	INT32 x[11];
-
-	INT32 RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
-
-	const tms5110_interface *intf;
-	const UINT8 *table;
-	sound_stream *stream;
-	INT32 speech_rom_bitnum;
-
-	emu_timer *romclk_hack_timer;
-	UINT8 romclk_hack_timer_started;
-	UINT8 romclk_hack_state;
-};
-
-struct tmsprom_state
-{
-	/* Rom interface */
-	UINT32 address;
-	/* ctl lines */
-	UINT8  m0;
-	UINT8  enable;
-	UINT32  base_address;
-	UINT8  bit;
-
-	int prom_cnt;
-
-	int    clock;
-	const UINT8 *rom;
-	const UINT8 *prom;
-
-	devcb_resolved_write_line pdc_func;     /* tms pdc func */
-	devcb_resolved_write8 ctl_func;         /* tms ctl func */
-
-	device_t *device;
-	emu_timer *romclk_timer;
-
-	const tmsprom_interface *intf;
-};
-
 /* Pull in the ROM tables */
 #include "tms5110r.c"
 
-
-
-INLINE tms5110_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TMS5110 ||
-			device->type() == TMS5100 ||
-			device->type() == TMS5110A ||
-			device->type() == CD2801 ||
-			device->type() == TMC0281 ||
-			device->type() == CD2802 ||
-			device->type() == M58817);
-	return (tms5110_state *)downcast<tms5110_device *>(device)->token();
-}
-
-INLINE tmsprom_state *get_safe_token_prom(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TMSPROM);
-	return (tmsprom_state *)downcast<tmsprom_device *>(device)->token();
-}
-
-/* Static function prototypes */
-static void tms5110_set_variant(tms5110_state *tms, int variant);
-static void tms5110_PDC_set(tms5110_state *tms, int data);
-static void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size);
-static void parse_frame(tms5110_state *tms);
-static STREAM_UPDATE( tms5110_update );
-static TIMER_CALLBACK( romclk_hack_timer_cb );
-
-
 #define DEBUG_5110  0
 
-void tms5110_set_variant(tms5110_state *tms, int variant)
+void tms5110_device::set_variant(int variant)
 {
 	switch (variant)
 	{
 		case TMS5110_IS_5110A:
-			tms->coeff = &tms5110a_coeff;
+			m_coeff = &tms5110a_coeff;
 			break;
 		case TMS5110_IS_5100:
-			tms->coeff = &pat4209836_coeff;
+			m_coeff = &pat4209836_coeff;
 			break;
 		case TMS5110_IS_5110:
-			tms->coeff = &pat4403965_coeff;
+			m_coeff = &pat4403965_coeff;
 			break;
 		default:
 			fatalerror("Unknown variant in tms5110_create\n");
 	}
 
-	tms->variant = variant;
+	m_variant = variant;
 }
 
-static void new_int_write(tms5110_state *tms, UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+void tms5110_device::new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
 {
-	if (!tms->m0_func.isnull())
-		tms->m0_func(m0);
-	if (!tms->m1_func.isnull())
-		tms->m1_func(m1);
-	if (!tms->addr_func.isnull())
-		tms->addr_func(0, addr);
-	if (!tms->romclk_func.isnull())
+	if (!m_m0_func.isnull())
+		m_m0_func(m0);
+	if (!m_m1_func.isnull())
+		m_m1_func(m1);
+	if (!m_addr_func.isnull())
+		m_addr_func(0, addr);
+	if (!m_romclk_func.isnull())
 	{
 		//printf("rc %d\n", rc);
-		tms->romclk_func(rc);
+		m_romclk_func(rc);
 	}
 }
 
-static void new_int_write_addr(tms5110_state *tms, UINT8 addr)
+void tms5110_device::new_int_write_addr(UINT8 addr)
 {
-	new_int_write(tms, 1, 0, 1, addr);
-	new_int_write(tms, 0, 0, 1, addr);
-	new_int_write(tms, 1, 0, 0, addr);
-	new_int_write(tms, 0, 0, 0, addr);
+	new_int_write(1, 0, 1, addr);
+	new_int_write(0, 0, 1, addr);
+	new_int_write(1, 0, 0, addr);
+	new_int_write(0, 0, 0, addr);
 }
 
-static UINT8 new_int_read(tms5110_state *tms)
+UINT8 tms5110_device::new_int_read()
 {
-	new_int_write(tms, 1, 1, 0, 0);
-	new_int_write(tms, 0, 1, 0, 0);
-	new_int_write(tms, 1, 0, 0, 0);
-	new_int_write(tms, 0, 0, 0, 0);
-	if (!tms->data_func.isnull())
-		return tms->data_func();
+	new_int_write(1, 1, 0, 0);
+	new_int_write(0, 1, 0, 0);
+	new_int_write(1, 0, 0, 0);
+	new_int_write(0, 0, 0, 0);
+	if (!m_data_func.isnull())
+		return m_data_func();
 	return 0;
 }
 
-static void register_for_save_states(tms5110_state *tms)
+void tms5110_device::register_for_save_states()
 {
-	tms->device->save_item(NAME(tms->fifo));
-	tms->device->save_item(NAME(tms->fifo_head));
-	tms->device->save_item(NAME(tms->fifo_tail));
-	tms->device->save_item(NAME(tms->fifo_count));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_head));
+	save_item(NAME(m_fifo_tail));
+	save_item(NAME(m_fifo_count));
 
-	tms->device->save_item(NAME(tms->PDC));
-	tms->device->save_item(NAME(tms->CTL_pins));
-	tms->device->save_item(NAME(tms->speaking_now));
-	tms->device->save_item(NAME(tms->talk_status));
-	tms->device->save_item(NAME(tms->state));
+	save_item(NAME(m_PDC));
+	save_item(NAME(m_CTL_pins));
+	save_item(NAME(m_speaking_now));
+	save_item(NAME(m_talk_status));
+	save_item(NAME(m_state));
 
-	tms->device->save_item(NAME(tms->old_energy));
-	tms->device->save_item(NAME(tms->old_pitch));
-	tms->device->save_item(NAME(tms->old_k));
+	save_item(NAME(m_old_energy));
+	save_item(NAME(m_old_pitch));
+	save_item(NAME(m_old_k));
 
-	tms->device->save_item(NAME(tms->new_energy));
-	tms->device->save_item(NAME(tms->new_pitch));
-	tms->device->save_item(NAME(tms->new_k));
+	save_item(NAME(m_new_energy));
+	save_item(NAME(m_new_pitch));
+	save_item(NAME(m_new_k));
 
-	tms->device->save_item(NAME(tms->current_energy));
-	tms->device->save_item(NAME(tms->current_pitch));
-	tms->device->save_item(NAME(tms->current_k));
+	save_item(NAME(m_current_energy));
+	save_item(NAME(m_current_pitch));
+	save_item(NAME(m_current_k));
 
-	tms->device->save_item(NAME(tms->target_energy));
-	tms->device->save_item(NAME(tms->target_pitch));
-	tms->device->save_item(NAME(tms->target_k));
+	save_item(NAME(m_target_energy));
+	save_item(NAME(m_target_pitch));
+	save_item(NAME(m_target_k));
 
-	tms->device->save_item(NAME(tms->interp_count));
-	tms->device->save_item(NAME(tms->sample_count));
-	tms->device->save_item(NAME(tms->pitch_count));
+	save_item(NAME(m_interp_count));
+	save_item(NAME(m_sample_count));
+	save_item(NAME(m_pitch_count));
 
-	tms->device->save_item(NAME(tms->next_is_address));
-	tms->device->save_item(NAME(tms->address));
-	tms->device->save_item(NAME(tms->schedule_dummy_read));
-	tms->device->save_item(NAME(tms->addr_bit));
+	save_item(NAME(m_next_is_address));
+	save_item(NAME(m_address));
+	save_item(NAME(m_schedule_dummy_read));
+	save_item(NAME(m_addr_bit));
 
-	tms->device->save_item(NAME(tms->x));
+	save_item(NAME(m_x));
 
-	tms->device->save_item(NAME(tms->RNG));
+	save_item(NAME(m_RNG));
 }
 
 
@@ -328,17 +193,17 @@ static void register_for_save_states(tms5110_state *tms)
      FIFO_data_write -- handle bit data write to the TMS5110 (as a result of toggling M0 pin)
 
 ******************************************************************************************/
-static void FIFO_data_write(tms5110_state *tms, int data)
+void tms5110_device::FIFO_data_write(int data)
 {
 	/* add this bit to the FIFO */
-	if (tms->fifo_count < FIFO_SIZE)
+	if (m_fifo_count < FIFO_SIZE)
 	{
-		tms->fifo[tms->fifo_tail] = (data&1); /* set bit to 1 or 0 */
+		m_fifo[m_fifo_tail] = (data&1); /* set bit to 1 or 0 */
 
-		tms->fifo_tail = (tms->fifo_tail + 1) % FIFO_SIZE;
-		tms->fifo_count++;
+		m_fifo_tail = (m_fifo_tail + 1) % FIFO_SIZE;
+		m_fifo_count++;
 
-		if (DEBUG_5110) logerror("Added bit to FIFO (size=%2d)\n", tms->fifo_count);
+		if (DEBUG_5110) logerror("Added bit to FIFO (size=%2d)\n", m_fifo_count);
 	}
 	else
 	{
@@ -352,56 +217,55 @@ static void FIFO_data_write(tms5110_state *tms, int data)
 
 ******************************************************************************************/
 
-static int extract_bits(tms5110_state *tms, int count)
+int tms5110_device::extract_bits(int count)
 {
 	int val = 0;
 
 	while (count--)
 	{
-		val = (val << 1) | (tms->fifo[tms->fifo_head] & 1);
-		tms->fifo_count--;
-		tms->fifo_head = (tms->fifo_head + 1) % FIFO_SIZE;
+		val = (val << 1) | (m_fifo[m_fifo_head] & 1);
+		m_fifo_count--;
+		m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
 	}
 	return val;
 }
 
-static void request_bits(tms5110_state *tms, int no)
+void tms5110_device::request_bits(int no)
 {
-int i;
-	for (i=0; i<no; i++)
+	for (int i=0; i<no; i++)
 	{
-		if (tms->M0_callback)
+		if (m_M0_callback)
 		{
-			int data = (*tms->M0_callback)(tms->device);
-			FIFO_data_write(tms, data);
+			int data = (*m_M0_callback)(this);
+			FIFO_data_write(data);
 		}
 		else
 		{
 			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
-			UINT8 data = new_int_read(tms);
-			FIFO_data_write(tms, data);
+			UINT8 data = new_int_read();
+			FIFO_data_write(data);
 		}
 	}
 }
 
-static void perform_dummy_read(tms5110_state *tms)
+void tms5110_device::perform_dummy_read()
 {
-	if (tms->schedule_dummy_read)
+	if (m_schedule_dummy_read)
 	{
-		if (tms->M0_callback)
+		if (m_M0_callback)
 		{
-			int data = (*tms->M0_callback)(tms->device);
+			int data = (*m_M0_callback)(this);
 
 			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
 		}
 		else
 		{
-			int data = new_int_read(tms);
+			int data = new_int_read();
 
 			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
 			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
 		}
-		tms->schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = FALSE;
 	}
 }
 
@@ -414,18 +278,18 @@ static void perform_dummy_read(tms5110_state *tms)
 
 ***********************************************************************************************/
 
-void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
+void tms5110_device::process(INT16 *buffer, unsigned int size)
 {
 	int buf_count=0;
 	int i, interp_period, bitout;
 	INT16 Y11, cliptemp;
 
 	/* if we're not speaking, fill with nothingness */
-	if (!tms->speaking_now)
+	if (!m_speaking_now)
 		goto empty;
 
 	/* if we're to speak, but haven't started */
-	if (!tms->talk_status)
+	if (!m_talk_status)
 	{
 	/* a "dummy read" is mentioned in the tms5200 datasheet */
 	/* The Bagman speech roms data are organized in such a way that
@@ -433,67 +297,67 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 	** is the speech data. It seems that the tms5110 performs a dummy read
 	** just before it executes a SPEAK command.
 	** This has been moved to command logic ...
-	**  perform_dummy_read(tms);
+	**  perform_dummy_read();
 	*/
 
 		/* clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
-		tms->new_energy = 0;
-		tms->new_pitch = 0;
-		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->new_k[i] = 0;
+		m_new_energy = 0;
+		m_new_pitch = 0;
+		for (i = 0; i < m_coeff->num_k; i++)
+			m_new_k[i] = 0;
 
-		tms->talk_status = 1;
+		m_talk_status = 1;
 	}
 
 
 	/* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && tms->speaking_now)
+	while ((size > 0) && m_speaking_now)
 	{
 		int current_val;
 
 		/* if we're ready for a new frame */
-		if ((tms->interp_count == 0) && (tms->sample_count == 0))
+		if ((m_interp_count == 0) && (m_sample_count == 0))
 		{
 			/* remember previous frame */
-			tms->old_energy = tms->new_energy;
-			tms->old_pitch = tms->new_pitch;
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->old_k[i] = tms->new_k[i];
+			m_old_energy = m_new_energy;
+			m_old_pitch = m_new_pitch;
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_old_k[i] = m_new_k[i];
 
 
 			/* if the old frame was a stop frame, exit and do not process any more frames */
-			if (tms->old_energy == COEFF_ENERGY_SENTINEL)
+			if (m_old_energy == COEFF_ENERGY_SENTINEL)
 			{
 				if (DEBUG_5110) logerror("processing frame: stop frame\n");
-				tms->target_energy = tms->current_energy = 0;
-				tms->speaking_now = tms->talk_status = 0;
-				tms->interp_count = tms->sample_count = tms->pitch_count = 0;
+				m_target_energy = m_current_energy = 0;
+				m_speaking_now = m_talk_status = 0;
+				m_interp_count = m_sample_count = m_pitch_count = 0;
 				goto empty;
 			}
 
 
 			/* Parse a new frame into the new_energy, new_pitch and new_k[] */
-			parse_frame(tms);
+			parse_frame();
 
 
 			/* Set old target as new start of frame */
-			tms->current_energy = tms->old_energy;
-			tms->current_pitch = tms->old_pitch;
+			m_current_energy = m_old_energy;
+			m_current_pitch = m_old_pitch;
 
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->current_k[i] = tms->old_k[i];
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_current_k[i] = m_old_k[i];
 
 
 			/* is this the stop (ramp down) frame? */
-			if (tms->new_energy == COEFF_ENERGY_SENTINEL)
+			if (m_new_energy == COEFF_ENERGY_SENTINEL)
 			{
 				/*logerror("processing frame: ramp down\n");*/
-				tms->target_energy = 0;
-				tms->target_pitch = tms->old_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->old_k[i];
+				m_target_energy = 0;
+				m_target_pitch = m_old_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_target_k[i] = m_old_k[i];
 			}
-			else if ((tms->old_energy == 0) && (tms->new_energy != 0)) /* was the old frame a zero-energy frame? */
+			else if ((m_old_energy == 0) && (m_new_energy != 0)) /* was the old frame a zero-energy frame? */
 			{
 				/* if so, and if the new frame is non-zero energy frame then the new parameters
 				   should become our current and target parameters immediately,
@@ -501,32 +365,32 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 				*/
 
 				/*logerror("processing non-zero energy frame after zero-energy frame\n");*/
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
+				m_target_energy = m_new_energy;
+				m_target_pitch = m_current_pitch = m_new_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_target_k[i] = m_current_k[i] = m_new_k[i];
 			}
-			else if ((tms->old_pitch == 0) && (tms->new_pitch != 0))    /* is this a change from unvoiced to voiced frame ? */
+			else if ((m_old_pitch == 0) && (m_new_pitch != 0))    /* is this a change from unvoiced to voiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
 				   i.e. we should NOT interpolate them slowly in.
 				*/
 				/*if (DEBUG_5110) logerror("processing frame: UNVOICED->VOICED frame change\n");*/
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
+				m_target_energy = m_new_energy;
+				m_target_pitch = m_current_pitch = m_new_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_target_k[i] = m_current_k[i] = m_new_k[i];
 			}
-			else if ((tms->old_pitch != 0) && (tms->new_pitch == 0))    /* is this a change from voiced to unvoiced frame ? */
+			else if ((m_old_pitch != 0) && (m_new_pitch == 0))    /* is this a change from voiced to unvoiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
 				   i.e. we should NOT interpolate them slowly in.
 				*/
 				/*if (DEBUG_5110) logerror("processing frame: VOICED->UNVOICED frame change\n");*/
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->current_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i] = tms->new_k[i];
+				m_target_energy = m_new_energy;
+				m_target_pitch = m_current_pitch = m_new_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_target_k[i] = m_current_k[i] = m_new_k[i];
 			}
 			else
 			{
@@ -534,16 +398,16 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 				/*logerror("*** Energy = %d\n",current_energy);*/
 				/*logerror("proc: %d %d\n",last_fbuf_head,fbuf_head);*/
 
-				tms->target_energy = tms->new_energy;
-				tms->target_pitch = tms->new_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->new_k[i];
+				m_target_energy = m_new_energy;
+				m_target_pitch = m_new_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_target_k[i] = m_new_k[i];
 			}
 		}
 		else
 		{
-			interp_period = tms->sample_count / 25;
-			switch(tms->interp_count)
+			interp_period = m_sample_count / 25;
+			switch(m_interp_count)
 			{
 				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
 				case 0: /* PC=0, A cycle, nothing happens (calc energy) */
@@ -551,62 +415,62 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 				case 1: /* PC=0, B cycle, nothing happens (update energy) */
 				break;
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
-				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_energy += ((m_target_energy - m_current_energy) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
-				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_pitch += ((m_target_pitch - m_current_pitch) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
-				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[0] += ((m_target_k[0] - m_current_k[0]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
-				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[1] += ((m_target_k[1] - m_current_k[1]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
-				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[2] += ((m_target_k[2] - m_current_k[2]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
-				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[3] += ((m_target_k[3] - m_current_k[3]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
-				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[4] += ((m_target_k[4] - m_current_k[4]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
-				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[5] += ((m_target_k[5] - m_current_k[5]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
-				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[6] += ((m_target_k[6] - m_current_k[6]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
-				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[7] += ((m_target_k[7] - m_current_k[7]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
-				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[8] += ((m_target_k[8] - m_current_k[8]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
-				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
+				m_current_k[9] += ((m_target_k[9] - m_current_k[9]) >> m_coeff->interp_coeff[interp_period]);
 				break;
 			}
 		}
@@ -614,15 +478,15 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 
 		/* calculate the output */
 
-		if (tms->current_energy == 0)
+		if (m_current_energy == 0)
 		{
 			/* generate silent samples here */
 			current_val = 0x00;
 		}
-		else if (tms->old_pitch == 0)
+		else if (m_old_pitch == 0)
 		{
 			/* generate unvoiced samples here */
-			if (tms->RNG&1)
+			if (m_RNG&1)
 				current_val = -64; /* according to the patent it is (either + or -) half of the maximum value in the chirp table */
 			else
 				current_val = 64;
@@ -639,36 +503,36 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 			 * (address 50d holds zeroes)
 			 */
 
-		/*if (tms->coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
+		/*if (m_coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
 
-		if (tms->pitch_count > 50)
-			current_val = tms->coeff->chirptable[50];
+		if (m_pitch_count > 50)
+			current_val = m_coeff->chirptable[50];
 		else
-			current_val = tms->coeff->chirptable[tms->pitch_count];
+			current_val = m_coeff->chirptable[m_pitch_count];
 		}
 
 		/* Update LFSR *20* times every sample, like patent shows */
 		for (i=0; i<20; i++)
 		{
-			bitout = ((tms->RNG>>12)&1) ^
-					((tms->RNG>>10)&1) ^
-					((tms->RNG>> 9)&1) ^
-					((tms->RNG>> 0)&1);
-			tms->RNG >>= 1;
-			tms->RNG |= (bitout<<12);
+			bitout = ((m_RNG>>12)&1) ^
+					((m_RNG>>10)&1) ^
+					((m_RNG>> 9)&1) ^
+					((m_RNG>> 0)&1);
+			m_RNG >>= 1;
+			m_RNG |= (bitout<<12);
 		}
 
 		/* Lattice filter here */
 
-		Y11 = (current_val * 64 * tms->current_energy) / 512;
+		Y11 = (current_val * 64 * m_current_energy) / 512;
 
-		for (i = tms->coeff->num_k - 1; i >= 0; i--)
+		for (i = m_coeff->num_k - 1; i >= 0; i--)
 		{
-			Y11 = Y11 - ((tms->current_k[i] * tms->x[i]) / 512);
-			tms->x[i+1] = tms->x[i] + ((tms->current_k[i] * Y11) / 512);
+			Y11 = Y11 - ((m_current_k[i] * m_x[i]) / 512);
+			m_x[i+1] = m_x[i] + ((m_current_k[i] * Y11) / 512);
 		}
 
-		tms->x[0] = Y11;
+		m_x[0] = Y11;
 
 
 		/* clipping & wrapping, just like the patent */
@@ -677,7 +541,7 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 		cliptemp = Y11 / 16;
 
 		/* M58817 seems to be different */
-		if (tms->coeff->subtype & (SUBTYPE_M58817))
+		if (m_coeff->subtype & (SUBTYPE_M58817))
 			cliptemp = cliptemp / 2;
 
 		if (cliptemp > 511) cliptemp = -512 + (cliptemp-511);
@@ -692,18 +556,18 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 
 		/* Update all counts */
 
-		tms->sample_count = (tms->sample_count + 1) % 200;
+		m_sample_count = (m_sample_count + 1) % 200;
 
-		if (tms->current_pitch != 0)
+		if (m_current_pitch != 0)
 		{
-			tms->pitch_count++;
-			if (tms->pitch_count >= tms->current_pitch)
-				tms->pitch_count = 0;
+			m_pitch_count++;
+			if (m_pitch_count >= m_current_pitch)
+				m_pitch_count = 0;
 		}
 		else
-			tms->pitch_count = 0;
+			m_pitch_count = 0;
 
-		tms->interp_count = (tms->interp_count + 1) % 25;
+		m_interp_count = (m_interp_count + 1) % 25;
 
 		buf_count++;
 		size--;
@@ -713,8 +577,8 @@ empty:
 
 	while (size > 0)
 	{
-		tms->sample_count = (tms->sample_count + 1) % 200;
-		tms->interp_count = (tms->interp_count + 1) % 25;
+		m_sample_count = (m_sample_count + 1) % 200;
+		m_interp_count = (m_interp_count + 1) % 25;
 
 		buffer[buf_count] = 0x00;
 		buf_count++;
@@ -730,83 +594,83 @@ empty:
 
 ******************************************************************************************/
 
-void tms5110_PDC_set(tms5110_state *tms, int data)
+void tms5110_device::PDC_set(int data)
 {
-	if (tms->PDC != (data & 0x1) )
+	if (m_PDC != (data & 0x1) )
 	{
-		tms->PDC = data & 0x1;
-		if (tms->PDC == 0) /* toggling 1->0 processes command on CTL_pins */
+		m_PDC = data & 0x1;
+		if (m_PDC == 0) /* toggling 1->0 processes command on CTL_pins */
 		{
 			/* first pdc toggles output, next toggles input */
-			switch (tms->state)
+			switch (m_state)
 			{
 			case CTL_STATE_INPUT:
 				/* continue */
 				break;
 			case CTL_STATE_NEXT_OUTPUT:
-				tms->state = CTL_STATE_OUTPUT;
+				m_state = CTL_STATE_OUTPUT;
 				return;
 			case CTL_STATE_OUTPUT:
-				tms->state = CTL_STATE_INPUT;
+				m_state = CTL_STATE_INPUT;
 				return;
 			}
 			/* the only real commands we handle now are SPEAK and RESET */
-			if (tms->next_is_address)
+			if (m_next_is_address)
 			{
-				tms->next_is_address = FALSE;
-				tms->address = tms->address | ((tms->CTL_pins & 0x0F)<<tms->addr_bit);
-				tms->addr_bit = (tms->addr_bit + 4) % 12;
-				tms->schedule_dummy_read = TRUE;
-				if (tms->set_load_address)
-					tms->set_load_address(tms->device, tms->address);
-				new_int_write_addr(tms, tms->CTL_pins & 0x0F);
+				m_next_is_address = FALSE;
+				m_address = m_address | ((m_CTL_pins & 0x0F)<<m_addr_bit);
+				m_addr_bit = (m_addr_bit + 4) % 12;
+				m_schedule_dummy_read = TRUE;
+				if (m_set_load_address)
+					m_set_load_address(this, m_address);
+				new_int_write_addr(m_CTL_pins & 0x0F);
 			}
 			else
 			{
-				switch (tms->CTL_pins & 0xe) /*CTL1 - don't care*/
+				switch (m_CTL_pins & 0xe) /*CTL1 - don't care*/
 				{
 				case TMS5110_CMD_SPEAK:
-					perform_dummy_read(tms);
-					tms->speaking_now = 1;
+					perform_dummy_read();
+					m_speaking_now = 1;
 
 					//should FIFO be cleared now ?????
 					break;
 
 				case TMS5110_CMD_RESET:
-					perform_dummy_read(tms);
-					tms->device->reset();
+					perform_dummy_read();
+					reset();
 					break;
 
 				case TMS5110_CMD_READ_BIT:
-					if (tms->schedule_dummy_read)
-						perform_dummy_read(tms);
+					if (m_schedule_dummy_read)
+						perform_dummy_read();
 					else
 					{
-						request_bits(tms, 1);
-						tms->CTL_pins = (tms->CTL_pins & 0x0E) | extract_bits(tms, 1);
+						request_bits(1);
+						m_CTL_pins = (m_CTL_pins & 0x0E) | extract_bits(1);
 					}
 					break;
 
 				case TMS5110_CMD_LOAD_ADDRESS:
-					tms->next_is_address = TRUE;
+					m_next_is_address = TRUE;
 					break;
 
 				case TMS5110_CMD_READ_BRANCH:
-					new_int_write(tms, 0,1,1,0);
-					new_int_write(tms, 1,1,1,0);
-					new_int_write(tms, 0,1,1,0);
-					new_int_write(tms, 0,0,0,0);
-					new_int_write(tms, 1,0,0,0);
-					new_int_write(tms, 0,0,0,0);
-					tms->schedule_dummy_read = FALSE;
+					new_int_write(0,1,1,0);
+					new_int_write(1,1,1,0);
+					new_int_write(0,1,1,0);
+					new_int_write(0,0,0,0);
+					new_int_write(1,0,0,0);
+					new_int_write(0,0,0,0);
+					m_schedule_dummy_read = FALSE;
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
-					tms->state = CTL_STATE_NEXT_OUTPUT;
+					m_state = CTL_STATE_NEXT_OUTPUT;
 					break;
 
 				default:
-					logerror("tms5110.c: unknown command: 0x%02x\n", tms->CTL_pins);
+					logerror("tms5110.c: unknown command: 0x%02x\n", m_CTL_pins);
 					break;
 				}
 
@@ -823,7 +687,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 
 ******************************************************************************************/
 
-static void parse_frame(tms5110_state *tms)
+void tms5110_device::parse_frame()
 {
 	int bits, indx, i, rep_flag;
 #if (DEBUG_5110)
@@ -831,18 +695,18 @@ static void parse_frame(tms5110_state *tms)
 #endif
 
 	/* count the total number of bits available */
-	bits = tms->fifo_count;
+	bits = m_fifo_count;
 
 
 	/* attempt to extract the energy index */
-	bits -= tms->coeff->energy_bits;
+	bits -= m_coeff->energy_bits;
 	if (bits < 0)
 	{
-		request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
+		request_bits( -bits ); /* toggle M0 to receive needed bits */
 		bits = 0;
 	}
-	indx = extract_bits(tms,tms->coeff->energy_bits);
-	tms->new_energy = tms->coeff->energytable[indx];
+	indx = extract_bits(m_coeff->energy_bits);
+	m_new_energy = m_coeff->energytable[indx];
 #if (DEBUG_5110)
 	ene = indx;
 #endif
@@ -851,20 +715,20 @@ static void parse_frame(tms5110_state *tms)
 
 	if ((indx == 0) || (indx == 15))
 	{
-		if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",tms->new_energy);
+		if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",m_new_energy);
 
 	/* clear the k's */
 		if (indx == 0)
 		{
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->new_k[i] = 0;
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_new_k[i] = 0;
 		}
 
 		/* clear fifo if stop frame encountered */
 		if (indx == 15)
 		{
-			if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",tms->new_energy);
-			tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
+			if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",m_new_energy);
+			m_fifo_head = m_fifo_tail = m_fifo_count = 0;
 		}
 		return;
 	}
@@ -874,27 +738,27 @@ static void parse_frame(tms5110_state *tms)
 	bits -= 1;
 	if (bits < 0)
 	{
-		request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
+		request_bits( -bits ); /* toggle M0 to receive needed bits */
 		bits = 0;
 	}
-	rep_flag = extract_bits(tms,1);
+	rep_flag = extract_bits(1);
 
 	/* attempt to extract the pitch */
-	bits -= tms->coeff->pitch_bits;
+	bits -= m_coeff->pitch_bits;
 	if (bits < 0)
 	{
-		request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
+		request_bits( -bits ); /* toggle M0 to receive needed bits */
 		bits = 0;
 	}
-	indx = extract_bits(tms,tms->coeff->pitch_bits);
-	tms->new_pitch = tms->coeff->pitchtable[indx];
+	indx = extract_bits(m_coeff->pitch_bits);
+	m_new_pitch = m_coeff->pitchtable[indx];
 
 	/* if this is a repeat frame, just copy the k's */
 	if (rep_flag)
 	{
 	//actually, we do nothing because the k's were already loaded (on parsing the previous frame)
 
-		if (DEBUG_5110) logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+		if (DEBUG_5110) logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", m_new_energy, m_new_pitch, rep_flag);
 		return;
 	}
 
@@ -906,17 +770,17 @@ static void parse_frame(tms5110_state *tms)
 		bits -= 18;
 		if (bits < 0)
 		{
-		request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
+		request_bits( -bits ); /* toggle M0 to receive needed bits */
 		bits = 0;
 		}
 		for (i = 0; i < 4; i++)
-			tms->new_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
+			m_new_k[i] = m_coeff->ktable[i][extract_bits(m_coeff->kbits[i])];
 
 	/* and clear the rest of the new_k[] */
-		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->new_k[i] = 0;
+		for (i = 4; i < m_coeff->num_k; i++)
+			m_new_k[i] = 0;
 
-		if (DEBUG_5110) logerror("  (28-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+		if (DEBUG_5110) logerror("  (28-bit energy=%d pitch=%d rep=%d 4K frame)\n", m_new_energy, m_new_pitch, rep_flag);
 		return;
 	}
 
@@ -924,28 +788,28 @@ static void parse_frame(tms5110_state *tms)
 	bits -= 39;
 	if (bits < 0)
 	{
-			request_bits( tms,-bits ); /* toggle M0 to receive needed bits */
+			request_bits( -bits ); /* toggle M0 to receive needed bits */
 		bits = 0;
 	}
 #if (DEBUG_5110)
 	printf("FrameDump %02d ", ene);
-	for (i = 0; i < tms->coeff->num_k; i++)
+	for (i = 0; i < m_coeff->num_k; i++)
 	{
 		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_k[i] = tms->coeff->ktable[i][x];
+		x = extract_bits( m_coeff->kbits[i]);
+		m_new_k[i] = m_coeff->ktable[i][x];
 		printf("%02d ", x);
 	}
 	printf("\n");
 #else
-	for (i = 0; i < tms->coeff->num_k; i++)
+	for (i = 0; i < m_coeff->num_k; i++)
 	{
 		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_k[i] = tms->coeff->ktable[i][x];
+		x = extract_bits( m_coeff->kbits[i]);
+		m_new_k[i] = m_coeff->ktable[i][x];
 	}
 #endif
-	if (DEBUG_5110) logerror("  (49-bit energy=%d pitch=%d rep=%d 10K frame)\n", tms->new_energy, tms->new_pitch, rep_flag);
+	if (DEBUG_5110) logerror("  (49-bit energy=%d pitch=%d rep=%d 10K frame)\n", m_new_energy, m_new_pitch, rep_flag);
 
 }
 
@@ -976,25 +840,33 @@ static const unsigned int example_word_TEN[619]={
 
 static int speech_rom_read_bit(device_t *device)
 {
-	tms5110_state *tms = get_safe_token(device);
+	tms5110_device *tms5110 = (tms5110_device *) device;
+	return tms5110->_speech_rom_read_bit();
+}
 
+int tms5110_device::_speech_rom_read_bit()
+{
 	int r;
 
-	if (tms->speech_rom_bitnum<0)
+	if (m_speech_rom_bitnum<0)
 		r = 0;
 	else
-		r = (tms->table[tms->speech_rom_bitnum >> 3] >> (0x07 - (tms->speech_rom_bitnum & 0x07))) & 1;
+		r = (m_table[m_speech_rom_bitnum >> 3] >> (0x07 - (m_speech_rom_bitnum & 0x07))) & 1;
 
-	tms->speech_rom_bitnum++;
+	m_speech_rom_bitnum++;
 
 	return r;
 }
 
 static void speech_rom_set_addr(device_t *device, int addr)
 {
-	tms5110_state *tms = get_safe_token(device);
+	tms5110_device *tms5110 = (tms5110_device *) device;
+	tms5110->_speech_rom_set_addr(addr);
+}
 
-	tms->speech_rom_bitnum = addr * 8 - 1;
+void tms5110_device::_speech_rom_set_addr(int addr)
+{
+	m_speech_rom_bitnum = addr * 8 - 1;
 }
 
 /******************************************************************************
@@ -1004,124 +876,144 @@ static void speech_rom_set_addr(device_t *device, int addr)
 ******************************************************************************/
 
 
-static DEVICE_START( tms5110 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5110_device::device_start()
 {
 	static const tms5110_interface dummy = { NULL, NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL};
-	tms5110_state *tms = get_safe_token(device);
 
-	assert_always(tms != NULL, "Error creating TMS5110 chip");
+	assert_always(static_config() != NULL, "No config");
 
-	assert_always(device->static_config() != NULL, "No config");
+	m_intf = static_config() ? (const tms5110_interface *)static_config() : &dummy;
+	m_table = *region();
 
-	tms->intf = device->static_config() ? (const tms5110_interface *)device->static_config() : &dummy;
-	tms->table = *device->region();
-
-	tms->device = device;
-	tms5110_set_variant(tms, TMS5110_IS_5110A);
+	set_variant(TMS5110_IS_5110A);
 
 	/* resolve lines */
-	tms->m0_func.resolve(tms->intf->m0_func, *device);
-	tms->m1_func.resolve(tms->intf->m1_func, *device);
-	tms->romclk_func.resolve(tms->intf->romclk_func, *device);
-	tms->addr_func.resolve(tms->intf->addr_func, *device);
-	tms->data_func.resolve(tms->intf->data_func, *device);
+	m_m0_func.resolve(m_intf->m0_func, *this);
+	m_m1_func.resolve(m_intf->m1_func, *this);
+	m_romclk_func.resolve(m_intf->romclk_func, *this);
+	m_addr_func.resolve(m_intf->addr_func, *this);
+	m_data_func.resolve(m_intf->data_func, *this);
 
 	/* initialize a stream */
-	tms->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5110_update);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 80);
 
-	if (tms->table == NULL)
+	if (m_table == NULL)
 	{
 #if 0
-		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+		assert_always(m_intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
 #endif
-		tms->M0_callback = tms->intf->M0_callback;
-		tms->set_load_address = tms->intf->load_address;
+		m_M0_callback = m_intf->M0_callback;
+		m_set_load_address = m_intf->load_address;
 	}
 	else
 	{
-		tms->M0_callback = speech_rom_read_bit;
-		tms->set_load_address = speech_rom_set_addr;
+		m_M0_callback = speech_rom_read_bit;
+		m_set_load_address = speech_rom_set_addr;
 	}
 
-	tms->state = CTL_STATE_INPUT; /* most probably not defined */
-	tms->romclk_hack_timer = device->machine().scheduler().timer_alloc(FUNC(romclk_hack_timer_cb), (void *) device);
+	m_state = CTL_STATE_INPUT; /* most probably not defined */
+	m_romclk_hack_timer = timer_alloc(0);
 
-	register_for_save_states(tms);
+	register_for_save_states();
 }
 
-static DEVICE_START( tms5100 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5100_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_5100);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_5100);
 }
 
-static DEVICE_START( tms5110a )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms5110a_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_5110A);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_5110A);
 }
 
-static DEVICE_START( cd2801 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cd2801_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_CD2801);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_CD2801);
 }
 
-static DEVICE_START( tmc0281 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tmc0281_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_TMC0281);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_TMC0281);
 }
 
-static DEVICE_START( cd2802 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cd2802_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_CD2802);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_CD2802);
 }
 
-static DEVICE_START( m58817 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m58817_device::device_start()
 {
-	tms5110_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms5110 );
-	tms5110_set_variant(tms, TMS5110_IS_M58817);
+	tms5110_device::device_start();
+	set_variant(TMS5110_IS_M58817);
 }
 
 
-static DEVICE_RESET( tms5110 )
-{
-	tms5110_state *tms = get_safe_token(device);
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
+void tms5110_device::device_reset()
+{
 	/* initialize the FIFO */
-	memset(tms->fifo, 0, sizeof(tms->fifo));
-	tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
+	memset(m_fifo, 0, sizeof(m_fifo));
+	m_fifo_head = m_fifo_tail = m_fifo_count = 0;
 
 	/* initialize the chip state */
-	tms->speaking_now = tms->talk_status = 0;
-	tms->CTL_pins = 0;
-		tms->RNG = 0x1fff;
+	m_speaking_now = m_talk_status = 0;
+	m_CTL_pins = 0;
+		m_RNG = 0x1fff;
 
 	/* initialize the energy/pitch/k states */
-	tms->old_energy = tms->new_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_pitch = tms->new_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_k, 0, sizeof(tms->old_k));
-	memset(tms->new_k, 0, sizeof(tms->new_k));
-	memset(tms->current_k, 0, sizeof(tms->current_k));
-	memset(tms->target_k, 0, sizeof(tms->target_k));
+	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
+	m_old_pitch = m_new_pitch = m_current_pitch = m_target_pitch = 0;
+	memset(m_old_k, 0, sizeof(m_old_k));
+	memset(m_new_k, 0, sizeof(m_new_k));
+	memset(m_current_k, 0, sizeof(m_current_k));
+	memset(m_target_k, 0, sizeof(m_target_k));
 
 	/* initialize the sample generators */
-	tms->interp_count = tms->sample_count = tms->pitch_count = 0;
-	memset(tms->x, 0, sizeof(tms->x));
-	tms->next_is_address = FALSE;
-	tms->address = 0;
-	if (tms->table != NULL || tms->M0_callback != NULL)
+	m_interp_count = m_sample_count = m_pitch_count = 0;
+	memset(m_x, 0, sizeof(m_x));
+	m_next_is_address = FALSE;
+	m_address = 0;
+	if (m_table != NULL || m_M0_callback != NULL)
 	{
 		/* legacy interface */
-		tms->schedule_dummy_read = TRUE;
+		m_schedule_dummy_read = TRUE;
 
 	}
 	else
@@ -1129,9 +1021,9 @@ static DEVICE_RESET( tms5110 )
 		/* no dummy read! This makes bagman and ad2083 speech fail
 		 * with the new cycle and transition exact interfaces
 		 */
-		tms->schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = FALSE;
 	}
-	tms->addr_bit = 0;
+	m_addr_bit = 0;
 }
 
 
@@ -1143,13 +1035,11 @@ commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
+WRITE8_MEMBER( tms5110_device::ctl_w )
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
-	tms->CTL_pins = data & 0xf;
+	m_stream->update();
+	m_CTL_pins = data & 0xf;
 }
 
 
@@ -1159,13 +1049,11 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 
 ******************************************************************************/
 
-WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
+WRITE_LINE_MEMBER( tms5110_device::pdc_w )
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
-	tms5110_PDC_set(tms, state);
+	m_stream->update();
+	PDC_set(state);
 }
 
 
@@ -1185,16 +1073,14 @@ WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
 
 ******************************************************************************/
 
-READ8_DEVICE_HANDLER( tms5110_ctl_r )
+READ8_MEMBER( tms5110_device::ctl_r )
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
-	if (tms->state == CTL_STATE_OUTPUT)
+	m_stream->update();
+	if (m_state == CTL_STATE_OUTPUT)
 	{
-		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", tms->talk_status);
-		return (tms->talk_status << 0); /*CTL1 = still talking ? */
+		//if (DEBUG_5110) logerror("Status read (status=%2d)\n", m_talk_status);
+		return (m_talk_status << 0); /*CTL1 = still talking ? */
 	}
 	else
 	{
@@ -1203,13 +1089,11 @@ READ8_DEVICE_HANDLER( tms5110_ctl_r )
 	}
 }
 
-READ8_DEVICE_HANDLER( m58817_status_r )
+READ8_MEMBER( m58817_device::status_r )
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
-	return (tms->talk_status << 0); /*CTL1 = still talking ? */
+	m_stream->update();
+	return (m_talk_status << 0); /*CTL1 = still talking ? */
 }
 
 /******************************************************************************
@@ -1218,26 +1102,23 @@ READ8_DEVICE_HANDLER( m58817_status_r )
 
 ******************************************************************************/
 
-static TIMER_CALLBACK( romclk_hack_timer_cb )
+void tms5110_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	tms5110_state *tms = get_safe_token((device_t *) ptr);
-	tms->romclk_hack_state = !tms->romclk_hack_state;
+	m_romclk_hack_state = !m_romclk_hack_state;
 }
 
-READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
+READ8_MEMBER( tms5110_device::romclk_hack_r )
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
+	m_stream->update();
 
 	/* create and start timer if necessary */
-	if (!tms->romclk_hack_timer_started)
+	if (!m_romclk_hack_timer_started)
 	{
-		tms->romclk_hack_timer_started = TRUE;
-		tms->romclk_hack_timer->adjust(attotime::from_hz(device->clock() / 40), 0, attotime::from_hz(device->clock() / 40));
+		m_romclk_hack_timer_started = TRUE;
+		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
 	}
-	return tms->romclk_hack_state;
+	return m_romclk_hack_state;
 }
 
 
@@ -1248,13 +1129,11 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
 
 ******************************************************************************/
 
-int tms5110_ready_r(device_t *device)
+int tms5110_device::ready_r()
 {
-	tms5110_state *tms = get_safe_token(device);
-
 	/* bring up to date first */
-	tms->stream->update();
-	return (tms->fifo_count < FIFO_SIZE-1);
+	m_stream->update();
+	return (m_fifo_count < FIFO_SIZE-1);
 }
 
 
@@ -1265,9 +1144,12 @@ int tms5110_ready_r(device_t *device)
 
 ******************************************************************************/
 
-static STREAM_UPDATE( tms5110_update )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	tms5110_state *tms = (tms5110_state *)param;
 	INT16 sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 
@@ -1278,7 +1160,7 @@ static STREAM_UPDATE( tms5110_update )
 		int index;
 
 		/* generate the samples and copy to the target buffer */
-		tms5110_process(tms, sample_data, length);
+		process(sample_data, length);
 		for (index = 0; index < length; index++)
 			*buffer++ = sample_data[index];
 
@@ -1295,12 +1177,10 @@ static STREAM_UPDATE( tms5110_update )
 
 ******************************************************************************/
 
-void tms5110_set_frequency(device_t *device, int frequency)
+void tms5110_device::set_frequency(int frequency)
 {
-	tms5110_state *tms = get_safe_token(device);
-	tms->stream->set_sample_rate(frequency / 80);
+	m_stream->set_sample_rate(frequency / 80);
 }
-
 
 /*
  *
@@ -1346,31 +1226,27 @@ void tms5110_set_frequency(device_t *device, int frequency)
 
 ******************************************************************************/
 
-static void register_for_save_states_prom(tmsprom_state *tms)
+void tmsprom_device::register_for_save_states()
 {
-	tms->device->save_item(NAME(tms->address));
-	tms->device->save_item(NAME(tms->base_address));
-	tms->device->save_item(NAME(tms->bit));
-	tms->device->save_item(NAME(tms->enable));
-	tms->device->save_item(NAME(tms->prom_cnt));
-	tms->device->save_item(NAME(tms->m0));
+	save_item(NAME(m_address));
+	save_item(NAME(m_base_address));
+	save_item(NAME(m_bit));
+	save_item(NAME(m_enable));
+	save_item(NAME(m_prom_cnt));
+	save_item(NAME(m_m0));
 }
 
-
-static void update_prom_cnt(tmsprom_state *tms)
+void tmsprom_device::update_prom_cnt()
 {
-	UINT8 prev_val = tms->prom[tms->prom_cnt] | 0x0200;
-	if (tms->enable && (prev_val & (1<<tms->intf->stop_bit)))
-		tms->prom_cnt |= 0x10;
+	UINT8 prev_val = m_prom[m_prom_cnt] | 0x0200;
+	if (m_enable && (prev_val & (1<<m_intf->stop_bit)))
+		m_prom_cnt |= 0x10;
 	else
-		tms->prom_cnt &= 0x0f;
+		m_prom_cnt &= 0x0f;
 }
 
-static TIMER_CALLBACK( tmsprom_step )
+void tmsprom_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_t *device = (device_t *)ptr;
-	tmsprom_state *tms = get_safe_token_prom(device);
-
 	/* only 16 bytes needed ... The original dump is bad. This
 	 * is what is needed to get speech to work. The prom data has
 	 * been updated and marked as BAD_DUMP. The information below
@@ -1381,98 +1257,88 @@ static TIMER_CALLBACK( tmsprom_step )
 	 */
 	UINT16 ctrl;
 
-	update_prom_cnt(tms);
-	ctrl = (tms->prom[tms->prom_cnt] | 0x200);
+	update_prom_cnt();
+	ctrl = (m_prom[m_prom_cnt] | 0x200);
 
-	//if (tms->enable && tms->prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, tms->enable, tms->prom_cnt);
-	tms->prom_cnt = ((tms->prom_cnt + 1) & 0x0f) | (tms->prom_cnt & 0x10);
+	//if (m_enable && m_prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, m_enable, m_prom_cnt);
+	m_prom_cnt = ((m_prom_cnt + 1) & 0x0f) | (m_prom_cnt & 0x10);
 
-	if (ctrl & (1 << tms->intf->reset_bit))
-		tms->address = 0;
+	if (ctrl & (1 << m_intf->reset_bit))
+		m_address = 0;
 
-	tms->ctl_func(0, BITSWAP8(ctrl,0,0,0,0,tms->intf->ctl8_bit,
-			tms->intf->ctl4_bit,tms->intf->ctl2_bit,tms->intf->ctl1_bit));
+	m_ctl_func(0, BITSWAP8(ctrl,0,0,0,0,m_intf->ctl8_bit,
+			m_intf->ctl4_bit,m_intf->ctl2_bit,m_intf->ctl1_bit));
 
-	tms->pdc_func((ctrl >> tms->intf->pdc_bit) & 0x01);
+	m_pdc_func((ctrl >> m_intf->pdc_bit) & 0x01);
 }
 
-static DEVICE_START( tmsprom )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tmsprom_device::device_start()
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
-	assert_always(tms != NULL, "Error creating TMSPROM chip");
-
-	tms->intf = (const tmsprom_interface *) device->static_config();
-	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
+	m_intf = (const tmsprom_interface *) static_config();
+	assert_always(m_intf != NULL, "Error creating TMSPROM chip: No configuration");
 
 	/* resolve lines */
-	tms->pdc_func.resolve(tms->intf->pdc_func, *device);
-	tms->ctl_func.resolve(tms->intf->ctl_func, *device);
+	m_pdc_func.resolve(m_intf->pdc_func, *this);
+	m_ctl_func.resolve(m_intf->ctl_func, *this);
 
-	tms->rom = *device->region();
-	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
-	tms->prom = device->machine().root_device().memregion(tms->intf->prom_region)->base();
-	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
+	m_rom = *region();
+	assert_always(m_rom != NULL, "Error creating TMSPROM chip: No rom region found");
+	m_prom = machine().root_device().memregion(m_intf->prom_region)->base();
+	assert_always(m_rom != NULL, "Error creating TMSPROM chip: No prom region found");
 
-	tms->device = device;
-	tms->clock = device->clock();
+	m_clock = clock();
 
-	tms->romclk_timer = device->machine().scheduler().timer_alloc(FUNC(tmsprom_step), device);
-	tms->romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(tms->clock));
+	m_romclk_timer = timer_alloc(0);
+	m_romclk_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock));
 
-	tms->bit = 0;
-	tms->base_address = 0;
-	tms->address = 0;
-	tms->enable = 0;
-	tms->m0 = 0;
-	tms->prom_cnt = 0;
-	register_for_save_states_prom(tms);
+	m_bit = 0;
+	m_base_address = 0;
+	m_address = 0;
+	m_enable = 0;
+	m_m0 = 0;
+	m_prom_cnt = 0;
+
+	register_for_save_states();
 }
 
-WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w )
+WRITE_LINE_MEMBER( tmsprom_device::m0_w )
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
 	/* falling edge counts */
-	if (tms->m0 && !state)
+	if (m_m0 && !state)
 	{
-		tms->address += 1;
-		tms->address &= (tms->intf->rom_size-1);
+		m_address += 1;
+		m_address &= (m_intf->rom_size-1);
 	}
-	tms->m0 = state;
+	m_m0 = state;
 }
 
-READ_LINE_DEVICE_HANDLER( tmsprom_data_r )
+READ_LINE_MEMBER( tmsprom_device::data_r )
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
-	return (tms->rom[tms->base_address + tms->address] >> tms->bit) & 0x01;
+	return (m_rom[m_base_address + m_address] >> m_bit) & 0x01;
 }
 
 
-WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w )
+WRITE8_MEMBER( tmsprom_device::rom_csq_w )
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
 	if (!data)
-		tms->base_address = offset * tms->intf->rom_size;
+		m_base_address = offset * m_intf->rom_size;
 }
 
-WRITE8_DEVICE_HANDLER( tmsprom_bit_w )
+WRITE8_MEMBER( tmsprom_device::bit_w )
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
-	tms->bit = data;
+	m_bit = data;
 }
 
-WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
+WRITE_LINE_MEMBER( tmsprom_device::enable_w )
 {
-	tmsprom_state *tms = get_safe_token_prom(device);
-
-	if (state != tms->enable)
+	if (state != m_enable)
 	{
-		tms->enable = state;
-		update_prom_cnt(tms);
+		m_enable = state;
+		update_prom_cnt();
 
 		/* the following is needed for ad2084.
 		 * It is difficult to derive the actual connections from
@@ -1484,7 +1350,7 @@ WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
 		 * counter bits are 0!
 		 */
 		if (state)
-			tms->prom_cnt &= 0x10;
+			m_prom_cnt &= 0x10;
 	}
 }
 
@@ -1499,13 +1365,12 @@ tms5110_device::tms5110_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TMS5110, "TMS5110", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(tms5110_state);
 }
+
 tms5110_device::tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(tms5110_state);
 }
 
 //-------------------------------------------------
@@ -1518,59 +1383,12 @@ void tms5110_device::device_config_complete()
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5110_device::device_start()
-{
-	DEVICE_START_NAME( tms5110 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tms5110_device::device_reset()
-{
-	DEVICE_RESET_NAME( tms5110 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tms5110_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-
 const device_type TMS5100 = &device_creator<tms5100_device>;
+
 
 tms5100_device::tms5100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, TMS5100, "TMS5100", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5100_device::device_start()
-{
-	DEVICE_START_NAME( tms5100 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tms5100_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1581,50 +1399,12 @@ tms5110a_device::tms5110a_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms5110a_device::device_start()
-{
-	DEVICE_START_NAME( tms5110a )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tms5110a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type CD2801 = &device_creator<cd2801_device>;
 
 cd2801_device::cd2801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, CD2801, "CD2801", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2801_device::device_start()
-{
-	DEVICE_START_NAME( cd2801 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void cd2801_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1635,50 +1415,12 @@ tmc0281_device::tmc0281_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tmc0281_device::device_start()
-{
-	DEVICE_START_NAME( tmc0281 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tmc0281_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type CD2802 = &device_creator<cd2802_device>;
 
 cd2802_device::cd2802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms5110_device(mconfig, CD2802, "CD2802", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void cd2802_device::device_start()
-{
-	DEVICE_START_NAME( cd2802 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void cd2802_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1689,33 +1431,12 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m58817_device::device_start()
-{
-	DEVICE_START_NAME( m58817 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void m58817_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-
 
 const device_type TMSPROM = &device_creator<tmsprom_device>;
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMSPROM, "TMSPROM", tag, owner, clock)
 {
-	m_token = global_alloc_clear(tmsprom_state);
 }
 
 //-------------------------------------------------
@@ -1726,13 +1447,4 @@ tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, d
 
 void tmsprom_device::device_config_complete()
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tmsprom_device::device_start()
-{
-	DEVICE_START_NAME( tmsprom )(this);
 }

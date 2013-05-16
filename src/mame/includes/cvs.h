@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "sound/dac.h"
+#include "sound/tms5110.h"
 
 #define CVS_S2636_Y_OFFSET     (3)
 #define CVS_S2636_X_OFFSET     (-26)
@@ -29,7 +30,10 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
 			m_dac2(*this, "dac2"),
-			m_dac3(*this, "dac3") { }
+			m_dac3(*this, "dac3"),
+			m_tms5110(*this, "tms")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -64,7 +68,7 @@ public:
 	device_t *m_speech;
 	optional_device<dac_device> m_dac2;
 	optional_device<dac_device> m_dac3;
-	device_t *m_tms;
+	optional_device<tms5110_device> m_tms5110;
 	device_t *m_s2636_0;
 	device_t *m_s2636_1;
 	device_t *m_s2636_2;

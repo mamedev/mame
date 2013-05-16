@@ -69,7 +69,7 @@ DIP locations verified for:
 
 WRITE8_MEMBER(bagman_state::bagman_ls259_w)
 {
-	device_t *device = machine().device("tmsprom");
+	tmsprom_device *tmsprom = machine().device<tmsprom_device>("tmsprom");
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (m_ls259_buf[offset] != (data&1) )
@@ -81,16 +81,16 @@ WRITE8_MEMBER(bagman_state::bagman_ls259_w)
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, space, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
+			tmsprom->bit_w(space, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
 			break;
 		case 3:
-			tmsprom_enable_w(device, m_ls259_buf[offset]);
+			tmsprom->enable_w(m_ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom_rom_csq_w(device, space, 0, m_ls259_buf[offset]);
+			tmsprom->rom_csq_w(space, 0, m_ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom_rom_csq_w(device, space, 1, m_ls259_buf[offset]);
+			tmsprom->rom_csq_w(space, 1, m_ls259_buf[offset]);
 			break;
 		}
 	}
@@ -444,8 +444,8 @@ static const tmsprom_interface prom_intf =
 	2,                              /* bit # of ctl8 line */
 	6,                              /* bit # of rom reset */
 	7,                              /* bit # of stop */
-	DEVCB_DEVICE_LINE("tms", tms5110_pdc_w),        /* tms pdc func */
-	DEVCB_DEVICE_HANDLER("tms", tms5110_ctl_w)      /* tms ctl func */
+	DEVCB_DEVICE_LINE_MEMBER("tms", tms5110_device, pdc_w),        /* tms pdc func */
+	DEVCB_DEVICE_MEMBER("tms", tms5110_device, ctl_w)      /* tms ctl func */
 };
 
 static const tms5110_interface bagman_tms5110_interface =
@@ -454,10 +454,10 @@ static const tms5110_interface bagman_tms5110_interface =
 	NULL,                                           /* function to be called when chip requests another bit */
 	NULL,                                           /* speech ROM load address callback */
 	/* new rom controller interface */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_m0_w),     /* the M0 line */
+	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, m0_w),     /* the M0 line */
 	DEVCB_NULL,                                     /* the M1 line */
 	DEVCB_NULL,                                     /* Write to ADD1,2,4,8 - 4 address bits */
-	DEVCB_DEVICE_LINE("tmsprom", tmsprom_data_r),   /* Read one bit from ADD8/Data - voice data */
+	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, data_r),   /* Read one bit from ADD8/Data - voice data */
 	DEVCB_NULL                                      /* rom clock - Only used to drive the data lines */
 };
 

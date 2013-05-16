@@ -93,7 +93,6 @@ Todo & FIXME:
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
-#include "sound/tms5110.h"
 #include "video/s2636.h"
 #include "includes/cvs.h"
 
@@ -279,8 +278,7 @@ READ8_MEMBER(cvs_state::cvs_393hz_clock_r)
 
 READ8_MEMBER(cvs_state::tms_clock_r)
 {
-	device_t *device = machine().device("tms");
-	return tms5110_romclk_hack_r(device, space, 0) ? 0x80 : 0;
+	return m_tms5110->romclk_hack_r(space, 0) ? 0x80 : 0;
 }
 
 TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
@@ -375,13 +373,12 @@ READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
-	return ((tms5110_ctl_r(m_tms, space, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
+	return ((m_tms5110->ctl_r(space, 0) ^ 1) << 7) | (soundlatch_byte_r(space, 0) & 0x7f);
 }
 
 
 WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 {
-	device_t *device = machine().device("tms");
 	UINT8 ctl;
 	/*
 	 * offset 0: CS ?
@@ -394,16 +391,15 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_ctl_w)
 			(m_tms5110_ctl_data[1] << 3);   /* CTL8 */
 
 	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
-	tms5110_ctl_w(device, space, 0, ctl);
+	m_tms5110->ctl_w(space, 0, ctl);
 }
 
 
 WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
 {
-	device_t *device = machine().device("tms");
 	UINT8 out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
-	tms5110_pdc_w(device, out);
+	m_tms5110->pdc_w(out);
 }
 
 
@@ -982,7 +978,6 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 
 	/* set devices */
 	m_speech = machine().device("speech");
-	m_tms = machine().device("tms");
 	m_s2636_0 = machine().device("s2636_0");
 	m_s2636_1 = machine().device("s2636_1");
 	m_s2636_2 = machine().device("s2636_2");

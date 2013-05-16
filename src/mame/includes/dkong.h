@@ -227,6 +227,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE8_MEMBER(M58817_command_w);
+	DECLARE_READ8_MEMBER(M58817_status_r);
 	DECLARE_READ8_MEMBER(dkong_voice_status_r);
 	DECLARE_READ8_MEMBER(dkong_tune_r);
 	DECLARE_WRITE8_MEMBER(dkong_p1_w);
