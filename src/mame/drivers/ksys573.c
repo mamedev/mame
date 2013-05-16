@@ -5495,7 +5495,7 @@ ROM_START( mrtlbeat )
 	DISK_IMAGE_READONLY( "b47jxb02", 0, SHA1(6bbe8d6169ef692bd8995da564bd5a97b6bf0b31) )
 ROM_END
 
-ROM_START( pbballex )
+ROM_START( powyakex )
 	SYS573_BIOS_A
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* security cart eeprom */
@@ -5598,7 +5598,7 @@ GAME( 1997, hndlchmp, sys573,   konami573,    hndlchmp,  ksys573_state, konami57
 GAME( 1998, darkhleg, sys573,   konami573x,   konami573, ksys573_state, konami573,    ROT0, "Konami", "Dark Horse Legend (GX706 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, fbaitbc,  sys573,   k573baitx,    fbaitbc,   ksys573_state, ge765pwbba,   ROT0, "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, bassangl, fbaitbc,  k573baitx,    fbaitbc,   ksys573_state, ge765pwbba,   ROT0, "Konami", "Bass Angler (GE765 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, pbballex, sys573,   konami573x,   konami573, ksys573_state, konami573,    ROT0, "Konami", "Powerful Pro Baseball EX (GX802 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, powyakex, sys573,   konami573x,   konami573, ksys573_state, konami573,    ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu EX (GX802 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, konam80s, sys573,   konami573x,   konami573, ksys573_state, konami573,    ROT90, "Konami", "Konami 80's AC Special (GC826 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, konam80u, konam80s, konami573x,   konami573, ksys573_state, konami573,    ROT90, "Konami", "Konami 80's AC Special (GC826 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, konam80j, konam80s, konami573x,   konami573, ksys573_state, konami573,    ROT90, "Konami", "Konami 80's Gallery (GC826 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

@@ -8,22 +8,22 @@
 Known Dumps
 -----------
 
-Game       Description                  Mother Board   Code       Version       Date   Time
+Game       Description                        Mother Board   Code       Version       Date   Time
 
-pbball96   Powerful Pro Baseball '96    GV999          GV017   JAPAN 1.03   96.05.27  18:00
-hyperath   Hyper Athlete                ZV610          GV021   JAPAN 1.00   96.06.09  19:00
-lacrazyc   Let's Attack Crazy Cross     ZV610          GV027   ASIA  1.10   96.01.18  12:00
-susume     Susume! Taisen Puzzle-Dama   ZV610          GV027   JAPAN 1.20   96.03.04  12:00
-btchamp    Beat the Champ               GV999          GV053   UAA01        ?
-kdeadeye   Dead Eye                     GV999          GV054   UAA01        ?
-weddingr   Wedding Rhapsody             ?              GX624   JAA          97.05.29   9:12
-tokimosh   Tokimeki Memorial Oshiete    ?              GE755   JAA          97.08.06  11:52
+powyak96   Jikkyou Powerful Pro Yakyuu '96    GV999          GV017   JAPAN 1.03   96.05.27  18:00
+hyperath   Hyper Athlete                      ZV610          GV021   JAPAN 1.00   96.06.09  19:00
+lacrazyc   Let's Attack Crazy Cross           ZV610          GV027   ASIA  1.10   96.01.18  12:00
+susume     Susume! Taisen Puzzle-Dama         ZV610          GV027   JAPAN 1.20   96.03.04  12:00
+btchamp    Beat the Champ                     GV999          GV053   UAA01        ?
+kdeadeye   Dead Eye                           GV999          GV054   UAA01        ?
+weddingr   Wedding Rhapsody                   ?              GX624   JAA          97.05.29   9:12
+tokimosh   Tokimeki Memorial Oshiete          ?              GE755   JAA          97.08.06  11:52
            Your Heart
-tokimosp   Tokimeki Memorial Oshiete    ?              GE756   JAB          97.09.27   9:10
+tokimosp   Tokimeki Memorial Oshiete          ?              GE756   JAB          97.09.27   9:10
            Your Heart Seal version PLUS
-nagano98   Winter Olypmics in Nagano 98 GV999          GX720   EAA01 1.03   98.01.08  10:45
-naganoj    Hyper Olympic in Nagano      GV999          GX720   JAA01 1.02   98.01.07  01:10
-simpbowl   Simpsons Bowling             GV999          GQ829   UAA          ?
+nagano98   Winter Olypmics in Nagano 98       GV999          GX720   EAA01 1.03   98.01.08  10:45
+naganoj    Hyper Olympic in Nagano            GV999          GX720   JAA01 1.02   98.01.07  01:10
+simpbowl   Simpsons Bowling                   GV999          GQ829   UAA          ?
 
 PCB Layouts
 -----------
@@ -750,14 +750,14 @@ ROM_START( hyperath )
 	DISK_IMAGE_READONLY( "hyperath", 0, BAD_DUMP SHA1(694ef6200c61d3052316100cd9251b495eab88a1) )
 ROM_END
 
-ROM_START( pbball96 )
+ROM_START( powyak96 )
 	GV_BIOS
 
 	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
-	ROM_LOAD( "pbball96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
+	ROM_LOAD( "powyak96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
 	DISK_REGION( "scsi:cdrom" )
-	DISK_IMAGE_READONLY( "pbball96", 0, BAD_DUMP SHA1(ebd0ea18ff9ce300ea1e30d66a739a96acfb0621) )
+	DISK_IMAGE_READONLY( "powyak96", 0, BAD_DUMP SHA1(ebd0ea18ff9ce300ea1e30d66a739a96acfb0621) )
 ROM_END
 
 ROM_START( weddingr )
@@ -843,7 +843,7 @@ ROM_END
 /* BIOS placeholder */
 GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Powerful Baseball '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
