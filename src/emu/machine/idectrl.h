@@ -162,8 +162,8 @@ void ide_controller_w(device_t *config, int reg, int size, UINT32 data);
 
 DECLARE_READ32_DEVICE_HANDLER( ide_controller32_r );
 DECLARE_WRITE32_DEVICE_HANDLER( ide_controller32_w );
-DECLARE_READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r );
-DECLARE_WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w );
+DECLARE_READ32_DEVICE_HANDLER( ide_controller16_pcmcia_r );
+DECLARE_WRITE32_DEVICE_HANDLER( ide_controller16_pcmcia_w );
 DECLARE_READ32_DEVICE_HANDLER( ide_bus_master32_r );
 DECLARE_WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
 

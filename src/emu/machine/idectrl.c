@@ -1631,34 +1631,34 @@ WRITE32_DEVICE_HANDLER( ide_controller32_w )
 }
 
 
-READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r )
+READ32_DEVICE_HANDLER( ide_controller16_pcmcia_r )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
 
 	int size;
-	UINT32 res = 0xffffffff;
+	UINT32 res = 0xffff;
 
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
+	offset *= 2;
+	size = convert_to_offset_and_size16(&offset, mem_mask);
 
 	if (offset < 0x008)
 		res = ide->ide_controller_read(0, offset & 7, size);
 	if (offset >= 0x008 && offset < 0x010)
 		res = ide->ide_controller_read(1, offset & 7, size);
 
-	return res << ((offset & 3) * 8);
+	return res << ((offset & 1) * 8);
 }
 
 
-WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w )
+WRITE32_DEVICE_HANDLER( ide_controller16_pcmcia_w )
 {
 	int size;
 
 	ide_controller_device *ide = (ide_controller_device *) device;
 
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-	data = data >> ((offset & 3) * 8);
+	offset *= 2;
+	size = convert_to_offset_and_size16(&offset, mem_mask);
+	data = data >> ((offset & 1) * 8);
 
 	if (offset < 0x008)
 		ide->ide_controller_write(0, offset & 7, size, data);

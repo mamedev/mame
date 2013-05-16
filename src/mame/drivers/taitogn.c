@@ -337,6 +337,7 @@ public:
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
+		m_card(*this,"card"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200") {
 	}
@@ -344,6 +345,7 @@ public:
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
 	required_device<zndip_device> m_zndip;
+	required_device<ide_controller_device> m_card;
 
 	intel_te28f160_device *m_biosflash;
 	intel_e28f400_device *m_pgmflash;
@@ -354,50 +356,38 @@ public:
 
 	unsigned char m_rf5c296_reg;
 
-	UINT32 m_control;
-	UINT32 m_control2;
-	UINT32 m_control3;
+	UINT8 m_control;
+	UINT16 m_control2;
+	UINT8 m_control3;
 	int m_v;
 
-	UINT32 m_n_znsecsel;
+	UINT8 m_n_znsecsel;
 
-	UINT32 m_coin_info;
+	UINT8 m_coin_info;
 	UINT32 m_mux_data;
-	DECLARE_WRITE32_MEMBER(rf5c296_io_w);
-	DECLARE_READ32_MEMBER(rf5c296_io_r);
-	DECLARE_READ32_MEMBER(rf5c296_mem_r);
-	DECLARE_WRITE32_MEMBER(rf5c296_mem_w);
-	DECLARE_READ32_MEMBER(flash_subbios_r);
-	DECLARE_WRITE32_MEMBER(flash_subbios_w);
-	DECLARE_READ32_MEMBER(flash_mn102_r);
-	DECLARE_WRITE32_MEMBER(flash_mn102_w);
-	DECLARE_READ32_MEMBER(flash_s1_r);
-	DECLARE_WRITE32_MEMBER(flash_s1_w);
-	DECLARE_READ32_MEMBER(flash_s2_r);
-	DECLARE_WRITE32_MEMBER(flash_s2_w);
-	DECLARE_READ32_MEMBER(flash_s3_r);
-	DECLARE_WRITE32_MEMBER(flash_s3_w);
-	DECLARE_READ32_MEMBER(control_r);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_WRITE32_MEMBER(control2_w);
-	DECLARE_READ32_MEMBER(control3_r);
-	DECLARE_WRITE32_MEMBER(control3_w);
-	DECLARE_READ32_MEMBER(gn_1fb70000_r);
-	DECLARE_WRITE32_MEMBER(gn_1fb70000_w);
-	DECLARE_READ32_MEMBER(hack1_r);
-	DECLARE_READ32_MEMBER(znsecsel_r);
-	DECLARE_WRITE32_MEMBER(znsecsel_w);
-	DECLARE_READ32_MEMBER(boardconfig_r);
-	DECLARE_WRITE32_MEMBER(coin_w);
-	DECLARE_READ32_MEMBER(coin_r);
-	DECLARE_READ32_MEMBER(gnet_mahjong_panel_r);
+	DECLARE_WRITE16_MEMBER(rf5c296_io_w);
+	DECLARE_READ16_MEMBER(rf5c296_io_r);
+	DECLARE_READ16_MEMBER(rf5c296_mem_r);
+	DECLARE_WRITE16_MEMBER(rf5c296_mem_w);
+	DECLARE_READ8_MEMBER(control_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(control3_r);
+	DECLARE_WRITE8_MEMBER(control3_w);
+	DECLARE_READ16_MEMBER(gn_1fb70000_r);
+	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
+	DECLARE_READ16_MEMBER(hack1_r);
+	DECLARE_READ8_MEMBER(znsecsel_r);
+	DECLARE_WRITE8_MEMBER(znsecsel_w);
+	DECLARE_READ8_MEMBER(boardconfig_r);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_READ8_MEMBER(coin_r);
+	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_DRIVER_INIT(coh3002t_mp);
 	DECLARE_DRIVER_INIT(coh3002t);
 	DECLARE_MACHINE_RESET(coh3002t);
 	void rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
 	UINT8 rf5c296_reg_r(ATTR_UNUSED UINT8 reg);
-	UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask);
-	void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 	void install_handlers(int mode);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
@@ -416,11 +406,9 @@ void taitogn_state::rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data)
 			// Check for card reset
 			if (!(data & 0x40))
 			{
-				ide_controller_device *card = (ide_controller_device *) machine().device(":card");
-
-				card->reset();
+				m_card->reset();
 				m_locked = 0x1ff;
-				card->ide_set_gnet_readlock(1);
+				m_card->ide_set_gnet_readlock(1);
 			}
 		break;
 
@@ -435,14 +423,15 @@ UINT8 taitogn_state::rf5c296_reg_r(ATTR_UNUSED UINT8 reg)
 	return 0x00;
 }
 
-WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
+WRITE16_MEMBER(taitogn_state::rf5c296_io_w)
 {
-	if(offset < 2) {
-		ide_controller32_pcmcia_w(machine().device(":card"), space, offset, data, mem_mask);
+	if(offset < 4) {
+		ide_controller16_pcmcia_w(m_card, space, offset, data, mem_mask);
 		return;
 	}
 
-	if(offset == 0x3e0/4) {
+	if(offset == 0x3e0/2)
+	{
 		if(ACCESSING_BITS_0_7)
 			m_rf5c296_reg = data;
 		if(ACCESSING_BITS_8_15)
@@ -450,15 +439,16 @@ WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 	}
 }
 
-READ32_MEMBER(taitogn_state::rf5c296_io_r)
+READ16_MEMBER(taitogn_state::rf5c296_io_r)
 {
-	if(offset < 2)
-		return ide_controller32_pcmcia_r(machine().device(":card"), space, offset, mem_mask);
+	if(offset < 4)
+		return ide_controller16_pcmcia_r(m_card, space, offset, mem_mask);
 
-	offset *= 4;
+	offset *= 2;
 
-	if(offset == 0x3e0/4) {
-		UINT32 res = 0xffff0000;
+	if(offset == 0x3e0/2)
+	{
+		UINT32 res = 0x0000;
 		if(ACCESSING_BITS_0_7)
 			res |= m_rf5c296_reg;
 		if(ACCESSING_BITS_8_15)
@@ -466,37 +456,33 @@ READ32_MEMBER(taitogn_state::rf5c296_io_r)
 		return res;
 	}
 
-	return 0xffffffff;
+	return 0xffff;
 }
 
 // Hardcoded to reach the pcmcia CIS
 
-READ32_MEMBER(taitogn_state::rf5c296_mem_r)
+READ16_MEMBER(taitogn_state::rf5c296_mem_r)
 {
-	if(offset < 0x80)
-		return (m_cis[offset*2+1] << 16) | m_cis[offset*2];
+	if(offset < 0x100)
+		return m_cis[offset];
 
 	switch(offset) {
-	case 0x080: return 0x00800041;
-	case 0x081: return 0x0000002e;
-	case 0x100: return m_locked ? 0x00010000 : 0;
+	case 0x100: return 0x0041;
+	case 0x101: return 0x0080;
+	case 0x102: return 0x002e;
+	case 0x201: return m_locked ? 0x0001 : 0;
 	default:
 		return 0;
 	}
 }
 
-WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
+WRITE16_MEMBER(taitogn_state::rf5c296_mem_w)
 {
-	if(offset >= 0x140 && offset <= 0x144) {
+	if(offset >= 0x280 && offset <= 0x288) {
 		dynamic_buffer key(get_disk_handle(machine(), ":drive_0")->hunk_bytes());
 
-		int pos = (offset - 0x140)*2;
-		UINT8 v, k;
-		if(ACCESSING_BITS_16_23) {
-			v = data >> 16;
-			pos++;
-		} else
-			v = data;
+		int pos = offset - 0x280;
+		UINT8 v = data, k;
 		get_disk_handle(machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
 		k = pos < key.count() ? key[pos] : 0;
 		if(v == k)
@@ -505,84 +491,9 @@ WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
 			m_locked |= 1 << pos;
 		if (!m_locked)
 		{
-			ide_controller_device *card = (ide_controller_device *) machine().device(":card");
-			card->ide_set_gnet_readlock(0);
+			m_card->ide_set_gnet_readlock(0);
 		}
 	}
-}
-
-
-// Flash handling
-
-UINT32 taitogn_state::gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask)
-{
-	UINT32 res = 0;
-	offset *= 2;
-	if(ACCESSING_BITS_0_15)
-		res |= device->read(offset);
-	if(ACCESSING_BITS_16_31)
-		res |= device->read(offset+1) << 16;
-	return res;
-}
-
-void taitogn_state::gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
-{
-	offset *= 2;
-	if(ACCESSING_BITS_0_15)
-		device->write(offset, data);
-	if(ACCESSING_BITS_16_31)
-		device->write(offset+1, data >> 16);
-}
-
-
-READ32_MEMBER(taitogn_state::flash_subbios_r)
-{
-	return gen_flash_r(m_biosflash, offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitogn_state::flash_subbios_w)
-{
-	gen_flash_w(m_biosflash, offset, data, mem_mask);
-}
-
-READ32_MEMBER(taitogn_state::flash_mn102_r)
-{
-	return gen_flash_r(m_pgmflash, offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitogn_state::flash_mn102_w)
-{
-	gen_flash_w(m_pgmflash, offset, data, mem_mask);
-}
-
-READ32_MEMBER(taitogn_state::flash_s1_r)
-{
-	return gen_flash_r(m_sndflash[0], offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitogn_state::flash_s1_w)
-{
-	gen_flash_w(m_sndflash[0], offset, data, mem_mask);
-}
-
-READ32_MEMBER(taitogn_state::flash_s2_r)
-{
-	return gen_flash_r(m_sndflash[1], offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitogn_state::flash_s2_w)
-{
-	gen_flash_w(m_sndflash[1], offset, data, mem_mask);
-}
-
-READ32_MEMBER(taitogn_state::flash_s3_r)
-{
-	return gen_flash_r(m_sndflash[2], offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitogn_state::flash_s3_w)
-{
-	gen_flash_w(m_sndflash[2], offset, data, mem_mask);
 }
 
 void taitogn_state::install_handlers(int mode)
@@ -590,28 +501,28 @@ void taitogn_state::install_handlers(int mode)
 	address_space &a = m_maincpu->space(AS_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_subbios_r),this), write32_delegate(FUNC(taitogn_state::flash_subbios_w),this));
-		a.install_readwrite_handler(0x1f200000, 0x1f2fffff, read32_delegate(FUNC(taitogn_state::rf5c296_mem_r),this), write32_delegate(FUNC(taitogn_state::rf5c296_mem_w),this));
-		a.install_readwrite_handler(0x1f300000, 0x1f37ffff, read32_delegate(FUNC(taitogn_state::flash_mn102_r),this), write32_delegate(FUNC(taitogn_state::flash_mn102_w),this));
+		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read16_delegate(FUNC(intelfsh16_device::read),m_biosflash), write16_delegate(FUNC(intel_te28f160_device::write),m_biosflash), 0xffffffff);
+		a.install_readwrite_handler(0x1f200000, 0x1f2fffff, read16_delegate(FUNC(taitogn_state::rf5c296_mem_r),this), write16_delegate(FUNC(taitogn_state::rf5c296_mem_w),this), 0xffffffff);
+		a.install_readwrite_handler(0x1f300000, 0x1f37ffff, read16_delegate(FUNC(intelfsh16_device::read),m_pgmflash), write16_delegate(FUNC(intelfsh16_device::write),m_pgmflash), 0xffffffff);
 		a.nop_readwrite(0x1f380000, 0x1f5fffff);
 
 	} else {
 		// Mode 1 has access to the 3 samples flashes
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_s1_r),this), write32_delegate(FUNC(taitogn_state::flash_s1_w),this));
-		a.install_readwrite_handler(0x1f200000, 0x1f3fffff, read32_delegate(FUNC(taitogn_state::flash_s2_r),this), write32_delegate(FUNC(taitogn_state::flash_s2_w),this));
-		a.install_readwrite_handler(0x1f400000, 0x1f5fffff, read32_delegate(FUNC(taitogn_state::flash_s3_r),this), write32_delegate(FUNC(taitogn_state::flash_s3_w),this));
+		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[0]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[0]), 0xffffffff);
+		a.install_readwrite_handler(0x1f200000, 0x1f3fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[1]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[1]), 0xffffffff);
+		a.install_readwrite_handler(0x1f400000, 0x1f5fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[2]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[2]), 0xffffffff);
 	}
 }
 
 // Misc. controls
 
-READ32_MEMBER(taitogn_state::control_r)
+READ8_MEMBER(taitogn_state::control_r)
 {
 	//      fprintf(stderr, "gn_r %08x @ %08x (%s)\n", 0x1fb00000+4*offset, mem_mask, machine().describe_context());
 	return m_control;
 }
 
-WRITE32_MEMBER(taitogn_state::control_w)
+WRITE8_MEMBER(taitogn_state::control_w)
 {
 	// 20 = watchdog
 	// 04 = select bank
@@ -643,22 +554,22 @@ WRITE32_MEMBER(taitogn_state::control_w)
 		install_handlers(m_control & 4 ? 1 : 0);
 }
 
-WRITE32_MEMBER(taitogn_state::control2_w)
+WRITE16_MEMBER(taitogn_state::control2_w)
 {
 	COMBINE_DATA(&m_control2);
 }
 
-READ32_MEMBER(taitogn_state::control3_r)
+READ8_MEMBER(taitogn_state::control3_r)
 {
 	return m_control3;
 }
 
-WRITE32_MEMBER(taitogn_state::control3_w)
+WRITE8_MEMBER(taitogn_state::control3_w)
 {
 	COMBINE_DATA(&m_control3);
 }
 
-READ32_MEMBER(taitogn_state::gn_1fb70000_r)
+READ16_MEMBER(taitogn_state::gn_1fb70000_r)
 {
 	// (1328) 1348 tests mask 0002, 8 times.
 	// Called by 1434, exit at 143c
@@ -670,17 +581,23 @@ READ32_MEMBER(taitogn_state::gn_1fb70000_r)
 	return 2;
 }
 
-WRITE32_MEMBER(taitogn_state::gn_1fb70000_w)
+WRITE16_MEMBER(taitogn_state::gn_1fb70000_w)
 {
 	// Writes 0 or 1 all the time, it *may* have somthing to do with
 	// i/o port width, but then maybe not
 }
 
-READ32_MEMBER(taitogn_state::hack1_r)
+READ16_MEMBER(taitogn_state::hack1_r)
 {
-	m_v = m_v ^ 8;
-	// Probably something to do with sound
-	return m_v;
+	switch(offset)
+	{
+	case 0:
+		m_v = m_v ^ 8;
+		// Probably something to do with sound
+		return m_v;
+	}
+
+	return 0;
 }
 
 
@@ -690,12 +607,12 @@ READ32_MEMBER(taitogn_state::hack1_r)
 static const UINT8 tt10[ 8 ] = { 0x80, 0x20, 0x38, 0x08, 0xf1, 0x03, 0xfe, 0xfc };
 static const UINT8 tt16[ 8 ] = { 0xc0, 0x04, 0xf9, 0xe1, 0x60, 0x70, 0xf2, 0x02 };
 
-READ32_MEMBER(taitogn_state::znsecsel_r)
+READ8_MEMBER(taitogn_state::znsecsel_r)
 {
 	return m_n_znsecsel;
 }
 
-WRITE32_MEMBER(taitogn_state::znsecsel_w)
+WRITE8_MEMBER(taitogn_state::znsecsel_w)
 {
 	COMBINE_DATA( &m_n_znsecsel );
 
@@ -704,7 +621,7 @@ WRITE32_MEMBER(taitogn_state::znsecsel_w)
 	m_zndip->select( ( m_n_znsecsel & 0x8c ) != 0x8c );
 }
 
-READ32_MEMBER(taitogn_state::boardconfig_r)
+READ8_MEMBER(taitogn_state::boardconfig_r)
 {
 	/*
 	------00 mem=4M
@@ -729,7 +646,7 @@ READ32_MEMBER(taitogn_state::boardconfig_r)
 }
 
 
-WRITE32_MEMBER(taitogn_state::coin_w)
+WRITE8_MEMBER(taitogn_state::coin_w)
 {
 	/* 0x01=counter
 	   0x02=coin lock 1
@@ -737,16 +654,16 @@ WRITE32_MEMBER(taitogn_state::coin_w)
 	   0x20=coin lock 2
 	   0x80=??
 	*/
-	COMBINE_DATA (&m_coin_info);
+	m_coin_info = data;
 }
 
-READ32_MEMBER(taitogn_state::coin_r)
+READ8_MEMBER(taitogn_state::coin_r)
 {
 	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
-READ32_MEMBER(taitogn_state::gnet_mahjong_panel_r)
+READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 {
 	m_mux_data = m_coin_info;
 	m_mux_data &= 0xcc;
@@ -785,7 +702,7 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 {
 	DRIVER_INIT_CALL(coh3002t);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1fa10100, 0x1fa10103, read8_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this), 0x000000ff);
 }
 
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
@@ -794,35 +711,34 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 	install_handlers(0);
 	m_control = 0;
 
-	ide_controller_device *card = (ide_controller_device *) machine().device(":card");
-	card->reset();
-	card->ide_set_gnet_readlock(1);
+	m_card->reset();
+	m_card->ide_set_gnet_readlock(1);
 
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
-	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
-	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE(flash_s2_r, flash_s2_w)
-	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE(flash_s3_r, flash_s3_w)
+//	AM_RANGE(0x1f000000, 0x1f1fffff) AM_DEVREADWRITE16("sndflash0", intelfsh16_device, read, write, 0xffffffff)
+//	AM_RANGE(0x1f200000, 0x1f3fffff) AM_DEVREADWRITE16("sndflash1", intelfsh16_device, read, write, 0xffffffff)
+//	AM_RANGE(0x1f400000, 0x1f5fffff) AM_DEVREADWRITE16("sndflash2", intelfsh16_device, read, write, 0xffffffff)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
 	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_r)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE(coin_r, coin_w)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE(control3_r, control3_w)
+	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ8(boardconfig_r, 0x000000ff)
+	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE8(znsecsel_r, znsecsel_w, 0x000000ff)
+	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE8(coin_r, coin_w, 0x000000ff)
+	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE8(control3_r, control3_w, 0x000000ff)
 	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READNOP // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ(hack1_r)
+	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ16(hack1_r, 0xffffffff)
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE(rf5c296_io_r, rf5c296_io_w)
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE(control2_w)
-	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE(gn_1fb70000_r, gn_1fb70000_w)
+	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE16(rf5c296_io_r, rf5c296_io_w, 0xffffffff)
+	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
+	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
+	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
 ADDRESS_MAP_END
 
