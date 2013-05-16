@@ -396,6 +396,10 @@ static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8, snowbros_state )
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( hyperpac_sound_io_map, AS_IO, 8, snowbros_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 /* Same volume used for all samples at the Moment, could be right, we have no
    way of knowing .. */
 READ16_MEMBER(snowbros_state::sb3_sound_r)
@@ -1578,6 +1582,7 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
+	MCFG_CPU_IO_MAP(hyperpac_sound_io_map)
 
 	MCFG_GFXDECODE(hyperpac)
 
