@@ -8589,6 +8589,23 @@ ay-38910A
                     = 4                     lucky8c    New Lucky 8 Lines (set 4, W-4)
                     = 4                     lucky8d    New Lucky 8 Lines (set 5, W-4)
 
+...and against lucky8:
+
+                        27128.1                 1ST AND 2ND HALF IDENTICAL
+                        27128.7                           11xxxxxxxxxxxx = 0xFF
+6                       27256.6                 IDENTICAL
+5                       27256.5                 IDENTICAL
+4                       2764.4                  IDENTICAL
+3                       2764.3                  IDENTICAL
+2                       2764.2                  IDENTICAL
+7            [2/2]      27128.7                 IDENTICAL
+1                       27128.1      [1/2]      IDENTICAL
+1                       27128.1      [2/2]      IDENTICAL
+9            [1/2]      27256.8      [3/4]      IDENTICAL
+8            [2/2]      27256.8      [2/4]      99.731445%
+8            [1/2]      27256.8      [1/4]      98.413086%
+9            [2/2]      27256.8      [4/4]      90.710449%
+
 The program is exactly the same of lucky8d, with 40% for main rate and 60% for d-up,
 but merged in only one 27128 EPROM instead of two.
  
