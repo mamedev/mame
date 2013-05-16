@@ -20,6 +20,7 @@
 #define LOG_OCW     0
 #define LOG_GENERAL  0
 
+ALLOW_SAVE_TYPE(pic8259_device::pic8259_state_t); // allow save_item on a non-fundamental type
 
 void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -377,10 +378,33 @@ WRITE8_MEMBER( pic8259_device::write )
 
 void pic8259_device::device_start()
 {
-	/* resolve callbacks */
+	// resolve callbacks
 	m_out_int_func.resolve();
 	m_sp_en_func.resolve();
 	m_read_slave_ack_func.resolve();
+
+	// Register save state items
+	save_item(NAME(m_state));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_irr));
+	save_item(NAME(m_prio));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_irq_lines));
+	save_item(NAME(m_input));
+	save_item(NAME(m_ocw3));
+	save_item(NAME(m_master));
+	save_item(NAME(m_level_trig_mode));
+	save_item(NAME(m_vector_size));
+	save_item(NAME(m_cascade));
+	save_item(NAME(m_icw4_needed));
+	save_item(NAME(m_vector_addr_low));
+	save_item(NAME(m_base));
+	save_item(NAME(m_vector_addr_high));
+	save_item(NAME(m_slave));
+	save_item(NAME(m_nested));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_auto_eoi));
+	save_item(NAME(m_is_x86));
 }
 
 

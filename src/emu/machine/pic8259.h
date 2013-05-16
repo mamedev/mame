@@ -102,10 +102,10 @@ private:
 
 	UINT8 m_master;
 	/* ICW1 state */
-	UINT32 m_level_trig_mode : 1;
-	UINT32 m_vector_size : 1;
-	UINT32 m_cascade : 1;
-	UINT32 m_icw4_needed : 1;
+	UINT8 m_level_trig_mode;
+	UINT8 m_vector_size;
+	UINT8 m_cascade;
+	UINT8 m_icw4_needed;
 	UINT32 m_vector_addr_low;
 	/* ICW2 state */
 	UINT8 m_base;
@@ -115,10 +115,10 @@ private:
 	UINT8 m_slave;
 
 	/* ICW4 state */
-	UINT32 m_nested : 1;
-	UINT32 m_mode : 2;
-	UINT32 m_auto_eoi : 1;
-	UINT32 m_is_x86 : 1;
+	UINT8 m_nested;
+	UINT8 m_mode;
+	UINT8 m_auto_eoi;
+	UINT8 m_is_x86;
 };
 
 extern const device_type PIC8259;
