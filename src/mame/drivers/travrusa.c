@@ -420,6 +420,69 @@ ROM_START( motorace )
 	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
 ROM_END
 
+/*
+
+Moto tour is a Tecfri's licensed version of Traverse usa/Zippy Race from Irem
+
+This version don't have de MSM5202 but still having the sounds produced bt 5202 with a lower quality, I guess it converts the sound data to analog in some way, also this version is unprotected, doesn't have the epoxy block.
+
+Unfortunately the eproms labels have dissapeared, so I name it similar to Traverse usa but with the letters mt (Moto Tour)
+
+Rom Info
+
+snd.a1	------	sound code, 100% identical to Traverse Usa/Zippy race
+
+mt1-1.e3 \
+mt1-2.c3  -- Backgrounds?, 100% identical to Traverse Usa/Zippy race
+mt1-3.a3 /
+
+mt1-4.m3  \
+mt1-5.l3  ==
+mt1-6.k3  ==  Main cpu.	Different from the other sets
+mt1-7.j3  /
+
+
+mt1-8.n3  \
+mt1-9.m3 --  Sprites. Apparently all different from the other sets
+mt1-10.k3 /
+
+mm6349.k2 \
+prom1.f1  --  color proms, identical to other versions
+prom2.h2  /
+
+If you need more info write me to ricky2001mf@hotmail.com
+
+Ricky2001
+
+*/
+
+ROM_START( mototour )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mt1-4.m3",     0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
+	ROM_LOAD( "mt1-5.l3",     0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
+	ROM_LOAD( "mt1-6.k3",     0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
+	ROM_LOAD( "mt1-7.j3",     0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
+
+	ROM_REGION( 0x8000, "iremsound", 0 )
+	ROM_LOAD( "snd.a1",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) ) // == mr10.1a
+
+	ROM_REGION( 0x06000, "gfx1", 0 )
+	ROM_LOAD( "mt1-1.e3", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // == zippyrac.001
+	ROM_LOAD( "mt1-2.c3", 0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // == mr8.3c
+	ROM_LOAD( "mt1-3.a3", 0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // == mr9.3a
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "mt1-8..n3",    0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
+	ROM_LOAD( "mt1-9..m3",    0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
+	ROM_LOAD( "mt1-10..k3",   0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "mmi6349.k2", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */ // == mmi6349.ij
+	ROM_LOAD( "prom1.f1",   0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */ // == tbp18s.2
+	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */ // == tbp24s10.3
+ROM_END
+
+
 /* it's probably a bootleg of the original Seibu version with the roms decrypted (no epoxy block) */
 ROM_START( shtrider )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -505,8 +568,10 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,        ROT270, "Irem", "Traverse USA / Zippy Race", GAME_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,        ROT270, "bootleg (I.P.)", "Traverse USA (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem",                    "Traverse USA / Zippy Race", GAME_SUPPORTS_SAVE )
+GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "bootleg (I.P.)",          "Traverse USA (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mototour, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem (Tecfri license)",   "MotoTour  / Zippy Race (Tecfri license)", GAME_SUPPORTS_SAVE )
 GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu", "Shot Rider", GAME_SUPPORTS_SAVE )
+
+GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,         ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", GAME_SUPPORTS_SAVE )
 GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", GAME_SUPPORTS_SAVE )
