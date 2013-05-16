@@ -1384,6 +1384,11 @@ void psxcpu_device::update_rom_config()
 	UINT32 rom_size = m_rom->bytes();
 	UINT8 *pointer = m_rom->base();
 
+	if( rom_size > max_window_size )
+	{
+		rom_size = max_window_size;
+	}
+
 	assert( window_size != 0 );
 
 	int start = 0;
