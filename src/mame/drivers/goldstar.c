@@ -8553,6 +8553,80 @@ ROM_START( lucky8d )
 ROM_END
 
 /*
+
+Z80
+3x 8255
+ay-38910A
+3 prom (no dump right now)
+
+27256.8 is Z80 PRG
+
+27256.8             NO MATCH
+
+27128.1             NO MATCH
+27128.7             NO MATCH
+27256.5             = 5                     lucky8     New Lucky 8 Lines (set 1, W-4)
+                    = 6(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 5                     lucky8c    New Lucky 8 Lines (set 4, W-4)
+                    = 5                     lucky8d    New Lucky 8 Lines (set 5, W-4)
+27256.6             = 6                     lucky8     New Lucky 8 Lines (set 1, W-4)
+                    = 7(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 6                     lucky8c    New Lucky 8 Lines (set 4, W-4)
+                    = 6                     lucky8d    New Lucky 8 Lines (set 5, W-4)
+2764.2              = 2.bin                 ladylinr   Lady Liner
+                    = 2                     lucky8     New Lucky 8 Lines (set 1, W-4)
+                    = 3(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 2                     lucky8c    New Lucky 8 Lines (set 4, W-4)
+                    = 2                     lucky8d    New Lucky 8 Lines (set 5, W-4)
+2764.3              = 3.bin                 ladylinr   Lady Liner
+                    = 3                     lucky8     New Lucky 8 Lines (set 1, W-4)
+                    = 4(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 3                     lucky8c    New Lucky 8 Lines (set 4, W-4)
+                    = 3                     lucky8d    New Lucky 8 Lines (set 5, W-4)
+2764.4              = 4.bin                 ladylinr   Lady Liner
+                    = 4                     lucky8     New Lucky 8 Lines (set 1, W-4)
+                    = 5(__lucky8a)          lucky8a    New Lucky 8 Lines (set 2, W-4)
+                    = 4                     lucky8c    New Lucky 8 Lines (set 4, W-4)
+                    = 4                     lucky8d    New Lucky 8 Lines (set 5, W-4)
+
+The program is exactly the same of lucky8d, with 40% for main rate and 60% for d-up,
+but merged in only one 27128 EPROM instead of two.
+ 
+*/
+
+ROM_START( lucky8e )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "27256.8",   0x0000, 0x8000, CRC(65decc53) SHA1(100f26ef796557182ba894d1e30b18ac58a793be) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "27256.5",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "27256.6",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+//	ROM_LOAD( "27128.7",  0x10000, 0x4000, BAD_DUMP CRC(0000b9d0) SHA1(00008fe8a116c33bbd712a639224d041447a45c1) )
+	ROM_LOAD( "7",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )	// from pàrent set, since 2 of 3 bitplanes matched
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27128.1",  0x0000, 0x2000, CRC(8ca19ee7) SHA1(2e0cd4a74bd9abef60ed561ba4e5bb2681ce1222) )	// overdump?
+	ROM_IGNORE(                   0x2000)
+	ROM_LOAD( "2764.2",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "2764.3",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "2764.4",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	/* missing prom? - using one from other dump */
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
   New Lucky 8 Lines / New Super 8 Lines.
 
   This set has a regular New Lucky 8 Lines, but allowing bets up to 64.
@@ -11806,6 +11880,7 @@ GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  goldstar_state, lucky8a,  
 GAMEL( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
 GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   goldstar_state, lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )
 GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )
+GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )
 GAMEL( 198?, ns8lines,  0,        lucky8,   ns8lines, driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
 GAMEL( 198?, ns8linew,  0,        lucky8,   ns8linew, driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, driver_device,  0,         ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               GAME_IMPERFECT_COLORS, layout_lucky8 )
