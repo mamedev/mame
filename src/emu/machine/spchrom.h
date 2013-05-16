@@ -24,8 +24,8 @@ public:
 
 private:
 	UINT8 *m_speechrom_data;           /* pointer to speech ROM data */
-	unsigned long m_speechROMlen;      /* length of data pointed by speechrom_data, from 0 to 2^18 */
-	unsigned long m_speechROMaddr;     /* 18 bit pointer in ROM */
+	unsigned int m_speechROMlen;       /* length of data pointed by speechrom_data, from 0 to 2^18 */
+	unsigned int m_speechROMaddr;      /* 18 bit pointer in ROM */
 	int m_load_pointer;                /* which 4-bit nibble will be affected by load address */
 	int m_ROM_bits_count;              /* current bit position in ROM */
 };
