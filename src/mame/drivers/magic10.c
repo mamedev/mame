@@ -11,6 +11,7 @@
 
     Magic's 10 (ver. 16.15),        1995, AWP Games.
     Magic's 10 (ver. 16.45),        1995, AWP Games.
+    Magic's 10 (ver. 16.54),        1995, AWP Games.
     Magic's 10 (ver. 16.55),        1995, AWP Games.
     Magic's 10 2,                   1997, ABM Games.
     Music Sort (ver 2.02, English), 1995, ABM Games.
@@ -830,6 +831,21 @@ ROM_END
 
 ROM_START( magic10a )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "u3.bin", 0x000000, 0x20000, CRC(3ef8736c) SHA1(0c36c516349cf2c843c4beb64c979b73da56183d) )
+	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x20000, CRC(c30507fc) SHA1(ca15e30e9078dae2177df1ec33c94b37317ced61) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "u25.bin", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
+	ROM_LOAD( "u26.bin", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
+	ROM_LOAD( "u27.bin", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
+	ROM_LOAD( "u28.bin", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+ROM_END
+
+ROM_START( magic10b )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "u3_1645.bin",  0x00000, 0x20000, CRC(7f2549e4) SHA1(6578ad29273c357faae7c6be3fa1b49087e088a2) )
 	ROM_LOAD16_BYTE( "u2_1645.bin",  0x00001, 0x20000, CRC(c075234e) SHA1(d9bc38f0b984082a77088fbb52b02c8f5c49846c) )
 
@@ -876,7 +892,7 @@ Note:
 1x battery
 
 */
-ROM_START( magic10b )
+ROM_START( magic10c )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(32c12ad6) SHA1(93340df2c0f4c260837bd6649008e26a17a22015) )
 	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(a9945aaa) SHA1(97d4f6441b96618f2e3ce14095ffc5628cb14f0e) )
@@ -1253,13 +1269,14 @@ DRIVER_INIT_MEMBER(magic10_state,sgsafari)
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                 FULLNAME                         FLAGS            LAYOUT  */
-GAMEL( 1995, magic10,  0,        magic10,  magic10, magic10_state,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10a, magic10, magic10_state,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10, magic10_state,  magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT      ROT    COMPANY                 FULLNAME                         FLAGS            LAYOUT  */
+GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
+GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
 GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         GAME_NOT_WORKING                 )
 GAME(  1997, suprpool, 0,        magic102, magic102, magic10_state, suprpool, ROT0, "ABM Games",            "Super Pool (9743 rev.01)",       GAME_NOT_WORKING                 )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot, magic10_state,  hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          GAME_NOT_WORKING                 )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          GAME_NOT_WORKING                 )
 GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       GAME_NOT_WORKING                 )
 GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
 GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
