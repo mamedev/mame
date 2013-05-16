@@ -465,7 +465,7 @@ int gte::docop2( UINT32 pc, int gteop )
 	int lm;
 	int cv;
 	int mx;
-	INT32 h_over_sz3;
+	INT32 h_over_sz3 = 0;
 
 	lm = GTE_LM( gteop );
 	m_sf = GTE_SF( gteop );
