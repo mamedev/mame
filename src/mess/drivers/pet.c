@@ -387,13 +387,17 @@ READ8_MEMBER( cbm8296_state::read )
 
 	if (!endra)
 	{
+		//logerror("%s read  %04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",machine().describe_context(),offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
+
+		offs_t drma = fa15 << 15 | (offset & 0x7e00) | BIT(offset, 0) << 8 | (offset & 0x1fe) >> 1;
+
 		if (!casena1)
 		{
-			data = m_ram->pointer()[offset & 0xffff];
+			data = m_ram->pointer()[drma];
 		}
 		if (casena2)
 		{
-			data = m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)];
+			data = m_ram->pointer()[0x10000 | drma];
 		}
 	}
 	if (!cs9)
@@ -457,13 +461,17 @@ WRITE8_MEMBER( cbm8296_state::write )
 
 	if (!endra)
 	{
+		//logerror("%s write %04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",machine().describe_context(),offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
+		
+		offs_t drma = fa15 << 15 | (offset & 0x7e00) | BIT(offset, 0) << 8 | (offset & 0x1fe) >> 1;
+
 		if (!casena1)
 		{
-			m_ram->pointer()[offset & 0xffff] = data;
+			m_ram->pointer()[drma] = data;
 		}
 		if (casena2)
 		{
-			m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)] = data;
+			m_ram->pointer()[0x10000 | drma] = data;
 		}
 	}
 	if (!csio)
@@ -480,7 +488,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 		{
 			m_via->write(space, offset & 0x0f, data);
 		}
-		if (m_crtc && BIT(offset, 7))
+		if (BIT(offset, 7))
 		{
 			if (BIT(offset, 0))
 			{
@@ -1213,11 +1221,14 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 		UINT8 lsd = 0, data = 0;
 		UINT8 rra = ra & 0x07;
 		int no_row = !BIT(ra, 3);
+		int ra4 = BIT(ra, 4);
 		int chr_option = BIT(ma, 13);
+		offs_t vma = (ma + column) & 0x1fff;
+		offs_t drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | (vma & 0xff);
 
 		// even character
 
-		lsd = state->m_ram->pointer()[0x8000 | (((ma + column) << 1) & 0x1fff)];
+		lsd = state->m_ram->pointer()[drma];
 
 		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
 		data = state->m_char_rom->base()[char_addr & char_rom_mask];
@@ -1230,7 +1241,7 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 		// odd character
 
-		lsd = state->m_ram->pointer()[0x8000 | ((((ma + column) << 1) + 1) & 0x1fff)];
+		lsd = state->m_ram->pointer()[drma | 0x100];
 
 		char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
 		data = state->m_char_rom->base()[char_addr & char_rom_mask];
@@ -1395,7 +1406,7 @@ MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 static MACHINE_CONFIG_FRAGMENT( 4k )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K, 16K,32K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 MACHINE_CONFIG_END
 
 
