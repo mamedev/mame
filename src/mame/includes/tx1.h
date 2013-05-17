@@ -38,13 +38,10 @@ struct math_t
 	UINT32  mux;
 	UINT16  ppshift;
 	UINT32  i0ff;
-
 	UINT16  retval;
-
 	UINT16  muxlatch;   // TX-1
-
-	int dbgaddr;
-	int dbgpc;
+	int		dbgaddr;
+	int		dbgpc;
 };
 
 /*
@@ -103,31 +100,42 @@ class tx1_state : public driver_device
 public:
 	tx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_z80_ram(*this, "z80_ram"),
+			m_maincpu(*this, "main_cpu"),
+			m_mathcpu(*this, "math_cpu"),
+			m_audiocpu(*this, "audio_cpu"),
 			m_math_ram(*this, "math_ram"),
 			m_vram(*this, "vram"),
 			m_objram(*this, "objram"),
 			m_rcram(*this, "rcram"),
-			m_maincpu(*this, "main_cpu"),
-			m_mathcpu(*this, "math_cpu"),
-			m_audiocpu(*this, "audio_cpu") { }
+			m_z80_ram(*this, "z80_ram") { }
 
-	math_t m_math;
-	sn74s516_t m_sn74s516;
-	required_shared_ptr<UINT8> m_z80_ram;
-	UINT8 m_ppi_latch_a;
-	UINT8 m_ppi_latch_b;
-	UINT32 m_ts;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mathcpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT16> m_math_ram;
-	vregs_t m_vregs;
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_objram;
 	required_shared_ptr<UINT16> m_rcram;
+	required_shared_ptr<UINT8> m_z80_ram;
+
 	emu_timer *m_interrupt_timer;
+
+	UINT8 m_ppi_latch_a;
+	UINT8 m_ppi_latch_b;
+	UINT32 m_ts;
+
+
+	math_t m_math;
+	sn74s516_t m_sn74s516;
+
+	vregs_t m_vregs;
 	UINT8 *m_chr_bmp;
 	UINT8 *m_obj_bmp;
 	UINT8 *m_rod_bmp;
 	bitmap_ind16 *m_bitmap;
+
+	bool m_needs_update;
+
 	DECLARE_READ16_MEMBER(tx1_math_r);
 	DECLARE_WRITE16_MEMBER(tx1_math_w);
 	DECLARE_READ16_MEMBER(tx1_spcs_rom_r);
@@ -171,6 +179,27 @@ public:
 	DECLARE_VIDEO_START(buggyboy);
 	DECLARE_PALETTE_INIT(buggyboy);
 	DECLARE_VIDEO_START(buggybjr);
+
+	void tx1_draw_char(UINT8 *bitmap);
+	void tx1_draw_road_pixel(int screen, UINT8 *bmpaddr,
+								UINT8 apix[3], UINT8 bpix[3], UINT32 pixnuma, UINT32 pixnumb,
+								UINT8 stl, UINT8 sld, UINT8 selb,
+								UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr);
+	void tx1_draw_road(UINT8 *bitmap);
+	void tx1_draw_objects(UINT8 *bitmap);
+	void tx1_update_layers();
+	void tx1_combine_layers(bitmap_ind16 &bitmap, int screen);
+
+	void buggyboy_draw_char(UINT8 *bitmap, bool wide);
+	void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
+								UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
+								const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2);
+	void buggyboy_draw_road(UINT8 *bitmap);
+	void buggybjr_draw_road(UINT8 *bitmap);
+	void buggyboy_draw_objs(UINT8 *bitmap, bool wide);
+	void bb_combine_layers(bitmap_ind16 &bitmap, int screen);
+	void bb_update_layers();
+
 	UINT32 screen_update_tx1_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tx1_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tx1_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -182,9 +211,6 @@ public:
 	void screen_eof_buggyboy(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(z80_irq);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mathcpu;
-	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in audio/tx1.c -----------*/
