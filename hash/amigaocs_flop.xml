@@ -2641,7 +2641,7 @@
 		</part>
 	</software>
 
-	<software name="arkanoida u1" cloneof="arkanoid" supported="no">
+	<software name="arkanoidau1" cloneof="arkanoid" supported="no">
 		<!-- SPS (CAPS) release 1519 -->
 		<description>Arkanoid (USA, v1.05 19880331, ADOS)</description>
 		<!-- retail, standalone -->
@@ -5151,8 +5151,8 @@
 		<description>Bermuda Project (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>Mirrorsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1056058">
 				<rom name="(sps436)bermudaproject.ipf" size="1056058" crc="69df00f1" sha1="199aad5e158f56eff7cc337d04e3fe55025f18e1" offset="0"/>
@@ -6450,7 +6450,7 @@
 
 	<software name="bortime" supported="no">
 		<!-- SPS (CAPS) release 2933 -->
-		<description>Borrowed Time</description>
+		<description>Borrowed Time (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1986</year>
@@ -22476,8 +22476,7 @@
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf
-&quot; to work" />
+		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf&quot; to work" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps691)jacknicklauscoursedisk2.ipf" size="1049612" crc="54b083b7" sha1="bac31eca5b1cd6a6eb479f4d7472a614eb8194c3" offset="0"/>
@@ -22492,8 +22491,7 @@
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Accolade</publisher>
-		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf
-&quot; to work" />
+		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf&quot; to work" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2154)jacknicklauspresentsthegreatcoursesoftheu.s.open.ipf" size="1049612" crc="c27ce30d" sha1="60ff22eae5f325f5f7d965064ec18e97e8965191" offset="0"/>
@@ -22508,8 +22506,7 @@
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf
-&quot; to work" />
+		<info name="usage" value="Requires &quot;Jack Nicklaus' Greatest 18 Holes of Major Championship Golf&quot; to work" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2125)jacknicklauspresentsthemajorchampionshipcoursesof1989.ipf" size="1049180" crc="37f4621c" sha1="86981655fead411b10e8f77a9ccc8ef819c7553b" offset="0"/>
@@ -44883,8 +44880,8 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
-		<info name="alt_title" value="Turrican II - The Final Fight (Box)" />
 		<publisher>Rainbow Arts</publisher>
+		<info name="alt_title" value="Turrican II - The Final Fight (Box)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1113286">
 				<rom name="(sps29)turrican2.ipf" size="1113286" crc="6fb14a38" sha1="ba35a835ce38f76f3a22def2fe7db6d480908ce1" offset="0"/>
