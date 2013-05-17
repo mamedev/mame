@@ -26,9 +26,7 @@ public:
 		  m_maincpu(*this, Z80_TAG),
 		  m_usart(*this, I8251_TAG),
 		  m_dbrg(*this, COM8116_TAG),
-		  m_ieee(*this, IEEE488_TAG),
-		  m_rx_clock(0),
-		  m_tx_clock(0)
+		  m_ieee(*this, IEEE488_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -53,9 +51,6 @@ public:
 		LED_B,
 		LED_READY
 	};
-
-	int m_rx_clock;
-	int m_tx_clock;
 };
 
 #endif

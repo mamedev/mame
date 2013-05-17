@@ -70,7 +70,6 @@ public:
 	DECLARE_WRITE8_MEMBER( prom_toggle_w );
 	DECLARE_READ8_MEMBER( prom_disable_r );
 	DECLARE_WRITE8_MEMBER( baud_w );
-	DECLARE_WRITE8_MEMBER( i8251_b_data_w );
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_READ8_MEMBER( fdc_wait_r );

@@ -139,6 +139,13 @@ void i8251_device::update_rx_ready()
 
 void i8251_device::receive_clock()
 {
+	m_rxc++;
+
+	if (m_rxc == m_br_factor)
+		m_rxc = 0;
+	else
+		return;
+
 	/* receive enable? */
 	if (m_command & (1<<2))
 	{
@@ -165,6 +172,13 @@ void i8251_device::receive_clock()
 
 void i8251_device::transmit_clock()
 {
+	m_txc++;
+
+	if (m_txc == m_br_factor)
+		m_txc = 0;
+	else
+		return;
+
 	/* transmit enable? */
 	if (m_command & (1<<0))
 	{
@@ -316,6 +330,8 @@ void i8251_device::device_reset()
 	m_mode_byte = 0;
 	m_command = 0;
 	m_data = 0;
+	m_rxc = m_txc = 0;
+	m_br_factor = 1;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -463,6 +479,15 @@ WRITE8_MEMBER(i8251_device::control_w)
 						break;
 				}
 				set_data_frame(word_length,stop_bit_count,parity);
+
+				switch (data & 0x03)
+				{
+				case 1: m_br_factor = 1; break;
+				case 2: m_br_factor = 16; break;
+				case 3: m_br_factor = 64; break;
+				}
+
+				m_rxc = m_txc = 0;
 
 #if 0
 				/* data bits */

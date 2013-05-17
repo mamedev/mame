@@ -153,12 +153,6 @@ WRITE8_MEMBER( xor100_state::baud_w )
 	m_dbrg->stt_w(data >> 4);
 }
 
-WRITE8_MEMBER( xor100_state::i8251_b_data_w )
-{
-	m_uart_b->data_w(space, 0, data);
-	m_terminal->write(space, 0, data);
-}
-
 READ8_MEMBER( xor100_state::fdc_r )
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
@@ -265,7 +259,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(I8251_A_TAG, i8251_device, status_r, control_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD(I8251_B_TAG, i8251_device, data_r) AM_WRITE(i8251_b_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(I8251_B_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE(I8251_B_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_WRITE(mmu_w)
@@ -401,8 +395,8 @@ static const i8251_interface printer_8251_intf =
 
 static const i8251_interface terminal_8251_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -512,14 +506,14 @@ void xor100_state::fdc_drq_w(bool state)
 
 /* Terminal Interface */
 
-WRITE8_MEMBER( xor100_state::xor100_kbd_put )
-{
-	m_uart_b->receive_character(data);
-}
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
+DEVICE_INPUT_DEFAULTS_END
 
 static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(xor100_state, xor100_kbd_put)
+	DEVCB_NULL
 };
 
 static S100_INTERFACE( s100_intf )
@@ -598,7 +592,8 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, xor100_centronics_intf)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf, 9600)
+	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
 
 	// S-100
 	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)

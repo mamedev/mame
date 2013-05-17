@@ -246,24 +246,12 @@ static I8255A_INTERFACE( ppi1_intf )
 
 WRITE_LINE_MEMBER( softbox_state::fr_w )
 {
-	m_rx_clock++;
-
-	if (m_rx_clock & 0x10)
-	{
-		m_rx_clock = 0;
-		m_usart->receive_clock();
-	}
+	m_usart->receive_clock();
 }
 
 WRITE_LINE_MEMBER( softbox_state::ft_w )
 {
-	m_tx_clock++;
-
-	if (m_tx_clock & 0x10)
-	{
-		m_tx_clock = 0;
-		m_usart->transmit_clock();
-	}
+	m_usart->transmit_clock();
 }
 
 static COM8116_INTERFACE( dbrg_intf )

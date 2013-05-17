@@ -119,6 +119,10 @@ private:
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
 	UINT8 m_mode_byte;
 
+	int m_rxc;
+	int m_txc;
+	int m_br_factor;
+
 	/* data being received */
 	UINT8 m_data;
 };
