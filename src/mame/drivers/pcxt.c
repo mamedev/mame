@@ -72,7 +72,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_pit8253(*this,"pit8253"),
 			m_pic8259_1(*this,"pic8259_1"),
-			m_pic8259_2(*this,"pic8259_2"),
 			m_dma8237_1(*this,"dma8237_1") ,
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
@@ -93,7 +92,6 @@ public:
 
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259_1;
-	required_device<pic8259_device> m_pic8259_2;
 	required_device<am9517a_device> m_dma8237_1;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
@@ -120,8 +118,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(tetriskr);
 	DECLARE_DRIVER_INIT(filetto);
 	virtual void machine_reset();
@@ -517,19 +513,6 @@ static I8237_INTERFACE( dma8237_1_config )
 8259 IRQ controller
 ******************/
 
-WRITE_LINE_MEMBER(pcxt_state::pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(pcxt_state::get_slave_ack)
-{
-	if (offset==2) { // IRQ = 2
-		return m_pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
 IRQ_CALLBACK_MEMBER(pcxt_state::irq_callback)
 {
 	return m_pic8259_1->acknowledge();
@@ -551,7 +534,6 @@ static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_device, read, write )
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
@@ -723,9 +705,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(pcxt_state,pic8259_1_set_int_line), VCC, READ8(pcxt_state,get_slave_ack) )
-
-	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	MCFG_GFXDECODE(pcxt)
