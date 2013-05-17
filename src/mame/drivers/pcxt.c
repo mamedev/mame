@@ -398,7 +398,7 @@ READ8_MEMBER(pcxt_state::fdc765_status_r)
 READ8_MEMBER(pcxt_state::fdc765_data_r)
 {
 	m_status = (FDC_READ);
-	machine().device<pic8259_device>("pic8259_1")->ir6_w(0);
+	m_pic8259_1->ir6_w(0);
 	return 0xc0;
 }
 
@@ -411,7 +411,7 @@ WRITE8_MEMBER(pcxt_state::fdc765_data_w)
 WRITE8_MEMBER(pcxt_state::fdc_dor_w)
 {
 	/* TODO: properly hook-up upd765 FDC there */
-	machine().device<pic8259_device>("pic8259_1")->ir6_w(1);
+	m_pic8259_1->ir6_w(1);
 }
 
 /******************
