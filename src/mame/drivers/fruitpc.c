@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/mc146818.h"
@@ -28,20 +28,36 @@ class fruitpc_state : public driver_device
 public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_pit8254(*this,"pit8254"),
+			m_pic8259_1(*this,"pic8259_1"),
+			m_pic8259_2(*this,"pic8259_2"),
+			m_dma8237_1(*this,"dma8237_1") ,
+			m_dma8237_2(*this,"dma8237_2") ,
+			m_maincpu(*this, "maincpu"),
+			m_ide(*this, "ide"),
+			m_inp1(*this, "INP1"),
+			m_inp2(*this, "INP2"),
+			m_inp3(*this, "INP3"),
+			m_inp4(*this, "INP4")
 			{ }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t    *m_pit8254;
-	pic8259_device  *m_pic8259_1;
-	pic8259_device  *m_pic8259_2;
-	i8237_device    *m_dma8237_1;
-	i8237_device    *m_dma8237_2;
-
+	required_device<pit8254_device> m_pit8254;
+	required_device<pic8259_device> m_pic8259_1;
+	required_device<pic8259_device> m_pic8259_2;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
 	required_device<cpu_device> m_maincpu;
+	required_device<ide_controller_device> m_ide;
+
+	required_ioport m_inp1;
+	required_ioport m_inp2;
+	required_ioport m_inp3;
+	required_ioport m_inp4;
+
 	DECLARE_READ8_MEMBER(at_page8_r);
 	DECLARE_WRITE8_MEMBER(at_page8_w);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
@@ -61,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(fruitpc);
 	DECLARE_READ8_MEMBER(get_out2);
+	DECLARE_READ8_MEMBER(fruit_inp_r);
 	virtual void machine_start();
 	virtual void machine_reset();
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -71,12 +88,12 @@ public:
 
 READ8_MEMBER(fruitpc_state::at_dma8237_2_r)
 {
-	return m_dma8237_2->i8237_r(space, offset / 2);
+	return m_dma8237_2->read(space, offset / 2);
 }
 
 WRITE8_MEMBER(fruitpc_state::at_dma8237_2_w)
 {
-	m_dma8237_2->i8237_w(space, offset / 2, data);
+	m_dma8237_2->write(space, offset / 2, data);
 }
 
 READ8_MEMBER(fruitpc_state::at_page8_r)
@@ -127,7 +144,7 @@ WRITE_LINE_MEMBER(fruitpc_state::pc_dma_hrq_changed)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	m_dma8237_1->i8237_hlda_w(state);
+	m_dma8237_1->hack_w(state);
 }
 
 
@@ -183,27 +200,39 @@ static I8237_INTERFACE( dma8237_2_config )
 
 READ32_MEMBER(fruitpc_state::ide_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
+	return ide_controller32_r(m_ide, space, 0x1f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(fruitpc_state::ide_w)
 {
-	device_t *device = machine().device("ide");
-	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_w(m_ide, space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 READ32_MEMBER(fruitpc_state::fdc_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x3f0/4 + offset, mem_mask);
+	return ide_controller32_r(m_ide, space, 0x3f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(fruitpc_state::fdc_w)
 {
-	device_t *device = machine().device("ide");
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_w(device, space, 0x3f0/4 + offset, data, mem_mask);
+	ide_controller32_w(m_ide, space, 0x3f0/4 + offset, data, mem_mask);
+}
+
+READ8_MEMBER(fruitpc_state::fruit_inp_r)
+{
+	switch(offset)
+	{
+		case 0:
+			return m_inp1->read();
+		case 1:
+			return m_inp2->read();
+		case 2:
+			return m_inp3->read();
+		case 3:
+			return m_inp4->read();
+	}
+	return 0;
 }
 
 static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
@@ -217,7 +246,7 @@ static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
@@ -238,6 +267,7 @@ static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
 	AM_RANGE(0x02e0, 0x02ef) AM_NOP //To debug
 	AM_RANGE(0x0278, 0x02ff) AM_NOP //To debug
 	AM_RANGE(0x02f8, 0x02ff) AM_NOP //To debug
+	AM_RANGE(0x0310, 0x0313) AM_READ8(fruit_inp_r, 0xffffffff)
 	AM_RANGE(0x0320, 0x038f) AM_NOP //To debug
 	AM_RANGE(0x03a0, 0x03a7) AM_NOP //To debug
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
@@ -300,6 +330,29 @@ static INPUT_PORTS_START( fruitpc )
 
 	PORT_START("pc_keyboard_7")
 
+	PORT_START("INP1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00fe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("INP2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("INP3")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0004, 0x0004, "CONFIGURATION" )
+	PORT_DIPSETTING( 0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "STATISTICHE" )
+	PORT_DIPSETTING( 0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("INP4")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+/*
 	PORT_START("IOCARD1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -438,6 +491,7 @@ static INPUT_PORTS_START( fruitpc )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+*/
 INPUT_PORTS_END
 #endif
 
@@ -449,12 +503,6 @@ IRQ_CALLBACK_MEMBER(fruitpc_state::irq_callback)
 void fruitpc_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fruitpc_state::irq_callback),this));
-
-	m_pit8254 = machine().device( "pit8254" );
-	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
-	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
-	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
-	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 }
 
 /*************************************************************
@@ -462,11 +510,6 @@ void fruitpc_state::machine_start()
  * pic8259 configuration
  *
  *************************************************************/
-
-WRITE_LINE_MEMBER(fruitpc_state::fruitpc_pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
 
 READ8_MEMBER(fruitpc_state::get_slave_ack)
 {
@@ -531,7 +574,7 @@ static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 	MCFG_PIT8254_ADD( "pit8254", fruitpc_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(fruitpc_state,fruitpc_pic8259_1_set_int_line), VCC, READ8(fruitpc_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, READ8(fruitpc_state,get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
