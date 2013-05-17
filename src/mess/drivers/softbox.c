@@ -247,7 +247,7 @@ static I8255A_INTERFACE( ppi1_intf )
 WRITE_LINE_MEMBER( softbox_state::fr_w )
 {
 	m_rx_clock++;
-	logerror("rx %u\n", m_rx_clock);
+
 	if (m_rx_clock & 0x10)
 	{
 		m_rx_clock = 0;
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER( softbox_state::fr_w )
 WRITE_LINE_MEMBER( softbox_state::ft_w )
 {
 	m_tx_clock++;
-	logerror("tx %u\n", m_tx_clock);
+
 	if (m_tx_clock & 0x10)
 	{
 		m_tx_clock = 0;
@@ -285,14 +285,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
 DEVICE_INPUT_DEFAULTS_END
 
-WRITE8_MEMBER( softbox_state::dummy_w )
-{
-	// handled in usart_intf
-}
-
 static const serial_terminal_interface terminal_intf =
 {
-	DEVCB_DRIVER_MEMBER(softbox_state, dummy_w)
+	DEVCB_NULL
 };
 
 

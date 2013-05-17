@@ -390,22 +390,26 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 				LOG(("Character length: %d\n", (((data>>2) & 0x03)+5)));
 
+				int parity = SERIAL_PARITY_NONE;
+
 				if (data & (1<<4))
 				{
 					LOG(("enable parity checking\n"));
+
+					if (data & (1<<5))
+					{
+						LOG(("even parity\n"));
+						parity = SERIAL_PARITY_EVEN;
+					}
+					else
+					{
+						LOG(("odd parity\n"));
+						parity = SERIAL_PARITY_ODD;
+					}
 				}
 				else
 				{
 					LOG(("parity check disabled\n"));
-				}
-
-				if (data & (1<<5))
-				{
-					LOG(("even parity\n"));
-				}
-				else
-				{
-					LOG(("odd parity\n"));
 				}
 
 				{
@@ -446,7 +450,6 @@ WRITE8_MEMBER(i8251_device::control_w)
 				}
 
 				int word_length = ((data>>2) & 0x03)+5;
-				int parity = SERIAL_PARITY_NONE;
 				int stop_bit_count = 1;
 				switch ((data>>6) & 0x03)
 				{
@@ -667,10 +670,12 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
+	m_status &=~I8251_STATUS_TX_EMPTY;
 
 	/* if transmitter is active, then tx empty will be signalled */
 
 	update_tx_ready();
+	update_tx_empty();
 }
 
 
