@@ -8374,7 +8374,7 @@ GAME( 199?, j6indyi     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, 
 GAME( 199?, j6indyj     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME( 199?, j6indyk     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 12)", GAME_FLAGS )
 GAME( 199?, j6indyge    , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German set 1)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
-GAME( 199?, j6indyge2   , j6indyge  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German set 2)", GAME_FLAGS )
+GAME( 199?, j6indyge2   , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German set 2)", GAME_FLAGS )
 
 GAME( 199?, j6showtm    , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6showtma   , j6showtm  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 2)", GAME_FLAGS )

@@ -450,8 +450,6 @@ mm6349.k2 \
 prom1.f1  --  color proms, identical to other versions
 prom2.h2  /
 
-If you need more info write me to ricky2001mf@hotmail.com
-
 Ricky2001
 
 */
@@ -570,7 +568,7 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem",                    "Traverse USA / Zippy Race", GAME_SUPPORTS_SAVE )
 GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "bootleg (I.P.)",          "Traverse USA (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1983, mototour, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem (Tecfri license)",   "MotoTour  / Zippy Race (Tecfri license)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mototour, travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "Irem (Tecfri license)",   "MotoTour / Zippy Race (Tecfri license)", GAME_SUPPORTS_SAVE )
 GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", GAME_SUPPORTS_SAVE )
 
 GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,         ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", GAME_SUPPORTS_SAVE )
