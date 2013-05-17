@@ -483,6 +483,18 @@ void serial_terminal_device::device_start()
 
 INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
 {
+	device_reset();
+}
+
+void serial_terminal_device::device_reset()
+{
+	generic_terminal_device::device_reset();
+	m_rbit = 1;
+	if(m_slot)
+		m_owner->out_rx(m_rbit);
+	else
+		m_out_tx_func(m_rbit);
+
 	UINT8 val = m_io_term_frame->read();
 	set_tra_rate(rates[val & 0x0f]);
 	set_rcv_rate(rates[val & 0x0f]);
@@ -497,16 +509,6 @@ INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
 		set_data_frame(8, 1, SERIAL_PARITY_NONE);
 		break;
 	}
-}
-
-void serial_terminal_device::device_reset()
-{
-	generic_terminal_device::device_reset();
-	m_rbit = 1;
-	if(m_slot)
-		m_owner->out_rx(m_rbit);
-	else
-		m_out_tx_func(m_rbit);
 }
 
 void serial_terminal_device::send_key(UINT8 code)

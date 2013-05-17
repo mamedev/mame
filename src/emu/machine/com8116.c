@@ -84,6 +84,17 @@ void com8116_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void com8116_device::device_reset()
+{
+	m_fr = 0;
+	m_ft = 0;
+}
+
+
+//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -110,13 +121,19 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  str_w -
 //-------------------------------------------------
 
+void com8116_device::str_w(UINT8 data)
+{
+	m_fr = data & 0x0f;
+	int fr_clock = clock() / m_fr_divisors[m_fr];
+
+	if (LOG) logerror("COM8116 '%s' Receiver Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_fr_divisors[m_fr], fr_clock);
+
+	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock));
+}
+
 WRITE8_MEMBER( com8116_device::str_w )
 {
-	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", tag(), data & 0x0f);
-
-	m_fr = data & 0x0f;
-
-	m_fr_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_fr_divisors[m_fr] / 2));
+	str_w(data);
 }
 
 
@@ -124,11 +141,17 @@ WRITE8_MEMBER( com8116_device::str_w )
 //  stt_w -
 //-------------------------------------------------
 
+void com8116_device::stt_w(UINT8 data)
+{
+	m_ft = data & 0x0f;
+	int ft_clock = clock() / m_ft_divisors[m_ft];
+
+	if (LOG) logerror("COM8116 '%s' Transmitter Divisor Select %01x: %u (%u Hz)\n", tag(), data & 0x0f, m_ft_divisors[m_ft], ft_clock);
+
+	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock));
+}
+
 WRITE8_MEMBER( com8116_device::stt_w )
 {
-	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", tag(), data & 0x0f);
-
-	m_ft = data & 0x0f;
-
-	m_ft_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_ft_divisors[m_ft] / 2));
+	stt_w(data);
 }

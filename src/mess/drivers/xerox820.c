@@ -502,8 +502,8 @@ static COM8116_INTERFACE( com8116_intf )
 	DEVCB_NULL,     /* fX/4 output */
 	DEVCB_NULL,     /* fR output */
 	DEVCB_NULL,     /* fT output */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* receiver divisor ROM */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* transmitter divisor ROM */
+	COM8116_DIVISORS_16X_5_0688MHz, // receiver
+	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
 
 WRITE8_MEMBER( xerox820_state::kbd_w )

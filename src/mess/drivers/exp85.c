@@ -181,6 +181,11 @@ static I8085_CONFIG( exp85_i8085_config )
 
 /* Terminal Interface */
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
+DEVICE_INPUT_DEFAULTS_END
+
 static const serial_terminal_interface terminal_intf =
 {
 	DEVCB_NULL
@@ -227,7 +232,8 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 	MCFG_CASSETTE_ADD("cassette", exp85_cassette_interface)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf,9600)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
+	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -260,4 +266,4 @@ ROM_END
 
 /* System Drivers */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   INIT    COMPANY         FULLNAME        FLAGS */
-COMP( 1979, exp85,  0,      0,      exp85,   exp85, driver_device,  0,    "Netronics",    "Explorer/85", GAME_NOT_WORKING )
+COMP( 1979, exp85,  0,      0,      exp85,   exp85, driver_device,  0,    "Netronics",    "Explorer/85", 0 )

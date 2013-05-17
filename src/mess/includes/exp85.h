@@ -15,7 +15,8 @@ public:
 			m_terminal(*this, TERMINAL_TAG),
 			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
-			m_rom(*this, I8085A_TAG)
+			m_rom(*this, I8085A_TAG),
+			m_tape_control(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -149,8 +149,8 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 
 WRITE8_MEMBER( xor100_state::baud_w )
 {
-	m_dbrg->str_w(space, 0, data & 0x0f);
-	m_dbrg->stt_w(space, 0, data >> 4);
+	m_dbrg->str_w(data & 0x0f);
+	m_dbrg->stt_w(data >> 4);
 }
 
 WRITE8_MEMBER( xor100_state::i8251_b_data_w )
@@ -378,8 +378,8 @@ static COM8116_INTERFACE( com5016_intf )
 	DEVCB_NULL,                 /* fX/4 output */
 	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_fr_w),   /* fR output */
 	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_ft_w),   /* fT output */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 }, // WRONG?
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 }, // WRONG?
+	COM8116_DIVISORS_16X_5_0688MHz, // receiver
+	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
 
 /* Printer 8251A Interface */
@@ -590,7 +590,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
+	MCFG_COM8116_ADD(COM5016_TAG, XTAL_5_0688MHz, com5016_intf)
 	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)

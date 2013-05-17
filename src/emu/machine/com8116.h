@@ -42,6 +42,16 @@
 	const com8116_interface (name) =
 
 
+#define COM8116_DIVISORS_16X_5_0688MHz \
+	{ 6336, 4224, 2880, 2355, 2112, 1056, 528, 264, 176, 158, 132, 88, 66, 44, 33, 16 }
+
+#define COM8116_DIVISORS_16X_4_9152MHz \
+	{ 6144, 4096, 2793, 2284, 2048, 1024, 512, 256, 171, 154, 128, 85, 64, 43, 32, 16 }
+
+#define COM8116_DIVISORS_32X_5_0688MHz \
+	{ 3168, 2112, 1440, 1177, 1056, 792, 528, 264, 132, 88, 66, 44, 33, 22, 16, 8 }
+
+
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -72,13 +82,16 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void str_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER( str_w );
+	void stt_w(UINT8 data);
 	DECLARE_WRITE8_MEMBER( stt_w );
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
 
 private:

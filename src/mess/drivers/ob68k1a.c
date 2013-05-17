@@ -51,7 +51,6 @@ Notes:
 
     TODO:
 
-    - COM8116 dividers are wrong
     - interrupts
     - configuration switches
     - PIA odd/even byte access
@@ -73,8 +72,8 @@ Notes:
 
 WRITE8_MEMBER( ob68k1a_state::com8116_w )
 {
-	m_dbrg->stt_w(space, 0, data & 0x0f);
-	m_dbrg->str_w(space, 0, data >> 4);
+	m_dbrg->stt_w(data & 0x0f);
+	m_dbrg->str_w(data >> 4);
 }
 
 
@@ -205,19 +204,20 @@ static const ptm6840_interface ptm_intf =
 	DEVCB_NULL
 };
 
+
 //-------------------------------------------------
 //  ACIA6850_INTERFACE( acia0_intf )
 //-------------------------------------------------
 
 static ACIA6850_INTERFACE( acia0_intf )
 {
-	9600*16, // HACK for terminal
-	9600*16, // HACK for terminal
+	0,
+	0,
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_LINE_GND, // HACK for terminal
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
-	DEVCB_LINE_GND, // HACK for terminal
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dcd_r),
 	DEVCB_NULL
 };
 
@@ -260,8 +260,8 @@ static COM8116_INTERFACE( dbrg_intf )
 	DEVCB_NULL,     /* fX/4 output */
 	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state, rx_tx_0_w),
 	DEVCB_DRIVER_LINE_MEMBER(ob68k1a_state, rx_tx_1_w),
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* receiver divisor ROM */
-	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },         /* transmitter divisor ROM */
+	COM8116_DIVISORS_16X_5_0688MHz, // receiver
+	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
 
 
@@ -322,15 +322,12 @@ void ob68k1a_state::machine_start()
 
 void ob68k1a_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	// initialize COM8116
-	com8116_w(program, 0, 0xee);
-//  m_dbrg->stt_w(program, 0, 0x01);
-//  m_dbrg->str_w(program, 0, 0x01);
+	m_dbrg->stt_w(0x0e);
+	m_dbrg->str_w(0x0e);
 
 	// set reset vector
-	void *ram = program.get_write_ptr(0);
+	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
 	UINT8 *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
