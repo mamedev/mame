@@ -41,8 +41,6 @@ To Do:
 
 - The scroll values are generally wrong when flip screen is on and rasters are often incorrect
 
-- gogomile M6295 banking is incorrect (the story sequence should have speech)
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -455,7 +453,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(fuuki16_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)  // Unverified
 	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
 	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
 
@@ -662,6 +660,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, gogomile, 0,        fuuki16, gogomile, driver_device, 0, ROT0, "Fuuki", "Go Go! Mile Smile", GAME_IMPERFECT_SOUND )
-GAME( 1995, gogomilej,gogomile, fuuki16, gogomilej, driver_device,0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1995, gogomile, 0,        fuuki16, gogomile, driver_device, 0, ROT0, "Fuuki", "Go Go! Mile Smile", 0 )
+GAME( 1995, gogomilej,gogomile, fuuki16, gogomilej, driver_device,0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", 0 )
 GAME( 1996, pbancho,  0,        fuuki16, pbancho, driver_device,  0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)
