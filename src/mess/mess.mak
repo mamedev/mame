@@ -931,7 +931,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c8280.o     \
 	$(MESS_MACHINE)/d9060.o     \
 	$(MESS_MACHINE)/d9060hd.o   \
-	$(MESS_MACHINE)/softbox.o   \
 	$(MESS_MACHINE)/serialbox.o \
 	$(MESS_MACHINE)/cmdhd.o     \
 	$(MESS_MACHINE)/fd2000.o    \
@@ -2149,6 +2148,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/rvoice.o    \
 	$(MESS_DRIVERS)/sacstate.o  \
 	$(MESS_DRIVERS)/sage2.o     \
+	$(MESS_DRIVERS)/softbox.o   \
 	$(MESS_DRIVERS)/swtpc.o     \
 	$(MESS_DRIVERS)/sys2900.o   \
 	$(MESS_DRIVERS)/systec.o    \

@@ -94,7 +94,6 @@
 #include "machine/plus4_sid.h"
 #include "machine/plus4_std.h"
 #include "machine/serialbox.h"
-#include "machine/softbox.h"
 #include "machine/superpet.h"
 #include "machine/vic1010.h"
 #include "machine/vic1011.h"
