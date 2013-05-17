@@ -68,6 +68,7 @@ public:
 	int m_maria_bcntl;
 	int m_maria_kangaroo;
 	int m_maria_rm;
+	int m_maria_nmi;
 	unsigned int m_maria_charbase;
 	bitmap_ind16 m_bitmap;
 	int m_p1_one_button;
