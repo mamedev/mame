@@ -4,7 +4,7 @@ Stunt Air - is this a bootleg of something? (it's not Star Jacker / Star Force)
 
 Stunt Air by Nuova Videotron 1983
 
-Finally i've found this one,too.This romset comes from a rare italian pcb.Game is a Sega's Star Jacker clone with different code,graphics,sound and hardware.
+Finally i've found this one,too.This romset comes from a rare italian pcb.
 
 Hardware info (complete):
 Main cpu Z80A
@@ -84,7 +84,9 @@ public:
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
 		m_bgattrram(*this, "bgattrram")
-	{ }
+	{
+		m_bg_xscroll = 0;
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -95,6 +97,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
+	UINT8 m_bg_xscroll;
+
 	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 
@@ -102,6 +106,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
 
+	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
 
 	DECLARE_READ8_MEMBER(stuntair_unk_r)
 	{
@@ -125,17 +130,17 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram") // bg
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe000) AM_READ(stuntair_unk_r) AM_WRITENOP
-	AM_RANGE(0xe800, 0xe800) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xe000, 0xe000) AM_READ(stuntair_unk_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(stuntair_unk_r) AM_WRITE(stuntair_bgxscroll_w)
 
-	AM_RANGE(0xf000, 0xf000) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xf000, 0xf000) AM_READ(stuntair_unk_r)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP // might be nmi enable
-	AM_RANGE(0xf002, 0xf002) AM_READ(stuntair_unk_r) AM_WRITENOP
-	AM_RANGE(0xf003, 0xf003) AM_READ(stuntair_unk_r) AM_WRITENOP
-	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
-	AM_RANGE(0xf005, 0xf005) AM_WRITENOP 
-	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
-	AM_RANGE(0xf007, 0xf007) AM_WRITENOP 
+	AM_RANGE(0xf002, 0xf002) AM_READ(stuntair_unk_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(stuntair_unk_r)
+//	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
+//	AM_RANGE(0xf005, 0xf005) AM_WRITENOP 
+//	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
+//	AM_RANGE(0xf007, 0xf007) AM_WRITENOP 
 
 	
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
@@ -216,13 +221,23 @@ void stuntair_state::machine_reset()
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 {
 	int tileno = m_fgram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, 0);
+	int opaque = tileno & 0x80;
+
+	
+	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+/* Back Layer */
+
+WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
+{
+	m_bg_xscroll = data;
 }
 
 WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
@@ -258,8 +273,13 @@ void stuntair_state::video_start()
 
 UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
+
+
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
+
 	return 0;
 }
 
