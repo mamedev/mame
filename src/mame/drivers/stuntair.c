@@ -1,19 +1,26 @@
 /*
 
+ Stunt Air by Nuova Videotron 1983
+
+  driver todo: (SOME OF THIS WILL NEED PCB REFERENCES / MEASUREMENTS)
 
 
-Stunt Air - is this a bootleg of something? (it's not Star Jacker / Star Force)
+  - correct colour PROM decoding (resistor values?)
+  - correct FG colour handling (currently use a hardcoded white)
+  - correct sound (need interrupt frequencies at least)
+  - correct remaining GFX / sprite issues (flicker sometimes, might need better vblank timing?)
+  - clean up input ports (identify unknown dips, unused ports)
+  - clean up driver
 
-Stunt Air by Nuova Videotron 1983
-
-Finally i've found this one,too.This romset comes from a rare italian pcb.
 
 Hardware info (complete):
 Main cpu Z80A
 Sound cpu Z80A
 Sound ic AY-3-8910 x2
 Note: stereo sound output.Op amps LM3900 x3, audio amps TDA2002 x2, many discrete components
+
 Osc: 18.432 Mhz
+
 Ram:
 Work 2kb (6116)
 Sound 1kb (2114 x2)
@@ -30,6 +37,7 @@ stuntair.a9 character gfx
 stuntair.a11,a12 background gfx
 stuntair.a13,a15 obj/sprites gfx
 82s123.a7 (removing it results in garbage boot screen with high score table music)
+
 -bottom pcb-
 82s129.l11 green,blue colors
 82s129.m11 red color
@@ -606,4 +614,4 @@ ROM_START( stuntair )
 ROM_END
 
 
-GAME( 1983, stuntair,  0,    stuntair, stuntair, driver_device,  0, ROT90, "Nuova Videotron", "Stunt Air", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1983, stuntair,  0,    stuntair, stuntair, driver_device,  0, ROT90, "Nuova Videotron", "Stunt Air",  GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
