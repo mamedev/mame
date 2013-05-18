@@ -186,10 +186,6 @@ I8237_INTERFACE( pc_dma8237_config )
  * pic8259 configuration
  *
  *************************************************************/
-WRITE_LINE_MEMBER(ibm5160_mb_device::pc_cpu_line)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
-}
 
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 {
@@ -473,7 +469,7 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, pc_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", DEVWRITELINE(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE(":maincpu", 0), VCC, NULL )
 
 	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 

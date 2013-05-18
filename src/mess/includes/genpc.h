@@ -103,7 +103,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pc_cpu_line );
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
 	const char *m_cputag;
