@@ -1,5 +1,7 @@
 /*
 
+
+
 Stunt Air - is this a bootleg of something? (it's not Star Jacker / Star Force)
 
 Stunt Air by Nuova Videotron 1983
@@ -73,6 +75,7 @@ Bprom dump by f205v
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
 
 class stuntair_state : public driver_device
 {
@@ -106,6 +109,7 @@ public:
 	UINT8 m_nmienable;
 	UINT8 m_spritebank0;
 	UINT8 m_spritebank1;
+	UINT8 m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
@@ -147,10 +151,33 @@ public:
 		// lower 2 bits are coin counters
 		if (data&~0x3) printf("stuntair_coin_w %02x\n", data);
 	}
+
+	DECLARE_WRITE8_MEMBER(stuntair_sound_w)
+	{
+		m_soundlatch = data;
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+
+	}
 	
 
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
 
+	INTERRUPT_GEN_MEMBER(stuntair_sound_irq)
+	{
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+	}
+
+	DECLARE_READ8_MEMBER(ay8910_in0_r)
+	{
+		return m_soundlatch;
+	}
+	
+	DECLARE_READ8_MEMBER(ay8910_in1_r)
+	{
+		printf("ay8910_in1_r\n");
+		return 0x00;//m_soundlatch;
+
+	}
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -182,7 +209,7 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
 
 
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP //? register or overrun?
+	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(stuntair_sound_w)
 
 ADDRESS_MAP_END
 
@@ -193,10 +220,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stuntair_sound_portmap, AS_IO, 8, stuntair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x03, 0x03) AM_WRITENOP
-	AM_RANGE(0x07, 0x07) AM_WRITENOP
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP
-	AM_RANGE(0x0d, 0x0d) AM_WRITENOP
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("ay2", ay8910_device, data_w)
+
+	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -455,16 +482,43 @@ INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+
+
+
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_in0_r),
+	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_in1_r),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+static const ay8910_interface ay8910_2_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,  18432000/4)         /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/4)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  stuntair_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,  18432000/4)         /* ? MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/4)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
+	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, stuntair_sound_irq, 60*8) // guessed, probably wrong ?? drives music tempo..
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -476,6 +530,18 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
 	MCFG_GFXDECODE(stuntair)
 	MCFG_PALETTE_LENGTH(0x100)
+
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
+
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_CONFIG(ay8910_2_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
