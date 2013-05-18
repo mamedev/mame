@@ -371,9 +371,9 @@ static const gfx_layout tiles16x8x2_layout =
 
 
 static GFXDECODE_START( stuntair )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0xe0, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0xe0, 8 )
 GFXDECODE_END
 
 
@@ -392,6 +392,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 	int tileno = m_fgram[tile_index];
 	int opaque = tileno & 0x80;
 
+	// where does the FG palette come from? it's a 1bpp layer..
 	
 	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
@@ -419,8 +420,9 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 {
 	int tileno = m_bgram[tile_index];
 	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
+	int colour = (m_bgattrram[tile_index] & 0x07);
 
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
 }
 
 
@@ -453,21 +455,20 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
 	for (int i=0;i<0x400/16;i++)
 	{
-		int x = m_sprram[(i*16)+5];
-		int y = 240-m_sprram[(i*16)+0];
-	
-		int tile;
-
-		tile = m_sprram[(i*16)+1] & 0x3f;
-
-		if (m_spritebank1) tile |= 0x40;
-		if (m_spritebank0) tile |= 0x80;
-
+		int x      = m_sprram[(i*16)+5];
+		int y      = m_sprram[(i*16)+0];
+		int colour = m_sprram[(i*16)+4] & 0x7;
+		int tile   = m_sprram[(i*16)+1] & 0x3f;
 		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
-	//	int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
+//	    int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
 		int flipx = 0;
+	
+		if (m_spritebank1) tile |= 0x40;
+		if (m_spritebank0) tile |= 0x80;		
 
-		drawgfx_transpen(bitmap,cliprect,gfx,tile,0,flipx,flipy,x,y,0);
+		y = 240 - y;
+
+		drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,flipx,flipy,x,y,0);
 	}
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
@@ -507,6 +508,33 @@ static const ay8910_interface ay8910_2_config =
 	DEVCB_NULL
 };
 
+PALETTE_INIT( stuntair )
+{
+	/* need resistor weights etc. */
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base()+0x100;
+	const UINT8 *color_prom2 = machine.root_device().memregion("proms")->base();
+
+	int i;
+
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 data = color_prom[i] | (color_prom2[i]<<4);
+
+
+		int b = (data&0xc0)>>6;
+		int g = (data&0x38)>>2;
+		int r = (data&0x07)>>0;
+
+
+		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
+	}
+
+	// just set the FG layer to black and white
+	palette_set_color(machine,0x100,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine,0x101,MAKE_RGB(0xff,0xff,0xff));
+
+}
+
 
 static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
@@ -529,8 +557,9 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
 
 	MCFG_GFXDECODE(stuntair)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x100+2)
 
+	MCFG_PALETTE_INIT(stuntair)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
@@ -568,9 +597,11 @@ ROM_START( stuntair )
 	ROM_LOAD( "stuntair.a13", 0x0000, 0x2000, CRC(bfdc0d38) SHA1(ea0a22971e9cf1b1682c35facc9c4e30607faed7) )
 	ROM_LOAD( "stuntair.a15", 0x2000, 0x2000, CRC(4531cab5) SHA1(35271555377ec3454a5d74bf8c21d7e8acc05782) )
 
-	ROM_REGION( 0x04000, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 ) // only the last few entries are used?
 	ROM_LOAD( "dm74s287n.11l", 0x000, 0x100, CRC(6c98f964) SHA1(abf7bdeccd33e62fa106d2056d1949cf278483a7) )
-	ROM_LOAD( "dm74s287n.11m", 0x000, 0x100, CRC(d330ff90) SHA1(e223935464109a3c4c7b29641b3736484c22c47a) )
+	ROM_LOAD( "dm74s287n.11m", 0x100, 0x100, CRC(d330ff90) SHA1(e223935464109a3c4c7b29641b3736484c22c47a) )
+
+	ROM_REGION( 0x020, "miscprom", 0 )
 	ROM_LOAD( "dm74s288n.7a",  0x000, 0x020, CRC(5779e751) SHA1(89c955ef8635ad3e9d699f33ec0e4d6c9205d01c) )
 ROM_END
 
