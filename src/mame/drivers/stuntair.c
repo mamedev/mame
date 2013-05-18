@@ -83,7 +83,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
-		m_bgattrram(*this, "bgattrram")
+		m_bgattrram(*this, "bgattrram"),
+		m_sprram(*this, "sprram")
 	{
 		m_bg_xscroll = 0;
 	}
@@ -93,6 +94,7 @@ public:
 	required_shared_ptr<UINT8> m_fgram;
 	required_shared_ptr<UINT8> m_bgram;
 	required_shared_ptr<UINT8> m_bgattrram;
+	required_shared_ptr<UINT8> m_sprram;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -128,15 +130,15 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")  // bg attr
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram") // bg
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
 
-	AM_RANGE(0xe000, 0xe000) AM_READ(stuntair_unk_r)
-	AM_RANGE(0xe800, 0xe800) AM_READ(stuntair_unk_r) AM_WRITE(stuntair_bgxscroll_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB")
+	AM_RANGE(0xe800, 0xe800 )AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
 
-	AM_RANGE(0xf000, 0xf000) AM_READ(stuntair_unk_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP // might be nmi enable
-	AM_RANGE(0xf002, 0xf002) AM_READ(stuntair_unk_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(stuntair_unk_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
+	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4")
 //	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
 //	AM_RANGE(0xf005, 0xf005) AM_WRITENOP 
 //	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
@@ -165,6 +167,124 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( stuntair )
+	PORT_START("DSWB") // the bit order logic doesn't seem to match the info in the text.. must be wired up in an odd way, might be better to do a bitswap in the read port handler
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) ) // SW 1   2
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPNAME( 0x24, 0x00,  DEF_STR( Coin_B ) ) // SW 3   4
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x24, "3" )
+	PORT_DIPNAME( 0x42, 0x40, DEF_STR( Bonus_Life ) ) // SW 5   6
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x40, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPSETTING(    0x42, "50000" )
+	PORT_DIPNAME( 0x81, 0x81, "Lives" ) // SW 7   8
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x81, "3" )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x10, 0x10, "DSWA:1" )  // SW1
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DSWA:2" ) // SW 2
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSWA:3" ) // SW 3
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives" ) // SW 4
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DSWA:5" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DSWA:6" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSWA:7" ) 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSWA:8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2:0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN2:1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN2:2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN2:3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN2:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN2:5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN2:6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN2:7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x04, 0x04, "Clear Credits on Reset" ) // I doubt this is a real switch
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x20, 0x20, "IN3:5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN3:6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN3:7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4:0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN4:1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN4:2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN4:3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN4:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN4:5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN4:6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN4:7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
