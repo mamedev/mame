@@ -1031,6 +1031,7 @@ $(MAMEOBJ)/metro.a: \
 $(MAMEOBJ)/midcoin.a: \
 	$(DRIVERS)/wallc.o \
 	$(DRIVERS)/wink.o \
+	$(DRIVERS)/24cdjuke.o \
 
 $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \

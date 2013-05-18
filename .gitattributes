@@ -2653,6 +2653,7 @@ src/mame/drivers/1942.c svneol=native#text/plain
 src/mame/drivers/1943.c svneol=native#text/plain
 src/mame/drivers/1945kiii.c svneol=native#text/plain
 src/mame/drivers/20pacgal.c svneol=native#text/plain
+src/mame/drivers/24cdjuke.c svneol=native#text/plain
 src/mame/drivers/2mindril.c svneol=native#text/plain
 src/mame/drivers/30test.c svneol=native#text/plain
 src/mame/drivers/39in1.c svneol=native#text/plain
