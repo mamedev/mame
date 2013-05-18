@@ -66,7 +66,7 @@ SW 7   8
 Note: no table-upright mode sw,upright fixed.No picture flip sw too
    
 
-Eprom dump,hw and dip info by tirino73 >isolani1973@libero.it<
+Eprom dump,hw and dip info by tirino73
 Bprom dump by f205v
 
 */
@@ -79,9 +79,25 @@ class stuntair_state : public driver_device
 public:
 	stuntair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_fgram(*this, "fgram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_fgram;
+
+	tilemap_t *m_fg_tilemap;
+
+	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
+	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
+
+	DECLARE_READ8_MEMBER(stuntair_unk_r)
+	{
+		return 0xff;
+	}
+
+	INTERRUPT_GEN_MEMBER(stuntair_irq);
+
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -92,6 +108,29 @@ public:
 
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM // bg
+	AM_RANGE(0xc800, 0xcfff) AM_RAM // bg attr
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+
+	AM_RANGE(0xe000, 0xe000) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xe800, 0xe800) AM_READ(stuntair_unk_r) AM_WRITENOP
+
+	AM_RANGE(0xf000, 0xf000) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xf001, 0xf001) AM_WRITENOP // might be nmi enable
+	AM_RANGE(0xf002, 0xf002) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xf003, 0xf003) AM_READ(stuntair_unk_r) AM_WRITENOP
+	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
+	AM_RANGE(0xf005, 0xf005) AM_WRITENOP 
+	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
+	AM_RANGE(0xf007, 0xf007) AM_WRITENOP 
+
+	
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
+
+
+	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP //? register or overrun?
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stuntair_soound_map, AS_PROGRAM, 8, stuntair_state )
@@ -140,23 +179,43 @@ void stuntair_state::machine_reset()
 {
 }
 
+
+TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
+{
+	int tileno = m_fgram[tile_index];
+	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, 0);
+}
+
+WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
 void stuntair_state::video_start()
 {
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-
+INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
+{
+//	if(m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  18432000/4)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  stuntair_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,  18432000/4)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(stuntair_soound_map)
