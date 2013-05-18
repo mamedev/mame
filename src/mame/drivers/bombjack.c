@@ -262,9 +262,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout1 =
 {
 	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
+	RGN_FRAC(1,3),    /* 512 characters */
 	3,  /* 3 bits per pixel */
-	{ 0, 512*8*8, 2*512*8*8 },  /* the bitplanes are separated */
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },  /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 }, /* pretty straightforward layout */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
@@ -273,9 +273,9 @@ static const gfx_layout charlayout1 =
 static const gfx_layout charlayout2 =
 {
 	16,16,  /* 16*16 characters */
-	256,    /* 256 characters */
+	RGN_FRAC(1,3),    /* 256 characters */
 	3,  /* 3 bits per pixel */
-	{ 0, 1024*8*8, 2*1024*8*8 },    /* the bitplanes are separated */
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },    /* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,   /* pretty straightforward layout */
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -459,30 +459,39 @@ ROM_END
 
 ROM_START( bombjackt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tecfri9.bin",    0x0000, 0x4000, CRC(4b59a3bb) SHA1(dae45985d2575821c86757ead14b8313e922570d) ) // == 09_j01b.bin + 10_l01b.bin
-	ROM_LOAD( "tecfri12.bin",   0x4000, 0x4000, CRC(0a32506a) SHA1(2fb3ce695caebbae3ca7dd9f3d34ac5b734d77ed) ) // == 11_m01b.bin + (97.229004%) 12_n01b.bin             
-	ROM_LOAD( "tecfri13.bin",   0xc000, 0x2000, CRC(964ac5c5) SHA1(8d235ae91aea1ae86411671c5aa050c146a52026) ) // (99.877930%) 13_r01b.bin             
+	ROM_LOAD( "9.1j",    0x0000, 0x4000, CRC(4b59a3bb) SHA1(dae45985d2575821c86757ead14b8313e922570d) ) // == 09_j01b.bin + 10_l01b.bin
+	ROM_LOAD( "12.1n",   0x4000, 0x4000, CRC(0a32506a) SHA1(2fb3ce695caebbae3ca7dd9f3d34ac5b734d77ed) ) // == 11_m01b.bin + (97.229004%) 12_n01b.bin             
+	ROM_LOAD( "13.1r",   0xc000, 0x2000, CRC(964ac5c5) SHA1(8d235ae91aea1ae86411671c5aa050c146a52026) ) // (99.877930%) 13_r01b.bin             
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound board */
-	ROM_LOAD( "01_h03t.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
+	ROM_LOAD( "1.6h",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
-	ROM_REGION( 0x3000, "chars", 0 ) // ok
-	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )    /* chars */
+	/*
+	ROM_REGION( 0x3000, "chars", 0 )
+	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )    
 	ROM_LOAD( "04_h08t.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
+	*/
+
+	ROM_REGION( 0x6000, "chars", 0 ) // the Tecfri produced boards apparently use double size roms here (content duplicated in each half)
+	ROM_LOAD( "3.1e",  0x0000, 0x2000, CRC(54e1dac1) SHA1(3c5d8b932b2a87acf42e0b4632195776689c1154) ) 
+	ROM_LOAD( "4.1h",  0x2000, 0x2000, CRC(05e428ab) SHA1(0b2cae76aba8372482a4e315a9f49fd15cb94625) )
+	ROM_LOAD( "5.1k",  0x4000, 0x2000, CRC(f282f29a) SHA1(521a110213d6ecdf54be0f50f41c3c266d65d84c) )
+
+	
 
 	ROM_REGION( 0x6000, "tiles", 0 ) // ok
-	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )    /* background tiles */
-	ROM_LOAD( "07_n08t.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
-	ROM_LOAD( "08_r08t.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
+	ROM_LOAD( "6.1l",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )    /* background tiles */
+	ROM_LOAD( "7.1n",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
+	ROM_LOAD( "8.1r",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
 	ROM_REGION( 0x6000, "sprites", 0 ) // ok
-	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )    /* sprites */
-	ROM_LOAD( "15_l07b.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
-	ROM_LOAD( "14_j07b.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
+	ROM_LOAD( "16.7m",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )    /* sprites */
+	ROM_LOAD( "15.7k",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
+	ROM_LOAD( "14.7j",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
 
 	ROM_REGION( 0x2000, "gfx4", 0 ) /* background tilemaps */
-	ROM_LOAD( "tecfri2.bin",  0x0000, 0x2000, CRC(de796158) SHA1(e004f10ada5c282f3b4208031e274190a54bf94f) ) // 1xxxxxxxxxxxx = 0xFF (double size, second half empty, otherwise the same)
+	ROM_LOAD( "2.5n",  0x0000, 0x2000, CRC(de796158) SHA1(e004f10ada5c282f3b4208031e274190a54bf94f) ) // 1xxxxxxxxxxxx = 0xFF (double size, second half empty, otherwise the same)
 ROM_END
 
 /*************************************
