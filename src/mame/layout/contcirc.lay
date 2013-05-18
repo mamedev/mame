@@ -21,28 +21,28 @@
 			<bounds left="14" right="18" top="47" bottom="51" />
 			<color red="0.44" green="0.47" blue="0.5" />
 		</disk>
-		<text string="LOW" state="1">
+		<text string="LOW" state="0">
 			<bounds left="3" right="29" top="2" bottom="12" />
 			<color red="1.0" green="1.0" blue="0.4" />
 		</text>
-		<text string="LOW" state="0">
+		<text string="LOW" state="1">
 			<bounds left="3" right="29" top="2" bottom="12" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 
-		<text string="HIGH" state="1">
+		<text string="HIGH" state="0">
 			<bounds left="3" right="29" top="52" bottom="62" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
-		<text string="HIGH" state="0">
+		<text string="HIGH" state="1">
 			<bounds left="3" right="29" top="52" bottom="62" />
 			<color red="1.0" green="1.0" blue="0.4" />
 		</text>
-		<disk state="1">
+		<disk state="0">
 			<bounds left="9" right="23" top="14" bottom="28" />
 			<color red="0.85" green="0.4" blue="0.3" />
 		</disk>
-		<disk state="0">
+		<disk state="1">
 			<bounds left="9" right="23" top="36" bottom="50" />
 			<color red="0.85" green="0.4" blue="0.3" />
 		</disk>
