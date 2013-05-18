@@ -1653,6 +1653,7 @@ $(MAMEOBJ)/yunsung.a: \
 
 $(MAMEOBJ)/zaccaria.a: \
 	$(DRIVERS)/laserbat.o $(AUDIO)/laserbat.o \
+	$(DRIVERS)/seabattl.o \
 	$(DRIVERS)/zac2650.o $(VIDEO)/zac2650.o \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \
 

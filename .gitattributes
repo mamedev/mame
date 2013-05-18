@@ -3588,6 +3588,7 @@ src/mame/drivers/scotrsht.c svneol=native#text/plain
 src/mame/drivers/scramble.c svneol=native#text/plain
 src/mame/drivers/scregg.c svneol=native#text/plain
 src/mame/drivers/sderby.c svneol=native#text/plain
+src/mame/drivers/seabattl.c svneol=native#text/plain
 src/mame/drivers/seattle.c svneol=native#text/plain
 src/mame/drivers/segac2.c svneol=native#text/plain
 src/mame/drivers/segae.c svneol=native#text/plain
