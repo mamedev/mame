@@ -87,6 +87,9 @@ public:
 		m_sprram(*this, "sprram")
 	{
 		m_bg_xscroll = 0;
+		m_nmienable = 0;
+		m_spritebank0 = 0;
+		m_spritebank1 = 0;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -100,6 +103,9 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	UINT8 m_bg_xscroll;
+	UINT8 m_nmienable;
+	UINT8 m_spritebank0;
+	UINT8 m_spritebank1;
 
 	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
@@ -110,10 +116,38 @@ public:
 
 	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
 
-	DECLARE_READ8_MEMBER(stuntair_unk_r)
+	DECLARE_WRITE8_MEMBER(stuntair_unk_w)
 	{
-		return 0xff;
+		printf("unk %02x\n", data);
 	}
+
+	DECLARE_WRITE8_MEMBER(stuntair_f001_w)
+	{
+		m_nmienable = data&0x01; // guess
+
+		if (data&~0x01) printf("stuntair_f001_w %02x\n", data);
+	}
+	
+	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w)
+	{
+		m_spritebank0 = data&0x01;
+
+		if (data&~0x01) printf("stuntair_spritebank0_w %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w)
+	{
+		m_spritebank1 = data&0x01;
+
+		if (data&~0x01) printf("stuntair_spritebank1_w %02x\n", data);
+	}
+
+	DECLARE_WRITE8_MEMBER(stuntair_coin_w)
+	{
+		// lower 2 bits are coin counters
+		if (data&~0x3) printf("stuntair_coin_w %02x\n", data);
+	}
+	
 
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
 
@@ -132,15 +166,15 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram") // bg
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
 
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB")
-	AM_RANGE(0xe800, 0xe800 )AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB") AM_WRITE(stuntair_coin_w)
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
 
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP // might be nmi enable
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_f001_w)  // might be nmi enable
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4")
+	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4") AM_WRITE(stuntair_spritebank1_w) 
 //	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
-//	AM_RANGE(0xf005, 0xf005) AM_WRITENOP 
+	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w) 
 //	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
 //	AM_RANGE(0xf007, 0xf007) AM_WRITENOP 
 
@@ -388,24 +422,38 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
 
 	gfx_element *gfx = machine().gfx[2];
 
-	for (int i=0;i<0x200;i+=8)
+	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
+	for (int i=0;i<0x400/16;i++)
 	{
-		int x = m_sprram[i+5];
-		int y = 240-m_sprram[i+0];
-		
-		drawgfx_transpen(bitmap,cliprect,gfx,2,0,0,0,x,y,0);
+		int x = m_sprram[(i*16)+5];
+		int y = 240-m_sprram[(i*16)+0];
+	
+		int tile;
+
+		tile = m_sprram[(i*16)+1] & 0x3f;
+
+		if (m_spritebank1) tile |= 0x40;
+		if (m_spritebank0) tile |= 0x80;
+
+		int flipx = (m_sprram[(i*16)+1] & 0x80)>>7; // used
+		int flipy = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed
+
+
+		drawgfx_transpen(bitmap,cliprect,gfx,tile,0,flipx,flipy,x,y,0);
 	}
+
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
+
 
 	return 0;
 }
 
 INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
 {
-//	if(m_nmi_enable)
+	if(m_nmienable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
