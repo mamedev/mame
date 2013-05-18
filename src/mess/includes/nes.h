@@ -245,6 +245,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ks7032",           NES_KS7032) //  mapper 142
 	SLOT_INTERFACE_INTERNAL("ks7012",           NES_KS7012)  // used in Zanac (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("ks7013b",          NES_KS7013B) // used in Highway Star (FDS Conversion)
+	SLOT_INTERFACE_INTERNAL("ks7031",           NES_KS7031) //  used in Dracula II (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("gs2015",           NES_GS2015)
 	SLOT_INTERFACE_INTERNAL("gs2004",           NES_GS2004)
 	SLOT_INTERFACE_INTERNAL("gs2013",           NES_GS2013)

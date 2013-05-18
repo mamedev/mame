@@ -23,7 +23,6 @@
  TODO:
  - FCEUmm lists more Kaiser PCBs:
    * KS7030 (for Yume Koujou Doki Doki Panic by Kaiser?)
-   * KS7031 (for Dracula II?)
    * KS7037
    but there seem to be no available dumps...
 
@@ -56,6 +55,7 @@ const device_type NES_KS202 = &device_creator<nes_ks202_device>;
 const device_type NES_KS7017 = &device_creator<nes_ks7017_device>;
 const device_type NES_KS7012 = &device_creator<nes_ks7012_device>;
 const device_type NES_KS7013B = &device_creator<nes_ks7013b_device>;
+const device_type NES_KS7031 = &device_creator<nes_ks7031_device>;
 
 
 nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -95,6 +95,11 @@ nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *
 
 nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_KS7013B, "NES Cart Kaiser KS-7013B PCB", tag, owner, clock, "nes_ks7013b", __FILE__)
+{
+}
+
+nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_KS7031, "NES Cart Kaiser KS-7031 PCB", tag, owner, clock, "nes_ks7031", __FILE__)
 {
 }
 
@@ -203,6 +208,23 @@ void nes_ks7013b_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
+}
+
+void nes_ks7031_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_ks7031_device::pcb_reset()
+{
+	prg32(0);	// not really used...
+	chr8(0, CHRRAM);
+	
+	m_reg[0] = 0;
+	m_reg[1] = 0;
+	m_reg[2] = 0;
+	m_reg[3] = 0;
 }
 
 
@@ -503,15 +525,15 @@ WRITE8_MEMBER(nes_ks7012_device::write_h)
 
 
 /*-------------------------------------------------
-
+ 
  Kaiser Board KS7013B
-
+ 
  Games: Highway Star FDS Conversion
-
+ 
  iNES:
-
+ 
  In MESS: Supported.
-
+ 
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_ks7013b_device::write_m)
@@ -524,4 +546,44 @@ WRITE8_MEMBER(nes_ks7013b_device::write_h)
 {
 	LOG_MMC(("ks7013b write_h, offset: %04x, data: %02x\n", offset, data));
 	set_nt_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+
+/*-------------------------------------------------
+
+ Kaiser Board KS7031
+
+ Games: Dracula II FDS Conversion
+
+ This board is quite weird. It handles 2K PRG chunks
+ and the chip contains chunks in reverse order, so 
+ that the first 2K are actually loaded at the top
+ of the 0x8000-0xffff region. Main bank is fixed, while
+ the 8K mapped at 0x6000-0x7fff varies with reg writes.
+
+ TODO: understand how SRAM is handled...
+ 
+ iNES:
+
+ In MESS: Supported.
+
+ -------------------------------------------------*/
+
+READ8_MEMBER(nes_ks7031_device::read_m)
+{
+//	LOG_MMC(("ks7031 read_m, offset: %04x\n", offset));
+	return m_prg[(m_reg[(offset >> 11) & 3] * 0x0800) + (offset & 0x7ff)];
+}
+
+READ8_MEMBER(nes_ks7031_device::read_h)
+{
+	// here the first 32K are accessed, but in 16x2K blocks loaded in reverse order
+	int accessed_2k = (offset >> 11) & 0x0f;
+	return m_prg[((0x0f - accessed_2k) * 0x0800) + (offset & 0x7ff)];
+}
+
+WRITE8_MEMBER(nes_ks7031_device::write_h)
+{
+	LOG_MMC(("ks7031 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg[(offset >> 11) & 3] = data & 0x3f;
 }
