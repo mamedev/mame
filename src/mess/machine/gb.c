@@ -171,8 +171,7 @@ void gb_state::gb_init_regs()
 void gb_state::gb_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	gb_sound_w(m_custom, space, 0x16, 0x00);       /* Initialize sound hardware */
+	m_custom->sound_w(space, 0x16, 0x00);       /* Initialize sound hardware */
 
 	m_divcount = 0;
 	m_triggering_irq = 0;
@@ -252,9 +251,9 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 	m_bios_disable = 0;
 
 	/* Initialize the Sound registers */
-	gb_sound_w(m_custom, generic_space(), 0x16,0x80);
-	gb_sound_w(m_custom, generic_space(), 0x15,0xF3);
-	gb_sound_w(m_custom, generic_space(), 0x14,0x77);
+	m_custom->sound_w(generic_space(), 0x16, 0x80);
+	m_custom->sound_w(generic_space(), 0x15, 0xF3);
+	m_custom->sound_w(generic_space(), 0x14, 0x77);
 
 	m_divcount = 0xABC8;
 }
@@ -1157,25 +1156,25 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
-	gb_sound_w(m_custom, space, megaduck_sound_offsets[offset], data );
+	m_custom->sound_w(space, megaduck_sound_offsets[offset], data);
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
-	return gb_sound_r( m_custom, space, megaduck_sound_offsets[offset] );
+	return m_custom->sound_r(space, megaduck_sound_offsets[offset]);
 }
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
-		case 0x00:  gb_sound_w(m_custom, space, 0x10, data ); break;
-		case 0x01:  gb_sound_w(m_custom, space, 0x12, data ); break;
-		case 0x02:  gb_sound_w(m_custom, space, 0x11, data ); break;
-		case 0x03:  gb_sound_w(m_custom, space, 0x13, data ); break;
-		case 0x04:  gb_sound_w(m_custom, space, 0x14, data ); break;
-		case 0x05:  gb_sound_w(m_custom, space, 0x16, data ); break;
-		case 0x06:  gb_sound_w(m_custom, space, 0x15, data ); break;
+		case 0x00:  m_custom->sound_w(space, 0x10, data); break;
+		case 0x01:  m_custom->sound_w(space, 0x12, data); break;
+		case 0x02:  m_custom->sound_w(space, 0x11, data); break;
+		case 0x03:  m_custom->sound_w(space, 0x13, data); break;
+		case 0x04:  m_custom->sound_w(space, 0x14, data); break;
+		case 0x05:  m_custom->sound_w(space, 0x16, data); break;
+		case 0x06:  m_custom->sound_w(space, 0x15, data); break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -1191,5 +1190,5 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
-	return gb_sound_r(m_custom, space, 0x10 + megaduck_sound_offsets[offset]);
+	return m_custom->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
 }

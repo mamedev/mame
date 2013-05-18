@@ -1,6 +1,7 @@
 #ifndef _GBA_H_
 #define _GBA_H_
 
+#include "audio/gb.h"
 #include "machine/intelfsh.h"
 #include "sound/dac.h"
 
@@ -160,7 +161,7 @@ public:
 	required_device<dac_device> m_radac;
 	required_device<dac_device> m_lbdac;
 	required_device<dac_device> m_rbdac;
-	required_device<device_t> m_gbsound;
+	required_device<gameboy_sound_device> m_gbsound;
 
 	void request_irq(UINT32 int_type);
 	void dma_exec(FPTR ch);

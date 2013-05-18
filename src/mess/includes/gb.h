@@ -7,6 +7,7 @@
 #ifndef GB_H_
 #define GB_H_
 
+#include "audio/gb.h"
 #include "machine/gb_slot.h"
 #include "machine/ram.h"
 
@@ -209,7 +210,7 @@ public:
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
-	required_device<device_t> m_custom;
+	required_device<gameboy_sound_device> m_custom;
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;

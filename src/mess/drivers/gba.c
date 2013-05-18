@@ -746,31 +746,31 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0060/4:
-			retval = gb_sound_r(m_gbsound, space, 0) | gb_sound_r(m_gbsound, space, 1)<<16 | gb_sound_r(m_gbsound, space, 2)<<24;
+			retval = m_gbsound->sound_r(space, 0) | m_gbsound->sound_r(space, 1)<<16 | m_gbsound->sound_r(space, 2)<<24;
 			break;
 		case 0x0064/4:
-			retval = gb_sound_r(m_gbsound, space, 3) | gb_sound_r(m_gbsound, space, 4)<<8;
+			retval = m_gbsound->sound_r(space, 3) | m_gbsound->sound_r(space, 4)<<8;
 			break;
 		case 0x0068/4:
-			retval = gb_sound_r(m_gbsound, space, 6) | gb_sound_r(m_gbsound, space, 7)<<8;
+			retval = m_gbsound->sound_r(space, 6) | m_gbsound->sound_r(space, 7)<<8;
 			break;
 		case 0x006c/4:
-			retval = gb_sound_r(m_gbsound, space, 8) | gb_sound_r(m_gbsound, space, 9)<<8;
+			retval = m_gbsound->sound_r(space, 8) | m_gbsound->sound_r(space, 9)<<8;
 			break;
 		case 0x0070/4:
-			retval = gb_sound_r(m_gbsound, space, 0xa) | gb_sound_r(m_gbsound, space, 0xb)<<16 | gb_sound_r(m_gbsound, space, 0xc)<<24;
+			retval = m_gbsound->sound_r(space, 0xa) | m_gbsound->sound_r(space, 0xb)<<16 | m_gbsound->sound_r(space, 0xc)<<24;
 			break;
 		case 0x0074/4:
-			retval = gb_sound_r(m_gbsound, space, 0xd) | gb_sound_r(m_gbsound, space, 0xe)<<8;
+			retval = m_gbsound->sound_r(space, 0xd) | m_gbsound->sound_r(space, 0xe)<<8;
 			break;
 		case 0x0078/4:
-			retval = gb_sound_r(m_gbsound, space, 0x10) | gb_sound_r(m_gbsound, space, 0x11)<<8;
+			retval = m_gbsound->sound_r(space, 0x10) | m_gbsound->sound_r(space, 0x11)<<8;
 			break;
 		case 0x007c/4:
-			retval = gb_sound_r(m_gbsound, space, 0x12) | gb_sound_r(m_gbsound, space, 0x13)<<8;
+			retval = m_gbsound->sound_r(space, 0x12) | m_gbsound->sound_r(space, 0x13)<<8;
 			break;
 		case 0x0080/4:
-			retval = gb_sound_r(m_gbsound, space, 0x14) | gb_sound_r(m_gbsound, space, 0x15)<<8;
+			retval = m_gbsound->sound_r(space, 0x14) | m_gbsound->sound_r(space, 0x15)<<8;
 			if( (mem_mask) & 0xffff0000 )
 			{
 				verboselog(machine(), 2, "GBA IO Register Read: SOUNDCNT_H (%08x) = %04x\n", 0x04000000 + ( offset << 2 ) + 2, m_SOUNDCNT_H );
@@ -778,7 +778,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0084/4:
-			retval = gb_sound_r(m_gbsound, space, 0x16);
+			retval = m_gbsound->sound_r(space, 0x16);
 			break;
 		case 0x0088/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -792,16 +792,16 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0090/4:
-			retval = gb_wave_r(m_gbsound, space, 0) | gb_wave_r(m_gbsound, space, 1)<<8 | gb_wave_r(m_gbsound, space, 2)<<16 | gb_wave_r(m_gbsound, space, 3)<<24;
+			retval = m_gbsound->wave_r(space, 0) | m_gbsound->wave_r(space, 1)<<8 | m_gbsound->wave_r(space, 2)<<16 | m_gbsound->wave_r(space, 3)<<24;
 			break;
 		case 0x0094/4:
-			retval = gb_wave_r(m_gbsound, space, 4) | gb_wave_r(m_gbsound, space, 5)<<8 | gb_wave_r(m_gbsound, space, 6)<<16 | gb_wave_r(m_gbsound, space, 7)<<24;
+			retval = m_gbsound->wave_r(space, 4) | m_gbsound->wave_r(space, 5)<<8 | m_gbsound->wave_r(space, 6)<<16 | m_gbsound->wave_r(space, 7)<<24;
 			break;
 		case 0x0098/4:
-			retval = gb_wave_r(m_gbsound, space, 8) | gb_wave_r(m_gbsound, space, 9)<<8 | gb_wave_r(m_gbsound, space, 10)<<16 | gb_wave_r(m_gbsound, space, 11)<<24;
+			retval = m_gbsound->wave_r(space, 8) | m_gbsound->wave_r(space, 9)<<8 | m_gbsound->wave_r(space, 10)<<16 | m_gbsound->wave_r(space, 11)<<24;
 			break;
 		case 0x009c/4:
-			retval = gb_wave_r(m_gbsound, space, 12) | gb_wave_r(m_gbsound, space, 13)<<8 | gb_wave_r(m_gbsound, space, 14)<<16 | gb_wave_r(m_gbsound, space, 15)<<24;
+			retval = m_gbsound->wave_r(space, 12) | m_gbsound->wave_r(space, 13)<<8 | m_gbsound->wave_r(space, 14)<<16 | m_gbsound->wave_r(space, 15)<<24;
 			break;
 		case 0x00a0/4:
 		case 0x00a4/4:
@@ -1321,99 +1321,99 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0060/4:
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(m_gbsound, space, 0, data);
+				m_gbsound->sound_w(space, 0, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(m_gbsound, space, 1, data>>16);  // SOUND1CNT_H
+				m_gbsound->sound_w(space, 1, data>>16);  // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_sound_w(m_gbsound, space, 2, data>>24);
+				m_gbsound->sound_w(space, 2, data>>24);
 			}
 			break;
 		case 0x0064/4:
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(m_gbsound, space, 3, data);
+				m_gbsound->sound_w(space, 3, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 4, data>>8);   // SOUND1CNT_H
+				m_gbsound->sound_w(space, 4, data>>8);   // SOUND1CNT_H
 			}
 			break;
 		case 0x0068/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 6, data);
+				m_gbsound->sound_w(space, 6, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 7, data>>8);
+				m_gbsound->sound_w(space, 7, data>>8);
 			}
 			break;
 		case 0x006c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 8, data);
+				m_gbsound->sound_w(space, 8, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 9, data>>8);
+				m_gbsound->sound_w(space, 9, data>>8);
 			}
 			break;
 		case 0x0070/4:  //SND3CNTL and H
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(m_gbsound, space, 0xa, data);
+				m_gbsound->sound_w(space, 0xa, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(m_gbsound, space, 0xb, data>>16);    // SOUND1CNT_H
+				m_gbsound->sound_w(space, 0xb, data>>16);    // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_sound_w(m_gbsound, space, 0xc, data>>24);
+				m_gbsound->sound_w(space, 0xc, data>>24);
 			}
 			break;
 		case 0x0074/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 0xd, data);
+				m_gbsound->sound_w(space, 0xd, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 0xe, data>>8);
+				m_gbsound->sound_w(space, 0xe, data>>8);
 			}
 			break;
 		case 0x0078/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 0x10, data);
+				m_gbsound->sound_w(space, 0x10, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 0x11, data>>8);
+				m_gbsound->sound_w(space, 0x11, data>>8);
 			}
 			break;
 		case 0x007c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 0x12, data);
+				m_gbsound->sound_w(space, 0x12, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 0x13, data>>8);
+				m_gbsound->sound_w(space, 0x13, data>>8);
 			}
 			break;
 		case 0x0080/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 0x14, data);
+				m_gbsound->sound_w(space, 0x14, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 0x15, data>>8);
+				m_gbsound->sound_w(space, 0x15, data>>8);
 			}
 
 			if ((mem_mask) & 0xffff0000)
@@ -1443,7 +1443,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0084/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(m_gbsound, space, 0x16, data);
+				m_gbsound->sound_w(space, 0x16, data);
 				if ((data & 0x80) && !(m_SOUNDCNT_X & 0x80))
 				{
 					m_fifo_a_ptr = m_fifo_a_in = 17;
@@ -1470,73 +1470,73 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0090/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(m_gbsound, space, 0, data);
+				m_gbsound->wave_w(space, 0, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(m_gbsound, space, 1, data>>8);
+				m_gbsound->wave_w(space, 1, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(m_gbsound, space, 2, data>>16);
+				m_gbsound->wave_w(space, 2, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(m_gbsound, space, 3, data>>24);
+				m_gbsound->wave_w(space, 3, data>>24);
 			}
 			break;
 		case 0x0094/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(m_gbsound, space, 4, data);
+				m_gbsound->wave_w(space, 4, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(m_gbsound, space, 5, data>>8);
+				m_gbsound->wave_w(space, 5, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(m_gbsound, space, 6, data>>16);
+				m_gbsound->wave_w(space, 6, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(m_gbsound, space, 7, data>>24);
+				m_gbsound->wave_w(space, 7, data>>24);
 			}
 			break;
 		case 0x0098/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(m_gbsound, space, 8, data);
+				m_gbsound->wave_w(space, 8, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(m_gbsound, space, 9, data>>8);
+				m_gbsound->wave_w(space, 9, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(m_gbsound, space, 0xa, data>>16);
+				m_gbsound->wave_w(space, 0xa, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(m_gbsound, space, 0xb, data>>24);
+				m_gbsound->wave_w(space, 0xb, data>>24);
 			}
 			break;
 		case 0x009c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(m_gbsound, space, 0xc, data);
+				m_gbsound->wave_w(space, 0xc, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(m_gbsound, space, 0xd, data>>8);
+				m_gbsound->wave_w(space, 0xd, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(m_gbsound, space, 0xe, data>>16);
+				m_gbsound->wave_w(space, 0xe, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(m_gbsound, space, 0xf, data>>24);
+				m_gbsound->wave_w(space, 0xf, data>>24);
 			}
 			break;
 		case 0x00a0/4:
