@@ -102,6 +102,11 @@ public:
 	DECLARE_WRITE16_MEMBER(bioship_bank_w);
 	DECLARE_WRITE8_MEMBER(spec2k_oki1_banking_w);
 	DECLARE_WRITE8_MEMBER(twinactn_oki_bank_w);
+	DECLARE_READ16_MEMBER( atombjt_unkr_r )
+	{
+		return 0x0000;
+	}
+
 	DECLARE_DRIVER_INIT(nmk);
 	DECLARE_DRIVER_INIT(vandykeb);
 	DECLARE_DRIVER_INIT(tdragonb);
