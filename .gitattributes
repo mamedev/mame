@@ -3708,6 +3708,7 @@ src/mame/drivers/stellafr.c svneol=native#text/plain
 src/mame/drivers/stfight.c svneol=native#text/plain
 src/mame/drivers/stlforce.c svneol=native#text/plain
 src/mame/drivers/strnskil.c svneol=native#text/plain
+src/mame/drivers/stuntair.c svneol=native#text/plain
 src/mame/drivers/stv.c svneol=native#text/plain
 src/mame/drivers/su2000.c svneol=native#text/plain
 src/mame/drivers/sub.c svneol=native#text/plain
