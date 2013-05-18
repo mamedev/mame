@@ -251,9 +251,7 @@ static INPUT_PORTS_START( stuntair )
 	
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x02, 0x02, "IN2:1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_DIPNAME( 0x04, 0x04, "IN2:2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -438,9 +436,9 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 		if (m_spritebank1) tile |= 0x40;
 		if (m_spritebank0) tile |= 0x80;
 
-		int flipx = (m_sprram[(i*16)+1] & 0x80)>>7; // used
-		int flipy = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed
-
+		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
+	//	int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
+		int flipx = 0;
 
 		drawgfx_transpen(bitmap,cliprect,gfx,tile,0,flipx,flipy,x,y,0);
 	}
