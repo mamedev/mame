@@ -58,6 +58,8 @@
 #define VS71    0x0007000a
 #define VS2005  0x00080000
 #define VS2008  0x00090000
+#define VS2010  0x00100000
+#define VS2012  0x00110000
 
 
 
@@ -117,6 +119,7 @@ static const translation_info gcc_translate[] =
 	{ VS71,     "-msse2",                   "/arch:SSE2" },
 	{ 0,        "-msse2",                   "" },
 	{ 0,        "-msse3",                   "" },
+	{ VS2010,   "-mavx",                    "/arch:AVX" },
 	{ 0,        "-mwindows",                "" },
 	{ 0,        "-mno-cygwin",              "" },
 	{ 0,        "-std=gnu89",               "" },
@@ -124,6 +127,7 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-pipe",                    "" },
 	{ 0,        "-x",                       "" },
 	{ 0,        "c++",                      "" },
+	{ 0,        "-flto",                    "/GL" },
 	{ 0 }
 };
 
@@ -144,6 +148,7 @@ static const translation_info ld_translate[] =
 	{ 0,        "-static-libgcc",           "" },
 	{ 0,        "-static-libstdc++",            "" },
 	{ 0,        "-shared",                  "/dll" },
+	{ 0,        "-flto",                    "/LTCG" },
 	{ 0 }
 };
 
