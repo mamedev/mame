@@ -217,6 +217,11 @@ ROM_START( dlair2_318 )
 	ROM_LOAD( "dl2_318.bin",     0x00000, 0x10000, CRC(64706492) SHA1(99c92572c59ce1206847a5363d3791196fccd742) )
 ROM_END
 
+ROM_START( dlair2_317e )
+	ROM_REGION( 0x10000, "ipl", 0 )
+	ROM_LOAD( "dl2euro3.17.bin", 0x00000, 0x10000, CRC(743f65a5) SHA1(45199983156c561b8e88c69bef454fd4042579bb) )
+ROM_END
+
 ROM_START( dlair2_316e )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2euro.bin",     0x00000, 0x10000, CRC(d68f1b13) SHA1(cc9ee307b4d3caba049be6226163c810cf89ab44) )
@@ -267,6 +272,7 @@ GAME( 1991, dlair2,       0,        dlair2,  dlair2, driver_device,  0,       RO
 GAME( 1991, dlair2_319e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.19)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_319s,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Spanish v3.19)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_318,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.18)", GAME_IS_SKELETON )
+GAME( 1991, dlair2_317e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.17)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_316e,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Euro v3.16)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_315,   dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (US v3.15)", GAME_IS_SKELETON )
 GAME( 1991, dlair2_315s,  dlair2,   dlair2,  dlair2, driver_device,  0,       ROT0, "Leland",      "Dragon's Lair 2: Time Warp (Spanish v3.15)", GAME_IS_SKELETON )
