@@ -2988,6 +2988,7 @@ static INPUT_PORTS_START( sloco93 )
 	PORT_DIPSETTING(    0x00, "1 Coin - 100 Credits / 1 Note - 100 Credits" )
 INPUT_PORTS_END
 
+/*
 static INPUT_PORTS_START( royale )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
@@ -3055,6 +3056,7 @@ static INPUT_PORTS_START( royale )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+*/
 
 static INPUT_PORTS_START( bsuerte )
 	/* Multiplexed - 4x5bits */
