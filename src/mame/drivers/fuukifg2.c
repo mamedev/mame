@@ -450,10 +450,10 @@ void fuuki16_state::machine_reset()
 static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fuuki16_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000)  // Unverified
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
 	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
 
@@ -472,11 +472,11 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 4000000)
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 3)
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(fuuki16_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
