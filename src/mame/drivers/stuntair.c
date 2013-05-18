@@ -81,17 +81,27 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_fgram(*this, "fgram")
+		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_bgattrram(*this, "bgattrram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<UINT8> m_bgram;
+	required_shared_ptr<UINT8> m_bgattrram;
 
 	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
 
 	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
+
+	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
+	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
+	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
+
 
 	DECLARE_READ8_MEMBER(stuntair_unk_r)
 	{
@@ -110,9 +120,9 @@ public:
 
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM // bg
-	AM_RANGE(0xc800, 0xcfff) AM_RAM // bg attr
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")  // bg attr
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram") // bg
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe000) AM_READ(stuntair_unk_r) AM_WRITENOP
@@ -215,14 +225,40 @@ WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
+{
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
+{
+	int tileno = m_bgram[tile_index];
+	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
+
+	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+}
+
+
+WRITE8_MEMBER(stuntair_state::stuntair_bgattrram_w)
+{
+	m_bgattrram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
 
 void stuntair_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
