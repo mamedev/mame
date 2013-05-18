@@ -216,9 +216,7 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2:0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x02, 0x02, "IN2:1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -228,18 +226,10 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPNAME( 0x08, 0x08, "IN2:3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN2:4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN2:5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN2:6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN2:7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) 
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -399,6 +389,16 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
+
+	gfx_element *gfx = machine().gfx[2];
+
+	for (int i=0;i<0x200;i+=8)
+	{
+		int x = m_sprram[i+5];
+		int y = 240-m_sprram[i+0];
+		
+		drawgfx_transpen(bitmap,cliprect,gfx,2,0,0,0,x,y,0);
+	}
 
 	return 0;
 }
