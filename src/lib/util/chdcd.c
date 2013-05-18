@@ -756,11 +756,11 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 				if (!strcmp(token, "BINARY"))
 				{
-					outinfo.track[trknum].swap = false;
+					outinfo.track[trknum+1].swap = false;
 				}
 				else if (!strcmp(token, "MOTOROLA"))
 				{
-					outinfo.track[trknum].swap = true;
+					outinfo.track[trknum+1].swap = true;
 				}
 				else if (!strcmp(token, "WAVE"))
 				{
@@ -844,6 +844,33 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if ((outtoc.tracks[trknum].pregap == 0) && (outinfo.track[trknum].idx0offs != -1))
 					{
 						outtoc.tracks[trknum].pregap = frames - outinfo.track[trknum].idx0offs;
+						outtoc.tracks[trknum].pgtype = outtoc.tracks[trknum].trktype;
+						switch (outtoc.tracks[trknum].pgtype)
+						{
+							case CD_TRACK_MODE1:
+							case CD_TRACK_MODE2_FORM1:
+								outtoc.tracks[trknum].pgdatasize = 2048;
+								break;
+
+							case CD_TRACK_MODE1_RAW:
+							case CD_TRACK_MODE2_RAW:
+							case CD_TRACK_AUDIO:
+								outtoc.tracks[trknum].pgdatasize = 2352;
+								break;
+
+							case CD_TRACK_MODE2:
+							case CD_TRACK_MODE2_FORM_MIX:
+								outtoc.tracks[trknum].pgdatasize = 2336;
+								break;
+
+							case CD_TRACK_MODE2_FORM2:
+								outtoc.tracks[trknum].pgdatasize = 2324;
+								break;
+						}
+					}
+					else	// pregap sectors not in file, but we're always using idx0ofs for track length calc now
+					{
+						outinfo.track[trknum].idx0offs = frames;
 					}
 				}
 			}
@@ -923,7 +950,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				/* if we have the same filename as the next track, do it that way */
 				if (outinfo.track[trknum].fname == outinfo.track[trknum+1].fname)
 				{
-					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx1offs - outinfo.track[trknum].idx1offs;
+					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
 
 					if (trknum == 0)    // track 0 offset is 0
 					{
@@ -1148,3 +1175,4 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 	return CHDERR_NONE;
 }
+

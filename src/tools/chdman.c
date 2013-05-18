@@ -1249,12 +1249,23 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		// output TRACK entry
 		core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.cstr());
 
-		// output PREGAP
-		if (info.pregap > 0)
+		// output PREGAP tag if pregap sectors are not in the file
+		if ((info.pregap > 0) && (info.pgdatasize == 0))
+		{
 			core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
+			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+		}
+		else if ((info.pregap > 0) && (info.pgdatasize > 0)) 
+		{
+			core_fprintf(file, "    INDEX 00 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs+info.pregap));
+		}
 
-		// output track data
-		core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+		// if no pregap at all, output index 01 only
+		if (info.pregap == 0)
+		{
+			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+		}
 
 		// output POSTGAP
 		if (info.postgap > 0)

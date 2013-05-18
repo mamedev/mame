@@ -812,6 +812,11 @@ static void pce_cd_nec_get_dir_info( running_machine &machine )
 		{
 			track = MAX( bcd_2_dec( pce_cd.command_buffer[2] ), 1 );
 			frame = toc->tracks[track-1].logframeofs;
+			// PCE wants the start sector for data tracks to *not* include the pregap
+			if (toc->tracks[track-1].trktype != CD_TRACK_AUDIO)
+			{
+				frame += toc->tracks[track-1].pregap;
+			}
 			pce_cd.data_buffer[3] = ( toc->tracks[track-1].trktype == CD_TRACK_AUDIO ) ? 0x00 : 0x04;
 		}
 		logerror("track = %d, frame = %d\n", track, frame );

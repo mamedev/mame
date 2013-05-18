@@ -111,9 +111,9 @@ struct cdrom_track_info
 	/* fields used in CHDMAN only */
 	UINT32 padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
 
-	/* fields used in MAME only */
-	UINT32 logframeofs; /* logical frame offset: offset including pre/postgaps */
-	UINT32 physframeofs; /* physical frame offset: offset ignoring pre/postgaps */
+	/* fields used in MAME/MESS only */
+	UINT32 logframeofs; /* logical frame of actual track data - offset by pregap size if pregap not physically present */
+	UINT32 physframeofs; /* physical frame of actual track data in CHD data */
 	UINT32 chdframeofs; /* frame number this track starts at on the CHD */
 };
 
