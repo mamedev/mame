@@ -90,9 +90,8 @@ static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xffc040, 0xffc043) AM_DEVREADWRITE8(I8259_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0xffc050, 0xffc053) AM_DEVICE8(UPD765_TAG, upd765a_device, map, 0x00ff)
-	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
-	AM_RANGE(0xffc070, 0xffc071) AM_DEVREAD8(I8251_0_TAG, i8251_device, data_r, 0x00ff) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0x00ff)
-//  AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffc060, 0xffc067) AM_DEVREADWRITE8(I8255A_1_TAG, i8255_device, read, write, 0x00ff) // i8255, Printer
+	AM_RANGE(0xffc070, 0xffc071) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc072, 0xffc073) AM_DEVREADWRITE8(I8251_0_TAG, i8251_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xffc080, 0xffc087) AM_MIRROR(0x78) AM_DEVREADWRITE8_LEGACY(I8253_0_TAG, pit8253_r, pit8253_w, 0x00ff)
 //  AM_RANGE(0xffc400, 0xffc407) AM_DEVREADWRITE8(S2651_0_TAG, s2651_device, read, write, 0x00ff)
@@ -393,14 +392,20 @@ static const struct pit8253_config pit0_intf =
 
 WRITE_LINE_MEMBER( sage2_state::br1_w )
 {
-	m_usart0->transmit_clock();
-	m_usart0->receive_clock();
+	if (state)
+	{
+		m_usart0->transmit_clock();
+		m_usart0->receive_clock();
+	}
 }
 
 WRITE_LINE_MEMBER( sage2_state::br2_w )
 {
-	m_usart1->transmit_clock();
-	m_usart1->receive_clock();
+	if (state)
+	{
+		m_usart1->transmit_clock();
+		m_usart1->receive_clock();
+	}
 }
 
 static const struct pit8253_config pit1_intf =
@@ -429,11 +434,11 @@ static const struct pit8253_config pit1_intf =
 
 static const i8251_interface usart0_intf =
 {
-	DEVCB_NULL, //DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_r),
-	DEVCB_NULL, //DEVCB_DEVICE_LINE(TERMINAL_TAG, terminal_serial_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
 	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir2_w),
 	DEVCB_NULL,
@@ -447,11 +452,11 @@ static const i8251_interface usart0_intf =
 
 static const i8251_interface usart1_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir1_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir3_w),
 	DEVCB_NULL,
@@ -500,17 +505,35 @@ static const centronics_interface centronics_intf =
 
 
 //-------------------------------------------------
-//  GENERIC_TERMINAL_INTERFACE( terminal_intf )
+//  rs232_port_interface rs232a_intf
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::kbd_put )
-{
-	m_usart0->receive_character(data);
-}
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x08 ) // 19200
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
+DEVICE_INPUT_DEFAULTS_END
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static const rs232_port_interface rs232a_intf =
 {
-	DEVCB_DRIVER_MEMBER(sage2_state, kbd_put)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -557,9 +580,6 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)
 
-	// video hardware
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
 	// devices
 	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NULL)
 	MCFG_I8255A_ADD(I8255A_0_TAG, ppi0_intf)
@@ -573,6 +593,8 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

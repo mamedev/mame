@@ -8,7 +8,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
-#include "machine/terminal.h"
+#include "machine/serial.h"
 #include "machine/upd765.h"
 
 #define M68000_TAG      "u68"
@@ -22,6 +22,8 @@
 #define UPD765_TAG      "u21"
 #define TMS9914_TAG     "u6"
 #define CENTRONICS_TAG  "centronics"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
 
 class sage2_state : public driver_device
 {
@@ -39,7 +41,6 @@ public:
 			m_floppy(NULL),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ieee488(*this, IEEE488_TAG),
-			m_terminal(*this, TERMINAL_TAG),
 			m_reset(1),
 			m_fdc_int(0),
 			m_fdie(0)
@@ -56,7 +57,6 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
-	required_device<generic_terminal_device> m_terminal;
 
 	virtual void machine_start();
 	virtual void machine_reset();
