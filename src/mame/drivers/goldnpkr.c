@@ -10,12 +10,15 @@
 
   * Golden Poker Double Up (Big Boy),                 1981, Bonanza Enterprises, Ltd.
   * Golden Poker Double Up (Mini Boy),                1981, Bonanza Enterprises, Ltd.
+  * Videotron Poker (cards selector),                 198?, Unknown.
+  * Videotron Poker (normal controls),                198?, Unknown.
   * Jack Potten's Poker (set 1),                      198?, Bootleg.
   * Jack Potten's Poker (set 2),                      198?, Bootleg in Coinmaster H/W.
   * Jack Potten's Poker (set 3),                      198?, Bootleg.
   * Jack Potten's Poker (set 4),                      198?, Bootleg.
   * Jack Potten's Poker (set 5),                      198?, Bootleg.
   * Jack Potten's Poker (set 6),                      198?, Bootleg.
+  * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
   * Good Luck,                                        198?, Unknown.
   * Super Double (french),                            198?, Karateco.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
@@ -421,6 +424,16 @@
   |                                     |   |                                     |
   |   PM 1987 - BECK D-6330 WETZLAR     |   |   PM 1987 - BECK D-6330 WETZLAR     |
   |_____________________________________|   |_____________________________________|
+
+
+  * Royale
+
+  These sets are running in Golden Poker hardware (A0-A14), but with a hardware mod.
+  The multiplexer selector writes 3F-2F-1F-0F for all the different input states,
+  instead of 7F-BF-DF-EF (the normal ones for Golden Poker hardware). This turns
+  the inputs system unusable if you do a ROM swap. Just meant for protection.
+
+  Now that the mux system is totally understood, both sets are working properly.
 
 
   * Bonne Chance! (Golden Poker prequel hardware)
@@ -961,10 +974,20 @@
   - Added technical notes.
 
 
+  [2013-05-18]
+
+  - Added 2 Videotron Poker sets...(cards selector and normal controls)
+  - Added another Potten's Poker set with Royale cards back graphics.
+  - Proper inputs for Videotron Poker selector.
+  - Figured out the Royale multiplexer system.
+  - Removed the unused Royale driver init.
+  - Both Royale sets promoted to working.
+  - Added technical notes.
+
+
   TODO:
 
   - Missing PIA connections.
-  - Code analysis, Inputs & lamps for Royale.
   - Final cleanup and split the driver.
 
 
@@ -1014,11 +1037,18 @@ public:
 	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(pia0_a_w);
+	DECLARE_WRITE8_MEMBER(pia0_b_w);
+	DECLARE_WRITE8_MEMBER(pia1_a_w);
+	DECLARE_WRITE8_MEMBER(pia1_b_w);
+	DECLARE_READ8_MEMBER(pia0_a_r);
+	DECLARE_READ8_MEMBER(pia0_b_r);
+	DECLARE_READ8_MEMBER(pia1_a_r);
+	DECLARE_READ8_MEMBER(pia1_b_r);
 	DECLARE_DRIVER_INIT(vkdlswwh);
 	DECLARE_DRIVER_INIT(icp1db);
 	DECLARE_DRIVER_INIT(flcnw);
 	DECLARE_DRIVER_INIT(vkdlswwp);
-	DECLARE_DRIVER_INIT(royale);
 	DECLARE_DRIVER_INIT(vkdlsww);
 	DECLARE_DRIVER_INIT(vkdlsb);
 	DECLARE_DRIVER_INIT(vkdlsc);
@@ -1269,10 +1299,18 @@ READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
+		/* normal selector writes 7F-BF-DF-EF */   
 		case 0x10: return ioport("IN0-0")->read();
 		case 0x20: return ioport("IN0-1")->read();
 		case 0x40: return ioport("IN0-2")->read();
 		case 0x80: return ioport("IN0-3")->read();
+
+		/* royale selector writes 3F-2F-1F-0F.
+           worth to split a whole machine driver just for this? */
+		case 0xc0: return ioport("IN0-3")->read();
+		case 0xd0: return ioport("IN0-2")->read();
+		case 0xe0: return ioport("IN0-1")->read();
+		case 0xf0: return ioport("IN0-0")->read();
 	}
 	return 0xff;
 }
@@ -1296,6 +1334,7 @@ READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 
 WRITE8_MEMBER(goldnpkr_state::mux_w)
 {
+	logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
 
@@ -1403,6 +1442,47 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
 	discrete_sound_w(m_discrete, space, NODE_01, data >> 3 & 0x01);
 	discrete_sound_w(m_discrete, space, NODE_10, data & 0x07);
+}
+
+WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
+{
+	logerror("pia0_a_w: %2x\n", data);
+}
+
+WRITE8_MEMBER(goldnpkr_state::pia0_b_w)
+{
+	logerror("pia0_b_w: %2x\n", data);
+}
+
+WRITE8_MEMBER(goldnpkr_state::pia1_a_w)
+{
+	logerror("pia1_a_w: %2x\n", data);
+}
+
+WRITE8_MEMBER(goldnpkr_state::pia1_b_w)
+{
+	logerror("pia1_b_w: %2x\n", data);
+}
+
+
+READ8_MEMBER(goldnpkr_state::pia0_a_r)
+{
+	return 0xff;
+}
+
+READ8_MEMBER(goldnpkr_state::pia0_b_r)
+{
+	return 0xff;
+}
+
+READ8_MEMBER(goldnpkr_state::pia1_a_r)
+{
+	return 0xff;
+}
+
+READ8_MEMBER(goldnpkr_state::pia1_b_r)
+{
+	return 0xff;
 }
 
 
@@ -1572,6 +1652,18 @@ static ADDRESS_MAP_START( mondial_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bchancep_map, AS_PROGRAM, 8, goldnpkr_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -3381,6 +3473,69 @@ static INPUT_PORTS_START( mondial )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( videtron )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Card Selector") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Hold Card")     PORT_CODE(KEYCODE_X)
+
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /*********************************************
 *              Graphics Layouts              *
@@ -3510,6 +3665,40 @@ static const pia6821_interface wcfalcon_pia1_intf =
 	DEVCB_NULL,     /* line CB2 in */
 	DEVCB_DRIVER_MEMBER(goldnpkr_state,wcfalcon_snd_w), /* port A out, custom handler due to address + data are muxed */
 	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
+};
+
+/***** Bonne Chance! *****/
+
+static const pia6821_interface bchancep_pia0_intf =
+{
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_a_r),      /* port A in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_b_r),      /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_a_w),      /* port A out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_b_w),      /* port B out */
+	DEVCB_NULL,     /* line CA2 out */
+	DEVCB_NULL,     /* port CB2 out */
+	DEVCB_NULL,     /* IRQA */
+	DEVCB_NULL      /* IRQB */
+};
+
+static const pia6821_interface bchancep_pia1_intf =
+{
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_a_r),      /* port A in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_b_r),      /* port B in */
+	DEVCB_NULL,     /* line CA1 in */
+	DEVCB_NULL,     /* line CB1 in */
+	DEVCB_NULL,     /* line CA2 in */
+	DEVCB_NULL,     /* line CB2 in */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_a_w),      /* port A out */
+	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_b_w),      /* port B out */
 	DEVCB_NULL,     /* line CA2 out */
 	DEVCB_NULL,     /* port CB2 out */
 	DEVCB_NULL,     /* IRQA */
@@ -3884,6 +4073,23 @@ static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bchancep_map)
+
+	MCFG_PIA6821_MODIFY("pia0", bchancep_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", bchancep_pia1_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(pottnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
 
 /*********************************************
 *                  Rom Load                  *
@@ -3938,6 +4144,49 @@ ROM_START( goldnpkb )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*  Videotron Poker.
+    Alternative controls set, with cards selector...
+*/
+ROM_START( videtron )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.bin", 0x4000, 0x2000, CRC(0f00f87d) SHA1(3cd061463b0ed52cef88900f1d4511708588bfac) )
+	ROM_LOAD( "5.bin", 0x6000, 0x2000, CRC(395fbc5c) SHA1(f742d7a9312828997a4323ac2b957048687fbed2) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "3.bin", 0x2000, 0x0800, CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "0.bin", 0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*  Videotron Poker.
+    Only program. No gfx or prom dumps...
+	Normal controls.
+*/
+ROM_START( videtrna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "poker_videotron.prg", 0x4000, 0x2000, CRC(38494ffb) SHA1(defa03546fd21d854c2d2413e6e2bf575d0518d7) )
+	ROM_LOAD( "videotron_poker.prg", 0x6000, 0x2000, CRC(960dcb61) SHA1(a7da40383b0149d21156b461c144d345603d747a) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )	/* taken from videtron */
+	ROM_FILL(          0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "3.bin", 0x2000, 0x0800, BAD_DUMP CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )	/* taken from videtron */
+	ROM_LOAD( "0.bin", 0x0000, 0x0800, BAD_DUMP CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin", 0x0800, 0x0800, BAD_DUMP CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin", 0x1000, 0x0800, BAD_DUMP CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )	/* taken from videtron */
+	ROM_LOAD( "82s129.bin", 0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -4079,6 +4328,35 @@ ROM_START( potnpkre )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/*
+  Jack Potten's Poker set, with Royale GFX...
+
+  pok-0-.bin          = 0.bin                 royaleb    Royale (set 3)
+  pok-1-.bin          = 1.bin                 royaleb    Royale (set 3)
+  pok-2-.bin          = 2.bin                 royaleb    Royale (set 3)
+  pok-3-.bin          = 3.bin                 royaleb    Royale (set 3)
+  82s129.bin          = 82s129.9c             royaleb    Royale (set 3)
+
+  prg.bin             NO MATCH
+
+*/
+ROM_START( potnpkrf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.bin",    0x4000, 0x4000, CRC(d7a932a2) SHA1(c940ea90378a631c217a09c4a9e73c382acaa48d) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(                   0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "3.bin",  0x2000, 0x0800, CRC(23e83e89) SHA1(0c6352d46e3dfe176b0e970dd163e2bc01246890) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "0.bin",    0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1.bin",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "2.bin",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
 ROM_START( goodluck )
@@ -9496,6 +9774,7 @@ ROM_END
   but the back cards GFX are different...
 
   debug: bp 5042
+            5f63
 
 */
 
@@ -9509,6 +9788,7 @@ ROM_START( bchancep )	/* Bonne Chance! with PIAs 6821 */
 	ROM_LOAD( "88.bin",  0x5000, 0x1000, CRC(c617b037) SHA1(55b58496d12dc8bcaa252e8ee847dbcb7d2c417d) )
 	ROM_LOAD( "89.bin",  0x6000, 0x1000, CRC(15599de0) SHA1(5e7a87dded97ce7829759ed9524809241526b6d8) )
 	ROM_LOAD( "90.bin",  0x7000, 0x1000, CRC(86690685) SHA1(b8a8039b58f2cdfce77266ac523d87b0d627f213) )
+//	ROM_LOAD( "ups39_12a.bin",  0x0000, 0x8000, CRC(216b45fb) SHA1(fbfcd98cc39b2e791cceb845b166ff697f584add) )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(            0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
@@ -9619,16 +9899,6 @@ ROM_END
   sloco93a   --------   fast      custom     complete    only grid
 
 */
-DRIVER_INIT_MEMBER(goldnpkr_state, royale)
-{
-	/* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
-
-//  UINT8 *ROM = memregion("maincpu")->base();
-
-//  ROM[0x60bb] = 0xea;
-//  ROM[0x60bc] = 0xea;
-}
-
 
 /***********************************************
 
@@ -10030,12 +10300,16 @@ DRIVER_INIT_MEMBER(goldnpkr_state, mondial)
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
 
+GAMEL( 198?, videtron,  0,        goldnpkr, videtron, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (cards selector)",        0,                layout_goldnpkr )
+GAMEL( 198?, videtrna,  videtron, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Videotron Poker (normal controls)",       0,                layout_goldnpkr )
+
 GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
 GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrf,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 7, Royale GFX)", 0,                layout_goldnpkr )
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
@@ -10135,8 +10409,8 @@ GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, flcnw,    
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
 GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
-GAMEL( 198?, royale,    0,        goldnpkr, royale,   goldnpkr_state, royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAMEL( 198?, royalea,   royale,   goldnpkr, royale,   goldnpkr_state, royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Royale (set 1)",                          0,                layout_goldnpkr )
+GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Royale (set 2)",                          0,                layout_goldnpkr )
 GAME(  1993, sloco93,   0,        witchcrd, sloco93,  driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
 GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
 GAME(  198?, maverik,   0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
@@ -10144,14 +10418,14 @@ GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  driver_device,  0,        
 GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
 GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
 GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
-GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )               // no lamps
+GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )				// no lamps
 GAME(  1991, poker91,   0,        witchcrd, poker91,  driver_device,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,     0,        genie,    genie,    driver_device,  0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
 GAME(  1987, caspoker,  0,        goldnpkr, caspoker, driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
 
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )    // lacks of 2nd program ROM.
-GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
 
-GAME(  198?, bchancep,  0,        goldnpkr, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING )
+GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING, layout_goldnpkr )
 GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, mondial,  ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
