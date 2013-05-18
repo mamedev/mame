@@ -129,6 +129,36 @@ void seabattl_state::machine_reset()
 
 }
 
+static const gfx_layout tiles32x16x3_layout =
+{
+	32,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3),RGN_FRAC(1,3),RGN_FRAC(2,3) },
+	{ 384,385,386,387,388,389,390,391, 0, 1, 2, 3, 4, 5, 6, 7, 128,129,130,131,132,133,134,135, 256,257,258,259,260,261,262,263 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	16*8*4
+};
+
+
+static const gfx_layout tiles8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+	8*8
+};
+
+static GFXDECODE_START( seabattl )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	/* basic machine hardware */
@@ -138,6 +168,8 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 //	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state,  seabattl_interrupt)
 
 	MCFG_PALETTE_LENGTH(256)
+
+	MCFG_GFXDECODE(seabattl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -162,7 +194,7 @@ ROM_START( seabattl )
 	ROM_LOAD( "sea b b_1 5.prg",      0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
 	ROM_CONTINUE(                     0x3000, 0x0400 )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "gfx1", 0 ) // first half of each of these is empty, is that correct?
 	ROM_LOAD( "sea b red.prg",      0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
 	ROM_LOAD( "sea b green.prg",    0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
 	ROM_LOAD( "sea b blu.prg",      0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
@@ -174,4 +206,21 @@ ROM_START( seabattl )
 	ROM_LOAD( "sea b wawe.prg",     0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) )
 ROM_END
 
-GAME( 1980, seabattl, 0,        seabattl, seabattl, driver_device, 0, ROT0,  "Zaccaria", "Sea Battle",                    GAME_NO_SOUND | GAME_NOT_WORKING )
+ROM_START( seabattla ) // this was a very different looking PCB (bootleg called armada maybe?) most parts had been stripped
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "program roms",      0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0xc00, "gfx1", 0 ) // probably the same as above without the blank data at the start
+	ROM_LOAD( "armadared.ic26",      0x0000, 0x0400, CRC(b588f509) SHA1(073f9dc584aba1351969ef597cd80a0037938dfb) )
+	ROM_LOAD( "armadagreen.ic25",    0x0400, 0x0400, CRC(3cc861c9) SHA1(d9159ee045cc0994f468035ae28cd8b79b5985ee) )
+	ROM_LOAD( "armadablu.ic24",      0x0800, 0x0400, CRC(3689e530) SHA1(b30ab0d5ddc9b296437aa1bc2887f1416eb69f9c) )
+
+	ROM_REGION( 0x0800, "gfx2", 0 )
+	ROM_LOAD( "greenobj.ic38",     0x0000, 0x0800, CRC(81a9a741) SHA1(b2725c320a232d4abf6e6fc58ccf6a5edb8dd9a0) )
+
+	ROM_REGION( 0x0800, "gfx3", 0 )
+	ROM_LOAD( "seawawe.ic9",     0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
+ROM_END
+
+GAME( 1980, seabattl,  0,               seabattl, seabattl, driver_device, 0, ROT0,  "Zaccaria", "Sea Battle (set 1)",                    GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1980, seabattla, seabattl,        seabattl, seabattl, driver_device, 0, ROT0,  "Zaccaria", "Sea Battle (set 2)",                    GAME_NO_SOUND | GAME_NOT_WORKING )
