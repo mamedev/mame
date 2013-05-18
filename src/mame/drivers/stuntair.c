@@ -27,7 +27,7 @@ stuntair.e14 sound program
 stuntair.a9 character gfx
 stuntair.a11,a12 background gfx
 stuntair.a13,a15 obj/sprites gfx
-82s123.a7 encryption key? (removing it results in garbage boot screen with high score table music)
+82s123.a7 (removing it results in garbage boot screen with high score table music)
 -bottom pcb-
 82s129.l11 green,blue colors
 82s129.m11 red color
@@ -80,10 +80,12 @@ public:
 	stuntair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_fgram(*this, "fgram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_fgram;
 
 	tilemap_t *m_fg_tilemap;
@@ -133,9 +135,19 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stuntair_soound_map, AS_PROGRAM, 8, stuntair_state )
+static ADDRESS_MAP_START( stuntair_sound_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( stuntair_sound_portmap, AS_IO, 8, stuntair_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x03, 0x03) AM_WRITENOP
+	AM_RANGE(0x07, 0x07) AM_WRITENOP
+	AM_RANGE(0x0c, 0x0c) AM_WRITENOP
+	AM_RANGE(0x0d, 0x0d) AM_WRITENOP
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( stuntair )
 INPUT_PORTS_END
@@ -162,11 +174,22 @@ static const gfx_layout tiles8x8x2_layout =
 	8*8
 };
 
+static const gfx_layout tiles16x8x2_layout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,64,65,66,67,68,69,70,71 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 128+0*8, 128+1*8, 128+2*8, 128+3*8, 128+4*8, 128+5*8, 128+6*8, 128+7*8 },
+	16*16
+};
+
 
 static GFXDECODE_START( stuntair )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x2_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles16x8x2_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -218,7 +241,8 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  stuntair_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,  18432000/4)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(stuntair_soound_map)
+	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
+	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
