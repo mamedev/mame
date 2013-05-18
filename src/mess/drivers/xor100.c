@@ -380,11 +380,11 @@ static COM8116_INTERFACE( com5016_intf )
 
 static const i8251_interface printer_8251_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -395,11 +395,11 @@ static const i8251_interface printer_8251_intf =
 
 static const i8251_interface terminal_8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -504,15 +504,36 @@ void xor100_state::fdc_drq_w(bool state)
 	}
 }
 
-/* Terminal Interface */
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
 DEVICE_INPUT_DEFAULTS_END
 
-static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
+static const rs232_port_interface rs232b_intf =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -590,10 +611,9 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
-
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, xor100_centronics_intf)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf, 9600)
-	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, "serial_terminal", terminal)
 
 	// S-100
 	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)

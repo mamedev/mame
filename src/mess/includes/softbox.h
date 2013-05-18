@@ -10,13 +10,14 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/ieee488.h"
-#include "machine/terminal.h"
+#include "machine/serial.h"
 
 #define Z80_TAG         "z80"
 #define I8251_TAG       "i8251"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG		"ic14"
+#define RS232_TAG		"rs232"
 
 class softbox_state : public driver_device
 {

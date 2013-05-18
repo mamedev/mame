@@ -88,11 +88,11 @@ INPUT_PORTS_END
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -265,7 +265,7 @@ static COM8116_INTERFACE( dbrg_intf )
 
 
 //-------------------------------------------------
-//  serial_terminal_interface terminal_intf
+//  rs232_port_interface rs232_intf
 //-------------------------------------------------
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -273,8 +273,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
 DEVICE_INPUT_DEFAULTS_END
 
-static const serial_terminal_interface terminal_intf =
+static const rs232_port_interface rs232_intf =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -300,8 +304,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
 	MCFG_CBM_IEEE488_ADD("c8050")
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
-	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal", terminal)
 
 	// software lists
 	//MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox_flop")

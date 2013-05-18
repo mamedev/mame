@@ -11,7 +11,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/s100.h"
-#include "machine/terminal.h"
+#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 
@@ -24,6 +24,8 @@
 #define Z80CTC_TAG      "11b"
 #define WD1795_TAG      "wd1795"
 #define CENTRONICS_TAG  "centronics"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
 
 class xor100_state : public driver_device
 {
@@ -37,7 +39,6 @@ public:
 			m_fdc(*this, WD1795_TAG),
 			m_ctc(*this, Z80CTC_TAG),
 			m_ram(*this, RAM_TAG),
-			m_terminal(*this, TERMINAL_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_s100(*this, S100_TAG),
 			m_floppy0(*this, WD1795_TAG":0"),
@@ -54,7 +55,6 @@ public:
 	required_device<fd1795_t> m_fdc;
 	required_device<z80ctc_device> m_ctc;
 	required_device<ram_device> m_ram;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<centronics_device> m_centronics;
 	required_device<s100_device> m_s100;
 	required_device<floppy_connector> m_floppy0;

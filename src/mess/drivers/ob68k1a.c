@@ -215,9 +215,9 @@ static ACIA6850_INTERFACE( acia0_intf )
 	0,
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dcd_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
 	DEVCB_NULL
 };
 

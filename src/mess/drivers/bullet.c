@@ -769,17 +769,17 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, tx_r),
-	DEVCB_DEVICE_LINE_MEMBER(TERMINAL_TAG, serial_terminal_device, rx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartardy_w),
 	DEVCB_NULL,
 
-	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dartbrdy_w),
 	DEVCB_NULL,
 
@@ -1085,11 +1085,34 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 
 
 //-------------------------------------------------
-//  serial_terminal_interface terminal_intf
+//  rs232_port_interface rs232a_intf
 //-------------------------------------------------
 
-static serial_terminal_interface terminal_intf =
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
+DEVICE_INPUT_DEFAULTS_END
+
+static const rs232_port_interface rs232a_intf =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1250,7 +1273,8 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232b_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
@@ -1290,7 +1314,8 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232b_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
