@@ -199,6 +199,100 @@ void wswan_state::wswan_setup_bios()
 	}
 }
 
+void wswan_state::wswan_setup_banks()
+{
+	static const char *rom_bank_tags[14] = { "rom1", "rom2", "rom3", "rom4", "rom5", "rom6", "rom7", 
+		"rom8", "rom9", "rom10", "rom11", "rom12", "rom13", "rom14" };
+	for (int i = 0; i < 14; i++)
+		m_rom_bank[i] = membank(rom_bank_tags[i]);
+}
+
+void wswan_state::wswan_register_save()
+{
+	save_item(NAME(m_ws_portram));
+	save_item(NAME(m_internal_eeprom));
+	save_item(NAME(m_bios_disabled));
+	save_item(NAME(m_rotate));
+	save_item(NAME(m_bank_base));
+	
+	save_item(NAME(m_vdp.layer_bg_enable));
+	save_item(NAME(m_vdp.layer_fg_enable));
+	save_item(NAME(m_vdp.sprites_enable));
+	save_item(NAME(m_vdp.window_sprites_enable));
+	save_item(NAME(m_vdp.window_fg_mode));
+	save_item(NAME(m_vdp.current_line));
+	save_item(NAME(m_vdp.line_compare));
+	save_item(NAME(m_vdp.sprite_table_address));
+	save_item(NAME(m_vdp.sprite_table_buffer));
+	save_item(NAME(m_vdp.sprite_first));
+	save_item(NAME(m_vdp.sprite_count));
+	save_item(NAME(m_vdp.layer_bg_address));
+	save_item(NAME(m_vdp.layer_fg_address));
+	save_item(NAME(m_vdp.window_fg_left));
+	save_item(NAME(m_vdp.window_fg_top));
+	save_item(NAME(m_vdp.window_fg_right));
+	save_item(NAME(m_vdp.window_fg_bottom));
+	save_item(NAME(m_vdp.window_sprites_left));
+	save_item(NAME(m_vdp.window_sprites_top));
+	save_item(NAME(m_vdp.window_sprites_right));
+	save_item(NAME(m_vdp.window_sprites_bottom));
+	save_item(NAME(m_vdp.layer_bg_scroll_x));
+	save_item(NAME(m_vdp.layer_bg_scroll_y));
+	save_item(NAME(m_vdp.layer_fg_scroll_x));
+	save_item(NAME(m_vdp.layer_fg_scroll_y));
+	save_item(NAME(m_vdp.lcd_enable));
+	save_item(NAME(m_vdp.icons));
+	save_item(NAME(m_vdp.color_mode));
+	save_item(NAME(m_vdp.colors_16));
+	save_item(NAME(m_vdp.tile_packed));
+	save_item(NAME(m_vdp.timer_hblank_enable));
+	save_item(NAME(m_vdp.timer_hblank_mode));
+	save_item(NAME(m_vdp.timer_hblank_reload));
+	save_item(NAME(m_vdp.timer_vblank_enable));
+	save_item(NAME(m_vdp.timer_vblank_mode));
+	save_item(NAME(m_vdp.timer_vblank_reload));
+	save_item(NAME(m_vdp.timer_vblank_count));
+	save_item(NAME(m_vdp.main_palette));
+
+	save_item(NAME(m_eeprom.mode));
+	save_item(NAME(m_eeprom.address));
+	save_item(NAME(m_eeprom.command));
+	save_item(NAME(m_eeprom.start));
+	save_item(NAME(m_eeprom.write_enabled));
+	save_item(NAME(m_eeprom.size));
+	if (m_eeprom.size)
+		save_pointer(NAME(m_eeprom.data), m_eeprom.size);
+	
+	save_item(NAME(m_rtc.present));
+	save_item(NAME(m_rtc.setting));
+	save_item(NAME(m_rtc.year));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.day_of_week));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.minute));
+	save_item(NAME(m_rtc.second));
+	save_item(NAME(m_rtc.index));
+	
+	save_item(NAME(m_sound_dma.source));
+	save_item(NAME(m_sound_dma.size));
+	save_item(NAME(m_sound_dma.enable));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(wswan_state::wswan_postload), this));
+}
+
+void wswan_state::wswan_postload()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	// restore the vdp pointers
+	m_vdp.vram = (UINT8*)space.get_read_ptr(0);
+	m_vdp.palette_vram = (UINT8*)space.get_read_ptr(( m_system_type == TYPE_WSC ) ? 0xFE00 : 0 );
+	// restore banks
+	for (int i = 0; i < 14; i++)
+		m_rom_bank[i]->set_entry(m_bank_base[i]);
+}
+
+
 void wswan_state::machine_start()
 {
 	m_ws_bios_bank = NULL;
@@ -208,9 +302,11 @@ void wswan_state::machine_start()
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios();
+	wswan_setup_banks();
+	wswan_register_save();
 
 	/* Set up RTC timer */
-	if ( m_rtc.present )
+	if (m_rtc.present)
 		machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(wswan_state::wswan_rtc_callback),this));
 
 	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
@@ -225,9 +321,11 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
 	wswan_setup_bios();
+	wswan_setup_banks();
+	wswan_register_save();
 
 	/* Set up RTC timer */
-	if ( m_rtc.present )
+	if (m_rtc.present)
 		machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(wswan_state::wswan_rtc_callback),this));
 
 	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
@@ -235,13 +333,13 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 
 void wswan_state::machine_reset()
 {
-	address_space &space = m_maincpu->space( AS_PROGRAM );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Intialize ports */
-	memcpy( m_ws_portram, ws_portram_init, 256 );
+	memcpy(m_ws_portram, ws_portram_init, 256);
 
 	/* Initialize VDP */
-	memset( &m_vdp, 0, sizeof( m_vdp ) );
+	memset(&m_vdp, 0, sizeof(m_vdp));
 
 	m_vdp.vram = (UINT8*)space.get_read_ptr(0);
 	m_vdp.palette_vram = (UINT8*)space.get_read_ptr(( m_system_type == TYPE_WSC ) ? 0xFE00 : 0 );
@@ -254,25 +352,35 @@ void wswan_state::machine_reset()
 	target->set_view(m_rotate);
 
 	/* Initialize sound DMA */
-	memset( &m_sound_dma, 0, sizeof( m_sound_dma ) );
+	memset(&m_sound_dma, 0, sizeof(m_sound_dma));
 
 	/* Switch in the banks */
-	membank( "bank2" )->set_base( m_ROMMap[(m_ROMBanks - 1) & (m_ROMBanks - 1)] );
-	membank( "bank3" )->set_base( m_ROMMap[(m_ROMBanks - 1) & (m_ROMBanks - 1)] );
-	membank( "bank4" )->set_base( m_ROMMap[(m_ROMBanks - 12) & (m_ROMBanks - 1)] );
-	membank( "bank5" )->set_base( m_ROMMap[(m_ROMBanks - 11) & (m_ROMBanks - 1)] );
-	membank( "bank6" )->set_base( m_ROMMap[(m_ROMBanks - 10) & (m_ROMBanks - 1)] );
-	membank( "bank7" )->set_base( m_ROMMap[(m_ROMBanks - 9) & (m_ROMBanks - 1)] );
-	membank( "bank8" )->set_base( m_ROMMap[(m_ROMBanks - 8) & (m_ROMBanks - 1)] );
-	membank( "bank9" )->set_base( m_ROMMap[(m_ROMBanks - 7) & (m_ROMBanks - 1)] );
-	membank( "bank10" )->set_base( m_ROMMap[(m_ROMBanks - 6) & (m_ROMBanks - 1)] );
-	membank( "bank11" )->set_base( m_ROMMap[(m_ROMBanks - 5) & (m_ROMBanks - 1)] );
-	membank( "bank12" )->set_base( m_ROMMap[(m_ROMBanks - 4) & (m_ROMBanks - 1)] );
-	membank( "bank13" )->set_base( m_ROMMap[(m_ROMBanks - 3) & (m_ROMBanks - 1)] );
-	membank( "bank14" )->set_base( m_ROMMap[(m_ROMBanks - 2) & (m_ROMBanks - 1)] );
+	for (int bank = 0; bank < 14; bank++)
+	{
+		for (int i = 0; i < m_ROMBanks; i++)
+			m_rom_bank[bank]->configure_entries(i, 1, m_ROMMap[i], 0x10000);
+	}
+	m_rom_bank[13]->configure_entries(m_ROMBanks, 1, m_ws_bios_bank, 0x10000);
+
+	m_bank_base[0] = (m_ROMBanks - 1) & (m_ROMBanks - 1);
+	m_bank_base[1] = (m_ROMBanks - 1) & (m_ROMBanks - 1);
+	m_bank_base[2] = (m_ROMBanks - 12) & (m_ROMBanks - 1);
+	m_bank_base[3] = (m_ROMBanks - 11) & (m_ROMBanks - 1);
+	m_bank_base[4] = (m_ROMBanks - 10) & (m_ROMBanks - 1);
+	m_bank_base[5] = (m_ROMBanks - 9) & (m_ROMBanks - 1);
+	m_bank_base[6] = (m_ROMBanks - 8) & (m_ROMBanks - 1);
+	m_bank_base[7] = (m_ROMBanks - 7) & (m_ROMBanks - 1);
+	m_bank_base[8] = (m_ROMBanks - 6) & (m_ROMBanks - 1);
+	m_bank_base[9] = (m_ROMBanks - 5) & (m_ROMBanks - 1);
+	m_bank_base[10] = (m_ROMBanks - 4) & (m_ROMBanks - 1);
+	m_bank_base[11] = (m_ROMBanks - 3) & (m_ROMBanks - 1);
+	m_bank_base[12] = (m_ROMBanks - 2) & (m_ROMBanks - 1);
+	m_bank_base[13] = m_ROMBanks; // the last bank is mapped to bios at start!
+
 	m_bios_disabled = 0;
-	membank( "bank15" )->set_base( m_ws_bios_bank );
-//  membank( 15 )->set_base( m_ROMMap[(m_ROMBanks - 1) & (m_ROMBanks - 1)] );
+
+	for (int i = 0; i < 14; i++)
+		m_rom_bank[i]->set_entry(m_bank_base[i]);
 }
 
 READ8_MEMBER( wswan_state::wswan_sram_r )
@@ -846,17 +954,18 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			machine().device<wswan_sound_device>("custom")->wswan_sound_port_w( space, offset, data );
+			m_sound->port_w( space, offset, data );
 			break;
 		case 0xa0:  /* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios
                    Bit 1   - Hardware type: 0 = WS, 1 = WSC
                    Bit 2-7 - Unknown
                 */
-			if ( ( data & 0x01 ) && !m_bios_disabled )
+			if ((data & 0x01) && !m_bios_disabled)
 			{
 				m_bios_disabled = 1;
-				membank( "bank15" )->set_base( m_ROMMap[ ( ( ( m_ws_portram[0xc0] & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
+				m_bank_base[13] = (((m_ws_portram[0xc0] & 0x0f) << 4) | 15) & (m_ROMBanks - 1);
+				m_rom_bank[13]->set_entry(m_bank_base[13]);
 			}
 			break;
 		case 0xa2:  /* Timer control
@@ -1050,24 +1159,28 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 				logerror( "Unsupported internal EEPROM command: %X\n", data );
 			}
 			break;
-		case 0xc0:  /* ROM bank select for banks 4-15
-                   Bit 0-3 - ROM bank base register for banks 4-15
-                   Bit 4-7 - Unknown
-                */
-			membank( "bank4" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 4 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank5" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 5 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank6" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 6 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank7" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 7 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank8" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 8 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank9" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 9 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank10" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 10 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank11" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 11 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank12" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 12 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank13" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 13 ) & ( m_ROMBanks - 1 ) ] );
-			membank( "bank14" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 14 ) & ( m_ROMBanks - 1 ) ] );
-			if ( m_bios_disabled )
+		case 0xc0:
+			// Bit 0-3 - ROM bank base register for rom3-rom14
+			// Bit 4-7 - Unknown
+			m_bank_base[2] =  (((data & 0x0f) << 4) |  4) & (m_ROMBanks - 1);
+			m_bank_base[3] =  (((data & 0x0f) << 4) |  5) & (m_ROMBanks - 1);
+			m_bank_base[4] =  (((data & 0x0f) << 4) |  6) & (m_ROMBanks - 1);
+			m_bank_base[5] =  (((data & 0x0f) << 4) |  7) & (m_ROMBanks - 1);
+			m_bank_base[6] =  (((data & 0x0f) << 4) |  8) & (m_ROMBanks - 1);
+			m_bank_base[7] =  (((data & 0x0f) << 4) |  9) & (m_ROMBanks - 1);
+			m_bank_base[8] =  (((data & 0x0f) << 4) | 10) & (m_ROMBanks - 1);
+			m_bank_base[9] =  (((data & 0x0f) << 4) | 11) & (m_ROMBanks - 1);
+			m_bank_base[10] = (((data & 0x0f) << 4) | 12) & (m_ROMBanks - 1);
+			m_bank_base[11] = (((data & 0x0f) << 4) | 13) & (m_ROMBanks - 1);
+			m_bank_base[12] = (((data & 0x0f) << 4) | 14) & (m_ROMBanks - 1);
+			for (int i = 2; i < 13; i++)
+				m_rom_bank[i]->set_entry(m_bank_base[i]);
+
+			m_bank_base[13] = m_ROMBanks; // the last bank is mapped to bios at start!
+			if (m_bios_disabled)
 			{
-				membank( "bank15" )->set_base( m_ROMMap[ ( ( ( data & 0x0F ) << 4 ) | 15 ) & ( m_ROMBanks - 1 ) ] );
+				m_bank_base[13] = (((data & 0x0f) << 4) | 14) & (m_ROMBanks - 1);
+				m_rom_bank[13]->set_entry(m_bank_base[13]);
 			}
 			break;
 		case 0xc1:  /* SRAM bank select
@@ -1078,15 +1191,15 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 				m_eeprom.page = &m_eeprom.data[ ( data * 64 * 1024 ) & ( m_eeprom.size - 1 ) ];
 			}
 			break;
-		case 0xc2:  /* ROM bank select for segment 2 (0x20000 - 0x2ffff)
-                   Bit 0-7 - ROM bank for segment 2
-                */
-			membank( "bank2" )->set_base( m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
+		case 0xc2:
+			// Bit 0-7 - ROM bank for segment 2 (0x20000 - 0x2ffff)
+			m_bank_base[0] =  data & (m_ROMBanks - 1);
+			m_rom_bank[0]->set_entry(m_bank_base[0]);
 			break;
-		case 0xc3:  /* ROM bank select for segment 3 (0x30000-0x3ffff)
-                   Bit 0-7 - ROM bank for segment 3
-                */
-			membank( "bank3" )->set_base( m_ROMMap[ data & ( m_ROMBanks - 1 ) ]);
+		case 0xc3:
+			// Bit 0-7 - ROM bank for segment 3 (0x30000 - 0x3ffff)
+			m_bank_base[1] =  data & (m_ROMBanks - 1);
+			m_rom_bank[1]->set_entry(m_bank_base[1]);
 			break;
 		case 0xc6:  /* EEPROM address lower bits port/EEPROM address and command port
                    1KBit EEPROM:
@@ -1353,7 +1466,7 @@ DRIVER_INIT_MEMBER(wswan_state, wswan)
 
 DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 {
-	UINT32 ii, size;
+	UINT32 size;
 	const char *sram_str;
 
 	if (image.software_entry() == NULL)
@@ -1365,13 +1478,13 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 	memset(m_ws_ram, 0, 0xffff);
 	m_ROMBanks = size / 65536;
 
-	for (ii = 0; ii < m_ROMBanks; ii++)
+	for (int i = 0; i < m_ROMBanks; i++)
 	{
-		if ((m_ROMMap[ii] = auto_alloc_array(machine(), UINT8, 0x10000)))
+		if ((m_ROMMap[i] = auto_alloc_array(machine(), UINT8, 0x10000)))
 		{
 			if (image.software_entry() == NULL)
 			{
-				if (image.fread( m_ROMMap[ii], 0x10000) != 0x10000)
+				if (image.fread( m_ROMMap[i], 0x10000) != 0x10000)
 				{
 					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Wrongly sized ROM");
 					image.message(" Wrongly sized ROM");
@@ -1380,7 +1493,7 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 				}
 			}
 			else
-				memcpy(m_ROMMap[ii], image.get_software_region("rom") + ii * 0x10000, 0x10000);
+				memcpy(m_ROMMap[i], image.get_software_region("rom") + i * 0x10000, 0x10000);
 		}
 		else
 		{
@@ -1407,12 +1520,12 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 		logerror("\tSRAM size: %s\n", sram_str);
 		logerror("\tFeatures: %X\n", m_ROMMap[m_ROMBanks - 1][0xfffc]);
 		logerror("\tRTC: %s\n", m_ROMMap[m_ROMBanks - 1][0xfffd] ? "yes" : "no");
-		for (ii = 0; ii < m_ROMBanks; ii++)
+		for (int i = 0; i < m_ROMBanks; i++)
 		{
 			int count;
 			for (count = 0; count < 0x10000; count++)
 			{
-				sum += m_ROMMap[ii][count];
+				sum += m_ROMMap[i][count];
 			}
 		}
 		sum -= m_ROMMap[m_ROMBanks - 1][0xffff];

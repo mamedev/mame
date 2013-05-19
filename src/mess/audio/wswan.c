@@ -56,6 +56,64 @@ void wswan_sound_device::device_start()
 {
 	m_channel = stream_alloc(0, 2, machine().sample_rate());
 
+	save_item(NAME(m_sweep_step));
+	save_item(NAME(m_sweep_time));
+	save_item(NAME(m_sweep_count));
+	save_item(NAME(m_noise_type));
+	save_item(NAME(m_noise_reset));
+	save_item(NAME(m_noise_enable));
+	save_item(NAME(m_sample_address));
+	save_item(NAME(m_audio2_voice));
+	save_item(NAME(m_audio3_sweep));
+	save_item(NAME(m_audio4_noise));
+	save_item(NAME(m_mono));
+	save_item(NAME(m_voice_data));
+	save_item(NAME(m_output_volume));
+	save_item(NAME(m_external_stereo));
+	save_item(NAME(m_external_speaker));
+	save_item(NAME(m_noise_shift));
+	save_item(NAME(m_master_volume));
+
+	save_item(NAME(m_audio1.freq));
+	save_item(NAME(m_audio1.period));
+	save_item(NAME(m_audio1.pos));
+	save_item(NAME(m_audio1.vol_left));
+	save_item(NAME(m_audio1.vol_right));
+	save_item(NAME(m_audio1.on));
+	save_item(NAME(m_audio1.signal));
+	
+	save_item(NAME(m_audio2.freq));
+	save_item(NAME(m_audio2.period));
+	save_item(NAME(m_audio2.pos));
+	save_item(NAME(m_audio2.vol_left));
+	save_item(NAME(m_audio2.vol_right));
+	save_item(NAME(m_audio2.on));
+	save_item(NAME(m_audio2.signal));
+	
+	save_item(NAME(m_audio3.freq));
+	save_item(NAME(m_audio3.period));
+	save_item(NAME(m_audio3.pos));
+	save_item(NAME(m_audio3.vol_left));
+	save_item(NAME(m_audio3.vol_right));
+	save_item(NAME(m_audio3.on));
+	save_item(NAME(m_audio3.signal));
+	
+	save_item(NAME(m_audio4.freq));
+	save_item(NAME(m_audio4.period));
+	save_item(NAME(m_audio4.pos));
+	save_item(NAME(m_audio4.vol_left));
+	save_item(NAME(m_audio4.vol_right));
+	save_item(NAME(m_audio4.on));
+	save_item(NAME(m_audio4.signal));
+}
+
+
+//-------------------------------------------------
+//  device_reset
+//-------------------------------------------------
+
+void wswan_sound_device::device_reset()
+{
 	m_audio1.on = 0;
 	m_audio1.signal = 16;
 	m_audio1.pos = 0;
@@ -160,7 +218,7 @@ void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, UINT16 freq )
 	ch->period = machine().sample_rate() / (3072000 / ((2048 - freq) << 5));
 }
 
-WRITE8_MEMBER( wswan_sound_device::wswan_sound_port_w )
+WRITE8_MEMBER( wswan_sound_device::port_w )
 {
 	m_channel->update();
 

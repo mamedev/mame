@@ -100,12 +100,16 @@ struct VDP
 	emu_timer *timer;
 };
 
+class wswan_sound_device;
+
+
 class wswan_state : public driver_device
 {
 public:
 	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_sound(*this, "custom"),
 		m_cursx(*this, "CURSX"),
 		m_cursy(*this, "CURSY"),
 		m_buttons(*this, "BUTTONS") { }
@@ -115,10 +119,12 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<wswan_sound_device> m_sound;
 	DECLARE_READ8_MEMBER(wswan_port_r);
 	DECLARE_WRITE8_MEMBER(wswan_port_w);
 	DECLARE_READ8_MEMBER(wswan_sram_r);
 	DECLARE_WRITE8_MEMBER(wswan_sram_w);
+
 	VDP m_vdp;
 	UINT8 m_ws_portram[256];
 	UINT8 *m_ROMMap[256];
@@ -134,6 +140,8 @@ public:
 	int m_pal[16][16];
 	bitmap_ind16 m_bitmap;
 	UINT8 m_rotate;
+	UINT8 m_bank_base[14];
+
 	void wswan_clear_irq_line(int irq);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -170,8 +178,12 @@ protected:
 	required_ioport m_cursx;
 	required_ioport m_cursy;
 	required_ioport m_buttons;
+	memory_bank *m_rom_bank[14];
 
 	void wswan_setup_bios();
+	void wswan_setup_banks();
+	void wswan_register_save();
+	void wswan_postload();
 	void wswan_handle_irqs();
 	void wswan_set_irq_line(int irq);
 	void wswan_setup_palettes();
@@ -184,11 +196,6 @@ protected:
 	const char* wswan_determine_sram( UINT8 data );
 	const char* wswan_determine_romsize( UINT8 data );
 };
-
-
-/*----------- defined in video/wswan.c -----------*/
-
-void wswan_refresh_scanline( running_machine &machine );
 
 
 /*----------- defined in audio/wswan.c -----------*/
@@ -230,12 +237,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-	DECLARE_WRITE8_MEMBER( wswan_sound_port_w );
+	DECLARE_WRITE8_MEMBER( port_w );
 
 private:
 	void wswan_ch_set_freq( CHAN *ch, UINT16 freq );
