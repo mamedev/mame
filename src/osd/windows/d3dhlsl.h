@@ -117,6 +117,8 @@ struct hlsl_options
 	float                   vector_length_ratio;
 
 	// Bloom
+	float                   vector_bloom_scale;
+	float                   raster_bloom_scale;
 	float                   bloom_level0_weight;
 	float                   bloom_level1_weight;
 	float                   bloom_level2_weight;

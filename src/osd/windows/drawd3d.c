@@ -533,6 +533,10 @@ texture_manager::texture_manager(renderer *d3d)
 	mame_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
 }
 
+texture_manager::~texture_manager()
+{
+}
+
 void texture_manager::create_resources()
 {
 	// experimental: load a PNG to use for vector rendering; it is treated
@@ -997,6 +1001,7 @@ try_again:
 													video_config.waitvsync || video_config.syncrefresh) ?
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
+	printf("m_device is %08x%08x\n", (UINT32)((UINT64)m_device >> 32), (UINT32)((UINT64)m_device & 0x00000000ffffffff));
 	// create the D3D device
 	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, win_window_list->hwnd,
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);

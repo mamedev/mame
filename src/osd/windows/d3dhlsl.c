@@ -224,6 +224,21 @@ shaders::shaders()
 shaders::~shaders()
 {
 	global_free(options);
+	cache_target *currcache = cachehead;
+	while(cachehead != NULL)
+	{
+		cachehead = currcache->next;
+		global_free(currcache);
+		currcache = cachehead;
+	}
+
+	render_target *currtarget = targethead;
+	while(targethead != NULL)
+	{
+		targethead = currtarget->next;
+		global_free(currtarget);
+		currtarget = targethead;
+	}
 }
 
 
@@ -983,6 +998,8 @@ void shaders::init(base *d3dintf, win_window_info *window)
 		options->vector_time_period = winoptions.screen_vector_time_period();
 		options->vector_length_scale = winoptions.screen_vector_length_scale();
 		options->vector_length_ratio = winoptions.screen_vector_length_ratio();
+		options->vector_bloom_scale = winoptions.screen_vector_bloom_scale();
+		options->raster_bloom_scale = winoptions.screen_raster_bloom_scale();
 		options->bloom_level0_weight = winoptions.screen_bloom_lvl0_weight();
 		options->bloom_level1_weight = winoptions.screen_bloom_lvl1_weight();
 		options->bloom_level2_weight = winoptions.screen_bloom_lvl2_weight();
@@ -2058,6 +2075,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect = downsample_effect;
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->render_texture[2]);
+		(*d3dintf->effect.set_float)(curr_effect, "BloomRescale", options->raster_bloom_scale);
 
 		int bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 		int bloom_index = 0;
@@ -2222,6 +2240,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect = downsample_effect;
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->render_texture[0]);
+		(*d3dintf->effect.set_float)(curr_effect, "BloomRescale", options->vector_bloom_scale);
 
 		int bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 		int bloom_index = 0;
@@ -2264,6 +2283,15 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		float target_size[2] = { d3d->get_width(), d3d->get_height() };
 		(*d3dintf->effect.set_vector)(curr_effect, "TargetSize", 2, target_size);
+		float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight,
+								options->bloom_level2_weight, options->bloom_level3_weight };
+		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
+								options->bloom_level6_weight, options->bloom_level7_weight };
+		float weight89A[3] = { options->bloom_level8_weight, options->bloom_level9_weight,
+							   options->bloom_level10_weight };
+		(*d3dintf->effect.set_vector)(curr_effect, "Level0123Weight", 4, weight0123);
+		(*d3dintf->effect.set_vector)(curr_effect, "Level4567Weight", 4, weight4567);
+		(*d3dintf->effect.set_vector)(curr_effect, "Level89AWeight", 3, weight89A);
 
 		(*d3dintf->effect.set_texture)(curr_effect, "DiffuseA", rt->render_texture[0]);
 		(*d3dintf->effect.set_float)(curr_effect, "DiffuseScaleA", 1.0f);

@@ -68,7 +68,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float lengthModulate = clamp(1.0f - LengthParams.x / LengthParams.z, 0.0f, 1.0f);
 	lengthModulate = lerp(1.0f, timeModulate * lengthModulate, LengthParams.y) * 2.0;
 
-	float4 outColor = Input.Color * float4(lengthModulate, lengthModulate, lengthModulate, 1.0f) * 2.5;
+	float4 outColor = Input.Color * float4(lengthModulate, lengthModulate, lengthModulate, 1.0f) * 8.0;
 	return outColor;
 }
 

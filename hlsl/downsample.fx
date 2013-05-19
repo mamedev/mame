@@ -25,9 +25,6 @@ struct VS_OUTPUT
 	float4 Color : COLOR0;
 	float4 TexCoord01 : TEXCOORD0;
 	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
 };
 
 struct VS_INPUT
@@ -42,9 +39,6 @@ struct PS_INPUT
 	float4 Color : COLOR0;
 	float4 TexCoord01 : TEXCOORD0;
 	float4 TexCoord23 : TEXCOORD1;
-	float4 TexCoord45 : TEXCOORD2;
-	float4 TexCoord67 : TEXCOORD3;
-	float4 TexCoord89 : TEXCOORD4;
 };
 
 //-----------------------------------------------------------------------------
@@ -53,6 +47,7 @@ struct PS_INPUT
 
 uniform float2 TargetSize;
 uniform float2 SourceSize;
+uniform float BloomRescale;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -64,17 +59,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= 0.5f;
 	Output.Position.xy *= 2.0f;
 	Output.Color = Input.Color;
-	float2 inversePixel = 1.0f / TargetSize;
-	Output.TexCoord01.xy = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.00f + 0.5f) * inversePixel;
-	Output.TexCoord01.zw = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.00f + 0.5f) * inversePixel;
-	Output.TexCoord23.xy = Input.Position.xy * inversePixel + float2(0.25f + 0.5f, 0.25f + 0.5f) * inversePixel;
-	Output.TexCoord23.zw = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.25f + 0.5f) * inversePixel;
-	Output.TexCoord45.xy = Input.Position.xy * inversePixel + float2(0.75f + 0.5f, 0.25f + 0.5f) * inversePixel;
-	Output.TexCoord45.zw = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.50f + 0.5f) * inversePixel;
-	Output.TexCoord67.xy = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.50f + 0.5f) * inversePixel;
-	Output.TexCoord67.zw = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.75f + 0.5f) * inversePixel;
-	Output.TexCoord89.xy = Input.Position.xy * inversePixel + float2(0.25f + 0.5f, 0.75f + 0.5f) * inversePixel;
-	Output.TexCoord89.zw = Input.Position.xy * inversePixel + float2(0.75f + 0.5f, 0.75f + 0.5f) * inversePixel;
+	float2 inversePixel = 1.0f / SourceSize;
+	Output.TexCoord01.xy = Input.Position.xy * inversePixel + float2(0.5f, 0.5f) * inversePixel;
+	Output.TexCoord01.zw = Input.Position.xy * inversePixel + float2(1.5f, 0.5f) * inversePixel;
+	Output.TexCoord23.xy = Input.Position.xy * inversePixel + float2(0.5f, 1.5f) * inversePixel;
+	Output.TexCoord23.zw = Input.Position.xy * inversePixel + float2(1.5f, 1.5f) * inversePixel;
 
 	return Output;
 }
@@ -89,13 +78,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw);
 	float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
 	float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
-	float4 texel4 = tex2D(DiffuseSampler, Input.TexCoord45.xy);
-	float4 texel5 = tex2D(DiffuseSampler, Input.TexCoord45.zw);
-	float4 texel6 = tex2D(DiffuseSampler, Input.TexCoord67.xy);
-	float4 texel7 = tex2D(DiffuseSampler, Input.TexCoord67.zw);
-	float4 texel8 = tex2D(DiffuseSampler, Input.TexCoord89.xy);
-	float4 texel9 = tex2D(DiffuseSampler, Input.TexCoord89.zw);
-	float4 outTexel = (texel0 + texel1 + texel2 + texel3 + texel4 + texel5 + texel6 + texel7 + texel8 + texel9) * 0.1f;
+	float4 outTexel = (texel0 + texel1 + texel2 + texel3) * BloomRescale;
 	return float4(outTexel.rgb, 1.0f);
 }
 

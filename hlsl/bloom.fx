@@ -189,16 +189,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 inversePixel = 1.0f / TargetSize;
 	float2 TexCoord = Input.Position.xy * inversePixel + float2(0.5f, 0.5f) * inversePixel;
 	Output.TexCoord01.xy = TexCoord;
-	Output.TexCoord01.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.5f;
-	Output.TexCoord23.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.25f;
-	Output.TexCoord23.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.125f;
-	Output.TexCoord45.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0625f;
-	Output.TexCoord45.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.03125f;
-	Output.TexCoord67.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.015625f;
-	Output.TexCoord67.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0078125f;
-	Output.TexCoord89.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.00390625f;
-	Output.TexCoord89.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.001953125f;
-	Output.TexCoordA = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0009765625f;
+	Output.TexCoord01.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.5f;
+	Output.TexCoord23.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.25f;
+	Output.TexCoord23.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.125f;
+	Output.TexCoord45.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0625f;
+	Output.TexCoord45.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.03125f;
+	Output.TexCoord67.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.015625f;
+	Output.TexCoord67.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0078125f;
+	Output.TexCoord89.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.00390625f;
+	Output.TexCoord89.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.001953125f;
+	Output.TexCoordA = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0009765625f;
 
 	return Output;
 }
@@ -225,17 +225,17 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
 	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
 
-	texel0 = texel0 * Level0123Weight.x; // 1.0f;
-	texel1 = texel1 * Level0123Weight.y; // 0.21f;
-	texel2 = texel2 * Level0123Weight.z; // 0.19f;
-	texel3 = texel3 * Level0123Weight.w; // 0.17f;
-	texel4 = texel4 * Level4567Weight.x; // 0.15f;
-	texel5 = texel5 * Level4567Weight.y; // 0.14f;
-	texel6 = texel6 * Level4567Weight.z; // 0.13f;
-	texel7 = texel7 * Level4567Weight.w; // 0.12f;
-	texel8 = texel8 * Level89AWeight.x; // 0.11f;
-	texel9 = texel9 * Level89AWeight.y; // 0.10f;
-	texelA = texelA * Level89AWeight.z; // 0.09f;
+	texel0 = texel0 * Level0123Weight.x;
+	texel1 = texel1 * Level0123Weight.y;
+	texel2 = texel2 * Level0123Weight.z;
+	texel3 = texel3 * Level0123Weight.w;
+	texel4 = texel4 * Level4567Weight.x;
+	texel5 = texel5 * Level4567Weight.y;
+	texel6 = texel6 * Level4567Weight.z;
+	texel7 = texel7 * Level4567Weight.w;
+	texel8 = texel8 * Level89AWeight.x;
+	texel9 = texel9 * Level89AWeight.y;
+	texelA = texelA * Level89AWeight.z;
 
 	float4 sum = float4(texel0 + texel1 + texel2 + texel3 + texel4 +
 	        texel5 + texel6 + texel7 + texel8 + texel9 + texelA, 1.0f);

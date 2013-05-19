@@ -90,7 +90,7 @@ class texture_manager
 public:
 	texture_manager() { }
 	texture_manager(renderer *d3d);
-	~texture_manager() { }
+	~texture_manager();
 
 	void					update_textures();
 
