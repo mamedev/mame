@@ -747,6 +747,12 @@ renderer::renderer(win_window_info *window)
 	m_shaders = NULL;
 	m_numverts = 0;
 	m_numpolys = 0;
+	m_vertexbuf = NULL;
+	m_lockedbuf = NULL;
+	m_vectorbatch = NULL;
+	m_last_texture = NULL;
+	m_hlsl_buf = NULL;
+	m_texture_manager = NULL;
 }
 
 int renderer::initialize()
