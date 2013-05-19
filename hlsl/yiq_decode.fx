@@ -57,8 +57,7 @@ struct PS_INPUT
 uniform float TargetWidth;
 uniform float TargetHeight;
 
-uniform float RawWidth;
-uniform float RawHeight;
+uniform float2 RawDims;
 
 uniform float WidthRatio;
 uniform float HeightRatio;
@@ -75,7 +74,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Coord0.xy = Input.TexCoord;
-	Output.Coord0.zw = float2(1.0f / RawWidth, 0.0f);
+	Output.Coord0.zw = float2(1.0f / RawDims.x, 0.0f);
 
 	return Output;
 }
@@ -98,8 +97,6 @@ uniform float QFreqResponse = 0.6f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 RawDims = float2(RawWidth, RawHeight);
-	
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
 
 	// YIQ convolution: N coefficients each
@@ -109,11 +106,11 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
-	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_y3 = YFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_i = IFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
-	float Fc_q = QFreqResponse * ScanTime / (RawWidth * 4.0f / WidthRatio);
+	float Fc_y1 = (CCValue - NotchHalfWidth) * ScanTime / (RawDims.x * 4.0f / WidthRatio);
+	float Fc_y2 = (CCValue + NotchHalfWidth) * ScanTime / (RawDims.x * 4.0f / WidthRatio);
+	float Fc_y3 = YFreqResponse * ScanTime / (RawDims.x * 4.0f / WidthRatio);
+	float Fc_i = IFreqResponse * ScanTime / (RawDims.x * 4.0f / WidthRatio);
+	float Fc_q = QFreqResponse * ScanTime / (RawDims.x * 4.0f / WidthRatio);
 	float PI = 3.1415926535897932384626433832795;
 	float PI2 = 2.0f * PI;
 	float PI2Length = PI2 / 82.0f;
@@ -126,7 +123,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		float4 CoordY = Input.Coord0.y;
 		float2 TexCoord = float2(CoordX.r, CoordY.r);
 		float4 C = tex2D(CompositeSampler, TexCoord + float2(0.625f, 0.4f) / RawDims) * CRange + MinC;
-		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawHeight / HeightRatio) + BValue) + OValue;
+		float4 WT = W * (CoordX * WidthRatio + AValue * CoordY * 2.0f * (RawDims.y / HeightRatio) + BValue) + OValue;
 
 		float4 SincYIn1 = PI2 * Fc_y1 * n4;
 		float4 SincYIn2 = PI2 * Fc_y2 * n4;

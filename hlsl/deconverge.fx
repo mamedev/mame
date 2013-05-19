@@ -23,6 +23,9 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
+	//float2 RedCoord : TEXCOORD0;
+	//float2 GrnCoord : TEXCOORD1;
+	//float2 BluCoord : TEXCOORD2;
 	float3 CoordX : TEXCOORD0;
 	float3 CoordY : TEXCOORD1;
 	float2 TexCoord : TEXCOORD2;
@@ -38,6 +41,9 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
+	//float2 RedCoord : TEXCOORD0;
+	//float2 GrnCoord : TEXCOORD1;
+	//float2 BluCoord : TEXCOORD2;
 	float3 CoordX : TEXCOORD0;
 	float3 CoordY : TEXCOORD1;
 	float2 TexCoord : TEXCOORD2;
@@ -53,11 +59,9 @@ uniform float3 ConvergeY = float3(0.0f, 0.0f, 0.0f);
 uniform float TargetWidth;
 uniform float TargetHeight;
 
-uniform float RawWidth;
-uniform float RawHeight;
+uniform float2 RawDims;
 
-uniform float WidthRatio;
-uniform float HeightRatio;
+uniform float2 SizeRatio;
 
 uniform float3 RadialConvergeX = float3(0.0f, 0.0f, 0.0f);
 uniform float3 RadialConvergeY = float3(0.0f, 0.0f, 0.0f);
@@ -68,9 +72,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
-	float2 TargetRawRatio = float2(TargetWidth / RawWidth, TargetWidth / RawWidth);
-	float2 invDims = float2(1.0f / RawWidth, 1.0f / RawHeight);
-	float2 Ratios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
+	float2 invDims = 1.0f / RawDims;
+	float2 Ratios = SizeRatio;
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.x /= TargetWidth;
 	Output.Position.y /= TargetHeight;
@@ -81,8 +84,19 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	float2 TexCoord = Input.TexCoord;
 
-	Output.CoordX = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RadialConvergeX / RawWidth) + 0.5f) * Ratios.x + ConvergeX * invDims.x;
-	Output.CoordY = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RadialConvergeY / RawHeight) + 0.5f) * Ratios.y + ConvergeY * invDims.y;
+	float2 RadialRed = float2(RadialConvergeX.x, RadialConvergeY.x);
+	float2 RadialGrn = float2(RadialConvergeX.y, RadialConvergeY.y);
+	float2 RadialBlu = float2(RadialConvergeX.z, RadialConvergeY.z);
+	float2 ConvergeRed = float2(ConvergeX.x, ConvergeY.x);
+	float2 ConvergeGrn = float2(ConvergeX.y, ConvergeY.y);
+	float2 ConvergeBlu = float2(ConvergeX.z, ConvergeY.z);
+	float2 ScaledRatio = ((TexCoord * SizeRatio) - 0.5f);
+
+	Output.CoordX = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RadialConvergeX / RawDims.x) + 0.5f) * Ratios.x + ConvergeX * invDims.x;
+	Output.CoordY = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RadialConvergeY / RawDims.y) + 0.5f) * Ratios.y + ConvergeY * invDims.y;
+	//Output.RedCoord = (ScaledRatio * (1.0f + RadialRed / RawDims) + 0.5f) * SizeRatio + ConvergeRed * invDims;
+	//Output.GrnCoord = (ScaledRatio * (1.0f + RadialGrn / RawDims) + 0.5f) * SizeRatio + ConvergeGrn * invDims;
+	//Output.BluCoord = (ScaledRatio * (1.0f + RadialBlu / RawDims) + 0.5f) * SizeRatio + ConvergeBlu * invDims;
 	Output.TexCoord = TexCoord;	
 
 	return Output;
@@ -94,39 +108,15 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 MagnetOffset = float2(32.0f / RawWidth, 32.0f / RawHeight);
-	float2 MagnetCenter = float2(0.9f / WidthRatio, 0.9f / HeightRatio);
-	float MagnetDistance = length((MagnetCenter - Input.TexCoord) * float2(WidthRatio, HeightRatio));
-	float Deconverge = 1.0f - MagnetDistance / MagnetCenter;
-	Deconverge = 1.0f;//clamp(Deconverge, 0.0f, 1.0f);
-	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
+	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;	
+	//float RedTexel = tex2D(DiffuseSampler, Input.RedCoord).r;
+	//float GrnTexel = tex2D(DiffuseSampler, Input.GrnCoord).g;
+	//float BluTexel = tex2D(DiffuseSampler, Input.BluCoord).b;
+	float RedTexel = tex2D(DiffuseSampler, float2(Input.CoordX.x, Input.CoordY.x)).r;
+	float GrnTexel = tex2D(DiffuseSampler, float2(Input.CoordX.y, Input.CoordY.y)).g;
+	float BluTexel = tex2D(DiffuseSampler, float2(Input.CoordX.z, Input.CoordY.z)).b;
 	
-	float2 TargetDims = float2(RawWidth, RawHeight);
-	float2 DimOffset = 0.0f / TargetDims;
-	float2 TexCoord = Input.TexCoord;
-	float3 CoordX = Input.CoordX;
-	float3 CoordY = Input.CoordY;
-	
-	CoordX = lerp(TexCoord.x, CoordX, Deconverge);
-	CoordY = lerp(TexCoord.y, CoordY, Deconverge);
-
-	float RedTexel = tex2D(DiffuseSampler, float2(CoordX.x, CoordY.x) - DimOffset).r;
-	float GrnTexel = tex2D(DiffuseSampler, float2(CoordX.y, CoordY.y) - DimOffset).g;
-	float BluTexel = tex2D(DiffuseSampler, float2(CoordX.z, CoordY.z) - DimOffset).b;
-	
-	//RedTexel *= Input.RedCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
-
+	//return float4(Input.TexCoord, 0.0f, 1.0f);
 	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
 }
 

@@ -364,6 +364,7 @@ render_texture::render_texture()
 		m_format(TEXFORMAT_ARGB32),
 		m_bcglookup(NULL),
 		m_bcglookup_entries(0),
+		m_osddata(~0L),
 		m_scaler(NULL),
 		m_param(NULL),
 		m_curseq(0)
@@ -397,6 +398,7 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 		m_scaler = scaler;
 		m_param = param;
 	}
+	m_osddata = ~0L;
 }
 
 
@@ -491,6 +493,8 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 	if (dwidth < 1) dwidth = 1;
 	if (dheight < 1) dheight = 1;
 
+	texinfo.osddata = m_osddata;
+
 	// are we scaler-free? if so, just return the source bitmap
 	const rgb_t *palbase = (m_format == TEXFORMAT_PALETTE16 || m_format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(m_bitmap->palette()) : NULL;
 	if (m_scaler == NULL || (m_bitmap != NULL && swidth == dwidth && sheight == dheight))
@@ -502,7 +506,6 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.width = swidth;
 		texinfo.height = sheight;
 		texinfo.palette = palbase;
-		texinfo.osddata = m_osddata;
 		texinfo.seqid = ++m_curseq;
 		return true;
 	}

@@ -75,7 +75,6 @@
 #define WINOPTION_HWSTRETCH             "hwstretch"
 
 // Direct3D-specific options
-#define WINOPTION_D3DVERSION            "d3dversion"
 #define WINOPTION_FILTER                "filter"
 
 // core post-processing options
@@ -134,6 +133,17 @@
 #define WINOPTION_VECTOR_TIME_PERIOD        "vector_time_period"
 #define WINOPTION_VECTOR_LENGTH_SCALE       "vector_length_scale"
 #define WINOPTION_VECTOR_LENGTH_RATIO       "vector_length_ratio"
+#define WINOPTION_BLOOM_LEVEL0_WEIGHT       "bloom_lvl0_weight"
+#define WINOPTION_BLOOM_LEVEL1_WEIGHT       "bloom_lvl1_weight"
+#define WINOPTION_BLOOM_LEVEL2_WEIGHT       "bloom_lvl2_weight"
+#define WINOPTION_BLOOM_LEVEL3_WEIGHT       "bloom_lvl3_weight"
+#define WINOPTION_BLOOM_LEVEL4_WEIGHT       "bloom_lvl4_weight"
+#define WINOPTION_BLOOM_LEVEL5_WEIGHT       "bloom_lvl5_weight"
+#define WINOPTION_BLOOM_LEVEL6_WEIGHT       "bloom_lvl6_weight"
+#define WINOPTION_BLOOM_LEVEL7_WEIGHT       "bloom_lvl7_weight"
+#define WINOPTION_BLOOM_LEVEL8_WEIGHT       "bloom_lvl8_weight"
+#define WINOPTION_BLOOM_LEVEL9_WEIGHT       "bloom_lvl9_weight"
+#define WINOPTION_BLOOM_LEVEL10_WEIGHT      "bloom_lvl10_weight"
 
 // per-window options
 #define WINOPTION_SCREEN                "screen"
@@ -194,7 +204,6 @@ public:
 	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
 
 	// Direct3D-specific options
-	int d3d_version() const { return int_value(WINOPTION_D3DVERSION); }
 	bool filter() const { return bool_value(WINOPTION_FILTER); }
 
 	// core post-processing options
@@ -247,6 +256,17 @@ public:
 	float screen_vector_time_period() const { return float_value(WINOPTION_VECTOR_TIME_PERIOD); }
 	float screen_vector_length_scale() const { return float_value(WINOPTION_VECTOR_LENGTH_SCALE); }
 	float screen_vector_length_ratio() const { return float_value(WINOPTION_VECTOR_LENGTH_RATIO); }
+	float screen_bloom_lvl0_weight() const { return float_value(WINOPTION_BLOOM_LEVEL0_WEIGHT); }
+	float screen_bloom_lvl1_weight() const { return float_value(WINOPTION_BLOOM_LEVEL1_WEIGHT); }
+	float screen_bloom_lvl2_weight() const { return float_value(WINOPTION_BLOOM_LEVEL2_WEIGHT); }
+	float screen_bloom_lvl3_weight() const { return float_value(WINOPTION_BLOOM_LEVEL3_WEIGHT); }
+	float screen_bloom_lvl4_weight() const { return float_value(WINOPTION_BLOOM_LEVEL4_WEIGHT); }
+	float screen_bloom_lvl5_weight() const { return float_value(WINOPTION_BLOOM_LEVEL5_WEIGHT); }
+	float screen_bloom_lvl6_weight() const { return float_value(WINOPTION_BLOOM_LEVEL6_WEIGHT); }
+	float screen_bloom_lvl7_weight() const { return float_value(WINOPTION_BLOOM_LEVEL7_WEIGHT); }
+	float screen_bloom_lvl8_weight() const { return float_value(WINOPTION_BLOOM_LEVEL8_WEIGHT); }
+	float screen_bloom_lvl9_weight() const { return float_value(WINOPTION_BLOOM_LEVEL9_WEIGHT); }
+	float screen_bloom_lvl10_weight() const { return float_value(WINOPTION_BLOOM_LEVEL10_WEIGHT); }
 	const char *screen_offset() const { return value(WINOPTION_OFFSET); }
 	const char *screen_scale() const { return value(WINOPTION_SCALE); }
 	const char *screen_power() const { return value(WINOPTION_POWER); }

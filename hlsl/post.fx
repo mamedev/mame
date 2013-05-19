@@ -59,11 +59,9 @@ struct PS_INPUT
 uniform float TargetWidth;
 uniform float TargetHeight;
 
-uniform float RawWidth;
-uniform float RawHeight;
+uniform float2 RawDims;
 
-uniform float WidthRatio;
-uniform float HeightRatio;
+uniform float2 SizeRatio;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -77,11 +75,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord + 0.5f / float2(TargetWidth, TargetHeight);
+	Output.TexCoord = Input.TexCoord + 0.5f / RawDims;//float2(TargetWidth, TargetHeight);
 
-	//float Zoom = 32.0f;
-	//Output.TexCoord /= Zoom;
-	//Output.TexCoord += float2(0.175f * (1.0f - 1.0f / Zoom) / WidthRatio, 0.175f * (1.0f - 1.0f / Zoom) / HeightRatio);
 	return Output;
 }
 
@@ -117,7 +112,7 @@ uniform float3 Floor = float3(0.0f, 0.0f, 0.0f);
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 Ratios = float2(WidthRatio, HeightRatio);
+	float2 Ratios = 1.0f / SizeRatio;
 
 	// -- Screen Pincushion Calculation --
 	float2 PinViewpointOffset = float2(0.0f, 0.0f);
@@ -153,14 +148,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
-	clip((BaseCoord.x < 1.0f / RawWidth) ? -1 : 1);
-	clip((BaseCoord.y < 1.0f / RawHeight) ? -1 : 1);
-	clip((BaseCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth)) ? -1 : 1);
-	clip((BaseCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight)) ? -1 : 1);
+	clip((BaseCoord < 1.0f / RawDims) ? -1 : 1);
+	clip((BaseCoord > (SizeRatio + 1.0f / RawDims)) ? -1 : 1);
 
 	// -- Scanline Simulation --
-	float InnerSine = ScanCoord.y * RawHeight * ScanlineScale;
-	float ScanBrightMod = sin(InnerSine * PI + ScanlineOffset * RawHeight);
+	float InnerSine = ScanCoord.y * RawDims.y * ScanlineScale;
+	float ScanBrightMod = sin(InnerSine * PI + ScanlineOffset * RawDims.y);
 	float3 ScanBrightness = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f) * 0.5f, ScanlineAmount);
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 

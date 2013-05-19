@@ -54,31 +54,27 @@ struct PS_INPUT
 uniform float2 TargetSize;
 uniform float2 SourceSize;
 
-uniform float2 Defocus = float2(0.0f, 0.0f);
-
-uniform float Brighten;
-
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.xy /= TargetSize;
+	Output.Position.xy /= SourceSize;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= float2(0.5f, 0.5f);
-	Output.Position.xy *= float2(2.0f, 2.0f);
+	Output.Position.xy -= 0.5f;
+	Output.Position.xy *= 2.0f;
 	Output.Color = Input.Color;
 	float2 inversePixel = 1.0f / TargetSize;
-	Output.TexCoord01.xy = Input.Position.xy * inversePixel + float2(0.75f - 0.5f, 0.32f - 0.5f) * inversePixel;
-	Output.TexCoord01.zw = Input.Position.xy * inversePixel + float2(0.35f - 0.5f, 0.65f - 0.5f) * inversePixel;
-	Output.TexCoord23.xy = Input.Position.xy * inversePixel + float2(0.31f - 0.5f, 1.25f - 0.5f) * inversePixel;
-	Output.TexCoord23.zw = Input.Position.xy * inversePixel + float2(0.58f - 0.5f, 1.61f - 0.5f) * inversePixel;
-	Output.TexCoord45.xy = Input.Position.xy * inversePixel + float2(1.00f - 0.5f, 1.75f - 0.5f) * inversePixel;
-	Output.TexCoord45.zw = Input.Position.xy * inversePixel + float2(1.35f - 0.5f, 1.64f - 0.5f) * inversePixel;
-	Output.TexCoord67.xy = Input.Position.xy * inversePixel + float2(1.65f - 0.5f, 1.32f - 0.5f) * inversePixel;
-	Output.TexCoord67.zw = Input.Position.xy * inversePixel + float2(1.72f - 0.5f, 0.93f - 0.5f) * inversePixel;
-	Output.TexCoord89.xy = Input.Position.xy * inversePixel + float2(1.57f - 0.5f, 0.57f - 0.5f) * inversePixel;
-	Output.TexCoord89.zw = Input.Position.xy * inversePixel + float2(1.25f - 0.5f, 0.33f - 0.5f) * inversePixel;
+	Output.TexCoord01.xy = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.00f + 0.5f) * inversePixel;
+	Output.TexCoord01.zw = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.00f + 0.5f) * inversePixel;
+	Output.TexCoord23.xy = Input.Position.xy * inversePixel + float2(0.25f + 0.5f, 0.25f + 0.5f) * inversePixel;
+	Output.TexCoord23.zw = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.25f + 0.5f) * inversePixel;
+	Output.TexCoord45.xy = Input.Position.xy * inversePixel + float2(0.75f + 0.5f, 0.25f + 0.5f) * inversePixel;
+	Output.TexCoord45.zw = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.50f + 0.5f) * inversePixel;
+	Output.TexCoord67.xy = Input.Position.xy * inversePixel + float2(0.50f + 0.5f, 0.50f + 0.5f) * inversePixel;
+	Output.TexCoord67.zw = Input.Position.xy * inversePixel + float2(0.00f + 0.5f, 0.75f + 0.5f) * inversePixel;
+	Output.TexCoord89.xy = Input.Position.xy * inversePixel + float2(0.25f + 0.5f, 0.75f + 0.5f) * inversePixel;
+	Output.TexCoord89.zw = Input.Position.xy * inversePixel + float2(0.75f + 0.5f, 0.75f + 0.5f) * inversePixel;
 
 	return Output;
 }

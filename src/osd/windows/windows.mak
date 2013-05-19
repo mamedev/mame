@@ -322,11 +322,7 @@ OSDOBJS += \
 	$(WINOBJ)/netdev_pcap.o
 endif
 
-ifeq ($(DIRECT3D),9)
 CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
-else
-OSDOBJS += $(WINOBJ)/d3d8intf.o
-endif
 
 # extra dependencies
 $(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.c

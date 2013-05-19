@@ -51,26 +51,31 @@
 //============================================================
 
 #define VERTEX_BASE_FORMAT  (D3DFVF_DIFFUSE | D3DFVF_TEX1)
-#define VERTEX_BUFFER_SIZE  (2048*4+4)
+#define VERTEX_BUFFER_SIZE  (10240*4+4)
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-struct d3d_info;
+namespace d3d
+{
 
-/* d3d_cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
-class d3d_cache_target
+class cache_target;
+class render_target;
+class renderer;
+
+/* cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
+class cache_target
 {
 public:
 	// construction/destruction
-	d3d_cache_target() { }
-	~d3d_cache_target();
+	cache_target() { }
+	~cache_target();
 
-	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y, bool bloom);
+	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
 
-	d3d_surface *last_target;
-	d3d_texture *last_texture;
+	surface *last_target;
+	texture *last_texture;
 
 	int target_width;
 	int target_height;
@@ -80,22 +85,22 @@ public:
 
 	int screen_index;
 
-	d3d_cache_target *next;
-	d3d_cache_target *prev;
+	cache_target *next;
+	cache_target *prev;
 
-	d3d_surface *bloom_target[11];
-	d3d_texture *bloom_texture[11];
+	surface *bloom_target[11];
+	texture *bloom_texture[11];
 };
 
-/* d3d_render_target is the information about a Direct3D render target chain */
-class d3d_render_target
+/* render_target is the information about a Direct3D render target chain */
+class render_target
 {
 public:
 	// construction/destruction
-	d3d_render_target() { }
-	~d3d_render_target();
+	render_target() { }
+	~render_target();
 
-	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y, bool bloom = false);
+	bool init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y);
 
 	int target_width;
 	int target_height;
@@ -106,85 +111,148 @@ public:
 	int screen_index;
 	int page_index;
 
-	d3d_surface *prescaletarget;
-	d3d_texture *prescaletexture;
-	d3d_surface *smalltarget;
-	d3d_texture *smalltexture;
-	d3d_surface *target[5];
-	d3d_texture *texture[5];
+	surface *prescaletarget;
+	texture *prescaletexture;
+	surface *smalltarget;
+	texture *smalltexture;
+	surface *target[5];
+	texture *render_texture[5];
 
-	d3d_render_target *next;
-	d3d_render_target *prev;
+	render_target *next;
+	render_target *prev;
 
-	d3d_surface *bloom_target[11];
-	d3d_texture *bloom_texture[11];
+	surface *bloom_target[11];
+	texture *bloom_texture[11];
 };
 
-/* d3d_info is the information about Direct3D for the current screen */
-struct d3d_info
+/* renderer is the information about Direct3D for the current screen */
+class renderer
 {
-	int                     adapter;                    // ordinal adapter number
-	int                     width, height;              // current width, height
-	int                     refresh;                    // current refresh rate
-	int                     create_error_count;         // number of consecutive create errors
+public:
+	renderer() { }
+	renderer(win_window_info *window);
+	~renderer();
 
-	win_window_info *       window;                     // current window info
+	int 					initialize();
 
-	d3d_device *            device;                     // pointer to the Direct3DDevice object
-	int                     gamma_supported;            // is full screen gamma supported?
-	d3d_present_parameters  presentation;               // set of presentation parameters
-	D3DDISPLAYMODE          origmode;                   // original display mode for the adapter
-	D3DFORMAT               pixformat;                  // pixel format we are using
+	int 					device_create();
+	int 					device_create_resources();
+	void 					device_delete();
+	void 					device_delete_resources();
 
-	d3d_vertex_buffer *     vertexbuf;                  // pointer to the vertex buffer object
-	d3d_vertex *            lockedbuf;                  // pointer to the locked vertex buffer
-	int                     numverts;                   // number of accumulated vertices
+	int 					device_verify_caps();
+	int 					device_test_cooperative();
 
-	d3d_poly_info           poly[VERTEX_BUFFER_SIZE/3]; // array to hold polygons as they are created
-	int                     numpolys;                   // number of accumulated polygons
+	int 					config_adapter_mode();
+	void 					pick_best_mode();
+	int 					get_adapter_for_monitor();
 
-	bool                    restarting;                 // if we're restarting
+	int 					update_window_size();
 
-	d3d_texture_info *      texlist;                    // list of active textures
-	int                     dynamic_supported;          // are dynamic textures supported?
-	int                     stretch_supported;          // is StretchRect with point filtering supported?
-	int                     mod2x_supported;            // is D3DTOP_MODULATE2X supported?
-	int                     mod4x_supported;            // is D3DTOP_MODULATE4X supported?
-	D3DFORMAT               screen_format;              // format to use for screen textures
-	D3DFORMAT               yuv_format;                 // format to use for YUV textures
+	int 					pre_window_draw_check();
+	void 					begin_frame();
+	void 					end_frame();
 
-	DWORD                   texture_caps;               // textureCaps field
-	DWORD                   texture_max_aspect;         // texture maximum aspect ratio
-	DWORD                   texture_max_width;          // texture maximum width
-	DWORD                   texture_max_height;         // texture maximum height
+	void 					draw_line(const render_primitive *prim);
+	void 					draw_quad(const render_primitive *prim);
+	void 					batch_vector(const render_primitive *prim, float line_time);
+	void					batch_vectors();
 
-	d3d_texture_info *      last_texture;               // previous texture
-	UINT32                  last_texture_flags;         // previous texture flags
-	int                     last_blendenable;           // previous blendmode
-	int                     last_blendop;               // previous blendmode
-	int                     last_blendsrc;              // previous blendmode
-	int                     last_blenddst;              // previous blendmode
-	int                     last_filter;                // previous texture filter
-	int                     last_wrap;                  // previous wrap state
-	DWORD                   last_modmode;               // previous texture modulation
+	vertex *				mesh_alloc(int numverts);
 
-	bitmap_argb32           vector_bitmap;              // experimental: bitmap for vectors
-	d3d_texture_info *      vector_texture;             // experimental: texture for vectors
+	void 					update_textures();
 
-	bitmap_rgb32            default_bitmap;             // experimental: default bitmap
-	d3d_texture_info *      default_texture;            // experimental: default texture
+	void 					process_primitives();
+	void 					primitive_flush_pending();
 
-	void *                  hlsl_buf;                   // HLSL vertex data
-	hlsl_info *             hlsl;                       // HLSL interface
+	void 					set_texture(texture_info *texture);
+	void 					set_filter(int filter);
+	void 					set_wrap(D3DTEXTUREADDRESS wrap);
+	void 					set_modmode(DWORD modmode);
+	void 					set_blendmode(int blendmode);
+	void 					reset_render_states();
+
+	// Setters / getters
+	int						get_adapter() { return m_adapter; }
+	int						get_width() { return m_width; }
+	int						get_height() { return m_height; }
+	int						get_refresh() { return m_refresh; }
+
+	win_window_info *		get_window() { return m_window; }
+
+	device *				get_device() { return m_device; }
+	present_parameters *	get_presentation() { return &m_presentation; }
+
+	vertex_buffer *			get_vertex_buffer() { return m_vertexbuf; }
+	vertex *				get_locked_buffer() { return m_lockedbuf; }
+	VOID **					get_locked_buffer_ptr() { return (VOID **)&m_lockedbuf; }
+	void					set_locked_buffer(vertex *lockedbuf) { m_lockedbuf = lockedbuf; }
+
+	void					set_restarting(bool restarting) { m_restarting = restarting; }
+	bool					is_mod2x_supported() { return (bool)m_mod2x_supported; }
+	bool					is_mod4x_supported() { return (bool)m_mod4x_supported; }
+
+	D3DFORMAT				get_screen_format() { return m_screen_format; }
+	D3DFORMAT               get_pixel_format() { return m_pixformat; }
+	D3DDISPLAYMODE          get_origmode() { return m_origmode; }
+
+	UINT32					get_last_texture_flags() { return m_last_texture_flags; }
+
+	texture_manager *		get_texture_manager() { return m_texture_manager; }
+	texture_info *			get_default_texture() { return m_texture_manager->get_default_texture(); }
+	texture_info *			get_vector_texture() { return m_texture_manager->get_vector_texture(); }
+
+	shaders *				get_shaders() { return m_shaders; }
+
+private:
+	int                     m_adapter;                  // ordinal adapter number
+	int                     m_width;					// current width
+	int						m_height;              		// current height
+	int                     m_refresh;                  // current refresh rate
+	int                     m_create_error_count;       // number of consecutive create errors
+
+	win_window_info *       m_window;                     // current window info
+
+	device *            	m_device;                   // pointer to the Direct3DDevice object
+	int                     m_gamma_supported;          // is full screen gamma supported?
+	present_parameters  	m_presentation;             // set of presentation parameters
+	D3DDISPLAYMODE          m_origmode;                 // original display mode for the adapter
+	D3DFORMAT               m_pixformat;                // pixel format we are using
+
+	vertex_buffer *     	m_vertexbuf;                // pointer to the vertex buffer object
+	vertex *            	m_lockedbuf;                // pointer to the locked vertex buffer
+	int                     m_numverts;                 // number of accumulated vertices
+
+	vertex *				m_vectorbatch;				// pointer to the vector batch buffer
+	int						m_batchindex;				// current index into the vector batch
+
+	poly_info          		m_poly[VERTEX_BUFFER_SIZE/3];// array to hold polygons as they are created
+	int                     m_numpolys;                 // number of accumulated polygons
+
+	bool                    m_restarting;               // if we're restarting
+
+	int                     m_mod2x_supported;          // is D3DTOP_MODULATE2X supported?
+	int                     m_mod4x_supported;          // is D3DTOP_MODULATE4X supported?
+	D3DFORMAT               m_screen_format;            // format to use for screen textures
+
+	texture_info *     		m_last_texture;             // previous texture
+	UINT32                  m_last_texture_flags;       // previous texture flags
+	int                     m_last_blendenable;         // previous blendmode
+	int                     m_last_blendop;             // previous blendmode
+	int                     m_last_blendsrc;            // previous blendmode
+	int                     m_last_blenddst;            // previous blendmode
+	int                     m_last_filter;              // previous texture filter
+	D3DTEXTUREADDRESS		m_last_wrap;                // previous wrap state
+	DWORD                   m_last_modmode;             // previous texture modulation
+
+	void *                  m_hlsl_buf;                 // HLSL vertex data
+	shaders *             	m_shaders;                  // HLSL interface
+
+	texture_manager *		m_texture_manager;			// texture manager
+
+	int						m_line_count;
 };
 
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource, UINT32 flags);
-void texture_destroy(d3d_info *d3d, d3d_texture_info *info);
+};
 
 #endif

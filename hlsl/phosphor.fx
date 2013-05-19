@@ -114,8 +114,8 @@ technique TestTechnique
 	{
 		Lighting = FALSE;
 
-		//Sampler[0] = <DiffuseSampler>;
-		//Sampler[1] = <PreviousSampler>;
+		Sampler[0] = <DiffuseSampler>;
+		Sampler[1] = <PreviousSampler>;
 
 		VertexShader = compile vs_2_0 vs_main();
 		PixelShader  = compile ps_2_0 ps_main();

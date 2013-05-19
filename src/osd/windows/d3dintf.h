@@ -56,8 +56,6 @@
 #endif
 
 
-#if (DIRECT3D_VERSION >= 0x0900)
-// the following used to be TEXTURESTAGESTATES but are now SAMPLERSTATES
 #define D3DTSS_ADDRESSU       13
 #define D3DTSS_ADDRESSV       14
 #define D3DTSS_BORDERCOLOR    15
@@ -67,28 +65,29 @@
 #define D3DTSS_MIPMAPLODBIAS  19
 #define D3DTSS_MAXMIPLEVEL    20
 #define D3DTSS_MAXANISOTROPY  21
-#endif
 
+namespace d3d
+{
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-struct d3d_base;
-struct d3d_device;
-struct d3d_surface;
-struct d3d_texture;
-struct d3d_vertex_buffer;
-struct d3d_effect;
-typedef D3DXVECTOR4 d3d_vector;
-typedef D3DMATRIX d3d_matrix;
+struct base;
+struct device;
+struct surface;
+struct texture;
+struct vertex_buffer;
+struct effect;
+typedef D3DXVECTOR4 vector;
+typedef D3DMATRIX matrix;
 
 
 //============================================================
 //  Abstracted presentation parameters
 //============================================================
 
-struct d3d_present_parameters
+struct present_parameters
 {
 	UINT BackBufferWidth;
 	UINT BackBufferHeight;
@@ -111,7 +110,7 @@ struct d3d_present_parameters
 //  Abstracted device identifier
 //============================================================
 
-struct d3d_adapter_identifier
+struct adapter_identifier
 {
 	char            Driver[512];
 	char            Description[512];
@@ -129,7 +128,7 @@ struct d3d_adapter_identifier
 //  Caps enumeration
 //============================================================
 
-enum d3d_caps_index
+enum caps_index
 {
 	CAPS_PRESENTATION_INTERVALS,
 	CAPS_CAPS2,
@@ -152,19 +151,19 @@ enum d3d_caps_index
 //  Direct3D interfaces
 //============================================================
 
-struct d3d_interface
+struct interface
 {
-	HRESULT  (*check_device_format)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
-	HRESULT  (*check_device_type)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
-	HRESULT  (*create_device)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, d3d_present_parameters *params, d3d_device **dev);
-	HRESULT  (*enum_adapter_modes)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
-	UINT     (*get_adapter_count)(d3d_base *d3dptr);
-	HRESULT  (*get_adapter_display_mode)(d3d_base *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
-	HRESULT  (*get_adapter_identifier)(d3d_base *d3dptr, UINT adapter, DWORD flags, d3d_adapter_identifier *identifier);
-	UINT     (*get_adapter_mode_count)(d3d_base *d3dptr, UINT adapter, D3DFORMAT format);
-	HMONITOR (*get_adapter_monitor)(d3d_base *d3dptr, UINT adapter);
-	HRESULT  (*get_caps_dword)(d3d_base *d3dptr, UINT adapter, D3DDEVTYPE devtype, d3d_caps_index which, DWORD *value);
-	ULONG    (*release)(d3d_base *d3dptr);
+	HRESULT  (*check_device_format)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT adapterformat, DWORD usage, D3DRESOURCETYPE restype, D3DFORMAT format);
+	HRESULT  (*check_device_type)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, D3DFORMAT format, D3DFORMAT backformat, BOOL windowed);
+	HRESULT  (*create_device)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, HWND focus, DWORD behavior, present_parameters *params, device **dev);
+	HRESULT  (*enum_adapter_modes)(base *d3dptr, UINT adapter, D3DFORMAT format, UINT index, D3DDISPLAYMODE *mode);
+	UINT     (*get_adapter_count)(base *d3dptr);
+	HRESULT  (*get_adapter_display_mode)(base *d3dptr, UINT adapter, D3DDISPLAYMODE *mode);
+	HRESULT  (*get_adapter_identifier)(base *d3dptr, UINT adapter, DWORD flags, adapter_identifier *identifier);
+	UINT     (*get_adapter_mode_count)(base *d3dptr, UINT adapter, D3DFORMAT format);
+	HMONITOR (*get_adapter_monitor)(base *d3dptr, UINT adapter);
+	HRESULT  (*get_caps_dword)(base *d3dptr, UINT adapter, D3DDEVTYPE devtype, caps_index which, DWORD *value);
+	ULONG    (*release)(base *d3dptr);
 };
 
 
@@ -172,32 +171,32 @@ struct d3d_interface
 //  Direct3DDevice interfaces
 //============================================================
 
-struct d3d_device_interface
+struct device_interface
 {
-	HRESULT (*begin_scene)(d3d_device *dev);
-	HRESULT (*clear)(d3d_device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
-	HRESULT (*create_offscreen_plain_surface)(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, d3d_surface **surface);
-	HRESULT (*create_effect)(d3d_device *dev, const WCHAR *name, d3d_effect **effect);
-	HRESULT (*create_texture)(d3d_device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, d3d_texture **texture);
-	HRESULT (*create_vertex_buffer)(d3d_device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, d3d_vertex_buffer **buf);
-	HRESULT (*create_render_target)(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, d3d_surface **surface);
-	HRESULT (*draw_primitive)(d3d_device *dev, D3DPRIMITIVETYPE type, UINT start, UINT count);
-	HRESULT (*end_scene)(d3d_device *dev);
-	HRESULT (*get_raster_status)(d3d_device *dev, D3DRASTER_STATUS *status);
-	HRESULT (*get_render_target)(d3d_device *dev, DWORD index, d3d_surface **surface);
-	HRESULT (*get_render_target_data)(d3d_device *dev, d3d_surface *rendertarget, d3d_surface *destsurface);
-	HRESULT (*present)(d3d_device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags);
-	ULONG   (*release)(d3d_device *dev);
-	HRESULT (*reset)(d3d_device *dev, d3d_present_parameters *params);
-	void    (*set_gamma_ramp)(d3d_device *dev, DWORD flags, const D3DGAMMARAMP *ramp);
-	HRESULT (*set_render_state)(d3d_device *dev, D3DRENDERSTATETYPE state, DWORD value);
-	HRESULT (*set_render_target)(d3d_device *dev, DWORD index, d3d_surface *surf);
-	HRESULT (*set_stream_source)(d3d_device *dev, UINT number, d3d_vertex_buffer *vbuf, UINT stride);
-	HRESULT (*set_texture)(d3d_device *dev, DWORD stage, d3d_texture *tex);
-	HRESULT (*set_texture_stage_state)(d3d_device *dev, DWORD stage, D3DTEXTURESTAGESTATETYPE state, DWORD value);
-	HRESULT (*set_vertex_format)(d3d_device *dev, D3DFORMAT format);
-	HRESULT (*stretch_rect)(d3d_device *dev, d3d_surface *source, const RECT *srcrect, d3d_surface *dest, const RECT *dstrect, D3DTEXTUREFILTERTYPE filter);
-	HRESULT (*test_cooperative_level)(d3d_device *dev);
+	HRESULT (*begin_scene)(device *dev);
+	HRESULT (*clear)(device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
+	HRESULT (*create_offscreen_plain_surface)(device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, surface **surface);
+	HRESULT (*create_effect)(device *dev, const WCHAR *name, effect **effect);
+	HRESULT (*create_texture)(device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, texture **texture);
+	HRESULT (*create_vertex_buffer)(device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, vertex_buffer **buf);
+	HRESULT (*create_render_target)(device *dev, UINT width, UINT height, D3DFORMAT format, surface **surface);
+	HRESULT (*draw_primitive)(device *dev, D3DPRIMITIVETYPE type, UINT start, UINT count);
+	HRESULT (*end_scene)(device *dev);
+	HRESULT (*get_raster_status)(device *dev, D3DRASTER_STATUS *status);
+	HRESULT (*get_render_target)(device *dev, DWORD index, surface **surface);
+	HRESULT (*get_render_target_data)(device *dev, surface *rendertarget, surface *destsurface);
+	HRESULT (*present)(device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags);
+	ULONG   (*release)(device *dev);
+	HRESULT (*reset)(device *dev, present_parameters *params);
+	void    (*set_gamma_ramp)(device *dev, DWORD flags, const D3DGAMMARAMP *ramp);
+	HRESULT (*set_render_state)(device *dev, D3DRENDERSTATETYPE state, DWORD value);
+	HRESULT (*set_render_target)(device *dev, DWORD index, surface *surf);
+	HRESULT (*set_stream_source)(device *dev, UINT number, vertex_buffer *vbuf, UINT stride);
+	HRESULT (*set_texture)(device *dev, DWORD stage, texture *tex);
+	HRESULT (*set_texture_stage_state)(device *dev, DWORD stage, D3DTEXTURESTAGESTATETYPE state, DWORD value);
+	HRESULT (*set_vertex_format)(device *dev, D3DFORMAT format);
+	HRESULT (*stretch_rect)(device *dev, surface *source, const RECT *srcrect, surface *dest, const RECT *dstrect, D3DTEXTUREFILTERTYPE filter);
+	HRESULT (*test_cooperative_level)(device *dev);
 };
 
 
@@ -205,11 +204,11 @@ struct d3d_device_interface
 //  Direct3DSurface interfaces
 //============================================================
 
-struct d3d_surface_interface
+struct surface_interface
 {
-	HRESULT (*lock_rect)(d3d_surface *surf, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
-	ULONG   (*release)(d3d_surface *tex);
-	HRESULT (*unlock_rect)(d3d_surface *surf);
+	HRESULT (*lock_rect)(surface *surf, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
+	ULONG   (*release)(surface *tex);
+	HRESULT (*unlock_rect)(surface *surf);
 };
 
 
@@ -217,12 +216,12 @@ struct d3d_surface_interface
 //  Direct3DTexture interfaces
 //============================================================
 
-struct d3d_texture_interface
+struct texture_interface
 {
-	HRESULT (*get_surface_level)(d3d_texture *tex, UINT level, d3d_surface **surface);
-	HRESULT (*lock_rect)(d3d_texture *tex, UINT level, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
-	ULONG   (*release)(d3d_texture *tex);
-	HRESULT (*unlock_rect)(d3d_texture *tex, UINT level);
+	HRESULT (*get_surface_level)(texture *tex, UINT level, surface **surface);
+	HRESULT (*lock_rect)(texture *tex, UINT level, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags);
+	ULONG   (*release)(texture *tex);
+	HRESULT (*unlock_rect)(texture *tex, UINT level);
 };
 
 
@@ -230,11 +229,11 @@ struct d3d_texture_interface
 //  Direct3DVertexBuffer interfaces
 //============================================================
 
-struct d3d_vertex_buffer_interface
+struct vertex_buffer_interface
 {
-	HRESULT (*lock)(d3d_vertex_buffer *vbuf, UINT offset, UINT size, VOID **data, DWORD flags);
-	ULONG   (*release)(d3d_vertex_buffer *vbuf);
-	HRESULT (*unlock)(d3d_vertex_buffer *vbuf);
+	HRESULT (*lock)(vertex_buffer *vbuf, UINT offset, UINT size, VOID **data, DWORD flags);
+	ULONG   (*release)(vertex_buffer *vbuf);
+	HRESULT (*unlock)(vertex_buffer *vbuf);
 };
 
 
@@ -242,19 +241,19 @@ struct d3d_vertex_buffer_interface
 //  Direct3DEffect interfaces
 //============================================================
 
-struct d3d_effect_interface
+struct effect_interface
 {
-	void     (*begin)(d3d_effect *effect, UINT *passes, DWORD flags);
-	void     (*end)(d3d_effect *effect);
-	void     (*begin_pass)(d3d_effect *effect, UINT pass);
-	void     (*end_pass)(d3d_effect *effect);
-	void     (*set_technique)(d3d_effect *effect, const char *name);
-	void     (*set_vector)(d3d_effect *effect, const char *name, int count, float *vector);
-	void     (*set_float)(d3d_effect *effect, const char *name, float value);
-	void     (*set_int)(d3d_effect *effect, const char *name, int value);
-	void     (*set_matrix)(d3d_effect *effect, const char *name, d3d_matrix *matrix);
-	void     (*set_texture)(d3d_effect *effect, const char *name, d3d_texture *tex);
-	ULONG    (*release)(d3d_effect *effect);
+	void     (*begin)(effect *effect, UINT *passes, DWORD flags);
+	void     (*end)(effect *effect);
+	void     (*begin_pass)(effect *effect, UINT pass);
+	void     (*end_pass)(effect *effect);
+	void     (*set_technique)(effect *effect, const char *name);
+	void     (*set_vector)(effect *effect, const char *name, int count, float *vector);
+	void     (*set_float)(effect *effect, const char *name, float value);
+	void     (*set_int)(effect *effect, const char *name, int value);
+	void     (*set_matrix)(effect *effect, const char *name, matrix *matrix);
+	void     (*set_texture)(effect *effect, const char *name, texture *tex);
+	ULONG    (*release)(effect *effect);
 };
 
 
@@ -262,7 +261,7 @@ struct d3d_effect_interface
 //  Core D3D object
 //============================================================
 
-struct d3d_base
+struct base
 {
 	// internal objects
 	int                         version;
@@ -271,12 +270,12 @@ struct d3d_base
 	bool                        post_fx_available;
 
 	// interface pointers
-	d3d_interface               d3d;
-	d3d_device_interface        device;
-	d3d_surface_interface       surface;
-	d3d_texture_interface       texture;
-	d3d_vertex_buffer_interface vertexbuf;
-	d3d_effect_interface        effect;
+	interface               d3d;
+	device_interface        device;
+	surface_interface       surface;
+	texture_interface       texture;
+	vertex_buffer_interface vertexbuf;
+	effect_interface        effect;
 };
 
 
@@ -284,10 +283,8 @@ struct d3d_base
 //  PROTOTYPES
 //============================================================
 
-#if DIRECT3D_VERSION < 0x0900
-d3d_base *drawd3d8_init(void);
-#endif
-d3d_base *drawd3d9_init(void);
+base *drawd3d9_init(void);
 
+};
 
 #endif

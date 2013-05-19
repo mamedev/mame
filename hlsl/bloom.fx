@@ -124,7 +124,7 @@ sampler DiffuseSampler9 = sampler_state
 	AddressW = CLAMP;
 };
 
-sampler DiffuseSampler10 = sampler_state
+sampler DiffuseSamplerA = sampler_state
 {
 	Texture   = <DiffuseK>;
 	MipFilter = LINEAR;
@@ -143,7 +143,12 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
+	float4 TexCoord01 : TEXCOORD0;
+	float4 TexCoord23 : TEXCOORD1;
+	float4 TexCoord45 : TEXCOORD2;
+	float4 TexCoord67 : TEXCOORD3;
+	float4 TexCoord89 : TEXCOORD4;
+	float2 TexCoordA : TEXCOORD5;
 };
 
 struct VS_INPUT
@@ -156,7 +161,12 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
+	float4 TexCoord01 : TEXCOORD0;
+	float4 TexCoord23 : TEXCOORD1;
+	float4 TexCoord45 : TEXCOORD2;
+	float4 TexCoord67 : TEXCOORD3;
+	float4 TexCoord89 : TEXCOORD4;
+	float2 TexCoordA : TEXCOORD5;
 };
 
 //-----------------------------------------------------------------------------
@@ -164,18 +174,7 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 TargetSize;
-
-uniform float DiffuseScaleA;
-uniform float DiffuseScaleB;
-uniform float DiffuseScaleC;
-uniform float DiffuseScaleD;
-uniform float DiffuseScaleE;
-uniform float DiffuseScaleF;
-uniform float DiffuseScaleG;
-uniform float DiffuseScaleH;
-uniform float DiffuseScaleI;
-uniform float DiffuseScaleJ;
-uniform float DiffuseScaleK;
+uniform float2 SourceSize;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -188,7 +187,18 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy *= float2(2.0f, 2.0f);
 	Output.Color = Input.Color;
 	float2 inversePixel = 1.0f / TargetSize;
-	Output.TexCoord = Input.Position.xy * inversePixel;
+	float2 TexCoord = Input.Position.xy * inversePixel + float2(0.5f, 0.5f) * inversePixel;
+	Output.TexCoord01.xy = TexCoord;
+	Output.TexCoord01.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.5f;
+	Output.TexCoord23.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.25f;
+	Output.TexCoord23.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.125f;
+	Output.TexCoord45.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0625f;
+	Output.TexCoord45.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.03125f;
+	Output.TexCoord67.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.015625f;
+	Output.TexCoord67.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0078125f;
+	Output.TexCoord89.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.00390625f;
+	Output.TexCoord89.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.001953125f;
+	Output.TexCoordA = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 0.0009765625f;
 
 	return Output;
 }
@@ -197,21 +207,39 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Bloom Pixel Shader
 //-----------------------------------------------------------------------------
 
+uniform float4 Level0123Weight;
+uniform float4 Level4567Weight;
+uniform float3 Level89AWeight;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord).rgb * DiffuseScaleA * 1.00f;
-	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord).rgb * DiffuseScaleB * 0.95f;
-	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord).rgb * DiffuseScaleC * 0.85f;
-	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord).rgb * DiffuseScaleD * 0.75f;
-	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord).rgb * DiffuseScaleE * 0.65f;
-	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord).rgb * DiffuseScaleF * 0.55f;
-	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord).rgb * DiffuseScaleG * 0.45f;
-	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord).rgb * DiffuseScaleH * 0.35f;
-	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord).rgb * DiffuseScaleI * 0.25f;
-	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord).rgb * DiffuseScaleJ * 0.15f;
-	float3 texel10 = tex2D(DiffuseSampler10, Input.TexCoord).rgb * DiffuseScaleK * 0.10f;
-	return float4(texel0 + texel1 + texel2 + texel3 + texel4 +
-	        texel5 + texel6 + texel7 + texel8 + texel9 + texel10, 1.0f);
+	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord01.xy).rgb;
+	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord01.zw).rgb;
+	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord23.xy).rgb;
+	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord23.zw).rgb;
+	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord45.xy).rgb;
+	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord45.zw).rgb;
+	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord67.xy).rgb;
+	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord67.zw).rgb;
+	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord89.xy).rgb;
+	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
+	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
+
+	texel0 = texel0 * Level0123Weight.x; // 1.0f;
+	texel1 = texel1 * Level0123Weight.y; // 0.21f;
+	texel2 = texel2 * Level0123Weight.z; // 0.19f;
+	texel3 = texel3 * Level0123Weight.w; // 0.17f;
+	texel4 = texel4 * Level4567Weight.x; // 0.15f;
+	texel5 = texel5 * Level4567Weight.y; // 0.14f;
+	texel6 = texel6 * Level4567Weight.z; // 0.13f;
+	texel7 = texel7 * Level4567Weight.w; // 0.12f;
+	texel8 = texel8 * Level89AWeight.x; // 0.11f;
+	texel9 = texel9 * Level89AWeight.y; // 0.10f;
+	texelA = texelA * Level89AWeight.z; // 0.09f;
+
+	float4 sum = float4(texel0 + texel1 + texel2 + texel3 + texel4 +
+	        texel5 + texel6 + texel7 + texel8 + texel9 + texelA, 1.0f);
+	return sum;
 }
 
 //-----------------------------------------------------------------------------
@@ -234,7 +262,7 @@ technique TestTechnique
 		Sampler[7] = <DiffuseSampler7>; // 16x16
 		Sampler[8] = <DiffuseSampler8>; // 8x8
 		Sampler[9] = <DiffuseSampler9>; // 4x4
-		Sampler[10] = <DiffuseSampler10>; // 2x2
+		Sampler[10] = <DiffuseSamplerA>; // 2x2
 
 		VertexShader = compile vs_3_0 vs_main();
 		PixelShader  = compile ps_3_0 ps_main();

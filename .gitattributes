@@ -8333,7 +8333,6 @@ src/osd/sdl/watchdog.c svneol=native#text/plain
 src/osd/sdl/watchdog.h svneol=native#text/plain
 src/osd/sdl/window.c svneol=native#text/plain
 src/osd/sdl/window.h svneol=native#text/plain
-src/osd/windows/d3d8intf.c svneol=native#text/plain
 src/osd/windows/d3d9intf.c svneol=native#text/plain
 src/osd/windows/d3dcomm.h svneol=native#text/plain
 src/osd/windows/d3dhlsl.c svneol=native#text/plain

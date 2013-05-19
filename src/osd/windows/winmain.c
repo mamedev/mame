@@ -329,7 +329,6 @@ const options_entry windows_options::s_option_entries[] =
 
 	// Direct3D-specific options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "DIRECT3D-SPECIFIC OPTIONS" },
-	{ WINOPTION_D3DVERSION "(8-9)",                   "9",        OPTION_INTEGER,    "specify the preferred Direct3D version (8 or 9)" },
 	{ WINOPTION_FILTER ";d3dfilter;flt",              "1",        OPTION_BOOLEAN,    "enable bilinear filtering on screen output" },
 
 	// post-processing options
@@ -397,6 +396,19 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_VECTOR_TIME_PERIOD";vecperiod",                 "0.1",       OPTION_FLOAT,      "Vector fade rate versus screen refresh rate" },
 	{ WINOPTION_VECTOR_LENGTH_SCALE";veclength",                "0.9",       OPTION_FLOAT,      "How much length affects vector fade" },
 	{ WINOPTION_VECTOR_LENGTH_RATIO";vecsize",                  "4.0",       OPTION_FLOAT,      "Vector fade length (4.0 - vectors fade the most at and above 4 pixels, etc.)" },
+	/* Bloom below this line */
+	{ NULL,                                                     NULL,        OPTION_HEADER,     "BLOOM POST-PROCESSING OPTIONS" },
+	{ WINOPTION_BLOOM_LEVEL0_WEIGHT,                    		"1.0",       OPTION_FLOAT,      "Bloom level 0  (full-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL1_WEIGHT,                    		"0.21",      OPTION_FLOAT,      "Bloom level 1  (half-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL2_WEIGHT,                    		"0.19",      OPTION_FLOAT,      "Bloom level 2  (quarter-size target) weight" },
+	{ WINOPTION_BLOOM_LEVEL3_WEIGHT,                    		"0.17",      OPTION_FLOAT,      "Bloom level 3  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL4_WEIGHT,                    		"0.15",      OPTION_FLOAT,      "Bloom level 4  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL5_WEIGHT,                    		"0.14",      OPTION_FLOAT,      "Bloom level 5  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL6_WEIGHT,                    		"0.13",      OPTION_FLOAT,      "Bloom level 6  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL7_WEIGHT,                    		"0.12",      OPTION_FLOAT,      "Bloom level 7  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL8_WEIGHT,                    		"0.11",      OPTION_FLOAT,      "Bloom level 8  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL9_WEIGHT,                    		"0.10",      OPTION_FLOAT,      "Bloom level 9  (.) weight" },
+	{ WINOPTION_BLOOM_LEVEL10_WEIGHT,                    	    "0.09",      OPTION_FLOAT,      "Bloom level 10 (1x1 target) weight" },
 
 	// per-window options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
