@@ -765,8 +765,6 @@ int renderer::initialize()
 	if (m_window->fullscreen && device_create())
 		return false;
 
-	m_texture_manager = global_alloc(texture_manager(this));
-
 	return true;
 }
 
