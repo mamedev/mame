@@ -920,12 +920,39 @@ ROM_START( europass )
 	ROM_LOAD( "xninesnd.bin", 0x00000, 0x20000, CRC(9dab99a6) SHA1(ce34056dd964be32359acd2e53a6101cb4d9ddff) )
 ROM_END
 
+ROM_START( thedrink )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "thedrink_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "the-drink-ep1.bin", 0x000000, 0x80000, CRC(9d0f61ad) SHA1(8e45afdd7e31a830b62b3dc85e21e9bc024262ff) )
+	ROM_LOAD( "the-drink-ep2.bin", 0x080000, 0x80000, CRC(b21f349a) SHA1(c46b95af869a648a17e0dd8f0eb82d5e347289ab) )
+	ROM_LOAD( "the-drink-ep3.bin", 0x100000, 0x80000, CRC(bb1af614) SHA1(77496efc361b6fd2b4bac0304032ea44e47d1819) )
+	ROM_LOAD( "the-drink-ep4.bin", 0x180000, 0x80000, CRC(f02a6387) SHA1(59d2a20d4fa9c78ef49c9afe82939c0a882012cc) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "the-drink-msg0.bin", 0x00000, 0x20000, CRC(5eefd405) SHA1(7b1d91181f5078c55cfa623d7e8fc5b4ebfff110) )
+ROM_END
+
+ROM_START( unkh8gam )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
+	ROM_LOAD( "unkh8gam.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "24.bin", 0x000000, 0x80000, CRC(240eb4bf) SHA1(f79a735ed290f84a44411127af3e16a514b62b6b) )
+	ROM_LOAD( "25.bin", 0x080000, 0x80000, CRC(c273c0ce) SHA1(8774cb101fccf1d97d66816df56dec8fa4e24ee6) )
+	ROM_LOAD( "26.bin", 0x100000, 0x80000, CRC(0293b9bb) SHA1(00794fab4d9deb2ca5ce352ac7ed7aedb59bec7b) )
+
+	ROM_REGION( 0x20000, "upd", 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "30.bin", 0x00000, 0x20000, CRC(72e56518) SHA1(7afdd6434beeea22673228c2417e4dee253a42b5) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY    FULLNAME                          FLAGS  */
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                                FLAGS  */
 GAME( 1999, ntcash,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "NtCash",                                GAME_IS_SKELETON )
 GAME( 1999, wizard,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "A.A.",      "Wizard (Ver 1.0)",                      GAME_IS_SKELETON )
 GAME( 200?, trstar2k, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "A.M.",      "Triple Star 2000",                      GAME_IS_SKELETON )
@@ -937,7 +964,9 @@ GAME( 200?, millsun,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<un
 GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Space 2001",                      GAME_IS_SKELETON )
 GAME( 200?, elvis,    0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Elvis?",                                GAME_IS_SKELETON )
 GAME( 200?, sstar,    0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Super Star",                            GAME_IS_SKELETON )
-GAME( 2001, pirati,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "Cin",    "Pirati",                                GAME_IS_SKELETON )
+GAME( 2001, pirati,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "Cin",       "Pirati",                                GAME_IS_SKELETON )
 GAME( 200?, mnumitg,  0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Number (Italian Gambling Game, Ver 1.5)", GAME_IS_SKELETON )
 GAME( 200?, mclass,   0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Magic Class (Ver 2.2)",                 GAME_IS_SKELETON )
 GAME( 200?, europass, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Euro Pass (Ver 1.1)",                   GAME_IS_SKELETON )
+GAME( 200?, thedrink, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "The Drink",                             GAME_IS_SKELETON )
+GAME( 200?, unkh8gam, 0,      itgambl2, itgambl2, driver_device, 0,   ROT0, "<unknown>", "Unknown H8 Italian Gambling game",      GAME_IS_SKELETON )
