@@ -952,6 +952,8 @@ int renderer::device_create()
 		return 1;
 	}
 
+	m_texture_manager = global_alloc(texture_manager(this));
+
 try_again:
 	// try for XRGB first
 	m_screen_format = D3DFMT_X8R8G8B8;
