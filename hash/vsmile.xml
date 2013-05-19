@@ -3,7 +3,7 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
-<softwarelist name="vsmile" description="VTech V.Smile V.Disc images">
+<softwarelist name="vsmile" description="VTech V.Smile cartridges &amp; V.Disc images">
 
 <!--
 
@@ -196,6 +196,45 @@ Language:
 80-282000(US)   | Animated E-Book Cartridge - Winnie the Pooh
 
 -->
+
+<!-- carts -->
+
+	<software name="manny">
+		<description>Meister Manny's Werkzeugkiste (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="090024.bin" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas">
+		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092344.bin" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb">
+		<description>Spongebob Schwammkopf - Der Tag es Schwamms (Germany) (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092444.bin" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- V.Discs -->
 
 	<!-- disk mounted as 93020 -->
 	<software name="incredib">
