@@ -90,6 +90,9 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( horizsd, horizon )

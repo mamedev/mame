@@ -1,0 +1,457 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="horizon" description="NorthStar Horizon diskettes">
+
+	<software name="alpssrc">
+		<description>ALPS Source Code</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="alpsdsrc.nsi" size="89600" crc="2b17c80e" sha1="93e66d6e002e4b198f5954259bf5f6546e91fbc9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="alpsnsrc.nsi" size="89600" crc="36217dd0" sha1="4209eb5c34d54163ce988b50ffe19691a59e1d86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c145_54">
+		<description>LifeBoat CP/M 1.45 - 54k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="c145_54.nsi" size="358400" crc="b074cc41" sha1="5eed044ca7b09487bba64035046be2ccc1cc21c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c223_52">
+		<description>LifeBoat CP/M 2.23 - 52k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="c223_52.nsi" size="179200" crc="30a08e90" sha1="d50a1c8f3074ee101d2f78c1681f415f699aad32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c223_56">
+		<description>LifeBoat CP/M 2.23 - 56k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="c223_56.nsi" size="179200" crc="8ae20b57" sha1="2061d4f5feb88d714e6986ccf6c9ea2a5ffec291" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c223a_24">
+		<description>n2212</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="c223a_24.nsi" size="179200" crc="c479a55a" sha1="bed22d2b04b2d2c1bc27a0b37748afea4a6dfaf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmf">
+		<description>DMF</description>
+		<year>198?</year>
+		<publisher>Dave Dunfield</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="dmf.nsi" size="89600" crc="5eaf5ef9" sha1="87d5de9125d936f5444a3266d8b8f1ca4b7c7e1f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="dmfdoc.nsi" size="89600" crc="829fc174" sha1="8c391916828a4a8e9f83804daf9cd083f5e9e730" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="dmfsrc1.nsi" size="89600" crc="2a2cd518" sha1="9fb1089a90d3d1c89ba39bf8defba0febb5e93a2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="dmfsrc2.nsi" size="89600" crc="c128aa3a" sha1="7bc9d959e45b29cf1eb73d8fb1fec9ecb1031833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth">
+		<description>Forth</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="forth.nsi" size="89600" crc="ee1bf39f" sha1="8620ddfcdb98596d5cfc1fc171637b48f412b612" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="forthsrc.nsi" size="89600" crc="ab4971ce" sha1="565e1b79b0624e3e04caf394aed022fb83836f31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hd221ird">
+		<description>NorthStar HDOS 2.2.1 H Initial Recovery Disk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="hd221ird.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hd221sd">
+		<description>NorthStar HDOS 2.2.0 H System Disk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="hd221sd.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="horhd1b">
+		<description>NorthStar HORIZON-HD System Diskette R1.B</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="horhd1b.nsi" size="179200" crc="59d8da92" sha1="4adea8d9d00bb1add69714a0f6dbdd72e58b4de1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insua211">
+		<description>INSUA NorthStar DOS 2.1.1 QuadDensity</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="insua211.nsi" size="179200" crc="ca021e0f" sha1="a32da65e25aab5cfce6d8d6642f293415fe78193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcd96r7">
+		<description>Micro Complex DOS96R7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="mcd96r7.nsi" size="179200" crc="c5954cae" sha1="cb59896c05bd90aa3b9c53962a792f45dfba0ecb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsmcutil">
+		<description></description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="mcdos.nsi" size="179200" crc="1a445513" sha1="c6368e06135a87c2f31b214ac58c3a7aa6fba86b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="devel1.nsi" size="179200" crc="ea60f455" sha1="0410346aa3e75dbecdd0d6fdac587db72c432a10" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="devel2.nsi" size="179200" crc="abe1ecc3" sha1="dfb2fcd2f105a464f993163817ae4e95cbda694f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="proc.nsi" size="179200" crc="5fd0f9c5" sha1="1aea0f990c606270eaca763a8a0eda33586b3343" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdos70d">
+		<description>Micro Complex Dos 7.0</description>
+		<year>1980</year>
+		<publisher>Micro Complex</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="mcdos70d.nsi" size="179200" crc="111e45f0" sha1="bc7396b3d040fdd94ad5149940d78a2153dda85d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n2212_64">
+		<description>NorthStar CP/M 2.2 release 1.20 - 64k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="n2212_64.nsi" size="358400" crc="91100bc5" sha1="54e625bf17fd3e2067b9e7b2789b1d27974607e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n22a_56">
+		<description>NorthStar CP/M 2.2 release A - 56k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="n22a_56.nsi" size="358400" crc="01cbd9bd" sha1="7094017c3150b48b3c5c07d08213f14ea91269d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos20s">
+		<description>NorthStar DOS 2.0 Single Density (DOS only)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsdos20s.nsi" size="89600" crc="8ea66be9" sha1="94709b31b6bbb5910e01644df5daf3544a33ef20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos40s">
+		<description>NorthStar DOS 4.0 Single Density</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsdos40s.nsi" size="89600" crc="c270d019" sha1="68ffa944c8d34262f5c757ec65276d527979b801" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos50d">
+		<description>NorthStar DOS 5.0 Double Density</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="nsdos50d.nsi" size="179200" crc="f5de495e" sha1="16406a46bc445903e310511726ab9922bf8c8641" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos51q">
+		<description>NorthStar DOS 5.1 Quad Density (Unconfigured I/O)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="nsdos51q.nsi" size="179200" crc="98febaa3" sha1="20742efdff1f068ee1ccab2f865e76874c2f4e0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos51s">
+		<description>NorthStar DOS 5.1 Single Density</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsdos51s.nsi" size="89600" crc="e13ed7bd" sha1="cf3f0a7a6956aa113ff7ae76cdcb73b6565b0669" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsdos52q">
+		<description>NorthStar DOS 5.2 Quad Density</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="nsdos52q.nsi" size="358400" crc="83043049" sha1="4c403213a34053c791315107281b2f81de0b5a25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>UCSD Pascal 1.5</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Original distribution disk #1"/>
+			<dataarea name="flop" size="179200">
+				<rom name="pasns.nsi" size="179200" crc="edd9ed9b" sha1="1d94ddc411a454946ec5b6501f7c60f283464370" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Original distribution disk #2"/>
+			<dataarea name="flop" size="179200">
+				<rom name="pasaux.nsi" size="179200" crc="e8b7846d" sha1="3761eac77067438fc0ad8b42a08db0d0b7b4fdb0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System disk"/>
+			<dataarea name="flop" size="179200">
+				<rom name="passys.nsi" size="179200" crc="fd9011bf" sha1="1fada88d333c912364813bc70e6eb250be1ca32d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User disk"/>
+			<dataarea name="flop" size="179200">
+				<rom name="pasusr.nsi" size="179200" crc="e730fa8b" sha1="1973b27efa9fe760bec3443c844d99dcc2cad662" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="td130">
+		<description>TurboDos 1.30 1.1.1 QH</description>
+		<year>1984</year>
+		<publisher>North Star Computers</publisher>
+		<info name="serial" value="20/002741" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130sys.nsi" size="358400" crc="ce949891" sha1="5e710b183f7dba0c3cf1a5e45d06ace3dd0e21c9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Config Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130cfg.nsi" size="358400" crc="ef407df5" sha1="123f46191f1d94cb5b4fc753318cf471033bdcce" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Help Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130hlp.nsi" size="358400" crc="35efe9f5" sha1="2a32a1dfc9a106abbb0c918b50766287620274a8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="SYS/CON Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130sc.nsi" size="358400" crc="19589349" sha1="a0e931ad62f7275cc5b3feb537476ad9dcaa9b62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="td130a" cloneof="td130">
+		<description>TurboDos 1.30 1.1.1 QH (Alt)</description>
+		<year>1984</year>
+		<publisher>North Star Computers</publisher>
+		<info name="serial" value="20/002756" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130sys_.nsi" size="358400" crc="860a1aa4" sha1="c2cb833f95ed86d42faa67e8871c85d87993ae67" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Config Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130cfga_.nsi" size="358400" crc="f60b5980" sha1="b5187f8631dcd2e5e65497b0d0ec27d4213183f6" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Help Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130sc_.nsi" size="358400" crc="c8bdba74" sha1="a1c7571b0a5d620bb4959072bb93048c92fdd270" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="SYS/CON Disk"/>
+			<dataarea name="flop" size="358400">
+				<rom name="td130hlp_.nsi" size="358400" crc="18a74438" sha1="de17aae8d991330e1470bf78969d6d966ad6eb46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="v2212_56">
+		<description>NorthStar CP/M 2.2 release 1.20 - 56k for Vector/3P+S</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="v2212_56.nsi" size="358400" crc="b54e58ef" sha1="52a579c7e1b1869ceb24d567391c1b0e9e792aa0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vinsua">
+		<description>INSUA NorthStar DOS 2.1.1 QuadDensity for Vector/3P+S</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="vinsua.nsi" size="358400" crc="5432bfd2" sha1="6bf2a757904a64947b652b2e299b4ce7b8c59ff0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xitancpm">
+		<description>Xitan CP/M 2.26 - 48k</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="xitancpm.nsi" size="179200" crc="b442f8c2" sha1="de1a311d8fd6f490f76760787f6a8f6600aebe1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
