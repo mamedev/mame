@@ -33,6 +33,159 @@
     Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
     Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
 
+--------------------------------------------------------------------------------
+
+Sega Master System II
+Sega 1990
+
+This particular version was manufactured between July 1991 and October 1992
+The PCB is stamped '17 AUG 1991'
+
+PCB Layout
+----------
+171-5922A
+(C) SEGA 1990
+IC BD M4Jr. PAL
+|----------|------|-----------------------|
+| POWER_IN |RF_OUT|       IC1  IC2   IC3  |
+|          |      |       Z80  BIOS  6264 |
+|          |      | IC9                   |
+|          |------| CXA1145               |
+|                                         |
+|                                         |
+|IC8                                      |
+|7805                                     |
+|                   |---------------|     |
+|                   |   CART SLOT   |     |
+|                   |---------------|     |
+|                                         |
+|                                         |
+| PAUSE_SW                                |
+|                                         |
+|      IC6       IC5            IC4       |
+|      D4168     315-5246       315-5237  |
+|                                         |
+|      IC7                                |
+|      D4168                              |
+|                                         |
+| POWER_SW           JOY1 JOY2  53.2034MHz|
+|-----------------------------------------|
+Notes: (All ICs shown)
+       IC1 Z80      - Z0840004PSC Z80 CPU (DIP40). Clock input 3.54689MHz (53.2034/15)
+       IC2 BIOS     - 1M 28-pin mask ROM marked MPR-12808 (DIP28)
+       IC3 6264     - Samsung KM6264 8k x8 SRAM. Some models have NEC D4168 or Sanyo LC3664 which are compatible (DIP28)
+       IC4 315-5237 - Custom Sega I/O controller IC (DIP48)
+                      Clocks - Pin 43 - master clock input 53.2034MHz from OSC
+                               Pin 41 - 10.6406MHz (53.2034/5)
+                               Pin 42 - 4.43361MHz (53.2034/12)
+       IC5 315-5246 - Custom Sega Video Display Processor (VDP) (64 pin flat pack)
+                      The VDP also contains a Texas Instruments SN76489 sound chip
+                      Clocks - Pin 33 - 3.54689MHz (53.2034/15)
+                               Pin 34 - 10.6406MHz (53.2034/5)
+                               Pin 35 - 10.6406MHz (53.2034/5)
+                               Pin 39 - 2.66017MHz (53.2034/20)
+       IC6/IC7 D4168- NEC D4168 8k x8 SRAM (DIP28)
+       IC8 7805     - Motorola MC7805 voltage regulator (7v to 25v input, 5v output)
+       IC9 CXA1145  - Sony CXA1145 RGB to composite video encoder IC (DIP24)
+       POWER_IN     - Power input from AC/DC power pack. System requires 9VDC at 500mA. Center pin is negative and 
+                      outer barrel is positive. Note this is opposite to regular DC power packs
+       RF_OUT       - RF modulator with RF signal output to TV
+       POWER_SW     - Power on/off switch
+       PAUSE_SW     - Push button used to pause the game
+       JOY1/JOY2    - Joystick connectors (DB9)
+       HSync        - 15.5565kHz
+       VSync        - 49.7015Hz
+
+
+Cart PCB Examples 
+-----------------
+Note! There are many more types of PCBs & custom chip matching variations. This document 
+is not meant to provide all details of every type in existence. Some games have been 
+found on different types of ROM boards with and without bankswitching hardware.
+
+Type with no bankswitching hardware
+
+171-5519 \ no visible difference?
+171-5519D/ 
+|------------------|
+||----------|      |
+||  DIP28   |      |
+||----------|      |
+|IC1               |
+|------------------|
+Notes:
+      DIP28 - 1M mask ROM (DIP28) at location IC1. Actual ROM type is Fujitsu MB831001
+              This ROM has a built-in mapper so no bankswitching chip is required.
+              The CPU uses pin 22 of the ROM to bankswitch it.
+              Found in....
+                          Game Name         Sega ROM ID
+                          -----------------------------
+                          World Grand Prix  MPR-11074
+                          Black Belt        MPR-10150
+                          Ghost House       MPR-12586
+               
+               
+Types with bankswitching hardware
+
+171-5713D (uses 315-5235)
+171-5838 (uses 315-5365)
+171-5893 (uses 315-5365)
+|------------------|
+|                  |
+|  |------------|  |
+|  |   SDIP42   |  |
+|  |------------|  |
+|               IC1|
+||----------|      |
+||  DIP32   |      |
+||----------|      |
+|IC2               |
+|------------------|
+Notes:
+     SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different 
+              types of these chips with different 315-xxxx numbers
+              These include 315-5235 (DIP42), 315-5208 (DIP28) and 315-5365 (DIP42) and possibly others.
+      DIP32 - 1MBit/2MBit/4MBit mask ROM (DIP32) at location IC2
+              Actual ROM type can be 831000, 831001, 832011, 834000, 834011
+              Found in....
+                          Game Name         Sega ROM ID   Bank Chip
+                          -----------------------------------------
+                          Spellcaster       MPR-12532-T   315-5365
+                          Altered Beast     MPR-12534     315-5235
+                          Bubble Bobble     MPR-14177     315-5365
+
+171-5442 (uses 315-5235)
+|--------------------------|
+|  |----------------|      |
+|  |     DIP40      |      |
+|  |----------------|IC2   |
+|                          |
+|      |------------|      |
+|      |   SDIP42   |      |
+|      |------------|IC1   |
+|----|                |----|
+     |                |
+     |----------------|
+Notes:
+      SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different 
+               types of these chips with different 315-xxxx numbers
+               These include 315-5235 (DIP42), 315-5208 (DIP28) and 315-5365 (DIP42) and possibly others.
+       DIP40 - 2MBit/4Mbit 16-bit mask ROM (DIP40) at location IC2
+               Found in....
+                           Game Name         Sega ROM ID   Bank Chip
+                           -----------------------------------------
+                           Space Harrier     MPR-10410     315-5235
+                           
+Another ROM board 171-5497 used by Monopoly has 315-5235 DIP42 mapper chip, DIP28 mask ROM, a DIP8 chip (unknown), 
+DIP28 SRAM (likely 8k) and a 3V coin battery.
+Yet another type of ROM board with unknown PCB number used by Phantasy Star has 315-5235 DIP42 mapper chip, DIP32 mask 
+ROM and DIP28 SRAM (likely 8k) and a 3V coin battery.
+Unfortunatley the majority of these ROM boards, ROM types and MPR-xxxxx Sega part numbers are undocumented because they
+were mostly dumped from the edge connector without being opened.
+Some additional info can be found at http://www.smspower.org/Development/Index
+Some excellent SMS documentation can be found at http://cgfm2.emuviews.com/sms.php
+
+--------------------------------------------------------------------------------
 SMS Store Unit memory map for the second CPU:
 
 0000-3FFF - BIOS
