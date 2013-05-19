@@ -276,5 +276,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1976, nshrz,   0,       0,    horizon,   horizon, driver_device, 0,  "North Star Computers", "Horizon", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, nshrz,   0,       0,    horizon,   horizon, driver_device, 0,  "North Star Computers", "Horizon (North Star Computers)", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
 COMP( 1979, vector1,  nshrz, 0,    horizon,   horizon, driver_device, 0,  "Vector Graphic", "Vector 1+ (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

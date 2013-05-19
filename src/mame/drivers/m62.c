@@ -2217,4 +2217,4 @@ GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, spelunkr, ROT0,  
 GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, horizon,  0,        horizon,  horizon, driver_device,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, horizon,  0,        horizon,  horizon, driver_device,  0,        ROT0,   "Irem", "Horizon (Irem)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
