@@ -11,7 +11,6 @@ the only difference of a larger gfx ROM (losing the ability to choose full or ha
 brightness for each character).
 
 
-
 Gee Bee memory map
 Navarone, Kaitei, SOS are the same but CGROM is twice as large
 
@@ -119,6 +118,9 @@ Notes:
 - warpwarpr doesn't have an explicit Namco copyright notice, but in the default
   high score table the names are NNN AAA MMM CCC OOO. warpwarp doesn't have an
   high score table at all.
+
+- There are images/videos on the net of kaitei and geebee running in 3bpp
+  (aka 7 colors), this is assumed to be a homebrew repair or hack.
 
 
 TODO:
