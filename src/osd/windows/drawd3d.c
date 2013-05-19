@@ -490,6 +490,8 @@ texture_manager::texture_manager(renderer *d3d)
 	m_renderer = d3d;
 
 	m_texlist = NULL;
+	m_vector_texture = NULL;
+	m_default_texture = NULL;
 
 	// check for dynamic texture support
 	DWORD tempcaps;
@@ -582,8 +584,12 @@ void texture_manager::create_resources()
 
 void texture_manager::delete_resources()
 {
-	global_free(m_default_texture);
+	// is part of m_texlist and will be free'd there
+	//global_free(m_default_texture);
 	m_default_texture = NULL;
+
+	//global_free(m_vector_texture);
+	m_vector_texture = NULL;
 
 	// free all textures
 	while (m_texlist != NULL)
