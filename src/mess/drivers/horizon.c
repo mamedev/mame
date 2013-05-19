@@ -251,10 +251,10 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ROM( horizon )
+//  ROM( nshrz )
 //-------------------------------------------------
 
-ROM_START( horizon )
+ROM_START( nshrz )
 	ROM_REGION( 0x400, Z80_TAG, 0 )
 	ROM_LOAD( "option.prom", 0x000, 0x400, NO_DUMP )
 ROM_END
@@ -276,5 +276,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1976, horizon,  0,       0,    horizon,   horizon, driver_device, 0,  "North Star Computers", "Horizon", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, nshrz,   0,       0,    horizon,   horizon, driver_device, 0,  "North Star Computers", "Horizon", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
 COMP( 1979, vector1,  horizon, 0,    horizon,   horizon, driver_device, 0,  "Vector Graphic", "Vector 1+ (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
