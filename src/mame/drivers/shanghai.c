@@ -566,6 +566,21 @@ ROM_START( shangha2 )
 	ROM_LOAD16_BYTE( "sht-30j", 0xc0000, 0x20000, CRC(2861a894) SHA1(6da99d15f41e900735f8943f2710487817f98579) )
 ROM_END
 
+ROM_START( shangha2a ) // content is the same, just different ROM sizes
+	ROM_REGION( 0x100000, "maincpu", 0 )
+
+	ROM_LOAD16_BYTE( "3.bin", 0x80001, 0x10000, CRC(93aacccb) SHA1(8b29b9b24cf268a4376b7f653c19d6f46d698552) )
+	ROM_LOAD16_BYTE( "1.bin", 0x80000, 0x10000, CRC(0fb2d8ee) SHA1(fee8074d8116f551c634f088b8121d48a9b4a008) )
+	ROM_LOAD16_BYTE( "7.bin", 0xa0001, 0x10000, CRC(f9e06880) SHA1(7840b6672cc02fd70f478a5c9f11cfc26ddfca52) )
+	ROM_LOAD16_BYTE( "5.bin", 0xa0000, 0x10000, CRC(06ada73c) SHA1(13ee91b94489096f03afc05fdd3d4c65a87a6628) )
+	ROM_LOAD16_BYTE( "4.bin", 0xc0001, 0x10000, CRC(b4d82724) SHA1(84496b7ad43817c307227bdab4f58a19484519bb) )
+	ROM_LOAD16_BYTE( "2.bin", 0xc0000, 0x10000, CRC(97a25fdb) SHA1(43f065b737e5c4bd44c02ab1d0d6fa34aea8d139) )
+
+	ROM_LOAD16_BYTE( "8.bin", 0xf0001, 0x08000, CRC(21c41557) SHA1(967c97a6b35407a5b32938c88bf7e719a1489b6b) )
+	ROM_LOAD16_BYTE( "6.bin", 0xf0000, 0x08000, CRC(14250057) SHA1(15af554099c977e3c753d758080805581a9e4c50) )
+ROM_END
+
+
 /*
 
 Kyuukyoku no Othello
@@ -638,5 +653,6 @@ ROM_END
 
 
 GAME( 1988, shanghai, 0, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, shangha2, 0, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
+GAME( 1989, shangha2, 0, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", 0 )
+GAME( 1989, shangha2a, shangha2, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", 0 )
 GAME( 1990, kothello, 0, kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )

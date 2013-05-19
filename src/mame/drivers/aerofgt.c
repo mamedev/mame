@@ -1840,6 +1840,28 @@ ROM_START( pspikesk )
 	ROM_LOAD( "peel18cv8-1103-u112.76", 0x0200, 0x0155, CRC(786da44c) SHA1(02fd63083631abeced42714fb58a11b7d463285b) )
 ROM_END
 
+ROM_START( pspikesu )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "svolly91.73", 0x00000, 0x40000, CRC(bfbffcdb) SHA1(2bba99cb6d0cb2fbb3cd1242551dd7e2c6ebef50) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "19",           0x00000, 0x20000, CRC(7e8ed6e5) SHA1(eeb1a1e1989fad8fc1e741928422efaec0598868) )
+	ROM_RELOAD(               0x10000, 0x20000 )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "g7h",          0x000000, 0x80000, CRC(74c23c3d) SHA1(c0ac57d1f05c42556f97154ce1a08f465948546b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
+	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
+
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
+ROM_END
+
 ROM_START( svolly91 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "u11.jpn",      0x00000, 0x40000, CRC(ea2e4c82) SHA1(f9cf9122499d9b1e54221fb8b6ef9c12004ca85e) )
@@ -2488,6 +2510,7 @@ GAME( 1990, spinlbrkj,spinlbrk, spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V
 
 GAME( 1991, pspikes,  0,        pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesu, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Power Spikes (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, svolly91, pspikes,  pspikes,  pspikes, driver_device,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, driver_device, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, spikes91, pspikes,  spikes91, pspikes, driver_device,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
