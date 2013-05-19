@@ -602,4 +602,4 @@ ROM_START( fruitpc )
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
-GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit Land", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
