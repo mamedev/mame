@@ -713,14 +713,14 @@ ADDRESS_MAP_END
 
 #define CPS1_DIFFICULTY_1(diploc) \
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
-	PORT_DIPSETTING(    0x07, "1 (Easiest)" ) \
-	PORT_DIPSETTING(    0x06, "2" ) \
-	PORT_DIPSETTING(    0x05, "3" ) \
-	PORT_DIPSETTING(    0x04, "4 (Normal)" ) \
-	PORT_DIPSETTING(    0x03, "5" ) \
-	PORT_DIPSETTING(    0x02, "6" ) \
-	PORT_DIPSETTING(    0x01, "7" ) \
-	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
+	PORT_DIPSETTING(    0x07, "0 (Easiest)" ) \
+	PORT_DIPSETTING(    0x06, "1" ) \
+	PORT_DIPSETTING(    0x05, "2" ) \
+	PORT_DIPSETTING(    0x04, "3 (Normal)" ) \
+	PORT_DIPSETTING(    0x03, "4" ) \
+	PORT_DIPSETTING(    0x02, "5" ) \
+	PORT_DIPSETTING(    0x01, "6" ) \
+	PORT_DIPSETTING(    0x00, "7 (Hardest)" )
 
 #define CPS1_DIFFICULTY_2(diploc) \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) ) PORT_DIPLOCATION(diploc ":1,2,3") \

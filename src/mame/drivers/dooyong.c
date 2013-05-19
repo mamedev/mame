@@ -512,8 +512,8 @@ static INPUT_PORTS_START( lastday )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )  /* maybe, but I'm not sure */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gulfstrm )
@@ -615,6 +615,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( superx )
 	PORT_INCLUDE( dooyongm68_generic )
+
+	PORT_MODIFY("DSW") /* In documentation this switch enables "service mode" but it never had any effect in game */ 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( popbingo )
