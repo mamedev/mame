@@ -5,17 +5,15 @@
 #include "devcb.h"
 
 
-#define MCFG_K1GE_ADD(_tag, _clock, _screen, _vram, _vblank, _hblank ) \
+#define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \
 	k1ge_device::static_set_screen( *device, _screen ); \
-	k1ge_device::static_set_vram( *device, _vram ); \
 	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB2_##_hblank );
 
-#define MCFG_K2GE_ADD(_tag, _clock, _screen, _vram, _vblank, _hblank ) \
+#define MCFG_K2GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
 	k1ge_device::static_set_screen( *device, _screen ); \
-	k1ge_device::static_set_vram( *device, _vram ); \
 	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB2_##_hblank );
 
@@ -26,14 +24,15 @@ public:
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( reg_read );
+	DECLARE_WRITE8_MEMBER( reg_write );
+	DECLARE_READ8_MEMBER( vram_read );
+	DECLARE_WRITE8_MEMBER( vram_write );
 
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
 	static void static_set_screen(device_t &device, const char *screen_name) { downcast<k1ge_device &>(device).m_screen_tag = screen_name; }
-	static void static_set_vram(device_t &device, const char *vram_name) { downcast<k1ge_device &>(device).m_vram_tag = vram_name; }
 	template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(object); }
 	template<class _Object> static devcb2_base &static_set_hblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(object); }
 
@@ -44,7 +43,6 @@ protected:
 	virtual void device_reset();
 
 	const char *m_screen_tag;
-	const char *m_vram_tag;
 	screen_device *m_screen;
 	devcb2_write_line m_vblank_pin_w;
 	devcb2_write_line m_hblank_pin_w;

@@ -41,7 +41,7 @@ PALETTE_INIT( k2ge )
 }
 
 
-READ8_MEMBER( k1ge_device::read )
+READ8_MEMBER( k1ge_device::reg_read )
 {
 	UINT8   data = m_vram[offset & 0x7ff];
 
@@ -58,7 +58,7 @@ READ8_MEMBER( k1ge_device::read )
 }
 
 
-WRITE8_MEMBER( k1ge_device::write )
+WRITE8_MEMBER( k1ge_device::reg_write )
 {
 	switch( offset )
 	{
@@ -90,6 +90,20 @@ WRITE8_MEMBER( k1ge_device::write )
 	}
 
 	m_vram[offset & 0x7ff] = data;
+}
+
+// TODO: these i/o handlers can probably be merged with the above...
+READ8_MEMBER( k1ge_device::vram_read )
+{
+	assert(offset < 0x3800);
+	return m_vram[0x800 + offset];
+}
+
+
+WRITE8_MEMBER( k1ge_device::vram_write )
+{
+	assert(offset < 0x3800);
+	m_vram[0x800 + offset] = data;
 }
 
 
@@ -797,8 +811,14 @@ void k1ge_device::device_start()
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::timer_callback), this));
 	m_hblank_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k1ge_device::hblank_on_timer_callback), this));
 	m_screen = machine().device<screen_device>(m_screen_tag);
-	m_vram = machine().root_device().memregion( m_vram_tag )->base();
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x4000);
 	m_bitmap = auto_bitmap_ind16_alloc( machine(), m_screen->width(), m_screen->height() );
+
+	save_pointer(NAME(m_vram), 0x4000);
+	save_item(NAME(m_wba_h));
+	save_item(NAME(m_wba_v));
+	save_item(NAME(m_wsi_h));
+	save_item(NAME(m_wsi_v));
 }
 
 
