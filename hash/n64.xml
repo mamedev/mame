@@ -5290,7 +5290,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw2k">
+	<software name="powyak2k">
 		<description>Jikkyou Powerful Pro Yakyuu 2000 (Jpn, Rev. A)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -5304,7 +5304,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw2ka" cloneof="jikkpw2k">
+	<software name="powyak2ka" cloneof="powyak2k">
 		<description>Jikkyou Powerful Pro Yakyuu 2000 (Jpn)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
@@ -5318,7 +5318,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw4">
+	<software name="powyak4">
 		<description>Jikkyou Powerful Pro Yakyuu 4 (Jpn, Rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -5332,7 +5332,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw4a" cloneof="jikkpw4">
+	<software name="powyak4a" cloneof="powyak4">
 		<description>Jikkyou Powerful Pro Yakyuu 4 (Jpn)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -5346,7 +5346,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw5">
+	<software name="powyak5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn, Rev. B)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -5360,7 +5360,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw5a" cloneof="jikkpw5">
+	<software name="powyak5a" cloneof="powyak5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn, Rev. A)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -5374,7 +5374,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw5b" cloneof="jikkpw5">
+	<software name="powyak5b" cloneof="powyak5">
 		<description>Jikkyou Powerful Pro Yakyuu 5 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -5388,7 +5388,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw6">
+	<software name="powyak6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn, Rev. B)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -5402,7 +5402,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw6a" cloneof="jikkpw6">
+	<software name="powyak6a" cloneof="powyak6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn, Rev. A)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -5416,7 +5416,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkpw6b" cloneof="jikkpw6">
+	<software name="powyak6b" cloneof="powyak6">
 		<description>Jikkyou Powerful Pro Yakyuu 6 (Jpn)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -5430,7 +5430,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkp2k1">
+	<software name="powyk2k1">
 		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Jpn, Rev. A)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -5444,7 +5444,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		</part>
 	</software>
 
-	<software name="jikkp2k1a" cloneof="jikkp2k1">
+	<software name="powyk2k1a" cloneof="powyk2k1">
 		<description>Jikkyou Powerful Pro Yakyuu Basic Ban 2001 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>

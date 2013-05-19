@@ -9224,7 +9224,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="gex">
+	<software name="gex2">
 		<description>Gex - Enter the Gecko (Euro, USA)</description>
 		<year>1998</year>
 		<publisher>Crave Entertainment</publisher>
@@ -10555,7 +10555,7 @@ List of unconfirmed retail cartridge roms
 		</part>
 	</software>
 
-	<software name="honkyoni">
+	<software name="honkmj">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-04 -->
 		<description>Honkaku Yonin Uchi Mahjong - Mahjong Ou (Jpn)</description>
 		<year>1999</year>

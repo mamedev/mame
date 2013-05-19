@@ -14695,7 +14695,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw98">
+	<software name="powyak98">
 		<description>Jikkyou Powerful Pro Yakyuu - Basic Ban '98 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
@@ -14722,7 +14722,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw2a" cloneof="jikkpw2">
+	<software name="powyak2a" cloneof="powyak2">
 		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
@@ -14751,7 +14751,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw3">
+	<software name="powyak3">
 		<description>Jikkyou Powerful Pro Yakyuu 3 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -14778,7 +14778,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw3a" cloneof="jikkpw3">
+	<software name="powyak3a" cloneof="powyak3">
 		<description>Jikkyou Powerful Pro Yakyuu 3 (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -14807,7 +14807,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkp397a" cloneof="jikkp397">
+	<software name="powyk397a" cloneof="powyk397">
 		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Jpn)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
@@ -14834,7 +14834,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw94">
+	<software name="powyak94">
 		<description>Jikkyou Powerful Pro Yakyuu '94 (Jpn)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
@@ -14856,7 +14856,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw96a" cloneof="jikkpw96">
+	<software name="powyak96a" cloneof="powyak96">
 		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Jpn)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -14883,7 +14883,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw96">
+	<software name="powyak96">
 		<description>Jikkyou Powerful Pro Yakyuu '96 - Kaimaku Ban (Jpn, Rev. A)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
@@ -31914,7 +31914,7 @@ List of verified retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="jikkpw2">
+	<software name="powyak2">
 		<!-- single cartridge source: Yakushi~Kabuto -->
 		<description>Jikkyou Powerful Pro Yakyuu 2 (Jpn, Rev. A)</description>
 		<year>1995</year>
@@ -42688,7 +42688,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="jikkp397">
+	<software name="powyk397">
 		<description>Jikkyou Powerful Pro Yakyuu 3 - '97 Haru (Jpn, Rev. A)</description>
 		<year>1997</year>
 		<publisher>Konami</publisher>
