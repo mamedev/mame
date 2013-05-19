@@ -144,7 +144,6 @@ struct s100_bus_interface
 	devcb_write_line    m_out_rdy_cb;
 	devcb_write_line    m_out_hold_cb;
 	devcb_write_line    m_out_error_cb;
-	devcb_write8        m_out_terminal_cb;
 };
 
 class device_s100_card_interface;
@@ -185,10 +184,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hold_w );
 	DECLARE_WRITE_LINE_MEMBER( error_w );
 
-	DECLARE_WRITE8_MEMBER( terminal_receive_w );
-	DECLARE_WRITE8_MEMBER( terminal_transmit_w );
-	void terminal_transmit_w(UINT8 data);
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -213,7 +208,6 @@ private:
 	devcb_resolved_write_line   m_out_rdy_func;
 	devcb_resolved_write_line   m_out_hold_func;
 	devcb_resolved_write_line   m_out_error_func;
-	devcb_resolved_write8       m_out_terminal_func;
 
 	simple_list<device_s100_card_interface> m_device_list;
 };
@@ -266,10 +260,6 @@ public:
 	virtual void s100_phantom_w(int state) { }
 	virtual void s100_sxtrq_w(int state) { }
 	virtual int s100_sixtn_r() { return 1; }
-
-	// terminal
-	virtual bool s100_has_terminal() { return false; }
-	virtual void s100_terminal_w(UINT8 data) { }
 
 	// reset
 	virtual void s100_poc_w(int state) { }

@@ -16,6 +16,7 @@
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/s100.h"
+#include "machine/serial.h"
 #include "machine/upd1990a.h"
 
 
@@ -52,8 +53,6 @@ protected:
 	virtual void s100_vi2_w(int state);
 	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset);
 	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data);
-	virtual bool s100_has_terminal() { return true; }
-	virtual void s100_terminal_w(UINT8 data);
 
 private:
 	required_device<pic8259_device> m_pic;

@@ -19,6 +19,9 @@
 #define INS8250_1_TAG   "6d"
 #define INS8250_2_TAG   "5d"
 #define INS8250_3_TAG   "4d"
+#define RS232_A_TAG		"rs232a"
+#define RS232_B_TAG		"rs232b"
+#define RS232_C_TAG		"rs232c"
 #define UPD1990C_TAG    "12a"
 
 
@@ -58,29 +61,13 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 //-------------------------------------------------
 //  ins8250_interface ace1_intf
 //-------------------------------------------------
-/*
-static INS8250_TRANSMIT( ace1_transmit )
-{
-    s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
-
-    wunderbus->m_bus->terminal_transmit_w(data);
-}
-*/
-//-------------------------------------------------
-//  s100_terminal_w - terminal write
-//-------------------------------------------------
-
-void s100_wunderbus_device::s100_terminal_w(UINT8 data)
-{
-//  ins8250_receive(m_ace1, data);
-}
 
 static ins8250_interface ace1_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir3_w),
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -92,10 +79,10 @@ static ins8250_interface ace1_intf =
 
 static ins8250_interface ace2_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -107,12 +94,59 @@ static ins8250_interface ace2_intf =
 
 static ins8250_interface ace3_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_C_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir5_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
+DEVICE_INPUT_DEFAULTS_END
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, cts_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, cts_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232c_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232c_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, cts_w)
 };
 
 
@@ -145,6 +179,9 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, rs232c_intf, default_rs232_devices, NULL, NULL)
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 

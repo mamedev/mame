@@ -12,11 +12,9 @@
 #include "machine/s100_djdma.h"
 #include "machine/s100_mm65k16s.h"
 #include "machine/s100_wunderbus.h"
-#include "machine/terminal.h"
 
 #define Z80_TAG         "17a"
 #define AM9512_TAG      "17d"
-#define TERMINAL_TAG    "terminal"
 
 class mpz80_state : public driver_device
 {
@@ -25,7 +23,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ram(*this, RAM_TAG),
-			m_terminal(*this, TERMINAL_TAG),
 			m_s100(*this, S100_TAG),
 			m_rom(*this, Z80_TAG),
 			m_map_ram(*this, "map_ram"),
@@ -45,7 +42,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<s100_device> m_s100;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_map_ram;

@@ -629,16 +629,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  GENERIC_TERMINAL_INTERFACE( terminal_intf )
-//-------------------------------------------------
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DEVICE_MEMBER(S100_TAG, s100_device, terminal_receive_w)
-};
-
-
-//-------------------------------------------------
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
@@ -677,8 +667,7 @@ static S100_INTERFACE( s100_intf )
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, Z80_INPUT_LINE_WAIT),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(TERMINAL_TAG, generic_terminal_device, write)
+	DEVCB_NULL
 };
 
 static SLOT_INTERFACE_START( mpz80_s100_cards )
@@ -754,9 +743,6 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_SLOT_ADD("s100_12", mpz80_s100_cards, NULL, NULL)
 	MCFG_S100_SLOT_ADD("s100_13", mpz80_s100_cards, NULL, NULL)
 	MCFG_S100_SLOT_ADD("s100_14", mpz80_s100_cards, NULL, NULL)
-
-	// devices
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
