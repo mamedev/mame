@@ -1905,6 +1905,36 @@ MACHINE_START_MEMBER(sms_state,sms)
 	{
 		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1FFF);
 	}
+
+	save_item(NAME(m_fm_detect));
+	save_item(NAME(m_ctrl_reg));
+	save_item(NAME(m_paused));
+	save_item(NAME(m_bios_port));
+	save_item(NAME(m_mapper));
+	save_item(NAME(m_input_port0));
+	save_item(NAME(m_input_port1));
+
+	save_item(NAME(m_gg_sio));
+	save_item(NAME(m_store_control));
+	save_item(NAME(m_rapid_fire_state_1));
+	save_item(NAME(m_rapid_fire_state_2));
+	save_item(NAME(m_last_paddle_read_time));
+	save_item(NAME(m_paddle_read_state));
+	save_item(NAME(m_last_sports_pad_time_1));
+	save_item(NAME(m_last_sports_pad_time_2));
+	save_item(NAME(m_sports_pad_state_1));
+	save_item(NAME(m_sports_pad_state_2));
+	save_item(NAME(m_sports_pad_last_data_1));
+	save_item(NAME(m_sports_pad_last_data_2));
+	save_item(NAME(m_sports_pad_1_x));
+	save_item(NAME(m_sports_pad_1_y));
+	save_item(NAME(m_sports_pad_2_x));
+	save_item(NAME(m_sports_pad_2_y));
+	save_item(NAME(m_lphaser_1_latch));
+	save_item(NAME(m_lphaser_2_latch));
+	save_item(NAME(m_sscope_state));
+	save_item(NAME(m_frame_sscope_state));
+	save_item(NAME(m_current_cartridge));
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)

@@ -1683,6 +1683,23 @@ void sega315_5124_device::device_config_complete()
 	}
 }
 
+void sega315_5124_device::vdp_postload()
+{
+	switch (m_y_pixels)
+	{
+		case 192:
+			m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
+			break;
+			
+		case 224:
+			m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
+			break;
+			
+		case 240:
+			m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
+			break;
+	}
+}
 
 void sega315_5124_device::device_start()
 {
@@ -1732,6 +1749,13 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_tmpbitmap));
 	save_item(NAME(m_y1_bitmap));
 	save_item(NAME(m_draw_time));
+	save_item(NAME(m_sprite_base));
+	save_item(NAME(m_selected_sprite));
+	save_item(NAME(m_sprite_count));
+	save_item(NAME(m_sprite_height));
+	save_item(NAME(m_sprite_zoom));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(sega315_5124_device::vdp_postload), this));
 }
 
 

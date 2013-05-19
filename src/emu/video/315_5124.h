@@ -115,6 +115,8 @@ protected:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_0) ? &m_space_config : NULL; }
 
+	void vdp_postload();
+
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
 	UINT8            m_pending_status;           /* Pending status flags */
