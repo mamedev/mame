@@ -5929,6 +5929,7 @@ src/mess/audio/gb.c svneol=native#text/plain
 src/mess/audio/gb.h svneol=native#text/plain
 src/mess/audio/gmaster.c svneol=native#text/plain
 src/mess/audio/lynx.c svneol=native#text/plain
+src/mess/audio/lynx.h svneol=native#text/plain
 src/mess/audio/mac.c svneol=native#text/plain
 src/mess/audio/mea8000.c svneol=native#text/plain
 src/mess/audio/mea8000.h svneol=native#text/plain
