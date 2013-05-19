@@ -1222,7 +1222,99 @@ Missing files come here
 
 	<!-- Coverdisks -->
 
-	<!-- PC Gamer Germany -->
+	<!-- Riki (Slovakia) -->
+	
+	<!-- Riki 8 undumped
+	    <info name="Contents" value="The Mask" />-->
+	
+	<!-- Riki 10 undumped
+	    <info name="Contents" value="Pyrotechnika" />-->
+	
+	<!-- Riki 11 undumped
+	    <info name="Contents" value="Super Stardust" />-->
+
+	<software name="riki12">
+		<description>Riki Coverdisk (September 1995) (Slovak)</description>
+		<year>1995</year>
+		<publisher>Riki</publisher>
+		<info name="contents" value="3D Lemmings" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="riki0995-12.img" size="1474560" crc="08ba4452" sha1="5bafab8f03ee9193bdaaf486abf0a34afc1020bd" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riki13">
+		<description>Riki Coverdisk (October 1995) (Slovak)</description>
+		<year>1995</year>
+		<publisher>Riki</publisher>
+		<info name="contents" value="Darker" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="riki1095-13.img" size="1474560" crc="473d5119" sha1="95f5a08381985710cf9e712b4c8aae4370b16824" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Riki 14 undumped
+	    <info name="Contents" value="Bleifuss" />-->
+
+	<software name="riki15">
+		<description>Riki Coverdisk (December 1995) (Slovak)</description>
+		<year>1995</year>
+		<publisher>Riki</publisher>
+		<info name="contents" value="Quadrax" /> <!-- Seems to be a game made especially for Riki by Cauldron and is in Slovakian -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="riki1295-15.img" size="1474560" crc="8e22c825" sha1="72a1b27790d4fcab18a81cb892d9e3e6dc80e47c" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- Riki 16 undumped
+	    <info name="Contents" value="Jungle Book" />-->
+	
+	<!-- Riki 17 undumped
+	    <info name="Contents" value="Turrican II" />-->
+	
+	<!-- Riki 18 undumped
+	    <info name="Contents" value="Worms />-->
+	
+	<!-- Riki 19 undumped
+	    <info name="Contents" value="Tempest 2000" />-->
+	
+	<!-- Riki 20 undumped
+	    <info name="Contents" value="Virtual Snooker" />-->
+	
+	<!-- Riki 21 undumped
+	    <info name="Contents" value="World Rally Fever" />-->
+
+	<software name="riki22">
+		<description>Riki Coverdisk (September 1996) (Slovak)</description>
+		<year>1996</year>
+		<publisher>Riki</publisher>
+		<info name="contents" value="Gearheads" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="riki0996-22.img" size="1474560" crc="785d713a" sha1="8d4d2108200b36feef6d0f16a2dd243609d90943" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riki23">
+		<description>Riki Coverdisk (October/November 1996) (Slovak)</description>
+		<year>1996</year>
+		<publisher>Riki</publisher>
+		<info name="contents" value="Mutation of JB" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="riki1196-23.img" size="1474560" crc="d690c997" sha1="38996ed2f099b5c800184ff6b6fbc1f21d87456d" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC Gamer (Germany) -->
 	<!-- October 1992 undumped
 	    <info name="Contents" value="Soul Magican / Atom Demo" />-->
 
