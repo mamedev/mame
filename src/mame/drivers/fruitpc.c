@@ -1,8 +1,9 @@
 /************************************************************************************
 
-  "Fruit" (c) ???? (DOSBox runs it with half the screen missing)
+  "Fruit Land" (c) ????
+  hack of an open source game by MesSoft with coin handling added
 
-  preliminary driver by R. Belmont
+  preliminary driver by R. Belmont and Carl
 
   Hardware:
   - ST STPCD0166BTC3 486/66 + PC + VGA all on one chip
@@ -602,4 +603,4 @@ ROM_START( fruitpc )
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
-GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit Land", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "<unknown>", "Fruit Land", GAME_NO_SOUND|GAME_IMPERFECT_GRAPHICS )
