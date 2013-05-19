@@ -152,19 +152,6 @@ void lynx_sound_device::register_save()
 		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].shifter);
 		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].ticks);
 		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].count);
-/*		save_item(NAME(m_audio[chan].reg.volume));
-		save_item(NAME(m_audio[chan].reg.feedback));
-		save_item(NAME(m_audio[chan].reg.output));
-		save_item(NAME(m_audio[chan].reg.shifter));
-		save_item(NAME(m_audio[chan].reg.bakup));
-		save_item(NAME(m_audio[chan].reg.control1));
-		save_item(NAME(m_audio[chan].reg.counter));
-		save_item(NAME(m_audio[chan].reg.control2));
-		save_item(NAME(m_audio[chan].attenuation));
-		save_item(NAME(m_audio[chan].mask));
-		save_item(NAME(m_audio[chan].shifter));
-		save_item(NAME(m_audio[chan].ticks));
-		save_item(NAME(m_audio[chan].count));*/
 	}
 }
 
