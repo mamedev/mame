@@ -6553,7 +6553,7 @@ Other: Lattice pLSI 1032 x 2
 
 DRIVER_INIT_MEMBER(nmk16_state,redhawk)
 {
-	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+	decryptcode( machine(), 23, 22, 21, 20,  19, 18, 16, 15,  14, 17, 13, 12,  11, 10, 9, 8,  7, 6, 5, 4,  3, 2, 1, 0 );
 }
 
 ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
@@ -6657,6 +6657,9 @@ ROM_START( redhawkb )
 	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
+
+
+
 
 /***************************************************************************
 
@@ -6816,6 +6819,38 @@ ROM_START( redfoxwp2 )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
+
+DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
+{
+	// todo collapse to one bitswap
+	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,  	11, 10, 9, 8,   	7, 6, 5, 4, 	3, 2, 1, 0 );
+	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */14,15, /* */    13,12,   	11, 10, 9, 8,    	7, 6, 5, 4,		3, 2, 1, 0 );
+	decryptcode( machine(),23, 22, 21, 20, 	 19, 18, /* */ 16, 17, /* */    15,14,13,12,	11, 10, 9, 8,  	    7, 6, 5, 4, 	3, 2, 1, 0 );
+}
+
+
+ROM_START( redfoxwp2a )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "afega_4.u112", 0x000000, 0x040000, CRC(e6e6682a) SHA1(1a70ca3881b4ecc6d329814ff1fdafce16550ca2) )
+	ROM_LOAD16_BYTE( "afega_5.u107", 0x000001, 0x040000, CRC(2faa2ed6) SHA1(c6ca3ca0cff85379007a44648c6de87864095c2e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "afega_1.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites, 16x16x4 */ // not dumped, it is correct?
+	ROM_LOAD( "afega_af1-sp.uc13", 0x000000, 0x200000, CRC(7d4d4985) SHA1(15c6c1aecd3f12050c1db2376f929f1a26a1d1cf) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 0, 16x16x8 */ // not dumped, it is correct?
+	ROM_LOAD( "afega_af1-b2.uc8", 0x000000, 0x200000, CRC(d68588c2) SHA1(c5f397d74a6ecfd2e375082f82e37c5a330fba62) )
+	ROM_LOAD( "afega_af1-b1.uc3", 0x200000, 0x200000, CRC(f8b200a8) SHA1(a6c43dd57b752d87138d7125b47dc0df83df8987) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASEFF )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "afega_3.u4", 0x000000, 0x10000, CRC(64608687) SHA1(c13e55429171653437c8e8c7c8e9c6c5ffa2d2dc) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "afega_2.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
 /***************************************************************************
@@ -7346,7 +7381,8 @@ GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, driver_device, 0,        ROT
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, driver_device, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
-GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Red Fox War Planes II (China)", 0 )
+GAME( 1998, redfoxwp2,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega",                             "Red Fox War Planes II (China, set 1)", 0 )
+GAME( 1998, redfoxwp2a,grdnstrm,grdnstrmk,grdnstrk, nmk16_state,  redfoxwp2a,ROT270,             "Afega",                             "Red Fox War Planes II (China, set 2)", 0 )
 
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
