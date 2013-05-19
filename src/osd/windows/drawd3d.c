@@ -794,7 +794,9 @@ int renderer::pre_window_draw_check()
 	if (m_device != NULL)
 	{
 		if (device_test_cooperative())
+		{
 			return 1;
+		}
 	}
 
 	// in window mode, we need to track the window size
@@ -1001,9 +1003,8 @@ try_again:
 													video_config.waitvsync || video_config.syncrefresh) ?
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
-	printf("m_device is %08x%08x\n", (UINT32)((UINT64)m_device >> 32), (UINT32)((UINT64)m_device & 0x00000000ffffffff));
 	// create the D3D device
-	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, win_window_list->hwnd,
+	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_window->hwnd,
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (result != D3D_OK)
 	{
@@ -1013,7 +1014,9 @@ try_again:
 		{
 			m_create_error_count++;
 			if (m_create_error_count < 10)
+			{
 				return 0;
+			}
 		}
 
 		//  fatal error if we just can't do it
@@ -1154,7 +1157,10 @@ void renderer::device_delete()
 
 	// free the device itself
 	if (m_device != NULL)
+	{
+		(*d3dintf->device.reset)(m_device, &m_presentation);
 		(*d3dintf->device.release)(m_device);
+	}
 	m_device = NULL;
 }
 
