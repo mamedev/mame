@@ -1140,8 +1140,10 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 
 	MCFG_CARTSLOT_ADD( "cart" )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
-	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_LOAD( vii_state, vsmile_cart )
+	MCFG_CARTSLOT_INTERFACE("vsmile_cart")
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile")
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
@@ -1207,6 +1209,7 @@ ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x100000, CRC(2bd4f3b1) SHA1(e49c21f2326944c4164ee703acdb9ad2e7044246) )
 	ROM_CART_LOAD("cart", 0x0000, 0x2000000, ROM_MIRROR)
 ROM_END
 
@@ -1219,6 +1222,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batmantv, vii,      0,        batman,   batman, vii_state,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", GAME_NO_SOUND )
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile, vii_state,   vsmile,   "V-Tech",                                            "V-Smile (Germany)",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii, vii_state,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle, vii_state,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND )
