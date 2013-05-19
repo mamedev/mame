@@ -351,6 +351,7 @@ DRVLIBS += \
 	$(MESSOBJ)/next.a \
 	$(MESSOBJ)/nintendo.a \
 	$(MESSOBJ)/nokia.a \
+	$(MESSOBJ)/northstar.a \
 	$(MESSOBJ)/novag.a \
 	$(MESSOBJ)/olivetti.a \
 	$(MESSOBJ)/omnibyte.a \
@@ -1480,6 +1481,11 @@ $(MESSOBJ)/nokia.a:             \
 	$(MESS_DRIVERS)/mikromik.o  \
 	$(MESS_VIDEO)/mikromik.o    \
 
+$(MESSOBJ)/northstar.a:         \
+	$(MESS_DRIVERS)/horizon.o   \
+	$(MESS_MACHINE)/s100_nsmdsa.o \
+	$(MESS_MACHINE)/s100_nsmdsad.o \
+
 $(MESSOBJ)/novag.a:             \
 	$(MESS_DRIVERS)/mk1.o       \
 	$(MESS_DRIVERS)/mk2.o       \
@@ -2112,7 +2118,6 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/eti660.o    \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/fidelz80.o  \
-	$(MESS_DRIVERS)/horizon.o   \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
 	$(MESS_DRIVERS)/ie15.o     \

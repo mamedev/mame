@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, "serial_terminal", terminal)
 
 	// S-100
-	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)
+	MCFG_S100_BUS_ADD(s100_intf)
 	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, NULL, NULL)
 	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, NULL, NULL)
 	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, NULL, NULL)

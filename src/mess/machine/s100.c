@@ -31,12 +31,6 @@ s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void s100_slot_device::static_set_s100_slot(device_t &device, const char *tag)
-{
-	s100_slot_device &s100_card = dynamic_cast<s100_slot_device &>(device);
-	s100_card.m_bus_tag = tag;
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -44,7 +38,7 @@ void s100_slot_device::static_set_s100_slot(device_t &device, const char *tag)
 
 void s100_slot_device::device_start()
 {
-	m_bus = machine().device<s100_device>(m_bus_tag);
+	m_bus = machine().device<s100_device>(S100_TAG);
 	device_s100_card_interface *dev = dynamic_cast<device_s100_card_interface *>(get_card_device());
 	if (dev) m_bus->add_s100_card(dev);
 }
@@ -56,13 +50,6 @@ void s100_slot_device::device_start()
 //**************************************************************************
 
 const device_type S100 = &device_creator<s100_device>;
-
-
-void s100_device::static_set_cputag(device_t &device, const char *tag)
-{
-	s100_device &s100 = downcast<s100_device &>(device);
-	s100.m_cputag = tag;
-}
 
 
 //-------------------------------------------------
@@ -126,8 +113,6 @@ s100_device::s100_device(const machine_config &mconfig, const char *tag, device_
 
 void s100_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);
 	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
