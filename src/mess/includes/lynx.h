@@ -7,6 +7,7 @@
 #ifndef LYNX_H_
 #define LYNX_H_
 
+#include "audio/lynx.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 
@@ -14,10 +15,8 @@
 #define LYNX_QUICKLOAD  1
 
 
-class lynx_state;
 struct BLITTER
 {
-	UINT8 *mem;
 	// global
 	UINT16 screen;
 	UINT16 colbuf;
@@ -34,8 +33,9 @@ struct BLITTER
 	UINT16 width_offset, height_offset;
 	INT16 stretch, tilt;
 	UINT8 color[16]; // or stored
-	void (*line_function)(lynx_state *state, const int y, const int xdir);
 	UINT16 bitmap;
+	int use_rle;
+	int line_color;
 
 	UINT8 spr_ctl0;
 	UINT8 spr_ctl1;
@@ -102,7 +102,8 @@ public:
 		m_mem_fd00(*this, "mem_fd00"),
 		m_mem_fe00(*this, "mem_fe00"),
 		m_mem_fffa(*this, "mem_fffa"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_sound(*this, "custom") { }
 
 	virtual void video_start();
 
@@ -113,18 +114,22 @@ public:
 	required_shared_ptr<UINT8> m_mem_fd00;
 	required_shared_ptr<UINT8> m_mem_fe00;
 	required_shared_ptr<UINT8> m_mem_fffa;
+	required_device<cpu_device> m_maincpu;
+	required_device<lynx_sound_device> m_sound;
+	
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
 	UINT32 m_palette[0x10];
 	int m_rotate;
-	device_t *m_audio;
-	SUZY m_suzy;
-	BLITTER m_blitter;
 	UINT8 m_memory_config;
+
+	BLITTER m_blitter;
+	SUZY m_suzy;
 	MIKEY m_mikey;
-	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
 	UART m_uart;
+	LYNX_TIMER m_timer[NR_LYNX_TIMERS];
+
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_bitmap_temp;
 	DECLARE_READ8_MEMBER(suzy_read);
@@ -142,13 +147,13 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	void sound_cb();
 	TIMER_CALLBACK_MEMBER(lynx_blitter_timer);
 	TIMER_CALLBACK_MEMBER(lynx_timer_shot);
 	TIMER_CALLBACK_MEMBER(lynx_uart_loopback_timer);
 	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
 	void lynx_postload();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
-	required_device<cpu_device> m_maincpu;
 	UINT8 lynx_read_ram(UINT16 address);
 	void lynx_write_ram(UINT16 address, UINT8 data);
 	inline void lynx_plot_pixel(const int mode, const INT16 x, const int y, const int color);
@@ -170,54 +175,6 @@ public:
 /*----------- defined in machine/lynx.c -----------*/
 
 MACHINE_CONFIG_EXTERN( lynx_cartslot );
-
-
-/*----------- defined in audio/lynx.c -----------*/
-
-class lynx_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~lynx_sound_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type LYNX;
-
-class lynx2_sound_device : public lynx_sound_device
-{
-public:
-	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-};
-
-extern const device_type LYNX2;
-
-
-void lynx_audio_write(device_t *device, int offset, UINT8 data);
-UINT8 lynx_audio_read(device_t *device, int offset);
-void lynx_audio_count_down(device_t *device, int nr);
 
 /*---------- suzy registers ------------- */
 #define TMPADRL 0x00    // Temporary address (not sure what this is used for)

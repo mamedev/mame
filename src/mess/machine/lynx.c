@@ -20,21 +20,6 @@
 
 ****************************************/
 
-/*
-2008-10 FP:
-Current implementation: lynx_blitter reads what will be drawn and sets which line_functions to use.
-It then calls lynx_blit_lines which sets the various flip bits (horizontal and vertical) and calls
-the chosen line_function. These functions (available in various versions, depending on how many
-color bits are to be used) finally call lynx_plot_pixel which draws the sprite.
-
-Notice however that, based on the problems in Electrocop, Jimmy Connors Tennis and Switchblade II
-(among the others), it clearly seems that something is being lost in some of the passages. From
-my partial understanding while comparing the code with the manual, I would suspect the loops in
-the line_functions to be not completely correct.
-
-This whole part will be eventually moved to video/ once I'm satisfied (or I give up).
-*/
-
 /* modes from blitter command */
 enum {
 	BACKGROUND = 0,
@@ -413,11 +398,6 @@ void lynx_state::lynx_blit_do_work( const int y, const int xdir, const int bits_
 	}
 }
 
-static void lynx_blit_2color_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_do_work(y, xdir, 1, 0x01);}
-static void lynx_blit_4color_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_do_work(y, xdir, 2, 0x03);}
-static void lynx_blit_8color_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_do_work(y, xdir, 3, 0x07);}
-static void lynx_blit_16color_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_do_work(y, xdir, 4, 0x0f);}
-
 void lynx_state::lynx_blit_rle_do_work( const INT16 y, const int xdir, const int bits_per_pixel, const int mask )
 {
 	int i;
@@ -491,7 +471,7 @@ void lynx_state::lynx_blit_rle_do_work( const INT16 y, const int xdir, const int
 			for ( ; count>=0; count--)
 			{
 				width_accum += m_blitter.width;
-				for (i = 0; i < (width_accum>>8); i++, xi += xdir)
+				for (i = 0; i < (width_accum >> 8); i++, xi += xdir)
 				{
 					if ((xi >= 0) && (xi < 160))
 						lynx_plot_pixel(m_blitter.mode, xi, y, color);
@@ -502,15 +482,11 @@ void lynx_state::lynx_blit_rle_do_work( const INT16 y, const int xdir, const int
 	}
 }
 
-static void lynx_blit_2color_rle_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_rle_do_work(y, xdir, 1, 0x01);}
-static void lynx_blit_4color_rle_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_rle_do_work(y, xdir, 2, 0x03);}
-static void lynx_blit_8color_rle_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_rle_do_work(y, xdir, 3, 0x07);}
-static void lynx_blit_16color_rle_line(lynx_state *state, const int y, const int xdir) {state->lynx_blit_rle_do_work(y, xdir, 4, 0x0f);}
-
 void lynx_state::lynx_blit_lines()
 {
-	int i;
+	static const int lynx_color_masks[4] = { 0x01, 0x03, 0x07, 0x0f };
 	INT16 y;
+	int i;
 	int ydir = 0, xdir = 0;
 	int flip = 0;
 
@@ -580,12 +556,16 @@ void lynx_state::lynx_blit_lines()
 			continue;
 		}
 
-
 		m_blitter.height_accumulator += m_blitter.height;
-		for (int i=0; i < (m_blitter.height_accumulator>>8); i++, y += ydir)
-		{
+		for (int j = 0; j < (m_blitter.height_accumulator >> 8); j++, y += ydir)
+		{				
 			if (y >= 0 && y < 102)
-				m_blitter.line_function(this, y, xdir);
+			{
+				if (m_blitter.use_rle)
+					lynx_blit_rle_do_work(y, xdir, m_blitter.line_color + 1, lynx_color_masks[m_blitter.line_color]);
+				else
+					lynx_blit_do_work(y, xdir, m_blitter.line_color + 1, lynx_color_masks[m_blitter.line_color]);
+			}
 			m_blitter.width += (INT16)m_blitter.stretch;
 			if (m_blitter.vstretch) // doesn't seem to be used
 			{
@@ -681,27 +661,10 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
 
 void lynx_state::lynx_blitter()
 {
-	static const int lynx_colors[4]={2,4,8,16};
+	static const int lynx_colors[4] = { 2, 4, 8, 16 };
 	UINT8 palette_offset;
 	UINT8 coldep;
-
-	static void (* const blit_line[4])(lynx_state *state, const int y, const int xdir)= {
-	lynx_blit_2color_line,
-	lynx_blit_4color_line,
-	lynx_blit_8color_line,
-	lynx_blit_16color_line
-	};
-
-	static void (* const blit_rle_line[4])(lynx_state *state, const int y, const int xdir)= {
-	lynx_blit_2color_rle_line,
-	lynx_blit_4color_rle_line,
-	lynx_blit_8color_rle_line,
-	lynx_blit_16color_rle_line
-	};
-
-	int i; int colors;
-
-	m_blitter.mem = (UINT8*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x0000);
+	int colors;
 
 	m_blitter.busy = 1; // blitter working
 	m_blitter.memory_accesses = 0;
@@ -750,7 +713,7 @@ void lynx_state::lynx_blitter()
 
 				colors = lynx_colors[m_blitter.spr_ctl0 >> 6];
 
-				for (i = 0; i < colors / 2; i++)
+				for (int i = 0; i < colors / 2; i++)
 				{
 					m_blitter.color[i * 2]      = lynx_read_ram(m_blitter.scb + palette_offset + i) >> 4;
 					m_blitter.color[i * 2 + 1 ] = lynx_read_ram(m_blitter.scb + palette_offset + i) & 0x0f;
@@ -764,12 +727,9 @@ void lynx_state::lynx_blitter()
 		{
 			m_blitter.colpos = m_blitter.scb + (m_suzy.data[COLLOFFL] | (m_suzy.data[COLLOFFH]<<8));
 			m_blitter.mode = m_blitter.spr_ctl0 & 0x07;
-
-			if (m_blitter.spr_ctl1 & 0x80) // totally literal sprite
-				m_blitter.line_function = blit_line[m_blitter.spr_ctl0 >> 6];
-			else
-				m_blitter.line_function = blit_rle_line[m_blitter.spr_ctl0 >> 6];
-
+			m_blitter.use_rle = m_blitter.spr_ctl1 & 0x80 ? 0 : 1;
+			m_blitter.line_color = (m_blitter.spr_ctl0 >> 6) & 0x03;
+			
 			m_blitter.sprite_collide = !(m_blitter.spr_coll & 0x20);
 			m_blitter.spritenr = m_blitter.spr_coll & 0x0f;
 			m_blitter.fred = 0;
@@ -1395,19 +1355,25 @@ TIM_BORROWOUT   EQU %00000001
 
 void lynx_state::lynx_timer_init(int which)
 {
-	memset( &m_timer[which], 0, sizeof(LYNX_TIMER) );
+	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
 	m_timer[which].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::lynx_timer_shot),this));
+
+	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].bakup);
+	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].cntrl1);
+	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].cntrl2);
+	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].counter);
+	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].timer_active);
 }
 
 void lynx_state::lynx_timer_signal_irq(int which)
 {
-	if ( ( m_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) // if interrupts are enabled and timer != 4
+	if ((m_timer[which].cntrl1 & 0x80) && (which != 4)) // if interrupts are enabled and timer != 4
 	{
-		m_mikey.data[0x81] |= ( 1 << which ); // set interupt poll register
+		m_mikey.data[0x81] |= (1 << which); // set interupt poll register
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
-	switch ( which ) // count down linked timers
+	switch (which) // count down linked timers
 	{
 	case 0:
 		switch (m_timer[2].counter)
@@ -1427,43 +1393,43 @@ void lynx_state::lynx_timer_signal_irq(int which)
 			default:
 				lynx_draw_line();
 		}
-		lynx_timer_count_down( 2 );
+		lynx_timer_count_down(2);
 		break;
 	case 2:
 		copybitmap(m_bitmap, m_bitmap_temp, 0, 0, 0, 0, machine().primary_screen->cliprect());
-		lynx_timer_count_down( 4 );
+		lynx_timer_count_down(4);
 		break;
 	case 1:
-		lynx_timer_count_down( 3 );
+		lynx_timer_count_down(3);
 		break;
 	case 3:
-		lynx_timer_count_down( 5 );
+		lynx_timer_count_down(5);
 		break;
 	case 5:
-		lynx_timer_count_down( 7 );
+		lynx_timer_count_down(7);
 		break;
 	case 7:
-		lynx_audio_count_down( m_audio, 0 );
+		m_sound->count_down(0);
 		break;
 	}
 }
 
 void lynx_state::lynx_timer_count_down(int which)
 {
-	if ( ( m_timer[which].cntrl1 & 0x0f ) == 0x0f ) // count and linking enabled
+	if ((m_timer[which].cntrl1 & 0x0f) == 0x0f) // count and linking enabled
 	{
-		if ( m_timer[which].counter > 0 )
+		if (m_timer[which].counter > 0)
 		{
 			m_timer[which].counter--;
 			//m_timer[which].borrow_in = 1;
 			return;
 		}
-		if ( m_timer[which].counter == 0 )
+		if (m_timer[which].counter == 0)
 		{
 			if (m_timer[which].cntrl2 & 0x01) // borrow out
 			{
 				lynx_timer_signal_irq(which);
-				if ( m_timer[which].cntrl1 & 0x10 ) // if reload enabled
+				if (m_timer[which].cntrl1 & 0x10) // if reload enabled
 				{
 					m_timer[which].counter = m_timer[which].bakup;
 				}
@@ -1502,8 +1468,8 @@ UINT32 lynx_state::lynx_time_factor(int val)
 
 TIMER_CALLBACK_MEMBER(lynx_state::lynx_timer_shot)
 {
-	lynx_timer_signal_irq( param );
-	if ( ! ( m_timer[param].cntrl1 & 0x10 ) ) // if reload not enabled
+	lynx_timer_signal_irq(param);
+	if (!(m_timer[param].cntrl1 & 0x10)) // if reload not enabled
 	{
 		m_timer[param].timer_active = 0;
 		m_timer[param].cntrl2 |= 8; // set timer done
@@ -1722,7 +1688,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		value = lynx_audio_read(m_audio, offset);
+		value = m_sound->read(space, offset);
 		break;
 
 	case 0x80:
@@ -1789,7 +1755,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 	case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
 	case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-		lynx_audio_write(m_audio, offset, data);
+		m_sound->write(space, offset, data);
 		return;
 
 	case 0x80:
@@ -1895,21 +1861,22 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 	 * when these are safe in the cpu */
 	m_memory_config = data;
 
-	if (data & 1) {
-		space.install_readwrite_bank(0xfc00, 0xfcff, "bank1");
-	} else {
-		space.install_readwrite_handler(0xfc00, 0xfcff, read8_delegate(FUNC(lynx_state::suzy_read),this), write8_delegate(FUNC(lynx_state::suzy_write),this));
-	}
-	if (data & 2) {
-		space.install_readwrite_bank(0xfd00, 0xfdff, "bank2");
-	} else {
-		space.install_readwrite_handler(0xfd00, 0xfdff, read8_delegate(FUNC(lynx_state::mikey_read),this), write8_delegate(FUNC(lynx_state::mikey_write),this));
-	}
-
 	if (data & 1)
+	{
+		space.install_readwrite_bank(0xfc00, 0xfcff, "bank1");
 		membank("bank1")->set_base(m_mem_fc00);
+	}
+	else
+		space.install_readwrite_handler(0xfc00, 0xfcff, read8_delegate(FUNC(lynx_state::suzy_read),this), write8_delegate(FUNC(lynx_state::suzy_write),this));
+
 	if (data & 2)
+	{
+		space.install_readwrite_bank(0xfd00, 0xfdff, "bank2");
 		membank("bank2")->set_base(m_mem_fd00);
+	}
+	else
+		space.install_readwrite_handler(0xfd00, 0xfdff, read8_delegate(FUNC(lynx_state::mikey_read),this), write8_delegate(FUNC(lynx_state::mikey_write),this));
+
 	membank("bank3")->set_entry((data & 4) ? 1 : 0);
 	membank("bank4")->set_entry((data & 8) ? 1 : 0);
 }
@@ -1958,9 +1925,68 @@ void lynx_state::machine_start()
 {
 	m_bitmap_temp.allocate(160,102,0,0);
 
-	int i;
+	// save driver variables
 	save_item(NAME(m_memory_config));
-	save_pointer(NAME(m_mem_fe00.target()), m_mem_fe00.bytes());
+	save_item(NAME(m_sign_AB));
+	save_item(NAME(m_sign_CD));
+	save_item(NAME(m_palette));
+	save_item(NAME(m_rotate));
+	// save blitter variables
+	save_item(NAME(m_blitter.screen));
+	save_item(NAME(m_blitter.colbuf));
+	save_item(NAME(m_blitter.colpos));
+	save_item(NAME(m_blitter.xoff));
+	save_item(NAME(m_blitter.yoff));
+	save_item(NAME(m_blitter.mode));
+	save_item(NAME(m_blitter.spr_coll));
+	save_item(NAME(m_blitter.spritenr));
+	save_item(NAME(m_blitter.x_pos));
+	save_item(NAME(m_blitter.y_pos));
+	save_item(NAME(m_blitter.width));
+	save_item(NAME(m_blitter.height));
+	save_item(NAME(m_blitter.tilt_accumulator));
+	save_item(NAME(m_blitter.width_accumulator));
+	save_item(NAME(m_blitter.height_accumulator));
+	save_item(NAME(m_blitter.width_offset));
+	save_item(NAME(m_blitter.height_offset));
+	save_item(NAME(m_blitter.stretch));
+	save_item(NAME(m_blitter.tilt));
+	save_item(NAME(m_blitter.color));
+	save_item(NAME(m_blitter.bitmap));
+	save_item(NAME(m_blitter.use_rle));
+	save_item(NAME(m_blitter.line_color));
+	save_item(NAME(m_blitter.spr_ctl0));
+	save_item(NAME(m_blitter.spr_ctl1));
+	save_item(NAME(m_blitter.scb));
+	save_item(NAME(m_blitter.scb_next));
+	save_item(NAME(m_blitter.sprite_collide));
+	save_item(NAME(m_blitter.everon));
+	save_item(NAME(m_blitter.fred));
+	save_item(NAME(m_blitter.memory_accesses));
+	save_item(NAME(m_blitter.no_collide));
+	save_item(NAME(m_blitter.vstretch));
+	save_item(NAME(m_blitter.lefthanded));
+	save_item(NAME(m_blitter.busy));
+	// save suzy variables
+	save_item(NAME(m_suzy.data));
+	save_item(NAME(m_suzy.high));
+	save_item(NAME(m_suzy.low));
+	save_item(NAME(m_suzy.signed_math));
+	save_item(NAME(m_suzy.accumulate));
+	save_item(NAME(m_suzy.accumulate_overflow));
+	// save mikey variables
+	save_item(NAME(m_mikey.data));
+	save_item(NAME(m_mikey.disp_addr));
+	save_item(NAME(m_mikey.vb_rest));
+	// save uart variables
+	save_item(NAME(m_uart.serctl));
+	save_item(NAME(m_uart.data_received));
+	save_item(NAME(m_uart.data_to_send));
+	save_item(NAME(m_uart.buffer));
+	save_item(NAME(m_uart.received));
+	save_item(NAME(m_uart.sending));
+	save_item(NAME(m_uart.buffer_loaded));
+	
 	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_state::lynx_postload), this));
 
 	membank("bank3")->configure_entry(0, memregion("maincpu")->base() + 0x0000);
@@ -1968,11 +1994,7 @@ void lynx_state::machine_start()
 	membank("bank4")->configure_entry(0, memregion("maincpu")->base() + 0x01fa);
 	membank("bank4")->configure_entry(1, m_mem_fffa);
 
-	m_audio = machine().device("custom");
-
-	memset(&m_suzy, 0, sizeof(m_suzy));
-
-	for (i = 0; i < NR_LYNX_TIMERS; i++)
+	for (int i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(i);
 }
 

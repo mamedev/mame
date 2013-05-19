@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m65sc02.h"
+#include "audio/lynx.h"
 #include "includes/lynx.h"
 
 #include "imagedev/snapquik.h"
@@ -63,6 +64,13 @@ UINT32 lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
+// callback for Mikey call of shift(3) which shall act on the lynx_timer_count_down
+void lynx_state::sound_cb()
+{
+	lynx_timer_count_down(1);
+}
+
+
 static MACHINE_CONFIG_START( lynx, lynx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, 4000000)        /* vti core, integrated in vlsi, stz, but not bbr bbs */
@@ -83,7 +91,8 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", LYNX, 0)
+	MCFG_SOUND_ADD("custom", LYNX_SND, 0)
+	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -99,7 +108,8 @@ static MACHINE_CONFIG_DERIVED( lynx2, lynx )
 	MCFG_DEVICE_REMOVE("mono")
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_DEVICE_REMOVE("lynx")
-	MCFG_SOUND_ADD("custom", LYNX2, 0)
+	MCFG_SOUND_ADD("custom", LYNX2_SND, 0)
+	MCFG_LYNX_SND_SET_TIMER(lynx_state, sound_cb)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
