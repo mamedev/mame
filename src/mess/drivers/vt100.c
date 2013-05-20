@@ -20,11 +20,15 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
+#include "machine/com8116.h"
 #include "machine/i8251.h"
+#include "machine/serial.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
 #include "vt100.lh"
 
+#define RS232_TAG		"rs232"
+#define COM5016T_TAG	"com5016t"
 
 class vt100_state : public driver_device
 {
@@ -35,6 +39,7 @@ public:
 		m_crtc(*this, "vt100_video"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
+		m_dbrg(*this, COM5016T_TAG),
 		m_p_ram(*this, "p_ram")
 		{ }
 
@@ -42,6 +47,7 @@ public:
 	required_device<vt100_video_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
+	required_device<com8116_device> m_dbrg;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
 	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
 	DECLARE_READ8_MEMBER(vt100_keyboard_r);
@@ -55,8 +61,6 @@ public:
 	bool m_vertical_int;
 	bool m_key_scan;
 	UINT8 m_key_code;
-	double m_send_baud_rate;
-	double m_recv_baud_rate;
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,6 +68,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
 	UINT8 bit_sel(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( ft_w );
 };
 
 
@@ -164,14 +170,8 @@ READ8_MEMBER( vt100_state::vt100_keyboard_r )
 
 WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
 {
-	static const double baud_rate[] =
-	{
-		50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
-		1800, 2000, 2400, 3600, 4800, 9600, 19200
-	};
-
-	m_send_baud_rate = baud_rate[(data >>4)];
-	m_recv_baud_rate = baud_rate[data & 0x0f];
+	m_dbrg->str_w(data & 0x0f);
+	m_dbrg->stt_w(data >> 4);
 }
 
 WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
@@ -409,18 +409,45 @@ static GFXDECODE_START( vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-/* TODO: i8251: connect me up! */
 static const i8251_interface i8251_intf =
 {
-	DEVCB_NULL, // in_rxd_cb
-	DEVCB_NULL, // out_txd_cb
-	DEVCB_NULL, // in_dsr_cb
-	DEVCB_NULL, // out_dtr_cb
-	DEVCB_NULL, // out_rts_cb
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL, // out_rxrdy_cb
 	DEVCB_NULL, // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
 	DEVCB_NULL // out_syndet_cb
+};
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+WRITE_LINE_MEMBER( vt100_state::fr_w )
+{
+	m_uart->receive_clock();
+}
+
+WRITE_LINE_MEMBER( vt100_state::ft_w )
+{
+	m_uart->transmit_clock();
+}
+
+static COM8116_INTERFACE( dbrg_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(vt100_state, fr_w),
+	DEVCB_DRIVER_LINE_MEMBER(vt100_state, ft_w),
+	COM8116_DIVISORS_16X_5_0688MHz, // receiver
+	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
 
 static MACHINE_CONFIG_START( vt100, vt100_state )
@@ -450,6 +477,8 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, dbrg_intf)
 
 
 	/* audio hardware */

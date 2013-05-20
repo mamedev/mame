@@ -148,8 +148,13 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 #include "cpu/i8085/i8085.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "machine/com8116.h"
 #include "machine/i8251.h"
+#include "machine/serial.h"
 #include "vk100.lh"
+
+#define RS232_TAG		"rs232"
+#define COM5016T_TAG	"com5016t"
 
 class vk100_state : public driver_device
 {
@@ -161,6 +166,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
+		m_dbrg(*this, COM5016T_TAG),
 		//m_i8251_rx_timer(NULL),
 		//m_i8251_tx_timer(NULL),
 		//m_sync_timer(NULL),
@@ -173,6 +179,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
+	required_device<com8116_device> m_dbrg;
 	//required_device<> m_i8251_rx_timer;
 	//required_device<> m_i8251_tx_timer;
 	//required_device<> m_sync_timer;
@@ -207,8 +214,6 @@ public:
 	UINT8 m_VG_MODE; // 2 bits, latched on EXEC
 	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
 	UINT8 m_ACTS;
-	UINT16 m_RXDivisor;
-	UINT16 m_TXDivisor;
 	ioport_port* m_col_array[16];
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -234,6 +239,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	UINT8 vram_read();
 	void vram_write(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( ft_w );
 };
 
 // vram access functions:
@@ -554,14 +561,8 @@ WRITE8_MEMBER(vk100_state::KBDW)
  */
 WRITE8_MEMBER(vk100_state::BAUD)
 {
-	static const UINT16 baudDivisors[16] = {
-		6336, 4224, 2880, 2355, 2112, 1056,  528,  264,
-			176,  158,  132,   88,   66,   44,   33,   16
-		};
-	m_RXDivisor = baudDivisors[data&0xF];
-	m_TXDivisor = baudDivisors[(data&0xF0)>>4];
-	logerror("BAUD: 0x6C: write of %02X, RX baud: %d, TX baud: %d \n", data, (5068800/m_RXDivisor)/16, (5068800/m_TXDivisor)/16);
-	//TODO: adjust the rate of the rx and tx timers here
+	m_dbrg->str_w(data & 0x0f);
+	m_dbrg->stt_w(data >> 4);
 }
 
 /* port 0x40-0x47: "SYSTAT A"; various status bits, poorly documented in the tech manual
@@ -892,8 +893,6 @@ void vk100_state::machine_start()
 	m_VG_MODE = 0;
 	m_vgGO = 0;
 	m_ACTS = 1;
-	m_RXDivisor = 6336;
-	m_TXDivisor = 6336;
 	char kbdcol[8];
 	// look up all 16 tags 'the slow way' but only once on reset
 	for (int i = 0; i < 16; i++)
@@ -993,17 +992,44 @@ static MC6845_INTERFACE( mc6845_intf )
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_NULL, // in_rxd_cb
-	DEVCB_NULL, // out_txd_cb
-	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rx), // in_rxd_cb
-	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
-	DEVCB_NULL, // in_dsr_cb
-	DEVCB_NULL, // out_dtr_cb
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rts), // out_rts_cb
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	//DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rts), // out_rts_cb
 	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_rxrdy_int), // out_rxrdy_cb
 	DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_txrdy_int), // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
 	DEVCB_NULL // out_syndet_cb
+};
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+WRITE_LINE_MEMBER( vk100_state::fr_w )
+{
+	m_uart->receive_clock();
+}
+
+WRITE_LINE_MEMBER( vk100_state::ft_w )
+{
+	m_uart->transmit_clock();
+}
+
+static COM8116_INTERFACE( dbrg_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, fr_w),
+	DEVCB_DRIVER_LINE_MEMBER(vk100_state, ft_w),
+	COM8116_DIVISORS_16X_5_0688MHz, // receiver
+	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
 
 static MACHINE_CONFIG_START( vk100, vk100_state )
@@ -1021,6 +1047,8 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, dbrg_intf)
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
