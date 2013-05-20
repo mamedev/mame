@@ -993,13 +993,13 @@ void pc1512_state::update_fdc_drq()
 		m_dmac->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( pc1512_state::fdc_int_w )
+void pc1512_state::fdc_int_w(bool state)
 {
 	m_dint = state;
 	update_fdc_int();
 }
 
-WRITE_LINE_MEMBER( pc1512_state::fdc_drq_w )
+void pc1512_state::fdc_drq_w(bool state)
 {
 	m_ddrq = state;
 	update_fdc_drq();
@@ -1107,6 +1107,8 @@ void pc1512_state::machine_start()
 {
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
+	m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_int_w), this));
+	m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_drq_w), this));
 
 	// set RAM size
 	size_t ram_size = m_ram->size();

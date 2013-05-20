@@ -139,8 +139,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 	DECLARE_READ8_MEMBER( memr_r );
@@ -162,6 +160,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(pc1512_irq_callback);
+	void fdc_int_w(bool state);
+	void fdc_drq_w(bool state);
 
 	// system status register
 	int m_pit1;
