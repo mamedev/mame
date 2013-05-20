@@ -17,6 +17,7 @@
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
+#include "machine/serial.h"
 #include "machine/v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -42,6 +43,7 @@
 #define TIMER_ACK_TAG           "timer_ack"
 #define TIMER_RST_TAG           "timer_rst"
 #define SASIBUS_TAG             "sasi"
+#define RS232_TAG				"rs232"
 
 #define V1050_VIDEORAM_SIZE     0x8000
 #define V1050_VIDEORAM_MASK     0x7fff

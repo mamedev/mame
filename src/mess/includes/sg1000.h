@@ -12,6 +12,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -27,6 +28,7 @@
 #define UPD9255_1_TAG   "upd9255_1"
 #define CENTRONICS_TAG  "centronics"
 #define TMS9918A_TAG    "tms9918a"
+#define RS232_TAG		"rs232"
 
 #define IS_CARTRIDGE_TV_DRAW(ptr) \
 	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))

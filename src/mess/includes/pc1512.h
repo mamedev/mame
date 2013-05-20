@@ -3,7 +3,6 @@
 #ifndef __PC1512__
 #define __PC1512__
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
@@ -19,6 +18,7 @@
 #include "machine/pc1512kb.h"
 #include "machine/pc_fdc.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
@@ -36,6 +36,7 @@
 #define SPEAKER_TAG     "speaker"
 #define ISA_BUS_TAG     "isa"
 #define SCREEN_TAG      "screen"
+#define RS232_TAG		"rs232"
 
 class pc1512_state : public driver_device
 {

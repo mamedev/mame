@@ -78,6 +78,8 @@
 #include "includes/portfoli.h"
 #include "rendlay.h"
 
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -102,6 +104,8 @@ enum
 
 static const UINT8 INTERRUPT_VECTOR[] = { 0x08, 0x09, 0x00 };
 
+
+
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************
@@ -117,6 +121,7 @@ void portfolio_state::check_interrupt()
 	m_maincpu->set_input_line(INPUT_LINE_INT0, level);
 }
 
+
 //-------------------------------------------------
 //  trigger_interrupt - trigger interrupt request
 //-------------------------------------------------
@@ -129,6 +134,7 @@ void portfolio_state::trigger_interrupt(int level)
 	check_interrupt();
 }
 
+
 //-------------------------------------------------
 //  irq_status_r - interrupt status read
 //-------------------------------------------------
@@ -137,6 +143,7 @@ READ8_MEMBER( portfolio_state::irq_status_r )
 {
 	return m_ip;
 }
+
 
 //-------------------------------------------------
 //  irq_mask_w - interrupt enable mask
@@ -150,6 +157,7 @@ WRITE8_MEMBER( portfolio_state::irq_mask_w )
 	check_interrupt();
 }
 
+
 //-------------------------------------------------
 //  sivr_w - serial interrupt vector register
 //-------------------------------------------------
@@ -159,6 +167,7 @@ WRITE8_MEMBER( portfolio_state::sivr_w )
 	m_sivr = data;
 	//logerror("SIVR %02x\n", data);
 }
+
 
 //-------------------------------------------------
 //  IRQ_CALLBACK_MEMBER( portfolio_int_ack )
@@ -188,6 +197,8 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 
 	return vector;
 }
+
+
 
 //**************************************************************************
 //  KEYBOARD
@@ -242,6 +253,7 @@ void portfolio_state::scan_keyboard()
 	}
 }
 
+
 //-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
 //-------------------------------------------------
@@ -251,6 +263,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
 	scan_keyboard();
 }
 
+
 //-------------------------------------------------
 //  keyboard_r - keyboard scan code register
 //-------------------------------------------------
@@ -259,6 +272,8 @@ READ8_MEMBER( portfolio_state::keyboard_r )
 {
 	return m_keylatch;
 }
+
+
 
 //**************************************************************************
 //  INTERNAL SPEAKER
@@ -290,6 +305,8 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 	//logerror("SPEAKER %02x\n", data);
 }
 
+
+
 //**************************************************************************
 //  POWER MANAGEMENT
 //**************************************************************************
@@ -317,6 +334,7 @@ WRITE8_MEMBER( portfolio_state::power_w )
 
 	//logerror("POWER %02x\n", data);
 }
+
 
 //-------------------------------------------------
 //  battery_r - battery status
@@ -350,6 +368,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 	return data;
 }
 
+
 //-------------------------------------------------
 //  unknown_w - ?
 //-------------------------------------------------
@@ -358,6 +377,8 @@ WRITE8_MEMBER( portfolio_state::unknown_w )
 {
 	//logerror("UNKNOWN %02x\n", data);
 }
+
+
 
 //**************************************************************************
 //  SYSTEM TIMERS
@@ -372,6 +393,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
 	trigger_interrupt(INT_TICK);
 }
 
+
 //-------------------------------------------------
 //  TIMER_DEVICE_CALLBACK_MEMBER( counter_tick )
 //-------------------------------------------------
@@ -380,6 +402,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
 {
 	m_counter++;
 }
+
 
 //-------------------------------------------------
 //  counter_r - counter register read
@@ -403,6 +426,7 @@ READ8_MEMBER( portfolio_state::counter_r )
 	return data;
 }
 
+
 //-------------------------------------------------
 //  counter_w - counter register write
 //-------------------------------------------------
@@ -420,6 +444,8 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 		break;
 	}
 }
+
+
 
 //**************************************************************************
 //  EXPANSION
@@ -448,6 +474,7 @@ WRITE8_MEMBER( portfolio_state::ncc1_w )
 	//logerror("NCC %02x\n", data);
 }
 
+
 //-------------------------------------------------
 //  pid_r - peripheral identification
 //-------------------------------------------------
@@ -473,6 +500,8 @@ READ8_MEMBER( portfolio_state::pid_r )
 	return m_pid;
 }
 
+
+
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
@@ -488,6 +517,7 @@ static ADDRESS_MAP_START( portfolio_mem, AS_PROGRAM, 8, portfolio_state )
 	AM_RANGE(0xc0000, 0xdffff) AM_ROM AM_REGION(M80C88A_TAG, 0) // or credit card memory
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION(M80C88A_TAG, 0x20000)
 ADDRESS_MAP_END
+
 
 //-------------------------------------------------
 //  ADDRESS_MAP( portfolio_io )
@@ -508,6 +538,8 @@ static ADDRESS_MAP_START( portfolio_io, AS_IO, 8, portfolio_state )
 	AM_RANGE(0x807c, 0x807c) AM_WRITE(ncc1_w)
 	AM_RANGE(0x807f, 0x807f) AM_READWRITE(pid_r, sivr_w)
 ADDRESS_MAP_END
+
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -630,6 +662,8 @@ static INPUT_PORTS_START( portfolio )
 	PORT_CONFSETTING( PID_SERIAL, "Serial Interface (HPC-102)" )
 INPUT_PORTS_END
 
+
+
 //**************************************************************************
 //  VIDEO
 //**************************************************************************
@@ -643,6 +677,7 @@ void portfolio_state::palette_init()
 	palette_set_color(machine(), 0, MAKE_RGB(138, 146, 148));
 	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
+
 
 //-------------------------------------------------
 //  HD61830_INTERFACE( lcdc_intf )
@@ -662,6 +697,7 @@ static HD61830_INTERFACE( lcdc_intf )
 	DEVCB_DRIVER_MEMBER(portfolio_state,hd61830_rd_r)
 };
 
+
 //-------------------------------------------------
 //  gfx_layout charlayout
 //-------------------------------------------------
@@ -677,6 +713,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
+
 //-------------------------------------------------
 //  GFXDECODE( portfolio )
 //-------------------------------------------------
@@ -684,6 +721,8 @@ static const gfx_layout charlayout =
 static GFXDECODE_START( portfolio )
 	GFXDECODE_ENTRY( HD61830_TAG, 0, charlayout, 0, 2 )
 GFXDECODE_END
+
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -703,6 +742,7 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_NULL                                                  // Port C write
 };
 
+
 //-------------------------------------------------
 //  ins8250_interface i8250_intf
 //-------------------------------------------------
@@ -714,13 +754,14 @@ WRITE_LINE_MEMBER( portfolio_state::i8250_intrpt_w )
 
 static const ins8250_interface i8250_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(portfolio_state, i8250_intrpt_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
 
 //-------------------------------------------------
 //  centronics_interface centronics_intf
@@ -732,6 +773,22 @@ static const centronics_interface centronics_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 };
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, cts_w)
+};
+
+
 
 //**************************************************************************
 //  IMAGE LOADING
@@ -745,6 +802,8 @@ DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
 {
 	return IMAGE_INIT_FAIL;
 }
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -788,6 +847,7 @@ void portfolio_state::machine_start()
 	save_item(NAME(m_pid));
 }
 
+
 //-------------------------------------------------
 //  machine_reset
 //-------------------------------------------------
@@ -813,6 +873,8 @@ void portfolio_state::machine_reset()
 		break;
 	}
 }
+
+
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -854,6 +916,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf, XTAL_1_8432MHz) // should be MCFG_INS8250A_ADD
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))
@@ -887,6 +950,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram2")
 MACHINE_CONFIG_END
 
+
+
 //**************************************************************************
 //  ROMS
 //**************************************************************************
@@ -904,6 +969,8 @@ ROM_START( pofo )
 	ROM_REGION( 0x800, HD61830_TAG, 0 )
 	ROM_LOAD( "hd61830 external character generator", 0x000, 0x800, BAD_DUMP CRC(747a1db3) SHA1(a4b29678fdb43791a8ce4c1ec778f3231bb422c5) ) // typed in from manual
 ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

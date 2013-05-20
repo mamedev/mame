@@ -411,11 +411,11 @@ WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, rxrdy_w),
 	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, txrdy_w),
 	DEVCB_NULL,
@@ -606,6 +606,19 @@ static const centronics_interface centronics_intf =
 	DEVCB_NULL                                      // NOT BUSY output
 };
 
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 // Keyboard
 
 WRITE_LINE_MEMBER( tandy2k_state::kbdclk_w )
@@ -707,6 +720,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 
 	// software lists

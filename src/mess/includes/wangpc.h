@@ -14,6 +14,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
@@ -35,6 +36,7 @@
 #define SCN2661_TAG     "scn2661"
 #define UPD765_TAG      "upd765"
 #define CENTRONICS_TAG  "centronics"
+#define RS232_TAG		"rs232"
 
 class wangpc_state : public driver_device
 {

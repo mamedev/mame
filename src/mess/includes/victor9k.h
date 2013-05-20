@@ -3,7 +3,6 @@
 #ifndef __VICTOR9K__
 #define __VICTOR9K__
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
@@ -15,6 +14,7 @@
 #include "machine/mc6852.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/serial.h"
 #include "machine/upd7201.h"
 #include "machine/victor9kb.h"
 #include "sound/hc55516.h"
@@ -36,6 +36,8 @@
 #define M6522_5_TAG     "m6522_5"
 #define M6522_6_TAG     "m6522_6"
 #define CENTRONICS_TAG  "centronics"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
 
 class victor9k_state : public driver_device
 {

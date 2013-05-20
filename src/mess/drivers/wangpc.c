@@ -961,12 +961,12 @@ static MC2661_INTERFACE( epci_intf )
 {
 	0,
 	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1035,6 +1035,20 @@ static const centronics_interface centronics_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, ack_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, busy_w),
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1205,6 +1219,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", 0, wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", 0, wangpc_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_WANGPC_KEYBOARD_ADD()
 
 	// bus

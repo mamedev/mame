@@ -180,12 +180,12 @@ static UPD7201_INTERFACE( mpsc_intf )
 			0,                  // transmit clock
 			DEVCB_NULL,         // receive DRQ
 			DEVCB_NULL,         // transmit DRQ
-			DEVCB_NULL,         // receive data
-			DEVCB_NULL,         // transmit data
-			DEVCB_NULL,         // clear to send
-			DEVCB_NULL,         // data carrier detect
-			DEVCB_NULL,         // ready to send
-			DEVCB_NULL,         // data terminal ready
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 			DEVCB_NULL,         // wait
 			DEVCB_NULL          // sync output
 		}, {
@@ -193,12 +193,12 @@ static UPD7201_INTERFACE( mpsc_intf )
 			0,                  // transmit clock
 			DEVCB_NULL,         // receive DRQ
 			DEVCB_NULL,         // transmit DRQ
-			DEVCB_NULL,         // receive data
-			DEVCB_NULL,         // transmit data
-			DEVCB_NULL,         // clear to send
-			DEVCB_NULL,         // data carrier detect
-			DEVCB_NULL,         // ready to send
-			DEVCB_NULL,         // data terminal ready
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dcd_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
 			DEVCB_NULL,         // wait
 			DEVCB_NULL          // sync output
 		}
@@ -881,6 +881,33 @@ static SLOT_INTERFACE_START( victor9k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 // Machine Initialization
 
 IRQ_CALLBACK_MEMBER(victor9k_state::victor9k_irq_callback)
@@ -942,6 +969,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_VICTOR9K_KEYBOARD_ADD(kb_intf)
 
 	// internal ram

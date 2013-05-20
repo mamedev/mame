@@ -420,17 +420,17 @@ static Z80DART_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -497,11 +497,22 @@ void xerox820_state::fdc_drq_w(bool state)
 
 /* COM8116 Interface */
 
+WRITE_LINE_MEMBER( xerox820_state::fr_w )
+{
+	z80dart_rxca_w(m_sio, state);
+	z80dart_txca_w(m_sio, state);
+}
+
+WRITE_LINE_MEMBER( xerox820_state::ft_w )
+{
+	z80dart_rxtxcb_w(m_sio, state);
+}
+
 static COM8116_INTERFACE( com8116_intf )
 {
 	DEVCB_NULL,     /* fX/4 output */
-	DEVCB_NULL,     /* fR output */
-	DEVCB_NULL,     /* fT output */
+	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, fr_w),
+	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, ft_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
@@ -518,6 +529,34 @@ WRITE8_MEMBER( xerox820_state::kbd_w )
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(xerox820_state, kbd_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Video */
@@ -701,6 +740,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	/* internal ram */
@@ -747,6 +788,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// SASI bus

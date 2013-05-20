@@ -1005,15 +1005,16 @@ WRITE_LINE_MEMBER( pc1512_state::fdc_drq_w )
 	update_fdc_drq();
 }
 
+
 //-------------------------------------------------
 //  ins8250_interface uart_intf
 //-------------------------------------------------
 
 static const ins8250_interface uart_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1077,6 +1078,21 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( ibmpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, rx_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, dsr_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, ri_w),
+	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, cts_w)
+};
+
 
 
 //**************************************************************************
@@ -1245,6 +1261,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
@@ -1290,6 +1307,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)

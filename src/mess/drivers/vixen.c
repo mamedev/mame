@@ -233,11 +233,13 @@ READ8_MEMBER( vixen_state::port3_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	UINT8 data = 0xfc;
 
-	// TODO ring indicator
+	// ring indicator
+	data |= m_rs232->ri_r();
 
-	// TODO data carrier detect
+	// data carrier detect
+	data |= m_rs232->dcd_r() << 1;
 
 	return data;
 }
@@ -670,11 +672,11 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(vixen_state, rxrdy_w),
 	DEVCB_DRIVER_LINE_MEMBER(vixen_state, txrdy_w),
 	DEVCB_NULL,
@@ -707,6 +709,20 @@ void vixen_state::fdc_intrq_w(bool state)
 	m_fdint = state;
 	update_interrupt();
 }
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 
 
@@ -822,6 +838,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")

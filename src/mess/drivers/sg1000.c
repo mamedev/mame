@@ -941,6 +941,23 @@ static I8255_INTERFACE( sf7000_ppi_intf )
 	DEVCB_DRIVER_MEMBER(sf7000_state, ppi_pc_w)                 // Port C write
 };
 
+//-------------------------------------------------
+//  i8251_interface usart_intf
+//-------------------------------------------------
+
+static const i8251_interface usart_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 /*-------------------------------------------------
     upd765_interface sf7000_upd765_interface
 -------------------------------------------------*/
@@ -963,6 +980,19 @@ SLOT_INTERFACE_END
 
 static const sn76496_config psg_intf =
 {
+	DEVCB_NULL
+};
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1042,13 +1072,12 @@ void sc3000_state::machine_start()
 
 void sf7000_state::machine_start()
 {
+	sc3000_state::machine_start();
+
 	/* configure memory banking */
 	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
 	membank("bank2")->configure_entry(0, m_ram->pointer());
-
-	/* register for state saving */
-	save_item(NAME(m_keylatch));
 }
 
 /*-------------------------------------------------
@@ -1184,12 +1213,12 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
-	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
+	MCFG_I8251_ADD(UPD8251_TAG, usart_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", 0, sf7000_state::floppy_formats)
-//  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")

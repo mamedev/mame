@@ -9,6 +9,7 @@
 #include "machine/i8251.h"
 #include "machine/ieee488.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "sound/discrete.h"
 
@@ -19,6 +20,7 @@
 #define P8251A_TAG      "c3"
 #define DISCRETE_TAG    "discrete"
 #define SCREEN_TAG      "screen"
+#define RS232_TAG		"rs232"
 
 class vixen_state : public driver_device
 {
@@ -34,6 +36,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, FDC1797_TAG":0"),
 			m_floppy1(*this, FDC1797_TAG":1"),
+			m_rs232(*this, RS232_TAG),
 			m_rom(*this, Z8400A_TAG),
 			m_sync_rom(*this, "video"),
 			m_char_rom(*this, "chargen"),
@@ -63,6 +66,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
 	required_memory_region m_sync_rom;
 	required_memory_region m_char_rom;

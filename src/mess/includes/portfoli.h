@@ -3,26 +3,27 @@
 #ifndef __PORTFOLIO__
 #define __PORTFOLIO__
 
-
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/cartslot.h"
-#include "machine/ram.h"
 #include "imagedev/printer.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/hd61830.h"
 
-#define SCREEN_TAG      "screen"
 #define M80C88A_TAG     "u1"
 #define M82C55A_TAG     "hpc101_u1"
 #define M82C50A_TAG     "hpc102_u1"
 #define HD61830_TAG     "hd61830"
 #define CENTRONICS_TAG  "centronics"
 #define TIMER_TICK_TAG  "tick"
+#define SCREEN_TAG      "screen"
+#define RS232_TAG      "rs232"
 
 class portfolio_state : public driver_device
 {
