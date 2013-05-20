@@ -202,8 +202,8 @@ public:
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")  // bg attr
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram") // bg
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB") AM_WRITE(stuntair_coin_w)
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_f001_w)  // might be nmi enable
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4") AM_WRITE(stuntair_spritebank1_w)
+	AM_RANGE(0xf003, 0xf003) AM_READNOP AM_WRITE(stuntair_spritebank1_w)
 //  AM_RANGE(0xf004, 0xf004) AM_WRITENOP
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w)
 //  AM_RANGE(0xf006, 0xf006) AM_WRITENOP
@@ -309,33 +309,6 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPNAME( 0x80, 0x80, "IN3:7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4:0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN4:1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN4:2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN4:3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN4:4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN4:5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN4:6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN4:7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
