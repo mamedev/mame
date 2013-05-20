@@ -156,8 +156,13 @@ public:
 
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w)
 	{
-		// lower 2 bits are coin counters
-		if (data&~0x3) printf("stuntair_coin_w %02x\n", data);
+		// lower 2 bits are coin counters, excluding 1st coin(?)
+		coin_counter_w(machine(), 0, data >> 0 & 1);
+		coin_counter_w(machine(), 1, data >> 1 & 1);
+		
+		// other bits: unknown
+		if (data & 0xfc)
+			logerror("stuntair_coin_w %02x\n", data);
 	}
 
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w)
@@ -175,16 +180,16 @@ public:
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 
-	DECLARE_READ8_MEMBER(ay8910_in0_r)
+	DECLARE_READ8_MEMBER(ay8910_soundlatch_r)
 	{
 		return m_soundlatch;
 	}
 
-	DECLARE_READ8_MEMBER(ay8910_in1_r)
+	DECLARE_WRITE8_MEMBER(ay8910_portb_w)
 	{
-		printf("ay8910_in1_r\n");
-		return 0x00;//m_soundlatch;
-
+		// it writes $e8 and $f0 for music drums
+		// possibly to discrete sound circuitry?
+		logerror("ay8910_portb_w: %02x\n", data);
 	}
 
 	virtual void machine_start();
@@ -499,10 +504,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_in0_r),
-	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_in1_r),
+	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_soundlatch_r),
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_portb_w)
 };
 
 
@@ -547,11 +552,11 @@ PALETTE_INIT( stuntair )
 static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/4)         /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  stuntair_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/4)         /* ? MHz */
+	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, stuntair_sound_irq, 60*8) // guessed, probably wrong ?? drives music tempo..
