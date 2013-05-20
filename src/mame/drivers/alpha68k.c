@@ -2747,17 +2747,11 @@ ROM_START( skysoldr )
 	ROM_LOAD( "ss.17",          0x1a0000, 0x20000, CRC(a7f524e0) SHA1(97e3e637d754a8c8c25c9b8bf8f67b1f8776e460) )
 	ROM_LOAD( "ss.21",          0x1c0000, 0x20000, CRC(cb7bf5fe) SHA1(8ded0be6b7d3ac4478234df9e72e6cad95f36d21) )
 	ROM_LOAD( "ss.25",          0x1e0000, 0x20000, CRC(65138016) SHA1(871b0ba39710b1094519cd808339e80ea366a016) )
-
-	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* Reload the code here for upper bank */
-	ROM_LOAD16_BYTE( "ss.3",      0x00000, 0x10000, CRC(7b88aa2e) SHA1(17ed682fb67e8fa05a1309e87ac29c09adcd7474) )
-	ROM_CONTINUE   ( 0x40000,     0x10000 )
-	ROM_LOAD16_BYTE( "ss.4",      0x00001, 0x10000, CRC(f0283d43) SHA1(bfbc7235c9ff52b9ab269247e9c4a9d574ba25e2) )
-	ROM_CONTINUE   ( 0x40001,     0x10000 )
-	ROM_LOAD16_BYTE( "ss.1",      0x20000, 0x10000, CRC(20e9dbc7) SHA1(632e5c7348a88620b85f968501a33609cc993972) )
-	ROM_CONTINUE   ( 0x60000,     0x10000 )
-	ROM_LOAD16_BYTE( "ss.2",      0x20001, 0x10000, CRC(486f3432) SHA1(56b6c74031001bccb98e73f228e697556e8111d4) )
-	ROM_CONTINUE   ( 0x60001,     0x10000 )
 ROM_END
+
+
+
+
 
 ROM_START( goldmedl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -3210,7 +3204,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,btlfieldb)
 
 DRIVER_INIT_MEMBER(alpha68k_state,skysoldr)
 {
-	membank("bank8")->set_base((memregion("user1")->base()) + 0x40000);
+	membank("bank8")->set_base((memregion("maincpu")->base()) + 0x40000);
 	m_invert_controls = 0;
 	m_microcontroller_id = 0;
 	m_coin_id = 0x22 | (0x22 << 8);
