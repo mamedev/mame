@@ -239,9 +239,9 @@ public:
 	DECLARE_READ8_MEMBER( iga_r );
 	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_READ8_MEMBER( io_unmapped_r );
 
 	required_ioport m_sw;
+
 
 	// video state
 	int m_opt;
@@ -255,8 +255,6 @@ public:
 	UINT8 m_crtcar;         // CRT controller address register
 	UINT8 m_crtcdr[32];     // CRT controller data registers
 	UINT8 m_plr;            // Plantronics mode register
-
-	bool test_unmapped;     // Temporary for io_r/unmapped_r combination
 };
 
 // ---------- defined in video/pc1512.c ----------

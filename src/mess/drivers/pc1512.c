@@ -466,20 +466,25 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::io_unmapped_r )
-{
-	test_unmapped = true;
-	return 0xff;
-}
-
-
 READ8_MEMBER( pc1640_state::io_r )
 {
-	test_unmapped = false;
+	UINT8 data = 0;
+	offs_t addr = offset & 0x3ff;
+	bool decoded = false;
 
-	UINT8 data = space.read_byte(offset + 0x10000);
+	if		(                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
+	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
+	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x3b0 && addr <= 0x3df) { data = iga_r(space, addr - 0x3b0); decoded = true; }
+	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
 
-	if (!test_unmapped)
+	if (decoded)
 	{
 		if (BIT(offset, 7))
 		{
@@ -489,7 +494,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = m_sw->read();
+		UINT16 sw = ioport("SW")->read();
 
 		if (!BIT(offset, 14))
 		{
@@ -566,19 +571,19 @@ static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 
 	// Mirrored over to 10000 for indirect reads through io_r
 
-	AM_RANGE(0x000, 0x00f) AM_MIRROR(0x10000) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
-	AM_RANGE(0x020, 0x021) AM_MIRROR(0x10000) AM_DEVWRITE8(I8259A2_TAG, pic8259_device, write, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_MIRROR(0x10000) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
-	AM_RANGE(0x060, 0x06f) AM_MIRROR(0x10000) AM_WRITE8(system_w, 0xffff)
-	AM_RANGE(0x070, 0x071) AM_MIRROR(0x10000) AM_MIRROR(0x02) AM_DEVWRITE8(MC146818_TAG, mc146818_device, write, 0xffff)
-	AM_RANGE(0x078, 0x07f) AM_MIRROR(0x10000) AM_WRITE8(mouse_w, 0xffff)
-	AM_RANGE(0x080, 0x083) AM_MIRROR(0x10000) AM_WRITE8(dma_page_w, 0xffff)
-	AM_RANGE(0x0a0, 0x0a1) AM_MIRROR(0x10000) AM_WRITE8(nmi_mask_w, 0xff00)
-	AM_RANGE(0x378, 0x37b) AM_MIRROR(0x10000) AM_WRITE8(printer_w, 0xffff)
-	AM_RANGE(0x3b0, 0x3df) AM_MIRROR(0x10000) AM_WRITE8(iga_w, 0xffff)
-	AM_RANGE(0x3f0, 0x3f7) AM_MIRROR(0x10000) AM_DEVICE8(PC_FDC_XT_TAG, pc_fdc_xt_device, map, 0xffff)
-	AM_RANGE(0x3f8, 0x3ff) AM_MIRROR(0x10000) AM_DEVWRITE8(INS8250_TAG, ins8250_device, ins8250_w, 0xffff)
-	AM_RANGE(0x10000, 0x1ffff) AM_READ8(io_unmapped_r, 0xffff)
+	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
+	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(I8259A2_TAG, pic8259_device, write, 0xffff)
+	AM_RANGE(0x040, 0x043) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
+	AM_RANGE(0x060, 0x06f) AM_WRITE8(system_w, 0xffff)
+	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVWRITE8(MC146818_TAG, mc146818_device, write, 0xffff)
+	AM_RANGE(0x078, 0x07f) AM_WRITE8(mouse_w, 0xffff)
+	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
+	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
+	AM_RANGE(0x378, 0x37b) AM_WRITE8(printer_w, 0xffff)
+	AM_RANGE(0x3b0, 0x3df) AM_WRITE8(iga_w, 0xffff)
+	AM_RANGE(0x3f2, 0x3f3) AM_DEVWRITE8(PC_FDC_XT_TAG, pc_fdc_xt_device, dor_w, 0x00ff)
+	AM_RANGE(0x3f4, 0x3f5) AM_DEVWRITE8(PC_FDC_XT_TAG ":upd765", upd765_family_device, fifo_w, 0xff00)
+	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8(INS8250_TAG, ins8250_device, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
@@ -1189,6 +1194,8 @@ void pc1640_state::machine_start()
 {
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
+	m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_int_w), this));
+	m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_drq_w), this));
 
 	// state saving
 	save_item(NAME(m_pit1));
