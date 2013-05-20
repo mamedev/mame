@@ -25,7 +25,7 @@
 // ======================> s100_mds_a_device
 
 class s100_mds_a_device : public device_t,
-						  public device_s100_card_interface
+							public device_s100_card_interface
 {
 public:
 	// construction/destruction

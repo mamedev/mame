@@ -1,8 +1,8 @@
 /*
 
-	RCA COSMAC Microkit
+    RCA COSMAC Microkit
 
-	http://www.vintagecomputer.net/browse_thread.cfm?id=511
+    http://www.vintagecomputer.net/browse_thread.cfm?id=511
 
 */
 

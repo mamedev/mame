@@ -11,7 +11,7 @@ sea b b_1 *.prg are 2650 progamm
 
 sea b blu.prg is blue data?
 sea b red.prg is red data?
-sea b green.prg is green data?	for video?
+sea b green.prg is green data?  for video?
 
 sea b wawe.prg is sea wave data?
 
@@ -21,56 +21,56 @@ sea b screen.prg ???
 the sound board should be fully discrete.
 
 
-DS0		1	2	3
-PLAY TIME	ON	ON	ON	free game
-		ON	OFF	ON	75 seconds
-		OFF 	OFF	ON	90 seconds
-		OFF	ON	ON	105 seconds
+DS0     1   2   3
+PLAY TIME   ON  ON  ON  free game
+        ON  OFF ON  75 seconds
+        OFF     OFF ON  90 seconds
+        OFF ON  ON  105 seconds
 
-SHIP NUMBER	ON	ON	OFF	free game
-		ON	OFF	OFF	3 ships
-		OFF	OFF	OFF	4 ships
-		OFF	ON	OFF	5 ships
-	I don't forget anything, this is a copy of the manual
-	DS0-3	seem to select from time based games to ships based game.
-
-
-			
-DS0		4	5	6
-COIN SLOT 2	ON	ON	ON	2 coin 1 play
-		ON	OFF	ON	1 coin 1 play
-		ON	ON	OFF	1 coin 2 plays
-		ON	OFF	OFF	1 coin 3 plays
-		OFF	ON	ON	1 coin 4 plays	
-		OFF	OFF	ON	1 coin 5 plays
-		OFF	ON	OFF	1 coin 6 plays
-		OFF	OFF	OFF	1 coin 7 plays
+SHIP NUMBER ON  ON  OFF free game
+        ON  OFF OFF 3 ships
+        OFF OFF OFF 4 ships
+        OFF ON  OFF 5 ships
+    I don't forget anything, this is a copy of the manual
+    DS0-3   seem to select from time based games to ships based game.
 
 
-DS0		7	8	DS1-1
-COIN SLOT 1	ON	ON	ON	2 coin 1 play
-		ON	OFF	ON	1 coin 1 play
-		ON	ON	OFF	1 coin 2 plays
-		ON	OFF	OFF	1 coin 3 plays
-		OFF	ON	ON	1 coin 4 plays	
-		OFF	OFF	ON	1 coin 5 plays
-		OFF	ON	OFF	1 coin 6 plays
-		OFF	OFF	OFF	1 coin 7 plays
 
-DS1		2
-SHIP SPEED	ON	fast
-		OFF	slow
+DS0     4   5   6
+COIN SLOT 2 ON  ON  ON  2 coin 1 play
+        ON  OFF ON  1 coin 1 play
+        ON  ON  OFF 1 coin 2 plays
+        ON  OFF OFF 1 coin 3 plays
+        OFF ON  ON  1 coin 4 plays
+        OFF OFF ON  1 coin 5 plays
+        OFF ON  OFF 1 coin 6 plays
+        OFF OFF OFF 1 coin 7 plays
 
 
-DS1		3	4
-EXTEND PLAY	OFF	OFF	no extended
-		ON	OFF	2000 points
-		OFF	ON	3000 points
-		ON	ON	4000 points
+DS0     7   8   DS1-1
+COIN SLOT 1 ON  ON  ON  2 coin 1 play
+        ON  OFF ON  1 coin 1 play
+        ON  ON  OFF 1 coin 2 plays
+        ON  OFF OFF 1 coin 3 plays
+        OFF ON  ON  1 coin 4 plays
+        OFF OFF ON  1 coin 5 plays
+        OFF ON  OFF 1 coin 6 plays
+        OFF OFF OFF 1 coin 7 plays
 
-DS1		5
-GRID		ON	game
-		OFF	grid
+DS1     2
+SHIP SPEED  ON  fast
+        OFF slow
+
+
+DS1     3   4
+EXTEND PLAY OFF OFF no extended
+        ON  OFF 2000 points
+        OFF ON  3000 points
+        ON  ON  4000 points
+
+DS1     5
+GRID        ON  game
+        OFF grid
 
 DS1 6-7-8 not used
 
@@ -106,7 +106,6 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 
 void seabattl_state::video_start()
 {
-
 }
 
 static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
@@ -121,12 +120,10 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
-
 }
 
 void seabattl_state::machine_reset()
 {
-
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -164,8 +161,8 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318180/4) // ???
 	MCFG_CPU_PROGRAM_MAP(seabattl_map)
-//	MCFG_CPU_IO_MAP(seabattl_io_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state,  seabattl_interrupt)
+//  MCFG_CPU_IO_MAP(seabattl_io_map)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state,  seabattl_interrupt)
 
 	MCFG_PALETTE_LENGTH(256)
 

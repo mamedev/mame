@@ -6,9 +6,9 @@
 
         29/06/2012 Skeleton driver.
 
-	A serial (RS232 or current loop) green-screen terminal, mostly VT52 compatible
-	(no Hold Screen mode and no graphics character set, but has Cyrillic characters).
-	The top line is a status line.
+    A serial (RS232 or current loop) green-screen terminal, mostly VT52 compatible
+    (no Hold Screen mode and no graphics character set, but has Cyrillic characters).
+    The top line is a status line.
 
 ****************************************************************************/
 
@@ -18,19 +18,19 @@
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 
-#define SCREEN_PAGE	(80*48)
+#define SCREEN_PAGE (80*48)
 
-#define	IE_1		0x80
-#define IE_KB_ACK	1
+#define IE_1        0x80
+#define IE_KB_ACK   1
 
-#define IE15_TOTAL_HORZ	1000
-#define IE15_TOTAL_VERT	28*11
+#define IE15_TOTAL_HORZ 1000
+#define IE15_TOTAL_VERT 28*11
 
-#define IE15_DISP_HORZ	800
-#define IE15_DISP_VERT	25*11
+#define IE15_DISP_HORZ  800
+#define IE15_DISP_VERT  25*11
 
-#define IE15_HORZ_START	100
-#define IE15_VERT_START	2*11
+#define IE15_HORZ_START 100
+#define IE15_VERT_START 2*11
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -50,7 +50,7 @@
 #define LOOPBACK (0)
 #endif
 
-#define BITBANGER_TAG	"bitbanger"
+#define BITBANGER_TAG   "bitbanger"
 
 class ie15_state : public driver_device
 {
@@ -296,9 +296,9 @@ READ8_MEMBER( ie15_state::serial_r ) {
 }
 
 /*
-	m_serial_rx_buffer	incoming bits.
-	m_serial_rx_bits	number of bits in _buffer.
-	m_serial_rx_data	complete byte, ready to be read by host, or 0 if no data.
+    m_serial_rx_buffer  incoming bits.
+    m_serial_rx_bits    number of bits in _buffer.
+    m_serial_rx_data    complete byte, ready to be read by host, or 0 if no data.
 */
 
 WRITE_LINE_MEMBER( ie15_state::serial_rx_callback )
@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER( ie15_state::serial_rx_callback )
 			// overflow
 			break;
 	}
-	DBG_LOG(2,"serial",("r %d bits %02d->%02d buffer %02X data %02X\n", 
+	DBG_LOG(2,"serial",("r %d bits %02d->%02d buffer %02X data %02X\n",
 		state, tmp, m_serial_rx_bits, m_serial_rx_buffer, m_serial_rx_data));
 }
 
@@ -380,13 +380,13 @@ READ8_MEMBER( ie15_state::flag_r ) {
 
 	switch (offset)
 	{
-		case 0:	// hsync pulse (not hblank)
+		case 0: // hsync pulse (not hblank)
 			ret = machine().primary_screen->hpos() < IE15_HORZ_START;
 			break;
-		case 1:	// marker scanline
+		case 1: // marker scanline
 			ret = (machine().primary_screen->vpos() % 11) > 7;
 			break;
-		case 2:	// vblank
+		case 2: // vblank
 			ret = !machine().primary_screen->vblank();
 			break;
 		case 4:
@@ -436,22 +436,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ie15_io, AS_IO, 8, ie15_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(000, 000) AM_READ(mem_r) AM_WRITE(mem_w)	// 00h W: memory request, R: memory data [6.1.2.2]
-	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP	// 01h W: memory latch [6.1.2.2]
-	AM_RANGE(002, 002) AM_WRITE(mem_addr_hi_w)		// 02h W: memory address high [6.1.2.2]
-	AM_RANGE(003, 003) AM_WRITE(mem_addr_lo_w)		// 03h W: memory address low [6.1.2.2]
-	AM_RANGE(004, 004) AM_WRITE(mem_addr_inc_w)		// 04h W: memory address counter + [6.1.2.2]
-	AM_RANGE(005, 005) AM_WRITE(mem_addr_dec_w)		// 05h W: memory address counter - [6.1.2.2]
-	AM_RANGE(006, 006) AM_READ(serial_r) AM_WRITE(serial_w)		// 06h W: serial port data [6.1.5.4]
+	AM_RANGE(000, 000) AM_READ(mem_r) AM_WRITE(mem_w)   // 00h W: memory request, R: memory data [6.1.2.2]
+	AM_RANGE(001, 001) AM_READ(serial_rx_ready_r) AM_WRITENOP   // 01h W: memory latch [6.1.2.2]
+	AM_RANGE(002, 002) AM_WRITE(mem_addr_hi_w)      // 02h W: memory address high [6.1.2.2]
+	AM_RANGE(003, 003) AM_WRITE(mem_addr_lo_w)      // 03h W: memory address low [6.1.2.2]
+	AM_RANGE(004, 004) AM_WRITE(mem_addr_inc_w)     // 04h W: memory address counter + [6.1.2.2]
+	AM_RANGE(005, 005) AM_WRITE(mem_addr_dec_w)     // 05h W: memory address counter - [6.1.2.2]
+	AM_RANGE(006, 006) AM_READ(serial_r) AM_WRITE(serial_w)     // 06h W: serial port data [6.1.5.4]
 // port 7 is handled in cpu core
-	AM_RANGE(010, 010) AM_READ(serial_tx_ready_r) AM_WRITE(beep_w)	// 08h W: speaker control [6.1.5.4]
-	AM_RANGE(011, 011) AM_READ(kb_r)			// 09h R: keyboard data [6.1.5.2]
-	AM_RANGE(012, 012) AM_READ(kb_s_red_r)			// 0Ah I: keyboard mode "RED" [6.1.5.2]
-	AM_RANGE(013, 013) AM_READ(kb_ready_r)			// 0Bh R: keyboard data ready [6.1.5.2]
-	AM_RANGE(014, 014) AM_READ(kb_s_sdv_r) AM_WRITENOP	// 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
-	AM_RANGE(015, 015) AM_READ(kb_s_dk_r) AM_WRITE(kb_ready_w)	// 0Dh I: keyboard mode "DK" [6.1.5.2]
-	AM_RANGE(016, 016) AM_READ(kb_s_dupl_r)			// 0Eh I: keyboard mode "DUPL" [6.1.5.2]
-	AM_RANGE(017, 017) AM_READ(kb_s_lin_r)			// 0Fh I: keyboard mode "LIN" [6.1.5.2]
+	AM_RANGE(010, 010) AM_READ(serial_tx_ready_r) AM_WRITE(beep_w)  // 08h W: speaker control [6.1.5.4]
+	AM_RANGE(011, 011) AM_READ(kb_r)            // 09h R: keyboard data [6.1.5.2]
+	AM_RANGE(012, 012) AM_READ(kb_s_red_r)          // 0Ah I: keyboard mode "RED" [6.1.5.2]
+	AM_RANGE(013, 013) AM_READ(kb_ready_r)          // 0Bh R: keyboard data ready [6.1.5.2]
+	AM_RANGE(014, 014) AM_READ(kb_s_sdv_r) AM_WRITENOP  // 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
+	AM_RANGE(015, 015) AM_READ(kb_s_dk_r) AM_WRITE(kb_ready_w)  // 0Dh I: keyboard mode "DK" [6.1.5.2]
+	AM_RANGE(016, 016) AM_READ(kb_s_dupl_r)         // 0Eh I: keyboard mode "DUPL" [6.1.5.2]
+	AM_RANGE(017, 017) AM_READ(kb_s_lin_r)          // 0Fh I: keyboard mode "LIN" [6.1.5.2]
 // simulation of flag registers
 	AM_RANGE(020, 027) AM_READ(flag_r) AM_WRITE(flag_w)
 ADDRESS_MAP_END
@@ -531,12 +531,12 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline, UINT8
 			gfx = m_p_chargen[chr | ra];
 
 			/*
-				Cursor is a character with only 3 scan lines, and is
-				not shown if flag 1 is not active on this scan line.
-				It always blinks if shown.
+			    Cursor is a character with only 3 scan lines, and is
+			    not shown if flag 1 is not active on this scan line.
+			    It always blinks if shown.
 
-				Control characters blink if RED mode is on and they
-				are not on status line; else they are blanked out.  
+			    Control characters blink if RED mode is on and they
+			    are not on status line; else they are blanked out.
 			*/
 
 			if (scanline > 7 && (!m_cursor || blink))
@@ -577,8 +577,8 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline, UINT8
 TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 {
 	UINT16 y = machine().primary_screen->vpos();
-//	DBG_LOG(2,"scanline",
-//		("addr %03x frame %lld x %04d y %03d\n", m_videoptr_2, machine().primary_screen->frame_number(), machine().primary_screen->hpos(), y));
+//  DBG_LOG(2,"scanline",
+//      ("addr %03x frame %lld x %04d y %03d\n", m_videoptr_2, machine().primary_screen->frame_number(), machine().primary_screen->hpos(), y));
 	if (y>=IE15_VERT_START) {
 		y -= IE15_VERT_START;
 		if (y < IE15_DISP_VERT) {
@@ -597,15 +597,15 @@ UINT32 ie15_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 /* F4 Character Displayer */
 static const gfx_layout ie15_charlayout =
 {
-	7, 8,					/* 7x8 pixels in 10x11 cell */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
+	7, 8,                   /* 7x8 pixels in 10x11 cell */
+	256,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
 	/* x offsets */
 	{ 0, 1, 2, 3, 4, 5, 6 },
 	/* y offsets */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
+	8*8                 /* every char takes 8 bytes */
 };
 
 static GFXDECODE_START( ie15 )

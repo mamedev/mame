@@ -274,18 +274,18 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 	UINT32 size;
 	UINT8 *temp_copy;
 	const struct aim_cart_range *aim_cart = &aim_cart_table[0], *this_cart;
-	
+
 	/* First, determine where this cart has to be loaded */
 	while (aim_cart->tag)
 	{
 		if (strcmp(aim_cart->tag, image.device().tag()) == 0)
 			break;
-		
+
 		aim_cart++;
 	}
-	
+
 	this_cart = aim_cart;
-	
+
 	if (!this_cart->tag)
 	{
 		astring errmsg;
@@ -293,19 +293,19 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
 		return IMAGE_INIT_FAIL;
 	}
-	
+
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
 		temp_copy = auto_alloc_array(machine(), UINT8, size);
-		
+
 		if (size > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		if (image.fread(temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
@@ -318,8 +318,8 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		if (image.get_software_region(this_cart->tag + 1) == NULL)
 		{
 			astring errmsg;
-			errmsg.printf("Attempted to load file with wrong extension\nCartslot '%s' only accepts files with '.%s' extension", 
-						  this_cart->tag, this_cart->tag + 1);
+			errmsg.printf("Attempted to load file with wrong extension\nCartslot '%s' only accepts files with '.%s' extension",
+							this_cart->tag, this_cart->tag + 1);
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
 			return IMAGE_INIT_FAIL;
 		}
@@ -330,9 +330,9 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 	}
 
 	memcpy(memregion("maincpu")->base() + this_cart->offset, temp_copy, size);
-	
+
 	auto_free(machine(), temp_copy);
-	
+
 	return IMAGE_INIT_PASS;
 }
 

@@ -54,10 +54,10 @@ public:
 	DebuggerMemView(const debug_view_type& type,
 					running_machine* machine,
 					QWidget* parent=NULL)
-		: DebuggerView(type, machine, parent) 
+		: DebuggerView(type, machine, parent)
 	{}
 	virtual ~DebuggerMemView() {}
-    
+
 protected:
 	void mousePressEvent(QMouseEvent* event);
 };
@@ -79,13 +79,13 @@ public:
 	}
 
 	~MemoryWindowQtConfig() {}
-	
+
 	// Settings
 	int m_reverse;
 	int m_addressMode;
 	int m_chunkSize;
 	int m_memoryRegion;
-	
+
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
 	void addToXmlDataNode(xml_data_node* node) const;

@@ -893,4 +893,3 @@ k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_
 	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock)
 {
 }
-

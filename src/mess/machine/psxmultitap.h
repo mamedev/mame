@@ -5,7 +5,7 @@
 
 SLOT_INTERFACE_EXTERN(psx_controllers_nomulti);
 
-class psx_multitap_device :	public device_t,
+class psx_multitap_device : public device_t,
 							public device_psx_controller_interface
 {
 public:

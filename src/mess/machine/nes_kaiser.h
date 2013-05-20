@@ -154,15 +154,15 @@ class nes_ks7031_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
+
 	virtual void pcb_reset();
-	
+
 private:
 	UINT8 m_reg[4];
 };

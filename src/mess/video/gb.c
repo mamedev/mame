@@ -1204,14 +1204,14 @@ void gb_state::save_gb_video()
 	save_item(NAME(m_lcd.window_lines_drawn));
 	save_item(NAME(m_lcd.gb_vid_regs));
 	save_item(NAME(m_lcd.bg_zbuf));
-	
+
 	save_item(NAME(m_lcd.cgb_bpal));
 	save_item(NAME(m_lcd.cgb_spal));
-	
+
 	save_item(NAME(m_lcd.gb_bpal));
 	save_item(NAME(m_lcd.gb_spal0));
 	save_item(NAME(m_lcd.gb_spal1));
-	
+
 	save_item(NAME(m_lcd.current_line));
 	save_item(NAME(m_lcd.cmp_line));
 	save_item(NAME(m_lcd.sprCount));
@@ -1244,7 +1244,7 @@ void gb_state::save_gb_video()
 	save_item(NAME(m_lcd.gbc_chrgen_offs));
 	save_item(NAME(m_lcd.gbc_bgdtab_offs));
 	save_item(NAME(m_lcd.gbc_wndtab_offs));
-	
+
 	save_item(NAME(m_lcd.layer[0].enabled));
 	save_item(NAME(m_lcd.layer[0].xindex));
 	save_item(NAME(m_lcd.layer[0].xshift));
@@ -1269,8 +1269,8 @@ void gb_state::gb_video_start( int mode )
 
 	save_pointer(NAME(m_lcd.gb_vram), vram_size);
 	save_pointer(NAME(m_lcd.gb_oam), 0x100);
-	save_gb_video();	
-	
+	save_gb_video();
+
 	if (mode == GB_VIDEO_CGB)
 	{
 		m_lcd.lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gbc_lcd_timer_proc),this));
@@ -1281,11 +1281,11 @@ void gb_state::gb_video_start( int mode )
 		m_lcd.lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_lcd_timer_proc),this));
 		machine().save().register_postload(save_prepost_delegate(FUNC(gb_state::gb_videoptr_restore), this));
 	}
-	
+
 	switch (mode)
 	{
 		case GB_VIDEO_DMG:
-			memcpy(m_lcd.gb_oam, dmg_oam_fingerprint, 0x100);			
+			memcpy(m_lcd.gb_oam, dmg_oam_fingerprint, 0x100);
 			break;
 		case GB_VIDEO_MGB:
 			/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
@@ -1298,7 +1298,7 @@ void gb_state::gb_video_start( int mode )
 			memcpy(m_lcd.gb_oam, mgb_oam_fingerprint, 0x100);
 			break;
 		case GB_VIDEO_SGB:
-			break;			
+			break;
 		case GB_VIDEO_CGB:
 			memcpy(m_lcd.gb_oam, cgb_oam_fingerprint, 0x100);
 			break;
@@ -1317,7 +1317,7 @@ void gb_state::gb_video_reset( int mode )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_lcd.window_lines_drawn = 0;
-	
+
 	m_lcd.current_line = 0;
 	m_lcd.cmp_line = 0;
 	m_lcd.sprCount = 0;
@@ -1340,11 +1340,11 @@ void gb_state::gb_video_reset( int mode )
 	m_lcd.gbc_mode = 0;
 	m_lcd.gb_tile_no_mod = 0;
 	m_lcd.gb_vram_bank = 0;
-	
+
 	m_lcd.gb_chrgen_offs = 0;
 	m_lcd.gb_bgdtab_offs = 0x1c00;
 	m_lcd.gb_wndtab_offs = 0x1c00;
-	
+
 	memset(&m_lcd.gb_vid_regs, 0, sizeof(m_lcd.gb_vid_regs));
 	memset(&m_lcd.bg_zbuf, 0, sizeof(m_lcd.bg_zbuf));
 	memset(&m_lcd.cgb_bpal, 0, sizeof(m_lcd.cgb_bpal));

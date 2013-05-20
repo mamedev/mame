@@ -53,7 +53,7 @@ lua_engine* lua_engine::luaThis = NULL;
 //  emu_gamename - returns game full name
 //-------------------------------------------------
 
-int lua_engine::emu_gamename(lua_State *L) 
+int lua_engine::emu_gamename(lua_State *L)
 {
 	lua_pushstring(L, luaThis->machine().system().description);
 	return 1;
@@ -63,7 +63,7 @@ int lua_engine::emu_gamename(lua_State *L)
 //  emu_keypost - post keys to natural keyboard
 //-------------------------------------------------
 
-int lua_engine::emu_keypost(lua_State *L) 
+int lua_engine::emu_keypost(lua_State *L)
 {
 	const char *keys = luaL_checkstring(L,1);
 	luaThis->machine().ioport().natkeyboard().post_utf8(keys);
@@ -72,9 +72,9 @@ int lua_engine::emu_keypost(lua_State *L)
 
 static const struct luaL_Reg emu_funcs [] =
 {
-  { "gamename", lua_engine::emu_gamename },
-  { "keypost", lua_engine::emu_keypost },
-  { NULL, NULL }  /* sentinel */
+	{ "gamename", lua_engine::emu_gamename },
+	{ "keypost", lua_engine::emu_keypost },
+	{ NULL, NULL }  /* sentinel */
 };
 
 //-------------------------------------------------
@@ -83,8 +83,8 @@ static const struct luaL_Reg emu_funcs [] =
 
 int luaopen_emu ( lua_State * L )
 {
-  luaL_newlib(L, emu_funcs);
-  return 1;
+	luaL_newlib(L, emu_funcs);
+	return 1;
 }
 
 //-------------------------------------------------
@@ -94,7 +94,7 @@ int luaopen_emu ( lua_State * L )
 
 void hook(lua_State* l, lua_Debug* ar)
 {
-    lua_yield(l, 0);
+	lua_yield(l, 0);
 }
 
 //-------------------------------------------------
@@ -133,9 +133,9 @@ void lua_engine::initialize()
 void lua_engine::close()
 {
 	if (m_lua_state) {
-		// close the Lua state    
+		// close the Lua state
 		lua_close(m_lua_state);
-		mame_printf_verbose("[LUA] End executing script\n");		
+		mame_printf_verbose("[LUA] End executing script\n");
 		m_lua_state = NULL;
 	}
 }
@@ -146,12 +146,12 @@ void lua_engine::close()
 
 void lua_engine::report_errors(int status)
 {
-  if ( status!=0 ) {
-    mame_printf_error("[LUA ERROR] %s\n",lua_tostring(m_lua_state, -1));
-    lua_pop(m_lua_state, 1); // remove error message
-	
+	if ( status!=0 ) {
+	mame_printf_error("[LUA ERROR] %s\n",lua_tostring(m_lua_state, -1));
+	lua_pop(m_lua_state, 1); // remove error message
+
 	close(); // close in case of error
-  }
+	}
 }
 
 //-------------------------------------------------
@@ -161,12 +161,12 @@ void lua_engine::report_errors(int status)
 void lua_engine::createvm()
 {
 	close();
-	
-	// create new Lua state    
-	m_lua_state = luaL_newstate();    	
+
+	// create new Lua state
+	m_lua_state = luaL_newstate();
 	luaL_openlibs(m_lua_state);
-	luaL_requiref(m_lua_state, "emu", luaopen_emu, 1);	
-	lua_sethook(m_lua_state, hook, LUA_MASKLINE, 0);		
+	luaL_requiref(m_lua_state, "emu", luaopen_emu, 1);
+	lua_sethook(m_lua_state, hook, LUA_MASKLINE, 0);
 }
 
 //-------------------------------------------------
@@ -175,9 +175,9 @@ void lua_engine::createvm()
 
 void lua_engine::execute(const char *filename)
 {
-	createvm();	
-	
-	int s = luaL_loadfile(m_lua_state, filename);     	
+	createvm();
+
+	int s = luaL_loadfile(m_lua_state, filename);
 	report_errors(s);
 
 	mame_printf_verbose("[LUA] Start executing script\n");
@@ -189,9 +189,9 @@ void lua_engine::execute(const char *filename)
 
 void lua_engine::execute_string(const char *value)
 {
-	createvm();	
-	
-	int s = luaL_loadstring(m_lua_state, value);     	
+	createvm();
+
+	int s = luaL_loadstring(m_lua_state, value);
 	report_errors(s);
 
 	mame_printf_verbose("[LUA] Start executing script\n");
@@ -204,11 +204,11 @@ void lua_engine::execute_string(const char *value)
 void lua_engine::lua_execute()
 {
 	if (m_lua_state==NULL) return;
-	
+
 	int s = lua_resume(m_lua_state, m_lua_state, 0);
-	
+
 	if (s != LUA_YIELD) {
-		report_errors(s);	
+		report_errors(s);
 		close();
 	}
 }

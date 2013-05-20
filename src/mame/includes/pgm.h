@@ -373,14 +373,14 @@ public:
 
 	UINT32 m_kb_game_id;
 
-	UINT16	      m_kb_prot_hold;
-	UINT16	      m_kb_prot_hilo;
-	UINT16	      m_kb_prot_hilo_select;
+	UINT16        m_kb_prot_hold;
+	UINT16        m_kb_prot_hilo;
+	UINT16        m_kb_prot_hilo_select;
 
 	int           m_kb_cmd;
 	int           m_kb_reg;
 	int           m_kb_ptr;
-	UINT8	      m_kb_swap;
+	UINT8         m_kb_swap;
 	UINT32        m_kb_regs[0x10];
 
 	required_shared_ptr<UINT16> m_sharedprotram;
@@ -415,9 +415,9 @@ public:
 	int           m_olds_ptr;
 	UINT16        m_olds_bs;
 	UINT16        m_olds_cmd3;
-	UINT16	      m_olds_prot_hold;
-	UINT16	      m_olds_prot_hilo;
-	UINT16	      m_olds_prot_hilo_select;
+	UINT16        m_olds_prot_hold;
+	UINT16        m_olds_prot_hilo;
+	UINT16        m_olds_prot_hilo_select;
 	const UINT8  *m_olds_prot_hilo_source2;
 	required_shared_ptr<UINT16> m_sharedprotram;
 

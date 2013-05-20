@@ -1127,7 +1127,7 @@ static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0C2010, 0x0C2011) AM_READ_PORT("IN0")
 	AM_RANGE(0x0C2012, 0x0C2013) AM_READ(atombjt_unkr_r)
 	AM_RANGE(0x0C2014, 0x0C2015) AM_READ(atombjt_unkr_r)
-	
+
 	AM_RANGE(0x0C2016, 0x0C2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0C2018, 0x0C2019) AM_READ_PORT("DSW2")
 
@@ -1137,9 +1137,9 @@ static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
 
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
-//	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-//	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-//	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
+//  AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
+//  AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+//  AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
@@ -4425,7 +4425,7 @@ static MACHINE_CONFIG_START( atombjt, nmk16_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
-	
+
 	// the bootleg just has a single OKI
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6377,7 +6377,7 @@ ROM_START( atombjt ) // based off bjtwina set
 	ROM_LOAD32_BYTE( "24.u42",  0x000002, 0x80000, CRC(4c30e15f) SHA1(f92185743594e4e4573ac3f6c0c091802a08d5bd) )
 	ROM_LOAD32_BYTE( "25.u39",  0x000001, 0x80000, CRC(ff1af60f) SHA1(4fe626c9d59ab9b945535b2f796f13adc900f1ed) )
 	ROM_LOAD32_BYTE( "26.u45",  0x000000, 0x80000, CRC(6cc4e817) SHA1(70f2ab50e228a029d3157c94fe0a79e7aad010bd) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_COPY( "gfxtemp", 0x000000, 0x00000, 0x100000 )
 
@@ -6825,9 +6825,9 @@ ROM_END
 DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
 {
 	// todo collapse to one bitswap
-	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,  	11, 10, 9, 8,   	7, 6, 5, 4, 	3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */14,15, /* */    13,12,   	11, 10, 9, 8,    	7, 6, 5, 4,		3, 2, 1, 0 );
-	decryptcode( machine(),23, 22, 21, 20, 	 19, 18, /* */ 16, 17, /* */    15,14,13,12,	11, 10, 9, 8,  	    7, 6, 5, 4, 	3, 2, 1, 0 );
+	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
+	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */14,15, /* */    13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
+	decryptcode( machine(),23, 22, 21, 20,   19, 18, /* */ 16, 17, /* */    15,14,13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
 }
 
 

@@ -49,7 +49,7 @@
 //============================================================
 
 #define HLSL_VECTOR         (1)
-#define CRT_BLOOM			(1)
+#define CRT_BLOOM           (1)
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -57,7 +57,6 @@
 
 namespace d3d
 {
-
 class render_target;
 class cache_target;
 class renderer;
@@ -172,7 +171,7 @@ public:
 	void init_fsfx_quad(void *vertbuf);
 
 	void                    set_texture(texture_info *texture);
-	render_target *     	find_render_target(texture_info *info);
+	render_target *         find_render_target(texture_info *info);
 	void                    remove_render_target(texture_info *texture);
 	void                    remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	void                    remove_render_target(render_target *rt);
@@ -196,11 +195,11 @@ private:
 
 	bool                    register_texture(texture_info *texture, int width, int height, int xscale, int yscale);
 
-	render_target*      	find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
-	cache_target *      	find_cache_target(UINT32 screen_index, int width, int height);
+	render_target*          find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	cache_target *          find_cache_target(UINT32 screen_index, int width, int height);
 	void                    remove_cache_target(cache_target *cache);
 
-	base *              	d3dintf;                    // D3D interface
+	base *                  d3dintf;                    // D3D interface
 	win_window_info *       window;                     // D3D window info
 
 	bool                    master_enable;              // overall enable flag
@@ -218,7 +217,7 @@ private:
 	int                     prescale_size_y;            // prescale size y
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
-	texture_info *     		shadow_texture;             // shadow mask texture for post-processing shader
+	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current uniform state
 	D3DPRIMITIVETYPE        vecbuf_type;
 	UINT32                  vecbuf_index;
@@ -229,20 +228,20 @@ private:
 	int                     avi_frame;                  // AVI frame
 	attotime                avi_frame_period;           // AVI frame period
 	attotime                avi_next_frame_time;        // AVI next frame time
-	surface *           	avi_copy_surface;           // AVI destination surface in system memory
-	texture *           	avi_copy_texture;           // AVI destination texture in system memory
-	surface *           	avi_final_target;           // AVI upscaled surface
-	texture *           	avi_final_texture;          // AVI upscaled texture
+	surface *               avi_copy_surface;           // AVI destination surface in system memory
+	texture *               avi_copy_texture;           // AVI destination texture in system memory
+	surface *               avi_final_target;           // AVI upscaled surface
+	texture *               avi_final_texture;          // AVI upscaled texture
 
-	surface *           	black_surface;              // black dummy surface
-	texture *           	black_texture;              // black dummy texture
+	surface *               black_surface;              // black dummy surface
+	texture *               black_texture;              // black dummy texture
 
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
 	bool                    snap_rendered;              // whether we just rendered our HLSL post-render shot or not
-	surface *           	snap_copy_target;           // snapshot destination surface in system memory
-	texture *           	snap_copy_texture;          // snapshot destination surface in system memory
-	surface *           	snap_target;                // snapshot upscaled surface
-	texture *           	snap_texture;               // snapshot upscaled texture
+	surface *               snap_copy_target;           // snapshot destination surface in system memory
+	texture *               snap_copy_texture;          // snapshot destination surface in system memory
+	surface *               snap_target;                // snapshot upscaled surface
+	texture *               snap_texture;               // snapshot upscaled texture
 	int                     snap_width;                 // snapshot width
 	int                     snap_height;                // snapshot height
 	bool                    lines_pending;              // whether or not we have lines to flush on the next quad
@@ -250,32 +249,32 @@ private:
 	bool                    initialized;                // whether or not we're initialize
 
 	// HLSL effects
-	surface *           	backbuffer;                 // pointer to our device's backbuffer
-	effect *            	curr_effect;                // pointer to the currently active effect object
-	effect *            	default_effect;             // pointer to the primary-effect object
-	effect *            	prescale_effect;            // pointer to the prescale-effect object
-	effect *            	post_effect;                // pointer to the post-effect object
-	effect *            	pincushion_effect;          // pointer to the pincushion-effect object
-	effect *            	focus_effect;               // pointer to the focus-effect object
-	effect *            	phosphor_effect;            // pointer to the phosphor-effect object
-	effect *            	deconverge_effect;          // pointer to the deconvergence-effect object
-	effect *            	color_effect;               // pointer to the color-effect object
-	effect *            	yiq_encode_effect;          // pointer to the YIQ encoder effect object
-	effect *            	yiq_decode_effect;          // pointer to the YIQ decoder effect object
+	surface *               backbuffer;                 // pointer to our device's backbuffer
+	effect *                curr_effect;                // pointer to the currently active effect object
+	effect *                default_effect;             // pointer to the primary-effect object
+	effect *                prescale_effect;            // pointer to the prescale-effect object
+	effect *                post_effect;                // pointer to the post-effect object
+	effect *                pincushion_effect;          // pointer to the pincushion-effect object
+	effect *                focus_effect;               // pointer to the focus-effect object
+	effect *                phosphor_effect;            // pointer to the phosphor-effect object
+	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
+	effect *                color_effect;               // pointer to the color-effect object
+	effect *                yiq_encode_effect;          // pointer to the YIQ encoder effect object
+	effect *                yiq_decode_effect;          // pointer to the YIQ decoder effect object
 #if (HLSL_VECTOR || CRT_BLOOM)
-	effect *            	bloom_effect;               // pointer to the bloom composite effect
-	effect *            	downsample_effect;          // pointer to the bloom downsample effect
+	effect *                bloom_effect;               // pointer to the bloom composite effect
+	effect *                downsample_effect;          // pointer to the bloom downsample effect
 #endif
 #if (HLSL_VECTOR)
-	effect *            	vector_effect;              // pointer to the vector-effect object
+	effect *                vector_effect;              // pointer to the vector-effect object
 #endif
-	vertex *            	fsfx_vertices;              // pointer to our full-screen-quad object
+	vertex *                fsfx_vertices;              // pointer to our full-screen-quad object
 
 public:
-	render_target *     	targethead;
-	cache_target *      	cachehead;
+	render_target *         targethead;
+	cache_target *          cachehead;
 
-	static hlsl_options 	s_hlsl_presets[4];
+	static hlsl_options     s_hlsl_presets[4];
 };
 
 };

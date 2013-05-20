@@ -124,7 +124,7 @@ void gameboy_sound_device::device_config_complete()
 //-------------------------------------------------
 
 void gameboy_sound_device::device_start()
-{	
+{
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
 	m_rate = machine().sample_rate();
 
@@ -249,14 +249,14 @@ void gameboy_sound_device::device_reset()
 	memset(&m_snd_2, 0, sizeof(m_snd_2));
 	memset(&m_snd_3, 0, sizeof(m_snd_3));
 	memset(&m_snd_4, 0, sizeof(m_snd_4));
-	
+
 	/* Calculate the envelope and sweep tables */
 	for (int i = 0; i < 8; i++)
 	{
 		m_env_length_table[i] = (i * ((1 << FIXED_POINT) / 64) * m_rate) >> FIXED_POINT;
 		m_swp_time_table[i] = (((i << FIXED_POINT) / 128) * m_rate) >> (FIXED_POINT - 1);
 	}
-	
+
 	/* Calculate the period tables */
 	for (int i = 0; i < MAX_FREQUENCIES; i++)
 	{
@@ -273,15 +273,15 @@ void gameboy_sound_device::device_reset()
 			m_period_mode4_table[i][j] = ((1 << FIXED_POINT) / (524288 / ((i == 0) ? 0.5 : i) / (1 << (j + 1)))) * m_rate;
 		}
 	}
-	
+
 	/* Calculate the length table */
 	for (int i = 0; i < 64; i++)
 		m_length_table[i] = ((64 - i) * ((1 << FIXED_POINT)/256) * m_rate) >> FIXED_POINT;
-	
+
 	/* Calculate the length table for mode 3 */
 	for (int i = 0; i < 256; i++)
 		m_length_mode3_table[i] = ((256 - i) * ((1 << FIXED_POINT)/256) * m_rate) >> FIXED_POINT;
-	
+
 	sound_w_internal(NR52, 0x00);
 	m_snd_regs[AUD3W0] = 0xac;
 	m_snd_regs[AUD3W1] = 0xdd;
@@ -314,7 +314,7 @@ READ8_MEMBER( gameboy_sound_device::wave_r )
 
 READ8_MEMBER( gameboy_sound_device::sound_r )
 {
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x05:
 		case 0x0f:
@@ -333,14 +333,13 @@ WRITE8_MEMBER( gameboy_sound_device::wave_w )
 
 WRITE8_MEMBER( gameboy_sound_device::sound_w )
 {
-	
 	/* change in registers so update first */
 	m_channel->update();
-	
+
 	/* Only register NR52 is accessible if the sound controller is disabled */
 	if (!m_snd_control.on && offset != NR52)
 		return;
-	
+
 	sound_w_internal(offset, data);
 }
 
@@ -536,7 +535,7 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 	}
 }
 
-	
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -544,11 +543,11 @@ void gameboy_sound_device::sound_w_internal( int offset, UINT8 data )
 void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t sample, left, right, mode4_mask;
-	
+
 	while (samples-- > 0)
 	{
 		left = right = 0;
-		
+
 		/* Mode 1 - Wave with Envelope and Sweep */
 		if (m_snd_1.on)
 		{
@@ -563,7 +562,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				m_snd_1.pos = 0;
 				m_snd_1.signal = -m_snd_1.signal;
 			}
-			
+
 			if (m_snd_1.length && m_snd_1.mode)
 			{
 				m_snd_1.count++;
@@ -573,7 +572,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					m_snd_regs[NR52] &= 0xFE;
 				}
 			}
-			
+
 			if (m_snd_1.env_length)
 			{
 				m_snd_1.env_count++;
@@ -587,7 +586,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 						m_snd_1.env_value = 15;
 				}
 			}
-			
+
 			if (m_snd_1.swp_time)
 			{
 				m_snd_1.swp_count++;
@@ -611,17 +610,17 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 							m_snd_1.frequency = MAX_FREQUENCIES - 1;
 						}
 					}
-					
+
 					m_snd_1.period = m_period_table[m_snd_1.frequency];
 				}
 			}
-			
+
 			if (m_snd_control.mode1_left)
 				left += sample;
 			if (m_snd_control.mode1_right)
 				right += sample;
 		}
-		
+
 		/* Mode 2 - Wave with Envelope */
 		if (m_snd_2.on)
 		{
@@ -636,7 +635,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				m_snd_2.pos = 0;
 				m_snd_2.signal = -m_snd_2.signal;
 			}
-			
+
 			if (m_snd_2.length && m_snd_2.mode)
 			{
 				m_snd_2.count++;
@@ -646,7 +645,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					m_snd_regs[NR52] &= 0xFD;
 				}
 			}
-			
+
 			if (m_snd_2.env_length)
 			{
 				m_snd_2.env_count++;
@@ -660,13 +659,13 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 						m_snd_2.env_value = 15;
 				}
 			}
-			
+
 			if (m_snd_control.mode2_left)
 				left += sample;
 			if (m_snd_control.mode2_right)
 				right += sample;
 		}
-		
+
 		/* Mode 3 - Wave patterns from WaveRAM */
 		if (m_snd_3.on)
 		{
@@ -679,12 +678,12 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				sample >>= 4;
 			}
 			sample = (sample & 0xF) - 8;
-			
+
 			if (m_snd_3.level)
 				sample >>= (m_snd_3.level - 1);
 			else
 				sample = 0;
-			
+
 			m_snd_3.pos++;
 			if (m_snd_3.pos >= ((UINT32)(((m_snd_3.period) >> 21)) + m_snd_3.duty))
 			{
@@ -702,7 +701,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					m_snd_3.dutycount = 0;
 				}
 			}
-			
+
 			if (m_snd_3.length && m_snd_3.mode)
 			{
 				m_snd_3.count++;
@@ -712,13 +711,13 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					m_snd_regs[NR52] &= 0xFB;
 				}
 			}
-			
+
 			if (m_snd_control.mode3_left)
 				left += sample;
 			if (m_snd_control.mode3_right)
 				right += sample;
 		}
-		
+
 		/* Mode 4 - Noise with Envelope */
 		if (m_snd_4.on)
 		{
@@ -745,7 +744,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				m_snd_4.ply_value &= (m_snd_4.ply_step ? 0x7f : 0x7fff);
 				m_snd_4.signal = (INT8)m_snd_4.ply_value;
 			}
-			
+
 			if (m_snd_4.length && m_snd_4.mode)
 			{
 				m_snd_4.count++;
@@ -755,7 +754,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 					m_snd_regs[NR52] &= 0xF7;
 				}
 			}
-			
+
 			if (m_snd_4.env_length)
 			{
 				m_snd_4.env_count++;
@@ -769,26 +768,26 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 						m_snd_4.env_value = 15;
 				}
 			}
-			
+
 			if (m_snd_control.mode4_left)
 				left += sample;
 			if (m_snd_control.mode4_right)
 				right += sample;
 		}
-		
+
 		/* Adjust for master volume */
 		left *= m_snd_control.vol_left;
 		right *= m_snd_control.vol_right;
-		
+
 		/* pump up the volume */
 		left <<= 6;
 		right <<= 6;
-		
+
 		/* Update the buffers */
 		*(outputs[0]++) = left;
 		*(outputs[1]++) = right;
 	}
-	
+
 	m_snd_regs[NR52] = (m_snd_regs[NR52]&0xf0) | m_snd_1.on | (m_snd_2.on << 1) | (m_snd_3.on << 2) | (m_snd_4.on << 3);
 
 }

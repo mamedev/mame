@@ -170,8 +170,8 @@ NOTES:
     Note that this may be incorrect, maybe to sum of squares should be
     constant, the half-point should be at -3dB and the linearity in dB
     space.
- 
- 
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -188,7 +188,7 @@ NOTES:
 #define WD1772_TAG      "wd1772"
 
 class esq1_filters : public device_t,
-					 public device_sound_interface
+						public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -225,7 +225,7 @@ static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
 
 esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -278,11 +278,11 @@ void esq1_filters::recalc_filter(filter &f)
 	double g = 6060*exp(vfc/28.5);
 	double zc = g/tan(g/2/44100);
 
-/*	if(f.vfc) {
-		double ff = g/(2*M_PI);
-		double fzc = 2*M_PI*ff/tan(M_PI*ff/44100);
-		fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*M_PI), zc, fzc);
-	}*/
+/*  if(f.vfc) {
+        double ff = g/(2*M_PI);
+        double fzc = 2*M_PI*ff/tan(M_PI*ff/44100);
+        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*M_PI), zc, fzc);
+    }*/
 
 	double gzc = zc/g;
 	double gzc2 = gzc*gzc;
@@ -302,10 +302,10 @@ void esq1_filters::recalc_filter(filter &f)
 	f.b[3] = 4*(r1 - 2*gzc          + 2*gzc3 - gzc4);
 	f.b[4] =    r1 - 4*gzc + 6*gzc2 - 4*gzc3 + gzc4;
 
-/*	if(f.vfc != 0)
-		for(int i=0; i<5; i++)
-			printf("a%d=%f\nb%d=%f\n",
-				   i, f.a[i], i, f.b[i]);*/
+/*  if(f.vfc != 0)
+        for(int i=0; i<5; i++)
+            printf("a%d=%f\nb%d=%f\n",
+                   i, f.a[i], i, f.b[i]);*/
 
 	// Amplification stage
 	double vca = f.vca*(5.0/255.0);
@@ -336,15 +336,15 @@ void esq1_filters::device_start()
 
 void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-/*	if(0) {
-		for(int i=0; i<8; i++)
-			fprintf(stderr, " [%02x %02x %02x %02x]",
-					filters[i].vca,
-					filters[i].vpan,
-					filters[i].vq,
-					filters[i].vfc);
-		fprintf(stderr, "\n");
-	}*/
+/*  if(0) {
+        for(int i=0; i<8; i++)
+            fprintf(stderr, " [%02x %02x %02x %02x]",
+                    filters[i].vca,
+                    filters[i].vpan,
+                    filters[i].vq,
+                    filters[i].vfc);
+        fprintf(stderr, "\n");
+    }*/
 
 	for(int i=0; i<samples; i++) {
 		double l=0, r=0;
@@ -365,11 +365,11 @@ void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		static double maxl = 0;
 		if(l > maxl) {
 			maxl = l;
-//			fprintf(stderr, "%f\n", maxl);
+//          fprintf(stderr, "%f\n", maxl);
 		}
 
-//		l *= 6553;
-//		r *= 6553;
+//      l *= 6553;
+//      r *= 6553;
 		l *= 2;
 		r *= 2;
 		outputs[0][i] = l < -32768 ? -32768 : l > 32767 ? 32767 : int(l);
@@ -532,7 +532,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
 {
-    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 };
 
 READ8_MEMBER(esq1_state::duart_input)
@@ -555,31 +555,31 @@ WRITE8_MEMBER(esq1_state::duart_output)
 // MIDI send
 WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
 {
-    m_mdout->tx(state);
+	m_mdout->tx(state);
 }
 
 WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
 {
-    m_panel->rx_w(state);
+	m_panel->rx_w(state);
 }
 
 void esq1_state::send_through_panel(UINT8 data)
 {
-    m_panel->xmit_char(data);
+	m_panel->xmit_char(data);
 }
 
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
-    if (oldval == 0 && newval == 1)
-    {
-	    send_through_panel((UINT8)(FPTR)param);
-	    send_through_panel((UINT8)(FPTR)0x00);
-    }
-    else if (oldval == 1 && newval == 0)
-    {
-	    send_through_panel((UINT8)(FPTR)param&0x7f);
-	    send_through_panel((UINT8)(FPTR)0x00);
-    }
+	if (oldval == 0 && newval == 1)
+	{
+		send_through_panel((UINT8)(FPTR)param);
+		send_through_panel((UINT8)(FPTR)0x00);
+	}
+	else if (oldval == 1 && newval == 0)
+	{
+		send_through_panel((UINT8)(FPTR)param&0x7f);
+		send_through_panel((UINT8)(FPTR)0x00);
+	}
 }
 
 static SLOT_INTERFACE_START(midiin_slot)
@@ -707,7 +707,7 @@ ROM_END
 
 ROM_START( esqm )
 	ROM_REGION(0x10000, "osrom", 0)
-        ROM_LOAD( "1355500157_d640_esq-m_oshi.u14", 0x8000, 0x008000, CRC(ea6a7bae) SHA1(2830f8c52dc443b4ca469dc190b33e2ff15b78e1) ) 
+		ROM_LOAD( "1355500157_d640_esq-m_oshi.u14", 0x8000, 0x008000, CRC(ea6a7bae) SHA1(2830f8c52dc443b4ca469dc190b33e2ff15b78e1) )
 
 	ROM_REGION(0x20000, "es5503", 0)
 	ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )
@@ -718,4 +718,3 @@ ROM_END
 CONS( 1986, esq1, 0   , 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
 CONS( 1986, esqm, esq1, 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-M", GAME_NOT_WORKING )
 CONS( 1988, sq80, 0,    0, sq80, esq1, driver_device, 0, "Ensoniq", "SQ-80", GAME_NOT_WORKING )
-

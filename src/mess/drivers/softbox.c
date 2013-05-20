@@ -1,8 +1,8 @@
 /*
 
-	SSE SoftBox
+    SSE SoftBox
 
-	http://mikenaberezny.com/hardware/pet-cbm/sse-softbox-z80-computer/
+    http://mikenaberezny.com/hardware/pet-cbm/sse-softbox-z80-computer/
 
 */
 
@@ -193,14 +193,14 @@ READ8_MEMBER( softbox_state::pia1_pc_r )
 
 	  bit     description
 
-	  PC0     
-	  PC1     
-	  PC2     
-	  PC3     
+	  PC0
+	  PC1
+	  PC2
+	  PC3
 	  PC4     Corvus READY
 	  PC5     Corvus ACTIVE
-	  PC6     
-	  PC7     
+	  PC6
+	  PC7
 
 	*/
 
@@ -216,11 +216,11 @@ WRITE8_MEMBER( softbox_state::pia1_pc_w )
 	  PC0     LED "A"
 	  PC1     LED "B"
 	  PC2     LED "READY"
-	  PC3     
-	  PC4     
-	  PC5     
-	  PC6     
-	  PC7     
+	  PC3
+	  PC4
+	  PC5
+	  PC6
+	  PC7
 
 	*/
 

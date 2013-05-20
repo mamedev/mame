@@ -241,7 +241,6 @@ static MC6845_UPDATE_ROW( applix_update_row )
 
 	for (x = 0; x < x_count; x++)
 	{
-
 		if (BIT(state->m_pa, 3))
 		// 640 x 200 x 4of16 mode
 		{

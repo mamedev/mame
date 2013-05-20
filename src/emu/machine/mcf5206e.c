@@ -18,10 +18,10 @@ void CLIB_DECL nolog(const char *format, ...) {}
 #define debuglogtimer nolog
 
 static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_device )
-	
-	
+
+
 	AM_RANGE(0x014, 0x017) AM_READWRITE8(ICR1_ICR2_ICR3_ICR4_r,    ICR1_ICR2_ICR3_ICR4_w,    0xffffffff)
-	
+
 	AM_RANGE(0x01c, 0x01f) AM_READWRITE8(ICR9_ICR10_ICR11_ICR12_r, ICR9_ICR10_ICR11_ICR12_w, 0xffffffff)
 	AM_RANGE(0x020, 0x023) AM_READWRITE8(ICR13_r,                  ICR13_w,                  0xffffffff)
 
@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_devic
 
 	AM_RANGE(0x1c4, 0x1c7) AM_READWRITE8(PPDDR_r, PPDDR_w, 0xffffffff)
 	AM_RANGE(0x1c8, 0x1cb) AM_READWRITE8(PPDAT_r, PPDAT_w, 0xffffffff)
-	
+
 	AM_RANGE(0x1e4, 0x1e7) AM_READWRITE8(MFDR_r, MFDR_w, 0xffffffff)
 	AM_RANGE(0x1e8, 0x1eb) AM_READWRITE8(MBCR_r, MBCR_w, 0xffffffff)
 	AM_RANGE(0x1ec, 0x1ef) AM_READWRITE8(MBSR_r, MBSR_w, 0xffffffff)
@@ -651,7 +651,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 
 void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
 {
-	debuglog("	(AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
+	debuglog("  (AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
 	debuglog("(Interrupt Level) IL : %01x | ", (ICR&0x1c)>>2); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
 	debuglog("(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
 	debuglog("(Unused bits) : %01x\n", (ICR&0x60)>>5);
@@ -671,7 +671,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 
 	debuglogtimer("timer1_callback\n");
 	m_TER1 |= 0x02;
-	
+
 	timer1->adjust(attotime::from_msec(10)); // completely made up value just to fire our timers for now
 }
 
@@ -699,8 +699,8 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 		COMBINE_DATA(&m_TMR1);
 		debuglogtimer("%s: (Timer 1 Mode Register) TMR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 
-		debuglogtimer("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
-		
+		debuglogtimer(" (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
+
 		if (m_TMR1 & 0x0001)
 		{
 			timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
@@ -709,8 +709,8 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 		{
 			timer1->adjust(attotime::never);
 		}
-		
-		
+
+
 		break;
 	case 1:
 		invalidlog("%s: invalid TMR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
@@ -830,8 +830,8 @@ const device_type MCF5206E_PERIPHERAL = &device_creator<mcf5206e_peripheral_devi
 
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, "MCF5206E Peripheral", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, NULL, *ADDRESS_MAP_NAME(coldfire_regs_map))
+		device_memory_interface(mconfig, *this),
+		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, NULL, *ADDRESS_MAP_NAME(coldfire_regs_map))
 
 {
 }
@@ -915,31 +915,31 @@ READ32_MEMBER(mcf5206e_peripheral_device::seta2_coldfire_regs_r)
 
 void mcf5206e_peripheral_device::init_regs(bool first_init)
 {
-	m_ICR[ICR1] =	0x04; 
-	m_ICR[ICR2] = 	0x08; 
-	m_ICR[ICR3] = 	0x0C; 
-	m_ICR[ICR4] = 	0x10; 
-	m_ICR[ICR5] = 	0x14; 
-	m_ICR[ICR6] = 	0x18; 
-	m_ICR[ICR7] = 	0x1C; 
-	m_ICR[ICR8] = 	0x1C; 
-	m_ICR[ICR9] =	0x80;
-	m_ICR[ICR10] = 	0x80;
-	m_ICR[ICR11] = 	0x80;
-	m_ICR[ICR12] =  	0x00;
-	m_ICR[ICR13] = 	0x00;
+	m_ICR[ICR1] =   0x04;
+	m_ICR[ICR2] =   0x08;
+	m_ICR[ICR3] =   0x0C;
+	m_ICR[ICR4] =   0x10;
+	m_ICR[ICR5] =   0x14;
+	m_ICR[ICR6] =   0x18;
+	m_ICR[ICR7] =   0x1C;
+	m_ICR[ICR8] =   0x1C;
+	m_ICR[ICR9] =   0x80;
+	m_ICR[ICR10] =  0x80;
+	m_ICR[ICR11] =  0x80;
+	m_ICR[ICR12] =      0x00;
+	m_ICR[ICR13] =  0x00;
 
-	m_CSAR[0] =	0x0000;
-	m_CSMR[0] =	0x00000000;
+	m_CSAR[0] = 0x0000;
+	m_CSMR[0] = 0x00000000;
 	m_CSCR[0] =   0x3C1F; /* 3C1F, 3C5F, 3C9F, 3CDF, 3D1F, 3D5F, 3D9F, 3DDF |  AA set by IRQ 7 at reset, PS1 set by IRQ 4 at reset, PS0 set by IRQ 1 at reset*/
 
 	if (first_init)
 	{
 		for (int x=1;x<8;x++)
 		{
-			m_CSAR[1] =	UNINIT;
-			m_CSMR[1] =	UNINIT;
-			m_CSCR[1] =	UNINIT_NOTE; // except BRST=ASET=WRAH=RDAH=WR=RD=0
+			m_CSAR[1] = UNINIT;
+			m_CSMR[1] = UNINIT;
+			m_CSCR[1] = UNINIT_NOTE; // except BRST=ASET=WRAH=RDAH=WR=RD=0
 		}
 	}
 

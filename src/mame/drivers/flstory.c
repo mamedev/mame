@@ -873,7 +873,7 @@ static INPUT_PORTS_START( rumba )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x08, 0x00, "Attract Sound" )	/* At title sequence only - NOT Demo Sounds */
+	PORT_DIPNAME( 0x08, 0x00, "Attract Sound" ) /* At title sequence only - NOT Demo Sounds */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "Coinage Display" )

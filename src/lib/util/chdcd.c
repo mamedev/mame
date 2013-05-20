@@ -868,7 +868,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 								break;
 						}
 					}
-					else	// pregap sectors not in file, but we're always using idx0ofs for track length calc now
+					else    // pregap sectors not in file, but we're always using idx0ofs for track length calc now
 					{
 						outinfo.track[trknum].idx0offs = frames;
 					}
@@ -1175,4 +1175,3 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 	return CHDERR_NONE;
 }
-

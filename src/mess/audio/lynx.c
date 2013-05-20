@@ -97,7 +97,7 @@ const device_type LYNX2_SND = &device_creator<lynx2_sound_device>;
 lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, LYNX_SND, "Mikey", tag, owner, clock, "lynx_sound", __FILE__),
 						device_sound_interface(mconfig, *this)
-{	
+{
 	m_timer_delegate = lynx_sound_timer_delegate();
 }
 
@@ -156,10 +156,10 @@ void lynx_sound_device::register_save()
 }
 
 void lynx_sound_device::init()
-{	
+{
 	m_shift_mask = auto_alloc_array_clear(machine(), int, 512);
 	m_shift_xor = auto_alloc_array_clear(machine(), int, 4096);
-	
+
 	for (int i = 0; i < 512; i++)
 	{
 		m_shift_mask[i] = 0;
@@ -173,7 +173,7 @@ void lynx_sound_device::init()
 		if (i & 0x80) m_shift_mask[i] |= 0x800;
 		if (i & 0x100) m_shift_mask[i] |= 0x80;
 	}
-	
+
 	for (int i = 0; i < 4096; i++)
 	{
 		m_shift_xor[i] = 1;
@@ -182,7 +182,7 @@ void lynx_sound_device::init()
 			if (i & j)
 				m_shift_xor[i] ^= 1;
 		}
-	}	
+	}
 }
 
 void lynx_sound_device::device_start()
@@ -238,9 +238,9 @@ void lynx_sound_device::reset_channel(LYNX_AUDIO *channel)
 void lynx_sound_device::count_down(int nr)
 {
 	LYNX_AUDIO *channel = &m_audio[nr];
-	if (channel->reg.control1 & 8 && (channel->reg.control1 & 7) != 7) 
+	if (channel->reg.control1 & 8 && (channel->reg.control1 & 7) != 7)
 		return;
-	if (nr == 0) 
+	if (nr == 0)
 		m_mixer_channel->update();
 	//if ((channel->reg.control1 & 0x0f) == 0x0f) //count down if linking enabled and count enabled
 		channel->count--;
@@ -250,17 +250,17 @@ void lynx_sound_device::shift(int chan_nr)
 {
 	INT16 out_temp;
 	LYNX_AUDIO *channel;
-	
+
 	assert(chan_nr < 4);
 
-	channel = &m_audio[chan_nr];	
+	channel = &m_audio[chan_nr];
 	//channel->shifter = ((channel->shifter<<1)&0xffe) | (m_shift_xor[ channel->shifter & channel->mask ]&1);
 
 	// alternative method (functionally the same as above)
 	UINT8 xor_out = 0;
 	for (int bit = 0; bit < 12; bit++)
 	{
-		if ((channel->mask >> bit) & 1) 
+		if ((channel->mask >> bit) & 1)
 			xor_out ^= (channel->shifter >> bit) & 1;
 	}
 	channel->shifter = ((channel->shifter << 1) & 0xffe) | (xor_out ^ 1); // output of xor is inverted
@@ -284,7 +284,7 @@ void lynx_sound_device::shift(int chan_nr)
 		case 0: count_down(1); break;
 		case 1: count_down(2); break;
 		case 2: count_down(3); break;
-		case 3: 
+		case 3:
 			if (!m_timer_delegate.isnull())
 				m_timer_delegate();
 			break;
@@ -294,10 +294,10 @@ void lynx_sound_device::shift(int chan_nr)
 void lynx_sound_device::execute(int chan_nr)
 {
 	LYNX_AUDIO *channel;
-	
+
 	assert(chan_nr < 4);
-	
-	channel = &m_audio[chan_nr];	
+
+	channel = &m_audio[chan_nr];
 
 	if (channel->reg.control1 & 8) // count enable
 	{
@@ -320,7 +320,7 @@ void lynx_sound_device::execute(int chan_nr)
 				for (; (channel->ticks >= t) && (channel->count >= 0); channel->ticks -= t) // at least one sampled worth of time left, timer not expired
 					channel->count--;
 
-				if (channel->ticks < t) 
+				if (channel->ticks < t)
 					break;
 
 				if (channel->count < 0)
@@ -355,7 +355,7 @@ READ8_MEMBER(lynx_sound_device::read)
 
 	if (offset < 0x40)
 	{
-		switch (offset & 7) 
+		switch (offset & 7)
 		{
 			case 0:
 				value = channel->reg.volume;
@@ -418,7 +418,7 @@ WRITE8_MEMBER(lynx_sound_device::write)
 
 	if (offset < 0x40)
 	{
-		switch (offset & 0x07) 
+		switch (offset & 0x07)
 		{
 			// Volume control (signed)
 			case 0:
@@ -489,7 +489,7 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 {
 	int v;
 	stream_sample_t *buffer = outputs[0];
-	
+
 	for (int i = 0; i < samples; i++, buffer++)
 	{
 		*buffer = 0;
@@ -510,7 +510,7 @@ void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 {
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int v;
-	
+
 	for (int i = 0; i < samples; i++, left++, right++)
 	{
 		*left = 0;
@@ -521,7 +521,7 @@ void lynx2_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 			v = m_audio[channel].reg.output;
 			if (!(m_master_enable & (0x10 << channel)))
 			{
-				if (m_attenuation_enable & (0x10 << channel)) 
+				if (m_attenuation_enable & (0x10 << channel))
 					*left += v * (m_audio[channel].attenuation >> 4);
 				else
 					*left += v * 15;

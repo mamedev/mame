@@ -1721,7 +1721,7 @@ static void execute_stateload(running_machine &machine, int ref, int params, con
 {
 	astring filename(param[0]);
 	machine.immediate_load(filename);
-	
+
 	// Clear all PC & memory tracks
 	device_iterator iter(machine.root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
@@ -2802,9 +2802,9 @@ static void execute_pcatmem(running_machine &machine, int ref, int params, const
 	// Get the value of memory at the address
 	const int nativeDataWidth = space->data_width() / 8;
 	const UINT64 data = debug_read_memory(*space,
-										  space->address_to_byte(address),
-										  nativeDataWidth,
-										  true);
+											space->address_to_byte(address),
+											nativeDataWidth,
+											true);
 
 	// Recover the pc & print
 	const address_spacenum spaceNum = (address_spacenum)ref;

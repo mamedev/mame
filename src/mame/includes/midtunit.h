@@ -71,7 +71,7 @@ public:
 	void register_state_saving();
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
-	
+
 	/* CMOS-related variables */
 	UINT8    cmos_write_enable;
 
@@ -90,7 +90,7 @@ public:
 	const UINT8 *jdredd_prot_table;
 	UINT8    jdredd_prot_index;
 	UINT8    jdredd_prot_max;
-	
+
 };
 /*----------- defined in video/midtunit.c -----------*/
 extern UINT8 midtunit_gfx_rom_large;

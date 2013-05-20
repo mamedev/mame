@@ -63,4 +63,3 @@ public:
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
 };
-

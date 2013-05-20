@@ -146,7 +146,7 @@ WRITE8_MEMBER( ym3812_device::write )
 READ8_MEMBER( ym3812_device::status_port_r ) { return read(space, 0); }
 READ8_MEMBER( ym3812_device::read_port_r ) { return read(space, 1); }
 WRITE8_MEMBER( ym3812_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( ym3812_device::write_port_w ) { write(	space, 1, data); }
+WRITE8_MEMBER( ym3812_device::write_port_w ) { write(   space, 1, data); }
 
 
 const device_type YM3812 = &device_creator<ym3812_device>;

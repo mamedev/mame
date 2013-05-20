@@ -4,7 +4,7 @@
 
 <!--
 
-  There are 5 ROM sockets on the AIM 65 PCB: 2 sockets were for the boot strap and 3 sockets for software roms, 
+  There are 5 ROM sockets on the AIM 65 PCB: 2 sockets were for the boot strap and 3 sockets for software roms,
   at locations z24, z25, and z26.
 
   There are the BASIC ROMs, PL65 and FORTH. Each has 2 ROMs and they all work.
@@ -25,7 +25,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basic11">
 		<description>AIM 65 BASIC v1.1</description>
 		<year>1978</year>
@@ -59,7 +59,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="mathpack" supported="no">
 		<description>Mathpack</description>
 		<year>197?</year>
@@ -71,7 +71,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pl65">
 		<description>AIM 65 PL/65 v1.0</description>
 		<year>1978</year>

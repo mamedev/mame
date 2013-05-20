@@ -73,7 +73,7 @@ protected:
 
 	UINT8   m_A;
 	PAIR    m_PC;
-	UINT16	m_REGS[32]; // General registers (2 pages of 16)
+	UINT16  m_REGS[32]; // General registers (2 pages of 16)
 	UINT8   m_CF; // Carry flag
 	UINT8   m_ZF; // Zero flag
 	UINT8   m_RF; // Current register page

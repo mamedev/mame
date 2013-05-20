@@ -50,7 +50,7 @@ class mcf5206e_peripheral_device :  public device_t,
 public:
 	// construction/destruction
 	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void ICR_info(UINT8 ICR);
 
 	DECLARE_READ32_MEMBER( dev_r );
@@ -153,9 +153,9 @@ public:
 	DECLARE_WRITE8_MEMBER( MFDR_w );
 	DECLARE_READ8_MEMBER( MBDR_r );
 	DECLARE_WRITE8_MEMBER( MBDR_w );
-	
 
-	
+
+
 
 	cpu_device* m_cpu;
 
@@ -171,7 +171,7 @@ protected:
 
 
 private:
-	
+
 	void init_regs(bool first_init);
 
 	UINT8 m_ICR[MAX_ICR];

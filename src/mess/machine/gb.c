@@ -134,7 +134,7 @@ void gb_state::save_gbc_only()
 }
 
 void gb_state::save_sgb_only()
-{	
+{
 	save_item(NAME(m_sgb_pal_data));
 	save_item(NAME(m_sgb_pal));
 	save_item(NAME(m_sgb_tile_map));
@@ -194,7 +194,7 @@ MACHINE_START_MEMBER(gb_state,gbpocket)
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
-	
+
 	save_gb_base();
 	gb_video_start(GB_VIDEO_MGB);
 }
@@ -231,12 +231,12 @@ MACHINE_START_MEMBER(gb_state,sgb)
 MACHINE_RESET_MEMBER(gb_state,gb)
 {
 	gb_init();
-	
+
 	gb_video_reset(GB_VIDEO_DMG);
-	
+
 	/* Enable BIOS rom */
 	m_bios_disable = 0;
-	
+
 	m_divcount = 0x0004;
 }
 
@@ -276,21 +276,21 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 MACHINE_RESET_MEMBER(gb_state,sgb)
 {
 	gb_init();
-	
+
 	gb_video_reset(GB_VIDEO_SGB);
-	
+
 	gb_init_regs();
-	
-	
+
+
 	/* Enable BIOS rom */
 	m_bios_disable = 0;
-	
+
 	memset(m_sgb_tile_data, 0, 0x2000);
-	
+
 	m_sgb_window_mask = 0;
 	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
 	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
-	
+
 	m_divcount = 0x0004;
 }
 
@@ -1072,7 +1072,7 @@ MACHINE_START_MEMBER(megaduck_state,megaduck)
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
-	
+
 	save_gb_base();
 	gb_video_start(GB_VIDEO_DMG);
 }

@@ -261,7 +261,7 @@ public:
 	// memory tracking
 	void set_track_mem(bool value) { m_track_mem = value; }
 	offs_t track_mem_pc_from_space_address_data(const address_spacenum& space,
-												const offs_t& address, 
+												const offs_t& address,
 												const UINT64& data) const;
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
@@ -410,10 +410,10 @@ private:
 	class dasm_memory_access
 	{
 	public:
-		dasm_memory_access(const address_spacenum& address_space, 
-                           const offs_t& address, 
-                           const UINT64& data, 
-                           const offs_t& pc);
+		dasm_memory_access(const address_spacenum& address_space,
+							const offs_t& address,
+							const UINT64& data,
+							const offs_t& pc);
 
 		// required to be included in a simple_set
 		bool operator < (const dasm_memory_access& rhs) const

@@ -26,7 +26,6 @@ struct game_keys
 
 static const struct game_keys keys_table[] =
 {
-
 	// name             key              gameid #         year
 // M2
 	{ "wldkicks",        0x00ae2901 }, // 25209801    2000
@@ -69,7 +68,7 @@ static const struct game_keys keys_table[] =
 	{ "samba2k",         0x001702cf }, // 840-0047    2000
 	{ "alienfnt",        0x00174343 }, // 840-0048    2001
 	{ "alienfnta",       0x00174343 }, // 840-0048    2001
-    { "crackdj2",        0x00428247 }, // 840-0068    2001
+	{ "crackdj2",        0x00428247 }, // 840-0068    2001
 	{ "vf4cart",         0x02ef2f96 }, // 840-0080    2002
 	{ "pstone",          0x000e69c1 }, // 841-0001    1999
 	{ "suchie3",         0x000368e1 }, // 841-0002    1999

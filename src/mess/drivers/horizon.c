@@ -8,25 +8,25 @@
         succesfully loaded. The memory range EA00-EB40 appears to be
         used by devices, particularly the FDC.
 
-	http://www.hartetechnologies.com/manuals/Northstar/
+    http://www.hartetechnologies.com/manuals/Northstar/
 
 ****************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- connect to S-100 bus
-	- USARTs
-	- parallel I/O
-	- motherboard ports
-	- RTC
-	- RAM boards
-	- floppy boards
-	- floating point board
-	- SOROC IQ 120 CRT terminal
-	- NEC 5530-2 SPINWRITER printer
-	- Anadex DP-8000 printer
+    - connect to S-100 bus
+    - USARTs
+    - parallel I/O
+    - motherboard ports
+    - RTC
+    - RAM boards
+    - floppy boards
+    - floating point board
+    - SOROC IQ 120 CRT terminal
+    - NEC 5530-2 SPINWRITER printer
+    - Anadex DP-8000 printer
 
 */
 
@@ -38,20 +38,20 @@
 #include "machine/s100_nsmdsa.h"
 #include "machine/s100_nsmdsad.h"
 
-#define Z80_TAG			"z80"
-#define I8251_L_TAG		"3a"
-#define I8251_R_TAG		"4a"
-#define RS232_A_TAG		"rs232a"
-#define RS232_B_TAG		"rs232b"
+#define Z80_TAG         "z80"
+#define I8251_L_TAG     "3a"
+#define I8251_R_TAG     "4a"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
 
 class horizon_state : public driver_device
 {
 public:
 	horizon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_usart_l(*this, I8251_L_TAG),
-		  m_usart_r(*this, I8251_L_TAG)
+			m_maincpu(*this, Z80_TAG),
+			m_usart_l(*this, I8251_L_TAG),
+			m_usart_r(*this, I8251_L_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

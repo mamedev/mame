@@ -40,8 +40,8 @@ struct math_t
 	UINT32  i0ff;
 	UINT16  retval;
 	UINT16  muxlatch;   // TX-1
-	int		dbgaddr;
-	int		dbgpc;
+	int     dbgaddr;
+	int     dbgpc;
 };
 
 /*

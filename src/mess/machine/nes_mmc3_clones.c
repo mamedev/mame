@@ -167,7 +167,7 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 }
 
 //nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-//					: nes_txrom_device(mconfig, NES_A9746, "NES Cart A-9746 PCB", tag, owner, clock, "nes_bmc_a9746", __FILE__)
+//                  : nes_txrom_device(mconfig, NES_A9746, "NES Cart A-9746 PCB", tag, owner, clock, "nes_bmc_a9746", __FILE__)
 //{
 //}
 
@@ -2498,16 +2498,16 @@ WRITE8_MEMBER(nes_pjoy84_device::write_m)
 
 #ifdef UNUSED_FUNCTION
 /*-------------------------------------------------
- 
+
  UNL-A9746
- 
- 
+
+
  MMC3 clone
- 
- 
+
+
  Preliminary emulation based on Cah4e3's code
  No dump is available (yet) for this.
- 
+
  -------------------------------------------------*/
 
 void nes_a9746_device::device_start()
@@ -2519,7 +2519,7 @@ void nes_a9746_device::device_start()
 void nes_a9746_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	
+
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 	m_reg[2] = 0;
@@ -2529,7 +2529,7 @@ void nes_a9746_device::pcb_reset()
 void nes_a9746_device::update_banks(UINT8 value)
 {
 	UINT8 bank = BITSWAP8(value & 0x3c,7,6,0,1,2,3,4,5);
-	
+
 	switch (m_reg[0])
 	{
 		case 0x26: prg8_89(bank); break;
@@ -2537,7 +2537,7 @@ void nes_a9746_device::update_banks(UINT8 value)
 		case 0x24: prg8_cd(bank); break;
 		case 0x23: prg8_ef(bank); break;
 	}
-	
+
 	switch (m_reg[1])
 	{
 		case 0x08: case 0x0a: case 0x0c: case 0x0e:
@@ -2559,7 +2559,7 @@ void nes_a9746_device::update_banks(UINT8 value)
 WRITE8_MEMBER(nes_a9746_device::write_h)
 {
 	LOG_MMC(("unl_a9746 write_h, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
@@ -2573,18 +2573,17 @@ WRITE8_MEMBER(nes_a9746_device::write_h)
 			m_reg[0] = data;
 			m_reg[1] = 0;
 			break;
-			
+
 		case 0x0003:
 		case 0x2000:
 		case 0x2001:
 		case 0x2002:
 		case 0x2003:
 			break;
-			
+
 		default:
 			txrom_write(space, offset, data, mem_mask);
 			break;
 	}
 }
 #endif
-

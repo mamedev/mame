@@ -88,7 +88,6 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 namespace d3d
 {
-
 hlsl_options shaders::s_hlsl_presets[4] =
 {
 	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
@@ -2131,7 +2130,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
 								options->bloom_level6_weight, options->bloom_level7_weight };
 		float weight89A[3] = { options->bloom_level8_weight, options->bloom_level9_weight,
-							   options->bloom_level10_weight };
+								options->bloom_level10_weight };
 		(*d3dintf->effect.set_vector)(curr_effect, "Level0123Weight", 4, weight0123);
 		(*d3dintf->effect.set_vector)(curr_effect, "Level4567Weight", 4, weight4567);
 		(*d3dintf->effect.set_vector)(curr_effect, "Level89AWeight", 3, weight89A);
@@ -2302,7 +2301,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
 								options->bloom_level6_weight, options->bloom_level7_weight };
 		float weight89A[3] = { options->bloom_level8_weight, options->bloom_level9_weight,
-							   options->bloom_level10_weight };
+								options->bloom_level10_weight };
 		(*d3dintf->effect.set_vector)(curr_effect, "Level0123Weight", 4, weight0123);
 		(*d3dintf->effect.set_vector)(curr_effect, "Level4567Weight", 4, weight4567);
 		(*d3dintf->effect.set_vector)(curr_effect, "Level89AWeight", 3, weight89A);
@@ -3432,4 +3431,3 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 	file.set_openflags(origflags);
 	return file.open(fname);
 }
-

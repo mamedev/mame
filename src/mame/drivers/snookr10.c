@@ -125,7 +125,7 @@
     - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
     You can see the following table, where 'Normal tile #' is the tile number called
-	to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+    to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
 
     Normal | Scrambled
     tile # |  tile #
@@ -262,7 +262,7 @@
     - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
     You can see the following table, where 'Normal tile #' is the tile number called
-	to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+    to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
 
     Normal | Scrambled
     tile # |  tile #
@@ -405,7 +405,7 @@
         ||||+---------> 7    |
         |||+----------> 1    |
         ||+-----------> 5    |
-        |+------------> A   / 
+        |+------------> A   /
         +-------------> 0 -
 
 
@@ -492,7 +492,7 @@
     $0000 - $07FF   NVRAM (battery backed 6116) ;R/W, all registers and settings.
     $1000 - $1000   Output Port 0  ;  W, lamps & counters.
     $1001 - $1001   Output Port 1  ;  W, lamps.
-	$2000 - $2008   Special Input  ;R  , special ports meant for data channels...
+    $2000 - $2008   Special Input  ;R  , special ports meant for data channels...
     $3000 - $3000   Input Port 0   ;R
     $3001 - $3001   Input Port 1   ;R
     $3002 - $3002   Input Port 2   ;R
@@ -511,26 +511,26 @@
 
     [2013/05/12]
 
-	Crystals Colours:
+    Crystals Colours:
     - Decrypted the tile matrix / video RAM.
-	- Wrote proper memory map and inputs from the scratch.
-	- Bypassed the program data channels protection.
+    - Wrote proper memory map and inputs from the scratch.
+    - Bypassed the program data channels protection.
     - Decrypted the colors / color RAM.
     - Added button-lamps support.
     - Created a default NVRAM.
     - Promoted to working state.
-	- Added technical and encryption notes...
+    - Added technical and encryption notes...
 
     Snooker 10:
-	- Fixed NVRAM size.
+    - Fixed NVRAM size.
     - Added default NVRAM.
 
     Apple 10:
-	- Fixed NVRAM size.
+    - Fixed NVRAM size.
     - Added default NVRAM.
 
     Ten Balls:
-	- Fixed NVRAM size.
+    - Fixed NVRAM size.
     - Added default NVRAM.
 
 
@@ -750,9 +750,9 @@ READ8_MEMBER(snookr10_state::port2000_8_r)
 {
 /*
     Ports 2000-2008 expect data, otherwise the program trigger
-	a sort of service-text mode, sets 300000 points and starts
-	to decrease the amount one by one, triggering a sound each
-	time the amount is decremented.
+    a sort of service-text mode, sets 300000 points and starts
+    to decrease the amount one by one, triggering a sound each
+    time the amount is decremented.
 */
 	return 0xff;
 }
@@ -762,7 +762,7 @@ READ8_MEMBER(snookr10_state::port2000_8_r)
 *************************/
 
 static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed 6116 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")        /* IN1 */
@@ -777,7 +777,7 @@ static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed 6116 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")        /* IN0 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")        /* IN1 */
@@ -791,10 +791,10 @@ static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crystalc_map, AS_PROGRAM, 8, snookr10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed 6116 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(output_port_0_w)  /* OUT0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(output_port_1_w)  /* OUT1 */
-	AM_RANGE(0x2000, 0x2008) AM_READ(port2000_8_r)		/* unknown... protection or data channels? */
+	AM_RANGE(0x2000, 0x2008) AM_READ(port2000_8_r)      /* unknown... protection or data channels? */
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")        /* IN1 */
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")        /* IN2 */
@@ -963,32 +963,32 @@ static INPUT_PORTS_START( crystalc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// SG vs real value in paytable.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // SG vs real value in paytable.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )		PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )        PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )
 	PORT_DIPSETTING(    0x02, "200" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Payment Type" )		PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPNAME( 0x60, 0x60, "Payment Type" )      PORT_DIPLOCATION("SW1:3,2")
 	PORT_DIPSETTING(    0x00, "Ticket + Coins" )
 	PORT_DIPSETTING(    0x20, "Ticket only" )
 	PORT_DIPSETTING(    0x40, "Coins only" )
 	PORT_DIPSETTING(    0x60, "Ticket + Coins" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END

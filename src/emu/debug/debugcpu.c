@@ -2647,9 +2647,9 @@ void device_debug::set_track_pc_visited(const offs_t& pc)
 //  'not available'.
 //-------------------------------------------------
 
-offs_t device_debug::track_mem_pc_from_space_address_data(const address_spacenum& space, 
-                                                          const offs_t& address, 
-                                                          const UINT64& data) const
+offs_t device_debug::track_mem_pc_from_space_address_data(const address_spacenum& space,
+															const offs_t& address,
+															const UINT64& data) const
 {
 	const offs_t missing = (offs_t)(-1);
 	if (m_track_mem_set.empty())
@@ -2702,7 +2702,7 @@ bool device_debug::comment_remove(offs_t addr)
 
 const char *device_debug::comment_text(offs_t addr) const
 {
-	const UINT32 crc = compute_opcode_crc32(addr); 
+	const UINT32 crc = compute_opcode_crc32(addr);
 	dasm_comment* comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
 	if (comment == NULL) return NULL;
 	return comment->m_text;
@@ -3553,7 +3553,7 @@ void device_debug::tracer::flush()
 
 device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const UINT32& crc)
 	: m_address(address),
-	  m_crc(crc)
+		m_crc(crc)
 {
 }
 
@@ -3561,14 +3561,14 @@ device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const UINT32& crc)
 //  dasm_memory_access - constructor
 //-------------------------------------------------
 
-device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& address_space, 
-													 const offs_t& address, 
-													 const UINT64& data, 
-													 const offs_t& pc)
+device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& address_space,
+														const offs_t& address,
+														const UINT64& data,
+														const offs_t& pc)
 	: m_address_space(address_space),
-	  m_address(address),
-	  m_data(data),
-	  m_pc(pc)
+		m_address(address),
+		m_data(data),
+		m_pc(pc)
 {
 }
 
@@ -3578,7 +3578,7 @@ device_debug::dasm_memory_access::dasm_memory_access(const address_spacenum& add
 
 device_debug::dasm_comment::dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color)
 	: dasm_pc_tag(address, crc),
-	  m_text(text),
-	  m_color(color)
+		m_text(text),
+		m_color(color)
 {
 }

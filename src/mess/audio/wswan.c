@@ -81,7 +81,7 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_audio1.vol_right));
 	save_item(NAME(m_audio1.on));
 	save_item(NAME(m_audio1.signal));
-	
+
 	save_item(NAME(m_audio2.freq));
 	save_item(NAME(m_audio2.period));
 	save_item(NAME(m_audio2.pos));
@@ -89,7 +89,7 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_audio2.vol_right));
 	save_item(NAME(m_audio2.on));
 	save_item(NAME(m_audio2.signal));
-	
+
 	save_item(NAME(m_audio3.freq));
 	save_item(NAME(m_audio3.period));
 	save_item(NAME(m_audio3.pos));
@@ -97,7 +97,7 @@ void wswan_sound_device::device_start()
 	save_item(NAME(m_audio3.vol_right));
 	save_item(NAME(m_audio3.on));
 	save_item(NAME(m_audio3.signal));
-	
+
 	save_item(NAME(m_audio4.freq));
 	save_item(NAME(m_audio4.period));
 	save_item(NAME(m_audio4.pos));

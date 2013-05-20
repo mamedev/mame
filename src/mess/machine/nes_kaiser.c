@@ -218,9 +218,9 @@ void nes_ks7031_device::device_start()
 
 void nes_ks7031_device::pcb_reset()
 {
-	prg32(0);	// not really used...
+	prg32(0);   // not really used...
 	chr8(0, CHRRAM);
-	
+
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 	m_reg[2] = 0;
@@ -525,15 +525,15 @@ WRITE8_MEMBER(nes_ks7012_device::write_h)
 
 
 /*-------------------------------------------------
- 
+
  Kaiser Board KS7013B
- 
+
  Games: Highway Star FDS Conversion
- 
+
  iNES:
- 
+
  In MESS: Supported.
- 
+
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_ks7013b_device::write_m)
@@ -556,13 +556,13 @@ WRITE8_MEMBER(nes_ks7013b_device::write_h)
  Games: Dracula II FDS Conversion
 
  This board is quite weird. It handles 2K PRG chunks
- and the chip contains chunks in reverse order, so 
+ and the chip contains chunks in reverse order, so
  that the first 2K are actually loaded at the top
  of the 0x8000-0xffff region. Main bank is fixed, while
  the 8K mapped at 0x6000-0x7fff varies with reg writes.
 
  TODO: understand how SRAM is handled...
- 
+
  iNES:
 
  In MESS: Supported.
@@ -571,7 +571,7 @@ WRITE8_MEMBER(nes_ks7013b_device::write_h)
 
 READ8_MEMBER(nes_ks7031_device::read_m)
 {
-//	LOG_MMC(("ks7031 read_m, offset: %04x\n", offset));
+//  LOG_MMC(("ks7031 read_m, offset: %04x\n", offset));
 	return m_prg[(m_reg[(offset >> 11) & 3] * 0x0800) + (offset & 0x7ff)];
 }
 

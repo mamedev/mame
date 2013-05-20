@@ -171,13 +171,13 @@ public:
 		m_rightBar(0),
 		m_windowState()
 	{}
-	
+
 	~MainWindowQtConfig() {}
-	
+
 	// Settings
 	int m_rightBar;
 	QByteArray m_windowState;
-	
+
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
 	void addToXmlDataNode(xml_data_node* node) const;

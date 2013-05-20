@@ -59,7 +59,7 @@ static INPUT_PORTS_START( galaxrf )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPNAME( 0x08, 0x00, "Player Bullet Speed" )
 	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x08, "Fast" ) 
+	PORT_DIPSETTING(    0x08, "Fast" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superg )
@@ -1148,7 +1148,7 @@ static INPUT_PORTS_START( mooncreg )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, "Player's Bullet Speed" ) 
+	PORT_DIPNAME( 0x80, 0x80, "Player's Bullet Speed" )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x80, "Fast" )
 
@@ -3850,7 +3850,7 @@ ROM_START( asideral )
 	ROM_LOAD( "u11.l2",    0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // which PROM should we be using, the one from the bootlegs or the original UniWarS one, the gfx roms are the same as the original.
-//	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+//  ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 	ROM_LOAD( "uniwars.clr",  0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 ROM_END
 

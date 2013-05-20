@@ -87,15 +87,15 @@ ROM_END
 
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound", __FILE__),
-	  device_sound_interface(mconfig, *this),
-	  m_data(0),
-	  m_stream(NULL),
-	  m_sample_rom_length(0),
-	  m_sample_rom(NULL),
-	  m_cpu(NULL),
-	  m_frq_ratio(0.0f),
-	  m_fpRawDataL(NULL),
-	  m_fpRawDataR(NULL)
+		device_sound_interface(mconfig, *this),
+		m_data(0),
+		m_stream(NULL),
+		m_sample_rom_length(0),
+		m_sample_rom(NULL),
+		m_cpu(NULL),
+		m_frq_ratio(0.0f),
+		m_fpRawDataL(NULL),
+		m_fpRawDataR(NULL)
 {
 }
 

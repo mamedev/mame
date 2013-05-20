@@ -43,15 +43,15 @@
 #define SR_BLANK        0x80
 #define SR_V_BLANK      0x40
 #define SR_H_SYNC       0x20
-#define SR_DONE         0x20	// 4- and 8-plane color
+#define SR_DONE         0x20    // 4- and 8-plane color
 #define SR_R_M_W        0x10
 #define SR_ALT          0x08
 #define SR_V_SYNC       0x04
-#define SR_SYNC         0x04	// 4- and 8-plane color
+#define SR_SYNC         0x04    // 4- and 8-plane color
 #define SR_H_CK         0x02
 #define SR_V_DATA       0x01
-#define SR_V_FLAG       0x01	// 4-plane color
-#define SR_LUT_OK       0x01	// 8-plane color
+#define SR_V_FLAG       0x01    // 4-plane color
+#define SR_LUT_OK       0x01    // 8-plane color
 // control register 0
 #define CR0_MODE(a)     ((a) >> 5)
 #define CR0_MODE_0      0
@@ -64,9 +64,9 @@
 
 // control register 1
 #define CR1_INV         0x80
-#define CR1_AD_BIT      0x80	// 4- and 8-plane color
+#define CR1_AD_BIT      0x80    // 4- and 8-plane color
 #define CR1_DADDR_16    0x40
-#define CR1_DV_CK       0x40	// 4- and 8-plane color
+#define CR1_DV_CK       0x40    // 4- and 8-plane color
 #define CR1_DH_CK       0x20
 #define CR1_ROP_EN      0x10
 #define CR1_RESET       0x08
@@ -96,7 +96,7 @@
 #define LUT_C0          0x01
 #define LUT_C1_C0(a)    ((a)& (LUT_C1|LUT_C0))
 
-#define LUT_FIFO_SIZE	1024
+#define LUT_FIFO_SIZE   1024
 
 //**************************************************************************
 //  class apollo_graphics
@@ -235,9 +235,9 @@ private:
 	running_machine *m_machine;
 };
 
- //**************************************************************************
- // class LUT Fifo
- //**************************************************************************
+	//**************************************************************************
+	// class LUT Fifo
+	//**************************************************************************
 
 class apollo_graphics::lut_fifo
 {
@@ -490,7 +490,7 @@ UINT8 apollo_graphics::bt458::read(UINT8 c10)
 		break;
 	}
 
-//	MLOG1(("reading Bt458 data=%02x cs=%d", m_data, c10));
+//  MLOG1(("reading Bt458 data=%02x cs=%d", m_data, c10));
 	return data;
 }
 
@@ -629,7 +629,7 @@ void apollo_graphics::device_reset()
 	memset(m_color_lookup_table, 0, sizeof(m_color_lookup_table));
 	memset(m_image_memory, 0, m_image_memory_size * 2);
 
-	//	register_vblank_callback(this);
+	//  register_vblank_callback(this);
 }
 
 void apollo_graphics::device_reset_mono19i()
@@ -912,7 +912,7 @@ void apollo_graphics::increment_p_clock()
 				// FIXME: ok for DEX Test 5 6 17 20 - nok for 19
 				// Note: for dn3500_19i DEX Test 17 18 20 will fail !!!!
 				// Note: must NOT reset m_data_clock in increment_p_clock !
-//				int pixel_addr = m_data_clock * 32;
+//              int pixel_addr = m_data_clock * 32;
 
 				UINT16 pixel = m_image_memory[pixel_addr / 16] & (0x8000 >> (pixel_addr % 16));
 

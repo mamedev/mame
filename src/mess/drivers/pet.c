@@ -462,7 +462,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 	if (!endra)
 	{
 		//logerror("%s write %04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",machine().describe_context(),offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
-		
+
 		offs_t drma = fa15 << 15 | (offset & 0x7e00) | BIT(offset, 0) << 8 | (offset & 0x1fe) >> 1;
 
 		if (!casena1)

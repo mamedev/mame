@@ -322,7 +322,7 @@ void mach8_device::device_start()
 
 UINT16 vga_device::offset()
 {
-//	popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+//  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
 	if(vga.crtc.dw)
 		return vga.crtc.offset << 3;
 	if(vga.crtc.word_mode)
@@ -603,18 +603,18 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xi;
 	UINT8 start_shift;
-//	UINT16 line_length;
+//  UINT16 line_length;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff;
 	curr_addr = 0;
 
-//	if(vga.crtc.dw)
-//		line_length = vga.crtc.offset << 3;  // doubleword mode
-//	else
-//	{
-//		line_length = vga.crtc.offset << 4;
-//	}
+//  if(vga.crtc.dw)
+//      line_length = vga.crtc.offset << 3;  // doubleword mode
+//  else
+//  {
+//      line_length = vga.crtc.offset << 4;
+//  }
 
 	start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
 

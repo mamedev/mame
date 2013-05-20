@@ -173,5 +173,3 @@ ioport_constructor pc_mssw_pad_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( sidewinder_pad );
 }
-
-

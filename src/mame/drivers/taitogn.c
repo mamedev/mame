@@ -719,9 +719,9 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
-//	AM_RANGE(0x1f000000, 0x1f1fffff) AM_DEVREADWRITE16("sndflash0", intelfsh16_device, read, write, 0xffffffff)
-//	AM_RANGE(0x1f200000, 0x1f3fffff) AM_DEVREADWRITE16("sndflash1", intelfsh16_device, read, write, 0xffffffff)
-//	AM_RANGE(0x1f400000, 0x1f5fffff) AM_DEVREADWRITE16("sndflash2", intelfsh16_device, read, write, 0xffffffff)
+//  AM_RANGE(0x1f000000, 0x1f1fffff) AM_DEVREADWRITE16("sndflash0", intelfsh16_device, read, write, 0xffffffff)
+//  AM_RANGE(0x1f200000, 0x1f3fffff) AM_DEVREADWRITE16("sndflash1", intelfsh16_device, read, write, 0xffffffff)
+//  AM_RANGE(0x1f400000, 0x1f5fffff) AM_DEVREADWRITE16("sndflash2", intelfsh16_device, read, write, 0xffffffff)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")

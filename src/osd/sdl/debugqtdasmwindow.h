@@ -52,13 +52,13 @@ public:
 		m_rightBar(0)
 	{
 	}
-	
+
 	~DasmWindowQtConfig() {}
-	
+
 	// Settings
 	int m_cpu;
 	int m_rightBar;
-	
+
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
 	void addToXmlDataNode(xml_data_node* node) const;

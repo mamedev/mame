@@ -1485,8 +1485,8 @@ static ADDRESS_MAP_START( timefgtr_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
-//	AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ?
-//	AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
+//  AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ?
+//  AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
 ADDRESS_MAP_END
 
 
@@ -3283,7 +3283,7 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 
 DRIVER_INIT_MEMBER(galaxian_state,timefgtr)
 {
-	/* two sprite generators */ 
+	/* two sprite generators */
 	m_numspritegens = 2;
 
 	/* bullets moved from $60 to $c0 */

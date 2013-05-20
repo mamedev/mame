@@ -231,24 +231,24 @@ inline void ie15_device::execute_one(int opcode)
 
 	switch (opcode & 0xf0)
 	{
-		case 0x00:	// add
+		case 0x00:  // add
 			tmp = m_A + get_reg_lo(opcode & 15);
 			m_A = tmp & 255;
 			update_flags(m_A);
 			m_CF = BIT(tmp, 8);
 			break;
-		case 0x10:	// jmp
+		case 0x10:  // jmp
 			m_PC.w.l = get_addr(opcode);
-//			m_CF = 0;
+//          m_CF = 0;
 			break;
-		case 0x20:	// ldc
+		case 0x20:  // ldc
 			set_reg(opcode & 15, arg() | (m_PC.w.l & 0xf00));
 			m_PC.w.l = m_PC.w.l + 1;
-//			m_CF = 0;
+//          m_CF = 0;
 			break;
-		case 0x40: 	// dsr
+		case 0x40:  // dsr
 			tmp = get_reg_lo(opcode & 15) - 1;
-//			m_CF = BIT(tmp, 8);
+//          m_CF = BIT(tmp, 8);
 			tmp &= 255;
 			set_reg(opcode & 15, tmp);
 			update_flags(tmp);
@@ -259,17 +259,17 @@ inline void ie15_device::execute_one(int opcode)
 		case 0x30:
 			switch (opcode)
 			{
-				case 0x30:	// lca
+				case 0x30:  // lca
 					m_A = arg();
 					update_flags(m_A);
 					m_PC.w.l = m_PC.w.l + 1;
 					break;
-				case 0x33:	// ral
+				case 0x33:  // ral
 					tmp = m_A;
 					m_A = (m_A << 1) | BIT(tmp,7);
 					update_flags(m_A);
 					break;
-				case 0x35:	// rar
+				case 0x35:  // rar
 					tmp = m_A;
 					m_A = (m_A >> 1) | (BIT(tmp,0) ? 0x80 : 0x00);
 					update_flags(m_A);
@@ -282,9 +282,9 @@ inline void ie15_device::execute_one(int opcode)
 		case 0x50:
 			switch (opcode)
 			{
-				case 0x51:	// inc
-				case 0x50:	// isn
-				case 0x58:	// ise
+				case 0x51:  // inc
+				case 0x50:  // isn
+				case 0x58:  // ise
 					tmp = m_A + 1;
 					m_A = tmp & 255;
 					update_flags(m_A);
@@ -294,9 +294,9 @@ inline void ie15_device::execute_one(int opcode)
 					if (opcode == 0x58 && !m_ZF)
 						SKIP_OP(tmp);
 					break;
-				case 0x5b:	// dec
-				case 0x52:	// dsn
-				case 0x5a:	// dse
+				case 0x5b:  // dec
+				case 0x52:  // dsn
+				case 0x5a:  // dse
 					tmp = m_A - 1;
 					m_A = tmp & 255;
 					update_flags(m_A);
@@ -306,11 +306,11 @@ inline void ie15_device::execute_one(int opcode)
 					if (opcode == 0x5a && !m_ZF)
 						SKIP_OP(tmp);
 					break;
-				case 0x5d:	// com
+				case 0x5d:  // com
 					m_A ^= 255;
 					update_flags(m_A);
 					break;
-				case 0x5f:	// clr
+				case 0x5f:  // clr
 					m_A = 0;
 					update_flags(m_A);
 					break;
@@ -319,11 +319,11 @@ inline void ie15_device::execute_one(int opcode)
 					break;
 			};
 			break;
-		case 0x70:	// jmi
-//			m_CF = 0;
+		case 0x70:  // jmi
+//          m_CF = 0;
 			m_PC.w.l = get_reg(opcode & 15);
 			break;
-		case 0x60:	// lla
+		case 0x60:  // lla
 			// special case -- port 7
 			if (opcode == 0x67)
 				m_A = 255;
@@ -331,7 +331,7 @@ inline void ie15_device::execute_one(int opcode)
 				m_A = m_io->read_byte(opcode & 15);
 			update_flags(m_A);
 			break;
-		case 0xf0:	// ota
+		case 0xf0:  // ota
 			// special case -- ports 016, 017
 			if (opcode == 0xfe)
 				m_RF = 1;
@@ -339,9 +339,9 @@ inline void ie15_device::execute_one(int opcode)
 				m_RF = 0;
 			else
 				m_io->write_byte(opcode & 15, m_A);
-//			m_CF = 0;
+//          m_CF = 0;
 			break;
-		case 0xc0:	// cfl, sfl
+		case 0xc0:  // cfl, sfl
 			switch (opcode)
 			{
 				// special case -- accessing control flag 05 resets CF
@@ -354,7 +354,7 @@ inline void ie15_device::execute_one(int opcode)
 					break;
 			}
 			break;
-		case 0x80:	// sfc, skp, sfs, nop
+		case 0x80:  // sfc, skp, sfs, nop
 			tmp = opcode & 7;
 			switch (tmp)
 			{
@@ -377,28 +377,28 @@ inline void ie15_device::execute_one(int opcode)
 			if (BIT(opcode, 3) && tmp)
 				SKIP_OP(tmp);
 			break;
-		case 0xb0:	// cs
-//			m_CF = 0;
+		case 0xb0:  // cs
+//          m_CF = 0;
 			if (m_A == get_reg_lo(opcode & 15)) {
 				m_ZF = 1;
 				SKIP_OP(tmp);
 			}
 			break;
-		case 0x90:	// and
+		case 0x90:  // and
 			m_A &= get_reg_lo(opcode & 15);
 			update_flags(m_A);
 			break;
-		case 0xa0:	// xor
+		case 0xa0:  // xor
 			m_A ^= get_reg_lo(opcode & 15);
 			update_flags(m_A);
 			break;
-		case 0xd0:	// lda
+		case 0xd0:  // lda
 			m_A = get_reg_lo(opcode & 15);
 			update_flags(m_A);
 			break;
-		case 0xe0:	// sta
+		case 0xe0:  // sta
 			set_reg(opcode & 15, m_A | (m_PC.w.l & 0xf00));
-//			m_CF = 0;
+//          m_CF = 0;
 			break;
 		default:
 			illegal(opcode);
@@ -437,7 +437,7 @@ inline UINT16 ie15_device::get_reg(UINT8 reg)
 inline void ie15_device::set_reg(UINT8 reg, UINT16 val)
 {
 	(m_RF ? m_REGS[16 + reg] : m_REGS[reg]) = val;
-	
+
 }
 
 inline void ie15_device::update_flags(UINT8 val)

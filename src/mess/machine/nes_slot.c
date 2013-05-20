@@ -768,7 +768,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	if (m_vram_size)
 		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_vram, m_vram_size);
 	if (m_battery_size)
-		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_battery, m_battery_size);	
+		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_battery, m_battery_size);
 }
 
 void device_nes_cart_interface::pcb_reg_postload(running_machine &machine)

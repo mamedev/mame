@@ -47,7 +47,7 @@ Bproms are 82s123,82s129
 
 Dip switches (by direct test,no manuals present):
 -DIP A-
-SW 1   2   3   5   6   7   8  
+SW 1   2   3   5   6   7   8
    unknown
 SW 4
    OFF infinite lives (test)
@@ -74,7 +74,7 @@ SW 7   8
    OFF ON  3 lives
    ON  ON  2 lives
 Note: no table-upright mode sw,upright fixed.No picture flip sw too
-   
+
 
 Eprom dump,hw and dip info by tirino73
 Bprom dump by f205v
@@ -139,7 +139,7 @@ public:
 
 		if (data&~0x01) printf("stuntair_f001_w %02x\n", data);
 	}
-	
+
 	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w)
 	{
 		m_spritebank0 = data&0x01;
@@ -166,7 +166,7 @@ public:
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	}
-	
+
 
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
 
@@ -179,7 +179,7 @@ public:
 	{
 		return m_soundlatch;
 	}
-	
+
 	DECLARE_READ8_MEMBER(ay8910_in1_r)
 	{
 		printf("ay8910_in1_r\n");
@@ -207,13 +207,13 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_f001_w)  // might be nmi enable
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
-	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4") AM_WRITE(stuntair_spritebank1_w) 
-//	AM_RANGE(0xf004, 0xf004) AM_WRITENOP 
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w) 
-//	AM_RANGE(0xf006, 0xf006) AM_WRITENOP 
-//	AM_RANGE(0xf007, 0xf007) AM_WRITENOP 
+	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("IN4") AM_WRITE(stuntair_spritebank1_w)
+//  AM_RANGE(0xf004, 0xf004) AM_WRITENOP
+	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w)
+//  AM_RANGE(0xf006, 0xf006) AM_WRITENOP
+//  AM_RANGE(0xf007, 0xf007) AM_WRITENOP
 
-	
+
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
 
 
@@ -277,13 +277,13 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPNAME( 0x02, 0x02, "DSWA:6" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSWA:7" ) 
+	PORT_DIPNAME( 0x80, 0x80, "DSWA:7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x01, 0x01, "DSWA:8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -293,10 +293,10 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPNAME( 0x08, 0x08, "IN2:3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -401,7 +401,7 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 	int opaque = tileno & 0x80;
 
 	// where does the FG palette come from? it's a 1bpp layer..
-	
+
 	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
@@ -468,11 +468,11 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 		int colour = m_sprram[(i*16)+4] & 0x7;
 		int tile   = m_sprram[(i*16)+1] & 0x3f;
 		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
-//	    int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
+//      int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
 		int flipx = 0;
-	
+
 		if (m_spritebank1) tile |= 0x40;
-		if (m_spritebank0) tile |= 0x80;		
+		if (m_spritebank0) tile |= 0x80;
 
 		y = 240 - y;
 

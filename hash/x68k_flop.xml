@@ -3,16 +3,16 @@
 
 <!--
 
-Image formats: 
+Image formats:
 
 Collections of X68000 disks are available in multiple formats: DIM, FDI, XDF, D88
-* D88 and FDI are very good formats but not widely supported by other X68000 emus 
+* D88 and FDI are very good formats but not widely supported by other X68000 emus
   (they are typically used for PC88 or PC98 disks)
-* DIM is capable of represent any X68000 disk without protections (6 different disk 
+* DIM is capable of represent any X68000 disk without protections (6 different disk
   formats, including both 1.2MB and 1.4MB disks with different densities)
 * XDF is limited to standard X68000 1.2MB disks without protections and nothing else
 
-Notice that for standard 1.2MB disks, DIM and XDF are basically equivalent, since the 
+Notice that for standard 1.2MB disks, DIM and XDF are basically equivalent, since the
 only difference lies in the 0x100 bytes header appended to the DIM files (prescribing
 the disk format and the number of used tracks, among other things)
 
@@ -27,15 +27,15 @@ Exceptions are:
 A very nice tool to convert files from a format to the other is VFIC (Virtual Floppy
 Image Converter).
 A minor bug is present in the program though, when converting *some* images to DIM,
-which has to be taken into account (many thanks to Ashura at the Tokugawa boards for 
-explaining the issue and the fix): VFIC sometimes detects 2HS (1.4M) images as 2HC (1.2M) 
+which has to be taken into account (many thanks to Ashura at the Tokugawa boards for
+explaining the issue and the fix): VFIC sometimes detects 2HS (1.4M) images as 2HC (1.2M)
 and sets the wrong media flag in the header in the conversion from other formats to DIM.
-To check if a 1.4M disk converted to DIM is ok it is enough to check the first byte of 
-the DIM file (media flag): if it is 03h (2HDE format), then the image is OK; if it is 02h, 
-then it has to be changed to 01h. 2HQ format (media flag 09h) might be affected as well, 
-but there seems to be no 2HQ images converted from other formats to DIM, so there should 
+To check if a 1.4M disk converted to DIM is ok it is enough to check the first byte of
+the DIM file (media flag): if it is 03h (2HDE format), then the image is OK; if it is 02h,
+then it has to be changed to 01h. 2HQ format (media flag 09h) might be affected as well,
+but there seems to be no 2HQ images converted from other formats to DIM, so there should
 be no problematic files.
-An alternate way to check whether the 1.4MB images are correct it is to convert them all 
+An alternate way to check whether the 1.4MB images are correct it is to convert them all
 to D88 format with VFIC.  If the resulting image size is 1.2MB, then it has the wrong flag!
 
 The only protected disks known are (as of now): Might & Magic, Rogue Alliance and Silent Moebius.
@@ -46,10 +46,10 @@ TODO: check the first byte in the 1.44MB images below!!
 
 -->
 
-<!-- 
+<!--
 Missing dumps
 
-Arkham Products	
+Arkham Products
 ===============
 Floppy Bunko 1 Listeners club 0990 vol.1
 Floppy Bunko 11 Listeners club 0990 vol.2
@@ -109,7 +109,7 @@ Ayumi chan Monogatari prototype
 Ayumi chan Monogatari Hint Disk
 DALK Hint Disk
 
-Babylon	
+Babylon
 =======
 Pasocomic Purple Cat Vol.2 Hospital Tokushuu
 Pasocomic Purple Cat Kokodake no Disk
@@ -218,7 +218,7 @@ Family Soft
 ===========
 Kidou Senshi Gundam Classic Operation Orignal Scenario Disk
 
-Grocer	
+Grocer
 ======
 As you like Yaritaihoudai 3 Europa Tour As You Like
 
@@ -232,11 +232,11 @@ Shinjuku Monogatari
 Yumeji Asakusa Kitan
 Koroshi no Dress 3
 
-JDS	
+JDS
 ===
 Meikantoku 2
 
-Jitensha Sougyou	
+Jitensha Sougyou
 ================
 Road Blaster
 Sora no Fudousan
@@ -251,7 +251,7 @@ Kure Software Koubou
 ====================
 First Queen
 
-KD Office	
+KD Office
 =========
 Kage no Subashi Shitehonzon
 
@@ -272,11 +272,11 @@ MicroProse
 ==========
 F15 Strike Eagle II Sabaku no Arashi Sakusen Scenario Disk
 
-NIC	
+NIC
 ===
 Magic Knight
 
-New	
+New
 ===
 Princess Maker
 
@@ -284,7 +284,7 @@ New System House Oh!
 ====================
 Tokyo Joshikou Seifuku o Nuida Zukan Part.3
 
-Nihon Computer Club Renmei Kikaku	
+Nihon Computer Club Renmei Kikaku
 =================================
 Cyber Writer Graphic & Music library Shuu
 D-RETURN Tei Nanido Version
@@ -303,7 +303,7 @@ Sharp
 =====
 Soukoban Revenge SX-68K User no Gyakushuu Hen
 
-Symphonic Project	
+Symphonic Project
 =================
 Galaxy Mind
 
@@ -311,16 +311,16 @@ Scap Trust
 ==========
 Shikinjou
 
-Starcraft	
+Starcraft
 =========
 Might & Magic 2
 
-Sougou Business Assist	
+Sougou Business Assist
 ======================
 Campaign ban Daisenryaku 2 Sakusenbetsu Map
 Campaign ban Daisenryaku 2 Unit Kaizou Pack
 
-Software House Parsley	
+Software House Parsley
 ======================
 image 2
 Be Rain
@@ -329,12 +329,12 @@ Softhouse Aladdin
 =================
 QUIZ Ikasete...
 
-Soft Plan	
+Soft Plan
 =========
 King's Dungeon
 Dark Odyssey
 
-Techno Brain	
+Techno Brain
 ============
 Ginga Senshin Guyna Rock
 
@@ -3220,7 +3220,7 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 	</software>
 
 <!--
-According to http://mercenaryforce.web.fc2.com/x68k/x68000/00083.html this game consisted of 4 disks, not 8! 
+According to http://mercenaryforce.web.fc2.com/x68k/x68000/00083.html this game consisted of 4 disks, not 8!
 maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup kit to Shin Scenario Make kit &amp; Daikairei Tsuika Scenario
 -->
 	<software name="daikaint">
@@ -3711,7 +3711,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 				<rom name="dios (1990)(zain soft)(disk 4 of 4)(disk d).dim" size="1261824" crc="48c84933" sha1="df88e09eb61df27865866c29893669b9aa261bb0" offset="000000" />
 			</dataarea>
 		</part>
-        <!-- is this really needed? -->
+		<!-- is this really needed? -->
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261824">
@@ -12778,7 +12778,7 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="strider">
 		<description>Strider Hiryuu</description>
 		<year>1992</year>
@@ -29951,8 +29951,8 @@ a contest among doujin programmers...  -->
 	</software>
 
 
-<!-- 
-Technically speaking these are invalid XDF files, because they contain more tracks than supported by XDF, while waiting to get (if possible) 
+<!--
+Technically speaking these are invalid XDF files, because they contain more tracks than supported by XDF, while waiting to get (if possible)
 a DIM dump with DIFC, these are at least confirmed as coming from real disk (by SuperDeadite)
 -->
 

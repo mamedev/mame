@@ -616,7 +616,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( superx )
 	PORT_INCLUDE( dooyongm68_generic )
 
-	PORT_MODIFY("DSW") /* In documentation this switch enables "service mode" but it never had any effect in game */ 
+	PORT_MODIFY("DSW") /* In documentation this switch enables "service mode" but it never had any effect in game */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

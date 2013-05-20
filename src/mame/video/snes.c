@@ -1687,7 +1687,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
 
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].enable);

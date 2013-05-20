@@ -1690,11 +1690,11 @@ void sega315_5124_device::vdp_postload()
 		case 192:
 			m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 			break;
-			
+
 		case 224:
 			m_frame_timing = (m_is_pal) ? pal_224 : ntsc_224;
 			break;
-			
+
 		case 240:
 			m_frame_timing = (m_is_pal) ? pal_240 : ntsc_240;
 			break;

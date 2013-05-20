@@ -430,7 +430,7 @@ void nes_lh53_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_reg));
@@ -439,10 +439,10 @@ void nes_lh53_device::device_start()
 void nes_lh53_device::pcb_reset()
 {
 	chr8(0, CHRRAM);
-	
+
 	prg8_89(0xc);
-	prg8_ab(0xd);	// last 2K are overlayed by WRAM
-	prg8_cd(0xe);	// first 6K are overlayed by WRAM
+	prg8_ab(0xd);   // last 2K are overlayed by WRAM
+	prg8_cd(0xe);   // first 6K are overlayed by WRAM
 	prg8_ef(0xf);
 	m_reg = 0;
 	m_irq_count = 0;
@@ -1305,18 +1305,18 @@ WRITE8_MEMBER(nes_lh10_device::write_h)
 }
 
 /*-------------------------------------------------
- 
+
  UNL-LH53
- 
+
  Games: Nazo no Murasamejou (FDS conversion)
- 
- This PCB maps WRAM (w/battery) in 0xb800-0xd7ff and 
+
+ This PCB maps WRAM (w/battery) in 0xb800-0xd7ff and
  PRG in 0x6000-0x7fff
 
  iNES:
- 
+
  In MESS: Preliminar Support only.
- 
+
  -------------------------------------------------*/
 
 void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1344,20 +1344,20 @@ READ8_MEMBER(nes_lh53_device::read_m)
 READ8_MEMBER(nes_lh53_device::read_h)
 {
 	LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
-	
+
 	if (offset >= 0x3800 && offset < 0x5800)
 		return m_battery[offset & 0x1fff];
-	
+
 	return hi_access_rom(offset);
 }
 
 WRITE8_MEMBER(nes_lh53_device::write_h)
 {
 	LOG_MMC(("lh53 write_h, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset >= 0x3800 && offset < 0x5800)
 		m_battery[offset & 0x1fff] = data;
-	
+
 	else
 	{
 		switch (offset & 0x7000)

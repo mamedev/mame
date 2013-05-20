@@ -330,7 +330,7 @@ int sms_state::lgun_bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 		/* Caculate distance in x of the radius, relative to beam's y distance.
 		   First try some shortcuts. */
 		switch (dy)
- 		{
+		{
 		case LGUN_RADIUS:
 			dx_radius = 0;
 			break;

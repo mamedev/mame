@@ -7,8 +7,8 @@
   TODO:
     precise DMA cycle stealing
 
-	2013-05-08 huygens rewrite to emulate line ram buffers (mostly fixes Kung-Fu Master
-							Started DMA cycle stealing implementation 
+    2013-05-08 huygens rewrite to emulate line ram buffers (mostly fixes Kung-Fu Master
+                            Started DMA cycle stealing implementation
 
     2003-06-23 ericball Kangaroo mode & 320 mode & other stuff
 
@@ -47,13 +47,13 @@ void a7800_state::video_start()
 	{
 		m_maria_palette[i]=0;
 	}
-	
+
 	for(i=0; i<2; i++)
 	{
 		for(j=0; j<160; j++)
 			m_line_ram[i][j] = 0;
 	}
-	
+
 	m_active_buffer = 0;
 
 	m_maria_write_mode=0;
@@ -199,7 +199,7 @@ void a7800_state::maria_draw_scanline()
 		}
 	}
 	m_maincpu->eat_cycles(maria_cycles/4); // Maria clock rate is 4 times that of CPU
-	
+
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers
 	UINT16 *scanline;
@@ -250,7 +250,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 		machine().scheduler().trigger( TRIGGER_HSYNC );
 		m_maria_wsync = 0;
 	}
-	
+
 	int frame_scanline = m_screen->vpos() % ( m_lines + 1 );
 	if (frame_scanline == 16)
 		m_maria_vblank = 0x00;
@@ -304,7 +304,7 @@ TIMER_CALLBACK_MEMBER(a7800_state::a7800_maria_startdma)
 			m_maria_offset--;
 		}
 	}
-	
+
 	if( m_maria_nmi )
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -343,7 +343,7 @@ READ8_MEMBER(a7800_state::a7800_MARIA_r)
 WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 {
 	int i;
-	
+
 	if ((offset & 3) != 0)
 		m_maria_palette[offset] = data;
 

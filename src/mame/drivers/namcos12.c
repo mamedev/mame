@@ -1293,7 +1293,7 @@ READ16_MEMBER(namcos12_state::system11gun_r)
 		break;
 
 	case 3:
-		 data = ioport("LIGHT0_Y")->read() + 1;
+			data = ioport("LIGHT0_Y")->read() + 1;
 		break;
 
 	case 4:

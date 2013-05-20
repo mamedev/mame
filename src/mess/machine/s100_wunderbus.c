@@ -19,9 +19,9 @@
 #define INS8250_1_TAG   "6d"
 #define INS8250_2_TAG   "5d"
 #define INS8250_3_TAG   "4d"
-#define RS232_A_TAG		"rs232a"
-#define RS232_B_TAG		"rs232b"
-#define RS232_C_TAG		"rs232c"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define RS232_C_TAG     "rs232c"
 #define UPD1990C_TAG    "12a"
 
 

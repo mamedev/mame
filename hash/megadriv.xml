@@ -380,7 +380,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Arena Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="670100 REV7" />		<!-- REV1 found in Euro cart -->
+			<feature name="pcb" value="670100 REV7" />      <!-- REV1 found in Euro cart -->
 			<feature name="ic1" value="MPR-15061-F" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15061-f.ic1" size="524288" crc="a3b00d6e" sha1="1f4b969592f98d2692cb06eca550da9c03062593" offset="000000" loadflag="load16_word_swap" />
@@ -2493,7 +2493,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
     ALL RIGHTS RESERVED
     S77H81/00000010
     9640 D
-    
+
 [USA, maybe?]
     FIFA 97 B1
     (c)ELECTRONIC ARTS 1996
@@ -4514,7 +4514,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajam" />
 			<feature name="pcb" value="670120 REV 2" />
-			<feature name="u1" value="NBA JAM GEN VER 1.00" />	<!-- also found pic (from US cart?) with rom marked "GEN NBA JAM 9402 VER 1.00 S285" -->
+			<feature name="u1" value="NBA JAM GEN VER 1.00" />  <!-- also found pic (from US cart?) with rom marked "GEN NBA JAM 9402 VER 1.00 S285" -->
 			<feature name="u2" value="DV74ALS138N" />
 			<feature name="u3" value="GD74LS74A" />
 			<feature name="u4" value="GD74LS125A" />
@@ -7925,10 +7925,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="MPR-19766-MX" />
 			<feature name="ic2" value="MPR-19767-MX" />
 			<feature name="ic3" value="LH52B256D-70LL" />
-			<feature name="ic4" value="BA6162" />	<!-- On the back of the PCB -->
-			<feature name="ic5" value="7C46HC139" />	<!-- On the back of the PCB -->
-			<feature name="ic6" value="7B16HC00" />	<!-- On the back of the PCB -->
-			<feature name="ic7" value="74HC74A" />	<!-- On the back of the PCB -->
+			<feature name="ic4" value="BA6162" />   <!-- On the back of the PCB -->
+			<feature name="ic5" value="7C46HC139" />    <!-- On the back of the PCB -->
+			<feature name="ic6" value="7B16HC00" /> <!-- On the back of the PCB -->
+			<feature name="ic7" value="74HC74A" />  <!-- On the back of the PCB -->
 			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-19766-mx.ic1" size="2097152" crc="99545a01" sha1="f56f4376e45917c875b9286b1bfe90c2b67c29c1" offset="0x000000" loadflag="load16_word_swap" />

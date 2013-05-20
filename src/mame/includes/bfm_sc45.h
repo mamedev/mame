@@ -21,7 +21,6 @@ public:
 			m_vfd0(*this, "vfd0"),
 			m_ymz(*this, "ymz")
 	{
-
 	}
 
 public:

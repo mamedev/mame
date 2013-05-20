@@ -57,7 +57,7 @@ struct QSOUND_CHANNEL
 // ======================> qsound_device
 
 class qsound_device : public device_t,
-					  public device_sound_interface
+						public device_sound_interface
 {
 public:
 	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -150,7 +150,7 @@ void ym2610_device::device_start()
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	
+
 	int rate = clock()/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;

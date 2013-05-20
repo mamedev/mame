@@ -23,7 +23,7 @@
 WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 {
 	// clearly a duart of some kind, write patterns are the same as SC4 games
-//	printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
+//  printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (mem_mask &0xff00)
 	{
@@ -104,9 +104,9 @@ static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, bfm_sc5_state )
 	AM_RANGE(0x010102f0, 0x010102f3) AM_WRITENOP
 
 	AM_RANGE(0x01010300, 0x01010303) AM_WRITENOP
-	
+
 	AM_RANGE(0x01010330, 0x01010333) AM_WRITENOP
-	
+
 	AM_RANGE(0x01010360, 0x01010363) AM_WRITENOP
 
 	AM_RANGE(0x01010380, 0x01010383) AM_WRITENOP
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, bfm_sc5_state )
 	AM_RANGE(0x010202c0, 0x010202c3) AM_WRITENOP
 #endif
 	AM_RANGE(0x010202F0, 0x010202F3) AM_READWRITE8(sc5_10202F0_r, sc5_10202F0_w, 0xffffffff)
-#if 1	
+#if 1
 	AM_RANGE(0x01020330, 0x01020333) AM_WRITENOP
 
 	AM_RANGE(0x01020350, 0x01020353) AM_WRITENOP

@@ -986,7 +986,7 @@ void spu_device::device_start()
 	memset(cache,0,(spu_ram_size>>4)*sizeof(sample_cache *));
 
 	// register save state stuff
-	save_item(NAME(reg));			// this covers all spureg.* plus the reverb parameter block
+	save_item(NAME(reg));           // this covers all spureg.* plus the reverb parameter block
 	save_item(NAME(xa_cnt));
 	save_item(NAME(cdda_cnt));
 	save_item(NAME(xa_freq));

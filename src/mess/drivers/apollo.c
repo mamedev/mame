@@ -808,8 +808,8 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 //
-//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
-//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
+//      AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//      AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -891,8 +891,8 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 //
-//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
-//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
+//      AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//      AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -994,8 +994,8 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 //      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
 //
-//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
-//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
+//      AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//      AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 

@@ -99,7 +99,7 @@ private:
 	UINT8 m_PDC;
 	UINT8 m_CTL_pins;
 	UINT8 m_speaking_now;
-protected:	UINT8 m_talk_status; private:
+protected:  UINT8 m_talk_status; private:
 	UINT8 m_state;
 
 	/* Rom interface */

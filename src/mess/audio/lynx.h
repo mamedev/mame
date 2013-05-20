@@ -66,11 +66,11 @@ class lynx2_sound_device : public lynx_sound_device
 {
 public:
 	lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };

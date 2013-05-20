@@ -44,7 +44,7 @@
     2013/04/07 Robert Tuccitto  Address map locations for the XBOARD
            added.
 
-    2013/05/01 Robert Tuccitto  Red and Blue miscalculated proportions 
+    2013/05/01 Robert Tuccitto  Red and Blue miscalculated proportions
                fixed.
 
 ***************************************************************************/

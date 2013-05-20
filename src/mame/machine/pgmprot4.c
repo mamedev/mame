@@ -446,7 +446,7 @@ void pgm_022_025_state::IGS022_reset()
 
 	src >>= 1;
 
-//	printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
+//  printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
 
 	IGS022_do_dma(src,dst,size,mode);
 
@@ -598,8 +598,8 @@ WRITE16_MEMBER(pgm_022_025_state::killbld_igs025_prot_w )
 				killbld_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
 			break;
 
-		//	default:
-		//		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
+		//  default:
+		//      logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
 		}
 	}
 }
@@ -611,14 +611,13 @@ READ16_MEMBER(pgm_022_025_state::killbld_igs025_prot_r )
 		switch (m_kb_cmd)
 		{
 			case 0x00:
-				return BITSWAP8((m_kb_swap+1)&0xff, 0,1,2,3,4,5,6,7); // dw3 
+				return BITSWAP8((m_kb_swap+1)&0xff, 0,1,2,3,4,5,6,7); // dw3
 
 			case 0x01:
 				return m_kb_reg & 0x7f;
 
 			case 0x05:
 			{
-
 				logerror ("ptr: %d\n", m_kb_ptr);
 
 				switch (m_kb_ptr)
@@ -631,7 +630,7 @@ READ16_MEMBER(pgm_022_025_state::killbld_igs025_prot_r )
 
 					case 3:
 						return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-	
+
 					case 4:
 						return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
@@ -648,7 +647,7 @@ READ16_MEMBER(pgm_022_025_state::killbld_igs025_prot_r )
 				return 0; // is this used?
 
 			//default:
-			//	logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
+			//  logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
 		}
 	}
 
@@ -832,7 +831,7 @@ INPUT_PORTS_START( dw3 )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
-//	PORT_CONFSETTING(      0x0000, "0" )
+//  PORT_CONFSETTING(      0x0000, "0" )
 	PORT_CONFSETTING(      0x0001, "1" )
 	PORT_CONFSETTING(      0x0002, "2" )
 	PORT_CONFSETTING(      0x0003, "3" )

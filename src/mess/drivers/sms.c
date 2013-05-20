@@ -87,7 +87,7 @@ Notes: (All ICs shown)
        IC6/IC7 D4168- NEC D4168 8k x8 SRAM (DIP28)
        IC8 7805     - Motorola MC7805 voltage regulator (7v to 25v input, 5v output)
        IC9 CXA1145  - Sony CXA1145 RGB to composite video encoder IC (DIP24)
-       POWER_IN     - Power input from AC/DC power pack. System requires 9VDC at 500mA. Center pin is negative and 
+       POWER_IN     - Power input from AC/DC power pack. System requires 9VDC at 500mA. Center pin is negative and
                       outer barrel is positive. Note this is opposite to regular DC power packs
        RF_OUT       - RF modulator with RF signal output to TV
        POWER_SW     - Power on/off switch
@@ -97,16 +97,16 @@ Notes: (All ICs shown)
        VSync        - 49.7015Hz
 
 
-Cart PCB Examples 
+Cart PCB Examples
 -----------------
-Note! There are many more types of PCBs & custom chip matching variations. This document 
-is not meant to provide all details of every type in existence. Some games have been 
+Note! There are many more types of PCBs & custom chip matching variations. This document
+is not meant to provide all details of every type in existence. Some games have been
 found on different types of ROM boards with and without bankswitching hardware.
 
 Type with no bankswitching hardware
 
 171-5519 \ no visible difference?
-171-5519D/ 
+171-5519D/
 |------------------|
 ||----------|      |
 ||  DIP28   |      |
@@ -123,8 +123,8 @@ Notes:
                           World Grand Prix  MPR-11074
                           Black Belt        MPR-10150
                           Ghost House       MPR-12586
-               
-               
+
+
 Types with bankswitching hardware
 
 171-5713D (uses 315-5235)
@@ -142,7 +142,7 @@ Types with bankswitching hardware
 |IC2               |
 |------------------|
 Notes:
-     SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different 
+     SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different
               types of these chips with different 315-xxxx numbers
               These include 315-5235 (DIP42), 315-5208 (DIP28) and 315-5365 (DIP42) and possibly others.
       DIP32 - 1MBit/2MBit/4MBit mask ROM (DIP32) at location IC2
@@ -167,7 +167,7 @@ Notes:
      |                |
      |----------------|
 Notes:
-      SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different 
+      SDIP42 - Custom Sega bankswitch chip at location IC1. There are several different
                types of these chips with different 315-xxxx numbers
                These include 315-5235 (DIP42), 315-5208 (DIP28) and 315-5365 (DIP42) and possibly others.
        DIP40 - 2MBit/4Mbit 16-bit mask ROM (DIP40) at location IC2
@@ -175,10 +175,10 @@ Notes:
                            Game Name         Sega ROM ID   Bank Chip
                            -----------------------------------------
                            Space Harrier     MPR-10410     315-5235
-                           
-Another ROM board 171-5497 used by Monopoly has 315-5235 DIP42 mapper chip, DIP28 mask ROM, a DIP8 chip (unknown), 
+
+Another ROM board 171-5497 used by Monopoly has 315-5235 DIP42 mapper chip, DIP28 mask ROM, a DIP8 chip (unknown),
 DIP28 SRAM (likely 8k) and a 3V coin battery.
-Yet another type of ROM board with unknown PCB number used by Phantasy Star has 315-5235 DIP42 mapper chip, DIP32 mask 
+Yet another type of ROM board with unknown PCB number used by Phantasy Star has 315-5235 DIP42 mapper chip, DIP32 mask
 ROM and DIP28 SRAM (likely 8k) and a 3V coin battery.
 Unfortunatley the majority of these ROM boards, ROM types and MPR-xxxxx Sega part numbers are undocumented because they
 were mostly dumped from the edge connector without being opened.

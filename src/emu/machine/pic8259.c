@@ -447,4 +447,3 @@ pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, d
 	, m_read_slave_ack_func(*this)
 {
 }
-

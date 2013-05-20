@@ -1517,8 +1517,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pacmansp )
 	PORT_INCLUDE( pacman )
 
-	PORT_MODIFY("DSW1") 
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7") 
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Hard (Invalid)" ) // breaks the attract screen on this version
 INPUT_PORTS_END
@@ -1526,7 +1526,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pacuman )
 	PORT_INCLUDE( pacman )
 
-	PORT_MODIFY("DSW1") 
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x03, "2C/1C, 1C/1C" )
 	PORT_DIPSETTING(    0x01, "1C/2C, 1C/3C" )
@@ -3793,7 +3793,7 @@ There are 4 proms in the board, one of them is a color prom that is different fr
 82s123  different from other sets
 82s129-1.a9 == Ms. Pacman prom 82s126.1m
 82s129-2.c9 == Ms. Pacman prom 82s126.3m
-82s129-3.d1 == Ms. Pacman prom 82s126.4a 
+82s129-3.d1 == Ms. Pacman prom 82s126.4a
 
 If you need more info about the board please write contact ricky2001 at AUMAP
 */
@@ -3816,7 +3816,7 @@ ROM_START( mspacmanbg )
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s129-1.a9",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // == 82s126.1m
-	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */ // == 82s126.3m 
+	ROM_LOAD( "82s129-2.c9",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) /* timing - not used */ // == 82s126.3m
 ROM_END
 
 
@@ -6446,5 +6446,3 @@ GAME( 198?, cannonbp, 0,        pacman,   cannonbp, pacman_state,  cannonbp, ROT
 
 GAME( 1999, superabc, 0,        superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Sep. 03 1999)", GAME_SUPPORTS_SAVE )
 GAME( 1999, superabco,superabc, superabc, superabc, pacman_state,  superabc, ROT90,  "hack (Two-Bit Score)", "Super ABC (Pac-Man multigame kit, Mar. 08 1999)", GAME_SUPPORTS_SAVE )
-
-

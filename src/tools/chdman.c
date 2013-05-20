@@ -1255,7 +1255,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 			core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
 			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
 		}
-		else if ((info.pregap > 0) && (info.pgdatasize > 0)) 
+		else if ((info.pregap > 0) && (info.pgdatasize > 0))
 		{
 			core_fprintf(file, "    INDEX 00 %s\n", msf_string_from_frames(tempstr, frameoffs));
 			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs+info.pregap));

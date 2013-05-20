@@ -293,18 +293,18 @@ void DebuggerMemView::mousePressEvent(QMouseEvent* event)
 			address_space* addressSpace = source->space();
 			const int nativeDataWidth = addressSpace->data_width() / 8;
 			const UINT64 memValue = debug_read_memory(*addressSpace,
-													  addressSpace->address_to_byte(address),
-													  nativeDataWidth,
-													  true);
-			const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(), 
-																							  address, 
-																							  memValue);
+														addressSpace->address_to_byte(address),
+														nativeDataWidth,
+														true);
+			const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(),
+																								address,
+																								memValue);
 			if (pc != (offs_t)(-1))
 			{
 				// TODO: You can specify a box that the tooltip stays alive within - might be good?
 				const QString addressAndPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
 				QToolTip::showText(QCursor::pos(), addressAndPc, NULL);
-				
+
 				// Copy the PC into the clipboard as well
 				QClipboard *clipboard = QApplication::clipboard();
 				clipboard->setText(QString("%1").arg(pc, 2, 16));

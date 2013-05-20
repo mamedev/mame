@@ -46,7 +46,7 @@ protected:
 	int     stream_pos;
 	int     stream_data;
 	int     eeprom_addr;
-	
+
 	running_machine& m_machine;
 };
 

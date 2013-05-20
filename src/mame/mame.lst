@@ -50,9 +50,9 @@ puckmod         // (c) 1981 Namco
 pacmod          // (c) 1981 Midway
 newpuc2         // hack
 newpuc2b        // hack
-pacuman			// bootleg
+pacuman         // bootleg
 newpuckx        // hack
-pacmansp		// hack
+pacmansp        // hack
 pacheart        // hack
 bucaner         // hack
 hangly          // hack
@@ -65,7 +65,7 @@ abscam          // hack
 crush           // (c) 1981 Kural Samno Electric Ltd
 crushbl         // bootleg
 crushbl2        // bootleg
-crushbl3		// bootleg
+crushbl3        // bootleg
 crush2          // (c) 1981 Kural Esco Electric Ltd - bootleg?
 crush3          // Kural Electric Ltd - bootleg?
 crush4          // Kural TWT
@@ -98,7 +98,7 @@ mspacman        // (c) 1981 Midway  // made by General Computer
 mspacmnf        // hack
 mspacmat        // hack
 msheartb        // hack
-mspacmanbg		// bootleg
+mspacmanbg      // bootleg
 woodpeck        // (c) 1981 Amenip (Palcom Queen River)
 woodpeca        // (c) 1981 Amenip Nova Games Ltd.
 mspacmab        // bootleg
@@ -162,7 +162,7 @@ galaxiana       // (c) Namco
 galaxianm       // (c) Midway
 galaxianmo      // (c) Midway
 galaxiant       // (c) Taito
-galaxrf			// bootleg (Recreativos Franco)
+galaxrf         // bootleg (Recreativos Franco)
 superg          // hack
 galapx          // hack
 moonaln         // [Nichibutsu] (Karateco license) or hack
@@ -184,7 +184,7 @@ gteikoku        // (c) Irem
 gteikokb        // bootleg
 gteikob2        // bootleg
 galemp          // (c) Taito do Brasil
-asideral		// bootleg
+asideral        // bootleg
 spacbatt        // bootleg
 spacbat2        // bootleg
 spacempr        // bootleg
@@ -227,7 +227,7 @@ starfgmc        // bootleg
 spcdrag         // bootleg
 stera           // bootleg
 spcdraga        // bootleg
-mooncreg		// bootleg
+mooncreg        // bootleg
 mooncrs3        // bootleg
 mooncrs4        // bootleg
 fantazia        // bootleg
@@ -243,7 +243,7 @@ eagle           // [1980] Centuri
 eagle2          // [1980] Centuri
 eagle3          // [1980] Centuri
 spctbird        // (c) Fortrek
-mooncptc		// bootleg (Petaco S.A.)
+mooncptc        // bootleg (Petaco S.A.)
 fantastc        // (c) Taito (Brazil) - rewrite of Galaga
 timefgtr        // (c) Taito (Brazil) - rewrite of Time Pilot
 kong            // (c) Taito (Brazil) - rewrite of Donkey Kong
@@ -671,7 +671,7 @@ falconz         // bootleg
 vautourz        // bootleg
 griffon         // bootleg (Videotron)
 nextfase        // bootleg
-phoenixs		// bootleg (Sonic)
+phoenixs        // bootleg (Sonic)
 pleiads         // (c) 1981 Tehkan
 pleiadsb2       // bootleg
 pleiadbl        // bootleg
@@ -1680,7 +1680,7 @@ vs10yardu       // (c) 1983/1984
 travrusa        // (c) 1983
 travrusab       // (c) 1983 I.P. (bootleg)
 motorace        // (c) 1983 Williams license
-mototour		// (c) 1983 Tecfri
+mototour        // (c) 1983 Tecfri
 shtrider        // (c) 1984 Seibu Kaihatsu
 shtridera       // (c) 1984 Seibu Kaihatsu
 wilytowr        // M63 (c) 1984
@@ -3059,7 +3059,7 @@ megaman         // 06/10/1995 (c) 1995 (USA)
 megamana        // 06/10/1995 (c) 1995 (Asia)
 rockmanj        // 22/09/1995 (c) 1995 (Japan)
 fcrash          // bootleg of Final Fight
-ffightbl		//
+ffightbl        //
 ganbare         // 11/04/2000 (c) 2000 (Japan)
 
 // Capcom CPS2 games
@@ -3836,7 +3836,7 @@ pang            // (c) 1989 Mitchell (World)
 pangb           // bootleg
 pangbold        // bootleg
 pangba          // bootleg
-pangb2			// bootleg
+pangb2          // bootleg
 bbros           // (c) 1989 Capcom (US) not listed on Capcom's site
 pompingw        // (c) 1989 Mitchell (Japan)
 cbasebal        // 10/1989 (c) 1989 Capcom (Japan) (different hardware)
@@ -4317,7 +4317,7 @@ altbeast4       // (c) 1988 (MC-8123B)
 altbeast2       // (c) 1988 (MC-8123B)
 altbeastj1      // (c) 1988 (protected)
 altbeastj3      // (c) 1988 (FD1094, decrypted)
-altbeastbl		//
+altbeastbl      //
 aurail          // (c) 1990 Sega / Westone
 aurail1         // (c) 1990 Sega / Westone (FD1089B, decrypted)
 aurailj         // (C) 1990 Sega / Westone (FD1089A, decrypted)
@@ -5078,7 +5078,7 @@ gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 				// 2001.03 Star Horse Progress (Rev A)
 dygolf          // 2001.04 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-shaktmsp		// 2001.04 Shakatto Tambourine 2K1 SPR
+shaktmsp        // 2001.04 Shakatto Tambourine 2K1 SPR
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
@@ -5815,7 +5815,7 @@ megaforc        // (c) 1985 Tehkan + Video Ware license
 baluba          // (c) 1986 Able Corp.
 bombjack        // (c) 1984 Tehkan
 bombjack2       // (c) 1984 Tehkan
-bombjackt		// (c) 1984 Tehkan + Tecfri license
+bombjackt       // (c) 1984 Tehkan + Tecfri license
 pbaction        // (c) 1985 Tehkan
 pbaction2       // (c) 1985 Tehkan
 pbaction3       // (c) 1985 Tehkan
@@ -7540,8 +7540,8 @@ laserbat        // (c) 1981
 lazarian        // (c) 1981
 catnmous        // (c) 1982
 catnmousa       // (c) 1982
-seabattl		// (c) 1980
-seabattla		// (c) 1980
+seabattl        // (c) 1980
+seabattla       // (c) 1980
 monymony        // (c) 1983
 jackrabt        // (c) 1984
 jackrabt2       // (c) 1984
@@ -7590,7 +7590,7 @@ strahla         // UPL-91074 (c) 1992 UPL (Japan)
 bjtwin          // UPL-93087 (c) 1993 NMK
 bjtwina         // UPL-93087 (c) 1993 NMK
 bjtwinp         // UPL-93087 (c) 1993 NMK
-atombjt			// bootleg
+atombjt         // bootleg
 tdragon2        // UPL-93091 (c) 1993 NMK
 tdragon2a       // UPL-93091 (c) 1993 NMK
 bigbang         // UPL-93091 (c) 1993 NMK
@@ -7931,7 +7931,7 @@ brod
 bagman          // (c) 1982
 bagnard         // (c) 1982
 bagnarda        // (c) 1982
-bagnardi		// (c) 1982 + Itisa license
+bagnardi        // (c) 1982 + Itisa license
 bagmans         // (c) 1982 + Stern license
 bagmans2        // (c) 1982 + Stern license
 pickin          // (c) 1983
@@ -8260,11 +8260,11 @@ spinlbrku       // (c) 1990 V-System Co. (US)
 spinlbrkj       // (c) 1990 V-System Co. (Japan)
 pspikes         // (c) 1991 Video System Co. (World)
 pspikesk        // (c) 1991 Video System Co. (Korea)
-pspikesu		// (c) 1991 Video System Co. (US)
+pspikesu        // (c) 1991 Video System Co. (US)
 svolly91        // (c) 1991 Video System Co. (Japan)
 pspikesb        // bootleg
 spikes91        // bootleg
-spikes91b		// bootleg
+spikes91b       // bootleg
 pspikesc        // bootleg
 karatblz        // (c) 1991 Video System Co.
 karatblzu       // (c) 1991 Video System Co. (US)
@@ -8462,7 +8462,7 @@ galsnewa        // (c) 1990 Kaneko
 galsnewj        // (c) 1990 Kaneko
 galsnewk        // (c) 1990 Kaneko
 galpani2        // (c) 1993 Kaneko
-galpani2e		// (c) 1993 Kaneko
+galpani2e       // (c) 1993 Kaneko
 galpani2g       // (c) 1993 Kaneko
 galpani2t       // (c) 1993 Kaneko
 galpani2i       // (c) 1993 Kaneko
@@ -8740,7 +8740,7 @@ ikki            // TVG17 (c) 1985 Sun Electronics (Japan)
 farmer          // TVG17 (c) 1985 Sun Electronics
 shanghai        // (c) 1988 Sunsoft (Sun Electronics)
 shangha2        // (c) 1989 Sunsoft (Sun Electronics)
-shangha2a		// (c) 1989 Sunsoft (Sun Electronics)
+shangha2a       // (c) 1989 Sunsoft (Sun Electronics)
 shangha3        // (c) 1993 Sunsoft
 heberpop        // (c) 1994 Sunsoft / Atlus
 blocken         // (c) 1994 KID / Visco
@@ -8990,7 +8990,7 @@ zeropnta        // (c) 1998
 zeropntj        // (c) 1998 (Japan)
 zeropnt2        // (c) 1999
 silkroad        // (c) 1999
-silkroada		// (c) 1999
+silkroada       // (c) 1999
 aoh             // (c) 2001
 
 // Afega games
@@ -9001,10 +9001,10 @@ redhawke        // (c) 1997 Excellent Co., Ltd license
 redhawki        // (c) 1997 Haedong Corp. license
 redhawkb        // (c) 1997
 grdnstrm        // (c) 1998 Apples Industries license
-grdnstrmv		//
+grdnstrmv       //
 grdnstrmk       // (c) 1998 (Korea)
 redfoxwp2       // (c) 1998 (China)
-redfoxwp2a		// (c) 1998 (China)
+redfoxwp2a      // (c) 1998 (China)
 bubl2000        // (c) 1998 Tuning
 hotbubl         // (c) 1998 Pandora
 popspops        // (c) 1999
@@ -9853,7 +9853,7 @@ wallc           // (c) 1984 Midcoin
 wallca          // (c) 1984 Midcoin
 wink            // (c) 1985 Midcoin
 winka           // (c) 1985 Midcoin
-24cdjuke		// (c) 1988 Midcoin
+24cdjuke        // (c) 1988 Midcoin
 skyarmy         // (c) 1982 Shoei
 lethalj         // (c) 1996 The Game Room
 eggventr        // (c) 1997 The Game Room
@@ -9958,7 +9958,7 @@ majorpkr        // (c) 1994 PAL System.
 su2000          // (c) 1993 Virtuality
 boonggab        // (c) 2001 Taff System
 fresh           // (c) Chain Leisure
-stuntair		// (c) 1983 Nuova Videotron
+stuntair        // (c) 1983 Nuova Videotron
 
 // Success
 tonton          // (c) 199? Success / Taiyo Jidoki.
@@ -30595,4 +30595,3 @@ bingomana
 
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
-

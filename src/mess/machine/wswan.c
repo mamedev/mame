@@ -201,7 +201,7 @@ void wswan_state::wswan_setup_bios()
 
 void wswan_state::wswan_setup_banks()
 {
-	static const char *rom_bank_tags[14] = { "rom1", "rom2", "rom3", "rom4", "rom5", "rom6", "rom7", 
+	static const char *rom_bank_tags[14] = { "rom1", "rom2", "rom3", "rom4", "rom5", "rom6", "rom7",
 		"rom8", "rom9", "rom10", "rom11", "rom12", "rom13", "rom14" };
 	for (int i = 0; i < 14; i++)
 		m_rom_bank[i] = membank(rom_bank_tags[i]);
@@ -214,7 +214,7 @@ void wswan_state::wswan_register_save()
 	save_item(NAME(m_bios_disabled));
 	save_item(NAME(m_rotate));
 	save_item(NAME(m_bank_base));
-	
+
 	save_item(NAME(m_vdp.layer_bg_enable));
 	save_item(NAME(m_vdp.layer_fg_enable));
 	save_item(NAME(m_vdp.sprites_enable));
@@ -262,7 +262,7 @@ void wswan_state::wswan_register_save()
 	save_item(NAME(m_eeprom.size));
 	if (m_eeprom.size)
 		save_pointer(NAME(m_eeprom.data), m_eeprom.size);
-	
+
 	save_item(NAME(m_rtc.present));
 	save_item(NAME(m_rtc.setting));
 	save_item(NAME(m_rtc.year));
@@ -273,7 +273,7 @@ void wswan_state::wswan_register_save()
 	save_item(NAME(m_rtc.minute));
 	save_item(NAME(m_rtc.second));
 	save_item(NAME(m_rtc.index));
-	
+
 	save_item(NAME(m_sound_dma.source));
 	save_item(NAME(m_sound_dma.size));
 	save_item(NAME(m_sound_dma.enable));

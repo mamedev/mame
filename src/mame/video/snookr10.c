@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 
 /**********************************************************
 
-  Apple 10 palette and tile matrix / video RAM 
+  Apple 10 palette and tile matrix / video RAM
   are encrypted/scrambled.
 
   For more information, see the driver notes.
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 
 /**********************************************************
 
-  Crystals Colours palette and tile matrix / video RAM 
+  Crystals Colours palette and tile matrix / video RAM
   are encrypted/scrambled.
 
   For more information, see the driver notes.

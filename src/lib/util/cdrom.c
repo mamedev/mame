@@ -218,20 +218,20 @@ cdrom_file *cdrom_open(const char *inputfile)
 		physofs += file->cdtoc.tracks[i].frames;
 		logofs  += file->cdtoc.tracks[i].frames;
 
-/*		printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
-			file->cdtoc.tracks[i].trktype,
-			file->cdtoc.tracks[i].subtype,
-			file->cdtoc.tracks[i].datasize,
-			file->cdtoc.tracks[i].subsize,
-			file->cdtoc.tracks[i].frames,
-			file->cdtoc.tracks[i].extraframes,
+/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
+            file->cdtoc.tracks[i].trktype,
+            file->cdtoc.tracks[i].subtype,
+            file->cdtoc.tracks[i].datasize,
+            file->cdtoc.tracks[i].subsize,
+            file->cdtoc.tracks[i].frames,
+            file->cdtoc.tracks[i].extraframes,
             file->cdtoc.tracks[i].pregap,
- 		    file->cdtoc.tracks[i].pgtype,
-			file->cdtoc.tracks[i].pgdatasize,
-			file->cdtoc.tracks[i].postgap,
-			file->cdtoc.tracks[i].logframeofs,
-			file->cdtoc.tracks[i].physframeofs,
-			file->cdtoc.tracks[i].chdframeofs);*/
+            file->cdtoc.tracks[i].pgtype,
+            file->cdtoc.tracks[i].pgdatasize,
+            file->cdtoc.tracks[i].postgap,
+            file->cdtoc.tracks[i].logframeofs,
+            file->cdtoc.tracks[i].physframeofs,
+            file->cdtoc.tracks[i].chdframeofs);*/
 	}
 
 	/* fill out dummy entries for the last track to help our search */
@@ -306,20 +306,20 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 		logofs  += file->cdtoc.tracks[i].frames;
 
-/*		printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
-			file->cdtoc.tracks[i].trktype,
-			file->cdtoc.tracks[i].subtype,
-			file->cdtoc.tracks[i].datasize,
-			file->cdtoc.tracks[i].subsize,
-			file->cdtoc.tracks[i].frames,
-			file->cdtoc.tracks[i].extraframes,
+/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
+            file->cdtoc.tracks[i].trktype,
+            file->cdtoc.tracks[i].subtype,
+            file->cdtoc.tracks[i].datasize,
+            file->cdtoc.tracks[i].subsize,
+            file->cdtoc.tracks[i].frames,
+            file->cdtoc.tracks[i].extraframes,
             file->cdtoc.tracks[i].pregap,
- 		    file->cdtoc.tracks[i].pgtype,
-			file->cdtoc.tracks[i].pgdatasize,
-			file->cdtoc.tracks[i].postgap,
-			file->cdtoc.tracks[i].logframeofs,
-			file->cdtoc.tracks[i].physframeofs,
-			file->cdtoc.tracks[i].chdframeofs);*/
+            file->cdtoc.tracks[i].pgtype,
+            file->cdtoc.tracks[i].pgdatasize,
+            file->cdtoc.tracks[i].postgap,
+            file->cdtoc.tracks[i].logframeofs,
+            file->cdtoc.tracks[i].physframeofs,
+            file->cdtoc.tracks[i].chdframeofs);*/
 	}
 
 	/* fill out dummy entries for the last track to help our search */
@@ -362,7 +362,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 	// if this is pregap info that isn't actually in the file, just return blank data
 	if ((file->cdtoc.tracks[tracknum].pgdatasize == 0) && (lbasector < (file->cdtoc.tracks[tracknum].logframeofs + file->cdtoc.tracks[tracknum].pregap)))
 	{
-//		printf("PG missing sector: LBA %d, trklog %d\n", lbasector, file->cdtoc.tracks[tracknum].logframeofs);
+//      printf("PG missing sector: LBA %d, trklog %d\n", lbasector, file->cdtoc.tracks[tracknum].logframeofs);
 		memset(dest, 0, length);
 		return CHDERR_NONE;
 	}
@@ -379,7 +379,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, UINT32 lbasector, UI
 
 	sourcefileoffset += chdsector * bytespersector + startoffs;
 
-//	printf("Reading sector %d from track %d at offset %lld\n", chdsector, tracknum, sourcefileoffset);
+//  printf("Reading sector %d from track %d at offset %lld\n", chdsector, tracknum, sourcefileoffset);
 
 	core_fseek(srcfile, sourcefileoffset, SEEK_SET);
 	core_fread(srcfile, dest, length);
@@ -998,7 +998,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 			if (toc->tracks[i].pgdatasize > 0)
 			{
 				strcpy(&submode[1], cdrom_get_type_string(toc->tracks[i].pgtype));
-				submode[0] = 'V';	// indicate valid submode
+				submode[0] = 'V';   // indicate valid submode
 			}
 			else
 			{
@@ -1322,4 +1322,3 @@ void ecc_clear(UINT8 *sector)
 	memset(&sector[ECC_P_OFFSET], 0, 2 * ECC_P_NUM_BYTES);
 	memset(&sector[ECC_Q_OFFSET], 0, 2 * ECC_Q_NUM_BYTES);
 }
-

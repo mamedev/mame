@@ -896,9 +896,9 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 
 	// setup autoboot if needed
 	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
-	
+
 	// now we're running
-	m_current_phase = MACHINE_PHASE_RUNNING;	
+	m_current_phase = MACHINE_PHASE_RUNNING;
 }
 
 

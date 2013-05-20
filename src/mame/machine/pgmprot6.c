@@ -183,7 +183,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 	UINT16 param = mode >> 8;
 	UINT16 *PROTROM = (UINT16*)memregion("user1")->base();
 
-//	logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
+//  logerror ("mode: %2.2x, src: %4.4x, dst: %4.4x, size: %4.4x, data: %4.4x\n", (mode &0xf), src, dst, size, mode);
 
 	mode &= 0x0f;
 
@@ -222,7 +222,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 		break;
 
 		//default:
-		//	logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
+		//  logerror ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
 	}
 }
 
@@ -252,13 +252,13 @@ void pgm_028_025_state::olds_protection_calculate_hilo() // calculated in routin
 
 	source = olds_source_data[ioport("Region")->read() - 1][m_olds_prot_hilo_select];
 
-	if (m_olds_prot_hilo_select & 1)	// $8178fa
+	if (m_olds_prot_hilo_select & 1)    // $8178fa
 	{
-		m_olds_prot_hilo = (m_olds_prot_hilo & 0x00ff) | (source << 8);		// $8178d8
+		m_olds_prot_hilo = (m_olds_prot_hilo & 0x00ff) | (source << 8);     // $8178d8
 	}
 	else
 	{
-		m_olds_prot_hilo = (m_olds_prot_hilo & 0xff00) | (source << 0);		// $8178d8
+		m_olds_prot_hilo = (m_olds_prot_hilo & 0xff00) | (source << 0);     // $8178d8
 	}
 }
 
@@ -284,14 +284,14 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 			{
 				UINT16 cmd = m_sharedprotram[0x3026 / 2];
 
-			//	logerror ("command: %x\n", cmd);
+			//  logerror ("command: %x\n", cmd);
 
 				switch (cmd)
 				{
 					case 0x12:
 					{
-						UINT16 mode = m_sharedprotram[0x303e / 2];	// ?
-						UINT16 src  = m_sharedprotram[0x306a / 2] >> 1;	// ?
+						UINT16 mode = m_sharedprotram[0x303e / 2];  // ?
+						UINT16 src  = m_sharedprotram[0x306a / 2] >> 1; // ?
 						UINT16 dst  = m_sharedprotram[0x3084 / 2] & 0x1fff;
 						UINT16 size = m_sharedprotram[0x30a2 / 2] & 0x1fff;
 
@@ -304,15 +304,15 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 						UINT16 p1 = m_sharedprotram[0x3050 / 2];
 						UINT16 p2 = m_sharedprotram[0x3082 / 2];
 
-					//	logerror ("p1: %4.4x, p2: %4.4x\n", p1, p2);
+					//  logerror ("p1: %4.4x, p2: %4.4x\n", p1, p2);
 
 						if (p2  == 0x02)
 							olds_write_reg(p1, olds_read_reg(p1) + 0x10000);
 					}
 					break;
 
-				//	default:
-				//		logerror ("unemulated command!\n");
+				//  default:
+				//      logerror ("unemulated command!\n");
 				}
 
 				m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
@@ -335,8 +335,8 @@ WRITE16_MEMBER(pgm_028_025_state::olds_w )
 				olds_protection_calculate_hold(m_olds_cmd & 0x0f, data & 0xff);
 			break;
 
-		//	default:
-		//		logerror ("unemulated write mode!\n");
+		//  default:
+		//      logerror ("unemulated write mode!\n");
 		}
 	}
 }
@@ -373,7 +373,7 @@ READ16_MEMBER(pgm_028_025_state::olds_r )
 
 					case 5:
 					default: // >= 5
-						return 0x3f00 | BITSWAP8(m_olds_prot_hold, 5,2,9,7,10,13,12,15);	// $817906
+						return 0x3f00 | BITSWAP8(m_olds_prot_hold, 5,2,9,7,10,13,12,15);    // $817906
 				}
 			}
 
@@ -390,25 +390,25 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 
-//	written by protection device
-//	there seems to be an auto-dma that writes from $401000-402573?
+//  written by protection device
+//  there seems to be an auto-dma that writes from $401000-402573?
 	m_sharedprotram[0x1000/2] = 0x4749; // 'IGS.28'
 	m_sharedprotram[0x1002/2] = 0x2E53;
 	m_sharedprotram[0x1004/2] = 0x3832;
 	m_sharedprotram[0x3064/2] = 0xB315; // crc or status check?
 
-//	Should these be written by command 64??
-//	m_sharedprotram[0x2a00/2] = 0x0000; // ?
-//	m_sharedprotram[0x2a02/2] = 0x0000; // ?
+//  Should these be written by command 64??
+//  m_sharedprotram[0x2a00/2] = 0x0000; // ?
+//  m_sharedprotram[0x2a02/2] = 0x0000; // ?
 	m_sharedprotram[0x2a04/2] = 0x0002; // ?
-//	m_sharedprotram[0x2a06/2] = 0x0000; // ?
-//	m_sharedprotram[0x2ac0/2] = 0x0000; // ?
+//  m_sharedprotram[0x2a06/2] = 0x0000; // ?
+//  m_sharedprotram[0x2ac0/2] = 0x0000; // ?
 	m_sharedprotram[0x2ac2/2] = 0x0001; // ?
-//	m_sharedprotram[0x2e00/2] = 0x0000; // ?
-//	m_sharedprotram[0x2e02/2] = 0x0000; // ?
-//	m_sharedprotram[0x2e04/2] = 0x0000; // ?
+//  m_sharedprotram[0x2e00/2] = 0x0000; // ?
+//  m_sharedprotram[0x2e02/2] = 0x0000; // ?
+//  m_sharedprotram[0x2e04/2] = 0x0000; // ?
 	m_sharedprotram[0x2e06/2] = 0x0009; // seconds on char. select timer
-//	m_sharedprotram[0x2e08/2] = 0x0000; // ?
+//  m_sharedprotram[0x2e08/2] = 0x0000; // ?
 	m_sharedprotram[0x2e0a/2] = 0x0006; // ?
 }
 

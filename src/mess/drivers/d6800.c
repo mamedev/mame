@@ -287,10 +287,10 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 {
 	/*
-        A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
-        This output drives the speaker and the output signal to the cassette player.
-        Bit 6 enables the speaker. Also the speaker is silenced when cassette operations
-        are in progress (DMA/CB2 line low).
+	    A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
+	    This output drives the speaker and the output signal to the cassette player.
+	    Bit 6 enables the speaker. Also the speaker is silenced when cassette operations
+	    are in progress (DMA/CB2 line low).
 	*/
 
 	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
@@ -307,7 +307,7 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	*/
 
 	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read()
-	           & m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
+				& m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
 
 	return data;
 }

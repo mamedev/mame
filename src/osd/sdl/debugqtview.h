@@ -12,8 +12,8 @@ class DebuggerView : public QAbstractScrollArea
 
 public:
 	DebuggerView(const debug_view_type& type,
-				 running_machine* machine,
-				 QWidget* parent=NULL);
+					running_machine* machine,
+					QWidget* parent=NULL);
 	virtual ~DebuggerView();
 
 	void paintEvent(QPaintEvent* event);

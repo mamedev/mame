@@ -327,7 +327,7 @@ class nes_lh53_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_lh53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -335,14 +335,14 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_WRITE8_MEMBER(write_m) {}
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
+
 	virtual void pcb_reset();
-	
+
 private:
 	UINT16 m_irq_count;
 	int m_irq_enable;
 	UINT8 m_reg;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 	attotime timer_freq;

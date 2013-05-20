@@ -179,7 +179,7 @@ void sega_genesis_vdp_device::device_start()
 
 	m_render_line_raw = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
 
-	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved, 
+	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved,
 	// but better safe than sorry...
 	save_pointer(NAME(m_sprite_renderline), 1024);
 	save_pointer(NAME(m_highpri_renderline), 320);

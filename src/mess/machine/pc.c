@@ -56,7 +56,7 @@
 
 #define DBG_LOG(N,M,A) \
 	do { \
-  	if(VERBOSE_DBG>=N) \
+	if(VERBOSE_DBG>=N) \
 		{ \
 			if( M ) \
 				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \

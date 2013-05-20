@@ -10,7 +10,7 @@
     This file is designed to be interfaced with the tms5220 core.
     Interfacing it with the tms5110 would make sense, too.
 
-	TODO:
+    TODO:
         Create seperate devices for TMS6100 & TMS6125
         Implement the serial protocol
 */

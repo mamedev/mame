@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER(deniam_state::irqhandler)
 	if (m_audiocpu != NULL)
 		m_audiocpu->set_input_line(0, state);
 }
-	
+
 
 
 void deniam_state::machine_start()

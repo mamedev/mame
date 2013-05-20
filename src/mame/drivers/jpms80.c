@@ -17,7 +17,7 @@
 
 
 System80 is based on the SRU platform, but with more outputs and finally a separate CPU and sound board setup to permit easy repair.
- 
+
 */
 
 

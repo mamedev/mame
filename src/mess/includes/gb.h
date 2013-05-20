@@ -96,12 +96,12 @@ struct gb_lcd_t {
 	UINT8   *gb_vram;     // Pointer to VRAM
 	UINT8   *gb_oam;      // Pointer to OAM memory
 	UINT8   gb_tile_no_mod;
-	UINT32  gb_chrgen_offs;		// GB Character generator
-	UINT32  gb_bgdtab_offs;		// GB Background character table
-	UINT32  gb_wndtab_offs;		// GB Window character table
-	UINT32  gbc_chrgen_offs;	// CGB Character generator
-	UINT32  gbc_bgdtab_offs;	// CGB Background character table
-	UINT32  gbc_wndtab_offs;	// CGB Window character table
+	UINT32  gb_chrgen_offs;     // GB Character generator
+	UINT32  gb_bgdtab_offs;     // GB Background character table
+	UINT32  gb_wndtab_offs;     // GB Window character table
+	UINT32  gbc_chrgen_offs;    // CGB Character generator
+	UINT32  gbc_bgdtab_offs;    // CGB Background character table
+	UINT32  gbc_wndtab_offs;    // CGB Window character table
 	int     gb_vram_bank;
 };
 
@@ -234,7 +234,7 @@ protected:
 	void gb_increment_scanline();
 	void gb_lcd_switch_on();
 	inline void gb_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
-	
+
 	void save_gb_base();
 	void save_gb_video();
 	void save_gbc_only();

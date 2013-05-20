@@ -64,7 +64,7 @@ public:
 	DECLARE_READ8_MEMBER(wave_r);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(wave_w);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -80,7 +80,7 @@ private:
 
 	sound_stream *m_channel;
 	int m_rate;
-	
+
 	INT32 m_env_length_table[8];
 	INT32 m_swp_time_table[8];
 	UINT32 m_period_table[MAX_FREQUENCIES];
@@ -88,13 +88,13 @@ private:
 	UINT32 m_period_mode4_table[8][16];
 	UINT32 m_length_table[64];
 	UINT32 m_length_mode3_table[256];
-	
+
 	struct SOUND  m_snd_1;
 	struct SOUND  m_snd_2;
 	struct SOUND  m_snd_3;
 	struct SOUND  m_snd_4;
 	struct SOUNDC m_snd_control;
-	
+
 	UINT8 m_snd_regs[0x30];
 };
 

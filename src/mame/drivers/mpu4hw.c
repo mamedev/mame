@@ -2074,7 +2074,7 @@ how this is generated, and currently trial and error is the only sensible method
 of all 00, is sometimes the correct answer, particularly in non-Barcrest use of the CHR chip, though when used normally,
 there are again fixed call values.
 
-Apparently, just before the characteriser is checked bit 1 at 0x61DF is checked and if zero the characteriser 
+Apparently, just before the characteriser is checked bit 1 at 0x61DF is checked and if zero the characteriser
 check is bypassed. This may be something to look at for prototype ROMs and hacks.
 
 */

@@ -558,7 +558,7 @@ void lynx_state::lynx_blit_lines()
 
 		m_blitter.height_accumulator += m_blitter.height;
 		for (int j = 0; j < (m_blitter.height_accumulator >> 8); j++, y += ydir)
-		{				
+		{
 			if (y >= 0 && y < 102)
 			{
 				if (m_blitter.use_rle)
@@ -729,7 +729,7 @@ void lynx_state::lynx_blitter()
 			m_blitter.mode = m_blitter.spr_ctl0 & 0x07;
 			m_blitter.use_rle = m_blitter.spr_ctl1 & 0x80 ? 0 : 1;
 			m_blitter.line_color = (m_blitter.spr_ctl0 >> 6) & 0x03;
-			
+
 			m_blitter.sprite_collide = !(m_blitter.spr_coll & 0x20);
 			m_blitter.spritenr = m_blitter.spr_coll & 0x0f;
 			m_blitter.fred = 0;
@@ -1986,7 +1986,7 @@ void lynx_state::machine_start()
 	save_item(NAME(m_uart.received));
 	save_item(NAME(m_uart.sending));
 	save_item(NAME(m_uart.buffer_loaded));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_state::lynx_postload), this));
 
 	membank("bank3")->configure_entry(0, memregion("maincpu")->base() + 0x0000);

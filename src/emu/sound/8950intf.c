@@ -39,7 +39,7 @@ void y8950_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case 0:
 		y8950_timer_over(m_chip,0);
 		break;
-		
+
 	case 1:
 		y8950_timer_over(m_chip,1);
 		break;

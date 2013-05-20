@@ -116,7 +116,7 @@ public:
 	required_shared_ptr<UINT8> m_mem_fffa;
 	required_device<cpu_device> m_maincpu;
 	required_device<lynx_sound_device> m_sound;
-	
+
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
