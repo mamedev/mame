@@ -423,6 +423,7 @@ static INPUT_PORTS_START(serial_terminal)
 	PORT_INCLUDE(generic_terminal)
 	PORT_START("TERM_FRAME")
 	PORT_CONFNAME(0x0f, 0x06, "Baud") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_terminal_device, update_frame, 0)
+	PORT_CONFSETTING( 0x0d, "110")
 	PORT_CONFSETTING( 0x00, "150")
 	PORT_CONFSETTING( 0x01, "300")
 	PORT_CONFSETTING( 0x02, "600")
@@ -439,6 +440,7 @@ static INPUT_PORTS_START(serial_terminal)
 	PORT_CONFNAME(0x30, 0x00, "Format") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_terminal_device, update_frame, 0)
 	PORT_CONFSETTING( 0x00, "8N1")
 	PORT_CONFSETTING( 0x10, "7E1")
+	PORT_CONFSETTING( 0x20, "8N2")
 INPUT_PORTS_END
 
 ioport_constructor serial_terminal_device::device_input_ports() const
@@ -466,7 +468,7 @@ void serial_terminal_device::device_config_complete()
 	}
 }
 
-static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};
+static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 110};
 
 void serial_terminal_device::device_start()
 {
@@ -507,6 +509,9 @@ void serial_terminal_device::device_reset()
 	case 0x00:
 	default:
 		set_data_frame(8, 1, SERIAL_PARITY_NONE);
+		break;
+	case 0x20:
+		set_data_frame(8, 2, SERIAL_PARITY_NONE);
 		break;
 	}
 }

@@ -108,8 +108,8 @@ static ins8250_interface ace3_intf =
 //-------------------------------------------------
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x0d ) // 110
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x20 ) // 8N2
 DEVICE_INPUT_DEFAULTS_END
 
 static const rs232_port_interface rs232a_intf =
