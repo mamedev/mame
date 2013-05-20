@@ -524,21 +524,19 @@ static const ay8910_interface ay8910_2_config =
 PALETTE_INIT( stuntair )
 {
 	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base()+0x100;
-	const UINT8 *color_prom2 = machine.root_device().memregion("proms")->base();
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 data = color_prom[i] | (color_prom2[i]<<4);
+		UINT8 data = color_prom[i];
 
 
 		int b = (data&0xc0)>>6;
-		int g = (data&0x38)>>2;
+		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
-
-
+		
 		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
 	}
 
@@ -610,12 +608,10 @@ ROM_START( stuntair )
 	ROM_LOAD( "stuntair.a13", 0x0000, 0x2000, CRC(bfdc0d38) SHA1(ea0a22971e9cf1b1682c35facc9c4e30607faed7) )
 	ROM_LOAD( "stuntair.a15", 0x2000, 0x2000, CRC(4531cab5) SHA1(35271555377ec3454a5d74bf8c21d7e8acc05782) )
 
-	ROM_REGION( 0x200, "proms", 0 ) // only the last few entries are used?
-	ROM_LOAD( "dm74s287n.11l", 0x000, 0x100, CRC(6c98f964) SHA1(abf7bdeccd33e62fa106d2056d1949cf278483a7) )
-	ROM_LOAD( "dm74s287n.11m", 0x100, 0x100, CRC(d330ff90) SHA1(e223935464109a3c4c7b29641b3736484c22c47a) )
-
-	ROM_REGION( 0x020, "miscprom", 0 )
-	ROM_LOAD( "dm74s288n.7a",  0x000, 0x020, CRC(5779e751) SHA1(89c955ef8635ad3e9d699f33ec0e4d6c9205d01c) )
+	ROM_REGION( 0x120, "proms", 0 )
+	ROM_LOAD_NIB_LOW ( "dm74s287n.11m", 0x000, 0x100, CRC(d330ff90) SHA1(e223935464109a3c4c7b29641b3736484c22c47a) ) // only the last few entries are used?
+	ROM_LOAD_NIB_HIGH( "dm74s287n.11l", 0x000, 0x100, CRC(6c98f964) SHA1(abf7bdeccd33e62fa106d2056d1949cf278483a7) ) // "
+	ROM_LOAD_NIB_LOW ( "dm74s288n.7a",  0x100, 0x020, CRC(5779e751) SHA1(89c955ef8635ad3e9d699f33ec0e4d6c9205d01c) ) // ?
 ROM_END
 
 
