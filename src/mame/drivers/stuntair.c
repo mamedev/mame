@@ -7,7 +7,6 @@
   - correct FG colour handling (currently use a hardcoded white)
   - correct sound (need interrupt frequencies at least)
   - correct remaining GFX / sprite issues (flicker sometimes, might need better vblank timing?)
-  - clean up driver
 
 
 Hardware info (complete):
@@ -93,12 +92,7 @@ public:
 		m_bgram(*this, "bgram"),
 		m_bgattrram(*this, "bgattrram"),
 		m_sprram(*this, "sprram")
-	{
-		m_bg_xscroll = 0;
-		m_nmi_enable = 0;
-		m_spritebank0 = 0;
-		m_spritebank1 = 0;
-	}
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -115,63 +109,19 @@ public:
 	UINT8 m_spritebank0;
 	UINT8 m_spritebank1;
 
-	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
-
+	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
+	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
 	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
-	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
-
 	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
-
-
-	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w)
-	{
-		m_nmi_enable = data&0x01;
-		if (!m_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		// other bits are unused
-	}
-
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w)
-	{
-		m_spritebank0 = data&0x01;
-		// other bits are unused
-	}
-
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w)
-	{
-		m_spritebank1 = data&0x01;
-		// other bits are unused
-	}
-
-	DECLARE_WRITE8_MEMBER(stuntair_coin_w)
-	{
-		// lower 2 bits are coin counters, excluding 1st coin(?)
-		coin_counter_w(machine(), 0, data >> 0 & 1);
-		coin_counter_w(machine(), 1, data >> 1 & 1);
-		
-		// other bits: unknown
-		if (data & 0xfc)
-			logerror("stuntair_coin_w %02x\n", data);
-	}
-
-	DECLARE_WRITE8_MEMBER(stuntair_sound_w)
-	{
-		soundlatch_byte_w(space, 0, data);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-
-
+	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w);
+	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w);
+	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w);
+	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
+	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
+	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
-
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w)
-	{
-		// it writes $e8 and $f0 for music drums
-		// possibly to discrete sound circuitry?
-		logerror("ay8910_portb_w: %02x\n", data);
-	}
-
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -179,16 +129,178 @@ public:
 };
 
 
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
+
+PALETTE_INIT( stuntair )
+{
+	/* need resistor weights etc. */
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+
+	for (int i = 0; i < 0x100; i++)
+	{
+		UINT8 data = color_prom[i];
+
+		int b = (data&0xc0)>>6;
+		int g = (data&0x38)>>3;
+		int r = (data&0x07)>>0;
+		
+		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
+	}
+
+	// just set the FG layer to black and white
+	palette_set_color(machine,0x100,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine,0x101,MAKE_RGB(0xff,0xff,0xff));
+}
+
+
+TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
+{
+	int tileno = m_fgram[tile_index];
+	int opaque = tileno & 0x80;
+
+	// where does the FG palette come from? it's a 1bpp layer..
+
+	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+}
+
+TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
+{
+	int tileno = m_bgram[tile_index];
+	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
+	int colour = (m_bgattrram[tile_index] & 0x07);
+
+	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
+}
+
+
+void stuntair_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
+
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
+
+	gfx_element *gfx = machine().gfx[2];
+
+	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
+	for (int i=0;i<0x400/16;i++)
+	{
+		int x      = m_sprram[(i*16)+5];
+		int y      = m_sprram[(i*16)+0];
+		int colour = m_sprram[(i*16)+4] & 0x7;
+		int tile   = m_sprram[(i*16)+1] & 0x3f;
+		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
+//      int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
+		int flipx = 0;
+
+		if (m_spritebank1) tile |= 0x40;
+		if (m_spritebank0) tile |= 0x80;
+
+		y = 240 - y;
+
+		drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,flipx,flipy,x,y,0);
+	}
+
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
+
+
+	return 0;
+}
+
+
+
+/***************************************************************************
+
+  Memory Maps, I/O
+
+***************************************************************************/
+
+WRITE8_MEMBER(stuntair_state::stuntair_bgattrram_w)
+{
+	m_bgattrram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
+{
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+
+WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
+{
+	m_bg_xscroll = data;
+}
+
+
+WRITE8_MEMBER(stuntair_state::stuntair_spritebank0_w)
+{
+	m_spritebank0 = data&0x01;
+	// other bits are unused
+}
+
+WRITE8_MEMBER(stuntair_state::stuntair_spritebank1_w)
+{
+	m_spritebank1 = data&0x01;
+	// other bits are unused
+}
+
+
+WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
+{
+	m_nmi_enable = data&0x01;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	// other bits are unused
+}
+
+WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
+{
+	// lower 2 bits are coin counters, excluding 1st coin(?)
+	coin_counter_w(machine(), 0, data >> 0 & 1);
+	coin_counter_w(machine(), 1, data >> 1 & 1);
+
+	// other bits: unknown
+	if (data & 0xfc)
+		logerror("stuntair_coin_w %02x\n", data);
+}
+
+
+WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
+{
+	soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+// main Z80
 static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(stuntair_bgattrram_w) AM_SHARE("bgattrram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stuntair_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("sprram")
-
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWB") AM_WRITE(stuntair_coin_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
-
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_nmienable_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
@@ -197,15 +309,11 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(stuntair_spritebank0_w)
 //  AM_RANGE(0xf006, 0xf006) AM_WRITENOP
 //  AM_RANGE(0xf007, 0xf007) AM_WRITENOP
-
-
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(stuntair_fgram_w) AM_SHARE("fgram")
-
-
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(stuntair_sound_w)
-
 ADDRESS_MAP_END
 
+// sound Z80
 static ADDRESS_MAP_START( stuntair_sound_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
@@ -215,10 +323,16 @@ static ADDRESS_MAP_START( stuntair_sound_portmap, AS_IO, 8, stuntair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("ay2", ay8910_device, data_w)
-
 	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
 
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( stuntair )
 	PORT_START("DSWB") // the bit order is scrambled, but this matches the text above
@@ -281,6 +395,14 @@ static INPUT_PORTS_START( stuntair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+
+/***************************************************************************
+
+  GFX Layouts
+
+***************************************************************************/
+
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -323,114 +445,18 @@ GFXDECODE_END
 
 
 
-void stuntair_state::machine_start()
+/***************************************************************************
+
+  AY8910 Config
+
+***************************************************************************/
+
+WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
 {
+	// it writes $e8 and $f0 for music drums
+	// possibly to discrete sound circuitry?
+	logerror("ay8910_portb_w: %02x\n", data);
 }
-
-void stuntair_state::machine_reset()
-{
-}
-
-
-TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
-{
-	int tileno = m_fgram[tile_index];
-	int opaque = tileno & 0x80;
-
-	// where does the FG palette come from? it's a 1bpp layer..
-
-	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
-}
-
-WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
-{
-	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-/* Back Layer */
-
-WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
-{
-	m_bg_xscroll = data;
-}
-
-WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
-{
-	m_bgram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
-{
-	int tileno = m_bgram[tile_index];
-	tileno |= (m_bgattrram[tile_index] & 0x08)<<5;
-	int colour = (m_bgattrram[tile_index] & 0x07);
-
-	SET_TILE_INFO_MEMBER(1, tileno, colour, 0);
-}
-
-
-WRITE8_MEMBER(stuntair_state::stuntair_bgattrram_w)
-{
-	m_bgattrram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-void stuntair_state::video_start()
-{
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-}
-
-UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
-
-
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
-
-	gfx_element *gfx = machine().gfx[2];
-
-	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
-	for (int i=0;i<0x400/16;i++)
-	{
-		int x      = m_sprram[(i*16)+5];
-		int y      = m_sprram[(i*16)+0];
-		int colour = m_sprram[(i*16)+4] & 0x7;
-		int tile   = m_sprram[(i*16)+1] & 0x3f;
-		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
-//      int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
-		int flipx = 0;
-
-		if (m_spritebank1) tile |= 0x40;
-		if (m_spritebank0) tile |= 0x80;
-
-		y = 240 - y;
-
-		drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,flipx,flipy,x,y,0);
-	}
-
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
-
-
-	return 0;
-}
-
-INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
-{
-	if(m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-
-
-
 
 static const ay8910_interface ay8910_config =
 {
@@ -439,9 +465,8 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_portb_w)
+	DEVCB_DRIVER_MEMBER(stuntair_state, ay8910_portb_w)
 };
-
 
 static const ay8910_interface ay8910_2_config =
 {
@@ -453,31 +478,36 @@ static const ay8910_interface ay8910_2_config =
 	DEVCB_NULL
 };
 
-PALETTE_INIT( stuntair )
+
+
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
+
+INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
 {
-	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
-
-	int i;
-
-	for (i = 0; i < 0x100; i++)
-	{
-		UINT8 data = color_prom[i];
-
-
-		int b = (data&0xc0)>>6;
-		int g = (data&0x38)>>3;
-		int r = (data&0x07)>>0;
-		
-		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
-	}
-
-	// just set the FG layer to black and white
-	palette_set_color(machine,0x100,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine,0x101,MAKE_RGB(0xff,0xff,0xff));
-
+	if(m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+void stuntair_state::machine_start()
+{
+	m_bg_xscroll = 0;
+	m_nmi_enable = 0;
+	m_spritebank0 = 0;
+	m_spritebank1 = 0;
+
+	save_item(NAME(m_bg_xscroll));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_spritebank0));
+	save_item(NAME(m_spritebank1));
+}
+
+void stuntair_state::machine_reset()
+{
+}
 
 static MACHINE_CONFIG_START( stuntair, stuntair_state )
 
@@ -518,6 +548,12 @@ MACHINE_CONFIG_END
 
 
 
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
+
 ROM_START( stuntair )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stuntair.a0", 0x0000, 0x2000, CRC(f61c4a1d) SHA1(29a227b447866e27e7619a0a676c9ad66364c323) )
@@ -547,4 +583,4 @@ ROM_START( stuntair )
 ROM_END
 
 
-GAME( 1983, stuntair,  0,    stuntair, stuntair, driver_device,  0, ROT90, "Nuova Videotron", "Stunt Air",  GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, stuntair,  0,    stuntair, stuntair, driver_device,  0, ROT90, "Nuova Videotron", "Stunt Air",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
