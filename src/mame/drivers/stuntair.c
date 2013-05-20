@@ -241,53 +241,39 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( stuntair )
-	PORT_START("DSWB") // the bit order logic doesn't seem to match the info in the text.. must be wired up in an odd way, might be better to do a bitswap in the read port handler
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) ) // SW 1   2
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPNAME( 0x24, 0x00,  DEF_STR( Coin_B ) ) // SW 3   4
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x24, "3" )
-	PORT_DIPNAME( 0x42, 0x40, DEF_STR( Bonus_Life ) ) // SW 5   6
-	PORT_DIPSETTING(    0x00, "10000" )
-	PORT_DIPSETTING(    0x40, "20000" )
-	PORT_DIPSETTING(    0x02, "30000" )
-	PORT_DIPSETTING(    0x42, "50000" )
-	PORT_DIPNAME( 0x81, 0x81, "Lives" ) // SW 7   8
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0x81, "3" )
+	PORT_START("DSWB") // the bit order is scrambled, but this matches the text above
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SWB:2,1")
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, "1 Coin/1 or 2 Credits" ) // alternates between the two
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x24, 0x00, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("SWB:4,3")
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x24, "1 Coin/1 or 2 Credits" ) // alternates between the two
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x42, 0x40, DEF_STR( Bonus_Life ) )    PORT_DIPLOCATION("SWB:6,5")
+	PORT_DIPSETTING(    0x00, "10000 20000" )
+	PORT_DIPSETTING(    0x40, "20000 30000" )
+	PORT_DIPSETTING(    0x02, "30000 50000" )
+	PORT_DIPSETTING(    0x42, "50000 100000" )
+	PORT_DIPNAME( 0x81, 0x01, "Lives" )                  PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x81, "5" )
 
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x10, 0x10, "DSWA:1" )  // SW1
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSWA:2" ) // SW 2
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSWA:3" ) // SW 3
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives" ) // SW 4
+	PORT_START("DSWA") // the bit order is scrambled, not sure if this is correct
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SWA:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SWA:3" )
+	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives (Cheat)" ) PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSWA:5" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSWA:6" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSWA:7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "DSWA:8" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SWA:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SWA:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SWA:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SWA:8" )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
