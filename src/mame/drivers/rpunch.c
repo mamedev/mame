@@ -459,7 +459,7 @@ static const gfx_layout bootleg_sprite_layout =
 	32*32*2,
 };
 
-static GFXDECODE_START( spikes91a )
+static GFXDECODE_START( svolleybl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_tile_layout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, bootleg_sprite_layout,   0, 16*4 )
@@ -507,7 +507,7 @@ MACHINE_CONFIG_END
 
 
 // c+p of above for now, bootleg hw, things need verifying
-static MACHINE_CONFIG_START( spikes91a, rpunch_state )
+static MACHINE_CONFIG_START( svolleybl, rpunch_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( spikes91a, rpunch_state )
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
 
-	MCFG_GFXDECODE(spikes91a)
+	MCFG_GFXDECODE(svolleybl)
 	MCFG_PALETTE_LENGTH(1024)
 
 
@@ -730,7 +730,7 @@ ROM_START( svolleyu )
 ROM_END
 
 
-ROM_START( spikes91a )
+ROM_START( svolleybl )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "4-prg.bin", 0x00001, 0x10000, CRC(eefaa208) SHA1(2a0417e170de3212f45be64719bb1eb0c6d33c59) )
 	ROM_LOAD16_BYTE( "6-prg.bin", 0x00000, 0x10000, CRC(da7d2e81) SHA1(ca78a661876ddbcb0e7599edcc819558afb76930) )
@@ -804,4 +804,4 @@ GAME( 1989, svolleyu, svolley,  rpunch,   svolley, rpunch_state,  svolley,  ROT0
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.c)
-GAME( 1991, spikes91a,svolley,  spikes91a,svolley, rpunch_state,  svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL ) // aka 1991 Spikes?
+GAME( 1991, svolleybl,svolley,  svolleybl,svolley, rpunch_state,  svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL ) // aka 1991 Spikes?
