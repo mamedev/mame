@@ -3,13 +3,10 @@
  Stunt Air by Nuova Videotron 1983
 
   driver todo: (SOME OF THIS WILL NEED PCB REFERENCES / MEASUREMENTS)
-
-
   - correct colour PROM decoding (resistor values?)
   - correct FG colour handling (currently use a hardcoded white)
   - correct sound (need interrupt frequencies at least)
   - correct remaining GFX / sprite issues (flicker sometimes, might need better vblank timing?)
-  - clean up input ports (identify unknown dips, unused ports)
   - clean up driver
 
 
@@ -98,7 +95,7 @@ public:
 		m_sprram(*this, "sprram")
 	{
 		m_bg_xscroll = 0;
-		m_nmienable = 0;
+		m_nmi_enable = 0;
 		m_spritebank0 = 0;
 		m_spritebank1 = 0;
 	}
@@ -114,10 +111,9 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	UINT8 m_bg_xscroll;
-	UINT8 m_nmienable;
+	UINT8 m_nmi_enable;
 	UINT8 m_spritebank0;
 	UINT8 m_spritebank1;
-	UINT8 m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
@@ -128,30 +124,25 @@ public:
 
 	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
 
-	DECLARE_WRITE8_MEMBER(stuntair_unk_w)
-	{
-		printf("unk %02x\n", data);
-	}
 
-	DECLARE_WRITE8_MEMBER(stuntair_f001_w)
+	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w)
 	{
-		m_nmienable = data&0x01; // guess
-
-		if (data&~0x01) printf("stuntair_f001_w %02x\n", data);
+		m_nmi_enable = data&0x01;
+		if (!m_nmi_enable)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		// other bits are unused
 	}
 
 	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w)
 	{
 		m_spritebank0 = data&0x01;
-
-		if (data&~0x01) printf("stuntair_spritebank0_w %02x\n", data);
+		// other bits are unused
 	}
 
 	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w)
 	{
 		m_spritebank1 = data&0x01;
-
-		if (data&~0x01) printf("stuntair_spritebank1_w %02x\n", data);
+		// other bits are unused
 	}
 
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w)
@@ -167,23 +158,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w)
 	{
-		m_soundlatch = data;
+		soundlatch_byte_w(space, 0, data);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-
 	}
 
 
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
-
-	INTERRUPT_GEN_MEMBER(stuntair_sound_irq)
-	{
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-
-	DECLARE_READ8_MEMBER(ay8910_soundlatch_r)
-	{
-		return m_soundlatch;
-	}
 
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w)
 	{
@@ -210,7 +190,7 @@ static ADDRESS_MAP_START( stuntair_map, AS_PROGRAM, 8, stuntair_state )
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA") AM_WRITE(stuntair_bgxscroll_w)
 
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN2")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_f001_w)  // might be nmi enable
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(stuntair_nmienable_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN3")
 	AM_RANGE(0xf003, 0xf003) AM_READNOP AM_WRITE(stuntair_spritebank1_w)
 //  AM_RANGE(0xf004, 0xf004) AM_WRITENOP
@@ -264,7 +244,7 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x81, "5" )
 
 	PORT_START("DSWA") // the bit order is scrambled, not sure if the dip locations are correct
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" ) // coin related? $05c7
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" ) // test related? $05c7
 	PORT_DIPNAME( 0x28, 0x08, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SWA:2,3") // $298f
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
@@ -281,12 +261,8 @@ static INPUT_PORTS_START( stuntair )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_DIPNAME( 0x04, 0x04, "IN2:2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN2:3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -300,15 +276,9 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x20, 0x20, "IN3:5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN3:6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN3:7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -454,8 +424,8 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 
 INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
 {
-	if(m_nmienable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if(m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -466,7 +436,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(stuntair_state,ay8910_portb_w)
@@ -514,12 +484,12 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state,  stuntair_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state, stuntair_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, stuntair_sound_irq, 60*8) // guessed, probably wrong ?? drives music tempo..
+	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 60*8) // timing guessed, probably wrong ?? drives music tempo.. and where is irq ack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
