@@ -525,12 +525,3 @@ void s100_dj2db_device::s100_phantom_w(int state)
 		m_phantom = 1;
 	}
 }
-
-
-//-------------------------------------------------
-//  s100_terminal_w - terminal write
-//-------------------------------------------------
-
-void s100_dj2db_device::s100_terminal_w(UINT8 data)
-{
-}
