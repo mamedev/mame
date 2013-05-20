@@ -154,9 +154,9 @@ const UINT16 lc8670_cpu_device::s_irq_vectors[] =
 //**************************************************************************
 
 static ADDRESS_MAP_START( lc8670_internal_map, AS_DATA, 8, lc8670_cpu_device )
-	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE(DEVICE_SELF, lc8670_cpu_device, mram_r, mram_w)
-	AM_RANGE(0x100, 0x17f) AM_DEVREADWRITE(DEVICE_SELF, lc8670_cpu_device, regs_r, regs_w)
-	AM_RANGE(0x180, 0x1ff) AM_DEVREADWRITE(DEVICE_SELF, lc8670_cpu_device, xram_r, xram_w)
+	AM_RANGE(0x000, 0x0ff) AM_READWRITE(mram_r, mram_w)
+	AM_RANGE(0x100, 0x17f) AM_READWRITE(regs_r, regs_w)
+	AM_RANGE(0x180, 0x1ff) AM_READWRITE(xram_r, xram_w)
 ADDRESS_MAP_END
 
 

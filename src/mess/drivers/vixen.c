@@ -820,8 +820,8 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, vixen_state, srq_w))
-	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(DEVICE_SELF, vixen_state, atn_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")

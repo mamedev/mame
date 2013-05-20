@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, iteagle_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(iteagle_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

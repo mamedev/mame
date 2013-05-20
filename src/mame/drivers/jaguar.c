@@ -1551,7 +1551,7 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, jaguar_state, external_int))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

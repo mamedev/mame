@@ -52,7 +52,7 @@ static const rs232_port_interface rs232_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_swiftlink )
-	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_3_6864MHz, DEVWRITELINE(DEVICE_SELF, c64_swiftlink_cartridge_device, acia_irq_w))
+	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_3_6864MHz, WRITELINE(c64_swiftlink_cartridge_device, acia_irq_w))
 	MCFG_MOS6551_RXD_TXD_CALLBACKS(NULL, DEVWRITELINE(RS232_TAG, rs232_port_device, tx))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)

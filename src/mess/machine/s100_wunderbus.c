@@ -175,7 +175,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
-	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259A_TAG, WRITELINE(s100_wunderbus_device, pic_int_w), VCC, NULL)
 	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)

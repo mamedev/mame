@@ -1454,7 +1454,7 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, djmain_state, ide_interrupt))
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(djmain_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

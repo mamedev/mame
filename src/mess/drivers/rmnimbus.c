@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SCSICB_CD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_cd_w))
 	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_io_w))
 	MCFG_SCSICB_MSG_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_msg_w))
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_req_w))
+	MCFG_SCSICB_REQ_HANDLER(WRITELINE(rmnimbus_state, nimbus_scsi_req_w))
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")
