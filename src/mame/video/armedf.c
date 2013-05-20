@@ -398,10 +398,10 @@ UINT32 armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 &b
 	if (sprite_enable)
 		draw_sprites(bitmap, cliprect, 1);
 
+	m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+
 	if (sprite_enable)
 		draw_sprites(bitmap, cliprect, 0);
-
-	m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
 }
