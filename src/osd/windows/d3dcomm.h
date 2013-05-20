@@ -215,10 +215,12 @@ public:
 	poly_info() { }
 
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-			UINT32 flags, d3d::texture_info *texture, UINT32 modmode);
+			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
+			float prim_width, float prim_height);
 	void init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
 			UINT32 flags, d3d::texture_info *texture, UINT32 modmode,
-			float line_time, float line_length);
+			float line_time, float line_length,
+			float prim_width, float prim_height);
 
 	D3DPRIMITIVETYPE        get_type() { return m_type; }
 	UINT32					get_count() { return m_count; }
@@ -231,7 +233,11 @@ public:
 	float					get_line_time() { return m_line_time; }
 	float					get_line_length() { return m_line_length; }
 
+	float					get_prim_width() { return m_prim_width; }
+	float					get_prim_height() { return m_prim_height; }
+
 private:
+
 	D3DPRIMITIVETYPE        m_type;                       // type of primitive
 	UINT32                  m_count;                      // total number of primitives
 	UINT32                  m_numverts;                   // total number of vertices
@@ -242,6 +248,9 @@ private:
 
 	float                   m_line_time;                  // used by vectors
 	float                   m_line_length;                // used by vectors
+
+	float					m_prim_width;				  // used by quads
+	float					m_prim_height;				  // used by quads
 };
 
 }; // d3d

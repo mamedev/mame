@@ -2077,16 +2077,23 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->render_texture[2]);
 		(*d3dintf->effect.set_float)(curr_effect, "BloomRescale", options->raster_bloom_scale);
 
-		int bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
+		float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 		int bloom_index = 0;
-		int bloom_width = d3d->get_width();
-		int bloom_height = d3d->get_height();
-		for(; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
+		float bloom_width = rt->target_width;
+		float bloom_height = rt->target_height;
+		float prim_width = poly->get_prim_width();
+		float prim_height = poly->get_prim_height();
+		float prim_ratio[2] = { prim_width / bloom_width, prim_height / bloom_height };
+		float screen_size[2] = { d3d->get_width(), d3d->get_height() };
+		//float target_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
+		(*d3dintf->effect.set_vector)(curr_effect, "ScreenSize", 2, screen_size);
+		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
-			float source_size[2] = { bloom_width, bloom_height };
-			float target_size[2] = { bloom_width >> 1, bloom_height >> 1 };
+			float target_size[2] = { bloom_width, bloom_height };
+			float source_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
 			(*d3dintf->effect.set_vector)(curr_effect, "TargetSize", 2, target_size);
 			(*d3dintf->effect.set_vector)(curr_effect, "SourceSize", 2, source_size);
+			(*d3dintf->effect.set_vector)(curr_effect, "PrimRatio", 2, prim_ratio);
 
 			(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -2110,8 +2117,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			(*d3dintf->effect.end)(curr_effect);
 
 			bloom_index++;
-			bloom_width >>= 1;
-			bloom_height >>= 1;
+			bloom_width *= 0.5f;
+			bloom_height *= 0.5f;
 		}
 
 		// Bloom composite pass
@@ -2242,16 +2249,23 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->render_texture[0]);
 		(*d3dintf->effect.set_float)(curr_effect, "BloomRescale", options->vector_bloom_scale);
 
-		int bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
+		float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 		int bloom_index = 0;
-		int bloom_width = d3d->get_width();
-		int bloom_height = d3d->get_height();
-		for(; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
+		float bloom_width = rt->target_width;
+		float bloom_height = rt->target_height;
+		float prim_width = poly->get_prim_width();
+		float prim_height = poly->get_prim_height();
+		float prim_ratio[2] = { prim_width / bloom_width, prim_height / bloom_height };
+		float screen_size[2] = { d3d->get_width(), d3d->get_height() };
+		//float target_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
+		(*d3dintf->effect.set_vector)(curr_effect, "ScreenSize", 2, screen_size);
+		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
-			float source_size[2] = { bloom_width, bloom_height };
-			float target_size[2] = { bloom_width >> 1, bloom_height >> 1 };
+			float target_size[2] = { bloom_width, bloom_height };
+			float source_size[2] = { bloom_width * 0.5f, bloom_height * 0.5f };
 			(*d3dintf->effect.set_vector)(curr_effect, "TargetSize", 2, target_size);
 			(*d3dintf->effect.set_vector)(curr_effect, "SourceSize", 2, source_size);
+			(*d3dintf->effect.set_vector)(curr_effect, "PrimRatio", 2, prim_ratio);
 
 			(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -2274,8 +2288,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			(*d3dintf->effect.end)(curr_effect);
 
 			bloom_index++;
-			bloom_width >>= 1;
-			bloom_height >>= 1;
+			bloom_width *= 0.5f;
+			bloom_height *= 0.5f;
 		}
 
 		// Bloom composite pass

@@ -188,17 +188,17 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	float2 inversePixel = 1.0f / TargetSize;
 	float2 TexCoord = Input.Position.xy * inversePixel + float2(0.5f, 0.5f) * inversePixel;
-	Output.TexCoord01.xy = TexCoord;
-	Output.TexCoord01.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.5f;
-	Output.TexCoord23.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.25f;
-	Output.TexCoord23.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.125f;
-	Output.TexCoord45.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0625f;
-	Output.TexCoord45.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.03125f;
-	Output.TexCoord67.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.015625f;
-	Output.TexCoord67.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0078125f;
-	Output.TexCoord89.xy = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.00390625f;
-	Output.TexCoord89.zw = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.001953125f;
-	Output.TexCoordA = ((TexCoord - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0009765625f;
+	Output.TexCoord01.xy = TexCoord - inversePixel;
+	Output.TexCoord01.zw = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.5f;
+	Output.TexCoord23.xy = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.25f;
+	Output.TexCoord23.zw = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.125f;
+	Output.TexCoord45.xy = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0625f;
+	Output.TexCoord45.zw = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.03125f;
+	Output.TexCoord67.xy = (((TexCoord - inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.015625f;
+	Output.TexCoord67.zw = (((TexCoord + inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0078125f;
+	Output.TexCoord89.xy = (((TexCoord + inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.00390625f;
+	Output.TexCoord89.zw = (((TexCoord + inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.001953125f;
+	Output.TexCoordA = (((TexCoord + inversePixel) - 0.5f) * 1.00f + 0.5f) * 1.0f;//0.0009765625f;
 
 	return Output;
 }

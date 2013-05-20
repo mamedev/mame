@@ -1577,7 +1577,7 @@ void renderer::batch_vectors()
 
 	// now add a polygon entry
 	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, m_line_count * (options.antialias() ? 8 : 2), vector_size * m_line_count, cached_flags,
-		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f);
+		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 	m_numpolys++;
 
 	start_index += (int)((float)line_index * period);
@@ -1740,7 +1740,7 @@ void renderer::draw_line(const render_primitive *prim)
 
 		// now add a polygon entry
 		m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, get_vector_texture(),
-								D3DTOP_MODULATE, 0.0f, 1.0f);
+								D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 		m_numpolys++;
 	}
 }
@@ -1774,6 +1774,8 @@ void renderer::draw_quad(const render_primitive *prim)
 	vertex[2].y = prim->bounds.y1 - 0.5f;
 	vertex[3].x = prim->bounds.x1 - 0.5f;
 	vertex[3].y = prim->bounds.y1 - 0.5f;
+	float width = prim->bounds.x1 - prim->bounds.x0;
+	float height = prim->bounds.y1 - prim->bounds.y0;
 
 	// set the texture coordinates
 	if(texture != NULL)
@@ -1828,21 +1830,23 @@ void renderer::draw_quad(const render_primitive *prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, texture, modmode);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim->flags, texture, modmode, width, height);
 	m_numpolys++;
 }
 
 void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
 						  UINT32 flags, texture_info *texture, UINT32 modmode,
-						  float line_time, float line_length)
+						  float line_time, float line_length,
+						  float prim_width, float prim_height)
 {
-	init(type, count, numverts, flags, texture, modmode);
+	init(type, count, numverts, flags, texture, modmode, prim_width, prim_height);
 	m_line_time = line_time;
 	m_line_length = line_length;
 }
 
 void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
-						  UINT32 flags, texture_info *texture, UINT32 modmode)
+						  UINT32 flags, texture_info *texture, UINT32 modmode,
+						  float prim_width, float prim_height)
 {
 	m_type = type;
 	m_count = count;
@@ -1850,6 +1854,8 @@ void poly_info::init(D3DPRIMITIVETYPE type, UINT32 count, UINT32 numverts,
 	m_flags = flags;
 	m_texture = texture;
 	m_modmode = modmode;
+	m_prim_width = prim_width;
+	m_prim_height = prim_height;
 }
 
 //============================================================
@@ -2851,10 +2857,10 @@ cache_target::~cache_target()
 
 bool cache_target::init(renderer *d3d, base *d3dintf, int width, int height, int prescale_x, int prescale_y)
 {
-	int bloom_size = (width * prescale_x < height * prescale_y) ? width * prescale_x : height * prescale_y;
+	int bloom_size = (width < height) ? width : height;
 	int bloom_index = 0;
-	int bloom_width = width * prescale_x;
-	int bloom_height = height * prescale_y;
+	int bloom_width = width;
+	int bloom_height = height;
 	for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
 	{
 		bloom_width >>= 1;
@@ -2980,15 +2986,15 @@ bool render_target::init(renderer *d3d, base *d3dintf, int width, int height, in
 		return false;
 	(*d3dintf->texture.get_surface_level)(prescaletexture, 0, &prescaletarget);
 
-	int bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
+	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
-	int bloom_width = d3d->get_width();
-	int bloom_height = d3d->get_height();
-	for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
+	float bloom_width = d3d->get_width();
+	float bloom_height = d3d->get_height();
+	for (; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
-		bloom_width >>= 1;
-		bloom_height >>= 1;
-		result = (*d3dintf->device.create_texture)(d3d->get_device(), bloom_width, bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
+		bloom_width *= 0.5f;
+		bloom_height *= 0.5f;
+		result = (*d3dintf->device.create_texture)(d3d->get_device(), (int)bloom_width, (int)bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
 		if (result != D3D_OK)
 			return false;
 		(*d3dintf->texture.get_surface_level)(bloom_texture[bloom_index], 0, &bloom_target[bloom_index]);

@@ -45,8 +45,10 @@ struct PS_INPUT
 // Downsample Vertex Shader
 //-----------------------------------------------------------------------------
 
+uniform float2 ScreenSize;
 uniform float2 TargetSize;
 uniform float2 SourceSize;
+uniform float2 PrimRatio;
 uniform float BloomRescale;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
@@ -54,16 +56,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
 	Output.Position = float4(Input.Position.xyz, 1.0f);
-	Output.Position.xy /= SourceSize;
+	Output.Position.xy /= ScreenSize;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.xy -= 0.5f;
-	Output.Position.xy *= 2.0f;
+	Output.Position.xy -= float2(0.5f, 0.5f);
+	Output.Position.xy *= float2(2.0f, 2.0f);
 	Output.Color = Input.Color;
-	float2 inversePixel = 1.0f / SourceSize;
-	Output.TexCoord01.xy = Input.Position.xy * inversePixel + float2(0.5f, 0.5f) * inversePixel;
-	Output.TexCoord01.zw = Input.Position.xy * inversePixel + float2(1.5f, 0.5f) * inversePixel;
-	Output.TexCoord23.xy = Input.Position.xy * inversePixel + float2(0.5f, 1.5f) * inversePixel;
-	Output.TexCoord23.zw = Input.Position.xy * inversePixel + float2(1.5f, 1.5f) * inversePixel;
+	float2 inversePixel = 1.0f / ScreenSize;
+	Output.TexCoord01.xy = Input.Position.xy / ScreenSize + float2(0.5f, 0.5f) / TargetSize;
+	Output.TexCoord01.zw = Input.Position.xy / ScreenSize + float2(1.5f, 0.5f) / TargetSize;
+	Output.TexCoord23.xy = Input.Position.xy / ScreenSize + float2(0.5f, 1.5f) / TargetSize;
+	Output.TexCoord23.zw = Input.Position.xy / ScreenSize + float2(1.5f, 1.5f) / TargetSize;
 
 	return Output;
 }
