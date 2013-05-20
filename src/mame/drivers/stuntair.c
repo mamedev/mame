@@ -257,23 +257,26 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPSETTING(    0x40, "20000 30000" )
 	PORT_DIPSETTING(    0x02, "30000 50000" )
 	PORT_DIPSETTING(    0x42, "50000 100000" )
-	PORT_DIPNAME( 0x81, 0x01, "Lives" )                  PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPNAME( 0x81, 0x80, "Lives" )                  PORT_DIPLOCATION("SWB:8,7")
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x81, "5" )
 
-	PORT_START("DSWA") // the bit order is scrambled, not sure if this is correct
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SWA:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SWA:3" )
-	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives (Cheat)" ) PORT_DIPLOCATION("SWA:4")
+	PORT_START("DSWA") // the bit order is scrambled, not sure if the dip locations are correct
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWA:1" ) // coin related? $05c7
+	PORT_DIPNAME( 0x28, 0x08, DEF_STR( Difficulty ) )    PORT_DIPLOCATION("SWA:2,3") // $298f
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives (Cheat)" ) PORT_DIPLOCATION("SWA:4") // $3f49
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SWA:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SWA:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SWA:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SWA:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWA:5" ) // not accessed in game code
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SWA:6" ) // "
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWA:7" ) // "
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SWA:8" ) // "
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
