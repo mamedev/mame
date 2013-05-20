@@ -125,6 +125,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	void draw_sprites();
 	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -186,24 +187,22 @@ void stuntair_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+void stuntair_state::draw_sprites()
 {
-	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
-
-	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
-
 	gfx_element *gfx = machine().gfx[2];
 
 	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
-	for (int i=0;i<0x400/16;i++)
+	for (int i=0;i<0x400;i+=16)
 	{
-		int x      = m_sprram[(i*16)+5];
-		int y      = m_sprram[(i*16)+0];
-		int colour = m_sprram[(i*16)+4] & 0x7;
-		int tile   = m_sprram[(i*16)+1] & 0x3f;
-		int flipy = (m_sprram[(i*16)+1] & 0x80)>>7; // used
-//      int flipx = (m_sprram[(i*16)+1] & 0x40)>>6; // guessed , wrong
+		// +2, +3, +4(high bits): always 00
+		// +6 to +15: unused
+		int x      = m_sprram[i+5];
+		int y      = m_sprram[i+0];
+		int colour = m_sprram[i+4] & 0x7;
+		int tile   = m_sprram[i+1] & 0x3f;
+		int flipy = (m_sprram[i+1] & 0x80)>>7; // used
+//      int flipx = (m_sprram[i+1] & 0x40)>>6; // guessed , wrong
 		int flipx = 0;
 
 		if (m_spritebank1) tile |= 0x40;
@@ -213,9 +212,16 @@ UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind1
 
 		drawgfx_transpen(bitmap,cliprect,gfx,tile,colour,flipx,flipy,x,y,0);
 	}
+}
+
+UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
+
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER0);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, TILEMAP_PIXEL_LAYER1|TILEMAP_DRAW_OPAQUE);
-
 
 	return 0;
 }
@@ -339,12 +345,12 @@ static INPUT_PORTS_START( stuntair )
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coin_A ) )        PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x18, "1 Coin/1 or 2 Credits" ) // alternates between the two
+	PORT_DIPSETTING(    0x18, "1 Coin/1 Credit - 2 Coins/3 Credits" )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x24, 0x00, DEF_STR( Coin_B ) )        PORT_DIPLOCATION("SWB:4,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x24, "1 Coin/1 or 2 Credits" ) // alternates between the two
+	PORT_DIPSETTING(    0x24, "1 Coin/1 Credit - 2 Coins/3 Credits" )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x42, 0x40, DEF_STR( Bonus_Life ) )    PORT_DIPLOCATION("SWB:6,5")
 	PORT_DIPSETTING(    0x00, "10000 20000" )
