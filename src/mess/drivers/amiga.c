@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, a1200_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)   /* Kickstart */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, a1200_state )
+static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, amiga_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //  ADDRESS_MAP_GLOBAL_MASK(0xffffff) // not sure
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
