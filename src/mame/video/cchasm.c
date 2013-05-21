@@ -18,11 +18,18 @@
 #define LENGTH 7
 
 
-
-TIMER_CALLBACK_MEMBER(cchasm_state::cchasm_refresh_end)
+void cchasm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(2, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_REFRESH_END:
+		m_maincpu->set_input_line(2, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in cchasm_state::device_timer");
+	}
 }
+
 
 void cchasm_state::cchasm_refresh ()
 {
@@ -97,7 +104,7 @@ void cchasm_state::cchasm_refresh ()
 		}
 	}
 	/* Refresh processor runs with 6 MHz */
-	machine().scheduler().timer_set (attotime::from_hz(6000000) * total_length, timer_expired_delegate(FUNC(cchasm_state::cchasm_refresh_end),this));
+	timer_set(attotime::from_hz(6000000) * total_length, TIMER_REFRESH_END);
 }
 
 

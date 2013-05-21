@@ -109,17 +109,24 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-TIMER_CALLBACK_MEMBER(stfight_state::stfight_interrupt_1)
+void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// Do a RST08
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+	switch (id)
+	{
+	case TIMER_STFIGHT_INTERRUPT_1:
+		// Do a RST08
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in stfight_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
 	// Do a RST10
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);
-	machine().scheduler().timer_set(attotime::from_hz(120), timer_expired_delegate(FUNC(stfight_state::stfight_interrupt_1),this));
+	timer_set(attotime::from_hz(120), TIMER_STFIGHT_INTERRUPT_1);
 }
 
 /*

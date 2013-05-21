@@ -578,6 +578,17 @@ struct snes_superscope
 class snes_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NMI_TICK,
+		TIMER_HIRQ_TICK,
+		TIMER_RESET_OAM_ADDRESS,
+		TIMER_RESET_HDMA,
+		TIMER_UPDATE_IO,
+		TIMER_SCANLINE_TICK,
+		TIMER_HBLANK_TICK
+	};
+
 	snes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -704,6 +715,9 @@ public:
 	void snes_init_timers();
 	virtual void machine_start();
 	virtual void machine_reset();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /* Special chips, checked at init and used in memory handlers */

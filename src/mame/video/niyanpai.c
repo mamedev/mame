@@ -160,9 +160,16 @@ void niyanpai_state::update_pixel(int vram, int x, int y)
 	m_tmpbitmap[vram].pix16(y, x) = color;
 }
 
-TIMER_CALLBACK_MEMBER(niyanpai_state::blitter_timer_callback)
+void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_nb19010_busyflag = 1;
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		m_nb19010_busyflag = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in niyanpai_state::device_timer");
+	}
 }
 
 void niyanpai_state::niyanpai_gfxdraw(int vram)
@@ -317,7 +324,7 @@ void niyanpai_state::niyanpai_gfxdraw(int vram)
 	}
 
 	m_nb19010_busyflag = 0;
-	machine().scheduler().timer_set(attotime::from_nsec(1000 * m_nb19010_busyctr), timer_expired_delegate(FUNC(niyanpai_state::blitter_timer_callback),this));
+	timer_set(attotime::from_nsec(1000 * m_nb19010_busyctr), TIMER_BLITTER);
 }
 
 /******************************************************************************

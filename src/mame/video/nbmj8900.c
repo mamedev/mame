@@ -196,9 +196,16 @@ void nbmj8900_state::update_pixel1(int x, int y)
 	m_tmpbitmap1.pix16(y, x) = machine().pens[color];
 }
 
-TIMER_CALLBACK_MEMBER(nbmj8900_state::blitter_timer_callback)
+void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	nb1413m3_busyflag = 1;
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		nb1413m3_busyflag = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in nbmj8900_state::device_timer");
+	}
 }
 
 void nbmj8900_state::nbmj8900_gfxdraw()
@@ -349,7 +356,7 @@ void nbmj8900_state::nbmj8900_gfxdraw()
 	}
 
 	nb1413m3_busyflag = 0;
-	machine().scheduler().timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8900_state::blitter_timer_callback),this));
+	timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, TIMER_BLITTER);
 }
 
 /******************************************************************************

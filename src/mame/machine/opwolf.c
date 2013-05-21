@@ -273,6 +273,22 @@ static const UINT16 *const level_data_lookup[] =
 };
 
 
+	void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_OPWOLF:
+		opwolf_timer_callback(ptr, param);
+		break;
+	case TIMER_CCHIP:
+		cchip_timer(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in opwolf_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 {
 	// Level data command
@@ -683,7 +699,7 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		m_current_cmd = 0xf5;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(80000), timer_expired_delegate(FUNC(opwolf_state::opwolf_timer_callback),this));
+		timer_set(m_maincpu->cycles_to_attotime(80000), TIMER_OPWOLF);
 	}
 	m_cchip_last_7a = m_cchip_ram[0x7a];
 
@@ -698,6 +714,9 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 	// These are set every frame
 	m_cchip_ram[0x64] = 0;
 	m_cchip_ram[0x66] = 0;
+
+	// Pulse the timer
+	timer_set(attotime::from_hz(60), TIMER_CCHIP);
 }
 
 /*************************************
@@ -737,5 +756,5 @@ void opwolf_state::opwolf_cchip_init(  )
 	m_cchip_coins_for_credit[1] = 1;
 	m_cchip_credits_for_coin[1] = 1;
 
-	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(opwolf_state::cchip_timer),this));
+	timer_set(attotime::from_hz(60), TIMER_CCHIP);
 }

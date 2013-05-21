@@ -22,6 +22,11 @@
 class exidy_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_COLLISION_IRQ
+	};
+
 	exidy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -70,7 +75,6 @@ public:
 	DECLARE_MACHINE_START(teetert);
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(collision_irq_callback);
 	void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);
 	inline void set_1_color(int index, int which);
@@ -80,6 +84,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void check_collision();
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in video/exidy.c -----------*/

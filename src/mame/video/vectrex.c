@@ -264,15 +264,12 @@ void vectrex_state::video_start()
 	m_imager_freq = 1;
 
 	vector_add_point_function = &vectrex_state::vectrex_add_point;
-	m_imager_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_eye),this));
-	m_imager_timer->adjust(
-							attotime::from_hz(m_imager_freq),
-							2,
-							attotime::from_hz(m_imager_freq));
+	m_imager_timer = timer_alloc(TIMER_VECTREX_IMAGER_EYE);
+	m_imager_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
 
-	m_lp_t = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger),this));
+	m_lp_t = timer_alloc(TIMER_LIGHTPEN_TRIGGER);
 
-	m_refresh = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::vectrex_refresh),this));
+	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
 
 	VIDEO_START_CALL_LEGACY(vector);
 }
@@ -286,7 +283,7 @@ void vectrex_state::video_start()
 
 void vectrex_state::vectrex_multiplexer(int mux)
 {
-	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this), m_via_out[PORTA], &m_analog[mux]);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA], &m_analog[mux]);
 
 	if (mux == A_AUDIO)
 		m_dac->write_unsigned8(m_via_out[PORTA]);
@@ -341,7 +338,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 		if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))
 		{
 			/* MUX has been enabled */
-			machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this));
+			timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL);
 		}
 	}
 	else
@@ -374,7 +371,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 		vectrex_multiplexer((data >> 1) & 0x3);
 
 	m_via_out[PORTB] = data;
-	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data & 0x80, &m_ramp);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data & 0x80, &m_ramp);
 }
 
 
@@ -382,7 +379,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
-	machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data, &m_analog[A_Y]);
+	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, data, &m_analog[A_Y]);
 
 	if (!(m_via_out[PORTB] & 0x1))
 		vectrex_multiplexer((m_via_out[PORTB] >> 1) & 0x3);
@@ -392,7 +389,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 WRITE8_MEMBER(vectrex_state::v_via_ca2_w)
 {
 	if (data == 0)
-		machine().scheduler().timer_set(attotime::from_nsec(ANALOG_DELAY), timer_expired_delegate(FUNC(vectrex_state::vectrex_zero_integrators),this));
+		timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_VECTREX_ZERO_INTEGRATORS);
 }
 
 
@@ -415,11 +412,11 @@ WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
 				dx = abs(m_pen_x - m_x_int);
 				dy = abs(m_pen_y - m_y_int);
 				if (dx < 500000 && dy < 500000 && data > 0)
-					machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::lightpen_trigger),this));
+					timer_set(attotime::zero, TIMER_LIGHTPEN_TRIGGER);
 			}
 		}
 
-		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vectrex_state::update_signal),this), data, &m_blank);
+		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, data, &m_blank);
 		m_cb2 = data;
 	}
 }
@@ -458,7 +455,7 @@ VIDEO_START_MEMBER(vectrex_state,raaspec)
 	m_y_max = visarea.max_y << 16;
 
 	vector_add_point_function = &vectrex_state::vectrex_add_point;
-	m_refresh = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vectrex_state::vectrex_refresh),this));
+	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
 
 	VIDEO_START_CALL_LEGACY(vector);
 }

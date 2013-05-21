@@ -52,10 +52,16 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 	}
 }
 
-
-TIMER_CALLBACK_MEMBER(hyhoo_state::blitter_timer_callback)
+void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	nb1413m3_busyflag = 1;
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		nb1413m3_busyflag = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in hyhoo_state::device_timer");
+	}
 }
 
 void hyhoo_state::hyhoo_gfxdraw()
@@ -214,7 +220,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 	}
 
 	nb1413m3_busyflag = 0;
-	machine().scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(hyhoo_state::blitter_timer_callback),this));
+	timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
 }
 
 

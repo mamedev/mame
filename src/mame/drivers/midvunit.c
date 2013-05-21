@@ -132,12 +132,6 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 }
 
 
-TIMER_CALLBACK_MEMBER(midvunit_state::adc_ready)
-{
-	m_maincpu->set_input_line(3, ASSERT_LINE);
-}
-
-
 WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 {
 	static const char *const adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
@@ -148,7 +142,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		m_adc_data = ioport(adcnames[which])->read_safe(0);
-		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(midvunit_state::adc_ready),this));
+		timer_set(attotime::from_msec(1), TIMER_ADC_READY);
 	}
 	else
 		logerror("adc_w without enabling writes!\n");

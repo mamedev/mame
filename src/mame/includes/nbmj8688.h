@@ -1,6 +1,11 @@
 class nbmj8688_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BLITTER
+	};
+
 	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
@@ -93,7 +98,6 @@ public:
 	UINT32 screen_update_mbmj8688(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mbmj8688_lcd0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mbmj8688_lcd1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
 	void update_pixel(int x, int y);
 	void writeram_low(int x, int y, int color);
 	void writeram_high(int x, int y, int color);
@@ -102,4 +106,7 @@ public:
 	void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip);
 	void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

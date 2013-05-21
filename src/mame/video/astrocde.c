@@ -165,9 +165,9 @@ PALETTE_INIT_MEMBER(astrocde_state,profpac)
 void astrocde_state::video_start()
 {
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
+	m_intoff_timer = timer_alloc(TIMER_INTERRUPT_OFF);
 
 	/* register for save states */
 	init_savestate();
@@ -181,9 +181,9 @@ void astrocde_state::video_start()
 VIDEO_START_MEMBER(astrocde_state,profpac)
 {
 	/* allocate timers */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
-	m_intoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
+	m_intoff_timer = timer_alloc(TIMER_INTERRUPT_OFF);
 
 	/* allocate videoram */
 	m_profpac_videoram = auto_alloc_array(machine(), UINT16, 0x4000 * 4);
@@ -372,9 +372,19 @@ UINT32 astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
+void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_INTERRUPT_OFF:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	case TIMER_SCANLINE:
+		scanline_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in astrocde_state::device_timer");
+	}
 }
 
 
@@ -428,14 +438,14 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
 			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
-			machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
+			timer_set(machine().primary_screen->time_until_vblank_end(), TIMER_INTERRUPT_OFF);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
-			machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(1), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
+			timer_set(m_maincpu->cycles_to_attotime(1), TIMER_INTERRUPT_OFF);
 		}
 	}
 

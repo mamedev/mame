@@ -10,6 +10,11 @@
 class midtunit_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DMA
+	};
+
 	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram"),
@@ -66,7 +71,6 @@ public:
 	DECLARE_DRIVER_INIT(mk2);
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
-	TIMER_CALLBACK_MEMBER(dma_callback);
 	required_device<cpu_device> m_maincpu;
 	void register_state_saving();
 	void init_tunit_generic(int sound);
@@ -91,7 +95,11 @@ public:
 	UINT8    jdredd_prot_index;
 	UINT8    jdredd_prot_max;
 
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
+
+
 /*----------- defined in video/midtunit.c -----------*/
 extern UINT8 midtunit_gfx_rom_large;
 

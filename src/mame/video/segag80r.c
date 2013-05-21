@@ -19,9 +19,16 @@ enum { spaceod_bg_detect_tile_color = 1 };
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(segag80r_state::vblank_latch_clear)
+void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_vblank_latch = 0;
+	switch (id)
+	{
+	case TIMER_VBLANK_LATCH_CLEAR:
+		m_vblank_latch = 0;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in segag80r_state::device_timer");
+	}
 }
 
 
@@ -30,7 +37,7 @@ void segag80r_state::vblank_latch_set()
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
 	m_vblank_latch = 1;
-	machine().scheduler().timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), timer_expired_delegate(FUNC(segag80r_state::vblank_latch_clear),this));
+	timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), TIMER_VBLANK_LATCH_CLEAR);
 
 	/* latch the current flip state at the same time */
 	m_video_flip = m_video_control & 1;

@@ -3,6 +3,13 @@
 class tubep_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TUBEP_SCANLINE,
+		TIMER_RJAMMER_SCANLINE,
+		TIMER_SPRITE
+	};
+
 	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_textram(*this, "textram"),
@@ -97,6 +104,9 @@ public:
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
 	optional_device<msm5205_device> m_msm;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

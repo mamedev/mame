@@ -8,6 +8,11 @@
 class volfied_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_VOLFIED
+	};
+
 	volfied_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -53,4 +58,7 @@ public:
 	void volfied_cchip_init(  );
 	void volfied_cchip_reset(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

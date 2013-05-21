@@ -7,6 +7,11 @@
 class lethalj_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_GEN_EXT1_INT
+	};
+
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
@@ -30,9 +35,11 @@ public:
 	DECLARE_DRIVER_INIT(ripribit);
 	DECLARE_DRIVER_INIT(cclownz);
 	virtual void video_start();
-	TIMER_CALLBACK_MEMBER(gen_ext1_int);
 	inline void get_crosshair_xy(int player, int *x, int *y);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in video/lethalj.c -----------*/

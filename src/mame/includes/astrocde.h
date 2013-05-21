@@ -17,6 +17,12 @@
 class astrocde_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT_OFF,
+		TIMER_SCANLINE
+	};
+
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -125,7 +131,6 @@ public:
 	DECLARE_PALETTE_INIT(profpac);
 	UINT32 screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_off);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	void profbank_banksw_restore();
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
@@ -139,6 +144,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	optional_device<samples_device> m_samples;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in audio/wow.c -----------*/

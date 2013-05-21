@@ -354,9 +354,24 @@ static void dma_draw(running_machine &machine, UINT16 command)
 
 /*************************************
  *
- *  DMA finished callback
+ *  Timer callbacks
  *
  *************************************/
+
+void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_DMA:
+		dma_callback(ptr, param);
+		break;
+	case TIMER_AUTOERASE_LINE:
+		autoerase_line(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in midyunit_state::device_timer");
+	}
+}
 
 TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
 {
@@ -515,7 +530,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	machine().scheduler().timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), timer_expired_delegate(FUNC(midyunit_state::dma_callback),this));
+	timer_set(attotime::from_nsec(41 * dma_state.width * dma_state.height), TIMER_DMA);
 
 	g_profiler.stop();
 }
@@ -555,5 +570,5 @@ void midyunit_scanline_update(screen_device &screen, bitmap_ind16 &bitmap, int s
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == screen.visible_area().max_y)
-		screen.machine().scheduler().timer_set(screen.time_until_pos(scanline + 1), timer_expired_delegate(FUNC(midyunit_state::autoerase_line),state), params->rowaddr);
+		state->timer_set(screen.time_until_pos(scanline + 1), midyunit_state::TIMER_AUTOERASE_LINE, params->rowaddr);
 }

@@ -25,6 +25,13 @@ driver by Chris Moore
 class gameplan_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_CLEAR_SCREEN_DONE,
+		TIMER_VIA_IRQ_DELAYED,
+		TIMER_VIA_0_CAL
+	};
+
 	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_trvquest_question(*this, "trvquest_q"),
@@ -89,6 +96,9 @@ public:
 	DECLARE_READ8_MEMBER(trvquest_question_r);
 	DECLARE_WRITE8_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE8_MEMBER(trvquest_misc_w);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in video/gameplan.c -----------*/

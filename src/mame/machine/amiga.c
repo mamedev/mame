@@ -250,8 +250,8 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 	}
 
 	/* setup the timers */
-	state->m_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_irq_proc),state));
-	state->m_blitter_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(amiga_state::amiga_blitter_proc),state));
+	state->m_irq_timer = state->timer_alloc(amiga_state::TIMER_AMIGA_IRQ);
+	state->m_blitter_timer = state->timer_alloc(amiga_state::TIMER_AMIGA_BLITTER);
 
 	state->m_sound_device = machine.device("amiga");
 }
@@ -298,9 +298,30 @@ MACHINE_RESET_MEMBER(amiga_state,amiga)
 		(*m_intf->reset_callback)(machine());
 
 	/* start the scanline timer */
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(amiga_state::scanline_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_SCANLINE);
 }
 
+
+void amiga_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_SCANLINE:
+		scanline_callback(ptr, param);
+		break;
+	case TIMER_AMIGA_IRQ:
+		amiga_irq_proc(ptr, param);
+		break;
+	case TIMER_AMIGA_BLITTER:
+		amiga_blitter_proc(ptr, param);
+		break;
+	case TIMER_FINISH_SERIAL_WRITE:
+		finish_serial_write(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in amiga_state::device_timer");
+	}
+}
 
 
 /*************************************
@@ -350,7 +371,7 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 
 	/* set timer for next line */
 	scanline = (scanline + 1) % machine().primary_screen->height();
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(amiga_state::scanline_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_SCANLINE, scanline);
 }
 
 
@@ -1320,7 +1341,7 @@ WRITE16_MEMBER( amiga_state::amiga_custom_w )
 			if (state->m_intf->serdat_w != NULL)
 				(*state->m_intf->serdat_w)(space.machine(), data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			space.machine().scheduler().timer_set(amiga_get_serial_char_period(space.machine()), timer_expired_delegate(FUNC(amiga_state::finish_serial_write),state));
+			timer_set(amiga_get_serial_char_period(space.machine()), TIMER_FINISH_SERIAL_WRITE);
 			break;
 
 		case REG_BLTSIZE:

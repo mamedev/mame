@@ -588,10 +588,17 @@ DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midtunit_state::dma_callback)
+void midtunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_DMA:
+		dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in midtunit_state::device_timer");
+	}
 }
 
 
@@ -791,7 +798,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), timer_expired_delegate(FUNC(midtunit_state::dma_callback),this));
+	timer_set(attotime::from_nsec(41 * pixels), TIMER_DMA);
 
 	g_profiler.stop();
 }

@@ -258,12 +258,26 @@ INLINE INT64 normalised_multiply(INT32 a, INT32 b)
 	return result >> 14;
 }
 
+void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_MAC_DONE:
+		mac_done_callback(ptr, param);
+		break;
+	case TIMER_ADC_DONE:
+		adc_done_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in micro3d_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 {
 	m_drmath->set_input_line(AM29000_INTR0, ASSERT_LINE);
 	m_mac_stat = 0;
 }
-
 
 WRITE32_MEMBER(micro3d_state::micro3d_mac1_w)
 {
@@ -464,7 +478,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
 
 	/* TODO: Calculate a better estimate for timing */
 	if (m_mac_stat)
-		machine().scheduler().timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, timer_expired_delegate(FUNC(micro3d_state::mac_done_callback),this));
+		timer_set(attotime::from_hz(MAC_CLK) * mac_cycles, TIMER_MAC_DONE);
 
 	m_mrab11 = mrab11;
 	m_vtx_addr = vtx_addr;
@@ -524,7 +538,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
 		return;
 	}
 
-	machine().scheduler().timer_set(attotime::from_usec(40), timer_expired_delegate(FUNC(micro3d_state::adc_done_callback),this), data & ~4);
+	timer_set(attotime::from_usec(40), TIMER_ADC_DONE, data & ~4);
 }
 
 CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)

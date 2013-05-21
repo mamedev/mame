@@ -166,9 +166,16 @@ void tank8_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-TIMER_CALLBACK_MEMBER(tank8_state::tank8_collision_callback)
+void tank8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	tank8_set_collision(param);
+	switch (id)
+	{
+	case TIMER_COLLISION:
+		tank8_set_collision(param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in tank8_state::device_timer");
+	}
 }
 
 
@@ -267,7 +274,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 						index |= 0x80; /* collision on right side */
 				}
 
-				machine().scheduler().timer_set(screen.time_until_pos(y, x), timer_expired_delegate(FUNC(tank8_state::tank8_collision_callback),this), index);
+				timer_set(screen.time_until_pos(y, x), TIMER_COLLISION, index);
 
 				_state = 1;
 			}

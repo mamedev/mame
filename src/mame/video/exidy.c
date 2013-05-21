@@ -255,13 +255,21 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(exidy_state::collision_irq_callback)
+void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* latch the collision bits */
-	latch_condition(param);
+	switch (id)
+	{
+	case TIMER_COLLISION_IRQ:
+		/* latch the collision bits */
+		latch_condition(param);
 
-	/* set the IRQ line */
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+		/* set the IRQ line */
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in exidy_state::device_timer");
+	}
 }
 
 
@@ -327,7 +335,7 @@ void exidy_state::check_collision()
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
-					machine().scheduler().timer_set(machine().primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), timer_expired_delegate(FUNC(exidy_state::collision_irq_callback),this), current_collision_mask);
+					timer_set(machine().primary_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
 			}
 
 			if (m_motion_object_2_vid.pix16(sy, sx) != 0xff)
@@ -335,7 +343,7 @@ void exidy_state::check_collision()
 				/* check for background collision (M2CHAR) */
 				if (m_background_bitmap.pix16(org_2_y + sy, org_2_x + sx) != 0)
 					if ((m_collision_mask & 0x08) && (count++ < 128))
-						machine().scheduler().timer_set(machine().primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), timer_expired_delegate(FUNC(exidy_state::collision_irq_callback),this), 0x08);
+						timer_set(machine().primary_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
 			}
 		}
 }

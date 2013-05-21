@@ -9,6 +9,12 @@
 class blstroid_state : public atarigen_state
 {
 public:
+	enum
+	{
+		TIMER_IRQ_OFF,
+		TIMER_IRQ_ON
+	};
+
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_priorityram(*this, "priorityram") { }
@@ -24,8 +30,9 @@ public:
 	DECLARE_MACHINE_RESET(blstroid);
 	DECLARE_VIDEO_START(blstroid);
 	UINT32 screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_CALLBACK_MEMBER(irq_on);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

@@ -44,12 +44,20 @@
 
 /*****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(m92_state::spritebuffer_callback)
+void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_sprite_buffer_busy = 1;
-	if (m_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
-		m92_sprite_interrupt();
+	switch (id)
+	{
+	case TIMER_SPRITEBUFFER:
+		m_sprite_buffer_busy = 1;
+		if (m_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
+			m92_sprite_interrupt();
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in m92_state::device_timer");
+	}
 }
+
 
 WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 {
@@ -81,7 +89,7 @@ WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 
 		/* Pixel clock is 26.6666MHz (some boards 27MHz??), we have 0x800 bytes, or 0x400 words to copy from
 		spriteram to the buffer.  It seems safe to assume 1 word can be copied per clock. */
-		machine().scheduler().timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, timer_expired_delegate(FUNC(m92_state::spritebuffer_callback),this));
+		timer_set(attotime::from_hz(XTAL_26_66666MHz) * 0x400, TIMER_SPRITEBUFFER);
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",space.device().safe_pc(),offset,data);
 }

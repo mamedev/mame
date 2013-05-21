@@ -143,10 +143,18 @@ void pastelg_state::pastelg_vramflip()
 	m_flipscreen_old = m_flipscreen;
 }
 
-TIMER_CALLBACK_MEMBER(pastelg_state::blitter_timer_callback)
+void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	nb1413m3_busyflag = 1;
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		nb1413m3_busyflag = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in pastelg_state::device_timer");
+	}
 }
+
 
 void pastelg_state::pastelg_gfxdraw()
 {
@@ -268,7 +276,7 @@ void pastelg_state::pastelg_gfxdraw()
 	}
 
 	nb1413m3_busyflag = 0;
-	machine().scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(pastelg_state::blitter_timer_callback),this));
+	timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
 }
 
 /******************************************************************************

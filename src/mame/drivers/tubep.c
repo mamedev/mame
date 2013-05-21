@@ -254,6 +254,25 @@ static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
+void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_SPRITE:
+		m_mcu->set_input_line(0, ASSERT_LINE);
+		break;
+	case TIMER_TUBEP_SCANLINE:
+		tubep_scanline_callback(ptr, param);
+		break;
+	case TIMER_RJAMMER_SCANLINE:
+		rjammer_scanline_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in tubep_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 {
 	int scanline = param;
@@ -336,7 +355,7 @@ void tubep_state::tubep_setup_save_state()
 MACHINE_START_MEMBER(tubep_state,tubep)
 {
 	/* Create interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::tubep_scanline_callback),this));
+	m_interrupt_timer = timer_alloc(TIMER_TUBEP_SCANLINE);
 
 	tubep_setup_save_state();
 }
@@ -499,7 +518,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 MACHINE_START_MEMBER(tubep_state,rjammer)
 {
 	/* Create interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::rjammer_scanline_callback),this));
+	m_interrupt_timer = timer_alloc(TIMER_RJAMMER_SCANLINE);
 
 	tubep_setup_save_state();
 }

@@ -2,6 +2,12 @@
 class bublbobl_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NMI,
+		TIMER_M68705_IRQ_ACK
+	};
+
 	bublbobl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -114,8 +120,9 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
-	TIMER_CALLBACK_MEMBER(bublbobl_m68705_irq_ack);
 	void configure_banks(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

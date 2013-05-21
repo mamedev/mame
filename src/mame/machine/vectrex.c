@@ -58,6 +58,37 @@ int vectrex_state::vectrex_verify_cart(char *data)
 }
 
 
+void vectrex_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VECTREX_IMAGER_CHANGE_COLOR:
+		vectrex_imager_change_color(ptr, param);
+		break;
+	case TIMER_UPDATE_LEVEL:
+		update_level(ptr, param);
+		break;
+	case TIMER_VECTREX_IMAGER_EYE:
+		vectrex_imager_eye(ptr, param);
+		break;
+	case TIMER_LIGHTPEN_TRIGGER:
+		lightpen_trigger(ptr, param);
+		break;
+	case TIMER_VECTREX_REFRESH:
+		vectrex_refresh(ptr, param);
+		break;
+	case TIMER_VECTREX_ZERO_INTEGRATORS:
+		vectrex_zero_integrators(ptr, param);
+		break;
+	case TIMER_UPDATE_SIGNAL:
+		update_signal(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in vectrex_state::device_timer");
+	}
+}
+
+
 /*********************************************************************
 
    ROM load and id functions
@@ -287,19 +318,19 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
 	{
 		m_imager_status = param;
 		coffset = param > 1? 3: 0;
-		machine().scheduler().timer_set (attotime::from_double(rtime * m_imager_angles[0]), timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_change_color),this), m_imager_colors[coffset+2]);
-		machine().scheduler().timer_set (attotime::from_double(rtime * m_imager_angles[1]), timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_change_color),this), m_imager_colors[coffset+1]);
-		machine().scheduler().timer_set (attotime::from_double(rtime * m_imager_angles[2]), timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_change_color),this), m_imager_colors[coffset]);
+		timer_set(attotime::from_double(rtime * m_imager_angles[0]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset+2]);
+		timer_set(attotime::from_double(rtime * m_imager_angles[1]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset+1]);
+		timer_set(attotime::from_double(rtime * m_imager_angles[2]), TIMER_VECTREX_IMAGER_CHANGE_COLOR, m_imager_colors[coffset]);
 
 		if (param == 2)
 		{
-			machine().scheduler().timer_set (attotime::from_double(rtime * 0.50), timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_eye),this), 1);
+			timer_set(attotime::from_double(rtime * 0.50), TIMER_VECTREX_IMAGER_EYE, 1);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			m_via6522_0->write_ca1(1);
 			m_via6522_0->write_ca1(0);
 			m_imager_pinlevel |= 0x80;
-			machine().scheduler().timer_set (attotime::from_double(rtime / 360.0), timer_expired_delegate(FUNC(vectrex_state::update_level),this), 0, &m_imager_pinlevel);
+			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0, &m_imager_pinlevel);
 		}
 	}
 }

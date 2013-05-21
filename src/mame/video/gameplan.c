@@ -32,6 +32,32 @@ driver by Chris Moore
 
 /*************************************
  *
+ *  Timer handling
+ *
+ *************************************/
+
+void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_CLEAR_SCREEN_DONE:
+		clear_screen_done_callback(ptr, param);
+		break;
+	case TIMER_VIA_IRQ_DELAYED:
+		via_irq_delayed(ptr, param);
+		break;
+	case TIMER_VIA_0_CAL:
+		via_0_ca1_timer_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gameplan_state::device_timer");
+	}
+}
+
+
+
+/*************************************
+ *
  *  Palette handling
  *
  *************************************/
@@ -191,7 +217,7 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 			/* set a timer for an arbitrarily short period.
 			   The real time it takes to clear to screen is not
 			   important to the software */
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(gameplan_state::clear_screen_done_callback),this));
+			synchronize(TIMER_CLEAR_SCREEN_DONE);
 
 			break;
 		}
@@ -210,7 +236,7 @@ WRITE_LINE_MEMBER(gameplan_state::via_irq)
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
 	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
 	   leave time for the program to see the flag change. */
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gameplan_state::via_irq_delayed),this), state);
+	timer_set(attotime::from_usec(50), TIMER_VIA_IRQ_DELAYED, state);
 }
 
 
@@ -274,7 +300,7 @@ VIDEO_START_MEMBER(gameplan_state,common)
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 
-	m_via_0_ca1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameplan_state::via_0_ca1_timer_callback),this));
+	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
 
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);

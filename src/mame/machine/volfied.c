@@ -277,6 +277,17 @@ static const UINT16 *const palette_data_lookup[] =
 	palette_data_11
 };
 
+void volfied_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VOLFIED:
+		volfied_timer_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in volfied_state::device_timer");
+	}
+}
 
 TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
 {
@@ -387,12 +398,12 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 			{
-				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), timer_expired_delegate(FUNC(volfied_state::volfied_timer_callback),this));
+				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(122242), TIMER_VOLFIED);
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (m_current_cmd >= 0x81 && m_current_cmd < 0x92)
 			{
-				machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), timer_expired_delegate(FUNC(volfied_state::volfied_timer_callback),this));
+				timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(105500), TIMER_VOLFIED);
 			}
 			else
 			{

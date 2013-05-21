@@ -10,6 +10,11 @@
 class cchasm_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_REFRESH_END
+	};
+
 	cchasm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
@@ -37,7 +42,6 @@ public:
 	INPUT_CHANGED_MEMBER(cchasm_set_coin_flag);
 	DECLARE_WRITE_LINE_MEMBER(cchasm_6840_irq);
 	virtual void video_start();
-	TIMER_CALLBACK_MEMBER(cchasm_refresh_end);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
 	void cchasm_refresh ();
@@ -45,6 +49,9 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in audio/cchasm.c -----------*/

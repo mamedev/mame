@@ -69,16 +69,20 @@ void dcheese_state::update_scanline_irq()
 }
 
 
-TIMER_CALLBACK_MEMBER(dcheese_state::blitter_scanline_callback)
+void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	dcheese_signal_irq(3);
-	update_scanline_irq();
-}
-
-
-TIMER_CALLBACK_MEMBER(dcheese_state::dcheese_signal_irq_callback)
-{
-	dcheese_signal_irq(param);
+	switch (id)
+	{
+	case TIMER_BLITTER_SCANLINE:
+		dcheese_signal_irq(3);
+		update_scanline_irq();
+		break;
+	case TIMER_SIGNAL_IRQ:
+		dcheese_signal_irq(param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in dcheese_state::device_timer");
+	}
 }
 
 
@@ -94,7 +98,7 @@ void dcheese_state::video_start()
 	m_dstbitmap = auto_bitmap_ind16_alloc(machine(), DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 
 	/* create a timer */
-	m_blitter_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dcheese_state::blitter_scanline_callback),this));
+	m_blitter_timer = timer_alloc(TIMER_BLITTER_SCANLINE);
 
 	/* register for saving */
 	save_item(NAME(m_blitter_color));
@@ -145,7 +149,7 @@ void dcheese_state::do_clear(  )
 		memset(&m_dstbitmap->pix16(y % DSTBITMAP_HEIGHT), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	machine().scheduler().timer_set(machine().primary_screen->scan_period(), timer_expired_delegate(FUNC(dcheese_state::dcheese_signal_irq_callback),this), 1);
+	timer_set(machine().primary_screen->scan_period(), TIMER_SIGNAL_IRQ, 1);
 }
 
 
@@ -199,7 +203,7 @@ void dcheese_state::do_blit(  )
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	machine().scheduler().timer_set(machine().primary_screen->scan_period() / 2, timer_expired_delegate(FUNC(dcheese_state::dcheese_signal_irq_callback),this), 2);
+	timer_set(machine().primary_screen->scan_period() / 2, TIMER_SIGNAL_IRQ, 2);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (m_blitter_xparam[8] != 0 || m_blitter_xparam[9] != 0 || m_blitter_xparam[10] != 0 || m_blitter_xparam[11] != 0 ||

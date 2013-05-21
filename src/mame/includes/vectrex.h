@@ -24,6 +24,17 @@ struct vectrex_point
 class vectrex_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_VECTREX_IMAGER_CHANGE_COLOR,
+		TIMER_UPDATE_LEVEL,
+		TIMER_VECTREX_IMAGER_EYE,
+		TIMER_LIGHTPEN_TRIGGER,
+		TIMER_VECTREX_REFRESH,
+		TIMER_VECTREX_ZERO_INTEGRATORS,
+		TIMER_UPDATE_SIGNAL
+	};
+
 	vectrex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_gce_vectorram(*this, "gce_vectorram"),
@@ -105,6 +116,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
 protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;
 	required_device<dac_device> m_dac;

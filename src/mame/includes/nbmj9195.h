@@ -9,6 +9,11 @@
 class nbmj9195_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BLITTER
+	};
+
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
@@ -117,7 +122,6 @@ public:
 	DECLARE_VIDEO_START(nbmj9195_nb22090);
 	UINT32 screen_update_nbmj9195(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ctc0_trg1);
-	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
 	int nbmj9195_blitter_r(int offset, int vram);
 	void nbmj9195_blitter_w(int offset, int data, int vram);
 	void nbmj9195_clutsel_w(int data);
@@ -133,4 +137,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

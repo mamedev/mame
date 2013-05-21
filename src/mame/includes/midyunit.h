@@ -32,6 +32,12 @@ struct dma_state_t
 class midyunit_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DMA,
+		TIMER_AUTOERASE_LINE
+	};
+
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_narc_sound(*this, "narcsnd"),
@@ -116,7 +122,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
+
 /*----------- defined in video/midyunit.c -----------*/
 void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);
 void midyunit_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);

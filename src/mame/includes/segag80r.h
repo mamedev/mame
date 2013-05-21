@@ -10,6 +10,11 @@
 class segag80r_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_VBLANK_LATCH_CLEAR
+	};
+
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
@@ -104,7 +109,6 @@ public:
 	UINT32 screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
-	TIMER_CALLBACK_MEMBER(vblank_latch_clear);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
 	DECLARE_WRITE8_MEMBER(monsterb_sound_a_w);
@@ -126,6 +130,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<samples_device> m_samples;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

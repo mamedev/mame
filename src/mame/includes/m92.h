@@ -18,6 +18,11 @@ struct pf_layer_info
 class m92_state : public driver_device
 {
 public:
+	enum
+	{
+			TIMER_SPRITEBUFFER
+	};
+
 	m92_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
@@ -79,7 +84,6 @@ public:
 	DECLARE_VIDEO_START(ppan);
 	UINT32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(spritebuffer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ppan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -87,6 +91,9 @@ public:
 	void m92_draw_tiles(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void m92_sprite_interrupt();
 	optional_device<okim6295_device> m_oki;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in drivers/m92.c -----------*/

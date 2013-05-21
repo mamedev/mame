@@ -373,6 +373,14 @@ struct autoconfig_device
 class amiga_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SCANLINE,
+		TIMER_AMIGA_IRQ,
+		TIMER_AMIGA_BLITTER,
+		TIMER_FINISH_SERIAL_WRITE
+	};
+
 	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"), /* accelerator cards may present an interesting challenge because the maincpu will be the one on the card instead */
@@ -492,6 +500,8 @@ public:
 	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
 	void amiga_ar23_init( running_machine &machine, int ar3 );
 
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

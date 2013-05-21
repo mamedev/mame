@@ -50,6 +50,36 @@ UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
     Timers
 
 *************************************/
+void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_NMI_TICK:
+		snes_nmi_tick(ptr, param);
+		break;
+	case TIMER_HIRQ_TICK:
+		snes_hirq_tick_callback(ptr, param);
+		break;
+	case TIMER_RESET_OAM_ADDRESS:
+		snes_reset_oam_address(ptr, param);
+		break;
+	case TIMER_RESET_HDMA:
+		snes_reset_hdma(ptr, param);
+		break;
+	case TIMER_UPDATE_IO:
+		snes_update_io(ptr, param);
+		break;
+	case TIMER_SCANLINE_TICK:
+		snes_scanline_tick(ptr, param);
+		break;
+	case TIMER_HBLANK_TICK:
+		snes_hblank_tick(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in snes_state::device_timer");
+	}
+}
+
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
 {
@@ -155,7 +185,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	/* Start of VBlank */
 	if (m_ppu.m_beam.current_vert == m_ppu.m_beam.last_visible_line)
 	{
-		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, 10), timer_expired_delegate(FUNC(snes_state::snes_reset_oam_address),this));
+		timer_set(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, 10), TIMER_RESET_OAM_ADDRESS);
 
 		SNES_CPU_REG(HVBJOY) |= 0x81;       /* Set vblank bit to on & indicate controllers being read */
 		SNES_CPU_REG(RDNMI) |= 0x80;        /* Set NMI occurred bit */
@@ -559,7 +589,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			return;
 		case HDMAEN:    /* HDMA channel designation */
 			if (data) //if a HDMA is enabled, data is inited at the next scanline
-				space.machine().scheduler().timer_set(space.machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 1), timer_expired_delegate(FUNC(snes_state::snes_reset_hdma),this));
+				timer_set(space.machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 1), TIMER_RESET_HDMA);
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
 		case TIMEUP:    // IRQ Flag is cleared on both read and write
@@ -995,19 +1025,19 @@ READ8_MEMBER(snes_state::nss_oldjoy2_read)
 void snes_state::snes_init_timers()
 {
 	/* init timers and stop them */
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_scanline_tick),this));
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE_TICK);
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hblank_tick),this));
+	m_hblank_timer = timer_alloc(TIMER_HBLANK_TICK);
 	m_hblank_timer->adjust(attotime::never);
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_nmi_tick),this));
+	m_nmi_timer = timer_alloc(TIMER_NMI_TICK);
 	m_nmi_timer->adjust(attotime::never);
-	m_hirq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_hirq_tick_callback),this));
+	m_hirq_timer = timer_alloc(TIMER_HIRQ_TICK);
 	m_hirq_timer->adjust(attotime::never);
-	//m_div_timer = machine().scheduler().timer_alloc(FUNC(snes_div_callback));
+	//m_div_timer = timer_alloc(TIMER_DIV);
 	//m_div_timer->adjust(attotime::never);
-	//m_mult_timer = machine().scheduler().timer_alloc(FUNC(snes_mult_callback));
+	//m_mult_timer = timer_alloc(TIMER_MULT);
 	//m_mult_timer->adjust(attotime::never);
-	m_io_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_state::snes_update_io),this));
+	m_io_timer = timer_alloc(TIMER_UPDATE_IO);
 	m_io_timer->adjust(attotime::never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

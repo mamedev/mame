@@ -263,9 +263,16 @@ void nbmj8688_state::writeram_high(int x, int y, int color)
 	update_pixel(x, y);
 }
 
-TIMER_CALLBACK_MEMBER(nbmj8688_state::blitter_timer_callback)
+void nbmj8688_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	nb1413m3_busyflag = 1;
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		nb1413m3_busyflag = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in nbmj8688_state::device_timer");
+	}
 }
 
 void nbmj8688_state::mbmj8688_gfxdraw(int gfxtype)
@@ -523,9 +530,9 @@ void nbmj8688_state::mbmj8688_gfxdraw(int gfxtype)
 	nb1413m3_busyflag = 0;
 
 	if (gfxtype == GFXTYPE_8BIT)
-		machine().scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8688_state::blitter_timer_callback),this));
+		timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
 	else
-		machine().scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8688_state::blitter_timer_callback),this));
+		timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
 }
 
 

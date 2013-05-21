@@ -24,9 +24,16 @@ void triplhnt_state::video_start()
 }
 
 
-TIMER_CALLBACK_MEMBER(triplhnt_state::triplhnt_hit_callback)
+void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	triplhnt_set_collision(param);
+	switch (id)
+	{
+	case TIMER_HIT:
+		triplhnt_set_collision(param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in triplhnt_state::device_timer");
+	}
 }
 
 
@@ -98,7 +105,7 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(hit_line), timer_expired_delegate(FUNC(triplhnt_state::triplhnt_hit_callback),this), hit_code);
+		timer_set(machine().primary_screen->time_until_pos(hit_line), TIMER_HIT, hit_code);
 }
 
 
