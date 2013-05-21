@@ -370,8 +370,17 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int tmp = 0x100;
 		for (int i=0; i<tracks * heads; i++)
 		{
-			track_offsets[cnt] = tmp;
-			tmp += header[0x34 + i] << 8;
+			int length = header[0x34 + i] << 8;
+			if (length != 0)
+			{
+				track_offsets[cnt] = tmp;
+				tmp += length;
+			}
+			else
+			{
+				track_offsets[cnt] = image_size;
+			}
+
 			cnt += skip;
 		}
 	}
