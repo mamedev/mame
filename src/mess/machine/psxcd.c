@@ -1125,7 +1125,7 @@ void psxcd_device::start_read()
 
 void psxcd_device::start_play()
 {
-	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w));
+	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
 
 	if(cdrom_get_track_type(m_cdrom_handle, track) != CD_TRACK_AUDIO)
 		verboselog(machine(), 0, "psxcd: playing data track\n");
