@@ -267,9 +267,9 @@ int cli_frontend::execute(int argc, char **argv)
 		// reason for failure, offer some suggestions
 		if (m_result == MAMERR_NO_SUCH_GAME && *(m_options.system_name()) != 0 && strchr(m_options.system_name(), '*') == NULL && m_options.system() == NULL)
 		{
-			// get the top 10 approximate matches
+			// get the top 16 approximate matches
 			driver_enumerator drivlist(m_options);
-			int matches[10];
+			int matches[16];
 			drivlist.find_approximate_matches(m_options.system_name(), ARRAY_LENGTH(matches), matches);
 
 			// print them out

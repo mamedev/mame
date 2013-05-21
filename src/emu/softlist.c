@@ -1602,11 +1602,11 @@ void software_display_matches(const machine_config &config,emu_options &options,
 
 		if (list)
 		{
-			software_info *matches[10] = { 0 };
+			software_info *matches[16] = { 0 };
 			int softnum;
 
 			software_list_parse(list, list->error_proc, NULL);
-			// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
+			// get the top 16 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
 			software_list_find_approx_matches(swlist, list, name, ARRAY_LENGTH(matches), matches, interface);
 
 			if (matches[0] != 0)
