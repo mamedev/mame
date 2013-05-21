@@ -280,18 +280,23 @@ void coin_lockout_global_w(running_machine &machine, int on)
     NVRAM depending of selected BIOS
 -------------------------------------------------*/
 
-static astring &nvram_filename(astring &result, device_t &device)
+static astring &nvram_filename(astring &result, device_t &device, const char *software)
 {
 	running_machine &machine = device.machine();
 
 	// start with either basename or basename_biosnum
-	result.cpy(machine.basename());
+	result.cpy(machine.basename());	
 	if (device.machine().root_device().system_bios() != 0 && device.machine().root_device().default_bios() != device.machine().root_device().system_bios())
 		result.catprintf("_%d", device.machine().root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (&device != &device.machine().root_device())
 	{
+		// add per software nvrams into one folder
+		if (software!=NULL && strlen(software)>0)
+		{
+			result.cat('\\').cat(software);
+		}
 		astring tag(device.tag());
 		tag.del(0, 1).replacechr(':', '_');
 		result.cat('\\').cat(tag);
@@ -309,7 +314,7 @@ void nvram_load(running_machine &machine)
 	{
 		astring filename;
 		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, machine.root_device()), ".nv") == FILERR_NONE)
+		if (file.open(nvram_filename(filename, machine.root_device(),NULL), ".nv") == FILERR_NONE)
 		{
 			(*machine.config().m_nvram_handler)(machine, &file, FALSE);
 			file.close();
@@ -325,7 +330,7 @@ void nvram_load(running_machine &machine)
 	{
 		astring filename;
 		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		if (file.open(nvram_filename(filename, nvram->device(),machine.options().software_name())) == FILERR_NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -346,7 +351,7 @@ void nvram_save(running_machine &machine)
 	{
 		astring filename;
 		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, machine.root_device()), ".nv") == FILERR_NONE)
+		if (file.open(nvram_filename(filename, machine.root_device(),NULL), ".nv") == FILERR_NONE)
 		{
 			(*machine.config().m_nvram_handler)(machine, &file, TRUE);
 			file.close();
@@ -358,7 +363,7 @@ void nvram_save(running_machine &machine)
 	{
 		astring filename;
 		emu_file file(machine.options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		if (file.open(nvram_filename(filename, nvram->device(),machine.options().software_name())) == FILERR_NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();
