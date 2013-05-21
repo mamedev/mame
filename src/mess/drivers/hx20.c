@@ -4,6 +4,8 @@
 
         29/09/2009 Skeleton driver.
 
+        http://fjkraan.home.xs4all.nl/comp/hx20/
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -147,6 +149,8 @@ static MACHINE_CONFIG_START( ehx20, hx20_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "hx20_flop")
 MACHINE_CONFIG_END
 
 /* ROM definition */

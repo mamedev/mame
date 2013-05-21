@@ -104,6 +104,7 @@ hash/gmaster.xml svneol=native#text/xml
 hash/gp32.xml svneol=native#text/xml
 hash/gx4000.xml svneol=native#text/xml
 hash/horizon.xml svneol=native#text/xml
+hash/hx20_flop.xml svneol=native#text/xml
 hash/ibm5140.xml svneol=native#text/xml
 hash/ibm5150.xml svneol=native#text/xml
 hash/ibm5150_cass.xml svneol=native#text/xml

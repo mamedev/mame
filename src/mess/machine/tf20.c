@@ -9,6 +9,8 @@
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+    http://fjkraan.home.xs4all.nl/comp/tf20/index.html
+
 **********************************************************************/
 
 #include "tf20.h"
