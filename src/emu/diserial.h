@@ -93,6 +93,8 @@ public:
 
 	void set_rcv_rate(int baud);
 	void set_tra_rate(int baud);
+	void tra_clock();
+	void rcv_clock();
 
 	void transmit_register_reset();
 	void transmit_register_add_bit(int bit);

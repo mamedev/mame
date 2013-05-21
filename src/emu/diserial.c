@@ -1,3 +1,4 @@
+
 /***************************************************************************
 
         Serial device interface
@@ -78,7 +79,7 @@ void device_serial_interface::set_tra_rate(int baud)
 	m_tra_clock->adjust(attotime::never);
 }
 
-void device_serial_interface::tra_timer(void *ptr, int param)
+void device_serial_interface::tra_clock()
 {
 	tra_callback();
 	if(is_transmit_register_empty())
@@ -88,7 +89,12 @@ void device_serial_interface::tra_timer(void *ptr, int param)
 	}
 }
 
-void device_serial_interface::rcv_timer(void *ptr, int param)
+void device_serial_interface::tra_timer(void *ptr, int param)
+{
+	tra_clock();
+}
+
+void device_serial_interface::rcv_clock()
 {
 	rcv_callback();
 	if(is_receive_register_full())
@@ -96,6 +102,11 @@ void device_serial_interface::rcv_timer(void *ptr, int param)
 		m_rcv_clock->adjust(attotime::never);
 		rcv_complete();
 	}
+}
+
+void device_serial_interface::rcv_timer(void *ptr, int param)
+{
+	rcv_clock();
 }
 
 void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_count, int parity_code)
