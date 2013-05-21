@@ -559,7 +559,7 @@ public:
 	int m_atapi_cdata_wait;
 	int m_atapi_xfermod;
 
-	UINT32 m_n_security_control;
+	UINT16 m_n_security_control;
 	void (ksys573_state::*m_security_callback)( int data );
 
 	UINT8 m_gx700pwbf_output_data[ 4 ];
@@ -607,16 +607,16 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gn845pwbb_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_tank_shutter_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
-	DECLARE_WRITE32_MEMBER(mb89371_w);
-	DECLARE_READ32_MEMBER(mb89371_r);
+	DECLARE_WRITE16_MEMBER(mb89371_w);
+	DECLARE_READ16_MEMBER(mb89371_r);
 	DECLARE_READ32_MEMBER(jamma_r);
-	DECLARE_READ32_MEMBER(control_r);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(atapi_r);
-	DECLARE_WRITE32_MEMBER(atapi_w);
-	DECLARE_WRITE32_MEMBER(atapi_reset_w);
-	DECLARE_WRITE32_MEMBER(security_w);
-	DECLARE_READ32_MEMBER(security_r);
+	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_READ16_MEMBER(atapi_r);
+	DECLARE_WRITE16_MEMBER(atapi_w);
+	DECLARE_WRITE16_MEMBER(atapi_reset_w);
+	DECLARE_WRITE16_MEMBER(security_w);
+	DECLARE_READ16_MEMBER(security_r);
 	DECLARE_READ16_MEMBER(flash_r);
 	DECLARE_WRITE16_MEMBER(flash_w);
 	DECLARE_READ32_MEMBER(ge765pwbba_r);
@@ -688,15 +688,15 @@ void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt
 	}
 }
 
-WRITE32_MEMBER(ksys573_state::mb89371_w)
+WRITE16_MEMBER(ksys573_state::mb89371_w)
 {
-	verboselog(2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog(2, "mb89371_w %04x %04x %04x\n", offset, mem_mask, data );
 }
 
-READ32_MEMBER(ksys573_state::mb89371_r)
+READ16_MEMBER(ksys573_state::mb89371_r)
 {
-	UINT32 data = 0xffffffff;
-	verboselog(2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
+	UINT32 data = 0xffff;
+	verboselog(2, "mb89371_r %04x %04x %04x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -731,20 +731,18 @@ READ32_MEMBER(ksys573_state::jamma_r)
 	return data;
 }
 
-READ32_MEMBER(ksys573_state::control_r)
+READ16_MEMBER(ksys573_state::control_r)
 {
 	verboselog(2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
 	return m_control;
 }
 
-WRITE32_MEMBER(ksys573_state::control_w)
+WRITE16_MEMBER(ksys573_state::control_w)
 {
-	UINT32 control;
 	int old_bank = m_flash_bank;
 
 	COMBINE_DATA(&m_control);
-	control = m_control;
 
 	verboselog(2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -753,39 +751,38 @@ WRITE32_MEMBER(ksys573_state::control_w)
 	// zs01 only, others are reached through security_w
 	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(m_security_cart_number ? "game_eeprom" : "install_eeprom");
 	if( dynamic_cast<zs01_device *>(secflash) )
-		secflash->sda_w( !( ( control >> 6 ) & 1 ) ); /* 0x40 */
+		secflash->sda_w( !( ( m_control >> 6 ) & 1 ) ); /* 0x40 */
 
-	if( m_flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
+	if( m_flash_device[0][0] != NULL && ( m_control & ~0x43 ) == 0x00 )
 	{
-		m_flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "onboard %d\n", control & 3 );
+		m_flash_bank = (0 << 8) + ( ( m_control & 3 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog(1, "onboard %d\n", m_control & 3 );
 	}
-	else if( m_flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
+	else if( m_flash_device[1][0] != NULL && ( m_control & ~0x47 ) == 0x10 )
 	{
-		m_flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard1 %d\n", control & 7 );
+		m_flash_bank = (1 << 8) + ( ( m_control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog(1, "pccard1 %d\n", m_control & 7 );
 	}
-	else if( m_flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[2][0] != NULL && ( m_control & ~0x47 ) == 0x20 )
 	{
-		m_flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard2 %d\n", control & 7 );
+		m_flash_bank = (2 << 8) + ( ( m_control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog(1, "pccard2 %d\n", m_control & 7 );
 	}
-	else if( m_flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[3][0] != NULL && ( m_control & ~0x47 ) == 0x20 )
 	{
-		m_flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard3 %d\n", control & 7 );
+		m_flash_bank = (3 << 8) + ( ( m_control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog(1, "pccard3 %d\n", m_control & 7 );
 	}
-	else if( m_flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
+	else if( m_flash_device[4][0] != NULL && ( m_control & ~0x47 ) == 0x28 )
 	{
-		m_flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard4 %d\n", control & 7 );
+		m_flash_bank = (4 << 8) + ( ( m_control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog(1, "pccard4 %d\n", m_control & 7 );
 	}
 }
 
 TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 {
 	UINT32 *p_n_psxram = m_p_n_psxram;
-	UINT8 *atapi_regs = m_atapi_regs;
 	int i, n_state;
 	UINT8 sector_buffer[ 4096 ];
 
@@ -832,16 +829,16 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 	if (m_atapi_xferlen > 0)
 	{
 		//mame_printf_debug("ATAPI: starting next piece of multi-part transfer\n");
-		atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-		atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
+		m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+		m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
 		m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xferlen/2048))));
 	}
 	else
 	{
 		//mame_printf_debug("ATAPI: Transfer completed, dropping DRQ\n");
-		atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
+		m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+		m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 	}
 
 	m_psxirq->intin10(1);
@@ -849,12 +846,11 @@ TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
 	verboselog(2, "atapi_xfer_end: %d %d\n", m_atapi_xferlen, m_atapi_xfermod );
 }
 
-READ32_MEMBER(ksys573_state::atapi_r)
+READ16_MEMBER(ksys573_state::atapi_r)
 {
-	UINT8 *atapi_regs = m_atapi_regs;
-	int reg, data;
+	int data;
 
-	if (mem_mask == 0x0000ffff) // word-wide command read
+	if (offset == 0 && mem_mask == 0xffff) // word-wide command read
 	{
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
@@ -882,18 +878,18 @@ READ32_MEMBER(ksys573_state::atapi_r)
 			verboselog(2, "atapi_r: atapi_xferlen=%d\n", m_atapi_xferlen );
 			if( m_atapi_xferlen != 0 )
 			{
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+				m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 			else
 			{
 				//mame_printf_debug("ATAPI: dropping DRQ\n");
-				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+				m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+				m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 
-			atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
+			m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+			m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
 			m_psxirq->intin10(1);
 		}
@@ -910,8 +906,8 @@ READ32_MEMBER(ksys573_state::atapi_r)
 
 				if( m_atapi_xferlen == 0 )
 				{
-					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 					m_psxirq->intin10(1);
 				}
 			}
@@ -923,18 +919,9 @@ READ32_MEMBER(ksys573_state::atapi_r)
 	}
 	else
 	{
-		int shift;
-		reg = offset<<1;
-		shift = 0;
-		if (mem_mask == 0x00ff0000)
-		{
-			reg += 1;
-			shift = 16;
-		}
+		data = m_atapi_regs[offset];
 
-		data = atapi_regs[reg];
-
-		switch( reg )
+		switch( offset )
 		{
 		case ATAPI_REG_DATA:
 			verboselog(1, "atapi_r: data=%02x\n", data );
@@ -963,29 +950,23 @@ READ32_MEMBER(ksys573_state::atapi_r)
 		}
 
 //      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, space.device().safe_pc());
-
-		data <<= shift;
 	}
 
 	verboselog(2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-WRITE32_MEMBER(ksys573_state::atapi_w)
+WRITE16_MEMBER(ksys573_state::atapi_w)
 {
-	UINT8 *atapi_regs = m_atapi_regs;
-	UINT8 *atapi_data = m_atapi_data;
-	int reg;
-
 	verboselog(2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if (mem_mask == 0x0000ffff) // word-wide command write
+	if (offset == 0 && mem_mask == 0xffff) // word-wide command write
 	{
 		verboselog(2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		atapi_data[m_atapi_data_ptr++] = data & 0xff;
-		atapi_data[m_atapi_data_ptr++] = data >> 8;
+		m_atapi_data[m_atapi_data_ptr++] = data & 0xff;
+		m_atapi_data[m_atapi_data_ptr++] = data >> 8;
 
 		if (m_atapi_cdata_wait)
 		{
@@ -993,13 +974,13 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				m_cr589->WriteData( atapi_data, m_atapi_cdata_wait );
+				m_cr589->WriteData( m_atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
 				m_psxirq->intin10(1);
 
 				// not sure here, but clear DRQ at least?
-				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+				m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 			}
 		}
 
@@ -1007,7 +988,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 		{
 			int phase;
 
-			verboselog(2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
+			verboselog(2, "atapi_w: command %02x\n", m_atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
 			m_atapi_data_ptr = 0;
@@ -1020,7 +1001,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 
 			if (m_atapi_xferlen != -1)
 			{
-//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
+//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", m_atapi_data[0]&0xff, m_atapi_xferlen);
 
 				// store the returned command length in the ATAPI regs, splitting into
 				// multiple transfers if necessary
@@ -1031,20 +1012,20 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					m_atapi_xferlen = MAX_TRANSFER_SIZE;
 				}
 
-				atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
+				m_atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+				m_atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
 				if (m_atapi_xferlen == 0)
 				{
 					// if no data to return, set the registers properly
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
+					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO|ATAPI_INTREASON_COMMAND;
 				}
 				else
 				{
 					// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
+					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 				}
 
 				switch( phase )
@@ -1055,15 +1036,15 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 				}
 
 				// perform special ATAPI processing of certain commands
-				switch (atapi_data[0]&0xff)
+				switch (m_atapi_data[0]&0xff)
 				{
 					case 0x00: // BUS RESET / TEST UNIT READY
 					case 0xbb: // SET CDROM SPEED
-						atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+						m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 
 					case 0x45: // PLAY
-						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
+						m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
 						m_atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
@@ -1075,23 +1056,16 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			{
 //              mame_printf_debug("ATAPI: SCSI device returned error!\n");
 
-				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
-				atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;   // sense key = ILLEGAL REQUEST
-				atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
+				m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
+				m_atapi_regs[ATAPI_REG_ERRFEAT] = 0x50;   // sense key = ILLEGAL REQUEST
+				m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+				m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0;
 			}
 		}
 	}
 	else
 	{
-		reg = offset<<1;
-		if (mem_mask == 0x00ff0000)
-		{
-			reg += 1;
-			data >>= 16;
-		}
-
-		switch( reg )
+		switch( offset )
 		{
 		case ATAPI_REG_DATA:
 			verboselog(1, "atapi_w: data=%02x\n", data );
@@ -1119,18 +1093,18 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 			break;
 		}
 
-		atapi_regs[reg] = data;
+		m_atapi_regs[offset] = data;
 //      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, space.device().safe_pc());
 
-		if (reg == ATAPI_REG_CMDSTATUS)
+		if (offset == ATAPI_REG_CMDSTATUS)
 		{
 //          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, space.device().safe_pc());
 
 			switch (data)
 			{
 				case 0xa0:  // PACKET
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
-					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					m_atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
 					m_atapi_data_ptr = 0;
 					m_atapi_data_len = 0;
@@ -1143,7 +1117,7 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					break;
 
 				case 0xa1:  // IDENTIFY PACKET DEVICE
-					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
 					m_atapi_data_ptr = 0;
 					m_atapi_data_len = 512;
@@ -1152,45 +1126,45 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 					m_atapi_xferlen = 0;
 					m_atapi_xfermod = 0;
 
-					memset( atapi_data, 0, m_atapi_data_len );
+					memset( m_atapi_data, 0, m_atapi_data_len );
 
-					atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
-					atapi_data[ 1 ^ 1 ] = 0x00;
+					m_atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
+					m_atapi_data[ 1 ^ 1 ] = 0x00;
 
-					memset( &atapi_data[ 46 ], ' ', 8 );
-					atapi_data[ 46 ^ 1 ] = '1';
-					atapi_data[ 47 ^ 1 ] = '.';
-					atapi_data[ 48 ^ 1 ] = '0';
+					memset( &m_atapi_data[ 46 ], ' ', 8 );
+					m_atapi_data[ 46 ^ 1 ] = '1';
+					m_atapi_data[ 47 ^ 1 ] = '.';
+					m_atapi_data[ 48 ^ 1 ] = '0';
 
-					memset( &atapi_data[ 54 ], ' ', 40 );
-					atapi_data[ 54 ^ 1 ] = 'M';
-					atapi_data[ 55 ^ 1 ] = 'A';
-					atapi_data[ 56 ^ 1 ] = 'T';
-					atapi_data[ 57 ^ 1 ] = 'S';
-					atapi_data[ 58 ^ 1 ] = 'H';
-					atapi_data[ 59 ^ 1 ] = 'I';
-					atapi_data[ 60 ^ 1 ] = 'T';
-					atapi_data[ 61 ^ 1 ] = 'A';
-					atapi_data[ 62 ^ 1 ] = ' ';
-					atapi_data[ 63 ^ 1 ] = 'C';
-					atapi_data[ 64 ^ 1 ] = 'R';
-					atapi_data[ 65 ^ 1 ] = '-';
-					atapi_data[ 66 ^ 1 ] = '5';
-					atapi_data[ 67 ^ 1 ] = '8';
-					atapi_data[ 68 ^ 1 ] = '9';
-					atapi_data[ 69 ^ 1 ] = ' ';
+					memset( &m_atapi_data[ 54 ], ' ', 40 );
+					m_atapi_data[ 54 ^ 1 ] = 'M';
+					m_atapi_data[ 55 ^ 1 ] = 'A';
+					m_atapi_data[ 56 ^ 1 ] = 'T';
+					m_atapi_data[ 57 ^ 1 ] = 'S';
+					m_atapi_data[ 58 ^ 1 ] = 'H';
+					m_atapi_data[ 59 ^ 1 ] = 'I';
+					m_atapi_data[ 60 ^ 1 ] = 'T';
+					m_atapi_data[ 61 ^ 1 ] = 'A';
+					m_atapi_data[ 62 ^ 1 ] = ' ';
+					m_atapi_data[ 63 ^ 1 ] = 'C';
+					m_atapi_data[ 64 ^ 1 ] = 'R';
+					m_atapi_data[ 65 ^ 1 ] = '-';
+					m_atapi_data[ 66 ^ 1 ] = '5';
+					m_atapi_data[ 67 ^ 1 ] = '8';
+					m_atapi_data[ 68 ^ 1 ] = '9';
+					m_atapi_data[ 69 ^ 1 ] = ' ';
 
-					atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
-					atapi_data[ 99 ^ 1 ] = 0x00;
+					m_atapi_data[ 98 ^ 1 ] = 0x04; // IORDY may be disabled
+					m_atapi_data[ 99 ^ 1 ] = 0x00;
 
-					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
-					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
+					m_atapi_regs[ATAPI_REG_COUNTLOW] = 0;
+					m_atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
 					m_psxirq->intin10(1);
 					break;
 
 				case 0xef:  // SET FEATURES
-					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
 					m_atapi_data_ptr = 0;
 					m_atapi_data_len = 0;
@@ -1233,7 +1207,7 @@ void ksys573_state::atapi_init()
 	save_item( NAME(m_atapi_xfermod) );
 }
 
-WRITE32_MEMBER(ksys573_state::atapi_reset_w)
+WRITE16_MEMBER(ksys573_state::atapi_reset_w)
 {
 	UINT8 *atapi_regs = m_atapi_regs;
 
@@ -1280,43 +1254,40 @@ void ksys573_state::cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size
 	m_atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (m_atapi_xferlen/2048))));
 }
 
-WRITE32_MEMBER(ksys573_state::security_w)
+WRITE16_MEMBER(ksys573_state::security_w)
 {
 	int security_cart_number = m_security_cart_number;
 	COMBINE_DATA( &m_n_security_control );
 
 	verboselog(2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if( ACCESSING_BITS_0_15 )
+	ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
+	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+
+	if( secflash ) {
+		if( !dynamic_cast<zs01_device *>(secflash) )
+			secflash->sda_w(( data >> 0 ) & 1);
+		secflash->scl_w(( data >> 1 ) & 1);
+		secflash->cs_w(( data >> 2 ) & 1);
+		secflash->rst_w(( data >> 3 ) & 1);
+	}
+
+	if(ds2401)
 	{
-		ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
-		device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+		ds2401->write(!( ( data >> 4 ) & 1 ));
+	}
 
-		if( secflash ) {
-			if( !dynamic_cast<zs01_device *>(secflash) )
-				secflash->sda_w(( data >> 0 ) & 1);
-			secflash->scl_w(( data >> 1 ) & 1);
-			secflash->cs_w(( data >> 2 ) & 1);
-			secflash->rst_w(( data >> 3 ) & 1);
-		}
-
-		if(ds2401)
-		{
-			ds2401->write(!( ( data >> 4 ) & 1 ));
-		}
-
-		if( m_security_callback != NULL )
-		{
-			(this->*m_security_callback)( data & 0xff );
-		}
+	if( m_security_callback != NULL )
+	{
+		(this->*m_security_callback)( data & 0xff );
 	}
 
 	ioport("OUT1")->write_safe( data, mem_mask );
 }
 
-READ32_MEMBER(ksys573_state::security_r)
+READ16_MEMBER(ksys573_state::security_r)
 {
-	UINT32 data = m_n_security_control;
+	UINT16 data = m_n_security_control;
 	verboselog(2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
@@ -1378,18 +1349,18 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ(jamma_r )
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
 	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT( "IN3" )
-	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE(atapi_r, atapi_w )    // IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
-	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE(control_r, control_w )    // Konami can't make a game without a "control" register.
-	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE(atapi_reset_w )
+	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE16(atapi_r, atapi_w, 0xffffffff)    // IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
+	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE16(control_r, control_w, 0x0000ffff)    // Konami can't make a game without a "control" register.
+	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE16(atapi_reset_w, 0x0000ffff)
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP                // watchdog?
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
-	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE(security_r, security_w )
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
+	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE16(security_r, security_w, 0x0000ffff)
 ADDRESS_MAP_END
 
 
 
-void ksys573_state::flash_init(  )
+void ksys573_state::flash_init()
 {
 	// find onboard flash devices
 	astring tempstr;
