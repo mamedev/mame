@@ -118,7 +118,10 @@ void mos6551_device::device_reset()
 
 void mos6551_device::tra_callback()
 {
-	m_write_txd(transmit_register_get_data_bit());
+	if (m_write_txd.isnull())
+		transmit_register_send_bit();
+	else
+		m_write_txd(transmit_register_get_data_bit());
 }
 
 
@@ -361,7 +364,8 @@ WRITE_LINE_MEMBER( mos6551_device::rxd_w )
 
 WRITE_LINE_MEMBER( mos6551_device::rxc_w )
 {
-	// TODO
+	rcv_clock();
+	tra_clock();
 }
 
 

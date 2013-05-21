@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( grip_io, AS_IO, 8, grip_device )
 //  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(flash_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(vol1_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY(Z80STI_TAG, z80sti_r, z80sti_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE(Z80STI_TAG, z80sti_device, read, write)
 	AM_RANGE(0x30, 0x30) AM_READWRITE(lrs_r, lrs_w)
 	AM_RANGE(0x40, 0x40) AM_READ(stat_r)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
@@ -290,8 +290,8 @@ static MC6845_INTERFACE( crtc_intf )
 	NULL,
 	grip_update_row,
 	NULL,
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i1_w),
-	DEVCB_DEVICE_LINE(Z80STI_TAG, z80sti_i2_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i1_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
@@ -398,14 +398,14 @@ WRITE8_MEMBER( grip_device::ppi_pc_w )
 
 	// keyboard interrupt
 	m_ib = BIT(data, 0);
-	z80sti_i4_w(m_sti, m_ib);
+	m_sti->i4_w(m_ib);
 
 	// keyboard buffer full
 	m_kbf = BIT(data, 1);
 
 	// PROF-80 interrupt
 	m_ia = BIT(data, 3);
-	z80sti_i7_w(m_sti, m_ia);
+	m_sti->i7_w(m_ia);
 
 	// PROF-80 handshaking
 	m_ppi_pc = (!BIT(data, 7) << 7) | (!BIT(data, 5) << 6) | (m_ppi->pa_r() & 0x3f);
@@ -481,8 +481,8 @@ static Z80STI_INTERFACE( sti_intf )
 	DEVCB_NULL,                                             // serial output
 	DEVCB_NULL,                                             // timer A output
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),    // timer B output
-	DEVCB_DEVICE_LINE(DEVICE_SELF, z80sti_tc_w),                                // timer C output
-	DEVCB_DEVICE_LINE(DEVICE_SELF, z80sti_rc_w)                                 // timer D output
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80sti_device, tc_w),                                // timer C output
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80sti_device, rc_w)                                 // timer D output
 };
 
 

@@ -816,6 +816,15 @@ static SLOT_INTERFACE_START( econet_devices )
 	SLOT_INTERFACE("e01s", E01S)
 SLOT_INTERFACE_END
 
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
@@ -878,6 +887,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* devices */
 	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
@@ -978,6 +988,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)

@@ -1416,10 +1416,29 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 }
 
 
+READ_LINE_MEMBER( bbc_state::bbc_rxd_r )
+{ 
+	return ( m_serproc_data & 0x40 ) ? m_rs232->rx() : m_rxd_cass; 
+}
+
+
+READ_LINE_MEMBER( bbc_state::bbc_dcd_r )
+{
+	return ( m_serproc_data & 0x40 ) ? m_rs232->dcd_r() : m_dcd_cass;
+}
+
+
+READ_LINE_MEMBER( bbc_state::bbc_cts_r )
+{ 
+	return ( m_serproc_data & 0x40 ) ? m_rs232->cts_r() : 0;
+}
+
+
 WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
 {
 	if ( m_serproc_data & 0x40 )
 	{
+		m_rs232->rts_w(state);
 		m_cass_out_enabled = 0;
 	}
 	else
@@ -1431,7 +1450,14 @@ WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
 
 WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
 {
-	m_txd = state;
+	if ( m_serproc_data & 0x40 )
+	{
+		m_rs232->tx(state);
+	}
+	else
+	{
+		m_txd = state;
+	}
 }
 
 
@@ -2089,9 +2115,6 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
 	m_Master=0;
 	m_rxd_cass = 0;
-	m_rxd_rs423 = 0;
-	m_dcd_cass = 0;
-	m_cts_rs423 = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
@@ -2102,9 +2125,6 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 {
 	m_Master=1;
 	m_rxd_cass = 0;
-	m_rxd_rs423 = 0;
-	m_dcd_cass = 0;
-	m_cts_rs423 = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;

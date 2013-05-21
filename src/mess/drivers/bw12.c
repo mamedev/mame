@@ -454,17 +454,17 @@ static Z80DART_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -604,6 +604,34 @@ FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
 	FLOPPY_BW12_FORMAT
 FLOPPY_FORMATS_END
 
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, dcda_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, ctsa_w)
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, dcdb_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, ctsb_w)
+};
+
 /* F4 Character Displayer */
 static const gfx_layout bw12_charlayout =
 {
@@ -655,6 +683,8 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
 	MCFG_AY3600_ADD(AY3600PRO002_TAG, 0, bw12_ay3600_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 
 	/* printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, bw12_centronics_intf)

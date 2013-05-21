@@ -89,15 +89,15 @@ public:
 	// construction/destruction
 	im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( read );
+	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_READ_LINE_MEMBER( dr_r );
-	DECLARE_READ_LINE_MEMBER( tbre_r );
-	DECLARE_READ_LINE_MEMBER( tre_r );
-	DECLARE_READ_LINE_MEMBER( pe_r );
-	DECLARE_READ_LINE_MEMBER( fe_r );
-	DECLARE_READ_LINE_MEMBER( oe_r );
+	DECLARE_READ_LINE_MEMBER( dr_r ) { return m_dr; }
+	DECLARE_READ_LINE_MEMBER( tbre_r ) { return m_tbre; }
+	DECLARE_READ_LINE_MEMBER( tre_r ) { return m_tre; }
+	DECLARE_READ_LINE_MEMBER( pe_r ) { return m_pe; }
+	DECLARE_READ_LINE_MEMBER( fe_r ) { return m_fe; }
+	DECLARE_READ_LINE_MEMBER( oe_r ) { return m_oe; }
 
 	DECLARE_WRITE_LINE_MEMBER( rrc_w );
 	DECLARE_WRITE_LINE_MEMBER( trc_w );
@@ -117,24 +117,18 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_serial_interface overrides
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_callback();
+	virtual void rcv_complete();
 	virtual void input_callback(UINT8 state);
 
 private:
 	inline void set_dr(int state);
 	inline void set_tbre(int state);
 	inline void set_tre(int state);
-	inline void receive_bit(int state);
-	inline void receive();
-	inline void transmit();
-
-	enum
-	{
-		TIMER_RX,
-		TIMER_TX
-	};
 
 	devcb_resolved_read_line    m_in_rri_func;
 	devcb_resolved_write_line   m_out_tro_func;
@@ -165,10 +159,6 @@ private:
 	// transmitter
 	UINT8 m_tbr;
 	int m_trc_count;
-
-	// timers
-	emu_timer *m_rx_timer;
-	emu_timer *m_tx_timer;
 };
 
 

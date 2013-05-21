@@ -99,21 +99,15 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_serial_interface overrides
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_callback();
+	virtual void rcv_complete();
 	virtual void input_callback(UINT8 state);
 
 private:
-	inline void receive();
-	inline void transmit();
-
-	enum
-	{
-		TIMER_RX,
-		TIMER_TX
-	};
-
 	devcb_resolved_read_line    m_in_rxd_func;
 	devcb_resolved_write_line   m_out_txd_func;
 
@@ -134,10 +128,6 @@ private:
 
 	int m_mode_index;
 	int m_sync_index;
-
-	// timers
-	emu_timer *m_rx_timer;
-	emu_timer *m_tx_timer;
 };
 
 

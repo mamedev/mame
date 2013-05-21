@@ -92,29 +92,6 @@ enum
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  receive -
-//-------------------------------------------------
-
-inline void mc2661_device::receive()
-{
-}
-
-
-//-------------------------------------------------
-//  transmit -
-//-------------------------------------------------
-
-inline void mc2661_device::transmit()
-{
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -178,14 +155,12 @@ void mc2661_device::device_start()
 	// create the timers
 	if (m_rxc > 0)
 	{
-		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rxc));
+		set_rcv_rate(m_rxc);
 	}
 
 	if (m_txc > 0)
 	{
-		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_txc));
+		set_tra_rate(m_txc);
 	}
 
 	// save state
@@ -206,8 +181,8 @@ void mc2661_device::device_start()
 
 void mc2661_device::device_reset()
 {
-	transmit_register_reset();
 	receive_register_reset();
+	transmit_register_reset();
 
 	m_mr[0] = m_mr[1] = 0;
 	m_sync[0] = m_sync[1] = m_sync[2] = 0;
@@ -229,21 +204,48 @@ void mc2661_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer events
+//  tra_callback -
 //-------------------------------------------------
 
-void mc2661_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void mc2661_device::tra_callback()
 {
-	switch (id)
-	{
-	case TIMER_RX:
-		rxc_w(1);
-		break;
+	if (m_out_txd_func.isnull())
+		transmit_register_send_bit();
+	else
+		m_out_txd_func(transmit_register_get_data_bit());
+}
 
-	case TIMER_TX:
-		txc_w(1);
-		break;
-	}
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void mc2661_device::tra_complete()
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void mc2661_device::rcv_callback()
+{
+	if (m_in_rxd_func.isnull())
+		receive_register_update_bit(get_in_data_bit());
+	else
+		receive_register_update_bit(m_in_rxd_func());
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void mc2661_device::rcv_complete()
+{
+	// TODO
 }
 
 
@@ -253,6 +255,7 @@ void mc2661_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void mc2661_device::input_callback(UINT8 state)
 {
+	m_input_state = state;
 }
 
 
@@ -368,6 +371,7 @@ WRITE8_MEMBER( mc2661_device::write )
 
 WRITE_LINE_MEMBER( mc2661_device::rxc_w )
 {
+	rcv_clock();
 }
 
 
@@ -377,6 +381,7 @@ WRITE_LINE_MEMBER( mc2661_device::rxc_w )
 
 WRITE_LINE_MEMBER( mc2661_device::txc_w )
 {
+	tra_clock();
 }
 
 

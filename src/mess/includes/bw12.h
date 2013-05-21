@@ -11,6 +11,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/serial.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
@@ -27,6 +28,8 @@
 #define AY3600PRO002_TAG    "ic74"
 #define CENTRONICS_TAG      "centronics"
 #define FLOPPY_TIMER_TAG    "motor_off"
+#define RS232_A_TAG     	"rs232a"
+#define RS232_B_TAG     	"rs232b"
 
 #define BW12_VIDEORAM_MASK  0x7ff
 #define BW12_CHARROM_MASK   0xfff

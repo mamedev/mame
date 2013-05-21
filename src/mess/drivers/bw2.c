@@ -543,6 +543,24 @@ static const struct pit8253_config pit_intf =
 
 
 //-------------------------------------------------
+//  i8251_interface usart_intf
+//-------------------------------------------------
+
+static const i8251_interface usart_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
@@ -578,9 +596,6 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 //  rs232_port_interface rs232_intf
 //-------------------------------------------------
-
-static SLOT_INTERFACE_START( rs232_devices )
-SLOT_INTERFACE_END
 
 static const rs232_port_interface rs232_intf =
 {
@@ -655,12 +670,12 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_I8251_ADD(I8251_TAG, default_i8251_interface)
+	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", NULL, bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, NULL,   NULL, bw2_state::floppy_formats)
 	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL_16MHz, bw2_expansion_cards, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")

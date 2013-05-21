@@ -20,6 +20,9 @@
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
+#include "machine/serial.h"
+
+#define RS232_TAG       "rs232"
 
 class bbc_state : public driver_device
 {
@@ -32,6 +35,7 @@ public:
 		m_trom(*this, "saa505x"),
 		m_cassette(*this, "cassette"),
 		m_acia(*this, "acia6850"),
+		m_rs232(*this, RS232_TAG),
 		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
@@ -54,6 +58,7 @@ public:
 	required_device<saa5050_device> m_trom;
 	required_device<cassette_image_device> m_cassette;
 	required_device<acia6850_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
 
 	void check_interrupts();
 
@@ -163,8 +168,6 @@ public:
 	UINT8 m_serproc_data;
 	int m_dcd_cass;
 	int m_rxd_cass;
-	int m_rxd_rs423;
-	int m_cts_rs423;
 	int m_cass_out_enabled;
 	int m_txd;
 	UINT32 m_nr_high_tones;
@@ -332,9 +335,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
-	DECLARE_READ_LINE_MEMBER(bbc_rxd_r) { return ( m_serproc_data & 0x40 ) ? m_rxd_rs423 : m_rxd_cass; }
-	DECLARE_READ_LINE_MEMBER(bbc_dcd_r) { return ( m_serproc_data & 0x40 ) ? 0 : m_dcd_cass; }
-	DECLARE_READ_LINE_MEMBER(bbc_cts_r) { return ( m_serproc_data & 0x40 ) ? m_cts_rs423 : 0; }
+	DECLARE_READ_LINE_MEMBER(bbc_rxd_r);
+	DECLARE_READ_LINE_MEMBER(bbc_dcd_r);
+	DECLARE_READ_LINE_MEMBER(bbc_cts_r);
 	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
 

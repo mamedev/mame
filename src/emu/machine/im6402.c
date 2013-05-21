@@ -67,86 +67,6 @@ inline void im6402_device::set_tre(int state)
 }
 
 
-//-------------------------------------------------
-//  receive_bit -
-//-------------------------------------------------
-
-inline void im6402_device::receive_bit(int state)
-{
-	if (LOG) logerror("IM6402 '%s' Receive Bit %u\n", tag(), state);
-
-	receive_register_update_bit(state);
-
-	if (is_receive_register_full())
-	{
-		receive_register_extract();
-		m_rbr = get_received_char();
-
-		if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
-
-		if (m_dr)
-		{
-			m_oe = 1;
-		}
-
-		set_dr(ASSERT_LINE);
-	}
-}
-
-
-//-------------------------------------------------
-//  receive -
-//-------------------------------------------------
-
-inline void im6402_device::receive()
-{
-	int bit = 1;
-
-	if (m_in_rri_func.isnull())
-	{
-		bit = get_in_data_bit();
-	}
-	else
-	{
-		bit = m_in_rri_func();
-	}
-
-	receive_bit(bit);
-}
-
-
-//-------------------------------------------------
-//  transmit -
-//-------------------------------------------------
-
-inline void im6402_device::transmit()
-{
-	if (is_transmit_register_empty() && !m_tbre)
-	{
-		if (LOG) logerror("IM6402 '%s' Transmit Data %02x\n", tag(), m_tbr);
-
-		transmit_register_setup(m_tbr);
-
-		set_tbre(ASSERT_LINE);
-		set_tre(CLEAR_LINE);
-	}
-
-	if (!is_transmit_register_empty())
-	{
-		int bit = transmit_register_send_bit();
-
-		if (LOG) logerror("IM6402 '%s' Transmit Bit %u\n", tag(), bit);
-
-		m_out_tro_func(bit);
-
-		if (is_transmit_register_empty())
-		{
-			set_tre(ASSERT_LINE);
-		}
-	}
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -206,14 +126,12 @@ void im6402_device::device_start()
 	// create the timers
 	if (m_rrc > 0)
 	{
-		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rrc));
+		set_rcv_rate(m_rrc/16);
 	}
 
 	if (m_trc > 0)
 	{
-		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_trc));
+		set_tra_rate(m_trc/16);
 	}
 
 	// state saving
@@ -242,8 +160,12 @@ void im6402_device::device_start()
 
 void im6402_device::device_reset()
 {
-	transmit_register_reset();
 	receive_register_reset();
+	transmit_register_reset();
+
+	m_out_tro_func(1);
+	set_out_data_bit(1);
+	serial_connection_out();
 
 	m_rrc_count = 0;
 	m_trc_count = 0;
@@ -260,21 +182,66 @@ void im6402_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  tra_callback -
 //-------------------------------------------------
 
-void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void im6402_device::tra_callback()
 {
-	switch (id)
-	{
-	case TIMER_RX:
-		rrc_w(1);
-		break;
+	if (m_out_tro_func.isnull())
+		transmit_register_send_bit();
+	else
+		m_out_tro_func(transmit_register_get_data_bit());
+}
 
-	case TIMER_TX:
-		trc_w(1);
-		break;
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void im6402_device::tra_complete()
+{
+	if (!m_tbre)
+	{
+		if (LOG) logerror("IM6402 '%s' Transmit Data %02x\n", tag(), m_tbr);
+
+		transmit_register_setup(m_tbr);
+
+		set_tbre(ASSERT_LINE);
+		set_tre(CLEAR_LINE);
 	}
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void im6402_device::rcv_callback()
+{
+	if (m_in_rri_func.isnull())
+		receive_register_update_bit(get_in_data_bit());
+	else
+		receive_register_update_bit(m_in_rri_func());
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void im6402_device::rcv_complete()
+{
+	receive_register_extract();
+	m_rbr = get_received_char();
+
+	if (LOG) logerror("IM6402 '%s' Receive Data %02x\n", tag(), m_rbr);
+
+	if (m_dr)
+	{
+		m_oe = 1;
+	}
+
+	set_dr(ASSERT_LINE);
 }
 
 
@@ -284,19 +251,9 @@ void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void im6402_device::input_callback(UINT8 state)
 {
-	int bit = (state & SERIAL_STATE_RX_DATA) ? 1 : 0;
+	m_input_state = state;
 
-	receive_bit(bit);
-}
-
-
-//-------------------------------------------------
-//  read - receiver buffer register read
-//-------------------------------------------------
-
-READ8_MEMBER( im6402_device::read )
-{
-	return m_rbr;
+	rcv_clock(); // HACK for Wang PC keyboard
 }
 
 
@@ -310,7 +267,19 @@ WRITE8_MEMBER( im6402_device::write )
 
 	m_tbr = data;
 
-	set_tbre(CLEAR_LINE);
+	if (is_transmit_register_empty())
+	{
+		if (LOG) logerror("IM6402 '%s' Transmit Data %02x\n", tag(), m_tbr);
+
+		transmit_register_setup(m_tbr);
+
+		set_tbre(ASSERT_LINE);
+		set_tre(CLEAR_LINE);
+	}
+	else
+	{
+		set_tbre(CLEAR_LINE);		
+	}
 }
 
 
@@ -326,7 +295,7 @@ WRITE_LINE_MEMBER( im6402_device::rrc_w )
 
 		if (m_rrc_count == 16)
 		{
-			receive();
+			rcv_clock();
 			m_rrc_count = 0;
 		}
 	}
@@ -345,70 +314,10 @@ WRITE_LINE_MEMBER( im6402_device::trc_w )
 
 		if (m_trc_count == 16)
 		{
-			transmit();
+			tra_clock();
 			m_trc_count = 0;
 		}
 	}
-}
-
-
-//-------------------------------------------------
-//  dr_r - data received
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::dr_r )
-{
-	return m_dr;
-}
-
-
-//-------------------------------------------------
-//  tbre_r - transmitter buffer register empty
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::tbre_r )
-{
-	return m_tbre;
-}
-
-
-//-------------------------------------------------
-//  tre_r - transmitter register empty
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::tre_r )
-{
-	return m_tre;
-}
-
-
-//-------------------------------------------------
-//  pe_r - parity error
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::pe_r )
-{
-	return m_pe;
-}
-
-
-//-------------------------------------------------
-//  fe_r - framing error
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::fe_r )
-{
-	return m_fe;
-}
-
-
-//-------------------------------------------------
-//  oe_r - overrun error
-//-------------------------------------------------
-
-READ_LINE_MEMBER( im6402_device::oe_r )
-{
-	return m_oe;
 }
 
 

@@ -60,97 +60,6 @@ const device_type MC68901 = &device_creator<mc68901_device>;
 #define LOG 0
 
 
-enum
-{
-	REGISTER_GPIP = 0,
-	REGISTER_AER,
-	REGISTER_DDR,
-	REGISTER_IERA,
-	REGISTER_IERB,
-	REGISTER_IPRA,
-	REGISTER_IPRB,
-	REGISTER_ISRA,
-	REGISTER_ISRB,
-	REGISTER_IMRA,
-	REGISTER_IMRB,
-	REGISTER_VR,
-	REGISTER_TACR,
-	REGISTER_TBCR,
-	REGISTER_TCDCR,
-	REGISTER_TADR,
-	REGISTER_TBDR,
-	REGISTER_TCDR,
-	REGISTER_TDDR,
-	REGISTER_SCR,
-	REGISTER_UCR,
-	REGISTER_RSR,
-	REGISTER_TSR,
-	REGISTER_UDR
-};
-
-
-enum
-{
-	INT_GPI0 = 0,
-	INT_GPI1,
-	INT_GPI2,
-	INT_GPI3,
-	INT_TIMER_D,
-	INT_TIMER_C,
-	INT_GPI4,
-	INT_GPI5,
-	INT_TIMER_B,
-	INT_XMIT_ERROR,
-	INT_XMIT_BUFFER_EMPTY,
-	INT_RCV_ERROR,
-	INT_RCV_BUFFER_FULL,
-	INT_TIMER_A,
-	INT_GPI6,
-	INT_GPI7
-};
-
-
-enum
-{
-	GPIP_0 = 0,
-	GPIP_1,
-	GPIP_2,
-	GPIP_3,
-	GPIP_4,
-	GPIP_5,
-	GPIP_6,
-	GPIP_7
-};
-
-
-enum
-{
-	TIMER_A = 0,
-	TIMER_B,
-	TIMER_C,
-	TIMER_D,
-	MAX_TIMERS
-};
-
-
-enum
-{
-	SERIAL_START = 0,
-	SERIAL_DATA,
-	SERIAL_PARITY,
-	SERIAL_STOP
-};
-
-
-enum
-{
-	XMIT_OFF = 0,
-	XMIT_STARTING,
-	XMIT_ON,
-	XMIT_BREAK,
-	XMIT_STOPPING
-};
-
 
 #define AER_GPIP_0              0x01
 #define AER_GPIP_1              0x02
@@ -240,27 +149,29 @@ enum
 #define TSR_UNDERRUN_ERROR      0x40
 #define TSR_BUFFER_EMPTY        0x80
 
+#define DIVISOR PRESCALER[data & 0x07]
 
-static const int INT_MASK_GPIO[] =
+
+const int mc68901_device::INT_MASK_GPIO[] =
 {
 	IR_GPIP_0, IR_GPIP_1, IR_GPIP_2, IR_GPIP_3,
 	IR_GPIP_4, IR_GPIP_5, IR_GPIP_6, IR_GPIP_7
 };
 
 
-static const int INT_MASK_TIMER[] =
+const int mc68901_device::INT_MASK_TIMER[] =
 {
 	IR_TIMER_A, IR_TIMER_B, IR_TIMER_C, IR_TIMER_D
 };
 
 
-static const int GPIO_TIMER[] =
+const int mc68901_device::GPIO_TIMER[] =
 {
 	GPIP_4, GPIP_3
 };
 
 
-static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
+const int mc68901_device::PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 
 #define TXD(_data) m_out_so_func(_data);
@@ -741,6 +652,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock),
+		device_serial_interface(mconfig, *this),
 		m_gpip(0),
 		m_tsr(TSR_BUFFER_EMPTY)
 {
@@ -793,14 +705,12 @@ void mc68901_device::device_start()
 
 	if (m_rx_clock > 0)
 	{
-		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rx_clock));
+		set_rcv_rate(m_rx_clock);
 	}
 
 	if (m_tx_clock > 0)
 	{
-		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_tx_clock));
+		set_tra_rate(m_tx_clock);
 	}
 
 	/* register for state saving */
@@ -888,23 +798,67 @@ void mc68901_device::device_reset()
 
 void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (id)
-	{
-	case TIMER_RX:
-		serial_receive();
-		break;
-
-	case TIMER_TX:
-		serial_transmit();
-		break;
-
-	default:
-		timer_count(id);
-		break;
-	}
+	timer_count(id);
 }
 
 
+//-------------------------------------------------
+//  tra_callback -
+//-------------------------------------------------
+
+void mc68901_device::tra_callback()
+{
+	if (m_out_so_func.isnull())
+		transmit_register_send_bit();
+	else
+		m_out_so_func(transmit_register_get_data_bit());
+}
+
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void mc68901_device::tra_complete()
+{
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void mc68901_device::rcv_callback()
+{
+	if (m_in_si_func.isnull())
+		receive_register_update_bit(get_in_data_bit());
+	else
+		receive_register_update_bit(m_in_si_func());
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void mc68901_device::rcv_complete()
+{
+}
+
+
+//-------------------------------------------------
+//  input_callback -
+//-------------------------------------------------
+
+void mc68901_device::input_callback(UINT8 state)
+{
+	m_input_state = state;
+}
+
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
 
 READ8_MEMBER( mc68901_device::read )
 {
@@ -968,7 +922,10 @@ READ8_MEMBER( mc68901_device::read )
 }
 
 
-#define DIVISOR PRESCALER[data & 0x07]
+
+//-------------------------------------------------
+//  register_w -
+//-------------------------------------------------
 
 void mc68901_device::register_w(offs_t offset, UINT8 data)
 {
@@ -1267,15 +1224,22 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		break;
 
 	case REGISTER_UCR:
+		{
+		int parity_code = SERIAL_PARITY_NONE;
+
 		if (data & UCR_PARITY_ENABLED)
 		{
 			if (data & UCR_PARITY_EVEN)
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Even\n", tag());
+				
+				parity_code = SERIAL_PARITY_EVEN;
 			}
 			else
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Odd\n", tag());
+
+				parity_code = SERIAL_PARITY_ODD;
 			}
 		}
 		else
@@ -1308,7 +1272,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		case UCR_START_STOP_1_15:
 			m_rxtx_start = 1;
 			m_rxtx_stop = 1;
-			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1??, Format : asynchronous\n", tag());
+			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1.5, Format : asynchronous\n", tag());
 			break;
 		case UCR_START_STOP_1_2:
 			m_rxtx_start = 1;
@@ -1326,7 +1290,10 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			if (LOG) logerror("MC68901 '%s' Rx/Tx Clock Divisor : 1\n", tag());
 		}
 
+		set_data_frame(m_rxtx_word, m_rxtx_stop, parity_code);
+
 		m_ucr = data;
+		}
 		break;
 
 	case REGISTER_RSR:
@@ -1471,7 +1438,7 @@ WRITE_LINE_MEMBER( mc68901_device::rc_w )
 {
 	if (state)
 	{
-		serial_receive();
+		rcv_clock();
 	}
 }
 
@@ -1480,6 +1447,6 @@ WRITE_LINE_MEMBER( mc68901_device::tc_w )
 {
 	if (state)
 	{
-		serial_transmit();
+		tra_clock();
 	}
 }

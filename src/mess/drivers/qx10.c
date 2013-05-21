@@ -38,11 +38,14 @@
 #include "machine/mc146818.h"
 #include "machine/i8255.h"
 #include "machine/8237dma.h"
+#include "machine/serial.h"
 #include "video/upd7220.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 
 #define MAIN_CLK    15974400
+
+#define RS232_TAG	"rs232"
 
 /*
     Driver data
@@ -494,12 +497,12 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 			0,                  /* transmit clock */
 			DEVCB_NULL,         /* receive DRQ */
 			DEVCB_NULL,         /* transmit DRQ */
-			DEVCB_NULL,         /* receive data */
-			DEVCB_NULL,         /* transmit data */
-			DEVCB_NULL,         /* clear to send */
-			DEVCB_NULL,         /* data carrier detect */
-			DEVCB_NULL,         /* ready to send */
-			DEVCB_NULL,         /* data terminal ready */
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, cts_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dcd_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 			DEVCB_NULL,         /* wait */
 			DEVCB_NULL          /* sync output */
 		}
@@ -1015,6 +1018,19 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
 	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* basic machine hardware */
@@ -1046,6 +1062,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

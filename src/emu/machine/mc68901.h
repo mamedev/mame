@@ -96,6 +96,7 @@ struct mc68901_interface
 // ======================> mc68901_device
 
 class mc68901_device :  public device_t,
+						public device_serial_interface,
 						public mc68901_interface
 {
 public:
@@ -129,6 +130,13 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// device_serial_interface overrides
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_callback();
+	virtual void rcv_complete();
+	virtual void input_callback(UINT8 state);
+
 	void check_interrupts();
 	void take_interrupt(UINT16 mask);
 	void rx_buffer_full();
@@ -148,12 +156,95 @@ protected:
 	void register_w(offs_t offset, UINT8 data);
 
 private:
-	static const device_timer_id TIMER_A = 0;
-	static const device_timer_id TIMER_B = 1;
-	static const device_timer_id TIMER_C = 2;
-	static const device_timer_id TIMER_D = 3;
-	static const device_timer_id TIMER_RX = 4;
-	static const device_timer_id TIMER_TX = 5;
+	enum
+	{
+		TIMER_A = 0,
+		TIMER_B,
+		TIMER_C,
+		TIMER_D
+	};
+
+	enum
+	{
+		REGISTER_GPIP = 0,
+		REGISTER_AER,
+		REGISTER_DDR,
+		REGISTER_IERA,
+		REGISTER_IERB,
+		REGISTER_IPRA,
+		REGISTER_IPRB,
+		REGISTER_ISRA,
+		REGISTER_ISRB,
+		REGISTER_IMRA,
+		REGISTER_IMRB,
+		REGISTER_VR,
+		REGISTER_TACR,
+		REGISTER_TBCR,
+		REGISTER_TCDCR,
+		REGISTER_TADR,
+		REGISTER_TBDR,
+		REGISTER_TCDR,
+		REGISTER_TDDR,
+		REGISTER_SCR,
+		REGISTER_UCR,
+		REGISTER_RSR,
+		REGISTER_TSR,
+		REGISTER_UDR
+	};
+
+	enum
+	{
+		INT_GPI0 = 0,
+		INT_GPI1,
+		INT_GPI2,
+		INT_GPI3,
+		INT_TIMER_D,
+		INT_TIMER_C,
+		INT_GPI4,
+		INT_GPI5,
+		INT_TIMER_B,
+		INT_XMIT_ERROR,
+		INT_XMIT_BUFFER_EMPTY,
+		INT_RCV_ERROR,
+		INT_RCV_BUFFER_FULL,
+		INT_TIMER_A,
+		INT_GPI6,
+		INT_GPI7
+	};
+
+	enum
+	{
+		GPIP_0 = 0,
+		GPIP_1,
+		GPIP_2,
+		GPIP_3,
+		GPIP_4,
+		GPIP_5,
+		GPIP_6,
+		GPIP_7
+	};
+
+	enum
+	{
+		SERIAL_START = 0,
+		SERIAL_DATA,
+		SERIAL_PARITY,
+		SERIAL_STOP
+	};
+
+	enum
+	{
+		XMIT_OFF = 0,
+		XMIT_STARTING,
+		XMIT_ON,
+		XMIT_BREAK,
+		XMIT_STOPPING
+	};
+
+	static const int INT_MASK_GPIO[];
+	static const int INT_MASK_TIMER[];
+	static const int GPIO_TIMER[];
+	static const int PRESCALER[];
 
 	devcb_resolved_read8        m_in_gpio_func;
 	devcb_resolved_write8       m_out_gpio_func;
@@ -219,8 +310,6 @@ private:
 
 	// timers
 	emu_timer *m_timer[4]; /* counter timers */
-	emu_timer *m_rx_timer;                  /* receive timer */
-	emu_timer *m_tx_timer;                  /* transmit timer */
 };
 
 

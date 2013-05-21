@@ -631,12 +631,12 @@ static UPD7201_INTERFACE( mpsc_intf )
 			0,                  // transmit clock
 			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
 			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
-			DEVCB_NULL,         // receive data
-			DEVCB_NULL,         // transmit data
-			DEVCB_NULL,         // clear to send
-			DEVCB_NULL,         // data carrier detect
-			DEVCB_NULL,         // ready to send
-			DEVCB_NULL,         // data terminal ready
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 			DEVCB_NULL,         // wait
 			DEVCB_NULL          // sync output
 		}, {

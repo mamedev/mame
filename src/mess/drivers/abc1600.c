@@ -44,6 +44,7 @@
     - hard disk
         - 4105 SASI interface card
         - SASI interface (scsibus.c)
+    - connect RS-232 port A
 
 */
 
@@ -1523,10 +1524,10 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -1792,6 +1793,34 @@ static ABC1600BUS_INTERFACE( bus2_intf )
 };
 
 
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1924,6 +1953,8 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ABC99_ADD(abc99_intf)
 
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL, NULL)
