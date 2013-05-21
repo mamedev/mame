@@ -218,8 +218,8 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "sound/2413intf.h"
 #include "video/315_5124.h"
 #include "imagedev/cartslot.h"
-#include "machine/eeprom.h"
 #include "includes/sms.h"
+#include "machine/sega8_rom.h"
 
 #include "sms1.lh"
 
@@ -227,13 +227,10 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 
 static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")                            /* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")                            /* switchable rom bank */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")                            /* switchable rom bank */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")                            /* switchable rom bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                            /* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)  /* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w) /* ROM bank / on-cart RAM */
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
 	AM_RANGE(0xe000, 0xfff7) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
 	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)       /* 3-D glasses */
@@ -241,22 +238,29 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")                            /* First 0x0400 part always points to first page */
-	AM_RANGE(0x0400, 0x1fff) AM_ROMBANK("bank2")                            /* switchable rom bank */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank7")                            /* switchable rom bank */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank3")                            /* switchable rom bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                            /* switchable rom bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE(sms_cartram_w)  /* ROM bank / on-cart RAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE(sms_cartram2_w) /* ROM bank / on-cart RAM */
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
 	AM_RANGE(0xe000, 0xfffb) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, sms_state )
+static ADDRESS_MAP_START( smssdisp_mem, AS_PROGRAM, 8, smssdisp_state )
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(store_write_cart)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(store_read_0000)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(store_read_4000)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(store_read_8000)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("mainram")                     /* RAM */
+	AM_RANGE(0xe000, 0xfffb) AM_RAM AM_SHARE("mainram")                     /* RAM (mirror) */
+	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     /* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM                     /* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank10")                   /* Cartridge/card peek area */
+	AM_RANGE(0x6000, 0x7fff) AM_READ(store_cart_peek)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w) /* Control */
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) /* cartridge/card slot selector */
 	AM_RANGE(0xd800, 0xd800) AM_READ(sms_store_select1)         /* Game selector port #1 */
@@ -471,26 +475,6 @@ static INPUT_PORTS_START( sms1 )
 	PORT_BIT( 0x03, 0x00, IPT_UNUSED ) PORT_CONDITION("SEGASCOPE", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( smsj )
-	PORT_INCLUDE( sms1 )
-
-	PORT_START("TVDRAW")
-	PORT_CONFNAME( 0x01, 0x00, "Terebi Oekaki Graphics Tablet" )
-	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-
-	PORT_START("TVDRAW_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-	PORT_CONDITION("TVDRAW", 0x01, EQUALS, 0x01)
-
-	PORT_START("TVDRAW_Y")
-	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-	PORT_CONDITION("TVDRAW", 0x01, EQUALS, 0x01)
-
-	PORT_START("TVDRAW_PEN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Tablet - Pen") PORT_CONDITION("TVDRAW", 0x01, EQUALS, 0x01)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( gg )
 	PORT_START("PORT_DC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
@@ -507,6 +491,11 @@ static INPUT_PORTS_START( gg )
 	PORT_START("START")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start") /* Game Gear START */
+
+	PORT_START("PERSISTENCE")
+	PORT_CONFNAME( 0x01, 0x01, "LCD Persistence Hack" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -535,7 +524,7 @@ static const sega315_5124_interface sms_store_intf =
 {
 	false,
 	"screen",
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_store_int_callback),
+	DEVCB_DRIVER_LINE_MEMBER(smssdisp_state,sms_store_int_callback),
 	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
 };
 
@@ -550,25 +539,23 @@ static const sn76496_config psg_intf =
 };
 
 
-static MACHINE_CONFIG_FRAGMENT( sms_cartslot )
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("sms_cart")
-	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
+static SLOT_INTERFACE_START(sms_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("terebi",  SEGA8_ROM_TEREBI)
+	SLOT_INTERFACE_INTERNAL("codemasters",  SEGA8_ROM_CODEMASTERS)
+	SLOT_INTERFACE_INTERNAL("4pak",  SEGA8_ROM_4PAK)
+	SLOT_INTERFACE_INTERNAL("zemina",  SEGA8_ROM_ZEMINA)
+	SLOT_INTERFACE_INTERNAL("nemesis",  SEGA8_ROM_NEMESIS)
+	SLOT_INTERFACE_INTERNAL("janggun",  SEGA8_ROM_JANGGUN)
+	SLOT_INTERFACE_INTERNAL("korean",  SEGA8_ROM_KOREAN)
+	SLOT_INTERFACE_INTERNAL("korean_nb",  SEGA8_ROM_KOREAN_NB)
+SLOT_INTERFACE_END
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( gg_cartslot )
-	MCFG_CARTSLOT_ADD("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("gg,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("gamegear_cart")
-	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamegear")
-MACHINE_CONFIG_END
+static SLOT_INTERFACE_START(gg_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("eeprom",  SEGA8_ROM_EEPROM)
+	SLOT_INTERFACE_INTERNAL("codemasters",  SEGA8_ROM_CODEMASTERS)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	/* basic machine hardware */
@@ -587,7 +574,9 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_FRAGMENT_ADD( sms_cartslot )
+	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL, NULL)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
@@ -641,16 +630,33 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
 MACHINE_CONFIG_END
 
-#define MCFG_SMSSDISP_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin") \
-	MCFG_CARTSLOT_NOT_MANDATORY \
-	MCFG_CARTSLOT_INTERFACE("sms_cart") \
-	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
+static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_53_693175MHz/15)
+	MCFG_CPU_PROGRAM_MAP(smssdisp_mem)  // This adds the multicart accesses
+	MCFG_CPU_IO_MAP(sms_io)
 
-static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_REMOVE("sms_vdp")
+	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
+	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_53_693175MHz/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_CONFIG(psg_intf)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_53_693175MHz/10, \
+		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH - 2, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256 + 10, \
+		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
+	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
+
+	MCFG_PALETTE_LENGTH(SEGA315_5124_PALETTE_SIZE)
+	MCFG_PALETTE_INIT(sega315_5124)
+
 	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
 
 	MCFG_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
@@ -658,27 +664,24 @@ static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
 	/* Both CPUs seem to communicate with the VDP etc? */
 	MCFG_CPU_IO_MAP(sms_io)
 
-	MCFG_CARTSLOT_MODIFY("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("sms_cart")
-	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
+	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL, NULL)	// should be mandatory?
+	MCFG_SMS_CARTRIDGE_ADD("slot2", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot3", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot4", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot5", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot6", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot7", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot8", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot9", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot10", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot11", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot12", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot13", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot14", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot15", sms_cart, NULL, NULL)
+	MCFG_SMS_CARTRIDGE_ADD("slot16", sms_cart, NULL, NULL)
 
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart2")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart3")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart4")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart5")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart6")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart7")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart8")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart9")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart10")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart11")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart12")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart13")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart14")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart15")
-	MCFG_SMSSDISP_CARTSLOT_ADD("cart16")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sms_pal_base, sms_state )
@@ -698,7 +701,9 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_FRAGMENT_ADD( sms_cartslot )
+	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL, NULL)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
@@ -763,10 +768,8 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sms_no3e3f_io)
 
-	MCFG_CARTSLOT_MODIFY("cart1")
-	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin,sg")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
+	MCFG_DEVICE_REMOVE("slot")
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sms_cart, NULL, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_fm, sms2_ntsc )
@@ -810,10 +813,9 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* cartridge */
-	MCFG_FRAGMENT_ADD( gg_cartslot )
+	MCFG_GG_CARTRIDGE_ADD("slot", gg_cart, NULL, NULL)
 
-	/* Some gamegear games use a 93c46 eeprom to store information */
-	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gamegear")
 MACHINE_CONFIG_END
 
 
@@ -823,13 +825,13 @@ ROM_START(sms1)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
+	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" )
-	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "v10", "US Master System BIOS v1.0 (prototype)" )
 	ROMX_LOAD("v1.0.bin", 0x0000, 0x2000, CRC(72bec693) SHA1(29091ff60ef4c22b1ee17aa21e0e75bac6b36474), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 5, "proto", "US Master System Prototype BIOS" )
@@ -842,7 +844,7 @@ ROM_START(sms)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 ROM_END
 
 ROM_START(smssdisp)
@@ -862,13 +864,13 @@ ROM_START(sms1pal)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
+	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" )
-	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
 ROM_END
 
 ROM_START(smspal)
@@ -877,9 +879,9 @@ ROM_START(smspal)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" ) /* PCB Label: SEGA // IC BD M4Jr. PAL" Master System II with 314-5246 (ZIP) VDP and 314-5237 (DIP48) IO */
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 	ROM_SYSTEM_BIOS( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
-	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81C3476B) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
+	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81c3476b) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 ROM_END
 
 ROM_START(sg1000m3)
@@ -894,7 +896,7 @@ ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM24
 
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
-	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48D44A13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
+	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48d44a13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
 ROM_END
 
 ROM_START(sms2kr)
@@ -913,7 +915,7 @@ ROM_START(gamegear)
 	ROM_REGION(0x0400, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */
 	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" ) /* gamg */
-	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0EBEA9D4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(2))
+	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0ebea9d4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(2))
 ROM_END
 
 #define rom_gamegeaj rom_gamegear
@@ -964,14 +966,14 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT   INIT      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    smsj, sms_state,   sg1000m3, "Sega",     "SG-1000 Mark III",                 0 )
-CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1, sms_state,   sms1,     "Sega",     "Master System I",                  0 )
-CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1, sms_state,   sms1,     "Sega",     "Master System I (PAL)" ,           0 )
-CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms, sms_state,    smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj, sms_state,   smsj,     "Sega",     "Master System (Japan)",            0 )
-CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms, sms_state,    sms1,     "Sega",     "Master System II",                 0 )
-CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms, sms_state,    sms1,     "Sega",     "Master System II (PAL)",           0 )
-CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms, sms_state,    sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               0 )
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sms1, sms_state,      sg1000m3, "Sega",     "SG-1000 Mark III",                 0 )
+CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1, sms_state,      sms1,     "Sega",     "Master System I",                  0 )
+CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1, sms_state,      sms1,     "Sega",     "Master System I (PAL)" ,           0 )
+CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,  smssdisp_state, smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
+CONS( 1987, smsj,       sms,        0,      sms_fm,      sms1, sms_state,      smsj,     "Sega",     "Master System (Japan)",            0 )
+CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,  sms_state,      sms1,     "Sega",     "Master System II",                 0 )
+CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,  sms_state,      sms1,     "Sega",     "Master System II (PAL)",           0 )
+CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,  sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               0 )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,    gg, sms_state,     gamegear, "Sega",     "Game Gear (Europe/America)",       0 )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg, sms_state,     gamegeaj, "Sega",     "Game Gear (Japan)",                0 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,   sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       0 )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,   sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                0 )

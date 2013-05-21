@@ -2374,7 +2374,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120098-50"/>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="ernie els golf (europe) (en,fr,de,es,it).bin" size="262144" crc="5e53c7f7" sha1="a8d75c2af514dc81ba4dc66a508384d730a77ce4" offset="000000" />
 			</dataarea>
@@ -2415,7 +2415,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
 				<rom name="excellent dizzy collection, the (europe).bin" size="524288" crc="aa140c9c" sha1="db3c0686715373242911f8471a1e91673811d62a" offset="000000" />
@@ -2428,7 +2428,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="excellent dizzy collection, the (prototype) [s][!].bin" size="262144" crc="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" offset="000000" />
@@ -2505,7 +2505,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="fantastic dizzy (europe) (en,fr,de,es,it).bin" size="262144" crc="c888222b" sha1="b6a13d51c72b576738f0d7e8e328db2ffeb0b38c" offset="000000" />
@@ -3411,7 +3411,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
 				<rom name="jang pung ii (k) [s].bin" size="262144" crc="76c5bdfb" sha1="2b3bb8fd76fe706d7e564b372d2d71dfce53cb1b" offset="000000" />
@@ -4233,7 +4233,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2418"/>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="262144">
 				<rom name="majors pro baseball, the (usa).bin" size="262144" crc="36ebcd6d" sha1="76f3c504d717067134a88f7f1d0ef38bd6698e50" offset="000000" />
 			</dataarea>
@@ -5560,7 +5560,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
 
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18562.ic1" size="524288" crc="4ed45bda" sha1="127a7e6706f6d9b129d5cf0dd2bb417e9b108748" offset="000000" />
 			</dataarea>
@@ -6100,7 +6100,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940930"/>
 		<info name="alt_title" value="プロ野球GGリーグ '94"/>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="524288">
 				<rom name="pro yakyuu gg league '94 (japan).bin" size="524288" crc="a1a19135" sha1="faac2b420cb895aec4216d4c5ce21e5f2a4c4338" offset="000000" />
 			</dataarea>
@@ -6119,7 +6119,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="pcb" value="171-6309A" />
 			<feature name="ic1" value="MPR-15564" />
 
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-15564.ic1" size="262144" crc="2da8e943" sha1="bf78122a549ad9b016e3704690c7eea1574af140" offset="000000" />
 			</dataarea>
@@ -8057,7 +8057,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
 				<rom name="street hero [proto 0] (us).bin" size="524288" crc="9fa727a0" sha1="94f1113a6b19b7fa080114c65e8d0bd67f9117d7" offset="000000" />
@@ -9383,7 +9383,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="524288">
 				<rom name="world series baseball '95 (usa).bin" size="524288" crc="578a8a38" sha1="66d31ed6bb6dfedd769bf5e6c5dcbf899f2f2c8c" offset="000000" />
 			</dataarea>
@@ -9461,7 +9461,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="262144">
 				<rom name="world series baseball (usa) (v1.1).bin" size="262144" crc="bb38cfd7" sha1="333dd99f11781d6de5720043530a460a409d652b" offset="000000" />
 			</dataarea>
@@ -9473,7 +9473,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<feature name="eeprom" value="93c46" />
+			<feature name="slot" value="eeprom" />
 			<dataarea name="rom" size="262144">
 				<rom name="world series baseball (usa).bin" size="262144" crc="3d8d0dd6" sha1="ccfd03edf130f28e6bb4c2764df7ace7bbe9e159" offset="000000" />
 			</dataarea>

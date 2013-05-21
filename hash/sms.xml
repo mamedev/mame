@@ -35,7 +35,7 @@
 		<year>1995</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="4pak" />
+			<feature name="slot" value="4pak" />
 			<dataarea name="rom" size="1048576">
 				<rom name="4 pak all action (aus).bin" size="1048576" crc="a67f2a5c" sha1="2f8b5a66381dbbe7524af7af6372fbb6a6575ac5" offset="000000" />
 			</dataarea>
@@ -1031,7 +1031,7 @@
 		<publisher>YM Soft</publisher>
 		<info name="alt_title" value="파워 보글 보글 (Power Boggle Boggle, Box)" />
 		<part name="cart" interface="sms_cart">
-			<feature name="pcb" value="korean_nobank" />
+			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="32768">
 				<rom name="power boggle boggle (kr).bin" size="32768" crc="6d309ac5" sha1="d7e67d15ccc12e9bf40611dc91a080a99716ca6e" offset="000000" />
 			</dataarea>
@@ -1099,7 +1099,7 @@
 		<publisher>Joy Soft</publisher>
 		<info name="alt_title" value="시소" />
 		<part name="cart" interface="sms_cart">
-			<feature name="pcb" value="korean_nobank" />
+			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="32768">
 				<rom name="c_so! [msx] (kr).bin" size="32768" crc="0918fba0" sha1="e7fefabd7a920fd71e87509d065080855b5b233c" offset="000000" />
 			</dataarea>
@@ -1510,7 +1510,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="cosmic spacehead (europe) (en,fr,de,es).bin" size="262144" crc="29822980" sha1="f46f716dd34a1a5013a2d8a59769f6ef7536a567" offset="000000" />
 			</dataarea>
@@ -1582,7 +1582,7 @@
 		<publisher>Game Line</publisher>
 		<info name="serial" value="G9511-RP4"/>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="korean" />
+			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="442368">
 				<rom name="dallyeora pigu-wang (korea) (unl).bin" size="442368" crc="89b79e77" sha1="9ebd5a7b025e980795eaac206f3f6f5dc297084f" offset="000000" />
 			</dataarea>
@@ -1690,7 +1690,7 @@
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="dinobasher starring bignose the caveman (europe) (proto).bin" size="262144" crc="ea5c3a6f" sha1="05b4f23e33ada08e0a8b1fc6feccd8a97c690a21" offset="000000" />
 			</dataarea>
@@ -2000,7 +2000,7 @@
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="excellent dizzy collection, the (usa, europe) (en,fr,de,es,it) (proto).bin" size="262144" crc="8813514b" sha1="09a2acf3ed90101be2629384c5c702f6a5408035" offset="000000" />
 			</dataarea>
@@ -2027,7 +2027,7 @@
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="zemina" />
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="f-1 spirit - the way to formula-1 (kr)" size="131072" crc="06965ed9" sha1="5df1b4c00adb2b494f7298353d92b4d7ad3f50f6" offset="000000" />
 			</dataarea>
@@ -2093,7 +2093,7 @@
 		<publisher>FA Soft</publisher>
 		<info name="alt_title" value="에프에이 테트리스" />
 		<part name="cart" interface="sms_cart">
-			<feature name="pcb" value="korean_nobank" />
+			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="32768">
 				<rom name="fa tetris (kr).bin" size="32768" crc="17ab6883" sha1="4e35c8375aba080c416d721fa885ccc232b9a171" offset="000000" />
 			</dataarea>
@@ -2124,7 +2124,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="MK-27074-50"/>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="fantastic dizzy (europe) (en,fr,de,es,it).bin" size="262144" crc="b9664ae1" sha1="4202ce26832046c7ca8209240f097a8a0a84d981" offset="000000" />
 			</dataarea>
@@ -2321,7 +2321,7 @@
 		<year>199?</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="pcb" value="korean_nobank" />
+			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="32768">
 				<rom name="flashpoint (kr).bin" size="32768" crc="61e8806f" sha1="bfa43eaa99c470eaa542ba37033651c2759b9874" offset="000000" />
 			</dataarea>
@@ -3341,6 +3341,7 @@
 		<publisher>Daou Infosys</publisher>
 		<info name="alt_title" value="장군의 아들"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="janggun" />
 			<dataarea name="rom" size="524288">
 				<rom name="janggun ui adeul (kr).bin" size="524288" crc="192949d5" sha1="a290e41e0218dd54c7774229a7bf77c0e6b037f9" offset="00000" />
 			</dataarea>
@@ -3352,7 +3353,7 @@
 		<year>1994</year>
 		<publisher>Sanghun</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="korean" />
+			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="1048576">
 				<rom name="jang pung 3 (kr).bin" size="1048576" crc="18fb98a3" sha1="1b2b525ef2ab2d7ea3f934f0c229dab33af56d90" offset="000000" />
 			</dataarea>
@@ -3485,7 +3486,7 @@
 		<publisher>Zemina?</publisher>
 		<info name="alt_title" value="마성전설 II (Maseong Jeonseol II)" />
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="zemina" />
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="knightmare ii - the maze of galious [kr].bin" size="131072" crc="f89af3cc" sha1="b716266e936b7cd0a6e29785ae3e7686e1b35793" offset="000000"/>
 			</dataarea>
@@ -3935,7 +3936,7 @@
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="19001"/>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="codemasters" />
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="micro machines (europe).bin" size="262144" crc="a577ce46" sha1="425621f350d011fd021850238c6de9999625fd69" offset="000000" />
 			</dataarea>
@@ -4195,6 +4196,7 @@
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="그라디우스 ~ Gradius (Box)"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="nemesis" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis (kr).bin" size="131072" crc="e316c06d" sha1="fbee313aaa8d7acea4acbb763592f73466596113" offset="000000" />
 			</dataarea>
@@ -4456,7 +4458,7 @@
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="꿈의대륙 (Kkum Ui Dai Ryuk)" />
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="zemina" />
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="penguin adventure (kr).bin" size="131072" crc="445525e2" sha1="9d0c8fb5f1ff6f596aa156264db8d7c1c778b1bf" offset="000000" />
 			</dataarea>
@@ -5106,7 +5108,7 @@
 		<year>1994</year>
 		<publisher>Game Line</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="korean" />
+			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sangokushi 3 (korea) (unl).bin" size="1048576" crc="97d03541" sha1="c0256188b15271bb814bb8356b3311340e53ea3e" offset="000000" />
 			</dataarea>
@@ -5982,7 +5984,7 @@
 		<year>1992</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="zemina" />
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="street master (kr).bin" size="131072" crc="83f0eede" sha1="49f9d62f121d3b7e35d38436c920a53b7070ecd4" offset="000000" />
 			</dataarea>
@@ -6844,7 +6846,7 @@
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="원시인"/>
 		<part name="cart" interface="sms_cart">
-			<feature name="mapper" value="zemina" />
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="wonsiin (kr).bin" size="131072" crc="a05258f5" sha1="f98f9c0fd32b2392b57b14105a9b730c8957d9b9" offset="000000" />
 			</dataarea>
@@ -7139,7 +7141,7 @@
 		<year>19??</year>
 		<publisher>Taito?</publisher>
 		<part name="cart" interface="sms_cart">
-			<feature name="pcb" value="korean_nobank" />
+			<feature name="slot" value="korean_nb" />
 			<dataarea name="rom" size="49152">
 				<rom name="xyzolog (kr).sms" size="49152" crc="565c799f" sha1="202cc058ba46cc466387a67cce2ab7f5f55977d0" offset="0" />
 			</dataarea>

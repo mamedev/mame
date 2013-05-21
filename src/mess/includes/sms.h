@@ -16,44 +16,82 @@
 
 #define MAX_CARTRIDGES        16
 
+#include "machine/sega8_slot.h"
+
+
 class sms_state : public driver_device
 {
 public:
-	void map_cart_16k( UINT16 address, UINT16 bank );
-	void map_cart_8k( UINT16 address, UINT16 bank );
-	void map_bios_16k( UINT16 address, UINT16 bank );
-	void map_bios_8k( UINT16 address, UINT16 bank );
-
-public:
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_main_cpu(*this, "maincpu"),
-		m_control_cpu(*this, "control"),
+		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
-		m_eeprom(*this, "eeprom"),
 		m_ym(*this, "ym2413"),
 		m_main_scr(*this, "screen"),
+		m_mainram(*this, "mainram"),
+		m_cartslot(*this, "slot"),
+		m_region_maincpu(*this, "maincpu"),
+		m_port_dd(*this, "PORT_DD"),
+		m_port_dc(*this, "PORT_DC"),
+		m_port_pause(*this, "PAUSE"),
+		m_port_reset(*this, "RESET"),
+		m_port_start(*this, "START"),
+		m_port_ctrlsel(*this, "CTRLSEL"),
+		m_port_lphas0(*this, "LPHASER0"),
+		m_port_lphas1(*this, "LPHASER1"),
+		m_port_lphas2(*this, "LPHASER2"),
+		m_port_lphas3(*this, "LPHASER3"),
+		m_port_rfu(*this, "RFU"),
+		m_port_paddle0(*this, "PADDLE0"),
+		m_port_paddle1(*this, "PADDLE1"),
+		m_port_ctrlipt(*this, "CTRLIPT"),
+		m_port_sport0(*this, "SPORT0"),
+		m_port_sport1(*this, "SPORT1"),
+		m_port_sport2(*this, "SPORT2"),
+		m_port_sport3(*this, "SPORT3"),
+		m_port_scope(*this, "SEGASCOPE"),
+		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
 		m_has_bios(0),
-		m_has_fm(0),
-		m_mainram(*this, "mainram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_has_fm(0) { }
 
-	// device_ts
-	required_device<cpu_device> m_main_cpu;
-	optional_device<cpu_device> m_control_cpu;
+	// devices
+	required_device<cpu_device> m_maincpu;
 	required_device<sega315_5124_device> m_vdp;
-	optional_device<eeprom_device> m_eeprom;
 	optional_device<ym2413_device> m_ym;
 	required_device<screen_device> m_main_scr;
+	required_shared_ptr<UINT8> m_mainram;
+	required_device<sega8_cart_slot_device> m_cartslot;
+	required_memory_region m_region_maincpu;
+	required_ioport m_port_dd;
+	required_ioport m_port_dc;
+	optional_ioport m_port_pause;
+	optional_ioport m_port_reset;
+	optional_ioport m_port_start;
+	optional_ioport m_port_ctrlsel;
+	optional_ioport m_port_lphas0;
+	optional_ioport m_port_lphas1;
+	optional_ioport m_port_lphas2;
+	optional_ioport m_port_lphas3;
+	optional_ioport m_port_rfu;
+	optional_ioport m_port_paddle0;
+	optional_ioport m_port_paddle1;
+	optional_ioport m_port_ctrlipt;
+	optional_ioport m_port_sport0;
+	optional_ioport m_port_sport1;
+	optional_ioport m_port_sport2;
+	optional_ioport m_port_sport3;
+	optional_ioport m_port_scope;
+	optional_ioport m_port_persist;
+
 	device_t *m_left_lcd;
 	device_t *m_right_lcd;
 	address_space *m_space;
-
+	
 	UINT8 m_bios_page_count;
 	UINT8 m_fm_detect;
 	UINT8 m_ctrl_reg;
@@ -61,17 +99,14 @@ public:
 	UINT8 m_bios_port;
 	UINT8 *m_BIOS;
 	UINT8 m_mapper[4];
-	// we are going to use 1-6, same as bank numbers. Notice, though, that most mappers
-	// only work on 16K banks and, hence, banks 4-6 are not always directly set
-	// (they often use bank3 + 0x2000 and bank5 + 0x2000)
-	UINT8 *m_banking_bios[8];
-	UINT8 *m_banking_cart[8];
-	UINT8 *m_banking_none;
-	UINT8 m_gg_sio[5];
-	UINT8 m_store_control;
 	UINT8 m_input_port0;
 	UINT8 m_input_port1;
-
+	UINT8 m_gg_sio[5];
+	
+	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
+	int m_bank_enabled[4];
+	UINT8 m_bios_page[4];
+	
 	// for gamegear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
 
@@ -79,7 +114,7 @@ public:
 	bitmap_rgb32 m_prevleft_bitmap;
 	bitmap_rgb32 m_prevright_bitmap;
 
-	/* Model identifiers */
+	// model identifiers
 	UINT8 m_is_gamegear;
 	UINT8 m_is_region_japan;
 	UINT8 m_has_bios_0400;
@@ -88,16 +123,16 @@ public:
 	UINT8 m_has_bios;
 	UINT8 m_has_fm;
 
-	/* Data needed for Rapid Fire Unit support */
+	// Data needed for Rapid Fire Unit support
 	emu_timer *m_rapid_fire_timer;
 	UINT8 m_rapid_fire_state_1;
 	UINT8 m_rapid_fire_state_2;
 
-	/* Data needed for Paddle Control controller */
+	// Data needed for Paddle Control controller
 	UINT32 m_last_paddle_read_time;
 	UINT8 m_paddle_read_state;
 
-	/* Data needed for Sports Pad controller */
+	// Data needed for Sports Pad controller
 	UINT32 m_last_sports_pad_time_1;
 	UINT32 m_last_sports_pad_time_2;
 	UINT8 m_sports_pad_state_1;
@@ -109,42 +144,22 @@ public:
 	UINT8 m_sports_pad_2_x;
 	UINT8 m_sports_pad_2_y;
 
-	/* Data needed for Light Phaser */
+	// Data needed for Light Phaser
 	emu_timer *m_lphaser_1_timer;
 	emu_timer *m_lphaser_2_timer;
 	UINT8 m_lphaser_1_latch;
 	UINT8 m_lphaser_2_latch;
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
 
-	/* Data needed for SegaScope (3D glasses) */
+	// Data needed for SegaScope (3D glasses)
 	UINT8 m_sscope_state;
 	UINT8 m_frame_sscope_state;
 
+	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
+	UINT8 m_store_control;	
+	int m_current_cartridge;
+
 	/* Cartridge slot info */
-	UINT8 m_current_cartridge;
-	struct
-	{
-		UINT8 *ROM;        /* Pointer to ROM image data */
-		UINT32 size;       /* Size of the ROM image */
-		UINT32 features;   /* on-cartridge special hardware */
-		UINT8 *cartSRAM;   /* on-cartridge SRAM */
-		UINT8 sram_save;   /* should be the contents of the on-cartridge SRAM be saved */
-		UINT8 *cartRAM;    /* additional on-cartridge RAM (64KB for Ernie Els Golf) */
-		UINT32 ram_size;   /* size of the on-cartridge RAM */
-		UINT8 ram_page;    /* currently swapped in cartridge RAM */
-
-		/* Data needed for Terebi Oekaki (TV Draw) */
-		UINT8 m_tvdraw_data;
-
-		/* Data needed for 4pak mapper */
-		UINT8 m_4pak_page0;
-		UINT8 m_4pak_page1;
-		UINT8 m_4pak_page2;
-
-		/* Data needed for 93c46 */
-		bool m_93c46_enabled;
-		UINT8 m_93c46_lines;
-	} m_cartridge[MAX_CARTRIDGES];
 	DECLARE_WRITE8_MEMBER(sms_input_write);
 	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
 	DECLARE_READ8_MEMBER(sms_fm_detect_r);
@@ -158,40 +173,22 @@ public:
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
 	DECLARE_READ8_MEMBER(sms_mapper_r);
-	DECLARE_WRITE8_MEMBER(sms_tvdraw_axis_w);
-	DECLARE_READ8_MEMBER(sms_tvdraw_status_r);
-	DECLARE_READ8_MEMBER(sms_tvdraw_data_r);
-	DECLARE_WRITE8_MEMBER(sms_93c46_w);
-	DECLARE_READ8_MEMBER(sms_93c46_r);
+
+	DECLARE_READ8_MEMBER(read_0000);
+	DECLARE_READ8_MEMBER(read_4000);
+	DECLARE_READ8_MEMBER(read_8000);
+	DECLARE_WRITE8_MEMBER(write_cart);
+
 	DECLARE_WRITE8_MEMBER(sms_mapper_w);
-	DECLARE_WRITE8_MEMBER(sms_korean_zemina_banksw_w);
-	DECLARE_WRITE8_MEMBER(sms_codemasters_page0_w);
-	DECLARE_WRITE8_MEMBER(sms_codemasters_page1_w);
-	DECLARE_WRITE8_MEMBER(sms_4pak_page0_w);
-	DECLARE_WRITE8_MEMBER(sms_4pak_page1_w);
-	DECLARE_WRITE8_MEMBER(sms_4pak_page2_w);
-	DECLARE_WRITE8_MEMBER(sms_janggun_bank0_w);
-	DECLARE_WRITE8_MEMBER(sms_janggun_bank1_w);
-	DECLARE_WRITE8_MEMBER(sms_janggun_bank2_w);
-	DECLARE_WRITE8_MEMBER(sms_janggun_bank3_w);
 	DECLARE_WRITE8_MEMBER(sms_bios_w);
-	DECLARE_WRITE8_MEMBER(sms_cartram2_w);
-	DECLARE_WRITE8_MEMBER(sms_cartram_w);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
 	DECLARE_READ8_MEMBER(gg_sio_r);
-	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
-	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
-	DECLARE_READ8_MEMBER(sms_store_select1);
-	DECLARE_READ8_MEMBER(sms_store_select2);
-	DECLARE_READ8_MEMBER(sms_store_control_r);
-	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 	DECLARE_DRIVER_INIT(sg1000m3);
 	DECLARE_DRIVER_INIT(gamegear);
 	DECLARE_DRIVER_INIT(gamegeaj);
 	DECLARE_DRIVER_INIT(sms2kr);
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
-	DECLARE_DRIVER_INIT(smssdisp);
 	DECLARE_MACHINE_START(sms);
 	DECLARE_MACHINE_RESET(sms);
 	DECLARE_VIDEO_START(gamegear);
@@ -208,29 +205,76 @@ public:
 	TIMER_CALLBACK_MEMBER(lphaser_2_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
-	void sms_machine_stop();
-	void setup_sms_cart();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sms_cart);
-protected:
-	required_shared_ptr<UINT8> m_mainram;
 
+protected:
+
+	void setup_bios();
 	void setup_rom();
+	void setup_sms_cart();
 	void lphaser_hcount_latch(int hpos);
 	void lphaser1_sensor_check();
 	void lphaser2_sensor_check();
 	UINT16 screen_hpos_nonscaled(int scaled_hpos);
 	UINT16 screen_vpos_nonscaled(int scaled_vpos);
 	int lgun_bright_aim_area(emu_timer *timer, int lgun_x, int lgun_y);
-	void setup_cart_banks();
-	void setup_banks();
 	void sms_get_inputs(address_space &space);
-	required_device<cpu_device> m_maincpu;
-	int sms_verify_cart( UINT8 *magic, int size );
-	int detect_codemasters_mapper( UINT8 *rom );
-	int detect_korean_mapper( UINT8 *rom );
-	int detect_tvdraw( UINT8 *rom );
-	int detect_lphaser_xoffset( UINT8 *rom );
+};
+
+class smssdisp_state : public sms_state
+{
+public:
+	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag)
+	: sms_state(mconfig, type, tag),
+	m_control_cpu(*this, "control"),
+	m_slot2(*this, "slot2"),
+	m_slot3(*this, "slot3"),
+	m_slot4(*this, "slot4"),
+	m_slot5(*this, "slot5"),
+	m_slot6(*this, "slot6"),
+	m_slot7(*this, "slot7"),
+	m_slot8(*this, "slot8"),
+	m_slot9(*this, "slot9"),
+	m_slot10(*this, "slot10"),
+	m_slot11(*this, "slot11"),
+	m_slot12(*this, "slot12"),
+	m_slot13(*this, "slot13"),
+	m_slot14(*this, "slot14"),
+	m_slot15(*this, "slot15"),
+	m_slot16(*this, "slot16")
+	{ }
+	
+	required_device<cpu_device> m_control_cpu;
+	required_device<sega8_cart_slot_device> m_slot2;
+	required_device<sega8_cart_slot_device> m_slot3;
+	required_device<sega8_cart_slot_device> m_slot4;
+	required_device<sega8_cart_slot_device> m_slot5;
+	required_device<sega8_cart_slot_device> m_slot6;
+	required_device<sega8_cart_slot_device> m_slot7;
+	required_device<sega8_cart_slot_device> m_slot8;
+	required_device<sega8_cart_slot_device> m_slot9;
+	required_device<sega8_cart_slot_device> m_slot10;
+	required_device<sega8_cart_slot_device> m_slot11;
+	required_device<sega8_cart_slot_device> m_slot12;
+	required_device<sega8_cart_slot_device> m_slot13;
+	required_device<sega8_cart_slot_device> m_slot14;
+	required_device<sega8_cart_slot_device> m_slot15;
+	required_device<sega8_cart_slot_device> m_slot16;
+
+	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
+	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
+	DECLARE_READ8_MEMBER(sms_store_select1);
+	DECLARE_READ8_MEMBER(sms_store_select2);
+	DECLARE_READ8_MEMBER(sms_store_control_r);
+	DECLARE_WRITE8_MEMBER(sms_store_control_w);
+	DECLARE_DRIVER_INIT(smssdisp);
+	
+	DECLARE_READ8_MEMBER(store_read_0000);
+	DECLARE_READ8_MEMBER(store_read_4000);
+	DECLARE_READ8_MEMBER(store_read_8000);
+	DECLARE_READ8_MEMBER(store_cart_peek);
+	DECLARE_WRITE8_MEMBER(store_write_cart);
+	
+	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };
 
 

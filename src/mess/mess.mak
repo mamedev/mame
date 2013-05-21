@@ -1698,6 +1698,8 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/sat_bram.o  \
 	$(MESS_DRIVERS)/saturn.o    \
 	$(MESS_MACHINE)/sms.o       \
+	$(MESS_MACHINE)/sega8_slot.o \
+	$(MESS_MACHINE)/sega8_rom.o \
 	$(MESS_DRIVERS)/sms.o       \
 	$(MESS_DRIVERS)/svmu.o      \
 
