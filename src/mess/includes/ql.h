@@ -4,6 +4,7 @@
 #define __QL__
 
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/wd17xx.h"
 
 #define SCREEN_TAG  "screen"
@@ -14,6 +15,8 @@
 #define ZX8301_TAG  "ic22"
 #define ZX8302_TAG  "ic23"
 #define WD1772_TAG  "wd1772"
+#define RS232_A_TAG "ser1"
+#define RS232_B_TAG "ser2"
 
 #define ROMBANK_TAG "rombank"
 #define RAMBANK_TAG "rambank"
@@ -75,6 +78,8 @@ public:
 			m_speaker(*this, "speaker"),
 			m_mdv1(*this, MDV_1),
 			m_mdv2(*this, MDV_2),
+			m_ser1(*this, RS232_A_TAG),
+			m_ser2(*this, RS232_A_TAG),
 			m_ram(*this, RAM_TAG),
 			m_fdc(*this, WD1772_TAG),
 			m_printer(*this, PRINTER_TAG),
@@ -97,6 +102,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<microdrive_image_device> m_mdv1;
 	required_device<microdrive_image_device> m_mdv2;
+	required_device<rs232_port_device> m_ser1;
+	required_device<rs232_port_device> m_ser2;
 	required_device<ram_device> m_ram;
 	required_device<wd1772_device> m_fdc;
 	required_device<printer_image_device> m_printer;

@@ -33,72 +33,9 @@
 #define LOG 0
 
 
-// IPC serial state
-enum
-{
-	IPC_START,
-	IPC_DATA,
-	IPC_STOP
-};
-
-
-// baud rate
-enum
-{
-		BAUD_19200              = 0x00,
-		BAUD_9600               = 0x01,
-		BAUD_4800               = 0x02,
-		BAUD_2400               = 0x03,
-		BAUD_1200               = 0x04,
-		BAUD_600                = 0x05,
-		BAUD_300                = 0x06,
-		BAUD_75             = 0x07,
-		BAUD_MASK               = 0x07,
-};
-
-// transmit mode
-enum
-{
-		MODE_SER1               = 0x00,
-		MODE_SER2               = 0x08,
-		MODE_MDV                = 0x10,
-		MODE_NET                = 0x18,
-		MODE_MASK               = 0x18,
-};
-
-// interrupts
-enum
-{
-		INT_GAP             = 0x01,
-		INT_INTERFACE           = 0x02,
-		INT_TRANSMIT            = 0x04,
-		INT_FRAME               = 0x08,
-		INT_EXTERNAL            = 0x10,
-};
-
-// status register
-enum
-{
-		STATUS_NETWORK_PORT = 0x01,
-		STATUS_TX_BUFFER_FULL   = 0x02,
-		STATUS_RX_BUFFER_FULL   = 0x04,
-		STATUS_MICRODRIVE_GAP   = 0x08,
-};
-
-// transmit bits
-enum
-{
-		TXD_START               = 0,
-		TXD_STOP                = 9,
-		TXD_STOP2               = 10,
-};
-
-
 // Monday 1st January 1979 00:00:00 UTC
-enum
-{
-		RTC_BASE_ADJUST     = 283996800,
-};
+static const int RTC_BASE_ADJUST = 283996800;
+
 
 
 //**************************************************************************
@@ -224,70 +161,6 @@ inline void zx8302_device::transmit_ipc_data()
 }
 
 
-//-------------------------------------------------
-//  transmit_bit - transmit serial bit
-//-------------------------------------------------
-
-inline void zx8302_device::transmit_bit(int state)
-{
-	switch (m_tcr & MODE_MASK)
-	{
-	case MODE_SER1:
-		m_out_txd1_func(state);
-		break;
-
-	case MODE_SER2:
-		m_out_txd2_func(state);
-		break;
-
-	case MODE_MDV:
-		// TODO
-		break;
-
-	case MODE_NET:
-		m_out_netout_func(state);
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  transmit_data - transmit serial data
-//-------------------------------------------------
-
-inline void zx8302_device::transmit_serial_data()
-{
-	switch (m_tx_bits)
-	{
-	case TXD_START:
-		if (!(m_irq & INT_TRANSMIT))
-		{
-			transmit_bit(0);
-			m_tx_bits++;
-		}
-		break;
-
-	default:
-		transmit_bit(BIT(m_tdr, 0));
-		m_tdr >>= 1;
-		m_tx_bits++;
-		break;
-
-	case TXD_STOP:
-		transmit_bit(1);
-		m_tx_bits++;
-		break;
-
-	case TXD_STOP2:
-		transmit_bit(1);
-		m_tx_bits = TXD_START;
-		m_status &= ~STATUS_TX_BUFFER_FULL;
-		trigger_interrupt(INT_TRANSMIT);
-		break;
-	}
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -296,8 +169,10 @@ inline void zx8302_device::transmit_serial_data()
 //-------------------------------------------------
 //  zx8302_device - constructor
 //-------------------------------------------------
+
 zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock),
+		device_serial_interface(mconfig, *this),
 		m_idr(1),
 		m_irq(0),
 		m_ctr(time(NULL) + RTC_BASE_ADJUST),
@@ -308,7 +183,6 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_ipc_rx(0),
 		m_ipc_busy(0),
 		m_baudx4(0),
-		m_tx_bits(0),
 		m_track(0)
 {
 }
@@ -340,7 +214,6 @@ void zx8302_device::device_start()
 	m_in_raw2_func.resolve(in_raw2_cb, *this);
 
 	// allocate timers
-	m_txd_timer = timer_alloc(TIMER_TXD);
 	m_baudx4_timer = timer_alloc(TIMER_BAUDX4);
 	m_rtc_timer = timer_alloc(TIMER_RTC);
 	m_gap_timer = timer_alloc(TIMER_GAP);
@@ -362,7 +235,6 @@ void zx8302_device::device_start()
 	save_item(NAME(m_ipc_rx));
 	save_item(NAME(m_ipc_busy));
 	save_item(NAME(m_baudx4));
-	save_item(NAME(m_tx_bits));
 	save_item(NAME(m_mdv_data));
 	save_item(NAME(m_track));
 }
@@ -376,10 +248,6 @@ void zx8302_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
-	case TIMER_TXD:
-		transmit_serial_data();
-		break;
-
 	case TIMER_BAUDX4:
 		m_baudx4 = !m_baudx4;
 		m_out_baudx4_func(m_baudx4);
@@ -401,6 +269,80 @@ void zx8302_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		transmit_ipc_data();
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  tra_callback -
+//-------------------------------------------------
+
+void zx8302_device::tra_callback()
+{
+	switch (m_tcr & MODE_MASK)
+	{
+	case MODE_SER1:
+		m_out_txd1_func(transmit_register_get_data_bit());
+		break;
+
+	case MODE_SER2:
+		m_out_txd2_func(transmit_register_get_data_bit());
+		break;
+
+	case MODE_MDV:
+		// TODO
+		break;
+
+	case MODE_NET:
+		m_out_netout_func(transmit_register_get_data_bit());
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void zx8302_device::tra_complete()
+{
+	m_status &= ~STATUS_TX_BUFFER_FULL;
+
+	trigger_interrupt(INT_TRANSMIT);
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void zx8302_device::rcv_callback()
+{
+	switch (m_tcr & MODE_MASK)
+	{
+	case MODE_NET:
+		receive_register_update_bit(m_in_netin_func());
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void zx8302_device::rcv_complete()
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  input_callback -
+//-------------------------------------------------
+
+void zx8302_device::input_callback(UINT8 state)
+{
+	m_input_state = state;
 }
 
 
@@ -455,8 +397,10 @@ WRITE8_MEMBER( zx8302_device::control_w )
 
 	m_tcr = data;
 
-	m_txd_timer->adjust(attotime::zero, 0, attotime::from_hz(baud));
 	m_baudx4_timer->adjust(attotime::zero, 0, attotime::from_hz(baudx4));
+
+	set_tra_rate(baud);
+	set_data_frame(8, 2, SERIAL_PARITY_NONE);
 }
 
 

@@ -94,6 +94,7 @@ struct zx8302_interface
 // ======================> zx8302_device
 
 class zx8302_device :  public device_t,
+						public device_serial_interface,
 						public zx8302_interface
 {
 public:
@@ -121,17 +122,70 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
+	// device_serial_interface overrides
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_callback();
+	virtual void rcv_complete();
+	virtual void input_callback(UINT8 state);
+
 	inline void trigger_interrupt(UINT8 line);
 	inline void transmit_ipc_data();
-	inline void transmit_bit(int state);
-	inline void transmit_serial_data();
 
 private:
-	static const device_timer_id TIMER_TXD = 0;
-	static const device_timer_id TIMER_BAUDX4 = 1;
-	static const device_timer_id TIMER_RTC = 2;
-	static const device_timer_id TIMER_GAP = 3;
-	static const device_timer_id TIMER_IPC = 4;
+	enum
+	{
+		TIMER_BAUDX4 = 0,
+		TIMER_RTC,
+		TIMER_GAP,
+		TIMER_IPC
+	};
+
+	enum
+	{
+		IPC_START,
+		IPC_DATA,
+		IPC_STOP
+	};
+
+	enum
+	{
+		BAUD_19200 = 0,
+		BAUD_9600,
+		BAUD_4800,
+		BAUD_2400,
+		BAUD_1200,
+		BAUD_600,
+		BAUD_300,
+		BAUD_75,
+		BAUD_MASK = 0x07
+	};
+
+	enum
+	{
+		MODE_SER1               = 0x00,
+		MODE_SER2               = 0x08,
+		MODE_MDV                = 0x10,
+		MODE_NET                = 0x18,
+		MODE_MASK               = 0x18,
+	};
+
+	enum
+	{
+		INT_GAP             	= 0x01,
+		INT_INTERFACE           = 0x02,
+		INT_TRANSMIT            = 0x04,
+		INT_FRAME               = 0x08,
+		INT_EXTERNAL            = 0x10,
+	};
+
+	enum
+	{
+		STATUS_NETWORK_PORT 	= 0x01,
+		STATUS_TX_BUFFER_FULL   = 0x02,
+		STATUS_RX_BUFFER_FULL   = 0x04,
+		STATUS_MICRODRIVE_GAP   = 0x08,
+	};
 
 	devcb_resolved_write_line   m_out_ipl1l_func;
 	devcb_resolved_write_line   m_out_baudx4_func;
@@ -168,15 +222,11 @@ private:
 	int m_ipc_busy;                 // IPC busy
 	int m_baudx4;                   // IPC baud x4
 
-	// serial transmit state
-	int m_tx_bits;                  // bits transmitted
-
 	// microdrive state
 	UINT8 m_mdv_data[2];            // track data register
 	int m_track;                    // current track
 
 	// timers
-	emu_timer *m_txd_timer;         // transmit timer
 	emu_timer *m_baudx4_timer;      // baud x4 timer
 	emu_timer *m_rtc_timer;         // real time clock timer
 	emu_timer *m_gap_timer;         // microdrive gap timer

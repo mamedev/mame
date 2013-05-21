@@ -134,6 +134,39 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 
 
 //-------------------------------------------------
+//  ipc_port2_r -
+//-------------------------------------------------
+
+READ8_MEMBER( ql_state::ipc_port2_r )
+{
+	/*
+
+	    bit     description
+
+	    0       Serial data input (SER2 RxD, SER1 TxD)
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       ZX8302 serial link input/output (COMDATA)
+
+	*/
+
+	UINT8 data = 0;
+
+	// SER2 serial data input
+	data |= m_ser2->rx();
+
+	// COMDATA
+	data |= m_comdata << 7;
+
+	return data;
+}
+
+
+//-------------------------------------------------
 //  ipc_port2_w -
 //-------------------------------------------------
 
@@ -143,13 +176,13 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 
 	    bit     description
 
-	    0       Serial data input (SER2 RxD, SER1 TxD)
+	    0       
 	    1       Speaker output
 	    2       Interrupt output (IPL0-2)
 	    3       Interrupt output (IPL1)
 	    4       Serial Clear-to-Send output (SER1 CTS)
 	    5       Serial Data Terminal Ready output (SER2 DTR)
-	    6       not connected
+	    6       
 	    7       ZX8302 serial link input/output (COMDATA)
 
 	*/
@@ -173,45 +206,15 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 		m_ipl = ipl;
 	}
 
-	// clear to send
-	//rs232_cts_w(m_ser1, !BIT(data, 4));
+	// TODO SER1 clear to send
 
-	// data terminal ready
-	//rs232_dtr_w(m_ser2, !BIT(data, 5));
+	// SER2 data terminal ready
+	m_ser2->dtr_w(!BIT(data, 5));
 
 	// COMDATA
 	m_comdata = BIT(data, 7);
 
 	m_zx8302->comdata_w(BIT(data, 7));
-}
-
-
-//-------------------------------------------------
-//  ipc_port2_r -
-//-------------------------------------------------
-
-READ8_MEMBER( ql_state::ipc_port2_r )
-{
-	/*
-
-	    bit     description
-
-	    0       Serial data input (SER2 RxD, SER1 TxD)
-	    1       Speaker output
-	    2       Interrupt output (IPL0-2)
-	    3       Interrupt output (IPL1)
-	    4       Serial Clear-to-Send output (SER2 CTS)
-	    5       Serial Data Terminal Ready output (SER1 DTR)
-	    6       not connected
-	    7       ZX8302 serial link input/output (COMDATA)
-
-	*/
-
-//  int irq = (m_ser2_rxd | m_ser1_txd);
-
-//  m_ipc->set_input_line(INPUT_LINE_IRQ0, irq);
-
-	return (m_comdata << 7);
 }
 
 
@@ -777,9 +780,9 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
 	DEVCB_NULL, // TXD1
-	DEVCB_NULL, // TXD2
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
 	DEVCB_NULL, // DTR1
-	DEVCB_NULL, // CTS2
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
 	DEVCB_NULL, // NETOUT
 	DEVCB_NULL, // NETIN
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
@@ -879,6 +882,34 @@ static MICRODRIVE_CONFIG( mdv2_config )
 	DEVCB_NULL,
 	NULL,
 	NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -997,12 +1028,12 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	// devices
 	MCFG_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
 	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
-
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
-
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL) // wired as DCE
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL) // wired as DTE
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
