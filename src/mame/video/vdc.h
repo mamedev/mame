@@ -1,6 +1,4 @@
 
-#include "video/generic.h"
-
 VIDEO_START( pce );
 SCREEN_UPDATE_IND16( pce );
 DECLARE_WRITE8_HANDLER ( vdc_0_w );
