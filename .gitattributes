@@ -5997,6 +5997,7 @@ src/mess/drivers/atari400.c svneol=native#text/plain
 src/mess/drivers/atarist.c svneol=native#text/plain
 src/mess/drivers/atm.c svneol=native#text/plain
 src/mess/drivers/atom.c svneol=native#text/plain
+src/mess/drivers/attache.c svneol=native#text/plain
 src/mess/drivers/avigo.c svneol=native#text/plain
 src/mess/drivers/ax20.c svneol=native#text/plain
 src/mess/drivers/b16.c svneol=native#text/plain
