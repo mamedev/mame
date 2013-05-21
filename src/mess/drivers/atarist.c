@@ -7,13 +7,11 @@
 
     - floppy write
     - floppy DMA transfer timer
-    - MSA disk image support
     - mouse moves too fast?
     - UK keyboard layout for the special keys
     - accurate screen timing
     - STe DMA sound and LMC1992 Microwire mixer
     - Mega ST/STe MC68881 FPU
-    - MIDI interface
     - Mega STe 16KB cache
     - Mega STe LAN
 
@@ -1728,8 +1726,10 @@ WRITE8_MEMBER( st_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
+	m_rs232->rts_w(BIT(data, 3));
 
 	// data terminal ready
+	m_rs232->dtr_w(BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->strobe_w(BIT(data, 5));
@@ -1781,8 +1781,10 @@ WRITE8_MEMBER( stbook_state::psg_pa_w )
 	m_fdc->set_floppy(floppy);
 
 	// request to send
+	m_rs232->rts_w(BIT(data, 3));
 
 	// data terminal ready
+	m_rs232->dtr_w(BIT(data, 4));
 
 	// centronics strobe
 	m_centronics->strobe_w(BIT(data, 5));
@@ -1857,6 +1859,16 @@ static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 //  ACIA6850_INTERFACE( acia_midi_intf )
 //-------------------------------------------------
 
+READ_LINE_MEMBER( st_state::midi_rx_in )
+{
+	return m_midi_rx_state;
+}
+
+WRITE_LINE_MEMBER( st_state::midi_tx_out )
+{
+	m_mdout->tx(state);
+}
+
 WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
 {
 	m_acia_midi_irq = state;
@@ -1867,9 +1879,9 @@ WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
 static ACIA6850_INTERFACE( acia_midi_intf )
 {
 	Y2/64,
-	Y2/64,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	0,          // rx clock (we manually clock rx)
+	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_rx_in),
+	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_tx_out),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1904,8 +1916,10 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
+	data |= m_rs232->dcd_r() << 1;
 
 	// clear to send
+	data |= m_rs232->cts_r() << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -1917,6 +1931,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
+	data |= m_rs232->ri_r() << 6;
 
 	// monochrome monitor detect
 	data |= m_config->read() & 0x80;
@@ -1942,8 +1957,8 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_NULL,                                         /* serial input */
-	DEVCB_NULL                                          /* serial output */
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
 
@@ -1974,8 +1989,10 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
+	data |= m_rs232->dcd_r() << 1;
 
 	// clear to send
+	data |= m_rs232->cts_r() << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -1987,6 +2004,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
+	data |= m_rs232->ri_r() << 6;
 
 	// monochrome monitor detect, DMA sound active
 	data |= (m_config->read() & 0x80) ^ (m_dmasnd_active << 7);
@@ -2006,8 +2024,8 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_NULL,                                         /* serial input */
-	DEVCB_NULL                                          /* serial output */
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
 
@@ -2038,8 +2056,10 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= m_centronics->busy_r();
 
 	// data carrier detect
+	data |= m_rs232->dcd_r() << 1;
 
 	// clear to send
+	data |= m_rs232->cts_r() << 2;
 
 	// blitter done
 	data |= m_blitter_done << 3;
@@ -2051,6 +2071,7 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= !m_fdc->intrq_r() << 5;
 
 	// ring indicator
+	data |= m_rs232->ri_r() << 6;
 
 	// TODO power alarms
 
@@ -2069,8 +2090,8 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_NULL,                                         /* serial input */
-	DEVCB_NULL                                          /* serial output */
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
 void st_state::fdc_intrq_w(bool state)
@@ -2105,6 +2126,58 @@ static const centronics_interface centronics_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
 	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( midiin_slot )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( midiin_slot )
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+WRITE_LINE_MEMBER( st_state::midi_rx_w )
+{
+	m_midi_rx_state = state;
+
+	for (int i = 0; i < 64; i++)    // divider is set to 64
+	{
+		m_acia1->rx_clock_in();
+	}
+}
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_rx_w)
+};
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( midiout_slot )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( midiout_slot )
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 
@@ -2310,6 +2383,8 @@ static SLOT_INTERFACE_START( atari_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
+
+
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -2350,6 +2425,9 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2402,6 +2480,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	// cartridge
@@ -2463,6 +2544,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2534,6 +2618,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
