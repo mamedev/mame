@@ -494,7 +494,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = ioport("SW")->read();
+		UINT16 sw = m_sw->read();
 
 		if (!BIT(offset, 14))
 		{
