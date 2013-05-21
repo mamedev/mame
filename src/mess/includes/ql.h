@@ -42,7 +42,7 @@
 
 #define CART_ROM_BASE   0x0c000
 #define CART_ROM_END    0x0ffff
-#define TRUMP_ROM_BASE  0x10000
+#define TRUMP_ROM_BASE  0x14000
 #define TRUMP_ROM_LEN   0x08000
 #define TRUMP_ROM_END   (TRUMP_ROM_BASE+(TRUMP_ROM_LEN-1))
 
@@ -50,7 +50,7 @@
 #define TRUMP_IO_LEN    0x04000
 #define TRUMP_IO_END    (TRUMP_IO_BASE+(TRUMP_IO_LEN-1))
 
-#define SANDY_ROM_BASE  0x18000
+#define SANDY_ROM_BASE  0x1c000
 #define SANDY_IO_BASE   0xc3fc0
 #define SANDY_IO_LEN    0x00040
 #define SANDY_IO_END    (SANDY_IO_BASE+(SANDY_IO_LEN-1))
