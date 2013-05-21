@@ -287,26 +287,23 @@ READ8_MEMBER(attache_state::pio_portA_r)
 {
 	UINT8 ret = 0xff;
 
-	if(m_operation_enable)
+	switch(m_pio_select)
 	{
-		switch(m_pio_select)
-		{
-		case PIO_SEL_8910_DATA:
-			ret = m_psg->data_r(space,0);
-			break;
-		case PIO_SEL_5832_READ:
-			ret = m_rtc->data_r(space,0);
-			break;
-		case PIO_SEL_5101_READ:
-			ret = m_cmos_ram[m_cmos_select] & 0x0f;
-			break;
-		case PIO_SEL_LATCH:
-			ret = 0xff;  // Write-only?
-			break;
-		case PIO_SEL_NOP:
-			logerror("PIO: NOP read\n");
-			break;
-		}
+	case PIO_SEL_8910_DATA:
+		ret = m_psg->data_r(space,0);
+		break;
+	case PIO_SEL_5832_READ:
+		ret = m_rtc->data_r(space,0);
+		break;
+	case PIO_SEL_5101_READ:
+		ret = m_cmos_ram[m_cmos_select] & 0x0f;
+		break;
+	case PIO_SEL_LATCH:
+		ret = 0xff;  // Write-only?
+		break;
+	case PIO_SEL_NOP:
+		logerror("PIO: NOP read\n");
+		break;
 //	logerror("PIO: Port A read operation %i returning %02x\n",m_pio_select,ret);
 	}
 
@@ -341,6 +338,7 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 	case PIO_SEL_5101_WRITE:
 		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
 		m_cmos_ram[m_cmos_select] = data & 0x0f;
+		logerror("CMOS: write %02x to byte %02x\n",data & 0x0f, m_cmos_select);
 		break;
 	case PIO_SEL_5101_READ:
 		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
@@ -402,7 +400,7 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 READ8_MEMBER(attache_state::display_data_r)
 {
 	UINT8 ret = 0xff;
-	UINT8 param = m_maincpu->state_int(Z80_B);
+	UINT8 param = (offset & 0xff00) >> 8;
 
 	switch(m_current_cmd)
 	{
@@ -424,7 +422,7 @@ READ8_MEMBER(attache_state::display_data_r)
 
 WRITE8_MEMBER(attache_state::display_data_w)
 {
-	UINT8 param = m_maincpu->state_int(Z80_B);
+	UINT8 param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
 	{
 	case DISP_CRTC:
@@ -438,7 +436,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 		m_char_ram[(m_char_line*128)+(param & 0x7f)] = data;
 		break;
 	default:
-		logerror("Unimplemented display operation %02x data %02x\n",m_current_cmd,data);
+		logerror("Unimplemented display operation %02x data %02x param %02x\n",m_current_cmd,data,param);
 	}
 }
 
@@ -531,15 +529,14 @@ static ADDRESS_MAP_START( attache_map , AS_PROGRAM, 8, attache_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write)
-	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio",z80sio_device,read_alt,write_alt)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt)
-	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w)
+	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
+	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio",z80sio_device,read_alt,write_alt) AM_MIRROR(0xff00)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
+	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	// 0xff - RAM Virtual Map Data
 ADDRESS_MAP_END
 
