@@ -2421,7 +2421,7 @@ static MACHINE_CONFIG_DERIVED( scramble, galaxian_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( explorer, konami_base )
+static MACHINE_CONFIG_DERIVED( explorer, galaxian_base )
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
