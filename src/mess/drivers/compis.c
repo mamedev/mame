@@ -328,7 +328,7 @@ static INPUT_PORTS_START (compis)
 INPUT_PORTS_END
 
 
-static const unsigned i86_address_mask = 0x000fffff;
+//static const unsigned i86_address_mask = 0x000fffff;
 
 static const mm58274c_interface compis_mm58274c_interface =
 {
@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
-	MCFG_CPU_CONFIG(i86_address_mask)
+	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -395,7 +395,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_CPU_PROGRAM_MAP(compis_mem)
 	MCFG_CPU_IO_MAP(compis_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", compis_state,  compis_vblank_int)
-	MCFG_CPU_CONFIG(i86_address_mask)
+	//MCFG_CPU_CONFIG(i86_address_mask)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
