@@ -1156,69 +1156,103 @@ ROM_END
 
 ROM_START( wwfmania )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "wwf.2",  0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) )
-	ROM_LOAD16_BYTE( "wwf.3",  0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
-	ROM_LOAD16_BYTE( "wwf.4",  0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
-	ROM_LOAD16_BYTE( "wwf.5",  0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u3", 0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u4", 0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u5", 0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
-	ROM_LOAD16_BYTE( "wwf.54",  0x00000, 0x80000, CRC(eeb7bf58) SHA1(d93df59aed1672ab38af231d909d9df1a8e30f44) )
-	ROM_LOAD16_BYTE( "wwf.63",  0x00001, 0x80000, CRC(09759529) SHA1(cf548ff199428a93b9bc5f4fc1347c4a3cbdf106) )
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.30.u54", 0x00000, 0x80000, CRC(eeb7bf58) SHA1(d93df59aed1672ab38af231d909d9df1a8e30f44) ) /* Labeled as L1.30 */
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.30.u63", 0x00001, 0x80000, CRC(09759529) SHA1(cf548ff199428a93b9bc5f4fc1347c4a3cbdf106) ) /* Labeled as L1.30 */
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
-	ROM_LOAD32_BYTE( "wwf.133",  0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) )
-	ROM_LOAD32_BYTE( "wwf.132",  0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
-	ROM_LOAD32_BYTE( "wwf.131",  0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
-	ROM_LOAD32_BYTE( "wwf.130",  0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u133", 0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) ) /* All graphics roms labeled as L1 */
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u132", 0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u131", 0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u130", 0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
 
-	ROM_LOAD32_BYTE( "wwf.129",  0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
-	ROM_LOAD32_BYTE( "wwf.128",  0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
-	ROM_LOAD32_BYTE( "wwf.127",  0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
-	ROM_LOAD32_BYTE( "wwf.126",  0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u129", 0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u128", 0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u127", 0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u126", 0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
 
-	ROM_LOAD32_BYTE( "wwf.125",  0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
-	ROM_LOAD32_BYTE( "wwf.124",  0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
-	ROM_LOAD32_BYTE( "wwf.123",  0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
-	ROM_LOAD32_BYTE( "wwf.122",  0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u125", 0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u124", 0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u123", 0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u122", 0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
 
-	ROM_LOAD32_BYTE( "wwf.121",  0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
-	ROM_LOAD32_BYTE( "wwf.120",  0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
-	ROM_LOAD32_BYTE( "wwf.119",  0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
-	ROM_LOAD32_BYTE( "wwf.118",  0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u121", 0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u120", 0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u119", 0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u118", 0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
 ROM_END
 
 
 ROM_START( wwfmaniab )
 	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
-	ROM_LOAD16_BYTE( "wwf.2",  0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) )
-	ROM_LOAD16_BYTE( "wwf.3",  0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
-	ROM_LOAD16_BYTE( "wwf.4",  0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
-	ROM_LOAD16_BYTE( "wwf.5",  0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u3", 0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u4", 0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u5", 0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
-	ROM_LOAD16_BYTE( "u54.bin",  0x00000, 0x80000, CRC(1b2dce48) SHA1(f70b6c5b56f9fc15cedfd8e0a95f983f3ea6dbb7) )
-	ROM_LOAD16_BYTE( "u63.bin",  0x00001, 0x80000, CRC(1262f0bb) SHA1(e97a5939f10532f7815d08b1a7d63a7554d47d4f) )
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.20.u54",  0x00000, 0x80000, CRC(1b2dce48) SHA1(f70b6c5b56f9fc15cedfd8e0a95f983f3ea6dbb7) ) /* Labeled as L1.20 */
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.20.u63",  0x00001, 0x80000, CRC(1262f0bb) SHA1(e97a5939f10532f7815d08b1a7d63a7554d47d4f) ) /* Labeled as L1.20 */
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
-	ROM_LOAD32_BYTE( "wwf.133",  0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) )
-	ROM_LOAD32_BYTE( "wwf.132",  0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
-	ROM_LOAD32_BYTE( "wwf.131",  0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
-	ROM_LOAD32_BYTE( "wwf.130",  0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u133", 0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) ) /* All graphics roms labeled as L1 */
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u132", 0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u131", 0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u130", 0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
 
-	ROM_LOAD32_BYTE( "wwf.129",  0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
-	ROM_LOAD32_BYTE( "wwf.128",  0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
-	ROM_LOAD32_BYTE( "wwf.127",  0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
-	ROM_LOAD32_BYTE( "wwf.126",  0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u129", 0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u128", 0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u127", 0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u126", 0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
 
-	ROM_LOAD32_BYTE( "wwf.125",  0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
-	ROM_LOAD32_BYTE( "wwf.124",  0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
-	ROM_LOAD32_BYTE( "wwf.123",  0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
-	ROM_LOAD32_BYTE( "wwf.122",  0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u125", 0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u124", 0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u123", 0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u122", 0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
 
-	ROM_LOAD32_BYTE( "wwf.121",  0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
-	ROM_LOAD32_BYTE( "wwf.120",  0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
-	ROM_LOAD32_BYTE( "wwf.119",  0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
-	ROM_LOAD32_BYTE( "wwf.118",  0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u121", 0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u120", 0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u119", 0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u118", 0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
+ROM_END
+
+
+ROM_START( wwfmaniac )
+	ROM_REGION16_LE( 0x800000, "dcs", ROMREGION_ERASEFF )   /* sound data */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u2", 0x000000, 0x100000, CRC(a9acb250) SHA1(c1a7773ffdb86dc2c1c90c220482ed6330fcbb55) ) /* These 4 are labeled as L1 */
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u3", 0x200000, 0x100000, CRC(9442b6c9) SHA1(1f887c05ab9ca99078be584d7e9e6c59c8ec1818) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u4", 0x400000, 0x100000, CRC(cee78fac) SHA1(c37d3b4aef47dc80d864497b3013f03220d45482) )
+	ROM_LOAD16_BYTE( "wwf_music-spch_l1.u5", 0x600000, 0x100000, CRC(5b31fd40) SHA1(35dcf19b223029e17616357d29dd04bbfeb83491) )
+
+	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.10.u54",  0x00000, 0x80000, CRC(ae1a3195) SHA1(89ce1e3dc46b4da2d723b61e868889d05f7d5162) ) /* Labeled as L1.10, test menu shows REV 1.1 */
+	ROM_LOAD16_BYTE( "wwf_game_rom_l1.10.u63",  0x00001, 0x80000, CRC(d809eb60) SHA1(9531009fb6e245548ab52ac1cbb6c736d6357cb5) ) /* Labeled as L1.10, test menu shows REV 1.1 */
+
+	ROM_REGION( 0x2000000, "gfxrom", 0 )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u133", 0x0000000, 0x100000, CRC(5e1b1e3d) SHA1(55f54e4b0dc775058699b1c0abdd7241ffca0e76) ) /* All graphics roms labeled as L1 */
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u132", 0x0000001, 0x100000, CRC(5943b3b2) SHA1(8ba0b20e7993769736c961d0fda97b2850d1446b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u131", 0x0000002, 0x100000, CRC(0815db22) SHA1(ebd6a8c4f0e8d979af7f173b3f139d91e4857f6b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u130", 0x0000003, 0x100000, CRC(9ee9a145) SHA1(caeb8506e1414e8c58e3031d4a2e0619ef3922b7) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u129", 0x0400000, 0x100000, CRC(c644c2f4) SHA1(9094452eb37ec92932109ab2b209e12074111dd7) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u128", 0x0400001, 0x100000, CRC(fcda4e9a) SHA1(a05a12f606632034eae662cccfee5aaaffe0348b) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u127", 0x0400002, 0x100000, CRC(45be7428) SHA1(a5d3e37c64cac03139028fe998494b76e6b6a7ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u126", 0x0400003, 0x100000, CRC(eaa276a8) SHA1(d0c2f4d4409830355c6e112e3eafb4d3a1b8c22e) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u125", 0x0800000, 0x100000, CRC(a19ebeed) SHA1(cf51bca29fd39c6189c2b431eb718a6341781d1f) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u124", 0x0800001, 0x100000, CRC(dc7d3dbb) SHA1(8982d9a1babce57ae7465bce3f4863dd336c20ac) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u123", 0x0800002, 0x100000, CRC(e0ade56f) SHA1(a15c672a45f39c0232d678e71380d4f58c4659ae) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u122", 0x0800003, 0x100000, CRC(2800c78d) SHA1(8012785f1c1eaf8d533a98e0a521a5d31efc7a42) )
+
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u121", 0x0c00000, 0x100000, CRC(a28ffcba) SHA1(f66be0793b12a7f04e32d3db8311d1f33b0c3fbe) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u120", 0x0c00001, 0x100000, CRC(3a05d371) SHA1(4ed73e1c06ea7bd33e6c72a6a752960ba55d1975) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u119", 0x0c00002, 0x100000, CRC(97ffa659) SHA1(986f8ec57085b808d33c85ed55b35a5e1cadf3b6) )
+	ROM_LOAD32_BYTE( "wwf_image_rom_l1.u118", 0x0c00003, 0x100000, CRC(46668e97) SHA1(282ca2e561f7553717d60b5a745f8e3fc1bda610) )
 ROM_END
 
 
@@ -1229,19 +1263,22 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, mk3,      0,         wunit, mk3, midwunit_state,      mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", GAME_SUPPORTS_SAVE )
-GAME( 1994, mk3r20,   mk3,       wunit, mk3, midwunit_state,      mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", GAME_SUPPORTS_SAVE )
-GAME( 1994, mk3r10,   mk3,       wunit, mk3, midwunit_state,      mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", GAME_SUPPORTS_SAVE )
-GAME( 1994, mk3p40,   mk3,       wunit, mk3, midwunit_state,      mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", GAME_SUPPORTS_SAVE )
-GAME( 1994, umk3,     0,         wunit, mk3, midwunit_state,      umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", GAME_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,  umk3,      wunit, mk3, midwunit_state,      umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", GAME_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,  umk3,      wunit, mk3, midwunit_state,      umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mk3,       0,        wunit, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mk3r20,    mk3,      wunit, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mk3r10,    mk3,      wunit, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1994, mk3p40,    mk3,      wunit, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", GAME_SUPPORTS_SAVE )
+GAME( 1994, umk3,      0,        wunit, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", GAME_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, wwfmania, 0,         wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", GAME_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniab,wwfmania,  wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", GAME_SUPPORTS_SAVE )
-GAME( 1995, openice,  0,         wunit, openice, midwunit_state,  openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", GAME_SUPPORTS_SAVE )
-GAME( 1996, nbahangt, 0,         wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", GAME_SUPPORTS_SAVE )
-GAME( 1996, nbamht,   nbahangt,  wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", GAME_SUPPORTS_SAVE )
-GAME( 1996, nbamht1,  nbahangt,  wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", GAME_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt,   0,         wunit, rmpgwt, midwunit_state,   rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", GAME_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt11, rmpgwt,    wunit, rmpgwt, midwunit_state,   rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wwfmania,  0,        wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab, wwfmania, wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", GAME_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniac, wwfmania, wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", GAME_SUPPORTS_SAVE )
+GAME( 1995, openice,   0,        wunit, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", GAME_SUPPORTS_SAVE )
+
+GAME( 1996, nbahangt,  0,        wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", GAME_SUPPORTS_SAVE )
+GAME( 1996, nbamht,    nbahangt, wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", GAME_SUPPORTS_SAVE )
+GAME( 1996, nbamht1,   nbahangt, wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", GAME_SUPPORTS_SAVE )
+
+GAME( 1997, rmpgwt,    0,        wunit, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", GAME_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt11,  rmpgwt,   wunit, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", GAME_SUPPORTS_SAVE )
