@@ -145,6 +145,21 @@ void psxcd_device::device_start()
 	save_item(NAME(m_param_count));
 }
 
+void psxcd_device::device_stop()
+{
+	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
+	{
+		if(m_timerinuse[i] && m_timers[i]->ptr())
+			global_free(m_timers[i]->ptr());
+	}
+	while(res_queue)
+	{
+		command_result *res = res_queue->next;
+		global_free(res_queue);
+		res_queue = res;
+	}
+}
+
 void psxcd_device::device_reset()
 {
 	next_read_event = -1;
@@ -152,6 +167,8 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
+		if(m_timerinuse[i] && m_timers[i]->ptr())
+			global_free(m_timers[i]->ptr());
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
