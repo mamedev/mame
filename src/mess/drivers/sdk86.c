@@ -21,14 +21,18 @@ Download the User Manual to get the operating procedures.
 ToDo:
 - Artwork
 - Add INTR and RESET keys
-- Add terminal interface and option to enable it.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "machine/i8251.h"
 #include "machine/i8279.h"
+#include "machine/serial.h"
 #include "sdk86.lh"
+
+#define I8251_TAG		"i8251"
+#define RS232_TAG     	"rs232"
 
 
 class sdk86_state : public driver_device
@@ -36,13 +40,20 @@ class sdk86_state : public driver_device
 public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_usart(*this, I8251_TAG)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_usart;
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
+
+	TIMER_DEVICE_CALLBACK_MEMBER( serial_tick );
+
 	UINT8 m_digit;
-	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
@@ -52,14 +63,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
+	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
 	AM_RANGE(0xffe8, 0xffe9) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w, 0xff)
 	AM_RANGE(0xffea, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w, 0xff)
-
-	// FFF0-FFF3 = 8251 serial chip (even -> data, control) AM_MIRROR(4)
 	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
 	//             ports are A,B,C,control in that order.
-
-
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,6 +128,25 @@ READ8_MEMBER( sdk86_state::kbd_r )
 	return data;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( sdk86_state::serial_tick )
+{
+	m_usart->receive_clock();
+	m_usart->transmit_clock();
+}
+
+static const i8251_interface usart_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_NULL, // connected to CTS
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static I8279_INTERFACE( sdk86_intf )
 {
 	DEVCB_NULL, // irq
@@ -128,6 +156,20 @@ static I8279_INTERFACE( sdk86_intf )
 	DEVCB_DRIVER_MEMBER(sdk86_state, kbd_r),        // kbd RL lines
 	DEVCB_LINE_GND,                     // Shift key
 	DEVCB_LINE_GND
+};
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x05 ) // 4800
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x20 ) // 8N2
+DEVICE_INPUT_DEFAULTS_END
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( sdk86, sdk86_state )
@@ -140,19 +182,24 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_DEFAULT_LAYOUT(layout_sdk86)
 
 	/* Devices */
+	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sdk86 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF ) // all are Intel D2616 ?eproms with the windows painted over? (factory programmed eproms? this would match the 'i8642' marking on the factory programmed eprom version of the AT keyboard mcu...)
 	// Note that the rom pairs at FE000-FEFFF and FF000-FFFFF are interchangeable; the ones at FF000-FFFFF are the ones which start on bootup, and the other ones live at FE000-FEFFF and can be switched in by the user. One pair is the Serial RS232 Monitor and the other is the Keypad/front panel monitor. On the SDK-86 I (LN) dumped, the Keypad monitor was primary, but the other SDK-86 I know of has the roms in the opposite arrangement (Serial primary).
-	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
-	ROM_LOAD16_BYTE( "0456_104531-001.a36", 0xfe000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93)) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
-	ROM_LOAD16_BYTE( "0457_104532-001.a37", 0xfe001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3)) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 	// Keypad Monitor Version 1.1 (says "- 86   1.1" on LED display at startup)
-	ROM_LOAD16_BYTE( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626)) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
-	ROM_LOAD16_BYTE( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b)) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	ROM_SYSTEM_BIOS( 0, "keypad", "Keypad Monitor" )
+	ROMX_LOAD( "0169_102042-001.a27", 0xff000, 0x0800, CRC(3f46311a) SHA1(a97e6861b736f26230b9adbf5cd2576a9f60d626), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T142094WS // (C)INTEL '77 // 0169 // 102042-001" */
+	ROMX_LOAD( "0170_102043-001.a30", 0xff001, 0x0800, CRC(65924471) SHA1(5d258695bf585f89179dfa0a113a0eeeabd5ee2b), ROM_SKIP(1) | ROM_BIOS(1) ) /* Label: "iD2616 // T145056WS // (C)INTEL '77 // 0170 // 102043-001" */
+	// Serial Monitor Version 1.2 (says "  86   1.2" on LED display at startup, and sends a data prompt over serial)
+	ROM_SYSTEM_BIOS( 1, "serial", "Serial Monitor" )
+	ROMX_LOAD( "0456_104531-001.a36", 0xff000, 0x0800, CRC(f9c4a809) SHA1(aea324c3f52dd393f1eed2b856ba11f050a35b93), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T142099WS // (C)INTEL '77 // 0456 // 104531-001" */
+	ROMX_LOAD( "0457_104532-001.a37", 0xff001, 0x0800, CRC(a245ba5c) SHA1(7f67277f866fca5377cb123e9cc405b5fdfe61d3), ROM_SKIP(1) | ROM_BIOS(2) ) /* Label: "iD2616 // T145054WS // (C)INTEL '77 // 0457 // 104532-001" */
 
 	/* proms:
 	 * dumped 11/21/09 through 11/29/09 by LN
