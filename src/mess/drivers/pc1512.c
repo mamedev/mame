@@ -18,6 +18,7 @@
 */
 
 #include "includes/pc1512.h"
+#include "video/isa_ega.h"
 
 
 
@@ -569,8 +570,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ8(io_r, 0xffff)
 
-	// Mirrored over to 10000 for indirect reads through io_r
-
 	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(I8259A2_TAG, pic8259_device, write, 0xffff)
 	AM_RANGE(0x040, 0x043) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
@@ -1058,6 +1057,7 @@ static const centronics_interface centronics_intf =
 
 static SLOT_INTERFACE_START( pc1512_isa8_cards )
 	SLOT_INTERFACE("wdxt_gen", WDXT_GEN)
+	SLOT_INTERFACE("ega", ISA8_EGA)
 SLOT_INTERFACE_END
 
 static const isa8bus_interface isabus_intf =
