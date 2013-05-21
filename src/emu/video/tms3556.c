@@ -531,7 +531,9 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 
 	if (double_lines)
 	{
-		memcpy (ln2, ln, TMS3556_TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
+		// TODO: this overlaps in exeltel - use memmove for now
+		//memcpy(ln2, ln, TMS3556_TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
+		memmove(ln2, ln, TMS3556_TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
 	}
 }
 
