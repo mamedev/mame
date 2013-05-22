@@ -2749,6 +2749,66 @@ ROM_START( skysoldr )
 	ROM_LOAD( "ss.25",          0x1e0000, 0x20000, CRC(65138016) SHA1(871b0ba39710b1094519cd808339e80ea366a016) )
 ROM_END
 
+ROM_START( skysoldrbl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "g.bin",     0x00000, 0x10000, CRC(4d3273e9) SHA1(7ddaba59114180fe371d2326fc49d6274e58f5c9) )	//different from other set
+	ROM_LOAD16_BYTE( "c.bin",     0x00001, 0x10000, CRC(86c7af62) SHA1(4092558f3c11130e917d06b8d43f8f00815e4148) )	//different from other set
+	ROM_LOAD16_BYTE( "e.bin",     0x20000, 0x10000, CRC(03115b75) SHA1(e36f2eab0198bf6b5b419aacc593b3790b479e81) )
+	ROM_LOAD16_BYTE( "a.bin",     0x20001, 0x10000, CRC(7aa103c7) SHA1(1907b92a3769089e01af36f74e0ff30e7a8f178c) )
+	ROM_LOAD16_BYTE( "h-gtop.bin",     0x40000, 0x10000, CRC(f41dfeab) SHA1(1b4f68c0f55e89a9dcd0fae8fb26074b97b5303a) )
+	ROM_LOAD16_BYTE( "d-ctop.bin",     0x40001, 0x10000, CRC(56560a3c) SHA1(c57c33d3935c23d56ae256981e4c3dcd80fb86a2) )
+	ROM_LOAD16_BYTE( "f-etop.bin",     0x60000, 0x10000, CRC(60a52583) SHA1(975d309ba55730c87cb5ea786c4d2d82358a1b73) )
+	ROM_LOAD16_BYTE( "b-atop.bin",     0x60001, 0x10000, CRC(028fd31b) SHA1(feb18a7217c107bb5f8e5c5ec5bc4173e977286b) )
+	
+	ROM_REGION( 0x80000, "audiocpu", 0 )   /* Sound CPU */
+	ROM_LOAD( "33.ic11",            0x00000, 0x08000, CRC(b711fad4) SHA1(0a9515cb36b8d03ee5f7e0669a9948571b4ec34e) )
+	ROM_CONTINUE(                0x18000, 0x08000 )
+	ROM_LOAD( "34.ic12",            0x30000, 0x10000, CRC(e5cf7b37) SHA1(770ee80a1cc0f877486c6b47812db2b1118651d9) )
+	ROM_LOAD( "35.ic13",            0x50000, 0x10000, CRC(76124ca2) SHA1(5b87178ab663cd8aa67670f0c14c9cbb8616b04d) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "68705r3p.mcu", 0x000, 0x1000, NO_DUMP ) // the BOOTLEGs use a 68705, I think it's programmed to act the same way as the original MCU tho.
+
+	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
+	ROM_LOAD( "xx.ic2",            0x00000, 0x08000, CRC(928ba287) SHA1(c415c5b84b83ee0e5e0aa60eb33132145fcd7487) )
+	ROM_LOAD( "xx.ic1",            0x08000, 0x08000, CRC(93b30b55) SHA1(51cacc48f4a298131852d41da80126bda5988920) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )  /* sprites */
+	ROM_LOAD( "26.ica9",         0x000000, 0x10000, CRC(2aad8c4d) SHA1(ff407b43cede6a0f2c199be82bad0c491975c2ad) )
+	ROM_LOAD( "25.ica8",         0x010000, 0x10000, CRC(7bca633e) SHA1(fe8610608c2bb457669dbf6a19d7681f145a93e7) )
+	ROM_LOAD( "28.ic41",         0x020000, 0x10000, CRC(da94809d) SHA1(35c99e98cdfa444d7af689894b078519b5eb2ed4) )
+	ROM_LOAD( "27.ica10",        0x030000, 0x10000, CRC(dd1e56c0) SHA1(e2bfc85518ee4de1fb9cd58a358c450c6acf652b) )
+	ROM_LOAD( "30.ic43",         0x040000, 0x10000, CRC(9eb10d3d) SHA1(ba1445e2c166f72a67295d595990efbdd3460736) )
+	ROM_LOAD( "31.ic44",         0x050000, 0x10000, CRC(6b6c4e56) SHA1(1af79c5931be2eb1421172e6e7877a97681fdb84) )
+	ROM_LOAD( "32.ic45",         0x060000, 0x10000, CRC(fdf55eca) SHA1(0c61ab8fc60c69c4d3fa976976f42bda63c06549) )
+	ROM_LOAD( "29.ic42",         0x070000, 0x10000, CRC(cf888369) SHA1(d1ef5b2c81bbf4e039cc6cfee8339700a1dbb4ca) )	//different from other set (is one of them bad?)
+	ROM_LOAD( "18.ica1",         0x080000, 0x10000, CRC(08419273) SHA1(0ded4b60b0ce17a922fb7170f992c4f6c75be895) )
+	ROM_LOAD( "17.ic30",         0x090000, 0x10000, CRC(6258a61b) SHA1(d56a9f1dfa02dc59935f03b86a134076e3039bf4) )
+	ROM_LOAD( "20.ica3",         0x0a0000, 0x10000, CRC(5e716c62) SHA1(9427cd1578221ee48f4a8d8a24a232cb9e9b2206) )
+	ROM_LOAD( "19.ica2",         0x0b0000, 0x10000, CRC(f3922f1e) SHA1(e6ec6d1ea4cb23a78c61b6e5ab794a44b451b8b7) )
+	ROM_LOAD( "22.ica5",         0x0c0000, 0x10000, CRC(1a7c2f20) SHA1(9951185635c02822fd337ed1ddf91a5e334180a0) )
+	ROM_LOAD( "23.ica6",         0x0d0000, 0x10000, CRC(3155aca2) SHA1(204250660cfaaea5674aa56c888a55c8e2e894a1) )
+	ROM_LOAD( "24.ica7",         0x0e0000, 0x10000, CRC(8fc95590) SHA1(05b4675c3dd957bff5c9d106cdcc7595e240c781) )
+	ROM_LOAD( "21.ica4",         0x0f0000, 0x10000, CRC(f7ea25b0) SHA1(9d92120e3636fc3306e3d5e994ae9171a3be4d42) )
+	ROM_LOAD( "10.ic23",         0x100000, 0x10000, CRC(8e67a39e) SHA1(9a26e8119604cd965cc6afb1474f6db8dcdcc12c) )
+	ROM_LOAD( "9.ic22",          0x110000, 0x10000, CRC(6f6d2593) SHA1(7ceb54fa685be7a860e96acaba6983dea2b63b87) )
+	ROM_LOAD( "12.ic25",         0x120000, 0x10000, CRC(549182ba) SHA1(0068348340893e589196a43d7dbfb80ee8019a17) )
+	ROM_LOAD( "11.ic24",         0x130000, 0x10000, CRC(b5b06e28) SHA1(535a18c955c338fe9e1140a63e19402e81aeb5a2) )
+	ROM_LOAD( "14.ic27",         0x140000, 0x10000, CRC(1498a515) SHA1(c67f4a767823bf1e9cec33b332ebd68befe27ca2) )
+	ROM_LOAD( "15.ic28",         0x150000, 0x10000, CRC(34545c01) SHA1(9abeff9723f38537bf01fd928d01018a37da6669) )
+	ROM_LOAD( "16.ic29",         0x160000, 0x10000, CRC(ea5c20a1) SHA1(5693f76b084159a1443d6fb2c587b68a38a6ed9d) )
+	ROM_LOAD( "13.ic26",         0x170000, 0x10000, CRC(962a3e28) SHA1(1c78a099ec282bace2c22cb4484b3e3d525db3a8) )
+	ROM_LOAD( "2.ic15",          0x180000, 0x10000, CRC(022bcdc1) SHA1(30cc680e1947713eb6f87684e45d286da711e443) )
+	ROM_LOAD( "1.ic14",          0x190000, 0x10000, CRC(129a58b5) SHA1(cfcb1e475651cf59e81b045b166708eeac0ba458) )
+	ROM_LOAD( "4.ic17",          0x1a0000, 0x10000, CRC(ccaf1968) SHA1(7d302ec0b2fe9b440c2ee7503924e8b97d2fead0) )
+	ROM_LOAD( "3.ic16",          0x1b0000, 0x10000, CRC(796999ba) SHA1(1ffd862b99d3452160e047af9445da0c1a709d55) )
+	ROM_LOAD( "6.ic19",          0x1c0000, 0x10000, CRC(45b1ab8a) SHA1(c106f17890eb5be77f1eaf4eea0b07b59174b197) )
+	ROM_LOAD( "7.ic20",          0x1d0000, 0x10000, CRC(052247d1) SHA1(386d24704702845108273262a4802afa35be1850) )
+	ROM_LOAD( "8.ic21",          0x1e0000, 0x10000, CRC(f670ce4b) SHA1(2844b927e20612ae71b11f543dcfc926d70923a6) )
+	ROM_LOAD( "5.ic18",          0x1f0000, 0x10000, CRC(fe34cd89) SHA1(ea86405da4d83e2f438fe28cdbc4e460d680e5e8) )
+ROM_END
+
+
 
 
 
@@ -3317,6 +3377,8 @@ GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, alpha68k_state, btlfi
 GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb, alpha68k_state,btlfieldb,ROT90, "bootleg",                                           "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr, alpha68k_state, skysoldr, ROT90, "bootleg",											 "Sky Soldiers (bootleg)", GAME_SUPPORTS_SAVE )
+
 
 GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, alpha68k_state, goldmedl, ROT0,  "SNK",                                               "Gold Medalist (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", GAME_SUPPORTS_SAVE )
