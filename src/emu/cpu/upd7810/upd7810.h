@@ -17,7 +17,6 @@ enum UPD7810_TYPE
 	TYPE_78C05,
 	TYPE_78C06,
 	TYPE_7810,
-	TYPE_7810_GAMEMASTER, // a few modifications until internal rom dumped
 	TYPE_7807
 //  TYPE_78C10, // stop instruction added
 //  TYPE_78IV,

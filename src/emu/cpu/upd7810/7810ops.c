@@ -9047,23 +9047,15 @@ static void CALT(upd7810_state *cpustate)
 	PAIR w;
 	w.d = 0;
 
-	switch (cpustate->config.type) {
-	case TYPE_7810_GAMEMASTER:
-		logerror ("!!!!!!!%.4x calt %.2x game master table position not known\n",PPC, OP);
-		break;
-	default:
 	w.w.l = 0x80 + 2 * (OP & 0x1f);
-	}
 
-	if (cpustate->config.type!=TYPE_7810_GAMEMASTER) {
 	SP--;
 	WM( SPD, PCH );
 	SP--;
 	WM( SPD, PCL );
 
-		PCL=RM(w.w.l);
-		PCH=RM(w.w.l+1);
-	}
+	PCL=RM(w.w.l);
+	PCH=RM(w.w.l+1);
 }
 
 /* a0: 1010 0000 */

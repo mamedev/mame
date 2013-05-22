@@ -886,28 +886,14 @@ static void upd7810_take_irq(upd7810_state *cpustate)
 		/* check the interrupts in priority sequence */
 		if ((IRR & INTFT0)  && 0 == (MKL & 0x02))
 		{
-			switch (cpustate->config.type)
-			{
-				case TYPE_7810_GAMEMASTER:
-					vector = 0xff2a;
-					break;
-				default:
-					vector = 0x0008;
-			}
+			vector = 0x0008;
 			if (!((IRR & INTFT1)    && 0 == (MKL & 0x04)))
 			IRR&=~INTFT0;
 		}
 		else
 		if ((IRR & INTFT1)  && 0 == (MKL & 0x04))
 		{
-			switch (cpustate->config.type)
-			{
-				case TYPE_7810_GAMEMASTER:
-					vector = 0xff2a;
-					break;
-				default:
-					vector = 0x0008;
-			}
+			vector = 0x0008;
 			IRR&=~INTFT1;
 		}
 		else
@@ -928,28 +914,14 @@ static void upd7810_take_irq(upd7810_state *cpustate)
 		else
 		if ((IRR & INTFE0)  && 0 == (MKL & 0x20))
 		{
-			switch (cpustate->config.type)
-			{
-				case TYPE_7810_GAMEMASTER:
-					vector = 0xff2d;
-					break;
-				default:
-					vector = 0x0018;
-			}
+			vector = 0x0018;
 			if (!((IRR & INTFE1)    && 0 == (MKL & 0x40)))
 			IRR&=~INTFE0;
 		}
 		else
 		if ((IRR & INTFE1)  && 0 == (MKL & 0x40))
 		{
-			switch (cpustate->config.type)
-			{
-				case TYPE_7810_GAMEMASTER:
-					vector = 0xff2d;
-					break;
-				default:
-					vector = 0x0018;
-			}
+			vector = 0x0018;
 			IRR&=~INTFE1;
 		}
 		else
@@ -1801,19 +1773,8 @@ static CPU_RESET( upd7810 )
 	TMM = 0xff;
 	MA = 0xff;
 	MB = 0xff;
-	switch (cpustate->config.type)
-	{
-		case TYPE_7810_GAMEMASTER:
-			// needed for lcd screen/ram selection; might be internal in cpu and therefor not needed; 0x10 written in some games
-			MC = 0xff&~0x7;
-			WP( cpustate, UPD7810_PORTC, 1 ); //hyper space
-			PCD=0x8000;
-			break;
-		default:
-			MC = 0xff;
-	}
+	MC = 0xff;
 	MF = 0xff;
-	// gamemaster falling block "and"s to enable interrupts
 	MKL = 0xff;
 	MKH = 0xff; //?
 	cpustate->handle_timers = upd7810_timers;
