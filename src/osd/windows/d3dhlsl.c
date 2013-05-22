@@ -1075,6 +1075,19 @@ void shaders::init_fsfx_quad(void *vertbuf)
 	fsfx_vertices[5].u0 = 1.0f;
 	fsfx_vertices[5].v0 = 1.0f;
 
+	fsfx_vertices[0].u1 = 0.0f;
+	fsfx_vertices[0].v1 = 0.0f;
+	fsfx_vertices[1].u1 = 0.0f;
+	fsfx_vertices[1].v1 = 0.0f;
+	fsfx_vertices[2].u1 = 0.0f;
+	fsfx_vertices[2].v1 = 0.0f;
+	fsfx_vertices[3].u1 = 0.0f;
+	fsfx_vertices[3].v1 = 0.0f;
+	fsfx_vertices[4].u1 = 0.0f;
+	fsfx_vertices[4].v1 = 0.0f;
+	fsfx_vertices[5].u1 = 0.0f;
+	fsfx_vertices[5].v1 = 0.0f;
+
 	// set the color, Z parameters to standard values
 	for (int i = 0; i < 6; i++)
 	{

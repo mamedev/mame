@@ -1621,6 +1621,10 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		m_vectorbatch[m_batchindex + 5].x = b1.x1 + step->xoffs;
 		m_vectorbatch[m_batchindex + 5].y = b1.y1 + step->yoffs;
 
+		float dx = b1.x1 - b0.x1;
+		float dy = b1.y1 - b0.y1;
+		float line_length = sqrtf(dx * dx + dy * dy);
+
 		// determine the color of the line
 		INT32 r = (INT32)(prim->color.r * step->weight * 255.0f);
 		INT32 g = (INT32)(prim->color.g * step->weight * 255.0f);
@@ -1648,6 +1652,13 @@ void renderer::batch_vector(const render_primitive *prim, float line_time)
 		m_vectorbatch[m_batchindex + 4].v0 = start.c.y;
 		m_vectorbatch[m_batchindex + 5].u0 = stop.c.x;
 		m_vectorbatch[m_batchindex + 5].v0 = stop.c.y;
+
+		m_vectorbatch[m_batchindex + 0].u1 = line_length;
+		m_vectorbatch[m_batchindex + 1].u1 = line_length;
+		m_vectorbatch[m_batchindex + 2].u1 = line_length;
+		m_vectorbatch[m_batchindex + 3].u1 = line_length;
+		m_vectorbatch[m_batchindex + 4].u1 = line_length;
+		m_vectorbatch[m_batchindex + 5].u1 = line_length;
 
 		// set the color, Z parameters to standard values
 		for (int i = 0; i < 6; i++)
@@ -1868,6 +1879,7 @@ vertex *renderer::mesh_alloc(int numverts)
 	// if we're going to overflow, flush
 	if (m_lockedbuf != NULL && m_numverts + numverts >= VERTEX_BUFFER_SIZE)
 	{
+		printf("request for %d verts\n", numverts);
 		primitive_flush_pending();
 
 		if(m_shaders->enabled())
@@ -1951,6 +1963,12 @@ void renderer::primitive_flush_pending()
 
 		// set the blendmode if different
 		set_blendmode(PRIMFLAG_GET_BLENDMODE(flags));
+
+		if (vertnum + m_poly[polynum].get_vertcount() > m_numverts)
+		{
+			printf("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].get_vertcount(), m_numverts);
+			fflush(stdout);
+		}
 
 		assert(vertnum + m_poly[polynum].get_vertcount() <= m_numverts);
 
