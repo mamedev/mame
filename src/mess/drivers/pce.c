@@ -55,7 +55,6 @@ Super System Card:
 **********************************************************************/
 
 #include "emu.h"
-#include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
 #include "imagedev/cartslot.h"
