@@ -4110,7 +4110,15 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 	m_thom_cart_bank = 0;
 	m_thom_vram = ram;
 	membank( THOM_CART_BANK )->configure_entries( 0,  8, mem + 0x10000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 8, 32, ram, 0x4000 );
+	if ( m_ram->size() == 256*1024 )
+	{
+		membank( THOM_CART_BANK )->configure_entries( 8,    16, ram, 0x4000 );
+		membank( THOM_CART_BANK )->configure_entries( 8+16, 16, ram, 0x4000 );
+	}
+	else
+	{
+		membank( THOM_CART_BANK )->configure_entries( 8, 32, ram, 0x4000 );
+	}
 	membank( THOM_VRAM_BANK )->configure_entries( 0,  2, ram, 0x2000 );
 	membank( TO8_SYS_LO )->configure_entry( 0,  ram + 0x6000);
 	membank( TO8_SYS_HI )->configure_entry( 0,  ram + 0x4000);

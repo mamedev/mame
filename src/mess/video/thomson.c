@@ -1192,7 +1192,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
 
 WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 {
-	UINT8* dst = m_thom_vram + offset + 0x4000 * m_to8_data_vpage + 0x2000;
+	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
@@ -1207,7 +1207,7 @@ WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 
 WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 {
-	UINT8* dst = m_thom_vram + offset + 0x4000 * m_to8_data_vpage;
+	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
 	if ( *dst == data )
 		return;
@@ -1223,7 +1223,7 @@ WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 /* write to video memory page through cartridge addresses space */
 WRITE8_MEMBER( thomson_state::to8_vcart_w )
 {
-	UINT8* dst = m_thom_vram + offset + 0x4000 * m_to8_cart_vpage;
+	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
 	if ( *dst == data )
 		return;
