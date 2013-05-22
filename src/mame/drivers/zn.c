@@ -61,7 +61,6 @@ public:
 	DECLARE_READ16_MEMBER(taitofx1b_sound_r);
 	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
 	DECLARE_WRITE8_MEMBER(coh1002e_latch_w);
-	DECLARE_WRITE8_MEMBER(bam2_sec_w);
 	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
 	DECLARE_READ16_MEMBER(bam2_mcu_r);
 	DECLARE_READ16_MEMBER(bam2_unk_r);
@@ -82,7 +81,6 @@ public:
 	DECLARE_READ32_MEMBER(jdredd_idestat_r);
 	DECLARE_READ32_MEMBER(jdredd_ide_r);
 	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
-	DECLARE_DRIVER_INIT(bam2);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000a);
@@ -1624,11 +1622,6 @@ MTR-BAM* - DIP42 32MBit maskROMs
 
 */
 
-WRITE8_MEMBER(zn_state::bam2_sec_w)
-{
-	znsecsel_w( space, offset, data, mem_mask );
-}
-
 /*
     H8/3644 MCU comms: there are 4 16-bit read/write ports
 
@@ -1650,7 +1643,7 @@ WRITE16_MEMBER(zn_state::bam2_mcu_w)
 	switch( offset )
 	{
 	case 0:
-		membank( "bank2" )->set_base( memregion( "user2" )->base() + ( ( data & 0xf ) * 0x400000 ) );
+		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 0xf ) * 0x400000 ) );
 		break;
 
 	case 1:
@@ -1664,21 +1657,21 @@ READ16_MEMBER(zn_state::bam2_mcu_r)
 {
 	switch (offset)
 	{
-		case 0:
-			logerror("MCU port 0 read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
-			break;
+	case 0:
+		logerror("MCU port 0 read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
+		break;
 
-		case 2:
-			logerror("MCU status read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
+	case 2:
+		logerror("MCU status read @ PC %08x mask %08x\n", space.device().safe_pc(), mem_mask);
 
-			switch (m_bam2_mcu_command)
-			{
-				case 0x7f:      // first drive check
-				case 0x1c:      // second drive check (causes HDD detected)
-					return 1;   // return error
-			}
+		switch (m_bam2_mcu_command)
+		{
+			case 0x7f:      // first drive check
+			case 0x1c:      // second drive check (causes HDD detected)
+				return 1;   // return error
+		}
 
-			return 4;           // return OK
+		return 4;           // return OK
 	}
 
 	return 0;
@@ -1689,24 +1682,25 @@ READ16_MEMBER(zn_state::bam2_unk_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(zn_state,bam2)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f3fffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f400000, 0x1f7fffff, "bank2" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fa10300, 0x1fa10303, write8_delegate(FUNC(zn_state::bam2_sec_w),this), 0x0000ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler ( 0x1fa20000, 0x1fa20003, read16_delegate(FUNC(zn_state::bam2_unk_r),this), 0x0000ffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fb00000, 0x1fb00007, read16_delegate(FUNC(zn_state::bam2_mcu_r),this), write16_delegate(FUNC(zn_state::bam2_mcu_w),this), 0xffffffff);
-}
+static ADDRESS_MAP_START(bam2_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("bankedroms", 0)
+	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READ16(bam2_unk_r, 0x0000ffff)
+	AM_RANGE(0x1fb00000, 0x1fb00007) AM_READWRITE16(bam2_mcu_r, bam2_mcu_w, 0xffffffff)
+
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,bam2)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
-	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + 0x400000 );
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bam2_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2 )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, bam2)
 MACHINE_CONFIG_END
 
 /*
@@ -4363,8 +4357,6 @@ ROM_START( bldyror2 )
 	ROM_LOAD( "rom-2a.026",      0x1000000, 0x400000, CRC(b71d955d) SHA1(49fce452c70ceafc8a149fa9ff073589b7261882) )
 	ROM_LOAD( "rom-2b.210",      0x1400000, 0x400000, CRC(89959dde) SHA1(99d54b9876f38f5e625334bbd1439618cdf01d56) )
 
-	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "br2_u0412.412", 0x000001, 0x080000, CRC(e254dd8a) SHA1(5b8fcafcf2176e0b55efcf37799d7c0d97e01bdc) )
 	ROM_LOAD16_BYTE( "br2_u049.049",  0x000000, 0x080000, CRC(10dc855b) SHA1(4e6e3a71911c8976ae07c2b6cac5a36f98193def) )
@@ -4386,8 +4378,6 @@ ROM_START( bldyror2u )
 	ROM_LOAD( "rom-1b.29",       0x0c00000, 0x400000, CRC(0cf153f9) SHA1(53bb9f8642079f56d8e925792b069362df666819) )
 	ROM_LOAD( "rom-2a.026",      0x1000000, 0x400000, CRC(b71d955d) SHA1(49fce452c70ceafc8a149fa9ff073589b7261882) )
 	ROM_LOAD( "rom-2b.210",      0x1400000, 0x400000, CRC(89959dde) SHA1(99d54b9876f38f5e625334bbd1439618cdf01d56) )
-
-	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "br2_u0412.412", 0x000001, 0x080000, CRC(e254dd8a) SHA1(5b8fcafcf2176e0b55efcf37799d7c0d97e01bdc) )
@@ -4411,8 +4401,6 @@ ROM_START( bldyror2j )
 	ROM_LOAD( "rom-2a.026",      0x1000000, 0x400000, CRC(b71d955d) SHA1(49fce452c70ceafc8a149fa9ff073589b7261882) )
 	ROM_LOAD( "rom-2b.210",      0x1400000, 0x400000, CRC(89959dde) SHA1(99d54b9876f38f5e625334bbd1439618cdf01d56) )
 
-	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "br2_u0412.412", 0x000001, 0x080000, CRC(e254dd8a) SHA1(5b8fcafcf2176e0b55efcf37799d7c0d97e01bdc) )
 	ROM_LOAD16_BYTE( "br2_u049.049",  0x000000, 0x080000, CRC(10dc855b) SHA1(4e6e3a71911c8976ae07c2b6cac5a36f98193def) )
@@ -4435,8 +4423,6 @@ ROM_START( bldyror2a )
 	ROM_LOAD( "rom-2a.026",      0x1000000, 0x400000, CRC(b71d955d) SHA1(49fce452c70ceafc8a149fa9ff073589b7261882) )
 	ROM_LOAD( "rom-2b.210",      0x1400000, 0x400000, CRC(89959dde) SHA1(99d54b9876f38f5e625334bbd1439618cdf01d56) )
 
-	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "br2_u0412.412", 0x000001, 0x080000, CRC(e254dd8a) SHA1(5b8fcafcf2176e0b55efcf37799d7c0d97e01bdc) )
 	ROM_LOAD16_BYTE( "br2_u049.049",  0x000000, 0x080000, CRC(10dc855b) SHA1(4e6e3a71911c8976ae07c2b6cac5a36f98193def) )
@@ -4451,21 +4437,19 @@ ROM_END
 ROM_START( bam2 )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x2c00000, "user2", 0 )
-		ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
-		ROM_LOAD( "u20",             0x0200000, 0x200000, CRC(1efb3c55) SHA1(d86e21a10fbcbcc759ba78b200dc2a10cb945b4c) )
-		ROM_LOAD( "mtr-bam-a01.u23", 0x0400000, 0x400000, CRC(5ed9e2dd) SHA1(85ac746735ec2fd89cd9082a3ab4ac6b4d9e8f4a) )
-		ROM_LOAD( "mtr-bam-a02.u24", 0x0800000, 0x400000, CRC(be335265) SHA1(7e09a166fe6d0e9e96c99fd472afb4db023ad217) )
-		ROM_LOAD( "mtr-bam-a03.u25", 0x0c00000, 0x400000, CRC(bf71791b) SHA1(b3eb791770838fc74e3535340610164166b63af8) )
-		ROM_LOAD( "mtr-bam-a04.u26", 0x1000000, 0x400000, CRC(d3aa62b5) SHA1(958b34fa2fa21c25f34972d4c288ef46e088d6e3) )
-		ROM_LOAD( "mtr-bam-a05.u27", 0x1400000, 0x400000, CRC(bd94d0ae) SHA1(97fe7b25768be2f57d8e823ec445c0ee92f07c02) )
-		ROM_LOAD( "mtr-bam-a06.u28", 0x1800000, 0x400000, CRC(b972c0b4) SHA1(e5ef170d0e71b7e02463462e1ea31c21ae890d14) )
-		ROM_LOAD( "mtr-bam-a07.u29", 0x1c00000, 0x400000, CRC(e8f716c1) SHA1(b15aafb0c9f3484a7ee41b5e6728af08d6a7bd8b) )
-		ROM_LOAD( "mtr-bam-a08.u30", 0x2000000, 0x400000, CRC(6e691ff1) SHA1(3fdcf3403e9ffd99b98e789930fc805dc2bc7692) )
-		ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
-		ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
-
-	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x2c00000, "bankedroms", 0 )
+	ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
+	ROM_LOAD( "u20",             0x0200000, 0x200000, CRC(1efb3c55) SHA1(d86e21a10fbcbcc759ba78b200dc2a10cb945b4c) )
+	ROM_LOAD( "mtr-bam-a01.u23", 0x0400000, 0x400000, CRC(5ed9e2dd) SHA1(85ac746735ec2fd89cd9082a3ab4ac6b4d9e8f4a) )
+	ROM_LOAD( "mtr-bam-a02.u24", 0x0800000, 0x400000, CRC(be335265) SHA1(7e09a166fe6d0e9e96c99fd472afb4db023ad217) )
+	ROM_LOAD( "mtr-bam-a03.u25", 0x0c00000, 0x400000, CRC(bf71791b) SHA1(b3eb791770838fc74e3535340610164166b63af8) )
+	ROM_LOAD( "mtr-bam-a04.u26", 0x1000000, 0x400000, CRC(d3aa62b5) SHA1(958b34fa2fa21c25f34972d4c288ef46e088d6e3) )
+	ROM_LOAD( "mtr-bam-a05.u27", 0x1400000, 0x400000, CRC(bd94d0ae) SHA1(97fe7b25768be2f57d8e823ec445c0ee92f07c02) )
+	ROM_LOAD( "mtr-bam-a06.u28", 0x1800000, 0x400000, CRC(b972c0b4) SHA1(e5ef170d0e71b7e02463462e1ea31c21ae890d14) )
+	ROM_LOAD( "mtr-bam-a07.u29", 0x1c00000, 0x400000, CRC(e8f716c1) SHA1(b15aafb0c9f3484a7ee41b5e6728af08d6a7bd8b) )
+	ROM_LOAD( "mtr-bam-a08.u30", 0x2000000, 0x400000, CRC(6e691ff1) SHA1(3fdcf3403e9ffd99b98e789930fc805dc2bc7692) )
+	ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
+	ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE("bam2", 0, SHA1(634d9a745a82c567fc4d7ce48e3570d88326c5f9) )
@@ -4747,7 +4731,7 @@ GAME( 2000, brvbladea, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eigh
 GAME( 2000, brvbladej, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
-GAME( 1999, bam2,     psarc95,  bam2,     zn,    zn_state, bam2, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, bam2,     psarc95,  bam2,     zn,    driver_device, 0, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* Atlus */
 
