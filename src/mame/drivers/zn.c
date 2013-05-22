@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE32_MEMBER(nbajamex_80_w);
 	DECLARE_READ32_MEMBER(nbajamex_08_r);
 	DECLARE_READ32_MEMBER(nbajamex_80_r);
-	DECLARE_WRITE32_MEMBER(coh1001l_bnk_w);
+	DECLARE_WRITE8_MEMBER(coh1001l_bnk_w);
 	DECLARE_WRITE32_MEMBER(coh1002v_bnk_w);
 	DECLARE_WRITE32_MEMBER(coh1002m_bank_w);
 	DECLARE_READ32_MEMBER(cbaj_z80_r);
@@ -97,7 +97,6 @@ public:
 	DECLARE_READ32_MEMBER(jdredd_ide_r);
 	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
 	DECLARE_DRIVER_INIT(zn);
-	DECLARE_DRIVER_INIT(coh1001l);
 	DECLARE_DRIVER_INIT(bam2);
 	DECLARE_DRIVER_INIT(coh1002v);
 	DECLARE_DRIVER_INIT(coh1000ta);
@@ -2172,32 +2171,33 @@ Notes:
       VSync        - 60Hz
 */
 
-WRITE32_MEMBER(zn_state::coh1001l_bnk_w)
+WRITE8_MEMBER(zn_state::coh1001l_bnk_w)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1001l)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f7fffff, "bank1" ); /* banked rom */
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb00000, 0x1fb00003, write32_delegate(FUNC(zn_state::coh1001l_bnk_w),this) );
-
-	DRIVER_INIT_CALL( zn );
-}
+static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1001l_bnk_w, 0x00ff0000)
+	
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked rom */
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
 }
 
-static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
 //  MCFG_CPU_ADD("audiocpu", M68000, 10000000 )
-//  MCFG_CPU_PROGRAM_MAP( atlus_snd_map)
+//  MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
-//  MCFG_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
+//  MCFG_SOUND_ADD("ymz", YMZ280B, ymz280b_intf)
 MACHINE_CONFIG_END
 
 /*
@@ -4562,7 +4562,7 @@ ROM_END
 ROM_START( hvnsgate )
 	ATLUS_BIOS
 
-	ROM_REGION32_LE( 0x02000000, "user2", 0 )
+	ROM_REGION32_LE( 0x02000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "athg-01b.18",  0x0000001, 0x080000, CRC(e820136f) SHA1(2bc3465928dd08060736a2a67d98864d634275d6) )
 	ROM_LOAD16_BYTE( "athg-02b.17",  0x0000000, 0x080000, CRC(11bfa89b) SHA1(f23e4c9d8eb90bd3bb3327d9950edd7a467ce8da) )
 	ROM_LOAD( "athg-07.027",         0x0100000, 0x400000, CRC(46411f67) SHA1(2e8f37c3d9d7f5f3c79fca8ffeaf4c2fd1634b91) )
@@ -4571,7 +4571,7 @@ ROM_START( hvnsgate )
 	ROM_LOAD( "athg-10.029",         0x0d00000, 0x400000, CRC(748f936e) SHA1(134e78ea71bb9646f36cc503c704496a2b622ee9) )
 	ROM_LOAD( "athg-11.215",         0x1100000, 0x200000, CRC(ac8e53bd) SHA1(002c4be1aa57d810c5d810c475631d9f14e1d2ab) )
 
-	ROM_REGION( 0x040000, "cpu1", 0 ) /* 68000 code, 10.000MHz */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) /* 68000 code, 10.000MHz */
 	ROM_LOAD16_BYTE( "athg-04.21",   0x000001, 0x020000, CRC(18523e85) SHA1(0ecc2116760f05fca8e5366b0a97dfe26fa9bc0c) )
 	ROM_LOAD16_BYTE( "athg-03.22",   0x000000, 0x020000, CRC(7eef7e68) SHA1(65b8ae18ef4ff636c548326a360b481aeb316869) )
 
@@ -4743,6 +4743,6 @@ GAME( 1999, bam2,     psarc95,  bam2,     zn,    zn_state, bam2, ROT0, "Metro / 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002l.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atluspsx,  0,       coh1001l, zn, zn_state, coh1001l, ROT0, "Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atluspsx,  0,       coh1001l, zn, zn_state, zn, ROT0, "Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, zn_state, coh1001l, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, zn_state, zn, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
