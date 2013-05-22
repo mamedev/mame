@@ -1685,7 +1685,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			if(options->params_dirty)
 			{
 				(*d3dintf->effect.set_vector)(curr_effect, "RawDims", 2, &rawdims.c.x);
-				(*d3dintf->effect.set_vector)(curr_effect, "SizeRatio", 2, &delta.c.x);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / delta.c.x);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / delta.c.y);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->get_width());
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->get_height());
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
@@ -1723,10 +1724,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.set_texture)(curr_effect, "Composite", rt->render_texture[4]);
 			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", texture->get_finaltex());
-			if(options->params_dirty)
+			if(true)//options->params_dirty)
 			{
-				(*d3dintf->effect.set_vector)(curr_effect, "RawDims", 2, &rawdims.c.x);
-				(*d3dintf->effect.set_vector)(curr_effect, "SizeRatio", 2, &delta.c.x);
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", rawdims.c.x);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", rawdims.c.y);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / delta.c.x);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / delta.c.y);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->get_width());
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->get_height());
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);

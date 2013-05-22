@@ -55,7 +55,8 @@ uniform float TargetHeight;
 
 uniform float2 RawDims;
 
-uniform float2 SizeRatio;
+uniform float WidthRatio;
+uniform float HeightRatio;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -100,13 +101,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 Texel2 = tex2D(DiffuseSampler, Coord2 + TexelOffset).rgb;
 	float3 Texel3 = tex2D(DiffuseSampler, Coord3 + TexelOffset).rgb;
 	
-	float2 InvSize = 1.0f / SizeRatio;
 	float PI = 3.1415926535897932384626433832795;
 	float W = PI * 2.0f * CCValue * ScanTime;
-	float T0 = Coord0.x * InvSize.x + AValue * Coord0.y * 2.0f * (RawDims.y / InvSize.y) + BValue;
-	float T1 = Coord1.x * InvSize.x + AValue * Coord1.y * 2.0f * (RawDims.y / InvSize.y) + BValue;
-	float T2 = Coord2.x * InvSize.x + AValue * Coord2.y * 2.0f * (RawDims.y / InvSize.y) + BValue;
-	float T3 = Coord3.x * InvSize.x + AValue * Coord3.y * 2.0f * (RawDims.y / InvSize.y) + BValue;
+	float T0 = Coord0.x * WidthRatio + AValue * Coord0.y * 2.0f * (RawDims.y / HeightRatio) + BValue;
+	float T1 = Coord1.x * WidthRatio + AValue * Coord1.y * 2.0f * (RawDims.y / HeightRatio) + BValue;
+	float T2 = Coord2.x * WidthRatio + AValue * Coord2.y * 2.0f * (RawDims.y / HeightRatio) + BValue;
+	float T3 = Coord3.x * WidthRatio + AValue * Coord3.y * 2.0f * (RawDims.y / HeightRatio) + BValue;
 
 	float Y0 = dot(Texel0, float3(0.299f, 0.587f, 0.114f));
 	float I0 = dot(Texel0, float3(0.595716f, -0.274453f, -0.321263f));
