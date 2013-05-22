@@ -100,7 +100,6 @@ public:
 	DECLARE_DRIVER_INIT(coh1001l);
 	DECLARE_DRIVER_INIT(bam2);
 	DECLARE_DRIVER_INIT(coh1002v);
-	DECLARE_DRIVER_INIT(coh1002e);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1002m);
@@ -428,7 +427,6 @@ DRIVER_INIT_MEMBER(zn_state, zn)
 		{
 			m_znsec0->init( zn_config_table[ n_game ].p_n_mainsec );
 			m_znsec1->init( zn_config_table[ n_game ].p_n_gamesec );
-//          psx_sio_install_handler( machine, 0, sio_pad_handler );
 			break;
 		}
 		n_game++;
@@ -1545,7 +1543,7 @@ WRITE8_MEMBER(zn_state::coh1002e_bank_w)
 {
 	znsecsel_w( space, offset, data, mem_mask );
 
-	membank( "bank1" )->set_base( memregion( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 WRITE8_MEMBER(zn_state::coh1002e_latch_w)
@@ -1556,18 +1554,17 @@ WRITE8_MEMBER(zn_state::coh1002e_latch_w)
 		soundlatch_byte_w(space, 0, data);
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1002e)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f7fffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fa10300, 0x1fa10303, write8_delegate(FUNC(zn_state::coh1002e_bank_w),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb00000, 0x1fb00007, write8_delegate(FUNC(zn_state::coh1002e_latch_w),this), 0x000000ff);
+static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00007) AM_WRITE8(coh1002e_latch_w, 0x000000ff)
 
-	DRIVER_INIT_CALL( zn );
-}
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1579,14 +1576,16 @@ static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED( coh1002e, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED(coh1002e, zn1_2mb_vram)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 12000000 )
-	MCFG_CPU_PROGRAM_MAP( psarc_snd_map)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(psarc_snd_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
 
-	MCFG_SOUND_ADD( "ymf", YMF271, 16934400 )
+	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3836,7 +3835,7 @@ ROM_END
 
 ROM_START( taitofx1 )
 	TAITOFX1_BIOS
-	ROM_REGION32_LE( 0x01000000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4203,7 +4202,7 @@ ROM_END
 
 ROM_START( psarc95 )
 	PSARC95_BIOS
-	ROM_REGION32_LE( 0x1800000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
 ROM_END
@@ -4211,7 +4210,7 @@ ROM_END
 ROM_START( beastrzr )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "b.roar_u0213",   0x000001, 0x080000, CRC(2c586534) SHA1(a38dfc3a45446d24a1caac89b0f560989d46ded5) ) /* For U0212 & U0213, 8ing used indentical rom labels */
 	ROM_LOAD16_BYTE( "b.roar_u0212",   0x000000, 0x080000, CRC(1c85d7fb) SHA1(aa406a42c424cc16a9e5330c68dda9acf8760088) ) /* even though the content changes between versions   */
 	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
@@ -4230,7 +4229,7 @@ ROM_END
 ROM_START( bldyroar )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "b.roar-u0213",   0x000001, 0x080000, CRC(63769342) SHA1(7231188073b997b039467db85ce7c85383daf591) ) /* For U0212 & U0213, 8ing used indentical rom labels */
 	ROM_LOAD16_BYTE( "b.roar-u0212",   0x000000, 0x080000, CRC(966b7169) SHA1(63e025cacb84e89d30b40ed6cfa5c63d84c298c4) ) /* even though the content changes between versions   */
 	ROM_LOAD16_BYTE( "b.roar-u0215",   0x100001, 0x080000, CRC(31c8e055) SHA1(2811789ab6221b972d1e3ffe98916587990f7564) )
@@ -4249,7 +4248,7 @@ ROM_END
 ROM_START( beastrzrb ) /* bootleg board */
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "27c160.1",     0x000000, 0x200000, CRC(820855e2) SHA1(18bdd4d0b4a92ae4fde457e1f37c813be6eece71) )
 	ROM_LOAD( "27c160.4",     0x400000, 0x200000, CRC(2d2b25f4) SHA1(77d8ad94602e71f16b47de47bc2e0a97957c530b) )
 	ROM_LOAD( "27c160.5",     0x600000, 0x200000, CRC(10fe6f4d) SHA1(9faee2faa6d741e1caf25edd093644be5723aa5c) )
@@ -4269,7 +4268,7 @@ ROM_END
 ROM_START( brvblade )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(d9d40a34) SHA1(c91dbc6f85404e9397fa79a4bac28e8c3c1a5228) )
 	ROM_LOAD( "ra-bbl_rom1.028", 0x0800000, 0x400000, CRC(418535e0) SHA1(7c443e651704f2cd552565c35f4a93f2dc250558) )
@@ -4288,7 +4287,7 @@ ROM_END
 ROM_START( brvbladeu )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(d9d40a34) SHA1(c91dbc6f85404e9397fa79a4bac28e8c3c1a5228) )
 	ROM_LOAD( "ra-bbl_rom1.028", 0x0800000, 0x400000, CRC(418535e0) SHA1(7c443e651704f2cd552565c35f4a93f2dc250558) )
@@ -4307,7 +4306,7 @@ ROM_END
 ROM_START( brvbladej )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(d9d40a34) SHA1(c91dbc6f85404e9397fa79a4bac28e8c3c1a5228) )
 	ROM_LOAD( "ra-bbl_rom1.028", 0x0800000, 0x400000, CRC(418535e0) SHA1(7c443e651704f2cd552565c35f4a93f2dc250558) )
@@ -4326,7 +4325,7 @@ ROM_END
 ROM_START( brvbladea )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(97e12c63) SHA1(382970617a363f6c98ee741f26be6a75c9752bdb) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(d9d40a34) SHA1(c91dbc6f85404e9397fa79a4bac28e8c3c1a5228) )
 	ROM_LOAD( "ra-bbl_rom1.028", 0x0800000, 0x400000, CRC(418535e0) SHA1(7c443e651704f2cd552565c35f4a93f2dc250558) )
@@ -4346,7 +4345,7 @@ ROM_END
 ROM_START( bldyror2 )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(03465a69) SHA1(7c29aff2bf19c379873d3927c260892c78281882) )
 	ROM_LOAD( "rom-1a.028",      0x0800000, 0x400000, CRC(0e711461) SHA1(1d0bd80e6885432ef0623babde28e5760b714bfa) )
@@ -4370,7 +4369,7 @@ ROM_END
 ROM_START( bldyror2u )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(03465a69) SHA1(7c29aff2bf19c379873d3927c260892c78281882) )
 	ROM_LOAD( "rom-1a.028",      0x0800000, 0x400000, CRC(0e711461) SHA1(1d0bd80e6885432ef0623babde28e5760b714bfa) )
@@ -4394,7 +4393,7 @@ ROM_END
 ROM_START( bldyror2j )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(03465a69) SHA1(7c29aff2bf19c379873d3927c260892c78281882) )
 	ROM_LOAD( "rom-1a.028",      0x0800000, 0x400000, CRC(0e711461) SHA1(1d0bd80e6885432ef0623babde28e5760b714bfa) )
@@ -4418,7 +4417,7 @@ ROM_END
 ROM_START( bldyror2a )
 	PSARC95_BIOS
 
-	ROM_REGION32_LE( 0x1800000, "user2", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "flash0.021",      0x0000000, 0x200000, CRC(fa7602e1) SHA1(6fb6af09656fbb86d2abda35804b2ed4a4cd7461) )
 	ROM_LOAD( "flash1.024",      0x0200000, 0x200000, CRC(03465a69) SHA1(7c29aff2bf19c379873d3927c260892c78281882) )
 	ROM_LOAD( "rom-1a.028",      0x0800000, 0x400000, CRC(0e711461) SHA1(1d0bd80e6885432ef0623babde28e5760b714bfa) )
@@ -4718,26 +4717,26 @@ GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002e.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, psarc95,  0,         coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
+GAME( 1997, psarc95,  0,         coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, beastrzr,  psarc95,  coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, beastrzrb, beastrzr, coh1002e, zn, zn_state,   coh1002e, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-
-/* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, zn_state, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, zn_state, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, zn_state, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, zn_state, coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, coh1002e, zn,   zn_state, zn, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 2000, brvblade,  tps,      coh1002e, zn, zn_state,   coh1002e, ROT270, "Eighting / Raizing", "Brave Blade (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladeu, brvblade, coh1002e, zn, zn_state,   coh1002e, ROT270, "Eighting / Raizing", "Brave Blade (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladea, brvblade, coh1002e, zn, zn_state,   coh1002e, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladej, brvblade, coh1002e, zn, zn_state,   coh1002e, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+/* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
+GAME( 2000, brvblade,  tps,      coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladeu, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladea, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladej, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
-GAME( 1999, bam2,     psarc95,  bam2,     zn, zn_state, bam2,     ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, bam2,     psarc95,  bam2,     zn,    zn_state, bam2, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* Atlus */
 
