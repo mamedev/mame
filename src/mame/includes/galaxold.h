@@ -88,6 +88,7 @@ public:
 	struct star m_stars[STAR_COUNT];
 
 	DECLARE_READ8_MEMBER(drivfrcg_port0_r);
+	DECLARE_READ8_MEMBER(scrambler_protection_2_r);
 	DECLARE_READ8_MEMBER(scramb2_protection_r);
 	DECLARE_READ8_MEMBER(scramb2_port0_r);
 	DECLARE_READ8_MEMBER(scramb2_port1_r);

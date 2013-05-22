@@ -608,6 +608,47 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
+READ8_MEMBER( galaxold_state::scrambler_protection_2_r )
+{
+	// if this doesn't return a value the code is happy with then it jumps out of ROM space after reading the port
+	return 0xff;
+}
+
+// there are still unmapped reads / writes, it's not really clear what gets hooked up to where on these bootlegs, if they go anywhere at all
+static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+
+	AM_RANGE(0x4800, 0x4bff) AM_RAM // mirror, leftovers?
+
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+
+	AM_RANGE(0x5800, 0x587f) AM_RAM
+	AM_RANGE(0x5880, 0x58bf) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x58c0, 0x58df) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x58e0, 0x58ff) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
+	AM_RANGE(0x6000, 0x6001) AM_WRITENOP  /* sound triggers */
+	AM_RANGE(0x6003, 0x6003) AM_WRITE(galaxold_coin_counter_w)
+	AM_RANGE(0x6004, 0x6007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")
+	AM_RANGE(0x6800, 0x6802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
+	AM_RANGE(0x6803, 0x6803) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_noise_enable_w) // should this disable the stars too?
+	AM_RANGE(0x6805, 0x6805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)
+	AM_RANGE(0x6806, 0x6807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2") AM_WRITE(galaxold_nmi_enable_w)
+//	AM_RANGE(0x7001, 0x7001) 
+	AM_RANGE(0x7002, 0x7002) AM_WRITE(galaxold_coin_counter_w)
+	AM_RANGE(0x7003, 0x7003) AM_WRITE(scrambold_background_enable_w)
+	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
+	AM_RANGE(0x7006, 0x7006) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+//	AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
+	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")    /* banked game code */
@@ -1243,6 +1284,58 @@ static INPUT_PORTS_START( scramb2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( scrambler )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("IN1") // cocktail mode inputs conflict with player 1 inputs, either wiring would be attached to the same bit as the flipscreen, or this set never worked in cocktail mode
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // also ends up being P2 left in cocktail mode
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // also ends up being P2 right in cocktail mode
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "A 1/1  B 1/6" )
+	PORT_DIPSETTING(    0x02, "A 2/1  B 1/3" )
+	PORT_DIPSETTING(    0x04, "A 1/2  B 1/6" )
+	PORT_DIPSETTING(    0x06, "A 2/2  B 1/3" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "255 (Cheat)")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	// probably unused
+	PORT_DIPNAME( 0x08, 0x08, "IN4:3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN4:4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN4:5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN4:6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN4:7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -2146,7 +2239,18 @@ static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
 
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(scrambler_map)
+
+	/* video hardware */
+	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+
+	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
 
@@ -2555,6 +2659,26 @@ ROM_START( scramb2 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+
+ROM_START( scrambler )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "principal 1.bin",        0x0000, 0x0800, CRC(926958d2) SHA1(eda1ddca0d43f40d684886d5ec54d40d40ce5715) )
+	ROM_LOAD( "principal 2.bin",        0x0800, 0x0800, CRC(655c6eca) SHA1(a9f4484d9c5c6716018e234563798b3c54124878) )
+	ROM_LOAD( "principal 3.bin",        0x1000, 0x0800, CRC(cd31749a) SHA1(0250530e76cf5019df61bfe3e0a85969e011b8f9) )
+	ROM_LOAD( "principal 4.bin",        0x1800, 0x0800, CRC(f055e1e3) SHA1(51eabb4915ceade37def5fe39129b15f0a37bd65) )
+	ROM_LOAD( "principal 5.bin",        0x2000, 0x0800, CRC(15f10df7) SHA1(93c9abcd61fbe5c5dd33a9387527565af6117c40) )
+	ROM_LOAD( "principal 6.bin",        0x2800, 0x0800, CRC(4bd1c703) SHA1(b91465d6ef2ae8e1b1d24bc9895e7e596b9e422b) )
+	ROM_LOAD( "principal 7.bin",        0x3000, 0x0800, CRC(0bb49470) SHA1(05a6fe3010c2136284ca76352dac147797c79778) ) // == s7.2m
+	ROM_LOAD( "principal 8.bin",        0x3800, 0x0800, CRC(6db9f380) SHA1(0678ffe16886ba76314ea14f15b4bb5752366dd5) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "graph hj.bin",        0x0000, 0x0800, CRC(4c017c9c) SHA1(36ea77be224aac16578b26c6f69601c7f10d1c7b) )
+	ROM_LOAD( "graph kl.bin",        0x0800, 0x0800, CRC(28a66399) SHA1(fe4c900e80a3a04c5c12e037ae2ae23339b9a9f8) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, assumed to be the same
+	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
 ROM_START( 4in1 )
@@ -3074,6 +3198,7 @@ GAME( 1981, ckongg,   ckong,    ckongg,   ckongg,   driver_device,  0,        RO
 GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc,  driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
 GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, scrambler,scramble,scrambler,scrambler, driver_device,  0,        ROT90,  "bootleg (Reben S.A.)", "Scramble (Reben S.A. Spanish bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, 4in1,     0,        4in1,     4in1,     galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, driver_device,  0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware, set 1)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1984, bagmanm2, bagman,   bagmanmc, bagmanmc, driver_device,  0,        ROT90,  "bootleg (GIB)", "Bagman (bootleg on Moon Cresta hardware, set 2)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
