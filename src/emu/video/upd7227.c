@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    uPD7227 Liquid Crystal Display Controller/Driver emulation
+    uPD7227 Intelligent Dot-Matrix LCD Controller/Driver emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -27,6 +27,12 @@
 const device_type UPD7227 = &device_creator<upd7227_device>;
 
 
+static ADDRESS_MAP_START( upd7227_map, AS_PROGRAM, 8, upd7227_device )
+	AM_RANGE(0x00, 0x27) AM_RAM
+	AM_RANGE(0x40, 0x67) AM_RAM
+ADDRESS_MAP_END
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -38,6 +44,8 @@ const device_type UPD7227 = &device_creator<upd7227_device>;
 
 upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7227, "uPD7227", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map)),
 	  m_cs(1),
 	  m_cd(1),
 	  m_sck(1),
@@ -81,6 +89,17 @@ void upd7227_device::device_start()
 
 void upd7227_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *upd7227_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 

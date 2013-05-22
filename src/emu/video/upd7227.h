@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    uPD7227 Liquid Crystal Display Controller/Driver emulation
+    uPD7227 Intelligent Dot-Matrix LCD Controller/Driver emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -32,7 +32,8 @@
 
 // ======================> upd7227_device
 
-class upd7227_device :  public device_t
+class upd7227_device :  public device_t,
+						public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -54,7 +55,28 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	address_space_config        m_space_config;
+
 private:
+	enum
+	{
+		CMD_SMM 		= 0x18,
+		CMD_SFF 		= 0x10,
+		CMD_LDPI 		= 0x80,
+		CMD_SWM 		= 0x64,
+		CMD_SRM 		= 0x60,
+		CMD_SANDM 		= 0x6c,
+		CMD_SORM 		= 0x68,
+		CMD_SCM 		= 0x72,
+		CMD_BSET 		= 0x40,
+		CMD_BRESET 		= 0x20,
+		CMD_DISP_ON 	= 0x09,
+		CMD_DISP_OFF 	= 0x08
+	};
+
 	int m_sx;
 	int m_sy;
 
