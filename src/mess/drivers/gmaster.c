@@ -123,6 +123,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 	{
 		case UPD7810_PORTC:
 			m_video.y = BLITTER_Y;
+			gmaster_io_callback(this, UPD7810_TO, ( data & 0x10 ) ? 1 : 0 );
 			break;
 	}
 }
@@ -212,7 +213,7 @@ INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 
 static const UPD7810_CONFIG config = {
 //  TYPE_78C10, // 78c11 in handheld
-	TYPE_7801, // temporarily until 7810 core fixes synchronized
+	TYPE_7810, // temporarily until 7810 core fixes synchronized
 	gmaster_io_callback
 };
 
