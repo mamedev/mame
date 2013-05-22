@@ -94,7 +94,7 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
-	void internal_header_logging(UINT8 *ROM, UINT32 len);
+	void internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len);
 	int verify_cart(UINT8 *magic, int size);
 	void set_lphaser_xoffset(UINT8 *rom, int size);
 

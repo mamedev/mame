@@ -1705,6 +1705,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="cj elephant fugitive.bin" size="262144" crc="72981057" sha1="a60815aa0c6ec2bc5ad7f817668b74a42bb64026" offset="000000" />
 			</dataarea>
@@ -1819,12 +1820,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="cosmic" supported="partial">
+	<software name="cosmic">
 		<description>Cosmic Spacehead (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120028-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="cosmic spacehead (europe).bin" size="262144" crc="6caa625b" sha1="c24f48ca3fb7df3b50b4353095c7a070653f3539" offset="000000" />
 			</dataarea>
@@ -2207,6 +2209,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="u1?" value="DROPZONE GGDZ E7F1" />
 			<feature name="u2?" value="TI16R4-25" />
 			<feature name="u3?" value="GD4011BD" />
+
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="131072">
 				<rom name="dropzone ggdz e7f1.u1" size="131072" crc="152f0dcc" sha1="b78bc3fe6bfbc7d6f5e85d59d79be19bf7372bcc" offset="000000" />
 			</dataarea>
@@ -4400,6 +4404,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="micro machines (europe).bin" size="262144" crc="f7c524f6" sha1="7b2d39b68622e18eac6c27fd961133b1d002342b" offset="000000" />
 			</dataarea>
@@ -4412,6 +4417,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="T-120108-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="524288">
 				<rom name="micro machines 2 - turbo tournament (europe).bin" size="524288" crc="dbe8895c" sha1="53ad6546462638ab246b4fdd7ca4b8966dde0d96" offset="000000" />
 			</dataarea>
@@ -5798,6 +5804,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="pete sampras tennis (europe).bin" size="262144" crc="c1756bee" sha1="ab9b4c833207824efb14b712b4ec82721c8436bc" offset="000000" />
 			</dataarea>
@@ -6522,9 +6529,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<software name="sslucifr">
 		<description>S.S. Lucifer - Man Overboard! (Euro)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Codemasters</publisher>
+		<info name="serial" value="T-120088"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="slot" value="codemasters" />
 			<dataarea name="rom" size="262144">
 				<rom name="s.s. lucifer - man overboard! (europe).bin" size="262144" crc="d9a7f170" sha1="b167fda9f0e7a6a47027f782a08149e8d4f46e0c" offset="000000" />
 			</dataarea>

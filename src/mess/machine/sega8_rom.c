@@ -195,43 +195,43 @@ void sega8_janggun_device::device_start()
 void sega8_rom_device::late_bank_setup()
 {
 	m_rom_bank_base[0] = 0;
-	m_rom_bank_base[1] = 1 & (m_rom_page_count - 1);
-	m_rom_bank_base[2] = 2 & (m_rom_page_count - 1);
+	m_rom_bank_base[1] = 1 % m_rom_page_count;
+	m_rom_bank_base[2] = 2 % m_rom_page_count;
 }
 
 void sega8_eeprom_device::late_bank_setup()
 {
 	m_rom_bank_base[0] = 0;
-	m_rom_bank_base[1] = 1 & (m_rom_page_count - 1);
-	m_rom_bank_base[2] = 2 & (m_rom_page_count - 1);
+	m_rom_bank_base[1] = 1 % m_rom_page_count;
+	m_rom_bank_base[2] = 2 % m_rom_page_count;
 }
 
 void sega8_codemasters_device::late_bank_setup()
 {
 	m_rom_bank_base[0] = 0;
-	m_rom_bank_base[1] = 1 & (m_rom_page_count - 1);
+	m_rom_bank_base[1] = 1 % m_rom_page_count;
 	m_rom_bank_base[2] = 0;
 }
 
 void sega8_zemina_device::late_bank_setup()
 {
 	m_rom_bank_base[0] = 0;
-	m_rom_bank_base[1] = 1 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[2] = 2 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[3] = 3 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[4] = 4 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[5] = 5 & (m_rom_page_count * 2 - 1);
+	m_rom_bank_base[1] = 1 % (m_rom_page_count * 2);
+	m_rom_bank_base[2] = 2 % (m_rom_page_count * 2);
+	m_rom_bank_base[3] = 3 % (m_rom_page_count * 2);
+	m_rom_bank_base[4] = 4 % (m_rom_page_count * 2);
+	m_rom_bank_base[5] = 5 % (m_rom_page_count * 2);
 }
 
 void sega8_nemesis_device::late_bank_setup()
 {
 	// Nemesis starts with last 8kb bank in page 0 (m_rom_page_count is for 16kb pages)
 	m_rom_bank_base[0] = m_rom_page_count * 2 - 1;
-	m_rom_bank_base[1] = 1 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[2] = 2 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[3] = 3 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[4] = 4 & (m_rom_page_count * 2 - 1);
-	m_rom_bank_base[5] = 5 & (m_rom_page_count * 2 - 1);
+	m_rom_bank_base[1] = 1 % (m_rom_page_count * 2);
+	m_rom_bank_base[2] = 2 % (m_rom_page_count * 2);
+	m_rom_bank_base[3] = 3 % (m_rom_page_count * 2);
+	m_rom_bank_base[4] = 4 % (m_rom_page_count * 2);
+	m_rom_bank_base[5] = 5 % (m_rom_page_count * 2);
 }
 
 void sega8_janggun_device::late_bank_setup()
@@ -303,7 +303,7 @@ WRITE8_MEMBER(sega8_rom_device::write_mapper)
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
-			m_rom_bank_base[offset - 1] = data  & (m_rom_page_count - 1);
+			m_rom_bank_base[offset - 1] = data  % m_rom_page_count;
 			break;
 	}	 
 }
@@ -362,7 +362,7 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
-			m_rom_bank_base[offset - 1] = data  & (m_rom_page_count - 1);
+			m_rom_bank_base[offset - 1] = data % m_rom_page_count;
 			break;
 	}	 
 }
@@ -458,7 +458,7 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
 	switch (offset)
 	{
 		case 0x0000:
-			m_rom_bank_base[0] = data & (m_rom_page_count - 1);
+			m_rom_bank_base[0] = data % m_rom_page_count;
 			break;
 		case 0x4000:
 			if (data & 0x80)
@@ -469,11 +469,11 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
 			else
 			{
 				m_ram_enabled = 0;
-				m_rom_bank_base[1] = data & (m_rom_page_count - 1);
+				m_rom_bank_base[1] = data % m_rom_page_count;
 			}
 			break;
 		case 0x8000:
-			m_rom_bank_base[2] = data & (m_rom_page_count - 1);
+			m_rom_bank_base[2] = data % m_rom_page_count;
 			break;
 	}
 
@@ -494,16 +494,16 @@ WRITE8_MEMBER(sega8_4pak_device::write_cart)
 	{
 		case 0x3ffe:
 			m_reg[0] = data;
-			m_rom_bank_base[0] = data & (m_rom_page_count - 1);
-			m_rom_bank_base[2] = ((m_reg[0] & 0x30) + m_reg[2])  & (m_rom_page_count - 1);
+			m_rom_bank_base[0] = data % m_rom_page_count;
+			m_rom_bank_base[2] = ((m_reg[0] & 0x30) + m_reg[2]) % m_rom_page_count;
 			break;
 		case 0x7fff:
 			m_reg[1] = data;
-			m_rom_bank_base[1] = data & (m_rom_page_count - 1);
+			m_rom_bank_base[1] = data % m_rom_page_count;
 			break;
 		case 0xbfff:
 			m_reg[2] = data;
-			m_rom_bank_base[2] = ((m_reg[0] & 0x30) + m_reg[2])  & (m_rom_page_count - 1);
+			m_rom_bank_base[2] = ((m_reg[0] & 0x30) + m_reg[2]) % m_rom_page_count;
 			break;
 	}
 }
@@ -537,16 +537,16 @@ WRITE8_MEMBER(sega8_zemina_device::write_cart)
 		switch (offset & 3)
 		{
 			case 0:
-				m_rom_bank_base[4] = data & (m_rom_page_count * 2 - 1);
+				m_rom_bank_base[4] = data % (m_rom_page_count * 2);
 				break;
 			case 1:
-				m_rom_bank_base[5] = data & (m_rom_page_count * 2 - 1);
+				m_rom_bank_base[5] = data % (m_rom_page_count * 2);
 				break;
 			case 2:
-				m_rom_bank_base[2] = data & (m_rom_page_count * 2 - 1);
+				m_rom_bank_base[2] = data % (m_rom_page_count * 2);
 				break;
 			case 3:
-				m_rom_bank_base[3] = data & (m_rom_page_count * 2 - 1);
+				m_rom_bank_base[3] = data % (m_rom_page_count * 2);
 				break;
 		}
 	}
@@ -611,8 +611,8 @@ WRITE8_MEMBER(sega8_janggun_device::write_mapper)
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
-			m_rom_bank_base[(offset - 1) * 2] = (data  & (m_rom_page_count - 1)) * 2;
-			m_rom_bank_base[(offset - 1) * 2 + 1] = (data  & (m_rom_page_count - 1)) * 2 + 1;
+			m_rom_bank_base[(offset - 1) * 2] = (data  % m_rom_page_count) * 2;
+			m_rom_bank_base[(offset - 1) * 2 + 1] = (data  % m_rom_page_count) * 2 + 1;
 			break;
 	}	 
 }

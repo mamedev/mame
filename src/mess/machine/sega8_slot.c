@@ -1,7 +1,24 @@
 /***********************************************************************************************************
+ 
+ 
+ Sega 8-bit cart emulation
+ (through slot devices)
 
+ Master System (Mark III) and Game Gear memory map can access 3 x 16K banks of ROM in
+ 0x0000-0xbfff memory range. These banks can however point to different ROM or RAM area 
+ of the cart (or to BIOS banks, but these are handled directly in SMS emulation).
+ 
+ Hence, carts can interface with the main system through the following handlers
+ * read_cart : to read from ROM/RAM in memory range [0000-bfff]
+ * write_cart : to write to ROM/RAM in memory range [0000-bfff]
+ * write_mapper : to write to range [fffc-ffff] (called by the handler accessing those
+ same addresses in sms.c)
 
-
+ TODO:
+ - investigate SG-1000 carts so to reduce duplicated code and to add full .sg support to sg1000m3
+ - add support for sms card slot (using the same code, since the access are basically the same as 
+   the cart ones)
+ 
  ***********************************************************************************************************/
 
 
@@ -60,6 +77,8 @@ void device_sega8_cart_interface::rom_alloc(running_machine &machine, UINT32 siz
 		m_rom = auto_alloc_array_clear(machine, UINT8, size);
 		m_rom_size = size;
 		m_rom_page_count = size / 0x4000;
+		if (!m_rom_page_count) 
+			m_rom_page_count = 1;	// we compute rom pages through (XXX % m_rom_page_count)!
 		late_bank_setup();
 	}
 }
@@ -255,7 +274,7 @@ bool sega8_cart_slot_device::call_load()
 			offset = 512;
 			len -= 512;
 		}
-		
+	
 		// make sure that we only get complete (0x4000) rom banks
 		if (len & 0x3fff)
 			len = ((len >> 14) + 1) << 14;
@@ -290,7 +309,7 @@ bool sega8_cart_slot_device::call_load()
 		{
 			// for now
 			m_cart->ram_alloc(machine(), 0x08000);
-			m_cart->set_has_battery(TRUE);
+			//m_cart->set_has_battery(TRUE);
 		}
 		
 		set_lphaser_xoffset(ROM, len);
@@ -310,7 +329,7 @@ bool sega8_cart_slot_device::call_load()
 		
 		//printf("Type: %s\n", sega8_get_slot(type));
 		
-		internal_header_logging(ROM + offset, len);
+		internal_header_logging(ROM + offset, len, m_cart->get_ram_size());
 		
 		return IMAGE_INIT_PASS;
 	}
@@ -524,6 +543,137 @@ WRITE8_MEMBER(sega8_cart_slot_device::write_cart)
  Internal header logging
  -------------------------------------------------*/
 
-void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void sega8_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len)
 {
+	static const char *const system_region[] =
+	{
+		"",
+		"",
+		"",
+		"Master System Japan",
+		"Master System Export",
+		"Game Gear Japan",
+		"Game Gear Export",
+		"Game Gear International",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	};
+
+	static int csum_length[] =
+	{
+		0x40000,
+		0x80000,
+		0x100000,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0x1ff0,
+		0x3ff0,
+		0x7ff0,
+		0xcff0,
+		0x10000,
+		0x20000,
+	};
+	
+	char reserved[10];
+	UINT8 version, csum_size, region, serial[3];
+	UINT16 checksum, csum = 0;
+	UINT32 csum_end = 0;
+	
+	// LOG FILE DETAILS
+	logerror("FILE DETAILS\n" );
+	logerror("============\n" );
+	logerror("Name: %s\n", basename());
+	logerror("File Size: 0x%" I64FMT "x\n", (software_entry() == NULL) ? length() : get_software_region_length("rom"));
+	logerror("Detected type: %s\n", sega8_get_slot(m_type));
+	logerror("ROM (Allocated) Size: 0x%X\n", len);
+	logerror("RAM: %s\n", nvram_len ? "Yes" : "No");
+	if (nvram_len)
+		logerror("RAM (Allocated) Size: 0x%X - Battery: %s\n", nvram_len, m_cart->get_has_battery() ? "Yes" : "No");
+	logerror("\n" );
+	
+	
+	// LOG HEADER DETAILS
+	if (len < 0x8000)
+		return;
+
+	for (int i = 0; i < 10; i++)
+		reserved[i] = ROM[0x7ff0 + i];
+	
+	checksum = ROM[0x7ffa] | (ROM[0x7ffb] << 8);
+	
+	for (int i = 0; i < 3; i++)
+		serial[i] = ROM[0x7ffc + i];
+	serial[2] &= 0x0f;
+	
+	version = (ROM[0x7ffe] & 0xf0) >> 4;
+	
+	csum_size = ROM[0x7fff] & 0x0f;
+	csum_end = csum_length[csum_size];
+	if (!csum_end || csum_end > len)
+		csum_end = len;
+	
+	region = (ROM[0x7fff] & 0xf0) >> 4;
+	
+	// compute cart checksum to compare with expected one
+	for (int i = 0; i < csum_end; i++)
+	{
+		if (i < 0x7ff0 || i >= 0x8000)
+		{
+			csum += ROM[i];
+			csum &= 0xffff;
+		}			
+	}
+	
+	logerror("INTERNAL HEADER\n" );
+	logerror("===============\n" );
+	logerror("Reserved String: %.10s\n", reserved);
+	logerror("Region: %s\n", system_region[region]);
+	logerror("Checksum: (Expected) 0x%x - (Computed) 0x%x\n", checksum, csum);
+	logerror("   [checksum over 0x%X bytes]\n", csum_length[csum_size]);
+	logerror("Serial String: %X\n", serial[0] | (serial[1] << 8) | (serial[2] << 16));
+	logerror("Software Revision: %x\n", version);
+	logerror("\n" );
+
+	
+	if (m_type == SEGA8_CODEMASTERS)
+	{
+		UINT8 day, month, year, hour, minute;
+		csum = 0;
+		
+		day = ROM[0x7fe1];
+		month = ROM[0x7fe2];
+		year = ROM[0x7fe3];
+		hour = ROM[0x7fe4];
+		minute = ROM[0x7fe5];
+		checksum = ROM[0x7fe6] | (ROM[0x7fe7] << 8);
+		csum_size = ROM[0x7fe0];
+
+		// compute cart checksum to compare with expected one
+		for (int i = 0; i < len; i += 2)
+		{
+			if (i < 0x7ff0 || i >= 0x8000)
+			{
+				csum += (ROM[i] | (ROM[i + 1] << 8));
+				csum &= 0xffff;
+			}
+		}
+		
+		logerror("CODEMASTERS HEADER\n" );
+		logerror("==================\n" );
+		logerror("Build date & time: %x/%x/%x %.2x:%.2x\n", day, month, year, hour, minute);
+		logerror("Checksum: (Expected) 0x%x - (Computed) 0x%x\n", checksum, csum);
+		logerror("   [checksum over 0x%X bytes]\n", csum_size * 0x4000);
+		logerror("\n" );
+	}
 }

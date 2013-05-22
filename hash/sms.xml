@@ -1558,6 +1558,7 @@
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="cyborg z (kr).bin" size="131072" crc="77efe84a" sha1="c2e661e9b68a78e5a5fae5ae297b5d964d82491e" offset="000000" />
 			</dataarea>
@@ -4209,6 +4210,7 @@
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="그라디우 2 ~ Gradius 2 (Box?)"/>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="nemesis 2 (kr).bin" size="131072" crc="0a77fa5e" sha1="4b0c286448bde49f9247a4f9a5add38d48021fd7" offset="000000" />
 			</dataarea>
@@ -6147,6 +6149,7 @@
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 I" />
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean" />
 			<dataarea name="rom" size="49152">
 				<rom name="super boy 1.bin" size="49152" crc="bf5a994a" sha1="f0e6a20c72f0fb0feb1681217eeec3b69950e897" offset="000000"/>
 			</dataarea>
@@ -6170,6 +6173,7 @@
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="zemina" />
 			<dataarea name="rom" size="131072">
 				<rom name="super boy 3.bin" size="131072" crc="9195c34c" sha1="5d65a308bb9ec8c4b4ce334b18d699b1f53227ef" offset="000000"/>
 			</dataarea>
