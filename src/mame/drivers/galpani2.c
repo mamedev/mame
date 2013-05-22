@@ -728,7 +728,6 @@ ROM_START( galpani2 )
 	ROM_CONTINUE(            0x200000, 0x080000 )
 ROM_END
 
-// only the 2 'sub' ROMs were in this set.  It is NOT clear which other roms should be used with it, so this might be (very) wrong.
 ROM_START( galpani2e )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000a2.u165-1", 0x000000, 0x080000, CRC(0c6dfe3f) SHA1(22b16eaa3fee7f8f8434c6775255b25c8d960620) )
