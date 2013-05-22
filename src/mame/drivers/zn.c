@@ -50,11 +50,6 @@ public:
 	required_device<zndip_device> m_zndip;
 	UINT8 m_n_znsecsel;
 
-	size_t m_taitofx1_eeprom_size1;
-	UINT8 *m_taitofx1_eeprom1;
-	size_t m_taitofx1_eeprom_size2;
-	UINT8 *m_taitofx1_eeprom2;
-
 	UINT16 m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
@@ -1093,7 +1088,7 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 	device_t *mb3773 = machine().device("mb3773");
 	mb3773_set_ck(mb3773, (data & 0x20) >> 5);
 	verboselog(1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	membank( "bank1" )->set_base( memregion( "user2" )->base() + ( ( data & 3 ) * 0x800000 ) );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
@@ -1101,28 +1096,27 @@ WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 	membank( "bank10" )->set_base( memregion( "audiocpu" )->base() + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
 }
 
+static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x000000ff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff0000)
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM AM_SHARE("fm1208s")
+
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
+
 DRIVER_INIT_MEMBER(zn_state,coh1000ta)
 {
-	tc0140syt_device *tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-	
-	m_taitofx1_eeprom_size1 = 0x200; m_taitofx1_eeprom1 = auto_alloc_array( machine(), UINT8, m_taitofx1_eeprom_size1 );
-	machine().device<nvram_device>("eeprom1")->set_base(m_taitofx1_eeprom1, m_taitofx1_eeprom_size1);
-
-	m_maincpu->space(AS_PROGRAM).install_read_bank     ( 0x1f000000, 0x1f7fffff, "bank1" );     /* banked game rom */
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fb40000, 0x1fb40003, write8_delegate(FUNC(zn_state::bank_coh1000t_w),this), 0x000000ff); /* bankswitch */
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb80000, 0x1fb80003, write8_delegate(FUNC(tc0140syt_device::tc0140syt_port_w), tc0140syt), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fb80000, 0x1fb80003, read8_delegate(FUNC(tc0140syt_device::tc0140syt_comm_r), tc0140syt), write8_delegate(FUNC(tc0140syt_device::tc0140syt_comm_w), tc0140syt), 0x00ff0000);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank( 0x1fbe0000, 0x1fbe0000 + ( m_taitofx1_eeprom_size1 - 1 ), "bank2" );
+	memory_share *eeprom = memshare("fm1208s");
+	machine().device<nvram_device>("fm1208s")->set_base(eeprom->ptr(), eeprom->bytes());
 
 	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
-	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
@@ -1150,11 +1144,13 @@ static const tc0140syt_interface coh1000ta_tc0140syt_intf =
 };
 
 static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )    /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP( fx1a_sound_map)
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta )
-	MCFG_NVRAM_ADD_0FILL("eeprom1")
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4)    /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(fx1a_sound_map)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
+	MCFG_NVRAM_ADD_0FILL("fm1208s")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(zn_state, irqhandler))
@@ -1185,41 +1181,41 @@ READ16_MEMBER(zn_state::taitofx1b_sound_r)
 	return data;
 }
 
+static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_RAM AM_SHARE("m66220fp")
+	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
+	AM_RANGE(0x1fb80000, 0x1fb8ffff) AM_WRITE16(taitofx1b_volume_w, 0xffffffff)
+	AM_RANGE(0x1fba0000, 0x1fbaffff) AM_WRITE16(taitofx1b_sound_w, 0xffffffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_READ16(taitofx1b_sound_r, 0x0000ffff)
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM AM_SHARE("fm1208s")
+
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
+
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-	m_taitofx1_eeprom_size1 = 0x400; m_taitofx1_eeprom1 = auto_alloc_array( machine(), UINT8, m_taitofx1_eeprom_size1 );
-	m_taitofx1_eeprom_size2 = 0x200; m_taitofx1_eeprom2 = auto_alloc_array( machine(), UINT8, m_taitofx1_eeprom_size2 );
-
-	machine().device<nvram_device>("eeprom1")->set_base(m_taitofx1_eeprom1, m_taitofx1_eeprom_size1);
-	machine().device<nvram_device>("eeprom2")->set_base(m_taitofx1_eeprom2, m_taitofx1_eeprom_size2);
-
-	m_maincpu->space(AS_PROGRAM).install_read_bank     ( 0x1f000000, 0x1f7fffff, "bank1" ); /* banked game rom */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank( 0x1fb00000, 0x1fb00000 + ( m_taitofx1_eeprom_size1 - 1 ), "bank2" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fb40000, 0x1fb40003, write8_delegate(FUNC(zn_state::bank_coh1000t_w),this), 0x000000ff); /* bankswitch */
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fb80000, 0x1fb8ffff, write16_delegate(FUNC(zn_state::taitofx1b_volume_w),this), 0xffffffff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fba0000, 0x1fbaffff, write16_delegate(FUNC(zn_state::taitofx1b_sound_w),this), 0xffffffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler     ( 0x1fbc0000, 0x1fbc0003, read16_delegate(FUNC(zn_state::taitofx1b_sound_r),this), 0x0000ffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_bank( 0x1fbe0000, 0x1fbe0000 + ( m_taitofx1_eeprom_size2 - 1 ), "bank3" );
+	memory_share *fm1208s = memshare("fm1208s");
+	machine().device<nvram_device>("fm1208s")->set_base(fm1208s->ptr(), fm1208s->bytes());
 
 	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
-	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
-	membank( "bank3" )->set_base( m_taitofx1_eeprom2 );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked game rom */
 }
 
-static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb )
-	MCFG_NVRAM_ADD_0FILL("eeprom1")
-	MCFG_NVRAM_ADD_0FILL("eeprom2")
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb)
+	MCFG_NVRAM_ADD_0FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
 
-	MCFG_FRAGMENT_ADD( taito_zoom_sound )
+	MCFG_FRAGMENT_ADD(taito_zoom_sound)
 MACHINE_CONFIG_END
 
 /*
@@ -3847,7 +3843,7 @@ ROM_END
 ROM_START( ftimpcta )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-13.4",     0x0000001, 0x100000, CRC(7f078d7b) SHA1(df9800dd6885dbc33736c5143d877b0847221061) )
 	ROM_LOAD16_BYTE( "e25-14.3",     0x0000000, 0x100000, CRC(0c5f474f) SHA1(ce7031ba860297b99cddd6d0177f07e03520faeb) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
@@ -3865,7 +3861,7 @@ ROM_END
 ROM_START( ftimpact )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-09.4",     0x0000001, 0x080000, CRC(d457bfc7) SHA1(e974a9c3e7b0748ef89d78e76a7dbb763c42b6f7) )
 	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
@@ -3883,7 +3879,7 @@ ROM_END
 ROM_START( ftimpactu )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-08.4",     0x0000001, 0x080000, CRC(a3508f51) SHA1(fd4c3cc186e280497dc905ebda92472d5b72b1b4) )
 	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
@@ -3901,7 +3897,7 @@ ROM_END
 ROM_START( ftimpactj )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e25-06.4",     0x0000001, 0x080000, CRC(3a59deeb) SHA1(4377c5829fb5b6f5d0120caf992b1ee714897641) )
 	ROM_LOAD16_BYTE( "e25-07.3",     0x0000000, 0x080000, CRC(829be1cc) SHA1(64b139d7c3696ab2f0b9a4842c19a38fe6a8cede) )
 	ROM_LOAD( "e25-01.1",            0x0400000, 0x400000, CRC(8cc4be0c) SHA1(9ca15558a83b7e332e50accf1f7852444a7ce730) )
@@ -3919,7 +3915,7 @@ ROM_END
 ROM_START( gdarius )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-06.4",     0x0000001, 0x100000, CRC(2980c30d) SHA1(597321642125c3ae37581c2d9abc2723c7909996) )
 	ROM_LOAD16_BYTE( "e39-05.3",     0x0000000, 0x100000, CRC(750e5b13) SHA1(68fe9cbd7d506cfd587dccc40b6ae0b0b6ee7c29) )
 	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
@@ -3936,7 +3932,7 @@ ROM_END
 ROM_START( gdariusb )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-08.ic4",   0x0000001, 0x100000, CRC(835049db) SHA1(2b230c8fd6c6ea4e30740fda28f631344b018b79) )
 	ROM_LOAD16_BYTE( "e39-10.ic3",   0x0000000, 0x100000, CRC(6ba4d941) SHA1(75f2d8c920d29102c09e041fc3198e32ad57dbaf) )
 	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
@@ -3953,7 +3949,7 @@ ROM_END
 ROM_START( gdarius2 )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e39-12.4",     0x0000001, 0x100000, CRC(b23266c3) SHA1(80aaddaaf10e40280ade4c7d11f45ddab47ee9a6) )
 	ROM_LOAD16_BYTE( "e39-11.3",     0x0000000, 0x100000, CRC(766f73df) SHA1(9ce24c153920d259bc7fdef0778083eb6d639be3) )
 	ROM_LOAD( "e39-01.1",            0x0400000, 0x400000, CRC(bdaaa251) SHA1(a42daa706ee859c2b66be179e08c0ad7990f919e) )
@@ -3970,7 +3966,7 @@ ROM_END
 ROM_START( mgcldate )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e32-05.2",     0x0000001, 0x080000, CRC(72fc7f7b) SHA1(50d9e84bc74fb63ec1900ab149051888bc3d03a5) )
 	ROM_LOAD16_BYTE( "e32-06.7",     0x0000000, 0x080000, CRC(d11c3881) SHA1(f7046c5bed4818152edcf697a49664b0bcf12a1b) )
 	ROM_LOAD( "e32-01.1",            0x0400000, 0x400000, CRC(cf5f1d01) SHA1(5417f8aef5c8d0e9e63ba8c68efb5b3ef37b4693) )
@@ -3988,7 +3984,7 @@ ROM_END
 ROM_START( mgcldtex )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e32-08.2",     0x0000001, 0x100000, CRC(3d42cd28) SHA1(9017922e835a359ba5126c8a9e8c27380a5ce081) )
 	ROM_LOAD16_BYTE( "e32-09.7",     0x0000000, 0x100000, CRC(db7ec115) SHA1(fa6f18de71ba997389d887d7ffe745aa25e24c20) )
 	ROM_LOAD( "e32-01.1",            0x0400000, 0x400000, CRC(cf5f1d01) SHA1(5417f8aef5c8d0e9e63ba8c68efb5b3ef37b4693) )
@@ -4007,7 +4003,7 @@ ROM_START( psyforce )
 	/* It is VERY ODD that Taito had 2 different labels for the same data (E22-06* & E22-10*) but is verified correct! */
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-09+.2",    0x0000001, 0x080000, CRC(997e4500) SHA1(4a90b452c9a877ccec55a11f36c4cbc6df1f1f41) ) /* Labled as E22-09* */
 	ROM_LOAD16_BYTE( "e22-06+.7",    0x0000000, 0x080000, CRC(f6341d63) SHA1(99dc27aa694ae5951148054291912a486726e8c9) ) /* Labled as E22-06* */
 	ROM_LOAD( "e22-02.16",           0x0800000, 0x200000, CRC(03b50064) SHA1(0259537e86b266b3f34308c4fc0bcc04c037da71) )
@@ -4025,7 +4021,7 @@ ROM_END
 ROM_START( psyforcej )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-05+.2",    0x0000001, 0x080000, CRC(7770242c) SHA1(dd37575d3d9ffdef60fe0e4cab6c9e42d087f714) ) /* Labled as E22-05* */
 	ROM_LOAD16_BYTE( "e22-10+.7",    0x0000000, 0x080000, CRC(f6341d63) SHA1(99dc27aa694ae5951148054291912a486726e8c9) ) /* Labled as E22-10* */
 	ROM_LOAD( "e22-02.16",           0x0800000, 0x200000, CRC(03b50064) SHA1(0259537e86b266b3f34308c4fc0bcc04c037da71) )
@@ -4043,7 +4039,7 @@ ROM_END
 ROM_START( psyforcex )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e22-11.2",     0x0000001, 0x080000, CRC(a263b41f) SHA1(a797f1eb74a7ba7aeefabd9f5d55e6eec2df46e2) )
 	ROM_LOAD16_BYTE( "e22-12.7",     0x0000000, 0x080000, CRC(7426ffc5) SHA1(24b0132241e2e49109e585b082bf4ab67f86b294) )
 	ROM_LOAD( "e22-02.16",           0x0800000, 0x200000, CRC(03b50064) SHA1(0259537e86b266b3f34308c4fc0bcc04c037da71) )
@@ -4062,7 +4058,7 @@ ROM_END
 ROM_START( raystorm )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-xx.ic4", 0x0000001, 0x080000, CRC(33f63638) SHA1(fdda33ffc9902b3605a3272fae5a614e93856a86) ) /* Need to verify actual label */
 	ROM_LOAD16_BYTE( "e24-xx.ic3", 0x0000000, 0x080000, CRC(5eeed3b2) SHA1(d8bb1613d7285eabdc6f0a2d231d2eeeb52f307b) ) /* Need to verify actual label */
 	ROM_LOAD( "e24-02.1",          0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
@@ -4078,7 +4074,7 @@ ROM_END
 ROM_START( raystormo )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-08.4",     0x0000001, 0x080000, CRC(ae071b95) SHA1(0e1597220808d6e3998ef1e9d88779e0187ba0af) )
 	ROM_LOAD16_BYTE( "e24-06.3",     0x0000000, 0x080000, CRC(d70cdf46) SHA1(da6163d69d3ea9c1e3f4b7961a548f1f9d8d9909) )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
@@ -4094,7 +4090,7 @@ ROM_END
 ROM_START( raystormu )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-07.4",     0x0000001, 0x080000, CRC(d9002b03) SHA1(bdb0aa88536c4c98c150ece87387930b3dbdd258) )
 	ROM_LOAD16_BYTE( "e24-06.3",     0x0000000, 0x080000, CRC(d70cdf46) SHA1(da6163d69d3ea9c1e3f4b7961a548f1f9d8d9909) )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
@@ -4110,7 +4106,7 @@ ROM_END
 ROM_START( raystormj )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e24-05.4",     0x0000001, 0x080000, CRC(40097ab9) SHA1(67e73568b35515c2c5a9119e97ac4709baff8c5a) )
 	ROM_LOAD16_BYTE( "e24-06.3",     0x0000000, 0x080000, CRC(d70cdf46) SHA1(da6163d69d3ea9c1e3f4b7961a548f1f9d8d9909) )
 	ROM_LOAD( "e24-02.1",            0x0400000, 0x400000, CRC(9f70950d) SHA1(b3e4f925a61ae2e5dd4cc5d7ec3030a0d5c2c04d) )
@@ -4126,7 +4122,7 @@ ROM_END
 ROM_START( sfchamp )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-12.2",     0x0000001, 0x080000, CRC(72304685) SHA1(2e6f645871e19a49fcdfbdca49c6be415471eadf) ) /* Ver 2.5O */
 	ROM_LOAD16_BYTE( "e18-13.7",     0x0000000, 0x080000, CRC(fa4d01ee) SHA1(27efd8e2107d71213d35f2a58762ed8812f809d3) ) /* Ver 2.5O */
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
@@ -4145,7 +4141,7 @@ ROM_END
 ROM_START( sfchampo )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-11.2",     0x0000001, 0x080000, CRC(f5462f30) SHA1(44eb03a9b51e2d8dd14fe2ed36dbcf17035a22c7) ) /* Ver 2.4O */
 	ROM_LOAD16_BYTE( "e18-08.7",     0x0000000, 0x080000, CRC(6a5558cd) SHA1(75b26bcaaa213283e7e0dace69ee58f305b4572d) ) /* Ver 2.4O */
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
@@ -4164,7 +4160,7 @@ ROM_END
 ROM_START( sfchampu )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-10.2",     0x0000001, 0x080000, CRC(82411fa6) SHA1(0aa1764b7ff68258ef76a41355c50d5067262d75) )
 	ROM_LOAD16_BYTE( "e18-08.7",     0x0000000, 0x080000, CRC(6a5558cd) SHA1(75b26bcaaa213283e7e0dace69ee58f305b4572d) )
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
@@ -4183,7 +4179,7 @@ ROM_END
 ROM_START( sfchampj )
 	TAITOFX1_BIOS
 
-	ROM_REGION32_LE( 0x01000000, "user2", 0 )
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "e18-07.2",     0x0000001, 0x080000, CRC(1b484e1c) SHA1(f29f40a9988475d8abbb126095b0716133c087a0) )
 	ROM_LOAD16_BYTE( "e18-08.7",     0x0000000, 0x080000, CRC(6a5558cd) SHA1(75b26bcaaa213283e7e0dace69ee58f305b4572d) )
 	ROM_LOAD( "e18-02.12",           0x0600000, 0x200000, CRC(c7b4fe29) SHA1(7f823bd61abf2b15d3ba62bca829a5b1acacfd09) )
