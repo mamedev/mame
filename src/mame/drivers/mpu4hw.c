@@ -1815,8 +1815,7 @@ INPUT_PORTS_START( mpu4_cw )
 	PORT_DIPSETTING(    0x00, "20p" )
 	PORT_DIPSETTING(    0x80, "10p" )	
 
-	PORT_START("DIL2")
-	
+	PORT_MODIFY("DIL2")
 	PORT_DIPNAME( 0x07, 0x00, "Stake Setting" )
 	PORT_DIPSETTING(    0x00, "Not fitted / 5p"  )
 	PORT_DIPSETTING(    0x01, "10p" )
