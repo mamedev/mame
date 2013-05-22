@@ -44,21 +44,6 @@ public:
 	{
 	}
 
-	required_device<psxgpu_device> m_gpu;
-	required_device<znsec_device> m_znsec0;
-	required_device<znsec_device> m_znsec1;
-	required_device<zndip_device> m_zndip;
-	UINT8 m_n_znsecsel;
-
-	UINT16 m_bam2_mcu_command;
-	int m_jdredd_gun_mux;
-
-	size_t m_nbajamex_eeprom_size;
-	UINT8 *m_nbajamex_eeprom;
-
-	int m_cbaj_to_z80;
-	int m_cbaj_to_r3k;
-	int m_latch_to_z80;
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
@@ -86,7 +71,7 @@ public:
 	DECLARE_READ32_MEMBER(nbajamex_08_r);
 	DECLARE_READ32_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bnk_w);
-	DECLARE_WRITE32_MEMBER(coh1002v_bnk_w);
+	DECLARE_WRITE8_MEMBER(coh1002v_bnk_w);
 	DECLARE_WRITE32_MEMBER(coh1002m_bank_w);
 	DECLARE_READ32_MEMBER(cbaj_z80_r);
 	DECLARE_WRITE32_MEMBER(cbaj_z80_w);
@@ -96,9 +81,7 @@ public:
 	DECLARE_READ32_MEMBER(jdredd_idestat_r);
 	DECLARE_READ32_MEMBER(jdredd_ide_r);
 	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
-	DECLARE_DRIVER_INIT(zn);
 	DECLARE_DRIVER_INIT(bam2);
-	DECLARE_DRIVER_INIT(coh1002v);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1002m);
@@ -115,14 +98,36 @@ public:
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline UINT8 psxreadbyte( UINT32 *p_n_psxram, UINT32 n_address );
-	inline void psxwritebyte( UINT32 *p_n_psxram, UINT32 n_address, UINT8 n_data );
 	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void driver_start();
+
+private:
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	inline UINT8 psxreadbyte( UINT32 *p_n_psxram, UINT32 n_address );
+	inline void psxwritebyte( UINT32 *p_n_psxram, UINT32 n_address, UINT8 n_data );
+
+	UINT8 m_n_znsecsel;
+
+	UINT16 m_bam2_mcu_command;
+	int m_jdredd_gun_mux;
+
+	size_t m_nbajamex_eeprom_size;
+	UINT8 *m_nbajamex_eeprom;
+
+	int m_cbaj_to_z80;
+	int m_cbaj_to_r3k;
+	int m_latch_to_z80;
+
+	required_device<psxgpu_device> m_gpu;
+	required_device<znsec_device> m_znsec0;
+	required_device<znsec_device> m_znsec1;
+	required_device<zndip_device> m_zndip;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<ram_device> m_ram;
@@ -415,7 +420,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER(zn_state, zn)
+void zn_state::driver_start()
 {
 	int n_game;
 
@@ -643,8 +648,6 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000c)
 {
-	DRIVER_INIT_CALL( zn );
-
 	if( strcmp( machine().system().name, "glpracr" ) == 0 ||
 		strcmp( machine().system().name, "glpracr2l" ) == 0 )
 	{
@@ -1107,8 +1110,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000ta)
 {
 	memory_share *eeprom = memshare("fm1208s");
 	machine().device<nvram_device>("fm1208s")->set_base(eeprom->ptr(), eeprom->bytes());
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
@@ -1194,8 +1195,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
 	memory_share *fm1208s = memshare("fm1208s");
 	machine().device<nvram_device>("fm1208s")->set_base(fm1208s->ptr(), fm1208s->bytes());
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
@@ -1368,8 +1367,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000w)
 	m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0x1f7e4000, 0x1f7e4fff, FUNC(ide_controller32_r), FUNC(ide_controller32_w) );
 	m_maincpu->space(AS_PROGRAM).nop_readwrite                     ( 0x1f7e8000, 0x1f7e8003);
 	m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0x1f7f4000, 0x1f7f4fff, FUNC(ide_controller32_r), FUNC(ide_controller32_w) );
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000w)
@@ -1699,8 +1696,6 @@ DRIVER_INIT_MEMBER(zn_state,bam2)
 	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fa10300, 0x1fa10303, write8_delegate(FUNC(zn_state::bam2_sec_w),this), 0x0000ffff);
 	m_maincpu->space(AS_PROGRAM).install_read_handler ( 0x1fa20000, 0x1fa20003, read16_delegate(FUNC(zn_state::bam2_unk_r),this), 0x0000ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fb00000, 0x1fb00007, read16_delegate(FUNC(zn_state::bam2_mcu_r),this), write16_delegate(FUNC(zn_state::bam2_mcu_w),this), 0xffffffff);
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,bam2)
@@ -2025,8 +2020,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000a)
 		m_maincpu->space(AS_PROGRAM).nop_write                    ( 0x1fbfff8c, 0x1fbfff8f);
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1fbfff90, 0x1fbfff9f, read32_delegate(FUNC(zn_state::jdredd_ide_r),this), write32_delegate(FUNC(zn_state::jdredd_ide_w),this) );
 	}
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000a)
@@ -2221,29 +2214,29 @@ Key:    Mother    KN01
 
 */
 
-WRITE32_MEMBER(zn_state::coh1002v_bnk_w)
+WRITE8_MEMBER(zn_state::coh1002v_bnk_w)
 {
-	membank( "bank2" )->set_base( memregion( "user3" )->base() + ( data * 0x100000 ) );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( data * 0x100000 ) );
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1002v)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f27ffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1fb00000, 0x1fbfffff, "bank2" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb00000, 0x1fb00003, write32_delegate(FUNC(zn_state::coh1002v_bnk_w),this));
-
-	DRIVER_INIT_CALL( zn );
-}
+static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f27ffff) AM_ROM AM_REGION("fixedroms", 0)
+	AM_RANGE(0x1fb00000, 0x1fbfffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1002v_bnk_w, 0x000000ff)
+	
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
-	membank( "bank2" )->set_base( memregion( "user3" )->base() ); /* banked rom */
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1002v_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002v)
 MACHINE_CONFIG_END
 
 /*
@@ -2433,8 +2426,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1002m)
 	m_maincpu->space(AS_PROGRAM).install_read_bank               ( 0x1f000000, 0x1f7fffff, "bank1" );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fb00000, 0x1fb00003, read32_delegate(FUNC(zn_state::cbaj_z80_r),this), write32_delegate(FUNC(zn_state::cbaj_z80_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fb00004, 0x1fb00007, write32_delegate(FUNC(zn_state::coh1002m_bank_w),this));
-
-	DRIVER_INIT_CALL( zn );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
@@ -3792,21 +3783,21 @@ ROM_END
 
 ROM_START( vspsx )
 	KN_BIOS
-	ROM_REGION32_LE( 0x0280000, "user2", ROMREGION_ERASE00 )
-	ROM_REGION32_LE( 0x1800000, "user3", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x0280000, "fixedroms", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( aerofgts )
 	KN_BIOS
 
-	ROM_REGION32_LE( 0x0280000, "user2", 0 )
+	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
 	ROM_LOAD( "vs.ic5",      0x0000000, 0x080000, CRC(453dd514) SHA1(189fe5598485de160f5c0add90235ed63ed92747) )
 	ROM_LOAD( "vs.ic6",      0x0080000, 0x080000, CRC(24257295) SHA1(fe6d969c407f2c26c3af2a2a5015dc83b1675e9a) )
 	ROM_LOAD( "vs.ic7",      0x0100000, 0x080000, CRC(df5ba2f7) SHA1(19153084e7cff632380b67a2fff800644a2fbf7d) )
 	ROM_LOAD( "vs.ic8",      0x0180000, 0x080000, CRC(df638f92) SHA1(5704eed2ef798a91a0398948af0324955ec38534) )
 	ROM_LOAD( "vs.ic9",      0x0200000, 0x080000, CRC(1294aa24) SHA1(07ca2cc3f117cfd48d2ca558d9435a3fc238c0fe) )
 
-	ROM_REGION32_LE( 0x1800000, "user3", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "ic11.bin",     0x0000000, 0x400000, CRC(a93f6fee) SHA1(6f079643b50833f8fb497c49945ad23326cc9170) )
 	ROM_LOAD( "ic12.bin",     0x0400000, 0x400000, CRC(9f584ef7) SHA1(12c04e198f17d1915f58e83aff45ca2e76773df8) )
 	ROM_LOAD( "ic13.bin",     0x0800000, 0x400000, CRC(652e9c78) SHA1(a929b2944de72606338acb822c1031463e2b1cc5) )
@@ -3818,14 +3809,14 @@ ROM_END
 ROM_START( sncwgltd )
 	KN_BIOS
 
-	ROM_REGION32_LE( 0x0280000, "user2", 0 )
+	ROM_REGION32_LE( 0x0280000, "fixedroms", 0 )
 	ROM_LOAD( "ic5.bin",      0x0000000, 0x080000, CRC(458f14aa) SHA1(b4e50be60ffb9b7911561dd35b6a7e0df3432a3a) )
 	ROM_LOAD( "ic6.bin",      0x0080000, 0x080000, CRC(8233dd1e) SHA1(1422b4530d671e3b8b471ec16c20ef7c819ab762) )
 	ROM_LOAD( "ic7.bin",      0x0100000, 0x080000, CRC(df5ba2f7) SHA1(19153084e7cff632380b67a2fff800644a2fbf7d) )
 	ROM_LOAD( "ic8.bin",      0x0180000, 0x080000, CRC(e8145f2b) SHA1(3a1cb189426998856dfeda47267fde64be34c6ec) )
 	ROM_LOAD( "ic9.bin",      0x0200000, 0x080000, CRC(605c9370) SHA1(9734549cae3028c089f4c9f2336ee374b3f950f8) )
 
-	ROM_REGION32_LE( 0x1800000, "user3", 0 )
+	ROM_REGION32_LE( 0x1800000, "bankedroms", 0 )
 	ROM_LOAD( "ic11.bin",     0x0000000, 0x400000, CRC(a93f6fee) SHA1(6f079643b50833f8fb497c49945ad23326cc9170) )
 	ROM_LOAD( "ic12.bin",     0x0400000, 0x400000, CRC(9f584ef7) SHA1(12c04e198f17d1915f58e83aff45ca2e76773df8) )
 	ROM_LOAD( "ic13.bin",     0x0800000, 0x400000, CRC(652e9c78) SHA1(a929b2944de72606338acb822c1031463e2b1cc5) )
@@ -4615,37 +4606,37 @@ GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capc
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, cpzn2,    0,         coh3002c, zn,   zn_state, zn, ROT0, "Capcom", "ZN2", GAME_IS_BIOS_ROOT )
+GAME( 1997, cpzn2,    0,         coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "ZN2", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Rival Schools: United By Fate (Euro 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, rvschoolu, rvschool, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, rvschoola, rvschool, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Rival Schools: United By Fate (Asia 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 (Hispanic 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 (Japan 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, plsmaswd,  cpzn2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (USA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (Asia 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, tgmj,      cpzn2,    coh3002c, zn4w, zn_state, zn, ROT0, "Arika / Capcom", "Tetris The Grand Master (Japan 980710)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, techromn,  cpzn2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Tech Romancer (Euro 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, techromnu, techromn, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Tech Romancer (USA 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, zn_state, zn, ROT0, "Capcom", "Choukou Senki Kikaioh (Japan 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2ph,   sfex2p,   coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, zn_state, zn, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   zn_state, zn, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, strider2a, strider2, coh3002c, zn,   zn_state, zn, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, shiryu2,   strider2, coh3002c, zn,   zn_state, zn, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (Euro 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, rvschoolu, rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, rvschoola, rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Rival Schools: United By Fate (Asia 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, jgakuen,   rvschool, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Shiritsu Justice Gakuen: Legion of Heroes (Japan 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2,     cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (USA 980526)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2a,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Asia 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2h,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Hispanic 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, sfex2j,    sfex2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 (Japan 980312)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, plsmaswd,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (USA 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, plsmaswda, plsmaswd, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Plasma Sword: Nightmare of Bilstein (Asia 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, stargld2,  plsmaswd, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator 2: Nightmare of Bilstein (Japan 980316)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, tgmj,      cpzn2,    coh3002c, zn4w, driver_device, 0, ROT0, "Arika / Capcom", "Tetris The Grand Master (Japan 980710)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, techromn,  cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (Euro 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, techromnu, techromn, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Tech Romancer (USA 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, driver_device, 0, ROT0, "Capcom", "Choukou Senki Kikaioh (Japan 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2ph,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, strider2a, strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Atari */
 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000w.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atpsx,    0,        coh1000w, zn, zn_state,       coh1000w, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atpsx,    0,        coh1000w, zn,       zn_state, coh1000w, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, zn_state, coh1000w, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
@@ -4688,10 +4679,10 @@ GAME( 2001, mfjump,    tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo"
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002v.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, vspsx,    0,        coh1002v, zn, zn_state, coh1002v, ROT0,   "Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, vspsx,    0,        coh1002v, zn, driver_device, 0, ROT0,   "Video System Co.", "Video System PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, aerofgts, vspsx,    coh1002v, zn, zn_state, coh1002v, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, zn_state, coh1002v, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, aerofgts, vspsx,    coh1002v, zn, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, driver_device, 0, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Taito */
 
@@ -4726,23 +4717,23 @@ GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002e.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, psarc95,  0,         coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
+GAME( 1997, psarc95,  0,         coh1002e, zn,   driver_device, 0, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, beastrzrb, beastrzr, coh1002e, zn,   zn_state, zn, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-
-/* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, zn_state, zn, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzr,  psarc95,  coh1002e, zn,   driver_device, 0, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e, zn,   driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, coh1002e, zn,   driver_device, 0, ROT0, "bootleg", "Beastorizer (USA bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 2000, brvblade,  tps,      coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladeu, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladea, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, brvbladej, brvblade, coh1002e, zn,   zn_state, zn, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2,  psarc95,  coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2u, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, coh1002e, zn6b, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+/* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
+GAME( 2000, brvblade,  tps,      coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladeu, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladea, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, brvbladej, brvblade, coh1002e, zn,   driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
 GAME( 1999, bam2,     psarc95,  bam2,     zn,    zn_state, bam2, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
@@ -4752,6 +4743,6 @@ GAME( 1999, bam2,     psarc95,  bam2,     zn,    zn_state, bam2, ROT0, "Metro / 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002l.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atluspsx,  0,       coh1001l, zn, zn_state, zn, ROT0, "Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atluspsx,  0,       coh1001l, zn, driver_device, 0, ROT0, "Atlus", "Atlus PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, zn_state, zn, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, hvnsgate, atluspsx, coh1001l, zn, driver_device, 0, ROT0, "Atlus / Racdym", "Heaven's Gate", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
