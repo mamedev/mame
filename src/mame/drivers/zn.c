@@ -2188,16 +2188,24 @@ MACHINE_RESET_MEMBER(zn_state,coh1001l)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
 }
 
+static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	//AM_RANGE(0x100000, 0x100001) ??
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM
+ADDRESS_MAP_END
+
+
 static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
-//  MCFG_CPU_ADD("audiocpu", M68000, 10000000 )
-//  MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
-//  MCFG_SOUND_ADD("ymz", YMZ280B, ymz280b_intf)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 MACHINE_CONFIG_END
 
 /*
@@ -4556,7 +4564,8 @@ ROM_END
 
 ROM_START( atluspsx )
 	ATLUS_BIOS
-	ROM_REGION32_LE( 0x02000000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x02000000, "bankedroms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x040000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( hvnsgate )
