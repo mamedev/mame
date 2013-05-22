@@ -146,6 +146,26 @@ ROM_START( j_luck2 )
 	ROM_LOAD( "lt_9.3", 0x0800, 0x000400, CRC(d6881e6f) SHA1(42a83f01d67a8f530ca2a10ffeff30237bdfba94) )
 ROM_END
 
+ROM_START( j_nuddup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ndu10_1.p1", 0x0000, 0x000400, CRC(f2210c00) SHA1(34a18028661a5ac0064b8c5c2f09d3918942be6e) )
+	ROM_LOAD( "ndu10_1.p2", 0x0400, 0x000400, CRC(69243c04) SHA1(958791fbd515ab6e2b38391527b611977303ad10) )
+	ROM_LOAD( "ndu10_1.p3", 0x0800, 0x000400, CRC(9f67e2f7) SHA1(f850655ba5d3651ff91f624431deb0e008fab57e) )
+ROM_END
+
+ROM_START( j_nuddup2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nduset1-1.bin", 0x0000, 0x000400, CRC(66445282) SHA1(8614b5330d72ed28141974e60a2238e003f4bce1) )
+	ROM_LOAD( "nduset1-2.bin", 0x0400, 0x000400, CRC(2945e808) SHA1(e306b5f9cc9f4999b9b4b8536101f2b69728f6ca) )
+	ROM_LOAD( "nduset1-3.bin", 0x0800, 0x000400, CRC(f4359851) SHA1(43c17c147a96aba901435154de657594fbec6008) )
+ROM_END
+
+ROM_START( j_unk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sruunk1.p1", 0x0000, 0x000400, CRC(be7d3b79) SHA1(3304dcc69e93eca2e6e89df0b18afc6874ebacf0) )
+	ROM_LOAD( "sruunk1.p2", 0x0400, 0x000400, CRC(bf19cd60) SHA1(77b0b439628589cb0db1b74a760b652519c20991) )
+	ROM_LOAD( "sruunk1.p3", 0x0800, 0x000400, CRC(25138e03) SHA1(644fc6144ea74f08dc892f106ad494ba364afe86) )
+ROM_END
 
 GAME(198?, j_ewnud  ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",                       GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j_ewnda  ,j_ewnud    ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",                       GAME_IS_SKELETON_MECHANICAL )
@@ -157,6 +177,12 @@ GAME(198?, j_luckac ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "<un
 GAME(198?, j_super2 ,0          ,jpmsru,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Super 2 (JPM)",                      GAME_IS_SKELETON_MECHANICAL )
 
 GAME(198?, j_luck2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "<unknown>","Lucky Twos?",                        GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j_nuddup ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 1)",                     GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j_nuddup2,j_nuddup   ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Nudge Double Up (JPM SRU, set 2)",                     GAME_IS_SKELETON_MECHANICAL )
+
+GAME(198?, j_unk	,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM?","Unknown SRU Game (JPM?)",                     GAME_IS_SKELETON_MECHANICAL )
 
 // this one is different again?
 GAME(198?, j_plus2  ,0          ,jpmsru_4,jpmsru, jpmsru_state,jpmsru,ROT0,   "JPM","Plus 2 (JPM)",                     GAME_IS_SKELETON_MECHANICAL )

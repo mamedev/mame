@@ -12056,6 +12056,9 @@ j_ewnd20
 j_ews       // Each Way Shifter
 j_ews8a
 j_luckac    // Lucky Aces
+j_nuddup    // Nudge Double Up
+j_nuddup2
+j_unk
 j_super2    // Super 2
 j_plus2     // Plus 2
 j_luck2     // Lucky Twos

@@ -18,6 +18,7 @@ MACHINE_CONFIG_EXTERN( bwboki );
 MACHINE_CONFIG_EXTERN( mod2 );
 
 INPUT_PORTS_EXTERN( mpu4 );
+INPUT_PORTS_EXTERN( mpu4_cw );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( grtecp );
@@ -1881,6 +1882,33 @@ ROM_START( m4fsxb )
 	M4FSX_EXTRAS
 ROM_END
 
+/*
+Coinworld data
+
+Error Number	Cause of alarm	      Comments
+11              1 GBP coin in         These alarms go off when a coin is jammed in the mech, or if the Mars anti-strimming alarm is activated.  
+12              50p coin in           The machine will lock up for a short amount of time, whilst sounding as alarm tone.
+13              20p coin in           Error 15 can be caused by having DIL switch 6 in the wrong position for your coin mech loom.
+14              10p coin in
+15               5p coin in
+16	            2 GBP coin in
+21              Reel 1 alarm          The faulty reel will flash. Nothing more will happen until the machine is reset
+22              Reel 2 alarm
+23	            Reel 3 alarm
+42	            Ram Cleared	          The RAM is cleared when the machine is turned on for the first time, or when the price of play is changed. The alarm 
+                                      clears after a short time
+51	           Checksum error         The machine will lock up completely if the eprom has failed, or if the security chip is missing or has failed
+54             Security chip fail
+61             Cash in meter failure  The machine will not run if the cash in, or cash out meters are not connected properly.
+62	           Cash out meter failure
+71             Datapack error	      If the machine is in protocol mode, and a datapack is not connected, then the machine alarms. It will reset after a  
+                                      time, and have another go at transmitting the data
+72	           Sound card fail	      If the sound card is missing, or the wrong sound eprom is fitted, the machine alarms on power on. The machine will then 
+                                      operate in silence.
+99	           Payout tubes empty	  If one of the tubes runs dry, the machine will attempt to compensate by paying from the other tube. If this runs dry
+                                      as well, the machine will lock up, requiring a refill before games can continue. The alarm tone is a softer, more friendly one.
+*/
+
 #define M4CCOP_EXTRAS \
 	ROM_REGION( 0x100000, "alt1msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "cash-copssnd1-de.bin", 0x000000, 0x080000, CRC(cd03f7f7) SHA1(4c09a86bcdf9a9eb224b19b932b75c9db3784fad) ) \
@@ -2634,11 +2662,11 @@ GAME(199?, m4fsx    ,  0,       mpu4crys    ,mpu4, mpu4_state, m_frkstn, ROT0,  
 GAME(199?, m4fsxa   ,  m4fsx,   mpu4crys    ,mpu4, mpu4_state, m_frkstn, ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 2)",GAME_FLAGS )
 GAME(199?, m4fsxb   ,  m4fsx,   mpu4crys    ,mpu4, mpu4_state, m_frkstn, ROT0,   "AET/Coinworld","Fun Spot X (MPU4?) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4ccop   ,  0,       mod4oki     ,mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )
-GAME(199?, m4ccopa  ,  m4ccop,  mod4oki     ,mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Cash Cops (MPU4?) (set 2)",GAME_FLAGS )
-GAME(199?, m4ccopb  ,  m4ccop,  mod4oki     ,mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Cash Cops (MPU4?) (set 3)",GAME_FLAGS )
+GAME(199?, m4ccop   ,  0,       mod4oki     ,mpu4_cw,mpu4_state, m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 1)",GAME_FLAGS )
+GAME(199?, m4ccopa  ,  m4ccop,  mod4oki     ,mpu4_cw,mpu4_state, m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 2)",GAME_FLAGS )
+GAME(199?, m4ccopb  ,  m4ccop,  mod4oki     ,mpu4_cw,mpu4_state, m4default, ROT0, "Coinworld","Cash Cops (MPU4?) (set 3)",GAME_FLAGS )
 
-GAME(199?, m4ccc    ,  0,       mod4oki     ,mpu4, mpu4_state, m4default, ROT0,   "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",GAME_FLAGS )
+GAME(199?, m4ccc    ,  0,       mod4oki     ,mpu4_cw,mpu4_state, m4default, ROT0, "Coinworld","Criss Cross Crazy (Coinworld) (MPU4?)",GAME_FLAGS )
 GAME(199?, m4treel  ,  0,       mod2        ,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 1)",GAME_FLAGS )
 GAME(199?, m4treela ,  m4treel, mod2        ,mpu4, mpu4_state, m4default, ROT0,   "<unknown>","Turbo Reels (unknown) (MPU4?) (set 2)",GAME_FLAGS )
 
