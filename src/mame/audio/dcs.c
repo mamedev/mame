@@ -1425,7 +1425,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			space.machine().root_device().membank("databank")->set_entry(DENV_DM_PG % dcs.sounddata_bank);
+			space.machine().root_device().membank("databank")->set_entry(DENV_DM_PG % dcs.sounddata_banks);
 			break;
 
 		/* offset 3 controls FIFO reset */
