@@ -183,7 +183,7 @@ public:
 private:
 	// internal helpers
 	audit_record *audit_one_rom(const rom_entry *rom);
-	audit_record *audit_one_disk(const rom_entry *rom);
+	audit_record *audit_one_disk(const rom_entry *rom, const char *locationtag = NULL);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
 	device_t *find_shared_device(device_t &device, const char *name, const hash_collection &romhashes, UINT64 romlength);
 

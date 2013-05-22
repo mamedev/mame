@@ -218,8 +218,10 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	m_validation = validation;
 
 	astring combinedpath(swinfo->shortname, ";", list_name, PATH_SEPARATOR, swinfo->shortname);
+	astring locationtag(list_name, "%", swinfo->shortname, "%");
 	if ( swinfo->parentname )
 	{
+		locationtag.cat(swinfo->parentname);
 		combinedpath.cat(";").cat(swinfo->parentname).cat(";").cat(list_name).cat(PATH_SEPARATOR).cat(swinfo->parentname);
 	}
 	m_searchpath = combinedpath;
@@ -253,7 +255,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 				// audit a disk
 				else if (ROMREGION_ISDISKDATA(region))
 				{
-					record = audit_one_disk(rom);
+					record = audit_one_disk(rom, (const char *)locationtag);
 				}
 
 				// count the number of files that are found.
@@ -476,14 +478,14 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 //  audit_one_disk - validate a single disk entry
 //-------------------------------------------------
 
-audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
+audit_record *media_auditor::audit_one_disk(const rom_entry *rom, const char *locationtag)
 {
 	// allocate and append a new record
 	audit_record &record = m_record_list.append(*global_alloc(audit_record(*rom, audit_record::MEDIA_DISK)));
 
 	// open the disk
 	chd_file source;
-	chd_error err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, NULL));
+	chd_error err = chd_error(open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, source, locationtag));
 
 	// if we succeeded, get the hashes
 	if (err == CHDERR_NONE)
