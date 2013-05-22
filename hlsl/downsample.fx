@@ -63,11 +63,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy *= float2(2.0f, 2.0f);
 	Output.Color = Input.Color;
 	float2 inversePixel = 1.0f / ScreenSize;
-	Output.TexCoord01.xy = Input.Position.xy / ScreenSize + float2(1.0f, 1.0f) / TargetSize;
-	//Output.TexCoord01.xy = Input.Position.xy / ScreenSize + float2(0.5f, 0.5f) / TargetSize;
-	//Output.TexCoord01.zw = Input.Position.xy / ScreenSize + float2(1.5f, 0.5f) / TargetSize;
-	//Output.TexCoord23.xy = Input.Position.xy / ScreenSize + float2(0.5f, 1.5f) / TargetSize;
-	//Output.TexCoord23.zw = Input.Position.xy / ScreenSize + float2(1.5f, 1.5f) / TargetSize;
+	Output.TexCoord01.xy = Input.Position.xy / ScreenSize + float2(0.5f, 0.5f) / TargetSize;
+	Output.TexCoord01.zw = Input.Position.xy / ScreenSize + float2(1.5f, 0.5f) / TargetSize;
+	Output.TexCoord23.xy = Input.Position.xy / ScreenSize + float2(0.5f, 1.5f) / TargetSize;
+	Output.TexCoord23.zw = Input.Position.xy / ScreenSize + float2(1.5f, 1.5f) / TargetSize;
 
 	return Output;
 }
@@ -79,12 +78,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 texel0 = tex2D(DiffuseSampler, Input.TexCoord01.xy);
-	//float4 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw);
-	//float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
-	//float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
-	//float4 outTexel = (texel0 + texel1 + texel2 + texel3) * BloomRescale;
-	//return float4(outTexel.rgb, 1.0f);
-	return float4(texel0.rgb, 1.0f);
+	float4 texel1 = tex2D(DiffuseSampler, Input.TexCoord01.zw);
+	float4 texel2 = tex2D(DiffuseSampler, Input.TexCoord23.xy);
+	float4 texel3 = tex2D(DiffuseSampler, Input.TexCoord23.zw);
+	float4 outTexel = (texel0 + texel1 + texel2 + texel3) * BloomRescale;
+	return float4(outTexel.rgb, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
