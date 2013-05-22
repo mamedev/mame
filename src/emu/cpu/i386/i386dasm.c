@@ -161,7 +161,7 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"sub",             MODRM,          PARAM_RM,           PARAM_REG,          0               },
 	{"sub",             MODRM,          PARAM_REG8,         PARAM_RM8,          0               },
 	{"sub",             MODRM,          PARAM_REG,          PARAM_RM,           0               },
-	{"sub",             0,              PARAM_AL,           PARAM_I8,           0               },
+	{"sub",             0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"sub",             0,              PARAM_EAX,          PARAM_IMM,          0               },
 	{"seg_cs",          SEG_CS,         0,                  0,                  0               },
 	{"das",             0,              0,                  0,                  0               },
@@ -321,15 +321,15 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	// 0xc0
 	{"groupC0",         GROUP,          0,                  0,                  0               },
 	{"groupC1",         GROUP,          0,                  0,                  0               },
-	{"ret",             0,              PARAM_I16,          0,                  0,              DASMFLAG_STEP_OUT},
+	{"ret",             0,              PARAM_UI16,         0,                  0,              DASMFLAG_STEP_OUT},
 	{"ret",             0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
 	{"les",             MODRM,          PARAM_REG,          PARAM_RM,           0               },
 	{"lds",             MODRM,          PARAM_REG,          PARAM_RM,           0               },
 	{"mov",             MODRM,          PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"mov",             MODRM,          PARAM_RMPTR,        PARAM_IMM,          0               },
-	{"enter",           0,              PARAM_I16,          PARAM_UI8,          0               },
+	{"enter",           0,              PARAM_UI16,         PARAM_UI8,          0               },
 	{"leave",           0,              0,                  0,                  0               },
-	{"retf",            0,              PARAM_I16,          0,                  0,              DASMFLAG_STEP_OUT},
+	{"retf",            0,              PARAM_UI16,         0,                  0,              DASMFLAG_STEP_OUT},
 	{"retf",            0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
 	{"int 3",           0,              0,                  0,                  0,              DASMFLAG_STEP_OVER},
 	{"int",             0,              PARAM_UI8,          0,                  0,              DASMFLAG_STEP_OVER},
@@ -340,8 +340,8 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"groupD1",         GROUP,          0,                  0,                  0               },
 	{"groupD2",         GROUP,          0,                  0,                  0               },
 	{"groupD3",         GROUP,          0,                  0,                  0               },
-	{"aam",             0,              PARAM_I8,           0,                  0               },
-	{"aad",             0,              PARAM_I8,           0,                  0               },
+	{"aam",             0,              PARAM_UI8,          0,                  0               },
+	{"aad",             0,              PARAM_UI8,          0,                  0               },
 	{"salc",            0,              0,                  0,                  0               }, //AMD docs name it
 	{"xlat",            0,              0,                  0,                  0               },
 	{"escape",          FPU,            0,                  0,                  0               },
@@ -623,7 +623,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"pshufw\0"
 		"pshufd\0"
 		"pshuflw\0"
-		"pshufhw",          MODRM|VAR_NAME4,PARAM_MMX,          PARAM_MMXM,         PARAM_I8        },
+		"pshufhw",          MODRM|VAR_NAME4,PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
 	{"group0F71",       GROUP,          0,                  0,                  0               },
 	{"group0F72",       GROUP,          0,                  0,                  0               },
 	{"group0F73",       GROUP,          0,                  0,                  0               },
@@ -690,7 +690,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"pop     fs",      0,              0,                  0,                  0               },
 	{"cpuid",           0,              0,                  0,                  0               },
 	{"bt",              MODRM,          PARAM_RM,           PARAM_REG,          0               },
-	{"shld",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_I8        },
+	{"shld",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_UI8       },
 	{"shld",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_CL        },
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -698,7 +698,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"pop     gs",      0,              0,                  0,                  0               },
 	{"rsm",             0,              0,                  0,                  0               },
 	{"bts",             MODRM,          PARAM_RM,           PARAM_REG,          0               },
-	{"shrd",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_I8        },
+	{"shrd",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_UI8       },
 	{"shrd",            MODRM,          PARAM_RM,           PARAM_REG,          PARAM_CL        },
 	{"group0FAE",       GROUP,          0,                  0,                  0               },
 	{"imul",            MODRM,          PARAM_REG,          PARAM_RM,           0               },
@@ -736,12 +736,12 @@ static const I386_OPCODE i386_opcode_table2[256] =
 		"cmpsd\0"
 		"cmpss",            MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
 	{"movnti",          MODRM,          PARAM_RM,           PARAM_REG,          0               },
-	{"pinsrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_I8        },
-	{"pextrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_I8        },
+	{"pinsrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
+	{"pextrw",          MODRM,          PARAM_MMX,          PARAM_MMXM,         PARAM_UI8       },
 	{"shufps\0"
 		"shufpd\0"
 		"???\0"
-		"???",              MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         PARAM_I8        },
+		"???",              MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         PARAM_UI8       },
 	{"group0FC7",           GROUP,          0,          0,                  0               },
 	{"bswap",           0,              PARAM_EAX,          0,                  0               },
 	{"bswap",           0,              PARAM_ECX,          0,                  0               },
@@ -1616,14 +1616,14 @@ static const I386_OPCODE i386_opcode_table0F3A[256] =
 
 static const I386_OPCODE group80_table[8] =
 {
-	{"add",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"or",              0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"adc",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"sbb",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"and",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"sub",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"xor",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"cmp",             0,              PARAM_RMPTR8,       PARAM_I8,           0               }
+	{"add",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"or",              0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"adc",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"sbb",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"and",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"sub",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"xor",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"cmp",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               }
 };
 
 static const I386_OPCODE group81_table[8] =
@@ -1652,26 +1652,26 @@ static const I386_OPCODE group83_table[8] =
 
 static const I386_OPCODE groupC0_table[8] =
 {
-	{"rol",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"ror",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"rcl",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"rcr",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"shl",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"shr",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"sal",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"sar",             0,              PARAM_RMPTR8,       PARAM_I8,           0               }
+	{"rol",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"ror",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"rcl",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"rcr",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"shl",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"shr",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"sal",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"sar",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               }
 };
 
 static const I386_OPCODE groupC1_table[8] =
 {
-	{"rol",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"ror",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"rcl",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"rcr",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"shl",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"shr",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"sal",             0,              PARAM_RMPTR,        PARAM_I8,           0               },
-	{"sar",             0,              PARAM_RMPTR,        PARAM_I8,           0               }
+	{"rol",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"ror",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"rcl",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"rcr",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"shl",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"shr",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"sal",             0,              PARAM_RMPTR,        PARAM_UI8,          0               },
+	{"sar",             0,              PARAM_RMPTR,        PARAM_UI8,          0               }
 };
 
 static const I386_OPCODE groupD0_table[8] =
@@ -1724,8 +1724,8 @@ static const I386_OPCODE groupD3_table[8] =
 
 static const I386_OPCODE groupF6_table[8] =
 {
-	{"test",            0,              PARAM_RMPTR8,       PARAM_I8,           0               },
-	{"test",            0,              PARAM_RMPTR8,       PARAM_I8,           0               },
+	{"test",            0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
+	{"test",            0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"not",             0,              PARAM_RMPTR8,       0,                  0               },
 	{"neg",             0,              PARAM_RMPTR8,       0,                  0               },
 	{"mul",             0,              PARAM_RMPTR8,       0,                  0               },
@@ -1822,11 +1822,11 @@ static const I386_OPCODE group0F71_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrlw",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psrlw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psraw",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psraw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psllw",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psllw",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               }
 };
 
@@ -1834,23 +1834,23 @@ static const I386_OPCODE group0F72_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrld",           0,              PARAM_MMX,          PARAM_I8,           0               },
-	{"psrldq",          0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psrld",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"psrldq",          0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"pslld",           0,              PARAM_MMX,          PARAM_I8,           0               },
-	{"pslldq",          0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"pslld",           0,              PARAM_MMX,          PARAM_UI8,          0               },
+	{"pslldq",          0,              PARAM_MMX,          PARAM_UI8,          0               },
 };
 
 static const I386_OPCODE group0F73_table[8] =
 {
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psrlq",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psrlq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psraq",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psraq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"psllq",           0,              PARAM_MMX,          PARAM_I8,           0               },
+	{"psllq",           0,              PARAM_MMX,          PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               }
 };
 
@@ -1873,10 +1873,10 @@ static const I386_OPCODE group0FBA_table[8] =
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"bt",              0,              PARAM_RM,           PARAM_I8,           0               },
-	{"bts",             0,              PARAM_RM,           PARAM_I8,           0               },
-	{"btr",             0,              PARAM_RM,           PARAM_I8,           0               },
-	{"btc",             0,              PARAM_RM,           PARAM_I8,           0               }
+	{"bt",              0,              PARAM_RM,           PARAM_UI8,          0               },
+	{"bts",             0,              PARAM_RM,           PARAM_UI8,          0               },
+	{"btr",             0,              PARAM_RM,           PARAM_UI8,          0               },
+	{"btc",             0,              PARAM_RM,           PARAM_UI8,          0               }
 };
 
 static const I386_OPCODE group0FC7_table[8] =
