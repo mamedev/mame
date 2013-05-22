@@ -72,19 +72,19 @@ public:
 	DECLARE_READ32_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bnk_w);
 	DECLARE_WRITE8_MEMBER(coh1002v_bnk_w);
-	DECLARE_WRITE32_MEMBER(coh1002m_bank_w);
-	DECLARE_READ32_MEMBER(cbaj_z80_r);
-	DECLARE_WRITE32_MEMBER(cbaj_z80_w);
-	DECLARE_READ8_MEMBER(cbaj_z80_latch_r);
-	DECLARE_WRITE8_MEMBER(cbaj_z80_latch_w);
-	DECLARE_READ8_MEMBER(cbaj_z80_ready_r);
+	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
+	DECLARE_READ8_MEMBER(cbaj_from_z80_latch_r);
+	DECLARE_WRITE8_MEMBER(cbaj_to_z80_latch_w);
+	DECLARE_READ8_MEMBER(cbaj_from_z80_status_r);
+	DECLARE_READ8_MEMBER(cbaj_to_z80_latch_r);
+	DECLARE_WRITE8_MEMBER(cbaj_from_z80_latch_w);
+	DECLARE_READ8_MEMBER(cbaj_to_z80_status_r);
 	DECLARE_READ32_MEMBER(jdredd_idestat_r);
 	DECLARE_READ32_MEMBER(jdredd_ide_r);
 	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
 	DECLARE_DRIVER_INIT(bam2);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
-	DECLARE_DRIVER_INIT(coh1002m);
 	DECLARE_DRIVER_INIT(coh1000a);
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_DRIVER_INIT(coh1000w);
@@ -120,8 +120,8 @@ private:
 	size_t m_nbajamex_eeprom_size;
 	UINT8 *m_nbajamex_eeprom;
 
-	int m_cbaj_to_z80;
-	int m_cbaj_to_r3k;
+	int m_cbaj_to_z80_status;
+	int m_cbaj_from_z80_status;
 	int m_latch_to_z80;
 
 	required_device<psxgpu_device> m_gpu;
@@ -2223,7 +2223,7 @@ static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f27ffff) AM_ROM AM_REGION("fixedroms", 0)
 	AM_RANGE(0x1fb00000, 0x1fbfffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1002v_bnk_w, 0x000000ff)
-	
+
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
@@ -2396,101 +2396,112 @@ Notes:
       for 11 more 32MBit smt SOP44 MASKROMs.
 */
 
-WRITE32_MEMBER(zn_state::coh1002m_bank_w)
+WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 {
 	verboselog(1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	membank( "bank1" )->set_base( memregion( "user2" )->base() + ((data>>16) * 0x800000) );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + (data * 0x800000) );
 }
 
-READ32_MEMBER(zn_state::cbaj_z80_r)
-{
-	int ready;
-
-	machine().scheduler().synchronize();
-
-	ready = m_cbaj_to_r3k;
-	m_cbaj_to_r3k &= ~2;
-	return soundlatch2_byte_r(space,0) | ready<<24;
-}
-
-WRITE32_MEMBER(zn_state::cbaj_z80_w)
-{
-	machine().scheduler().synchronize();
-
-	m_cbaj_to_z80 |= 2;
-	m_latch_to_z80 = data;
-}
-
-DRIVER_INIT_MEMBER(zn_state,coh1002m)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_bank               ( 0x1f000000, 0x1f7fffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fb00000, 0x1fb00003, read32_delegate(FUNC(zn_state::cbaj_z80_r),this), write32_delegate(FUNC(zn_state::cbaj_z80_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1fb00004, 0x1fb00007, write32_delegate(FUNC(zn_state::coh1002m_bank_w),this));
-}
+static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002m_bank_w, 0x00ff0000)
+	
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() );
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
 }
 
-READ8_MEMBER(zn_state::cbaj_z80_latch_r)
+static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1002m_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
+MACHINE_CONFIG_END
+
+READ8_MEMBER(zn_state::cbaj_from_z80_latch_r)
 {
-	m_cbaj_to_z80 &= ~2;
+	machine().scheduler().synchronize();
+
+	m_cbaj_from_z80_status &= ~2;
+	return soundlatch2_byte_r(space,0);
+}
+
+WRITE8_MEMBER(zn_state::cbaj_to_z80_latch_w)
+{
+	machine().scheduler().synchronize();
+
+	m_cbaj_to_z80_status |= 2;
+	m_latch_to_z80 = data;
+}
+
+READ8_MEMBER(zn_state::cbaj_from_z80_status_r)
+{
+	machine().scheduler().synchronize();
+
+	int ready = m_cbaj_from_z80_status;
+	m_cbaj_from_z80_status &= ~2;
+	return ready;
+}
+
+static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE8(cbaj_from_z80_latch_r, cbaj_to_z80_latch_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_from_z80_status_r, 0xff000000)
+	
+	AM_IMPORT_FROM(coh1002m_map)
+ADDRESS_MAP_END
+
+READ8_MEMBER(zn_state::cbaj_to_z80_latch_r)
+{
+	m_cbaj_to_z80_status &= ~2;
 	return m_latch_to_z80;
 }
 
-WRITE8_MEMBER(zn_state::cbaj_z80_latch_w)
+WRITE8_MEMBER(zn_state::cbaj_from_z80_latch_w)
 {
-	m_cbaj_to_r3k |= 2;
+	m_cbaj_from_z80_status |= 2;
 	soundlatch2_byte_w(space, 0, data);
 }
 
-READ8_MEMBER(zn_state::cbaj_z80_ready_r)
+READ8_MEMBER(zn_state::cbaj_to_z80_status_r)
 {
-	int ret = m_cbaj_to_z80;
-
-	m_cbaj_to_z80 &= ~2;
-
+	int ret = m_cbaj_to_z80_status;
+	m_cbaj_to_z80_status &= ~2;
 	return ret;
 }
 
 static ADDRESS_MAP_START( cbaj_z80_map, AS_PROGRAM, 8, zn_state )
-	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
-	AM_RANGE( 0x90, 0x90 ) AM_READWRITE(cbaj_z80_latch_r, cbaj_z80_latch_w )
-	AM_RANGE( 0x91, 0x91 ) AM_READ(cbaj_z80_ready_r )
+	AM_RANGE(0x84, 0x85) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(cbaj_to_z80_latch_r, cbaj_from_z80_latch_w)
+	AM_RANGE(0x91, 0x91) AM_READ(cbaj_to_z80_status_r)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1002msnd_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
-
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/8 )
-	MCFG_CPU_PROGRAM_MAP( cbaj_z80_map)
-	MCFG_CPU_IO_MAP( cbaj_z80_port_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
+	MCFG_CPU_ADD("audiocpu", Z80, 32000000/8)
+	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
+	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh1002ml, zn1_2mb_vram )
 
-	MCFG_CPU_ADD("link", Z80, 8000000 )
-	MCFG_CPU_PROGRAM_MAP( link_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m )
+static MACHINE_CONFIG_DERIVED( coh1002ml, coh1002m )
+	MCFG_CPU_ADD("link", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(link_map)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( zn )
@@ -3534,7 +3545,7 @@ ROM_END
 
 ROM_START( tps )
 	TPS_BIOS
-	ROM_REGION32_LE( 0x02800000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", ROMREGION_ERASE00 )
 ROM_END
 
 /*
@@ -3547,7 +3558,7 @@ ROM_END
 ROM_START( glpracr2 )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gallop2u.119", 0x0000001, 0x100000, CRC(9899911c) SHA1(f043fb97760c53422ad6aeb214474c0be00017ce) )
 	ROM_LOAD16_BYTE( "gallop2u.120", 0x0000000, 0x100000, CRC(fd69bd4b) SHA1(26a183bdc3b2fb3d93bd7694e429a676106f4e58) )
 	ROM_LOAD( "gra2-0.217",          0x0800000, 0x400000, CRC(a077ffa3) SHA1(73492ec2145246276bfe25b27d7de4f6393124f4) )
@@ -3563,7 +3574,7 @@ ROM_END
 ROM_START( glpracr2j )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1.119",        0x0000001, 0x100000, CRC(0fe2d2df) SHA1(031369f4e1138e2ee293c321e5ee418e560b3f06) )
 	ROM_LOAD16_BYTE( "2.120",        0x0000000, 0x100000, CRC(8e3fb1c0) SHA1(2126c1e43bee7cd938e0f2a3ea841da8811223cd) )
 	ROM_LOAD( "gra2-0.217",          0x0800000, 0x400000, CRC(a077ffa3) SHA1(73492ec2145246276bfe25b27d7de4f6393124f4) )
@@ -3579,7 +3590,7 @@ ROM_END
 ROM_START( glpracr2l )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gra2b.119",    0x0000001, 0x100000, CRC(43abee7c) SHA1(ea0afc820d8480c12c9af54057877ff11a8012fb) )
 	ROM_LOAD16_BYTE( "gra2a.120",    0x0000000, 0x100000, CRC(f60096d4) SHA1(5349d780d41a5711b483cd7eb66cd4e496b4fbe4) )
 	ROM_LOAD( "gra2-0.217",          0x0800000, 0x400000, CRC(a077ffa3) SHA1(73492ec2145246276bfe25b27d7de4f6393124f4) )
@@ -3598,7 +3609,7 @@ ROM_END
 ROM_START( cbaj )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "cbaj_1.119",   0x0000001, 0x080000, CRC(814f8b4b) SHA1(17966038a692d0701139660f25725d7c10a2a928) )
 	ROM_LOAD16_BYTE( "cbaj_2.120",   0x0000000, 0x080000, CRC(89286229) SHA1(18a84ef648ec3b79707eb42b55563adf38dffd0d) )
 	ROM_LOAD( "cb-00.216",           0x0400000, 0x400000, CRC(3db68bea) SHA1(77ab334e0c02e608b11d8fdb9505b2301f6f9afb) )
@@ -3622,7 +3633,7 @@ ROM_END
 ROM_START( shngmtkb )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "shmj-b.119",   0x0000001, 0x080000, CRC(65522c67) SHA1(b5981e5859aab742a87d6742feb9c55a3e6ba13f) )
 	ROM_LOAD16_BYTE( "shmj-a.120",   0x0000000, 0x080000, CRC(a789defa) SHA1(f8f0d1c9e3492cda652a9561ef1d549b92f73efd) )
 	ROM_LOAD( "sh-00.217",           0x0800000, 0x400000, CRC(081fed1c) SHA1(fb18add9521b8b104329871b4c1b8ae5e0254f8b) )
@@ -3634,7 +3645,7 @@ ROM_END
 ROM_START( doapp )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "doapp119.bin", 0x0000001, 0x100000, CRC(bbe04cef) SHA1(f2dae4810ca78075fc3007a6001531a455235a2e) )
 	ROM_LOAD16_BYTE( "doapp120.bin", 0x0000000, 0x100000, CRC(b614d7e6) SHA1(373756d9b88b45c677e987ee1e5cb2d5446ecfe8) )
 	ROM_LOAD( "doapp-0.216",         0x0400000, 0x400000, CRC(acc6c539) SHA1(a744567a3d75634098b1749103307981be9acbdd) )
@@ -3648,7 +3659,7 @@ ROM_END
 ROM_START( tondemo )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "u0119.bin",    0x0000001, 0x100000, CRC(5711e301) SHA1(005375d32c1eda9bd39e46326880a62506d06389) )
 	ROM_LOAD16_BYTE( "u0120.bin",    0x0000000, 0x100000, CRC(0b8312c6) SHA1(93e0e4b796cc953daf7ed2ff2f327aed07cf833a) )
 	ROM_LOAD( "tca-0.217",           0x0800000, 0x400000, CRC(ef175910) SHA1(b77aa9016804172d433d97d5fdc242a1361e941c) )
@@ -3661,7 +3672,7 @@ ROM_END
 ROM_START( glpracr3 )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "gra3u119.119", 0x0000001, 0x100000, CRC(aba69017) SHA1(670b895ee7d36bc5a00f6b0df7ce965517986617) )
 	ROM_LOAD16_BYTE( "gra3u120.120", 0x0000000, 0x100000, CRC(8aa98d99) SHA1(9dc1ba89e37a5c2955ee027e4e5aa0ae71e09f9b) )
 	ROM_LOAD( "gra3-0.216",          0x0400000, 0x400000, CRC(b405ee65) SHA1(8ba9872e4c166e3b659a2802554bf1e964f64620) )
@@ -3677,7 +3688,7 @@ ROM_END
 ROM_START( tecmowcm )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "twm-ep.119",  0x0000001, 0x100000, CRC(5f2908fb) SHA1(fc7ac1f6e81543678705e6e510dbf786b1502444) )
 	ROM_LOAD16_BYTE( "twm-ep.120",  0x0000000, 0x100000, CRC(1a0ef17a) SHA1(bb7123610d3791c08577b87c8be59a0dd2cc33f1) )
 	ROM_LOAD( "twm-0.216",          0x0400000, 0x400000, CRC(39cbc56a) SHA1(931d0d729620ef20e5c4fd521bce45cdb1742127) )
@@ -3690,7 +3701,7 @@ ROM_END
 ROM_START( flamegun )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x03400000, "user2", 0 )
+	ROM_REGION32_LE( 0x03400000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "flamegun.119",   0x0000001, 0x100000, CRC(bc8e9e29) SHA1(02e4f079f0ed864dbc056d5f64d33a0522c034fd) )
 	ROM_LOAD16_BYTE( "flamegun.120",   0x0000000, 0x100000, CRC(387f3070) SHA1(6b12765f1d3ec5f3d1cdfd961fba72a319d65ff4) )
 	ROM_LOAD( "fg00.216",              0x0400000, 0x400000, CRC(f33736ca) SHA1(7b18f9fef1df913b7ed3a2c97e9c4925790d86c5) )
@@ -3710,7 +3721,7 @@ ROM_END
 ROM_START( flamegunj )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x03400000, "user2", 0 )
+	ROM_REGION32_LE( 0x03400000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "fg_1.119",       0x0000001, 0x100000, CRC(1f2aa527) SHA1(de3a20d9aeb745fe82cd1d87bde26876e088483a) )
 	ROM_LOAD16_BYTE( "fg_2.120",       0x0000000, 0x100000, CRC(a2cd4cad) SHA1(bf542eeb6e768b3e86bacdc79ab04be394ce3e63) )
 	ROM_LOAD( "fg00.216",              0x0400000, 0x400000, CRC(f33736ca) SHA1(7b18f9fef1df913b7ed3a2c97e9c4925790d86c5) )
@@ -3730,17 +3741,17 @@ ROM_END
 ROM_START( lpadv )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0xc00000, "user2", 0 )
-		ROM_LOAD16_BYTE( "lp_3.u0119",   0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) )
-		ROM_LOAD16_BYTE( "lp_4.u0120",   0x000000, 0x100000, CRC(12fffc02) SHA1(3294b65e4a0bbf501785565dd0c1f36f9bcea969) )
-		ROM_LOAD( "rp00.u0216",   0x400000, 0x400000, CRC(d759d0d4) SHA1(47b009a5dfa81611276b1376bdab44dfad597e85) )
-		ROM_LOAD( "rp01.u0217",   0x800000, 0x400000, CRC(5be576e1) SHA1(e24a96d179016d6d65205079874b35500760a642) )
+	ROM_REGION32_LE( 0xc00000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "lp_3.u0119",   0x000001, 0x100000, CRC(18cade44) SHA1(8a44156224c77c51f4f6ca61a0168e48dfcc6eda) )
+	ROM_LOAD16_BYTE( "lp_4.u0120",   0x000000, 0x100000, CRC(12fffc02) SHA1(3294b65e4a0bbf501785565dd0c1f36f9bcea969) )
+	ROM_LOAD( "rp00.u0216",   0x400000, 0x400000, CRC(d759d0d4) SHA1(47b009a5dfa81611276b1376bdab44dfad597e85) )
+	ROM_LOAD( "rp01.u0217",   0x800000, 0x400000, CRC(5be576e1) SHA1(e24a96d179016d6d65205079874b35500760a642) )
 ROM_END
 
 ROM_START( mfjump )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "mfj-o.119",   0x0000001, 0x100000, CRC(0d724dc5) SHA1(2ba388fe6254c0cf3847fd173a414ee5ca31f4f4) )
 	ROM_LOAD16_BYTE( "mfj-e.120",   0x0000000, 0x100000, CRC(86292bca) SHA1(b6a25ab828da3d5c8f6d945336513485708f3f5b) )
 	ROM_LOAD( "mfj.216",            0x0400000, 0x400000, CRC(0d518dba) SHA1(100cd4d0a1e678e660336027f067a9a1f5cbad3e) )
@@ -3749,7 +3760,7 @@ ROM_END
 ROM_START( tblkkuzu )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "tbk.u119",   0x0000001, 0x100000, CRC(621b07e1) SHA1(30773aaa333fdee7ef55db2f8adde010688abce1) )
 	ROM_LOAD16_BYTE( "tbk.u120",   0x0000000, 0x100000, CRC(bb390f7d) SHA1(6bce88448fbb5308952f8c221e786be8aa51ceff) )
 	ROM_LOAD( "tbk.u0216",          0x0400000, 0x400000, CRC(41f8285f) SHA1(3326ab83d96d51ed31fb5c2f30630ff480d45282) )
@@ -3758,7 +3769,7 @@ ROM_END
 ROM_START( 1on1gov )
 	TPS_BIOS
 
-	ROM_REGION32_LE( 0x02800000, "user2", 0 )
+	ROM_REGION32_LE( 0x02800000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "1on1.u119",   0x0000001, 0x100000, CRC(10aecc19) SHA1(ad2fe6011551935907568cc3b4028f481034537c) )
 	ROM_LOAD16_BYTE( "1on1.u120",   0x0000000, 0x100000, CRC(eea158bd) SHA1(2b2a56fcce46557201bbbab7b170ee64549ddafe) )
 	ROM_LOAD( "ooo-0.u0217",  0x0800000, 0x400000, CRC(8b42f365) SHA1(6035a370f477f0f33894f642717fa0b012540d36) )
@@ -4656,23 +4667,23 @@ GAME( 1996, jdreddb,  jdredd,   coh1000a_ide, jdredd, zn_state, coh1000a, ROT0, 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002m.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, tps,      0,         coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "TPS", GAME_IS_BIOS_ROOT )
+GAME( 1997, tps,      0,         coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "TPS", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, glpracr2,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1997, glpracr2j, glpracr2, coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1997, glpracr2l, glpracr2, coh1002ml,zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 Link HW (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1998, doapp,     tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, cbaj,      tps,      coh1002msnd, zn, zn_state, coh1002m, ROT0, "Tecmo", "Cool Boarders Arcade Jam", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, shngmtkb,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Sunsoft / Activision", "Shanghai Matekibuyuu", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, tondemo,   tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Tondemo Crisis (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, glpracr3,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, flamegun,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Gaps Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, flamegunj, flamegun, coh1002m, zn, zn_state, coh1002m, ROT0, "Gaps Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, lpadv,     tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, tblkkuzu,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, 1on1gov,   tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "1 on 1 Government (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, tecmowcm,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2001, mfjump,    tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, glpracr2,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1997, glpracr2j, glpracr2, coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1997, glpracr2l, glpracr2, coh1002ml,   zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 2 Link HW (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, doapp,     tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Dead Or Alive ++ (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, cbaj,      tps,      coh1002msnd, zn, driver_device, 0, ROT0, "Tecmo", "Cool Boarders Arcade Jam", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, shngmtkb,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Sunsoft / Activision", "Shanghai Matekibuyuu", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, tondemo,   tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Tondemo Crisis (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, glpracr3,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Gallop Racer 3 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, flamegun,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, flamegunj, flamegun, coh1002m,    zn, driver_device, 0, ROT0, "Gaps Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, lpadv,     tps,      coh1002m,    zn, driver_device, 0, ROT0, "Amuse World", "Logic Pro Adventure (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tblkkuzu,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tamsoft / D3 Publisher", "The Block Kuzushi (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, 1on1gov,   tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "1 on 1 Government (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tecmowcm,  tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup Millennium (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2001, mfjump,    tps,      coh1002m,    zn, driver_device, 0, ROT0, "Tecmo", "Monster Farm Jump (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Video System */
 
