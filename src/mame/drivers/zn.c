@@ -74,7 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_coh1000c_w);
 	DECLARE_WRITE8_MEMBER(qsound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(zn_qsound_w);
-	DECLARE_WRITE8_MEMBER(bank_coh3002c_w);
 	DECLARE_WRITE8_MEMBER(bank_coh1000t_w);
 	DECLARE_WRITE8_MEMBER(fx1a_sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitofx1b_volume_w);
@@ -114,7 +113,6 @@ public:
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_DRIVER_INIT(coh1000w);
 	DECLARE_MACHINE_RESET(coh1000c);
-	DECLARE_MACHINE_RESET(coh3002c);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
 	DECLARE_MACHINE_RESET(coh1000w);
@@ -620,7 +618,7 @@ READ8_MEMBER(zn_state::capcom_kickharness_r)
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
 {
-	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 + ( data * 0x400000 ) );
+	membank( "bankedroms" )->set_base( memregion( "maskroms" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
 WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
@@ -639,16 +637,20 @@ WRITE8_MEMBER(zn_state::zn_qsound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("maskroms", 0)
+	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(bank_coh1000c_w, 0x000000ff)
+	AM_RANGE(0x1fb40010, 0x1fb40013) AM_READ8(capcom_kickharness_r, 0x000000ff)
+	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ8(capcom_kickharness_r, 0x000000ff)
+	AM_RANGE(0x1fb80000, 0x1fbfffff) AM_ROM AM_REGION("countryrom", 0)
+	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE8(zn_qsound_w, 0x000000ff)
+
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
+
 DRIVER_INIT_MEMBER(zn_state,coh1000c)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f3fffff, "bank1" );     /* fixed game rom */
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f400000, 0x1f7fffff, "bank2" );     /* banked game rom */
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb00000, 0x1fb00003, write8_delegate(FUNC(zn_state::bank_coh1000c_w),this), 0x000000ff); /* bankswitch */
-	m_maincpu->space(AS_PROGRAM).install_read_handler ( 0x1fb40010, 0x1fb40013, read8_delegate(FUNC(zn_state::capcom_kickharness_r),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler ( 0x1fb40020, 0x1fb40023, read8_delegate(FUNC(zn_state::capcom_kickharness_r),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1fb80000, 0x1fbfffff, "bank3" );     /* country rom */
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fb60000, 0x1fb60003, write8_delegate(FUNC(zn_state::zn_qsound_w),this), 0x000000ff);
-
 	DRIVER_INIT_CALL( zn );
 
 	if( strcmp( machine().system().name, "glpracr" ) == 0 ||
@@ -657,15 +659,13 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 		/* disable:
 		    the QSound CPU for glpracr as it doesn't have any roms &
 		    the link cpu for glprac2l as the h/w is not emulated yet. */
-		m_audiocpu->suspend(SUSPEND_REASON_DISABLE, 1 );
+		m_audiocpu->suspend(SUSPEND_REASON_DISABLE, 1);
 	}
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	membank("bank1")->set_base(memregion("user2")->base()); /* fixed game rom */
-	membank("bank2")->set_base(memregion("user2")->base()+ 0x400000 ); /* banked game rom */
-	membank("bank3")->set_base(memregion("user3")->base()); /* country rom */
+	membank("bankedroms")->set_base(memregion("maskroms")->base()+ 0x400000 ); /* banked game rom */
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -683,29 +683,33 @@ static ADDRESS_MAP_START( qsound_portmap, AS_IO, 8, zn_state )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MCFG_CPU_PROGRAM_MAP( qsound_map )
-	MCFG_CPU_IO_MAP( qsound_portmap )
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP(qsound_map)
+	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
-	MCFG_QSOUND_ADD( "qsound", QSOUND_CLOCK )
+	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MCFG_CPU_PROGRAM_MAP( qsound_map)
-	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP(qsound_map)
+	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
-	MCFG_QSOUND_ADD( "qsound", QSOUND_CLOCK )
+	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -850,38 +854,16 @@ Notes:
                        Unpopulated sockets on Rival Schools - None
 */
 
-WRITE8_MEMBER(zn_state::bank_coh3002c_w)
-{
-	membank( "bankedroms" )->set_base( memregion( "maskroms" )->base() + 0x400000 + ( data * 0x400000 ) );
-}
-
-MACHINE_RESET_MEMBER(zn_state,coh3002c)
-{
-	membank( "bankedroms" )->set_base( memregion( "maskroms" )->base() + 0x400000 ); /* banked game rom */
-}
-
-static ADDRESS_MAP_START( coh3002c_map, AS_PROGRAM, 32, zn_state )
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("maskroms", 0)
-	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(bank_coh3002c_w, 0x000000ff) /* bankswitch */
-	AM_RANGE(0x1fb40010, 0x1fb40013) AM_READ8(capcom_kickharness_r, 0x000000ff)
-	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ8(capcom_kickharness_r, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fbfffff) AM_ROM AM_REGION("countryrom", 0)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE8(zn_qsound_w, 0x000000ff)
-
-	AM_IMPORT_FROM( zn_map )
-ADDRESS_MAP_END
-
 static MACHINE_CONFIG_DERIVED(coh3002c, zn2)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(coh3002c_map)
+	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000) /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh3002c)
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2701,8 +2683,8 @@ INPUT_PORTS_END
 
 ROM_START( cpzn1 )
 	CPZN1_BIOS
-	ROM_REGION32_LE( 0x80000, "user3", ROMREGION_ERASE00 )
-	ROM_REGION32_LE( 0x2400000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x80000, "countryrom", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2710,10 +2692,10 @@ ROM_END
 ROM_START( ts2 )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "ts2u_04.2h", 0x0000000, 0x080000, CRC(ddb52e7c) SHA1(e77891abae7681d911ef6eba2e0920d81433ebe6) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "ts2-05m.3h", 0x0000000, 0x400000, CRC(7f4228e2) SHA1(3690a76d19d97e55bc7b05a8456328697cfd7a77) )
 	ROM_LOAD( "ts2-06m",    0x0400000, 0x400000, CRC(cd7e0a27) SHA1(325b5f2e653cdea07cddc9d20d12b5ab50dca949) )
 	ROM_LOAD( "ts2-08m",    0x0800000, 0x400000, CRC(b1f7f115) SHA1(3f416d2aac07aa73a99593b5a21b047da60cea6a) )
@@ -2731,10 +2713,10 @@ ROM_END
 ROM_START( ts2a )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "ts2u_04.2h", 0x0000000, 0x080000, CRC(ddb52e7c) SHA1(e77891abae7681d911ef6eba2e0920d81433ebe6) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "ts2-05m.3h", 0x0000000, 0x400000, CRC(7f4228e2) SHA1(3690a76d19d97e55bc7b05a8456328697cfd7a77) )
 	ROM_LOAD( "ts2-06m.4h", 0x0400000, 0x200000, CRC(67be6797) SHA1(521f69439ba7666f54d1008a291f3391f3a16499) )
 	ROM_LOAD( "ts2-07m.5h", 0x0600000, 0x200000, CRC(db73e2b8) SHA1(239243f44c41df765789c14cc4036bb02e2ab373) )
@@ -2754,10 +2736,10 @@ ROM_END
 ROM_START( ts2j )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "ts2j_04.2h", 0x0000000, 0x080000, CRC(4aba8c5e) SHA1(a56001bf50bfc1b03036e88ae1febd1aac8c63c0) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "ts2-05m.3h", 0x0000000, 0x400000, CRC(7f4228e2) SHA1(3690a76d19d97e55bc7b05a8456328697cfd7a77) )
 	ROM_LOAD( "ts2-06m",    0x0400000, 0x400000, CRC(cd7e0a27) SHA1(325b5f2e653cdea07cddc9d20d12b5ab50dca949) )
 	ROM_LOAD( "ts2-08m",    0x0800000, 0x400000, CRC(b1f7f115) SHA1(3f416d2aac07aa73a99593b5a21b047da60cea6a) )
@@ -2775,10 +2757,10 @@ ROM_END
 ROM_START( starglad )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "ps1u_04.2h", 0x0000000, 0x080000, CRC(121fb234) SHA1(697d18d37afd95f302b40a5a6a78d8c92a41ea73) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "ps1-05m.3h", 0x0000000, 0x400000, CRC(8ad72c4f) SHA1(c848c37eb5365000b4d4720b5c08d89ddd8e2c33) )
 	ROM_LOAD( "ps1-06m.4h", 0x0400000, 0x400000, CRC(95d8ed61) SHA1(e9f259d589dc38a8321a6fea1f5dac741cadc0ff) )
 	ROM_LOAD( "ps1-07m.5h", 0x0800000, 0x400000, CRC(c06752db) SHA1(0884b308e9cd9dde8660b422bc8fec9a362bcb52) )
@@ -2799,10 +2781,10 @@ ROM_END
 ROM_START( stargladj )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "ps1j_04.2h", 0x0000000, 0x080000, CRC(f865006d) SHA1(6abb476777a4309b1a60f12e6313c051db195808) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "ps1-05m.3h", 0x0000000, 0x400000, CRC(8ad72c4f) SHA1(c848c37eb5365000b4d4720b5c08d89ddd8e2c33) )
 	ROM_LOAD( "ps1-06m.4h", 0x0400000, 0x400000, CRC(95d8ed61) SHA1(e9f259d589dc38a8321a6fea1f5dac741cadc0ff) )
 	ROM_LOAD( "ps1-07m.5h", 0x0800000, 0x400000, CRC(c06752db) SHA1(0884b308e9cd9dde8660b422bc8fec9a362bcb52) )
@@ -2823,10 +2805,10 @@ ROM_END
 ROM_START( glpracr )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "gpaj_04.2h", 0x0000000, 0x080000, CRC(53bf551c) SHA1(320632b5010630cee4c5ccb1578d5ee6d2754632) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "gra-05m.3h", 0x0000000, 0x400000, CRC(78053700) SHA1(38727c8cc34bb57b7b7e73041e382fb0361f184e) )
 	ROM_LOAD( "gra-06m.4h", 0x0400000, 0x400000, CRC(d73b392b) SHA1(241ddf474cea035e81a2abc580d3c0395ee925bb) )
 	ROM_LOAD( "gra-07m.5h", 0x0800000, 0x400000, CRC(acaefe3a) SHA1(32d596b0f975e1558fa7929c3166d8dad40a1c80) )
@@ -2843,10 +2825,10 @@ ROM_END
 ROM_START( sfex )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfee_04a.2h", 0x0000000, 0x080000, CRC(092cfa2e) SHA1(8af38a3f4f89f661233995a672faf486e71b79bc) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfe-05m.3h", 0x0000000, 0x400000, CRC(eab781fe) SHA1(205476cb72c8dac915e140fb32243dfc5d209ba4) )
 	ROM_LOAD( "sfe-06m.4h", 0x0400000, 0x400000, CRC(999de60c) SHA1(092882698c411fc5c3bcb43105bf1886f94b8e40) )
 	ROM_LOAD( "sfe-07m.5h", 0x0800000, 0x400000, CRC(76117b0a) SHA1(027233199170fa6e5b32f28da2031638c6d3d14a) )
@@ -2867,10 +2849,10 @@ ROM_END
 ROM_START( sfexu )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfeu_04b.2h", 0x0000000, 0x080000, CRC(de02bd29) SHA1(62a88a30f73db661f5b98fc7e2d34d51acb965cc) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfe-05m.3h", 0x0000000, 0x400000, CRC(eab781fe) SHA1(205476cb72c8dac915e140fb32243dfc5d209ba4) )
 	ROM_LOAD( "sfe-06m.4h", 0x0400000, 0x400000, CRC(999de60c) SHA1(092882698c411fc5c3bcb43105bf1886f94b8e40) )
 	ROM_LOAD( "sfe-07m.5h", 0x0800000, 0x400000, CRC(76117b0a) SHA1(027233199170fa6e5b32f28da2031638c6d3d14a) )
@@ -2891,10 +2873,10 @@ ROM_END
 ROM_START( sfexa )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfea_04a.2h", 0x0000000, 0x080000, CRC(08247bd4) SHA1(07f356ef2827b3fbd0bfaf2010915315d9d60ef1) )    // could be sfea_04.2h
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfe-05m.3h", 0x0000000, 0x400000, CRC(eab781fe) SHA1(205476cb72c8dac915e140fb32243dfc5d209ba4) )
 	ROM_LOAD( "sfe-06m.4h", 0x0400000, 0x400000, CRC(999de60c) SHA1(092882698c411fc5c3bcb43105bf1886f94b8e40) )
 	ROM_LOAD( "sfe-07m.5h", 0x0800000, 0x400000, CRC(76117b0a) SHA1(027233199170fa6e5b32f28da2031638c6d3d14a) )
@@ -2915,10 +2897,10 @@ ROM_END
 ROM_START( sfexj )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfej_04.2h", 0x0000000, 0x080000, CRC(ea100607) SHA1(27ef8c619804999d32d14fcc5ec783c057b4dc73) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfe-05m.3h", 0x0000000, 0x400000, CRC(eab781fe) SHA1(205476cb72c8dac915e140fb32243dfc5d209ba4) )
 	ROM_LOAD( "sfe-06m.4h", 0x0400000, 0x400000, CRC(999de60c) SHA1(092882698c411fc5c3bcb43105bf1886f94b8e40) )
 	ROM_LOAD( "sfe-07m.5h", 0x0800000, 0x400000, CRC(76117b0a) SHA1(027233199170fa6e5b32f28da2031638c6d3d14a) )
@@ -2939,10 +2921,10 @@ ROM_END
 ROM_START( sfexp )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfpu_04a.2h", 0x0000000, 0x080000, CRC(4617adc2) SHA1(200307904349ad7e5d7d76d8c904b6b10424c7ef) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfp-05m.3h", 0x0000000, 0x400000, CRC(ac7dcc5e) SHA1(216de2de691a9bd7982d5d6b5b1e3e35ff381a2f) )
 	ROM_LOAD( "sfp-06m.4h", 0x0400000, 0x400000, CRC(1d504758) SHA1(bd56141aba35dbb5b318445ba5db12eff7442221) )
 	ROM_LOAD( "sfp-07m.5h", 0x0800000, 0x400000, CRC(0f585f30) SHA1(24ffdbc360f8eddb702905c99d315614327861a7) )
@@ -2963,10 +2945,10 @@ ROM_END
 ROM_START( sfexpu1 )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfpu_04.2h", 0x0000000, 0x080000, CRC(305e4ec0) SHA1(0df9572d7fc1bbc7131483960771d016fa5487a5) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfp-05m.3h", 0x0000000, 0x400000, CRC(ac7dcc5e) SHA1(216de2de691a9bd7982d5d6b5b1e3e35ff381a2f) )
 	ROM_LOAD( "sfp-06m.4h", 0x0400000, 0x400000, CRC(1d504758) SHA1(bd56141aba35dbb5b318445ba5db12eff7442221) )
 	ROM_LOAD( "sfp-07m.5h", 0x0800000, 0x400000, CRC(0f585f30) SHA1(24ffdbc360f8eddb702905c99d315614327861a7) )
@@ -2987,10 +2969,10 @@ ROM_END
 ROM_START( sfexpj )
 	CPZN1_BIOS
 
-	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
 	ROM_LOAD( "sfpj_04.2h", 0x0000000, 0x080000, CRC(18d043f5) SHA1(9e6e24a722d13888fbfd391ddb1a5045b162488c) )
 
-	ROM_REGION32_LE( 0x2400000, "user2", 0 )
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
 	ROM_LOAD( "sfp-05m.3h", 0x0000000, 0x400000, CRC(ac7dcc5e) SHA1(216de2de691a9bd7982d5d6b5b1e3e35ff381a2f) )
 	ROM_LOAD( "sfp-06m.4h", 0x0400000, 0x400000, CRC(1d504758) SHA1(bd56141aba35dbb5b318445ba5db12eff7442221) )
 	ROM_LOAD( "sfp-07m.5h", 0x0800000, 0x400000, CRC(0f585f30) SHA1(24ffdbc360f8eddb702905c99d315614327861a7) )
