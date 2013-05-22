@@ -459,7 +459,7 @@ WRITE8_MEMBER(k054539_device::write)
 	regs[offset] = data;
 }
 
-void k054539_device::reset_zones()
+void k054539_device::device_post_load()
 {
 	int data = regs[0x22e];
 	cur_zone = data == 0x80 ? ram : rom + 0x20000*data;
@@ -516,8 +516,6 @@ void k054539_device::device_start()
 		pantab[i] = sqrt((double)i) / sqrt((double)0xe);
 
 	init_chip();
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k054539_device::reset_zones), this));
 }
 
 void k054539_device::device_reset()
