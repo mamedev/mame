@@ -142,7 +142,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 
 	// serial interface to another device
-	MCFG_EPSON_SIO_ADD("sio")
+	MCFG_EPSON_SIO_ADD("sio", NULL)
 MACHINE_CONFIG_END
 
 machine_config_constructor epson_tf20_device::device_mconfig_additions() const
