@@ -1182,7 +1182,6 @@ $(MESSOBJ)/grundy.a:            \
 
 $(MESSOBJ)/hartung.a:           \
 	$(MESS_DRIVERS)/gmaster.o   \
-	$(MESS_AUDIO)/gmaster.o     \
 
 $(MESSOBJ)/heathkit.a:          \
 	$(MESS_DRIVERS)/et3400.o    \

@@ -5,8 +5,48 @@
 #include "emu.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/cartslot.h"
+#include "sound/speaker.h"
 #include "rendlay.h"
-#include "includes/gmaster.h"
+
+
+struct GMASTER_VIDEO
+{
+	UINT8 data[8];
+	int index;
+	int x, y;
+	/*bool*/int mode; // true read does not increase address
+	/*bool*/int delayed;
+	UINT8 pixels[8][64/*>=62 sure*/];
+};
+
+struct GMASTER_MACHINE
+{
+	UINT8 ports[5];
+};
+
+
+class gmaster_state : public driver_device
+{
+public:
+	gmaster_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+	{ }
+
+	GMASTER_VIDEO m_video;
+	GMASTER_MACHINE m_gmachine;
+	DECLARE_READ8_MEMBER(gmaster_io_r);
+	DECLARE_WRITE8_MEMBER(gmaster_io_w);
+	DECLARE_READ8_MEMBER(gmaster_port_r);
+	DECLARE_WRITE8_MEMBER(gmaster_port_w);
+	DECLARE_DRIVER_INIT(gmaster);
+	virtual void palette_init();
+	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(gmaster_interrupt);
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+};
 
 
 READ8_MEMBER(gmaster_state::gmaster_io_r)
@@ -120,7 +160,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 	{
 		case UPD7810_PORTC:
 			m_video.y = BLITTER_Y;
-			gmaster_io_callback(this, UPD7810_TO, ( data & 0x10 ) ? 1 : 0 );
+			speaker_level_w( m_speaker, ( data & 0x10 ) ? 1 : 0 );
 			break;
 	}
 }
@@ -211,11 +251,11 @@ INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 static const UPD7810_CONFIG config = {
 //  TYPE_78C10, // 78c11 in handheld
 	TYPE_7810, // temporarily until 7810 core fixes synchronized
-	gmaster_io_callback
+	NULL
 };
 
 static MACHINE_CONFIG_START( gmaster, gmaster_state )
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)  // upd78c11 in the unit
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_CPU_IO_MAP( gmaster_io)
 	MCFG_CPU_CONFIG( config )
@@ -231,7 +271,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", GMASTER, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 
 	MCFG_CARTSLOT_ADD("cart")
