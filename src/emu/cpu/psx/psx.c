@@ -73,6 +73,7 @@
 #define EXC_INT ( 0 )
 #define EXC_ADEL ( 4 )
 #define EXC_ADES ( 5 )
+#define EXC_IBE ( 6 )
 #define EXC_DBE ( 7 )
 #define EXC_SYS ( 8 )
 #define EXC_BP ( 9 )
@@ -1072,7 +1073,6 @@ void psxcpu_device::log_bioscall()
 			sprintf( buf, "unknown_%02x_%02x", address, operation );
 		}
 		logerror( "%08x: bioscall %s\n", (unsigned int)m_r[ 31 ] - 8, buf );
-		m_berr = 0;
 	}
 }
 
@@ -1576,7 +1576,6 @@ void psxcpu_device::common_exception( int exception, UINT32 romOffset, UINT32 ra
 
 	m_delayr = 0;
 	m_delayv = 0;
-	m_berr = 0;
 
 	if( m_cp0r[ CP0_SR ] & SR_BEV )
 	{
@@ -1602,6 +1601,11 @@ void psxcpu_device::breakpoint_exception()
 	fetch_next_op();
 	execute_unstoppable_instructions( 1 );
 	common_exception( EXC_BP, 0xbfc00140, 0x80000040 );
+}
+
+void psxcpu_device::fetch_bus_error_exception()
+{
+	common_exception( EXC_IBE, 0xbfc00180, 0x80000080 );
 }
 
 void psxcpu_device::load_bus_error_exception()
@@ -1942,7 +1946,6 @@ void psxcpu_device::device_reset()
 
 	m_delayr = 0;
 	m_delayv = 0;
-	m_berr = 0;
 	m_biu = 0;
 
 	m_multiplier_operation = MULTIPLIER_OPERATION_IDLE;
@@ -2274,395 +2277,326 @@ void psxcpu_device::execute_run()
 		if (LOG_BIOSCALL) log_bioscall();
 		debugger_instruction_hook( this,  m_pc );
 
+		m_berr = 0;
 		m_op = m_direct->read_decrypted_dword( m_pc );
-		switch( INS_OP( m_op ) )
+
+		if( m_berr )
 		{
-		case OP_SPECIAL:
-			switch( INS_FUNCT( m_op ) )
+			fetch_bus_error_exception();
+		}
+		else
+		{
+			switch( INS_OP( m_op ) )
 			{
-			case FUNCT_SLL:
-				load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] << INS_SHAMT( m_op ) );
-				break;
-
-			case FUNCT_SRL:
-				load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
-				break;
-
-			case FUNCT_SRA:
-				load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
-				break;
-
-			case FUNCT_SLLV:
-				load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] << ( m_r[ INS_RS( m_op ) ] & 31 ) );
-				break;
-
-			case FUNCT_SRLV:
-				load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
-				break;
-
-			case FUNCT_SRAV:
-				load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
-				break;
-
-			case FUNCT_JR:
-				branch( m_r[ INS_RS( m_op ) ] );
-				break;
-
-			case FUNCT_JALR:
-				branch( m_r[ INS_RS( m_op ) ] );
-				if( INS_RD( m_op ) != 0 )
+			case OP_SPECIAL:
+				switch( INS_FUNCT( m_op ) )
 				{
-					m_r[ INS_RD( m_op ) ] = m_pc + 4;
-				}
-				break;
-
-			case FUNCT_SYSCALL:
-				if (LOG_BIOSCALL) log_syscall();
-				exception( EXC_SYS );
-				break;
-
-			case FUNCT_BREAK:
-				exception( EXC_BP );
-				break;
-
-			case FUNCT_MFHI:
-				load( INS_RD( m_op ), get_hi() );
-				break;
-
-			case FUNCT_MTHI:
-				funct_mthi();
-				advance_pc();
-				break;
-
-			case FUNCT_MFLO:
-				load( INS_RD( m_op ), get_lo() );
-				break;
-
-			case FUNCT_MTLO:
-				funct_mtlo();
-				advance_pc();
-				break;
-
-			case FUNCT_MULT:
-				funct_mult();
-				advance_pc();
-				break;
-
-			case FUNCT_MULTU:
-				funct_multu();
-				advance_pc();
-				break;
-
-			case FUNCT_DIV:
-				funct_div();
-				advance_pc();
-				break;
-
-			case FUNCT_DIVU:
-				funct_divu();
-				advance_pc();
-				break;
-
-			case FUNCT_ADD:
-				{
-					UINT32 result = m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ];
-					if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
-					{
-						exception( EXC_OVF );
-					}
-					else
-					{
-						load( INS_RD( m_op ), result );
-					}
-				}
-				break;
-
-			case FUNCT_ADDU:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_SUB:
-				{
-					UINT32 result = m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ];
-					if( (INT32)( ( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
-					{
-						exception( EXC_OVF );
-					}
-					else
-					{
-						load( INS_RD( m_op ), result );
-					}
-				}
-				break;
-
-			case FUNCT_SUBU:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_AND:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] & m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_OR:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] | m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_XOR:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_NOR:
-				load( INS_RD( m_op ), ~( m_r[ INS_RS( m_op ) ] | m_r[ INS_RT( m_op ) ] ) );
-				break;
-
-			case FUNCT_SLT:
-				load( INS_RD( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < (INT32)m_r[ INS_RT( m_op ) ] );
-				break;
-
-			case FUNCT_SLTU:
-				load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] < m_r[ INS_RT( m_op ) ] );
-				break;
-
-			default:
-				exception( EXC_RI );
-				break;
-			}
-			break;
-
-		case OP_REGIMM:
-			switch( INS_RT_REGIMM( m_op ) )
-			{
-			case RT_BLTZ:
-				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 );
-
-				if( INS_RT( m_op ) == RT_BLTZAL )
-				{
-					m_r[ 31 ] = m_pc + 4;
-				}
-				break;
-
-			case RT_BGEZ:
-				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 );
-
-				if( INS_RT( m_op ) == RT_BGEZAL )
-				{
-					m_r[ 31 ] = m_pc + 4;
-				}
-				break;
-			}
-			break;
-
-		case OP_J:
-			unconditional_branch();
-			break;
-
-		case OP_JAL:
-			unconditional_branch();
-			m_r[ 31 ] = m_pc + 4;
-			break;
-
-		case OP_BEQ:
-			conditional_branch( m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
-			break;
-
-		case OP_BNE:
-			conditional_branch( m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
-			break;
-
-		case OP_BLEZ:
-			conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 || m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
-			break;
-
-		case OP_BGTZ:
-			conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 && m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
-			break;
-
-		case OP_ADDI:
-			{
-				UINT32 immediate = PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				UINT32 result = m_r[ INS_RS( m_op ) ] + immediate;
-				if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ immediate ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
-				{
-					exception( EXC_OVF );
-				}
-				else
-				{
-					load( INS_RT( m_op ), result );
-				}
-			}
-			break;
-
-		case OP_ADDIU:
-			load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
-			break;
-
-		case OP_SLTI:
-			load( INS_RT( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
-			break;
-
-		case OP_SLTIU:
-			load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] < (UINT32)PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
-			break;
-
-		case OP_ANDI:
-			load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] & INS_IMMEDIATE( m_op ) );
-			break;
-
-		case OP_ORI:
-			load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] | INS_IMMEDIATE( m_op ) );
-			break;
-
-		case OP_XORI:
-			load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] ^ INS_IMMEDIATE( m_op ) );
-			break;
-
-		case OP_LUI:
-			load( INS_RT( m_op ), INS_IMMEDIATE( m_op ) << 16 );
-			break;
-
-		case OP_COP0:
-			switch( INS_RS( m_op ) )
-			{
-			case RS_MFC:
-				{
-					int reg = INS_RD( m_op );
-
-					if( reg == CP0_INDEX ||
-						reg == CP0_RANDOM ||
-						reg == CP0_ENTRYLO ||
-						reg == CP0_CONTEXT ||
-						reg == CP0_ENTRYHI )
-					{
-						exception( EXC_RI );
-					}
-					else if( reg < 16 )
-					{
-						if( cop0_usable() )
-						{
-							delayed_load( INS_RT( m_op ), m_cp0r[ reg ] );
-						}
-					}
-					else
-					{
-						advance_pc();
-					}
-				}
-				break;
-
-			case RS_CFC:
-				exception( EXC_RI );
-				break;
-
-			case RS_MTC:
-				{
-					int reg = INS_RD( m_op );
-
-					if( reg == CP0_INDEX ||
-						reg == CP0_RANDOM ||
-						reg == CP0_ENTRYLO ||
-						reg == CP0_CONTEXT ||
-						reg == CP0_ENTRYHI )
-					{
-						exception( EXC_RI );
-					}
-					else if( reg < 16 )
-					{
-						if( cop0_usable() )
-						{
-							UINT32 data = ( m_cp0r[ reg ] & ~mtc0_writemask[ reg ] ) |
-								( m_r[ INS_RT( m_op ) ] & mtc0_writemask[ reg ] );
-							advance_pc();
-
-							m_cp0r[ reg ] = data;
-							update_cop0( reg );
-						}
-					}
-					else
-					{
-						advance_pc();
-					}
-				}
-				break;
-
-			case RS_CTC:
-				exception( EXC_RI );
-				break;
-
-			case RS_BC:
-			case RS_BC_ALT:
-				switch( INS_BC( m_op ) )
-				{
-				case BC_BCF:
-					bc( 0, SR_CU0, 0 );
+				case FUNCT_SLL:
+					load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] << INS_SHAMT( m_op ) );
 					break;
 
-				case BC_BCT:
-					bc( 0, SR_CU0, 1 );
+				case FUNCT_SRL:
+					load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
 					break;
-				}
-				break;
 
-			default:
-				switch( INS_CO( m_op ) )
-				{
-				case 1:
-					switch( INS_CF( m_op ) )
+				case FUNCT_SRA:
+					load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> INS_SHAMT( m_op ) );
+					break;
+
+				case FUNCT_SLLV:
+					load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] << ( m_r[ INS_RS( m_op ) ] & 31 ) );
+					break;
+
+				case FUNCT_SRLV:
+					load( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
+					break;
+
+				case FUNCT_SRAV:
+					load( INS_RD( m_op ), (INT32)m_r[ INS_RT( m_op ) ] >> ( m_r[ INS_RS( m_op ) ] & 31 ) );
+					break;
+
+				case FUNCT_JR:
+					branch( m_r[ INS_RS( m_op ) ] );
+					break;
+
+				case FUNCT_JALR:
+					branch( m_r[ INS_RS( m_op ) ] );
+					if( INS_RD( m_op ) != 0 )
 					{
-					case CF_TLBR:
-					case CF_TLBWI:
-					case CF_TLBWR:
-					case CF_TLBP:
-						exception( EXC_RI );
-						break;
-
-					case CF_RFE:
-						if( cop0_usable() )
-						{
-							advance_pc();
-							m_cp0r[ CP0_SR ] = ( m_cp0r[ CP0_SR ] & ~0xf ) | ( ( m_cp0r[ CP0_SR ] >> 2 ) & 0xf );
-							update_cop0( CP0_SR );
-						}
-						break;
-
-					default:
-						advance_pc();
-						break;
+						m_r[ INS_RD( m_op ) ] = m_pc + 4;
 					}
+					break;
+
+				case FUNCT_SYSCALL:
+					if (LOG_BIOSCALL) log_syscall();
+					exception( EXC_SYS );
+					break;
+
+				case FUNCT_BREAK:
+					exception( EXC_BP );
+					break;
+
+				case FUNCT_MFHI:
+					load( INS_RD( m_op ), get_hi() );
+					break;
+
+				case FUNCT_MTHI:
+					funct_mthi();
+					advance_pc();
+					break;
+
+				case FUNCT_MFLO:
+					load( INS_RD( m_op ), get_lo() );
+					break;
+
+				case FUNCT_MTLO:
+					funct_mtlo();
+					advance_pc();
+					break;
+
+				case FUNCT_MULT:
+					funct_mult();
+					advance_pc();
+					break;
+
+				case FUNCT_MULTU:
+					funct_multu();
+					advance_pc();
+					break;
+
+				case FUNCT_DIV:
+					funct_div();
+					advance_pc();
+					break;
+
+				case FUNCT_DIVU:
+					funct_divu();
+					advance_pc();
+					break;
+
+				case FUNCT_ADD:
+					{
+						UINT32 result = m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ];
+						if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+						{
+							exception( EXC_OVF );
+						}
+						else
+						{
+							load( INS_RD( m_op ), result );
+						}
+					}
+					break;
+
+				case FUNCT_ADDU:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] + m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_SUB:
+					{
+						UINT32 result = m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ];
+						if( (INT32)( ( m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+						{
+							exception( EXC_OVF );
+						}
+						else
+						{
+							load( INS_RD( m_op ), result );
+						}
+					}
+					break;
+
+				case FUNCT_SUBU:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] - m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_AND:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] & m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_OR:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] | m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_XOR:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] ^ m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_NOR:
+					load( INS_RD( m_op ), ~( m_r[ INS_RS( m_op ) ] | m_r[ INS_RT( m_op ) ] ) );
+					break;
+
+				case FUNCT_SLT:
+					load( INS_RD( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < (INT32)m_r[ INS_RT( m_op ) ] );
+					break;
+
+				case FUNCT_SLTU:
+					load( INS_RD( m_op ), m_r[ INS_RS( m_op ) ] < m_r[ INS_RT( m_op ) ] );
 					break;
 
 				default:
-					advance_pc();
+					exception( EXC_RI );
 					break;
 				}
 				break;
-			}
-			break;
 
-		case OP_COP1:
-			if( ( m_cp0r[ CP0_SR ] & SR_CU1 ) == 0 )
-			{
-				exception( EXC_CPU );
-			}
-			else
-			{
+			case OP_REGIMM:
+				switch( INS_RT_REGIMM( m_op ) )
+				{
+				case RT_BLTZ:
+					conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 );
+
+					if( INS_RT( m_op ) == RT_BLTZAL )
+					{
+						m_r[ 31 ] = m_pc + 4;
+					}
+					break;
+
+				case RT_BGEZ:
+					conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 );
+
+					if( INS_RT( m_op ) == RT_BGEZAL )
+					{
+						m_r[ 31 ] = m_pc + 4;
+					}
+					break;
+				}
+				break;
+
+			case OP_J:
+				unconditional_branch();
+				break;
+
+			case OP_JAL:
+				unconditional_branch();
+				m_r[ 31 ] = m_pc + 4;
+				break;
+
+			case OP_BEQ:
+				conditional_branch( m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
+				break;
+
+			case OP_BNE:
+				conditional_branch( m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
+				break;
+
+			case OP_BLEZ:
+				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] < 0 || m_r[ INS_RS( m_op ) ] == m_r[ INS_RT( m_op ) ] );
+				break;
+
+			case OP_BGTZ:
+				conditional_branch( (INT32)m_r[ INS_RS( m_op ) ] >= 0 && m_r[ INS_RS( m_op ) ] != m_r[ INS_RT( m_op ) ] );
+				break;
+
+			case OP_ADDI:
+				{
+					UINT32 immediate = PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					UINT32 result = m_r[ INS_RS( m_op ) ] + immediate;
+					if( (INT32)( ~( m_r[ INS_RS( m_op ) ] ^ immediate ) & ( m_r[ INS_RS( m_op ) ] ^ result ) ) < 0 )
+					{
+						exception( EXC_OVF );
+					}
+					else
+					{
+						load( INS_RT( m_op ), result );
+					}
+				}
+				break;
+
+			case OP_ADDIU:
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
+				break;
+
+			case OP_SLTI:
+				load( INS_RT( m_op ), (INT32)m_r[ INS_RS( m_op ) ] < PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
+				break;
+
+			case OP_SLTIU:
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] < (UINT32)PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) ) );
+				break;
+
+			case OP_ANDI:
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] & INS_IMMEDIATE( m_op ) );
+				break;
+
+			case OP_ORI:
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] | INS_IMMEDIATE( m_op ) );
+				break;
+
+			case OP_XORI:
+				load( INS_RT( m_op ), m_r[ INS_RS( m_op ) ] ^ INS_IMMEDIATE( m_op ) );
+				break;
+
+			case OP_LUI:
+				load( INS_RT( m_op ), INS_IMMEDIATE( m_op ) << 16 );
+				break;
+
+			case OP_COP0:
 				switch( INS_RS( m_op ) )
 				{
 				case RS_MFC:
-					delayed_load( INS_RT( m_op ), getcp1dr( INS_RD( m_op ) ) );
+					{
+						int reg = INS_RD( m_op );
+
+						if( reg == CP0_INDEX ||
+							reg == CP0_RANDOM ||
+							reg == CP0_ENTRYLO ||
+							reg == CP0_CONTEXT ||
+							reg == CP0_ENTRYHI )
+						{
+							exception( EXC_RI );
+						}
+						else if( reg < 16 )
+						{
+							if( cop0_usable() )
+							{
+								delayed_load( INS_RT( m_op ), m_cp0r[ reg ] );
+							}
+						}
+						else
+						{
+							advance_pc();
+						}
+					}
 					break;
 
 				case RS_CFC:
-					delayed_load( INS_RT( m_op ), getcp1cr( INS_RD( m_op ) ) );
+					exception( EXC_RI );
 					break;
 
 				case RS_MTC:
-					setcp1dr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
+					{
+						int reg = INS_RD( m_op );
+
+						if( reg == CP0_INDEX ||
+							reg == CP0_RANDOM ||
+							reg == CP0_ENTRYLO ||
+							reg == CP0_CONTEXT ||
+							reg == CP0_ENTRYHI )
+						{
+							exception( EXC_RI );
+						}
+						else if( reg < 16 )
+						{
+							if( cop0_usable() )
+							{
+								UINT32 data = ( m_cp0r[ reg ] & ~mtc0_writemask[ reg ] ) |
+									( m_r[ INS_RT( m_op ) ] & mtc0_writemask[ reg ] );
+								advance_pc();
+
+								m_cp0r[ reg ] = data;
+								update_cop0( reg );
+							}
+						}
+						else
+						{
+							advance_pc();
+						}
+					}
 					break;
 
 				case RS_CTC:
-					setcp1cr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
+					exception( EXC_RI );
 					break;
 
 				case RS_BC:
@@ -2670,59 +2604,11 @@ void psxcpu_device::execute_run()
 					switch( INS_BC( m_op ) )
 					{
 					case BC_BCF:
-						bc( 1, SR_CU1, 0 );
+						bc( 0, SR_CU0, 0 );
 						break;
 
 					case BC_BCT:
-						bc( 1, SR_CU1, 1 );
-						break;
-					}
-					break;
-
-				default:
-					advance_pc();
-					break;
-				}
-			}
-			break;
-
-		case OP_COP2:
-			if( ( m_cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
-			{
-				exception( EXC_CPU );
-			}
-			else
-			{
-				switch( INS_RS( m_op ) )
-				{
-				case RS_MFC:
-					delayed_load( INS_RT( m_op ), m_gte.getcp2dr( m_pc, INS_RD( m_op ) ) );
-					break;
-
-				case RS_CFC:
-					delayed_load( INS_RT( m_op ), m_gte.getcp2cr( m_pc, INS_RD( m_op ) ) );
-					break;
-
-				case RS_MTC:
-					m_gte.setcp2dr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
-					break;
-
-				case RS_CTC:
-					m_gte.setcp2cr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
-					break;
-
-				case RS_BC:
-				case RS_BC_ALT:
-					switch( INS_BC( m_op ) )
-					{
-					case BC_BCF:
-						bc( 2, SR_CU2, 0 );
-						break;
-
-					case BC_BCT:
-						bc( 2, SR_CU2, 1 );
+						bc( 0, SR_CU0, 1 );
 						break;
 					}
 					break;
@@ -2731,12 +2617,28 @@ void psxcpu_device::execute_run()
 					switch( INS_CO( m_op ) )
 					{
 					case 1:
-						if( !m_gte.docop2( m_pc, INS_COFUN( m_op ) ) )
+						switch( INS_CF( m_op ) )
 						{
-							stop();
-						}
+						case CF_TLBR:
+						case CF_TLBWI:
+						case CF_TLBWR:
+						case CF_TLBP:
+							exception( EXC_RI );
+							break;
 
-						advance_pc();
+						case CF_RFE:
+							if( cop0_usable() )
+							{
+								advance_pc();
+								m_cp0r[ CP0_SR ] = ( m_cp0r[ CP0_SR ] & ~0xf ) | ( ( m_cp0r[ CP0_SR ] >> 2 ) & 0xf );
+								update_cop0( CP0_SR );
+							}
+							break;
+
+						default:
+							advance_pc();
+							break;
+						}
 						break;
 
 					default:
@@ -2745,525 +2647,636 @@ void psxcpu_device::execute_run()
 					}
 					break;
 				}
-			}
-			break;
+				break;
 
-		case OP_COP3:
-			if( ( m_cp0r[ CP0_SR ] & SR_CU3 ) == 0 )
-			{
-				exception( EXC_CPU );
-			}
-			else
-			{
-				switch( INS_RS( m_op ) )
+			case OP_COP1:
+				if( ( m_cp0r[ CP0_SR ] & SR_CU1 ) == 0 )
 				{
-				case RS_MFC:
-					delayed_load( INS_RT( m_op ), getcp3dr( INS_RD( m_op ) ) );
-					break;
-
-				case RS_CFC:
-					delayed_load( INS_RT( m_op ), getcp3cr( INS_RD( m_op ) ) );
-					break;
-
-				case RS_MTC:
-					setcp3dr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
-					break;
-
-				case RS_CTC:
-					setcp3cr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
-					advance_pc();
-					break;
-
-				case RS_BC:
-				case RS_BC_ALT:
-					switch( INS_BC( m_op ) )
-					{
-					case BC_BCF:
-						bc( 3, SR_CU3, 0 );
-						break;
-
-					case BC_BCT:
-						bc( 3, SR_CU3, 1 );
-						break;
-					}
-					break;
-
-				default:
-					advance_pc();
-					break;
-				}
-			}
-			break;
-
-		case OP_LB:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
-				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
+					exception( EXC_CPU );
 				}
 				else
 				{
-					UINT32 data = PSXCPU_BYTE_EXTEND( readbyte( address ) );
+					switch( INS_RS( m_op ) )
+					{
+					case RS_MFC:
+						delayed_load( INS_RT( m_op ), getcp1dr( INS_RD( m_op ) ) );
+						break;
 
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
+					case RS_CFC:
+						delayed_load( INS_RT( m_op ), getcp1cr( INS_RD( m_op ) ) );
+						break;
+
+					case RS_MTC:
+						setcp1dr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
+						break;
+
+					case RS_CTC:
+						setcp1cr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
+						break;
+
+					case RS_BC:
+					case RS_BC_ALT:
+						switch( INS_BC( m_op ) )
+						{
+						case BC_BCF:
+							bc( 1, SR_CU1, 0 );
+							break;
+
+						case BC_BCT:
+							bc( 1, SR_CU1, 1 );
+							break;
+						}
+						break;
+
+					default:
+						advance_pc();
+						break;
 					}
 				}
-			}
-			break;
+				break;
 
-		case OP_LH:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_half_address_mask ) != 0 )
+			case OP_COP2:
+				if( ( m_cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
 				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
+					exception( EXC_CPU );
 				}
 				else
 				{
-					UINT32 data = PSXCPU_WORD_EXTEND( readhalf( address ) );
+					switch( INS_RS( m_op ) )
+					{
+					case RS_MFC:
+						delayed_load( INS_RT( m_op ), m_gte.getcp2dr( m_pc, INS_RD( m_op ) ) );
+						break;
 
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
+					case RS_CFC:
+						delayed_load( INS_RT( m_op ), m_gte.getcp2cr( m_pc, INS_RD( m_op ) ) );
+						break;
+
+					case RS_MTC:
+						m_gte.setcp2dr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
+						break;
+
+					case RS_CTC:
+						m_gte.setcp2cr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
+						break;
+
+					case RS_BC:
+					case RS_BC_ALT:
+						switch( INS_BC( m_op ) )
+						{
+						case BC_BCF:
+							bc( 2, SR_CU2, 0 );
+							break;
+
+						case BC_BCT:
+							bc( 2, SR_CU2, 1 );
+							break;
+						}
+						break;
+
+					default:
+						switch( INS_CO( m_op ) )
+						{
+						case 1:
+							if( !m_gte.docop2( m_pc, INS_COFUN( m_op ) ) )
+							{
+								stop();
+							}
+
+							advance_pc();
+							break;
+
+						default:
+							advance_pc();
+							break;
+						}
+						break;
 					}
 				}
-			}
-			break;
+				break;
 
-		case OP_LWL:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int load_type = address & 3;
-				int breakpoint;
-
-				address &= ~3;
-				breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
+			case OP_COP3:
+				if( ( m_cp0r[ CP0_SR ] & SR_CU3 ) == 0 )
 				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
+					exception( EXC_CPU );
 				}
 				else
 				{
-					UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
-
-					switch( load_type )
+					switch( INS_RS( m_op ) )
 					{
-					case 0:
-						data = ( data & 0x00ffffff ) | ( readword_masked( address, 0x000000ff ) << 24 );
+					case RS_MFC:
+						delayed_load( INS_RT( m_op ), getcp3dr( INS_RD( m_op ) ) );
 						break;
 
-					case 1:
-						data = ( data & 0x0000ffff ) | ( readword_masked( address, 0x0000ffff ) << 16 );
+					case RS_CFC:
+						delayed_load( INS_RT( m_op ), getcp3cr( INS_RD( m_op ) ) );
 						break;
 
-					case 2:
-						data = ( data & 0x000000ff ) | ( readword_masked( address, 0x00ffffff ) << 8 );
+					case RS_MTC:
+						setcp3dr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
 						break;
 
-					case 3:
-						data = readword( address );
-						break;
-					}
-
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
-					}
-				}
-			}
-			break;
-
-		case OP_LW:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_word_address_mask ) != 0 )
-				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
-				}
-				else
-				{
-					UINT32 data = readword( address );
-
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
-					}
-				}
-			}
-			break;
-
-		case OP_LBU:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
-				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
-				}
-				else
-				{
-					UINT32 data = readbyte( address );
-
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
-					}
-				}
-			}
-			break;
-
-		case OP_LHU:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_half_address_mask ) != 0 )
-				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
-				}
-				else
-				{
-					UINT32 data = readhalf( address );
-
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
-					}
-				}
-			}
-			break;
-
-		case OP_LWR:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = load_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
-				{
-					load_bad_address( address );
-				}
-				else if( breakpoint )
-				{
-					breakpoint_exception();
-				}
-				else
-				{
-					UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
-
-					switch( address & 3 )
-					{
-					case 0:
-						data = readword( address );
+					case RS_CTC:
+						setcp3cr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+						advance_pc();
 						break;
 
-					case 1:
-						data = ( data & 0xff000000 ) | ( readword_masked( address, 0xffffff00 ) >> 8 );
+					case RS_BC:
+					case RS_BC_ALT:
+						switch( INS_BC( m_op ) )
+						{
+						case BC_BCF:
+							bc( 3, SR_CU3, 0 );
+							break;
+
+						case BC_BCT:
+							bc( 3, SR_CU3, 1 );
+							break;
+						}
 						break;
 
-					case 2:
-						data = ( data & 0xffff0000 ) | ( readword_masked( address, 0xffff0000 ) >> 16 );
+					default:
+						advance_pc();
 						break;
-
-					case 3:
-						data = ( data & 0xffffff00 ) | ( readword_masked( address, 0xff000000 ) >> 24 );
-						break;
-					}
-
-					if( m_berr )
-					{
-						load_bus_error_exception();
-					}
-					else
-					{
-						delayed_load( INS_RT( m_op ), data );
 					}
 				}
-			}
-			break;
+				break;
 
-		case OP_SB:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = store_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
+			case OP_LB:
 				{
-					store_bad_address( address );
-				}
-				else
-				{
-					int shift = 8 * ( address & 3 );
-					writeword_masked( address, m_r[ INS_RT( m_op ) ] << shift, 0xff << shift );
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
 
-					if( breakpoint )
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
 					{
 						breakpoint_exception();
 					}
-					else if( m_berr )
-					{
-						store_bus_error_exception();
-					}
 					else
 					{
-						advance_pc();
+						UINT32 data = PSXCPU_BYTE_EXTEND( readbyte( address ) );
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
 					}
 				}
-			}
-			break;
+				break;
 
-		case OP_SH:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = store_data_address_breakpoint( address );
-
-				if( ( address & m_bad_half_address_mask ) != 0 )
+			case OP_LH:
 				{
-					store_bad_address( address );
-				}
-				else
-				{
-					int shift = 8 * ( address & 2 );
-					writeword_masked( address, m_r[ INS_RT( m_op ) ] << shift, 0xffff << shift );
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
 
-					if( breakpoint )
+					if( ( address & m_bad_half_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
 					{
 						breakpoint_exception();
 					}
-					else if( m_berr )
+					else
 					{
-						store_bus_error_exception();
+						UINT32 data = PSXCPU_WORD_EXTEND( readhalf( address ) );
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
+					}
+				}
+				break;
+
+			case OP_LWL:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int load_type = address & 3;
+					int breakpoint;
+
+					address &= ~3;
+					breakpoint = load_data_address_breakpoint( address );
+
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
+					{
+						breakpoint_exception();
 					}
 					else
 					{
-						advance_pc();
+						UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
+
+						switch( load_type )
+						{
+						case 0:
+							data = ( data & 0x00ffffff ) | ( readword_masked( address, 0x000000ff ) << 24 );
+							break;
+
+						case 1:
+							data = ( data & 0x0000ffff ) | ( readword_masked( address, 0x0000ffff ) << 16 );
+							break;
+
+						case 2:
+							data = ( data & 0x000000ff ) | ( readword_masked( address, 0x00ffffff ) << 8 );
+							break;
+
+						case 3:
+							data = readword( address );
+							break;
+						}
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
 					}
 				}
-			}
-			break;
+				break;
 
-		case OP_SWL:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int save_type = address & 3;
-				int breakpoint;
-
-				address &= ~3;
-				breakpoint = store_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
+			case OP_LW:
 				{
-					store_bad_address( address );
-				}
-				else
-				{
-					switch( save_type )
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
+
+					if( ( address & m_bad_word_address_mask ) != 0 )
 					{
-					case 0:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 24, 0x000000ff );
-						break;
+						load_bad_address( address );
+					}
+					else if( breakpoint )
+					{
+						breakpoint_exception();
+					}
+					else
+					{
+						UINT32 data = readword( address );
 
-					case 1:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 16, 0x0000ffff );
-						break;
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
+					}
+				}
+				break;
 
-					case 2:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 8, 0x00ffffff );
-						break;
+			case OP_LBU:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
 
-					case 3:
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
+					{
+						breakpoint_exception();
+					}
+					else
+					{
+						UINT32 data = readbyte( address );
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
+					}
+				}
+				break;
+
+			case OP_LHU:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
+
+					if( ( address & m_bad_half_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
+					{
+						breakpoint_exception();
+					}
+					else
+					{
+						UINT32 data = readhalf( address );
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
+					}
+				}
+				break;
+
+			case OP_LWR:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = load_data_address_breakpoint( address );
+
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						load_bad_address( address );
+					}
+					else if( breakpoint )
+					{
+						breakpoint_exception();
+					}
+					else
+					{
+						UINT32 data = get_register_from_pipeline( INS_RT( m_op ) );
+
+						switch( address & 3 )
+						{
+						case 0:
+							data = readword( address );
+							break;
+
+						case 1:
+							data = ( data & 0xff000000 ) | ( readword_masked( address, 0xffffff00 ) >> 8 );
+							break;
+
+						case 2:
+							data = ( data & 0xffff0000 ) | ( readword_masked( address, 0xffff0000 ) >> 16 );
+							break;
+
+						case 3:
+							data = ( data & 0xffffff00 ) | ( readword_masked( address, 0xff000000 ) >> 24 );
+							break;
+						}
+
+						if( m_berr )
+						{
+							load_bus_error_exception();
+						}
+						else
+						{
+							delayed_load( INS_RT( m_op ), data );
+						}
+					}
+				}
+				break;
+
+			case OP_SB:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = store_data_address_breakpoint( address );
+
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						store_bad_address( address );
+					}
+					else
+					{
+						int shift = 8 * ( address & 3 );
+						writeword_masked( address, m_r[ INS_RT( m_op ) ] << shift, 0xff << shift );
+
+						if( breakpoint )
+						{
+							breakpoint_exception();
+						}
+						else if( m_berr )
+						{
+							store_bus_error_exception();
+						}
+						else
+						{
+							advance_pc();
+						}
+					}
+				}
+				break;
+
+			case OP_SH:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = store_data_address_breakpoint( address );
+
+					if( ( address & m_bad_half_address_mask ) != 0 )
+					{
+						store_bad_address( address );
+					}
+					else
+					{
+						int shift = 8 * ( address & 2 );
+						writeword_masked( address, m_r[ INS_RT( m_op ) ] << shift, 0xffff << shift );
+
+						if( breakpoint )
+						{
+							breakpoint_exception();
+						}
+						else if( m_berr )
+						{
+							store_bus_error_exception();
+						}
+						else
+						{
+							advance_pc();
+						}
+					}
+				}
+				break;
+
+			case OP_SWL:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int save_type = address & 3;
+					int breakpoint;
+
+					address &= ~3;
+					breakpoint = store_data_address_breakpoint( address );
+
+					if( ( address & m_bad_byte_address_mask ) != 0 )
+					{
+						store_bad_address( address );
+					}
+					else
+					{
+						switch( save_type )
+						{
+						case 0:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 24, 0x000000ff );
+							break;
+
+						case 1:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 16, 0x0000ffff );
+							break;
+
+						case 2:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] >> 8, 0x00ffffff );
+							break;
+
+						case 3:
+							writeword( address, m_r[ INS_RT( m_op ) ] );
+							break;
+						}
+
+						if( breakpoint )
+						{
+							breakpoint_exception();
+						}
+						else if( m_berr )
+						{
+							store_bus_error_exception();
+						}
+						else
+						{
+							advance_pc();
+						}
+					}
+				}
+				break;
+
+			case OP_SW:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = store_data_address_breakpoint( address );
+
+					if( ( address & m_bad_word_address_mask ) != 0 )
+					{
+						store_bad_address( address );
+					}
+					else
+					{
 						writeword( address, m_r[ INS_RT( m_op ) ] );
-						break;
-					}
 
-					if( breakpoint )
-					{
-						breakpoint_exception();
+						if( breakpoint )
+						{
+							breakpoint_exception();
+						}
+						else if( m_berr )
+						{
+							store_bus_error_exception();
+						}
+						else
+						{
+							advance_pc();
+						}
 					}
-					else if( m_berr )
+				}
+				break;
+
+			case OP_SWR:
+				{
+					UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
+					int breakpoint = store_data_address_breakpoint( address );
+
+					if( ( address & m_bad_byte_address_mask ) != 0 )
 					{
-						store_bus_error_exception();
+						store_bad_address( address );
 					}
 					else
 					{
-						advance_pc();
+						switch( address & 3 )
+						{
+						case 0:
+							writeword( address, m_r[ INS_RT( m_op ) ] );
+							break;
+
+						case 1:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] << 8, 0xffffff00 );
+							break;
+
+						case 2:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] << 16, 0xffff0000 );
+							break;
+
+						case 3:
+							writeword_masked( address, m_r[ INS_RT( m_op ) ] << 24, 0xff000000 );
+							break;
+						}
+
+						if( breakpoint )
+						{
+							breakpoint_exception();
+						}
+						else if( m_berr )
+						{
+							store_bus_error_exception();
+						}
+						else
+						{
+							advance_pc();
+						}
 					}
 				}
+				break;
+
+			case OP_LWC0:
+				lwc( 0, SR_CU0 );
+				break;
+
+			case OP_LWC1:
+				lwc( 1, SR_CU1 );
+				break;
+
+			case OP_LWC2:
+				lwc( 2, SR_CU2 );
+				break;
+
+			case OP_LWC3:
+				lwc( 3, SR_CU3 );
+				break;
+
+			case OP_SWC0:
+				swc( 0, SR_CU0 );
+				break;
+
+			case OP_SWC1:
+				swc( 1, SR_CU1 );
+				break;
+
+			case OP_SWC2:
+				swc( 2, SR_CU2 );
+				break;
+
+			case OP_SWC3:
+				swc( 3, SR_CU3 );
+				break;
+
+			default:
+				logerror( "%08x: unknown opcode %08x\n", m_pc, m_op );
+				stop();
+				exception( EXC_RI );
+				break;
 			}
-			break;
-
-		case OP_SW:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = store_data_address_breakpoint( address );
-
-				if( ( address & m_bad_word_address_mask ) != 0 )
-				{
-					store_bad_address( address );
-				}
-				else
-				{
-					writeword( address, m_r[ INS_RT( m_op ) ] );
-
-					if( breakpoint )
-					{
-						breakpoint_exception();
-					}
-					else if( m_berr )
-					{
-						store_bus_error_exception();
-					}
-					else
-					{
-						advance_pc();
-					}
-				}
-			}
-			break;
-
-		case OP_SWR:
-			{
-				UINT32 address = m_r[ INS_RS( m_op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( m_op ) );
-				int breakpoint = store_data_address_breakpoint( address );
-
-				if( ( address & m_bad_byte_address_mask ) != 0 )
-				{
-					store_bad_address( address );
-				}
-				else
-				{
-					switch( address & 3 )
-					{
-					case 0:
-						writeword( address, m_r[ INS_RT( m_op ) ] );
-						break;
-
-					case 1:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] << 8, 0xffffff00 );
-						break;
-
-					case 2:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] << 16, 0xffff0000 );
-						break;
-
-					case 3:
-						writeword_masked( address, m_r[ INS_RT( m_op ) ] << 24, 0xff000000 );
-						break;
-					}
-
-					if( breakpoint )
-					{
-						breakpoint_exception();
-					}
-					else if( m_berr )
-					{
-						store_bus_error_exception();
-					}
-					else
-					{
-						advance_pc();
-					}
-				}
-			}
-			break;
-
-		case OP_LWC0:
-			lwc( 0, SR_CU0 );
-			break;
-
-		case OP_LWC1:
-			lwc( 1, SR_CU1 );
-			break;
-
-		case OP_LWC2:
-			lwc( 2, SR_CU2 );
-			break;
-
-		case OP_LWC3:
-			lwc( 3, SR_CU3 );
-			break;
-
-		case OP_SWC0:
-			swc( 0, SR_CU0 );
-			break;
-
-		case OP_SWC1:
-			swc( 1, SR_CU1 );
-			break;
-
-		case OP_SWC2:
-			swc( 2, SR_CU2 );
-			break;
-
-		case OP_SWC3:
-			swc( 3, SR_CU3 );
-			break;
-
-		default:
-			logerror( "%08x: unknown opcode %08x\n", m_pc, m_op );
-			stop();
-			exception( EXC_RI );
-			break;
 		}
+
 		m_icount--;
 	} while( m_icount > 0 );
 }

@@ -297,6 +297,7 @@ protected:
 	void common_exception( int exception, UINT32 romOffset, UINT32 ramOffset );
 	void exception( int exception );
 	void breakpoint_exception();
+	void fetch_bus_error_exception();
 	void load_bus_error_exception();
 	void store_bus_error_exception();
 	void load_bad_address( UINT32 address );
