@@ -675,11 +675,10 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	m_backtab_row = 0;
 	UINT8 row;
 	m_maincpu->adjust_icount(-(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(STIC_VBLANK_END), timer_expired_delegate(FUNC(intv_state::intv_interrupt_complete),this));
+	timer_set(m_maincpu->cycles_to_attotime(STIC_VBLANK_END), TIMER_INTV_INTERRUPT_COMPLETE);
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
-		machine().scheduler().timer_set(m_maincpu
-			->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), timer_expired_delegate(FUNC(intv_state::intv_btb_fill),this));
+		timer_set(m_maincpu->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), TIMER_INTV_BTB_FILL);
 	}
 
 	if (m_row_delay == 0)

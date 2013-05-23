@@ -123,6 +123,12 @@ struct cass_data_t {
 class sol20_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SOL20_CASSETTE_TC,
+		TIMER_SOL20_BOOT
+	};
+
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -181,11 +187,15 @@ private:
 	emu_timer *m_cassette_timer;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+
 public:
 	DECLARE_DRIVER_INIT(sol20);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
 	cassette_image_device *cassette_device_image();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -198,6 +208,22 @@ cassette_image_device *sol20_state::cassette_device_image()
 		return m_cassette2;
 	else
 		return m_cassette1;
+}
+
+
+void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_SOL20_CASSETTE_TC:
+		sol20_cassette_tc(ptr, param);
+		break;
+	case TIMER_SOL20_BOOT:
+		sol20_boot(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sol20_state::device_timer");
+	}
 }
 
 
@@ -549,7 +575,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_boot)
 
 void sol20_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sol20_state::sol20_cassette_tc),this));
+	m_cassette_timer = timer_alloc(TIMER_SOL20_CASSETTE_TC);
 }
 
 void sol20_state::machine_reset()
@@ -601,7 +627,7 @@ void sol20_state::machine_reset()
 
 	// boot-bank
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(9), timer_expired_delegate(FUNC(sol20_state::sol20_boot),this));
+	timer_set(attotime::from_usec(9), TIMER_SOL20_BOOT);
 }
 
 DRIVER_INIT_MEMBER(sol20_state,sol20)

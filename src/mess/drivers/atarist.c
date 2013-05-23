@@ -40,6 +40,32 @@ static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 
 //**************************************************************************
+//  TIMERS
+//**************************************************************************
+
+void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_MOUSE_TICK:
+		mouse_tick();
+		break;
+	case TIMER_SHIFTER_TICK:
+		shifter_tick();
+		break;
+	case TIMER_GLUE_TICK:
+		glue_tick();
+		break;
+	case TIMER_BLITTER_TICK:
+		blitter_tick();
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in st_state::device_timer");
+	}
+}
+
+
+//**************************************************************************
 //  FLOPPY
 //**************************************************************************
 
@@ -474,16 +500,6 @@ void st_state::mouse_tick()
 
 
 //-------------------------------------------------
-//  TIMER_CALLBACK_MEMBER( st_mouse_tick )
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(st_state::st_mouse_tick)
-{
-	mouse_tick();
-}
-
-
-//-------------------------------------------------
 //  ikbd_port1_r -
 //-------------------------------------------------
 
@@ -768,13 +784,19 @@ void ste_state::dmasound_tick()
 }
 
 
-//-------------------------------------------------
-//  TIMER_CALLBACK_MEMBER( atariste_dmasound_tick )
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(ste_state::atariste_dmasound_tick)
+void ste_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	dmasound_tick();
+	switch (id)
+	{
+	case TIMER_DMASOUND_TICK:
+		dmasound_tick();
+		break;
+	case TIMER_MICROWIRE_TICK:
+		microwire_tick();
+		break;
+	default:
+		st_state::device_timer(timer, id, param, ptr);
+	}
 }
 
 
@@ -1014,16 +1036,6 @@ void ste_state::microwire_tick()
 		m_microwire_timer->enable(0);
 		break;
 	}
-}
-
-
-//-------------------------------------------------
-//  TIMER_CALLBACK_MEMBER( atariste_microwire_tick )
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(ste_state::atariste_microwire_tick)
-{
-	microwire_tick();
 }
 
 
@@ -2274,7 +2286,7 @@ void st_state::machine_start()
 
 	// allocate timers
 	if(m_mousex) {
-		m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::st_mouse_tick),this));
+		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
 		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
 	}
 
@@ -2332,8 +2344,8 @@ void ste_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
 
 	/* allocate timers */
-	m_dmasound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::atariste_dmasound_tick),this));
-	m_microwire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::atariste_microwire_tick),this));
+	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
+	m_microwire_timer = timer_alloc(TIMER_MICROWIRE_TICK);
 
 	/* register for state saving */
 	state_save();

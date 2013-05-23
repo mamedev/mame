@@ -281,7 +281,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 		// end of HBlank period clears GPIP6 also?
 		end_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend);
 		m_raster_irq->adjust(irq_time, scan);
-		machine().scheduler().timer_set(end_time, timer_expired_delegate(FUNC(x68k_state::x68k_crtc_raster_end),this));
+		timer_set(end_time, TIMER_X68K_CRTC_RASTER_END);
 		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine().primary_screen->vpos());
 	}
 }
@@ -440,7 +440,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy((m_crtc.reg[22] & 0xff00) >> 8,(m_crtc.reg[22] & 0x00ff));
-			machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),this), 0x02);  // time taken to do operation is a complete guess.
+			timer_set(attotime::from_msec(1), TIMER_X68K_CRTC_OPERATION_END, 0x02);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
@@ -448,7 +448,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 				memset(m_gvram32,0,0x40000);
 			else
 				memset(m_gvram16,0,0x40000);
-			machine().scheduler().timer_set(attotime::from_msec(10), timer_expired_delegate(FUNC(x68k_state::x68k_crtc_operation_end),this), 0x02);  // time taken to do operation is a complete guess.
+			timer_set(attotime::from_msec(10), TIMER_X68K_CRTC_OPERATION_END, 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
 	}

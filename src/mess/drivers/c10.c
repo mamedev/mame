@@ -17,6 +17,11 @@
 class c10_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RESET
+	};
+
 	c10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -29,7 +34,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(c10);
-	TIMER_CALLBACK_MEMBER(c10_reset);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -51,16 +58,23 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( c10 )
 INPUT_PORTS_END
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(c10_state::c10_reset)
+void c10_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	membank("boot")->set_entry(0);
+	switch (id)
+	{
+	case TIMER_RESET:
+		/* after the first 4 bytes have been read from ROM, switch the ram back in */
+		membank("boot")->set_entry(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in c10_state::device_timer");
+	}
 }
 
 void c10_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(c10_state::c10_reset),this));
+	timer_set(attotime::from_usec(4), TIMER_RESET);
 }
 
 void c10_state::video_start()

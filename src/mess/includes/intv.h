@@ -33,6 +33,13 @@ struct intv_sprite_type
 class intv_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTV_INTERRUPT2_COMPLETE,
+		TIMER_INTV_INTERRUPT_COMPLETE,
+		TIMER_INTV_BTB_FILL
+	};
+
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -264,6 +271,7 @@ protected:
 	void intv_stic_screenrefresh();
 	void draw_background(bitmap_ind16 &bitmap, int transparency);
 	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* INTV_H_ */

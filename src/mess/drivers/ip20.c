@@ -46,6 +46,11 @@ struct RTC_t
 class ip20_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RTC
+	};
+
 	ip20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_wd33c93(*this, "scsi:wd33c93"),
@@ -65,12 +70,15 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_ip204415(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ip20_timer);
+	TIMER_CALLBACK_MEMBER(ip20_timer_rtc);
 	required_device<wd33c93_device> m_wd33c93;
 	required_device<scc8530_t> m_scc;
 	required_device<eeprom_device> m_eeprom;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -493,7 +501,19 @@ DRIVER_INIT_MEMBER(ip20_state,ip204415)
 {
 }
 
-TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer)
+void ip20_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_RTC:
+		ip20_timer_rtc(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in ip20_state::device_timer");
+	}
+}
+
+TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer_rtc)
 {
 	ip20_state *state = machine().driver_data<ip20_state>();
 
@@ -549,7 +569,7 @@ TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer)
 		}
 	}
 
-	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip20_state::ip20_timer),this));
+	timer_set(attotime::from_msec(1), TIMER_RTC);
 }
 
 void ip20_state::machine_start()
@@ -565,7 +585,7 @@ void ip20_state::machine_start()
 
 	m_RTC.nTemp = 0;
 
-	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip20_state::ip20_timer),this));
+	timer_set(attotime::from_msec(1), TIMER_RTC);
 }
 
 static INPUT_PORTS_START( ip204415 )

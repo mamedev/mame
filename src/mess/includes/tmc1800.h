@@ -48,6 +48,11 @@ public:
 class tmc1800_state : public tmc1800_base_state
 {
 public:
+	enum
+	{
+		TIMER_SETUP_BEEP
+	};
+
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag),
 			m_vdc(*this, CDP1861_TAG)
@@ -69,7 +74,9 @@ public:
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
 	DECLARE_DRIVER_INIT(tmc1800);
-	TIMER_CALLBACK_MEMBER(setup_beep);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class osc1000b_state : public tmc1800_base_state

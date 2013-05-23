@@ -626,7 +626,7 @@ void fm7_state::fm77av_line_draw()
 
 	// set timer to disable busy flag
 	// 1/16 us for each byte changed
-	machine().scheduler().timer_set(attotime::from_usec(byte_count/16), timer_expired_delegate(FUNC(fm7_state::fm77av_alu_task_end),this));
+	timer_set(attotime::from_usec(byte_count/16), TIMER_FM77AV_ALU_TASK_END);
 }
 
 READ8_MEMBER(fm7_state::fm7_vram_r)

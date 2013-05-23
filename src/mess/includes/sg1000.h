@@ -49,6 +49,11 @@ extern const cassette_interface sc3000_cassette_interface;
 class sg1000_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_LIGHTGUN_TICK
+	};
+
 	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
@@ -79,6 +84,9 @@ public:
 	UINT8 m_tvdraw_data;
 	TIMER_CALLBACK_MEMBER(lightgun_tick);
 	DECLARE_WRITE_LINE_MEMBER(sg1000_vdp_interrupt);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class sc3000_state : public sg1000_state

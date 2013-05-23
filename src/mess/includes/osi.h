@@ -28,6 +28,11 @@
 class sb2m600_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SETUP_BEEP
+	};
+
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, M6502_TAG),
@@ -68,7 +73,6 @@ public:
 
 	/* floppy state */
 	int m_fdc_index;
-	TIMER_CALLBACK_MEMBER(setup_beep);
 	DECLARE_WRITE_LINE_MEMBER(osi470_index_callback);
 
 	required_device<cpu_device> m_maincpu;
@@ -88,6 +92,9 @@ public:
 	required_ioport m_io_sound;
 	required_ioport m_io_reset;
 	optional_device<beep_device> m_beeper;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class c1p_state : public sb2m600_state

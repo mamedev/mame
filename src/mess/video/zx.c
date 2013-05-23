@@ -25,6 +25,25 @@ int ula_frame_vsync = 0;
 //int ula_scancode_count = 0;
 int ula_scanline_count = 0;
 
+void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_TAPE_PULSE:
+		zx_tape_pulse(ptr, param);
+		break;
+	case TIMER_ULA_NMI:
+		zx_ula_nmi(ptr, param);
+		break;
+	case TIMER_ULA_IRQ:
+		zx_ula_irq(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in zx_state::device_timer");
+	}
+}
+
+
 /*
  * Toggle the video output between black and white.
  * This happens whenever the ULA scanline IRQs are enabled/disabled.
@@ -158,7 +177,7 @@ void zx_state::zx_ula_r(int offs, memory_region *region, const UINT8 param)
 		for (y = m_charline_ptr; y < ARRAY_LENGTH(m_charline); y++)
 			m_charline[y] = 0;
 
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(((32 - m_charline_ptr) << 2)), timer_expired_delegate(FUNC(zx_state::zx_ula_irq),this));
+		timer_set(m_maincpu->cycles_to_attotime(((32 - m_charline_ptr) << 2)), TIMER_ULA_IRQ);
 		m_ula_irq_active++;
 
 		scanline = &bitmap.pix16(m_ula_scanline_count);
@@ -187,7 +206,7 @@ void zx_state::zx_ula_r(int offs, memory_region *region, const UINT8 param)
 
 void zx_state::video_start()
 {
-	m_ula_nmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx_state::zx_ula_nmi),this));
+	m_ula_nmi = timer_alloc(TIMER_ULA_NMI);
 	m_ula_irq_active = 0;
 	m_screen->register_screen_bitmap(m_bitmap);
 }

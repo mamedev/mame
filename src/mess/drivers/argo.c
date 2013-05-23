@@ -28,11 +28,15 @@
 class argo_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+		  m_maincpu(*this, "maincpu"),
+		  m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
@@ -49,7 +53,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
-	TIMER_CALLBACK_MEMBER(argo_boot);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
@@ -249,16 +255,23 @@ static INPUT_PORTS_START( argo ) // Keyboard was worked out by trial & error;'F'
 INPUT_PORTS_END
 
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(argo_state::argo_boot)
+void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	membank("boot")->set_entry(0);
+	switch (id)
+	{
+	case TIMER_BOOT:
+		/* after the first 4 bytes have been read from ROM, switch the ram back in */
+		membank("boot")->set_entry(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in argo_state::device_timer");
+	}
 }
 
 void argo_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(argo_state::argo_boot),this));
+	timer_set(attotime::from_usec(5), TIMER_BOOT);
 }
 
 DRIVER_INIT_MEMBER(argo_state,argo)

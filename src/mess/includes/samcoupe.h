@@ -39,6 +39,13 @@
 class samcoupe_state :  public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ_OFF,
+		TIMER_MOUSE_RESET,
+		TIMER_VIDEO_UPDATE
+	};
+
 	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -137,6 +144,9 @@ public:
 	void samcoupe_update_memory(address_space &space);
 	UINT8 samcoupe_mouse_r();
 	void samcoupe_irq(UINT8 src);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* SAMCOUPE_H_ */

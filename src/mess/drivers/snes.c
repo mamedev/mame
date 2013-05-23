@@ -48,6 +48,11 @@
 class snes_console_state : public snes_state
 {
 public:
+	enum
+	{
+		TIMER_LIGHTGUN_TICK
+	};
+
 	snes_console_state(const machine_config &mconfig, device_type type, const char *tag)
 			: snes_state(mconfig, type, tag)
 			, m_cartslot(*this, "snsslot")
@@ -99,6 +104,9 @@ public:
 	virtual void machine_reset();
 	int m_type;
 	optional_device<sns_cart_slot_device> m_cartslot;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -919,6 +927,18 @@ CUSTOM_INPUT_MEMBER( snes_console_state::snes_superscope_offscreen_input )
 	return m_scope[port].offscreen;
 }
 
+void snes_console_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LIGHTGUN_TICK:
+		lightgun_tick(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in snes_console_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER( snes_console_state::lightgun_tick )
 {
 	if ((ioport("CTRLSEL")->read() & 0x0f) == 0x03 || (ioport("CTRLSEL")->read() & 0x0f) == 0x04)   {
@@ -1313,7 +1333,7 @@ WRITE8_MEMBER(snes_console_state::snes_input_read)
 	UINT8 ctrl2 = (ioport("CTRLSEL")->read() & 0xf0) >> 4;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(snes_console_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	switch (ctrl1)
 	{

@@ -171,14 +171,75 @@ void x68k_state::mfp_init()
 	m_mfp.current_irq = -1;  // No current interrupt
 
 #if 0
-	mfp_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_a_callback),this));
-	mfp_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_b_callback),this));
-	mfp_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_c_callback),this));
-	mfp_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_timer_d_callback),this));
-	mfp_irq = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::mfp_update_irq),this));
+	mfp_timer[0] = timer_alloc(TIMER_MFP_TIMER_A);
+	mfp_timer[1] = timer_alloc(TIMER_MFP_TIMER_B);
+	mfp_timer[2] = timer_alloc(TIMER_MFP_TIMER_C);
+	mfp_timer[3] = timer_alloc(TIMER_MFP_TIMER_D);
+	mfp_irq = timer_alloc(TIMER_MFP_UPDATE_IRQ);
 	mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
 #endif
 }
+
+void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_MFP_UPDATE_IRQ:
+		//mfp_update_irq(ptr, param);
+		break;
+	case TIMER_MFP_TIMER_A:
+		//mfp_timer_a_callback(ptr, param);
+		break;
+	case TIMER_MFP_TIMER_B:
+		//mfp_timer_b_callback(ptr, param);
+		break;
+	case TIMER_MFP_TIMER_C:
+		//mfp_timer_c_callback(ptr, param);
+		break;
+	case TIMER_MFP_TIMER_D:
+		//mfp_timer_d_callback(ptr, param);
+		break;
+	case TIMER_X68K_LED:
+		x68k_led_callback(ptr, param);
+		break;
+	case TIMER_X68K_KEYBOARD_POLL:
+		x68k_keyboard_poll(ptr, param);
+		break;
+	case TIMER_X68K_SCC_ACK:
+		x68k_scc_ack(ptr, param);
+		break;
+	case TIMER_MD_6BUTTON_PORT1_TIMEOUT:
+		md_6button_port1_timeout(ptr, param);
+		break;
+	case TIMER_MD_6BUTTON_PORT2_TIMEOUT:
+		md_6button_port2_timeout(ptr, param);
+		break;
+	case TIMER_X68K_BUS_ERROR:
+		x68k_bus_error(ptr, param);
+		break;
+	case TIMER_X68K_NET_IRQ:
+		x68k_net_irq(ptr, param);
+		break;
+	case TIMER_X68K_CRTC_OPERATION_END:
+		x68k_crtc_operation_end(ptr, param);
+		break;
+	case TIMER_X68K_HSYNC:
+		x68k_hsync(ptr, param);
+		break;
+	case TIMER_X68K_CRTC_RASTER_END:
+		x68k_crtc_raster_end(ptr, param);
+		break;
+	case TIMER_X68K_CRTC_RASTER_IRQ:
+		x68k_crtc_raster_irq(ptr, param);
+		break;
+	case TIMER_X68K_CRTC_VBLANK_IRQ:
+		x68k_crtc_vblank_irq(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
+	}
+}
+
 
 #ifdef UNUSED_FUNCTION
 TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
@@ -716,8 +777,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
 
 void x68k_state::md_6button_init()
 {
-	m_mdctrl.io_timeout1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port1_timeout),this));
-	m_mdctrl.io_timeout2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::md_6button_port2_timeout),this));
+	m_mdctrl.io_timeout1 = timer_alloc(TIMER_MD_6BUTTON_PORT1_TIMEOUT);
+	m_mdctrl.io_timeout2 = timer_alloc(TIMER_MD_6BUTTON_PORT2_TIMEOUT);
 }
 
 UINT8 x68k_state::md_6button_r(int port)
@@ -1626,7 +1687,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
+		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, 0xbffffc+offset);
 	}
 	return 0xff;
 }
@@ -1643,7 +1704,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
+		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, 0xbffffc+offset);
 	}
 }
 
@@ -1659,7 +1720,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
+		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, offset);
 	}
 	return 0xff;
 }
@@ -1676,7 +1737,7 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
+		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, offset);
 	}
 }
 
@@ -1690,7 +1751,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
+		timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR, 0xeafa00+offset);
 //      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
@@ -1706,7 +1767,7 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
+		timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR, 0xeafa00+offset);
 //      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
@@ -2583,13 +2644,13 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200
 	m_keyboard.repeat = 110;  // 4^2*5+30
-	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_keyboard_poll),this));
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_hsync),this));
-	m_raster_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_crtc_raster_irq),this));
-	m_vblank_irq = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_crtc_vblank_irq),this));
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_scc_ack),this));
-	m_led_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_led_callback),this));
-	m_net_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x68k_state::x68k_net_irq),this));
+	m_kb_timer = timer_alloc(TIMER_X68K_KEYBOARD_POLL);
+	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
+	m_raster_irq = timer_alloc(TIMER_X68K_CRTC_RASTER_IRQ);
+	m_vblank_irq = timer_alloc(TIMER_X68K_CRTC_VBLANK_IRQ);
+	m_mouse_timer = timer_alloc(TIMER_X68K_SCC_ACK);
+	m_led_timer = timer_alloc(TIMER_X68K_LED);
+	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();

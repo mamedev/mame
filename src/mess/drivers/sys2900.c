@@ -40,6 +40,11 @@
 class sys2900_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	sys2900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
@@ -48,8 +53,10 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(sys2900_boot);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -71,16 +78,23 @@ static INPUT_PORTS_START( sys2900 )
 INPUT_PORTS_END
 
 
-/* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sys2900_state::sys2900_boot)
+void sys2900_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	membank("boot")->set_entry(0);
+	switch (id)
+	{
+	case TIMER_BOOT:
+		/* after the first 4 bytes have been read from ROM, switch the ram back in */
+		membank("boot")->set_entry(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sys2900_state::device_timer");
+	}
 }
 
 void sys2900_state::machine_reset()
 {
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(sys2900_state::sys2900_boot),this));
+	timer_set(attotime::from_usec(5), TIMER_BOOT);
 }
 
 DRIVER_INIT_MEMBER(sys2900_state,sys2900)

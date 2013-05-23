@@ -44,6 +44,11 @@
 class h19_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	h19_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -66,14 +71,23 @@ public:
 	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void video_start();
-	TIMER_CALLBACK_MEMBER(h19_beepoff);
 	DECLARE_WRITE_LINE_MEMBER(h19_ace_irq);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
-TIMER_CALLBACK_MEMBER(h19_state::h19_beepoff)
+void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_beep->set_state(0);
+	switch (id)
+	{
+	case TIMER_BEEP_OFF:
+		m_beep->set_state(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in h19_state::device_timer");
+	}
 }
 
 READ8_MEMBER( h19_state::h19_80_r )
@@ -100,7 +114,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
 	m_beep->set_state(1);
-	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(h19_state::h19_beepoff),this));
+	timer_set(attotime::from_msec(length), TIMER_BEEP_OFF);
 }
 
 static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)

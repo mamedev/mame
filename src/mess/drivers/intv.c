@@ -793,6 +793,25 @@ static ADDRESS_MAP_START( intvkbd2_mem , AS_PROGRAM, 8, intv_state)
 	AM_RANGE( 0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTV_INTERRUPT2_COMPLETE:
+		intv_interrupt2_complete(ptr, param);
+		break;
+	case TIMER_INTV_INTERRUPT_COMPLETE:
+		intv_interrupt_complete(ptr, param);
+		break;
+	case TIMER_INTV_BTB_FILL:
+		intv_btb_fill(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in intv_state::device_timer");
+	}
+}
+
+
 /* This is needed because MAME core does not allow PULSE_LINE.
     The time interval is not critical, although it should be below 1000. */
 
@@ -804,7 +823,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
 INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 {
 	m_keyboard->set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(m_keyboard->cycles_to_attotime(100), timer_expired_delegate(FUNC(intv_state::intv_interrupt2_complete),this));
+	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
 }
 
 static MACHINE_CONFIG_START( intv, intv_state )

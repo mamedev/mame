@@ -79,6 +79,12 @@ TODO:
 class socrates_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_CLEAR_SPEECH,
+		TIMER_CLEAR_IRQ
+	};
+
 	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -136,6 +142,9 @@ public:
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
 	rgb_t socrates_create_color(UINT8 color);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -233,6 +242,21 @@ void socrates_state::machine_reset()
 	m_speech_dummy_read = 0;
 	m_speech_load_address_count = 0;
 	m_speech_load_settings_count = 0;
+}
+
+void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_CLEAR_SPEECH:
+		clear_speech_cb(ptr, param);
+		break;
+	case TIMER_CLEAR_IRQ:
+		clear_irq_cb(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in socrates_state::device_timer");
+	}
 }
 
 DRIVER_INIT_MEMBER(socrates_state,socrates)
@@ -334,6 +358,7 @@ UINT8 *speechromext = memregion("speechext")->base();
 	logerror("read from i/o 0x4x of %x\n", temp);
 	return temp;
 }
+
 TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 {
 	m_speech_running = 0;
@@ -401,7 +426,7 @@ end hd38880 info.*/
 			{
 				/* write me: start talking */
 				m_speech_running = 1;
-				machine().scheduler().timer_set(attotime::from_seconds(4), timer_expired_delegate(FUNC(socrates_state::clear_speech_cb),this)); // hack
+				timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
 			}
 			break;
 		case 0x90: // unknown, one of these is probably read and branch
@@ -425,7 +450,7 @@ end hd38880 info.*/
 			if ((data&0xF) == 0) // speak
 			{
 				m_speech_running = 1;
-				machine().scheduler().timer_set(attotime::from_seconds(4), timer_expired_delegate(FUNC(socrates_state::clear_speech_cb),this)); // hack
+				timer_set(attotime::from_seconds(4), TIMER_CLEAR_SPEECH); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
@@ -913,7 +938,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
 INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), timer_expired_delegate(FUNC(socrates_state::clear_irq_cb),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), TIMER_CLEAR_IRQ);
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	m_vblankstate = 1;
 	m_kbmcu_rscount = 0; // clear the mcu poke count

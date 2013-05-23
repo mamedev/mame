@@ -55,6 +55,28 @@
 
 
 /***************************************************************************
+	TIMERS
+***************************************************************************/
+
+void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_IRQ_OFF:
+		irq_off(ptr, param);
+		break;
+	case TIMER_MOUSE_RESET:
+		samcoupe_mouse_reset(ptr, param);
+		break;
+	case TIMER_VIDEO_UPDATE:
+		sam_video_update_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in samcoupe_state::device_timer");
+	}
+}
+
+/***************************************************************************
     I/O PORTS
 ***************************************************************************/
 
@@ -334,7 +356,7 @@ void samcoupe_state::samcoupe_irq(UINT8 src)
 {
 	/* assert irq and a timer to set it off again */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(samcoupe_state::irq_off),this), src);
+	timer_set(attotime::from_usec(20), TIMER_IRQ_OFF, src);
 
 	/* adjust STATUS register */
 	m_status &= ~src;

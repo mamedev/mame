@@ -931,15 +931,22 @@ ROM_END
 
 /* Driver Initialization */
 
-TIMER_CALLBACK_MEMBER(sb2m600_state::setup_beep)
+void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_beeper->set_state(0);
-	m_beeper->set_frequency(300);
+	switch (id)
+	{
+	case TIMER_SETUP_BEEP:
+		m_beeper->set_state(0);
+		m_beeper->set_frequency(300);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");
+	}
 }
 
 DRIVER_INIT_MEMBER(c1p_state,c1p)
 {
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sb2m600_state::setup_beep),this));
+	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
 
 

@@ -250,6 +250,13 @@ ToDo:
 class cat_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_KEYBOARD,
+		TIMER_COUNTER_6MS,
+		TIMER_SWYFT_RESET
+	};
+
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -333,10 +340,13 @@ public:
 	UINT8 m_keyboard_line;
 	UINT8 m_floppy_control;
 
-	TIMER_CALLBACK_MEMBER(keyboard_callback);
+	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	TIMER_CALLBACK_MEMBER(swyft_reset);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 // TODO: this init doesn't actually work yet! please fix me!
@@ -805,6 +815,21 @@ static INPUT_PORTS_START( swyft )
 INPUT_PORTS_END
 
 
+void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_COUNTER_6MS:
+		counter_6ms_callback(ptr, param);
+		break;
+	case TIMER_SWYFT_RESET:
+		swyft_reset(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in cat_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 {
 	// This is effectively also the KTOBF line 'clock' output to the d-latch before the duart
@@ -827,7 +852,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_6ms_counter = 0;
 	m_video_enable = 1;
 	m_video_invert = 0;
-	m_6ms_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::counter_6ms_callback),this));
+	m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS);
 	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
@@ -882,7 +907,7 @@ MACHINE_START_MEMBER(cat_state,swyft)
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(cat_state::swyft_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_SWYFT_RESET);
 }
 
 VIDEO_START_MEMBER(cat_state,swyft)

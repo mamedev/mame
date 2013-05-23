@@ -105,6 +105,17 @@ struct fm7_alu_t
 class fm7_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_FM7_BEEPER_OFF,
+		TIMER_FM77AV_ENCODER_ACK,
+		TIMER_FM7_IRQ,
+		TIMER_FM7_SUBTIMER_IRQ,
+		TIMER_FM7_KEYBOARD_POLL,
+		TIMER_FM77AV_ALU_TASK_END,
+		TIMER_FM77AV_VSYNC
+	};
+
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
@@ -291,6 +302,9 @@ public:
 	void fm7_mmr_refresh(address_space& space);
 	void key_press(UINT16 scancode);
 	void fm7_keyboard_poll_scan();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /*FM7_H_*/

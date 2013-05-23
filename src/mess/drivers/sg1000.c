@@ -1000,6 +1000,19 @@ static const rs232_port_interface rs232_intf =
     MACHINE INITIALIZATION
 ***************************************************************************/
 
+void sg1000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LIGHTGUN_TICK:
+		lightgun_tick(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sg1000_state::device_timer");
+	}
+}
+
+
 /*-------------------------------------------------
     TIMER_CALLBACK_MEMBER( lightgun_tick )
 -------------------------------------------------*/
@@ -1027,7 +1040,7 @@ TIMER_CALLBACK_MEMBER(sg1000_state::lightgun_tick)
 void sg1000_state::machine_start()
 {
 	/* toggle light gun crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sg1000_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	/* register for state saving */
 	save_item(NAME(m_tvdraw_data));
@@ -1040,7 +1053,7 @@ void sg1000_state::machine_start()
 void sc3000_state::machine_start()
 {
 	/* toggle light gun crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sg1000_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	// find keyboard rows
 	m_key_row[0] = m_pa0;

@@ -905,15 +905,22 @@ ROM_END
 
 /* Driver Initialization */
 
-TIMER_CALLBACK_MEMBER(tmc1800_state::setup_beep)
+void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_beeper->set_state(0);
-	m_beeper->set_frequency(0);
+	switch (id)
+	{
+	case TIMER_SETUP_BEEP:
+		m_beeper->set_state(0);
+		m_beeper->set_frequency(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in tmc1800_state::device_timer");
+	}
 }
 
 DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
 {
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(tmc1800_state::setup_beep),this));
+	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
 
 /* System Drivers */

@@ -25,6 +25,11 @@
 class zrt80_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	zrt80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -46,8 +51,11 @@ public:
 	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
 	virtual void video_start();
-	TIMER_CALLBACK_MEMBER(zrt80_beepoff);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
+
 
 READ8_MEMBER( zrt80_state::zrt80_10_r )
 {
@@ -56,20 +64,28 @@ READ8_MEMBER( zrt80_state::zrt80_10_r )
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(zrt80_state::zrt80_beepoff)
+void zrt80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_beep->set_state(0);
+	switch (id)
+	{
+	case TIMER_BEEP_OFF:
+		m_beep->set_state(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in zrt80_state::device_timer");
+	}
 }
+
 
 WRITE8_MEMBER(zrt80_state::zrt80_30_w)
 {
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
+	timer_set(attotime::from_msec(100), TIMER_BEEP_OFF);
 	m_beep->set_state(1);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 {
-	machine().scheduler().timer_set(attotime::from_msec(400), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
+	timer_set(attotime::from_msec(400), TIMER_BEEP_OFF);
 	m_beep->set_state(1);
 }
 

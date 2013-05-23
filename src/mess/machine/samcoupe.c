@@ -294,10 +294,10 @@ UINT8 samcoupe_state::samcoupe_mouse_r()
 
 void samcoupe_state::machine_start()
 {
-	m_mouse_reset = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::samcoupe_mouse_reset),this));
+	m_mouse_reset = timer_alloc(TIMER_MOUSE_RESET);
 
 	/* schedule our video updates */
-	m_video_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(samcoupe_state::sam_video_update_callback),this));
+	m_video_update_timer = timer_alloc(TIMER_VIDEO_UPDATE);
 	m_video_update_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
 }
 

@@ -159,6 +159,11 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 class vk100_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_EXECUTE_VG
+	};
+
 	vk100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -241,6 +246,9 @@ public:
 	void vram_write(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( ft_w );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 // vram access functions:
@@ -297,30 +305,42 @@ void vk100_state::vram_write(UINT8 data)
 	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
 
-	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
-	 * see figure 5-24 on page 5-39
-	 * It tells the direction and enable for counting on the X and Y counters
-	 * and also handles the non-math related parts of the bresenham line algorithm
-	 * control bits:
-	 *            /CE1 ----- DCOUNT 0 H [verified via tracing]
-	 *            /CE2 ----- ENA ERROR L [verified via tracing]
-	 * addr bits: 76543210
-	 *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-	 *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
-	 *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
-	 *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
-	 *            \--------- GND; the second half of the prom is blank (0x00)
-	 * data bits: 76543210
-	 *            |||||||\-- ENA Y (enables change on Y counter)
-	 *            ||||||\--- ENA X (enables change on X counter)
-	 *            |||||\---- Y DIRECTION (high is count down, low is count up)
-	 *            ||||\----- X DIRECTION (high is count down, low is count up)
-	 *            |||\------ PIXEL WRT
-	 *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
-	 *            |\-------- UNUSED, always 0
-	 *            \--------- UNUSED, always 0
-	 * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
-	 */
+void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_EXECUTE_VG:
+		execute_vg(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in vk100_state::device_timer");
+	}
+}
+
+/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+ * see figure 5-24 on page 5-39
+ * It tells the direction and enable for counting on the X and Y counters
+ * and also handles the non-math related parts of the bresenham line algorithm
+ * control bits:
+ *            /CE1 ----- DCOUNT 0 H [verified via tracing]
+ *            /CE2 ----- ENA ERROR L [verified via tracing]
+ * addr bits: 76543210
+ *            ||||\\\\-- DIR (vgDIR register low 4 bits)
+ *            |||\------ C OUT aka ERROR CARRY (strobed in by STROBE L from the error counter's adder) [verified via tracing]
+ *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham) [verified via tracing]
+ *            |\-------- feedback bit from d5 strobed by V CLK [verified via tracing]
+ *            \--------- GND; the second half of the prom is blank (0x00)
+ * data bits: 76543210
+ *            |||||||\-- ENA Y (enables change on Y counter)
+ *            ||||||\--- ENA X (enables change on X counter)
+ *            |||||\---- Y DIRECTION (high is count down, low is count up)
+ *            ||||\----- X DIRECTION (high is count down, low is count up)
+ *            |||\------ PIXEL WRT
+ *            ||\------- feedback bit to a6, this bit is held in PRESET/1 condition by GO being inactive, and if the vector prom is disabled it is pulled to 1 [verified via tracing and schematics]
+ *            |\-------- UNUSED, always 0
+ *            \--------- UNUSED, always 0
+ * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
+ */
 TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 {
 	m_cout = 1; // hack for now
@@ -377,7 +397,7 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		m_vgPAT_Mask >>= 1; // shift the mask
 		if (m_vgPAT_Mask == 0) m_vgPAT_Mask = 0x80; // reset mask if it hits 0
 	}
-	if (m_vgGO) machine().scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), timer_expired_delegate(FUNC(vk100_state::execute_vg),this)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
+	if (m_vgGO) timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), TIMER_EXECUTE_VG); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
@@ -490,7 +510,7 @@ WRITE8_MEMBER(vk100_state::vgEX)
 	m_vgDownCount = VG_DU; // set down counter to length of major vector
 	m_VG_MODE = offset&3;
 	m_vgGO = 1;
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(vk100_state::execute_vg),this));
+	timer_set(attotime::zero, TIMER_EXECUTE_VG);
 }
 
 

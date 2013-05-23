@@ -177,6 +177,37 @@ void fm7_state::main_irq_clear_flag(UINT8 flag)
 }
 
 
+void fm7_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_FM7_BEEPER_OFF:
+		fm7_beeper_off(ptr, param);
+		break;
+	case TIMER_FM77AV_ENCODER_ACK:
+		fm77av_encoder_ack(ptr, param);
+		break;
+	case TIMER_FM7_IRQ:
+		fm7_timer_irq(ptr, param);
+		break;
+	case TIMER_FM7_SUBTIMER_IRQ:
+		fm7_subtimer_irq(ptr, param);
+		break;
+	case TIMER_FM7_KEYBOARD_POLL:
+		fm7_keyboard_poll(ptr, param);
+		break;
+	case TIMER_FM77AV_ALU_TASK_END:
+		fm77av_alu_task_end(ptr, param);
+		break;
+	case TIMER_FM77AV_VSYNC:
+		fm77av_vsync(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in fm7_state::device_timer");
+	}
+}
+
+
 /*
  * Main CPU: I/O port 0xfd02
  *
@@ -257,7 +288,7 @@ WRITE8_MEMBER(fm7_state::fm7_beeper_w)
 		{
 			m_beeper->set_state(1);
 			logerror("timed beeper on\n");
-			machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
+			timer_set(attotime::from_msec(205), TIMER_FM7_BEEPER_OFF);
 		}
 	}
 	logerror("beeper state: %02x\n",data);
@@ -274,7 +305,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 	{
 		m_beeper->set_state(1);
 		logerror("timed beeper on\n");
-		machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
+		timer_set(attotime::from_msec(205), TIMER_FM7_BEEPER_OFF);
 	}
 	return 0xff;
 }
@@ -706,7 +737,7 @@ WRITE8_MEMBER(fm7_state::fm77av_key_encoder_w)
 			fm77av_encoder_handle_command();
 
 		// wait 5us to set ACK flag
-		machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(fm7_state::fm77av_encoder_ack),this));
+		timer_set(attotime::from_usec(5), TIMER_FM77AV_ENCODER_ACK);
 
 		//logerror("ENC: write 0x%02x to data register, moved to pos %i\n",data,m_encoder.position);
 	}
@@ -1816,10 +1847,10 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 {
 //  m_shared_ram = auto_alloc_array(machine(),UINT8,0x80);
 	m_video_ram = auto_alloc_array(machine(),UINT8,0x18000);  // 2 pages on some systems
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_timer_irq),this));
-	m_subtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_subtimer_irq),this));
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_keyboard_poll),this));
-	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm77av_vsync),this));
+	m_timer = timer_alloc(TIMER_FM7_IRQ);
+	m_subtimer = timer_alloc(TIMER_FM7_SUBTIMER_IRQ);
+	m_keyboard_timer = timer_alloc(TIMER_FM7_KEYBOARD_POLL);
+	m_fm77av_vsync_timer = timer_alloc(TIMER_FM77AV_VSYNC);
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_irq_ack),this));
 	m_sub->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_sub_irq_ack),this));
 }

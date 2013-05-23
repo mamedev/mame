@@ -223,7 +223,7 @@ void pes_state::machine_reset()
 ******************************************************************************/
 /*static TIMER_CALLBACK_MEMBER(pes_state::serial_read_cb )
 {
-    machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }*/
 
 DRIVER_INIT_MEMBER(pes_state,pes)

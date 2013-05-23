@@ -627,15 +627,22 @@ ROM_END
 
 /* Driver Initialization */
 
-TIMER_CALLBACK_MEMBER(studio2_state::setup_beep)
+void studio2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_beeper->set_state(0);
-	m_beeper->set_frequency(300);
+	switch (id)
+	{
+	case TIMER_SETUP_BEEP:
+		m_beeper->set_state(0);
+		m_beeper->set_frequency(300);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in studio2_state::device_timer");
+	}
 }
 
 DRIVER_INIT_MEMBER(studio2_state,studio2)
 {
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(studio2_state::setup_beep),this));
+	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }
 
 /* Game Drivers */

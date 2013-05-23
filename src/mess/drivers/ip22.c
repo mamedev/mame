@@ -91,6 +91,12 @@ struct PBUS_DMA_t
 class ip22_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IP22_DMA,
+		TIMER_IP22_MSEC
+	};
+
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -152,6 +158,9 @@ public:
 	void int3_lower_local1_irq(UINT8 source_mask);
 	void dump_chain(address_space &space, UINT32 ch_base);
 	void rtc_update();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -1050,9 +1059,24 @@ WRITE32_MEMBER(ip22_state::hal2_w)
 #define PBUS_DMADESC_BC         0x00003fff
 
 
+void ip22_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_IP22_DMA:
+		ip22_dma(ptr, param);
+		break;
+	case TIMER_IP22_MSEC:
+		ip22_timer(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in ip22_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 {
-	machine().scheduler().timer_set(attotime::never, timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
+	timer_set(attotime::never, TIMER_IP22_DMA);
 #if 0
 	if( m_PBUS_DMA.nActive )
 	{
@@ -1079,7 +1103,7 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 				return;
 			}
 		}
-		machine().scheduler().timer_set(attotime::from_hz(44100), timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
+		timer_set(attotime::from_hz(44100), TIMER_IP22_DMA);
 	}
 #endif
 }
@@ -1149,7 +1173,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
 		//verboselog((machine, 0, "    FIFO End: Rowe %04x\n", ( data & PBUS_CTRL_FIFO_END ) >> 24 );
 		if( ( data & PBUS_CTRL_DMASTART ) || ( data & PBUS_CTRL_LOAD_EN ) )
 		{
-			machine().scheduler().timer_set(attotime::from_hz(44100), timer_expired_delegate(FUNC(ip22_state::ip22_dma),this));
+			timer_set(attotime::from_hz(44100), TIMER_IP22_DMA);
 			m_PBUS_DMA.nActive = 1;
 		}
 		return;
@@ -1194,7 +1218,7 @@ ADDRESS_MAP_END
 
 TIMER_CALLBACK_MEMBER(ip22_state::ip22_timer)
 {
-	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip22_state::ip22_timer),this));
+	timer_set(attotime::from_msec(1), TIMER_IP22_MSEC);
 }
 
 void ip22_state::machine_reset()
@@ -1205,7 +1229,7 @@ void ip22_state::machine_reset()
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(ip22_state::ip22_timer),this));
+	timer_set(attotime::from_msec(1), TIMER_IP22_MSEC);
 
 	// set up low RAM mirror
 	membank("bank1")->set_base(m_mainram);

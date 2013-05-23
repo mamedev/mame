@@ -72,6 +72,14 @@ enum
 class st_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_MOUSE_TICK,
+		TIMER_SHIFTER_TICK,
+		TIMER_GLUE_TICK,
+		TIMER_BLITTER_TICK
+	};
+
 	st_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
@@ -325,12 +333,11 @@ public:
 
 	floppy_image_device *floppy_devices[2];
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	TIMER_CALLBACK_MEMBER(st_mouse_tick);
-	TIMER_CALLBACK_MEMBER(atarist_shifter_tick);
-	TIMER_CALLBACK_MEMBER(atarist_glue_tick);
-	TIMER_CALLBACK_MEMBER(atarist_blitter_tick);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class megast_state : public st_state
@@ -347,6 +354,12 @@ public:
 class ste_state : public st_state
 {
 public:
+	enum
+	{
+		TIMER_DMASOUND_TICK,
+		TIMER_MICROWIRE_TICK
+	};
+
 	ste_state(const machine_config &mconfig, device_type type, const char *tag)
 		: st_state(mconfig, type, tag),
 			m_lmc1992(*this, LMC1992_TAG)
@@ -384,9 +397,6 @@ public:
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 
-	TIMER_CALLBACK_MEMBER(atariste_dmasound_tick);
-	TIMER_CALLBACK_MEMBER(atariste_microwire_tick);
-
 	void dmasound_set_state(int level);
 	void dmasound_tick();
 	void microwire_shift();
@@ -417,6 +427,9 @@ public:
 	// timers
 	emu_timer *m_microwire_timer;
 	emu_timer *m_dmasound_timer;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class megaste_state : public ste_state

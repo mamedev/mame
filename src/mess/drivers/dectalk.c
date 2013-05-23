@@ -233,6 +233,11 @@ dgc (dg(no!spam)cx@mac.com)
 class dectalk_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_OUTFIFO_READ
+	};
+
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG) ,
@@ -289,6 +294,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<dac_device> m_dac;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -785,6 +793,18 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
+void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_OUTFIFO_READ:
+		outfifo_read_cb(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in dectalk_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
 	UINT16 data;
@@ -792,7 +812,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
-	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
+	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 	m_dac->write_signed16(data);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
@@ -808,7 +828,7 @@ DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 {
 	dectalk_clear_all_fifos();
 	m_simulate_outfifo_error = 0;
-	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
+	timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }
 
 WRITE8_MEMBER(dectalk_state::dectalk_kbd_put)

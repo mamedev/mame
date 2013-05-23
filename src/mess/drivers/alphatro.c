@@ -34,6 +34,13 @@
 class alphatro_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SYSTEM,
+		TIMER_SERIAL,
+		TIMER_ALPHATRO_BEEP_OFF
+	};
+
 	alphatro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -67,17 +74,9 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	static const device_timer_id SYSTEM_TIMER = 0;
-	static const device_timer_id SERIAL_TIMER = 1;
 	UINT8 m_timer_bit;
 	virtual void palette_init();
-	TIMER_CALLBACK_MEMBER(alphatro_beepoff);
 };
-
-TIMER_CALLBACK_MEMBER(alphatro_state::alphatro_beepoff)
-{
-	m_beep->set_state(0);
-}
 
 READ8_MEMBER( alphatro_state::port10_r )
 {
@@ -101,7 +100,7 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 
 	if (length)
 	{
-		machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(alphatro_state::alphatro_beepoff),this));
+		timer_set(attotime::from_msec(length), TIMER_ALPHATRO_BEEP_OFF);
 		m_beep->set_state(1);
 	}
 
@@ -112,13 +111,18 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch(id)
 	{
-	case SYSTEM_TIMER:
+	case TIMER_SYSTEM:
 		m_timer_bit ^= 0x80;
 		break;
-	case SERIAL_TIMER:
+	case TIMER_SERIAL:
 		m_usart->transmit_clock();
 		m_usart->receive_clock();
 		break;
+	case TIMER_ALPHATRO_BEEP_OFF:
+		m_beep->set_state(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
 	}
 }
 
@@ -342,8 +346,8 @@ GFXDECODE_END
 
 void alphatro_state::machine_start()
 {
-	m_sys_timer = timer_alloc(SYSTEM_TIMER);
-	m_serial_timer = timer_alloc(SERIAL_TIMER);
+	m_sys_timer = timer_alloc(TIMER_SYSTEM);
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
 }
 
 void alphatro_state::machine_reset()
