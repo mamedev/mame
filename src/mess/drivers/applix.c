@@ -492,10 +492,12 @@ static const via6522_interface applix_via =
 
 WRITE_LINE_MEMBER( applix_state::kbd_clock_w )
 {
+	m_via->write_cb1(state); // need to drop unknown number of pulses
 }
 
 WRITE_LINE_MEMBER( applix_state::kbd_data_w )
 {
+	m_via->write_cb2(state);
 }
 
 static const pc_kbdc_interface applix_kbdc =
