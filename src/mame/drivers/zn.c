@@ -86,7 +86,6 @@ public:
 	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
-	DECLARE_DRIVER_INIT(coh1000a);
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
@@ -94,7 +93,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1000w);
 	DECLARE_MACHINE_RESET(coh1002e);
 	DECLARE_MACHINE_RESET(bam2);
-	DECLARE_MACHINE_RESET(coh1000a);
+	DECLARE_MACHINE_RESET(jdredd);
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
@@ -1991,54 +1990,54 @@ READ32_MEMBER(zn_state::nbajamex_80_r)
 	return data;
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1000a)
+static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE(acpsx_00_w)
+	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE(acpsx_10_w)
+
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f200000, 0x1f207fff) AM_RAM AM_SHARE("eeprom")
+	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ(nbajamex_08_r)
+	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE(nbajamex_80_r, nbajamex_80_w)
+
+	AM_IMPORT_FROM(coh1000a_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1fbfff8c, 0x1fbfff8f) AM_READ(jdredd_idestat_r) AM_WRITENOP
+	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_READWRITE(jdredd_ide_r, jdredd_ide_w)
+
+	AM_IMPORT_FROM(coh1000a_map)
+ADDRESS_MAP_END
+
+MACHINE_RESET_MEMBER(zn_state,jdredd)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f1fffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fbfff00, 0x1fbfff03, write32_delegate(FUNC(zn_state::acpsx_00_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1fbfff10, 0x1fbfff13, write32_delegate(FUNC(zn_state::acpsx_10_w),this));
-
-	if( strcmp( machine().system().name, "nbajamex" ) == 0 )
-	{
-		m_nbajamex_eeprom_size = 0x8000;
-		m_nbajamex_eeprom = auto_alloc_array( machine(), UINT8, m_nbajamex_eeprom_size );
-
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank( 0x1f200000, 0x1f200000 + ( m_nbajamex_eeprom_size - 1 ), "bank2" );
-		m_maincpu->space(AS_PROGRAM).install_read_handler     ( 0x1fbfff08, 0x1fbfff0b, read32_delegate(FUNC(zn_state::nbajamex_08_r),this));
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1fbfff80, 0x1fbfff83, read32_delegate(FUNC(zn_state::nbajamex_80_r),this), write32_delegate(FUNC(zn_state::nbajamex_80_w),this));
-
-		membank( "bank2" )->set_base( m_nbajamex_eeprom ); /* ram/eeprom/?? */
-	}
-
-	if( ( !strcmp( machine().system().name, "jdredd" ) ) ||
-		( !strcmp( machine().system().name, "jdreddb" ) ) )
-	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1fbfff8c, 0x1fbfff8f,read32_delegate(FUNC(zn_state::jdredd_idestat_r),this) );
-		m_maincpu->space(AS_PROGRAM).nop_write                    ( 0x1fbfff8c, 0x1fbfff8f);
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1fbfff90, 0x1fbfff9f, read32_delegate(FUNC(zn_state::jdredd_ide_r),this), write32_delegate(FUNC(zn_state::jdredd_ide_w),this) );
-	}
-}
-
-MACHINE_RESET_MEMBER(zn_state,coh1000a)
-{
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
-	if( ( !strcmp( machine().system().name, "jdredd" ) ) ||
-		( !strcmp( machine().system().name, "jdreddb" ) ) )
-	{
-		machine().device("ide")->reset();
-	}
+	machine().device("ide")->reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000a_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( nbajamex, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
 
-	MCFG_DEVICE_MODIFY( "gpu" )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( zn_state::jdredd_vblank ), (zn_state *) owner ) )
+MACHINE_CONFIG_END
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000a )
+static MACHINE_CONFIG_DERIVED( jdredd, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jdredd_map)
+
+	MCFG_DEVICE_MODIFY("gpu")
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate( FUNC( zn_state::jdredd_vblank ), (zn_state *) owner))
+
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, jdredd)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
@@ -4510,13 +4509,13 @@ ROM_END
 
 ROM_START( acpsx )
 	AC_BIOS
-	ROM_REGION32_LE( 0x2000000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x2000000, "roms", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( nbajamex )
 	AC_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user2", 0 )
+	ROM_REGION32_LE( 0x2000000, "roms", 0 )
 	ROM_LOAD16_BYTE( "360mpa1o.u36", 0x0000001, 0x100000, CRC(c433e827) SHA1(1d2a5a6990a1b1864e63ce3ba7306d48ebbd4775) )
 	ROM_LOAD16_BYTE( "360mpa1e.u35", 0x0000000, 0x100000, CRC(d8f5b2f7) SHA1(e38609d314721b8b612e047406e2888395917b0d) )
 	ROM_LOAD16_BYTE( "nbax0o.u28",   0x0200001, 0x200000, CRC(be13c5af) SHA1(eee5c9d985384ecfe4f00fae27d66fbefc15b28e) )
@@ -4546,7 +4545,7 @@ ROM_END
 ROM_START( jdredd )
 	AC_BIOS
 
-	ROM_REGION32_LE( 0x200000, "user2", 0 )
+	ROM_REGION32_LE( 0x200000, "roms", 0 )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
@@ -4557,7 +4556,7 @@ ROM_END
 ROM_START( jdreddb )
 	AC_BIOS
 
-	ROM_REGION32_LE( 0x200000, "user2", 0 )
+	ROM_REGION32_LE( 0x200000, "roms", 0 )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
@@ -4663,11 +4662,11 @@ GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, driver_device, 0, ROT0, "Ata
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000a.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, acpsx,    0,        coh1000a, zn, zn_state, coh1000a, ROT0, "Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
+GAME( 1995, acpsx,    0,        coh1000a, zn,     driver_device, 0, ROT0, "Acclaim", "Acclaim PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, nbajamex, acpsx,    coh1000a,     zn, zn_state,     coh1000a, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1996, jdredd,   acpsx,    coh1000a_ide, jdredd, zn_state, coh1000a, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, jdreddb,  jdredd,   coh1000a_ide, jdredd, zn_state, coh1000a, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, nbajamex, acpsx,    nbajamex, zn,     driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1996, jdredd,   acpsx,    jdredd,   jdredd, driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, jdreddb,  jdredd,   jdredd,   jdredd, driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Tecmo */
 
