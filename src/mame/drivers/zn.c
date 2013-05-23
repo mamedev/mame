@@ -86,7 +86,6 @@ public:
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000a);
 	DECLARE_DRIVER_INIT(coh1000c);
-	DECLARE_DRIVER_INIT(coh1000w);
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
@@ -1357,25 +1356,25 @@ void zn_state::atpsx_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_si
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1000w)
-{
-	device_t *ide = machine().device("ide");
+static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
+	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
+	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
+	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
+	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w )
+	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w )
 
-	m_maincpu->space(AS_PROGRAM).install_read_bank         ( 0x1f000000, 0x1f1fffff, "bank1" );
-	m_maincpu->space(AS_PROGRAM).nop_write                         ( 0x1f000000, 0x1f000003);
-	m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0x1f7e4000, 0x1f7e4fff, FUNC(ide_controller32_r), FUNC(ide_controller32_w) );
-	m_maincpu->space(AS_PROGRAM).nop_readwrite                     ( 0x1f7e8000, 0x1f7e8003);
-	m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0x1f7f4000, 0x1f7f4fff, FUNC(ide_controller32_r), FUNC(ide_controller32_w) );
-}
+	AM_IMPORT_FROM(zn_map)
+ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000w)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
-
 	machine().device("ide")->reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(coh1000w_map)
+
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
@@ -4473,13 +4472,13 @@ ROM_END
 
 ROM_START( atpsx )
 	TW_BIOS
-	ROM_REGION32_LE( 0x200000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x200000, "roms", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( primrag2 )
 	TW_BIOS
 
-	ROM_REGION32_LE( 0x200000, "user2", 0 )
+	ROM_REGION32_LE( 0x200000, "roms", 0 )
 	ROM_LOAD16_BYTE( "pr2_036.u16",  0x000001, 0x080000, CRC(3ee39e4f) SHA1(dbd859b54fb9be33effc14eb847dcd829024eea3) )
 	ROM_LOAD16_BYTE( "pr2_036.u14",  0x000000, 0x080000, CRC(c86450cd) SHA1(19c3c50d839a9efb6ffa9ada8a072f56697c1abb) )
 	ROM_LOAD16_BYTE( "pr2_036.u17",  0x100001, 0x080000, CRC(3681516c) SHA1(714f73ea4ac190c36a6eb2308616a4aecabc4e69) )
@@ -4641,9 +4640,9 @@ GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000w.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1996, atpsx,    0,        coh1000w, zn,       zn_state, coh1000w, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
+GAME( 1996, atpsx,    0,        coh1000w, zn,       driver_device, 0, ROT0, "Atari", "Atari PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, zn_state, coh1000w, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1996, primrag2, atpsx,    coh1000w, primrag2, driver_device, 0, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* Acclaim */
 
