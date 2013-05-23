@@ -1,6 +1,8 @@
 /***********************************************************************************************************
 
  Sega 8-bit cart emulation (for Master System, GameGear and SG-1000)
+ 
+ TODO: implement proper ROM & RAM mirroring when the cart size is not a power of 2K (e.g. 24K or 48K)
 
  ***********************************************************************************************************/
 
@@ -268,7 +270,7 @@ READ8_MEMBER(sega8_rom_device::read_cart)
 	int bank = offset / 0x4000;
 	
 	if (bank == 2 && m_ram && m_ram_enabled)
-		return m_ram[m_ram_base * 0x4000 + (offset & 0x3fff)];
+		return m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size];
 
 	if (offset < 0x400)	// first 1k is hardcoded
 		return m_rom[offset];
@@ -281,7 +283,7 @@ WRITE8_MEMBER(sega8_rom_device::write_cart)
 	int bank = offset / 0x4000;
 	
 	if (bank == 2 && m_ram && m_ram_enabled)
-		m_ram[m_ram_base * 0x4000 + (offset & 0x3fff)] = data;
+		m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size] = data;
 }
 
 WRITE8_MEMBER(sega8_rom_device::write_mapper)
@@ -448,7 +450,7 @@ READ8_MEMBER(sega8_codemasters_device::read_cart)
 	int bank = offset / 0x2000;
 	
 	if (bank == 5 && m_ram && m_ram_enabled)
-		return m_ram[m_ram_base * 0x2000 + (offset & 0x1fff)];
+		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
 	
 	return m_rom[m_rom_bank_base[bank/2] * 0x4000 + (offset & 0x3fff)];
 }
@@ -480,7 +482,7 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
 	}
 
 	if (bank == 5 && m_ram && m_ram_enabled)
-		m_ram[m_ram_base * 0x2000 + (offset & 0x1fff)] = data;
+		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size] = data;
 }
 
 /*-------------------------------------------------
@@ -522,7 +524,7 @@ READ8_MEMBER(sega8_zemina_device::read_cart)
 	int bank = offset / 0x2000;
 	
 	if (bank >= 4 && m_ram && m_ram_enabled)
-		return m_ram[m_ram_base * 0x2000 + (offset & 0x1fff)];
+		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
 	
 	return m_rom[m_rom_bank_base[bank] * 0x2000 + (offset & 0x1fff)];
 }
@@ -532,7 +534,7 @@ WRITE8_MEMBER(sega8_zemina_device::write_cart)
 	int bank = offset / 0x2000;
 	
 	if (bank >= 4 && m_ram && m_ram_enabled)
-		m_ram[m_ram_base * 0x2000 + (offset & 0x1fff)] = data;
+		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size] = data;
 
 	if (offset < 4)
 	{
