@@ -808,9 +808,6 @@ int td0_format::identify(io_generic *io, UINT32 form_factor)
 	io_generic_read(io, h, 0, 7);
 	if((toupper(h[0]) == 'T') && (toupper(h[1]) == 'D'))
 	{
-		if((form_factor == floppy_image::FF_35) && ((h[6] == 3) || (h[6] == 4)))
-			return 100;
-		if((form_factor == floppy_image::FF_525) && ((h[6] == 1) || (h[6] == 2) || (h[6] == 3)))
 			return 100;
 	}
 	return 0;
@@ -845,7 +842,7 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			io_generic_read(io, imagebuf, 12, io_generic_size(io));
 
 		if(header[7] & 0x80)
-			offset = 10 + imagebuf[1] + (imagebuf[2] << 8);
+			offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
 
 		track_spt = imagebuf[offset];
 		if(track_spt == 255) // Empty file?
