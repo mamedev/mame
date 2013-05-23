@@ -38,6 +38,10 @@
     $68b8   -$40    Panning (PAN)
     $6878   -$80    Floppy (Motor/LED on - SQ-80 only)
 
+ESQ1: 8x CEM3379 VC Signal Processor Filter/Mix/VCA, 1x CEM3360 Dual VCA, 4x SSM2300
+SQ-80: 8x CEM3379 VC Signal Processor - Filter/Mix/VCA, 1x CEM3360 Dual VCA, 4x SSM2300
+
+
 If SEQRAM is mapped at 4000, DUART port 2 determines the 32KB "master bank" and ports 0 and 1
 determine which of the 4 8KB "sub banks" is visible.
 
