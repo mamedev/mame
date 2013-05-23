@@ -141,6 +141,24 @@ public:
 	{
 	}
 
+	DECLARE_WRITE16_MEMBER(mb89371_w);
+	DECLARE_READ16_MEMBER(mb89371_r);
+	DECLARE_READ16_MEMBER(flash_r);
+	DECLARE_WRITE16_MEMBER(flash_w);
+	DECLARE_READ16_MEMBER(trackball_r);
+	DECLARE_READ16_MEMBER(unknown_r);
+	DECLARE_READ16_MEMBER(btc_trackball_r);
+	DECLARE_WRITE16_MEMBER(btc_trackball_w);
+	DECLARE_READ16_MEMBER(tokimeki_serial_r);
+	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
+	DECLARE_DRIVER_INIT(simpbowl);
+	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+
+protected:
+	virtual void driver_start();
+
+private:
 	required_device<am53cf96_device> m_am53cf96;
 
 	UINT32 m_flash_address;
@@ -151,29 +169,8 @@ public:
 	UINT16 m_btc_trackball_data[ 4 ];
 
 	fujitsu_29f016a_device *m_flash8[4];
-	sharp_lh28f400_device *m_flash16[1];
 
 	UINT8 m_sector_buffer[ 4096 ];
-	DECLARE_WRITE16_MEMBER(mb89371_w);
-	DECLARE_READ16_MEMBER(mb89371_r);
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_READ16_MEMBER(btcflash_r);
-	DECLARE_WRITE16_MEMBER(btcflash_w);
-	DECLARE_READ16_MEMBER(btc_trackball_r);
-	DECLARE_WRITE16_MEMBER(btc_trackball_w);
-	DECLARE_READ16_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
-	DECLARE_DRIVER_INIT(simpbowl);
-	DECLARE_DRIVER_INIT(tokimosh);
-	DECLARE_DRIVER_INIT(kdeadeye);
-	DECLARE_DRIVER_INIT(konamigv);
-	DECLARE_DRIVER_INIT(btchamp);
-	DECLARE_MACHINE_START(konamigv);
-	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -207,7 +204,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( btchamp_map, AS_PROGRAM, 32, konamigv_state )
 	AM_IMPORT_FROM( konamigv_map )
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_READWRITE16(btcflash_r, btcflash_w, 0xffffffff)
+	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
 	AM_RANGE(0x1f680080, 0x1f680087) AM_READ16(btc_trackball_r, 0xffffffff)
 	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0xffffffff)
 	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
@@ -216,7 +213,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kdeadeye_map, AS_PROGRAM, 32, konamigv_state )
 	AM_IMPORT_FROM( konamigv_map )
 
-	AM_RANGE(0x1f380000, 0x1f3fffff) AM_READWRITE16(btcflash_r, btcflash_w, 0xffffffff)
+	AM_RANGE(0x1f380000, 0x1f3fffff) AM_DEVREADWRITE16("flash", intelfsh16_device, read, write, 0xffffffff)
 	AM_RANGE(0x1f680080, 0x1f680083) AM_READ_PORT("GUNX1")
 	AM_RANGE(0x1f680090, 0x1f680093) AM_READ_PORT("GUNY1")
 	AM_RANGE(0x1f6800a0, 0x1f6800a3) AM_READ_PORT("GUNX2")
@@ -312,11 +309,7 @@ void konamigv_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32
 	}
 }
 
-DRIVER_INIT_MEMBER(konamigv_state,konamigv)
-{
-}
-
-MACHINE_START_MEMBER(konamigv_state,konamigv)
+void konamigv_state::driver_start()
 {
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_flash_address));
@@ -336,8 +329,6 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigv_state::scsi_dma_read ), (konamigv_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigv_state::scsi_dma_write ), (konamigv_state *) owner ) )
-
-	MCFG_MACHINE_START_OVERRIDE(konamigv_state, konamigv )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -512,8 +503,6 @@ DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 	m_flash8[1] = machine().device<fujitsu_29f016a_device>("flash1");
 	m_flash8[2] = machine().device<fujitsu_29f016a_device>("flash2");
 	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
-
-	DRIVER_INIT_CALL(konamigv);
 }
 
 static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
@@ -538,16 +527,6 @@ static INPUT_PORTS_START( simpbowl )
 INPUT_PORTS_END
 
 /* Beat the Champ */
-
-READ16_MEMBER(konamigv_state::btcflash_r)
-{
-	return m_flash16[0]->read(offset);
-}
-
-WRITE16_MEMBER(konamigv_state::btcflash_w)
-{
-	m_flash16[0]->write(offset, data);
-}
 
 READ16_MEMBER(konamigv_state::btc_trackball_r)
 {
@@ -576,13 +555,6 @@ READ16_MEMBER(konamigv_state::btc_trackball_r)
 WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
 //  mame_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
-}
-
-DRIVER_INIT_MEMBER(konamigv_state,btchamp)
-{
-	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
-
-	DRIVER_INIT_CALL(konamigv);
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
@@ -634,11 +606,6 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-DRIVER_INIT_MEMBER(konamigv_state,tokimosh)
-{
-	DRIVER_INIT_CALL(konamigv);
-}
-
 static MACHINE_CONFIG_DERIVED( tokimosh, konamigv )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( tokimosh_map )
@@ -653,13 +620,6 @@ CD:
     UA
     A01
 */
-
-DRIVER_INIT_MEMBER(konamigv_state,kdeadeye)
-{
-	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
-
-	DRIVER_INIT_CALL(konamigv);
-}
 
 static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
 	MCFG_CPU_MODIFY( "maincpu" )
@@ -841,17 +801,17 @@ ROM_START( tokimosp )
 ROM_END
 
 /* BIOS placeholder */
-GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", GAME_IS_BIOS_ROOT )
+GAME( 1995, konamigv, 0,        konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Baby Phoenix/GV System", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, powyak96, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, tokimosh, konamigv, tokimosh, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1997, tokimosp, konamigv, tokimosh, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
-GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1996, powyak96, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Jikkyou Powerful Pro Yakyuu '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, hyperath, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, susume,   lacrazyc, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  driver_device,  0,        ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, driver_device,  0,        ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, weddingr, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, tokimosh, konamigv, tokimosh, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1997, tokimosp, konamigv, tokimosh, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1998, nagano98, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1998, naganoj,  nagano98, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, konamigv_state, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
