@@ -6559,6 +6559,7 @@ src/mess/includes/gp32.h svneol=native#text/plain
 src/mess/includes/hec2hrp.h svneol=native#text/plain
 src/mess/includes/hp48.h svneol=native#text/plain
 src/mess/includes/huebler.h svneol=native#text/plain
+src/mess/includes/hx20.h svneol=native#text/plain
 src/mess/includes/intv.h svneol=native#text/plain
 src/mess/includes/irisha.h svneol=native#text/plain
 src/mess/includes/jtc.h svneol=native#text/plain
