@@ -779,7 +779,6 @@ FLOPPY_DESTRUCT( td0_dsk_destruct )
 
 *********************************************************************/
 
-#include <ctype.h>
 #include "td0_dsk.h"
 
 td0_format::td0_format()
@@ -806,7 +805,7 @@ int td0_format::identify(io_generic *io, UINT32 form_factor)
 	UINT8 h[7];
 
 	io_generic_read(io, h, 0, 7);
-	if((toupper(h[0]) == 'T') && (toupper(h[1]) == 'D'))
+	if(((h[0] == 'T') && (h[1] == 'D')) || ((h[0] == 't') && (h[1] == 'd')))
 	{
 			return 100;
 	}
@@ -815,7 +814,6 @@ int td0_format::identify(io_generic *io, UINT32 form_factor)
 
 bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	int cell_count = 0;
 	int track_count = 0;
 	int head_count = 0;
 	int track_spt;
@@ -853,7 +851,6 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			case 2:
 				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 				{
-					cell_count = 166666;
 					if(head_count == 2)
 						image->set_variant(floppy_image::DSHD);
 					else
@@ -862,7 +859,6 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				}
 				/* no break; could be qd, won't know until tracks are counted */
 			case 1:
-				cell_count = 100000;
 				if(head_count == 2)
 					image->set_variant(floppy_image::DSDD);
 				else
@@ -871,7 +867,6 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			case 4:
 				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
 				{
-					cell_count = 200000;
 					if(head_count == 2)
 						image->set_variant(floppy_image::DSHD);
 					else
@@ -880,10 +875,9 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				}
 				/* no break */
 			case 3:
-				cell_count = 100000;
 				if(head_count == 2)
 				{
-					if(form_factor == floppy_image::FF_525) // is this correct?
+					if(form_factor == floppy_image::FF_525)
 						image->set_variant(floppy_image::DSQD);
 					else
 						image->set_variant(floppy_image::DSDD);
@@ -897,6 +891,11 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				}
 				break;
 		}
+
+		static const int rates[3] = { 250000, 300000, 500000 };
+		int rate = (header[5] & 0x7f) >= 3 ? 500000 : rates[header[5] & 0x7f];
+		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
+		int base_cell_count = rate*60/rpm;
 
 		while(track_spt != 255)
 		{
@@ -986,10 +985,12 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				}
 			}
 			track_count = track;
+
 			if(fm)
-				build_pc_track_fm(track, head, image, cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+				build_pc_track_fm(track, head, image, base_cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 			else
-				build_pc_track_mfm(track, head, image, cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+				build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+
 			track_spt = imagebuf[offset];
 		}
 		if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
