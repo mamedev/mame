@@ -180,6 +180,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<dataarea name="rom" size="131072">
 				<rom name="aerial assault (japan) (v1.1).bin" size="131072" crc="04fe6dde" sha1="2a91ab5817938dddf2724df2dfd95a3bc6f5156d" offset="000000" />
 			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -193,6 +195,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="aerial assault (world).bin" size="131072" crc="3e549b7a" sha1="cbdbaaeb62a8483d9d5a8757b0f19233dfb9b416" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1989,6 +1993,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="desert speedtrap (usa).bin" size="262144" crc="c2e111ac" sha1="6b88fb212f0556ea57e01a3a1cd5123db5631e28" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -7226,6 +7232,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<dataarea name="rom" size="524288">
 				<rom name="sonic drift (japan) (sample).bin" size="524288" crc="baac1fc0" sha1="462bdf9bfac3eb9b389142b55be39608c3343223" offset="000000" />
 			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -7239,6 +7247,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sonic drift (japan).bin" size="524288" crc="68f0a776" sha1="fef5d69093df2d774ed274a4079790f8778577fc" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
