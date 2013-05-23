@@ -756,7 +756,7 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	{
 		m_ext_ntram_size = 0x2000;
 		m_ext_ntram = auto_alloc_array_clear(machine, UINT8, m_ext_ntram_size);
-		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_ext_ntram, m_ext_ntram_size);
+		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_ext_ntram, m_ext_ntram_size);
 	}
 
 	// at loading time we have configured m_mirroring, now setup NT pages
@@ -764,11 +764,11 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 
 	// save the on-cart RAM pointers
 	if (m_prgram_size)
-		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_prgram, m_prgram_size);
+		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_prgram, m_prgram_size);
 	if (m_vram_size)
-		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_vram, m_vram_size);
+		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_vram, m_vram_size);
 	if (m_battery_size)
-		state_save_register_item_pointer(machine, "NES_CART", NULL, 0, m_battery, m_battery_size);
+		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_battery, m_battery_size);
 }
 
 void device_nes_cart_interface::pcb_reg_postload(running_machine &machine)

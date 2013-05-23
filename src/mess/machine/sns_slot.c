@@ -112,7 +112,7 @@ void device_sns_cart_interface::nvram_alloc(running_machine &machine, UINT32 siz
 	{
 		m_nvram = auto_alloc_array_clear(machine, UINT8, size);
 		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "SNES_CART", NULL, 0, m_nvram, m_nvram_size);
+		state_save_register_item_pointer(machine, "SNES_CART", this->device().tag(), 0, m_nvram, m_nvram_size);
 	}
 }
 
@@ -130,7 +130,7 @@ void device_sns_cart_interface::rtc_ram_alloc(running_machine &machine, UINT32 s
 	{
 		m_rtc_ram = auto_alloc_array_clear(machine, UINT8, size);
 		m_rtc_ram_size = size;
-		state_save_register_item_pointer(machine, "SNES_CART", NULL, 0, m_rtc_ram, m_rtc_ram_size);
+		state_save_register_item_pointer(machine, "SNES_CART", this->device().tag(), 0, m_rtc_ram, m_rtc_ram_size);
 	}
 }
 

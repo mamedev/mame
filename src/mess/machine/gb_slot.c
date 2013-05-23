@@ -76,7 +76,7 @@ void device_gb_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
 	{
 		m_ram = auto_alloc_array_clear(machine, UINT8, size);
 		m_ram_size = size;
-		state_save_register_item_pointer(machine, "GB_CART", NULL, 0, m_ram, m_ram_size);
+		state_save_register_item_pointer(machine, "GB_CART", this->device().tag(), 0, m_ram, m_ram_size);
 	}
 }
 
