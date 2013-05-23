@@ -71,6 +71,8 @@ public:
 	DECLARE_READ32_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
 	DECLARE_WRITE16_MEMBER(coh1001l_latch_w);
+	DECLARE_WRITE16_MEMBER(coh1001l_sound_unk_w);
+	DECLARE_WRITE_LINE_MEMBER(coh1001l_ymz_irq);
 	DECLARE_WRITE8_MEMBER(coh1002v_bank_w);
 	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
 	DECLARE_READ8_MEMBER(cbaj_from_z80_latch_r);
@@ -2158,15 +2160,26 @@ Notes:
       VSync        - 60Hz
 */
 
-WRITE8_MEMBER(zn_state::coh1001l_bank_w)
+WRITE_LINE_MEMBER(zn_state::coh1001l_ymz_irq)
 {
-	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
+	m_audiocpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE16_MEMBER(zn_state::coh1001l_sound_unk_w)
+{
+	// irq ack maybe?
+	logerror("coh1001l_sound_unk_w: %04x %04x\n", data, mem_mask);
 }
 
 WRITE16_MEMBER(zn_state::coh1001l_latch_w)
 {
 	soundlatch_word_w(space, 0, data);
-	//m_audiocpu->set_input_line(3, HOLD_LINE);
+	m_audiocpu->set_input_line(3, HOLD_LINE);
+}
+
+WRITE8_MEMBER(zn_state::coh1001l_bank_w)
+{
+	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
@@ -2184,7 +2197,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1001l)
 
 static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READ(soundlatch_word_r)
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(soundlatch_word_r, coh1001l_sound_unk_w)
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM
 ADDRESS_MAP_END
@@ -2200,8 +2213,9 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(zn_state, coh1001l_ymz_irq))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.4)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.4)
 MACHINE_CONFIG_END
 
 /*
@@ -4579,9 +4593,9 @@ ROM_START( hvnsgate )
 	ROM_LOAD16_BYTE( "athg-04.21",   0x000001, 0x020000, CRC(18523e85) SHA1(0ecc2116760f05fca8e5366b0a97dfe26fa9bc0c) )
 	ROM_LOAD16_BYTE( "athg-03.22",   0x000000, 0x020000, CRC(7eef7e68) SHA1(65b8ae18ef4ff636c548326a360b481aeb316869) )
 
-	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B Sound Samples */
-	ROM_LOAD( "athg-05.4136", 0x000000, 0x200000, CRC(74469a15) SHA1(0faa883900d7fd2e5240f486db33b3d868f1f05f) )
-	ROM_LOAD( "athg-06.4134", 0x200000, 0x200000, CRC(443ade73) SHA1(6ef6aa68c525b9749833125dcab929d1d65d3b90) )
+	ROM_REGION( 0x800000, "ymz", ROMREGION_ERASE00 ) /* YMZ280B Sound Samples */
+	ROM_LOAD( "athg-05.4136", 0x400000, 0x200000, CRC(74469a15) SHA1(0faa883900d7fd2e5240f486db33b3d868f1f05f) )
+	ROM_LOAD( "athg-06.4134", 0x600000, 0x200000, CRC(443ade73) SHA1(6ef6aa68c525b9749833125dcab929d1d65d3b90) )
 ROM_END
 
 /* Capcom ZN1 */
