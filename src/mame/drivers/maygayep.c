@@ -6602,7 +6602,18 @@ ROM_START( ep_snseta ) // why are these larger?
 ROM_END
 
 
+#define EP_TREAS_SOUND \
+	ROM_REGION( 0x100000, "ymz", 0 ) \
+	ROM_LOAD( "treas1_6.s0", 0x000000, 0x080000, CRC(df792dc0) SHA1(96647eb579a3a60f1a4a2bea53d7a13030838437) ) 
 
+ROM_START( ep_treas )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "treas1_6.g0", 0x000000, 0x020000, CRC(5b8bab5d) SHA1(a44254d468309f536a1e1e35536328bf3bc02704) )
+	ROM_LOAD16_BYTE( "treas1_6.g1", 0x000001, 0x020000, CRC(752117ed) SHA1(3c8ddf8acd1307749a03e90bd2d76f0b81d6e388) )
+	ROM_LOAD16_BYTE( "treas1_6.g2", 0x040000, 0x020000, CRC(d4f61c7e) SHA1(4f62fca291fcc4b24c3e3bbbbd6b0f5216f3e0ef) )
+	ROM_LOAD16_BYTE( "treas1_6.g3", 0x040001, 0x020000, CRC(8c287556) SHA1(e5c9dc34381c94d3ef4474f47fef119066ee380b) )
+	EP_TREAS_SOUND
+ROM_END
 
 ROM_START( ep_twarp )
 	ROM_REGION( 0x080000, "maincpu", 0 )
@@ -8058,6 +8069,8 @@ GAME( 199?, ep_redla,   ep_redl,    maygayep,  maygayep, maygayep_state,  maygay
 
 GAME( 199?, ep_snset,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Sunset Strip (Extreme) (EPOCH) (SUST 0.1, set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_snseta,  ep_snset,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Sunset Strip (Extreme) (EPOCH) (SUST 0.1, set 2)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, ep_treas,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Global",        "Treasure Hunt (Global) (EPOCH) (Version 1.6)",GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, ep_twarp,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Time Warp (Extreme) (EPOCH) (TWRP 0.1, set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_twarpa,  ep_twarp,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Time Warp (Extreme) (EPOCH) (TWRP 0.1, set 2)",GAME_IS_SKELETON_MECHANICAL )
