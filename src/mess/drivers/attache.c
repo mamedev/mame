@@ -198,7 +198,7 @@ private:
 	required_memory_bank m_membank8;
 
 	bool m_rom_active;
-	bool m_operation_enable;
+	//bool m_operation_enable;
 	UINT8 m_pio_porta;
 	UINT8 m_pio_portb;
 	UINT8 m_pio_select;
