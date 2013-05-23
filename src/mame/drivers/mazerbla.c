@@ -5,8 +5,57 @@ Great Guns by Stern Electronics (c) 1983
 
 
 Driver by Jarek Burczynski
+Added notes by Lord Nightmare
 2003.03.19
 
+Notes:
+======
+Mazer blazer consists of four boards in a cage:
+ZPU-2000 - main cpu board
+ - this board has the main cpu on it and four roms (seven sockets for roms, three empty)
+   - roms in sockets "ROM0"@H1 "ROM1"@H2 "ROM2"@H3 "ROM3"@H4
+   - "ROM4"@H5 "ROM5"@H6 "ROM6"@H7 are empty
+   - roms are marked "MAZER BLAZER // ZPU <rom#> RA<revision#> // 1983 STERN"
+ - 32 dipswitches in 4 banks of 8
+ - four 'test button' style switches
+ - one 4Mhz xtal @A1
+ - this same board is shared with cliff hanger (clifhgr.c)
+ 
+CFB-1000 - video/subcpu board
+ - this board has a sub-cpu on it and four roms (six sockets for roms, two empty)
+   - the roms go in sockets "ROM0"@G8, "ROM2"@K8, "ROM3"@K10, "ROM4"@K11
+   - "ROM1"@G6 and "ROM5"@K12 are empty
+   - roms are marked "MAZER BLAZER // CFB <rom#> RA<revision#> // 1983 STERN"
+ - "shared ram" ?6116? SRAM @G3
+ - DIP64 custom framebuffer controller "Video Controller"@E11
+ - "Parameter ram" ?6116? SRAM @K13
+ - "Frame buffer" 16x ?4116? DRAM @ right edge of pcb
+ - "Erase PROM" @A16 (UNDUMPED)
+ - 22.1164Mhz xtal @K14
+ - 8 dipswitches in 2 banks of 4, @B5 and @B7
+ - LED @B7
+
+VSB-2000 - sound/speech/subcpu board
+ - this board has a sub-cpu on it, a digitalker speech chip, 4 roms (2 dumped, 2 undumped) and 4 PROMs (all dumped)
+ - Z80 CPU @E6
+   - Roms at "ROM0"@D2, "ROM1"@D4
+ - MM54104 Digitalker "SPU" @A6
+   - Roms at "ROM2"@A2, "ROM3"@A4 (UNDUMPED)
+ - roms are marked "MAZER BLAZER // VSB <rom#> RA<revision#> // 1983 STERN"
+ - Sound section
+   - PROMS: 82s123: @B8 @B9; 82s129: @G8 @G9 (all dumped)
+
+CRF-1001 - RF Filter board for video/audio output
+ - this same board is shared with cliff hanger (clifhgr.c)
+
+Versions:
+======
+Mazer blazer's zpu-2000 roms are known to exist in at least the following versions:
+RA3
+and probably exist in versions RA1 and RA2 as well.
+It is currently unknown what versions the two sets correspond to.
+The other roms are likely always version RA1, as the RA3-zpu-2000 board has RA1
+roms for all roms except the zpu-2000 board.
 
 Issues:
 ======
