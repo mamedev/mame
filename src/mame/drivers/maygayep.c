@@ -6295,6 +6295,17 @@ ROM_START( ep_lla )
 ROM_END
 
 
+#define EP_RLGDT_SOUND \
+	ROM_REGION( 0x200000, "ymz", 0 ) \
+	ROM_LOAD( "rlgdt1_0.s0", 0x000000, 0x100000, CRC(f20867b8) SHA1(13bd978dca616599b3768da482a75fc524c147ce) ) \
+	ROM_LOAD( "rlgdt1_0.s1", 0x080000, 0x100000, CRC(54969491) SHA1(b689da0ec62a7eefa2d9758cddae67a5bdf0c4c7) )
+
+ROM_START( ep_rlgdt )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rlgdt1_0.g0", 0x000000, 0x020000, CRC(3133ed91) SHA1(62d665a7ad58686c2b9d6486118dce92de7cbd0d) )
+	ROM_LOAD16_BYTE( "rlgdt1_0.g1", 0x000001, 0x020000, CRC(7f08a205) SHA1(5166d3ff781b645fa02fb7be96a926c65e5b2a93) )
+	EP_RLGDT_SOUND
+ROM_END
 
 
 
@@ -7902,6 +7913,8 @@ GAME( 199?, ep_mummyd,  ep_mummy,   maygayep,  maygayep, maygayep_state,  maygay
 GAME( 199?, ep_mummye,  ep_mummy,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Impulse",       "Mummy Talks (Impulse) (EPOCH) (set 6)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_mummyf,  ep_mummy,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Impulse",       "Mummy Talks (Impulse) (EPOCH) (set 7)",GAME_IS_SKELETON_MECHANICAL )
 
+GAME( 199?, ep_rlgdt,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Global",        "Reel Good Time (Rebuild) (Global) (Version 1.0) (EPOCH)",GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, ep_rchik,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Global",        "Rich Chics Club (Global) (EPOCH) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_rchika,  ep_rchik,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Global",        "Rich Chics Club (Global) (EPOCH) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 
@@ -8038,6 +8051,7 @@ GAME( 199?, ep_cyce,    ep_cyc,     maygayep,  maygayep, maygayep_state,  maygay
 
 GAME( 199?, ep_ll,      0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Lucky Ladders (Extreme) (EPOCH) (LULA 0.3, set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_lla,     ep_ll,      maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Lucky Ladders (Extreme) (EPOCH) (LULA 0.3, set 2)",GAME_IS_SKELETON_MECHANICAL )
+
 
 GAME( 199?, ep_redl,    0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Red Line (Extreme) (EPOCH) (RELI 0.1, set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_redla,   ep_redl,    maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Extreme",       "Red Line (Extreme) (EPOCH) (RELI 0.1, set 2)",GAME_IS_SKELETON_MECHANICAL )
