@@ -153,6 +153,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
 	DECLARE_READ8_MEMBER(memmap_r);
 	DECLARE_WRITE8_MEMBER(memmap_w);
+	DECLARE_READ8_MEMBER(dma_mem_r);
+	DECLARE_WRITE8_MEMBER(dma_mem_w);
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
@@ -552,25 +554,32 @@ WRITE8_MEMBER(attache_state::dma_mask_w)
 READ8_MEMBER(attache_state::fdc_dma_r)
 {
 	UINT8 ret = m_fdc->dma_r();
-	logerror("DMA: read data %02x\n",ret);
 	return ret;
 }
 
 WRITE8_MEMBER(attache_state::fdc_dma_w)
 {
 	m_fdc->dma_w(data);
-	logerror("DMA: write data %02x\n",data);
+}
+
+READ8_MEMBER(attache_state::dma_mem_r)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+WRITE8_MEMBER(attache_state::dma_mem_w)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
 void attache_state::fdc_intrq_w(bool state)
 {
 	m_ctc->trg3(state);
-	logerror("FDC: INT Request %i\n",state);
 }
 
 void attache_state::fdc_drq_w(bool state)
 {
-	m_dma->dreq0_w(state);
+	m_dma->dreq0_w(state ^ 1);
 }
 
 WRITE_LINE_MEMBER( attache_state::hreq_w )
@@ -578,18 +587,15 @@ WRITE_LINE_MEMBER( attache_state::hreq_w )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dma->hack_w(state);
-	logerror("DMA: Halt Request %i\n",state);
 }
 
 WRITE_LINE_MEMBER(attache_state::eop_w)
 {
 	m_fdc->tc_w(state);
-	logerror("DMA: EOP %i\n",state);
 }
 
 WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 {
-	logerror("DMA: DMA Acknowledge %i\n",state);
 }
 
 static ADDRESS_MAP_START( attache_map , AS_PROGRAM, 8, attache_state)
@@ -741,10 +747,10 @@ static const z80ctc_interface ctc_interface =
 
 static const am9517a_interface dma_interface =
 {
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
+	DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
 	DEVCB_DRIVER_LINE_MEMBER(attache_state,eop_w),  // out_eop_cb
-	DEVCB_NULL,  // in_memr_cb
-	DEVCB_NULL,  // out_memw_cb
+	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_r),  // in_memr_cb
+	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_w),  // out_memw_cb
 	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // in_ior_cb[4]
 	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // out_iow_cb[4]
 	{DEVCB_DRIVER_LINE_MEMBER(attache_state,fdc_dack_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}   // out_dack_cb[4]
