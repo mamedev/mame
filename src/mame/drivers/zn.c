@@ -2214,8 +2214,8 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(zn_state, coh1001l_ymz_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.4)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.37)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.37)
 MACHINE_CONFIG_END
 
 /*
