@@ -94,7 +94,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 				scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 
 				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, space.device().safe_pc());
-				if (devices[last_id])
+				if (last_id >= 0 && last_id <= 7 && devices[last_id])
 				{
 					devices[last_id]->reset();
 				}
@@ -122,7 +122,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 				}
 
 				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, space.device().safe_pc());
-				if (devices[last_id])
+				if (last_id >= 0 && last_id <= 7 && devices[last_id])
 				{
 					int length;
 
@@ -182,6 +182,7 @@ void am53cf96_device::device_start()
 
 	fptr = 0;
 	xfer_state = 0;
+	last_id = -1;
 
 	save_item( NAME( scsi_regs ) );
 	save_item( NAME( fifo ) );
@@ -197,7 +198,7 @@ void am53cf96_device::dma_read_data(int bytes, UINT8 *pData)
 {
 	scsi_regs[REG_STATUS] |= 0x10;  // indicate DMA finished
 
-	if (devices[last_id])
+	if (last_id >= 0 && last_id <= 7 && devices[last_id])
 	{
 		devices[last_id]->ReadData( pData, bytes );
 	}
@@ -214,7 +215,7 @@ void am53cf96_device::dma_write_data(int bytes, UINT8 *pData)
 
 	scsi_regs[REG_STATUS] |= 0x10;  // indicate DMA finished
 
-	if (devices[last_id])
+	if (last_id >= 0 && last_id <= 7 && devices[last_id])
 	{
 		devices[last_id]->WriteData( pData, bytes );
 	}
