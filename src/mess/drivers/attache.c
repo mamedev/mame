@@ -17,9 +17,33 @@
  *  Video: CRT5027, 320x240
  *  Serial: Z80-SIO
  *
+ *  Note:
+ *  In terminal mode (when disk booting fails or no disk is inserted), press Ctrl+Linefeed (ctrl+pgdn by default)
+ *  to enter monitor mode.  From here you can run a bunch of diagnostic tests.
+ *
+ *  G - Display Test Pattern
+ *  H - Display RAM Test
+ *  nnI - Input Test  (nn = port number)
+ *  J - Jump
+ *  K - Keyboard Test
+ *  L - Loop Tests
+ *  M - Map Test
+ *  nnmmO - Output Test (nn = port number, mm = data to send)
+ *  P - Format Diskette (P to format disk in Drive A, 1P for Drive B)
+ *  Q - CMOS RAM Test
+ *  nR - Main RAM Test (n = 16kB bank to test [0-3])
+ *  bbpcS - Select Output Ports (first b = printer baud rate, second b = comm baud rate, p = printer port, c = comm port)
+ *  T - Real Time Clock Test
+ *  U - United Tests
+ *  cchsV - Read a sector from disk (cc = cylinder, h = head [bit 0=drive, bit 2=side], s = sector)
+ *  cchsW - Write a sector from disk
+ *  nnnnmmmmX - I/O port transmit (nnnn = number of bytes to transmit, mmmm = start of data to transmit)
+ *  nnnnY - I/O port recieve (nnnn = address of data loaded)
+ *  Z - Auto Disk Test (1Z for drive B)
+ *
+ *
  *  TODO:
  *    - Keyboard repeat
- *    - Figure out memory mapping
  *    - Get FDC/DMA transfers working
  *    - Get at least some of the system tests to pass
  *    - Add graphics support
@@ -68,6 +92,14 @@ public:
 		  m_kb_row6(*this, "row6"),
 		  m_kb_row7(*this, "row7"),
 		  m_kb_mod(*this, "modifiers"),
+		  m_membank1(*this, "bank1"),
+		  m_membank2(*this, "bank2"),
+		  m_membank3(*this, "bank3"),
+		  m_membank4(*this, "bank4"),
+		  m_membank5(*this, "bank5"),
+		  m_membank6(*this, "bank6"),
+		  m_membank7(*this, "bank7"),
+		  m_membank8(*this, "bank8"),
 		  m_rom_active(true),
 		  m_kb_clock(true),
 		  m_kb_empty(true)
@@ -119,6 +151,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dma_mask_w);
 	DECLARE_READ8_MEMBER(fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+	DECLARE_READ8_MEMBER(memmap_r);
+	DECLARE_WRITE8_MEMBER(memmap_w);
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
@@ -152,6 +186,15 @@ private:
 	required_ioport m_kb_row6;
 	required_ioport m_kb_row7;
 	required_ioport m_kb_mod;
+	required_memory_bank m_membank1;
+	required_memory_bank m_membank2;
+	required_memory_bank m_membank3;
+	required_memory_bank m_membank4;
+	required_memory_bank m_membank5;
+	required_memory_bank m_membank6;
+	required_memory_bank m_membank7;
+	required_memory_bank m_membank8;
+
 	bool m_rom_active;
 	bool m_operation_enable;
 	UINT8 m_pio_porta;
@@ -170,6 +213,7 @@ private:
 	bool m_kb_clock;
 	bool m_kb_empty;
 	UINT8 m_kb_bitpos;
+	UINT8 m_memmap;
 };
 
 
@@ -205,12 +249,12 @@ READ8_MEMBER(attache_state::rom_r)
 	if(m_rom_active)
 		return m_rom->base()[offset];
 	else
-		return m_ram->pointer()[offset];
+		return m_ram->pointer()[m_membank1->entry()*0x2000 + offset];
 }
 
 WRITE8_MEMBER(attache_state::rom_w)
 {
-	m_ram->pointer()[offset] = data;
+	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
 
 UINT16 attache_state::get_key()
@@ -230,19 +274,18 @@ UINT16 attache_state::get_key()
 				res = bits & 0x07;
 				res |= ((row & 0x07) << 3);
 				m_kb_empty = false;
+				data = m_kb_mod->read();
+				if(~data & 0x01)
+					res |= 0x80;  // shift
+				if(data & 0x02)
+					res |= 0x40;  // ctrl
 				//logerror("KB: hit row %i, bit %i\n",row,bits);
-				break;
+				return res;
 			}
 		}
-		// no key pressed
-		m_kb_empty = true;
 	}
-	data = m_kb_mod->read();
-	if(~data & 0x01)
-		res |= 0x80;  // shift
-	if(data & 0x02)
-		res |= 0x40;  // ctrl
-//	logerror("KB: keycode %02x\n",res);
+	// no key pressed
+	m_kb_empty = true;
 	return res;
 }
 
@@ -257,7 +300,7 @@ UINT8 attache_state::keyboard_data_r()
 		else
 			return 0x00;
 		//logerror("KB: bit position %i, key %02x, empty %i\n",m_kb_bitpos,m_kb_current_key,m_kb_empty);
-		if(!m_kb_empty)
+		if(m_kb_empty)
 			return 0x00;
 		else
 			return 0x40;
@@ -295,17 +338,22 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	case PIO_SEL_5832_READ:
 		ret = m_rtc->data_r(space,0);
 		break;
+	case PIO_SEL_5101_WRITE:
+		ret = m_cmos_ram[m_cmos_select] & 0x0f;
+		logerror("CMOS: read %02x to byte %02x (write)\n",ret, m_cmos_select);
+		break;
 	case PIO_SEL_5101_READ:
 		ret = m_cmos_ram[m_cmos_select] & 0x0f;
+		logerror("CMOS: read %02x to byte %02x\n",ret, m_cmos_select);
 		break;
 	case PIO_SEL_LATCH:
-		ret = 0xff;  // Write-only?
+		ret = 0x00;  // Write-only?
 		break;
 	case PIO_SEL_NOP:
 		logerror("PIO: NOP read\n");
 		break;
-//	logerror("PIO: Port A read operation %i returning %02x\n",m_pio_select,ret);
 	}
+	//logerror("PIO: Port A read operation %i returning %02x\n",m_pio_select,ret);
 
 	return ret;
 }
@@ -319,7 +367,7 @@ READ8_MEMBER(attache_state::pio_portB_r)
 
 void attache_state::operation_strobe(address_space& space, UINT8 data)
 {
-//	logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
+	//logerror("PIO: Port A write operation %i, data %02x\n",m_pio_select,data);
 	switch(m_pio_select)
 	{
 	case PIO_SEL_8910_ADDR:
@@ -342,6 +390,7 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		break;
 	case PIO_SEL_5101_READ:
 		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
+		logerror("CMOS: write %02x to byte %02x (read)\n",data & 0x0f, m_cmos_select);
 		break;
 	case PIO_SEL_LATCH:
 		m_pio_latch = data;
@@ -470,6 +519,26 @@ WRITE8_MEMBER(attache_state::display_command_w)
 	}
 }
 
+READ8_MEMBER(attache_state::memmap_r)
+{
+	return m_memmap;
+}
+
+WRITE8_MEMBER(attache_state::memmap_w)
+{
+	// TODO: figure this out properly
+	// Tech manual says that RAM is split into 8kB chunks.
+	// Would seem that bit 4 is always 0 and bit 3 is always 1?
+	UINT8 bank = (data & 0xe0) >> 5;
+	UINT8 loc = data & 0x07;
+	memory_bank* banknum[8] = { m_membank1, m_membank2, m_membank3, m_membank4, m_membank5, m_membank6, m_membank7, m_membank8 };
+	m_memmap = data;
+
+	banknum[bank]->set_entry(loc);
+
+	logerror("MEM: write %02x - bank %i, location %i\n",data, bank, loc);
+}
+
 READ8_MEMBER(attache_state::dma_mask_r)
 {
 	return m_dma->read(space,0x0f);
@@ -524,8 +593,14 @@ WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 }
 
 static ADDRESS_MAP_START( attache_map , AS_PROGRAM, 8, attache_state)
-	AM_RANGE(0x0000,0x3fff) AM_READWRITE(rom_r, rom_w)
-	AM_RANGE(0x4000,0xffff) AM_RAM
+	AM_RANGE(0x0000,0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000,0x3fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x4000,0x5fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x6000,0x7fff) AM_RAMBANK("bank4")
+	AM_RANGE(0x8000,0x9fff) AM_RAMBANK("bank5")
+	AM_RANGE(0xa000,0xbfff) AM_RAMBANK("bank6")
+	AM_RANGE(0xc000,0xdfff) AM_RAMBANK("bank7")
+	AM_RANGE(0xe000,0xffff) AM_RAMBANK("bank8")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
@@ -537,7 +612,7 @@ static ADDRESS_MAP_START( attache_io , AS_IO, 8, attache_state)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
 	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
 	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
-	// 0xff - RAM Virtual Map Data
+	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(attache)
@@ -667,7 +742,7 @@ static const z80ctc_interface ctc_interface =
 static const am9517a_interface dma_interface =
 {
 	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(attache_state,hreq_w),  // out_hreq_cb
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(attache_state,eop_w),  // out_eop_cb
+	DEVCB_DRIVER_LINE_MEMBER(attache_state,eop_w),  // out_eop_cb
 	DEVCB_NULL,  // in_memr_cb
 	DEVCB_NULL,  // out_memw_cb
 	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // in_ior_cb[4]
@@ -697,6 +772,30 @@ SLOT_INTERFACE_END
 
 void attache_state::driver_start()
 {
+	UINT8 *RAM = m_ram->pointer();
+
+	m_membank1->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank2->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank3->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank4->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank5->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank6->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank7->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+	m_membank8->configure_entries(0, 8, &RAM[0x0000], 0x2000);
+
+	m_membank1->set_entry(0);
+	m_membank2->set_entry(1);
+	m_membank3->set_entry(2);
+	m_membank4->set_entry(3);
+	m_membank5->set_entry(4);
+	m_membank6->set_entry(5);
+	m_membank7->set_entry(6);
+	m_membank8->set_entry(7);
+
+	memset(RAM,0,65536);
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff,read8_delegate(FUNC(attache_state::rom_r),this),write8_delegate(FUNC(attache_state::rom_w),this));
+
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);
 	save_pointer(m_cmos_ram,"CMOS RAM",64);
@@ -795,5 +894,5 @@ ROM_START( attachef )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1983, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IS_SKELETON)
-COMP( 1983, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IS_SKELETON)
+COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IS_SKELETON)
+COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IS_SKELETON)
