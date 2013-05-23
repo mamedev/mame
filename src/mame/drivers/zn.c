@@ -64,11 +64,11 @@ public:
 	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
 	DECLARE_READ16_MEMBER(bam2_mcu_r);
 	DECLARE_READ16_MEMBER(bam2_unk_r);
-	DECLARE_WRITE32_MEMBER(acpsx_00_w);
-	DECLARE_WRITE32_MEMBER(acpsx_10_w);
-	DECLARE_WRITE32_MEMBER(nbajamex_80_w);
-	DECLARE_READ32_MEMBER(nbajamex_08_r);
-	DECLARE_READ32_MEMBER(nbajamex_80_r);
+	DECLARE_WRITE16_MEMBER(acpsx_00_w);
+	DECLARE_WRITE16_MEMBER(acpsx_10_w);
+	DECLARE_WRITE16_MEMBER(nbajamex_80_w);
+	DECLARE_READ16_MEMBER(nbajamex_08_r);
+	DECLARE_READ16_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
 	DECLARE_WRITE16_MEMBER(coh1001l_latch_w);
 	DECLARE_WRITE16_MEMBER(coh1001l_sound_unk_w);
@@ -81,9 +81,9 @@ public:
 	DECLARE_READ8_MEMBER(cbaj_to_z80_latch_r);
 	DECLARE_WRITE8_MEMBER(cbaj_from_z80_latch_w);
 	DECLARE_READ8_MEMBER(cbaj_to_z80_status_r);
-	DECLARE_READ32_MEMBER(jdredd_idestat_r);
-	DECLARE_READ32_MEMBER(jdredd_ide_r);
-	DECLARE_WRITE32_MEMBER(jdredd_ide_w);
+	DECLARE_READ8_MEMBER(jdredd_idestat_r);
+	DECLARE_READ16_MEMBER(jdredd_ide_r);
+	DECLARE_WRITE16_MEMBER(jdredd_ide_w);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000c);
@@ -1874,55 +1874,39 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-READ32_MEMBER(zn_state::jdredd_idestat_r)
+READ8_MEMBER(zn_state::jdredd_idestat_r)
 {
 	device_t *device = machine().device("ide");
 	return ide_controller_r( device, 0x1f7, 1 );
 }
 
-READ32_MEMBER(zn_state::jdredd_ide_r)
+READ16_MEMBER(zn_state::jdredd_ide_r)
 {
 	device_t *device = machine().device("ide");
-	UINT32 data = 0;
+	UINT16 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= ide_controller_r( device, 0x1f0 + ( offset * 2 ), 1 ) << 0;
+		data |= ide_controller_r( device, 0x1f0 + offset, 1 ) << 0;
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= ide_controller_r( device, 0x1f0 + ( offset * 2 ), 1 ) << 8;
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		data |= ide_controller_r( device, 0x1f1 + ( offset * 2 ), 1 ) << 16;
-	}
-	if( ACCESSING_BITS_24_31 )
-	{
-		data |= ide_controller_r( device, 0x1f1 + ( offset * 2 ), 1 ) << 24;
+		data |= ide_controller_r( device, 0x1f0 + offset, 1 ) << 8;
 	}
 
 	return data;
 }
 
-WRITE32_MEMBER(zn_state::jdredd_ide_w)
+WRITE16_MEMBER(zn_state::jdredd_ide_w)
 {
 	device_t *device = machine().device("ide");
 	if( ACCESSING_BITS_0_7 )
 	{
-		ide_controller_w( device, 0x1f0 + ( offset * 2 ), 1, data >> 0 );
+		ide_controller_w( device, 0x1f0 + offset, 1, data >> 0 );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		ide_controller_w( device, 0x1f0 + ( offset * 2 ), 1, data >> 8 );
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		ide_controller_w( device, 0x1f1 + ( offset * 2 ), 1, data >> 16 );
-	}
-	if( ACCESSING_BITS_24_31 )
-	{
-		ide_controller_w( device, 0x1f1 + ( offset * 2 ), 1, data >> 24 );
+		ide_controller_w( device, 0x1f0 + offset, 1, data >> 8 );
 	}
 }
 
@@ -1959,31 +1943,31 @@ void zn_state::jdredd_vblank(screen_device &screen, bool vblank_state)
 	}
 }
 
-WRITE32_MEMBER(zn_state::acpsx_00_w)
+WRITE16_MEMBER(zn_state::acpsx_00_w)
 {
 	verboselog(0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-WRITE32_MEMBER(zn_state::acpsx_10_w)
+WRITE16_MEMBER(zn_state::acpsx_10_w)
 {
 	verboselog(0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-WRITE32_MEMBER(zn_state::nbajamex_80_w)
+WRITE16_MEMBER(zn_state::nbajamex_80_w)
 {
 	verboselog(0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
 	psxirq->intin10(1);
 }
 
-READ32_MEMBER(zn_state::nbajamex_08_r)
+READ16_MEMBER(zn_state::nbajamex_08_r)
 {
 	UINT32 data = 0xffffffff;
 	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
-READ32_MEMBER(zn_state::nbajamex_80_r)
+READ16_MEMBER(zn_state::nbajamex_80_r)
 {
 	UINT32 data = 0xffffffff;
 	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -1992,23 +1976,23 @@ READ32_MEMBER(zn_state::nbajamex_80_r)
 
 static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE(acpsx_00_w)
-	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE(acpsx_10_w)
+	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
+	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE16(acpsx_10_w, 0xffff0000)
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f200000, 0x1f207fff) AM_RAM AM_SHARE("eeprom")
-	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ(nbajamex_08_r)
-	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE(nbajamex_80_r, nbajamex_80_w)
+	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
+	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
 
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
-	AM_RANGE(0x1fbfff8c, 0x1fbfff8f) AM_READ(jdredd_idestat_r) AM_WRITENOP
-	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_READWRITE(jdredd_ide_r, jdredd_ide_w)
+	AM_RANGE(0x1fbfff8c, 0x1fbfff8f) AM_READ8(jdredd_idestat_r, 0x000000ff) AM_WRITENOP
+	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_READWRITE16(jdredd_ide_r, jdredd_ide_w, 0xffffffff)
 
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
