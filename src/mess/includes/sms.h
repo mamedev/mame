@@ -54,6 +54,7 @@ public:
 		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
+		m_is_sdisp(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
@@ -119,6 +120,7 @@ public:
 	// model identifiers
 	UINT8 m_is_gamegear;
 	UINT8 m_is_region_japan;
+	UINT8 m_is_sdisp;
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
 	UINT8 m_has_bios_full;
@@ -160,6 +162,8 @@ public:
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
 	UINT8 m_store_control;	
 	int m_current_cartridge;
+	sega8_cart_slot_device *m_slots[16];
+	sega8_card_slot_device *m_cards[16];
 
 	/* Cartridge slot info */
 	DECLARE_WRITE8_MEMBER(sms_input_write);
@@ -227,40 +231,10 @@ class smssdisp_state : public sms_state
 public:
 	smssdisp_state(const machine_config &mconfig, device_type type, const char *tag)
 	: sms_state(mconfig, type, tag),
-	m_control_cpu(*this, "control"),
-	m_slot2(*this, "slot2"),
-	m_slot3(*this, "slot3"),
-	m_slot4(*this, "slot4"),
-	m_slot5(*this, "slot5"),
-	m_slot6(*this, "slot6"),
-	m_slot7(*this, "slot7"),
-	m_slot8(*this, "slot8"),
-	m_slot9(*this, "slot9"),
-	m_slot10(*this, "slot10"),
-	m_slot11(*this, "slot11"),
-	m_slot12(*this, "slot12"),
-	m_slot13(*this, "slot13"),
-	m_slot14(*this, "slot14"),
-	m_slot15(*this, "slot15"),
-	m_slot16(*this, "slot16")
+	m_control_cpu(*this, "control")
 	{ }
 	
 	required_device<cpu_device> m_control_cpu;
-	required_device<sega8_cart_slot_device> m_slot2;
-	required_device<sega8_cart_slot_device> m_slot3;
-	required_device<sega8_cart_slot_device> m_slot4;
-	required_device<sega8_cart_slot_device> m_slot5;
-	required_device<sega8_cart_slot_device> m_slot6;
-	required_device<sega8_cart_slot_device> m_slot7;
-	required_device<sega8_cart_slot_device> m_slot8;
-	required_device<sega8_cart_slot_device> m_slot9;
-	required_device<sega8_cart_slot_device> m_slot10;
-	required_device<sega8_cart_slot_device> m_slot11;
-	required_device<sega8_cart_slot_device> m_slot12;
-	required_device<sega8_cart_slot_device> m_slot13;
-	required_device<sega8_cart_slot_device> m_slot14;
-	required_device<sega8_cart_slot_device> m_slot15;
-	required_device<sega8_cart_slot_device> m_slot16;
 
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);

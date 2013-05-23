@@ -806,43 +806,9 @@ READ8_MEMBER(smssdisp_state::store_read_0000)
 				return m_BIOS[(m_bios_page[3] * 0x4000) + (offset & 0x3fff)];
 		}
 		if (m_bank_enabled[3] == ENABLE_CART)
-		{
-			switch (m_current_cartridge)
-			{
-				case 0:
-					return m_cartslot->read_cart(space, offset); 
-				case 1:
-					return m_slot2->read_cart(space, offset); 
-				case 2:
-					return m_slot3->read_cart(space, offset); 
-				case 3:
-					return m_slot4->read_cart(space, offset); 
-				case 4:
-					return m_slot5->read_cart(space, offset); 
-				case 5:
-					return m_slot6->read_cart(space, offset); 
-				case 6:
-					return m_slot7->read_cart(space, offset); 
-				case 7:
-					return m_slot8->read_cart(space, offset); 
-				case 8:
-					return m_slot9->read_cart(space, offset); 
-				case 9:
-					return m_slot10->read_cart(space, offset); 
-				case 10:
-					return m_slot11->read_cart(space, offset); 
-				case 11:
-					return m_slot12->read_cart(space, offset); 
-				case 12:
-					return m_slot13->read_cart(space, offset); 
-				case 13:
-					return m_slot14->read_cart(space, offset); 
-				case 14:
-					return m_slot15->read_cart(space, offset); 
-				case 15:
-					return m_slot16->read_cart(space, offset); 
-			}
-		}
+			return m_slots[m_current_cartridge]->read_cart(space, offset); 
+		if (m_bank_enabled[3] == ENABLE_CARD)
+			return m_cards[m_current_cartridge]->read_cart(space, offset); 
 	}
 	else
 	{
@@ -852,44 +818,11 @@ READ8_MEMBER(smssdisp_state::store_read_0000)
 				return m_BIOS[(m_bios_page[0] * 0x4000) + (offset & 0x3fff)];
 		}
 		if (m_bank_enabled[0] == ENABLE_CART)
-		{
-			switch (m_current_cartridge)
-			{
-				case 0:
-					return m_cartslot->read_cart(space, offset); 
-				case 1:
-					return m_slot2->read_cart(space, offset); 
-				case 2:
-					return m_slot3->read_cart(space, offset); 
-				case 3:
-					return m_slot4->read_cart(space, offset); 
-				case 4:
-					return m_slot5->read_cart(space, offset); 
-				case 5:
-					return m_slot6->read_cart(space, offset); 
-				case 6:
-					return m_slot7->read_cart(space, offset); 
-				case 7:
-					return m_slot8->read_cart(space, offset); 
-				case 8:
-					return m_slot9->read_cart(space, offset); 
-				case 9:
-					return m_slot10->read_cart(space, offset); 
-				case 10:
-					return m_slot11->read_cart(space, offset); 
-				case 11:
-					return m_slot12->read_cart(space, offset); 
-				case 12:
-					return m_slot13->read_cart(space, offset); 
-				case 13:
-					return m_slot14->read_cart(space, offset); 
-				case 14:
-					return m_slot15->read_cart(space, offset); 
-				case 15:
-					return m_slot16->read_cart(space, offset); 
-			}
-		}
+			return m_slots[m_current_cartridge]->read_cart(space, offset); 
+		if (m_bank_enabled[0] == ENABLE_CARD)
+			return m_cards[m_current_cartridge]->read_cart(space, offset); 
 	}	
+
 	return m_region_maincpu->base()[offset];
 }
 
@@ -900,48 +833,10 @@ READ8_MEMBER(smssdisp_state::store_read_4000)
 		if (m_BIOS)
 			return m_BIOS[(m_bios_page[1] * 0x4000) + (offset & 0x3fff)];
 	}
-	
 	if (m_bank_enabled[1] == ENABLE_CART)
-	{
-		offset += 0x4000;
-			
-		switch (m_current_cartridge)
-		{
-			case 0:
-				return m_cartslot->read_cart(space, offset); 
-			case 1:
-				return m_slot2->read_cart(space, offset); 
-			case 2:
-				return m_slot3->read_cart(space, offset); 
-			case 3:
-				return m_slot4->read_cart(space, offset); 
-			case 4:
-				return m_slot5->read_cart(space, offset); 
-			case 5:
-				return m_slot6->read_cart(space, offset); 
-			case 6:
-				return m_slot7->read_cart(space, offset); 
-			case 7:
-				return m_slot8->read_cart(space, offset); 
-			case 8:
-				return m_slot9->read_cart(space, offset); 
-			case 9:
-				return m_slot10->read_cart(space, offset); 
-			case 10:
-				return m_slot11->read_cart(space, offset); 
-			case 11:
-				return m_slot12->read_cart(space, offset); 
-			case 12:
-				return m_slot13->read_cart(space, offset); 
-			case 13:
-				return m_slot14->read_cart(space, offset); 
-			case 14:
-				return m_slot15->read_cart(space, offset); 
-			case 15:
-				return m_slot16->read_cart(space, offset); 
-		}
-		offset -= 0x4000;
-	}
+		return m_slots[m_current_cartridge]->read_cart(space, offset + 0x4000); 
+	if (m_bank_enabled[1] == ENABLE_CARD)
+		return m_cards[m_current_cartridge]->read_cart(space, offset + 0x4000); 
 	
 	return m_region_maincpu->base()[offset];
 }
@@ -952,131 +847,31 @@ READ8_MEMBER(smssdisp_state::store_read_8000)
 	{
 		if (m_BIOS)
 			return m_BIOS[(m_bios_page[2] * 0x4000) + (offset & 0x3fff)];
-	}
-	
+	}	
 	if (m_bank_enabled[2] == ENABLE_CART)
-	{
-		offset += 0x8000;
-		switch (m_current_cartridge)
-		{
-			case 0:
-				return m_cartslot->read_cart(space, offset); 
-			case 1:
-				return m_slot2->read_cart(space, offset); 
-			case 2:
-				return m_slot3->read_cart(space, offset); 
-			case 3:
-				return m_slot4->read_cart(space, offset); 
-			case 4:
-				return m_slot5->read_cart(space, offset); 
-			case 5:
-				return m_slot6->read_cart(space, offset); 
-			case 6:
-				return m_slot7->read_cart(space, offset); 
-			case 7:
-				return m_slot8->read_cart(space, offset); 
-			case 8:
-				return m_slot9->read_cart(space, offset); 
-			case 9:
-				return m_slot10->read_cart(space, offset); 
-			case 10:
-				return m_slot11->read_cart(space, offset); 
-			case 11:
-				return m_slot12->read_cart(space, offset); 
-			case 12:
-				return m_slot13->read_cart(space, offset); 
-			case 13:
-				return m_slot14->read_cart(space, offset); 
-			case 14:
-				return m_slot15->read_cart(space, offset); 
-			case 15:
-				return m_slot16->read_cart(space, offset); 
-		}
-		offset -= 0x8000;
-	}
+		return m_slots[m_current_cartridge]->read_cart(space, offset + 0x8000); 
+	if (m_bank_enabled[2] == ENABLE_CARD)
+		return m_cards[m_current_cartridge]->read_cart(space, offset + 0x8000); 
 	
 	return m_region_maincpu->base()[offset];
 }
 
 WRITE8_MEMBER(smssdisp_state::store_write_cart)
 {
-	switch (m_current_cartridge)
-	{
-		case 0:
-			return m_cartslot->write_cart(space, offset, data); 
-		case 1:
-			return m_slot2->write_cart(space, offset, data); 
-		case 2:
-			return m_slot3->write_cart(space, offset, data); 
-		case 3:
-			return m_slot4->write_cart(space, offset, data); 
-		case 4:
-			return m_slot5->write_cart(space, offset, data); 
-		case 5:
-			return m_slot6->write_cart(space, offset, data); 
-		case 6:
-			return m_slot7->write_cart(space, offset, data); 
-		case 7:
-			return m_slot8->write_cart(space, offset, data); 
-		case 8:
-			return m_slot9->write_cart(space, offset, data); 
-		case 9:
-			return m_slot10->write_cart(space, offset, data); 
-		case 10:
-			return m_slot11->write_cart(space, offset, data); 
-		case 11:
-			return m_slot12->write_cart(space, offset, data); 
-		case 12:
-			return m_slot13->write_cart(space, offset, data); 
-		case 13:
-			return m_slot14->write_cart(space, offset, data); 
-		case 14:
-			return m_slot15->write_cart(space, offset, data); 
-		case 15:
-			return m_slot16->write_cart(space, offset, data); 
-	}
+	// this might only work because we are not emulating properly the cart/card selection system
+	// it will have to be reviewed when proper emulation is worked on!
+	if (m_bank_enabled[0] == ENABLE_CART)
+		m_slots[m_current_cartridge]->write_cart(space, offset, data); 
+	if (m_bank_enabled[0] == ENABLE_CARD)
+		m_cards[m_current_cartridge]->write_cart(space, offset, data); 
 }
 
 READ8_MEMBER(smssdisp_state::store_cart_peek)
 {
 	if (m_bank_enabled[1] == ENABLE_CART)
-	{
-		switch (m_current_cartridge)
-		{
-			case 0:
-				return m_cartslot->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 1:
-				return m_slot2->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 2:
-				return m_slot3->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 3:
-				return m_slot4->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 4:
-				return m_slot5->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 5:
-				return m_slot6->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 6:
-				return m_slot7->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 7:
-				return m_slot8->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 8:
-				return m_slot9->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 9:
-				return m_slot10->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 10:
-				return m_slot11->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 11:
-				return m_slot12->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 12:
-				return m_slot13->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 13:
-				return m_slot14->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 14:
-				return m_slot15->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-			case 15:
-				return m_slot16->read_cart(space, 0x4000 + (offset & 0x1fff)); 
-		}
-	}
+		return m_slots[m_current_cartridge]->read_cart(space, 0x4000 + (offset & 0x1fff)); 
+	if (m_bank_enabled[1] == ENABLE_CARD)
+		return m_cards[m_current_cartridge]->read_cart(space, 0x4000 + (offset & 0x1fff)); 
 	
 	return m_region_maincpu->base()[offset];
 }
@@ -1238,6 +1033,8 @@ void sms_state::setup_bios()
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
+	char str[6];
+	
 	m_rapid_fire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::rapid_fire_callback),this));
 	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
@@ -1294,8 +1091,23 @@ MACHINE_START_MEMBER(sms_state,sms)
 	save_item(NAME(m_sscope_state));
 	save_item(NAME(m_frame_sscope_state));
 
-	save_item(NAME(m_store_control));
-	save_item(NAME(m_current_cartridge));
+	if (m_is_sdisp)
+	{
+		save_item(NAME(m_store_control));
+		save_item(NAME(m_current_cartridge));
+
+		m_slots[0] = m_cartslot;
+		for (int i = 1; i < 16; i++)
+		{
+			sprintf(str,"slot%i",i + 1);
+			m_slots[i] = machine().device<sega8_cart_slot_device>(str);
+		}
+		for (int i = 0; i < 16; i++)
+		{
+			sprintf(str,"slot%i",i + 16 + 1);
+			m_cards[i] = machine().device<sega8_card_slot_device>(str);
+		}
+	}
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)
@@ -1316,8 +1128,11 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	m_gg_sio[3] = 0xff;
 	m_gg_sio[4] = 0x00;
 
-	m_store_control = 0;
-	m_current_cartridge = 0;
+	if (m_is_sdisp)
+	{
+		m_store_control = 0;
+		m_current_cartridge = 0;
+	}
 
 	setup_bios();
 
@@ -1460,6 +1275,7 @@ DRIVER_INIT_MEMBER(sms_state,sms2kr)
 
 DRIVER_INIT_MEMBER(smssdisp_state,smssdisp)
 {
+	m_is_sdisp = 1;
 	setup_sms_cart();
 }
 

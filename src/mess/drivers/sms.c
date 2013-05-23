@@ -685,6 +685,23 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 	MCFG_SMS_CARTRIDGE_ADD("slot15", sms_cart, NULL, NULL)
 	MCFG_SMS_CARTRIDGE_ADD("slot16", sms_cart, NULL, NULL)
 
+	MCFG_SMS_CARD_ADD("slot17", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot18", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot19", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot20", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot21", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot22", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot23", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot24", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot25", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot26", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot27", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot28", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot29", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot30", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot31", sms_cart, NULL, NULL)
+	MCFG_SMS_CARD_ADD("slot32", sms_cart, NULL, NULL)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_CONFIG_END
 
