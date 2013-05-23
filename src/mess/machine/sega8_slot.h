@@ -185,8 +185,8 @@ public:
 	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	static_cast<sega8_card_slot_device *>(device)->set_mandatory(FALSE); \
-	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_cart"); \
-	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sms"); \
+	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_card"); \
+	static_cast<sega8_card_slot_device *>(device)->set_ext("bin"); \
 
 
 #endif

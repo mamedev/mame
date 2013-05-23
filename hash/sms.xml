@@ -608,19 +608,6 @@
 		</part>
 	</software>
 
-	<software name="astrofl" cloneof="transbot">
-		<description>Astro Flash (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-503"/>
-		<info name="release" value="19851222 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="astro flash (japan).bin" size="32768" crc="c795182d" sha1="8370957b1192349d0a610437cd5d91ea4e3892c4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrofl1" cloneof="transbot">
 		<description>Astro Flash (Jpn, Pirate)</description>
@@ -778,7 +765,7 @@
 		<description>Bank Panic (Euro)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="4084 (Card), 4584 (Cart), 41022"/>
+		<info name="serial" value="4584 (Cart), 41022"/>
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Euro cart?) -->
 			<feature name="pcb" value="??" />
@@ -1454,19 +1441,6 @@
 		</part>
 	</software>
 
-	<software name="comical">
-		<description>Comical Machine Gun Joe (Jpn)</description>
-		<year>1986</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-511"/>
-		<info name="release" value="19860421 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="comical machine gun joe (japan).bin" size="32768" crc="9d549e08" sha1="33c21d164fd3cdf7aa9e7e0fe1a3ae5a491bd9f5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="comicaltw" cloneof="comical">
 		<description>Comical Machine Gun Joe (Tw)</description>
 		<year>1986?</year>
@@ -2055,19 +2029,6 @@
 		</part>
 	</software>
 
-	<software name="f16falcj" cloneof="f16fight">
-		<description>F-16 Fighting Falcon (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-508"/>
-		<info name="release" value="19851222 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="f-16 fighting falcon (japan).bin" size="32768" crc="7ce06fce" sha1="0f60f545ce99366860a94fbb115ce7d8531ab7ba" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- Alt. Title: F-16 -->
 	<software name="f16falctw" cloneof="f16fight">
 		<description>F-16 Fighting Falcon (Tw)</description>
@@ -2381,19 +2342,6 @@
 		</part>
 	</software>
 
-	<software name="pitpot">
-		<description>Fushigi no Oshiro Pit Pot (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-507"/>
-		<info name="release" value="19851214 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="fushigi no oshiro pit pot (japan).bin" size="32768" crc="e6795c53" sha1="b1afa682b2f70bfc4ab2020d7c3047aabbaf9a24" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pitpot1" cloneof="pitpot">
 		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -2622,30 +2570,6 @@
 		</part>
 	</software>
 
-	<software name="ghosthp" cloneof="ghosth">
-		<description>Ghost House (Prototype)</description>
-		<year>1986</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="ghost house (usa, europe) (beta).bin" size="32768" crc="c3e7c1ed" sha1="f341e68bad5029bf475922c2c1b79eb109f467a1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ghosthj" cloneof="ghosth">
-		<description>Ghost House (Jpn)</description>
-		<year>1986</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-512"/>
-		<info name="release" value="19860421 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="ghost house (japan).bin" size="32768" crc="c0f3ce7e" sha1="051e74c499c6792f891668a7be23a11c2c4087af" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ghosthj1" cloneof="ghosth">
 		<description>Ghost House (Jpn, Pirate?)</description>
 		<year>1986</year>
@@ -2806,19 +2730,6 @@
 		</part>
 	</software>
 
-	<software name="greatbasj" cloneof="greatbas">
-		<description>Great Baseball (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-505"/>
-		<info name="release" value="19851215 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="great baseball (japan).bin" size="32768" crc="89e98a7c" sha1="e6eaaec61bec32dee5161ae59a7a0902f0d05dc9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="greatbasj1" cloneof="greatbas">
 		<description>Great Baseball (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -2957,19 +2868,6 @@
 		</part>
 	</software>
 
-	<software name="greatscrj" cloneof="greatscr">
-		<description>Great Soccer (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-504"/>
-		<info name="release" value="19851027 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="great soccer (japan).bin" size="32768" crc="2d7fd7ef" sha1="110536303b7bccc193bef4437ba5a9eb6fd4ac8e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="greatscrtw" cloneof="greatscr">
 		<description>Great Soccer (Tw)</description>
 		<year>1985?</year>
@@ -2979,19 +2877,6 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="great soccer (tw).bin" size="32768" crc="84665648" sha1="88611c50fcaa307bfd70b2bd5effeb39c2c4f3ae" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="greattns" cloneof="stennis">
-		<description>Great Tennis (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-515"/>
-		<info name="release" value="19851222 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="great tennis (japan).bin" size="32768" crc="95cbf3dd" sha1="e7f3529689cd29be3fa02f94266e4ee8e0795d7d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3052,11 +2937,11 @@
 		</part>
 	</software>
 
-	<!-- 4080 (Card), 4580 (Cart) -->
 	<software name="hangon">
 		<description>Hang-On (Euro, Bra, Aus)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="4080 (Card), 4580 (Cart)"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="hang-on (europe).bin" size="32768" crc="071b045e" sha1="e601257f6477b85eb0b25a5b6d46ebc070d8a05a" offset="000000" />
@@ -3075,19 +2960,6 @@
 			<feature name="ic1" value="MPR-11125" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-11125.ic1" size="131072" crc="1c5059f0" sha1="ae29f676846fc740a2cfc69756875b6480265f97" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hangonj" cloneof="hangon">
-		<description>Hang-On (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-502"/>
-		<info name="release" value="19851020 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="hang-on (japan).bin" size="32768" crc="5c01adf9" sha1="43552f58f0c0c292f3e4c1b1525fd0344dc220c6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5219,19 +5091,6 @@
 		</part>
 	</software>
 
-	<software name="satell7">
-		<description>Satellite 7 (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-506"/>
-		<info name="release" value="19851220 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="satellite 7 (japan).bin" size="32768" crc="16249e19" sha1="88fc5596773ea31eda8ae5a8baf6f0ce5c3f7e5e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="satell7a" cloneof="satell7">
 		<description>Satellite 7 (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -5351,19 +5210,6 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="sega world tournament golf (europe).bin" size="262144" crc="296879dd" sha1="fd5a92e74a3c5fa16727637f1839b28595449bf6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seishun" cloneof="myhero">
-		<description>Seishun Scandal (Jpn)</description>
-		<year>1986</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-510"/>
-		<info name="release" value="19860131 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="seishun scandal (japan).bin" size="32768" crc="f0ba2bc6" sha1="6942f38e608cc7d70cf9cc8c13ee8c22e4b81679" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5961,12 +5807,12 @@
 		</part>
 	</software>
 
-	<software name="spyvsspyj" cloneof="spyvsspy">
-		<description>Spy vs Spy (Jpn, Kor)</description>
+<!-- same dump was released as a MyCard in Japan -->
+	<software name="spyvsspyk" cloneof="spyvsspy">
+		<description>Spy vs Spy (Kor)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="C-514, SG15C"/>
-		<info name="release" value="19860920 (Jpn, Card)"/>
+		<info name="serial" value="SG15C"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="spy vs spy (japan).bin" size="32768" crc="d41b9a08" sha1="c5e004b34d6569e6e1d99bff6be940f308e2c39f" offset="000000" />
@@ -6405,19 +6251,6 @@
 		</part>
 	</software>
 
-	<software name="teddyboyj" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-501"/>
-		<info name="release" value="19851020 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="teddy boy blues (japan).bin" size="32768" crc="316727dd" sha1="fb61c04f30c83733fdbf503b16e17aa8086932df" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="teddyboyj1" cloneof="teddyboy">
 		<description>Teddy Boy Blues (Jpn, Pirate?)</description>
 		<year>1985</year>
@@ -6425,17 +6258,6 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="teddy boy blues (j) [hack].bin" size="32768" crc="9dfa67ee" sha1="839da36557b494299b427bda4e32d2ba61977b25" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="teddyboyjp" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="49152">
-				<rom name="teddy boy blues (japan) (proto) (ep-mycard).bin" size="49152" crc="d7508041" sha1="51014d89cd8770df8a3d837a0208cb69d5bf7903" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7045,19 +6867,6 @@
 		</part>
 	</software>
 
-	<software name="woodypop">
-		<description>Woody Pop - Shinjinrui no Block Kuzushi (Jpn)</description>
-		<year>1987</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="C-519"/>
-		<info name="release" value="19870315 (Card)"/>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="woody pop - shinjinrui no block kuzushi (japan).bin" size="32768" crc="315917d4" sha1="b74078c4a3e6d20d21ca81e88c0cb3381b0c84a4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wldgames">
 		<description>World Games (Euro, Bra)</description>
 		<year>1989</year>
@@ -7392,6 +7201,345 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="lethal weapon 3 music [proto].bin" size="32768" crc="eb71247b" sha1="14dff343ef3c10ef06ef3fdfb4985dfa79062379" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Sega Cards & MyCard dumps -->
+
+	<software name="astrofl" cloneof="transbot">
+		<description>Astro Flash (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-503"/>
+		<info name="release" value="19851222"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="astro flash (japan).bin" size="32768" crc="c795182d" sha1="8370957b1192349d0a610437cd5d91ea4e3892c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bankpc" cloneof="bankp">
+		<description>Bank Panic (Euro, Sega Card)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4084"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="mpr-12554.ic1" size="32768" crc="655fb1f4" sha1="661bbe20f01b7afb242936d409fdd30420c6de5f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comical">
+		<description>Comical Machine Gun Joe (Jpn, MyCard)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-511"/>
+		<info name="release" value="19860421"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="comical machine gun joe (japan).bin" size="32768" crc="9d549e08" sha1="33c21d164fd3cdf7aa9e7e0fe1a3ae5a491bd9f5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f16fightc" cloneof="f16fight">
+		<description>F-16 Fighter (Euro, USA, Sega Card)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4081, 4005M"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="f-16 fighter (euro, usa).bin" size="32768" crc="eaebf323" sha1="de63ca2f59adb94fac87623fe68de75940397449" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f16falcjc" cloneof="f16fight">
+		<description>F-16 Fighting Falcon (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-508"/>
+		<info name="release" value="19851222"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="f-16 fighting falcon (japan).bin" size="32768" crc="7ce06fce" sha1="0f60f545ce99366860a94fbb115ce7d8531ab7ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f16falcc" cloneof="f16fight">
+		<description>F-16 Fighting Falcon (USA, Sega Card for Display Unit)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4005A"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="f-16 fighting falcon (usa).bin" size="32768" crc="184c23b7" sha1="a8f083b3db721b672b5b023d673a64577cb48ef3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitpot">
+		<description>Fushigi no Oshiro Pit Pot (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-507"/>
+		<info name="release" value="19851214"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="fushigi no oshiro pit pot (japan).bin" size="32768" crc="e6795c53" sha1="b1afa682b2f70bfc4ab2020d7c3047aabbaf9a24" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthc" cloneof="ghosth">
+		<description>Ghost House (Euro, USA, Bra, Sega Card)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4002"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="ghost house (euro, usa, bra).bin" size="32768" crc="f1f8ff2d" sha1="cbce4c5d819be524f874ec9b60ca9442047a6681" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthcp" cloneof="ghosth">
+		<description>Ghost House (Sega Card, Prototype)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="ghost house (usa, europe) (beta).bin" size="32768" crc="c3e7c1ed" sha1="f341e68bad5029bf475922c2c1b79eb109f467a1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghosthj" cloneof="ghosth">
+		<description>Ghost House (Jpn, MyCard)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-512"/>
+		<info name="release" value="19860421"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="ghost house (japan).bin" size="32768" crc="c0f3ce7e" sha1="051e74c499c6792f891668a7be23a11c2c4087af" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greatbasj" cloneof="greatbas">
+		<description>Great Baseball (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-505"/>
+		<info name="release" value="19851215"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="great baseball (japan).bin" size="32768" crc="89e98a7c" sha1="e6eaaec61bec32dee5161ae59a7a0902f0d05dc9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greatscrc" cloneof="greatscr">
+		<description>Great Soccer (Euro, Sega Card)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4082"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="great soccer (europe).bin" size="32768" crc="0ed170c9" sha1="7d1a381be96474f18ba1dac8eaf6710010b0e481" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greatscrj" cloneof="greatscr">
+		<description>Great Soccer (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-504"/>
+		<info name="release" value="19851027"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="great soccer (japan).bin" size="32768" crc="2d7fd7ef" sha1="110536303b7bccc193bef4437ba5a9eb6fd4ac8e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greattns" cloneof="stennis">
+		<description>Great Tennis (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-515"/>
+		<info name="release" value="19851222"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="great tennis (japan).bin" size="32768" crc="95cbf3dd" sha1="e7f3529689cd29be3fa02f94266e4ee8e0795d7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangonc" cloneof="hangon">
+		<description>Hang-On (Euro, Bra, Aus, Sega Card)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4080"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on (europe).bin" size="32768" crc="071b045e" sha1="e601257f6477b85eb0b25a5b6d46ebc070d8a05a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangonj" cloneof="hangon">
+		<description>Hang-On (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-502"/>
+		<info name="release" value="19851020"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="hang-on (japan).bin" size="32768" crc="5c01adf9" sha1="43552f58f0c0c292f3e4c1b1525fd0344dc220c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myheroc" cloneof="myhero">
+		<description>My Hero (Euro, USA, Bra, Sega Card)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4001"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="my hero (usa, europe).bin" size="32768" crc="62f0c23d" sha1="7583c5fb1963c070b7bda72b447cc3fd611ddf1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satell7">
+		<description>Satellite 7 (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-506"/>
+		<info name="release" value="19851220"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="satellite 7 (japan).bin" size="32768" crc="16249e19" sha1="88fc5596773ea31eda8ae5a8baf6f0ce5c3f7e5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seishun" cloneof="myhero">
+		<description>Seishun Scandal (Jpn, MyCard)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-510"/>
+		<info name="release" value="19860131 (Card)"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="seishun scandal (japan).bin" size="32768" crc="f0ba2bc6" sha1="6942f38e608cc7d70cf9cc8c13ee8c22e4b81679" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyvsspyc" cloneof="spyvsspy">
+		<description>Spy vs. Spy (Euro, USA, Bra, Sega Card)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4083"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="spy vs. spy (usa, europe).bin" size="32768" crc="78d7faab" sha1="feab16dd8b807b88395e91c67e9ff52f8f7aa7e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyvsspyj" cloneof="spyvsspy">
+		<description>Spy vs Spy (Jpn, MyCard)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-514"/>
+		<info name="release" value="19860920"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="spy vs spy (japan).bin" size="32768" crc="d41b9a08" sha1="c5e004b34d6569e6e1d99bff6be940f308e2c39f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stennisc" cloneof="stennis">
+		<description>Super Tennis (Euro, USA, Sega Card)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4507, 4007"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="super tennis (euro, usa).bin" size="32768" crc="914514e3" sha1="67787f3f29a5b5e74b5f6a636428da4517a0f992" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teddyboyc" cloneof="teddyboy">
+		<description>Teddy Boy (Euro, USA, Bra, Sega Card)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4003"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="teddy boy (euro, usa, bra).bin" size="32768" crc="2728faa3" sha1="6ae39718703dbf7126f71387ce24ad956710a315" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teddyboyjp" cloneof="teddyboy">
+		<description>Teddy Boy Blues (Jpn, Ep-MyCard, Prototype)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="49152">
+				<rom name="teddy boy blues (japan) (proto) (ep-mycard).bin" size="49152" crc="d7508041" sha1="51014d89cd8770df8a3d837a0208cb69d5bf7903" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teddyboyj" cloneof="teddyboy">
+		<description>Teddy Boy Blues (Jpn, MyCard)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-501"/>
+		<info name="release" value="19851020"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="teddy boy blues (japan).bin" size="32768" crc="316727dd" sha1="fb61c04f30c83733fdbf503b16e17aa8086932df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transbotc" cloneof="transbot">
+		<description>TransBot (Euro, USA, Bra, Sega Card)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="4004"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="transbot (euro, usa, bra).bin" size="32768" crc="4bc42857" sha1="73273e6d44ad7aea828b642d22f6f1c138be9d2b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="woodypop">
+		<description>Woody Pop - Shinjinrui no Block Kuzushi (Jpn, MyCard)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="C-519"/>
+		<info name="release" value="19870315"/>
+		<part name="cart" interface="sms_card">
+			<dataarea name="rom" size="32768">
+				<rom name="woody pop - shinjinrui no block kuzushi (japan).bin" size="32768" crc="315917d4" sha1="b74078c4a3e6d20d21ca81e88c0cb3381b0c84a4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
