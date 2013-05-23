@@ -39,7 +39,7 @@ beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C
 ? = Undumped pieces.
 # = Dumped but code unknown.
 * = Came with beatmania IIDX main board but might be for 8th Style (i.e. game C44)?
-If you can help, please contact us at http://guru.mameworld.info or http://mamedev.org/contact.html
+If you can help, please contact us at http://members.iinet.net.au/~lantra9jp1/gurudumps/ or http://mamedev.org/contact.html
 
 
 The Konami Twinkle hardware basically consists of the following parts....

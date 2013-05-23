@@ -91,7 +91,7 @@ Some kind of music game similar to Konami's Keyboard Mania series
 Um Jammer Lammy                         (C) Namco,        1999
 http://www.wailee.com/sys/lpic/UM_Jammer_Lammy.jpg
 
-If you can help with the remaining undumped S12 games, please contact me at http://guru.mameworld.info/
+If you can help with the remaining undumped S12 games, please contact me at http://members.iinet.net.au/~lantra9jp1/gurudumps/
 Note that this list above may not be 100% complete. Alternative versions are also welcome :-)
 
 The Namco System 12 system comprises 3 mandatory PCB's....

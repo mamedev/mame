@@ -158,7 +158,7 @@
  * Time Crisis      (C) Namco, 1995
  * Tokyo Wars       (C) Namco, 1996
  *
- * If you can help with other revisions of the dumped games, please contact http://guru.mameworld.info/
+ * If you can help with other revisions of the dumped games, please contact http://members.iinet.net.au/~lantra9jp1/gurudumps/
  *
  * The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
  * some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools

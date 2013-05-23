@@ -36,7 +36,7 @@ World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used     
 ---------------------------------------------------------------------------------------------------------
 
 * denotes not dumped. If you can help with the remaining undumped games
-please contact us via http://mamedev.org or http://guru.mameworld.info
+please contact us via http://mamedev.org or http://members.iinet.net.au/~lantra9jp1/gurudumps/
 
 
 Konami PCB Layout

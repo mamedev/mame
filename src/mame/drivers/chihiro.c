@@ -92,7 +92,7 @@ Games on this system include....
 | |Sega Golf Club Network Pro Tour 2005               | Sega, 2005      |
 +-+---------------------------------------------------+-----------------+
 If you can help with the undumped games or know of missing Chihiro games, please contact...
-http://guru.mameworld.info/  or  http://www.mamedev.org
+http://members.iinet.net.au/~lantra9jp1/gurudumps/ or http://www.mamedev.org
 
 A Chihiro system consists of several boards.
 The system is in 2 separate metal boxes that fit together to form one box.

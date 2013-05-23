@@ -47,7 +47,7 @@ Games on this system include....
 +-+------+----------------------------------------------------------+------------------+-----------------+--------------+
 * denotes these games are archived.
 If you can help with the undumped games or know of missing Triforce games, please contact...
-http://guru.mameworld.info/
+http://members.iinet.net.au/~lantra9jp1/gurudumps/
 
 
 PCB Layouts

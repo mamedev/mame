@@ -19,7 +19,7 @@ Planet Harriers             (C) Sega, 2001
 
 ! - denotes secured but not fully dumped yet
 * - denotes not dumped yet. If you can help with the remaining undumped games,
-    please contact http://guru.mameworld.info/ or http://mamedev.org/
+    please contact http://members.iinet.net.au/~lantra9jp1/gurudumps/ or http://mamedev.org/
 
 The Sega Hikaru system comprises the following PCBs.....
 Main board     - 2 known versions exists. They're mostly the same. It contains many thin BGAs,
