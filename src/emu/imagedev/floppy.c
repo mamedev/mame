@@ -40,6 +40,7 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_IPF_FORMAT,
 	FLOPPY_MFI_FORMAT,
 	FLOPPY_MFM_FORMAT,
+	FLOPPY_TD0_FORMAT,
 	NULL
 };
 

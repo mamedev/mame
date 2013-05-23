@@ -37,7 +37,7 @@
 #include "machine/upd7201.h"
 #include "machine/mc146818.h"
 #include "machine/i8255.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/serial.h"
 #include "video/upd7220.h"
 #include "machine/upd765.h"
@@ -77,8 +77,8 @@ public:
 	required_device<pic8259_device> m_pic_s;
 	required_device<upd7201_device> m_scc;
 	required_device<i8255_device> m_ppi;
-	required_device<i8237_device> m_dma_1;
-	required_device<i8237_device> m_dma_2;
+	required_device<am9517a_device> m_dma_1;
+	required_device<am9517a_device> m_dma_2;
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
@@ -340,7 +340,7 @@ void qx10_state::qx10_upd765_interrupt(bool state)
 
 void qx10_state::drq_w(bool state)
 {
-	m_dma_1->i8237_dreq0_w(!state);
+	m_dma_1->dreq0_w(!state);
 }
 
 WRITE8_MEMBER( qx10_state::fdd_motor_w )
@@ -369,9 +369,8 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 */
 WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 {
-	i8237_device *device = machine().device<i8237_device>("8237dma_1");
 	/* Assert HLDA */
-	device->i8237_hlda_w(state);
+	m_dma_1->hack_w(state);
 }
 
 READ8_MEMBER( qx10_state::gdc_dack_r )
@@ -694,8 +693,8 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 //  AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_device, i8237_r, i8237_w)
-	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_device, i8237_r, i8237_w)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", am9517a_device, read, write)
+	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", am9517a_device, read, write)
 //  AM_RANGE(0xfc, 0xfd) Multi-Font comms
 ADDRESS_MAP_END
 
@@ -920,7 +919,7 @@ void qx10_state::machine_start()
 
 void qx10_state::machine_reset()
 {
-	m_dma_1->i8237_dreq0_w(1);
+	m_dma_1->dreq0_w(1);
 
 	m_memprom = 0;
 	m_memcmos = 0;

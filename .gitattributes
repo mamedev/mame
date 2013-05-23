@@ -2081,6 +2081,7 @@ src/lib/formats/svi_cas.h svneol=native#text/plain
 src/lib/formats/svi_dsk.c svneol=native#text/plain
 src/lib/formats/svi_dsk.h svneol=native#text/plain
 src/lib/formats/td0_dsk.c svneol=native#text/plain
+src/lib/formats/td0_dsk.h svneol=native#text/plain
 src/lib/formats/thom_cas.c svneol=native#text/plain
 src/lib/formats/thom_cas.h svneol=native#text/plain
 src/lib/formats/thom_dsk.c svneol=native#text/plain

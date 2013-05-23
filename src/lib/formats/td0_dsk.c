@@ -13,6 +13,7 @@
  */
 
 #include <string.h>
+#include "emu.h"
 #include "flopimg.h"
 
 #define BUFSZ           512     // new input buffer
@@ -55,7 +56,7 @@ struct tdlzhuf {
 
 struct td0dsk_t
 {
-	floppy_image_legacy *floppy_file;
+	io_generic *floppy_file;
 	UINT64 floppy_file_offset;
 
 	struct tdlzhuf tdctl;
@@ -87,7 +88,12 @@ struct td0dsk_t
 	int Decode(UINT8 *buf, int len);
 };
 
-static td0dsk_t td0dsk;
+//static td0dsk_t td0dsk;
+
+struct floppy_image_legacy
+{
+	struct io_generic io;
+};
 
 
 static struct td0dsk_tag *get_tag(floppy_image_legacy *floppy)
@@ -312,10 +318,10 @@ static floperr_t td0_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 
 int td0dsk_t::data_read(UINT8 *buf, UINT16 size)
 {
-	if (floppy_file_offset + size > floppy_image_size(floppy_file) ) {
-		size = floppy_image_size(floppy_file) - floppy_file_offset;
+	if (floppy_file_offset + size > io_generic_size(floppy_file) ) {
+		size = io_generic_size(floppy_file) - floppy_file_offset;
 	}
-	floppy_image_read(floppy_file,buf,floppy_file_offset,size);
+	io_generic_read(floppy_file,buf,floppy_file_offset,size);
 	floppy_file_offset += size;
 	return size;
 }
@@ -654,7 +660,7 @@ int td0dsk_t::Decode(UINT8 *buf, int len)  /* Decoding/Uncompressing */
 
 FLOPPY_CONSTRUCT( td0_dsk_construct )
 {
-	td0dsk_t *state = &td0dsk;
+	td0dsk_t state;
 	struct FloppyCallbacks *callbacks;
 	struct td0dsk_tag *tag;
 	UINT8 *header;
@@ -685,12 +691,12 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		int rd;
 		int off = 12;
 		int size = 0;
-		state->floppy_file = floppy;
-		state->init_Decode();
-		state->floppy_file_offset = 12;
+		state.floppy_file = &(floppy->io);
+		state.init_Decode();
+		state.floppy_file_offset = 12;
 		do
 		{
-			if((rd = state->Decode(obuf, BUFSZ)) > 0) size += rd;
+			if((rd = state.Decode(obuf, BUFSZ)) > 0) size += rd;
 		} while(rd == BUFSZ);
 		memcpy(obuf,tag->data,12);
 		free(tag->data);
@@ -699,11 +705,11 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 			return FLOPPY_ERROR_OUTOFMEMORY;
 		}
 		memcpy(tag->data,obuf,12);
-		state->floppy_file_offset = 12;
-		state->init_Decode();
+		state.floppy_file_offset = 12;
+		state.init_Decode();
 		do
 		{
-			if((rd = state->Decode(obuf, BUFSZ)) > 0) {
+			if((rd = state.Decode(obuf, BUFSZ)) > 0) {
 				memcpy(tag->data+off,obuf,rd);
 				off += rd;
 			}
@@ -764,3 +770,259 @@ FLOPPY_DESTRUCT( td0_dsk_destruct )
 	tag->data = NULL;
 	return FLOPPY_ERROR_SUCCESS;
 }
+
+/*********************************************************************
+
+    formats/td0_dsk.h
+
+    Teledisk disk images
+
+*********************************************************************/
+
+#include <ctype.h>
+#include "td0_dsk.h"
+
+td0_format::td0_format()
+{
+}
+
+const char *td0_format::name() const
+{
+	return "td0";
+}
+
+const char *td0_format::description() const
+{
+	return "Teledisk disk image";
+}
+
+const char *td0_format::extensions() const
+{
+	return "td0";
+}
+
+int td0_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT8 h[7];
+
+	io_generic_read(io, h, 0, 7);
+	if((toupper(h[0]) == 'T') && (toupper(h[1]) == 'D'))
+	{
+		if((form_factor == floppy_image::FF_35) && ((h[6] == 3) || (h[6] == 4)))
+			return 100;
+		if((form_factor == floppy_image::FF_525) && ((h[6] == 1) || (h[6] == 2) || (h[6] == 3)))
+			return 100;
+	}
+	return 0;
+}
+
+bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	int cell_count = 0;
+	int track_count = 0;
+	int head_count = 0;
+	int track_spt;
+	int offset = 0;
+	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
+	UINT8 *imagebuf = global_alloc_array(UINT8, max_size);
+	UINT8 header[12];
+
+	try
+	{
+		io_generic_read(io, header, 0, 12);
+		head_count = header[9];
+
+		if(header[0] == 't')
+		{
+			td0dsk_t disk_decode;
+
+			disk_decode.floppy_file = io;
+			disk_decode.init_Decode();
+			disk_decode.floppy_file_offset = 12;
+			disk_decode.Decode(imagebuf, max_size);
+		}
+		else
+			io_generic_read(io, imagebuf, 12, io_generic_size(io));
+
+		if(header[7] & 0x80)
+			offset = 10 + imagebuf[1] + (imagebuf[2] << 8);
+
+		track_spt = imagebuf[offset];
+		if(track_spt == 255) // Empty file?
+			throw false;
+
+		switch(header[6])
+		{
+			case 2:
+				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
+				{
+					cell_count = 166666;
+					if(head_count == 2)
+						image->set_variant(floppy_image::DSHD);
+					else
+						throw false; // single side hd?
+					break;
+				}
+				/* no break; could be qd, won't know until tracks are counted */
+			case 1:
+				cell_count = 100000;
+				if(head_count == 2)
+					image->set_variant(floppy_image::DSDD);
+				else
+					image->set_variant(floppy_image::SSDD);
+				break;
+			case 4:
+				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
+				{
+					cell_count = 200000;
+					if(head_count == 2)
+						image->set_variant(floppy_image::DSHD);
+					else
+						throw false; // single side 3.5?
+					break;
+				}
+				/* no break */
+			case 3:
+				cell_count = 100000;
+				if(head_count == 2)
+				{
+					if(form_factor == floppy_image::FF_525) // is this correct?
+						image->set_variant(floppy_image::DSQD);
+					else
+						image->set_variant(floppy_image::DSDD);
+				}
+				else
+				{
+					if(form_factor == floppy_image::FF_525)
+						image->set_variant(floppy_image::SSQD);
+					else
+						throw false; // single side 3.5?
+				}
+				break;
+		}
+
+		while(track_spt != 255)
+		{
+			desc_pc_sector sects[256];
+			UINT8 sect_data[65536];
+			int sdatapos = 0;
+			int track = imagebuf[offset + 1];
+			int head = imagebuf[offset + 2] & 1;
+			bool fm = (header[5] & 0x80) || (imagebuf[offset + 2] & 0x80); // ?
+			offset += 4;
+			for(int i = 0; i < track_spt; i++)
+			{
+				UINT8 *hs = &imagebuf[offset];
+				UINT16 size;
+				offset += 6;
+
+				sects[i].track       = hs[0];
+				sects[i].head        = hs[1];
+				sects[i].sector      = hs[2];
+				sects[i].size        = hs[3];
+				sects[i].deleted     = (hs[4] & 4) == 4;
+				sects[i].bad_crc     = (hs[4] & 2) == 2;
+
+				if(hs[4] & 0x30)
+					size = 0;
+				else
+				{
+					offset += 3;
+					size = 128 << hs[3];
+					int j, k;
+					switch(hs[8])
+					{
+						default:
+							throw false;
+						case 0:
+							memcpy(&sect_data[sdatapos], &imagebuf[offset], size);
+							offset += size;
+							break;
+						case 1:
+							offset += 4;
+							k = (hs[9] + (hs[10] << 8)) * 2;
+							k = (k <= size) ? k : size;
+							for(j = 0; j < k; j += 2)
+							{
+								sect_data[sdatapos + j] = hs[11];
+								sect_data[sdatapos + j + 1] = hs[12];
+							}
+							if(k < size)
+								memset(&sect_data[sdatapos + k], '\0', size - k);
+							break;
+						case 2:
+							k = 0;
+							while(k < size)
+							{
+								UINT16 len = imagebuf[offset];
+								UINT16 rep = imagebuf[offset + 1];
+								offset += 2;
+								if(!len)
+								{
+									memcpy(&sect_data[sdatapos + k], &imagebuf[offset], rep);
+									offset += rep;
+									k += rep;
+								}
+								else
+								{
+									len = (1 << len);
+									rep = len * rep;
+									rep = ((rep + k) <= size) ? rep : (size - k);
+									for(j = 0; j < rep; j += len)
+										memcpy(&sect_data[sdatapos + j + k], &imagebuf[offset], len);
+									k += rep;
+									offset += len;
+								}
+							}
+							break;
+					}
+
+					sects[i].actual_size = size;
+
+					if(size)
+					{
+						sects[i].data = &sect_data[sdatapos];
+						sdatapos += size;
+					}
+					else
+						sects[i].data = NULL;
+				}
+			}
+			track_count = track;
+			if(fm)
+				build_pc_track_fm(track, head, image, cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			else
+				build_pc_track_mfm(track, head, image, cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			track_spt = imagebuf[offset];
+		}
+		if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
+		{
+			if(image->get_variant() == floppy_image::DSDD)
+				image->set_variant(floppy_image::DSQD);
+			else if(image->get_variant() == floppy_image::SSDD)
+				image->set_variant(floppy_image::SSQD);
+		}
+		throw true;
+	}
+	catch(bool ret)
+	{
+		global_free(imagebuf);
+		return ret;
+	}
+	return false;
+}
+
+
+bool td0_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+bool td0_format::supports_save() const
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_TD0_FORMAT = &floppy_image_format_creator<td0_format>;
+
+
