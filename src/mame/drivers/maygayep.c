@@ -2319,13 +2319,18 @@ ROM_START( ep_cdspna )
 ROM_END
 
 
+#define EP_COSC_SOUND \
+	ROM_REGION( 0x100000, "ymz", 0 ) \
+	ROM_LOAD( "cosc.s0", 0x0000, 0x080000, CRC(4282b495) SHA1(7cdec8e8219a892c26311608ebd8953b381ecc70) ) \
+	ROM_LOAD( "cosc.s1", 0x0000, 0x080000, CRC(ad191be1) SHA1(1d0934cf0d39ad842d68eeea5c91ddd8637644e6) )
+
 ROM_START( ep_cosc )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "msa02142.g0", 0x000000, 0x020000, CRC(110c9b28) SHA1(5aca3ad3fc79ec288a47c294bf32c841a9c2a9c7) )
 	ROM_LOAD16_BYTE( "msa02142.g1", 0x000001, 0x020000, CRC(3bea853f) SHA1(5752a11abe666da01d7f66b995d5274dc24c2403) )
 	ROM_LOAD16_BYTE( "msa02142.g2", 0x040000, 0x020000, CRC(64584ab4) SHA1(08817c5d68099f316850947ada95fb864da9ae7c) )
 	ROM_LOAD16_BYTE( "msa02142.g3", 0x040001, 0x020000, CRC(2a3ad9a8) SHA1(06c1df7e1c658c614098ee1939fb9af014927f28) )
-	MISSING_SOUND
+	EP_COSC_SOUND
 ROM_END
 
 ROM_START( ep_cosca )
@@ -2334,30 +2339,34 @@ ROM_START( ep_cosca )
 	ROM_LOAD16_BYTE( "msa02143.g1", 0x000001, 0x020000, CRC(a346b9be) SHA1(d43e328127a6c02739b47dc663a12f9b558b92dd) )
 	ROM_LOAD16_BYTE( "msa02143.g2", 0x040000, 0x020000, CRC(64584ab4) SHA1(08817c5d68099f316850947ada95fb864da9ae7c) )
 	ROM_LOAD16_BYTE( "msa02143.g3", 0x040001, 0x020000, CRC(2a3ad9a8) SHA1(06c1df7e1c658c614098ee1939fb9af014927f28) )
-	MISSING_SOUND
+	EP_COSC_SOUND
 ROM_END
 
+#define EP_CAHOY_SOUND \
+	ROM_REGION( 0x100000, "ymz", 0 ) \
+	ROM_LOAD( "cahoy.s0", 0x0000, 0x080000, CRC(28512eb3) SHA1(60b34bcbd840740fab45d16f9ac9784a917a6c5d) ) \
+	ROM_LOAD( "cahoy.s1", 0x0000, 0x080000, CRC(bc70d9c3) SHA1(b2b66956e5cbb53999386429bd32ddac32980289) )
 
-
+//Sound ROMs taken from this set...
 ROM_START( ep_cahoy )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cahoyg0.bin", 0x000000, 0x020000, CRC(b7aed7c8) SHA1(6aaf9fbb0b4d845d12d4a949aa794f958154e7d8) )
 	ROM_LOAD16_BYTE( "cahoyg1.bin", 0x000001, 0x020000, CRC(35dc24f6) SHA1(32eb669ba61e683aea31231a3a2139abe5a4dba1) )
-	MISSING_SOUND
+	EP_CAHOY_SOUND
 ROM_END
 
 ROM_START( ep_cahoya )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c_ahoy.g0", 0x000000, 0x020000, CRC(20be6dfc) SHA1(abda6674c7663f3136d270fbec5b214f3d7e33ee) )
 	ROM_LOAD16_BYTE( "c_ahoy.g1", 0x000001, 0x020000, CRC(a363f246) SHA1(3c609d803e6f9b43717e38e7c9264d6a1a115837) )
-	MISSING_SOUND
+	EP_CAHOY_SOUND
 ROM_END
 
 ROM_START( ep_cahoyb )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c_ahoy 5pound.g0", 0x000000, 0x020000, CRC(dc7a5c0d) SHA1(d6068e72ab3025c601752f18f144917a6da1d5df) )
 	ROM_LOAD16_BYTE( "c_ahoy 5pound.g1", 0x000001, 0x020000, CRC(fb92b892) SHA1(3cfe1486ee6b312259efda4a1eeb4d415b0c9dc1) )
-	MISSING_SOUND
+	EP_CAHOY_SOUND
 ROM_END
 
 
@@ -7549,7 +7558,7 @@ GAME( 199?, ep_wipeoe,  ep_wipeo,   maygayep,  maygayep, maygayep_state,  maygay
 GAME( 199?, ep_bbonz,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay",        "Bingo Bonanza (Maygay - Union) (EPOCH) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_bbonza,  ep_bbonz,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay",        "Bingo Bonanza (Maygay - Union) (EPOCH) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, ep_cahoy,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay",        "Cash Ahoy (Maygay) (EPOCH) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, ep_cahoy,   0,          maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay - Eclipse?",        "Cash Ahoy (Maygay - Eclipse?) (EPOCH) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_cahoya,  ep_cahoy,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay",        "Cash Ahoy (Maygay) (EPOCH) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, ep_cahoyb,  ep_cahoy,   maygayep,  maygayep, maygayep_state,  maygayep, ROT0, "Maygay",        "Cash Ahoy (Maygay) (EPOCH) (set 3)",GAME_IS_SKELETON_MECHANICAL )
 
