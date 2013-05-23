@@ -30,6 +30,7 @@
 #include "video/mc6845.h"
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
+#include "machine/pc_kbdc.h"
 
 
 class applix_state : public driver_device
@@ -41,6 +42,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
 //		m_fdc(*this, "wd1772"),
+		m_io_dsw(*this, "DSW"),
+		m_io_fdc(*this, "FDC"),
 		m_base(*this, "base"),
 		m_expansion(*this, "expansion"){ }
 
@@ -71,7 +74,9 @@ public:
 	DECLARE_READ16_MEMBER(fdc_stat_r);
 	DECLARE_WRITE16_MEMBER(fdc_data_w);
 	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
-//	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
+//	DECLARE_FLOPPY_FORMATS(floppy_formats);
 //	void fdc_intrq_w(bool state);
 //	void fdc_drq_w(bool state);
 	UINT8 m_pa;
@@ -95,6 +100,8 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
 //	required_device<wd1772_t> m_fdc;
+	required_ioport m_io_dsw;
+	required_ioport m_io_fdc;
 	required_shared_ptr<UINT16> m_base;
 	required_shared_ptr<UINT16> m_expansion;
 };
@@ -150,7 +157,7 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 // bits 2,3 joystick in
 // bit 1 cassette in
 // bit 0 something to do with audio
-	return ioport("DSW")->read();
+	return m_io_dsw->read();
 // set dips to Off,Off,Off,On for a video test.
 }
 
@@ -182,7 +189,7 @@ d3 = test switch
 */
 READ8_MEMBER( applix_state::port00_r )
 {
-	return (UINT8)m_data_or_cmd | ((UINT8)m_data << 1) | ((UINT8)m_buffer_empty << 2) | ioport("FDC")->read();
+	return (UINT8)m_data_or_cmd | ((UINT8)m_data << 1) | ((UINT8)m_buffer_empty << 2) | m_io_fdc->read();
 }
 
 /*
@@ -483,6 +490,20 @@ static const via6522_interface applix_via =
 	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_2) //IRQ
 };
 
+WRITE_LINE_MEMBER( applix_state::kbd_clock_w )
+{
+}
+
+WRITE_LINE_MEMBER( applix_state::kbd_data_w )
+{
+}
+
+static const pc_kbdc_interface applix_kbdc =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, applix_state, kbd_clock_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, applix_state, kbd_data_w)
+};
+
 static MACHINE_CONFIG_START( applix, applix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
@@ -505,6 +526,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
 //	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	MCFG_PC_KBDC_ADD("kbdc", applix_kbdc)
 MACHINE_CONFIG_END
 
 /* ROM definition */
