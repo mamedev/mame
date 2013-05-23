@@ -9,9 +9,6 @@
 #include "includes/gmaster.h"
 
 
-#define MAIN_XTAL   12000000
-
-
 READ8_MEMBER(gmaster_state::gmaster_io_r)
 {
 	UINT8 data = 0;
@@ -218,7 +215,7 @@ static const UPD7810_CONFIG config = {
 };
 
 static MACHINE_CONFIG_START( gmaster, gmaster_state )
-	MCFG_CPU_ADD("maincpu", UPD7810, MAIN_XTAL/2/*?*/)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_12MHz/2/*?*/)
 	MCFG_CPU_PROGRAM_MAP(gmaster_mem)
 	MCFG_CPU_IO_MAP( gmaster_io)
 	MCFG_CPU_CONFIG( config )
@@ -247,7 +244,7 @@ MACHINE_CONFIG_END
 
 ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
-	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
+	ROM_LOAD("d78c11agf_e19.u1", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
 ROM_END
 
