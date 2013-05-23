@@ -3005,6 +3005,10 @@ ROM_START( tranqgun )
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
+
+
+
+
 ROM_START( spacetrk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u33.bin",      0x0000, 0x0400, CRC(9033fe50) SHA1(0a9b86af03956575403d8b494963f55887fc4dc3) )
@@ -3193,6 +3197,33 @@ ROM_START( brdrline )
 	/* following 2 from sound board */
 	ROM_LOAD( "prom93427.1", 0x0000, 0x0100, CRC(64b98dc7) SHA1(f0bb7d0b4b56cc2936ce4cbec165394f3026ed6d) )
 	ROM_LOAD( "prom93427.2", 0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
+ROM_END
+
+
+ROM_START( brdrlinet )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1171a.u33",      0x0000, 0x0400, CRC(38dd9880) SHA1(1a879ce990129fd34e7265010872ac998d16accf) )
+	ROM_LOAD( "1172a.u32",      0x0400, 0x0400, CRC(1a3adff0) SHA1(3fab79688b739d6a5979638115629d0a61f8878b) )
+	ROM_LOAD( "1173a.u31",      0x0800, 0x0400, CRC(e668734d) SHA1(b01b06f4a107f14001c70e63e072c575cd97c89b) )
+	ROM_LOAD( "1174a.u30.bad",  0x0c00, 0x0400, BAD_DUMP CRC(22c83ae4) SHA1(16da92afe068401a6f27f56b214b600b49d8019f) ) // chip was dead, need another
+	ROM_LOAD( "1175a.u29",      0x1000, 0x0400, CRC(116517b8) SHA1(a7ded7cb53735e6cf4994ff70db35dead04828e6) )
+	ROM_LOAD( "1176a.u28",      0x1400, 0x0400, CRC(2b2c4ba8) SHA1(fe9ccb94b9d5d7fb9ec6170a7b71f859b22981d3) )
+	ROM_LOAD( "1177a.u27",      0x1800, 0x0400, CRC(d8cbcc1e) SHA1(632d2ba84d4276155960b176bf7ac514b214e481) )
+	ROM_LOAD( "1178a.u26",      0x1c00, 0x0400, CRC(05b1e3ea) SHA1(38657eb1df334dd66e66d7a1ec5cbe663982e12b) )
+	ROM_LOAD( "1179a.u8",       0x2000, 0x0400, CRC(c2dc3181) SHA1(8bd639a8c1d86d6432b9115195b5f394898c936a) )
+	ROM_LOAD( "1180a.u7",       0x2400, 0x0400, CRC(c00543a7) SHA1(21df4f31c8070c76f592b8c231fc7b3b192fc20f) )
+	ROM_LOAD( "1181a.u6",       0x2800, 0x0400, CRC(aba9ca30) SHA1(2d9d7a13adb21c71f0094c3c0518f995423fabe5) )
+	ROM_LOAD( "1182a.u5",       0x2c00, 0x0400, CRC(fe7cfc31) SHA1(93789ffbf9bd3a825dacb551a745ed1154de1773) )
+	ROM_LOAD( "1183a.u4",       0x3000, 0x0400, CRC(4e0684cd) SHA1(b1442a5f7b509f2a1775359174ecdf5e90df8150) )
+	ROM_LOAD( "1184a.u3",       0x3400, 0x0400, CRC(0f38ca4c) SHA1(1e5e19eae33c258f25495562f542aed38bba34e7) )
+	ROM_LOAD( "1185a.u2",       0x3800, 0x0400, CRC(1dff2ab0) SHA1(aab3482b15d1401897feabd4085b16acd5413c8f) )
+	ROM_LOAD( "1186a.u1",       0x3c00, 0x0400, CRC(5828ca5a) SHA1(cffa6dc6baa8a53bd165c40d1fc96c590c6e485c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "u49.bin",      0x0000, 0x0020, CRC(0a2156b3) SHA1(504abe8e253ff9b12ac6ffacd92722f8ee8a30ae) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    /* misc PROMs */
+	ROM_LOAD( "pr-52.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )
 ROM_END
 
 /*
@@ -3476,6 +3507,8 @@ GAME( 1981, brdrline,   0,        brdrline,  brdrline,  driver_device, 0, ROT270
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   driver_device, 0, ROT270, "Sega", "Star Raker", GAME_NO_SOUND )
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  driver_device, 0, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
+GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  driver_device, 0, ROT270, "Sega", "Borderline (Tranquilizer Gun conversion)", GAME_NO_SOUND ) // official factory conversion
+
 GAME( 1980, digger,     0,        digger,    digger,    driver_device, 0, ROT270, "Sega", "Digger", GAME_NO_SOUND )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    driver_device, 0, ROT270, "Sega", "Pulsar", GAME_IMPERFECT_SOUND )
 GAME( 1979, heiankyo,   0,        heiankyo,  heiankyo,  driver_device, 0, ROT270, "Denki Onkyo", "Heiankyo Alien", GAME_NO_SOUND )
