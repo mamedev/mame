@@ -2824,11 +2824,13 @@ static MACHINE_CONFIG_DERIVED( konami573yi, konami573 )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
+/*
 static MACHINE_CONFIG_DERIVED( konami573zi, konami573 )
 	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
+*/
 
 static MACHINE_CONFIG_DERIVED( k573baitx, k573bait )
 	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
