@@ -12,6 +12,9 @@
     The main articles appeared in ETI February/March/April 1987, followed by
     other articles in various issues after that.
 
+    Current Status:
+    After 60 seconds, boots to the ramdisk. No keyboard.
+
     TODO: everything!
     - Serial device Z8530 Z80SCC
     - Keyboard is a standard pc keyboard
@@ -87,6 +90,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	DECLARE_DRIVER_INIT(applix);
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
@@ -178,7 +182,7 @@ d3 = test switch
 */
 READ8_MEMBER( applix_state::port00_r )
 {
-	return m_data_or_cmd | (m_data << 1) | (m_buffer_empty << 2) | ioport("FDC")->read();
+	return (UINT8)m_data_or_cmd | ((UINT8)m_data << 1) | ((UINT8)m_buffer_empty << 2) | ioport("FDC")->read();
 }
 
 /*
@@ -204,6 +208,7 @@ d2-7 same as for port08_r
 WRITE8_MEMBER( applix_state::port08_w )
 {
 	m_port08 = data;
+	membank("bank1")->set_entry(BIT(data, 6));
 }
 
 READ8_MEMBER( applix_state::port10_r )
@@ -248,12 +253,14 @@ WRITE8_MEMBER( applix_state::port60_w )
 
 READ16_MEMBER( applix_state::fdc_stat_r )
 {
+	UINT8 data = 0;
 	switch (offset)
 	{
-	case 0: return m_buffer_empty;
-	case 1: return m_data;
-	default: return m_fdc_cmd; // case 2
+	case 0: data = (UINT8)m_buffer_empty^1; break;
+	case 1: data = (UINT8)m_data^1; break;
+	default: data = (UINT8)m_fdc_cmd; // case 2
 	}
+	return data << 7;
 }
 
 READ16_MEMBER( applix_state::fdc_data_r )
@@ -304,7 +311,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( subcpu_mem, AS_PROGRAM, 8, applix_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
-//	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
@@ -313,9 +320,9 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x08, 0x0f) AM_READWRITE(port08_r,port08_w) //Disk select
 	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
 	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x1c) AM_READWRITE(port20_r,port20_w) //SCSI
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI 5380
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("wd1772", wd1772_t, read, write) //FDC
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //Z80SCC
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
 
 
@@ -353,6 +360,7 @@ void applix_state::machine_reset()
 {
 	UINT8* ROM = memregion("maincpu")->base();
 	memcpy(m_expansion, ROM, 8);
+	membank("bank1")->set_entry(0);
 	m_maincpu->reset();
 }
 
@@ -516,9 +524,10 @@ ROM_START( applix )
 	ROM_LOAD( "1616osv.045",  0x00000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
 ROM_END
 
-#if 0
+
 DRIVER_INIT_MEMBER(applix_state, applix)
 {
+#if 0
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 	if (floppy)
@@ -529,10 +538,13 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 
 		floppy->ss_w(0);
 	}
-}
 #endif
+	UINT8 *RAM = memregion("subcpu")->base();
+	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
+}
+
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1986, applix, 0,       0,     applix, applix, driver_device, 0, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
