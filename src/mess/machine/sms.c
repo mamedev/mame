@@ -741,6 +741,8 @@ READ8_MEMBER(sms_state::read_0000)
 		}
 		if (m_bank_enabled[3] == ENABLE_CART)
 			return m_cartslot->read_cart(space, offset); 
+		if (m_card && m_bank_enabled[3] == ENABLE_CARD)
+			return m_card->read_cart(space, offset); 
 	}
 	else
 	{
@@ -751,6 +753,8 @@ READ8_MEMBER(sms_state::read_0000)
 		}
 		if (m_bank_enabled[0] == ENABLE_CART)
 			return m_cartslot->read_cart(space, offset); 
+		if (m_card && m_bank_enabled[0] == ENABLE_CARD)
+			return m_card->read_cart(space, offset); 
 	}	
 	return m_region_maincpu->base()[offset];
 }
@@ -765,6 +769,8 @@ READ8_MEMBER(sms_state::read_4000)
 
 	if (m_bank_enabled[1] == ENABLE_CART)
 		return m_cartslot->read_cart(space, offset + 0x4000); 
+	if (m_card && m_bank_enabled[1] == ENABLE_CARD)
+		return m_card->read_cart(space, offset + 0x4000); 
 
 	return m_region_maincpu->base()[offset];
 }
@@ -779,6 +785,8 @@ READ8_MEMBER(sms_state::read_8000)
 
 	if (m_bank_enabled[2] == ENABLE_CART)
 		return m_cartslot->read_cart(space, offset + 0x8000); 
+	if (m_card && m_bank_enabled[2] == ENABLE_CARD)
+		return m_card->read_cart(space, offset + 0x8000); 
 
 	return m_region_maincpu->base()[offset];
 }

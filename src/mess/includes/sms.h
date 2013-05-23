@@ -30,6 +30,7 @@ public:
 		m_main_scr(*this, "screen"),
 		m_mainram(*this, "mainram"),
 		m_cartslot(*this, "slot"),
+		m_card(*this, "mycard"),
 		m_region_maincpu(*this, "maincpu"),
 		m_port_dd(*this, "PORT_DD"),
 		m_port_dc(*this, "PORT_DC"),
@@ -66,6 +67,7 @@ public:
 	required_device<screen_device> m_main_scr;
 	required_shared_ptr<UINT8> m_mainram;
 	required_device<sega8_cart_slot_device> m_cartslot;
+	optional_device<sega8_card_slot_device> m_card;
 	required_memory_region m_region_maincpu;
 	required_ioport m_port_dd;
 	required_ioport m_port_dc;

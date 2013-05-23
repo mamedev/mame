@@ -14,10 +14,12 @@
  * write_mapper : to write to range [fffc-ffff] (called by the handler accessing those
  same addresses in sms.c)
 
+ Note about Sega Card / MyCard: the data contained in these matches the data in carts, it's only
+ the connector to be different. We emulate this with a variant of the slot having different media
+ switch and different interface (the latter not implemented yet)
+ 
  TODO:
  - investigate SG-1000 carts so to reduce duplicated code and to add full .sg support to sg1000m3
- - add support for sms card slot (using the same code, since the access are basically the same as 
-   the cart ones)
  
  ***********************************************************************************************************/
 
@@ -34,6 +36,7 @@
 //**************************************************************************
 
 const device_type SEGA8_CART_SLOT = &device_creator<sega8_cart_slot_device>;
+const device_type SEGA8_CARD_SLOT = &device_creator<sega8_card_slot_device>;
 
 
 //**************************************************************************
@@ -94,7 +97,7 @@ void device_sega8_cart_interface::ram_alloc(running_machine &machine, UINT32 siz
 	{
 		m_ram = auto_alloc_array_clear(machine, UINT8, size);
 		m_ram_size = size;
-		state_save_register_item_pointer(machine, "SEGA8_CART", NULL, 0, m_ram, m_ram_size);
+		state_save_register_item_pointer(machine, "SEGA8_CART", this->device().tag(), 0, m_ram, m_ram_size);
 	}
 }
 
@@ -108,14 +111,32 @@ void device_sega8_cart_interface::ram_alloc(running_machine &machine, UINT32 siz
 //  sega8_cart_slot_device - constructor
 //-------------------------------------------------
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, SEGA8_CART_SLOT, "Sega Master System / Game Gear / SG1000 Cartridge Slot", tag, owner, clock),
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_card) :
+						device_t(mconfig, type, name, tag, owner, clock),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(SEGA8_BASE_ROM),
 						m_must_be_loaded(FALSE),
 						m_interface("sms_cart"),
 						m_extensions("bin")
+{
+	m_is_card = is_card;
+}
+
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+						device_t(mconfig, SEGA8_CART_SLOT, "Sega Master System / Game Gear / SG1000 Cartridge Slot", tag, owner, clock),
+						device_image_interface(mconfig, *this),
+						device_slot_interface(mconfig, *this),
+						m_type(SEGA8_BASE_ROM),
+						m_must_be_loaded(FALSE),
+						m_is_card(FALSE),
+						m_interface("sms_cart"),
+						m_extensions("bin")
+{
+}
+
+sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, TRUE)
 {
 }
 
@@ -136,19 +157,6 @@ void sega8_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_sega8_cart_interface *>(get_card_device());
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sega8_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 //-------------------------------------------------
 //  SMS PCB
@@ -267,7 +275,13 @@ bool sega8_cart_slot_device::call_load()
 		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT32 offset = 0;
 		UINT8 *ROM;
-		
+
+		if (m_is_card && len > 0x8000)
+		{
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a card larger than 32KB");
+			return IMAGE_INIT_FAIL;
+		}
+			
 		// check for header
 		if ((len % 0x4000) == 512)
 		{

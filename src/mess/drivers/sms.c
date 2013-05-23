@@ -628,6 +628,10 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
+
+	// cardslot, not present in Master System II
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL, NULL)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
@@ -756,6 +760,9 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 
 	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
+
+	// cardslot, not present in Master System II
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
