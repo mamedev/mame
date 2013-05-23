@@ -291,8 +291,10 @@ WRITE8_MEMBER(sega8_rom_device::write_mapper)
 		case 0:
 			if (data & 0x08)
 			{
-				// hack: if the RAM is ever enabled by the game, then we save it at exit...
-				has_battery = 1;
+				// hack: if we were loading from fullpath (hence allowing m_late_battery_enable to be true)
+				// and the RAM is ever enabled by the game, then we save it at exit...
+				if (m_late_battery_enable)
+					has_battery = 1;
 				m_ram_enabled = 1;
 				m_ram_base = (data & 0x04) >> 2;
 			}

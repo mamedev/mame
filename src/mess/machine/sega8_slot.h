@@ -47,6 +47,8 @@ public:
 	
 	void set_has_battery(bool val) { has_battery = val; }
 	bool get_has_battery() { return has_battery; }
+	void set_late_battery(bool val) { m_late_battery_enable = val; }
+	bool get_late_battery() { return m_late_battery_enable; }
 	void set_lphaser_xoffs(int val) { m_lphaser_xoffs = val; }
 	int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	void set_sms_mode(int val) { m_sms_mode = val; }
@@ -70,6 +72,11 @@ public:
 	int m_rom_page_count;
 
 	bool has_battery;
+	
+	// we use this variable for fullpath loading only: in this case, RAM is always allocated, 
+	// but we set has_battery only if RAM is actually enabled during game...
+	bool m_late_battery_enable;	
+
 	int m_lphaser_xoffs;
 	int m_sms_mode;
 };
@@ -99,6 +106,7 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 
+	void setup_ram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len, UINT32 nvram_len);
 	int verify_cart(UINT8 *magic, int size);
 	void set_lphaser_xoffset(UINT8 *rom, int size);

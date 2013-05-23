@@ -55,6 +55,7 @@ device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &m
 		m_ram_size(0),
 		m_rom_page_count(0),
 		has_battery(FALSE),
+		m_late_battery_enable(FALSE),
 		m_lphaser_xoffs(0),
 		m_sms_mode(0)
 {
@@ -267,6 +268,38 @@ void sega8_cart_slot_device::set_lphaser_xoffset( UINT8 *rom, int size )
 	m_cart->set_lphaser_xoffs(xoff);
 }
 
+void sega8_cart_slot_device::setup_ram()
+{
+	if (software_entry() == NULL)
+	{
+		// from fullpath we have no way to know exactly if there was RAM, how much RAM was in the cart and if there was a battery
+		// so we always alloc 32KB and we save its content only if the game enable the RAM (unless it's Codemasters mapper...)
+
+		if (m_type != SEGA8_CODEMASTERS)
+		{
+			m_cart->set_late_battery(TRUE);
+			m_cart->ram_alloc(machine(), 0x08000);
+		}
+		else
+		{
+			// Codemasters cart can have 64KB of RAM (Ernie Els Golf) and no battery
+			m_cart->ram_alloc(machine(), 0x10000);
+			m_cart->set_has_battery(FALSE);
+		}	
+	}
+	else
+	{
+		// from softlist we rely on the xml to only allocate the correct amount of RAM and to save it only if a battery was present
+		const char *battery = get_feature("battery");
+		m_cart->set_late_battery(FALSE);
+		
+		if (get_software_region_length("ram"))
+			m_cart->ram_alloc(machine(), get_software_region_length("ram"));
+
+		if (battery && !strcmp(battery, "yes"))
+			m_cart->set_has_battery(TRUE);
+	}	
+}
 
 bool sega8_cart_slot_device::call_load()
 {
@@ -312,22 +345,10 @@ bool sega8_cart_slot_device::call_load()
 			m_type = sega8_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM, len);
-
-
-		if (m_type == SEGA8_CODEMASTERS)
-		{
-			m_cart->ram_alloc(machine(), 0x10000);
-			m_cart->set_has_battery(FALSE);
-		}
-		else
-		{
-			// for now
-			m_cart->ram_alloc(machine(), 0x08000);
-			//m_cart->set_has_battery(TRUE);
-		}
 		
 		set_lphaser_xoffset(ROM, len);
 
+		setup_ram();
 		
 		// Check for gamegear cartridges with PIN 42 set to SMS mode
 		if (software_entry() != NULL)
@@ -337,8 +358,9 @@ bool sega8_cart_slot_device::call_load()
 				m_cart->set_sms_mode(1);
 		}
 
-		// for now we always attempt to load a battery, but we only save it if ram is actually accessed
-		if (m_cart->get_ram_size() /*&& m_cart->get_has_battery()*/)
+		// when loading from fullpath m_late_battery_enable can be TRUE and in that case
+		// we attempt to load a battery because the game might have it!
+		if (m_cart->get_ram_size() && (m_cart->get_has_battery() || m_cart->get_late_battery()))
 			battery_load(m_cart->get_ram_base(), m_cart->get_ram_size(), 0x00);
 		
 		//printf("Type: %s\n", sega8_get_slot(type));

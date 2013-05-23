@@ -416,8 +416,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-14389" />
 			<feature name="ic2" value="KM6264LG-10L" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14389.ic1" size="262144" crc="35fa3f68" sha1="75a04fa483fccd12a52aa18e494d542f4486577f" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1873,8 +1877,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-14633" />
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14633.ic1" size="262144" crc="529c864e" sha1="6b03183b7183de17ad6fbc9938599d3d18badc1a" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1931,8 +1939,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2503"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="defenders of oasis (usa, europe).bin" size="524288" crc="e2791cc1" sha1="07c1167c3b6eea294a73272c256934406f48f9d5" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1942,8 +1953,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="defenders of oasis (proto).bin" size="262144" crc="c674eccc" sha1="76e1f94dbb8a12ba428767d2e70f00fe719fa449" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1961,6 +1975,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-16032.ic1" size="262144" crc="ec808026" sha1="a253283456010bd73d3bde209566f26b6f8c582f" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -2382,6 +2398,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<dataarea name="rom" size="262144">
 				<rom name="ernie els golf (europe) (en,fr,de,es,it).bin" size="262144" crc="5e53c7f7" sha1="a8d75c2af514dc81ba4dc66a508384d730a77ce4" offset="000000" />
 			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2393,8 +2411,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910809, 19931210 (Meisaku Collection)"/>
 		<info name="alt_title" value="エターナルレジェンド 永遠の伝説"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="eternal legend - eien no densetsu (japan).bin" size="262144" crc="04302bbd" sha1="717b4e33cf3956e4194b912533bf1b7bf9d20725" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -2981,8 +3002,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951208"/>
 		<info name="alt_title" value="ゴジラ 怪獣大進撃"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="godzilla - kaijuu daishingeki (japan).bin" size="524288" crc="4cf97801" sha1="ff3e8905635a02eb85556146225020b52506424c" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3341,8 +3365,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-16821" />
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-16821.ic1" size="524288" crc="a12a28a0" sha1="04248e53ce54c9f17daae9885fed87d39f0117b6" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -3654,8 +3682,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-6054A" />
 			<feature name="ic1" value="MPR-13610" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-13610.ic1" size="131072" crc="4af7f2aa" sha1="7447e0ad5e8e14c3ae05a274d393ca34de044855" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4060,8 +4092,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19960112"/>
 		<info name="alt_title" value="ルナ さんぽする学園"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="lunar - sanposuru gakuen (japan).bin" size="524288" crc="58459edd" sha1="1b0cc847d31956d843cadab7d86a2f434220301e" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4098,8 +4133,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951124"/>
 		<info name="alt_title" value="魔導物語A ドキドキばけ～しょん"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari a - dokidoki vacation (japan).bin" size="524288" crc="7ec95282" sha1="c027aa76fe0e09a2d1b982eea0df2c8b687aadf7" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4112,8 +4150,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19931203"/>
 		<info name="alt_title" value="魔導物語I 3つの魔導球"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari i - 3-tsu no madoukyuu (japan).bin" size="524288" crc="00c34d94" sha1="5ccd474cefcb8e086e2e1f77c0fdd5c1d2bf82e7" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4131,8 +4172,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-16616" />
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-16616.ic1" size="524288" crc="12eb2287" sha1="deead79fa4cb2e87652a9c8a76f2a7174f48f37a" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4145,8 +4190,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="魔導物語III 究極女王様"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari iii - kyuukyoku joou-sama (japan) (v1.1).bin" size="524288" crc="568f4825" sha1="673670f954176ffab28a0280aa49856a457f36b1" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4159,8 +4207,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19941125"/>
 		<info name="alt_title" value="魔導物語III 究極女王様"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="madou monogatari iii - kyuukyoku joou-sama (japan).bin" size="524288" crc="0a634d79" sha1="dd590c9086161b1f97573c48720c32cc5506dabc" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4178,8 +4229,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-17115" />
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17115.ic1" size="524288" crc="8f82a6b9" sha1="6c13e3b9bb24eafc1186c5ffa322b1f40c676b3d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4197,8 +4252,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-18183-S" />
 			<feature name="ic2" value="??" />
 			<feature name="ic3" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18183-s.ic1" size="524288" crc="1c2c2b04" sha1="29615d86057f3323ecda75d47102e77d364f6499" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4211,8 +4270,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910712 (JPN)"/>
 		<info name="alt_title" value="マジカルパズル ポピルズ (JPN)"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="131072">
 				<rom name="magical puzzle popils (world) (en,ja).bin" size="131072" crc="cf6d7bc5" sha1="fb939f0810d0763b9abaeec1a2bfbabacaad5441" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4313,8 +4375,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940422"/>
 		<info name="alt_title" value="女神転生外伝 ラストバイブル"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="megami tensei gaiden - last bible (japan).bin" size="524288" crc="2e4ec17b" sha1="d98332eba27fd4a0db82d551a54bee4fdccf41a2" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4327,8 +4392,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="女神転生外伝 ラストバイブル スペシャル"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="megami tensei gaiden - last bible s (japan).bin" size="524288" crc="4ec30806" sha1="ca597064a8f0dd8221e89655584ec0cc67dbe026" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -4490,8 +4558,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19941030"/>
 		<info name="alt_title" value="モルドリアン ～光と闇の姉妹～"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="moldorian - hikari to yami no sister (japan).bin" size="524288" crc="4d5d15fb" sha1="0dad260b5357b2f61d1452bb73d8321ca53d7262" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -4622,8 +4693,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="なぞぷよ2"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="nazo puyo 2 (japan).bin" size="262144" crc="73939de4" sha1="dbd511aff622c618eac0c21de36965b869362dbd" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5063,8 +5137,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19960719"/>
 		<info name="alt_title" value="ねこ大すき!"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="neko daisuki! (japan).bin" size="524288" crc="3679be80" sha1="c83fd440895ceb50e4da2ab9db2a29ac21555e9d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5793,8 +5870,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19961206"/>
 		<info name="alt_title" value="ペット倶楽部 いぬ大すき!"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="pet club inu daisuki! (japan).bin" size="524288" crc="b42d8430" sha1="0c0bcfd06084419e7c5921f92ccb0f977058c5a3" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -5885,8 +5965,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920918"/>
 		<info name="alt_title" value="ファンタシースター外伝"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="phantasy star gaiden (japan).bin" size="262144" crc="a942514a" sha1="914f1e693f396794a37b5d99acaf5db54fe529c2" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6504,8 +6587,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="ロイアル・ストーン"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="royal stone - hirakareshi toki no tobira (japan).bin" size="524288" crc="445d7cd2" sha1="c1afca3ac30cb9852f508f5dded7e50e08000f86" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6619,8 +6705,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="171-6087A" />
 			<feature name="ic1" value="MPR-15205" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-15205.ic1" size="262144" crc="0924d2ec" sha1="02fa5c6c6f81f5f4e1d78eced5a37617888404d3" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6656,8 +6746,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920918"/>
 		<info name="alt_title" value="シャダム・クルセイダー ～遙かなる王国～"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shadam crusader - harukanaru oukoku (japan).bin" size="524288" crc="09f9ed60" sha1="de4b546f61dd32106247d38643849f6aaeeedb07" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -6726,8 +6819,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921225, 19930723 (Meisaku Collection)"/>
 		<info name="alt_title" value="シャイニング・フォース外伝 ～遠征・邪神の国へ～"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force gaiden - ensei, jashin no kuni e (japan).bin" size="524288" crc="4d1f4699" sha1="bea1bea94ea745691ad944eaadc8a5576057ed53" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6740,8 +6836,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950630"/>
 		<info name="alt_title" value="シャイニング・フォース外伝 -ファイナル コンフリクト-"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force gaiden - final conflict (japan).bin" size="524288" crc="6019fe5e" sha1="0d4bc152e7ae70457fa74f593e064403cd24ab72" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -6752,8 +6851,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2524"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii - the sword of hajya (usa, europe).bin" size="524288" crc="a6ca6fa9" sha1="789734c4a837dffd2ad3e2c8de22cbd83836580d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -6773,8 +6875,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="u3" value="337-26B" />
 			<feature name="u4" value="??" />
 			<feature name="batt" value="" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15570 j07.u1" size="524288" crc="30374681" sha1="2dd374db661315e51e9eedebf346a5a4ded0c3be" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -6784,8 +6890,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - apr 27,  1994).bin" size="524288" crc="65e5345c" sha1="71ed14c75915d606e00481cc2fbbaa28b6d2ba4f" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -6795,8 +6904,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - jul 08,  1994).bin" size="524288" crc="80dca91d" sha1="a9dd1254577bff20ee33f7bce56e2c4361f911c4" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -6806,8 +6918,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - jun 27,  1994).bin" size="524288" crc="8bfc56c3" sha1="900f8640af14dd6c413f20058a98da11a0fd07b1" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -6817,8 +6932,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="shining force ii (prototype - may 30,  1994).bin" size="524288" crc="e97ec011" sha1="bb7be9acb986a923c6c8ae41053c1b2f508885d1" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="24576">
 			</dataarea>
 		</part>
 	</software>
@@ -8433,8 +8551,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950127"/>
 		<info name="alt_title" value="シルヴァンテイル"/>
 		<part name="cart" interface="gamegear_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
 				<rom name="sylvan tale (japan).bin" size="524288" crc="45ef2062" sha1="bec44ab675bcd6b081590d4d52b6af4076c342e6" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -8534,9 +8655,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 			<feature name="ic1" value="MPR-14246" />
 			<feature name="ic2" value="KM6264BLG-10L" />
 			<feature name="ic3" value="165-26B" />
-			<feature name="battery" value="??" />
+			<feature name="batt" value="??" />
+
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14246.ic1" size="262144" crc="7b7717b8" sha1="d290bba12f4b7341c3ce2a00be8b8d7e548327e1" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
