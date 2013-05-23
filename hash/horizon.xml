@@ -2,24 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="horizon" description="NorthStar Horizon diskettes">
 
-	<software name="alpssrc">
-		<description>ALPS Source Code</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="89600">
-				<rom name="alpsdsrc.nsi" size="89600" crc="2b17c80e" sha1="93e66d6e002e4b198f5954259bf5f6546e91fbc9" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="89600">
-				<rom name="alpsnsrc.nsi" size="89600" crc="36217dd0" sha1="4209eb5c34d54163ce988b50ffe19691a59e1d86" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="c145_54">
 		<description>LifeBoat CP/M 1.45 - 54k</description>
 		<year>198?</year>
@@ -450,6 +432,1250 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="179200">
 				<rom name="xitancpm.nsi" size="179200" crc="b442f8c2" sha1="de1a311d8fd6f490f76760787f6a8f6600aebe1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aca">
+		<description>Active Circuit Analysis</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="aca.nsi" size="179200" crc="2e951e55" sha1="a13b09dc05a9d8397ed9ed28382c00e10eac65e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adven">
+		<description>Original Adventure</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="adven_a.nsi" size="179200" crc="7b8d8c6f" sha1="0ac9afd674ed4a5aeada10ddd6867cea1e68f9a6" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="adven_b.nsi" size="179200" crc="70a49430" sha1="3f2ab3be79903ee46ebbdb56aa8a3b3da259480e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alps">
+		<description>Assembly Language Programming System</description>
+		<year>1979</year>
+		<publisher>Dave Dunfield</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="alps.nsi" size="89600" crc="f6889658" sha1="6427bce95e41fdb671d575f4018fa1cac0491f7f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="alpsdsrc.nsi" size="89600" crc="2b17c80e" sha1="93e66d6e002e4b198f5954259bf5f6546e91fbc9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="alpsnsrc.nsi" size="89600" crc="36217dd0" sha1="4209eb5c34d54163ce988b50ffe19691a59e1d86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apcbasic">
+		<description>APCBASIC 2.4.2</description>
+		<year>1982</year>
+		<publisher>Chris Cochran</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="apcbasic.nsi" size="179200" crc="88496cd7" sha1="435d0d2bef31ba6053ac02bbb774e6533b35dd14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aztec">
+		<description>AZTEC 'C' compiler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="aztec.nsi" size="358400" crc="ebe2c0d9" sha1="b8b4744e145f6ee7c49eb78ad45445f8d30bc38b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basex">
+		<description>BaseX</description>
+		<year>1978</year>
+		<publisher>Interactive Microware</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Tape and Disk Programs"/>
+			<dataarea name="flop" size="89600">
+				<rom name="basex1.nsi" size="89600" crc="ae3d017e" sha1="a3d0e370dd7db10bccce4cf2fcf1da1d09214b12" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler and Loader"/>
+			<dataarea name="flop" size="89600">
+				<rom name="basex2.nsi" size="89600" crc="1b7c959b" sha1="d10e4b2166e2188eb7ba951df2d554b7ef98b307" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bazic">
+		<description>BAZIC</description>
+		<year>198?</year>
+		<publisher>Micro Mike's</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="bazic.nsi" size="179200" crc="c4d152af" sha1="9c173ccbd4f41bec07dde7e4d9cb4822f9b725e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamdef">
+		<description>Beam Deflection</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="beamdef.nsi" size="89600" crc="1ebb2447" sha1="26acbcfb49dd40cab923170ad3d70ee35d675b9a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="beamdefl.nsi" size="89600" crc="b9d5f78d" sha1="1a32f4bcc10a57bf282d02d2c14112bafd80a94d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridge">
+		<description>Bridge 2.0</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="bridge.nsi" size="89600" crc="b8459a71" sha1="e25be1b28630a8241dac0a5a7e061ce06a193653" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssv2ch4">
+		<description>Basic Scientific Subroutines V2 CH4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="bssv2ch4.nsi" size="89600" crc="2359f6ed" sha1="f29701ac9603e6eb053c922d5c775b5cd8164bbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="butler">
+		<description>Butler Adventure</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="butler.nsi" size="179200" crc="2c23c0cd" sha1="b0e38cd73a2335a64ab00b06280f3d5ae2cb85d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Chess Master</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="chess.nsi" size="89600" crc="c4edfe98" sha1="785f683f379dfbe166e201db08fd548dec10921f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compare">
+		<description>File comparison package</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="compare.nsi" size="89600" crc="3817be37" sha1="2298930ac38b17ebec5e431af1cdc896770aa621" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compress">
+		<description>File compression package</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="compress.nsi" size="89600" crc="6d85c27b" sha1="0e14d21143b690d003742f31989aadf1d215e10c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="copyall">
+		<description>COPYALL</description>
+		<year>198?</year>
+		<publisher>Micro Mike's</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="copyall.nsi" size="179200" crc="a01d0155" sha1="2da7043def45b6c56b994f3122d4e482f548ff02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmgames">
+		<description>CP/M Games disk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmgames.nsi" size="179200" crc="7c3096f7" sha1="279126919f4ced3def4ebdff37d338a7beb45241" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug23">
+		<description>NorthStar CP/M Users Group Diskette #23</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug23a.nsi" size="179200" crc="facc44a2" sha1="156c2fc569d7279376ff4901818881d9736ffb32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug24">
+		<description>NorthStar CP/M Users Group Diskette #24</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug24.nsi" size="179200" crc="c3933235" sha1="32e4c7c9cb4ee025cdbba7e3f5f7da6f31434a18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug25">
+		<description>NorthStar CP/M Users Group Diskette #25</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug25a.nsi" size="179200" crc="45e30cf7" sha1="9322008d29196f79582872b697063d1d352aa077" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug25b.nsi" size="179200" crc="d17860db" sha1="d7ddd7c4e2e328305eb70119b9c3a376caa633b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug29">
+		<description>NorthStar CP/M Users Group Diskette #29</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug29a.nsi" size="179200" crc="bdda913d" sha1="0c4106bc47ad1e2f5940bf9b7f52cacf0d2ef255" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug29b.nsi" size="179200" crc="c2edf4c8" sha1="ddaa79f4f1ee6a710f432bdd84dfdce8632f2d67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug30">
+		<description>NorthStar CP/M Users Group Diskette #30</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug30a.nsi" size="179200" crc="e08e6eef" sha1="ca8e6e329b06d10afdf25afc860ff03d53053f15" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug30b.nsi" size="179200" crc="e7ee18d8" sha1="4e8733cc2d9cb056a87e995b5baa8a35ecddf08a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug31">
+		<description>NorthStar CP/M Users Group Diskette #31</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug31a.nsi" size="179200" crc="2cace9c3" sha1="79debadcbdfcc8832322877fe1b3a92b7c5d9dbe" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug31b.nsi" size="179200" crc="bac46e15" sha1="96637b871f6783897fbe4479bfe5c88b6f7f6dee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug32">
+		<description>NorthStar CP/M Users Group Diskette #32</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug32.nsi" size="179200" crc="4dc0f0b2" sha1="302de0c09d8ca8f5555c6c73faa79af3d1a9b357" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug34">
+		<description>NorthStar CP/M Users Group Diskette #34</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug34.nsi" size="179200" crc="0ccb00a7" sha1="82d25528795c5c9db7a989355b1da4012e8c8ad3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug36">
+		<description>NorthStar CP/M Users Group Diskette #36</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug36a.nsi" size="179200" crc="198fa43f" sha1="312453b55d035ef1bd526c759f90b57653fd0763" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug36b.nsi" size="179200" crc="a4abf14b" sha1="1f1c965835730a5b96757de4adbf178b821094c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmug40">
+		<description>NorthStar CP/M Users Group Diskette #40</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="cpmug40a.nsi" size="179200" crc="a0f4527c" sha1="01eb800abd2ae3c7c3ee8530544d81f64b7c5802" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crans">
+		<description>Cranston Manor Adventure</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="crans.nsi" size="89600" crc="b9cc329e" sha1="740c282b1b71d04d73f96f9193f8d2d440b7c660" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datasmth">
+		<description>Data Smoother</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="datasmth.nsi" size="89600" crc="c543be80" sha1="4bd543343739f06b03642ff2b3fb6d2ab5585c3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datastar">
+		<description>DATASTAR</description>
+		<year>198?</year>
+		<publisher>Micropro</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="datastar.nsi" size="358400" crc="78eb5420" sha1="bb3a0b5d2d6c00ef196f8ab6a91e4d3fcc87d8a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmmutil">
+		<description>DMM Utilities</description>
+		<year>198?</year>
+		<publisher>Elliam Associates</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="dmmutil.nsi" size="179200" crc="8dc745af" sha1="bf26de495ae3263e7d3d2b13a9093373c9698c1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynabase">
+		<description>Dynabase Database</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="dynabase.nsi" size="89600" crc="a6d4ffbc" sha1="194cf1d21141130a5cbcac414354639639cd2ad5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f80">
+		<description>Fortran-80 (v3.44)</description>
+		<year>1980</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="f80.nsi" size="179200" crc="b8f1eab2" sha1="77c4fe9f573570afe214fc2d464a4ab52895d739" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f80_331" cloneof="f80">
+		<description>Fortran-80 (v3.31)</description>
+		<year>1980</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="f80_1.nsi" size="179200" crc="944762d6" sha1="5e20a2f174f5c3f9a515e697ed093266275d38e4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastgam">
+		<description>FastGammon</description>
+		<year>198?</year>
+		<publisher>Quality Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="fastgam.nsi" size="89600" crc="b60aa119" sha1="b5ad920b3c4a7725ca9c0fae9d2c3ff088d56b80" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finmgtsy">
+		<description>Financial Management System</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="finmgtsy.nsi" size="89600" crc="be3e4084" sha1="0456ea44f8d6ad801fcac3e8329febb41aba538c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamepak2">
+		<description>Game Pak 2</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="gamepak2.nsi" size="89600" crc="f6d2f6be" sha1="c5b7120da2cdb642866ce9bc1126479a2df8ac85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games">
+		<description></description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games.nsi" size="89600" crc="f4fb0bb7" sha1="abca42781d815f9314d146f740b5256e037dc3a7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games1">
+		<description>Games 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games1.nsi" size="89600" crc="b610c1df" sha1="9c0d79fd5eb7f4f94d242b10c90d4da6cbb60d7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games10">
+		<description>Games 10</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="games10.nsi" size="358400" crc="ce9a9e1b" sha1="0c694aa84ed4fe788fbb6f70ea3a07e4d1d940ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games11">
+		<description>Games 11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="games11.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games2">
+		<description>Games 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games2.nsi" size="89600" crc="b8a8cd05" sha1="71cae09d1b1ddd4d2b5d42dc3de73fac1db25705" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games3">
+		<description>Games 3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games3.nsi" size="89600" crc="2e712162" sha1="0b0222598c2a3e030f3c96b7d3a48d80f114866c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games4">
+		<description>Games 4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games4.nsi" size="89600" crc="6c0a0193" sha1="1022cff9e0b49b94d7d85cc97f3c9904e54a52f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games5">
+		<description>Games 5</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games5.nsi" size="89600" crc="aafded43" sha1="61ba541cfdf7ea6bbaf05e35f4d13f95f88da117" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games6">
+		<description>Games 6</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games6.nsi" size="89600" crc="bd586e55" sha1="534af5b78c83d65e7775d02e56b18226ea8822f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games7">
+		<description>Games 7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="games7.nsi" size="89600" crc="765fc149" sha1="1f9e182618091e5e65c5fab2b56afe25d8d9defd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games8">
+		<description>Games 8</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="games8.nsi" size="358400" crc="e80d1576" sha1="f2ef93000d1c06a8abb6e34e23c3e62a2c88675e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games9">
+		<description>Games 9</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="games9.nsi" size="358400" crc="69b68978" sha1="74d3e97e757a2bb211397e2a3002a7bd9e77eebe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="generate">
+		<description>Basic Disassembler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="generate.nsi" size="89600" crc="5a6b27ff" sha1="aeeef6fb0e47beaef3c10b5198a946b3833572d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hancapii">
+		<description>Handicapper II (Horse Race Handicapper)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="hancapii.nsi" size="179200" crc="67d68c0b" sha1="eb547e8ffa117c7d4818d85a19af490edd8caf95" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="handicap">
+		<description>Horse Race Handicapper</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="handicap.nsi" size="89600" crc="d4b63647" sha1="e801305fc50811f854b603ea531ac5ec2d4fc53f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hearts">
+		<description>Hearts 1.5</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="hearts.nsi" size="89600" crc="300dee45" sha1="d8e5ac5908d5a821593c5bf40c0032697a07b973" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icatutil">
+		<description>INSUA Catalog Utilities</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="icatutil.nsi" size="179200" crc="6015c7ca" sha1="c573020d13215623d916c5b14057fb57970d2c88" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inutil">
+		<description>INSUA DOS Utilities #1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="inutil.nsi" size="179200" crc="5ad152d3" sha1="dba15b21b8be5d699acfa4b232914ef91fb530d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keeptrak">
+		<description>Keep Track Of It</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="keeptrak.nsi" size="179200" crc="7f902027" sha1="5ecabd24e3ca363f15ea6e3dd38144dd182f5638" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keno">
+		<description>KENO Casino game</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="keno.nsi" size="179200" crc="ec7e25bc" sha1="23049b8849d85d80eeb30bcc403b31f5666dbb26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maillist">
+		<description>DynaComp MailList 2.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="maillist.nsi" size="89600" crc="2c1d3649" sha1="f5549e5bd83d1ae26cd06de36024eeb83a1c75c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="michart">
+		<description>Micro Chart Program</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="michart.nsi" size="179200" crc="446654b0" sha1="792b094cd3a99e7d54bbb17c3d95ff540c90401d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monarch">
+		<description>Monarch</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="monarch.nsi" size="89600" crc="2a8459f2" sha1="582455bbbe7eea735262d4a32acfff1e433b5262" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstuf">
+		<description>The MicroStuf Co. RCONS 2.1 and MESS 2.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="mstuf.nsi" size="89600" crc="bc24e2e3" sha1="9f9bdcb40b68cb2ab5720eac9995afea7b709b9c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multlinr">
+		<description>Multilinear Regression</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="multlinr.nsi" size="89600" crc="2c1d2075" sha1="66b96ffca3c480e70402e8ea44f6174d2bd5f94c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse1">
+		<description>NorthStar Software Exchange #1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse1.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse16">
+		<description>NorthStar Software Exchange #16</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse16.nsi" size="89600" crc="65d1b73d" sha1="460a72c919844bfacc986f95b185f0507cb19fa9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse17">
+		<description>NorthStar Software Exchange #17</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse17.nsi" size="89600" crc="ad1e557e" sha1="6c690e024aa28c89324c2ff1f09030a8e19096a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse18">
+		<description>NorthStar Software Exchange #18</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse18.nsi" size="89600" crc="d13c7d90" sha1="e70d690fb1930dcf8506c4d1ac6089f4ce61766a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse2">
+		<description>NorthStar Software Exchange #2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse2.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse20">
+		<description>NorthStar Software Exchange #20</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse20.nsi" size="89600" crc="db5dfbb5" sha1="d35e01060e98529fc3909151e2a61cab4ad7751b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse21">
+		<description>NorthStar Software Exchange #21</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse21.nsi" size="89600" crc="4f6d1a13" sha1="8edb727ef6335bb05a959e845286e9a76007e9c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse22">
+		<description>NorthStar Software Exchange #22</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse22.nsi" size="89600" crc="d6c6a9a7" sha1="2ee6cd4286fdfdc5592db7a379c14cdc6fb2495d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse7">
+		<description>NorthStar Software Exchange #7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse7.nsi" size="89600" crc="176e3d5d" sha1="df3ccac8045e5e26ed71745c73c6cfdb2f1ddfa2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse8">
+		<description>NorthStar Software Exchange #8</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse8.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsse9">
+		<description>NorthStar Software Exchange #9</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsse9.nsi" size="89600" crc="44e2ec98" sha1="cea0ac0edb68c4a7fd3caeed5a5cc0d435563633" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nsseg1r3">
+		<description>NorthStar Software Exchange Games-1 Release-3</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="nsseg1r3.nsi" size="89600" crc="a1667011" sha1="eab521ae73a014b9a0a9177311c44d54e41876f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pds">
+		<description>Program Development System</description>
+		<year>1978</year>
+		<publisher>Allen Ashley</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179214">
+				<rom name="pds-dden.nsi" size="179214" crc="2080756d" sha1="9812ad0bbe2a139dd3ef316ed75610994643f577" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="pds-sden.nsi" size="89600" crc="18346016" sha1="3b37ef307106943bea37da77e7785e81027dc09a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfm">
+		<description>Personal Finance Manager</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="pfm.nsi" size="179200" crc="0f30ea0f" sha1="a9550c4198f4437e247e1c80ac9673249421f7ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="power">
+		<description>POWER! Special Version for INSUA Members</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="power.nsi" size="179200" crc="abba757c" sha1="b363f15f0d46ead9383430d962f88cc45c965fda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="protext">
+		<description>Protext and MultiEd</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89626">
+				<rom name="protext.nsi" size="89626" crc="93a03243" sha1="72bc6fc426cd3649cb4e76923986af34e9f9aa09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickref">
+		<description>Quickref</description>
+		<year>1979</year>
+		<publisher>A. H. Bazell</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="quickref.nsi" size="89600" crc="c22390c7" sha1="7db7289756b94d672fe79c3157aa620478365cee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rmf">
+		<description>Remote Micro Facility</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="rmf.nsi" size="358400" crc="5adf989f" sha1="c59d440b54cbd6244770003daecbf9a40a2b4145" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roots">
+		<description>Find roots of polynomial</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="roots.nsi" size="89600" crc="d6dd927a" sha1="81abe50ee2bf72bc6da3beb98b9ca059bafc5905" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skpilot">
+		<description>Starkweather Pilot (v4.3)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="skpilot.nsi" size="179200" crc="2e57a6e3" sha1="9dd00d2368b6ac0959204fb229d16c2775f3052f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smlinreg">
+		<description>Stepwise Multilinear Regression</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="smlinreg.nsi" size="89600" crc="989fdce3" sha1="fb9c13cc5c83c640f004cb936b2fe6a1905dc2d8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smms">
+		<description>Music Synth</description>
+		<year>1979</year>
+		<publisher>Jon Bokelman</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="smms.nsi" size="89600" crc="60089728" sha1="775601f5e16b8a0de77cc4e3af736196de21c1ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacelns">
+		<description>Space Lanes</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="spacelns.nsi" size="89600" crc="1ccaf3a1" sha1="50aea5f32affe52653a73f7a8c9c15657af08e5e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spilot41">
+		<description>Super-Pilot 4.1 (Pilot Plus)</description>
+		<year>1979</year>
+		<publisher>A. Banks</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="spilot41.nsi" size="89600" crc="cc2ccc91" sha1="6434936809aacf5f98a7afa4fc2ecc67a13a0112" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="statevar">
+		<description>State Variables</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="statevar.nsi" size="179200" crc="023b73a8" sha1="cee9af023285723a279264a82c0f291e952f41f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stock">
+		<description>Microcomputer Stock Program</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="stock.nsi" size="89600" crc="1e765ada" sha1="54c033a4f57f75f9923d412054704fe2c028fc66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strace">
+		<description>Super-Trace</description>
+		<year>1989</year>
+		<publisher>Pavel Breder</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="strace.nsi" size="89600" crc="2ad51e09" sha1="b5dd0177a14c39faaafc972e714fb3d002513133" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taxopt">
+		<description>Tax Optimizer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="taxopt.nsi" size="179200" crc="d8b4b129" sha1="34e768c31161de01f7e94e6dcf9e80e2fa70c252" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal">
+		<description>Turbo-Pascal</description>
+		<year>198?</year>
+		<publisher>Borland</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="tpascal.nsi" size="179200" crc="2633f6de" sha1="a77bcd507c16338460517eb691b4f61e55a7eaa9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafunan">
+		<description>Traffic Function Analyzer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="trafunan.nsi" size="89600" crc="11263a7e" sha1="b26361ca1839d7dbfa2198abb5e2d95590dd8fdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uncharry">
+		<description>Uncle Harrys Will</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="uncharry.nsi" size="89600" crc="8f819d72" sha1="c2c0e30581d82c1e72ffce02d64a820f50c67775" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valdez">
+		<description>Valdez (Supertanker simulation)</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="valdez.nsi" size="89600" crc="9a284229" sha1="f3c4c0b1feb7eda05a154e51bf6f180471e4715d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vedit">
+		<description>VEDIT editor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="vedit.nsi" size="179200" crc="8569c16d" sha1="ccd7a2a7c4c43466cbd5d1145237f846bbce0af6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="windmere">
+		<description>Windmere Estates</description>
+		<year>198?</year>
+		<publisher>DynaComp</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="windmere.nsi" size="89600" crc="deca5a21" sha1="a0074ec254b2d9361225d7b357ac5f7c34cab574" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ws30">
+		<description>WordStar 3.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="ws30.nsi" size="358400" crc="ded0ebb6" sha1="a1df35ec0aa2301da2fa4c88106fa0b6ab371c24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xek">
+		<description>XEK Assembler/Disassembler</description>
+		<year>198?</year>
+		<publisher>ByteShop of Westminster</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="xek.nsi" size="89600" crc="56f0c74e" sha1="8dc7c9fe9f0f6d10fb87e6c38d79fcacc3ebd7d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z80asm">
+		<description>Z80 Assembler (with LifeBoat CP/M 2.20 - 56k)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="z80asm.nsi" size="179200" crc="0647ea6a" sha1="702df06249d702985b46f3fe1cac7ba1cd635131" offset="0" />
 			</dataarea>
 		</part>
 	</software>
