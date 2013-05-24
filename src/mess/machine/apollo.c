@@ -1367,8 +1367,8 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 
 	MCFG_I8237_ADD( APOLLO_DMA1_TAG, XTAL_14_31818MHz/3, apollo_dma8237_1_config )
 	MCFG_I8237_ADD( APOLLO_DMA2_TAG, XTAL_14_31818MHz/3, apollo_dma8237_2_config )
-	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), NULL, NULL ) // TODO: Doublecheck config
-	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), NULL, NULL ) // TODO: Doublecheck config
+	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), GND, NULL ) // TODO: Doublecheck config
+	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), GND, NULL ) // TODO: Doublecheck config
 	MCFG_PTM6840_ADD(APOLLO_PTM_TAG, apollo_ptm_config)
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, MC146818_UTC )
 	MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )
