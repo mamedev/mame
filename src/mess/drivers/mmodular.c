@@ -733,7 +733,7 @@ WRITE8_MEMBER(polgar_state::beep_academy)
 
 WRITE8_MEMBER(polgar_state::megaiv_IO)
 {
-//  if (BIT(data,0)) beep_set_state(machine->device("beep"),1); else beep_set_state(machine->device("beep"),0);
+//  if (BIT(data,0)) beep_set_state(machine->device("beeper"),1); else beep_set_state(machine->device("beeper"),0);
 	logerror("$2400 = %02x\n",data);
 	latch2400 = data;
 }
@@ -1603,7 +1603,7 @@ static MACHINE_CONFIG_START( monteciv, polgar_state )
 	MCFG_MACHINE_START_OVERRIDE(polgar_state, polgar )
 	MCFG_MACHINE_RESET_OVERRIDE(polgar_state, monteciv )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", polgar_state, cause_nmi, attotime::from_hz(600))
