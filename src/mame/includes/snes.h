@@ -586,7 +586,8 @@ public:
 		TIMER_RESET_HDMA,
 		TIMER_UPDATE_IO,
 		TIMER_SCANLINE_TICK,
-		TIMER_HBLANK_TICK
+		TIMER_HBLANK_TICK,
+		TIMER_LIGHTGUN_TICK		// used in MESS for crosshairs
 	};
 
 	snes_state(const machine_config &mconfig, device_type type, const char *tag)

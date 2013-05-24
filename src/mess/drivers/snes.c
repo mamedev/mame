@@ -48,11 +48,6 @@
 class snes_console_state : public snes_state
 {
 public:
-	enum
-	{
-		TIMER_LIGHTGUN_TICK
-	};
-
 	snes_console_state(const machine_config &mconfig, device_type type, const char *tag)
 			: snes_state(mconfig, type, tag)
 			, m_cartslot(*this, "snsslot")
@@ -935,7 +930,8 @@ void snes_console_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		lightgun_tick(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in snes_console_state::device_timer");
+		snes_state::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 
