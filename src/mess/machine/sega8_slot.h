@@ -18,7 +18,12 @@ enum
 	SEGA8_NEMESIS,
 	SEGA8_JANGGUN,
 	SEGA8_KOREAN,
-	SEGA8_KOREAN_NOBANK
+	SEGA8_KOREAN_NOBANK,
+	SEGA8_CASTLE,
+	SEGA8_BASIC_L3,
+	SEGA8_MUSIC_EDITOR,
+	SEGA8_DAHJEE_TYPEA,
+	SEGA8_DAHJEE_TYPEB
 };
 
 
@@ -39,6 +44,9 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
 	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
+	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 	
 	void rom_alloc(running_machine &machine, UINT32 size);
 	void ram_alloc(running_machine &machine, UINT32 size);
@@ -132,6 +140,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_mapper);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 
 //protected:

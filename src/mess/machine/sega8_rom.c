@@ -15,9 +15,20 @@
 //  constructors
 //-------------------------------------------------
 
+// Base cart type shared across SG-1000, SG-1000 Mark II, SG-1000 Mark III, SMS, GG
+// even if in sg1000 rom banks are never changed and ram is never enabled
 const device_type SEGA8_ROM_STD = &device_creator<sega8_rom_device>;
-const device_type SEGA8_ROM_EEPROM = &device_creator<sega8_eeprom_device>;
+
+// Specific SG-1000 MkI - MkII cart types
+const device_type SEGA8_ROM_CASTLE = &device_creator<sega8_castle_device>;
+const device_type SEGA8_ROM_BASIC_L3 = &device_creator<sega8_basic_l3_device>;
+const device_type SEGA8_ROM_MUSIC_EDITOR = &device_creator<sega8_music_editor_device>;
 const device_type SEGA8_ROM_TEREBI = &device_creator<sega8_terebi_device>;
+const device_type SEGA8_ROM_DAHJEE_TYPEA = &device_creator<sega8_dahjee_typea_device>;
+const device_type SEGA8_ROM_DAHJEE_TYPEB = &device_creator<sega8_dahjee_typeb_device>;
+
+// Specific SG-1000 MkIII - SMS - GG cart types
+const device_type SEGA8_ROM_EEPROM = &device_creator<sega8_eeprom_device>;
 const device_type SEGA8_ROM_CODEMASTERS = &device_creator<sega8_codemasters_device>;
 const device_type SEGA8_ROM_4PAK = &device_creator<sega8_4pak_device>;
 const device_type SEGA8_ROM_ZEMINA = &device_creator<sega8_zemina_device>;
@@ -27,6 +38,7 @@ const device_type SEGA8_ROM_KOREAN = &device_creator<sega8_korean_device>;
 const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
 
 
+
 sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sega8_cart_interface( mconfig, *this )
@@ -34,22 +46,34 @@ sega8_rom_device::sega8_rom_device(const machine_config &mconfig, device_type ty
 }
 
 sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, SEGA8_ROM_STD, "SMS Carts", tag, owner, clock, "sega8_rom", __FILE__),
+					: device_t(mconfig, SEGA8_ROM_STD, "Mark III, SMS & GG Carts", tag, owner, clock, "sega8_rom", __FILE__),
 						device_sega8_cart_interface( mconfig, *this )
 {
 }
 
 
-sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, SEGA8_ROM_EEPROM, "SMS EEPROM Carts", tag, owner, clock, "sega8_eeprom", __FILE__),
-						device_sega8_cart_interface( mconfig, *this ),
-						m_eeprom(*this, "eeprom")
+
+
+sega8_castle_device::sega8_castle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_CASTLE, "SG-1000 The Castle Cart", tag, owner, clock, "sega8_castle", __FILE__)
+{
+}
+
+
+sega8_basic_l3_device::sega8_basic_l3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_BASIC_L3, "SC-3000 BASIC Level III Cart", tag, owner, clock, "sega8_basicl3", __FILE__)
+{
+}
+
+
+sega8_music_editor_device::sega8_music_editor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_MUSIC_EDITOR, "SC-3000 Music Editor Cart", tag, owner, clock, "sega8_music", __FILE__)
 {
 }
 
 
 sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sega8_rom_device(mconfig, SEGA8_ROM_TEREBI, "SMS Terebi Oekaki Cart", tag, owner, clock, "sega8_terebi", __FILE__),
+					: sega8_rom_device(mconfig, SEGA8_ROM_TEREBI, "SG-1000 Terebi Oekaki Cart", tag, owner, clock, "sega8_terebi", __FILE__),
 						m_tvdraw_x(*this, "TVDRAW_X"),
 						m_tvdraw_y(*this, "TVDRAW_Y"),
 						m_tvdraw_pen(*this, "TVDRAW_PEN")
@@ -57,8 +81,30 @@ sega8_terebi_device::sega8_terebi_device(const machine_config &mconfig, const ch
 }
 
 
+sega8_dahjee_typea_device::sega8_dahjee_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_DAHJEE_TYPEA, "SG-1000 Dahjee RAM expansion + Cart (Type A)", tag, owner, clock, "sega8_dahjeea", __FILE__)
+{
+}
+
+
+sega8_dahjee_typeb_device::sega8_dahjee_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_DAHJEE_TYPEB, "SG-1000 Dahjee RAM expansion + Cart (Type B)", tag, owner, clock, "sega8_dahjeeb", __FILE__)
+{
+}
+
+
+
+
+sega8_eeprom_device::sega8_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: device_t(mconfig, SEGA8_ROM_EEPROM, "GG Carts + EEPROM", tag, owner, clock, "sega8_eeprom", __FILE__),
+						device_sega8_cart_interface( mconfig, *this ),
+						m_eeprom(*this, "eeprom")
+{
+}
+
+
 sega8_codemasters_device::sega8_codemasters_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, SEGA8_ROM_CODEMASTERS, "SMS Codemasters Carts", tag, owner, clock, "sega8_codemasters", __FILE__),
+					: device_t(mconfig, SEGA8_ROM_CODEMASTERS, "Mark III, SMS & GG Codemasters Carts", tag, owner, clock, "sega8_codemasters", __FILE__),
 						device_sega8_cart_interface( mconfig, *this )
 {
 }
@@ -122,6 +168,21 @@ void sega8_rom_device::device_reset()
 }
 
 
+
+void sega8_terebi_device::device_start()
+{
+	save_item(NAME(m_rom_bank_base));
+	save_item(NAME(m_tvdraw_data));
+}
+
+void sega8_terebi_device::device_reset()
+{
+	m_tvdraw_data = 0;
+}
+
+
+
+
 void sega8_eeprom_device::device_start()
 {
 	save_item(NAME(m_rom_bank_base));
@@ -135,17 +196,6 @@ void sega8_eeprom_device::device_reset()
 	m_93c46_enabled = 0;
 }
 
-
-void sega8_terebi_device::device_start()
-{
-	save_item(NAME(m_rom_bank_base));
-	save_item(NAME(m_tvdraw_data));
-}
-
-void sega8_terebi_device::device_reset()
-{
-	m_tvdraw_data = 0;
-}
 
 void sega8_codemasters_device::device_start()
 {
@@ -183,12 +233,6 @@ void sega8_zemina_device::device_reset()
 {
 	m_ram_base = 0;
 	m_ram_enabled = 0;
-}
-
-
-void sega8_janggun_device::device_start()
-{
-	save_item(NAME(m_rom_bank_base));
 }
 
 
@@ -254,7 +298,6 @@ void sega8_korean_device::late_bank_setup()
 }
 
 
-
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
@@ -262,6 +305,7 @@ void sega8_korean_device::late_bank_setup()
 /*-------------------------------------------------
  
  Base Sega 8bit carts, possibly with bankswitch
+ (only used by Mark III, SMS and GG games)
  
  -------------------------------------------------*/
 
@@ -311,6 +355,242 @@ WRITE8_MEMBER(sega8_rom_device::write_mapper)
 			break;
 	}	 
 }
+
+/*-------------------------------------------------
+ 
+ The Castle is a SG-1000 game featuring 8K of 
+ oncart RAM, mapped at 0x8000-0x9fff
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(sega8_castle_device::read_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		return m_ram[offset & 0x1fff];
+	
+	return m_rom[offset % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_castle_device::write_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		m_ram[offset & 0x1fff] = data;
+}
+
+
+/*-------------------------------------------------
+ 
+ BASIC Level III cart featured 32K of 
+ oncart RAM, mapped at 0x8000-0xffff?
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(sega8_basic_l3_device::read_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000)
+		return m_ram[offset & 0x3fff];
+	
+	return m_rom[offset % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_basic_l3_device::write_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000)
+		m_ram[offset & 0x3fff] = data;
+}
+
+READ8_MEMBER(sega8_basic_l3_device::read_ram)
+{
+	return m_ram[0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(sega8_basic_l3_device::write_ram)
+{
+	m_ram[0x4000 + (offset & 0x3fff)] = data;
+}
+
+
+/*-------------------------------------------------
+ 
+ Music Editor cart featured 10K of oncart RAM, mapped 
+ in 0x8000-0x9fff and 0xc000-0xffff
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(sega8_music_editor_device::read_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		return m_ram[offset & 0x1fff];
+	
+	return m_rom[offset % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_music_editor_device::write_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		m_ram[offset & 0x1fff] = data;
+}
+
+READ8_MEMBER(sega8_music_editor_device::read_ram)
+{
+	// 2K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff)
+	// or should it simply go to the 2K of SC3000 RAM???
+	return m_ram[0x2000 + (offset & 0x7ff)];
+}
+
+WRITE8_MEMBER(sega8_music_editor_device::write_ram)
+{
+	// 2K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff)
+	// or should it simply go to the 2K of SC3000 RAM???
+	m_ram[0x2000 + (offset & 0x7ff)] = data;
+}
+
+
+/*-------------------------------------------------
+ 
+ SG-1000 Terebi Oekaki using a Tablet input device
+ 
+ -------------------------------------------------*/
+
+/*
+ 
+ Terebi Oekaki (TV Draw)
+ 
+ Address Access  Bits
+ 7       6   5   4   3   2   1   0
+ $6000   W       -       -   -   -   -   -   -   AXIS
+ $8000   R       BUSY    -   -   -   -   -   -   PRESS
+ $A000   R/W     DATA
+ 
+ AXIS: write 0 to select X axis, 1 to select Y axis.
+ BUSY: reads 1 when graphic board is busy sampling position, else 0.
+ PRESS: reads 0 when pen is touching graphic board, else 1.
+ DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
+ 
+ */
+
+
+READ8_MEMBER(sega8_terebi_device::read_cart)
+{
+	int bank = offset / 0x4000;
+	
+	if (offset == 0x8000)
+		return m_tvdraw_pen->read();
+	if (offset == 0xa000)
+		return m_tvdraw_data;
+	
+	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(sega8_terebi_device::write_cart)
+{
+	switch (offset)
+	{
+		case 0x6000:
+			if (data & 0x01)
+			{
+				m_tvdraw_data = m_tvdraw_x->read();
+				
+				if (m_tvdraw_data < 4) m_tvdraw_data = 4;
+				if (m_tvdraw_data > 251) m_tvdraw_data = 251;
+			}
+			else
+				m_tvdraw_data = m_tvdraw_y->read() + 0x20;
+			break;
+		case 0xa000:
+			// effect unknown
+			break;
+	}
+}
+
+static INPUT_PORTS_START( tvdraw )
+	PORT_START("TVDRAW_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("TVDRAW_Y")
+	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("TVDRAW_PEN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Tablet - Pen")
+INPUT_PORTS_END
+
+ioport_constructor sega8_terebi_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( tvdraw );
+}
+
+
+/*-------------------------------------------------
+ 
+ Dahjee carts were sold with a RAM expansion pass-through
+ cart (which we don't emulate separately for the 
+ moment) which allowed to play on old SG1000 machines 
+ some MSX conversions requiring more RAM than available
+ 
+ Two kind of expansion existed (for different games),
+ one with 9K of RAM (Type A) and one with 8K of 
+ RAM (Type B).
+ 
+ -------------------------------------------------*/
+
+// TYPE A
+READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
+{
+	// 8K of RAM sits in 0x2000-0x3fff
+	if (offset >= 0x2000 && offset < 0x4000)
+		return m_ram[offset & 0x1fff];
+	
+	return m_rom[offset % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_dahjee_typea_device::write_cart)
+{
+	// 8K of RAM sits in 0x2000-0x3fff
+	if (offset >= 0x2000 && offset < 0x4000)
+		m_ram[offset & 0x1fff] = data;
+}
+
+READ8_MEMBER(sega8_dahjee_typea_device::read_ram)
+{
+	// 1K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff
+	// or should it simply go to the 1K of SG1000 RAM???
+	return m_ram[0x2000 + (offset & 0x3ff)];
+}
+
+WRITE8_MEMBER(sega8_dahjee_typea_device::write_ram)
+{
+	// 1K more of RAM sits in 0xc000-0xc3ff (and mirrored up to 0xffff
+	// or should it simply go to the 1K of SG1000 RAM???
+	m_ram[0x2000 + (offset & 0x3ff)] = data;
+}
+
+
+// TYPE B
+READ8_MEMBER(sega8_dahjee_typeb_device::read_cart)
+{
+	return m_rom[offset % m_rom_size];
+}
+
+READ8_MEMBER(sega8_dahjee_typeb_device::read_ram)
+{
+	// 8K more of RAM sits in 0xc000-0xffff
+	return m_ram[offset & 0x1fff];
+}
+
+WRITE8_MEMBER(sega8_dahjee_typeb_device::write_ram)
+{
+	// 8K more of RAM sits in 0xc000-0xffff
+	m_ram[offset & 0x1fff] = data;
+}
+
+
+
 
 /*-------------------------------------------------
  
@@ -378,63 +658,6 @@ MACHINE_CONFIG_END
 machine_config_constructor sega8_eeprom_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( gg_eeprom );
-}
-
-
-/*-------------------------------------------------
- 
- Sega 8-bit cart + Tablet input device, used for 
- SG-1000 Terebi Oekaki (compatible with Mark III)
- 
- -------------------------------------------------*/
-
-READ8_MEMBER(sega8_terebi_device::read_cart)
-{
-	int bank = offset / 0x4000;
-	
-	if (offset == 0x8000)
-		return m_tvdraw_pen->read();
-	if (offset == 0xa000)
-		return m_tvdraw_data;
-	
-	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
-}
-
-WRITE8_MEMBER(sega8_terebi_device::write_cart)
-{
-	switch (offset)
-	{
-		case 0x6000:
-			if (data & 0x01)
-			{
-				m_tvdraw_data = m_tvdraw_x->read();
-				
-				if (m_tvdraw_data < 4) m_tvdraw_data = 4;
-				if (m_tvdraw_data > 251) m_tvdraw_data = 251;
-			}
-			else
-				m_tvdraw_data = m_tvdraw_y->read() + 0x20;
-			break;
-		case 0xa000:
-			// effect unknown
-			break;
-	}
-}
-
-static INPUT_PORTS_START( tvdraw )
-	PORT_START("TVDRAW_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Tablet - X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("TVDRAW_Y")
-	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_NAME("Tablet - Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("TVDRAW_PEN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Tablet - Pen")
-INPUT_PORTS_END
-
-ioport_constructor sega8_terebi_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( tvdraw );
 }
 
 
@@ -639,3 +862,4 @@ WRITE8_MEMBER(sega8_korean_device::write_cart)
 	if (offset == 0xa000)
 		m_rom_bank_base[2] = data % m_rom_page_count;
 }
+

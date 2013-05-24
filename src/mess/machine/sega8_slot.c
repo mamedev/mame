@@ -182,7 +182,12 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_NEMESIS, "nemesis" },
 	{ SEGA8_JANGGUN, "janggun" },
 	{ SEGA8_KOREAN, "korean" },
-	{ SEGA8_KOREAN_NOBANK, "korean_nobank" }
+	{ SEGA8_KOREAN_NOBANK, "korean_nb" },
+	{ SEGA8_CASTLE, "castle" },
+	{ SEGA8_BASIC_L3, "level3" },
+	{ SEGA8_MUSIC_EDITOR, "music_editor" },
+	{ SEGA8_DAHJEE_TYPEA, "dahjee_typea" },
+	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" }
 };
 
 static int sega8_get_pcb_id(const char *slot)
@@ -272,20 +277,45 @@ void sega8_cart_slot_device::setup_ram()
 {
 	if (software_entry() == NULL)
 	{
-		// from fullpath we have no way to know exactly if there was RAM, how much RAM was in the cart and if there was a battery
-		// so we always alloc 32KB and we save its content only if the game enable the RAM (unless it's Codemasters mapper...)
-
-		if (m_type != SEGA8_CODEMASTERS)
+		if (m_type == SEGA8_CASTLE)
 		{
-			m_cart->set_late_battery(TRUE);
-			m_cart->ram_alloc(machine(), 0x08000);
+			m_cart->ram_alloc(machine(), 0x2000);
+			m_cart->set_has_battery(FALSE);
 		}
-		else
+		else if (m_type == SEGA8_BASIC_L3)
 		{
-			// Codemasters cart can have 64KB of RAM (Ernie Els Golf) and no battery
+			m_cart->ram_alloc(machine(), 0x8000);
+			m_cart->set_has_battery(FALSE);
+		}
+		else if (m_type == SEGA8_MUSIC_EDITOR)
+		{
+			m_cart->ram_alloc(machine(), 0x2800);
+			m_cart->set_has_battery(FALSE);
+		}
+		else if (m_type == SEGA8_DAHJEE_TYPEA)
+		{
+			m_cart->ram_alloc(machine(), 0x2400);
+			m_cart->set_has_battery(FALSE);
+		}
+		else if (m_type == SEGA8_DAHJEE_TYPEB)
+		{
+			m_cart->ram_alloc(machine(), 0x2000);
+			m_cart->set_has_battery(FALSE);
+		}
+		else if (m_type == SEGA8_CODEMASTERS)
+		{
+			// Codemasters cart can have 64KB of RAM (Ernie Els Golf? or 8KB?) and no battery
 			m_cart->ram_alloc(machine(), 0x10000);
 			m_cart->set_has_battery(FALSE);
 		}	
+		else
+		{
+			// for generic carts loaded from fullpath we have no way to know exactly if there was RAM, 
+			// how much RAM was in the cart and if there was a battery so we always alloc 32KB and 
+			// we save its content only if the game enable the RAM
+			m_cart->set_late_battery(TRUE);
+			m_cart->ram_alloc(machine(), 0x08000);
+		}
 	}
 	else
 	{
@@ -456,9 +486,8 @@ int sms_state::detect_korean_mapper( UINT8 *rom )
 int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 {
 	int type = SEGA8_BASE_ROM;
-	static const UINT8 terebi_oekaki[7] = { 0x61, 0x6e, 0x6e, 0x61, 0x6b, 0x6d, 0x6e }; // "annakmn"
 
-	/* Check for special cartridge features (new routine, courtesy of Omar Cornut, from MEKA)  */
+	// Check for special cartridge features (new routine, courtesy of Omar Cornut, from MEKA)
 	if (len >= 0x8000)
 	{
 		int _0002 = 0, _8000 = 0, _a000 = 0, _ffff = 0, _3ffe = 0, _4000 = 0, _6000 = 0;
@@ -506,9 +535,64 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			type = SEGA8_JANGGUN;
 	}
 
-	// Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III
-	if (!memcmp(&ROM[0x13b3], terebi_oekaki, 7))
+	// Try to detect Dahjee RAM Expansions
+	if (len >= 0x8000)
+	{
+		int x2000_3000 = 0, xd000_e000_f000 = 0, x2000_ff = 0;
+		
+		for (int i = 0; i < 0x8000; i++)
+		{
+			if (ROM[i] == 0x32)
+			{
+				UINT16 addr = ROM[i + 1] | (ROM[i + 2] << 8);
+				
+				switch (addr & 0xf000)
+				{
+					case 0x2000:
+					case 0x3000:
+						i += 2;
+						x2000_3000++;
+						break;
+						
+					case 0xd000:
+					case 0xe000:
+					case 0xf000:
+						i += 2;
+						xd000_e000_f000++;
+						break;
+				}
+			}
+		}
+		for (int i = 0x2000; i < 0x4000; i++)
+		{
+			if (ROM[i] == 0xff)
+				x2000_ff++;
+		}
+		if (x2000_ff == 0x2000 && (xd000_e000_f000 > 10 || x2000_3000 > 10))
+		{
+			if (xd000_e000_f000 > x2000_3000)
+				type = SEGA8_DAHJEE_TYPEB;
+			else
+				type = SEGA8_DAHJEE_TYPEA;
+		}
+	}
+	
+	// Terebi Oekaki (TV Draw)
+	if (!strncmp((const char *)&ROM[0x13b3], "annakmn", 7))
 		type = SEGA8_TEREBIOEKAKI;
+
+	// The Castle (ROM+RAM)
+	if (!strncmp((const char *)&ROM[0x1cc3], "ASCII 1986", 10))
+		type = SEGA8_CASTLE;
+	
+	// BASIC Level 3
+	if (!strncmp((const char *)&ROM[0x6a20], "SC-3000 BASIC Level 3 ver 1.0", 29))
+		type = SEGA8_BASIC_L3;
+	
+	// Music Editor
+	if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5))
+		type = SEGA8_MUSIC_EDITOR;
+	
 	
 	return type;
 }
@@ -557,6 +641,14 @@ READ8_MEMBER(sega8_cart_slot_device::read_cart)
 		return 0xff;
 }
 
+READ8_MEMBER(sega8_cart_slot_device::read_ram)
+{
+	if (m_cart)
+		return m_cart->read_ram(space, offset);
+	else
+		return 0xff;
+}
+
 
 /*-------------------------------------------------
  write
@@ -572,6 +664,12 @@ WRITE8_MEMBER(sega8_cart_slot_device::write_cart)
 {
 	if (m_cart)
 		m_cart->write_cart(space, offset, data);
+}
+
+WRITE8_MEMBER(sega8_cart_slot_device::write_ram)
+{
+	if (m_cart)
+		m_cart->write_ram(space, offset, data);
 }
 
 

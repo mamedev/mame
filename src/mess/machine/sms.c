@@ -1108,6 +1108,15 @@ MACHINE_START_MEMBER(sms_state,sms)
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
 	}
+
+	// a bunch of SG1000 carts (compatible with SG1000 Mark III) can access directly system RAM... let's install here the necessary handlers
+	// TODO: are BASIC and Music actually compatible with Mark III??
+	if (m_cartslot->get_type() == SEGA8_BASIC_L3 || m_cartslot->get_type() == SEGA8_MUSIC_EDITOR 
+			|| m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
+	}
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)
