@@ -1355,16 +1355,22 @@ void psxcpu_device::update_ram_config()
 	UINT32 ram_size = m_ram->size();
 	UINT8 *pointer = m_ram->pointer();
 
-	assert( window_size != 0 );
-
-	int start = 0;
-	while( start < window_size )
+	if( ram_size > window_size )
 	{
-		m_program->install_ram( start + 0x00000000, start + 0x00000000 + ram_size - 1, pointer );
-		m_program->install_ram( start + 0x80000000, start + 0x80000000 + ram_size - 1, pointer );
-		m_program->install_ram( start + 0xa0000000, start + 0xa0000000 + ram_size - 1, pointer );
+		ram_size = window_size;
+	}
 
-		start += ram_size;
+	if( ram_size > 0 )
+	{
+		int start = 0;
+		while( start < window_size )
+		{
+			m_program->install_ram( start + 0x00000000, start + 0x00000000 + ram_size - 1, pointer );
+			m_program->install_ram( start + 0x80000000, start + 0x80000000 + ram_size - 1, pointer );
+			m_program->install_ram( start + 0xa0000000, start + 0xa0000000 + ram_size - 1, pointer );
+
+			start += ram_size;
+		}
 	}
 
 	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
@@ -1384,21 +1390,22 @@ void psxcpu_device::update_rom_config()
 	UINT32 rom_size = m_rom->bytes();
 	UINT8 *pointer = m_rom->base();
 
-	if( rom_size > max_window_size )
+	if( rom_size > window_size )
 	{
-		rom_size = max_window_size;
+		rom_size = window_size;
 	}
 
-	assert( window_size != 0 );
-
-	int start = 0;
-	while( start < window_size )
+	if( rom_size > 0 )
 	{
-		m_program->install_rom( start + 0x1fc00000, start + 0x1fc00000 + rom_size - 1, pointer );
-		m_program->install_rom( start + 0x9fc00000, start + 0x9fc00000 + rom_size - 1, pointer );
-		m_program->install_rom( start + 0xbfc00000, start + 0xbfc00000 + rom_size - 1, pointer );
+		int start = 0;
+		while( start < window_size )
+		{
+			m_program->install_rom( start + 0x1fc00000, start + 0x1fc00000 + rom_size - 1, pointer );
+			m_program->install_rom( start + 0x9fc00000, start + 0x9fc00000 + rom_size - 1, pointer );
+			m_program->install_rom( start + 0xbfc00000, start + 0xbfc00000 + rom_size - 1, pointer );
 
-		start += rom_size;
+			start += rom_size;
+		}
 	}
 
 	if( window_size < max_window_size )
