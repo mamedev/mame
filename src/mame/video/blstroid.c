@@ -103,7 +103,8 @@ void blstroid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		update_interrupts();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in blstroid_state::device_timer");
+		atarigen_state::device_timer(timer, id, param, ptr);
+		break;
 	}
 }
 

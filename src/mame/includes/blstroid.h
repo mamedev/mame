@@ -11,7 +11,7 @@ class blstroid_state : public atarigen_state
 public:
 	enum
 	{
-		TIMER_IRQ_OFF,
+		TIMER_IRQ_OFF = TID_UNHALT_CPU+1,
 		TIMER_IRQ_ON
 	};
 
