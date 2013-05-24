@@ -206,7 +206,8 @@ public:
 		TID_6502_WRITE,
 		TID_SCANLINE_TIMER,
 		TID_ATARIVC_EOF,
-		TID_UNHALT_CPU
+		TID_UNHALT_CPU,
+		TID_ATARIGEN_LAST
 	};
 
 	// vector and early raster EAROM interface
