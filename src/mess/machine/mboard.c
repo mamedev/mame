@@ -102,15 +102,20 @@ data:  0 0000 0000  all fields occupied
 
 	if (data && Line18_REED)
 	{
-		i_18=get_first_cleared_bit(Line18_REED);
+		i_18 = get_first_cleared_bit(Line18_REED);
 
-/* looking for a piece in this line and clear bit in data if found */
-
-		for ( i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
-			if (IsPiece(64-(i_18*8 + 8-i_AH)))
-				data &= ~(1 << i_AH);           // clear bit
-
-		read_board_flag = TRUE;
+		if (i_18 == NOT_VALID)
+			printf("No cleared bit in mask Line18_REED!\n");
+		else
+		{
+			/* looking for a piece in this line and clear bit in data if found */
+			
+			for (i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
+				if (IsPiece(64 - (i_18 * 8 + 8 - i_AH)))
+					data &= ~(1 << i_AH);           // clear bit
+			
+			read_board_flag = TRUE;
+		}
 	}
 
 	return data;
