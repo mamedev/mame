@@ -135,7 +135,6 @@ void gb_state::save_gbc_only()
 
 void gb_state::save_sgb_only()
 {
-	save_item(NAME(m_sgb_pal_data));
 	save_item(NAME(m_sgb_pal));
 	save_item(NAME(m_sgb_tile_map));
 	save_item(NAME(m_sgb_window_mask));
@@ -152,8 +151,7 @@ void gb_state::save_sgb_only()
 	save_item(NAME(m_sgb_atf));
 
 	save_pointer(NAME(m_sgb_tile_data), 0x2000);
-	for (int i = 0; i < 20; i++)
-		save_item(NAME(m_sgb_pal_map[i]));
+	save_item(NAME(m_sgb_pal_map));
 }
 
 
