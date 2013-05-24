@@ -246,7 +246,7 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 
 	gb_init_regs();
 
-	m_bios_disable = 0;
+	m_bios_disable = 1;
 
 	/* Initialize the Sound registers */
 	m_custom->sound_w(generic_space(), 0x16, 0x80);
