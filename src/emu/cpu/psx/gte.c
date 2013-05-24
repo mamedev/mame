@@ -401,7 +401,23 @@ UINT32 gte::Lm_E( UINT32 result )
 	return result;
 }
 
-INT64 gte::F( INT64 a ) { m_mac0 = a; if( a > S64( 0x7fffffff ) ) FLAG |= ( 1 << 31 ) | ( 1 << 16 ); if( a < S64(-0x80000000) ) FLAG |= ( 1 << 31 ) | ( 1 << 15 ); return a; }
+INT64 gte::F( INT64 a )
+{
+	m_mac0 = a;
+
+	if( a > 0x7fffffff )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 16 );
+	}
+
+	if( a < (INT32) -0x80000000 )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 15 );
+	}
+
+	return a;
+}
+
 INT32 gte::Lm_G1( INT64 a )
 {
 	if( a > 0x3ff )
@@ -409,6 +425,7 @@ INT32 gte::Lm_G1( INT64 a )
 		FLAG |= ( 1 << 31 ) | ( 1 << 14 );
 		return 0x3ff;
 	}
+
 	if( a < -0x400 )
 	{
 		FLAG |= ( 1 << 31 ) | ( 1 << 14 );
@@ -451,7 +468,8 @@ INT32 gte::Lm_H( INT64 value, int sf )
 	{
 		return max;
 	}
-	else if( value_12 < min )
+
+	if( value_12 < min )
 	{
 		return min;
 	}
