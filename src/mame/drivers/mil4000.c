@@ -1,88 +1,104 @@
 /*******************************************************************************************
 
-Millennium Nuovo 4000 / Nuovo Millennium 4000 (c) 2000 Sure Milano
+  Millennium Nuovo 4000 / Nuovo Millennium 4000
+  (c) 2000 Sure Milano
 
-driver by David Haywood and Angelo Salese
-
-
-Notes:
-
-- At first start-up,an Italian msg pops up: "(translated) pcb has been hacked from external
-  agent,it's advised to add an anti-spark device". Press F2 to enter Service Mode,then press
-  Hold 5 to exit Service Mode.
-
-- This game is supposed to have 3 kind of graphics: billiard/pool balls, numbers and cans.
-  If you go to the settings mode (F2), and then in "Impostazioni del Gioco" you disable all
-  3 graphics (Simboli Biliardo, Simboli Numeri, and Simboli Barattoli --> "Non Abilitato"),
-  The game will start using normal poker cards. A "illegal easter egg"... ;-)
-
-- HW name (stamped on the pcb) is "CHP4";
+  Driver by David Haywood and Angelo Salese.
+  Additional work by Roberto Fresca.
 
 
-TODO:
+  Notes:
 
-- Add Touch Screen support;
-- H/V-blank bits emulation;
-- Protection PIC is unused?
+  - At first start-up,an Italian msg pops up: "(translated) pcb has been hacked from external
+    agent,it's advised to add an anti-spark device". Press F2 to enter Service Mode,then press
+    Hold 5 to exit Service Mode.
+
+  - This game is supposed to have 3 kind of graphics: billiard/pool balls, numbers and cans.
+    If you go to the settings mode (F2), and then in "Impostazioni del Gioco" you disable all
+    3 graphics (Simboli Biliardo, Simboli Numeri, and Simboli Barattoli --> "Non Abilitato"),
+    The game will start using normal poker cards. A "illegal easter egg"... ;-)
+
+  - HW name (stamped on the pcb) is "CHP4";
 
 
-============================================================================================
+  TODO:
 
-Manufacturer: Sure
-Revision number: CHP4 1.5
+  - Add Touch Screen support;
+  - H/V-blank bits emulation;
+  - Protection PIC is unused?
 
-CPU
-1x PIC16C65B (u60)(read protected)
-1x MC68HC000FN12 (u61)
-1x U6295 (u53)(equivalent to M6295)
-1x resonator 1000j (close to 6295)
-1x oscillator 12.000MHz
-1x oscillator 14.31818MHz
-
-ROMs
-1x 27C020 (1)
-7x V29C51001T (2,3,4,5,6,27,28)
-1x PALCE22V10H (u74)(read protected)
-2x A40MX04-PL840010 (u2,u3)(read protected)
-
-RAM:
-4x CY62256L-70PC - 32K x 8 Static RAM.
-2x CY7C199-15PC  - 32K x 8 Static RAM
-
-Note
-1x 28x2 edge connector
-1x RS232 9pins connector
-1x trimmer (volume)
-1x 2positon jumper
-1x pushbutton (reset)
 
 ============================================================================================
 
-CHAMPION 4000 V 1.4
-(CMP4 1.3 on PCB)
-12.000000MHz
-14.31818MHz
-1000J
-MC68HC000FN12
-PIC16C74B
-PALCE22V10H
-U6295
+  Manufacturer: Sure
+  Revision number: CHP4 1.5
+
+  CPU
+  1x PIC16C65B (u60)(read protected)
+  1x MC68HC000FN12 (u61)
+  1x U6295 (u53)(equivalent to M6295)
+  1x resonator 1000j (close to 6295)
+  1x oscillator 12.000MHz
+  1x oscillator 14.31818MHz
+
+  ROMs
+  1x 27C020 (1)
+  7x V29C51001T (2,3,4,5,6,27,28)
+  1x PALCE22V10H (u74)(read protected)
+  2x A40MX04-PL840010 (u2,u3)(read protected)
+
+  RAM:
+  4x CY62256L-70PC - 32K x 8 Static RAM.
+  2x CY7C199-15PC  - 32K x 8 Static RAM
+
+  Note
+  1x 28x2 edge connector
+  1x RS232 9pins connector
+  1x trimmer (volume)
+  1x 2positon jumper
+  1x pushbutton (reset)
 
 ============================================================================================
 
-Changes (2008-12-10, Roberto Fresca):
+  CHAMPION 4000 V 1.4
+  (CMP4 1.3 on PCB)
+  12.000000MHz
+  14.31818MHz
+  1000J
+  MC68HC000FN12
+  PIC16C74B
+  PALCE22V10H
+  U6295
 
-- Completed normal Inputs/Outputs.
-- Added button-lamps calculation.
-- Created button-lamps layout.
-- Documented the PCB RAM.
-- Fixed NVRAM size based on PCB picture (2x CY62256L-70PC near the battery).
-- Added notes about the method to make appear the real poker cards.
-- Fixed the OKI 6295 frequency (1000 kHz resonator near). Now the game has more decent sounds.
-- Corrected CPU clock to 12 MHz. (main Xtal).
+============================================================================================
+
+  Changes (2008-12-10, Roberto Fresca):
+
+  - Completed normal Inputs/Outputs.
+  - Added button-lamps calculation.
+  - Created button-lamps layout.
+  - Documented the PCB RAM.
+  - Fixed NVRAM size based on PCB picture (2x CY62256L-70PC near the battery).
+  - Added notes about the method to make appear the real poker cards.
+  - Fixed the OKI 6295 frequency (1000 kHz resonator near). Now the game has more decent sounds.
+  - Corrected CPU clock to 12 MHz. (main Xtal).
+
+  Changes (2013-05-24, Roberto Fresca):
+
+  - Added Top XXI (Version 1.2).
+  - Added crystals and cpu clock through #define.
+  - Added default NVRAM.
+  - Button-lamps support.
+  - Added technical notes.
 
 
 *******************************************************************************************/
+
+#define MAIN_CLOCK    XTAL_12MHz
+#define SEC_CLOCK     XTAL_14_31818MHz
+
+#define CPU_CLOCK     MAIN_CLOCK
+
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -371,7 +387,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( mil4000, mil4000_state )
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )  // ?
+	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
@@ -394,8 +410,6 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
 
 
 ROM_START( mil4000 )
@@ -478,7 +492,60 @@ ROM_START( mil4000c )
 	ROM_LOAD( "pic16c74b_ch4000.u60", 0x000, 0x4d4c, NO_DUMP )
 ROM_END
 
-GAMEL( 2000, mil4000,    0,        mil4000,    mil4000, driver_device,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 2.0)", 0, layout_mil4000 )
-GAMEL( 2000, mil4000a,   mil4000,  mil4000,    mil4000, driver_device,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.8)", 0, layout_mil4000 )
-GAMEL( 2000, mil4000b,   mil4000,  mil4000,    mil4000, driver_device,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.5)", 0, layout_mil4000 )
-GAMEL( 2000, mil4000c,   mil4000,  mil4000,    mil4000, driver_device,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.6)", 0, layout_mil4000 )
+/*
+
+  TOP XXI
+  -------
+
+  CPU: 1x MC68HC000FN-12 (U81)
+       1x PIC16C65B-20   (U60)
+
+  Sound: 1x U6295 (U53)
+
+  RAM:  2x 6116. 
+        2x 6264 (prg RAM)
+        2x 62256 (near battery)
+
+  FPGA: 2x ACTEL A40MX04 - PL84 (U2, U3)
+  PLDs: 1x PALCE22V10H-25 (U74) (protected)
+
+  Battery: 1x 3.6 V.
+
+  Clocks: 1x Xtal @ 12 MHz.
+          1x Xtal @ 14.31818 MHz.
+
+  Both FPGAs have stickers with the game title pacman logo.
+
+*/
+ROM_START( top21 )
+	ROM_REGION( 0x100000, "maincpu", 0 )	// 68000 code
+	ROM_LOAD16_BYTE( "odd_1-2.u75",  0x000001, 0x80000, CRC(ce4f2a74) SHA1(f9a9043da924ddba16f49d6856dbcfd8f066c824) )
+	ROM_LOAD16_BYTE( "even_1-2.u76", 0x000000, 0x80000, CRC(8d645456) SHA1(06c59816f259168f15503b276fc28c947e17cc60) )
+	ROM_COPY( "maincpu",            0x080000, 0x00000, 0x80000 )	// copying the second halves to the right offset
+
+	ROM_REGION( 0xa0000, "gfx1", 0 )
+	ROM_LOAD( "36.u36",     0x000000, 0x20000, CRC(071883f7) SHA1(16b5c251975394bb94c0d32277912ea99280c21c) )
+	ROM_LOAD( "35.u35",     0x020000, 0x20000, CRC(cdc8cc44) SHA1(ce703e7f050465b1bc07800eb84eb7f127ebbddb) )	// double size. 2nd half empty
+	ROM_IGNORE(                       0x20000)
+	ROM_LOAD( "34.u34",     0x040000, 0x20000, CRC(bdbe7360) SHA1(3038f66d57a43afea9d6c05908bfb50167a881c2) )
+	ROM_LOAD( "33.u33",     0x060000, 0x20000, CRC(670584b0) SHA1(23772404b5e5066828c59d9baa03b732a80db676) )
+	ROM_LOAD( "32.u32",     0x080000, 0x20000, CRC(c5bc3950) SHA1(aebaae91ade0c221ba14186fde78206996cdec30) )
+
+	ROM_REGION( 0x80000, "oki", 0 )	// 6295 samples (first half empty)
+	ROM_LOAD( "audio.u64",  0x00000, 0x80000, CRC(4f70a9bc) SHA1(83f0664eadf923ed45e3e18bfcefafb85163c4a0) )
+	ROM_COPY( "oki",        0x40000, 0x00000, 0x40000 )	// copying the second half to the right offset
+
+	ROM_REGION( 0x4000, "mcu", 0 )	// MCU code
+	ROM_LOAD( "pic16c65b_top21.u60", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "nvram", 0 )	// default NVRAM (2x 62256)
+	ROM_LOAD( "top21_nvram.bin", 0x00000, 0x10000, CRC(638726ce) SHA1(c55c77df5fbddfb19acf50f1b4467c63c818d5e7) )
+ROM_END
+
+
+/*     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT      ROT     COMPANY              FULLNAME                              FLAGS  LAYOUT  */
+GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,     layout_mil4000 )
+GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,     layout_mil4000 )
+GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,     layout_mil4000 )
+GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, driver_device, 0,        ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,     layout_mil4000 )
+GAMEL( 200?, top21,    0,        mil4000,  mil4000, driver_device, 0,        ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,     layout_mil4000 )
