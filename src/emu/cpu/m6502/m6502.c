@@ -76,7 +76,7 @@ void m6502_device::init()
 	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
 	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  P).callimport().formatstr("%6s").noshow();
-	state_add(M6502_PC,        "PC",        NPC);
+	state_add(M6502_PC,        "PC",        NPC).callimport();
 	state_add(M6502_A,         "A",         A);
 	state_add(M6502_X,         "X",         X);
 	state_add(M6502_Y,         "Y",         Y);
@@ -445,6 +445,13 @@ void m6502_device::state_import(const device_state_entry &entry)
 	case STATE_GENFLAGS:
 	case M6502_P:
 		P = P | (F_B|F_E);
+		break;
+	case M6502_PC:
+		PC = NPC;
+		irq_taken = false;
+		prefetch();
+		PPC = NPC;
+		inst_state = IR | inst_state_base;
 		break;
 	}
 }
