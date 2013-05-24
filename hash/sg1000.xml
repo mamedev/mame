@@ -281,8 +281,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			<feature name="pcb" value="171-5382" />
 			<feature name="ic1" value="MPR-10159" />
 			<feature name="ic2" value="??" />   <!-- RAM should be present -->
+
+			<feature name="slot" value="castle" />
 			<dataarea name="rom" size="32768">
 				<rom name="mpr-10159.ic1" size="32768" crc="092f29d6" sha1="2681786bffccf58b59410c331865d30a4d027087" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1403,7 +1407,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="Y-106"/>
 		<info name="alt_title" value="King's Valley"/>
 		<part name="cart" interface="sg1000_cart">
-			<feature name="needs_addon" value="dahjee_type_a"/>
+			<feature name="slot" value="dahjee_typea"/>
 			<dataarea name="rom" size="32768">
 				<rom name="king's valley (tw).bin" size="32768" crc="223397a1" sha1="922d23895c12707b2fc382ea5cb769c5cb9b5755" offset="000000" />
 			</dataarea>
@@ -2646,8 +2650,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<publisher>Sega</publisher>
 		<info name="usage" value="Needs SC-3000 to work" />
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
 			<dataarea name="rom" size="32768">
 				<rom name="basic3.bin" size="32768" crc="a46e3c73" sha1="b1a8585a9afff962e8fd0e79b3305199da4e4562" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -2658,8 +2665,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<publisher>Sega</publisher>
 		<info name="usage" value="Needs SC-3000 to work" />
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
 			<dataarea name="rom" size="32768">
 				<rom name="basic3e.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -2681,8 +2691,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="music_editor" />
 			<dataarea name="rom" size="32768">
 				<rom name="music.bin" size="32768" crc="622010e1" sha1="61f40e4b7576d4d55322f3d6eef2038aa784336e" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="10240">
 			</dataarea>
 		</part>
 	</software>
@@ -2696,8 +2709,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="E-101"/>
 		<info name="alt_title" value="ミュージック"/>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="music_editor" />
 			<dataarea name="rom" size="32768">
 				<rom name="music (jp).bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="10240">
 			</dataarea>
 		</part>
 	</software>

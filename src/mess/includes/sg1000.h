@@ -12,6 +12,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/sega8_slot.h"
 #include "machine/serial.h"
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
@@ -29,18 +30,8 @@
 #define CENTRONICS_TAG  "centronics"
 #define TMS9918A_TAG    "tms9918a"
 #define RS232_TAG		"rs232"
+#define CARTSLOT_TAG	"slot"
 
-#define IS_CARTRIDGE_TV_DRAW(ptr) \
-	(!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
-
-#define IS_CARTRIDGE_THE_CASTLE(ptr) \
-	(!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
-
-#define IS_CARTRIDGE_BASIC_LEVEL_III(ptr) \
-	(!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
-
-#define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
-	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 
 INPUT_PORTS_EXTERN( sk1100 );
 extern const i8255_interface ( sc3000_ppi_intf );
@@ -58,35 +49,27 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_ram(*this, RAM_TAG),
-			m_rom(*this, Z80_TAG)
+			m_rom(*this, Z80_TAG),
+			m_cartslot(*this, CARTSLOT_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	optional_device<sega8_cart_slot_device> m_cartslot;
 
 	virtual void machine_start();
 
-	void install_cartridge(UINT8 *ptr, int size);
-
-	DECLARE_WRITE8_MEMBER( tvdraw_axis_w );
-	DECLARE_READ8_MEMBER( tvdraw_status_r );
-	DECLARE_READ8_MEMBER( tvdraw_data_r );
 	DECLARE_READ8_MEMBER( joysel_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sg1000_cart );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( omv_cart );
+
+	DECLARE_READ8_MEMBER( omv_r );
+	DECLARE_WRITE8_MEMBER( omv_w );
 
 	/* keyboard state */
 	UINT8 m_keylatch;
 
-	/* TV Draw state */
-	UINT8 m_tvdraw_data;
-	TIMER_CALLBACK_MEMBER(lightgun_tick);
 	DECLARE_WRITE_LINE_MEMBER(sg1000_vdp_interrupt);
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class sc3000_state : public sg1000_state
@@ -133,12 +116,9 @@ public:
 
 	virtual void machine_start();
 
-	void install_cartridge(UINT8 *ptr, int size);
-
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sc3000_cart );
 
 	ioport_port* m_key_row[16];
 };

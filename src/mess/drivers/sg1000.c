@@ -53,7 +53,6 @@ Notes:
 
     TODO:
 
-    - slot interface for cartridges
     - SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
     - connect PSG /READY signal to Z80 WAIT
     - accurate video timing
@@ -65,64 +64,28 @@ Notes:
 
 
 #include "includes/sg1000.h"
+#include "machine/sega8_rom.h"
 
 
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
 
-/*
-
-    Terebi Oekaki (TV Draw)
-
-    Address Access  Bits
-                    7       6   5   4   3   2   1   0
-    $6000   W       -       -   -   -   -   -   -   AXIS
-    $8000   R       BUSY    -   -   -   -   -   -   PRESS
-    $A000   R/W     DATA
-
-    AXIS: write 0 to select X axis, 1 to select Y axis.
-    BUSY: reads 1 when graphic board is busy sampling position, else 0.
-    PRESS: reads 0 when pen is touching graphic board, else 1.
-    DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
-
-*/
-
-/*-------------------------------------------------
-    tvdraw_axis_w - TV Draw axis select
--------------------------------------------------*/
-
-WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
+// TODO: not sure if the OMV bios actually detects the presence of a cart,
+// or if the cart data simply overwrites the internal bios...
+// for the moment let assume the latter!
+READ8_MEMBER( sg1000_state::omv_r )
 {
-	if (data & 0x01)
-	{
-		m_tvdraw_data = ioport("TVDRAW_X")->read();
-
-		if (m_tvdraw_data < 4) m_tvdraw_data = 4;
-		if (m_tvdraw_data > 251) m_tvdraw_data = 251;
-	}
+	if (m_cartslot && m_cartslot->m_cart)
+		return m_cartslot->m_cart->read_cart(space, offset);
 	else
-	{
-		m_tvdraw_data = ioport("TVDRAW_Y")->read() + 32;
-	}
+		return m_rom->base()[offset];
 }
 
-/*-------------------------------------------------
-    tvdraw_status_r - TV Draw status read
--------------------------------------------------*/
-
-READ8_MEMBER( sg1000_state::tvdraw_status_r )
+WRITE8_MEMBER( sg1000_state::omv_w )
 {
-	return ioport("TVDRAW_PEN")->read();
-}
-
-/*-------------------------------------------------
-    tvdraw_data_r - TV Draw data read
--------------------------------------------------*/
-
-READ8_MEMBER( sg1000_state::tvdraw_data_r )
-{
-	return m_tvdraw_data;
+	if (m_cartslot && m_cartslot->m_cart)
+		m_cartslot->m_cart->write_cart(space, offset, data);
 }
 
 /*-------------------------------------------------
@@ -139,9 +102,8 @@ READ8_MEMBER( sg1000_state::joysel_r )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sg1000_map, AS_PROGRAM, 8, sg1000_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -164,8 +126,7 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( omv_map, AS_PROGRAM, 8, sg1000_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(omv_r, omv_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
 
@@ -191,9 +152,8 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sc3000_map, AS_PROGRAM, 8, sg1000_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -258,21 +218,6 @@ INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 }
 
 /*-------------------------------------------------
-    INPUT_PORTS( tvdraw )
--------------------------------------------------*/
-
-static INPUT_PORTS_START( tvdraw )
-	PORT_START("TVDRAW_X")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("TVDRAW_Y")
-	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("TVDRAW_PEN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pen")
-INPUT_PORTS_END
-
-/*-------------------------------------------------
     INPUT_PORTS( sg1000 )
 -------------------------------------------------*/
 
@@ -296,8 +241,6 @@ static INPUT_PORTS_START( sg1000 )
 
 	PORT_START("NMI")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
-
-	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -351,8 +294,6 @@ static INPUT_PORTS_START( omv )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -487,7 +428,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc3000 )
 	PORT_INCLUDE( sk1100 )
-	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -626,244 +566,6 @@ const cassette_interface sc3000_cassette_interface =
 	NULL
 };
 
-/***************************************************************************
-    CARTRIDGE LOADING
-***************************************************************************/
-
-/*-------------------------------------------------
-    sg1000_install_cartridge -
--------------------------------------------------*/
-
-void sg1000_state::install_cartridge(UINT8 *ptr, int size)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	switch (size)
-	{
-	case 40 * 1024:
-		program.install_read_bank(0x8000, 0x9fff, "bank1");
-		program.unmap_write(0x8000, 0x9fff);
-		membank("bank1")->configure_entry(0, m_rom->base() + 0x8000);
-		membank("bank1")->set_entry(0);
-		break;
-
-	case 48 * 1024:
-		program.install_read_bank(0x8000, 0xbfff, "bank1");
-		program.unmap_write(0x8000, 0xbfff);
-		membank("bank1")->configure_entry(0, m_rom->base() + 0x8000);
-		membank("bank1")->set_entry(0);
-		break;
-
-	default:
-		if (IS_CARTRIDGE_TV_DRAW(ptr))
-		{
-			program.install_write_handler(0x6000, 0x6000, 0, 0, write8_delegate(FUNC(sg1000_state::tvdraw_axis_w), this), 0);
-			program.install_read_handler(0x8000, 0x8000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_status_r), this), 0);
-			program.install_read_handler(0xa000, 0xa000, 0, 0, read8_delegate(FUNC(sg1000_state::tvdraw_data_r), this), 0);
-			program.nop_write(0xa000, 0xa000);
-		}
-		else if (IS_CARTRIDGE_THE_CASTLE(ptr))
-		{
-			program.install_readwrite_bank(0x8000, 0x9fff, "bank1");
-		}
-		break;
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_IMAGE_LOAD( sg1000_cart )
--------------------------------------------------*/
-
-DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,sg1000_cart )
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ptr = m_rom->base();
-	UINT32 ram_size = 0x400;
-	bool install_2000_ram = false;
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread( ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr, image.get_software_region("rom"), size);
-
-		const char *needs_addon = image.get_feature("needs_addon");
-
-		//
-		// The Dahjee (Type A) RAM cartridge had 9KB of RAM. 1KB replaces
-		// the main unit's system ram (0xC000-0xC3FF) and 8K which appears
-		// at 0x2000-0x3FFF in the memory map.
-		//
-		if ( needs_addon && ! strcmp( needs_addon, "dahjee_type_a" ) )
-		{
-			install_2000_ram = true;
-		}
-
-		//
-		// The Dahjee (Type B) RAM cartridge had 8KB of RAM which
-		// replaces the main unit RAM in the memory map. (0xC000-0xDFFF area)
-		//
-		if ( needs_addon && ! strcmp( needs_addon, "dahjee_type_b" ) )
-		{
-			ram_size = 0x2000;
-		}
-	}
-
-	// Try to auto-detect special features
-	if ( ! install_2000_ram && ram_size == 0x400 )
-	{
-		if ( size >= 0x8000 )
-		{
-			int x2000_3000 = 0, xd000_e000_f000 = 0, x2000_ff = 0;
-
-			for ( int i = 0; i < 0x8000; i++ )
-			{
-				if ( ptr[i] == 0x32 )
-				{
-					UINT16 addr = ptr[i+1] | ( ptr[i+2] << 8 );
-
-					switch ( addr & 0xF000 )
-					{
-					case 0x2000:
-					case 0x3000:
-						i += 2;
-						x2000_3000++;
-						break;
-
-					case 0xD000:
-					case 0xE000:
-					case 0xF000:
-						i += 2;
-						xd000_e000_f000++;
-						break;
-					}
-				}
-			}
-			for ( int i = 0x2000; i < 0x4000; i++ )
-			{
-				if ( ptr[i] == 0xFF )
-				{
-					x2000_ff++;
-				}
-			}
-			if ( x2000_ff == 0x2000 && ( xd000_e000_f000 > 10 || x2000_3000 > 10 ) )
-			{
-				if ( xd000_e000_f000 > x2000_3000 )
-				{
-					// Type B
-					ram_size = 0x2000;
-				}
-				else
-				{
-					// Type A
-					install_2000_ram = true;
-				}
-			}
-		}
-	}
-
-	/* cartridge ROM banking */
-	install_cartridge(ptr, size);
-
-	if ( install_2000_ram )
-	{
-		program.install_ram(0x2000, 0x3FFF);
-	}
-
-	/* work RAM banking */
-	program.install_readwrite_bank(0xc000, 0xc000 + ram_size - 1, 0, 0x4000 - ram_size, "bank2");
-
-	return IMAGE_INIT_PASS;
-}
-
-/*-------------------------------------------------
-    DEVICE_IMAGE_LOAD( omv_cart )
--------------------------------------------------*/
-
-DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,omv_cart )
-{
-	UINT32 size;
-	UINT8 *ptr = m_rom->base();
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread( ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr, image.get_software_region("rom"), size);
-	}
-
-	/* cartridge ROM banking */
-	install_cartridge(ptr, size);
-
-	return IMAGE_INIT_PASS;
-}
-
-/*-------------------------------------------------
-    sc3000_install_cartridge -
--------------------------------------------------*/
-
-void sc3000_state::install_cartridge(UINT8 *ptr, int size)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	/* include SG-1000 mapping */
-	sg1000_state::install_cartridge(ptr, size);
-
-	if (IS_CARTRIDGE_BASIC_LEVEL_III(ptr))
-	{
-		program.install_readwrite_bank(0x8000, 0xbfff, "bank1");
-		program.install_readwrite_bank(0xc000, 0xffff, "bank2");
-	}
-	else if (IS_CARTRIDGE_MUSIC_EDITOR(ptr))
-	{
-		program.install_readwrite_bank(0x8000, 0x9fff, "bank1");
-		program.install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
-	}
-	else
-	{
-		/* regular cartridges */
-		program.install_readwrite_bank(0xc000, 0xc7ff, 0, 0x3800, "bank2");
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_IMAGE_LOAD( sc3000_cart )
--------------------------------------------------*/
-
-DEVICE_IMAGE_LOAD_MEMBER( sc3000_state,sc3000_cart )
-{
-	UINT8 *ptr = m_rom->base();
-	UINT32 size;
-
-	if (image.software_entry() == NULL)
-	{
-		size = image.length();
-		if (image.fread( ptr, size) != size)
-			return IMAGE_INIT_FAIL;
-	}
-	else
-	{
-		size = image.get_software_region_length("rom");
-		memcpy(ptr, image.get_software_region("rom"), size);
-	}
-
-	/* cartridge ROM and work RAM banking */
-	install_cartridge(ptr, size);
-
-	return IMAGE_INIT_PASS;
-}
-
 /*-------------------------------------------------
     I8255_INTERFACE( sf7000_ppi_intf )
 -------------------------------------------------*/
@@ -996,54 +698,17 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_NULL
 };
 
-/***************************************************************************
-    MACHINE INITIALIZATION
-***************************************************************************/
-
-void sg1000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_LIGHTGUN_TICK:
-		lightgun_tick(ptr, param);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in sg1000_state::device_timer");
-	}
-}
-
-
-/*-------------------------------------------------
-    TIMER_CALLBACK_MEMBER( lightgun_tick )
--------------------------------------------------*/
-
-TIMER_CALLBACK_MEMBER(sg1000_state::lightgun_tick)
-{
-	UINT8 *rom = m_rom->base();
-
-	if (IS_CARTRIDGE_TV_DRAW(rom))
-	{
-		/* enable crosshair for TV Draw */
-		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
-	}
-	else
-	{
-		/* disable crosshair for other cartridges */
-		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
-	}
-}
-
 /*-------------------------------------------------
     MACHINE_START( sg1000 )
 -------------------------------------------------*/
 
 void sg1000_state::machine_start()
 {
-	/* toggle light gun crosshair */
-	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
-
-	/* register for state saving */
-	save_item(NAME(m_tvdraw_data));
+	if (m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
+	}
 }
 
 /*-------------------------------------------------
@@ -1074,8 +739,14 @@ void sc3000_state::machine_start()
 	m_key_row[15] = m_pb7;
 
 	/* register for state saving */
-	save_item(NAME(m_tvdraw_data));
 	save_item(NAME(m_keylatch));
+
+	if (m_cartslot && (m_cartslot->get_type() == SEGA8_BASIC_L3 || m_cartslot->get_type() == SEGA8_MUSIC_EDITOR 
+								|| m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB))
+	{
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cartslot));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, 0, 0, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cartslot));
+	}
 }
 
 
@@ -1107,6 +778,17 @@ void sf7000_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
+
+static SLOT_INTERFACE_START(sg1000_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("castle",  SEGA8_ROM_CASTLE)
+	SLOT_INTERFACE_INTERNAL("terebi",  SEGA8_ROM_TEREBI)
+	SLOT_INTERFACE_INTERNAL("level3",  SEGA8_ROM_BASIC_L3)
+	SLOT_INTERFACE_INTERNAL("music_editor",  SEGA8_ROM_MUSIC_EDITOR)
+	SLOT_INTERFACE_INTERNAL("dahjee_typea",  SEGA8_ROM_DAHJEE_TYPEA)
+	SLOT_INTERFACE_INTERNAL("dahjee_typeb",  SEGA8_ROM_DAHJEE_TYPEB)
+SLOT_INTERFACE_END
+
 /*-------------------------------------------------
     MACHINE_CONFIG_START( sg1000, sg1000_state )
 -------------------------------------------------*/
@@ -1129,11 +811,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
-	MCFG_CARTSLOT_LOAD(sg1000_state,sg1000_cart)
+	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -1152,10 +830,8 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 	MCFG_CPU_PROGRAM_MAP(omv_map)
 	MCFG_CPU_IO_MAP(omv_io_map)
 
-	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(sg1000_state,omv_cart)
+	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
+	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
@@ -1188,11 +864,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	/* cartridge */
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
-	MCFG_CARTSLOT_LOAD(sc3000_state,sc3000_cart)
+	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -1280,5 +952,5 @@ CONS( 1984, sg1000m2,   sg1000,     0,          sc3000,     sc3000, driver_devic
 COMP( 1983, sc3000,     0,          sg1000,     sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000",                                  GAME_SUPPORTS_SAVE )
 COMP( 1983, sc3000h,    sc3000,     0,          sc3000,     sc3000, driver_device,     0,      "Sega",             "SC-3000H",                                 GAME_SUPPORTS_SAVE )
 COMP( 1983, sf7000,     sc3000,     0,          sf7000,     sf7000, driver_device,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    GAME_SUPPORTS_SAVE )
-CONS( 1984, omv1000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_SUPPORTS_SAVE )
-CONS( 1984, omv2000,    sg1000,     0,          omv,        omv, driver_device,        0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_SUPPORTS_SAVE )
+CONS( 1984, omv1000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_SUPPORTS_SAVE )
+CONS( 1984, omv2000,    sg1000,     0,          omv,        omv,    driver_device,     0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_SUPPORTS_SAVE )

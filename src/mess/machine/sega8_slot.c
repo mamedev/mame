@@ -590,7 +590,7 @@ int sega8_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		type = SEGA8_BASIC_L3;
 	
 	// Music Editor
-	if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5))
+	if (!strncmp((const char *)&ROM[0x0841], "PIANO", 5) || !strncmp((const char *)&ROM[0x0841], "music", 5))
 		type = SEGA8_MUSIC_EDITOR;
 	
 	

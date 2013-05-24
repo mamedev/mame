@@ -168,6 +168,34 @@ public:
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
+#define MCFG_SG1000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
+	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
+
+#define MCFG_OMV_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(FALSE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
+	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg");
+
+#define MCFG_SC3000_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_intf("sg1000_cart"); \
+	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sg,sc");
+
+#define MCFG_SG1000MK3_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
+	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart"); \
+	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms,sg");
+
 #define MCFG_SMS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
@@ -181,13 +209,6 @@ public:
 	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
 	static_cast<sega8_cart_slot_device *>(device)->set_intf("gamegear_cart"); \
 	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,gg");
-
-#define MCFG_SG1000MK3_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
-	MCFG_DEVICE_ADD(_tag, SEGA8_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
-	static_cast<sega8_cart_slot_device *>(device)->set_mandatory(TRUE); \
-	static_cast<sega8_cart_slot_device *>(device)->set_intf("sms_cart"); \
-	static_cast<sega8_cart_slot_device *>(device)->set_ext("bin,sms,sg");
 
 
 
