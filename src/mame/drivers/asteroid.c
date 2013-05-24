@@ -390,6 +390,18 @@ static INPUT_PORTS_START( asteroidb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)            /* hyperspace */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( aerolitos )
+	PORT_INCLUDE( asteroid )
+	
+	PORT_MODIFY("DSW1") // this bootleg was for the Spanish market, so set it to Spanish by default
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING (   0x00, DEF_STR( English ) )
+	PORT_DIPSETTING (   0x01, DEF_STR( German ) )
+	PORT_DIPSETTING (   0x02, DEF_STR( French ) )
+	PORT_DIPSETTING (   0x03, DEF_STR( Spanish ) )
+
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( asterock )
 	PORT_INCLUDE( asteroid )
@@ -733,6 +745,8 @@ ROM_START( asteroid1 )
 	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
+
+
 ROM_START( asteroidb )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145ll.de1",  0x6800, 0x0800, CRC(605fc0f2) SHA1(8d897a3b75bd1f2537470f0a34a97a8c0853ee08) )
@@ -745,6 +759,20 @@ ROM_START( asteroidb )
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
+
+ROM_START( aerolitos )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2516_1e.bin", 0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
+	ROM_LOAD( "2516_1d.bin", 0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
+	ROM_LOAD( "2516_1c.bin", 0x7800, 0x0800, CRC(b912754d) SHA1(d4ada3e162ff454a48468f6309947276df0c5331) )
+	/* Vector ROM */
+	ROM_LOAD( "2716_3n.bin", 0x5000, 0x0800, CRC(32e69e66) SHA1(a4cce36bc781443b430003280ef4185a4a04de96) )
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "034602-01.c8",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+ROM_END
+
 
 ROM_START( asterock )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -974,13 +1002,16 @@ GAME( 1979, asteroid,  0,         asteroid,  asteroid,  driver_device,  0,      
 GAME( 1979, asteroid2, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 2)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroid1, asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "Atari",   "Asteroids (rev 1)",        GAME_SUPPORTS_SAVE )
 GAME( 1979, asteroidb, asteroid,  asteroid,  asteroidb, asteroid_state, asteroidb, ROT0, "bootleg", "Asteroids (bootleg on Lunar Lander hardware)",  GAME_SUPPORTS_SAVE )
-GAME( 1979, asterock,  asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Sidam)",     "Asterock (Sidam bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
-GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Videotron)", "Asterock (Videotron bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
-GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (VGG)",       "Meteorites (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
-GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Hoei)",      "Meteor (bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
-GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Rumiano)",   "Hyperspace (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
+GAME( 1980, aerolitos, asteroid,  asteroid,  aerolitos, driver_device,  0,         ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        GAME_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
+GAME( 1979, asterock,  asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, asterockv, asteroid,  asterock,  asterock,  asteroid_state, asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorts,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
+GAME( 1979, meteorho,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     GAME_SUPPORTS_SAVE )
+GAME( 1979, hyperspc,  asteroid,  asteroid,  asteroid,  driver_device,  0,         ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", GAME_SUPPORTS_SAVE )
+
 GAMEL(1980, astdelux,  0,         astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 3)", GAME_SUPPORTS_SAVE, layout_astdelux )
 GAMEL(1980, astdelux2, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 2)", GAME_SUPPORTS_SAVE, layout_astdelux )
 GAMEL(1980, astdelux1, astdelux,  astdelux,  astdelux,  driver_device,  0,         ROT0, "Atari",   "Asteroids Deluxe (rev 1)", GAME_SUPPORTS_SAVE, layout_astdelux )
+
 GAME( 1979, llander,   0,         llander,   llander,   driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 2)",     GAME_SUPPORTS_SAVE )
 GAME( 1979, llander1,  llander,   llander,   llander1,  driver_device,  0,         ROT0, "Atari",   "Lunar Lander (rev 1)",     GAME_SUPPORTS_SAVE )
