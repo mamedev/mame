@@ -1541,7 +1541,10 @@ static MACHINE_CONFIG_DERIVED( asst128, iskr1031 )
 	MCFG_DEVICE_REMOVE("dma8237")
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
+	MCFG_DEVICE_REMOVE("pit8253")
 
+	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
+	
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
 
