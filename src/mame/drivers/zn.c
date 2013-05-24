@@ -50,7 +50,7 @@ public:
 	DECLARE_READ8_MEMBER(boardconfig_r);
 	DECLARE_READ16_MEMBER(unknown_r);
 	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_READ8_MEMBER(capcom_kickharness_r);
+	DECLARE_READ16_MEMBER(capcom_kickharness_r);
 	DECLARE_WRITE8_MEMBER(bank_coh1000c_w);
 	DECLARE_WRITE8_MEMBER(qsound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(zn_qsound_w);
@@ -605,11 +605,11 @@ Notes:
       Unpopulated sockets - 1.3B, 2.2E, 3.3E, 8.2K, 9.3K, 10.4K, 11.5K, 12.6K & 13.7K
 */
 
-READ8_MEMBER(zn_state::capcom_kickharness_r)
+READ16_MEMBER(zn_state::capcom_kickharness_r)
 {
 	/* required for buttons 4,5&6 */
 	verboselog(2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
-	return 0xff;
+	return 0xffff;
 }
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
@@ -637,8 +637,8 @@ static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("maskroms", 0)
 	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(bank_coh1000c_w, 0x000000ff)
-	AM_RANGE(0x1fb40010, 0x1fb40013) AM_READ8(capcom_kickharness_r, 0x000000ff)
-	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ8(capcom_kickharness_r, 0x000000ff)
+	AM_RANGE(0x1fb40010, 0x1fb40013) AM_READ16(capcom_kickharness_r, 0x0000ffff)
+	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ16(capcom_kickharness_r, 0x0000ffff)
 	AM_RANGE(0x1fb80000, 0x1fbfffff) AM_ROM AM_REGION("countryrom", 0)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE8(zn_qsound_w, 0x000000ff)
 
