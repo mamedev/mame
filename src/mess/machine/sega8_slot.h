@@ -219,5 +219,12 @@ public:
 	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_card"); \
 	static_cast<sega8_card_slot_device *>(device)->set_ext("bin"); \
 
+#define MCFG_SG1000_CARD_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	static_cast<sega8_card_slot_device *>(device)->set_intf("sg1000_cart"); \
+	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sg"); \
+
+
 
 #endif
