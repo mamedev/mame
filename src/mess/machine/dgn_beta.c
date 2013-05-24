@@ -1040,6 +1040,8 @@ void dgn_beta_state::machine_reset()
 
 	wd17xx_reset(fdc);
 	m_wd2797_written=0;
+
+	m_maincpu->reset();
 }
 
 void dgn_beta_state::machine_start()
