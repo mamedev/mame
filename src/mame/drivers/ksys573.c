@@ -487,6 +487,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/timekpr.h"
 #include "machine/adc083x.h"
 #include "machine/ds2401.h"
+#include "machine/mb89371.h"
 #include "machine/mpeg573.h"
 #include "machine/upd4701.h"
 #include "machine/x76f041.h"
@@ -605,8 +606,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gn845pwbb_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_tank_shutter_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
-	DECLARE_WRITE16_MEMBER(mb89371_w);
-	DECLARE_READ16_MEMBER(mb89371_r);
 	DECLARE_READ32_MEMBER(jamma_r);
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
@@ -678,18 +677,6 @@ void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt
 		va_end( v );
 		logerror( "%s: %s", machine().describe_context(), buf );
 	}
-}
-
-WRITE16_MEMBER(ksys573_state::mb89371_w)
-{
-	verboselog(2, "mb89371_w %04x %04x %04x\n", offset, mem_mask, data );
-}
-
-READ16_MEMBER(ksys573_state::mb89371_r)
-{
-	UINT32 data = 0xffff;
-	verboselog(2, "mb89371_r %04x %04x %04x\n", offset, mem_mask, data );
-	return data;
 }
 
 READ32_MEMBER(ksys573_state::jamma_r)
@@ -1346,7 +1333,7 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE16(atapi_reset_w, 0x0000ffff)
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP                // watchdog?
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE16(security_r, security_w, 0x0000ffff)
 ADDRESS_MAP_END
 
@@ -2699,6 +2686,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(ksys573_state, konami573 )
 
+	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_DEVICE_ADD("cdrom", CR589, 0)
 
 	// onboard flash

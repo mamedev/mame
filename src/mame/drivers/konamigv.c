@@ -123,11 +123,12 @@ Notes:
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
+#include "machine/am53cf96.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
+#include "machine/mb89371.h"
 #include "machine/scsibus.h"
 #include "machine/scsicd.h"
-#include "machine/am53cf96.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 
@@ -141,8 +142,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(mb89371_w);
-	DECLARE_READ16_MEMBER(mb89371_r);
 	DECLARE_READ16_MEMBER(flash_r);
 	DECLARE_WRITE16_MEMBER(flash_w);
 	DECLARE_READ16_MEMBER(trackball_r);
@@ -174,22 +173,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE16_MEMBER(konamigv_state::mb89371_w)
-{
-}
-
-READ16_MEMBER(konamigv_state::mb89371_r)
-{
-	return 0xffff;
-}
-
 static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 
@@ -330,6 +320,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigv_state::scsi_dma_read ), (konamigv_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigv_state::scsi_dma_write ), (konamigv_state *) owner ) )
 
+	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	MCFG_SCSIBUS_ADD("scsi")

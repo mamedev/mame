@@ -49,10 +49,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
+#include "machine/am53cf96.h"
 #include "machine/eeprom.h"
+#include "machine/mb89371.h"
 #include "machine/scsibus.h"
 #include "machine/scsihd.h"
-#include "machine/am53cf96.h"
 #include "sound/k054539.h"
 
 class konamigq_state : public driver_device
@@ -74,11 +75,9 @@ public:
 	UINT8 m_sector_buffer[ 512 ];
 	DECLARE_WRITE16_MEMBER(soundr3k_w);
 	DECLARE_READ16_MEMBER(soundr3k_r);
-	DECLARE_WRITE16_MEMBER(mb89371_w);
-	DECLARE_READ16_MEMBER(mb89371_r);
 	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(pcmram_w);
-	DECLARE_READ16_MEMBER(pcmram_r);
+	DECLARE_WRITE8_MEMBER(pcmram_w);
+	DECLARE_READ8_MEMBER(pcmram_r);
 	DECLARE_READ16_MEMBER(sndcomm68k_r);
 	DECLARE_WRITE16_MEMBER(sndcomm68k_w);
 	DECLARE_READ16_MEMBER(tms57002_data_word_r);
@@ -116,17 +115,6 @@ READ16_MEMBER(konamigq_state::soundr3k_r)
 	return m_sndtor3k[ offset ];
 }
 
-/* UART */
-
-WRITE16_MEMBER(konamigq_state::mb89371_w)
-{
-}
-
-READ16_MEMBER(konamigq_state::mb89371_r)
-{
-	return 0xffff;
-}
-
 /* EEPROM */
 
 static const UINT16 konamigq_def_eeprom[64] =
@@ -150,12 +138,12 @@ WRITE16_MEMBER(konamigq_state::eeprom_w)
 
 /* PCM RAM */
 
-WRITE16_MEMBER(konamigq_state::pcmram_w)
+WRITE8_MEMBER(konamigq_state::pcmram_w)
 {
 	m_p_n_pcmram[ offset ] = data;
 }
 
-READ16_MEMBER(konamigq_state::pcmram_r)
+READ8_MEMBER(konamigq_state::pcmram_r)
 {
 	return m_p_n_pcmram[ offset ];
 }
@@ -178,8 +166,8 @@ static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x1f230000, 0x1f230003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1f230004, 0x1f230007) AM_READ_PORT("P3_SERVICE")
 	AM_RANGE(0x1f238000, 0x1f238003) AM_READ_PORT("DSW")
-	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE16(pcmram_r, pcmram_w, 0xffffffff)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
+	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE8(pcmram_r, pcmram_w, 0x00ff00ff)
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 
@@ -306,6 +294,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 
 	MCFG_MACHINE_START_OVERRIDE(konamigq_state, konamigq )
 	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq )
+
+	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_EEPROM_93C46_ADD("eeprom")
 	MCFG_EEPROM_DATA(konamigq_def_eeprom, 128)
 
