@@ -178,7 +178,7 @@ void nes_namcot175_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_wram_enable));
+	save_item(NAME(m_wram_protect));
 
 	m_n163_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_n163_ram), 0x2000);
@@ -197,7 +197,7 @@ void nes_namcot175_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
-	m_wram_enable = 0;
+	m_wram_protect = 0;
 }
 
 void nes_namcot163_device::device_start()
@@ -517,7 +517,8 @@ WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
 READ8_MEMBER(nes_namcot175_device::read_m)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
-	if (m_battery && offset < m_battery_size && m_wram_enable)
+	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
+	if (m_battery && !m_wram_protect)
 		return m_battery[offset & (m_battery_size - 1)];
 
 	return m_open_bus;   // open bus
@@ -526,7 +527,8 @@ READ8_MEMBER(nes_namcot175_device::read_m)
 WRITE8_MEMBER(nes_namcot175_device::write_m)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
-	if (m_battery && offset < m_battery_size && m_wram_enable)
+	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
+	if (m_battery && !m_wram_protect)
 		m_battery[offset & (m_battery_size - 1)] = data;
 }
 
@@ -537,7 +539,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_h)
 	switch (offset & 0x7800)
 	{
 		case 0x4000:
-			m_wram_enable = data & 1;
+			m_wram_protect = data & 1;
 			break;
 		case 0x6000:
 			prg8_89(data & 0x3f);

@@ -115,7 +115,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	UINT8 m_wram_enable;
+	UINT8 m_wram_protect;
 };
 
 
