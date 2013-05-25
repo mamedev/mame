@@ -284,7 +284,7 @@ static const char *image_parent_basename(device_t *device)
 		device_image_interface *intf = NULL;
 		if (dev!=NULL && dev->interface(intf))
 		{
-			return intf->basename();
+			return intf->basename_noext();
 		}
 		dev = dev->owner();
 	}
