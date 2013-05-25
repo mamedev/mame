@@ -97,6 +97,7 @@ public:
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
+	DECLARE_MACHINE_RESET(coh1002msnd);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
@@ -119,9 +120,9 @@ private:
 	size_t m_nbajamex_eeprom_size;
 	UINT8 *m_nbajamex_eeprom;
 
-	int m_cbaj_to_z80_status;
-	int m_cbaj_from_z80_status;
-	int m_latch_to_z80;
+	UINT8 m_cbaj_fifo_buffer[2][0x400];
+	int m_cbaj_fifo_main_ptr[2];
+	int m_cbaj_fifo_z80_ptr[2];
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<znsec_device> m_znsec0;
@@ -2197,8 +2198,8 @@ static MACHINE_CONFIG_DERIVED(coh1001l, zn1_2mb_vram)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(zn_state, coh1001l_ymz_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.37)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.37)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 /*
@@ -2423,27 +2424,20 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(zn_state::cbaj_from_z80_latch_r)
 {
-	machine().scheduler().synchronize();
-
-	m_cbaj_from_z80_status &= ~2;
-	return soundlatch2_byte_r(space,0);
+	UINT8 ret = m_cbaj_fifo_buffer[1][m_cbaj_fifo_main_ptr[1]];
+	m_cbaj_fifo_main_ptr[1] = (m_cbaj_fifo_main_ptr[1] + 1) & 0x3ff;
+	return ret;
 }
 
 WRITE8_MEMBER(zn_state::cbaj_to_z80_latch_w)
 {
-	machine().scheduler().synchronize();
-
-	m_cbaj_to_z80_status |= 2;
-	m_latch_to_z80 = data;
+	m_cbaj_fifo_buffer[0][m_cbaj_fifo_main_ptr[0]] = data;
+	m_cbaj_fifo_main_ptr[0] = (m_cbaj_fifo_main_ptr[0] + 1) & 0x3ff;
 }
 
 READ8_MEMBER(zn_state::cbaj_from_z80_status_r)
 {
-	machine().scheduler().synchronize();
-
-	int ready = m_cbaj_from_z80_status;
-	m_cbaj_from_z80_status &= ~2;
-	return ready;
+	return (m_cbaj_fifo_main_ptr[1] != m_cbaj_fifo_z80_ptr[1]) ? 0x02 : 0x00;
 }
 
 static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
@@ -2455,21 +2449,20 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(zn_state::cbaj_to_z80_latch_r)
 {
-	m_cbaj_to_z80_status &= ~2;
-	return m_latch_to_z80;
+	UINT8 ret = m_cbaj_fifo_buffer[0][m_cbaj_fifo_z80_ptr[0]];
+	m_cbaj_fifo_z80_ptr[0] = (m_cbaj_fifo_z80_ptr[0] + 1) & 0x3ff;
+	return ret;
 }
 
 WRITE8_MEMBER(zn_state::cbaj_from_z80_latch_w)
 {
-	m_cbaj_from_z80_status |= 2;
-	soundlatch2_byte_w(space, 0, data);
+	m_cbaj_fifo_buffer[1][m_cbaj_fifo_z80_ptr[1]] = data;
+	m_cbaj_fifo_z80_ptr[1] = (m_cbaj_fifo_z80_ptr[1] + 1) & 0x3ff;
 }
 
 READ8_MEMBER(zn_state::cbaj_to_z80_status_r)
 {
-	int ret = m_cbaj_to_z80_status;
-	m_cbaj_to_z80_status &= ~2;
-	return ret;
+	return (m_cbaj_fifo_main_ptr[0] != m_cbaj_fifo_z80_ptr[0]) ? 0x02 : 0x00;
 }
 
 static ADDRESS_MAP_START( cbaj_z80_map, AS_PROGRAM, 8, zn_state )
@@ -2484,6 +2477,13 @@ static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	AM_RANGE(0x91, 0x91) AM_READ(cbaj_to_z80_status_r)
 ADDRESS_MAP_END
 
+MACHINE_RESET_MEMBER(zn_state,coh1002msnd)
+{
+	m_cbaj_fifo_main_ptr[0] = m_cbaj_fifo_main_ptr[1] = 0;
+	m_cbaj_fifo_z80_ptr[0] = m_cbaj_fifo_z80_ptr[1] = 0;
+
+	MACHINE_RESET_CALL_MEMBER(coh1002m);
+}
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_MODIFY("maincpu")
@@ -2493,9 +2493,12 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002msnd)
+
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 
