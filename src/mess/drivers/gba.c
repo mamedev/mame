@@ -18,7 +18,6 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
-#include "machine/intelfsh.h"
 #include "audio/gb.h"
 #include "includes/gba.h"
 #include "machine/gba_rom.h"
@@ -1951,7 +1950,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 	// draw only visible scanlines
 	if (scanline < 160)
 	{
-		gba_draw_scanline(machine(), scanline);
+		draw_scanline(scanline);
 	}
 	m_DISPSTAT |= DISPSTAT_HBL;
 	if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)

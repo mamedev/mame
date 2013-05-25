@@ -1,4 +1,4 @@
-	/***************************************************************************
+/***************************************************************************
 
 	gbamode1.c
 
@@ -8,15 +8,32 @@
 
 ***************************************************************************/
 
-static void draw_mode1_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+
+void gba_state::draw_mode1(int submode, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+{
+	switch (submode)
+	{
+		case 0:
+			draw_mode1_scanline(y, line0, line1, line2, line3, lineOBJ, lineOBJWin, lineMix, bpp);
+			break;
+		case 1:
+			draw_mode1_scanline_nowindow(y, line0, line1, line2, line3, lineOBJ, lineOBJWin, lineMix, bpp);
+			break;
+		case 2:
+			draw_mode1_scanline_all(y, line0, line1, line2, line3, lineOBJ, lineOBJWin, lineMix, bpp);
+			break;
+	}
+}
+
+void gba_state::draw_mode1_scanline(int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)m_gba_pram.target())[0] | 0x30000000;
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-	draw_gba_oam(state, machine, lineOBJ, y);
+	draw_bg_scanline(line0, y, DISPCNT_BG0_EN, m_BG0CNT, m_BG0HOFS, m_BG0VOFS);
+	draw_bg_scanline(line1, y, DISPCNT_BG1_EN, m_BG1CNT, m_BG1HOFS, m_BG1VOFS);
+	draw_roz_scanline(line2, y, DISPCNT_BG2_EN, m_BG2CNT, m_BG2X, m_BG2Y, m_BG2PA, m_BG2PB, m_BG2PC, m_BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed);
+	draw_gba_oam(lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
 	{
@@ -70,24 +87,24 @@ static void draw_mode1_scanline(running_machine &machine, gba_state *state, int 
 				top2 = 0x04;
 			}
 
-			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->m_BLDCNT & BLDCNT_SFX)
+				switch(m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -96,19 +113,19 @@ static void draw_mode1_scanline(running_machine &machine, gba_state *state, int 
 
 		lineMix[x] = color;
 	}
-	state->m_gfxBG2Changed = 0;
+	m_gfxBG2Changed = 0;
 }
 
-static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+void gba_state::draw_mode1_scanline_nowindow(int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
-	int effect = state->m_BLDCNT & BLDCNT_SFX;
+	UINT32 backdrop = ((UINT16*)m_gba_pram.target())[0] | 0x30000000;
+	int effect = m_BLDCNT & BLDCNT_SFX;
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-	draw_gba_oam(state, machine, lineOBJ, y);
+	draw_bg_scanline(line0, y, DISPCNT_BG0_EN, m_BG0CNT, m_BG0HOFS, m_BG0VOFS);
+	draw_bg_scanline(line1, y, DISPCNT_BG1_EN, m_BG1CNT, m_BG1HOFS, m_BG1VOFS);
+	draw_roz_scanline(line2, y, DISPCNT_BG2_EN, m_BG2CNT, m_BG2X, m_BG2Y, m_BG2PA, m_BG2PB, m_BG2PC, m_BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed);
+	draw_gba_oam(lineOBJ, y);
 
 	for(x = 0; x < 240; x++)
 	{
@@ -146,7 +163,7 @@ static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *st
 				case BLDCNT_SFX_NONE:
 					break;
 				case BLDCNT_SFX_ALPHA:
-					if(state->m_BLDCNT & top)
+					if(m_BLDCNT & top)
 					{
 						UINT32 back = backdrop;
 						UINT8 top2 = 0x20;
@@ -187,22 +204,22 @@ static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *st
 							}
 						}
 
-						if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+						if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 						{
-							color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+							color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 						}
 					}
 					break;
 				case BLDCNT_SFX_LIGHTEN:
-					if(top & state->m_BLDCNT)
+					if(top & m_BLDCNT)
 					{
-						color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+						color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 					}
 					break;
 				case BLDCNT_SFX_DARKEN:
-					if(top & state->m_BLDCNT)
+					if(top & m_BLDCNT)
 					{
-						color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+						color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 					}
 					break;
 			}
@@ -230,24 +247,24 @@ static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *st
 				top2 = 0x04;
 			}
 
-			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->m_BLDCNT & BLDCNT_SFX)
+				switch(m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -255,23 +272,23 @@ static void draw_mode1_scanline_nowindow(running_machine &machine, gba_state *st
 		}
 		lineMix[x] = color;
 	}
-	state->m_gfxBG2Changed = 0;
+	m_gfxBG2Changed = 0;
 }
 
-static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
+void gba_state::draw_mode1_scanline_all(int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)m_gba_pram.target())[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
-	UINT8 inWin0Mask = state->m_WININ & 0x00ff;
-	UINT8 inWin1Mask = state->m_WININ >> 8;
-	UINT8 outMask = state->m_WINOUT & 0x00ff;
+	UINT8 inWin0Mask = m_WININ & 0x00ff;
+	UINT8 inWin1Mask = m_WININ >> 8;
+	UINT8 outMask = m_WINOUT & 0x00ff;
 
-	if(state->m_DISPCNT & DISPCNT_WIN0_EN)
+	if(m_DISPCNT & DISPCNT_WIN0_EN)
 	{
-		UINT8 v0 = state->m_WIN0V >> 8;
-		UINT8 v1 = state->m_WIN0V & 0x00ff;
+		UINT8 v0 = m_WIN0V >> 8;
+		UINT8 v1 = m_WIN0V & 0x00ff;
 		inWindow0 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
 		if(v1 >= v0)
 		{
@@ -283,10 +300,10 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 		}
 	}
 
-	if(state->m_DISPCNT & DISPCNT_WIN1_EN)
+	if(m_DISPCNT & DISPCNT_WIN1_EN)
 	{
-		UINT8 v0 = state->m_WIN1V >> 8;
-		UINT8 v1 = state->m_WIN1V & 0x00ff;
+		UINT8 v0 = m_WIN1V >> 8;
+		UINT8 v1 = m_WIN1V & 0x00ff;
 		inWindow1 = ((v0 == v1) && (v0 >= 0xe8)) ? 1 : 0;
 		if(v1 >= v0)
 		{
@@ -298,11 +315,11 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 		}
 	}
 
-	draw_bg_scanline(state, line0, y, DISPCNT_BG0_EN, state->m_BG0CNT, state->m_BG0HOFS, state->m_BG0VOFS);
-	draw_bg_scanline(state, line1, y, DISPCNT_BG1_EN, state->m_BG1CNT, state->m_BG1HOFS, state->m_BG1VOFS);
-	draw_roz_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed);
-	draw_gba_oam(state, machine, lineOBJ, y);
-	draw_gba_oam_window(state, machine, lineOBJWin, y);
+	draw_bg_scanline(line0, y, DISPCNT_BG0_EN, m_BG0CNT, m_BG0HOFS, m_BG0VOFS);
+	draw_bg_scanline(line1, y, DISPCNT_BG1_EN, m_BG1CNT, m_BG1HOFS, m_BG1VOFS);
+	draw_roz_scanline(line2, y, DISPCNT_BG2_EN, m_BG2CNT, m_BG2X, m_BG2Y, m_BG2PA, m_BG2PB, m_BG2PC, m_BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed);
+	draw_gba_oam(lineOBJ, y);
+	draw_gba_oam_window(lineOBJWin, y);
 
 	for(x = 0; x < 240; x++)
 	{
@@ -312,12 +329,12 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 
 		if((lineOBJWin[x] & 0x80000000) == 0)
 		{
-			mask = state->m_WINOUT >> 8;
+			mask = m_WINOUT >> 8;
 		}
 
 		if(inWindow1)
 		{
-			if(is_in_window(state, x, 1))
+			if(is_in_window(x, 1))
 			{
 				mask = inWin1Mask;
 			}
@@ -325,7 +342,7 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 
 		if(inWindow0)
 		{
-			if(is_in_window(state, x, 0))
+			if(is_in_window(x, 0))
 			{
 				mask = inWin0Mask;
 			}
@@ -359,13 +376,13 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 		{
 			if((color & 0x00010000) == 0)
 			{
-				switch(state->m_BLDCNT & BLDCNT_SFX)
+				switch(m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_NONE:
 						break;
 					case BLDCNT_SFX_ALPHA:
 					{
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
 							UINT32 back = backdrop;
 							UINT8 top2 = 0x20;
@@ -405,23 +422,23 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 								}
 							}
 
-							if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+							if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 							{
-								color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+								color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 							}
 						}
 						break;
 					}
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -449,24 +466,24 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 					top2 = 0x04;
 				}
 
-				if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+				if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 				{
-					color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+					color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 				}
 				else
 				{
-					switch(state->m_BLDCNT & BLDCNT_SFX)
+					switch(m_BLDCNT & BLDCNT_SFX)
 					{
 						case BLDCNT_SFX_LIGHTEN:
-							if(top & state->m_BLDCNT)
+							if(top & m_BLDCNT)
 							{
-								color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+								color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 							}
 							break;
 						case BLDCNT_SFX_DARKEN:
-							if(top & state->m_BLDCNT)
+							if(top & m_BLDCNT)
 							{
-								color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+								color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 							}
 							break;
 					}
@@ -496,24 +513,24 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 				top2 = 0x04;
 			}
 
-			if(top2 & (state->m_BLDCNT >> BLDCNT_TP2_SHIFT))
+			if(top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 			{
-				color = alpha_blend_pixel(color, back, coeff[state->m_BLDALPHA & 0x1f], coeff[(state->m_BLDALPHA >> 8) & 0x1f]);
+				color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 			}
 			else
 			{
-				switch(state->m_BLDCNT & BLDCNT_SFX)
+				switch(m_BLDCNT & BLDCNT_SFX)
 				{
 					case BLDCNT_SFX_LIGHTEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = increase_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = increase_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 					case BLDCNT_SFX_DARKEN:
-						if(top & state->m_BLDCNT)
+						if(top & m_BLDCNT)
 						{
-							color = decrease_brightness(color, coeff[state->m_BLDY & 0x1f]);
+							color = decrease_brightness(color, coeff[m_BLDY & 0x1f]);
 						}
 						break;
 				}
@@ -521,5 +538,5 @@ static void draw_mode1_scanline_all(running_machine &machine, gba_state *state, 
 		}
 		lineMix[x] = color;
 	}
-	state->m_gfxBG2Changed = 0;
+	m_gfxBG2Changed = 0;
 }
