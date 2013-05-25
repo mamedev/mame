@@ -1473,6 +1473,8 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_DRIVERS)/pokemini.o  \
 	$(MESS_DRIVERS)/vboy.o      \
 	$(MESS_AUDIO)/vboy.o        \
+	$(MESS_MACHINE)/gba_slot.o  \
+	$(MESS_MACHINE)/gba_rom.o   \
 	$(MESS_DRIVERS)/gba.o       \
 	$(MESS_VIDEO)/gba.o         \
 

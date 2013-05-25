@@ -4,6 +4,7 @@
 #include "audio/gb.h"
 #include "machine/intelfsh.h"
 #include "sound/dac.h"
+#include "machine/gba_slot.h"
 
 #define DISPSTAT_VBL            0x0001
 #define DISPSTAT_HBL            0x0002
@@ -122,18 +123,6 @@
 #define TILEOBJ_VFLIP           0x0800
 #define TILEOBJ_PALETTE         0xf000
 
-enum
-{
-	EEP_IDLE,
-	EEP_COMMAND,
-	EEP_ADDR,
-	EEP_AFTERADDR,
-	EEP_READ,
-	EEP_WRITE,
-	EEP_AFTERWRITE,
-	EEP_READFIRST
-};
-
 /* driver state */
 class gba_state : public driver_device
 {
@@ -149,6 +138,7 @@ public:
 		m_lbdac(*this, "direct_b_left"),
 		m_rbdac(*this, "direct_b_right"),
 		m_gbsound(*this, "custom"),
+		m_cartslot(*this, "cartslot"),
 		m_region_maincpu(*this, "maincpu"),
 		m_io_in0(*this, "IN0")
 	{ }
@@ -162,6 +152,7 @@ public:
 	required_device<dac_device> m_lbdac;
 	required_device<dac_device> m_rbdac;
 	required_device<gameboy_sound_device> m_gbsound;
+	required_device<gba_cart_slot_device> m_cartslot;
 
 	void request_irq(UINT32 int_type);
 	void dma_exec(FPTR ch);
@@ -221,25 +212,6 @@ public:
 	UINT16 m_timer_reload[4];
 	int m_timer_recalc[4];
 
-	// Storage
-	UINT32 m_gba_sram[0x10000/4];
-	UINT8 m_gba_eeprom[0x2000];
-	UINT32 m_flash_size;
-	UINT32 m_flash_mask;
-	intelfsh8_device *m_mFlashDev;
-	int m_eeprom_state;
-	int m_eeprom_command;
-	int m_eeprom_count;
-	int m_eeprom_addr;
-	int m_eeprom_bits;
-	int m_eeprom_addr_bits;
-	UINT8 m_eep_data;
-
-	/* nvram-specific for MESS */
-	UINT8 *m_nvptr;
-	UINT32 m_nvsize;
-	device_t *m_nvimage;
-
 	emu_timer *m_tmr_timer[4], *m_irq_timer;
 	emu_timer *m_scan_timer, *m_hbl_timer;
 
@@ -255,8 +227,6 @@ public:
 
 	UINT32 m_bios_last_address;
 	int m_bios_protected;
-
-	int m_flash_battery_load;
 
 	DIRECT_UPDATE_MEMBER(gba_direct);
 	DECLARE_READ32_MEMBER(gba_io_r);
@@ -281,8 +251,6 @@ public:
 	TIMER_CALLBACK_MEMBER(handle_irq);
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
-	void gba_machine_stop();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gba_cart);
 
 protected:
 	required_memory_region m_region_maincpu;
