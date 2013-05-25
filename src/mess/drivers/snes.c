@@ -48,6 +48,11 @@
 class snes_console_state : public snes_state
 {
 public:
+	enum
+	{
+		TIMER_LIGHTGUN_TICK = TIMER_SNES_LAST
+	};
+
 	snes_console_state(const machine_config &mconfig, device_type type, const char *tag)
 			: snes_state(mconfig, type, tag)
 			, m_cartslot(*this, "snsslot")
