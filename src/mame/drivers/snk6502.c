@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_SHARE("charram")
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4000, 0x97ff) AM_ROM
+	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb001) AM_WRITE_LEGACY(satansat_sound_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
@@ -1079,6 +1079,37 @@ ROM_START( zarzon )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
 
+
+
+
+ROM_START( satansatind )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ss01.rom",   0x4000, 0x0800, CRC(7f16f8fe) SHA1(7ba2a3c31f7463eda0f300a27008a3fed9c84d9d) )
+	ROM_LOAD( "ss02.rom",   0x4800, 0x0800, CRC(04972fa8) SHA1(89833a7c893168acd5599ca7ad4b33a8f3df40c5) )
+	ROM_LOAD( "ss03.rom",   0x5000, 0x0800, CRC(6e0077e8) SHA1(b7e665b2b6a993ef75c87d53a2a814d141791590) )
+	ROM_LOAD( "ss04.rom",   0x5800, 0x0800, CRC(f9e33359) SHA1(b2586d5adff1703ecd86ed40681f5b703bd9a660) )
+	ROM_LOAD( "ss05.rom",   0x6000, 0x0800, CRC(f771e007) SHA1(80f01116be697680a8d64212d61dffaec1350f14) )
+	ROM_LOAD( "ss06.rom",   0x6800, 0x0800, CRC(e5b02850) SHA1(940ba0ebe7e37820ee1a1dc9f407b974fe354509) )
+	ROM_LOAD( "ss07.rom",   0x7000, 0x0800, CRC(93ea2df9) SHA1(4f7d076deef1e14b568b06974194861d3789ab5c) )
+	ROM_LOAD( "ss08.rom",   0x7800, 0x0800, CRC(e67ec873) SHA1(14158914f07cabe61abc400c371d742ceb61d165) )
+	ROM_RELOAD(               0xf800, 0x0800 ) /* for the reset/interrupt vectors */
+	ROM_LOAD( "ss09.rom",   0x8000, 0x0800, CRC(22c44650) SHA1(063915cde86aece8860db1df15497cde669e73bd) )
+	ROM_LOAD( "ss10.rom",   0x8800, 0x0800, CRC(8f1b313a) SHA1(0c7832505a1287533d9b2d7f2d54000b3b44e40d) )
+	ROM_LOAD( "ss11.rom",   0x9000, 0x0800, CRC(3cbcbddb) SHA1(1567c7fe7c8855427d1f9435b317ba15ed8545c8) )
+	ROM_LOAD( "ss16.rom",   0x9800, 0x0800, CRC(20bd6ee4) SHA1(a19011120c6f3c1c4e96439c1cbcf489ff991582) ) // extra code, unique to this set
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ss14.rom",   0x0000, 0x0800, CRC(5dfcd508) SHA1(6c2863b9850adf7ff0f323be71670438c66a85ee) )
+	ROM_LOAD( "ss15.rom",   0x0800, 0x0800, CRC(363d0500) SHA1(a02ad9e46c62075f54ad87ff287a50bc263c66d8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "zarz138.03",   0x0000, 0x0020, CRC(5dd6933a) SHA1(417d827d9e47b6db01fecc2164e5ef332d4cd70e) )
+
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_LOAD( "ss12.rom",   0x0000, 0x0800, CRC(dee01f24) SHA1(92c8545226a31412239dad4aa2715b51264ad22e) )
+	ROM_LOAD( "ss13.rom",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
+ROM_END
+
 ROM_START( vanguard )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
@@ -1463,6 +1494,7 @@ GAME( 1980, sasuke,   0,        sasuke,   sasuke, driver_device,   0, ROT90, "SN
 GAME( 1981, satansat, 0,        satansat, satansat, driver_device, 0, ROT90, "SNK", "Satan of Saturn (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1981, satansata,satansat, satansat, satansat, driver_device, 0, ROT90, "SNK", "Satan of Saturn (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, zarzon,   satansat, satansat, satansat, driver_device, 0, ROT90, "SNK (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND )
+GAME( 1981, satansatind,satansat,satansat,satansat, driver_device, 0, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguard, 0,        vanguard, vanguard, driver_device, 0, ROT90, "SNK", "Vanguard (SNK)", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguardc,vanguard, vanguard, vanguard, driver_device, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguardj,vanguard, vanguard, vanguard, driver_device, 0, ROT90, "SNK", "Vanguard (Japan)", GAME_IMPERFECT_SOUND )
