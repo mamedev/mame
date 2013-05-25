@@ -198,7 +198,6 @@ private:
 	required_memory_bank m_membank8;
 
 	bool m_rom_active;
-	//bool m_operation_enable;
 	UINT8 m_pio_porta;
 	UINT8 m_pio_portb;
 	UINT8 m_pio_select;
@@ -223,9 +222,9 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	UINT8 x,y,bit,scan,data;
 
-	for(y=0;y<24;y++)  // lines
+	for(y=0;y<bitmap.height()/10;y++)  // lines
 	{
-		for(x=0;x<40;x++)  // columns
+		for(x=0;x<bitmap.width()/8;x++)  // columns
 		{
 			UINT8 ch = m_char_ram[(y*128)+x];
 			for(scan=0;scan<10;scan++)  // 10 scanlines per line
@@ -233,7 +232,8 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				data = m_char_rom->base()[ch*16+scan];
 				for(bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					bitmap.pix32(y*10+scan,x*8+bit) = (BIT(data,7-bit)) ? 0xffffff : 0x000000;
+					if(x >= cliprect.min_x && x < cliprect.max_x && y >= cliprect.min_y && y < cliprect.max_y)
+						bitmap.pix32(y*10+scan,x*8+bit) = (BIT(data,7-bit)) ? 0xffffff : 0x000000;
 				}
 			}
 		}
@@ -486,8 +486,8 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	case DISP_CHAR:
 		m_char_ram[(m_char_line*128)+(param & 0x7f)] = data;
 		break;
-	default:
-		logerror("Unimplemented display operation %02x data %02x param %02x\n",m_current_cmd,data,param);
+//	default:
+//		logerror("Unimplemented display operation %02x data %02x param %02x\n",m_current_cmd,data,param);
 	}
 }
 
@@ -596,6 +596,7 @@ WRITE_LINE_MEMBER(attache_state::eop_w)
 
 WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 {
+
 }
 
 static ADDRESS_MAP_START( attache_map , AS_PROGRAM, 8, attache_state)
@@ -753,7 +754,7 @@ static const am9517a_interface dma_interface =
 	DEVCB_DRIVER_MEMBER(attache_state,dma_mem_w),  // out_memw_cb
 	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // in_ior_cb[4]
 	{DEVCB_DRIVER_MEMBER(attache_state,fdc_dma_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL},  // out_iow_cb[4]
-	{DEVCB_DRIVER_LINE_MEMBER(attache_state,fdc_dack_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}   // out_dack_cb[4]
+	{DEVCB_NULL,/*DEVCB_DRIVER_LINE_MEMBER(attache_state,fdc_dack_w),*/ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL}   // out_dack_cb[4]
 };
 
 // IRQ daisy chain = CTC -> SIO -> Expansion
@@ -768,7 +769,7 @@ static const z80_daisy_config attache_daisy_chain[] =
 static const tms9927_interface crtc_interface =
 {
 	"screen",
-	4,  // guessing for now
+	8,  // guessing for now
 	NULL
 };
 
@@ -830,8 +831,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(64)) /* not accurate */
-	MCFG_SCREEN_SIZE(320,240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_SIZE(640,240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
 
@@ -846,7 +847,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_Z80SIO_ADD("sio",XTAL_8MHz / 26, sio_interface)
 	MCFG_Z80CTC_ADD("ctc",XTAL_8MHz / 4, ctc_interface)
 
-	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 2, dma_interface)
+	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 4, dma_interface)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 
