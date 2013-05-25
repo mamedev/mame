@@ -31,7 +31,7 @@
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
 #include "cpu/mcs51/mcs51.h"
-
+#include "sound/dac.h"
 
 
 class applix_state : public driver_device
@@ -42,7 +42,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
-//		m_fdc(*this, "wd1772"),
+		m_fdc(*this, "wd1772"),
+		m_dacl(*this, "dacl"),
+		m_dacr(*this, "dacr"),
 		m_io_dsw(*this, "DSW"),
 		m_io_fdc(*this, "FDC"),
 		m_base(*this, "base"),
@@ -77,9 +79,9 @@ public:
 	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
-//	DECLARE_FLOPPY_FORMATS(floppy_formats);
-//	void fdc_intrq_w(bool state);
-//	void fdc_drq_w(bool state);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 	UINT8 m_pa;
 	UINT8 m_pb;
 	UINT8 m_analog_latch;
@@ -115,7 +117,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
-//	required_device<wd1772_t> m_fdc;
+	required_device<wd1772_t> m_fdc;
+	required_device<dac_device> m_dacl;
+	required_device<dac_device> m_dacr;
 	required_ioport m_io_dsw;
 	required_ioport m_io_fdc;
 	required_shared_ptr<UINT16> m_base;
@@ -128,9 +132,16 @@ public:
 // bit 3 cassette LED, low=on
 // bit 2,1,0 joystick
 WRITE16_MEMBER( applix_state::dac_latch_w )
-{//printf("%X ",data);
+{
 	if (ACCESSING_BITS_0_7)
+	{
+		if ((m_analog_latch & 0x70) == 0)
+			m_dacr->write_unsigned8(data);
+		else
+		if ((m_analog_latch & 0x70) == 0x10)
+			m_dacl->write_unsigned8(data);
 		m_dac_latch = data;
+	}
 }
 
 WRITE16_MEMBER( applix_state::analog_latch_w )
@@ -760,11 +771,18 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_LENGTH(16)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.75 )
+	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.75 )
+
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
-//	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	//MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -790,18 +808,18 @@ ROM_END
 
 DRIVER_INIT_MEMBER(applix_state, applix)
 {
-#if 0
+
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);
-		m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), this));
-		m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_drq_w), this));
+		//m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_intrq_w), this));
+		//m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_drq_w), this));
 
 		floppy->ss_w(0);
 	}
-#endif
+
 	UINT8 *RAM = memregion("subcpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0x8000], 0x8000);
 }
@@ -963,10 +981,10 @@ READ8_MEMBER( applix_state::p3_read )
 	data &= ~0x14;
 
 	/* -INT0 signal */
-	data |= 4;//(clock_signal() ? 0x04 : 0x00);
+	data |= 4;
 
 	/* T0 signal */
-	data |= 0;//(data_signal() ? 0x00 : 0x10);
+	data |= 0;
 
 	return data;
 }
