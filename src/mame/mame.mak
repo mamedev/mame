@@ -1989,6 +1989,8 @@ $(MAMEOBJ)/misc.a: \
 # layout dependencies
 #-------------------------------------------------
 
+$(DRIVERS)/24cdjuke.o:  $(LAYOUT)/24cdjuke.lh
+
 $(DRIVERS)/30test.o:    $(LAYOUT)/30test.lh
 
 $(DRIVERS)/8080bw.o:    $(LAYOUT)/cosmicm.lh \

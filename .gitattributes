@@ -4638,6 +4638,7 @@ src/mame/includes/zaxxon.h svneol=native#text/plain
 src/mame/includes/zerozone.h svneol=native#text/plain
 src/mame/includes/zodiack.h svneol=native#text/plain
 src/mame/layout/18w.lay svneol=native#text/plain
+src/mame/layout/24cdjuke.lay svneol=native#text/plain
 src/mame/layout/280zzzap.lay svneol=native#text/plain
 src/mame/layout/30test.lay svneol=native#text/plain
 src/mame/layout/3bagflnz.lay svneol=native#text/plain
