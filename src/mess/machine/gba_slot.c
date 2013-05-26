@@ -145,7 +145,7 @@ static const char *gba_get_slot(int type)
 			return slot_list[i].slot_option;
 	}
 
-	return "rom";
+	return "gba_rom";
 }
 
 
@@ -189,7 +189,7 @@ bool gba_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = gba_get_pcb_id(pcb_name);
 
-			printf("Type: %s\n", gba_get_slot(m_type));
+			//printf("Type: %s\n", gba_get_slot(m_type));
 
 			mame_printf_info("GBA: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
@@ -400,7 +400,7 @@ const char * gba_cart_slot_device::get_default_card_software(const machine_confi
 {
 	if (open_image_file(options))
 	{
-		const char *slot_string = "rom";
+		const char *slot_string = "gba_rom";
 		UINT32 len = core_fsize(m_file);
 		UINT8 *ROM = global_alloc_array(UINT8, len);
 		int type;
@@ -410,14 +410,14 @@ const char * gba_cart_slot_device::get_default_card_software(const machine_confi
 		type = get_cart_type(ROM, len);
 		slot_string = gba_get_slot(type);
 
-		printf("type: %s\n", slot_string);
+		//printf("type: %s\n", slot_string);
 		global_free(ROM);
 		clear();
 
 		return slot_string;
 	}
 
-	return software_get_default_slot(config, options, this, "rom");
+	return software_get_default_slot(config, options, this, "gba_rom");
 }
 
 /*-------------------------------------------------
