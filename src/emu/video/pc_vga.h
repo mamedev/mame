@@ -443,6 +443,7 @@ private:
 	void tseng_crtc_reg_write(UINT8 index, UINT8 data);
 	UINT8 tseng_seq_reg_read(UINT8 index);
 	void tseng_seq_reg_write(UINT8 index, UINT8 data);
+	void tseng_attribute_reg_write(UINT8 index, UINT8 data);
 
 	struct
 	{
@@ -452,6 +453,8 @@ private:
 		UINT8 horz_overflow;
 		UINT8 aux_ctrl;
 		bool ext_reg_ena;
+		UINT8 misc1;
+		UINT8 misc2;
 	}et4k;
 
 };

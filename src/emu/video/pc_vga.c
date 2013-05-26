@@ -2386,6 +2386,39 @@ WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
 	tseng_define_video_mode();
 }
 
+void tseng_vga_device::tseng_attribute_reg_write(UINT8 index, UINT8 data)
+{
+	switch(index)
+	{
+		case 0x16:
+			et4k.misc1 = data;
+			#if 0
+			svga.rgb8_en = 0;
+			svga.rgb15_en = 0;
+			svga.rgb16_en = 0;
+			svga.rgb32_en = 0;
+			/* TODO: et4k and w32 are different here */
+			switch(et4k.misc1 & 0x30)
+			{
+				case 0:
+					// normal power-up mode
+					break;
+				case 0x10:
+					svga.rgb8_en = 1;
+					break;
+				case 0x20:
+				case 0x30:
+					popmessage("Tseng 15/16 bit HiColor mode, contact MAMEdev");
+					break;
+			}
+			#endif
+			break;
+		case 0x17: et4k.misc2 = data; break;
+		default:
+			attribute_reg_write(index,data);
+	}
+
+}
 
 READ8_MEMBER(tseng_vga_device::port_03c0_r)
 {
@@ -2393,6 +2426,18 @@ READ8_MEMBER(tseng_vga_device::port_03c0_r)
 
 	switch(offset)
 	{
+		case 0x01:
+			switch(vga.attribute.index)
+			{
+				case 0x16: res = et4k.misc1; break;
+				case 0x17: res = et4k.misc2; break;
+				default:
+					res = vga_device::port_03c0_r(space,offset,mem_mask);
+					break;
+			}
+
+			break;
+
 		case 0x05:
 			res = tseng_seq_reg_read(vga.sequencer.index);
 			break;
@@ -2425,6 +2470,18 @@ WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
 {
 	switch(offset)
 	{
+		case 0:
+			if (vga.attribute.state==0)
+			{
+				vga.attribute.index=data;
+			}
+			else
+			{
+				tseng_attribute_reg_write(vga.attribute.index,data);
+			}
+			vga.attribute.state=!vga.attribute.state;
+			break;
+
 		case 0x05:
 			tseng_seq_reg_write(vga.sequencer.index,data);
 			break;
