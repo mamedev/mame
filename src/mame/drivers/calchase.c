@@ -5,7 +5,7 @@ California Chase (c) 1999 The Game Room
 driver by Angelo Salese & Grull Osgo
 
 TODO:
-- get Win 98 to boot (autoexec.bat is damaged inside current HDD dump);
+- get Win 98 to boot (most of Windows 98 copy is damaged inside current HDD dump);
 - Various graphics bugs (title screen uses ROZ?);
 - fix 129 Hz refresh rate bug;
 - inputs (is there a service mode?)
