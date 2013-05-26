@@ -10,20 +10,6 @@
 #include "emu.h"
 
 
-enum huc6270_v_state {
-	HUC6270_VSW,
-	HUC6270_VDS,
-	HUC6270_VDW,
-	HUC6270_VCR
-};
-
-enum huc6270_h_state {
-	HUC6270_HDS,
-	HUC6270_HDW,
-	HUC6270_HDE,
-	HUC6270_HSW
-};
-
 
 #define MCFG_HUC6270_ADD( _tag, _intrf )    \
 	MCFG_DEVICE_ADD( _tag, HUC6270, 0 )     \
@@ -74,6 +60,21 @@ protected:
 	inline void next_horz_state();
 
 private:
+
+	enum huc6270_v_state {
+		HUC6270_VSW,
+		HUC6270_VDS,
+		HUC6270_VDW,
+		HUC6270_VCR
+	};
+	
+	enum huc6270_h_state {
+		HUC6270_HDS,
+		HUC6270_HDW,
+		HUC6270_HDE,
+		HUC6270_HSW
+	};
+
 	/* Callbacks */
 	devcb_resolved_write_line   m_irq_changed;
 

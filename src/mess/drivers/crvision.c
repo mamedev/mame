@@ -807,12 +807,14 @@ void crvision_state::machine_start()
 {
 	// state saving
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_joylatch));
 }
 
 void crvision_pal_state::machine_start()
 {
 	// state saving
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_joylatch));
 }
 
 /*-------------------------------------------------
@@ -823,6 +825,7 @@ void laser2001_state::machine_start()
 {
 	// state saving
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_joylatch));
 }
 
 /***************************************************************************

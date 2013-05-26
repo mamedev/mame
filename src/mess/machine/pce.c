@@ -281,6 +281,14 @@ MACHINE_START_MEMBER(pce_state,pce)
 {
 	pce_cd_init( machine() );
 	machine().device<nvram_device>("nvram")->set_base(m_cd.bram, PCE_BRAM_SIZE);
+
+	// *partial* saving	(no cd items, no cart-specific items)
+	save_item(NAME(m_io_port_options));
+	save_item(NAME(m_sys3_card));
+	save_item(NAME(m_acard));
+	save_item(NAME(m_joystick_port_select));
+	save_item(NAME(m_joystick_data_select));
+	save_item(NAME(m_joy_6b_packet));
 }
 
 MACHINE_RESET_MEMBER(pce_state,mess_pce)

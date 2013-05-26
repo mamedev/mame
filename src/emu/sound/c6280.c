@@ -314,4 +314,21 @@ void c6280_device::device_start()
 		level /= pow(10.0, step / 20.0);
 	}
 	m_volume_table[31] = 0;
+
+	save_item(NAME(m_select));
+	save_item(NAME(m_balance));
+	save_item(NAME(m_lfo_frequency));
+	save_item(NAME(m_lfo_control));
+	for (int chan = 0; chan < 8; chan++)
+	{
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_frequency);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_control);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_balance);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_waveform);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_index);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_dda);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_noise_control);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_noise_counter);
+		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_counter);
+	}
 }
