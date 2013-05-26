@@ -2,7 +2,7 @@
 
     JR-200 (c) 1982 National / Panasonic
 
-    preliminary driver by Roberto Zandon? and Angelo Salese
+    driver by Roberto Zandona' and Angelo Salese
 
     http://www.armchairarcade.com/neo/node/1598
 

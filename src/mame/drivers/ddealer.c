@@ -1,63 +1,65 @@
-/*
-Double Dealer (c)NMK 1991
+/*********************************************************************************************************
 
-driver by Angelo Salese & David Haywood,based on early work by Tomasz Slanina
+	Double Dealer (c)NMK 1991
 
-Appears to be a down-grade of the nmk16 HW
+	driver by Angelo Salese & David Haywood, based on early work by Tomasz Slanina
 
-TODO:
--When you use the "gun card" the game gives "minus" points,but points are always added,inaccurate protection?
--Understand better the video emulation and convert it to tilemaps;
--A Double Dealer manual is needed for the coinage settings and coin/credit simulation;
--Decap + emulate MCU, required if the random number generation is going to be accurate;
+	Appears to be a down-grade of the nmk16 HW
 
---
+	TODO:
+	-When you use the "gun card" the game gives "minus" points,but points are always added,inaccurate protection?
+	-Understand better the video emulation and convert it to tilemaps;
+	-A Double Dealer manual is needed for the coinage settings and coin/credit simulation;
+	-Decap + emulate MCU, required if the random number generation is going to be accurate;
 
-pcb marked  GD91071
+==========================================================================================================
+	--
 
-68000P10
-YM2203C
-91071-3 (Mask ROM)
-NMK-110 8131 ( Mitsubishi M50747 MCU ?)
-NMK 901
-NMK 902
-NMK 903 x2
-82S135N ("5")
-82S129N ("6")
-xtals 16.000 MHz and  6.000 MHz
-DSW x2
+	pcb marked  GD91071
 
---
+	68000P10
+	YM2203C
+	91071-3 (Mask ROM)
+	NMK-110 8131 ( Mitsubishi M50747 MCU ?)
+	NMK 901
+	NMK 902
+	NMK 903 x2
+	82S135N ("5")
+	82S129N ("6")
+	xtals 16.000 MHz and  6.000 MHz
+	DSW x2
 
-Few words about protection:
+	--
 
-- Work RAM at $fe000 - $fffff is shared with MCU . Maybe whole $f0000-$fffff is shared ...
-- After boot, game writes random-looking data to work RAM:
+	Few words about protection:
 
- 00052C: 33FC 1234 000F E086        move.w  #$1234, $fe086.l
- 000534: 33FC 5678 000F E164        move.w  #$5678, $fe164.l
- 00053C: 33FC 9CA3 000F E62E        move.w  #$9ca3, $fe62e.l
- 000544: 33FC ABA2 000F E734        move.w  #$aba2, $fe734.l
- 00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
- 000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
- 00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
- 000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
+	- Work RAM at $fe000 - $fffff is shared with MCU . Maybe whole $f0000-$fffff is shared ...
+	- After boot, game writes random-looking data to work RAM:
 
-  Some (or maybe all ?) of above enables random generator at $fe010 - $fe017
+	00052C: 33FC 1234 000F E086        move.w  #$1234, $fe086.l
+	000534: 33FC 5678 000F E164        move.w  #$5678, $fe164.l
+	00053C: 33FC 9CA3 000F E62E        move.w  #$9ca3, $fe62e.l
+	000544: 33FC ABA2 000F E734        move.w  #$aba2, $fe734.l
+	00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
+	000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
+	00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
+	000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
 
-- There's also MCU response (write/read/test) test just after these writes.
-  (probably data used in the check depends on above writes). It's similar to
-  jalmah.c tests, but num of responses is different, and  shared ram is
-  used to communicate with MCU
+	Some (or maybe all ?) of above enables random generator at $fe010 - $fe017
 
-- After last check (or maybe durning tests ... no idea)
-  MCU writes $4ef900000604 (jmp $604) to $fe000 and game jumps to this address.
+	- There's also MCU response (write/read/test) test just after these writes.
+	  (probably data used in the check depends on above writes). It's similar to
+	  jalmah.c tests, but num of responses is different, and  shared ram is
+	  used to communicate with MCU
 
-- code at $604  writes $20.w to $fe018 and $1.w to $fe01e.
-  As result shared ram $fe000 - $fe007 is cleared.
+	- After last check (or maybe durning tests ... no idea)
+ 	  MCU writes $4ef900000604 (jmp $604) to $fe000 and game jumps to this address.
 
-  Also many, many other reads/writes  from/to shared mem.
-  Few checks every interrupt:
+	- code at $604  writes $20.w to $fe018 and $1.w to $fe01e.
+	  As result shared ram $fe000 - $fe007 is cleared.
+
+	Also many, many other reads/writes  from/to shared mem.
+	Few checks every interrupt:
 
     interrupt, lvl1
 
@@ -106,7 +108,7 @@ Few words about protection:
      000A6C: 33C3 000F 0014             move.w  D3, $f0014.l
      000A72: 4E75                       rts
 
-*/
+*********************************************************************************************************/
 
 
 #include "emu.h"

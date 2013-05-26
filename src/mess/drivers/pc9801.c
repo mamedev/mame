@@ -2,12 +2,11 @@
 
     PC-9801 (c) 1981 NEC
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese
 
     TODO:
     - proper 8251 uart hook-up on keyboard
     - SASI /SCSI support;
-    - kanji support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
     - Finish DIP-Switches support
     - text scrolling
