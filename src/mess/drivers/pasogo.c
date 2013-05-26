@@ -96,10 +96,12 @@ to make the standard pc driver one level more complex, so own driver
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+#include "cpu/nec/nec.h"
 #include "imagedev/cartslot.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/am9517a.h"
+
 /*
   rtc interrupt irq 2
  */
@@ -141,11 +143,17 @@ class pasogo_state : public driver_device
 {
 public:
 	pasogo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic8259(*this, "pic8259")
+		, m_dma8237(*this, "dma8237")
+		, m_pit8253(*this, "pit8254")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic8259;
+	required_device<am9517a_device> m_dma8237;
+	required_device<pit8253_device> m_pit8253;
 	DECLARE_READ8_MEMBER(ems_r);
 	DECLARE_WRITE8_MEMBER(ems_w);
 	DECLARE_READ8_MEMBER(vg230_io_r);
@@ -162,6 +170,28 @@ public:
 	IRQ_CALLBACK_MEMBER(pasogo_irq_callback);
 	void vg230_reset();
 	void vg230_init();
+	DECLARE_WRITE_LINE_MEMBER( dma_hrq_changed );
+	DECLARE_WRITE_LINE_MEMBER( dma8237_out_eop );
+	DECLARE_READ8_MEMBER( dma_read_byte );
+	DECLARE_WRITE8_MEMBER( dma_write_byte );
+	DECLARE_READ8_MEMBER( dma8237_1_dack_r );
+	DECLARE_READ8_MEMBER( dma8237_2_dack_r );
+	DECLARE_READ8_MEMBER( dma8237_3_dack_r );
+	DECLARE_WRITE8_MEMBER( dma8237_0_dack_w );
+	DECLARE_WRITE8_MEMBER( dma8237_1_dack_w );
+	DECLARE_WRITE8_MEMBER( dma8237_2_dack_w );
+	DECLARE_WRITE8_MEMBER( dma8237_3_dack_w );
+	void select_dma_channel(int channel, bool state);
+	DECLARE_WRITE_LINE_MEMBER( dack0_w ) { select_dma_channel(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack1_w ) { select_dma_channel(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack2_w ) { select_dma_channel(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( dack3_w ) { select_dma_channel(3, state); }
+
+protected:
+	UINT8 m_u73_q2;
+	int m_dma_channel;
+	bool m_cur_eop;
+	UINT8 m_dma_offset[4];
 };
 
 
@@ -403,9 +433,7 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 	}
 }
 
-static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 8, pasogo_state)
-//  AM_RANGE(0x00000, 0xfffff) AM_UNMAP AM_MASK(0xfffff)
-//  AM_RANGE( 0x4000, 0x7fff) AM_READWRITE(gmaster_io_r, gmaster_io_w)
+static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0x80000, 0x83fff) AM_RAMBANK("bank1")
@@ -440,12 +468,13 @@ static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 8, pasogo_state)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pasogo_io, AS_IO, 8, pasogo_state)
+static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8254", pit8253_r, pit8253_w)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
+//	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff )
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pasogo )
@@ -546,15 +575,13 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 
 IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
 {
-	return machine().device<pic8259_device>("pic8259")->acknowledge();
+	return m_pic8259->acknowledge();
 }
 
 void pasogo_state::machine_reset()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pasogo_state::pasogo_irq_callback),this));
 }
-
-//static const unsigned i86_address_mask = 0x000fffff;
 
 static const pit8253_config pc_pit8254_config =
 {
@@ -576,6 +603,136 @@ static const pit8253_config pc_pit8254_config =
 };
 
 
+WRITE_LINE_MEMBER( pasogo_state::dma_hrq_changed )
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	m_dma8237->hack_w(state);
+}
+
+WRITE_LINE_MEMBER( pasogo_state::dma8237_out_eop )
+{
+	m_cur_eop = state == ASSERT_LINE;
+	if(m_dma_channel != -1 && m_cur_eop)
+	{
+		//m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+	}
+}
+
+READ8_MEMBER( pasogo_state::dma_read_byte )
+{
+	if(m_dma_channel == -1)
+		return 0xff;
+	address_space &spaceio = m_maincpu->space(AS_PROGRAM);
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
+	return spaceio.read_byte( page_offset + offset);
+}
+
+WRITE8_MEMBER( pasogo_state::dma_write_byte )
+{
+	if(m_dma_channel == -1)
+		return;
+	address_space &spaceio = m_maincpu->space(AS_PROGRAM);
+	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
+
+	spaceio.write_byte( page_offset + offset, data);
+}
+
+
+READ8_MEMBER( pasogo_state::dma8237_1_dack_r )
+{
+	return 0;
+	//return m_isabus->dack_r(1);
+}
+
+
+READ8_MEMBER( pasogo_state::dma8237_2_dack_r )
+{
+	return 0;
+	//return m_isabus->dack_r(2);
+}
+
+
+READ8_MEMBER( pasogo_state::dma8237_3_dack_r )
+{
+	return 0;
+	//return m_isabus->dack_r(3);
+}
+
+
+WRITE8_MEMBER( pasogo_state::dma8237_0_dack_w )
+{
+	m_u73_q2 = 0;
+	m_dma8237->dreq0_w( m_u73_q2 );
+}
+
+
+WRITE8_MEMBER( pasogo_state::dma8237_1_dack_w )
+{
+	//m_isabus->dack_w(1,data);
+}
+
+
+WRITE8_MEMBER( pasogo_state::dma8237_2_dack_w )
+{
+	//m_isabus->dack_w(2,data);
+}
+
+
+WRITE8_MEMBER( pasogo_state::dma8237_3_dack_w )
+{
+	//m_isabus->dack_w(3,data);
+}
+
+
+void pasogo_state::select_dma_channel(int channel, bool state)
+{
+	if (!state)
+	{
+		m_dma_channel = channel;
+		if(m_cur_eop)
+		{
+			//m_isabus->eop_w(channel, ASSERT_LINE );
+		}
+	}
+	else if(m_dma_channel == channel)
+	{
+		m_dma_channel = -1;
+		if(m_cur_eop)
+		{
+			//m_isabus->eop_w(channel, CLEAR_LINE );
+		}
+	}
+}
+
+
+static I8237_INTERFACE( dma8237_config )
+{
+	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dma8237_out_eop),
+	DEVCB_DRIVER_MEMBER(pasogo_state, dma_read_byte),
+	DEVCB_DRIVER_MEMBER(pasogo_state, dma_write_byte),
+
+	{ DEVCB_NULL,
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_1_dack_r),
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_2_dack_r),
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_3_dack_r) },
+
+
+	{ DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_0_dack_w),
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_1_dack_w),
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_2_dack_w),
+		DEVCB_DRIVER_MEMBER(pasogo_state, dma8237_3_dack_w) },
+
+	// DACK's
+	{ DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack0_w),
+		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack1_w),
+		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack2_w),
+		DEVCB_DRIVER_LINE_MEMBER(pasogo_state, dack3_w) }
+};
+
+
 WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
@@ -584,15 +741,16 @@ WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
-	MCFG_CPU_ADD("maincpu", I80188/*V30HL in vadem vg230*/, XTAL_32_22MHz/2)
+	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-//  MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_PIT8254_ADD( "pit8254", pc_pit8254_config )
 
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pasogo_state, pasogo_pic8259_set_int_line), VCC, NULL )
+
+	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, dma8237_config )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -601,12 +759,6 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
-#if 0
-	MCFG_SPEAKER_STANDARD_MONO("gmaster")
-	MCFG_SOUND_ADD("custom", CUSTOM, 0)
-	MCFG_SOUND_CONFIG(gmaster_sound_interface)
-	MCFG_SOUND_ROUTE(0, "gmaster", 0.50)
-#endif
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
