@@ -70,6 +70,7 @@ Detailed list of bugs:
 #include "cpu/unsp/unsp.h"
 #include "imagedev/cartslot.h"
 #include "machine/i2cmem.h"
+#include "formats/imageutl.h"
 
 #define PAGE_ENABLE_MASK        0x0008
 
@@ -87,12 +88,13 @@ class vii_state : public driver_device
 public:
 	vii_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, "maincpu"),
 		m_p_ram(*this, "p_ram"),
 		m_p_rowscroll(*this, "p_rowscroll"),
 		m_p_palette(*this, "p_palette"),
 		m_p_spriteram(*this, "p_spriteram"),
 		m_p_cart(*this, "p_cart"),
+		m_region_cpu(*this, "maincpu"),
 		m_region_cart(*this, "cart"),
 		m_io_p1(*this, "P1")
 	{ }
@@ -150,6 +152,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
 protected:
+	required_memory_region m_region_cpu;
 	optional_memory_region m_region_cart;
 	required_ioport m_io_p1;
 
@@ -596,7 +599,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 	what ^= (dir & ~attr);
 	what &= ~special;
 
-	if(m_spg243_mode == SPG243_VII)
+	if (m_spg243_mode == SPG243_VII)
 	{
 		if(index == 1)
 		{
@@ -604,7 +607,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 			vii_switch_bank(bank);
 		}
 	}
-	else if(m_spg243_mode == SPG243_BATMAN)
+	else if (m_spg243_mode == SPG243_BATMAN)
 	{
 		if(index == 0)
 		{
@@ -939,6 +942,7 @@ static INPUT_PORTS_START( walle )
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
+
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 {
 	UINT8 *cart = m_region_cart->base();
@@ -974,25 +978,27 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
-	UINT8 *cart = m_region_cart->base();
+	UINT8 *CART = m_region_cart->base();
+	UINT16 *ROM = (UINT16 *) m_region_cpu->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
-
-		if( image.fread( cart, size ) != size )
-		{
-			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return IMAGE_INIT_FAIL;
-		}
+		image.fread(CART, size);
 	}
 	else
 	{
-		int filesize = image.get_software_region_length("rom");
-		memcpy(cart, image.get_software_region("rom"), filesize);
+		int size = image.get_software_region_length("rom");
+		memcpy(CART, image.get_software_region("rom"), size);
 	}
-	memcpy(m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+
+	// for whatever reason if we copy more than this, the CPU
+	// is not happy and VSmile won't show anything... bankswitch?
+	for (int i = 0; i < 0x400000; i += 2)
+		ROM[i / 2] = pick_integer_le(CART, i, 2);
+
 	return IMAGE_INIT_PASS;
 }
+
 
 TIMER_CALLBACK_MEMBER(vii_state::tmb1_tick)
 {
@@ -1015,7 +1021,7 @@ void vii_state::machine_start()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	if ( m_region_cart )
+	if ( m_region_cart && m_spg243_mode == SPG243_VII)
 	{
 		UINT8 *rom = m_region_cart->base();
 		memcpy(m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
@@ -1182,7 +1188,7 @@ DRIVER_INIT_MEMBER(vii_state,batman)
 
 DRIVER_INIT_MEMBER(vii_state,vsmile)
 {
-	m_spg243_mode = SPG243_VSMILE;
+	m_spg243_mode = SPG243_BATMAN;//SPG243_VSMILE;
 	m_centered_coordinates = 1;
 }
 
@@ -1207,10 +1213,9 @@ ROM_END
 
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
-	ROM_CART_LOAD("cart", 0x0000, 0x2000000, ROM_MIRROR)
 ROM_END
 
 ROM_START( walle )

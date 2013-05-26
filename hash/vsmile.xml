@@ -199,6 +199,84 @@ Language:
 
 <!-- carts -->
 
+
+	<software name="aladdin">
+		<description>Aladdin - Aladdins Welt der Wunder (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092204.bin" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariel">
+		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092124.bin" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbuild">
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092304.bin" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderla">
+		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 0)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderla1" cloneof="cinderla">
+		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092244-1.bin" size="8388608" crc="83b7e95c" sha1="8c29c4cc585b1c80c7294193a0dff5da76538752" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footschl">
+		<description>Fußball Schule (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092824.bin" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fred">
+		<description>Freds Zahlen Rallye (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092044.bin" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="manny">
 		<description>Meister Manny's Werkzeugkiste (Ger)</description>
 		<year>200?</year>
@@ -206,6 +284,83 @@ Language:
 		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="090024.bin" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstaln">
+		<description>Monsters vs Aliens (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="090164.bin" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oben">
+		<description>Oben (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="090004.bin" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratat">
+		<description>Ratatouille - Remys Neue Rezepte (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092884.bin" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek">
+		<description>Shrek - Die Geschichte des Drache (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092604.bin" size="8388608" crc="dc1ceca3" sha1="88349b556de43d78198aeb6289fa836f597f8a77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092444-1.bin" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb1" cloneof="spongeb">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092444.bin" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superman">
+		<description>Superman - Der Superheld (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092644.bin" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -221,16 +376,51 @@ Language:
 		</part>
 	</software>
 
-	<software name="spongeb">
-		<description>Spongebob Schwammkopf - Der Tag es Schwamms (Germany) (Ger)</description>
+	<software name="toystor2">
+		<description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="092444.bin" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
+			<dataarea name="flop" size="8388608">
+				<rom name="092224.bin" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="walle">
+		<description>Wall-E (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="flop" size="8388608">
+				<rom name="092844.bin" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh">
+		<description>Winnie Puhh - Die Honigjagd (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="8388608">
+				<rom name="092064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzoo">
+		<description>Zayzoo's Lernall (Germany)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="8388608">
+				<rom name="092364.bin" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 
 
 
