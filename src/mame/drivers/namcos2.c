@@ -4662,8 +4662,8 @@ ROM_END /* suzuk8hj */
 /* SUZUKA 8 HOURS 2 */
 ROM_START( suzuk8h2 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "ehs2-mp0b.11d",  0x000000, 0x020000, CRC(ade97f90) SHA1(8674da5b72d9c9dc09004cb5458b4e87a2b33459) )
-	ROM_LOAD16_BYTE( "ehs2-mp1b.13d",  0x000001, 0x020000, CRC(19744a66) SHA1(90a9699d988eca89633def190836bc3862b8e49e) )
+	ROM_LOAD16_BYTE( "ehs2_mp0b.11d",  0x000000, 0x020000, CRC(ade97f90) SHA1(8674da5b72d9c9dc09004cb5458b4e87a2b33459) )
+	ROM_LOAD16_BYTE( "ehs2_mp1b.13d",  0x000001, 0x020000, CRC(19744a66) SHA1(90a9699d988eca89633def190836bc3862b8e49e) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
 	ROM_LOAD16_BYTE( "ehs1-sp0.11k",  0x000000, 0x020000, CRC(9ca967bc) SHA1(a4d19ae72d0d8e96c1fa5f7e9d8e002275e7be32) )
@@ -4718,6 +4718,66 @@ ROM_START( suzuk8h2 )
 	ROM_LOAD( "ehs1-voi1.3m",  0x000000, 0x080000, CRC(bf94eb42) SHA1(61bb36550a58ffb8ad0ab8f5b51eddd7824ae8bc) )
 	ROM_LOAD( "ehs1-voi2.3l",  0x080000, 0x080000, CRC(0e427604) SHA1(ebb15f53713c24731f6ebdc37ece88587cce5616) )
 ROM_END /* suzuk8h2 */
+
+/* SUZUKA 8 HOURS 2 Japan */
+ROM_START( suzuk8h2j )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "ehs1_mp0b.11d",  0x000000, 0x020000, CRC(ae40d445) SHA1(a6ce8eb691d2b20a120a2c8ce04dbc925fceaad5) )
+	ROM_LOAD16_BYTE( "ehs1_mp1b.13d",  0x000001, 0x020000, CRC(9d5b0d43) SHA1(cc8d288bb91703221697484aa41417c041d6a77f) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "ehs1-sp0.11k",  0x000000, 0x020000, CRC(9ca967bc) SHA1(a4d19ae72d0d8e96c1fa5f7e9d8e002275e7be32) )
+	ROM_LOAD16_BYTE( "ehs1-sp1.13k",  0x000001, 0x020000, CRC(f25bfaaa) SHA1(829936a9d19c4a8818684ce263e9ae5cbc7d5ca4) )
+
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "ehs1-snd0.7j",  0x00c000, 0x004000, CRC(fc95993b) SHA1(e8ecd6dc37634bdd030b8cea0b69818fba5a9388) )
+	ROM_CONTINUE( 0x010000, 0x01c000 )
+	ROM_RELOAD(  0x010000, 0x020000 )
+
+	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
+	ROM_LOAD( "c68.3d",  0x000000, 0x002000, BAD_DUMP CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
+	ROM_LOAD( "sys2c68.3f",  0x008000, 0x008000, BAD_DUMP CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+	/*There is no C65 on the board. There is C68 instead */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "ehs1-obj0.3p",  0x000000, 0x80000, CRC(a0acf307) SHA1(6d79d2dd00da4f8f0462245f42a9d88b6ad632b1) )
+	ROM_LOAD( "ehs1-obj1.3w",  0x100000, 0x80000, CRC(ca780b44) SHA1(d16263851c165f5958b0a2ad1ba199058a8d56d5) )
+	ROM_LOAD( "ehs1-obj2.3t",  0x200000, 0x80000, CRC(83b45afe) SHA1(10a4b88b36f8d037cbb611cb273613b1d45e8eb5) )
+	ROM_LOAD( "ehs1-obj3.3y",  0x300000, 0x80000, CRC(360c03a8) SHA1(969b1a96833ab2db3d610a2b3793fc1e038b24d8) )
+	ROM_LOAD( "ehs1-obj4.3s",  0x080000, 0x80000, CRC(4e503ca5) SHA1(248af1cba2cad2b6e3c53c7c7673165789c5f4d5) )
+	ROM_LOAD( "ehs1-obj5.3x",  0x180000, 0x80000, CRC(5405f2d9) SHA1(c2b592abf72f4de22a3863909be579820c8fe5b1) )
+	ROM_LOAD( "ehs1-obj6.3j",  0x280000, 0x80000, CRC(f5fc8b23) SHA1(d7cd4596cd6991db72c371d835051cc8001f30b3) )
+	ROM_LOAD( "ehs1-obj7.3z",  0x380000, 0x80000, CRC(da6bf51b) SHA1(b9b49b983f76989067c4763fd88bfa11bbf5d064) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
+	ROM_LOAD( "ehs1-chr0.11n", 0x000000, 0x80000, CRC(844efe0d) SHA1(032a2d268bbab60706d911ab42206b5329e1abba) )
+	ROM_LOAD( "ehs1-chr1.11p", 0x080000, 0x80000, CRC(e8480a6d) SHA1(247a7ab2f5270a87c6a05b12f01b884fb05dabd2) )
+	ROM_LOAD( "ehs1-chr2.11r", 0x100000, 0x80000, CRC(ace2d871) SHA1(1a10f571268d83c70fe00fad2f1ce2b48fb764b1) )
+	ROM_LOAD( "ehs1-chr3.11s", 0x180000, 0x80000, CRC(c1680818) SHA1(c8c9fd02b1155924fdc1e930fe176225a3b840a1) )
+	ROM_LOAD( "ehs1-chr4.9n", 0x200000, 0x80000, CRC(82e8c1d5) SHA1(4c6d234a875f108623638960258a0cd530cab6da) )
+	ROM_LOAD( "ehs1-chr5.9p", 0x280000, 0x80000, CRC(9448537c) SHA1(99b9215907ed8658f19bec1153dc1d48bbfd7753) )
+	ROM_LOAD( "ehs1-chr6.9r", 0x300000, 0x80000, CRC(2d1c01ad) SHA1(1ed79e22b964fe648d22e43b78c1c3b5a7d5f8c8) )
+	ROM_LOAD( "ehs1-chr7.9s", 0x380000, 0x80000, CRC(18dd8676) SHA1(59b9a07f4a980fd920a29b8a90ef54c8c3b53e97) )
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASEFF ) /* ROZ Tiles */
+	/* No ROZ hardware on PCB */
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
+	ROM_LOAD( "ehs1-sha0.7n",  0x000000, 0x80000, CRC(0f0e2dbf) SHA1(a4575fbdc868ba959d23204be7d659d40d8db4c2) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_512K( "ehs1-dat0.13s",  0x000000, CRC(12a202fb) SHA1(dca1b88cb524d54a699d4f6003854cfc980e084b) )
+	NAMCOS2_DATA_LOAD_O_512K( "ehs1-dat1.13r",  0x000000, CRC(91790905) SHA1(988af294959dbb8636f808347b44897a133d3203) )
+	NAMCOS2_DATA_LOAD_E_512K( "ehs1-dat2.13p",  0x100000, CRC(087da1f3) SHA1(e9c4ba0383e883502c0f45ae6e6d5daba4eccb01) )
+	NAMCOS2_DATA_LOAD_O_512K( "ehs1-dat3.13n",  0x100000, CRC(85aecb3f) SHA1(00ab6104dee0cd0fbdb0235b88b41e4d26794f98) )
+
+	ROM_REGION( 0x100, "c45_road:clut", 0 ) /* prom for road colors */
+	ROM_LOAD( "ehs1-landdt.10w", 0, 0x100,             CRC(cde7e8a6) SHA1(860273daf2e649418746adf50a67ae33f9f3740c) )
+
+	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
+	ROM_LOAD( "ehs1-voi1.3m",  0x000000, 0x080000, CRC(bf94eb42) SHA1(61bb36550a58ffb8ad0ab8f5b51eddd7824ae8bc) )
+	ROM_LOAD( "ehs1-voi2.3l",  0x080000, 0x080000, CRC(0e427604) SHA1(ebb15f53713c24731f6ebdc37ece88587cce5616) )
+ROM_END /* suzuk8h2j */
 
 /* LEGEND OF THE VALKYRIE */
 ROM_START( valkyrie )
@@ -5550,5 +5610,6 @@ GAME( 1992, sws92,     0,        default,  default, namcos2_state,  sws92,    RO
 GAME( 1992, sws92g,    sws92,    default,  default, namcos2_state,  sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", 0 )
 
 GAME( 1993, suzuk8h2,  0,        luckywld, suzuka, namcos2_state,   suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1993, suzuk8h2j, suzuk8h2, luckywld, suzuka, namcos2_state,   suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1993, sws93,     0,        default,  default, namcos2_state,  sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", 0 )
