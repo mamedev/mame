@@ -858,6 +858,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
+	
+	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
 MACHINE_CONFIG_END
 
 ROM_START( attache )
