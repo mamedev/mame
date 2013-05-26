@@ -1,8 +1,94 @@
 /******************************************************************************
+
+Pasogo Handheld Console
+Koei 1996
+
+This is a handheld console made by Koei in 1996. All of the games available on
+this console are variations of the game 'Go'
+
+
+Main PCB Layout
+---------------
+PT-GMAIN01D
+|--------------|------------||
+|POWER    VOL  |            ||
+|       LM2937*|    CART    ||
+|CE-0702       |    SLOT    ||
+|              |    CN1     ||
+|              |MC14071B*   ||
+|              |            ||
+| PIEZO_SPKR   |------------||
+|CN5           74HC04*       |
+|    X2                      |
+|  |-------|              CN4|
+|  |VAGEM  |                 |
+|  |VG230  |                 |
+|  |       |     HM514800*   |
+|  |       |              CN3|
+|  |-------|     HM514800*   |
+|CN2*  X1                    |
+|----------------------------|
+Notes: (all ICs shown)
+
+       VG230    - Vagem VG230 single-chip PC platform. Contains 16 MHz NEC uPD70116H V30HL CPU 
+                  (which is a high-speed low-power 8086 variation), IBM PC/XT-compatible core 
+                  logic, LCD controller (CGA/AT&T640x400), keyboard matrix scanner, dual PCMCIA
+                  2.1 card controller, EMS 4.0 hardware support for up to 64MB, built-in timer
+                  PIC/DMA/UART/RTC controllers. The clock input is 32.2200MHz. An internal divider
+                  creates a 16.11MHz clock for the V30HL CPU.
+       HM514800 - Hitachi HM514800 512k x8-bit DRAM         
+       MC14071  - Motorola MC14071 Quad 2-input OR gate
+       74HC04   - 74HC04 Hex inverter
+       LM2937   - Texas Instruments LM2937ES-5 voltage regulator (Max 26V input, 5V output at 500mA)
+       CE-0702  - TDK CE-0702 DC-DC converter for LCD in SIP9 package (5V input, -24V output at 25mA)
+       POWER    - 9V DC power input from AC/DC adapter
+       VOL      - Volume pot
+       CN5      - 5 pin connector for 4-way control pad (up/down/left/right/ground)
+       CN4      - 5 pin connector for on/off switch and 2 buttons
+       CN3      - 2 pin power input from 6x AA-battery compartment (input voltage is 9V DC)       
+       CN2      - Flat cable connector for video out to LCD panel. When the LCD is powered on the pixels 
+                  are blue. The LCD panel PCB has part number 97-44264-8 LMG6912RPFC LMG6910RPGR 
+                  and contains the following parts.....
+                  Matsushita 53008HEB-8
+                  Sanyo LA6324N quad operational amplifier
+                  Hitachi BD66285BFC LCD controller IC (x3)
+                  Hitachi BD66284BFC LCD controller IC (x4)
+                  The LCD flat cable has several wires but 2 of them have frequencies which measure 
+                  69.9161Hz and 16.7798kHz. These are assumed to be VSync and HSync
+       CN1      - Cart slot
+       X1       - Marked 322. Measures 32.21732MHz so this is a common 32.22MHz OSC.
+       X2       - No markings. Measures 32.768kHz and used for the RTC
+       *        - These parts are on the other side of the PCB
+       
+
+Carts
+-----
+All of the carts are identical. Most have only one surface mounted mask ROM. Either a 
+MX23C8100 (8M) or YRM0442 (4M). Some are populated with additional parts including a 62256 
+32kx8 SRAM, a 3v coin battery and a MM1081N reset chip plus a few resistors/capacitors and 
+a transistor. All parts are surface mounted.
+
+PT-GMEM01B
+PT-GMEM01C
+|---------------|
+|--     CR2016  |
+|-- MM1081      |
+|--             |
+|--             |
+|--       62256 |
+|--             |
+|--             |
+|--    MX23C8100|
+|-- or YRM0442  |
+|---------------|
+Notes:
+      Carts containing just one mask ROM are KS-1002, KS-1003, KS1004 and KS-1009
+      Carts containing RAM, battery and reset chip are KS-1001 and KS1010
+      Carts KS-1005, KS-1006, KS-1007 and KS-1008 probably exist but are unknown.
+
+===========================================================================================
+
  PeT mess@utanet.at march 2008
-
-
- vadem vg230 (single chip pc) based handheld
 
 although it is very related to standard pc hardware, it is different enough
 to make the standard pc driver one level more complex, so own driver
@@ -498,7 +584,7 @@ WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
-	MCFG_CPU_ADD("maincpu", I80188/*V30HL in vadem vg230*/, 10000000/*?*/)
+	MCFG_CPU_ADD("maincpu", I80188/*V30HL in vadem vg230*/, XTAL_32_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP( pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
