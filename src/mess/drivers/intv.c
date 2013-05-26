@@ -862,8 +862,6 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_SOUND_CONFIG(intv_ay8914_ecs_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_MACHINE_RESET_OVERRIDE(intv_state, intvecs )
-
 	/* cassette */
 	//MCFG_CASSETTE_ADD( "cassette", ecs_cassette_interface )
 
@@ -965,13 +963,26 @@ DRIVER_INIT_MEMBER(intv_state,intv)
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
+	m_is_keybd = 0;
+	m_is_ecs = 0;
 }
 
 DRIVER_INIT_MEMBER(intv_state,intvkbd)
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);
+	m_is_keybd = 1;
+	m_is_ecs = 0;
 }
+
+DRIVER_INIT_MEMBER(intv_state,intvecs)
+{
+	m_stic->set_x_scale(INTV_X_SCALE);
+	m_stic->set_y_scale(INTV_Y_SCALE);
+	m_is_keybd = 0;
+	m_is_ecs = 1;
+}
+
 
 /***************************************************************************
 
@@ -980,8 +991,8 @@ DRIVER_INIT_MEMBER(intv_state,intvkbd)
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       intv, intv_state,       intv,       "Mattel", "Intellivision", 0 )
-CONS( 1981, intvsrs,    intv,   0,      intv,       intv, intv_state,       intv,       "Sears", "Super Video Arcade", 0 )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd, intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
-CONS( 1982, intv2,      intv,   0,      intv2,      intv, intv_state,       intv,       "Mattel", "Intellivision II", 0 )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    intvecs, intv_state,    intv,       "Mattel", "Intellivision Entertainment Computer System", 0)
+CONS( 1979, intv,       0,      0,      intv,       intv,       intv_state,    intv,       "Mattel", "Intellivision", 0 )
+CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv_state,    intv,       "Sears",  "Super Video Arcade", 0 )
+COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
+CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv_state,    intv,       "Mattel", "Intellivision II", 0 )
+COMP( 1983, intvecs,    intv,   0,      intvecs,    intvecs,    intv_state,    intvecs,    "Mattel", "Intellivision Entertainment Computer System", 0)
