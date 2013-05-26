@@ -21,7 +21,7 @@ PT-GMAIN01D
 |CN5           74HC04*       |
 |    X2                      |
 |  |-------|              CN4|
-|  |VAGEM  |                 |
+|  |VADEM  |                 |
 |  |VG230  |                 |
 |  |       |     HM514800*   |
 |  |       |              CN3|
@@ -30,7 +30,7 @@ PT-GMAIN01D
 |----------------------------|
 Notes: (all ICs shown)
 
-       VG230    - Vagem VG230 single-chip PC platform. Contains 16 MHz NEC uPD70116H V30HL CPU 
+       VG230    - Vadem VG230 single-chip PC platform. Contains 16 MHz NEC uPD70116H V30HL CPU 
                   (which is a high-speed low-power 8086 variation), IBM PC/XT-compatible core 
                   logic, LCD controller (CGA/AT&T640x400), keyboard matrix scanner, dual PCMCIA
                   2.1 card controller, EMS 4.0 hardware support for up to 64MB, built-in timer
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-//	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
