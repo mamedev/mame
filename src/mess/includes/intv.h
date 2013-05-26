@@ -9,26 +9,7 @@
 
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-
-struct intv_sprite_type
-{
-	int visible;
-	int xpos;
-	int ypos;
-	int coll;
-	int collision;
-	int doublex;
-	int doubley;
-	int quady;
-	int xflip;
-	int yflip;
-	int behind_foreground;
-	int grom;
-	int card;
-	int color;
-	int doubleyres;
-	int dirty;
-};
+#include "video/stic.h"
 
 class intv_state : public driver_device
 {
@@ -46,6 +27,7 @@ public:
 		m_intellivoice(*this, "sp0256_speech"),
 		m_sound(*this, "ay8914.1"),
 		m_ecs_sound(*this, "ay8914.2"),
+		m_stic(*this, "stic"),
 		m_intvkbd_dualport_ram(*this, "dualport_ram"),
 		m_videoram(*this, "videoram"),
 		m_keyboard(*this, "keyboard"),
@@ -104,6 +86,7 @@ public:
 	required_device<sp0256_device> m_intellivoice;
 	required_device<ay8914_device> m_sound;
 	optional_device<ay8914_device> m_ecs_sound;
+	required_device<stic_device> m_stic;
 	optional_shared_ptr<UINT16> m_intvkbd_dualport_ram;
 	optional_shared_ptr<UINT8> m_videoram;
 
@@ -123,28 +106,9 @@ public:
 	DECLARE_READ8_MEMBER( intv_right_control_r );
 	DECLARE_READ8_MEMBER( intv_left_control_r );
 
-	bitmap_ind16 m_bitmap;
-
-	intv_sprite_type m_sprite[STIC_MOBS];
-	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH*2][STIC_CARD_HEIGHT*4*2*2];
-	UINT16 m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
-	UINT8 m_backtab_row;
 	UINT8 m_bus_copy_mode;
-	int m_color_stack_mode;
-	int m_stic_registers[STIC_REGISTERS];
-	int m_color_stack_offset;
-	int m_stic_handshake;
-	int m_border_color;
-	int m_col_delay;
-	int m_row_delay;
-	int m_left_edge_inhibit;
-	int m_top_edge_inhibit;
-	UINT8 m_gramdirty;
-	UINT8 m_gram[512];
-	UINT8 m_gramdirtybytes[512];
+	UINT8 m_backtab_row;
 	UINT16 m_ram16[0x160];
-	int m_x_scale;
-	int m_y_scale;
 	int m_sr1_int_pending;
 	UINT8 m_ram8[256];
 	UINT8 m_cart_ram8[2048];

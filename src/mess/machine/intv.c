@@ -264,28 +264,36 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 	}
 }
 
+
+READ16_MEMBER( intv_state::intv_stic_r )
+{
+	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
+		return m_stic->read(space, offset, mem_mask);
+	else 
+		return offset;
+}
+
+WRITE16_MEMBER( intv_state::intv_stic_w )
+{
+	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
+		m_stic->write(space, offset, data, mem_mask);
+}
+
+
 READ16_MEMBER( intv_state::intv_gram_r )
 {
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
-	if (m_bus_copy_mode || !m_stic_handshake)
-	{
-	return (int)m_gram[offset];
-	}
-	else {return offset;}
-
+	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
+		return m_stic->gram_read(space, offset, mem_mask);
+	else 
+		return offset;	
 }
 
 WRITE16_MEMBER( intv_state::intv_gram_w )
 {
-	data &= 0xFF;
-	if(m_bus_copy_mode || !m_stic_handshake)
-	{
-		m_gram[offset] = data;
-		m_gramdirtybytes[offset] = 1;
-	m_gramdirty = 1;
-	}
+	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
+		m_stic->gram_write(space, offset, data, mem_mask);
 }
-
 
 READ16_MEMBER( intv_state::intv_ram8_r )
 {
@@ -379,7 +387,7 @@ WRITE16_MEMBER( intv_state::ecs_bank3_page_select )
 
 WRITE16_MEMBER( intv_state::wsmlb_bank_page_select )
 {
-		logerror("offset %x data %x\n",offset,data);
+	logerror("offset %x data %x\n", offset, data);
 	if (offset == 0xFFF)
 	{
 		if (data == 0xFA50)
@@ -656,19 +664,18 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
 
 TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 {
-	UINT8 column;
 	UINT8 row = m_backtab_row;
 	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
-	for(column=0; column < STIC_BACKTAB_WIDTH; column++)
-	{
-		m_backtab_buffer[row][column] = m_ram16[column + row * STIC_BACKTAB_WIDTH];
-	}
+
+	for (int column = 0; column < STIC_BACKTAB_WIDTH; column++)
+		m_stic->write_to_btb(row, column,  m_ram16[column + row * STIC_BACKTAB_WIDTH]);
 
 	m_backtab_row += 1;
 }
 
 INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 {
+	int delay = m_stic->read_row_delay();
 	m_maincpu->set_input_line(CP1610_INT_INTRM, ASSERT_LINE);
 	m_sr1_int_pending = 1;
 	m_bus_copy_mode = 1;
@@ -678,15 +685,15 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	timer_set(m_maincpu->cycles_to_attotime(STIC_VBLANK_END), TIMER_INTV_INTERRUPT_COMPLETE);
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
-		timer_set(m_maincpu->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*m_row_delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), TIMER_INTV_BTB_FILL);
+		timer_set(m_maincpu->cycles_to_attotime(STIC_FIRST_FETCH-STIC_FRAME_BUSRQ+STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*delay + (STIC_CYCLES_PER_SCANLINE*STIC_Y_SCALE*STIC_CARD_HEIGHT - STIC_ROW_BUSRQ)*row), TIMER_INTV_BTB_FILL);
 	}
 
-	if (m_row_delay == 0)
+	if (delay == 0)
 	{
 		m_maincpu->adjust_icount(-STIC_ROW_BUSRQ); // extra row fetch occurs if vertical delay == 0
 	}
 
-	intv_stic_screenrefresh();
+	m_stic->screenrefresh();
 }
 
 /* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */
@@ -841,7 +848,7 @@ DEVICE_IMAGE_LOAD_MEMBER( intv_state,intvkbd_cart )
 		UINT8 *memory = m_region_keyboard->base();
 
 		/* Assume an 8K cart, like BASIC */
-		image.fread( &memory[0xe000], 0x2000);
+		image.fread(&memory[0xe000], 0x2000);
 	}
 
 	return IMAGE_INIT_PASS;

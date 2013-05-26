@@ -51,7 +51,6 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/cp1610/cp1610.h"
-#include "video/stic.h"
 #include "includes/intv.h"
 #include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
@@ -88,31 +87,32 @@ static const unsigned char intv_colors[] =
 void intv_state::palette_init()
 {
 	int k = 0;
-
-	UINT8 i, j, r, g, b;
+	UINT8 r, g, b;
 	/* Two copies of everything (why?) */
 
 	machine().colortable = colortable_alloc(machine(), 32);
 
-	for ( i = 0; i < 16; i++ )
+	for (int i = 0; i < 16; i++)
 	{
-		r = intv_colors[i*3]; g = intv_colors[i*3+1]; b = intv_colors[i*3+2];
+		r = intv_colors[i * 3 + 0]; 
+		g = intv_colors[i * 3 + 1]; 
+		b = intv_colors[i * 3 + 2];
 		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 		colortable_palette_set_color(machine().colortable, i + 16, MAKE_RGB(r, g, b));
 	}
 
-	for(i=0;i<16;i++)
+	for (int i = 0; i < 16; i++)
 	{
-		for(j=0;j<16;j++)
+		for (int j = 0; j < 16; j++)
 		{
-		colortable_entry_set_value(machine().colortable, k++, i);
-		colortable_entry_set_value(machine().colortable, k++, j);
+			colortable_entry_set_value(machine().colortable, k++, i);
+			colortable_entry_set_value(machine().colortable, k++, j);
 		}
 	}
 
-	for(i=0;i<16;i++)
+	for (int i = 0; i < 16; i++)
 	{
-		for(j=16;j<32;j++)
+		for (int j = 16; j < 32; j++)
 		{
 			colortable_entry_set_value(machine().colortable, k++, i);
 			colortable_entry_set_value(machine().colortable, k++, j);
@@ -159,18 +159,6 @@ static const cassette_interface ecs_cassette_interface =
 
 /* graphics output */
 
-static const gfx_layout intv_gromlayout =
-{
-	16, 16,
-	256,
-	1,
-	{ 0 },
-	{ 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7},
-	{ 0*16, 0*16, 1*16, 1*16, 2*16, 2*16, 3*16, 3*16,
-		4*16, 4*16, 5*16, 5*16, 6*16, 6*16, 7*16, 7*16 },
-	8 * 16
-};
-
 static const gfx_layout intvkbd_charlayout =
 {
 	8, 8,
@@ -182,12 +170,7 @@ static const gfx_layout intvkbd_charlayout =
 	8 * 8
 };
 
-static GFXDECODE_START( intv )
-	GFXDECODE_ENTRY( "maincpu", 0x3000<<1, intv_gromlayout, 0, 256 )
-GFXDECODE_END
-
 static GFXDECODE_START( intvkbd )
-	GFXDECODE_ENTRY( "maincpu", 0x3000<<1, intv_gromlayout, 0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, intvkbd_charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -717,7 +700,7 @@ static ADDRESS_MAP_START(intv_mem, AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM,     8-bits wide */
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
@@ -735,7 +718,7 @@ static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400<<1)  /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM,     8-bits wide */
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x7fff) AM_ROM AM_REGION("maincpu", 0x4800<<1)
@@ -755,7 +738,7 @@ static ADDRESS_MAP_START( intvecs_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE( ecs_bank1_page_select );
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM,     8-bits wide */
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE( intv_ecs_ram8_r, intv_ecs_ram8_w )
@@ -776,7 +759,7 @@ static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREAD("stic", stic_device, grom_read) /* GROM,     8-bits wide */
 	AM_RANGE(0x3800, 0x39ff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM,     8-bits wide */
 	AM_RANGE(0x3a00, 0x3bff) AM_READWRITE( intv_gram_r, intv_gram_w )       /* GRAM Alias,     8-bits wide */
 	AM_RANGE(0x4800, 0x6fff) AM_ROM     /* Cartridges? */
@@ -833,8 +816,9 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", intv_state,  intv_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
 	/* video hardware */
+	MCFG_STIC_ADD("stic")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.92)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* not accurate */
@@ -842,9 +826,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
 	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
 
-	MCFG_GFXDECODE( intv )
 	MCFG_PALETTE_LENGTH(0x400)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -922,7 +904,6 @@ MACHINE_CONFIG_END
 ROM_START(intv) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -934,7 +915,6 @@ ROM_START(intv2)
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ro-3-9506-010.ic6", (0x400<<1)+0, 0x200, CRC(DD7E1237) SHA1(FB821A643B7714ED4C812553CD3F668766FD44AB))
 	ROM_CONTINUE( (0x1000<<1)+0, 0x2000 )
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u5", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917)) // needs verification
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -944,7 +924,6 @@ ROM_END
 ROM_START(intvsrs) // the intv1 sears exec rom should be two roms: RO-3-9502-???.U5 and RO-3-9504-???.U6 but the correct names are unknown as of yet
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "searsexc.bin", (0x1000<<1)+0, 0x2000, CRC(ea552a22) SHA1(834339de056d42a35571cae7fd5b04d1344001e9))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -954,7 +933,6 @@ ROM_END
 ROM_START(intvecs) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", (0x1000<<1)+0, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 
 	ROM_REGION( 0x10000<<1, "sp0256_speech", 0 )
 	/* SP0256-012 Speech chip w/2KiB mask rom */
@@ -969,7 +947,6 @@ ROM_END
 ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 and RO-3-9504-021.U6
 	ROM_REGION(0x10000<<1,"maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD( "exec.bin", 0x1000<<1, 0x2000, CRC(cbce86f7) SHA1(5a65b922b562cb1f57dab51b73151283f0e20c7a))
-	ROM_LOAD16_BYTE( "ro-3-9503-003.u21", (0x3000<<1)+1, 0x0800, CRC(683a4158) SHA1(f9608bb4ad1cfe3640d02844c7ad8e0bcd974917))
 	ROM_LOAD16_WORD( "024.u60",  0x7000<<1, 0x1000, CRC(4f7998ec) SHA1(ec006d0ae9002e9d56d83a71f5f2eddd6a456a40))
 	ROM_LOAD16_BYTE( "4d72.u62", 0x7800<<1, 0x0800, CRC(aa57c594) SHA1(741860d489d90f5882ca53daa3169b6abacdf130))
 	ROM_LOAD16_BYTE( "4d71.u63", (0x7800<<1)+1, 0x0800, CRC(069b2f0b) SHA1(070850bb32f8474107cc52c5183cfaa32d640f9a))
@@ -986,14 +963,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(intv_state,intv)
 {
-	m_x_scale = INTV_X_SCALE;
-	m_y_scale = INTV_Y_SCALE;
+	m_stic->set_x_scale(INTV_X_SCALE);
+	m_stic->set_y_scale(INTV_Y_SCALE);
 }
 
 DRIVER_INIT_MEMBER(intv_state,intvkbd)
 {
-	m_x_scale = INTVKBD_X_SCALE;
-	m_y_scale = INTVKBD_Y_SCALE;
+	m_stic->set_x_scale(INTVKBD_X_SCALE);
+	m_stic->set_y_scale(INTVKBD_Y_SCALE);
 }
 
 /***************************************************************************

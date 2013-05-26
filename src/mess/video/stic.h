@@ -445,4 +445,113 @@ enum
 #define STIC_CSQM_WIDTH             (STIC_CARD_WIDTH / 2)
 #define STIC_CSQM_HEIGHT            (STIC_CARD_HEIGHT / 2)
 
+
+
+struct intv_sprite_type
+{
+	int visible;
+	int xpos;
+	int ypos;
+	int coll;
+	int collision;
+	int doublex;
+	int doubley;
+	int quady;
+	int xflip;
+	int yflip;
+	int behind_foreground;
+	int grom;
+	int card;
+	int color;
+	int doubleyres;
+	int dirty;
+};
+
+
+// ======================> stic_device
+
+class stic_device :  public device_t
+{
+public:
+	// construction/destruction
+	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~stic_device();
+	
+	DECLARE_READ16_MEMBER(read);
+	DECLARE_READ16_MEMBER(gram_read);
+	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom_region->base()[offset]); }
+	DECLARE_WRITE16_MEMBER(write);
+	DECLARE_WRITE16_MEMBER(gram_write);
+
+	void write_to_btb(int h, int w, UINT16 data) { m_backtab_buffer[h][w] = data; }
+	int read_row_delay() { return m_row_delay; }
+	int read_stic_handshake() { return m_stic_handshake; }
+	void set_x_scale(int val) { m_x_scale = val; }
+	void set_y_scale(int val) { m_y_scale = val; }
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual const rom_entry *device_rom_region() const;
+	virtual void device_reset();
+	
+	void screenrefresh();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+private:
+	
+	required_memory_region m_grom_region;
+
+	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	UINT32 intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
+	void intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color);
+	int sprites_collide(int spriteNum1, int spriteNum2);
+	void determine_sprite_collisions();
+	void render_sprites();
+	void render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor);
+	void render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3);
+	void render_color_stack_mode(bitmap_ind16 &bitmap);
+	void render_fg_bg_mode(bitmap_ind16 &bitmap);
+	void copy_sprites_to_background(bitmap_ind16 &bitmap);
+	void render_background(bitmap_ind16 &bitmap);
+	void draw_borders(bitmap_ind16 &bitmap);
+	
+#ifdef UNUSED_CODE
+	void draw_background(bitmap_ind16 &bitmap, int transparency);
+	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
+#endif
+		
+	bitmap_ind16 m_bitmap;
+	
+	intv_sprite_type m_sprite[STIC_MOBS];
+	UINT8 m_sprite_buffers[STIC_MOBS][STIC_CARD_WIDTH * 2][STIC_CARD_HEIGHT * 4 * 2 * 2];
+	UINT16 m_backtab_buffer[STIC_BACKTAB_HEIGHT][STIC_BACKTAB_WIDTH];
+	int m_color_stack_mode;
+	int m_stic_registers[STIC_REGISTERS];
+	int m_color_stack_offset;
+	int m_stic_handshake;
+	int m_border_color;
+	int m_col_delay;
+	int m_row_delay;
+	int m_left_edge_inhibit;
+	int m_top_edge_inhibit;
+	int m_x_scale;
+	int m_y_scale;
+
+	UINT8 m_gramdirty;
+	UINT8 m_gram[512];
+	UINT8 m_gramdirtybytes[512];	
+};
+
+// device type definition
+extern const device_type STIC;
+
+
+/***************************************************************************
+ DEVICE CONFIGURATION MACROS
+ ***************************************************************************/
+
+#define MCFG_STIC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, STIC, 0)
+
+
 #endif /* STIC_H_ */
