@@ -262,6 +262,13 @@ void coleco_state::machine_start()
 		m_joy_d7_state[port] = 0;
 		m_joy_analog_state[port] = 0;
 	}
+
+	save_item(NAME(m_joy_mode));
+	save_item(NAME(m_last_nmi_state));
+	save_item(NAME(m_joy_irq_state));
+	save_item(NAME(m_joy_d7_state));
+	save_item(NAME(m_joy_analog_state));
+	save_item(NAME(m_joy_analog_reload));
 }
 
 void coleco_state::machine_reset()
@@ -412,6 +419,6 @@ ROM_END
 CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision",                     0 )
 CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision (Thick Characters)",  0 )
 CONS( 1983, colecob,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
-CONS( 1986, czz50,    0,   coleco,      czz50,    czz50, driver_device,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50, driver_device,    0,       "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50, driver_device,    0,       "Telegames",        "Personal Arcade",                  0 )
+CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device,   0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device,   0,       "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  driver_device,   0,       "Telegames",        "Personal Arcade",                  0 )
