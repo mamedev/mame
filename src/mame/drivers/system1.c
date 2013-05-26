@@ -64,6 +64,7 @@ imsorryj    3x16k 1x8k  6x8k  2x16k  no  pio  6649
 
 teddybb     3x16k 1x8k  6x8k  4x16k  no  pio  6770    6735
 teddybbo    3x16k 1x8k  6x8k  4x16k  no  pio  6741
+teddybbobl  3x16k 1x8k  3x16k 4x16k  no  pio  bootleg
 
 hvymetal    3x32k 1x32k 6x16k 4x32k  yes      6790    6778
 
@@ -3197,6 +3198,31 @@ ROM_START( teddybbo )
 ROM_END
 
 
+ROM_START( teddybbobl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-6739.116",   0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) // 1.f2
+	ROM_LOAD( "epr-6740.109",   0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) // 2.j2
+	ROM_LOAD( "epr-6741.96",    0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) ) // 3.k2
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* board was missing sound rom, using 'older' version which this set mostly matches and marked bad_dump */
+	ROM_LOAD( "epr-6748.120",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
+
+	ROM_REGION( 0xc000, "tiles", 0 ) /* same as parent except 3x16k instead of 6x8k */
+	ROM_LOAD( "11.r7",          0x0000, 0x4000, CRC(55d7aaf7) SHA1(84041b665f91b515968aaa48d8ffe93c84c90c57) ) // epr-6747.62 + epr-6746.61
+	ROM_LOAD( "10.r8",          0x4000, 0x4000, CRC(52a5083d) SHA1(33afef936ce21d49fc7bae3dd9b9d827e26e002f) ) // epr-6745.64 + epr-6744.63
+	ROM_LOAD( "9.r10",          0x8000, 0x4000, CRC(8076d3a3) SHA1(ba7f136b9300a2b41f225a7696345c90a6fbd6a5) ) // epr-6753.66 + epr-6742.65
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "epr-6735.117",   0x0000, 0x4000, CRC(1be35a97) SHA1(7524cfa1a9c9a2e37753f119e7ac7aa3158621be) ) // 4.f3
+	ROM_LOAD( "epr-6737.04",    0x4000, 0x4000, CRC(6b53aa7a) SHA1(b1b3ff9460b2321e72b49befa63b61c9c36fedd9) ) // 6.k3
+	ROM_LOAD( "epr-6736.110",   0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) ) // 5.h3
+	ROM_LOAD( "epr-6738.05",    0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) ) // 7.m3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
+
 ROM_START( hvymetal )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epra6790.1",   0x00000, 0x8000, CRC(59195bb9) SHA1(63dde673bd875dd23d445b152decb1d70c3750a4) ) /* encrypted */
@@ -4910,6 +4936,7 @@ GAME( 1985, imsorry,    0,        sys1pio,  imsorry, system1_state,   imsorry,  
 GAME( 1985, imsorryj,   imsorry,  sys1pio,  imsorry, system1_state,   imsorry,  ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, teddybb,    0,        sys1pio,  teddybb, system1_state,   teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, teddybbo,   teddybb,  sys1pio,  teddybb, system1_state,   teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, teddybbobl, teddybb,  sys1pio,  teddybb, system1_state,   teddybb,  ROT0,   "bootleg",         "TeddyBoy Blues (Old Ver. bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1985, myhero,     0,        sys1pio,  myhero, system1_state,    bank00,   ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sscandal,   myhero,   sys1pio,  myhero, system1_state,    myheroj,  ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, myherok,    myhero,   sys1pio,  myhero, system1_state,    myherok,  ROT0,   "Coreland / Sega", "My Hero (Korea)", GAME_SUPPORTS_SAVE )
