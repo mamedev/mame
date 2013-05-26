@@ -27,8 +27,8 @@
     the sp0256_start() call.
 
     If the memory map contents is modified during execution (accross of ROM
-    bank switching) the sp0256_bitrevbuff() call must be called after the
-    section of ROM is modified.
+    bank switching) the bitrevbuff() call must be called after the section 
+    of ROM is modified.
 */
 
 #include "emu.h"
@@ -52,59 +52,12 @@
 #define LOG_FIFO(x) do { if (DEBUG_FIFO) logerror x; } while (0)
 
 #define SET_SBY(line_state) {                  \
-	if( sp->sby_line != line_state )           \
+	if (m_sby_line != line_state)           \
 	{                                          \
-		sp->sby_line = line_state;             \
-		sp->sby(sp->sby_line);  \
+		m_sby_line = line_state;             \
+		m_sby(m_sby_line);  \
 	}                                          \
 }
-
-struct lpc12_t
-{
-	int     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-	UINT32  per, rng;       /* Period, Amplitude, Random Number Generator   */
-	int     amp;
-	INT16   f_coef[6];      /* F0 through F5.                               */
-	INT16   b_coef[6];      /* B0 through B5.                               */
-	INT16   z_data[6][2];   /* Time-delay data for the filter stages.       */
-	UINT8   r[16];          /* The encoded register set.                    */
-	int     interp;
-};
-
-
-struct sp0256_state
-{
-	device_t *device;
-	sound_stream  *stream;          /* MAME core sound stream                       */
-	devcb_resolved_write_line drq;  /* Data request callback                        */
-	devcb_resolved_write_line sby;  /* Standby callback                             */
-	int            sby_line;        /* Standby line state                           */
-	INT16         *cur_buf;         /* Current sound buffer.                        */
-	int            cur_len;         /* Fullness of current sound buffer.            */
-
-	int            silent;          /* Flag: SP0256 is silent.                      */
-
-	INT16         *scratch;         /* Scratch buffer for audio.                    */
-	UINT32         sc_head;         /* Head pointer into scratch circular buf       */
-	UINT32         sc_tail;         /* Tail pointer into scratch circular buf       */
-
-	struct lpc12_t filt;            /* 12-pole filter                               */
-	int            lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
-	int            ald;             /* Address LoaD.  < 0 if no command pending.    */
-	int            pc;              /* Microcontroller's PC value.                  */
-	int            stack;           /* Microcontroller's PC stack.                  */
-	int            fifo_sel;        /* True when executing from FIFO.               */
-	int            halted;          /* True when CPU is halted.                     */
-	UINT32         mode;            /* Mode register.                               */
-	UINT32         page;            /* Page set by SETPAGE                          */
-
-	UINT32         fifo_head;       /* FIFO head pointer (where new data goes).     */
-	UINT32         fifo_tail;       /* FIFO tail pointer (where data comes from).   */
-	UINT32         fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
-	UINT16         fifo[64];        /* The 64-decle FIFO.                           */
-
-	UINT8          *rom;            /* 64K ROM.                                     */
-};
 
 /* ======================================================================== */
 /*  qtbl  -- Coefficient Quantization Table.  This comes from a             */
@@ -130,18 +83,157 @@ static const INT16 qtbl[128] =
 	504,    505,    506,    507,    508,    509,    510,    511
 };
 
-INLINE sp0256_state *get_safe_token(device_t *device)
+
+
+// device type definition
+const device_type SP0256 = &device_creator<sp0256_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+				: device_t(mconfig, SP0256, "SP0256", tag, owner, clock),
+					device_sound_interface(mconfig, *this)
 {
-	assert(device != NULL);
-	assert(device->type() == SP0256);
-	return (sp0256_state *)downcast<sp0256_device *>(device)->token();
 }
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void sp0256_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const sp0256_interface *intf = reinterpret_cast<const sp0256_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<sp0256_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_lrq_cb, 0, sizeof(m_lrq_cb));
+		memset(&m_sby_cb, 0, sizeof(m_sby_cb));
+	}
+	
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void sp0256_device::device_start()
+{
+	m_drq.resolve(m_lrq_cb, *this);
+	m_sby.resolve(m_sby_cb, *this);
+	m_drq(1);
+	m_sby(1);
+	
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / CLOCK_DIVIDER, this);
+	
+	/* -------------------------------------------------------------------- */
+	/*  Configure our internal variables.                                   */
+	/* -------------------------------------------------------------------- */
+	m_filt.rng = 1;
+	
+	/* -------------------------------------------------------------------- */
+	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
+	/* -------------------------------------------------------------------- */
+	m_scratch = auto_alloc_array(machine(), INT16, SCBUF_SIZE);
+	save_pointer(NAME(m_scratch), SCBUF_SIZE);
+
+	m_sc_head = m_sc_tail = 0;
+	
+	/* -------------------------------------------------------------------- */
+	/*  Set up the microsequencer's initial state.                          */
+	/* -------------------------------------------------------------------- */
+	m_halted   = 1;
+	m_filt.rpt = -1;
+	m_lrq      = 0x8000;
+	m_page     = 0x1000 << 3;
+	m_silent   = 1;
+	
+	/* -------------------------------------------------------------------- */
+	/*  Setup the ROM.                                                      */
+	/* -------------------------------------------------------------------- */
+	m_rom = *region();
+	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
+	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
+	// TODO: because of this, check if the bitrev functions are even used anywhere else
+	// bitrevbuff(m_rom, 0, 0xffff);
+	
+	m_lrq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0256_device::set_lrq_timer_proc),this));
+
+	// save device variables
+	save_item(NAME(m_sby_line));
+	save_item(NAME(m_cur_len));
+	save_item(NAME(m_silent));
+	save_item(NAME(m_sc_head));
+	save_item(NAME(m_sc_tail));
+	save_item(NAME(m_lrq));
+	save_item(NAME(m_ald));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_stack));
+	save_item(NAME(m_fifo_sel));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_page));
+	save_item(NAME(m_fifo_head));
+	save_item(NAME(m_fifo_tail));
+	save_item(NAME(m_fifo_bitp));
+	save_item(NAME(m_fifo));
+	// save filter variables
+	save_item(NAME(m_filt.rpt));
+	save_item(NAME(m_filt.cnt));
+	save_item(NAME(m_filt.per));
+	save_item(NAME(m_filt.rng));
+	save_item(NAME(m_filt.amp));
+	save_item(NAME(m_filt.f_coef));
+	save_item(NAME(m_filt.b_coef));
+	save_item(NAME(m_filt.z_data));
+	save_item(NAME(m_filt.r));
+	save_item(NAME(m_filt.interp));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sp0256_device::device_reset()
+{
+	// reset FIFO and SP0256
+	m_fifo_head = m_fifo_tail = m_fifo_bitp = 0;
+	
+	memset(&m_filt, 0, sizeof(m_filt));
+	m_halted   = 1;
+	m_filt.rpt = -1;
+	m_filt.rng = 1;
+	m_lrq      = 0x8000;
+	m_ald      = 0x0000;
+	m_pc       = 0x0000;
+	m_stack    = 0x0000;
+	m_fifo_sel = 0;
+	m_mode     = 0;
+	m_page     = 0x1000 << 3;
+	m_silent   = 1;
+	m_drq(1);
+	SET_SBY(1)
+	
+	m_lrq = 0;
+	m_lrq_timer->adjust(attotime::from_ticks(50, m_clock));
+}
+
 
 
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
 /* ======================================================================== */
-static INT16 limit(INT16 s)
+INLINE INT16 limit(INT16 s)
 {
 #ifdef HIGH_QUALITY /* Higher quality than the original, but who cares? */
 	if (s >  8191) return  8191;
@@ -156,7 +248,7 @@ static INT16 limit(INT16 s)
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-static int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *optr)
+INLINE int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *optr)
 {
 	int i, j;
 	INT16 samp;
@@ -286,7 +378,7 @@ static const int stage_map[6] = { 0, 1, 2, 3, 4, 5 };
 /* ======================================================================== */
 /*  LPC12_REGDEC -- Decode the register set in the filter bank.             */
 /* ======================================================================== */
-static void lpc12_regdec(struct lpc12_t *f)
+INLINE void lpc12_regdec(struct lpc12_t *f)
 {
 	int i;
 
@@ -648,7 +740,7 @@ static const INT16 sp0256_df_idx[16 * 8] =
 /* ======================================================================== */
 /*  BITREV32       -- Bit-reverse a 32-bit number.                            */
 /* ======================================================================== */
-static UINT32 bitrev32(UINT32 val)
+INLINE UINT32 bitrev32(UINT32 val)
 {
 	val = ((val & 0xFFFF0000) >> 16) | ((val & 0x0000FFFF) << 16);
 	val = ((val & 0xFF00FF00) >>  8) | ((val & 0x00FF00FF) <<  8);
@@ -662,7 +754,7 @@ static UINT32 bitrev32(UINT32 val)
 /* ======================================================================== */
 /*  BITREV8       -- Bit-reverse a 8-bit number.                            */
 /* ======================================================================== */
-static UINT8 bitrev8(UINT8 val)
+INLINE UINT8 bitrev8(UINT8 val)
 {
 	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
 	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
@@ -674,18 +766,16 @@ static UINT8 bitrev8(UINT8 val)
 /* ======================================================================== */
 /*  BITREVBUFF       -- Bit-reverse a buffer.                               */
 /* ======================================================================== */
-void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
+void sp0256_device::bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
 {
-	unsigned int i;
-
-	for( i=start; i<length; i++ )
-		buffer[i] = bitrev8( buffer[i] );
+	for (unsigned int i = start; i < length; i++ )
+		buffer[i] = bitrev8(buffer[i]);
 }
 
 /* ======================================================================== */
 /*  SP0256_GETB  -- Get up to 8 bits at the current PC.                     */
 /* ======================================================================== */
-static UINT32 sp0256_getb(sp0256_state *sp, int len)
+UINT32 sp0256_device::getb( int len )
 {
 	UINT32 data = 0;
 	UINT32 d0, d1;
@@ -693,26 +783,26 @@ static UINT32 sp0256_getb(sp0256_state *sp, int len)
 	/* -------------------------------------------------------------------- */
 	/*  Fetch data from the FIFO or from the MASK                           */
 	/* -------------------------------------------------------------------- */
-	if (sp->fifo_sel)
+	if (m_fifo_sel)
 	{
-		d0 = sp->fifo[(sp->fifo_tail    ) & 63];
-		d1 = sp->fifo[(sp->fifo_tail + 1) & 63];
+		d0 = m_fifo[(m_fifo_tail    ) & 63];
+		d1 = m_fifo[(m_fifo_tail + 1) & 63];
 
-		data = ((d1 << 10) | d0) >> sp->fifo_bitp;
+		data = ((d1 << 10) | d0) >> m_fifo_bitp;
 
-		LOG_FIFO( ("sp0256: RD_FIFO %.3X %d.%d %d\n", data & ((1 << len) - 1),
-				sp->fifo_tail, sp->fifo_bitp, sp->fifo_head));
+		LOG_FIFO(("sp0256: RD_FIFO %.3X %d.%d %d\n", data & ((1 << len) - 1),
+				m_fifo_tail, m_fifo_bitp, m_fifo_head));
 
 		/* ---------------------------------------------------------------- */
 		/*  Note the PC doesn't advance when we execute from FIFO.          */
 		/*  Just the FIFO's bit-pointer advances.   (That's not REALLY      */
 		/*  what happens, but that's roughly how it behaves.)               */
 		/* ---------------------------------------------------------------- */
-		sp->fifo_bitp += len;
-		if (sp->fifo_bitp >= 10)
+		m_fifo_bitp += len;
+		if (m_fifo_bitp >= 10)
 		{
-			sp->fifo_tail++;
-			sp->fifo_bitp -= 10;
+			m_fifo_tail++;
+			m_fifo_bitp -= 10;
 		}
 	} else
 	{
@@ -721,15 +811,15 @@ static UINT32 sp0256_getb(sp0256_state *sp, int len)
 		/*  adjacent bytes.  The byte we're interested in is extracted      */
 		/*  from the appropriate bit-boundary between them.                 */
 		/* ---------------------------------------------------------------- */
-		int idx0 = (sp->pc    ) >> 3, d0;
-		int idx1 = (sp->pc + 8) >> 3, d1;
+		int idx0 = (m_pc    ) >> 3, d0;
+		int idx1 = (m_pc + 8) >> 3, d1;
 
-		d0 = sp->rom[idx0 & 0xffff];
-		d1 = sp->rom[idx1 & 0xffff];
+		d0 = m_rom[idx0 & 0xffff];
+		d1 = m_rom[idx1 & 0xffff];
 
-		data = ((d1 << 8) | d0) >> (sp->pc & 7);
+		data = ((d1 << 8) | d0) >> (m_pc & 7);
 
-		sp->pc += len;
+		m_pc += len;
 	}
 
 	/* -------------------------------------------------------------------- */
@@ -745,46 +835,46 @@ static UINT32 sp0256_getb(sp0256_state *sp, int len)
 /*                  instructions either until the repeat count != 0 or      */
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
-static void sp0256_micro(sp0256_state *sp)
+void sp0256_device::micro()
 {
 	UINT8  immed4;
 	UINT8  opcode;
 	UINT16 cr;
-	int     ctrl_xfer = 0;
-	int     repeat    = 0;
-	int     i, idx0, idx1;
+	int ctrl_xfer = 0;
+	int repeat    = 0;
+	int i, idx0, idx1;
 
 	/* -------------------------------------------------------------------- */
 	/*  Only execute instructions while the filter is not busy.             */
 	/* -------------------------------------------------------------------- */
-	while (sp->filt.rpt <= 0)
+	while (m_filt.rpt <= 0)
 	{
 		/* ---------------------------------------------------------------- */
 		/*  If the CPU is halted, see if we have a new command pending      */
 		/*  in the Address LoaD buffer.                                     */
 		/* ---------------------------------------------------------------- */
-		if (sp->halted && !sp->lrq)
+		if (m_halted && !m_lrq)
 		{
-			sp->pc       = sp->ald | (0x1000 << 3);
-			sp->fifo_sel = 0;
-			sp->halted   = 0;
-			sp->lrq      = 0x8000;
-			sp->ald      = 0;
+			m_pc       = m_ald | (0x1000 << 3);
+			m_fifo_sel = 0;
+			m_halted   = 0;
+			m_lrq      = 0x8000;
+			m_ald      = 0;
 			for (i = 0; i < 16; i++)
-				sp->filt.r[i] = 0;
-			sp->drq(1);
+				m_filt.r[i] = 0;
+			m_drq(1);
 		}
 
 		/* ---------------------------------------------------------------- */
 		/*  If we're still halted, do nothing.                              */
 		/* ---------------------------------------------------------------- */
-		if (sp->halted)
+		if (m_halted)
 		{
-			sp->filt.rpt = 1;
-			sp->lrq      = 0x8000;
-			sp->ald      = 0;
+			m_filt.rpt = 1;
+			m_lrq      = 0x8000;
+			m_ald      = 0;
 			for (i = 0; i < 16; i++)
-				sp->filt.r[i] = 0;
+				m_filt.r[i] = 0;
 
 			SET_SBY(1)
 
@@ -795,16 +885,16 @@ static void sp0256_micro(sp0256_state *sp)
 		/*  Fetch the first 8 bits of the opcode, which are always in the   */
 		/*  same approximate format -- immed4 followed by opcode.           */
 		/* ---------------------------------------------------------------- */
-		immed4 = sp0256_getb(sp, 4);
-		opcode = sp0256_getb(sp, 4);
+		immed4 = getb(4);
+		opcode = getb(4);
 		repeat = 0;
 		ctrl_xfer = 0;
 
 		LOG(("$%.4X.%.1X: OPCODE %d%d%d%d.%d%d\n",
-				(sp->pc >> 3) - 1, sp->pc & 7,
+				(m_pc >> 3) - 1, m_pc & 7,
 				!!(opcode & 1), !!(opcode & 2),
 				!!(opcode & 4), !!(opcode & 8),
-				!!(sp->mode&4), !!(sp->mode&2)));
+				!!(m_mode&4), !!(m_mode&2)));
 
 		/* ---------------------------------------------------------------- */
 		/*  Handle the special cases for specific opcodes.                  */
@@ -821,7 +911,7 @@ static void sp0256_micro(sp0256_state *sp)
 				/* -------------------------------------------------------- */
 				if (immed4)     /* SETPAGE */
 				{
-					sp->page = bitrev32(immed4) >> 13;
+					m_page = bitrev32(immed4) >> 13;
 				} else
 				/* -------------------------------------------------------- */
 				/*  Otherwise, this is an RTS / HLT.                        */
@@ -832,9 +922,9 @@ static void sp0256_micro(sp0256_state *sp)
 					/* ---------------------------------------------------- */
 					/*  Figure out our branch target.                       */
 					/* ---------------------------------------------------- */
-					btrg = sp->stack;
+					btrg = m_stack;
 
-					sp->stack = 0;
+					m_stack = 0;
 
 					/* ---------------------------------------------------- */
 					/*  If the branch target is zero, this is a HLT.        */
@@ -842,12 +932,12 @@ static void sp0256_micro(sp0256_state *sp)
 					/* ---------------------------------------------------- */
 					if (!btrg)
 					{
-						sp->halted = 1;
-						sp->pc     = 0;
+						m_halted   = 1;
+						m_pc       = 0;
 						ctrl_xfer  = 1;
 					} else
 					{
-						sp->pc    = btrg;
+						m_pc      = btrg;
 						ctrl_xfer = 1;
 					}
 				}
@@ -867,9 +957,9 @@ static void sp0256_micro(sp0256_state *sp)
 				/* -------------------------------------------------------- */
 				/*  Figure out our branch target.                           */
 				/* -------------------------------------------------------- */
-				btrg = sp->page                           |
-						(bitrev32(immed4)             >> 17) |
-						(bitrev32(sp0256_getb(sp, 8)) >> 21);
+				btrg = m_page                     |
+						(bitrev32(immed4)  >> 17) |
+						(bitrev32(getb(8)) >> 21);
 				ctrl_xfer = 1;
 
 				/* -------------------------------------------------------- */
@@ -877,12 +967,12 @@ static void sp0256_micro(sp0256_state *sp)
 				/*  stack.  Make sure it's byte aligned.                    */
 				/* -------------------------------------------------------- */
 				if (opcode == 0xD)
-					sp->stack = (sp->pc + 7) & ~7;
+					m_stack = (m_pc + 7) & ~7;
 
 				/* -------------------------------------------------------- */
 				/*  Jump to the new location!                               */
 				/* -------------------------------------------------------- */
-				sp->pc = btrg;
+				m_pc = btrg;
 				break;
 			}
 
@@ -891,8 +981,7 @@ static void sp0256_micro(sp0256_state *sp)
 			/* ------------------------------------------------------------ */
 			case 0x1:
 			{
-				sp->mode = ((immed4 & 8) >> 2) | (immed4 & 4) |
-							((immed4 & 3) << 4);
+				m_mode = ((immed4 & 8) >> 2) | (immed4 & 4) | ((immed4 & 3) << 4);
 				break;
 			}
 
@@ -912,11 +1001,11 @@ static void sp0256_micro(sp0256_state *sp)
 			/* ------------------------------------------------------------ */
 			default:
 			{
-				repeat    = immed4 | (sp->mode & 0x30);
+				repeat = immed4 | (m_mode & 0x30);
 				break;
 			}
 		}
-		if (opcode != 1) sp->mode &= 0xF;
+		if (opcode != 1) m_mode &= 0xF;
 
 		/* ---------------------------------------------------------------- */
 		/*  If this was a control transfer, handle setting "fifo_sel"       */
@@ -924,27 +1013,27 @@ static void sp0256_micro(sp0256_state *sp)
 		/* ---------------------------------------------------------------- */
 		if (ctrl_xfer)
 		{
-			LOG(("jumping to $%.4X.%.1X: ", sp->pc >> 3, sp->pc & 7));
+			LOG(("jumping to $%.4X.%.1X: ", m_pc >> 3, m_pc & 7));
 
 			/* ------------------------------------------------------------ */
 			/*  Set our "FIFO Selected" flag based on whether we're going   */
 			/*  to the FIFO's address.                                      */
 			/* ------------------------------------------------------------ */
-			sp->fifo_sel = sp->pc == FIFO_ADDR;
+			m_fifo_sel = m_pc == FIFO_ADDR;
 
-			LOG(("%s ", sp->fifo_sel ? "FIFO" : "ROM"));
+			LOG(("%s ", m_fifo_sel ? "FIFO" : "ROM"));
 
 			/* ------------------------------------------------------------ */
 			/*  Control transfers to the FIFO cause it to discard the       */
 			/*  partial decle that's at the front of the FIFO.              */
 			/* ------------------------------------------------------------ */
-			if (sp->fifo_sel && sp->fifo_bitp)
+			if (m_fifo_sel && m_fifo_bitp)
 			{
-				LOG(("bitp = %d -> Flush", sp->fifo_bitp));
+				LOG(("bitp = %d -> Flush", m_fifo_bitp));
 
 				/* Discard partially-read decle. */
-				if (sp->fifo_tail < sp->fifo_head) sp->fifo_tail++;
-				sp->fifo_bitp = 0;
+				if (m_fifo_tail < m_fifo_head) m_fifo_tail++;
+				m_fifo_bitp = 0;
 			}
 
 			LOG(("\n"));
@@ -958,10 +1047,10 @@ static void sp0256_micro(sp0256_state *sp)
 		/* ---------------------------------------------------------------- */
 		if (!repeat) continue;
 
-		sp->filt.rpt = repeat + 1;
+		m_filt.rpt = repeat + 1;
 		LOG(("repeat = %d\n", repeat));
 
-		i = (opcode << 3) | (sp->mode & 6);
+		i = (opcode << 3) | (m_mode & 6);
 		idx0 = sp0256_df_idx[i++];
 		idx1 = sp0256_df_idx[i  ];
 
@@ -990,29 +1079,27 @@ static void sp0256_micro(sp0256_state *sp)
 			value = 0;
 
 			LOG(("$%.4X.%.1X: len=%2d shf=%2d prm=%2d d=%d f=%d ",
-						sp->pc >> 3, sp->pc & 7, len, shf, prm, !!delta, !!field));
+						m_pc >> 3, m_pc & 7, len, shf, prm, !!delta, !!field));
 			/* ------------------------------------------------------------ */
 			/*  Clear any registers that were requested to be cleared.      */
 			/* ------------------------------------------------------------ */
 			if (clra)
 			{
-				int j;
+				for (int j = 0; j < 16; j++)
+					m_filt.r[j] = 0;
 
-				for (j = 0; j < 16; j++)
-					sp->filt.r[j] = 0;
-
-				sp->silent = 1;
+				m_silent = 1;
 			}
 
 			if (clr5)
-				sp->filt.r[B5] = sp->filt.r[F5] = 0;
+				m_filt.r[B5] = m_filt.r[F5] = 0;
 
 			/* ------------------------------------------------------------ */
 			/*  If this entry has a bitfield with it, grab the bitfield.    */
 			/* ------------------------------------------------------------ */
 			if (len)
 			{
-				value = sp0256_getb(sp, len);
+				value = getb(len);
 			}
 			else
 			{
@@ -1038,19 +1125,19 @@ static void sp0256_micro(sp0256_state *sp)
 						value & 0x80 ? '-' : '+',
 						0xFF & (value & 0x80 ? -value : value)));
 
-			sp->silent = 0;
+			m_silent = 0;
 
 			/* ------------------------------------------------------------ */
 			/*  If this is a field-replace, insert the field.               */
 			/* ------------------------------------------------------------ */
 			if (field)
 			{
-				LOG(("--field-> r[%2d] = %.2X -> ", prm, sp->filt.r[prm]));
+				LOG(("--field-> r[%2d] = %.2X -> ", prm, m_filt.r[prm]));
 
-				sp->filt.r[prm] &= ~(~0 << shf); /* Clear the old bits.     */
-				sp->filt.r[prm] |= value;        /* Merge in the new bits.  */
+				m_filt.r[prm] &= ~(~0 << shf); /* Clear the old bits.     */
+				m_filt.r[prm] |= value;        /* Merge in the new bits.  */
 
-				LOG(("%.2X\n", sp->filt.r[prm]));
+				LOG(("%.2X\n", m_filt.r[prm]));
 
 				continue;
 			}
@@ -1060,11 +1147,11 @@ static void sp0256_micro(sp0256_state *sp)
 			/* ------------------------------------------------------------ */
 			if (delta)
 			{
-				LOG(("--delta-> r[%2d] = %.2X -> ", prm, sp->filt.r[prm]));
+				LOG(("--delta-> r[%2d] = %.2X -> ", prm, m_filt.r[prm]));
 
-				sp->filt.r[prm] += value;
+				m_filt.r[prm] += value;
 
-				LOG(("%.2X\n", sp->filt.r[prm]));
+				LOG(("%.2X\n", m_filt.r[prm]));
 
 				continue;
 			}
@@ -1072,8 +1159,8 @@ static void sp0256_micro(sp0256_state *sp)
 			/* ------------------------------------------------------------ */
 			/*  Otherwise, just write the new value.                        */
 			/* ------------------------------------------------------------ */
-			sp->filt.r[prm] = value;
-			LOG(("--value-> r[%2d] = %.2X\n", prm, sp->filt.r[prm]));
+			m_filt.r[prm] = value;
+			LOG(("--value-> r[%2d] = %.2X\n", prm, m_filt.r[prm]));
 		}
 
 		/* ---------------------------------------------------------------- */
@@ -1081,14 +1168,14 @@ static void sp0256_micro(sp0256_state *sp)
 		/* ---------------------------------------------------------------- */
 		if (opcode == 0xF)
 		{
-			sp->silent = 1;
-			sp->filt.r[1] = PER_PAUSE;
+			m_silent = 1;
+			m_filt.r[1] = PER_PAUSE;
 		}
 
 		/* ---------------------------------------------------------------- */
 		/*  Now that we've updated the registers, go decode them.           */
 		/* ---------------------------------------------------------------- */
-		lpc12_regdec(&sp->filt);
+		lpc12_regdec(&m_filt);
 
 		/* ---------------------------------------------------------------- */
 		/*  Break out since we now have a repeat count.                     */
@@ -1097,327 +1184,124 @@ static void sp0256_micro(sp0256_state *sp)
 	}
 }
 
-static STREAM_UPDATE( sp0256_update )
+
+
+WRITE8_MEMBER( sp0256_device::ald_w )
 {
-	sp0256_state *sp = (sp0256_state *)param;
-	stream_sample_t *output = outputs[0];
-	int output_index = 0;
-	int length, did_samp/*, old_idx*/;
-
-	while( output_index < samples )
-	{
-		/* ---------------------------------------------------------------- */
-		/*  First, drain as much of our scratch buffer as we can into the   */
-		/*  sound buffer.                                                  */
-		/* ---------------------------------------------------------------- */
-
-		while( sp->sc_tail != sp->sc_head )
-		{
-			output[output_index++] = sp->scratch[sp->sc_tail++ & SCBUF_MASK];
-			sp->sc_tail &= SCBUF_MASK;
-
-			if( output_index > samples )
-				break;
-		}
-
-		/* ---------------------------------------------------------------- */
-		/*  If output outputs is full, then we're done.                      */
-		/* ---------------------------------------------------------------- */
-		if( output_index > samples )
-			break;
-
-		length = samples - output_index;
-
-		/* ---------------------------------------------------------------- */
-		/*  Process the current set of filter coefficients as long as the   */
-		/*  repeat count holds up and we have room in our scratch buffer.   */
-		/* ---------------------------------------------------------------- */
-		did_samp = 0;
-		//old_idx  = sp->sc_head;
-		if (length > 0) do
-		{
-			int do_samp;
-
-			/* ------------------------------------------------------------ */
-			/*  If our repeat count expired, emulate the microsequencer.    */
-			/* ------------------------------------------------------------ */
-			if (sp->filt.rpt <= 0)
-				sp0256_micro(sp);
-
-			/* ------------------------------------------------------------ */
-			/*  Do as many samples as we can.                               */
-			/* ------------------------------------------------------------ */
-			do_samp = length - did_samp;
-			if (sp->sc_head + do_samp - sp->sc_tail > SCBUF_SIZE)
-				do_samp = sp->sc_tail + SCBUF_SIZE - sp->sc_head;
-
-			if (do_samp == 0) break;
-
-			if (sp->silent && sp->filt.rpt <= 0)
-			{
-				int x, y = sp->sc_head;
-
-				for (x = 0; x < do_samp; x++)
-					sp->scratch[y++ & SCBUF_MASK] = 0;
-				sp->sc_head += do_samp;
-				did_samp    += do_samp;
-			}
-			else
-			{
-				did_samp += lpc12_update(&sp->filt, do_samp,
-											sp->scratch, &sp->sc_head);
-			}
-
-			sp->sc_head &= SCBUF_MASK;
-
-		} while (sp->filt.rpt >= 0 && length > did_samp);
-	}
-}
-
-static DEVICE_START( sp0256 )
-{
-	const sp0256_interface *intf = (const sp0256_interface *)device->static_config();
-	sp0256_state *sp = get_safe_token(device);
-
-	sp->device = device;
-	sp->drq.resolve(intf->lrq_callback, *device);
-	sp->sby.resolve(intf->sby_callback, *device);
-	sp->drq(1);
-	sp->sby(1);
-
-	sp->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
-
-	/* -------------------------------------------------------------------- */
-	/*  Configure our internal variables.                                   */
-	/* -------------------------------------------------------------------- */
-	sp->filt.rng = 1;
-
-	/* -------------------------------------------------------------------- */
-	/*  Allocate a scratch buffer for generating ~10kHz samples.             */
-	/* -------------------------------------------------------------------- */
-	sp->scratch = auto_alloc_array(device->machine(), INT16, SCBUF_SIZE);
-	sp->sc_head = sp->sc_tail = 0;
-
-	/* -------------------------------------------------------------------- */
-	/*  Set up the microsequencer's initial state.                          */
-	/* -------------------------------------------------------------------- */
-	sp->halted   = 1;
-	sp->filt.rpt = -1;
-	sp->lrq      = 0x8000;
-	sp->page     = 0x1000 << 3;
-	sp->silent   = 1;
-
-	/* -------------------------------------------------------------------- */
-	/*  Setup the ROM.                                                      */
-	/* -------------------------------------------------------------------- */
-	sp->rom = *device->region();
-	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
-	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
-	// TODO: because of this, check if the bitrev functions are even used anywhere else
-	//sp0256_bitrevbuff(sp->rom, 0, 0xffff);
-}
-
-static void sp0256_reset(sp0256_state *sp)
-{
-	/* ---------------------------------------------------------------- */
-	/*  Reset the FIFO and SP0256.                                      */
-	/* ---------------------------------------------------------------- */
-	sp->fifo_head = sp->fifo_tail = sp->fifo_bitp = 0;
-
-	memset(&sp->filt, 0, sizeof(sp->filt));
-	sp->halted   = 1;
-	sp->filt.rpt = -1;
-	sp->filt.rng = 1;
-	sp->lrq      = 0x8000;
-	sp->ald      = 0x0000;
-	sp->pc       = 0x0000;
-	sp->stack    = 0x0000;
-	sp->fifo_sel = 0;
-	sp->mode     = 0;
-	sp->page     = 0x1000 << 3;
-	sp->silent   = 1;
-	sp->drq(1);
-	SET_SBY(1)
-}
-
-static DEVICE_RESET( sp0256 )
-{
-	sp0256_reset(get_safe_token(device));
-}
-
-WRITE8_DEVICE_HANDLER( sp0256_ALD_w )
-{
-	sp0256_state *sp = get_safe_token(device);
-
 	/* ---------------------------------------------------------------- */
 	/*  Drop writes to the ALD register if we're busy.                  */
 	/* ---------------------------------------------------------------- */
-	if (!sp->lrq)
+	if (!m_lrq)
 	{
-		LOG(( "sp0256: Droped ALD write\n" ));
+		LOG(("sp0256: Droped ALD write\n"));
 		return;
 	}
-
+	
 	/* ---------------------------------------------------------------- */
 	/*  Set LRQ to "busy" and load the 8 LSBs of the data into the ALD  */
 	/*  reg.  We take the command address, and multiply by 2 bytes to   */
 	/*  get the new PC address.                                         */
 	/* ---------------------------------------------------------------- */
-	sp->lrq = 0;
-	sp->ald = (0xFF & data) << 4;
-	sp->drq(0);
+	m_lrq = 0;
+	m_ald = (0xff & data) << 4;
+	m_drq(0);
 	SET_SBY(0)
-
+	
 	return;
 }
 
-READ_LINE_DEVICE_HANDLER( sp0256_lrq_r )
+READ_LINE_MEMBER( sp0256_device::lrq_r )
 {
-	sp0256_state *sp = get_safe_token(device);
-
 	// force stream update
-	sp->stream->update();
-
-	return sp->lrq == 0x8000;
+	m_stream->update();
+	
+	return m_lrq == 0x8000;
 }
 
-READ_LINE_DEVICE_HANDLER( sp0256_sby_r )
+READ_LINE_MEMBER( sp0256_device::sby_r )
 {
-	sp0256_state *sp = get_safe_token(device);
+	// TODO: force stream update??	
 
-	// TODO: force stream update??
-
-	return sp->sby_line;
+	return m_sby_line;
 }
 
-READ16_DEVICE_HANDLER( spb640_r )
+READ16_MEMBER( sp0256_device::spb640_r )
 {
-	sp0256_state *sp = get_safe_token(device);
-
 	/* -------------------------------------------------------------------- */
 	/*  Offset 0 returns the SP0256 LRQ status on bit 15.                   */
 	/* -------------------------------------------------------------------- */
 	if (offset == 0)
 	{
-		return sp->lrq;
+		return m_lrq;
 	}
-
+	
 	/* -------------------------------------------------------------------- */
 	/*  Offset 1 returns the SPB640 FIFO full status on bit 15.             */
 	/* -------------------------------------------------------------------- */
 	if (offset == 1)
 	{
-		return (sp->fifo_head - sp->fifo_tail) >= 64 ? 0x8000 : 0;
+		return (m_fifo_head - m_fifo_tail) >= 64 ? 0x8000 : 0;
 	}
-
+	
 	/* -------------------------------------------------------------------- */
 	/*  Just return 255 for all other addresses in our range.               */
 	/* -------------------------------------------------------------------- */
-	return 0x00FF;
+	return 0x00ff;
 }
 
-WRITE16_DEVICE_HANDLER( spb640_w )
+WRITE16_MEMBER( sp0256_device::spb640_w )
 {
-	sp0256_state *sp = get_safe_token(device);
-
-	if( offset == 0 )
+	if (offset == 0)
 	{
-		sp0256_ALD_w( device, space, 0, data & 0xff );
+		ald_w(space, 0, data & 0xff);
 		return;
 	}
-
-	if( offset == 1 )
+	
+	if (offset == 1)
 	{
 		/* ---------------------------------------------------------------- */
 		/*  If Bit 10 is set, reset the FIFO, and SP0256.                   */
 		/* ---------------------------------------------------------------- */
-
+		
 		if (data & 0x400)
 		{
-			sp->fifo_head = sp->fifo_tail = sp->fifo_bitp = 0;
-			sp0256_reset(sp);
+			m_fifo_head = m_fifo_tail = m_fifo_bitp = 0;
+			device_reset();
 			return;
 		}
-
+		
 		/* ---------------------------------------------------------------- */
 		/*  If the FIFO is full, drop the data.                             */
 		/* ---------------------------------------------------------------- */
-		if ((sp->fifo_head - sp->fifo_tail) >= 64)
+		if ((m_fifo_head - m_fifo_tail) >= 64)
 		{
 			LOG(("spb640: Dropped FIFO write\n"));
 			return;
 		}
-
+		
 		/* ---------------------------------------------------------------- */
 		/*  FIFO up the lower 10 bits of the data.                          */
 		/* ---------------------------------------------------------------- */
-
-		LOG(("spb640: WR_FIFO %.3X %d.%d %d\n", data & 0x3FF,
-				sp->fifo_tail, sp->fifo_bitp, sp->fifo_head));
-
-		sp->fifo[sp->fifo_head++ & 63] = data & 0x3FF;
-
+		
+		LOG(("spb640: WR_FIFO %.3X %d.%d %d\n", data & 0x3ff,
+			 m_fifo_tail, m_fifo_bitp, m_fifo_head));
+		
+		m_fifo[m_fifo_head++ & 63] = data & 0x3ff;
+		
 		return;
 	}
 }
 
-void sp0256_set_clock(device_t *device, int clock)
+void sp0256_device::set_clock(int clock)
 {
-	sp0256_state *sp = get_safe_token(device);
-
-	device->set_unscaled_clock(clock);
-	sp->stream->set_sample_rate(clock / CLOCK_DIVIDER);
+	set_unscaled_clock(clock);
+	m_stream->set_sample_rate(clock / CLOCK_DIVIDER);
 }
 
-const device_type SP0256 = &device_creator<sp0256_device>;
-
-sp0256_device::sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SP0256, "SP0256", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(sp0256_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sp0256_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void sp0256_device::device_start()
-{
-	DEVICE_START_NAME( sp0256 )(this);
-
-	m_lrq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0256_device::set_lrq_timer_proc),this));
-}
 
 TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
 {
-	sp0256_state *sp = get_safe_token(this);
-
-	sp->lrq = 0x8000;
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void sp0256_device::device_reset()
-{
-	DEVICE_RESET_NAME( sp0256 )(this);
-
-	sp0256_state *sp = get_safe_token(this);
-	sp->lrq = 0;
-	m_lrq_timer->adjust( attotime::from_ticks( 50, m_clock ) );
+	m_lrq = 0x8000;
 }
 
 //-------------------------------------------------
@@ -1426,6 +1310,76 @@ void sp0256_device::device_reset()
 
 void sp0256_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t *output = outputs[0];
+	int output_index = 0;
+	int length, did_samp/*, old_idx*/;
+	
+	while (output_index < samples)
+	{
+		/* ---------------------------------------------------------------- */
+		/*  First, drain as much of our scratch buffer as we can into the   */
+		/*  sound buffer.                                                  */
+		/* ---------------------------------------------------------------- */
+		
+		while (m_sc_tail != m_sc_head)
+		{
+			output[output_index++] = m_scratch[m_sc_tail++ & SCBUF_MASK];
+			m_sc_tail &= SCBUF_MASK;
+			
+			if (output_index > samples)
+				break;
+		}
+		
+		/* ---------------------------------------------------------------- */
+		/*  If output outputs is full, then we're done.                      */
+		/* ---------------------------------------------------------------- */
+		if (output_index > samples)
+			break;
+		
+		length = samples - output_index;
+		
+		/* ---------------------------------------------------------------- */
+		/*  Process the current set of filter coefficients as long as the   */
+		/*  repeat count holds up and we have room in our scratch buffer.   */
+		/* ---------------------------------------------------------------- */
+		did_samp = 0;
+		//old_idx  = m_sc_head;
+		if (length > 0) do
+		{
+			int do_samp;
+			
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+			
+			/* ------------------------------------------------------------ */
+			/*  Do as many samples as we can.                               */
+			/* ------------------------------------------------------------ */
+			do_samp = length - did_samp;
+			if (m_sc_head + do_samp - m_sc_tail > SCBUF_SIZE)
+				do_samp = m_sc_tail + SCBUF_SIZE - m_sc_head;
+			
+			if (do_samp == 0) break;
+			
+			if (m_silent && m_filt.rpt <= 0)
+			{
+				int y = m_sc_head;
+				
+				for (int x = 0; x < do_samp; x++)
+					m_scratch[y++ & SCBUF_MASK] = 0;
+				m_sc_head += do_samp;
+				did_samp    += do_samp;
+			}
+			else
+			{
+				did_samp += lpc12_update(&m_filt, do_samp,
+										 m_scratch, &m_sc_head);
+			}
+			
+			m_sc_head &= SCBUF_MASK;
+			
+		} while (m_filt.rpt >= 0 && length > did_samp);
+	}
 }

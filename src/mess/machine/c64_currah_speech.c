@@ -155,7 +155,7 @@ void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 	int dotclock = m_slot->dotclock();
 
 	// TODO intonation and correct dividers
-	sp0256_set_clock(m_nsp, dotclock / (2 << voice));
+	m_nsp->set_clock(dotclock / (2 << voice));
 }
 
 
@@ -223,7 +223,7 @@ UINT8 c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t 
 
 		*/
 
-		data = sp0256_sby_r(m_nsp) << 7;
+		data = m_nsp->sby_r() << 7;
 	}
 
 	if (!space.debugger_access() && (offset == 0xa7f0))
@@ -264,6 +264,6 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 
 		set_osc1(voice, intonation);
 
-		sp0256_ALD_w(m_nsp, space, 0, data & 0x3f);
+		m_nsp->ald_w(space, 0, data & 0x3f);
 	}
 }

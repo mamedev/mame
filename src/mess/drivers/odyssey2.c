@@ -344,7 +344,7 @@ WRITE_LINE_MEMBER(odyssey2_state::the_voice_lrq_callback)
 
 READ8_MEMBER(odyssey2_state::t0_read)
 {
-	return sp0256_lrq_r( m_sp0256 ) ? 0 : 1;
+	return m_sp0256->lrq_r() ? 0 : 1;
 }
 
 
@@ -445,7 +445,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 			if ( data & 0x20 )
 			{
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1 );
-				sp0256_ALD_w( m_sp0256, space, 0, offset & 0x7F );
+				m_sp0256->ald_w(space, 0, offset & 0x7f);
 			}
 			else
 			{

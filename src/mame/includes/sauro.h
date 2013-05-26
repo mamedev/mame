@@ -1,8 +1,13 @@
+
+#include "sound/sp0256.h"
+
+
 class sauro_state : public driver_device
 {
 public:
 	sauro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_sp0256(*this, "speech"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -10,6 +15,7 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_maincpu(*this, "maincpu") { }
 
+	optional_device<sp0256_device> m_sp0256;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;

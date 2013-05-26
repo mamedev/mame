@@ -160,8 +160,7 @@ WRITE8_MEMBER(sauro_state::flip_screen_w)
 
 WRITE8_MEMBER(sauro_state::adpcm_w)
 {
-	device_t *device = machine().device("speech");
-	sp0256_ALD_w(device, space, 0, data);
+	m_sp0256->ald_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )

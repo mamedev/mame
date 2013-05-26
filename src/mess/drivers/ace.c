@@ -578,7 +578,6 @@ static const sp0256_interface sp0256_intf =
 
 READ8_MEMBER(ace_state::sby_r)
 {
-	device_t *device = machine().device(SP0256AL2_TAG);
 	/*
 
 	    bit     description
@@ -594,12 +593,11 @@ READ8_MEMBER(ace_state::sby_r)
 
 	*/
 
-	return sp0256_sby_r(device);
+	return m_sp0256->sby_r();
 }
 
 WRITE8_MEMBER(ace_state::ald_w)
 {
-	device_t *device = machine().device(SP0256AL2_TAG);
 	/*
 
 	    bit     description
@@ -617,7 +615,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 
 	if (!BIT(data, 6))
 	{
-		sp0256_ALD_w(device, space, 0, data & 0x3f);
+		m_sp0256->ald_w(space, 0, data & 0x3f);
 	}
 }
 

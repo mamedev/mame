@@ -28,8 +28,9 @@ public:
 			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_char_ram(*this, "char_ram"){ }
+			m_sp0256(*this, SP0256AL2_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_char_ram(*this, "char_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -37,6 +38,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_device<sp0256_device> m_sp0256;
 
 	virtual void machine_start();
 
