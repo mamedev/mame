@@ -1142,6 +1142,7 @@ $(MESSOBJ)/epson.a:             \
 	$(MESS_DRIVERS)/px4.o       \
 	$(MESS_DRIVERS)/px8.o       \
 	$(MESS_DRIVERS)/qx10.o      \
+	$(MESS_MACHINE)/qx10kbd.o   \
 
 $(MESSOBJ)/exeltel.a:           \
 	$(MESS_DRIVERS)/exelv.o     \

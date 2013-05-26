@@ -64,7 +64,7 @@ protected:
 	virtual void send_key(UINT8 code) { m_keyboard_func(0, code); }
 	emu_timer *m_timer;
 private:
-	UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
 	UINT8 row_number(UINT8 code);
 	UINT8 m_last_code;
 	UINT8 m_scan_line;

@@ -386,6 +386,8 @@ static INPUT_PORTS_START(serial_keyboard)
 	PORT_CONFNAME(0x30, 0x00, "Format") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_keyboard_device, update_frame, 0)
 	PORT_CONFSETTING( 0x00, "8N1")
 	PORT_CONFSETTING( 0x10, "7E1")
+	PORT_CONFSETTING( 0x20, "8N2")
+	PORT_CONFSETTING( 0x30, "8O1")
 INPUT_PORTS_END
 
 ioport_constructor serial_keyboard_device::device_input_ports() const
@@ -439,6 +441,12 @@ INPUT_CHANGED_MEMBER(serial_keyboard_device::update_frame)
 	case 0x00:
 	default:
 		set_data_frame(8, 1, SERIAL_PARITY_NONE);
+		break;
+	case 0x20:
+		set_data_frame(8, 2, SERIAL_PARITY_NONE);
+		break;
+	case 0x30:
+		set_data_frame(8, 1, SERIAL_PARITY_ODD);
 		break;
 	}
 }
