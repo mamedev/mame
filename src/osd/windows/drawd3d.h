@@ -149,7 +149,7 @@ public:
 	int                     update_window_size();
 
 	int                     pre_window_draw_check();
-	void                    begin_frame();
+	int						begin_frame();
 	void                    end_frame();
 
 	void                    draw_line(const render_primitive *prim);

@@ -1,10 +1,10 @@
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  video.h - Windows video system
 //
 //============================================================
 //
-//  Copyright Aaron Giles
+//  Copyright Nicola Salmoria and the MAME Team.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or
@@ -39,57 +39,49 @@
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#ifndef __RENDER_WINDOWS_VIDEO__
+#define __RENDER_WINDOWS_VIDEO__
 
+#include "video.h"
 #include "render.h"
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-#define MAX_WINDOWS         4
-
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-
-
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class monitor_info
+namespace render::windows
+{
+
+class video_system : public render::video_system
 {
 public:
-	monitor_info() { }
+	video_system(running_machine &machine);
+	virtual ~video_system();
 
-	static monitor_info *	m_next;					// pointer to next monitor in list
+	virtual void			update();
 
-	HMONITOR            	handle;                 // handle to the monitor
-	MONITORINFOEX       	info;                   // most recently retrieved info
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
+	virtual int				pick_monitor(int index);
+	BOOL CALLBACK			monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
+	virtual void			init_monitors();
+	virtual monitor_info *	monitor_from_handle(HMONITOR hmonitor);
 
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
+	virtual bool			window_has_focus();
+
+	virtual bool			has_menu();
+
+protected:
+	virtual void 			extract_video_config();
+
+	virtual void			set_pause_event();
+	virtual void			reset_pause_event();
+
+private:
+	float					get_aspect(const char *defdata, const char *data, int report_error);
+	void					get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
+
+	HANDLE 					m_ui_pause_event;
 };
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
+};
 
-extern win_monitor_info *win_monitor_list;
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
-
-#endif
+#endif // __RENDER_WINDOWS_VIDEO__

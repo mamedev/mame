@@ -47,12 +47,8 @@
 #define SDLOPTION_RESOLUTION            "resolution"
 #define SDLOPTION_VIEW                  "view"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
-#define SDLOPTION_KEEPASPECT            "keepaspect"
-#define SDLOPTION_WINDOW                "window"
-#define SDLOPTION_NUMSCREENS            "numscreens"
 #define SDLOPTION_UNEVENSTRETCH         "unevenstretch"
 #define SDLOPTION_USEALLHEADS           "useallheads"
-#define SDLOPTION_MAXIMIZE              "maximize"
 #define SDLOPTION_VIDEO                 "video"
 #define SDLOPTION_SWITCHRES             "switchres"
 #define SDLOPTION_FILTER                "filter"
@@ -61,10 +57,6 @@
 #define SDLOPTION_PRESCALE              "prescale"
 
 #define SDLOPTION_SCALEMODE             "scalemode"
-
-#define SDLOPTION_MULTITHREADING        "multithreading"
-#define SDLOPTION_BENCH                 "bench"
-#define SDLOPTION_NUMPROCESSORS         "numprocessors"
 
 #define SDLOPTION_WAITVSYNC             "waitvsync"
 #define SDLOPTION_SYNCREFRESH           "syncrefresh"
@@ -150,22 +142,13 @@ public:
 	int watchdog() const { return int_value(SDLOPTION_WATCHDOG); }
 
 	// performance options
-	bool multithreading() const { return bool_value(SDLOPTION_MULTITHREADING); }
-	const char *numprocessors() const { return value(SDLOPTION_NUMPROCESSORS); }
 	bool video_fps() const { return bool_value(SDLOPTION_SDLVIDEOFPS); }
-	int bench() const { return int_value(SDLOPTION_BENCH); }
 
 	// video options
 	const char *video() const { return value(SDLOPTION_VIDEO); }
-	int numscreens() const { return int_value(SDLOPTION_NUMSCREENS); }
-	bool window() const { return bool_value(SDLOPTION_WINDOW); }
-	bool maximize() const { return bool_value(SDLOPTION_MAXIMIZE); }
-	bool keep_aspect() const { return bool_value(SDLOPTION_KEEPASPECT); }
 	bool uneven_stretch() const { return bool_value(SDLOPTION_UNEVENSTRETCH); }
 	bool centerh() const { return bool_value(SDLOPTION_CENTERH); }
 	bool centerv() const { return bool_value(SDLOPTION_CENTERV); }
-	bool wait_vsync() const { return bool_value(SDLOPTION_WAITVSYNC); }
-	bool sync_refresh() const { return bool_value(SDLOPTION_SYNCREFRESH); }
 	const char *scale_mode() const { return value(SDLOPTION_SCALEMODE); }
 
 	// OpenGL specific options
@@ -181,18 +164,7 @@ public:
 	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SHADER_SCREEN, index)); }
 	bool glsl_vid_attr() const { return bool_value(SDLOPTION_GL_GLSL_VID_ATTR); }
 
-	// per-window options
-	const char *screen() const { return value(SDLOPTION_SCREEN); }
-	const char *aspect() const { return value(SDLOPTION_ASPECT); }
-	const char *resolution() const { return value(SDLOPTION_RESOLUTION); }
-	const char *view() const { return value(SDLOPTION_VIEW); }
-	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SCREEN, index)); }
-	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_ASPECT, index)); }
-	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_RESOLUTION, index)); }
-	const char *view(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_VIEW, index)); }
-
 	// full screen options
-	bool switch_res() const { return bool_value(SDLOPTION_SWITCHRES); }
 #ifdef SDLMAME_X11
 	bool use_all_heads() const { return bool_value(SDLOPTION_USEALLHEADS); }
 #endif

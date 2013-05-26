@@ -106,6 +106,19 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SLEEP,                                      "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 	{ OPTION_SPEED "(0.01-100)",                         "1.0",       OPTION_FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         OPTION_BOOLEAN,    "automatically adjusts the speed of gameplay to keep the refresh rate lower than the screen" },
+	{ OPTION_MULTITHREADING ";mt",                       "1",         OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+	{ OPTION_NUMPROCESSORS ";np",                        "auto",      OPTION_STRING,     "number of processors; this overrides the number the system reports" },
+	{ OPTION_BENCH,                                      "0",         OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
+
+	// video options
+	{ OPTION_NUMSCREENS "(1-4)",                         "1",        OPTION_INTEGER,    "number of screens to create; usually, you want just one" },
+	{ OPTION_WINDOW ";w",                                "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
+	{ OPTION_KEEPASPECT ";ka",                           "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ OPTION_MAXIMIZE ";max",                            "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
+#if !defined(SDLMAME) || (SDL_VERSION_ATLEAST(1,2,10))
+	{ OPTION_WAITVSYNC ";vs",                      		 "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	{ OPTION_SYNCREFRESH ";srf",                         "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
+#endif
 
 	// rotation options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE ROTATION OPTIONS" },
@@ -133,6 +146,33 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_GAMMA "(0.1-3.0)",                          "1.0",       OPTION_FLOAT,      "default game screen gamma correction" },
 	{ OPTION_PAUSE_BRIGHTNESS "(0.0-1.0)",               "0.65",      OPTION_FLOAT,      "amount to scale the screen brightness when paused" },
 	{ OPTION_EFFECT,                                     "none",      OPTION_STRING,     "name of a PNG file to use for visual effects, or 'none'" },
+
+	// per-window options
+	{ NULL,												NULL,             OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
+	{ OPTION_SCREEN,									"auto",   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OPTION_ASPECT ";screen_aspect",					"auto",   OPTION_STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ OPTION_RESOLUTION ";r",							"auto",   OPTION_STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OPTION_VIEW,										"auto",   OPTION_STRING,    "preferred view for all screens" },
+
+	{ OPTION_SCREEN "0",								"auto",   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OPTION_ASPECT "0",								"auto",   OPTION_STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ OPTION_RESOLUTION "0;r0",							"auto",   OPTION_STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OPTION_VIEW "0",									"auto",   OPTION_STRING,    "preferred view for the first screen" },
+
+	{ OPTION_SCREEN "1",								"auto",   OPTION_STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ OPTION_ASPECT "1",								"auto",   OPTION_STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ OPTION_RESOLUTION "1;r1",							"auto",   OPTION_STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OPTION_VIEW "1",									"auto",   OPTION_STRING,    "preferred view for the second screen" },
+
+	{ OPTION_SCREEN "2",								"auto",   OPTION_STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ OPTION_ASPECT "2",								"auto",   OPTION_STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ OPTION_RESOLUTION "2;r2",							"auto",   OPTION_STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OPTION_VIEW "2",									"auto",   OPTION_STRING,    "preferred view for the third screen" },
+
+	{ OPTION_SCREEN "3",								"auto",   OPTION_STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OPTION_ASPECT "3",								"auto",   OPTION_STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OPTION_RESOLUTION "3;r3",							"auto",   OPTION_STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OPTION_VIEW "3",									"auto",   OPTION_STRING,    "preferred view for the fourth screen" },
 
 	// vector options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE VECTOR OPTIONS" },

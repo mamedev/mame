@@ -1,10 +1,10 @@
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  monitor.h - Windows monitor management
 //
 //============================================================
 //
-//  Copyright Aaron Giles
+//  Copyright Nicola Salmoria and the MAME Team.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or
@@ -39,57 +39,34 @@
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#ifndef __RENDER_WINDOWS_MONITOR__
+#define __RENDER_WINDOWS_MONITOR__
 
+#include "video.h"
 #include "render.h"
+#include "render/monitor.h"
 
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-#define MAX_WINDOWS         4
-
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-
-
+namespace windows
+{
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class monitor_info
+class monitor_info : public render::monitor_info
 {
 public:
 	monitor_info() { }
 
-	static monitor_info *	m_next;					// pointer to next monitor in list
+	static monitor_info *	from_handle(HMONITOR monitor);
 
-	HMONITOR            	handle;                 // handle to the monitor
-	MONITORINFOEX       	info;                   // most recently retrieved info
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
+	virtual char *			device_name();
 
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
+private:
+	HMONITOR            	m_handle;				// handle to the monitor
+	MONITORINFOEX       	m_info;					// most recently retrieved info
 };
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
+}; // namespace windows
 
-extern win_monitor_info *win_monitor_list;
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
-
-#endif
+#endif // __RENDER_WINDOWS_MONITOR__

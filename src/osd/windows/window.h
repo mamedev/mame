@@ -65,55 +65,6 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-struct win_window_info
-{
-public:
-	win_window_info(running_machine &machine)
-		: m_machine(machine) { }
-
-	running_machine &machine() const { return m_machine; }
-
-	win_window_info *   next;
-	volatile int        init_state;
-
-	// window handle and info
-	HWND                hwnd;
-	char                title[256];
-	RECT                non_fullscreen_bounds;
-	int                 startmaximized;
-	int                 isminimized;
-	int                 ismaximized;
-	int                 resize_state;
-
-	// monitor info
-	win_monitor_info *  monitor;
-	int                 fullscreen;
-	int                 fullscreen_safe;
-	int                 maxwidth, maxheight;
-	int                 refresh;
-	float               aspect;
-
-	// rendering info
-	osd_lock *          render_lock;
-	render_target *     target;
-	int                 targetview;
-	int                 targetorient;
-	render_layer_config targetlayerconfig;
-	render_primitive_list *primlist;
-
-	// input info
-	DWORD               lastclicktime;
-	int                 lastclickx;
-	int                 lastclicky;
-
-	// drawing data
-	void *              drawdata;
-
-private:
-	running_machine &   m_machine;
-};
-
-
 struct win_draw_callbacks
 {
 	void (*exit)(void);
@@ -165,24 +116,12 @@ void winwindow_process_events_periodic(running_machine &machine);
 void winwindow_process_events(running_machine &machine, int ingame);
 
 void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause);
-void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause);
 int winwindow_ui_is_paused(running_machine &machine);
 
 void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param);
 void winwindow_dispatch_message(running_machine &machine, MSG *message);
 
 extern int win_create_menu(running_machine &machine, HMENU *menus);
-
-
-
-//============================================================
-//  win_has_menu
-//============================================================
-
-INLINE BOOL win_has_menu(win_window_info *window)
-{
-	return GetMenu(window->hwnd) ? TRUE : FALSE;
-}
 
 
 //============================================================

@@ -1,10 +1,10 @@
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  d3dhal.h - D3D9 renderer
 //
 //============================================================
 //
-//  Copyright Aaron Giles
+//  Copyright Nicola Salmoria and the MAME Team.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or
@@ -39,57 +39,32 @@
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#ifndef __RENDER_WINDOWS_D3DHAL__
+#define __RENDER_WINDOWS_D3DHAL__
 
+#include "video.h"
 #include "render.h"
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-#define MAX_WINDOWS         4
-
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-
-
+#include "render/drawhal.h"
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class monitor_info
+namespace render::windows
 {
-public:
-	monitor_info() { }
 
-	static monitor_info *	m_next;					// pointer to next monitor in list
-
-	HMONITOR            	handle;                 // handle to the monitor
-	MONITORINFOEX       	info;                   // most recently retrieved info
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
-
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
+class d3d_hal : public render::shader_hal
+{
 };
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
+class ddraw_hal : public render::raster_hal
+{
+};
 
-extern win_monitor_info *win_monitor_list;
+class gdi_hal : public render::raster_hal
+{
+};
 
+}}; // namespace render::windows
 
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
-
-#endif
+#endif // __RENDER_WINDOWS_D3DHAL__

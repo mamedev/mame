@@ -47,7 +47,7 @@
 //  PROTOTYPES
 //============================================================
 
-void wininput_init(running_machine &machine);
+void wininput_init(running_machine &machine, windows_osd_interface *osd);
 void wininput_poll(running_machine &machine);
 
 BOOL wininput_handle_mouse_button(int button, int down, int x, int y);

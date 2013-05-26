@@ -1,10 +1,10 @@
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  drawhal.h - Generic render abstraction layer
 //
 //============================================================
 //
-//  Copyright Aaron Giles
+//  Copyright Nicola Salmoria and the MAME Team.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or
@@ -39,57 +39,95 @@
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#ifndef __RENDER_DRAWHAL__
+#define __RENDER_DRAWHAL__
 
+#include "video.h"
 #include "render.h"
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-#define MAX_WINDOWS         4
-
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-
-
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-class monitor_info
+namespace math
+{
+
+class vec2f
 {
 public:
-	monitor_info() { }
+	vec2f()
+	{
+		memset(&c, 0, sizeof(float) * 2);
+	}
+	vec2f(float x, float y)
+	{
+		c.x = x;
+		c.y = y;
+	}
 
-	static monitor_info *	m_next;					// pointer to next monitor in list
+	vec2f operator+(const vec2f& a)
+	{
+		return vec2f(c.x + a.c.x, c.y + a.c.y);
+	}
 
-	HMONITOR            	handle;                 // handle to the monitor
-	MONITORINFOEX       	info;                   // most recently retrieved info
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
+	vec2f operator-(const vec2f& a)
+	{
+		return vec2f(c.x - a.c.x, c.y - a.c.y);
+	}
 
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
+	struct
+	{
+		float x, y;
+	} c;
 };
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
+};
 
-extern win_monitor_info *win_monitor_list;
+//typedef SDL_threadID render::threadid;
 
+namespace render
+{
 
-//============================================================
-//  PROTOTYPES
-//============================================================
+/* renderer is the information about our HAL */
+class draw_hal
+{
+public:
+	draw_hal() { }
+	~draw_hal() { }
 
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
+	virtual int             initialize();
 
-#endif
+	virtual int				create_resources();
+	virtual int				delete_resources();
+
+	virtual int				set_view_size(vec2f& size);
+
+	virtual void			process_primitives();
+	virtual void			draw_primitives();
+
+	virtual int				begin_frame();
+	virtual void			end_frame();
+
+protected:
+	virtual void			update_bounds() = 0;
+
+private:
+};
+
+class shader_hal : public render::draw_hal
+{
+public:
+	shader_hal() { }
+	~shader_hal() { }
+};
+
+class raster_hal : public render::draw_hal
+{
+public:
+	raster_hal() { }
+	~raster_hal() { }
+};
+
+}; // namespace render
+
+#endif // __RENDER_DRAWHAL__

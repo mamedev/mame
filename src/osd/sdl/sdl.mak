@@ -96,6 +96,8 @@ else
 SDL_CONFIG = $(SDL_LIBVER)-config
 endif
 
+DEFS += -DSDLMAME
+
 ifeq ($(SDL_LIBVER),sdl2)
 DEFS += -DSDLMAME_SDL2=1
 	ifeq ($(SDL2_MULTIAPI),1)

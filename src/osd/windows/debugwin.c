@@ -292,7 +292,7 @@ void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	if (firststop && main_console != NULL)
 	{
 		SetForegroundWindow(main_console->wnd);
-		if (winwindow_has_focus())
+		if (m_video->window_has_focus())
 			SetFocus(main_console->editwnd);
 	}
 

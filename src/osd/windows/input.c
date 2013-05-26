@@ -105,7 +105,11 @@ enum
 #define UNICODE_SUFFIX      "A"
 #endif
 
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
 
+static windows_osd_interface *winosd;
 
 //============================================================
 //  TYPEDEFS
@@ -499,8 +503,10 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //  wininput_init
 //============================================================
 
-void wininput_init(running_machine &machine)
+void wininput_init(running_machine &machine, windows_osd_interface *osd)
 {
+	winosd = osd;
+
 	// we need pause and exit callbacks
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(wininput_pause), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(wininput_resume), &machine));
@@ -563,7 +569,7 @@ static void wininput_exit(running_machine &machine)
 
 void wininput_poll(running_machine &machine)
 {
-	int hasfocus = winwindow_has_focus() && input_enabled;
+	int hasfocus = winosd->video()->window()->has_focus() && input_enabled;
 
 	// ignore if not enabled
 	if (input_enabled)
@@ -613,7 +619,7 @@ int wininput_should_hide_mouse(void)
 		return FALSE;
 
 	// if the window has a menu, no
-	if (win_window_list != NULL && win_has_menu(win_window_list))
+	if (m_video->window_list() != NULL && m_video->window_list()->has_menu())
 		return FALSE;
 
 	// otherwise, yes
@@ -1515,7 +1521,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	device_info *devinfo;
 	HRESULT result;
 
-	if (win_window_list != NULL && win_has_menu(win_window_list)) {
+	if (m_video->window_list() != NULL && win_has_menu(m_video->window_list()->has_menu())) {
 		cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 	}
 	// allocate and link in a new device

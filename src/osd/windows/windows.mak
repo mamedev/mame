@@ -178,6 +178,9 @@ CCOMFLAGS += /wd4350
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
+# specify windows build
+DEFS += -DWINMAME
+
 # add some VC++-specific defines
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf -DWIN32
 

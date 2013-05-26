@@ -349,10 +349,9 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 	if (d3d == NULL)
 		return 1;
 
-	int check = d3d->pre_window_draw_check();
-	if (check >= 0)
-		return check;
-
+	int status = d3d->begin_frame();
+	if (status >= 0)
+		return status;
 	d3d->begin_frame();
 	d3d->process_primitives();
 	d3d->end_frame();
@@ -845,8 +844,12 @@ void texture_manager::update_textures()
 	}
 }
 
-void renderer::begin_frame()
+int renderer::begin_frame()
 {
+	int check = d3d->pre_window_draw_check();
+	if (check >= 0)
+		return check;
+
 	HRESULT result = (*d3dintf->device.clear)(m_device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 

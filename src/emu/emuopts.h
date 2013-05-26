@@ -117,6 +117,20 @@ enum
 #define OPTION_SLEEP                "sleep"
 #define OPTION_SPEED                "speed"
 #define OPTION_REFRESHSPEED         "refreshspeed"
+#define OPTION_MULTITHREADING       "multithreading"
+#define OPTION_NUMPROCESSORS        "numprocessors"
+#define OPTION_BENCH                "bench"
+
+// core video options
+#define OPTION_NUMSCREENS           "numscreens"
+#define OPTION_WINDOW               "window"
+#define OPTION_KEEPASPECT           "keepaspect"
+#define OPTION_MAXIMIZE             "maximize"
+#define OPTION_WAITVSYNC            "waitvsync"
+#define OPTION_SYNCREFRESH          "syncrefresh"
+
+// full screen options
+#define OPTION_SWITCHRES			"switchres"
 
 // core rotation options
 #define OPTION_ROTATE               "rotate"
@@ -276,6 +290,7 @@ public:
 	bool sleep() const { return bool_value(OPTION_SLEEP); }
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return bool_value(OPTION_REFRESHSPEED); }
+	bool multithreading() const { return bool_value(OPTION_MULTITHREADING); }
 
 	// core rotation options
 	bool rotate() const { return bool_value(OPTION_ROTATE); }
@@ -300,6 +315,27 @@ public:
 	float gamma() const { return float_value(OPTION_GAMMA); }
 	float pause_brightness() const { return float_value(OPTION_PAUSE_BRIGHTNESS); }
 	const char *effect() const { return value(OPTION_EFFECT); }
+
+	// common video options
+	bool window() const { return bool_value(OPTION_WINDOW); }
+	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
+	int numscreens() const { return int_value(OPTION_NUMSCREENS); }
+	bool maximize() const { return bool_value(OPTION_MAXIMIZE); }
+	bool wait_vsync() const { return bool_value(OPTION_WAITVSYNC); }
+	bool sync_refresh() const { return bool_value(OPTION_SYNCREFRESH); }
+
+	// full screen options
+	bool switch_res() const { return bool_value(OPTION_SWITCHRES); }
+
+	// per-window options
+	const char *screen() const { return value(OPTION_SCREEN); }
+	const char *aspect() const { return value(OPTION_ASPECT); }
+	const char *resolution() const { return value(OPTION_RESOLUTION); }
+	const char *view() const { return value(OPTION_VIEW); }
+	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OPTION_SCREEN, index)); }
+	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OPTION_ASPECT, index)); }
+	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OPTION_RESOLUTION, index)); }
+	const char *view(int index) const { astring temp; return value(temp.format("%s%d", OPTION_VIEW, index)); }
 
 	// core vector options
 	bool antialias() const { return bool_value(OPTION_ANTIALIAS); }

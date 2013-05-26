@@ -1,4 +1,4 @@
-	//============================================================
+//============================================================
 //
 //  winmain.h - Win32 main program and core headers
 //
@@ -55,20 +55,11 @@
 
 // performance options
 #define WINOPTION_PRIORITY              "priority"
-#define WINOPTION_MULTITHREADING        "multithreading"
-#define WINOPTION_NUMPROCESSORS         "numprocessors"
 #define WINOPTION_PROFILE               "profile"
-#define WINOPTION_BENCH                 "bench"
 
 // video options
 #define WINOPTION_VIDEO                 "video"
-#define WINOPTION_NUMSCREENS            "numscreens"
-#define WINOPTION_WINDOW                "window"
-#define WINOPTION_MAXIMIZE              "maximize"
-#define WINOPTION_KEEPASPECT            "keepaspect"
 #define WINOPTION_PRESCALE              "prescale"
-#define WINOPTION_WAITVSYNC             "waitvsync"
-#define WINOPTION_SYNCREFRESH           "syncrefresh"
 #define WINOPTION_MENU                  "menu"
 
 // DirectDraw-specific options
@@ -147,12 +138,6 @@
 #define WINOPTION_BLOOM_LEVEL9_WEIGHT       "bloom_lvl9_weight"
 #define WINOPTION_BLOOM_LEVEL10_WEIGHT      "bloom_lvl10_weight"
 
-// per-window options
-#define WINOPTION_SCREEN                "screen"
-#define WINOPTION_ASPECT                "aspect"
-#define WINOPTION_RESOLUTION            "resolution"
-#define WINOPTION_VIEW                  "view"
-
 // full screen options
 #define WINOPTION_TRIPLEBUFFER          "triplebuffer"
 #define WINOPTION_SWITCHRES             "switchres"
@@ -186,20 +171,11 @@ public:
 
 	// performance options
 	int priority() const { return int_value(WINOPTION_PRIORITY); }
-	bool multithreading() const { return bool_value(WINOPTION_MULTITHREADING); }
-	const char *numprocessors() const { return value(WINOPTION_NUMPROCESSORS); }
 	int profile() const { return int_value(WINOPTION_PROFILE); }
-	int bench() const { return int_value(WINOPTION_BENCH); }
 
 	// video options
 	const char *video() const { return value(WINOPTION_VIDEO); }
-	int numscreens() const { return int_value(WINOPTION_NUMSCREENS); }
-	bool window() const { return bool_value(WINOPTION_WINDOW); }
-	bool maximize() const { return bool_value(WINOPTION_MAXIMIZE); }
-	bool keep_aspect() const { return bool_value(WINOPTION_KEEPASPECT); }
 	int prescale() const { return int_value(WINOPTION_PRESCALE); }
-	bool wait_vsync() const { return bool_value(WINOPTION_WAITVSYNC); }
-	bool sync_refresh() const { return bool_value(WINOPTION_SYNCREFRESH); }
 	bool menu() const { return bool_value(WINOPTION_MENU); }
 
 	// DirectDraw-specific options
@@ -278,16 +254,6 @@ public:
 	const char *screen_phosphor() const { return value(WINOPTION_PHOSPHOR); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
 
-	// per-window options
-	const char *screen() const { return value(WINOPTION_SCREEN); }
-	const char *aspect() const { return value(WINOPTION_ASPECT); }
-	const char *resolution() const { return value(WINOPTION_RESOLUTION); }
-	const char *view() const { return value(WINOPTION_VIEW); }
-	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_SCREEN, index)); }
-	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_ASPECT, index)); }
-	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_RESOLUTION, index)); }
-	const char *view(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_VIEW, index)); }
-
 	// full screen options
 	bool triple_buffer() const { return bool_value(WINOPTION_TRIPLEBUFFER); }
 	bool switch_res() const { return bool_value(WINOPTION_SWITCHRES); }
@@ -353,7 +319,14 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
+	windows::video_system *		video() { return m_video; }
+
 private:
+	windows::window_info *		m_window_list;
+	windows::video_system *		m_video;
+
+	void 		check_osd_inputs();
+
 	static void osd_exit(running_machine &machine);
 
 	static const int DEFAULT_FONT_HEIGHT = 200;

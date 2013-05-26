@@ -1,10 +1,10 @@
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  monitor.cpp - Windows monitor management
 //
 //============================================================
 //
-//  Copyright Aaron Giles
+//  Copyright Nicola Salmoria and the MAME Team.
 //  All rights reserved.
 //
 //  Redistribution and use in source and binary forms, with or
@@ -39,57 +39,45 @@
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#include "render/windows/monitor.h"
 
-#include "render.h"
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-#define MAX_WINDOWS         4
-
-#define VIDEO_MODE_NONE     0
-#define VIDEO_MODE_GDI      1
-#define VIDEO_MODE_DDRAW    2
-#define VIDEO_MODE_D3D      3
-
-
-
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-class monitor_info
+namespace render::windows
 {
-public:
-	monitor_info() { }
-
-	static monitor_info *	m_next;					// pointer to next monitor in list
-
-	HMONITOR            	handle;                 // handle to the monitor
-	MONITORINFOEX       	info;                   // most recently retrieved info
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
-
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
-};
 
 //============================================================
-//  GLOBAL VARIABLES
+//  monitor_info::get_aspect
 //============================================================
 
-extern win_monitor_info *win_monitor_list;
+float monitor_info::get_aspect()
+{
+	// refresh the monitor information and compute the aspect
+	if (video_config.keepaspect)
+	{
+		refresh();
+		int width = rect_width(&info.rcMonitor);
+		int height = rect_height(&info.rcMonitor);
+		return m_aspect / ((float)width / (float)height);
+	}
+	return 0.0f;
+}
 
 
 //============================================================
-//  PROTOTYPES
+//  monitor_info::refresh
 //============================================================
 
-void winvideo_monitor_refresh(win_monitor_info *monitor);
-float winvideo_monitor_get_aspect(win_monitor_info *monitor);
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR monitor);
+void monitor_info::refresh()
+{
+	// fetch the latest info about the monitor
+	m_info.cbSize = sizeof(m_info);
+	BOOL result = GetMonitorInfo(m_handle, (LPMONITORINFO)&m_info);
+	assert(result);
+	(void)result; // to silence gcc 4.6
+}
 
-#endif
+char *monitor_info::device_name()
+{
+	return utf8_from_tstring(m_info.szDevice)
+}
+
+}; // namespace render::windows

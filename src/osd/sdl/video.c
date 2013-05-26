@@ -493,25 +493,29 @@ static void init_monitors(void)
 #if (SDLMAME_SDL2) || defined(SDLMAME_WIN32)
 static sdl_monitor_info *pick_monitor(sdl_options &options, int index)
 {
-	sdl_monitor_info *monitor;
-	const char *scrname;
-	int moncount = 0;
-	float aspect;
-
 	// get the screen option
-	scrname = options.screen(index);
+	const char *scrname = m_machine.options().screen();
+	const char *scrname2 = m_machine.options().screen(index);
+
+	// decide which one we want to use
+	if (strcmp(scrname2, "auto") != 0)
+		scrname = scrname2;
 
 	// get the aspect ratio
-	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
+	float aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
+	sdl_monitor_info *monitor;
+	int moncount = 0;
 	if (scrname != NULL)
+	{
 		for (monitor = sdl_monitor_list; monitor != NULL; monitor = monitor->next)
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->monitor_device) == 0)
 				goto finishit;
 		}
+	}
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
@@ -624,9 +628,6 @@ static void extract_video_config(running_machine &machine)
 	video_config.restrictonemonitor = !options.use_all_heads();
 	#endif
 
-
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		video_config.windowed = TRUE;
 
 	// default to working video please
 	video_config.novideo = 0;
