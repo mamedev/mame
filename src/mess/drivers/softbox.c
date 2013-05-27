@@ -307,7 +307,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal", terminal)
 
 	// software lists
-	//MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")
 MACHINE_CONFIG_END
 
 

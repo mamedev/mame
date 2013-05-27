@@ -235,6 +235,7 @@ hash/snes.xml svneol=native#text/xml
 hash/snes_bspack.xml svneol=native#text/xml
 hash/snes_strom.xml svneol=native#text/xml
 hash/socrates.xml svneol=native#text/xml
+hash/softbox.xml svneol=native#text/xml
 hash/softwarelist.dtd svneol=native#text/plain
 hash/sorcerer_cart.xml svneol=native#text/xml
 hash/sorcerer_cass.xml svneol=native#text/xml
