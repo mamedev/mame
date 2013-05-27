@@ -819,11 +819,10 @@ void huc6270_device::device_start()
 
 	assert( ! m_irq_changed.isnull() );
 
-	m_vram = (UINT16 *)machine().memory().region_alloc(tag(), vram_size, 1, ENDIANNESS_LITTLE)->base();
-	memset(m_vram, 0, vram_size);
-	m_vram_mask = ( vram_size >> 1 ) - 1;
+	m_vram = auto_alloc_array_clear(machine(), UINT16, vram_size/sizeof(UINT16));
+	m_vram_mask = (vram_size >> 1) - 1;
 
-	//save_pointer(NAME(m_vram), vram_size);
+	save_pointer(NAME(m_vram), vram_size/sizeof(UINT16));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));
