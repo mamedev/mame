@@ -13,14 +13,18 @@
     other articles in various issues after that.
 
     Current Status:
-    After 60 seconds, boots to the ramdisk. No keyboard.
+    After 60 seconds, boots to the ramdisk. You can enter commands.
 
-    TODO: everything!
-    - Serial device Z8530 Z80SCC
-    - Keyboard is a standard pc keyboard
-    - Sound is stereo dac-sound, plus an analog output. Details unknown.
-    - Disk controller WD1772 driven by a Z80
+    TODO:
     - Cassette interface
+    - Floppy disk drives
+    - Use kbtro device (tried and failed)
+    - Optional serial device Z8530 Z80SCC
+    - Optional SCSI controller NCR5380 and hard drive (max 40mb)
+    - Joystick
+    - Sound to fix; code looks ok but system isn't sending data to latches
+    - DAC output is used to compare against analog inputs; core doesn't permit
+      audio outputs to be used for non-speaker purposes.
 
 ****************************************************************************/
 
@@ -32,6 +36,9 @@
 #include "machine/wd_fdc.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
+
 
 
 class applix_state : public driver_device
@@ -45,6 +52,7 @@ public:
 		m_fdc(*this, "wd1772"),
 		m_dacl(*this, "dacl"),
 		m_dacr(*this, "dacr"),
+		m_cass(*this, "cassette"),
 		m_io_dsw(*this, "DSW"),
 		m_io_fdc(*this, "FDC"),
 		m_base(*this, "base"),
@@ -80,14 +88,39 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_data_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_READ8_MEMBER( internal_data_read );
+	DECLARE_WRITE8_MEMBER( internal_data_write );
+	DECLARE_READ8_MEMBER( p1_read );
+	DECLARE_WRITE8_MEMBER( p1_write );
+	DECLARE_READ8_MEMBER( p2_read );
+	DECLARE_WRITE8_MEMBER( p2_write );
+	DECLARE_READ8_MEMBER( p3_read );
+	DECLARE_WRITE8_MEMBER( p3_write );
+	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
+	DECLARE_DRIVER_INIT(applix);
+	UINT8 m_video_latch;
+	UINT8 m_pa;
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	UINT8 m_palette_latch[4];
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<via6522_device> m_via;
+	required_device<wd1772_t> m_fdc;
+	required_device<dac_device> m_dacl;
+	required_device<dac_device> m_dacr;
+	required_device<cassette_image_device> m_cass;
+	required_ioport m_io_dsw;
+	required_ioport m_io_fdc;
+	required_shared_ptr<UINT16> m_base;
+	required_shared_ptr<UINT16> m_expansion;
+private:
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
-	UINT8 m_pa;
 	UINT8 m_pb;
 	UINT8 m_analog_latch;
 	UINT8 m_dac_latch;
-	UINT8 m_video_latch;
-	UINT8 m_palette_latch[4];
 	UINT8 m_port08;
 	UINT8 m_data_to_fdc;
 	UINT8 m_data_from_fdc;
@@ -102,52 +135,38 @@ public:
 	UINT8   m_p2;
 	UINT8   m_p3;
 	UINT16  m_last_write_addr;
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void palette_init();
-	DECLARE_DRIVER_INIT(applix);
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<via6522_device> m_via;
-	required_device<wd1772_t> m_fdc;
-	required_device<dac_device> m_dacl;
-	required_device<dac_device> m_dacr;
-	required_ioport m_io_dsw;
-	required_ioport m_io_fdc;
-	required_shared_ptr<UINT16> m_base;
-	required_shared_ptr<UINT16> m_expansion;
+	UINT8 m_cass_data[4];
 };
 
-// dac-latch seems to be:
-// bit 7 cassette relay, low=on
-// bit 6,5,4 sound outputs
-// bit 3 cassette LED, low=on
-// bit 2,1,0 joystick
-WRITE16_MEMBER( applix_state::dac_latch_w )
-{
-	if (ACCESSING_BITS_0_7)
+/*
+d0,1,2 = joystick
+d3     = cassette LED, low=on
+d4,5,6 = audio select
+d7     = cassette relay, low=on
+*/
+WRITE16_MEMBER( applix_state::analog_latch_w )
+{//printf("A:%X ",data);
+	data &= 0xff;
+	if (data != m_analog_latch)
 	{
-		if ((m_analog_latch & 0x70) == 0)
-			m_dacr->write_unsigned8(data);
+		if ((data & 0x70) == 0)
+			m_dacr->write_unsigned8(m_dac_latch);
 		else
-		if ((m_analog_latch & 0x70) == 0x10)
-			m_dacl->write_unsigned8(data);
-		m_dac_latch = data;
+		if ((data & 0x70) == 0x10)
+			m_dacl->write_unsigned8(m_dac_latch);
+
+		m_cass->change_state(
+			(BIT(data,7)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
+		m_analog_latch = data;
 	}
 }
 
-WRITE16_MEMBER( applix_state::analog_latch_w )
-{//printf("%X ",data);
-	if (ACCESSING_BITS_0_7)
-		m_analog_latch = data;
+// system not using this?
+WRITE16_MEMBER( applix_state::dac_latch_w )
+{//printf("B:%X ",data);
+	data &= 0xff;
+	m_dac_latch = data;
 }
 
 //cent = odd, video = even
@@ -168,24 +187,27 @@ WRITE16_MEMBER( applix_state::video_latch_w )
 
 WRITE16_MEMBER( applix_state::applix_index_w )
 {
-	if (ACCESSING_BITS_8_15)
-		m_crtc->address_w( space, offset, data >> 8 );
+	data >>= 8;
+	m_crtc->address_w( space, offset, data );
 }
 
 WRITE16_MEMBER( applix_state::applix_register_w )
 {
-	if (ACCESSING_BITS_8_15)
-		m_crtc->register_w( space, offset, data >> 8 );
+	data >>= 8;
+	m_crtc->register_w( space, offset, data );
 }
 
+/*
+d0   = dac output + external signal
+d1   = cassette in
+d2,3 = joystick in
+d4-7 = SW2 dipswitch block
+*/
 READ16_MEMBER( applix_state::applix_inputs_r )
-{// as far as i can tell:
-// bits 4,5,6,7 are SW0,1,2,3
-// bits 2,3 joystick in
-// bit 1 cassette in
-// bit 0 something to do with audio
-	return m_io_dsw->read();
+{
 // set dips to Off,Off,Off,On for a video test.
+
+	return m_io_dsw->read() | m_cass_data[2];
 }
 
 READ8_MEMBER( applix_state::applix_pa_r )
@@ -222,8 +244,13 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 		m_p3 = 0xff;
 		m_last_write_addr = 0;
 	}
+	m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
 }
 
+/*
+d0-6 = user
+d7   = square wave output for cassette IRQ
+*/
 WRITE8_MEMBER( applix_state::applix_pb_w )
 {//printf("%X ",data);
 	m_pb = data;
@@ -243,10 +270,10 @@ READ8_MEMBER( applix_state::port00_r )
 /*
 d0 = /RDY
 d1 = /DISC CHANGE
-d2 = SIDE
-d3 = DS0
-d4 = DS1
-d5 = MOTORON
+d2 = DS0
+d3 = DS1
+d4 = MOTORON
+d5 = SIDE
 d6 = BANK
 d7 = MAP
 */
@@ -347,14 +374,14 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	AM_RANGE(0x600000, 0x60007f) AM_WRITE(palette_w)
 	AM_RANGE(0x600080, 0x6000ff) AM_WRITE(dac_latch_w)
 	AM_RANGE(0x600100, 0x60017f) AM_WRITE(video_latch_w) //video latch (=border colour, high nybble; video base, low nybble) (odd)
-	AM_RANGE(0x600180, 0x6001ff) AM_WRITE(analog_latch_w) //analog multiplexer latch (odd)
+	AM_RANGE(0x600180, 0x6001ff) AM_WRITE(analog_latch_w)
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
-	AM_RANGE(0x700080, 0x7000ff) AM_READ(applix_inputs_r) //input port (odd)
+	AM_RANGE(0x700080, 0x7000ff) AM_READ(applix_inputs_r)
 	AM_RANGE(0x700100, 0x70011f) AM_MIRROR(0x60) AM_DEVREADWRITE8("via6522", via6522_device, read, write, 0xff00)
 	AM_RANGE(0x700180, 0x700181) AM_MIRROR(0x7c) AM_WRITE(applix_index_w)
 	AM_RANGE(0x700182, 0x700183) AM_MIRROR(0x7c) AM_WRITE(applix_register_w)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_READWRITE(fdc_data_r,fdc_data_w)
-	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w)
+	//AM_RANGE(0xffffc2, 0xffffc3) AM_READWRITE(fdc_int_r,fdc_int_w) // optional
 	AM_RANGE(0xffffc8, 0xffffcd) AM_READ(fdc_stat_r)
 	AM_RANGE(0xffffd0, 0xffffd1) AM_WRITE(fdc_cmd_w)
 	//600000, 6FFFFF  io ports and latches
@@ -750,6 +777,28 @@ static const via6522_interface applix_via =
 	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_2) //IRQ
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
+{
+	/* cassette - turn 2500/5000Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 2 : 0);
+		m_cass_data[1] = 0;
+	}
+}
+
+static const cassette_interface applix_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
 
 static MACHINE_CONFIG_START( applix, applix_state )
 	/* basic machine hardware */
@@ -774,15 +823,19 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.75 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75 )
 	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.75 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75 )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
+	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
 	//MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("applix_c", applix_state, cass_timer, attotime::from_hz(100000))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -828,7 +881,7 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING )
 
 
 
