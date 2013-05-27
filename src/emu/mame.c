@@ -78,7 +78,6 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "cheat.h"
 #include "ui.h"
 #include "uiinput.h"
 #include "crsshair.h"

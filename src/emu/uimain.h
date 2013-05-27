@@ -238,14 +238,6 @@ public:
 	virtual void handle();
 };
 
-class ui_menu_cheat : public ui_menu {
-public:
-	ui_menu_cheat(running_machine &machine, render_container *container);
-	virtual ~ui_menu_cheat();
-	virtual void populate();
-	virtual void handle();
-};
-
 class ui_menu_memory_card : public ui_menu {
 public:
 	ui_menu_memory_card(running_machine &machine, render_container *container);

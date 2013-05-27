@@ -14,7 +14,6 @@
 #include "video/vector.h"
 #include "machine/laserdsc.h"
 #include "render.h"
-#include "cheat.h"
 #include "rendfont.h"
 #include "ui.h"
 #include "uiinput.h"
@@ -422,10 +421,6 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 		if (alpha >= 0)
 			container->add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
-
-	/* render any cheat stuff at the bottom */
-	if (machine.phase() >= MACHINE_PHASE_RESET)
-		machine.cheat().render_text(*container);
 
 	/* call the current UI handler */
 	assert(ui_handler_callback != NULL);
@@ -1501,10 +1496,6 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		else
 			machine.pause();
 	}
-
-	/* handle a toggle cheats request */
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
-		machine.cheat().set_enable(!machine.cheat().enabled());
 
 	/* toggle movie recording */
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))

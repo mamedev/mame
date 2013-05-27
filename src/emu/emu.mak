@@ -47,7 +47,6 @@ EMUOBJS = \
 	$(EMUOBJ)/addrmap.o \
 	$(EMUOBJ)/attotime.o \
 	$(EMUOBJ)/audit.o \
-	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/crsshair.o \

@@ -103,7 +103,7 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "cheat.h"
+#include "ui.h"
 #include "uimain.h"
 #include "uiinput.h"
 #include "crsshair.h"
@@ -149,7 +149,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_osd(osd),
-		m_cheat(NULL),
 		m_render(NULL),
 		m_input(NULL),
 		m_sound(NULL),
@@ -199,7 +198,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 
 	// fetch core options
 	if (options().debug())
-		debug_flags = (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) | (options().debug_internal() ? 0 : DEBUG_FLAG_OSD_ENABLED);
+		debug_flags = (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) | DEBUG_FLAG_OSD_ENABLED;
 }
 
 
@@ -331,9 +330,6 @@ void running_machine::start()
 	// if we're in autosave mode, schedule a load
 	else if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
-
-	// set up the cheat engine
-	m_cheat = auto_alloc(*this, cheat_manager(*this));
 
 	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));

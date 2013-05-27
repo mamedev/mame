@@ -144,7 +144,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 // forward declarations
 class gfx_element;
 class colortable_t;
-class cheat_manager;
 class render_manager;
 class sound_manager;
 class video_manager;
@@ -222,7 +221,6 @@ public:
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
 	ioport_manager &ioport() { return m_ioport; }
-	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
@@ -342,7 +340,6 @@ private:
 	osd_interface &         m_osd;                  // reference to OSD system
 
 	// managers
-	cheat_manager *         m_cheat;                // internal data from cheat.c
 	render_manager *        m_render;               // internal data from render.c
 	input_manager *         m_input;                // internal data from input.c
 	sound_manager *         m_sound;                // internal data from sound.c

@@ -14,7 +14,6 @@
 #include "ui.h"
 #include "rendutil.h"
 #include "uiinput.h"
-#include "cheat.h"
 #include "uimain.h"
 #include <ctype.h>
 
@@ -900,10 +899,6 @@ void ui_menu::handle_keys(UINT32 flags)
 		else
 			machine().pause();
 	}
-
-	/* handle a toggle cheats request */
-	if (ui_input_pressed_repeat(machine(), IPT_UI_TOGGLE_CHEAT, 0))
-		machine().cheat().set_enable(!machine().cheat().enabled());
 
 	/* see if any other UI keys are pressed */
 	if (menu_event.iptkey == IPT_INVALID)
