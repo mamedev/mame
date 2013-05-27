@@ -21,6 +21,8 @@
 - update by Peter Ferrie:
 - split BIOS region into 16kb blocks and implement missing PAM registers
 
+- HASP emulator by Peter Ferrie
+
 
 ***************************************************************************/
 
@@ -56,6 +58,21 @@ public:
 	UINT32 *m_bios_e4000_ram;
 	UINT32 *m_bios_e8000_ram;
 	UINT32 *m_bios_ec000_ram;
+
+	int m_haspind;
+	int m_haspstate;
+	enum hasp_states
+	{
+		HASPSTATE_NONE,
+		HASPSTATE_PASSBEG,
+		HASPSTATE_PASSEND,
+		HASPSTATE_READ
+	};
+	int m_hasp_passind;
+	UINT8 m_hasp_tmppass[15];
+	UINT8 m_port379;
+	int m_hasp_passmode;
+
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -76,6 +93,9 @@ public:
 	DECLARE_WRITE32_MEMBER( bios_e4000_ram_w );
 	DECLARE_WRITE32_MEMBER( bios_e8000_ram_w );
 	DECLARE_WRITE32_MEMBER( bios_ec000_ram_w );
+
+	DECLARE_READ32_MEMBER(parallel_port_r);
+	DECLARE_WRITE32_MEMBER(parallel_port_w);
 
 protected:
 
@@ -351,6 +371,202 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 	#endif
 }
 
+static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d, 0x9d};
+
+READ32_MEMBER(savquest_state::parallel_port_r)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		return ((UINT32) m_port379 << 8);
+	}
+
+	return 0;
+}
+
+WRITE32_MEMBER(savquest_state::parallel_port_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		UINT8 data8 = (UINT8) (data & 0xff);
+
+		/* state machine to determine when password is about to be entered */
+
+		switch (m_haspind)
+		{
+			case 0:
+			{
+				if (data8 == 0xc6)
+				{
+					++m_haspind;
+					break;
+				}
+
+				m_haspind = 0;
+				break;
+			}
+
+			case 1:
+			{
+				if (data8 == 0xc7)
+				{
+					++m_haspind;
+					break;
+				}
+
+				m_haspind = 0;
+				break;
+			}
+
+			case 2:
+			{
+				if (data8 == 0xc6)
+				{
+					++m_haspind;
+					break;
+				}
+
+				m_haspind = 0;
+				m_haspstate = HASPSTATE_NONE;
+				break;
+			}
+
+			case 3:
+			{
+				if (data8 == 0x80)
+				{
+					m_haspstate = HASPSTATE_PASSBEG;
+					m_hasp_passind = 0;
+				}
+
+				m_haspind = 0;
+				break;
+			}
+
+			default:
+			{
+			}
+		}
+
+		m_port379 = 0x00;
+
+		if (m_haspstate == HASPSTATE_READ)
+		{
+			/* different passwords causes different values to be returned
+			   but there is really only one password of interest
+			*/
+
+			if (m_hasp_passmode == 1)
+			{
+				/* in passmode 1, some values remain unknown: 96, 9a, c4, d4, ec, f8
+				   they all return 00, but if that's wrong then there will be failures to start
+				*/
+
+				if ((data8 == 0x94)
+				 || (data8 == 0x9e)
+				 || (data8 == 0xa4)
+				 || (data8 == 0xb2)
+				 || (data8 == 0xbe)
+				 || (data8 == 0xd0)
+				   )
+				{
+					return;
+				}
+
+				if ((data8 == 0x8a)
+				 || (data8 == 0x8e)
+				 || (data8 == 0xca)
+				 || (data8 == 0xd2)
+				 || (data8 == 0xe2)
+				 || (data8 == 0xf0)
+				 || (data8 == 0xfc)
+				   )
+				{
+					/* someone with access to the actual dongle could dump the true values
+					   I've never seen it so I just determined the relevant bits instead
+					   from the disassembly of the software
+					   some of the keys are verified explicitly, the others implicitly
+					   I guessed the implicit ones with a bit of trial and error
+					*/
+
+					m_port379 = 0x20;
+					return;
+				}
+			}
+
+			switch (data8)
+			{
+				/* in passmode 0, some values remain unknown: 8a, 8e (inconclusive), 94, 96, 9a, a4, b2, be, c4, d2, d4 (inconclusive), e2, ec, f8, fc
+				   this is less of a concern since the contents seem to decrypt correctly
+				*/
+
+				case 0x88:
+				case 0x94:
+				case 0x98:
+				case 0x9c:
+				case 0x9e:
+				case 0xa0:
+				case 0xa4:
+				case 0xaa:
+				case 0xae:
+				case 0xb0:
+				case 0xb2:
+				case 0xbc:
+				case 0xbe:
+				case 0xc2:
+				case 0xc6:
+				case 0xc8:
+				case 0xce:
+				case 0xd0:
+				case 0xd6:
+				case 0xd8:
+				case 0xdc:
+				case 0xe0:
+				case 0xe6:
+				case 0xea:
+				case 0xee:
+				case 0xf2:
+				case 0xf6:
+				{
+					/* again, just the relevant bits instead of the true values */
+
+					m_port379 = 0x20;
+					break;
+				}
+
+				default:
+				{
+				}
+			}
+
+			return;
+		}
+
+		if (m_haspstate == HASPSTATE_PASSEND)
+		{
+			m_haspstate = HASPSTATE_READ;
+			return;
+		}
+
+		if ((m_haspstate == HASPSTATE_PASSBEG)
+		 && (data8 & 1)
+		   )
+		{
+			m_hasp_tmppass[m_hasp_passind] = data8;
+
+			if (++m_hasp_passind == 15)
+			{
+				m_haspstate = HASPSTATE_PASSEND;
+				m_hasp_passmode = 0;
+
+				if (!memcmp(m_hasp_tmppass, m_hasp_cmppass, sizeof(m_hasp_tmppass)))
+				{
+					m_hasp_passmode = 1;
+				}
+			}
+		}
+	}
+}
+
 READ32_MEMBER(savquest_state::ide_r)
 {
 	device_t *device = machine().device("ide");
@@ -515,6 +731,7 @@ static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
@@ -633,7 +850,7 @@ MACHINE_CONFIG_END
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
-	ROM_LOAD( "sq-aflash.bin", 0x00000, 0x040000, CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) // first half is 1-filled
+	ROM_LOAD( "sq-aflash.bin", 0x00000, 0x040000, BAD_DUMP CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) // first half is 1-filled
 
 	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
