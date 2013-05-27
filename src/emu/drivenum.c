@@ -278,9 +278,6 @@ int driver_enumerator::filter(const game_driver &driver)
 void driver_enumerator::include_all()
 {
 	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
-	int empty = find("___empty");
-	assert(empty != -1);
-	m_included[empty] = 0;
 }
 
 

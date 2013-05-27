@@ -92,8 +92,6 @@
 ***************************************************************************/
 
 /* started empty? */
-static bool started_empty;
-
 static bool print_verbose = false;
 
 static running_machine *global_machine;
@@ -120,23 +118,11 @@ static output_delegate output_cb[OUTPUT_CHANNEL_COUNT] =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mame_is_valid_machine - return true if the
-    given machine is valid
--------------------------------------------------*/
-
-int mame_is_valid_machine(running_machine &machine)
-{
-	return (&machine == global_machine);
-}
-
-
-/*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
 int mame_execute(emu_options &options, osd_interface &osd)
 {
-	bool firstgame = true;
 	bool firstrun = true;
 
 	// extract the verbose printing option
@@ -150,15 +136,13 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	{
 		// if no driver, use the internal empty driver
 		const game_driver *system = options.system();
+
 		if (system == NULL)
 		{
-			system = &GAME_NAME(___empty);
-			if (firstgame)
-				started_empty = true;
+			exit_pending = TRUE;
+			continue;
 		}
-
-		firstgame = false;
-
+		
 		// parse any INI files as the first thing
 		if (options.read_config())
 		{
@@ -177,7 +161,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		machine_config config(*system, options);
 
 		// create the machine structure and driver
-		running_machine machine(config, osd, started_empty);
+		running_machine machine(config, osd);
 
 		//ui_show_mouse(machine.system().flags & GAME_CLICKABLE_ARTWORK);
 
