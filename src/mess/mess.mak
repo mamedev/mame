@@ -1472,7 +1472,6 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/gb_rom.o    \
 	$(MESS_MACHINE)/gb_mbc.o    \
 	$(MESS_DRIVERS)/gb.o        \
-	$(MESS_MACHINE)/pokemini.o  \
 	$(MESS_DRIVERS)/pokemini.o  \
 	$(MESS_DRIVERS)/vboy.o      \
 	$(MESS_AUDIO)/vboy.o        \
