@@ -88,6 +88,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pipbug )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x0d ) // 110
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
+DEVICE_INPUT_DEFAULTS_END
+
 static const serial_terminal_interface terminal_intf =
 {
 	DEVCB_NULL
@@ -175,6 +180,7 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 
 	/* video hardware */
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 110)
+	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
