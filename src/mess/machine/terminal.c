@@ -441,6 +441,7 @@ static INPUT_PORTS_START(serial_terminal)
 	PORT_CONFSETTING( 0x00, "8N1")
 	PORT_CONFSETTING( 0x10, "7E1")
 	PORT_CONFSETTING( 0x20, "8N2")
+	PORT_CONFSETTING( 0x30, "8O1")
 INPUT_PORTS_END
 
 ioport_constructor serial_terminal_device::device_input_ports() const
