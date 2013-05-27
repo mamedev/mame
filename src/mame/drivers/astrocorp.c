@@ -17,6 +17,7 @@ Year + Game          PCB ID         CPU                Video        Chips       
 00  Show Hand        CHE-B50-4002A  68000              ASTRO V01    pLSI1016-60LJ, ASTRO 0001B   (28 pins)
 00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01    pLSI1016,      MDT2020AP MCU (28 pins)
 02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02    pLSI1016-60LJ
+02? Keno 21          ?              ASTRO V102?        ASTRO V05    ASTRO F02?                              not dumped
 03  Speed Drop       None           JX-1689HP          ASTRO V05    pLSI1016-60LJ
 04? Stone Age        L1             ASTRO V102PX-012?  ASTRO V05x2  ASTRO F02 2004-09-04                    Encrypted
 05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06    ASTRO F02 2005-02-18                    Encrypted
