@@ -52,7 +52,7 @@ void device_gba_cart_interface::nvram_alloc(running_machine &machine, UINT32 siz
 	{
 		m_nvram = auto_alloc_array_clear(machine, UINT32, size/sizeof(UINT32));
 		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "GBA_CART", this->device().tag(), 0, m_nvram, m_nvram_size);
+		state_save_register_item_pointer(machine, "GBA_CART", this->device().tag(), 0, m_nvram, m_nvram_size/sizeof(UINT32));
 	}
 }
 
