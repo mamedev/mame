@@ -41,7 +41,6 @@
 #include "emuopts.h"
 #include "png.h"
 #include "debugger.h"
-#include "debugint/debugint.h"
 #include "ui.h"
 #include "aviio.h"
 #include "crsshair.h"
@@ -239,9 +238,6 @@ void video_manager::frame_update(bool debug)
 
 	// draw the user interface
 	ui_update_and_render(machine(), &machine().render().ui_container());
-
-	// update the internal render debugger
-	debugint_update_during_game(machine());
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();

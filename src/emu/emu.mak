@@ -24,7 +24,6 @@ OBJDIRS += \
 	$(EMUOBJ)/cpu \
 	$(EMUOBJ)/sound \
 	$(EMUOBJ)/debug \
-	$(EMUOBJ)/debugint \
 	$(EMUOBJ)/audio \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
@@ -124,7 +123,6 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/dvtext.o \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o \
-	$(EMUOBJ)/debugint/debugint.o \
 	$(EMUOBJ)/profiler.o \
 	$(OSDOBJ)/osdepend.o \
 	$(OSDOBJ)/osdnet.o
