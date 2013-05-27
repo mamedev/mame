@@ -21,6 +21,7 @@ const device_type SEGA8_ROM_STD = &device_creator<sega8_rom_device>;
 
 // Specific SG-1000 MkI - MkII cart types
 const device_type SEGA8_ROM_CARDCATCH = &device_creator<sega8_cardcatch_device>;
+const device_type SEGA8_ROM_OTHELLO = &device_creator<sega8_othello_device>;
 const device_type SEGA8_ROM_CASTLE = &device_creator<sega8_castle_device>;
 const device_type SEGA8_ROM_BASIC_L3 = &device_creator<sega8_basic_l3_device>;
 const device_type SEGA8_ROM_MUSIC_EDITOR = &device_creator<sega8_music_editor_device>;
@@ -58,6 +59,12 @@ sega8_rom_device::sega8_rom_device(const machine_config &mconfig, const char *ta
 sega8_cardcatch_device::sega8_cardcatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sega8_rom_device(mconfig, SEGA8_ROM_CARDCATCH, "SG-1000 Card Catcher Cart", tag, owner, clock, "sega8_ccatch", __FILE__),
 						m_card(*this, "cardslot")
+{
+}
+
+
+sega8_othello_device::sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_OTHELLO, "SG-1000 Othello Cart", tag, owner, clock, "sega8_othello", __FILE__)
 {
 }
 
@@ -400,6 +407,31 @@ machine_config_constructor sega8_cardcatch_device::device_mconfig_additions() co
 {
 	return MACHINE_CONFIG_NAME( sub_slot );
 }
+
+/*-------------------------------------------------
+ 
+ Othello is a SG-1000 game featuring 2K of 
+ oncart RAM, mapped at 0x8000-0x9fff.
+ Is RAM mirrored? For now we assume so...
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(sega8_othello_device::read_cart)
+{
+	// 8K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		return m_ram[offset & 0x7ff];
+	
+	return m_rom[offset % m_rom_size];
+}
+
+WRITE8_MEMBER(sega8_othello_device::write_cart)
+{
+	// 2K of RAM sits in 0x8000-0x9fff
+	if (offset >= 0x8000 && offset < 0xa000)
+		m_ram[offset & 0x7ff] = data;
+}
+
 
 /*-------------------------------------------------
  

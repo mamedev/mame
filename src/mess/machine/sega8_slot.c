@@ -183,6 +183,7 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_JANGGUN, "janggun" },
 	{ SEGA8_KOREAN, "korean" },
 	{ SEGA8_KOREAN_NOBANK, "korean_nb" },
+	{ SEGA8_OTHELLO, "othello" },
 	{ SEGA8_CASTLE, "castle" },
 	{ SEGA8_BASIC_L3, "level3" },
 	{ SEGA8_MUSIC_EDITOR, "music_editor" },
@@ -280,6 +281,11 @@ void sega8_cart_slot_device::setup_ram()
 		if (m_type == SEGA8_CASTLE)
 		{
 			m_cart->ram_alloc(machine(), 0x2000);
+			m_cart->set_has_battery(FALSE);
+		}
+		else if (m_type == SEGA8_OTHELLO)
+		{
+			m_cart->ram_alloc(machine(), 0x800);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_BASIC_L3)

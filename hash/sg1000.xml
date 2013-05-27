@@ -1385,6 +1385,8 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			<dataarea name="rom" size="32768">
 				<rom name="king's valley (tw).bin" size="32768" crc="223397a1" sha1="922d23895c12707b2fc382ea5cb769c5cb9b5755" offset="000000" />
 			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
 		</part>
 	</software>
 
@@ -1461,8 +1463,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="Y-115"/>
 		<info name="alt_title" value="Mófǎ shī ~ 魔法師"/>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typeb"/>
 			<dataarea name="rom" size="49152">
 				<rom name="magical kid wiz (tw).bin" size="49152" crc="ffc4ee3f" sha1="fd24b501046cf811b04386129be0362a1eabf6b3" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -1695,8 +1700,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1044"/>
 		<info name="alt_title" value="オセロ"/>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="othello" />
 			<dataarea name="rom" size="32768">
 				<rom name="othello (japan).bin" size="32768" crc="af4f14bc" sha1="d0cd594ddb321f707ddba8a044fa3e9b906e720a" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -1708,8 +1716,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="R-044"/>
 		<info name="alt_title" value="Hēibái qí ~ 黑白棋"/>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="othello" />
 			<dataarea name="rom" size="32768">
 				<rom name="othello (tw).bin" size="32768" crc="1d1a0ca3" sha1="242c29989149b94ff27d59a94f067d0f1c84b4a7" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -2410,6 +2421,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="GB-800"/>
 		<info name="alt_title" value="テレビおえかき"/>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="terebi" />
 			<feature name="peripheral" value="tablet" />
 			<dataarea name="rom" size="8192">
 				<rom name="terebi oekaki (japan).bin" size="8192" crc="dd4a661b" sha1="12296f2bb57d80d1774749d3002a039e0940c6fa" offset="000000" />
@@ -2601,8 +2613,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1987</year>
 		<publisher>Abstract Software</publisher>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />  <!-- Not sure about this, in the sense that it could have less RAM... -->
 			<dataarea name="rom" size="32768">
 				<rom name="link world.bin" size="32768" crc="d5e919c1" sha1="c81c783fb806b3626ece75bf4456038a8a9e7075" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -2612,8 +2627,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
 			<dataarea name="rom" size="32768">
 				<rom name="home basic (jp).bin" size="32768" crc="78a37cbc" sha1="f1e1e7e9687cf4f9f498779a44134c2d70bb8d4b" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>

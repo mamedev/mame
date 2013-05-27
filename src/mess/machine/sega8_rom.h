@@ -54,6 +54,21 @@ protected:
 };
 
 
+// ======================> sega8_othello_device
+
+class sega8_othello_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_othello_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_cart);
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) {}
+};
+
+
 // ======================> sega8_castle_device
 
 class sega8_castle_device : public sega8_rom_device
@@ -348,6 +363,7 @@ public:
 // device type definition
 extern const device_type SEGA8_ROM_STD;
 extern const device_type SEGA8_ROM_CARDCATCH;
+extern const device_type SEGA8_ROM_OTHELLO;
 extern const device_type SEGA8_ROM_CASTLE;
 extern const device_type SEGA8_ROM_BASIC_L3;
 extern const device_type SEGA8_ROM_MUSIC_EDITOR;
