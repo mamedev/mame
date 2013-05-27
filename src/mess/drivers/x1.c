@@ -2276,19 +2276,6 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg2),       // ZC/TO2 callback
 };
 
-#if 0
-static const z80sio_interface sio_intf =
-{
-	DEVCB_NULL,                 /* interrupt handler */
-	DEVCB_NULL,                 /* DTR changed handler */
-	DEVCB_NULL,                 /* RTS changed handler */
-	DEVCB_NULL,                 /* BREAK changed handler */
-	DEVCB_NULL,                 /* transmit handler */
-	DEVCB_NULL                  /* receive handler */
-};
-#endif
-
-
 static Z80DART_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
@@ -2638,7 +2625,6 @@ static MACHINE_CONFIG_DERIVED( x1turbo, x1 )
 	MCFG_CPU_CONFIG(x1turbo_daisy)
 	MCFG_MACHINE_RESET_OVERRIDE(x1_state,x1turbo)
 
-//  MCFG_Z80SIO_ADD( "sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80SIO0_ADD("sio", MAIN_CLOCK/4 , sio_intf )
 	MCFG_Z80DMA_ADD( "dma", MAIN_CLOCK/4 , x1_dma )
 

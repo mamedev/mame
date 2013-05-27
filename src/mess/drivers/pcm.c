@@ -53,7 +53,7 @@
 #include "emu.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"
@@ -80,7 +80,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
 	required_device<z80pio_device> m_pio_u;
-	required_device<z80sio_device> m_sio;
+	required_device<z80sio0_device> m_sio;
 	required_device<z80ctc_device> m_ctc_s;
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<speaker_sound_device> m_speaker;
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc_s", z80ctc_device, read, write) // system CTC
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80pio_s", z80pio_device, read, write) // system PIO
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80sio", z80sio_device, read, write) // SIO
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80sio", z80sio0_device, cd_ba_r, cd_ba_w) // SIO
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_u", z80ctc_device, read, write) // user CTC
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("z80pio_u", z80pio_device, read, write) // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
@@ -267,14 +267,25 @@ static Z80PIO_INTERFACE( pio_s_intf )
 	DEVCB_NULL          /* portB ready active callback */
 };
 
-static const z80sio_interface sio_intf =
+static Z80SIO_INTERFACE( sio_intf )
 {
-	DEVCB_NULL, //DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* DTR changed handler */
-	DEVCB_NULL,         /* RTS changed handler */
-	DEVCB_NULL,         /* BREAK changed handler */
-	DEVCB_NULL,         /* transmit handler */
-	DEVCB_NULL          /* receive handler */
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL
 };
 
 
@@ -327,7 +338,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
-	MCFG_Z80SIO_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
+	MCFG_Z80SIO0_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
 	MCFG_Z80CTC_ADD( "z80ctc_u", XTAL_10MHz /4, ctc_u_intf )
 	MCFG_Z80CTC_ADD( "z80ctc_s", XTAL_10MHz /4, ctc_s_intf )
 MACHINE_CONFIG_END

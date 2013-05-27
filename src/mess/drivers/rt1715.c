@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80pio.h"
 #include "machine/z80dma.h"
 #include "machine/ram.h"
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_device, read_alt, write_alt)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
@@ -272,13 +272,24 @@ static const z80ctc_interface rt1715_ctc_intf =
 	DEVCB_NULL
 };
 
-static const z80sio_interface rt1715_sio_intf =
+static Z80SIO_INTERFACE( rt1715_sio_intf )
 {
+	0, 0, 0, 0,
+
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
 	DEVCB_NULL
 };
 
@@ -340,7 +351,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	MCFG_I8275_ADD("a26", rt1715_i8275_intf)
 	MCFG_Z80CTC_ADD("a30", XTAL_10MHz/4 /* ? */, rt1715_ctc_intf)
-	MCFG_Z80SIO_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
+	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, rt1715_sio_intf)
 
 	/* floppy */
 	MCFG_Z80PIO_ADD("a71", XTAL_10MHz/4 /* ? */, rt1715_pio_data_intf)

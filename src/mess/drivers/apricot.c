@@ -12,7 +12,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/wd17xx.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
@@ -49,7 +49,7 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
-	required_device<z80sio_device> m_z80sio;
+	required_device<z80sio0_device> m_z80sio;
 	required_device<wd2793_device> m_fdc;
 	DECLARE_READ8_MEMBER(apricot_sysctrl_r);
 	DECLARE_WRITE8_MEMBER(apricot_sysctrl_w);
@@ -128,14 +128,25 @@ WRITE_LINE_MEMBER(apricot_state::apricot_sio_irq_w)
 	m_pic->ir5_w(state);
 }
 
-static const z80sio_interface apricot_z80sio_intf =
+static Z80SIO_INTERFACE( apricot_z80sio_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_sio_irq_w),
+	0, 0, 0, 0,
+
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_sio_irq_w)
 };
 
 
@@ -282,7 +293,7 @@ static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8_LEGACY("ic16", pit8253_r, pit8253_w, 0x00ff)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio_device, read_alt, write_alt, 0x00ff)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_device, register_r, register_w, 0x00ff)
 //  AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
@@ -388,7 +399,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
 	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu",0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
-	MCFG_Z80SIO_ADD("ic15", 0, apricot_z80sio_intf)
+	MCFG_Z80SIO0_ADD("ic15", 0, apricot_z80sio_intf)
 
 	/* floppy */
 	MCFG_WD2793_ADD("ic68", apricot_wd17xx_intf)

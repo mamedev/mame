@@ -1,6 +1,9 @@
 /***************************************************************************
 
-    Z80 DART Dual Asynchronous Receiver/Transmitter emulation
+    Z80-DART Dual Asynchronous Receiver/Transmitter emulation
+    Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
+    Intel 8274 Multi-Protocol Serial Controller emulation
+    NEC uPD7201 Multiprotocol Serial Communications Controller emulation
 
     Copyright (c) 2008, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

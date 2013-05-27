@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "machine/upd765.h"
 #include "formats/nanos_dsk.h"
@@ -51,8 +51,8 @@ public:
 	required_device<z80pio_device> m_pio;
 	required_device<z80pio_device> m_pio_0;
 	required_device<z80pio_device> m_pio_1;
-	required_device<z80sio_device> m_sio_0;
-	required_device<z80sio_device> m_sio_1;
+	required_device<z80sio0_device> m_sio_0;
+	required_device<z80sio0_device> m_sio_1;
 	required_device<z80ctc_device> m_ctc_0;
 	required_device<z80ctc_device> m_ctc_1;
 	required_device<upd765a_device> m_fdc;
@@ -159,14 +159,46 @@ WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static const z80sio_interface sio_intf =
+static Z80SIO_INTERFACE( sio1_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt),  /* interrupt handler */
-	DEVCB_NULL,             /* DTR changed handler */
-	DEVCB_NULL,             /* RTS changed handler */
-	DEVCB_NULL,             /* BREAK changed handler */
-	DEVCB_NULL,             /* transmit handler */
-	DEVCB_NULL              /* receive handler */
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt)
+};
+
+static Z80SIO_INTERFACE( sio2_intf )
+{
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DRIVER_LINE_MEMBER(nanos_state, z80daisy_interrupt)
 };
 
 /* Z80 Daisy Chain */
@@ -182,6 +214,7 @@ static const z80_daisy_config nanos_daisy_chain[] =
 	{ "z80ctc_1" },
 	{ NULL }
 };
+
 static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -190,7 +223,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 
 	/* I/O card */
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
 
@@ -198,7 +231,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
 	AM_RANGE(0x94, 0x95) AM_DEVICE("upd765", upd765a_device, map)
 	/* V24+IFSS card */
-	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
+	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
@@ -541,8 +574,8 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
 	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
-	MCFG_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
-	MCFG_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
+	MCFG_Z80SIO0_ADD( "z80sio_0", XTAL_4MHz, sio1_intf)
+	MCFG_Z80SIO0_ADD( "z80sio_1", XTAL_4MHz, sio2_intf)
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", false, true)

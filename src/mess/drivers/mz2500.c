@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/i8255.h"
 #include "machine/wd17xx.h"
 #include "machine/pit8253.h"
@@ -1514,7 +1514,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 //  AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //  AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio_device, read_alt, write_alt)
+	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("z80sio",z80sio0_device, ba_cd_r, ba_cd_w)
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
 	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
@@ -2109,15 +2109,27 @@ static RP5C15_INTERFACE( rtc_intf )
 	DEVCB_NULL
 };
 
-static const z80sio_interface mz2500_sio_intf =
+static Z80SIO_INTERFACE( mz2500_sio_intf )
 {
+	0, 0, 0, 0,
+
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
 	DEVCB_NULL
 };
+
 
 static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	/* basic machine hardware */
@@ -2129,7 +2141,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
-	MCFG_Z80SIO_ADD( "z80sio", 6000000, mz2500_sio_intf )
+	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_PIT8253_ADD("pit", mz2500_pit8253_intf)
 

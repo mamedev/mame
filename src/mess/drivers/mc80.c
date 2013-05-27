@@ -51,7 +51,7 @@ static ADDRESS_MAP_START(mc8030_io, AS_IO, 8, mc80_state)
 	AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write) // PIO unknown usage
 	AM_RANGE(0x88, 0x8f) AM_MIRROR(0xff00) AM_WRITE(mc8030_zve_write_protect_w)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(mc8030_vis_w) AM_MASK(0xffff)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio_device, read, write) // keyboard & IFSS?
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80sio0_device, cd_ba_r, cd_ba_w) // keyboard & IFSS?
 	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write) // sio bauds, KMBG? and kbd
 	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write) // external bus
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(mc8030_eprom_prog_w)
@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_Z80CTC_ADD( "zve_ctc", XTAL_2_4576MHz, mc8030_zve_z80ctc_intf )
 	MCFG_Z80PIO_ADD( "asp_pio", XTAL_2_4576MHz, mc8030_asp_z80pio_intf )
 	MCFG_Z80CTC_ADD( "asp_ctc", XTAL_2_4576MHz, mc8030_asp_z80ctc_intf )
-	MCFG_Z80SIO_ADD( "asp_sio", 4800, mc8030_asp_z80sio_intf )
+	MCFG_Z80SIO0_ADD( "asp_sio", 4800, mc8030_asp_z80sio_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */

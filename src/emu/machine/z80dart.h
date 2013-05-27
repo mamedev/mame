@@ -1,7 +1,7 @@
 /***************************************************************************
 
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
-    Z80-SIO/1/2/4 Serial Input/Output Controller emulation
+    Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
     Intel 8274 Multi-Protocol Serial Controller emulation
     NEC uPD7201 Multiprotocol Serial Communications Controller emulation
 
@@ -192,7 +192,13 @@
 #define Z80DART_INTERFACE(_name) \
 	const z80dart_interface (_name) =
 
+#define Z80SIO_INTERFACE(_name) \
+	const z80dart_interface (_name) =
+
 #define UPD7201_INTERFACE(_name) \
+	const z80dart_interface (_name) =
+
+#define I8274_INTERFACE(_name) \
 	const z80dart_interface (_name) =
 
 

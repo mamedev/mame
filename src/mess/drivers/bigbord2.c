@@ -69,7 +69,7 @@ ToDo:
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/z80ctc.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/wd17xx.h"
 #include "video/mc6845.h"
@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, read_alt, write_alt)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80CTCA_TAG, z80ctc_device, read, write) //has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTCB_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
@@ -420,14 +420,25 @@ WRITE_LINE_MEMBER(bigbord2_state::bigbord2_interrupt)
 	m_maincpu->set_input_line(0, state);
 }
 
-const z80sio_interface sio_intf =
+static Z80SIO_INTERFACE( sio_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, bigbord2_interrupt),   /* interrupt handler */
-	DEVCB_NULL,         /* DTR changed handler */
-	DEVCB_NULL,         /* RTS changed handler */
-	DEVCB_NULL,         /* BREAK changed handler */
-	DEVCB_NULL,         /* transmit handler - which channel is this for? */
-	DEVCB_NULL          /* receive handler - which channel is this for? */
+	0, 0, 0, 0,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, bigbord2_interrupt)
 };
 
 
@@ -728,7 +739,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* devices */
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, MAIN_CLOCK, dma_intf)
-	MCFG_Z80SIO_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
+	MCFG_Z80SIO0_ADD(Z80SIO_TAG, MAIN_CLOCK, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTCA_TAG, MAIN_CLOCK, ctca_intf)
 	MCFG_Z80CTC_ADD(Z80CTCB_TAG, MAIN_CLOCK / 6, ctcb_intf)
 	MCFG_FD1793_ADD("fdc", fdc_intf)

@@ -11,7 +11,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 
 class mc80_state : public driver_device
 {
@@ -71,6 +71,6 @@ extern const z80pio_interface mc8030_zve_z80pio_intf;
 extern const z80pio_interface mc8030_asp_z80pio_intf;
 extern const z80ctc_interface mc8030_zve_z80ctc_intf;
 extern const z80ctc_interface mc8030_asp_z80ctc_intf;
-extern const z80sio_interface mc8030_asp_z80sio_intf;
+extern const z80dart_interface mc8030_asp_z80sio_intf;
 
 #endif /* MC80_H_ */
