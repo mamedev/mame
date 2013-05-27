@@ -179,9 +179,6 @@ public:
 	int create_resources(bool reset);
 	void delete_resources(bool reset);
 
-	// slider-related functions
-	slider_state *init_slider_list();
-
 private:
 	void                    blit(surface *dst, texture *src, surface *new_dst,
 									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count,

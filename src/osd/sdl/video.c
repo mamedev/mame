@@ -40,7 +40,6 @@
 // MAME headers
 #include "emu.h"
 #include "rendutil.h"
-#include "ui.h"
 #include "emuopts.h"
 #include "uiinput.h"
 
@@ -566,14 +565,14 @@ static void check_osd_inputs(running_machine &machine)
 	{
 		//FIXME: on a per window basis
 		video_config.fullstretch = !video_config.fullstretch;
-		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
+		//ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");
 	}
 
 	if (ui_input_pressed(machine, IPT_OSD_4))
 	{
 		//FIXME: on a per window basis
 		video_config.keepaspect = !video_config.keepaspect;
-		ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
+		//ui_popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 
 	if (USE_OPENGL || SDLMAME_SDL2)
@@ -582,7 +581,7 @@ static void check_osd_inputs(running_machine &machine)
 		if (ui_input_pressed(machine, IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
-			ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
+			//ui_popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 		}
 	}
 

@@ -136,9 +136,6 @@ Note: press Z to show some info on each sprite (debug builds only)
 
 #include "emu.h"
 #include "includes/ssv.h"
-#ifdef MAME_DEBUG
-#include "ui.h"
-#endif
 
 
 static void ssv_drawgfx(    bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,

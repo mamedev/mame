@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "video/decocomn.h"
-#include "ui.h"
 
 
 struct decocomn_state

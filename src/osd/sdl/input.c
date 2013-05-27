@@ -26,7 +26,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "ui.h"
 #include "uiinput.h"
 #include "emuopts.h"
 

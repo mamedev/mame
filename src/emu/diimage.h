@@ -183,7 +183,7 @@ public:
 	virtual const char *file_extensions() const = 0;
 	virtual const option_guide *create_option_guide() const = 0;
 
-	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
+	//virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
 
 	const image_device_format *device_get_indexed_creatable_format(int index);
 	const image_device_format *device_get_named_creatable_format(const char *format_name);
@@ -330,36 +330,5 @@ protected:
 
 // iterator
 typedef device_interface_iterator<device_image_interface> image_interface_iterator;
-
-class ui_menu_control_device_image : public ui_menu {
-public:
-	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_device_image();
-	virtual void populate();
-	virtual void handle();
-
-protected:
-	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST,
-		LAST_ID
-	};
-	int state;
-
-	device_image_interface *image;
-	astring current_directory;
-	astring current_file;
-	int submenu_result;
-	bool create_confirmed;
-	bool softlist_done;
-	const struct software_list *swl;
-	const software_info *swi;
-	const software_part *swp;
-	const class software_list_device *sld;
-	astring software_info_name;
-
-	void test_create(bool &can_create, bool &need_confirm);
-	void load_software_part();
-	virtual void hook_load(astring filename, bool softlist);
-};
 
 #endif  /* __DIIMAGE_H__ */

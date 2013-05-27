@@ -60,7 +60,6 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
-#include "ui.h"
 #include "rendutil.h"
 #include "options.h"
 #include "emuopts.h"

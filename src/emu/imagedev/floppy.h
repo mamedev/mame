@@ -116,8 +116,6 @@ public:
 	UINT32 get_form_factor() const;
 	UINT32 get_variant() const;
 
-	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
-
 	static const floppy_format_type default_floppy_formats[];
 
 protected:
@@ -177,25 +175,6 @@ protected:
 	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();
-};
-
-class ui_menu_control_floppy_image : public ui_menu_control_device_image {
-public:
-	ui_menu_control_floppy_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_floppy_image();
-
-	virtual void handle();
-
-protected:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
-
-	floppy_image_format_t **format_array;
-	floppy_image_format_t *input_format, *output_format;
-	astring input_filename, output_filename;
-
-	void do_load_create();
-	virtual void hook_load(astring filename, bool softlist);
-	astring try_file(astring location, astring name, bool has_crc, UINT32 crc);
 };
 
 class floppy_3_ssdd : public floppy_image_device {

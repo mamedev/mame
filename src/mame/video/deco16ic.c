@@ -161,7 +161,6 @@ Rowscroll style:
 
 #include "emu.h"
 #include "video/deco16ic.h"
-#include "ui.h"
 
 
 struct deco16ic_state
@@ -826,7 +825,7 @@ void deco16ic_print_debug_info(device_t *device, bitmap_ind16 &bitmap)
 	else
 		sprintf(buf, "\n\n");
 
-	ui_draw_text(&device->machine().render().ui_container(), buf, 60, 40);
+	//ui_draw_text(&device->machine().render().ui_container(), buf, 60, 40);
 }
 
 /*****************************************************************************************/

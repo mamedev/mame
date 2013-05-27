@@ -103,8 +103,6 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "ui.h"
-#include "uimain.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"
@@ -267,7 +265,7 @@ void running_machine::start()
 
 	// create the video manager
 	m_video = auto_alloc(*this, video_manager(*this));
-	ui_init(*this);
+//	ui_init(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -313,7 +311,7 @@ void running_machine::start()
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
-	ui_set_startup_text(*this, "Initializing...", true);
+	//ui_set_startup_text(*this, "Initializing...", true);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -387,12 +385,13 @@ int running_machine::run(bool firstrun)
 		start();
 
 		// load the configuration settings and NVRAM
-		bool settingsloaded = config_load_settings(*this);
+		//bool settingsloaded = 
+		config_load_settings(*this);
 		nvram_load(*this);
 		sound().ui_mute(false);
 
 		// display the startup screens
-		ui_display_startup_screens(*this, firstrun, !settingsloaded);
+		//ui_display_startup_screens(*this, firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -478,7 +477,7 @@ void running_machine::schedule_exit()
 	if (m_exit_to_game_select && options().system_name()[0] != 0)
 	{
 		options().set_system_name("");
-		ui_menu_force_game_select(*this, &render().ui_container());
+		//ui_menu_force_game_select(*this, &render().ui_container());
 	}
 
 	// otherwise, exit for real

@@ -124,7 +124,6 @@
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "ui.h"
 #include "uiinput.h"
 #include "debug/debugcon.h"
 
@@ -2035,8 +2034,8 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// if UI is active, ignore digital inputs
-	if (ui_is_menu_active())
-		return;
+/*	if (ui_is_menu_active())
+		return;*/
 
 	// if the state changed, look for switch down/switch up
 	bool curstate = mouse_down || machine().input().seq_pressed(seq());
@@ -2048,8 +2047,8 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// if we're a keyboard type and using natural keyboard, bail
-	if (m_type == IPT_KEYBOARD && ui_get_use_natural_keyboard(machine()))
-		return;
+/*	if (m_type == IPT_KEYBOARD) && ui_get_use_natural_keyboard(machine()))
+		return;*/
 
 	// coin impulse option
 	int effective_impulse = m_impulse;
@@ -2103,19 +2102,19 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	// skip locked-out coin inputs
 	if (curstate && m_type >= IPT_COIN1 && m_type <= IPT_COIN12 && coin_lockout_get_state(machine(), m_type - IPT_COIN1))
 	{
-		bool verbose = machine().options().verbose();
+		//bool verbose = machine().options().verbose();
 #ifdef MAME_DEBUG
-		verbose = true;
+		//verbose = true;
 #endif
 		if (machine().options().coin_lockout())
 		{
-			if (verbose)
-				ui_popup_time(3, "Coinlock disabled %s.", name());
+			//if (verbose)
+//				ui_popup_time(3, "Coinlock disabled %s.", name());
 			curstate = false;
 		}
-		else
-			if (verbose)
-				ui_popup_time(3, "Coinlock disabled, but broken through %s.", name());
+		//else
+			//if (verbose)
+//				ui_popup_time(3, "Coinlock disabled, but broken through %s.", name());
 	}
 
 	// if we're active, set the appropriate bits in the digital state

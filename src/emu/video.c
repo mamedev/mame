@@ -41,7 +41,7 @@
 #include "emuopts.h"
 #include "png.h"
 #include "debugger.h"
-#include "ui.h"
+#include "uiinput.h"
 #include "aviio.h"
 #include "crsshair.h"
 #include "rendersw.c"
@@ -237,7 +237,12 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	ui_update_and_render(machine(), &machine().render().ui_container());
+	//ui_update_and_render(machine(), &machine().render().ui_container());
+	// HERE HANDLE UI
+	if (ui_input_pressed(machine(), IPT_UI_CANCEL))
+	{
+		machine().schedule_exit();
+	}
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
@@ -618,7 +623,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused() || ui_is_menu_active())
+	if (machine().paused())// || ui_is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle

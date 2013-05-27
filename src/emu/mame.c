@@ -78,7 +78,6 @@
 #include "config.h"
 #include "debugger.h"
 #include "render.h"
-#include "ui.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"
@@ -180,7 +179,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		// create the machine structure and driver
 		running_machine machine(config, osd, started_empty);
 
-		ui_show_mouse(machine.system().flags & GAME_CLICKABLE_ARTWORK);
+		//ui_show_mouse(machine.system().flags & GAME_CLICKABLE_ARTWORK);
 
 		// looooong term: remove this
 		global_machine = &machine;
@@ -363,6 +362,7 @@ void mame_printf_log(const char *format, ...)
 
 void CLIB_DECL popmessage(const char *format, ...)
 {
+	/*
 	// if the format is NULL, it is a signal to clear the popmessage
 	if (format == NULL)
 		ui_popup_time(0, " ");
@@ -381,6 +381,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 		// pop it in the UI
 		ui_popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
 	}
+	*/
 }
 
 

@@ -26,7 +26,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"
@@ -64,7 +63,7 @@ static void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 
 		tempstring.catprintf(exec_format, exec);
 	}
 
-	ui_popup_time(10, "%s", tempstring.cstr());
+	//ui_popup_time(10, "%s", tempstring.cstr());
 }
 
 /*******************************************************************
