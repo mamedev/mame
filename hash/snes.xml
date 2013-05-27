@@ -8,7 +8,7 @@
   - Documentation and redump (significant contributors):
   - - d4s (extremely rare material)
   - - Yakushi~Kabuto (~1160 carts)
-  - - byuu (200 carts)
+  - - byuu (210 carts)
   - - badinsults (~350 carts)
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
@@ -84,9 +84,11 @@ Undumped
   <Europe>
           ?              Biker Mice From Mars / Prototype
           o   Inter rev  Donkey Kong Country 2 - Diddy's Kong Quest / Initial release prior to Rev A
+          o   PCB pic    Soccer Kid / Prototype
 
   <Unknown region>
-          ?              Plok! (Prototype 19930403)
+          o   PCB pic    Adventures of Dr. Franken / Prototype
+          ?              Plok! / Prototype 19930403
 
   Voice-Kun audio discs
   The Voice-Kun, often called Voicer Kun,
@@ -260,21 +262,21 @@ CIC types:
 
 Known revisions and their timeline approximaions (W.I.P):
 
-- 1990/36,1992/21  ⊆ t(D411)
-- 1992/31,1995/03] ⊆ t(D411A)
--[1995/03,1998/43  ⊆ t(D411B)
+-[1990/36,1992/21] ⊆ t(D411)
+-[1992/31,1995/03] ⊆ t(D411A)
+-[1995/03,1998/43] ⊆ t(D411B)
 
 -?                 ⊆ t(F411)  //maybe used in star fox early protoypes
-- 1993/03,1994/33  ⊆ t(F411A)
-- 1995/20,2000/13  ⊆ t(F411B)
+-[1993/03,1994/33] ⊆ t(F411A)
+-[1995/20,2000/13] ⊆ t(F411B)
 
-- 1992/18,1992/22  ⊆ t(D413)
-- 1992/24,1994/50  ⊆ t(D413A)
-- 1995/06,1997/35  ⊆ t(D413B)
+-[1992/18,1992/22] ⊆ t(D413)
+-[1992/24,1994/50] ⊆ t(D413A)
+-[1995/06,1997/35] ⊆ t(D413B)
 
 -?                 ⊆ t(F413)
 -?                 ⊆ t(F413A)
-- 1995/42,1995/42  ⊆ t(F413B)
+-[1995/42,1995/42] ⊆ t(F413B)
 -->
 
 <!--
@@ -1029,7 +1031,7 @@ List of documented non retail cartridges
 
 	<software name="dkongcuce" cloneof="dkongc">
 		<!-- snescentral.com -->
-		<description>Donkey Kong Country (USA, Competition Cartridge)</description>
+		<description>Donkey Kong Country - Competition Cartridge (USA, Not for sale)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DIS-SNS-8E-USA" />
@@ -1405,7 +1407,7 @@ List of documented non retail cartridges
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576">
 				<rom name="u1" size="524288" crc="24c41de0" sha1="89a9300db61a6591a1bd7cb2b77df807a6036346" offset="0x000000" />
 				<rom name="u2" size="524288" crc="e13dd74a" sha1="c1998e65c6bcd123d3974ab8cd2ea80a72127e66" offset="0x080000" />
 			</dataarea>
@@ -1604,7 +1606,7 @@ List of documented non retail cartridges
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="524288">
 				<rom name="u1" size="524288" crc="59059d83" sha1="7ced82ff061dd5a7ee9e35b67fba068b78754120" offset="0x000000" />
 			</dataarea>
 			<!-- memory capacity to be confirmed -->
@@ -2062,6 +2064,36 @@ List of documented non retail cartridges
 		</part>
 	</software>
 
+	<software name="ppersia2p" cloneof="ppersia2">
+		<!-- legrospixel.com -->
+		<!-- Notes: identical to the final release, except it has full save capability -->
+		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro, Prototype 19950417)</description>
+		<year>1995</year>
+		<publisher>Titus</publisher>
+		<info name="serial" value="12634" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="prince of persia ii snes 0.u1" size="524288" crc="bf7a94ae" sha1="f8e6d3c97830f9978d36a72036a067dab8a3659c" offset="0x000000" />
+				<rom name="prince of persia ii snes 1.u2" size="524288" crc="f88e10d8" sha1="748b79c6ed53d1533afbef57d34d6a4b29c4d45f" offset="0x080000" />
+				<rom name="prince of persia ii snes 2.u3" size="524288" crc="e166236e" sha1="5d2fabda96f3e08eeda10f6b749fa6539034e30a" offset="0x100000" />
+				<rom name="prince of persia ii snes 3.u4" size="524288" crc="6a226949" sha1="f6f833588de1abef6d0f57160fd6f4add2c7d8eb" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rpmp" cloneof="rpm">
 		<!-- Yakushi~Kabuto -->
 		<description>Radical Psycho Machine Racing (USA, Prototype 19910814)</description>
@@ -2110,8 +2142,8 @@ List of documented non retail cartridges
 			<feature name="u2" value="U2 EPROM" />
 			<feature name="u3" value="U3 EPROM" />
 			<feature name="u4" value="U4 EPROM" />
-			<feature name="u5" value="U5 SRAM" />
-			<feature name="u6" value="U6 PLD" /> <!-- empty socket -->
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
 			<feature name="u7" value="U7 74LS157" />
 			<feature name="u8" value="U8 CIC" />
 			<feature name="lockout" value="" />
@@ -2288,7 +2320,7 @@ List of documented non retail cartridges
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="no shell" />
 			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="524288">
+			<dataarea name="rom" size="262144">
 				<rom name="shooter demo.u1" size="262144" crc="f4aa6642" sha1="5631c3199b96dfd387562a586e4ceb1595cd3d6e" offset="0x000000" />
 			</dataarea>
 		</part>
@@ -2375,7 +2407,7 @@ List of documented non retail cartridges
 
 	<software name="starfoxswc" cloneof="starwing">
 		<!-- snescentral.com -->
-		<description>Star Fox Super Weekend (USA, Competition Cartridge)</description>
+		<description>Star Fox - Super Weekend (USA, Not for sale)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-FU-USA" />
@@ -4502,7 +4534,7 @@ Known bad dumps, redump needed
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="no shell" />
 			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1048576">
 				<rom name="mario paint ver e-5 prg 0.u1" size="524288" crc="5fb99df0" sha1="1666ff7c2ecadcaf47c21f965f99e53411ddbae1" offset="0x000000" status="baddump" />
 				<rom name="mario paint ver e-5 prg 1.u2" size="524288" crc="10878c55" sha1="06f96c0afdc7d3565e2a894c8e97891074ab7f66" offset="0x080000" status="baddump" />
 			</dataarea>
@@ -5107,7 +5139,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A 9252 CA" />
+			<feature name="lockout" value="D411A 9252 CA" /> <!-- Also found with D411A 9302 CA -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<feature name="slot" value="hirom" />
@@ -9135,6 +9167,75 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="clayfghtu" cloneof="clayfght">
+		<description>Clay Fighter (USA)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNS-8C-USA" />
+		<info name="release" value="199311xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9252 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-8c-0.u1" size="2097152" crc="c814e3c2" sha1="e91b6989c32fdabb1322af07be24c0c59f214e7f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clayfgte">
+		<description>Clay Fighter - Tournament Edition (USA)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNS-7E-USA" />
+		<info name="release" value="199405xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9409 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="sns-7e-0 p0.u1" size="2097152" crc="95888309" sha1="80e0ab4803647bfd7e11886968a2ce45249411db" offset="0x000000" />
+				<rom name="sns-7e-0 p3.u2" size="1048576" crc="51d624e0" sha1="6b16a74b7cc422603331b0043f406709ecb3a3b8" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clayfgt2u" cloneof="clayfgt2">
+		<description>Clay Fighter 2 - Judgment Clay (USA)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNS-ACZE-USA" />
+		<info name="release" value="199501xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-20" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9447 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="sns-acze-0 p0.u1" size="2097152" crc="5cb0a7ff" sha1="de61b7e7f38122d21bd82c00bf60c7eb5b171349" offset="0x000000" />
+				<rom name="sns-acze-0 p3.u2" size="1048576" crc="ad747d10" sha1="316aca62b3d135a0332568bd8b300b03d693b67d" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="claymateu" cloneof="claymate">
 		<description>Claymates (USA)</description>
 		<year>1994</year>
@@ -9152,6 +9253,119 @@ List of perfect retail cartridges rom dumps
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-y5-0.u1" size="1048576" crc="7ad5ccac" sha1="d136279ce3eb62a06f5762167db588c9d60f7441" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cliffhu" cloneof="cliffh">
+		<description>Cliffhanger (USA)</description>
+		<year>1993</year>
+		<publisher>Sony Imagesoft</publisher>
+		<info name="serial" value="SNS-6C-USA" />
+		<info name="release" value="199310xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9251 BA" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-6c-0.u1" size="1048576" crc="12f8a26c" sha1="5a494362063c61c3207d2bb49ee43766f9a4f00f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clue">
+		<description>Clue (USA)</description>
+		<year>1992</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="serial" value="SNS-CL-USA" />
+		<info name="release" value="199207xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9241 BA" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-cl-0.u1" size="524288" crc="a4fbe827" sha1="956b48f602a24dd3d5d64195f6366fa0b68f0738" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="collfoot">
+		<description>College Football USA '97 - The Road to New Orleans (USA)</description>
+		<year>1996</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="M/SNS-AC7E-USA" />
+		<info name="release" value="199612xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9636 C" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-ac7e-0.u1" size="2097152" crc="a27940c1" sha1="8fd9c0a0a20307b206e20990331e54e27db2a179" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="collslam">
+		<description>College Slam (USA)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="M/SNS-ANYE-USA" />
+		<info name="release" value="199602xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9604 CB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="sns-anye-0.u1" size="3145728" crc="ce842c6d" sha1="15a52aa47c29e25a7d48a6b2d46e1b1dbe5e76f8" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctribe">
+		<description>The Combatribes (USA)</description>
+		<year>1993</year>
+		<publisher>American Technos</publisher>
+		<info name="serial" value="SNS-CR-USA" />
+		<info name="release" value="199303xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9306 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-cr-0 p0.u1" size="1048576" crc="76d7987b" sha1="ac8e47d3cf42835fa2dffab586e60cd336d18c1b" offset="0x000000" />
+				<rom name="sns-cr-0 p1.u2" size="524288"  crc="140840f2" sha1="c03f48b76bba70e65d3219a1ee76dd8cd0bd892d" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9178,6 +9392,46 @@ List of perfect retail cartridges rom dumps
 				<rom name="shvc-aubj-0.u1" size="1048576" crc="0937a72f" sha1="b7b79481ca8ef24c36d80b3680b05325e6a2bae8" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congocapu" cloneof="congocap">
+		<description>Congo's Caper (USA)</description>
+		<year>1993</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="SNS-J2-USA" />
+		<info name="release" value="199305xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9314 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-j2-0.u1" size="524288" crc="8a24fba8" sha1="7edddd098160d3f398ab54b0a587a7cc5ad98ae1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="contra3" cloneof="sprobot">
+		<description>Contra III - The Alien Wars (USA)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="SNS-CS-USA" />
+		<info name="release" value="199204xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9238 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-cs-0.u1" size="1048576" crc="84da7cfe" sha1="265886e3f665adf2507e7b2f08b6b2ed9d0018b2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25351,8 +25605,8 @@ List of perfect retail cartridges rom dumps
 			<feature name="network1" value="CN1" /> <!-- for the DMG/CGB cartridge -->
 			<feature name="network2" value="CN2" /> <!-- for the SGB2 to DMG unit link -->
 			<feature name="network3" value="CN3" /> <!-- for the SHVC unit -->
-			<feature name="led" value="LED1" /> <!-- red, connected to CPU -->
-			<feature name="led" value="LED2" /> <!-- green, connected to CN2? -->
+			<feature name="led1" value="LED1" /> <!-- red, connected to CPU -->
+			<feature name="led2" value="LED2" /> <!-- green, connected to CN2? -->
 			<feature name="cart_model" value="SHVC-042" />
 			<feature name="cart_back_label" value="SHVC-SGB2-JPN" />
 			<feature name="slot" value="lorom_sgb" />
@@ -35676,34 +35930,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="clayfghtu" cloneof="clayfght">
-		<description>Clay Fighter (USA)</description>
-		<year>1993</year>
-		<publisher>Interplay</publisher>
-		<info name="release" value="199311xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="clay fighter (usa).sfc" size="2097152" crc="c814e3c2" sha1="e91b6989c32fdabb1322af07be24c0c59f214e7f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clayfgte">
-		<description>Clay Fighter - Tournament Edition (USA)</description>
-		<year>1994</year>
-		<publisher>Interplay</publisher>
-		<info name="release" value="199405xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="clay fighter - tournament edition (usa).sfc" size="3145728" crc="b360f7af" sha1="a7d9a90f792c90d3d51f62db6279e9533dab5ca8" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="clayfgt2">
 		<description>Clay Fighter 2 - Judgment Clay (Euro)</description>
 		<year>1995</year>
@@ -35712,20 +35938,6 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="clay fighter 2 - judgment clay (europe).sfc" size="3145728" crc="caa9abf1" sha1="8717b18ee64fb3df74a9c7c75f393c514b4d87e4" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clayfgt2u" cloneof="clayfgt2">
-		<description>Clay Fighter 2 - Judgment Clay (USA)</description>
-		<year>1995</year>
-		<publisher>Interplay</publisher>
-		<info name="release" value="199501xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="clay fighter 2 - judgment clay (usa).sfc" size="3145728" crc="20b5c364" sha1="b64ad1b7c388439a53549229375d53dfb29731d0" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35767,19 +35979,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="cliffhu" cloneof="cliffh">
-		<description>Cliffhanger (USA)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="release" value="199310xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="cliffhanger (usa).sfc" size="1048576" crc="12f8a26c" sha1="5a494362063c61c3207d2bb49ee43766f9a4f00f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="clocktow">
 		<description>Clock Tower (Jpn)</description>
 		<year>1995</year>
@@ -35809,49 +36008,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="clockwerx (japan).sfc" size="524288" crc="a62b84ff" sha1="652693214ebc0a1bbcae15396cde748a94324acb" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clue">
-		<description>Clue (USA)</description>
-		<year>1992</year>
-		<publisher>Parker Brothers</publisher>
-		<info name="release" value="199207xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="524288">
-				<rom name="clue (usa).sfc" size="524288" crc="a4fbe827" sha1="956b48f602a24dd3d5d64195f6366fa0b68f0738" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="collfoot">
-		<description>College Football USA '97 - The Road to New Orleans (USA)</description>
-		<year>1996</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="release" value="199612xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="college football usa '97 - the road to new orleans (usa).sfc" size="2097152" crc="a27940c1" sha1="8fd9c0a0a20307b206e20990331e54e27db2a179" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="collslam">
-		<description>College Slam (USA)</description>
-		<year>1996</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="release" value="199602xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="college slam (usa).sfc" size="3145728" crc="ce842c6d" sha1="15a52aa47c29e25a7d48a6b2d46e1b1dbe5e76f8" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -35890,19 +36046,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="ctribe">
-		<description>The Combatribes (USA)</description>
-		<year>1993</year>
-		<publisher>American Technos</publisher>
-		<info name="release" value="199303xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1572864">
-				<rom name="combatribes, the (usa).sfc" size="1572864" crc="9304044a" sha1="6827e8d9520ffdf05e8ffbeba71355fd32079af2" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="congocap">
 		<description>Congo's Caper (Euro)</description>
 		<year>1993</year>
@@ -35911,32 +36054,6 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="congo's caper (europe).sfc" size="524288" crc="549a163e" sha1="b5f1917a8844724d6a8a8a366966263e1f84e84d" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="congocapu" cloneof="congocap">
-		<description>Congo's Caper (USA)</description>
-		<year>1993</year>
-		<publisher>Data East</publisher>
-		<info name="release" value="199305xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="524288">
-				<rom name="congo's caper (usa).sfc" size="524288" crc="8a24fba8" sha1="7edddd098160d3f398ab54b0a587a7cc5ad98ae1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="contra3" cloneof="sprobot">
-		<description>Contra III - The Alien Wars (USA)</description>
-		<year>1992</year>
-		<publisher>Konami</publisher>
-		<info name="release" value="199204xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="contra iii - the alien wars (usa).sfc" size="1048576" crc="84da7cfe" sha1="265886e3f665adf2507e7b2f08b6b2ed9d0018b2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -54785,9 +54902,10 @@ List of unclassified roms
 	</software>
 
 	<software name="starwingswc" cloneof="starwing">
-		<description>Starwing (Euro, Super Weekend Competition)</description>
+		<description>Starwing - Competition (Euro, Not for sale)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNSP-FU-EEC" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
 			<feature name="slot" value="lorom_sfx" />
@@ -54800,7 +54918,7 @@ List of unclassified roms
 	</software>
 
 	<software name="starwinggce" cloneof="starwing">
-		<description>Starwing (Ger, Competition Edition)</description>
+		<description>Starwing - Competition (Ger, Not for sale)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-FU-EEC" />
