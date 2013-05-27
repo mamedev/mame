@@ -519,12 +519,12 @@ READ8_MEMBER( mm1_state::mpsc_dack_r )
 	// clear data request
 	m_dmac->dreq2_w(CLEAR_LINE);
 
-	return m_mpsc->dtra_r();
+	return 1;//m_mpsc->dtra_r();
 }
 
 WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 {
-	m_mpsc->hai_w(data);
+	//m_mpsc->hai_w(data);
 
 	// clear data request
 	m_dmac->dreq1_w(CLEAR_LINE);
@@ -624,36 +624,27 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_NULL,                 // interrupt
-	{
-		{
-			0,                  // receive clock
-			0,                  // transmit clock
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
-			DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
-			DEVCB_NULL,         // wait
-			DEVCB_NULL          // sync output
-		}, {
-			0,                  // receive clock
-			0,                  // transmit clock
-			DEVCB_NULL,         // receive DRQ
-			DEVCB_NULL,         // transmit DRQ
-			DEVCB_NULL,         // receive data
-			DEVCB_NULL,         // transmit data
-			DEVCB_NULL,         // clear to send
-			DEVCB_LINE_GND,     // data carrier detect
-			DEVCB_NULL,         // ready to send
-			DEVCB_NULL,         // data terminal ready
-			DEVCB_NULL,         // wait
-			DEVCB_NULL          // sync output
-		}
-	}
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq2_w),    // receive DRQ
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, drq1_w),    // transmit DRQ
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -740,7 +731,7 @@ static const rs232_port_interface rs232c_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, upd7201_device, ctsb_w)
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsb_w)
 };
 
 

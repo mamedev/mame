@@ -15,7 +15,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/serial.h"
-#include "machine/upd7201.h"
+#include "machine/z80dart.h"
 #include "machine/victor9kb.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"

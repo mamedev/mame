@@ -173,36 +173,27 @@ static const struct pit8253_config pit_intf =
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir1_w), // interrupt
-	{
-		{
-			0,                  // receive clock
-			0,                  // transmit clock
-			DEVCB_NULL,         // receive DRQ
-			DEVCB_NULL,         // transmit DRQ
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
-			DEVCB_NULL,         // wait
-			DEVCB_NULL          // sync output
-		}, {
-			0,                  // receive clock
-			0,                  // transmit clock
-			DEVCB_NULL,         // receive DRQ
-			DEVCB_NULL,         // transmit DRQ
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dcd_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
-			DEVCB_NULL,         // wait
-			DEVCB_NULL          // sync output
-		}
-	}
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir1_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 // MC6852 Interface
@@ -888,10 +879,10 @@ SLOT_INTERFACE_END
 static const rs232_port_interface rs232a_intf =
 {
 	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, dcda_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ria_w),
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsa_w)
 };
 
 
@@ -902,10 +893,10 @@ static const rs232_port_interface rs232a_intf =
 static const rs232_port_interface rs232b_intf =
 {
 	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, dcdb_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, rib_w),
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsb_w)
 };
 
 // Machine Initialization

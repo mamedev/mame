@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(cli_r, sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -632,7 +632,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 {
 	if (BIT(m_sb, 2))
 	{
-		z80dart_txca_w(m_sio, state);
+		m_sio->txca_w(state);
 		m_ctc->trg3(state);
 	}
 
@@ -643,20 +643,20 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 {
 	if (BIT(m_sb, 3))
 	{
-		z80dart_rxca_w(m_sio, state);
+		m_sio->rxca_w(state);
 	}
 
 	if (BIT(m_sb, 4))
 	{
-		z80dart_txca_w(m_sio, state);
+		m_sio->txca_w(state);
 		m_ctc->trg3(state);
 	}
 }
 
 WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 {
-	z80dart_rxca_w(m_dart, state);
-	z80dart_txca_w(m_dart, state);
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
@@ -679,7 +679,7 @@ void abc800_state::clock_cassette(int state)
 	if (m_ctc_z0 && !state)
 	{
 		m_sio_txcb = !m_sio_txcb;
-		z80dart_txcb_w(m_sio, !m_sio_txcb);
+		m_sio->txcb_w(!m_sio_txcb);
 
 		if (m_sio_txdb || m_sio_txcb)
 		{
@@ -692,7 +692,7 @@ void abc800_state::clock_cassette(int state)
 			m_tape_ctr++;
 		}
 
-		z80dart_rxcb_w(m_sio, m_tape_ctr == 15);
+		m_sio->rxcb_w(m_tape_ctr == 15);
 	}
 
 	m_ctc_z0 = state;
@@ -861,8 +861,8 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 
 static ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
 {
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, dcdb_w)
 };
 
 
@@ -872,8 +872,8 @@ static ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
 
 static ABC77_INTERFACE( kb_intf )
 {
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, dcdb_w)
 };
 
 
@@ -1083,16 +1083,16 @@ void abc802_state::machine_reset()
 	bankswitch();
 
 	// clear screen time out (S1)
-	z80dart_dcdb_w(m_sio, BIT(config, 0));
+	m_sio->dcdb_w(BIT(config, 0));
 
 	// unknown (S2)
-	z80dart_ctsb_w(m_sio, BIT(config, 1));
+	m_sio->ctsb_w(BIT(config, 1));
 
 	// 40/80 char (S3)
-	m_dart->ri_w(0, BIT(config, 2)); // 0 = 40, 1 = 80
+	m_dart->ria_w(BIT(config, 2)); // 0 = 40, 1 = 80
 
 	// 50/60 Hz
-	m_dart->cts_w(1, BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
+	m_dart->ctsb_w(BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
 
 	m_dfd_in = 0;
 }

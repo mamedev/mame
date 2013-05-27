@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8_LEGACY(Z80SIO2_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
+	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio2_device, ba_cd_r, ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER( f1_state::sio_int_w )
 {
 	m_sio_int = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int | m_sio_int);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int || m_sio_int);
 }
 
 static Z80DART_INTERFACE( sio_intf )
@@ -261,13 +261,13 @@ WRITE_LINE_MEMBER( f1_state::ctc_int_w )
 
 WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
 {
-	z80dart_rxcb_w(m_sio, state);
-	z80dart_txcb_w(m_sio, state);
+	m_sio->rxcb_w(state);
+	m_sio->txcb_w(state);
 }
 
 WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
 {
-	z80dart_txca_w(m_sio, state);
+	m_sio->txca_w(state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
@@ -321,7 +321,7 @@ static const wd17xx_interface fdc_intf =
 static const centronics_interface centronics_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z80SIO2_TAG, z80dart_ctsa_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO2_TAG, z80dart_device, ctsa_w),
 	DEVCB_NULL
 };
 
@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 
 	/* Devices */
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
-	MCFG_Z80DART_ADD(Z80SIO2_TAG, 2500000, sio_intf)
+	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
 	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)

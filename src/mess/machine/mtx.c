@@ -368,10 +368,6 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 {
 	ram_device *messram = m_ram;
 
-	/* find devices */
-	m_z80ctc = machine().device<z80ctc_device>(Z80CTC_TAG);
-	m_z80dart = machine().device(Z80DART_TAG);
-
 	/* configure memory */
 	membank("bank1")->set_base(memregion("user1")->base());
 	membank("bank2")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);

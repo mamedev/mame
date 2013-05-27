@@ -267,7 +267,7 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 			break;
 
 		case DRT:
-			data = z80dart_ba_cd_r(m_dart, program, A2_A1 ^ 0x03);
+			data = m_dart->ba_cd_r(program, A2_A1 ^ 0x03);
 			break;
 
 		case DMA0:
@@ -521,7 +521,7 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 			break;
 
 		case DRT:
-			z80dart_ba_cd_w(m_dart, program, A2_A1 ^ 0x03, data);
+			m_dart->ba_cd_w(program, A2_A1 ^ 0x03, data);
 			break;
 
 		case DMA0:
@@ -1635,8 +1635,8 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 	// printer baudrate
 	int prbr = BIT(data, 0);
 
-	z80dart_txca_w(m_dart, prbr);
-	z80dart_rxca_w(m_dart, prbr);
+	m_dart->txca_w(prbr);
+	m_dart->rxca_w(prbr);
 }
 
 READ8_MEMBER( abc1600_state::cio_pc_r )
@@ -1736,8 +1736,8 @@ void abc1600_state::fdc_drq_w(bool state)
 
 static ABC99_INTERFACE( abc99_intf )
 {
-	DEVCB_DEVICE_LINE(Z8470AB1_TAG, z80dart_rxtxcb_w),
-	DEVCB_DEVICE_LINE(Z8470AB1_TAG, z80dart_dcdb_w)
+	DEVCB_DEVICE_LINE_MEMBER(Z8470AB1_TAG, z80dart_device, rxtxcb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8470AB1_TAG, z80dart_device, dcdb_w)
 };
 
 

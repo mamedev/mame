@@ -11,7 +11,7 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
-#include "machine/upd7201.h"
+#include "machine/z80dart.h"
 #include "machine/upd765.h"
 #include "sound/speaker.h"
 #include "video/i8275x.h"

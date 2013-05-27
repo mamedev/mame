@@ -49,7 +49,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/upd7201.h"
+#include "machine/z80dart.h"
 #include "machine/terminal.h"
 
 

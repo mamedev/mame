@@ -182,22 +182,70 @@ const int WR5_DTR                   = 0x80;
 
 // device type definition
 const device_type Z80DART = &device_creator<z80dart_device>;
-const device_type Z80SIO0 = &device_creator<z80dart_device>;
-const device_type Z80SIO1 = &device_creator<z80dart_device>;
-const device_type Z80SIO2 = &device_creator<z80dart_device>;
-const device_type Z80SIO3 = &device_creator<z80dart_device>;
-const device_type Z80SIO4 = &device_creator<z80dart_device>;
+const device_type Z80SIO0 = &device_creator<z80sio0_device>;
+const device_type Z80SIO1 = &device_creator<z80sio1_device>;
+const device_type Z80SIO2 = &device_creator<z80sio2_device>;
+const device_type Z80SIO3 = &device_creator<z80sio3_device>;
+const device_type Z80SIO4 = &device_creator<z80sio4_device>;
+const device_type I8274 = &device_creator<i8274_device>;
+const device_type UPD7201 = &device_creator<upd7201_device>;
+
 
 //-------------------------------------------------
 //  z80dart_device - constructor
 //-------------------------------------------------
 
-z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80DART, "Zilog Z80 DART", tag, owner, clock),
-		device_z80daisy_interface(mconfig, *this)
+z80dart_device::z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_z80daisy_interface(mconfig, *this),
+		m_variant(variant)
 {
 	for (int i = 0; i < 8; i++)
 		m_int_state[i] = 0;
+}
+
+z80dart_device::z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, Z80DART, "Z80-DART", tag, owner, clock, "z80dart", __FILE__),
+		device_z80daisy_interface(mconfig, *this),
+		m_variant(TYPE_DART)
+{
+	for (int i = 0; i < 8; i++)
+		m_int_state[i] = 0;
+}
+
+z80sio0_device::z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, Z80SIO0, "Z80-SIO/0", tag, owner, clock, TYPE_SIO0, "z80sio0", __FILE__)
+{
+}
+
+z80sio1_device::z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, Z80SIO1, "Z80-SIO/1", tag, owner, clock, TYPE_SIO1, "z80sio1", __FILE__)
+{
+}
+
+z80sio2_device::z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, Z80SIO2, "Z80-SIO/2", tag, owner, clock, TYPE_SIO2, "z80sio2", __FILE__)
+{
+}
+
+z80sio3_device::z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, Z80SIO3, "Z80-SIO/3", tag, owner, clock, TYPE_SIO3, "z80sio3", __FILE__)
+{
+}
+
+z80sio4_device::z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, Z80SIO4, "Z80-SIO/4", tag, owner, clock, TYPE_SIO4, "z80sio4", __FILE__)
+{
+}
+
+i8274_device::i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, I8274, "I8274", tag, owner, clock, TYPE_I8274, "i8274", __FILE__)
+{
+}
+
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: z80dart_device(mconfig, UPD7201, "uPD7201", tag, owner, clock, TYPE_UPD7201, "upd7201", __FILE__)
+{
 }
 
 
@@ -218,6 +266,7 @@ void z80dart_device::device_config_complete()
 	else
 	{
 		m_rx_clock_a = m_tx_clock_a = m_rx_clock_b = m_tx_clock_b = 0;
+
 		memset(&m_in_rxda_cb, 0, sizeof(m_in_rxda_cb));
 		memset(&m_out_txda_cb, 0, sizeof(m_out_txda_cb));
 		memset(&m_out_dtra_cb, 0, sizeof(m_out_dtra_cb));
@@ -231,6 +280,10 @@ void z80dart_device::device_config_complete()
 		memset(&m_out_wrdyb_cb, 0, sizeof(m_out_wrdyb_cb));
 		memset(&m_out_syncb_cb, 0, sizeof(m_out_syncb_cb));
 		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_rxdrqa_cb, 0, sizeof(m_out_rxdrqa_cb));
+		memset(&m_out_txdrqa_cb, 0, sizeof(m_out_txdrqa_cb));
+		memset(&m_out_rxdrqb_cb, 0, sizeof(m_out_rxdrqb_cb));
+		memset(&m_out_txdrqb_cb, 0, sizeof(m_out_txdrqb_cb));
 	}
 }
 
@@ -244,8 +297,8 @@ void z80dart_device::device_start()
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);
 
-	m_channel[CHANNEL_A].start(this, CHANNEL_A, m_in_rxda_cb, m_out_txda_cb, m_out_dtra_cb, m_out_rtsa_cb, m_out_wrdya_cb, m_out_synca_cb);
-	m_channel[CHANNEL_B].start(this, CHANNEL_B, m_in_rxdb_cb, m_out_txdb_cb, m_out_dtrb_cb, m_out_rtsb_cb, m_out_wrdyb_cb, m_out_syncb_cb);
+	m_channel[CHANNEL_A].start(this, CHANNEL_A, m_in_rxda_cb, m_out_txda_cb, m_out_dtra_cb, m_out_rtsa_cb, m_out_wrdya_cb, m_out_synca_cb, m_out_rxdrqa_cb, m_out_txdrqa_cb);
+	m_channel[CHANNEL_B].start(this, CHANNEL_B, m_in_rxdb_cb, m_out_txdb_cb, m_out_dtrb_cb, m_out_rtsb_cb, m_out_wrdyb_cb, m_out_syncb_cb, m_out_rxdrqa_cb, m_out_txdrqa_cb);
 
 	if (m_rx_clock_a != 0)
 	{
@@ -481,7 +534,7 @@ z80dart_device::dart_channel::dart_channel()
 //  start - channel startup
 //-------------------------------------------------
 
-void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync)
+void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync, const devcb_write_line &out_rxdrq, const devcb_write_line &out_txdrq)
 {
 	m_index = index;
 	m_device = device;
@@ -492,6 +545,8 @@ void z80dart_device::dart_channel::start(z80dart_device *device, int index, cons
 	m_out_rts_func.resolve(out_rts, *m_device);
 	m_out_wrdy_func.resolve(out_wrdy, *m_device);
 	m_out_sync_func.resolve(out_sync, *m_device);
+	m_out_rxdrq_func.resolve(out_rxdrq, *m_device);
+	m_out_txdrq_func.resolve(out_txdrq, *m_device);
 
 	m_device->save_item(NAME(m_rr), m_index);
 	m_device->save_item(NAME(m_wr), m_index);
@@ -1429,57 +1484,6 @@ void z80dart_device::dart_channel::tx_w(int state)
 //**************************************************************************
 //  GLOBAL STUBS
 //**************************************************************************
-
-READ8_DEVICE_HANDLER( z80dart_c_r ) { return downcast<z80dart_device *>(device)->control_read(offset & 1); }
-READ8_DEVICE_HANDLER( z80dart_d_r ) { return downcast<z80dart_device *>(device)->data_read(offset & 1); }
-
-WRITE8_DEVICE_HANDLER( z80dart_c_w ) { downcast<z80dart_device *>(device)->control_write(offset & 1, data); }
-WRITE8_DEVICE_HANDLER( z80dart_d_w ) { downcast<z80dart_device *>(device)->data_write(offset & 1, data); }
-
-WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w ) { downcast<z80dart_device *>(device)->cts_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w ) { downcast<z80dart_device *>(device)->cts_w(CHANNEL_B, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_dcda_w ) { downcast<z80dart_device *>(device)->dcd_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w ) { downcast<z80dart_device *>(device)->dcd_w(CHANNEL_B, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_ria_w ) { downcast<z80dart_device *>(device)->ri_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_rib_w ) { downcast<z80dart_device *>(device)->ri_w(CHANNEL_B, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_synca_w ) { downcast<z80dart_device *>(device)->sync_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_syncb_w ) { downcast<z80dart_device *>(device)->sync_w(CHANNEL_B, state); }
-
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w ) { downcast<z80dart_device *>(device)->rx_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w ) { downcast<z80dart_device *>(device)->tx_w(CHANNEL_A, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxcb_w ) { downcast<z80dart_device *>(device)->rx_w(CHANNEL_B, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_txcb_w ) { downcast<z80dart_device *>(device)->tx_w(CHANNEL_B, state); }
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w ) { downcast<z80dart_device *>(device)->rx_w(CHANNEL_B, state); downcast<z80dart_device *>(device)->tx_w(CHANNEL_B, state); }
-
-READ8_DEVICE_HANDLER( z80dart_cd_ba_r )
-{
-	return (offset & 2) ? z80dart_c_r(device, space, offset & 1) : z80dart_d_r(device, space, offset & 1);
-}
-
-WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w )
-{
-	if (offset & 2)
-		z80dart_c_w(device, space, offset & 1, data);
-	else
-		z80dart_d_w(device, space, offset & 1, data);
-}
-
-READ8_DEVICE_HANDLER( z80dart_ba_cd_r )
-{
-	int channel = BIT(offset, 1);
-
-	return (offset & 1) ? z80dart_c_r(device, space, channel) : z80dart_d_r(device, space, channel);
-}
-
-WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
-{
-	int channel = BIT(offset, 1);
-
-	if (offset & 1)
-		z80dart_c_w(device, space, channel, data);
-	else
-		z80dart_d_w(device, space, channel, data);
-}
 
 READ8_MEMBER( z80dart_device::cd_ba_r )
 {

@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( amu880_io, AS_IO, 8, amu880_state )
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -252,7 +252,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
 	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z0_w),    /* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),    /* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w),    /* ZC/TO1 callback */
 	DEVCB_DRIVER_LINE_MEMBER(amu880_state,ctc_z2_w) /* ZC/TO2 callback */
 };
 

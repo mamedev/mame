@@ -279,7 +279,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
@@ -449,8 +449,8 @@ static Z80PIO_INTERFACE( pio_intf )
 
 WRITE_LINE_MEMBER( super6_state::fr_w )
 {
-	z80dart_rxca_w(m_dart, state);
-	z80dart_txca_w(m_dart, state);
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
 
 	m_ctc->trg1(state);
 }
@@ -459,7 +459,7 @@ static COM8116_INTERFACE( brg_intf )
 {
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(super6_state, fr_w),
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };

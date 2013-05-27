@@ -58,7 +58,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio0_device> m_sio;
 	required_device<upd765a_device> m_fdc;
 	required_device<ay3600_device> m_kbc;
 	required_device<mc6845_device> m_crtc;

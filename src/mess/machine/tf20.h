@@ -18,7 +18,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
-#include "machine/upd7201.h"
+#include "machine/z80dart.h"
 #include "machine/epson_sio.h"
 
 

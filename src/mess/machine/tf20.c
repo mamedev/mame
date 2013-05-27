@@ -86,36 +86,27 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 
 static UPD7201_INTERFACE( tf20_upd7201_intf )
 {
-	DEVCB_NULL,             /* interrupt: nc */
-	{
-		{
-			XTAL_CR2 / 128,     /* receive clock: 38400 baud (default) */
-			XTAL_CR2 / 128,     /* transmit clock: 38400 baud (default) */
-			DEVCB_NULL,         /* receive DRQ */
-			DEVCB_NULL,         /* transmit DRQ */
-			DEVCB_NULL,         /* receive data */
-			DEVCB_NULL,         /* transmit data */
-			DEVCB_NULL,         /* clear to send */
-			DEVCB_LINE_GND,     /* data carrier detect */
-			DEVCB_NULL,         /* ready to send */
-			DEVCB_NULL,         /* data terminal ready */
-			DEVCB_NULL,         /* wait */
-			DEVCB_NULL          /* sync output: nc */
-		}, {
-			XTAL_CR2 / 128,     /* receive clock: 38400 baud (default) */
-			XTAL_CR2 / 128,     /* transmit clock: 38400 baud (default) */
-			DEVCB_NULL,         /* receive DRQ: nc */
-			DEVCB_NULL,         /* transmit DRQ */
-			DEVCB_NULL,         /* receive data */
-			DEVCB_NULL,         /* transmit data */
-			DEVCB_LINE_GND,     /* clear to send */
-			DEVCB_LINE_GND,     /* data carrier detect */
-			DEVCB_NULL,         /* ready to send */
-			DEVCB_NULL,         /* data terminal ready: nc */
-			DEVCB_NULL,         /* wait */
-			DEVCB_NULL          /* sync output: nc */
-		}
-	}
+	XTAL_CR2 / 128, XTAL_CR2 / 128, XTAL_CR2 / 128, XTAL_CR2 / 128,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static SLOT_INTERFACE_START( tf20_floppies )
@@ -262,7 +253,7 @@ void epson_tf20_device::fdc_irq(bool state)
 void epson_tf20_device::tx_w(int level)
 {
 	logerror("%s: tx_w(%d)\n", tag(), level);
-	m_mpsc->rxda_w(level);
+	//m_mpsc->rxda_w(level);
 }
 
 
@@ -284,7 +275,7 @@ void epson_tf20_device::pout_w(int level)
 int epson_tf20_device::rx_r()
 {
 	logerror("%s: rx_r\n", tag());
-	return m_mpsc->txda_r();
+	return 1;//m_mpsc->txda_r();
 }
 
 
@@ -295,7 +286,7 @@ int epson_tf20_device::rx_r()
 int epson_tf20_device::pin_r()
 {
 	logerror("%s: pin_r\n", tag());
-	return m_mpsc->dtra_r();
+	return 1;//m_mpsc->dtra_r();
 }
 
 

@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
 	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
@@ -688,9 +688,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), // interrupt handler
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxca_w),  // ZC/TO0 callback
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_txca_w),  // ZC/TO1 callback
-	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w) // ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxca_w),  // ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, txca_w),  // ZC/TO1 callback
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w) // ZC/TO2 callback
 };
 
 

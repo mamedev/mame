@@ -153,8 +153,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, str_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
@@ -499,13 +498,13 @@ void xerox820_state::fdc_drq_w(bool state)
 
 WRITE_LINE_MEMBER( xerox820_state::fr_w )
 {
-	z80dart_rxca_w(m_sio, state);
-	z80dart_txca_w(m_sio, state);
+	m_sio->rxca_w(state);
+	m_sio->txca_w(state);
 }
 
 WRITE_LINE_MEMBER( xerox820_state::ft_w )
 {
-	z80dart_rxtxcb_w(m_sio, state);
+	m_sio->rxtxcb_w(state);
 }
 
 static COM8116_INTERFACE( com8116_intf )

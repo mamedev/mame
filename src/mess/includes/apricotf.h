@@ -51,11 +51,12 @@ public:
 			m_ctc_int(CLEAR_LINE),
 			m_sio_int(CLEAR_LINE),
 			m_p_scrollram(*this, "p_scrollram"),
-			m_p_paletteram(*this, "p_paletteram"){ }
+			m_p_paletteram(*this, "p_paletteram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio2_device> m_sio;
 	required_device<wd2797_device> m_fdc;
 	required_device<legacy_floppy_image_device> m_floppy0;
 	required_device<centronics_device> m_centronics;

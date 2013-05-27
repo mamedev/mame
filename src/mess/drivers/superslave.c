@@ -253,16 +253,16 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( superslave_state::fr_w )
 {
-	z80dart_rxca_w(m_dart0, state);
-	z80dart_txca_w(m_dart0, state);
-	z80dart_rxca_w(m_dart1, state);
-	z80dart_txca_w(m_dart1, state);
+	m_dart0->rxca_w(state);
+	m_dart0->txca_w(state);
+	m_dart1->rxca_w(state);
+	m_dart1->txca_w(state);
 }
 
 WRITE_LINE_MEMBER( superslave_state::ft_w )
 {
-	z80dart_rxtxcb_w(m_dart0, state);
-	z80dart_rxtxcb_w(m_dart1, state);
+	m_dart0->rxtxcb_w(state);
+	m_dart1->rxtxcb_w(state);
 }
 
 static COM8116_INTERFACE( dbrg_intf )

@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs128_io, AS_IO, 8, mtx_state )
 	AM_IMPORT_FROM(mtx_io)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, cd_ba_r, cd_ba_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -220,18 +220,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 
 WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
 {
-	if (m_z80dart != NULL)
+	if (m_z80dart)
 	{
-		z80dart_rxca_w(m_z80dart, state);
-		z80dart_txca_w(m_z80dart, state);
+		m_z80dart->rxca_w(state);
+		m_z80dart->txca_w(state);
 	}
 }
 
 WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
 {
-	if (m_z80dart != NULL)
+	if (m_z80dart)
 	{
-		z80dart_rxtxcb_w(m_z80dart, state);
+		m_z80dart->rxtxcb_w(state);
 	}
 }
 

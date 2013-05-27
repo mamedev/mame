@@ -172,10 +172,7 @@ static ADDRESS_MAP_START( bw12_io, AS_IO, 8, bw12_state )
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x20, 0x21) AM_MIRROR(0x0e) AM_DEVICE(UPD765_TAG, upd765a_device, map)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0x0c) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
-	AM_RANGE(0x42, 0x42) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
-	AM_RANGE(0x43, 0x43) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVWRITE(MC1408_TAG, dac_device, write_unsigned8)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(PIT8253_TAG, pit8253_r, pit8253_w)
 ADDRESS_MAP_END
@@ -473,10 +470,10 @@ static Z80DART_INTERFACE( sio_intf )
 
 /* PIT8253 Interface */
 
-WRITE_LINE_MEMBER(bw12_state::pit_out0_w)
+WRITE_LINE_MEMBER( bw12_state::pit_out0_w )
 {
-	z80dart_txca_w(m_sio, state);
-	z80dart_rxca_w(m_sio, state);
+	m_sio->txca_w(state);
+	m_sio->rxca_w(state);
 }
 
 WRITE_LINE_MEMBER( bw12_state::pit_out2_w )
@@ -495,7 +492,7 @@ static const struct pit8253_config pit_intf =
 		{
 			XTAL_1_8432MHz,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w)
+			DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, rxtxcb_w)
 		},
 		{
 			XTAL_1_8432MHz,

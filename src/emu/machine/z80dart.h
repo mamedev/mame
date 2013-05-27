@@ -1,6 +1,9 @@
 /***************************************************************************
 
-    Z80 DART Dual Asynchronous Receiver/Transmitter implementation
+    Z80-DART Dual Asynchronous Receiver/Transmitter emulation
+    Z80-SIO/1/2/4 Serial Input/Output Controller emulation
+    Intel 8274 Multi-Protocol Serial Controller emulation
+    NEC uPD7201 Multiprotocol Serial Communications Controller emulation
 
     Copyright (c) 2008, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -17,7 +20,7 @@
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
                _W/RDYA  10 |   Z80-DART  | 31  GND
-                  _RIA  11 |             | 30  _W/RDYB
+                  _RIA  11 |    Z8470    | 30  _W/RDYB
                   RxDA  12 |             | 29  _RIB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxTxCB
@@ -39,7 +42,7 @@
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
                _W/RDYA  10 |  Z80-SIO/0  | 31  GND
-                _SYNCA  11 |             | 30  _W/RDYB
+                _SYNCA  11 |    Z8440    | 30  _W/RDYB
                   RxDA  12 |             | 29  _SYNCB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxTxCB
@@ -61,7 +64,7 @@
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
                _W/RDYA  10 |  Z80-SIO/1  | 31  GND
-                _SYNCA  11 |             | 30  _W/RDYB
+                _SYNCA  11 |    Z8441    | 30  _W/RDYB
                   RxDA  12 |             | 29  _SYNCB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxCB
@@ -83,7 +86,7 @@
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
                _W/RDYA  10 |  Z80-SIO/2  | 31  GND
-                _SYNCA  11 |             | 30  _W/RDYB
+                _SYNCA  11 |    Z8442    | 30  _W/RDYB
                   RxDA  12 |             | 29  _RxDB
                  _RxCA  13 |             | 28  _RxCB
                  _TxCA  14 |             | 27  _TxCB
@@ -93,6 +96,50 @@
                  _CTSA  18 |             | 23  _CTSB
                  _DCDA  19 |             | 22  _DCDB
                    CLK  20 |_____________| 21  _RESET
+
+                            _____   _____
+                   CLK   1 |*    \_/     | 40  Vcc
+                _RESET   2 |             | 39  _CTSA
+                  _CDA   3 |             | 38  _RTSA
+                 _RxCB   4 |             | 37  TxDA
+                  _CDB   5 |             | 36  _TxCA
+                 _CTSB   6 |             | 35  _RxCA
+                 _TxCB   7 |             | 34  RxDA
+                  TxDB   8 |             | 33  _SYNDETA
+                  RxDB   9 |             | 32  RDYA/RxDRQA
+        _RTSB/_SYNDETB  10 |    I8274    | 31  _DTRA
+          RDYB/_TxDRQA  11 |             | 30  _IPO/TxDRQB
+                    D7  12 |             | 29  _IPI/RxDRQB
+                    D6  13 |             | 28  _INT
+                    D5  14 |             | 27  _INTA
+                    D4  15 |             | 26  _DTRB
+                    D3  16 |             | 25  A0
+                    D2  17 |             | 24  A1
+                    D1  18 |             | 23  _CS
+                    D0  19 |             | 22  _RD
+                   Vss  20 |_____________| 21  _WR
+
+                            _____   _____
+                   CLK   1 |*    \_/     | 40  Vcc
+                _RESET   2 |             | 39  _CTSA
+                 _DCDA   3 |             | 38  _RTSA
+                 _RxCB   4 |             | 37  TxDA
+                 _DCDB   5 |             | 36  _TxCA
+                 _CTSB   6 |             | 35  _RxCA
+                 _TxCB   7 |             | 34  RxDA
+                  TxDB   8 |             | 33  _SYNCA
+                  RxDB   9 |             | 32  _WAITA/DRQRxA
+          _RTSB/_SYNCB  10 |   UPD7201   | 31  _DTRA/_HAO
+        _WAITB/_DRQTxA  11 |             | 30  _PRO/DRQTxB
+                    D7  12 |             | 29  _PRI/DRQRxB
+                    D6  13 |             | 28  _INT
+                    D5  14 |             | 27  _INTAK
+                    D4  15 |             | 26  _DTRB/_HAI
+                    D3  16 |             | 25  B/_A
+                    D2  17 |             | 24  C/_D
+                    D1  18 |             | 23  _CS
+                    D0  19 |             | 22  _RD
+                   Vss  20 |_____________| 21  _WR
 
 ***************************************************************************/
 
@@ -131,10 +178,21 @@
 	MCFG_DEVICE_ADD(_tag, Z80SIO4, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_I8274_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, I8274, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
+
+#define MCFG_UPD7201_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, UPD7201, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
+
 #define MCFG_Z80DART_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define Z80DART_INTERFACE(_name) \
+	const z80dart_interface (_name) =
+
+#define UPD7201_INTERFACE(_name) \
 	const z80dart_interface (_name) =
 
 
@@ -168,8 +226,11 @@ struct z80dart_interface
 	devcb_write_line    m_out_syncb_cb;
 
 	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_rxdrqa_cb;
+	devcb_write_line    m_out_txdrqa_cb;
+	devcb_write_line    m_out_rxdrqb_cb;
+	devcb_write_line    m_out_txdrqb_cb;
 };
-
 
 
 // ======================> z80dart_device
@@ -182,6 +243,7 @@ class z80dart_device :  public device_t,
 
 public:
 	// construction/destruction
+	z80dart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( cd_ba_r );
@@ -217,14 +279,27 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { dcd_w(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( ria_w ) { ri_w(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( rib_w ) { ri_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { rx_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { rx_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( txa_w ) { tx_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( txb_w ) { tx_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { rx_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { rx_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( txca_w ) { tx_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { tx_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { rx_w(1, state); tx_w(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( synca_w ) { sync_w(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { sync_w(1, state); }
 
-private:
+protected:
+	enum
+	{
+		TYPE_DART,
+		TYPE_SIO0,
+		TYPE_SIO1,
+		TYPE_SIO2,
+		TYPE_SIO3,
+		TYPE_SIO4,
+		TYPE_I8274,
+		TYPE_UPD7201
+	};
+
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -247,7 +322,7 @@ private:
 	public:
 		dart_channel();
 
-		void start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync);
+		void start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync, const devcb_write_line &out_rxdrq, const devcb_write_line &out_txdrq);
 		void reset();
 
 		UINT8 control_read();
@@ -291,6 +366,8 @@ private:
 		devcb_resolved_write_line   m_out_rts_func;
 		devcb_resolved_write_line   m_out_wrdy_func;
 		devcb_resolved_write_line   m_out_sync_func;
+		devcb_resolved_write_line   m_out_rxdrq_func;
+		devcb_resolved_write_line   m_out_txdrq_func;
 
 		// register state
 		UINT8 m_rr[3];              // read register
@@ -341,6 +418,78 @@ private:
 	emu_timer *                     m_txca_timer;
 	emu_timer *                     m_rxcb_timer;
 	emu_timer *                     m_txcb_timer;
+
+	int m_variant;
+};
+
+
+// ======================> z80sio0_device
+
+class z80sio0_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	z80sio0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> z80sio1_device
+
+class z80sio1_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	z80sio1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> z80sio2_device
+
+class z80sio2_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	z80sio2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> z80sio3_device
+
+class z80sio3_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	z80sio3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> z80sio4_device
+
+class z80sio4_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	z80sio4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> i8274_device
+
+class i8274_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> upd7201_device
+
+class upd7201_device :  public z80dart_device
+{
+public:
+	// construction/destruction
+	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -351,49 +500,9 @@ extern const device_type Z80SIO1;
 extern const device_type Z80SIO2;
 extern const device_type Z80SIO3;
 extern const device_type Z80SIO4;
+extern const device_type I8274;
+extern const device_type UPD7201;
 
 
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-// register access
-DECLARE_READ8_DEVICE_HANDLER( z80dart_cd_ba_r );
-DECLARE_WRITE8_DEVICE_HANDLER( z80dart_cd_ba_w );
-
-DECLARE_READ8_DEVICE_HANDLER( z80dart_ba_cd_r );
-DECLARE_WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w );
-
-// control register access
-DECLARE_WRITE8_DEVICE_HANDLER( z80dart_c_w );
-DECLARE_READ8_DEVICE_HANDLER( z80dart_c_r );
-
-// data register access
-DECLARE_WRITE8_DEVICE_HANDLER( z80dart_d_w );
-DECLARE_READ8_DEVICE_HANDLER( z80dart_d_r );
-
-// serial clocks
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxcb_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_txcb_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w );
-
-// ring indicator
-WRITE_LINE_DEVICE_HANDLER( z80dart_ria_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_rib_w );
-
-// data carrier detected
-WRITE_LINE_DEVICE_HANDLER( z80dart_dcda_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w );
-
-// clear to send
-WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w );
-
-// sync
-WRITE_LINE_DEVICE_HANDLER( z80dart_synca_w );
-WRITE_LINE_DEVICE_HANDLER( z80dart_syncb_w );
 
 #endif

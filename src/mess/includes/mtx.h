@@ -10,6 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "machine/ctronics.h"
+#include "machine/z80dart.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
 #include "machine/ram.h"
@@ -31,12 +32,18 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 		m_sn(*this, SN76489A_TAG),
+		m_z80ctc(*this, Z80CTC_TAG),
+		m_z80dart(*this, Z80DART_TAG),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76489a_device> m_sn;
+	required_device<z80ctc_device> m_z80ctc;
+	optional_device<z80dart_device> m_z80dart;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 
 	/* keyboard state */
 	UINT8 m_key_sense;
@@ -47,13 +54,6 @@ public:
 
 	/* sound state */
 	UINT8 m_sound_latch;
-
-	/* devices */
-	z80ctc_device *m_z80ctc;
-	device_t *m_z80dart;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
-	centronics_device *m_centronics;
 
 	/* timers */
 	device_t *m_cassette_timer;

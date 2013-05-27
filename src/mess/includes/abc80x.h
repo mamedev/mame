@@ -97,7 +97,7 @@ public:
 	required_device<legacy_cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio2_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
