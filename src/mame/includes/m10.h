@@ -54,14 +54,14 @@ public:
 	required_shared_ptr<UINT8> m_chargen;
 
 	/* video-related */
-	tilemap_t *           m_tx_tilemap;
+	tilemap_t *         m_tx_tilemap;
 	gfx_element *       m_back_gfx;
 
 	/* this is currently unused, because it is needed by gfx_layout (which has no machine) */
 	UINT32              extyoffs[32 * 8];
 
 	/* video state */
-	UINT8                 m_bottomline;
+	UINT8               m_bottomline;
 	UINT8               m_flip;
 
 	/* misc */

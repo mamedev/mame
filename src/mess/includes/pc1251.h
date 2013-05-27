@@ -17,6 +17,11 @@
 class pc1251_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_POWER_UP
+	};
+
 	pc1251_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
@@ -28,7 +33,6 @@ public:
 
 	DECLARE_DRIVER_INIT(pc1251);
 	UINT32 screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pc1251_power_up);
 	DECLARE_WRITE8_MEMBER(pc1251_outa);
 	DECLARE_WRITE8_MEMBER(pc1251_outb);
 	DECLARE_WRITE8_MEMBER(pc1251_outc);
@@ -42,6 +46,9 @@ public:
 	virtual void machine_start();
 	DECLARE_MACHINE_START(pc1260);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* PC1251_H_ */

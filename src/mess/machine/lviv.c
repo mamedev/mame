@@ -40,15 +40,22 @@ void lviv_state::lviv_update_memory ()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lviv_state::lviv_reset)
+void lviv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	machine().schedule_soft_reset();
+	switch (id)
+	{
+	case TIMER_RESET:
+		machine().schedule_soft_reset();
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in lviv_state::device_timer");
+	}
 }
 
 DIRECT_UPDATE_MEMBER(lviv_state::lviv_directoverride)
 {
 	if (ioport("RESET")->read() & 0x01)
-		machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(lviv_state::lviv_reset),this));
+		timer_set(attotime::from_usec(10), TIMER_RESET);
 	return address;
 }
 

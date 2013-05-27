@@ -445,6 +445,11 @@ struct nes_input
 class nes_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_LIGHTGUN_TICK
+	};
+
 	nes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cartslot(*this, "nes_slot")
@@ -535,8 +540,11 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
 
 	void fds_irq(int scanline, int vblank, int blanked);
-private:
 
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
 	/* devices */
 	cpu_device        *m_maincpu;
 	ppu2c0x_device    *m_ppu;

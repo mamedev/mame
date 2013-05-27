@@ -12,6 +12,26 @@
 #include "includes/mbee.h"
 #include "machine/z80bin.h"
 
+
+void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_MBEE256_KBD:
+		mbee256_kbd(ptr, param);
+		break;
+	case TIMER_MBEE_RTC_IRQ:
+		mbee_rtc_irq(ptr, param);
+		break;
+	case TIMER_MBEE_RESET:
+		mbee_reset(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mbee_state::device_timer");
+	}
+}
+
+
 /***********************************************************
 
     PIO
@@ -185,6 +205,8 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee256_kbd)
 	/* if anything queued, cause an interrupt */
 	if (m_mbee256_q_pos)
 		m_mbee256_key_available = 2; // set irq
+
+	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);
 }
 
 READ8_MEMBER( mbee_state::mbee256_18_r )
@@ -247,6 +269,7 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_rtc_irq)
 {
 	UINT8 data = m_rtc->read(m_maincpu->space(AS_PROGRAM), 12);
 	if (data) m_clock_pulse = 0x80;
+	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);
 }
 
 
@@ -513,14 +536,14 @@ void mbee_state::machine_reset_common_disk()
 MACHINE_RESET_MEMBER(mbee_state,mbee)
 {
 	m_boot->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
+	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee56)
 {
 	machine_reset_common_disk();
 	m_boot->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
+	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee64)
@@ -548,7 +571,7 @@ MACHINE_RESET_MEMBER(mbee_state,mbee256)
 	m_mbee256_q_pos = 0;
 	mbee256_50_w(mem,0,0); // set banks to default
 	m_boot->set_entry(8); // boot time
-	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
+	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbeett)
@@ -557,7 +580,7 @@ MACHINE_RESET_MEMBER(mbee_state,mbeett)
 	for (i = 0; i < 15; i++) m_mbee256_was_pressed[i] = 0;
 	m_mbee256_q_pos = 0;
 	m_boot->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(4), timer_expired_delegate(FUNC(mbee_state::mbee_reset),this));
+	timer_set(attotime::from_usec(4), TIMER_MBEE_RESET);
 }
 
 INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
@@ -714,8 +737,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	m_bank8l->configure_entry(0, &RAM[0x0000]); // rom
 	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));   /* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));   /* timer for kbd */
+	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
+	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
 }
@@ -734,8 +757,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 	m_pak->set_entry(5);
 	m_telcom->set_entry(0);
 
-	machine().scheduler().timer_pulse(attotime::from_hz(1), timer_expired_delegate(FUNC(mbee_state::mbee_rtc_irq),this));   /* timer for rtc */
-	machine().scheduler().timer_pulse(attotime::from_hz(25), timer_expired_delegate(FUNC(mbee_state::mbee256_kbd),this));   /* timer for kbd */
+	timer_set(attotime::from_hz(1), TIMER_MBEE_RTC_IRQ);   /* timer for rtc */
+	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
 }

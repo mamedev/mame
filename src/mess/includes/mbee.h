@@ -26,6 +26,13 @@
 class mbee_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_MBEE256_KBD,
+		TIMER_MBEE_RTC_IRQ,
+		TIMER_MBEE_RESET
+	};
+
 	mbee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -208,6 +215,7 @@ protected:
 	optional_ioport m_io_x14;
 
 	void machine_reset_common_disk();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

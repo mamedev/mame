@@ -16,6 +16,13 @@
 class pmd85_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_CASSETTE,
+		TIMER_RESET,
+		TIMER_SETUP_MACHINE_STATE
+	};
+
 	pmd85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -144,6 +151,7 @@ protected:
 	void c2717_update_memory();
 	void pmd85_common_driver_init();
 	void pmd85_draw_scanline(bitmap_ind16 &bitmap, int pmd85_scanline);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

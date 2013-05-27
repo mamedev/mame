@@ -22,6 +22,12 @@
 class microtan_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_READ_CASSETTE,
+		TIMER_PULSE_NMI
+	};
+
 	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -91,6 +97,9 @@ public:
 	void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

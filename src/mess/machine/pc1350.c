@@ -83,9 +83,16 @@ READ_LINE_MEMBER(pc1350_state::pc1350_brk)
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-TIMER_CALLBACK_MEMBER(pc1350_state::pc1350_power_up)
+void pc1350_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_power=0;
+	switch (id)
+	{
+	case TIMER_POWER_UP:
+		m_power=0;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in pc1350_state::device_timer");
+	}
 }
 
 void pc1350_state::machine_start()
@@ -93,7 +100,7 @@ void pc1350_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_power = 1;
-	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1350_state::pc1350_power_up),this));
+	timer_set(attotime::from_seconds(1), TIMER_POWER_UP);
 
 	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
 	membank("bank1")->set_base(&m_ram->pointer()[0x0000]);

@@ -298,6 +298,22 @@ WRITE_LINE_MEMBER(microtan_state::via_1_irq)
 	microtan_set_irq_line();
 }
 
+void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_READ_CASSETTE:
+		microtan_read_cassette(ptr, param);
+		break;
+	case TIMER_PULSE_NMI:
+		microtan_pulse_nmi(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in microtan_state::device_timer");
+	}
+}
+
+
 /**************************************************************
  * VIA interface structure
  **************************************************************/
@@ -392,7 +408,7 @@ WRITE8_MEMBER(microtan_state::microtan_bffx_w)
 		break;
 	case 1: /* BFF1: write delayed NMI */
 		LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(8), timer_expired_delegate(FUNC(microtan_state::microtan_pulse_nmi),this));
+		timer_set(m_maincpu->cycles_to_attotime(8), TIMER_PULSE_NMI);
 		break;
 	case 2: /* BFF2: write keypad column write (what is this meant for?) */
 		LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
@@ -557,7 +573,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 			break;
 	}
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(microtan_state::microtan_read_cassette),this));
+	m_timer = timer_alloc(TIMER_READ_CASSETTE);
 }
 
 void microtan_state::machine_reset()

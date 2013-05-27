@@ -29,6 +29,11 @@ struct bebox_devices_t
 class bebox_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_GET_DEVICES
+	};
+
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_ppc1(*this, "ppc1"),
@@ -51,7 +56,6 @@ public:
 	DECLARE_DRIVER_INIT(bebox);
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_CALLBACK_MEMBER(bebox_get_devices);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -100,6 +104,9 @@ public:
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

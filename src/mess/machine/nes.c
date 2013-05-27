@@ -399,6 +399,19 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 }
 
 
+void nes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LIGHTGUN_TICK:
+		lightgun_tick(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in nes_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 {
 	if ((m_io_ctrlsel->read() & 0x000f) == 0x0002)
@@ -429,7 +442,7 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 	int cfg = m_io_ctrlsel->read();
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(nes_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	if ((cfg & 0x000f) >= 0x08) // for now we treat the FC keyboard separately from other inputs!
 	{

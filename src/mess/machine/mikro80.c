@@ -67,14 +67,21 @@ I8255_INTERFACE( mikro80_ppi8255_interface )
 };
 
 
-TIMER_CALLBACK_MEMBER(mikro80_state::mikro80_reset)
+void mikro80_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_bank1->set_entry(0);
+	switch (id)
+	{
+	case TIMER_RESET:
+		m_bank1->set_entry(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mikro80_state::device_timer");
+	}
 }
 
 void mikro80_state::machine_reset()
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(mikro80_state::mikro80_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
 	m_keyboard_mask = 0;
 }

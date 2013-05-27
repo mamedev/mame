@@ -954,11 +954,19 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 }
 
 
-TIMER_CALLBACK_MEMBER(bebox_state::bebox_get_devices){
-	m_devices.pic8259_master = machine().device<pic8259_device>("pic8259_master");
-	m_devices.pic8259_slave = machine().device<pic8259_device>("pic8259_slave");
-	m_devices.dma8237_1 = machine().device<i8237_device>("dma8237_1");
-	m_devices.dma8237_2 = machine().device<i8237_device>("dma8237_2");
+void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_GET_DEVICES:
+		m_devices.pic8259_master = machine().device<pic8259_device>("pic8259_master");
+		m_devices.pic8259_slave = machine().device<pic8259_device>("pic8259_slave");
+		m_devices.dma8237_1 = machine().device<i8237_device>("dma8237_1");
+		m_devices.dma8237_2 = machine().device<i8237_device>("dma8237_2");
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in bebox_state::device_timer");
+	}
 }
 
 
@@ -975,7 +983,7 @@ void bebox_state::machine_reset()
 	m_devices.dma8237_1 = NULL;
 	m_devices.dma8237_2 = NULL;
 
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(bebox_state::bebox_get_devices),this));
+	timer_set(attotime::zero, TIMER_GET_DEVICES);
 
 	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_ppc2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

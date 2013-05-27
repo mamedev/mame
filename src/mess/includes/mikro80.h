@@ -13,6 +13,11 @@
 class mikro80_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RESET
+	};
+
 	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cursor_ram(*this, "cursor_ram"),
@@ -50,9 +55,9 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(mikro80_reset);
 
 protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	required_device<i8255_device> m_ppi8255;
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_region_maincpu;
