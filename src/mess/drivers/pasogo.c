@@ -93,6 +93,10 @@ Notes:
 although it is very related to standard pc hardware, it is different enough
 to make the standard pc driver one level more complex, so own driver
 
+TODO:
+- Make a separate device of the Vadem VG230 core (it is also used in the HP
+  OmniGo 100 and 120).
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -101,6 +105,9 @@ to make the standard pc driver one level more complex, so own driver
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
+#include "sound/speaker.h"
+#include "machine/i8255.h"
+
 
 /*
   rtc interrupt irq 2
@@ -148,12 +155,15 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_dma8237(*this, "dma8237")
 		, m_pit8253(*this, "pit8254")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<am9517a_device> m_dma8237;
 	required_device<pit8253_device> m_pit8253;
+	required_device<speaker_sound_device> m_speaker;
+
 	DECLARE_READ8_MEMBER(ems_r);
 	DECLARE_WRITE8_MEMBER(ems_w);
 	DECLARE_READ8_MEMBER(vg230_io_r);
@@ -170,6 +180,11 @@ public:
 	IRQ_CALLBACK_MEMBER(pasogo_irq_callback);
 	void vg230_reset();
 	void vg230_init();
+	DECLARE_READ8_MEMBER( page_r );
+	DECLARE_WRITE8_MEMBER( page_w );
+	DECLARE_WRITE_LINE_MEMBER( speaker_set_spkrdata );
+	DECLARE_WRITE_LINE_MEMBER( pit8253_out1_changed );
+	DECLARE_WRITE_LINE_MEMBER( pit8253_out2_changed );
 	DECLARE_WRITE_LINE_MEMBER( dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( dma8237_out_eop );
 	DECLARE_READ8_MEMBER( dma_read_byte );
@@ -186,12 +201,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dack1_w ) { select_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack2_w ) { select_dma_channel(2, state); }
 	DECLARE_WRITE_LINE_MEMBER( dack3_w ) { select_dma_channel(3, state); }
+	DECLARE_READ8_MEMBER( ppi_porta_r );
+	DECLARE_READ8_MEMBER( ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( ppi_portb_w );
 
 protected:
 	UINT8 m_u73_q2;
+	UINT8 m_out1;
 	int m_dma_channel;
 	bool m_cur_eop;
 	UINT8 m_dma_offset[4];
+	UINT8 m_pc_spkrdata;
+	UINT8 m_pc_input;
+
+    int m_ppi_portc_switch_high;
+    int m_ppi_speaker;
+    int m_ppi_keyboard_clear;
+    UINT8 m_ppi_keyb_clock;
+    UINT8 m_ppi_portb;
+    UINT8 m_ppi_clock_signal;
+    UINT8 m_ppi_data_signal;
+    UINT8 m_ppi_shift_register;
+    UINT8 m_ppi_shift_enable;
+
 };
 
 
@@ -474,6 +506,7 @@ static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff )
 ADDRESS_MAP_END
 
@@ -581,7 +614,40 @@ IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
 void pasogo_state::machine_reset()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pasogo_state::pasogo_irq_callback),this));
+	m_u73_q2 = 0;
+	m_out1 = 2; // initial state of pit output is undefined
+	m_pc_spkrdata = 0;
+	m_pc_input = 0;
+	m_dma_channel = -1;
+	m_cur_eop = false;
 }
+
+
+WRITE_LINE_MEMBER(pasogo_state::speaker_set_spkrdata)
+{
+	m_pc_spkrdata = state ? 1 : 0;
+	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+}
+
+
+WRITE_LINE_MEMBER( pasogo_state::pit8253_out1_changed )
+{
+	/* Trigger DMA channel #0 */
+	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
+	{
+		m_u73_q2 = 1;
+		m_dma8237->dreq0_w( m_u73_q2 );
+	}
+	m_out1 = state;
+}
+
+
+WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
+{
+	m_pc_input = state ? 1 : 0;
+	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+}
+
 
 static const pit8253_config pc_pit8254_config =
 {
@@ -593,14 +659,37 @@ static const pit8253_config pc_pit8254_config =
 		}, {
 			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pit8253_out1_changed)
 		}, {
 			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pit8253_out2_changed)
 		}
 	}
 };
+
+
+READ8_MEMBER( pasogo_state::page_r )
+{
+	return 0xFF;
+}
+
+
+WRITE8_MEMBER( pasogo_state::page_w )
+{
+	switch(offset % 4)
+	{
+		case 1:
+			m_dma_offset[2] = data;
+			break;
+		case 2:
+			m_dma_offset[3] = data;
+			break;
+		case 3:
+			m_dma_offset[0] = m_dma_offset[1] = data;
+			break;
+	}
+}
 
 
 WRITE_LINE_MEMBER( pasogo_state::dma_hrq_changed )
@@ -733,6 +822,85 @@ static I8237_INTERFACE( dma8237_config )
 };
 
 
+READ8_MEMBER (pasogo_state::ppi_porta_r)
+{
+	int data = 0xFF;
+	/* KB port A */
+	if (m_ppi_keyboard_clear)
+	{
+		//data = ioport("DSW0")->read();
+	}
+	else
+	{
+		data = m_ppi_shift_register;
+	}
+	return data;
+}
+
+
+READ8_MEMBER ( pasogo_state::ppi_portc_r )
+{
+	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int data=0xff;
+
+	data&=~0x80; // no parity error
+	data&=~0x40; // no error on expansion board
+	/* KB port C: equipment flags */
+	if (m_ppi_portc_switch_high)
+	{
+		/* read hi nibble of S2 */
+		//data = (data & 0xf0) | ((ioport("DSW0")->read() >> 4) & 0x0f);
+	}
+	else
+	{
+		/* read lo nibble of S2 */
+		//data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
+	}
+
+	if ( m_ppi_portb & 0x01 )
+	{
+		data = ( data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
+	}
+	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+
+	return data;
+}
+
+
+WRITE8_MEMBER( pasogo_state::ppi_portb_w )
+{
+	/* PPI controller port B*/
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x08;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	speaker_set_spkrdata( data & 0x02 );
+
+	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
+	//m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
+
+	/* If PB7 is set clear the shift register and reset the IRQ line */
+	if ( m_ppi_keyboard_clear )
+	{
+		m_pic8259->ir1_w(0);
+		m_ppi_shift_register = 0;
+		m_ppi_shift_enable = 1;
+	}
+}
+
+
+static I8255A_INTERFACE( ppi8255_interface )
+{
+	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_portb_w),
+	DEVCB_DRIVER_MEMBER(pasogo_state, ppi_portc_r),
+	DEVCB_NULL
+};
+
+
 WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
@@ -752,6 +920,8 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, dma8237_config )
 
+	MCFG_I8255_ADD( "ppi8255", ppi8255_interface )
+
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 400)
@@ -759,6 +929,10 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pasogo_palette))
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
