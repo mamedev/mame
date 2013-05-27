@@ -2892,6 +2892,7 @@
 		<info name="release" value="19910405"/>
 		<info name="alt_title" value="ポピュラス"/>
 		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="populous" />
 			<dataarea name="rom" size="524288">
 				<rom name="populous (japan).pce" size="524288" crc="083c956a" sha1="4912ccc31bdd45ef9483ea345bbe4c4ff2d70779" offset="000000" />
 			</dataarea>
@@ -2906,6 +2907,7 @@
 		<info name="release" value="19910405"/>
 		<info name="alt_title" value="ポピュラス"/>
 		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="populous" />
 			<dataarea name="rom" size="524288">
 				<rom name="populous (japan) [a].pce" size="524288" crc="0a9ade99" sha1="8e021703241c20ebd2a40ee55788c3a5fc4b8592" offset="000000" />
 			</dataarea>
@@ -3666,6 +3668,7 @@
 		<info name="release" value="19930612"/>
 		<info name="alt_title" value="ストリートファイターIIダッシュ"/>
 		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="sf2" />
 			<dataarea name="rom" size="2621440">
 				<rom name="street fighter ii' - champion edition (japan).pce" size="2621440" crc="d15cb6bb" sha1="e757ecdf857803cb46cdf37ecf4596f6eaccdd76" offset="000000" />
 			</dataarea>
@@ -4442,6 +4445,7 @@
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
+			<feature name="slot" value="cdsys3j" />
 			<dataarea name="rom" size="262144">
 				<rom name="[cd] super cd-rom system (japan) (v3.0).pce" size="262144" crc="6d9a73ef" sha1="79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c" offset="000000" />
 			</dataarea>

@@ -13,14 +13,13 @@
 #include "cpu/h6280/h6280.h"
 #include "sound/msm5205.h"
 #include "machine/nvram.h"
+#include "machine/pce_slot.h"
 #include "video/huc6260.h"
 
 #define C6280_TAG           "c6280"
 
 #define MAIN_CLOCK      21477270
 #define PCE_CD_CLOCK    9216000
-
-#define PCE_HEADER_SIZE     512
 
 #define TG_16_JOY_SIG       0x00
 #define PCE_JOY_SIG         0x40
@@ -29,8 +28,6 @@
 /* these might be used to indicate something, but they always seem to return 1 */
 #define CONST_SIG           0x30
 
-/* the largest possible cartridge image (street fighter 2 - 2.5MB) */
-#define PCE_ROM_MAXSIZE     0x280000
 
 struct pce_cd_t
 {
@@ -114,7 +111,8 @@ public:
 		m_cd_ram(*this, "cd_ram"),
 		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260"),
-		m_msm5205(*this, "msm5205")
+		m_msm5205(*this, "msm5205"),
+		m_cartslot(*this, "cartslot")
 	{ }
 
 	required_device<h6280_device> m_maincpu;
@@ -122,16 +120,15 @@ public:
 	required_shared_ptr<UINT8> m_user_ram;
 	optional_device<huc6260_device> m_huc6260;
 	optional_device<msm5205_device> m_msm5205;
+	required_device<pce_cart_slot_device> m_cartslot;
+
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
 	UINT8 m_acard;
 	pce_cd_t m_cd;
-	UINT8 *m_cartridge_ram;
 	int m_joystick_port_select;
 	int m_joystick_data_select;
 	UINT8 m_joy_6b_packet[5];
-	DECLARE_WRITE8_MEMBER(pce_sf2_banking_w);
-	DECLARE_WRITE8_MEMBER(pce_cartridge_ram_w);
 	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
 	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
 	DECLARE_WRITE8_MEMBER(pce_cd_bram_w);
@@ -155,7 +152,6 @@ public:
 	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
 	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pce_cart);
 };
 
 

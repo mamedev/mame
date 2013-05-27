@@ -1042,6 +1042,7 @@
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<part name="cart" interface="tg16_cart">
+			<feature name="slot" value="cdsys3u" />
 			<dataarea name="rom" size="262144">
 				<rom name="[cd] turbografx cd super system card (usa) (v3.0).pce" size="262144" crc="2b5b75fe" sha1="d02611d99921986147c753df14c7349b31d71950" offset="000000" />
 			</dataarea>

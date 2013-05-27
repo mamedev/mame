@@ -118,150 +118,6 @@ static void pce_cd_init( running_machine &machine );
 static void pce_cd_set_irq_line( running_machine &machine, int num, int state );
 
 
-
-
-
-
-WRITE8_MEMBER(pce_state::pce_sf2_banking_w)
-{
-	membank( "bank2" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x080000 );
-	membank( "bank3" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x088000 );
-	membank( "bank4" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x0D0000 );
-}
-
-WRITE8_MEMBER(pce_state::pce_cartridge_ram_w)
-{
-	m_cartridge_ram[offset] = data;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(pce_state,pce_cart)
-{
-	UINT32 size;
-	int split_rom = 0, offset = 0;
-	const char *extrainfo = NULL;
-	unsigned char *ROM;
-	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
-
-	/* open file to get size */
-	ROM = memregion("user1")->base();
-
-	if (image.software_entry() == NULL)
-		size = image.length();
-	else
-		size = image.get_software_region_length("rom");
-
-	/* handle header accordingly */
-	if ((size / 512) & 1)
-	{
-		logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : Header present\n");
-		size -= 512;
-		offset = 512;
-	}
-
-	if (size > PCE_ROM_MAXSIZE)
-		size = PCE_ROM_MAXSIZE;
-
-	if (image.software_entry() == NULL)
-	{
-		image.fseek(offset, SEEK_SET);
-		image.fread( ROM, size);
-	}
-	else
-		memcpy(ROM, image.get_software_region("rom") + offset, size);
-
-	if (extrainfo)
-	{
-		logerror("extrainfo: %s\n", extrainfo);
-		if (strstr(extrainfo, "ROM_SPLIT"))
-			split_rom = 1;
-	}
-
-	if (ROM[0x1fff] < 0xe0)
-	{
-		int i;
-		UINT8 decrypted[256];
-
-		logerror( "*** DEVICE_IMAGE_LOAD(pce_cart) : ROM image seems encrypted, decrypting...\n" );
-
-		/* Initialize decryption table */
-		for (i = 0; i < 256; i++)
-			decrypted[i] = ((i & 0x01) << 7) | ((i & 0x02) << 5) | ((i & 0x04) << 3) | ((i & 0x08) << 1) | ((i & 0x10) >> 1) | ((i & 0x20 ) >> 3) | ((i & 0x40) >> 5) | ((i & 0x80) >> 7);
-
-		/* Decrypt ROM image */
-		for (i = 0; i < size; i++)
-			ROM[i] = decrypted[ROM[i]];
-	}
-
-	/* check if we're dealing with a split rom image */
-	if (size == 384 * 1024)
-	{
-		split_rom = 1;
-		/* Mirror the upper 128KB part of the image */
-		memcpy(ROM + 0x060000, ROM + 0x040000, 0x020000);   /* Set up 060000 - 07FFFF mirror */
-	}
-
-	/* set up the memory for a split rom image */
-	if (split_rom)
-	{
-		logerror("Split rom detected, setting up memory accordingly\n");
-		/* Set up ROM address space as follows:          */
-		/* 000000 - 03FFFF : ROM data 000000 - 03FFFF    */
-		/* 040000 - 07FFFF : ROM data 000000 - 03FFFF    */
-		/* 080000 - 0BFFFF : ROM data 040000 - 07FFFF    */
-		/* 0C0000 - 0FFFFF : ROM data 040000 - 07FFFF    */
-		memcpy(ROM + 0x080000, ROM + 0x040000, 0x040000);   /* Set up 080000 - 0BFFFF region */
-		memcpy(ROM + 0x0C0000, ROM + 0x040000, 0x040000);   /* Set up 0C0000 - 0FFFFF region */
-		memcpy(ROM + 0x040000, ROM, 0x040000);      /* Set up 040000 - 07FFFF region */
-	}
-	else
-	{
-		/* mirror 256KB rom data */
-		if (size <= 0x040000)
-			memcpy(ROM + 0x040000, ROM, 0x040000);
-
-		/* mirror 512KB rom data */
-		if (size <= 0x080000)
-			memcpy(ROM + 0x080000, ROM, 0x080000);
-	}
-
-	membank("bank1")->set_base(ROM);
-	membank("bank2")->set_base(ROM + 0x080000);
-	membank("bank3")->set_base(ROM + 0x088000);
-	membank("bank4")->set_base(ROM + 0x0d0000);
-
-	/* Check for Street fighter 2 */
-	if (size == PCE_ROM_MAXSIZE)
-	{
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),this));
-	}
-
-	/* Check for Populous */
-	if (!memcmp(ROM + 0x1F26, "POPULOUS", 8))
-	{
-		m_cartridge_ram = auto_alloc_array(machine(), UINT8, 0x8000);
-		membank("bank2")->set_base(m_cartridge_ram);
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),this));
-	}
-
-	/* Check for CD system card */
-	m_sys3_card = 0;
-	if (!memcmp(ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23))
-	{
-		/* Check if 192KB additional system card ram should be used */
-		if(!memcmp(ROM + 0x29D1, "VER. 3.", 7))         { m_sys3_card = 1; } // JP version
-		else if(!memcmp(ROM + 0x29C4, "VER. 3.", 7 ))   { m_sys3_card = 3; } // US version
-
-		if(m_sys3_card)
-		{
-			m_cartridge_ram = auto_alloc_array(machine(), UINT8, 0x30000);
-			membank("bank4")->set_base(m_cartridge_ram);
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),this));
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
-		}
-	}
-	return 0;
-}
-
 DRIVER_INIT_MEMBER(pce_state,mess_pce)
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
@@ -282,9 +138,8 @@ MACHINE_START_MEMBER(pce_state,pce)
 	pce_cd_init( machine() );
 	machine().device<nvram_device>("nvram")->set_base(m_cd.bram, PCE_BRAM_SIZE);
 
-	// *partial* saving	(no cd items, no cart-specific items)
+	// *partial* saving	(no cd items)
 	save_item(NAME(m_io_port_options));
-	save_item(NAME(m_sys3_card));
 	save_item(NAME(m_acard));
 	save_item(NAME(m_joystick_port_select));
 	save_item(NAME(m_joystick_data_select));
@@ -314,6 +169,18 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
 	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
 	m_acard = ioport("A_CARD")->read() & 1;
+
+	if (m_cartslot->get_type() == PCE_CDSYS3J)
+	{
+		m_sys3_card = 1;
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+	}
+	
+	if (m_cartslot->get_type() == PCE_CDSYS3U)
+	{
+		m_sys3_card = 3;
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+	}
 }
 
 /* todo: how many input ports does the PCE have? */

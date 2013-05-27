@@ -57,8 +57,8 @@ Super System Card:
 #include "emu.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
-#include "imagedev/cartslot.h"
 #include "imagedev/chd_cd.h"
+#include "machine/pce_rom.h"
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
@@ -237,16 +237,6 @@ static INPUT_PORTS_START( pce )
 INPUT_PORTS_END
 
 
-static void pce_partialhash(hash_collection &dest, const unsigned char *data,
-	unsigned long length, const char *functions)
-{
-	if ( ( length <= PCE_HEADER_SIZE ) || ( length & PCE_HEADER_SIZE ) ) {
-			dest.compute(&data[PCE_HEADER_SIZE], length - PCE_HEADER_SIZE, functions);
-	} else {
-		dest.compute(data, length, functions);
-	}
-}
-
 static const c6280_interface c6280_config =
 {
 	"maincpu"
@@ -264,41 +254,9 @@ static MACHINE_CONFIG_FRAGMENT( pce_cdslot )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pce_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("pce,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pce_cart")
-	MCFG_CARTSLOT_LOAD(pce_state,pce_cart)
-	MCFG_CARTSLOT_PARTIALHASH(pce_partialhash)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( tg16_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("pce,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("tg16_cart")
-	MCFG_CARTSLOT_LOAD(pce_state,pce_cart)
-	MCFG_CARTSLOT_PARTIALHASH(pce_partialhash)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( sgx_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("pce,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("pce_cart")
-	MCFG_CARTSLOT_LOAD(pce_state,pce_cart)
-	MCFG_CARTSLOT_PARTIALHASH(pce_partialhash)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
-MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
-	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
-	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
-	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
+	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
 	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
 	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
 	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
@@ -319,10 +277,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
-	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
-	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
-	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
+	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
 	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
 	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
 	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
@@ -415,6 +370,14 @@ static const huc6260_interface sgx_huc6260_config =
 	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, hsync_changed )
 };
 
+static SLOT_INTERFACE_START(pce_cart)
+	SLOT_INTERFACE_INTERNAL("rom", PCE_ROM_STD)
+	SLOT_INTERFACE_INTERNAL("cdsys3u", PCE_ROM_CDSYS3)
+	SLOT_INTERFACE_INTERNAL("cdsys3j", PCE_ROM_CDSYS3)
+	SLOT_INTERFACE_INTERNAL("populous", PCE_ROM_POPULOUS)
+	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( pce_common, pce_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
@@ -456,13 +419,17 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pce, pce_common )
-	MCFG_FRAGMENT_ADD( pce_cartslot )
+	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
+
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tg16, pce_common )
-	MCFG_FRAGMENT_ADD( tg16_cartslot )
+	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
+
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
@@ -507,7 +474,10 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MCFG_FRAGMENT_ADD( sgx_cartslot )
+	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
+
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
@@ -518,7 +488,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( pce )
-	ROM_REGION( PCE_ROM_MAXSIZE, "user1", ROMREGION_ERASEFF )       /* Cartridge ROM area */
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
 #define rom_tg16 rom_pce
