@@ -51,7 +51,7 @@
 //============================================================
 
 #define VERTEX_BASE_FORMAT  (D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEX2)
-#define VERTEX_BUFFER_SIZE  (20480*4+4)
+#define VERTEX_BUFFER_SIZE  (40960*4+4)
 
 //============================================================
 //  TYPE DEFINITIONS
