@@ -132,6 +132,8 @@ int mame_execute(emu_options &options, osd_interface &osd)
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = MAMERR_NONE;
+	machine_manager manager(options,osd);
+	
 	while (error == MAMERR_NONE && !exit_pending)
 	{
 		// if no driver, use the internal empty driver
@@ -161,7 +163,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		machine_config config(*system, options);
 
 		// create the machine structure and driver
-		running_machine machine(config, osd);
+		running_machine machine(config, manager);
 
 		//ui_show_mouse(machine.system().flags & GAME_CLICKABLE_ARTWORK);
 

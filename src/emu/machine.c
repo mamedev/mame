@@ -120,6 +120,32 @@
 // a giant string buffer for temporary strings
 static char giant_string_buffer[65536] = { 0 };
 
+//**************************************************************************
+//  MACHINE MANAGER
+//**************************************************************************
+
+//-------------------------------------------------
+//  machine_manager - constructor
+//-------------------------------------------------
+
+machine_manager::machine_manager(emu_options &options,osd_interface &osd)
+	: ui_input_data(NULL),
+		m_osd(osd),
+		m_options(options),
+		m_render(NULL),
+		m_sound(NULL),
+		m_video(NULL)
+{	
+}
+
+
+//-------------------------------------------------
+//  ~machine_manager - destructor
+//-------------------------------------------------
+
+machine_manager::~machine_manager()
+{
+}
 
 
 //**************************************************************************
@@ -130,7 +156,7 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const machine_config &_config, osd_interface &osd)
+running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: firstcpu(NULL),
 		primary_screen(NULL),
 		palette(NULL),
@@ -146,7 +172,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 
 		m_config(_config),
 		m_system(_config.gamedrv()),
-		m_osd(osd),
+		m_manager(manager),
 		m_render(NULL),
 		m_input(NULL),
 		m_sound(NULL),
@@ -260,7 +286,7 @@ void running_machine::start()
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
 	// init the osd layer
-	m_osd.init(*this);
+	m_manager.osd().init(*this);
 
 	// create the video manager
 	m_video = auto_alloc(*this, video_manager(*this));

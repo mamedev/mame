@@ -187,7 +187,33 @@ public:
 	full_time       utc_time;   // UTC coordinated time
 };
 
+// ======================> machine_manager
 
+class machine_manager
+{
+	DISABLE_COPYING(machine_manager);
+public:
+	// construction/destruction
+	machine_manager(emu_options &options, osd_interface &osd);
+	~machine_manager();
+
+	osd_interface &osd() const { return m_osd; }	
+	render_manager &render() const { assert(m_render != NULL); return *m_render; }
+	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
+	video_manager &video() const { assert(m_video != NULL); return *m_video; }	
+	emu_options &options() const { return m_options; }
+	
+	// internal core information
+	ui_input_private *      ui_input_data;      // internal data from uiinput.c
+private:
+	osd_interface &         m_osd;                  // reference to OSD system
+	emu_options &           m_options;              // reference to options
+
+	// managers
+	render_manager *        m_render;               // internal data from render.c
+	sound_manager *         m_sound;                // internal data from sound.c
+	video_manager *         m_video;                // internal data from video.c	
+};
 
 // ======================> running_machine
 
@@ -208,14 +234,15 @@ class running_machine
 
 public:
 	// construction/destruction
-	running_machine(const machine_config &config, osd_interface &osd);
+	running_machine(const machine_config &config, machine_manager &manager);
 	~running_machine();
 
 	// getters
 	const machine_config &config() const { return m_config; }
 	device_t &root_device() const { return m_config.root_device(); }
 	const game_driver &system() const { return m_system; }
-	osd_interface &osd() const { return m_osd; }
+	osd_interface &osd() const { return m_manager.osd(); }
+	machine_manager &manager() const { return m_manager; }	
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
@@ -337,9 +364,9 @@ private:
 	// internal state
 	const machine_config &  m_config;               // reference to the constructed machine_config
 	const game_driver &     m_system;               // reference to the definition of the game machine
-	osd_interface &         m_osd;                  // reference to OSD system
 
 	// managers
+	machine_manager &       m_manager;              // reference to machine manager	
 	render_manager *        m_render;               // internal data from render.c
 	input_manager *         m_input;                // internal data from input.c
 	sound_manager *         m_sound;                // internal data from sound.c
