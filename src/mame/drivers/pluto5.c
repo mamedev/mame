@@ -208,7 +208,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 
 	switch ( cs )
 	{
-		case 1:
+		case 1:if (offset < 0x100000)
 			return m_cpuregion[offset];
 
 		default:
