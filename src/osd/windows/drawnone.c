@@ -57,10 +57,10 @@
 
 // core functions
 static void drawnone_exit(void);
-static int drawnone_window_init(win_window_info *window);
-static void drawnone_window_destroy(win_window_info *window);
-static render_primitive_list *drawnone_window_get_primitives(win_window_info *window);
-static int drawnone_window_draw(win_window_info *window, HDC dc, int update);
+static int drawnone_window_init(render::window_info *window);
+static void drawnone_window_destroy(render::window_info *window);
+static render_primitive_list *drawnone_window_get_primitives(render::window_info *window);
+static int drawnone_window_draw(render::window_info *window, HDC dc, int update);
 
 
 
@@ -98,7 +98,7 @@ static void drawnone_exit(void)
 //  drawnone_window_init
 //============================================================
 
-static int drawnone_window_init(win_window_info *window)
+static int drawnone_window_init(render::window_info *window)
 {
 	return 0;
 }
@@ -109,7 +109,7 @@ static int drawnone_window_init(win_window_info *window)
 //  drawnone_window_destroy
 //============================================================
 
-static void drawnone_window_destroy(win_window_info *window)
+static void drawnone_window_destroy(render::window_info *window)
 {
 }
 
@@ -119,12 +119,15 @@ static void drawnone_window_destroy(win_window_info *window)
 //  drawnone_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawnone_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawnone_window_get_primitives(render::window_info *window)
 {
+	/*
 	RECT client;
 	GetClientRect(window->hwnd, &client);
 	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
 	return &window->target->get_primitives();
+	*/
+	return NULL;
 }
 
 
@@ -133,7 +136,7 @@ static render_primitive_list *drawnone_window_get_primitives(win_window_info *wi
 //  drawnone_window_draw
 //============================================================
 
-static int drawnone_window_draw(win_window_info *window, HDC dc, int update)
+static int drawnone_window_draw(render::window_info *window, HDC dc, int update)
 {
 	return 0;
 }

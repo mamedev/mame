@@ -65,10 +65,6 @@ video_system::video_system(running_machine &machine) :
 		m_window->window_create(index, pick_monitor(index), &m_video_config.window[index]);
 	}
 
-	// possibly create the debug window, but don't show it yet
-	if (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		debugwin_init_windows(m_machine);
-
 	// set up the window list
 	m_last_window_ptr = &m_window_list;
 }

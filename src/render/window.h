@@ -42,7 +42,6 @@
 #ifndef __RENDER_WINDOW__
 #define __RENDER_WINDOW__
 
-#include "video.h"
 #include "render.h"
 
 //============================================================
@@ -52,15 +51,10 @@
 namespace render
 {
 
-typedef threadid;
-
-struct window_config
-{
-	float               m_aspect;	// decoded aspect ratio
-	int                 m_width;	// decoded width
-	int                 m_height;	// decoded height
-	int                 m_refresh;	// decoded refresh
-};
+class video_system;
+class window_info;
+class monitor_info;
+class draw_hal;
 
 class window_system
 {
@@ -73,12 +67,26 @@ public:
 
 	virtual void			process_events_periodic() = 0;
 
-	virtual threadid		main_threadid() { return m_main_threadid; }
-	virtual threadid		window_threadid() { return m_window_threadid; }
+	virtual UINT64			main_threadid() { return m_main_threadid; }
+	virtual UINT64			window_threadid() { return m_window_threadid; }
 
 	virtual window_info *	window_alloc(monitor_info *monitor);
 
 	virtual void			toggle_full_screen() = 0;
+
+	virtual window_info *	window_list() { return m_window_list; }
+
+	virtual void			take_snap() = 0;
+	virtual void			toggle_fsfx() = 0;
+	virtual void			take_video() = 0;
+
+	struct window_config
+	{
+		float               aspect;	// decoded aspect ratio
+		int                 width;	// decoded width
+		int                 height;	// decoded height
+		int                 refresh;	// decoded refresh
+	};
 
 protected:
 	running_machine &		m_machine;
@@ -87,8 +95,8 @@ protected:
 
 	window_info *			m_window_list;
 
-	threadid				m_main_threadid;
-	threadid				m_window_threadid;
+	UINT64					m_main_threadid;
+	UINT64					m_window_threadid;
 
 	bool					m_multithreading_enabled;
 };
@@ -96,7 +104,8 @@ protected:
 class window_info
 {
 public:
-	window_info(running_machine &machine, threadid main_threadid, threadid window_threadid, window_system *system);
+	window_info(running_machine &machine, UINT64 main_threadid, UINT64 window_threadid, window_system *system,
+		monitor_info *monitor);
 	virtual ~window_info();
 
 	running_machine &		machine() const { return m_machine; }
@@ -114,8 +123,8 @@ public:
 
 	virtual void			complete_create() { m_init_state = -1; }
 
-	virtual int				extra_width() { return 0 };
-	virtual int				extra_height() { return 0 };
+	virtual int				extra_width() { return 0; }
+	virtual int				extra_height() { return 0; }
 
 	bool					fullscreen() { return m_fullscreen; }
 	virtual void			minimize_window() = 0;
@@ -125,16 +134,25 @@ public:
 
 	render_target *			target() { return m_target; }
 
-	static window_info *	window_list() { return m_window_list; }
+	window_info *			window_list() { return m_window_list; }
+
+	void					set_primlist(render_primitive_list *primlist) { m_primlist = primlist; }
+
+	int						targetorient() { return m_targetorient; }
+
+	virtual monitor_info *	monitor() { return m_monitor; }
 
 protected:
 	virtual void			set_starting_view(int index, const char *defview, const char *view);
+
+	// monitor info
+	monitor_info *			m_monitor;
 
 private:
 	draw_hal *			m_hal;
 	window_system *		m_system;
 
-	static window_info *m_window_list;
+	window_info *		m_window_list;
 
 	window_info *   	m_next;
 	volatile int        m_init_state;
@@ -157,8 +175,8 @@ private:
 
 	running_machine &   m_machine;
 
-	threadid			m_window_threadid;
-	threadid			m_main_threadid;
+	UINT64				m_window_threadid;
+	UINT64				m_main_threadid;
 };
 
 }; // namespace render

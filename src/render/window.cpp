@@ -73,23 +73,6 @@ window_info *window_system::window_alloc(monitor_info *monitor)
 }
 
 //============================================================
-//  winwindow_process_events_periodic
-//  (main thread)
-//============================================================
-
-void window_system::process_events_periodic()
-{
-	DWORD currticks = GetTickCount();
-
-	assert(GetCurrentThreadId() == m_main_threadid);
-
-	// update once every 1/8th of a second
-	if (currticks - last_event_check < 1000 / 8)
-		return;
-	process_events(TRUE);
-}
-
-//============================================================
 //  is_mame_window
 //============================================================
 
@@ -104,8 +87,11 @@ bool window_system::is_mame_window(HWND hwnd)
 	return FALSE;
 }
 
-window_info::window_info(running_machine &machine, threadid main_threadid, threadid window_threadid)
-	: m_machine(machine)
+window_info::window_info(running_machine &machine, UINT64 main_threadid, UINT64 window_threadid, window_system *system,
+	monitor_info *monitor)
+	: m_monitor(monitor),
+	  m_system(system),
+	  m_machine(machine)
 {
 	// create a lock that we can use to skip blitting
 	m_render_lock = osd_lock_alloc();
@@ -145,4 +131,37 @@ void window_info::set_starting_view(int index, const char *defview, const char *
 
 	// set the view
 	m_target->set_view(viewindex);
+}
+
+
+//============================================================
+//  update_minmax_state
+//  (window thread)
+//============================================================
+
+void window_info::update_minmax_state()
+{
+	assert(GetCurrentThreadId() == m_window_threadid);
+
+	if (!m_fullscreen)
+	{
+		RECT bounds, minbounds, maxbounds;
+
+		// compare the maximum bounds versus the current bounds
+		rectf minbounds = get_min_bounds(m_video_config.keepaspect);
+		rectf maxbounds = get_max_bounds(m_video_config.keepaspect);
+		GetWindowRect(window->hwnd, &bounds);
+
+		rectf bounds(vec2f(bounds.left, bounds.top), vec2f(bounds.right, bounds.bottom));
+		// if either the width or height matches, we were maximized
+		m_isminimized = (bounds.width() == minbounds.width() ||
+						bounds.height() == minbounds.height());
+		m_ismaximized = (bounds.width() == maxbounds.width() ||
+						bounds.height() == maxbounds.height());
+	}
+	else
+	{
+		m_isminimized = false;
+		m_ismaximized = true;
+	}
 }

@@ -41,14 +41,89 @@
 
 #include "render/window.h"
 
-namespace render::windows
+//============================================================
+//  PARAMETERS
+//============================================================
+
+// window styles
+#define WINDOW_STYLE                    WS_OVERLAPPEDWINDOW
+#define WINDOW_STYLE_EX                 0
+
+// debugger window styles
+#define DEBUG_WINDOW_STYLE              WS_OVERLAPPED
+#define DEBUG_WINDOW_STYLE_EX           0
+
+// full screen window styles
+#define FULLSCREEN_STYLE                WS_POPUP
+#define FULLSCREEN_STYLE_EX             WS_EX_TOPMOST
+
+// minimum window dimension
+#define MIN_WINDOW_DIM                  200
+
+// custom window messages
+#define WM_USER_FINISH_CREATE_WINDOW    (WM_USER + 0)
+#define WM_USER_SELF_TERMINATE          (WM_USER + 1)
+#define WM_USER_REDRAW                  (WM_USER + 2)
+#define WM_USER_SET_FULLSCREEN          (WM_USER + 3)
+#define WM_USER_SET_MAXSIZE             (WM_USER + 4)
+#define WM_USER_SET_MINSIZE             (WM_USER + 5)
+#define WM_USER_UI_TEMP_PAUSE           (WM_USER + 6)
+#define WM_USER_EXEC_FUNC               (WM_USER + 7)
+
+// temporary hacks
+#if LOG_THREADS
+struct mtlog
+{
+	osd_ticks_t timestamp;
+	const char *event;
+};
+
+static mtlog mtlog[100000];
+static volatile LONG mtlogindex;
+
+void mtlog_add(const char *event)
+{
+	int index = atomic_increment32((LONG *) &mtlogindex) - 1;
+	if (index < ARRAY_LENGTH(mtlog))
+	{
+		mtlog[index].timestamp = osd_ticks();
+		mtlog[index].event = event;
+	}
+}
+
+static void mtlog_dump(void)
+{
+	osd_ticks_t cps = osd_ticks_per_second();
+	osd_ticks_t last = mtlog[0].timestamp * 1000000 / cps;
+	int i;
+
+	FILE *f = fopen("mt.log", "w");
+	for (i = 0; i < mtlogindex; i++)
+	{
+		osd_ticks_t curr = mtlog[i].timestamp * 1000000 / cps;
+		fprintf(f, "%20I64d %10I64d %s\n", curr, curr - last, mtlog[i].event);
+		last = curr;
+	}
+	fclose(f);
+}
+#else
+void mtlog_add(const char *event) { }
+static void mtlog_dump(void) { }
+#endif
+
+namespace render
+{
+
+namespace windows
 {
 
 window_system::window_system(running_machine &machine, video_system *video) :
 	render::window_system(machine, video)
 {
+	m_classes_created = false;
+
 	// get the main thread ID before anything else
-	m_main_threadid = GetCurrentThreadId();
+	m_main_threadid = (UINT64)GetCurrentThreadId();
 
 	// set up window class and register it
 	create_window_class();
@@ -79,7 +154,7 @@ window_system::window_system(running_machine &machine, video_system *video) :
 	// otherwise, treat the window thread as the main thread
 	else
 	{
-		m_window_thread = GetCurrentThread();
+		m_window_thread = (UINT64)GetCurrentThread();
 		m_window_threadid = m_main_threadid;
 	}
 
@@ -157,7 +232,7 @@ void window_system::toggle_full_screen()
 	}
 
 	// toggle the window mode
-	video_system::video_config &video_config = m_video->video_config();
+	video_system::video_config &video_config = m_video->get_video_config();
 	video_config.windowed = !video_config.windowed;
 
 	// iterate over windows and toggle their fullscreen state
@@ -214,6 +289,616 @@ void window_system::exit()
 	while (ShowCursor(TRUE) < 0);
 }
 
+
+//============================================================
+//  window_system::process_events_periodic()
+//  (main thread)
+//============================================================
+
+void window_system::process_events_periodic()
+{
+	UINT32 currticks = (UINT32) GetTickCount();
+
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	// update once every 1/8th of a second
+	if (currticks - last_event_check < 1000 / 8)
+		return;
+	process_events(TRUE);
+}
+
+
+//============================================================
+//  window_system::process_events
+//  (main thread)
+//============================================================
+
+void window_system::process_events(bool ingame)
+{
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	// if we're running, disable some parts of the debugger
+	if (ingame && (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+		debugwin_update_during_game(m_machine);
+
+	// remember the last time we did this
+	m_last_event_check = (UINT32)GetTickCount();
+
+	do
+	{
+		// if we are paused, lets wait for a message
+		if (ui_temp_pause > 0)
+			WaitMessage();
+
+		// loop over all messages in the queue
+		MSG message;
+		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+		{
+			int dispatch = TRUE;
+
+			if (message.hwnd == NULL || is_mame_window(message.hwnd))
+			{
+				switch (message.message)
+				{
+					// ignore keyboard messages
+					case WM_SYSKEYUP:
+					case WM_SYSKEYDOWN:
+						dispatch = FALSE;
+						break;
+
+					// forward mouse button downs to the input system
+					case WM_LBUTTONDOWN:
+						dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_RBUTTONDOWN:
+						dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_MBUTTONDOWN:
+						dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_XBUTTONDOWN:
+						dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					// forward mouse button ups to the input system
+					case WM_LBUTTONUP:
+						dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_RBUTTONUP:
+						dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_MBUTTONUP:
+						dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+
+					case WM_XBUTTONUP:
+						dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						break;
+				}
+			}
+
+			// dispatch if necessary
+			if (dispatch)
+				dispatch_message(&message);
+		}
+	} while (ui_temp_pause > 0);
+
+	// update the cursor state after processing events
+	update_cursor_state();
+}
+
+
+//============================================================
+//  window_system::thread_entry
+//  (window thread)
+//============================================================
+
+unsigned __stdcall window_system::thread_entry(void *param)
+{
+	MSG message;
+
+	// make a bogus user call to make us a message thread
+	PeekMessage(&message, NULL, 0, 0, PM_NOREMOVE);
+
+	// attach our input to the main thread
+	AttachThreadInput(m_main_threadid, m_window_threadid, TRUE);
+
+	// signal to the main thread that we are ready to receive events
+	SetEvent(m_window_thread_ready_event);
+
+	// run the message pump
+	while (GetMessage(&message, NULL, 0, 0))
+	{
+		int dispatch = TRUE;
+
+		if ((message.hwnd == NULL) || is_mame_window(message.hwnd))
+		{
+			switch (message.message)
+			{
+				// ignore input messages here
+				case WM_SYSKEYUP:
+				case WM_SYSKEYDOWN:
+					dispatch = FALSE;
+					break;
+
+				// forward mouse button downs to the input system
+				case WM_LBUTTONDOWN:
+					dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_RBUTTONDOWN:
+					dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_MBUTTONDOWN:
+					dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_XBUTTONDOWN:
+					dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				// forward mouse button ups to the input system
+				case WM_LBUTTONUP:
+					dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_RBUTTONUP:
+					dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_MBUTTONUP:
+					dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				case WM_XBUTTONUP:
+					dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					break;
+
+				// a terminate message to the thread posts a quit
+				case WM_USER_SELF_TERMINATE:
+					PostQuitMessage(0);
+					dispatch = FALSE;
+					break;
+
+				// handle the "complete create" message
+				case WM_USER_FINISH_CREATE_WINDOW:
+				{
+					window_info *window = (window_info *)message.lParam;
+					window->complete_create();
+					dispatch = FALSE;
+					break;
+				}
+			}
+		}
+
+		// dispatch if necessary
+		if (dispatch)
+		{
+			TranslateMessage(&message);
+			DispatchMessage(&message);
+		}
+	}
+	return 0;
+}
+
+
+void window_system::ui_exec_on_main_thread(void (*func)(void *), void *param)
+{
+	assert(GetCurrentThreadId() == m_window_threadid);
+
+	// if we're multithreaded, we have to request a pause on the main thread
+	if (m_multithreading_enabled)
+	{
+		// request a pause from the main thread
+		PostThreadMessage(m_main_threadid, WM_USER_EXEC_FUNC, (WPARAM) func, (LPARAM) param);
+	}
+	else	// otherwise, we just do it directly
+	{
+		(*func)(param);
+	}
+}
+
+
+//============================================================
+//  window_system::create_window_class
+//  (main thread)
+//============================================================
+
+void window_system::create_window_class()
+{
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	if (!m_classes_created)
+	{
+		WNDCLASS wc = { 0 };
+
+		// initialize the description of the window class
+		wc.lpszClassName    = TEXT("MAME");
+		wc.hInstance        = GetModuleHandle(NULL);
+		wc.lpfnWndProc      = window_proc_ui;
+		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
+
+		// register the class; fail if we can't
+		if (!RegisterClass(&wc))
+			fatalerror("Failed to create window class\n");
+		m_classes_created = TRUE;
+	}
+}
+
+
+//============================================================
+//  window_system::dispatch_message
+//  (main thread)
+//============================================================
+
+void window_system::dispatch_message(MSG *message)
+{
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	// dispatch our special communication messages
+	switch (message->message)
+	{
+		// special case for quit
+		case WM_QUIT:
+			machine.schedule_exit();
+			break;
+
+		// temporary pause from the window thread
+		case WM_USER_UI_TEMP_PAUSE:
+			ui_pause_from_main_thread(message->wParam);
+			break;
+
+		// execute arbitrary function
+		case WM_USER_EXEC_FUNC:
+			{
+				void (*func)(void *) = (void (*)(void *)) message->wParam;
+				void *param = (void *) message->lParam;
+				func(param);
+			}
+			break;
+
+		// everything else dispatches normally
+		default:
+			TranslateMessage(message);
+			DispatchMessage(message);
+			break;
+	}
+}
+
+
+//============================================================
+//  window_system::take_snap
+//  (main thread)
+//============================================================
+
+void window_system::take_snap()
+{
+	assert(GetCurrentThreadId() == main_threadid);
+
+	//if (draw.window_save == NULL)
+		//return;
+
+	// iterate over windows and request a snap
+	for (window_info *window = m_window_list; window != NULL; window = window->get_next())
+	{
+		//(*draw.window_save)(window);
+	}
+}
+
+
+//============================================================
+//  window_system::toggle_fsfx
+//  (main thread)
+//============================================================
+
+void window_system::toggle_fsfx()
+{
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	//if (draw.window_toggle_fsfx == NULL)
+		//return;
+
+	// iterate over windows and request a snap
+	for (window_info *window = m_window_list; window != NULL; window = window->next())
+	{
+		//(*draw.window_toggle_fsfx)(window);
+	}
+}
+
+
+//============================================================
+//  window_system::window_proc_ui
+//  (window thread)
+//============================================================
+
+LRESULT CALLBACK window_system::window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	return window_proc(wnd, message, wparam, lparam);
+}
+
+
+//============================================================
+//  window_info::draw_video_contents
+//  (window thread)
+//============================================================
+
+void window_info::draw_video_contents(HDC dc, int update)
+{
+	assert(GetCurrentThreadId() == m_window_threadid);
+
+	mtlog_add("draw_video_contents: begin");
+
+	mtlog_add("draw_video_contents: render lock acquire");
+	osd_lock_acquire(m_render_lock);
+	mtlog_add("draw_video_contents: render lock acquired");
+
+	// if we're iconic, don't bother
+	if (m_hwnd != NULL && !IsIconic(m_hwnd))
+	{
+		// if no bitmap, just fill
+		if (m_primlist == NULL)
+		{
+			RECT fill;
+			GetClientRect(m_hwnd, &fill);
+			FillRect(dc, &fill, (HBRUSH)GetStockObject(BLACK_BRUSH));
+		}
+
+		// otherwise, render with our drawing system
+		else
+		{
+			(*draw.window_draw)(window, dc, update);
+			mtlog_add("draw_video_contents: drawing finished");
+		}
+	}
+
+	osd_lock_release(m_render_lock);
+	mtlog_add("draw_video_contents: render lock released");
+
+	mtlog_add("draw_video_contents: end");
+}
+
+
+//============================================================
+//  window_system::take_video
+//  (main thread)
+//============================================================
+
+void window_system::take_video()
+{
+	assert(GetCurrentThreadId() == main_threadid);
+
+	//if (draw.window_record == NULL)
+		//return;
+
+	// iterate over windows and request a snap
+	for (window_info *window = m_window_list; window != NULL; window = window->get_next())
+	{
+		//(*draw.window_record)(window);
+	}
+}
+
+
+//============================================================
+//  window_system::window_proc
+//  (window thread)
+//============================================================
+
+// TODO: Convert Windows events into generic internal events for abstraction
+LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
+	window_info *window = (window_info *)ptr;
+
+	// we may get called before SetWindowLongPtr is called
+	if (window != NULL)
+	{
+		assert(GetCurrentThreadId() == m_window_threadid);
+		window->update_minmax_state();
+	}
+
+	// handle a few messages
+	switch (message)
+	{
+		// paint: redraw the last bitmap
+		case WM_PAINT:
+		{
+			PAINTSTRUCT pstruct;
+			HDC hdc = BeginPaint(wnd, &pstruct);
+			window->draw_video_contents(hdc, TRUE);
+			if (m_video->has_menu())
+				DrawMenuBar(window->hwnd());
+			EndPaint(wnd, &pstruct);
+			break;
+		}
+
+		// non-client paint: punt if full screen
+		case WM_NCPAINT:
+			if (!window->fullscreen() || m_video->has_menu())
+				return DefWindowProc(wnd, message, wparam, lparam);
+			break;
+
+		// input: handle the raw input
+		case WM_INPUT:
+			wininput_handle_raw((HRAWINPUT)lparam);
+			break;
+
+		// syskeys - ignore
+		case WM_SYSKEYUP:
+		case WM_SYSKEYDOWN:
+			break;
+
+		// input events
+		case WM_MOUSEMOVE:
+			ui_input_push_mouse_move_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
+
+		case WM_MOUSELEAVE:
+			ui_input_push_mouse_leave_event(m_machine, window->target());
+			break;
+
+		case WM_LBUTTONDOWN:
+		{
+			DWORD ticks = GetTickCount();
+			ui_input_push_mouse_down_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+
+			// check for a double-click
+			if (ticks - window->lastclicktime() < GetDoubleClickTime() &&
+				GET_X_LPARAM(lparam) >= window->lastclickx() - 4 && GET_X_LPARAM(lparam) <= window->lastclickx() + 4 &&
+				GET_Y_LPARAM(lparam) >= window->lastclicky() - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky() + 4)
+			{
+				window->set_lastclicktime(0);
+				ui_input_push_mouse_double_click_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			}
+			else
+			{
+				window->set_lastclicktime(ticks);
+				window->set_lastclickx(GET_X_LPARAM(lparam));
+				window->set_lastclicky(GET_Y_LPARAM(lparam));
+			}
+			break;
+		}
+
+		case WM_LBUTTONUP:
+			ui_input_push_mouse_up_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
+
+		case WM_CHAR:
+			ui_input_push_char_event(m_machine, window->target(), (unicode_char) wparam);
+			break;
+
+		// pause the system when we start a menu or resize
+		case WM_ENTERSIZEMOVE:
+			window->set_resize_state(RESIZE_STATE_RESIZING);
+		case WM_ENTERMENULOOP:
+			m_video->ui_pause_from_window_thread(true);
+			break;
+
+		// unpause the system when we stop a menu or resize and force a redraw
+		case WM_EXITSIZEMOVE:
+			window->set_resize_state(RESIZE_STATE_PENDING);
+		case WM_EXITMENULOOP:
+			m_video->ui_pause_from_window_thread(false);
+			InvalidateRect(wnd, NULL, FALSE);
+			break;
+
+		// get min/max info: set the minimum window size
+		case WM_GETMINMAXINFO:
+		{
+			MINMAXINFO *minmax = (MINMAXINFO *)lparam;
+			minmax->ptMinTrackSize.x = MIN_WINDOW_DIM;
+			minmax->ptMinTrackSize.y = MIN_WINDOW_DIM;
+			break;
+		}
+
+		// sizing: constrain to the aspect ratio unless control key is held down
+		case WM_SIZING:
+		{
+			RECT *rect = (RECT *)lparam;
+			if (m_video->get_video_config().keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+				window->constrain_to_aspect_ratio(rect, wparam);
+			InvalidateRect(wnd, NULL, FALSE);
+			break;
+		}
+
+		// syscommands: catch win_start_maximized
+		case WM_SYSCOMMAND:
+		{
+			// prevent screensaver or monitor power events
+			if (wparam == SC_MONITORPOWER || wparam == SC_SCREENSAVE)
+				return 1;
+
+			// most SYSCOMMANDs require us to invalidate the window
+			InvalidateRect(wnd, NULL, FALSE);
+
+			// handle maximize
+			if ((wparam & 0xfff0) == SC_MAXIMIZE)
+			{
+				window->update_minmax_state();
+				if (window->ismaximized)
+					window->minimize_window();
+				else
+					window->maximize_window();
+				break;
+			}
+			return DefWindowProc(wnd, message, wparam, lparam);
+		}
+
+		// track whether we are in the foreground
+		case WM_ACTIVATEAPP:
+			m_in_background = !wparam;
+			break;
+
+		// close: cause MAME to exit
+		case WM_CLOSE:
+			if (m_multithreading_enabled)
+				PostThreadMessage(m_main_threadid, WM_QUIT, 0, 0);
+			else
+				m_machine.schedule_exit();
+			break;
+
+		// destroy: clean up all attached rendering bits and NULL out our hwnd
+		case WM_DESTROY:
+			//(*draw.window_destroy)(window);
+			window->set_hwnd(NULL);
+			return DefWindowProc(wnd, message, wparam, lparam);
+
+		// self redraw: draw ourself in a non-painty way
+		case WM_USER_REDRAW:
+		{
+			HDC hdc = GetDC(wnd);
+
+			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW begin");
+			window->set_primlist((render_primitive_list *)lparam);
+			window->draw_video_contents(hdc, FALSE);
+			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW end");
+
+			ReleaseDC(wnd, hdc);
+			break;
+		}
+
+		// self destruct
+		case WM_USER_SELF_TERMINATE:
+			DestroyWindow(window->hwnd());
+			break;
+
+		// fullscreen set
+		case WM_USER_SET_FULLSCREEN:
+			window->set_fullscreen(wparam);
+			break;
+
+		// minimum size set
+		case WM_USER_SET_MINSIZE:
+			window->minimize_window();
+			break;
+
+		// maximum size set
+		case WM_USER_SET_MAXSIZE:
+			window->maximize_window();
+			break;
+
+		// set focus: if we're not the primary window, switch back
+		// commented out ATM because this prevents us from resizing secondary windows
+//      case WM_SETFOCUS:
+//          if (window != win_window_list && win_window_list != NULL)
+//              SetFocus(win_window_list->hwnd);
+//          break;
+
+		// everything else: defaults
+		default:
+			return DefWindowProc(wnd, message, wparam, lparam);
+	}
+
+	return 0;
+}
+
+
 void window_info::remove_from_list()
 {
 	window_info *curr;
@@ -236,7 +921,7 @@ void window_info::remove_from_list()
 
 window_info::~window_info()
 {
-	assert(GetCurrentThreadId() == main_threadid);
+	assert(GetCurrentThreadId() == m_main_threadid);
 
 	// destroy the window
 	if (m_hwnd != NULL)
@@ -262,7 +947,7 @@ void window_info::update_bounds()
 
 void window_info::update()
 {
-	assert(GetCurrentThreadId() == main_threadid);
+	assert(GetCurrentThreadId() == m_main_threadid);
 
 	mtlog_add("winwindow_video_window_update: begin");
 
@@ -342,11 +1027,10 @@ void window_info::update()
 
 void window_info::minimize_window()
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
-	RECT newsize;
-	get_min_bounds(window, &newsize, m_video_config.keepaspect);
-	SetWindowPos(m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	vec2f newsize = get_min_bounds(m_video_config.keepaspect);
+	SetWindowPos(m_hwnd, NULL, newsize.c.x, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
 }
 
 
@@ -357,7 +1041,7 @@ void window_info::minimize_window()
 
 void window_info::maximize_window()
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	RECT newsize;
 	get_max_bounds(window, &newsize, m_video_config.keepaspect);
@@ -372,7 +1056,7 @@ void window_info::maximize_window()
 
 void window_info::get_min_bounds(RECT *bounds, bool constrain)
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// get the minimum target size
 	INT32 minwidth, minheight;
@@ -434,7 +1118,7 @@ void window_info::get_min_bounds(RECT *bounds, bool constrain)
 
 void window_info::get_max_bounds(RECT *bounds, bool constrain)
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// compute the maximum client area
 	winvideo_monitor_refresh(m_monitor);
@@ -475,7 +1159,7 @@ void window_info::get_max_bounds(RECT *bounds, bool constrain)
 
 void window_info::toggle_fullscreen(bool fullscreen)
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// if we're in the right state, punt
 	if (m_fullscreen == fullscreen)
@@ -588,8 +1272,8 @@ void window_info::adjust_window_position_after_major_change()
 	// take note of physical window size (used for lightgun coordinate calculation)
 	if (window == win_window_list)
 	{
-		win_physical_width = rect_width(&newrect);
-		win_physical_height = rect_height(&newrect);
+		m_win_physical_width = rect_width(&newrect);
+		m_win_physical_height = rect_height(&newrect);
 		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
 }
@@ -601,7 +1285,7 @@ void window_info::adjust_window_position_after_major_change()
 
 void window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	win_monitor_info *monitor = winwindow_video_window_monitor(window, rect);
 	INT32 extrawidth = extra_width();
@@ -840,7 +1524,7 @@ void window_info::wait_for_ready()
 		// TODO:
 		WaitForSingleObject(window_thread_ready_event, INFINITE);
 
-		PostThreadMessage(window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)window);
+		PostThreadMessage((DWORD)m_window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)window);
 		while (m_init_state == 0)
 			Sleep(1);
 	}

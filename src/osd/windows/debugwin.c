@@ -72,7 +72,9 @@
 #include "strconv.h"
 #include "winutf8.h"
 
-
+// Render headers
+#include "render/windows/video.h"
+#include "render/windows/window.h"
 
 //============================================================
 //  PARAMETERS
@@ -207,6 +209,8 @@ private:
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
+
+static render::windows::video_system *s_video;
 
 static debugwin_info *window_list;
 static debugwin_info *main_console;
@@ -393,9 +397,11 @@ static int debugwin_seq_pressed(running_machine &machine)
 //  debugwin_init_windows
 //============================================================
 
-void debugwin_init_windows(running_machine &machine)
+void debugwin_init_windows(running_machine &machine, render::windows::video_system *video)
 {
 	static int class_registered;
+
+	s_video = video;
 
 	// register the window classes
 	if (!class_registered)
@@ -514,7 +520,7 @@ void debugwin_show(int type)
 void debugwin_update_during_game(running_machine &machine)
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && machine.phase() == MACHINE_PHASE_RUNNING)
+	if (/*!winwindow_has_focus() && */!debug_cpu_is_stopped(machine) && machine.phase() == MACHINE_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (debugwin_seq_pressed(machine))
@@ -551,8 +557,9 @@ static debugwin_info *debugwin_window_create(running_machine &machine, LPCSTR ti
 
 	// create the window
 	info->handler = handler;
+	render::windows::window_info *window = (render::windows::window_info *)s_video->window()->window_list();
 	info->wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, win_window_list->hwnd, create_standard_menubar(), GetModuleHandle(NULL), info);
+			0, 0, 100, 100, window->hwnd(), create_standard_menubar(), GetModuleHandle(NULL), info);
 	if (info->wnd == NULL)
 		goto cleanup;
 
@@ -3112,9 +3119,13 @@ static void smart_show_window(HWND wnd, BOOL show)
 
 static void smart_show_all(BOOL show)
 {
-	debugwin_info *info;
 	if (!show)
-		SetForegroundWindow(win_window_list->hwnd);
-	for (info = window_list; info != NULL; info = info->next)
+	{
+		render::windows::window_info *window = (render::windows::window_info *)s_video->window()->window_list();
+		SetForegroundWindow(window->hwnd());
+	}
+	for (debugwin_info *info = window_list; info != NULL; info = info->next)
+	{
 		smart_show_window(info->wnd, show);
+	}
 }

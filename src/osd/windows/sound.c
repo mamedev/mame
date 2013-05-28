@@ -61,6 +61,7 @@
 #include "config.h"
 #include "sound.h"
 
+#include "render/windows/window.h"
 
 //============================================================
 //  DEBUGGING
@@ -69,6 +70,13 @@
 #define LOG_SOUND               0
 
 #define LOG(x) do { if (LOG_SOUND) logerror x; } while(0)
+
+
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
+
+static windows_osd_interface *winosd;
 
 
 //============================================================
@@ -112,8 +120,10 @@ static void         dsound_destroy_buffers(void);
 //  winsound_init
 //============================================================
 
-void winsound_init(running_machine &machine)
+void winsound_init(running_machine &machine, windows_osd_interface *osd)
 {
+	winosd = osd;
+
 	// if no sound, don't create anything
 	if (!machine.options().sound())
 		return;
@@ -276,7 +286,9 @@ static HRESULT dsound_init(running_machine &machine)
 	if (result != DS_OK)
 	{
 		mame_printf_error("Error creating DirectSound: %08x\n", (UINT32)result);
-		goto error;
+		dsound_destroy_buffers();
+		dsound_kill();
+		return result;
 	}
 
 	// get the capabilities
@@ -285,15 +297,20 @@ static HRESULT dsound_init(running_machine &machine)
 	if (result != DS_OK)
 	{
 		mame_printf_error("Error getting DirectSound capabilities: %08x\n", (UINT32)result);
-		goto error;
+		dsound_destroy_buffers();
+		dsound_kill();
+		return result;
 	}
 
 	// set the cooperative level
-	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->hwnd, DSSCL_PRIORITY);
+	render::windows::window_info *window_list = (render::windows::window_info *)winosd->video()->window_list();
+	result = IDirectSound_SetCooperativeLevel(dsound, window_list->hwnd(), DSSCL_PRIORITY);
 	if (result != DS_OK)
 	{
 		mame_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);
-		goto error;
+		dsound_destroy_buffers();
+		dsound_kill();
+		return result;
 	}
 
 	// make a format description for what we want
@@ -315,22 +332,22 @@ static HRESULT dsound_init(running_machine &machine)
 	// create the buffers
 	result = dsound_create_buffers();
 	if (result != DS_OK)
-		goto error;
+	{
+		dsound_destroy_buffers();
+		dsound_kill();
+		return result;
+	}
 
 	// start playing
 	result = IDirectSoundBuffer_Play(stream_buffer, 0, 0, DSBPLAY_LOOPING);
 	if (result != DS_OK)
 	{
 		mame_printf_error("Error playing: %08x\n", (UINT32)result);
-		goto error;
+		dsound_destroy_buffers();
+		dsound_kill();
+		return result;
 	}
 	return DS_OK;
-
-	// error handling
-error:
-	dsound_destroy_buffers();
-	dsound_kill();
-	return result;
 }
 
 

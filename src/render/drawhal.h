@@ -59,10 +59,17 @@ public:
 	{
 		memset(&c, 0, sizeof(float) * 2);
 	}
+
 	vec2f(float x, float y)
 	{
 		c.x = x;
 		c.y = y;
+	}
+
+	vec2f(const vec2f &v)
+	{
+		c.x = v.c.x;
+		c.y = v.c.y;
 	}
 
 	vec2f operator+(const vec2f& a)
@@ -75,10 +82,47 @@ public:
 		return vec2f(c.x - a.c.x, c.y - a.c.y);
 	}
 
+	vec2f& operator=(const vec2f& a)
+	{
+		c.x = a.c.x;
+		c.y = a.c.y;
+		return *this;
+	}
+
 	struct
 	{
 		float x, y;
 	} c;
+};
+
+class rectf
+{
+public:
+	rectf()
+	{
+		memset(&p, 0, sizeof(vec2f) * 2);
+	};
+
+	rectf(vec2f &tl, vec2f &br)
+	{
+		p[0] = tl;
+		p[1] = br;
+	}
+
+	rectf(rectf &r)
+	{
+		p[0] = r.p[0];
+		p[1] = r.p[1];
+	}
+
+	float left() { return p[0].c.x; }
+	float right() { return p[1].c.x; }
+	float top() { return p[0].c.y; }
+	float bottom() { return p[1].c.y; }
+	float width() { return p[1].c.x - p[0].c.x; }
+	float height() { return p[1].c.y - p[0].c.y; }
+
+	vec2f p[2];
 };
 
 };
@@ -100,7 +144,7 @@ public:
 	virtual int				create_resources();
 	virtual int				delete_resources();
 
-	virtual int				set_view_size(vec2f& size);
+	virtual int				set_view_size(math::vec2f& size);
 
 	virtual void			process_primitives();
 	virtual void			draw_primitives();

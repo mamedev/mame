@@ -45,11 +45,25 @@
 #include "video.h"
 #include "render.h"
 
+#include "render/video.h"
+
+//============================================================
+//  CONSTANTS
+//============================================================
+
+#define VIDEO_MODE_NONE     0
+#define VIDEO_MODE_GDI      1
+#define VIDEO_MODE_DDRAW    2
+#define VIDEO_MODE_D3D      3
+
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-namespace render::windows
+namespace render
+{
+
+namespace windows
 {
 
 class video_system : public render::video_system
@@ -60,7 +74,6 @@ public:
 
 	virtual void			update();
 
-	virtual int				pick_monitor(int index);
 	BOOL CALLBACK			monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 	virtual void			init_monitors();
 	virtual monitor_info *	monitor_from_handle(HMONITOR hmonitor);
@@ -68,6 +81,8 @@ public:
 	virtual bool			window_has_focus();
 
 	virtual bool			has_menu();
+
+	virtual void			process_events(bool ingame);
 
 protected:
 	virtual void 			extract_video_config();
@@ -77,11 +92,11 @@ protected:
 
 private:
 	float					get_aspect(const char *defdata, const char *data, int report_error);
-	void					get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
+	void					get_resolution(const char *defdata, const char *data, window_system::window_config *config, int report_error);
 
 	HANDLE 					m_ui_pause_event;
 };
 
-};
+}}; // render::windows
 
 #endif // __RENDER_WINDOWS_VIDEO__

@@ -42,6 +42,7 @@
 #include "clifront.h"
 #include "osdepend.h"
 
+#include "render/windows/video.h"
 
 //============================================================
 //  CONSTANTS
@@ -319,11 +320,10 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
-	windows::video_system *		video() { return m_video; }
+	static render::windows::video_system * video() { return m_video; }
 
 private:
-	windows::window_info *		m_window_list;
-	windows::video_system *		m_video;
+	static render::windows::video_system *	m_video;
 
 	void 		check_osd_inputs();
 

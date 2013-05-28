@@ -48,16 +48,6 @@
 #include "window.h"
 
 //============================================================
-//  winwindow_video_window_proc_ui
-//  (window thread)
-//============================================================
-
-LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
-{
-	return winwindow_video_window_proc(wnd, message, wparam, lparam);
-}
-
-//============================================================
 //  win_create_menu
 //============================================================
 

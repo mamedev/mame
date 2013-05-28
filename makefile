@@ -553,6 +553,9 @@ INCPATH += \
 	-I$(SRC)/lib \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
+	-I$(SRC)/render \
+	-I$(SRC)/render/$(OSD) \
+	-I$(SRC)
 
 
 
@@ -631,6 +634,7 @@ LIBSOUND = $(OBJ)/$(TARGET)/$(SUBTARGET)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
 LIBOSD = $(OBJ)/libosd.a
+LIBRENDER = $(OBJ)/librender.a
 
 VERSIONOBJ = $(OBJ)/version.o
 EMUINFOOBJ = $(OBJ)/$(TARGET)/$(TARGET).o
@@ -741,6 +745,9 @@ BUILDOUT = $(BUILDOBJ)
 # include OSD-specific rules first
 include $(SRC)/osd/$(OSD)/$(OSD).mak
 
+# include renderer-specific rules next
+include $(SRC)/render/$(OSD)/$(OSD).mak
+
 # then the various core pieces
 include $(SRC)/build/build.mak
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
@@ -770,7 +777,8 @@ tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
 
-clean: $(OSDCLEAN)
+clean: $(RENDERCLEAN)
+	$(OSDCLEAN)
 	@echo Deleting object tree $(OBJ)...
 	$(RM) -r $(OBJ)
 	@echo Deleting $(EMULATOR)...
@@ -812,7 +820,7 @@ $(sort $(OBJDIRS)):
 
 ifndef EXECUTABLE_DEFINED
 
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBRENDER) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $@

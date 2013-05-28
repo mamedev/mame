@@ -73,10 +73,10 @@ struct gdi_info
 
 // core functions
 static void drawgdi_exit(void);
-static int drawgdi_window_init(win_window_info *window);
-static void drawgdi_window_destroy(win_window_info *window);
-static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window);
-static int drawgdi_window_draw(win_window_info *window, HDC dc, int update);
+static int drawgdi_window_init(render::window_info *window);
+static void drawgdi_window_destroy(render::window_info *window);
+static render_primitive_list *drawgdi_window_get_primitives(render::window_info *window);
+static int drawgdi_window_draw(render::window_info *window, HDC dc, int update);
 
 
 
@@ -114,8 +114,9 @@ static void drawgdi_exit(void)
 //  drawgdi_window_init
 //============================================================
 
-static int drawgdi_window_init(win_window_info *window)
+static int drawgdi_window_init(render::window_info *window)
 {
+	/*
 	gdi_info *gdi;
 	int i;
 
@@ -141,7 +142,7 @@ static int drawgdi_window_init(win_window_info *window)
 		gdi->bminfo.bmiColors[i].rgbBlue        = i;
 		gdi->bminfo.bmiColors[i].rgbReserved    = i;
 	}
-
+	*/
 	return 0;
 }
 
@@ -151,8 +152,9 @@ static int drawgdi_window_init(win_window_info *window)
 //  drawgdi_window_destroy
 //============================================================
 
-static void drawgdi_window_destroy(win_window_info *window)
+static void drawgdi_window_destroy(render::window_info *window)
 {
+	/*
 	gdi_info *gdi = (gdi_info *)window->drawdata;
 
 	// skip if nothing
@@ -164,6 +166,7 @@ static void drawgdi_window_destroy(win_window_info *window)
 		global_free(gdi->bmdata);
 	global_free(gdi);
 	window->drawdata = NULL;
+	*/
 }
 
 
@@ -172,12 +175,15 @@ static void drawgdi_window_destroy(win_window_info *window)
 //  drawgdi_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawgdi_window_get_primitives(render::window_info *window)
 {
+	/*
 	RECT client;
 	GetClientRect(window->hwnd, &client);
 	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
 	return &window->target->get_primitives();
+	*/
+	return NULL;
 }
 
 
@@ -186,8 +192,9 @@ static render_primitive_list *drawgdi_window_get_primitives(win_window_info *win
 //  drawgdi_window_draw
 //============================================================
 
-static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
+static int drawgdi_window_draw(render::window_info *window, HDC dc, int update)
 {
+	/*
 	gdi_info *gdi = (gdi_info *)window->drawdata;
 	int width, height, pitch;
 	RECT bounds;
@@ -226,5 +233,6 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	StretchDIBits(dc, 0, 0, width, height,
 				0, 0, width, height,
 				gdi->bmdata, &gdi->bminfo, DIB_RGB_COLORS, SRCCOPY);
+	*/
 	return 0;
 }

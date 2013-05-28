@@ -132,6 +132,12 @@ enum
 // full screen options
 #define OPTION_SWITCHRES			"switchres"
 
+// per-window options
+#define OPTION_SCREEN               "screen"
+#define OPTION_ASPECT               "aspect"
+#define OPTION_RESOLUTION           "resolution"
+#define OPTION_VIEW                 "view"
+
 // core rotation options
 #define OPTION_ROTATE               "rotate"
 #define OPTION_ROR                  "ror"
@@ -291,6 +297,8 @@ public:
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return bool_value(OPTION_REFRESHSPEED); }
 	bool multithreading() const { return bool_value(OPTION_MULTITHREADING); }
+	const char *numprocessors() const { return value(OPTION_NUMPROCESSORS); }
+	bool bench() const { return bool_value(OPTION_BENCH); }
 
 	// core rotation options
 	bool rotate() const { return bool_value(OPTION_ROTATE); }

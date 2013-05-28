@@ -45,12 +45,26 @@
 #include "video.h"
 #include "render.h"
 
+#include "window.h"
+#include "monitor.h"
+#include "drawhal.h"
+
+//============================================================
+//  CONSTANTS
+//============================================================
+
+#define MAX_WINDOWS         4
+
+
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
 namespace render
 {
+
+class window_system;
+class window_info;
 
 class video_system
 {
@@ -76,7 +90,7 @@ public:
 		render_layer_config layerconfig;                // default configuration of layers
 
 		// per-window configuration
-		window_config		window[MAX_WINDOWS];        // configuration data per-window
+		window_system::window_config window[MAX_WINDOWS];		// configuration data per-window
 
 		// hardware options
 		int                 mode;                       // output mode
@@ -92,9 +106,13 @@ public:
 		int                 filter;                     // enable filtering
 	};
 
-	window_system *			window_system() { return m_window; }
+	window_system *			window() { return m_window; }
 
-	video_config &			video_config() { return m_video_config; }
+	video_config &			get_video_config() { return m_video_config; }
+
+	virtual window_info *	window_list() { return m_window->window_list(); }
+
+	bool					ui_is_paused() { return m_machine.paused() && m_ui_temp_was_paused; }
 
 protected:
 	virtual void 			extract_video_config();
@@ -111,7 +129,7 @@ private:
 
 	window_system *			m_window;
 
-	threadid				m_main_threadid;
+	UINT64					m_main_threadid;
 
 	monitor_info *			m_monitor_list;
 	monitor_info *			m_primary_monitor;
@@ -122,39 +140,4 @@ private:
 
 };
 
-namespace render::windows
-{
-
-class video_system : public render::video_system
-{
-public:
-	video_system(running_machine &machine);
-	virtual ~video_system();
-
-	virtual void			update();
-
-	virtual int				pick_monitor(int index);
-	BOOL CALLBACK			monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
-	virtual void			init_monitors();
-	virtual monitor_info *	monitor_from_handle(HMONITOR hmonitor);
-
-	virtual bool			window_has_focus();
-
-	virtual bool			has_menu();
-
-protected:
-	virtual void 			extract_video_config();
-
-	virtual void			set_pause_event();
-	virtual void			reset_pause_event();
-
-private:
-	float					get_aspect(const char *defdata, const char *data, int report_error);
-	void					get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
-
-	HANDLE 					m_ui_pause_event;
-};
-
-};
-
-#endif // __RENDER_WINDOWS_VIDEO__
+#endif // __RENDER_VIDEO__

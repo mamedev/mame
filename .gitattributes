@@ -8565,6 +8565,7 @@ src/render/windows/video.cpp svneol=native#text/plain
 src/render/windows/video.h svneol=native#text/plain
 src/render/windows/window.cpp svneol=native#text/plain
 src/render/windows/window.h svneol=native#text/plain
+src/render/windows/windows.mak svneol=native#text/plain
 src/tools/chdman.c svneol=native#text/plain
 src/tools/jedutil.c svneol=native#text/plain
 src/tools/ldresample.c svneol=native#text/plain

@@ -129,7 +129,7 @@ class renderer
 {
 public:
 	renderer() { }
-	renderer(win_window_info *window);
+	renderer(render::window_info *window);
 	~renderer();
 
 	int                     initialize();
@@ -177,7 +177,7 @@ public:
 	int                     get_height() { return m_height; }
 	int                     get_refresh() { return m_refresh; }
 
-	win_window_info *       get_window() { return m_window; }
+	render::window_info *   get_window() { return m_window; }
 
 	device *                get_device() { return m_device; }
 	present_parameters *    get_presentation() { return &m_presentation; }
@@ -210,7 +210,7 @@ private:
 	int                     m_refresh;                  // current refresh rate
 	int                     m_create_error_count;       // number of consecutive create errors
 
-	win_window_info *       m_window;                     // current window info
+	render::window_info *   m_window;                     // current window info
 
 	device *                m_device;                   // pointer to the Direct3DDevice object
 	int                     m_gamma_supported;          // is full screen gamma supported?

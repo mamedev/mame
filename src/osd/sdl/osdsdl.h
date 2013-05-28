@@ -42,10 +42,6 @@
 
 #define SDLOPTION_INIPATH               "inipath"
 #define SDLOPTION_AUDIO_LATENCY         "audio_latency"
-#define SDLOPTION_SCREEN                "screen"
-#define SDLOPTION_ASPECT                "aspect"
-#define SDLOPTION_RESOLUTION            "resolution"
-#define SDLOPTION_VIEW                  "view"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
 #define SDLOPTION_UNEVENSTRETCH         "unevenstretch"
 #define SDLOPTION_USEALLHEADS           "useallheads"

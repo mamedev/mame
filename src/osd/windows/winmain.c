@@ -76,7 +76,9 @@
 #include "netdev.h"
 #endif
 
+// Render headers
 #include "render/windows/video.h"
+#include "render/windows/window.h"
 
 #define DEBUG_SLOW_LOCKS    0
 
@@ -459,16 +461,6 @@ int main(int argc, char *argv[])
 	extern void (*s_debugger_stack_crawler)();
 	s_debugger_stack_crawler = winmain_dump_stack;
 
-	// if we're a GUI app, out errors to message boxes
-	if (win_is_gui_application() || is_double_click_start(argc))
-	{
-		// if we are a GUI app, output errors to message boxes
-		mame_set_output_channel(OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(winui_output_error), (delegate_late_bind *)0));
-
-		// make sure any console window that opened on our behalf is nuked
-		FreeConsole();
-	}
-
 	osd_init_midi();
 
 	// parse config and cmdline options
@@ -476,6 +468,17 @@ int main(int argc, char *argv[])
 	{
 		windows_options options;
 		windows_osd_interface osd;
+
+		// if we're a GUI app, out errors to message boxes
+		if (win_is_gui_application() || is_double_click_start(argc))
+		{
+			// if we are a GUI app, output errors to message boxes
+			mame_set_output_channel(OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(winui_output_error), (delegate_late_bind *)&osd));
+
+			// make sure any console window that opened on our behalf is nuked
+			FreeConsole();
+		}
+
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
@@ -543,12 +546,14 @@ static void winui_output_error(delegate_late_bind *param, const char *format, va
 {
 	char buffer[1024];
 
+	windows_osd_interface *osd = (windows_osd_interface *)(void *)param;
 	// if we are in fullscreen mode, go to windowed mode
-	if ((video_config.windowed == 0) && (win_window_list != NULL))
-		winwindow_toggle_full_screen();
+	render::windows::window_info *window_list = (render::windows::window_info *)osd->video()->window_list();
+	if ((osd->video()->get_video_config().windowed == 0) && (window_list != NULL))
+		osd->video()->window()->toggle_full_screen();
 
 	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
-	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, emulator_info::get_appname(), MB_OK);
+	win_message_box_utf8(window_list ? window_list->hwnd() : NULL, buffer, emulator_info::get_appname(), MB_OK);
 }
 
 
@@ -570,6 +575,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 
 windows_osd_interface::windows_osd_interface()
 {
+	m_video = NULL;
 }
 
 
@@ -595,7 +601,7 @@ void windows_osd_interface::init(running_machine &machine)
 	windows_options &options = downcast<windows_options &>(machine.options());
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options.bench();
+	int bench = machine.options().bench();
 	astring error_string;
 	if (bench > 0)
 	{
@@ -611,8 +617,8 @@ void windows_osd_interface::init(running_machine &machine)
 	if (profile > 0)
 	{
 		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM, error_string);
-		options.set_value(WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
 		assert(!error_string);
 	}
 
@@ -624,7 +630,7 @@ void windows_osd_interface::init(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_exit), &machine));
 
 	// get number of processors
-	stemp = options.numprocessors();
+	stemp = machine.options().numprocessors();
 
 	osd_num_processors = 0;
 
@@ -648,11 +654,12 @@ void windows_osd_interface::init(running_machine &machine)
 #endif
 	// notify listeners of screen configuration
 	astring tempstring;
-	for (win_window_info *info = win_window_list; info != NULL; info = info->next)
+	render::window_info *info;
+	for (info = m_video->window()->window_list(); info != NULL; info = info->next())
 	{
-		char *tmp = utf8_from_tstring(info->monitor->info.szDevice);
+		char *tmp = info->monitor()->device_name();
 		tempstring.printf("Orientation(%s)", tmp);
-		output_set_value(tempstring, info->targetorient);
+		output_set_value(tempstring, info->targetorient());
 		osd_free(tmp);
 	}
 
@@ -742,8 +749,14 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 	if (timeresult == TIMERR_NOERROR)
 		timeEndPeriod(caps.wPeriodMin);
 
+	if (m_video != NULL)
+	{
+		global_free(m_video);
+		m_video = NULL;
+	}
+
 	// one last pass at events
-	winwindow_process_events(machine, 0);
+	m_video->process_events(false);
 }
 
 

@@ -72,6 +72,10 @@
 #include "strconv.h"
 #include "config.h"
 
+// Render headers
+#include "render/windows/video.h"
+#include "render/windows/window.h"
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -569,7 +573,7 @@ static void wininput_exit(running_machine &machine)
 
 void wininput_poll(running_machine &machine)
 {
-	int hasfocus = winosd->video()->window()->has_focus() && input_enabled;
+	int hasfocus = winosd->video()->window_has_focus() && input_enabled;
 
 	// ignore if not enabled
 	if (input_enabled)
@@ -619,7 +623,7 @@ int wininput_should_hide_mouse(void)
 		return FALSE;
 
 	// if the window has a menu, no
-	if (m_video->window_list() != NULL && m_video->window_list()->has_menu())
+	if (winosd->video()->window_list() != NULL && winosd->video()->has_menu())
 		return FALSE;
 
 	// otherwise, yes
@@ -656,16 +660,17 @@ BOOL wininput_handle_mouse_button(int button, int down, int x, int y)
 
 	// set the button state
 	devinfo->mouse.state.rgbButtons[button] = down ? 0x80 : 0x00;
+	render::windows::window_info *window_list = (render::windows::window_info *)winosd->video()->window_list();
 	if (down)
 	{
 		RECT client_rect;
 		POINT mousepos;
 
 		// get the position relative to the window
-		GetClientRect(win_window_list->hwnd, &client_rect);
+		GetClientRect(window_list->hwnd(), &client_rect);
 		mousepos.x = x;
 		mousepos.y = y;
-		ScreenToClient(win_window_list->hwnd, &mousepos);
+		ScreenToClient(window_list->hwnd(), &mousepos);
 
 		// convert to absolute coordinates
 		devinfo->mouse.state.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -1074,13 +1079,14 @@ static void win32_lightgun_poll(device_info *devinfo)
 
 	// get the cursor position and transform into final results
 	GetCursorPos(&mousepos);
-	if (win_window_list != NULL)
+	render::windows::window_info *window_list = (render::windows::window_info *)winosd->video()->window_list();
+	if (window_list != NULL)
 	{
 		RECT client_rect;
 
 		// get the position relative to the window
-		GetClientRect(win_window_list->hwnd, &client_rect);
-		ScreenToClient(win_window_list->hwnd, &mousepos);
+		GetClientRect(window_list->hwnd(), &client_rect);
+		ScreenToClient(window_list->hwnd(), &mousepos);
 
 		// convert to absolute coordinates
 		xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -1225,7 +1231,10 @@ static device_info *dinput_device_create(running_machine &machine, device_info *
 	// attempt to create a device
 	result = IDirectInput_CreateDevice(dinput, WRAP_REFIID(instance->guidInstance), &devinfo->dinput.device, NULL);
 	if (result != DI_OK)
-		goto error;
+	{
+		dinput_device_release(devinfo);
+		return NULL;
+	}
 
 	// try to get a version 2 device for it
 	result = IDirectInputDevice_QueryInterface(devinfo->dinput.device, WRAP_REFIID(IID_IDirectInputDevice2), (void **)&devinfo->dinput.device2);
@@ -1236,7 +1245,10 @@ static device_info *dinput_device_create(running_machine &machine, device_info *
 	devinfo->dinput.caps.dwSize = STRUCTSIZE(DIDEVCAPS);
 	result = IDirectInputDevice_GetCapabilities(devinfo->dinput.device, &devinfo->dinput.caps);
 	if (result != DI_OK)
-		goto error;
+	{
+		dinput_device_release(devinfo);
+		return NULL;
+	}
 
 	// attempt to set the data format
 	devinfo->dinput.format = format1;
@@ -1250,18 +1262,21 @@ static device_info *dinput_device_create(running_machine &machine, device_info *
 			result = IDirectInputDevice_SetDataFormat(devinfo->dinput.device, devinfo->dinput.format);
 		}
 		if (result != DI_OK)
-			goto error;
+		{
+			dinput_device_release(devinfo);
+			return NULL;
+		}
 	}
 
 	// set the cooperative level
-	result = IDirectInputDevice_SetCooperativeLevel(devinfo->dinput.device, win_window_list->hwnd, cooperative_level);
+	render::windows::window_info *window_list = (render::windows::window_info *)winosd->video()->window_list();
+	result = IDirectInputDevice_SetCooperativeLevel(devinfo->dinput.device, window_list->hwnd(), cooperative_level);
 	if (result != DI_OK)
-		goto error;
+	{
+		dinput_device_release(devinfo);
+		return NULL;
+	}
 	return devinfo;
-
-error:
-	dinput_device_release(devinfo);
-	return NULL;
 }
 
 
@@ -1421,7 +1436,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	// allocate and link in a new device
 	devinfo = dinput_device_create(machine, &mouse_list, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if (devinfo == NULL)
-		goto exit;
+		return DIENUM_CONTINUE;
 
 	// allocate a second device for the gun (unless we are using the shared axis mode)
 	// we only support a single gun in dinput mode, so only add one
@@ -1429,7 +1444,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	{
 		guninfo = generic_device_alloc(machine, &lightgun_list, instance->tszInstanceName);
 		if (guninfo == NULL)
-			goto exit;
+			return DIENUM_CONTINUE;
 	}
 
 	// set relative mode on the mouse device
@@ -1437,7 +1452,11 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	if (result != DI_OK && result != DI_PROPNOEFFECT)
 	{
 		mame_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", generic_device_index(mouse_list, devinfo), devinfo->name);
-		goto error;
+		if (guninfo != NULL)
+			generic_device_free(guninfo);
+		if (devinfo != NULL)
+			dinput_device_release(devinfo);
+		return DIENUM_CONTINUE;
 	}
 
 	// add the device
@@ -1481,15 +1500,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		osd_free(name);
 	}
 
-exit:
 	return DIENUM_CONTINUE;
-
-error:
-	if (guninfo != NULL)
-		generic_device_free(guninfo);
-	if (devinfo != NULL)
-		dinput_device_release(devinfo);
-	goto exit;
 }
 
 
@@ -1521,7 +1532,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	device_info *devinfo;
 	HRESULT result;
 
-	if (m_video->window_list() != NULL && win_has_menu(m_video->window_list()->has_menu())) {
+	if (winosd->video()->window_list() != NULL && winosd->video()->has_menu()) {
 		cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 	}
 	// allocate and link in a new device
@@ -1697,7 +1708,12 @@ static void rawinput_init(running_machine &machine)
 	// look in user32 for the raw input APIs
 	user32 = LoadLibrary(TEXT("user32.dll"));
 	if (user32 == NULL)
-		goto error;
+	{
+		if (devlist != NULL)
+		{
+			global_free(devlist);
+		}
+	}
 
 	// look up the entry points
 	register_rawinput_devices = (register_rawinput_devices_ptr)GetProcAddress(user32, "RegisterRawInputDevices");
@@ -1705,17 +1721,37 @@ static void rawinput_init(running_machine &machine)
 	get_rawinput_device_info = (get_rawinput_device_info_ptr)GetProcAddress(user32, "GetRawInputDeviceInfo" UNICODE_SUFFIX);
 	get_rawinput_data = (get_rawinput_data_ptr)GetProcAddress(user32, "GetRawInputData");
 	if (register_rawinput_devices == NULL || get_rawinput_device_list == NULL || get_rawinput_device_info == NULL || get_rawinput_data == NULL)
-		goto error;
+	{
+		if (devlist != NULL)
+		{
+			global_free(devlist);
+		}
+	}
 	mame_printf_verbose("RawInput: APIs detected\n");
 
 	// get the number of devices, allocate a device list, and fetch it
 	if ((*get_rawinput_device_list)(NULL, &device_count, sizeof(*devlist)) != 0)
-		goto error;
+	{
+		if (devlist != NULL)
+		{
+			global_free(devlist);
+		}
+	}
 	if (device_count == 0)
-		goto error;
+	{
+		if (devlist != NULL)
+		{
+			global_free(devlist);
+		}
+	}
 	devlist = global_alloc_array(RAWINPUTDEVICELIST, device_count);
 	if ((*get_rawinput_device_list)(devlist, &device_count, sizeof(*devlist)) == -1)
-		goto error;
+	{
+		if (devlist != NULL)
+		{
+			global_free(devlist);
+		}
+	}
 
 	// iterate backwards through devices; new devices are added at the head
 	for (devnum = device_count - 1; devnum >= 0; devnum--)
@@ -1732,13 +1768,14 @@ static void rawinput_init(running_machine &machine)
 	}
 
 	// finally, register to receive raw input WM_INPUT messages
+	render::windows::window_info *window_list = (render::windows::window_info *)winosd->video()->window_list();
 	regcount = 0;
 	if (keyboard_list != NULL)
 	{
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x06;
 		reglist[regcount].dwFlags = RIDEV_INPUTSINK;
-		reglist[regcount].hwndTarget = win_window_list->hwnd;
+		reglist[regcount].hwndTarget = window_list->hwnd();
 		regcount++;
 	}
 	if (mouse_list != NULL)
@@ -1746,21 +1783,24 @@ static void rawinput_init(running_machine &machine)
 		reglist[regcount].usUsagePage = 0x01;
 		reglist[regcount].usUsage = 0x02;
 		reglist[regcount].dwFlags = 0;
-		reglist[regcount].hwndTarget = win_window_list->hwnd;
+		reglist[regcount].hwndTarget = window_list->hwnd();
 		regcount++;
 	}
 
 	// if the registration fails, we need to back off
 	if (regcount > 0)
+	{
 		if (!(*register_rawinput_devices)(reglist, regcount, sizeof(reglist[0])))
-			goto error;
+		{
+			if (devlist != NULL)
+			{
+				global_free(devlist);
+			}
+		}
+	}
 
 	global_free(devlist);
 	return;
-
-error:
-	if (devlist != NULL)
-		global_free(devlist);
 }
 
 

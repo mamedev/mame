@@ -211,21 +211,22 @@ static d3d::base *               d3dintf; // FIX ME
 //============================================================
 
 // core functions
-static void drawd3d_exit(void);
-static int drawd3d_window_init(win_window_info *window);
-static void drawd3d_window_destroy(win_window_info *window);
-static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
-static void drawd3d_window_save(win_window_info *window);
-static void drawd3d_window_record(win_window_info *window);
-static void drawd3d_window_toggle_fsfx(win_window_info *window);
-static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
+//static void drawd3d_exit(void);
+//static int drawd3d_window_init(render::window_info *window);
+//static void drawd3d_window_destroy(render::window_info *window);
+//static render_primitive_list *drawd3d_window_get_primitives(render::window_info *window);
+//static void drawd3d_window_save(render::window_info *window);
+//static void drawd3d_window_record(render::window_info *window);
+//static void drawd3d_window_toggle_fsfx(render::window_info *window);
+//static int drawd3d_window_draw(render::window_info *window, HDC dc, int update);
 
 
 //============================================================
 //  drawd3d_window_init
 //============================================================
 
-static int drawd3d_window_init(win_window_info *window)
+/*
+static int drawd3d_window_init(render::window_info *window)
 {
 	// allocate memory for our structures
 	d3d::renderer *d3d = global_alloc(d3d::renderer(window));
@@ -237,37 +238,37 @@ static int drawd3d_window_init(win_window_info *window)
 		mame_printf_error("Unable to initialize Direct3D.\n");
 		return 1;
 	}
-
 	return 0;
 }
+*/
 
 //============================================================
 //  drawd3d_exit
 //============================================================
 
-static void drawd3d_exit(void)
-{
-	if (d3dintf != NULL)
-		(*d3dintf->d3d.release)(d3dintf);
-}
+//static void drawd3d_exit(void)
+//{
+//	if (d3dintf != NULL)
+//		(*d3dintf->d3d.release)(d3dintf);
+//}
 
-static void drawd3d_window_toggle_fsfx(win_window_info *window)
-{
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->set_restarting(true);
-}
+//static void drawd3d_window_toggle_fsfx(render::window_info *window)
+//{
+	//d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
+	//d3d->set_restarting(true);
+//}
 
-static void drawd3d_window_record(win_window_info *window)
-{
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->get_shaders()->window_record();
-}
+//static void drawd3d_window_record(render::window_info *window)
+//{
+	//d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
+	//d3d->get_shaders()->window_record();
+//}
 
-static void drawd3d_window_save(win_window_info *window)
-{
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->get_shaders()->window_save();
-}
+//static void drawd3d_window_save(render::window_info *window)
+//{
+	//d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
+	//d3d->get_shaders()->window_save();
+//}
 
 
 
@@ -275,7 +276,8 @@ static void drawd3d_window_save(win_window_info *window)
 //  drawd3d_window_destroy
 //============================================================
 
-static void drawd3d_window_destroy(win_window_info *window)
+/*
+static void drawd3d_window_destroy(render::window_info *window)
 {
 	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
 
@@ -290,6 +292,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	global_free(d3d);
 	window->drawdata = NULL;
 }
+*/
 
 
 
@@ -297,7 +300,8 @@ static void drawd3d_window_destroy(win_window_info *window)
 //  drawd3d_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
+/*
+static render_primitive_list *drawd3d_window_get_primitives(render::window_info *window)
 {
 	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
 	RECT client;
@@ -309,10 +313,13 @@ static render_primitive_list *drawd3d_window_get_primitives(win_window_info *win
 		window->target->set_max_update_rate((d3d->get_refresh() == 0) ? d3d->get_origmode().RefreshRate : d3d->get_refresh());
 	}
 	return &window->target->get_primitives();
+	return NULL;
 }
+*/
 
 int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 {
+	/*
 	d3dintf = NULL;
 
 	// Use Direct3D9
@@ -334,6 +341,7 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_record = drawd3d_window_record;
 	callbacks->window_toggle_fsfx = drawd3d_window_toggle_fsfx;
 	callbacks->window_destroy = drawd3d_window_destroy;
+	*/
 	return 0;
 }
 
@@ -341,7 +349,8 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 //  drawd3d_window_draw
 //============================================================
 
-static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
+/*
+static int drawd3d_window_draw(render::window_info *window, HDC dc, int update)
 {
 	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
 
@@ -355,9 +364,9 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 	d3d->begin_frame();
 	d3d->process_primitives();
 	d3d->end_frame();
-
 	return 0;
 }
+*/
 
 namespace d3d
 {
@@ -492,6 +501,7 @@ texture_manager::texture_manager(renderer *d3d)
 	m_default_texture = NULL;
 
 	// check for dynamic texture support
+	/*
 	DWORD tempcaps;
 	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, d3d->get_adapter(), D3DDEVTYPE_HAL, CAPS_CAPS2, &tempcaps);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during get_caps_dword call\n", (int)result);
@@ -529,6 +539,7 @@ texture_manager::texture_manager(renderer *d3d)
 	// set the max texture size
 	d3d->get_window()->target->set_max_texture_size(m_texture_max_width, m_texture_max_height);
 	mame_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
+	*/
 }
 
 texture_manager::~texture_manager()
@@ -741,7 +752,7 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 	return NULL;
 }
 
-renderer::renderer(win_window_info *window)
+renderer::renderer(render::window_info *window)
 {
 	m_device = NULL;
 	m_restarting = false;
@@ -764,7 +775,7 @@ int renderer::initialize()
 		return false;
 
 	// create the device immediately for the full screen case (defer for window mode)
-	if (m_window->fullscreen && device_create())
+	if (m_window->fullscreen() && device_create())
 		return false;
 
 	return true;
@@ -772,8 +783,9 @@ int renderer::initialize()
 
 int renderer::pre_window_draw_check()
 {
+	/*
 	// if we're in the middle of resizing, leave things alone
-	if (m_window->resize_state == RESIZE_STATE_RESIZING)
+	if (m_window->resize_state() == RESIZE_STATE_RESIZING)
 		return 0;
 
 	// if we're restarting the renderer, leave things alone
@@ -808,12 +820,13 @@ int renderer::pre_window_draw_check()
 		if (m_device == NULL)
 			return 1;
 	}
-
+	*/
 	return -1;
 }
 
 void texture_manager::update_textures()
 {
+	/*
 	for (render_primitive *prim = m_renderer->get_window()->primlist->first(); prim != NULL; prim = prim->next())
 	{
 		if (prim->texture.base != NULL)
@@ -842,10 +855,12 @@ void texture_manager::update_textures()
 			}
 		}
 	}
+	*/
 }
 
 int renderer::begin_frame()
 {
+	/*
 	int check = d3d->pre_window_draw_check();
 	if (check >= 0)
 		return check;
@@ -878,10 +893,13 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
 			m_line_count++;
+	*/
+	return 0;
 }
 
 void renderer::process_primitives()
 {
+	/*
 	if (m_line_count && m_shaders->enabled() && d3dintf->post_fx_available)
 	{
 		batch_vectors();
@@ -916,10 +934,12 @@ void renderer::process_primitives()
 	{
 		batch_vectors();
 	}
+	*/
 }
 
 void renderer::end_frame()
 {
+	/*
 	m_window->primlist->release_lock();
 
 	// flush any pending polygons
@@ -934,6 +954,7 @@ void renderer::end_frame()
 	// present the current buffers
 	result = (*d3dintf->device.present)(m_device, NULL, NULL, NULL, NULL, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device present call\n", (int)result);
+	*/
 }
 
 //============================================================
@@ -942,6 +963,7 @@ void renderer::end_frame()
 
 int renderer::device_create()
 {
+	/*
 	// if a device exists, free it
 	if (m_device != NULL)
 		device_delete();
@@ -1061,6 +1083,8 @@ try_again:
 		return ret;
 
 	return device_create_resources();
+	*/
+	return 0;
 }
 
 
@@ -1305,6 +1329,7 @@ int renderer::device_test_cooperative()
 
 int renderer::config_adapter_mode()
 {
+	/*
 	adapter_identifier identifier;
 
 	// choose the monitor number
@@ -1328,7 +1353,7 @@ int renderer::config_adapter_mode()
 	}
 
 	// choose a resolution: window mode case
-	if (!m_window->fullscreen || !video_config.switchres || win_has_menu(m_window))
+	if (!m_window->fullscreen() || !video_config.switchres || win_has_menu(m_window))
 	{
 		RECT client;
 
@@ -1379,7 +1404,7 @@ int renderer::config_adapter_mode()
 			osd_free(utf8_device);
 		}
 		return 1;
-	}
+	}*/
 	return 0;
 }
 
@@ -1391,7 +1416,7 @@ int renderer::config_adapter_mode()
 
 int renderer::get_adapter_for_monitor()
 {
-	int maxadapter = (*d3dintf->d3d.get_adapter_count)(d3dintf);
+	/*int maxadapter = (*d3dintf->d3d.get_adapter_count)(d3dintf);
 
 	// iterate over adapters until we error or find a match
 	for (int adapternum = 0; adapternum < maxadapter; adapternum++)
@@ -1404,7 +1429,7 @@ int renderer::get_adapter_for_monitor()
 		{
 			return adapternum;
 		}
-	}
+	}*/
 
 	// default to the default
 	return D3DADAPTER_DEFAULT;
@@ -1418,7 +1443,7 @@ int renderer::get_adapter_for_monitor()
 
 void renderer::pick_best_mode()
 {
-	double target_refresh = 60.0;
+	/*double target_refresh = 60.0;
 	INT32 minwidth, minheight;
 	float best_score = 0.0f;
 
@@ -1496,7 +1521,7 @@ void renderer::pick_best_mode()
 			m_refresh = mode.RefreshRate;
 		}
 	}
-	mame_printf_verbose("Direct3D: Mode selected = %4dx%4d@%3dHz\n", m_width, m_height, m_refresh);
+	mame_printf_verbose("Direct3D: Mode selected = %4dx%4d@%3dHz\n", m_width, m_height, m_refresh);*/
 }
 
 
@@ -1508,7 +1533,7 @@ void renderer::pick_best_mode()
 int renderer::update_window_size()
 {
 	// get the current window bounds
-	RECT client;
+	/*RECT client;
 	GetClientRectExceptMenu(m_window->hwnd, &client, m_window->fullscreen);
 
 	// if we have a device and matching width/height, nothing to do
@@ -1531,7 +1556,7 @@ int renderer::update_window_size()
 		return FALSE;
 
 	// reset the resize state to normal, and indicate we made a change
-	m_window->resize_state = RESIZE_STATE_NORMAL;
+	m_window->resize_state = RESIZE_STATE_NORMAL;*/
 	return TRUE;
 }
 
@@ -1541,7 +1566,7 @@ int renderer::update_window_size()
 
 void renderer::batch_vectors()
 {
-	windows_options &options = downcast<windows_options &>(m_window->machine().options());
+	/*windows_options &options = downcast<windows_options &>(m_window->machine().options());
 
 	int vector_size = (options.antialias() ? 24 : 6);
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
@@ -1586,7 +1611,7 @@ void renderer::batch_vectors()
 	if (m_line_count > 0)
 	{
 		start_index %= m_line_count;
-	}
+	}*/
 }
 
 void renderer::batch_vector(const render_primitive *prim, float line_time)
@@ -1918,6 +1943,7 @@ vertex *renderer::mesh_alloc(int numverts)
 
 void renderer::primitive_flush_pending()
 {
+	/*
 	// ignore if we're not locked
 	if (m_lockedbuf == NULL)
 	{
@@ -1995,6 +2021,7 @@ void renderer::primitive_flush_pending()
 	// reset the vertex count
 	m_numverts = 0;
 	m_numpolys = 0;
+	*/
 }
 
 //============================================================
@@ -2030,6 +2057,7 @@ texture_info::~texture_info()
 
 texture_info::texture_info(texture_manager *manager, const render_texinfo* texsource, UINT32 flags)
 {
+	/*
 	HRESULT result;
 
 	// fill in the core data
@@ -2196,6 +2224,7 @@ error:
 		(*d3dintf->surface.release)(m_d3dsurface);
 	if (m_d3dtex != NULL)
 		(*d3dintf->texture.release)(m_d3dtex);
+	*/
 }
 
 

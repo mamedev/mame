@@ -100,19 +100,19 @@ struct dd_info
 
 
 /* monitor_enum_info holds information during a monitor enumeration */
-struct monitor_enum_info
+/*struct monitor_enum_info
 {
-	win_monitor_info *      monitor;                    // pointer to monitor we want
+	monitor_info *      monitor;                    // pointer to monitor we want
 	GUID                    guid;                       // GUID of the one we found
 	GUID *                  guid_ptr;                   // pointer to our GUID
 	int                     foundit;                    // TRUE if we found what we wanted
-};
+};*/
 
 
 /* mode_enum_info holds information during a display mode enumeration */
 struct mode_enum_info
 {
-	win_window_info *       window;
+	render::window_info *   window;
 	INT32                   minimum_width, minimum_height;
 	INT32                   target_width, target_height;
 	double                  target_refresh;
@@ -156,29 +156,29 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 
 // core functions
 static void drawdd_exit(void);
-static int drawdd_window_init(win_window_info *window);
-static void drawdd_window_destroy(win_window_info *window);
-static render_primitive_list *drawdd_window_get_primitives(win_window_info *window);
-static int drawdd_window_draw(win_window_info *window, HDC dc, int update);
+static int drawdd_window_init(render::window_info *window);
+static void drawdd_window_destroy(render::window_info *window);
+static render_primitive_list *drawdd_window_get_primitives(render::window_info *window);
+static int drawdd_window_draw(render::window_info *window, HDC dc, int update);
 
 // surface management
-static int ddraw_create(win_window_info *window);
-static int ddraw_create_surfaces(win_window_info *window);
-static void ddraw_delete(win_window_info *window);
-static void ddraw_delete_surfaces(win_window_info *window);
-static int ddraw_verify_caps(dd_info *dd);
-static int ddraw_test_cooperative(win_window_info *window);
-static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type);
-static int create_clipper(win_window_info *window);
+//static int ddraw_create(render::window_info *window);
+//static int ddraw_create_surfaces(render::window_info *window);
+//static void ddraw_delete(render::window_info *window);
+//static void ddraw_delete_surfaces(render::window_info *window);
+//static int ddraw_verify_caps(dd_info *dd);
+//static int ddraw_test_cooperative(render::window_info *window);
+//static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type);
+//static int create_clipper(render::window_info *window);
 
 // drawing helpers
-static void compute_blit_surface_size(win_window_info *window);
-static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight);
+//static void compute_blit_surface_size(render::window_info *window);
+//static void blit_to_primary(render::window_info *window, int srcwidth, int srcheight);
 
 // video modes
-static int config_adapter_mode(win_window_info *window);
-static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
-static void pick_best_mode(win_window_info *window);
+//static int config_adapter_mode(render::window_info *window);
+//static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
+//static void pick_best_mode(render::window_info *window);
 
 
 
@@ -248,8 +248,9 @@ static void drawdd_exit(void)
 //  drawdd_window_init
 //============================================================
 
-static int drawdd_window_init(win_window_info *window)
+static int drawdd_window_init(render::window_info *window)
 {
+	/*
 	dd_info *dd;
 
 	// allocate memory for our structures
@@ -263,13 +264,13 @@ static int drawdd_window_init(win_window_info *window)
 	// create the ddraw object
 	if (ddraw_create(window))
 		goto error;
-
+	*/
 	return 0;
 
-error:
-	drawdd_window_destroy(window);
-	mame_printf_error("Unable to initialize DirectDraw.\n");
-	return 1;
+//error:
+//	drawdd_window_destroy(window);
+//	mame_printf_error("Unable to initialize DirectDraw.\n");
+//	return 1;
 }
 
 
@@ -278,8 +279,9 @@ error:
 //  drawdd_window_destroy
 //============================================================
 
-static void drawdd_window_destroy(win_window_info *window)
+static void drawdd_window_destroy(render::window_info *window)
 {
+	/*
 	dd_info *dd = (dd_info *)window->drawdata;
 
 	// skip if nothing
@@ -292,6 +294,7 @@ static void drawdd_window_destroy(win_window_info *window)
 	// free the memory in the window
 	global_free(dd);
 	window->drawdata = NULL;
+	*/
 }
 
 
@@ -300,8 +303,9 @@ static void drawdd_window_destroy(win_window_info *window)
 //  drawdd_window_get_primitives
 //============================================================
 
-static render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawdd_window_get_primitives(render::window_info *window)
 {
+	/*
 	dd_info *dd = (dd_info *)window->drawdata;
 
 	compute_blit_surface_size(window);
@@ -309,6 +313,8 @@ static render_primitive_list *drawdd_window_get_primitives(win_window_info *wind
 	window->target->set_max_update_rate((dd->refresh == 0) ? dd->origmode.dwRefreshRate : dd->refresh);
 
 	return &window->target->get_primitives();
+	*/
+	return NULL;
 }
 
 
@@ -317,8 +323,9 @@ static render_primitive_list *drawdd_window_get_primitives(win_window_info *wind
 //  drawdd_window_draw
 //============================================================
 
-static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
+static int drawdd_window_draw(render::window_info *window, HDC dc, int update)
 {
+	/*
 	dd_info *dd = (dd_info *)window->drawdata;
 	render_primitive *prim;
 	int usemembuffer = FALSE;
@@ -438,6 +445,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 
 	// complete the blitting
 	blit_to_primary(window, dd->blitwidth, dd->blitheight);
+	*/
 	return 0;
 }
 
@@ -447,7 +455,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 //  ddraw_create
 //============================================================
 
-static int ddraw_create(win_window_info *window)
+/*static int ddraw_create(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
@@ -506,7 +514,7 @@ static int ddraw_create(win_window_info *window)
 error:
 	ddraw_delete(window);
 	return 1;
-}
+}*/
 
 
 
@@ -514,7 +522,7 @@ error:
 //  ddraw_create_surfaces
 //============================================================
 
-static int ddraw_create_surfaces(win_window_info *window)
+/*static int ddraw_create_surfaces(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
@@ -625,7 +633,7 @@ static int ddraw_create_surfaces(win_window_info *window)
 error:
 	ddraw_delete_surfaces(window);
 	return 1;
-}
+}*/
 
 
 
@@ -633,7 +641,7 @@ error:
 //  ddraw_delete
 //============================================================
 
-static void ddraw_delete(win_window_info *window)
+/*static void ddraw_delete(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 
@@ -652,7 +660,7 @@ static void ddraw_delete(win_window_info *window)
 	if (dd->ddraw != NULL)
 		IDirectDraw7_Release(dd->ddraw);
 	dd->ddraw = NULL;
-}
+}*/
 
 
 
@@ -660,7 +668,7 @@ static void ddraw_delete(win_window_info *window)
 //  ddraw_delete_surfaces
 //============================================================
 
-static void ddraw_delete_surfaces(win_window_info *window)
+/*static void ddraw_delete_surfaces(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 
@@ -693,7 +701,7 @@ static void ddraw_delete_surfaces(win_window_info *window)
 	if (dd->primary != NULL)
 		IDirectDrawSurface7_Release(dd->primary);
 	dd->primary = NULL;
-}
+}*/
 
 
 
@@ -701,7 +709,7 @@ static void ddraw_delete_surfaces(win_window_info *window)
 //  ddraw_verify_caps
 //============================================================
 
-static int ddraw_verify_caps(dd_info *dd)
+/*static int ddraw_verify_caps(dd_info *dd)
 {
 	int retval = 0;
 	HRESULT result;
@@ -724,7 +732,7 @@ static int ddraw_verify_caps(dd_info *dd)
 	}
 
 	return retval;
-}
+}*/
 
 
 
@@ -732,7 +740,7 @@ static int ddraw_verify_caps(dd_info *dd)
 //  ddraw_test_cooperative
 //============================================================
 
-static int ddraw_test_cooperative(win_window_info *window)
+/*static int ddraw_test_cooperative(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
@@ -754,7 +762,8 @@ static int ddraw_test_cooperative(win_window_info *window)
 				return ddraw_create_surfaces(window);
 			return 0;
 	}
-}
+	return 0;
+}*/
 
 
 
@@ -762,7 +771,7 @@ static int ddraw_test_cooperative(win_window_info *window)
 //  create_surface
 //============================================================
 
-static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type)
+/*static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurface7 **surface, const char *type)
 {
 	HRESULT result;
 
@@ -794,7 +803,7 @@ static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurf
 				(UINT32)desc->ddpfPixelFormat.dwGBitMask,
 				(UINT32)desc->ddpfPixelFormat.dwBBitMask);
 	return result;
-}
+}*/
 
 
 
@@ -802,7 +811,7 @@ static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurf
 //  create_clipper
 //============================================================
 
-static int create_clipper(win_window_info *window)
+/*static int create_clipper(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
@@ -830,8 +839,8 @@ static int create_clipper(win_window_info *window)
 		mame_printf_verbose("DirectDraw: Error %08X setting clipper on primary surface\n", (int)result);
 		return 1;
 	}
-	return 0;
-}
+=	return 0;
+}*/
 
 
 
@@ -839,7 +848,7 @@ static int create_clipper(win_window_info *window)
 //  compute_blit_surface_size
 //============================================================
 
-static void compute_blit_surface_size(win_window_info *window)
+/*static void compute_blit_surface_size(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	INT32 newwidth, newheight;
@@ -927,7 +936,7 @@ static void compute_blit_surface_size(win_window_info *window)
 	}
 	dd->blitwidth = newwidth;
 	dd->blitheight = newheight;
-}
+}*/
 
 
 
@@ -935,7 +944,7 @@ static void compute_blit_surface_size(win_window_info *window)
 //  calc_fullscreen_margins
 //============================================================
 
-static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, DWORD desc_height, RECT *margins)
+/*static void calc_fullscreen_margins(render::window_info *window, DWORD desc_width, DWORD desc_height, RECT *margins)
 {
 	margins->left = 0;
 	margins->top = 0;
@@ -955,7 +964,7 @@ static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, D
 		}
 		margins->top = height_with_menubar;
 	}
-}
+}*/
 
 
 
@@ -963,7 +972,7 @@ static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, D
 //  blit_to_primary
 //============================================================
 
-static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight)
+/*static void blit_to_primary(render::window_info *window, int srcwidth, int srcheight)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	IDirectDrawSurface7 *target = (dd->back != NULL) ? dd->back : dd->primary;
@@ -1090,7 +1099,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 		result = IDirectDrawSurface7_Flip(dd->primary, NULL, DDFLIP_WAIT);
 		if (result != DD_OK) mame_printf_verbose("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);
 	}
-}
+}*/
 
 
 
@@ -1098,7 +1107,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 //  config_adapter_mode
 //============================================================
 
-static int config_adapter_mode(win_window_info *window)
+/*static int config_adapter_mode(render::window_info *window)
 {
 	DDDEVICEIDENTIFIER2 identifier;
 	dd_info *dd = (dd_info *)window->drawdata;
@@ -1168,9 +1177,8 @@ static int config_adapter_mode(win_window_info *window)
 				return 1;
 		}
 	}
-
 	return 0;
-}
+}*/
 
 
 
@@ -1178,7 +1186,7 @@ static int config_adapter_mode(win_window_info *window)
 //  monitor_enum_callback
 //============================================================
 
-static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPSTR name, LPVOID context, HMONITOR hmonitor)
+/*static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPSTR name, LPVOID context, HMONITOR hmonitor)
 {
 	monitor_enum_info *einfo = (monitor_enum_info *)context;
 
@@ -1191,7 +1199,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 		einfo->foundit = TRUE;
 	}
 	return 1;
-}
+}*/
 
 
 
@@ -1199,7 +1207,7 @@ static BOOL WINAPI monitor_enum_callback(GUID FAR *guid, LPSTR description, LPST
 //  get_adapter_for_monitor
 //============================================================
 
-static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
+/*static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
 {
 	monitor_enum_info einfo;
 	HRESULT result;
@@ -1218,7 +1226,7 @@ static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
 	}
 	else
 		dd->adapter_ptr = NULL;
-}
+}*/
 
 
 
@@ -1226,7 +1234,7 @@ static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
 //  enum_modes_callback
 //============================================================
 
-static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
+/*static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 {
 	float size_score, refresh_score, final_score;
 	mode_enum_info *einfo = (mode_enum_info *)context;
@@ -1275,7 +1283,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 		dd->refresh = desc->dwRefreshRate;
 	}
 	return DDENUMRET_OK;
-}
+}*/
 
 
 
@@ -1283,7 +1291,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 //  pick_best_mode
 //============================================================
 
-static void pick_best_mode(win_window_info *window)
+/*static void pick_best_mode(render::window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 	mode_enum_info einfo;
@@ -1329,4 +1337,4 @@ static void pick_best_mode(win_window_info *window)
 	result = IDirectDraw7_EnumDisplayModes(dd->ddraw, DDEDM_REFRESHRATES, NULL, &einfo, enum_modes_callback);
 	if (result != DD_OK) mame_printf_verbose("DirectDraw: Error %08X during EnumDisplayModes call\n", (int)result);
 	mame_printf_verbose("DirectDraw: Mode selected = %4dx%4d@%3dHz\n", dd->width, dd->height, dd->refresh);
-}
+}*/

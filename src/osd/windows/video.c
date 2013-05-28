@@ -67,6 +67,9 @@
 #include "strconv.h"
 #include "config.h"
 
+// Render headers
+#include "render/windows/video.h"
+
 //============================================================
 //  update
 //============================================================
@@ -83,7 +86,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	}
 
 	// poll the joystick values here
-	m_video->process_events(TRUE);
+	m_video->process_events(true);
 	wininput_poll(machine());
 	check_osd_inputs();
 }
@@ -97,18 +100,18 @@ void windows_osd_interface::update(bool skip_redraw)
 void windows_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode
-	if (ui_input_pressed(*m_machine, IPT_OSD_1))
-		m_video->window_system()->toggle_full_screen();
+	if (ui_input_pressed(machine(), IPT_OSD_1))
+		m_video->window()->toggle_full_screen();
 
 	// check for taking fullscreen snap
-	if (ui_input_pressed(*m_machine, IPT_OSD_2))
-		winwindow_take_snap();
+	if (ui_input_pressed(machine(), IPT_OSD_2))
+		m_video->window()->take_snap();
 
 	// check for taking fullscreen video
-	if (ui_input_pressed(*m_machine, IPT_OSD_3))
-		winwindow_take_video();
+	if (ui_input_pressed(machine(), IPT_OSD_3))
+		m_video->window()->take_video();
 
 	// check for taking fullscreen video
-	if (ui_input_pressed(*m_machine, IPT_OSD_4))
-		winwindow_toggle_fsfx();
+	if (ui_input_pressed(machine(), IPT_OSD_4))
+		m_video->window()->toggle_fsfx();
 }

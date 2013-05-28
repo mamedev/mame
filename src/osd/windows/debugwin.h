@@ -42,6 +42,7 @@
 #ifndef __WIN_DEBUGWIN__
 #define __WIN_DEBUGWIN__
 
+#include "render/windows/video.h"
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -55,7 +56,7 @@
 //  PROTOTYPES
 //============================================================
 
-void debugwin_init_windows(running_machine &machine);
+void debugwin_init_windows(running_machine &machine, render::windows::video_system *video);
 void debugwin_destroy_windows(void);
 void debugwin_show(int type);
 void debugwin_update_during_game(running_machine &machine);

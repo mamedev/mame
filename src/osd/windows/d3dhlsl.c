@@ -84,7 +84,7 @@
 //============================================================
 
 static slider_state *g_slider_list;
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx);
+//static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx);
 
 namespace d3d
 {
@@ -188,7 +188,7 @@ hlsl_options shaders::s_hlsl_presets[4] =
 //  PROTOTYPES
 //============================================================
 
-static void get_vector(const char *data, int count, float *out, int report_error);
+//static void get_vector(const char *data, int count, float *out, int report_error);
 
 
 
@@ -248,7 +248,7 @@ shaders::~shaders()
 
 void shaders::window_save()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+/*	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -271,6 +271,7 @@ void shaders::window_save()
 
 	render_snap = true;
 	snap_rendered = false;
+	*/
 }
 
 
@@ -300,7 +301,7 @@ void shaders::window_record()
 
 void shaders::avi_update_snap(surface *surface)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+/*	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -340,6 +341,7 @@ void shaders::avi_update_snap(surface *surface)
 	// unlock
 	result = (*d3dintf->surface.unlock_rect)(avi_copy_surface);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+*/
 }
 
 
@@ -350,6 +352,7 @@ void shaders::avi_update_snap(surface *surface)
 
 void shaders::render_snapshot(surface *surface)
 {
+	/*
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
@@ -445,7 +448,7 @@ void shaders::render_snapshot(surface *surface)
 	{
 		(*d3dintf->surface.release)(snap_copy_target);
 		snap_copy_target = NULL;
-	}
+	}*/
 }
 
 
@@ -543,7 +546,7 @@ void shaders::toggle()
 
 void shaders::begin_avi_recording(const char *name)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	/*if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -607,7 +610,7 @@ void shaders::begin_avi_recording(const char *name)
 		{
 			mame_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
 		}
-	}
+	}*/
 }
 
 
@@ -702,7 +705,7 @@ void shaders::remove_render_target(render_target *rt)
 
 void shaders::set_texture(texture_info *texture)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+/*	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -719,7 +722,7 @@ void shaders::set_texture(texture_info *texture)
 		(*d3dintf->effect.set_texture)(yiq_encode_effect, "Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
 	else
 		(*d3dintf->effect.set_texture)(color_effect, "Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
-	(*d3dintf->effect.set_texture)(pincushion_effect, "Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());
+	(*d3dintf->effect.set_texture)(pincushion_effect, "Diffuse", (texture == NULL) ? default_texture->get_finaltex() : texture->get_finaltex());*/
 }
 
 
@@ -727,8 +730,10 @@ void shaders::set_texture(texture_info *texture)
 //  shaders::init
 //============================================================
 
-void shaders::init(base *d3dintf, win_window_info *window)
+void shaders::init(base *d3dintf, render::window_info *window)
 {
+	master_enable = false;
+	/*
 	if (!d3dintf->post_fx_available)
 		return;
 
@@ -1020,6 +1025,7 @@ void shaders::init(base *d3dintf, win_window_info *window)
 	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
 
 	g_slider_list = init_slider_list();
+	*/
 }
 
 
@@ -1033,7 +1039,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 	// Called at the start of each frame by the D3D code in order to reserve two triangles
 	// that are guaranteed to be at a fixed position so as to simply use D3DPT_TRIANGLELIST, 0, 2
 	// instead of having to do bookkeeping about a specific screen quad
-	if (!master_enable || !d3dintf->post_fx_available)
+	/*if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -1094,7 +1100,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 		fsfx_vertices[i].z = 0.0f;
 		fsfx_vertices[i].rhw = 1.0f;
 		fsfx_vertices[i].color = D3DCOLOR_ARGB(255, 255, 255, 255);
-	}
+	}*/
 }
 
 
@@ -1105,7 +1111,7 @@ void shaders::init_fsfx_quad(void *vertbuf)
 
 int shaders::create_resources(bool reset)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	/*if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -1348,7 +1354,7 @@ int shaders::create_resources(bool reset)
 		osd_free(yiq_decode_name);
 
 	initialized = true;
-
+	*/
 	return 0;
 }
 
@@ -1359,7 +1365,7 @@ int shaders::create_resources(bool reset)
 
 void shaders::begin_draw()
 {
-	if (!master_enable || !d3dintf->post_fx_available)
+	/*if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
 	renderer *d3d = (renderer *)window->drawdata;
@@ -1377,7 +1383,7 @@ void shaders::begin_draw()
 	(*d3dintf->effect.set_technique)(yiq_decode_effect, "DecodeTechnique");
 
 	HRESULT result = (*d3dintf->device.get_render_target)(d3d->get_device(), 0, &backbuffer);
-	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);*/
 }
 
 
@@ -1398,7 +1404,7 @@ void shaders::begin_frame()
 void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
 						UINT32 prim_index, UINT32 prim_count, int dstw, int dsth)
 {
-	renderer *d3d = (renderer *)window->drawdata;
+	/*renderer *d3d = (renderer *)window->drawdata;
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1431,7 +1437,7 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 	{
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, new_dst);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	}
+	}*/
 }
 
 
@@ -1443,7 +1449,7 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
 						UINT32 prim_index, UINT32 prim_count)
 {
-	renderer *d3d = (renderer *)window->drawdata;
+	/*renderer *d3d = (renderer *)window->drawdata;
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -1482,7 +1488,7 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 	{
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, new_dst);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	}
+	}*/
 }
 
 //============================================================
@@ -1530,7 +1536,7 @@ void shaders::init_effect_info(poly_info *poly)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	renderer *d3d = (renderer *)window->drawdata;
+	/*renderer *d3d = (renderer *)window->drawdata;
 	texture_info *texture = poly->get_texture();
 
 	vec2f shadow_dims;
@@ -1593,7 +1599,7 @@ void shaders::init_effect_info(poly_info *poly)
 		curr_effect = default_effect;
 
 		(*d3dintf->effect.set_float)(curr_effect, "FixedAlpha", 1.0f);
-	}
+	}*/
 }
 
 
@@ -1661,7 +1667,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	UINT num_passes = 0;
+	/*UINT num_passes = 0;
 	renderer *d3d = (renderer *)window->drawdata;
 	texture_info *texture = poly->get_texture();
 
@@ -2258,7 +2264,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			return;
 		}
 
-		/* Bloom */
+		// Bloom
 		curr_effect = downsample_effect;
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->render_texture[0]);
@@ -2360,7 +2366,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.end)(curr_effect);
 
-		/* Phosphor */
+		// Phosphor
 		curr_effect = phosphor_effect;
 
 		if(options->params_dirty)
@@ -2432,7 +2438,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		}
 
 		(*d3dintf->effect.end)(curr_effect);
-	}
+	}*/
 }
 
 
@@ -2446,7 +2452,7 @@ void shaders::end_draw()
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	(*d3dintf->surface.release)(backbuffer);
+	//(*d3dintf->surface.release)(backbuffer);
 }
 
 
@@ -2500,7 +2506,7 @@ bool shaders::add_cache_target(renderer* d3d, texture_info* info, int width, int
 
 render_target* shaders::get_vector_target()
 {
-#if HLSL_VECTOR
+/*#if HLSL_VECTOR
 	if (!vector_enable)
 	{
 		return false;
@@ -2509,20 +2515,20 @@ render_target* shaders::get_vector_target()
 	renderer *d3d = (renderer *)window->drawdata;
 
 	return find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
-#else
+#else*/
 	return NULL;
-#endif
+//#endif
 }
 
 void shaders::create_vector_target(render_primitive *prim)
 {
-#if HLSL_VECTOR
+/*#if HLSL_VECTOR
 	renderer *d3d = (renderer *)window->drawdata;
 	if (!add_render_target(d3d, NULL, d3d->get_width(), d3d->get_height(), 1, 1))
 	{
 		vector_enable = false;
 	}
-#endif
+#endif*/
 }
 
 //============================================================
@@ -2621,7 +2627,7 @@ void shaders::enumerate_screens()
 
 bool shaders::register_texture(texture_info *texture)
 {
-	int width = texture->get_width();
+	/*int width = texture->get_width();
 	int height = texture->get_height();
 	int xscale = texture->get_xscale();
 	int yscale = texture->get_yscale();
@@ -2666,7 +2672,7 @@ bool shaders::register_texture(texture_info *texture)
 		return false;
 
 	options->params_dirty = true;
-
+	*/
 	return true;
 }
 
@@ -2679,7 +2685,7 @@ void shaders::delete_resources(bool reset)
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	initialized = false;
+	/*initialized = false;
 
 	if(write_ini && !reset)
 	{
@@ -2839,7 +2845,7 @@ void shaders::delete_resources(bool reset)
 		avi_final_target = NULL;
 	}
 
-	shadow_bitmap.reset();
+	shadow_bitmap.reset();*/
 }
 
 
@@ -2847,7 +2853,7 @@ void shaders::delete_resources(bool reset)
 //  get_vector
 //============================================================
 
-static void get_vector(const char *data, int count, float *out, int report_error)
+/*static void get_vector(const char *data, int count, float *out, int report_error)
 {
 	if (count > 3)
 	{
@@ -2869,7 +2875,7 @@ static void get_vector(const char *data, int count, float *out, int report_error
 		if (sscanf(data, "%f", &out[0]) < 1 && report_error)
 			mame_printf_error("Illegal single vector value = %s\n", data);
 	}
-}
+}*/
 
 
 /*-------------------------------------------------
@@ -3329,7 +3335,7 @@ void *windows_osd_interface::get_slider_list()
 //  scheme
 //-------------------------------------------------
 
-static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx)
+/*static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *templ, const char *extension, int idx)
 {
 	UINT32 origflags = file.openflags();
 
@@ -3446,4 +3452,5 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 	// create the final file
 	file.set_openflags(origflags);
 	return file.open(fname);
-}
+}*/
+

@@ -40,8 +40,12 @@
 //============================================================
 
 #include "render/windows/video.h"
+#include "osd/windows/debugwin.h"
 
-namespace render::windows
+namespace render
+{
+
+namespace windows
 {
 
 video_system::video_system(running_machine &machine) :
@@ -49,6 +53,10 @@ video_system::video_system(running_machine &machine) :
 {
 	if (m_video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(m_window_list->hwnd());
+
+	// possibly create the debug window, but don't show it yet
+	if (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		debugwin_init_windows(m_machine, this);
 }
 
 void video_system::update()
@@ -258,13 +266,13 @@ void video_system::reset_pause_event()
 
 void video_system::ui_pause_from_window_thread(bool pause)
 {
-	assert(GetCurrentThreadId() == window_threadid);
+	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// if we're multithreaded, we have to request a pause on the main thread
 	if (m_multithreading_enabled)
 	{
 		// request a pause from the main thread
-		PostThreadMessage(m_main_threadid, WM_USER_UI_TEMP_PAUSE, pause, 0);
+		PostThreadMessage((DWORD)m_main_threadid, WM_USER_UI_TEMP_PAUSE, pause, 0);
 
 		// if we're pausing, block until it happens
 		if (pause)
@@ -275,46 +283,6 @@ void video_system::ui_pause_from_window_thread(bool pause)
 	else // otherwise, we just do it directly
 	{
 		ui_pause_from_main_thread(pause);
-	}
-}
-
-
-//============================================================
-//  video_system::dispatch_message
-//  (main thread)
-//============================================================
-
-void video_system::dispatch_message(MSG *message)
-{
-	assert(GetCurrentThreadId() == m_main_threadid);
-
-	// dispatch our special communication messages
-	switch (message->message)
-	{
-		// special case for quit
-		case WM_QUIT:
-			machine.schedule_exit();
-			break;
-
-		// temporary pause from the window thread
-		case WM_USER_UI_TEMP_PAUSE:
-			ui_pause_from_main_thread(message->wParam);
-			break;
-
-		// execute arbitrary function
-		case WM_USER_EXEC_FUNC:
-			{
-				void (*func)(void *) = (void (*)(void *)) message->wParam;
-				void *param = (void *) message->lParam;
-				func(param);
-			}
-			break;
-
-		// everything else dispatches normally
-		default:
-			TranslateMessage(message);
-			DispatchMessage(message);
-			break;
 	}
 }
 
@@ -344,7 +312,7 @@ float video_system::get_aspect(const char *defdata, const char *data, int report
 //  get_resolution
 //============================================================
 
-void video_system::get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error)
+void video_system::get_resolution(const char *defdata, const char *data, window_system::window_config *config, int report_error)
 {
 	config->width = config->height = config->refresh = 0;
 	if (strcmp(data, "auto") == 0)
@@ -376,91 +344,6 @@ bool video_system::window_has_focus()
 
 
 //============================================================
-//  video_system::process_events
-//  (main thread)
-//============================================================
-
-void video_system::process_events(bool ingame)
-{
-	assert(GetCurrentThreadId() == m_main_threadid);
-
-	// if we're running, disable some parts of the debugger
-	if (ingame && (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(machine);
-
-	// remember the last time we did this
-	last_event_check = GetTickCount();
-
-	do
-	{
-		// if we are paused, lets wait for a message
-		if (ui_temp_pause > 0)
-			WaitMessage();
-
-		// loop over all messages in the queue
-		MSG message;
-		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-		{
-			int dispatch = TRUE;
-
-			if (message.hwnd == NULL || window->is_mame_window(message.hwnd))
-			{
-				switch (message.message)
-				{
-					// ignore keyboard messages
-					case WM_SYSKEYUP:
-					case WM_SYSKEYDOWN:
-						dispatch = FALSE;
-						break;
-
-					// forward mouse button downs to the input system
-					case WM_LBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_RBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_MBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_XBUTTONDOWN:
-						dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					// forward mouse button ups to the input system
-					case WM_LBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_RBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_MBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-
-					case WM_XBUTTONUP:
-						dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						break;
-				}
-			}
-
-			// dispatch if necessary
-			if (dispatch)
-				winwindow_dispatch_message(machine, &message);
-		}
-	} while (ui_temp_pause > 0);
-
-	// update the cursor state after processing events
-	winwindow_update_cursor_state(machine);
-}
-
-
-//============================================================
 //  video_system::update_cursor_state
 //  (main thread)
 //============================================================
@@ -477,9 +360,9 @@ void video_system::update_cursor_state()
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (window_has_focus() && ((!m_video_config.windowed && !win_has_menu(win_window_list)) || (!machine.paused() && wininput_should_hide_mouse())))
+	if (window_has_focus() && ((!m_video_config.windowed && !has_menu()) || (!m_machine.paused() && wininput_should_hide_mouse())))
 	{
-		win_window_info *window = win_window_list;
+		window_info *window = win_window_list;
 		RECT bounds;
 
 		// hide cursor

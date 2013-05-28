@@ -55,8 +55,6 @@ namespace render
 
 class draw_hal;
 
-typedef DWORD render::threadid;
-
 namespace windows
 {
 
@@ -70,19 +68,33 @@ public:
 
 	virtual void		toggle_full_screen();
 
+	virtual window_info *	window_alloc(monitor_info *monitor);
+
+	virtual void		take_snap();
+	virtual void		toggle_fsfx();
+	virtual void		take_video();
+
+	void				create_window_class();
 	void				is_mame_window(HWND hwnd);
+	void				ui_exec_on_main_thread(void (*func)(void *), void *param);
+	unsigned __stdcall 	thread_entry(void *param);
 
 private:
 	HANDLE 				m_window_thread;
 
 	HANDLE 				m_window_thread_ready_event;
+
+	UINT32				m_last_event_check;
+
+	bool				m_classes_created;
 };
 
 class window_info : public render::window_info
 {
 public:
-	window_info(running_machine &machine, threadid main_threadid, threadid window_threadid, monitor_info *monitor)
-		: render::window_info(machine, main_threadid, window_threadid), m_monitor(monitor) { }
+	window_info(running_machine &machine, UINT64 main_threadid, UINT64 window_threadid, window_system *system,
+				monitor_info *monitor)
+		: render::window_info(machine, main_threadid, window_threadid, system, monitor) { }
 	~window_info();
 
 	draw_hal *			hal() { return m_hal; }
@@ -104,12 +116,20 @@ public:
 	virtual int			extra_width();
 	virtual int			extra_height();
 
-	virtual bool		has_menu();
+	monitor_info *		monitor() { return m_monitor; }
 
-	virtual HWND		hwnd() { return m_hwnd; }
+	HWND				hwnd() { return m_hwnd; }
+	void				set_hwnd(HWND hwnd) { m_hwnd = hwnd; } // Hodor, hodor hodor!
 
 	virtual void		minimize_window();
 	virtual void		maximize_window();
+
+	virtual int			resize_state() { return m_resize_state; }
+
+	void				draw_video_contents(HDC dc, int update);
+
+	LRESULT CALLBACK 	window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+	LRESULT CALLBACK	window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
 private:
 	draw_hal *				m_hal;
@@ -127,13 +147,15 @@ private:
 	int                 	m_ismaximized;
 	int                 	m_resize_state;
 
-	// monitor info
-	monitor_info *			m_monitor;
-
 	// input info
 	DWORD               	m_lastclicktime;
 	int                 	m_lastclickx;
 	int                 	m_lastclicky;
+
+	bool					m_in_background;
+
+	int						m_win_physical_width;
+	int						m_win_physical_height;
 };
 
 }}; // namespace render::windows

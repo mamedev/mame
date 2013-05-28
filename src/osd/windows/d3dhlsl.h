@@ -44,6 +44,8 @@
 
 #include "aviio.h"
 
+#include "render/window.h"
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -138,7 +140,7 @@ public:
 	shaders();
 	~shaders();
 
-	void init(base *d3dintf, win_window_info *window);
+	void init(base *d3dintf, render::window_info *window);
 
 	bool enabled() { return master_enable; }
 	void toggle();
@@ -200,7 +202,7 @@ private:
 	void                    remove_cache_target(cache_target *cache);
 
 	base *                  d3dintf;                    // D3D interface
-	win_window_info *       window;                     // D3D window info
+	render::window_info *   window;                     // Window info
 
 	bool                    master_enable;              // overall enable flag
 	bool                    vector_enable;              // vector post-processing enable flag
