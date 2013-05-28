@@ -68,7 +68,6 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #include "emu.h"
 #include "coreutil.h"
 #include "machine/pce_cd.h"
-#include "sound/cdda.h"
 
 
 #define PCE_CD_CLOCK    9216000
@@ -79,6 +78,8 @@ const device_type PCE_CD = &device_creator<pce_cd_device>;
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, PCE_CD, "PCE CD Add-on", tag, owner, clock, "pcecd", __FILE__),
+						m_msm(*this, "msm5205"),
+						m_cdda(*this, "cdda"),
 						m_nvram(*this, "bram"),
 						m_cdrom(*this, "cdrom")
 {
@@ -97,7 +98,6 @@ void pce_cd_device::device_start()
 	/* set up adpcm related things */
 	m_adpcm_ram = auto_alloc_array_clear(machine(), UINT8, PCE_ADPCM_RAM_SIZE);
 	m_adpcm_clock_divider = 1;
-	machine().device<msm5205_device>("msm5205")->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 	
 	/* Set up cd command buffer */
 	m_command_buffer = auto_alloc_array_clear(machine(), UINT8, PCE_CD_COMMAND_BUFFER_SIZE);
@@ -193,7 +193,7 @@ void pce_cd_device::device_reset()
 	
 	// TODO: add CD-DA stop command here
 	//m_cdda_status = PCE_CD_CDDA_OFF;
-	//cdda_stop_audio(machine().device("cdda"));
+	//m_cdda->stop_audio();
 
 	memset(m_regs, 0, sizeof(m_regs));
 	
@@ -211,12 +211,14 @@ void pce_cd_device::late_setup()
 	if (m_cd_file)
 	{
 		m_toc = cdrom_get_toc(m_cd_file);
-		machine().device<cdda_device>("cdda")->set_cdrom(m_cd_file);
+		m_cdda->set_cdrom(m_cd_file);
 		m_last_frame = cdrom_get_track_start(m_cd_file, cdrom_get_last_track(m_cd_file) - 1);
 		m_last_frame += m_toc->tracks[cdrom_get_last_track(m_cd_file) - 1].frames;
 		m_end_frame = m_last_frame;
 	}
-	
+
+	// MSM5205 might be initialized after PCE CD as well...
+	m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
 struct cdrom_interface pce_cdrom =
@@ -225,13 +227,29 @@ struct cdrom_interface pce_cdrom =
 	NULL
 };
 
+static const msm5205_interface pce_cd_msm5205_interface =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pce_cd_device, msm5205_int), /* interrupt function */
+	MSM5205_S48_4B      /* 1/48 prescaler, 4bit data */
+};
 
+
+// TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
 static MACHINE_CONFIG_FRAGMENT( pce_cd )
 	MCFG_NVRAM_ADD_0FILL("bram")
 
-// TODO: move here MSM5205 and CDDA!
 	MCFG_CDROM_ADD("cdrom", pce_cdrom)
+
+	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.00 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.00 )
+
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "^:lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "^:rspeaker", 1.00 )
 MACHINE_CONFIG_END
+
 
 machine_config_constructor pce_cd_device::device_mconfig_additions() const
 {
@@ -265,7 +283,7 @@ void pce_cd_device::adpcm_play()
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-void pce_cd_device::msm5205_int(msm5205_device *device)
+WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 {
 	UINT8 msm_data;
 	
@@ -277,7 +295,7 @@ void pce_cd_device::msm5205_int(msm5205_device *device)
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
 	
-	device->data_w(msm_data);
+	m_msm->data_w(msm_data);
 	m_msm_nibble ^= 1;
 	
 	if (m_msm_nibble == 0)
@@ -295,7 +313,7 @@ void pce_cd_device::msm5205_int(msm5205_device *device)
 			//set_irq_line(PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE);
 			//set_irq_line(PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE);
 			adpcm_stop(1);
-			device->reset_w(1);
+			m_msm->reset_w(1);
 		}
 	}
 }
@@ -354,7 +372,7 @@ void pce_cd_device::read_6()
 	if (m_cdda_status != PCE_CD_CDDA_OFF)
 	{
 		m_cdda_status = PCE_CD_CDDA_OFF;
-		machine().device<cdda_device>("cdda")->stop_audio();
+		m_cdda->stop_audio();
 		m_end_mark = 0;
 	}
 	
@@ -422,7 +440,7 @@ void pce_cd_device::nec_set_audio_start_position()
 	if (m_cdda_status == PCE_CD_CDDA_PAUSED)
 	{
 		m_cdda_status = PCE_CD_CDDA_OFF;
-		machine().device<cdda_device>("cdda")->stop_audio();
+		m_cdda->stop_audio();
 		m_end_frame = m_last_frame;
 		m_end_mark = 0;
 	}
@@ -432,7 +450,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		{
 			m_cdda_status = PCE_CD_CDDA_PLAYING;
 			m_end_frame = m_last_frame; //get the end of the CD
-			machine().device<cdda_device>("cdda")->start_audio(m_current_frame, m_end_frame - m_current_frame);
+			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_cdda_play_mode = (m_command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
 			m_end_mark =  (m_command_buffer[1] & 0x02) ? 1 : 0;
 		}
@@ -440,7 +458,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		{
 			m_cdda_status = PCE_CD_CDDA_PLAYING;
 			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) + 1 ].logframeofs; //get the end of THIS track
-			machine().device<cdda_device>("cdda")->start_audio(m_current_frame, m_end_frame - m_current_frame);
+			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 0;
 			m_cdda_play_mode = 3;
 		}
@@ -497,12 +515,12 @@ void pce_cd_device::nec_set_audio_stop_position()
 	{
 		if (m_cdda_status == PCE_CD_CDDA_PAUSED)
 		{
-			machine().device<cdda_device>("cdda")->pause_audio(0);
+			m_cdda->pause_audio(0);
 		}
 		else
 		{
 			//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
-			machine().device<cdda_device>("cdda")->start_audio(m_current_frame, m_end_frame - m_current_frame);
+			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 1;
 		}
 		m_cdda_status = PCE_CD_CDDA_PLAYING;
@@ -510,7 +528,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 	else
 	{
 		m_cdda_status = PCE_CD_CDDA_OFF;
-		machine().device<cdda_device>("cdda")->stop_audio();
+		m_cdda->stop_audio();
 		m_end_frame = m_last_frame;
 		m_end_mark = 0;
 //      assert(NULL == nec_set_audio_stop_position);
@@ -538,8 +556,8 @@ void pce_cd_device::nec_pause()
 	}
 	
 	m_cdda_status = PCE_CD_CDDA_PAUSED;
-	m_current_frame = machine().device<cdda_device>("cdda")->get_audio_lba();
-	machine().device<cdda_device>("cdda")->pause_audio(1);
+	m_current_frame = m_cdda->get_audio_lba();
+	m_cdda->pause_audio(1);
 	reply_status_byte(SCSI_STATUS_OK);
 }
 
@@ -562,11 +580,11 @@ void pce_cd_device::nec_get_subq()
 	{
 		case PCE_CD_CDDA_PAUSED:
 			m_data_buffer[0] = 2;
-			frame = machine().device<cdda_device>("cdda")->get_audio_lba();
+			frame = m_cdda->get_audio_lba();
 			break;
 		case PCE_CD_CDDA_PLAYING:
 			m_data_buffer[0] = 0;
-			frame = machine().device<cdda_device>("cdda")->get_audio_lba();
+			frame = m_cdda->get_audio_lba();
 			break;
 		default:
 			m_data_buffer[0] = 3;
@@ -819,7 +837,7 @@ void pce_cd_device::update()
 			m_cd_motor_on = 0;
 			m_selected = 0;
 			m_cdda_status = PCE_CD_CDDA_OFF;
-			machine().device<cdda_device>("cdda")->stop_audio();
+			m_cdda->stop_audio();
 			m_adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 		}
 		m_scsi_last_RST = m_scsi_RST;
@@ -884,11 +902,11 @@ void pce_cd_device::update()
 	}
 	
 	/* FIXME: presumably CD-DA needs an irq interface for this */
-	if (machine().device<cdda_device>("cdda")->audio_ended() && m_end_mark == 1)
+	if (m_cdda->audio_ended() && m_end_mark == 1)
 	{
 		switch (m_cdda_play_mode & 3)
 		{
-			case 1: machine().device<cdda_device>("cdda")->start_audio(m_current_frame, m_end_frame - m_current_frame); m_end_mark = 1; break; //play with repeat
+			case 1: m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame); m_end_mark = 1; break; //play with repeat
 			case 2: set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE); m_end_mark = 0; break; //irq when finished
 			case 3: m_end_mark = 0; break; //play without repeat
 		}
@@ -983,12 +1001,12 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadeout_callback)
 	if (m_cdda_volume <= 0)
 	{
 		m_cdda_volume = 0.0;
-		machine().device<cdda_device>("cdda")->set_volume(0.0);
+		m_cdda->set_volume(0.0);
 		m_cdda_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		machine().device<cdda_device>("cdda")->set_volume(m_cdda_volume);
+		m_cdda->set_volume(m_cdda_volume);
 		m_cdda_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1000,12 +1018,12 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadein_callback)
 	if (m_cdda_volume >= 100.0)
 	{
 		m_cdda_volume = 100.0;
-		machine().device<cdda_device>("cdda")->set_volume(100.0);
+		m_cdda->set_volume(100.0);
 		m_cdda_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		machine().device<cdda_device>("cdda")->set_volume(m_cdda_volume);
+		m_cdda->set_volume(m_cdda_volume);
 		m_cdda_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1017,12 +1035,12 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadeout_callback)
 	if (m_adpcm_volume <= 0)
 	{
 		m_adpcm_volume = 0.0;
-		machine().device<msm5205_device>("msm5205")->set_volume(0.0);
+		m_msm->set_volume(0.0);
 		m_adpcm_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		machine().device<msm5205_device>("msm5205")->set_volume(m_adpcm_volume);
+		m_msm->set_volume(m_adpcm_volume);
 		m_adpcm_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1034,12 +1052,12 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 	if (m_adpcm_volume >= 100.0)
 	{
 		m_adpcm_volume = 100.0;
-		machine().device<msm5205_device>("msm5205")->set_volume(100.0);
+		m_msm->set_volume(100.0);
 		m_adpcm_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		machine().device<msm5205_device>("msm5205")->set_volume(m_adpcm_volume);
+		m_msm->set_volume(m_adpcm_volume);
 		m_adpcm_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1114,7 +1132,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 				m_msm_half_addr = 0;
 				m_msm_nibble = 0;
 				adpcm_stop(0);
-				machine().device<msm5205_device>("msm5205")->reset_w(1);
+				m_msm->reset_w(1);
 			}
 			
 			if ((data & 0x40) && ((m_regs[0x0D] & 0x40) == 0)) // ADPCM play
@@ -1124,7 +1142,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 				m_msm_half_addr = (m_adpcm_read_ptr + (m_adpcm_length / 2)) & 0xffff;
 				m_msm_nibble = 0;
 				adpcm_play();
-				machine().device<msm5205_device>("msm5205")->reset_w(0);
+				m_msm->reset_w(0);
 				
 				//popmessage("%08x %08x",m_adpcm_read_ptr,m_adpcm_length);
 			}
@@ -1132,7 +1150,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 			{
 				/* used by Buster Bros to cancel an in-flight sample */
 				adpcm_stop(0);
-				machine().device<msm5205_device>("msm5205")->reset_w(1);
+				m_msm->reset_w(1);
 			}
 			
 			m_msm_repeat = BIT(data, 5);
@@ -1154,7 +1172,7 @@ WRITE8_MEMBER(pce_cd_device::intf_w)
 			break;
 		case 0x0E:  /* ADPCM playback rate */
 			m_adpcm_clock_divider = 0x10 - (data & 0x0f);
-			machine().device<msm5205_device>("msm5205")->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
+			m_msm->change_clock_w((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 			break;
 		case 0x0F:  /* ADPCM and CD audio fade timer */
 			/* TODO: timers needs HW tests */
@@ -1309,10 +1327,10 @@ READ8_MEMBER(pce_cd_device::intf_r)
 		case 0x04:  /* CD reset */
 			break;
 		case 0x05:  /* Convert PCM data / PCM data */
-			data = machine().device<cdda_device>("cdda")->get_channel_volume((m_regs[0x03] & 2) ? 0 : 1) & 0xff;
+			data = m_cdda->get_channel_volume((m_regs[0x03] & 2) ? 0 : 1) & 0xff;
 			break;
 		case 0x06:  /* PCM data */
-			data = machine().device<cdda_device>("cdda")->get_channel_volume((m_regs[0x03] & 2) ? 0 : 1) >> 8;
+			data = m_cdda->get_channel_volume((m_regs[0x03] & 2) ? 0 : 1) >> 8;
 			break;
 		case 0x07:  /* BRAM unlock / CD status */
 			data = (m_bram_locked ? (data & 0x7f) : (data | 0x80));

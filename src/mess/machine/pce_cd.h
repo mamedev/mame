@@ -6,8 +6,9 @@
  ***************************************************************************/
 
 #include "imagedev/chd_cd.h"
-#include "sound/msm5205.h"
 #include "machine/nvram.h"
+#include "sound/cdda.h"
+#include "sound/msm5205.h"
 
 #define PCE_BRAM_SIZE               0x800
 #define PCE_ADPCM_RAM_SIZE          0x10000
@@ -47,7 +48,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_reset();
 
-	void msm5205_int(msm5205_device *device);
 	void update();
 
 	void late_setup();
@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bram_w);
 	DECLARE_WRITE8_MEMBER(intf_w);
 	DECLARE_WRITE8_MEMBER(acard_w);
+	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	DECLARE_READ8_MEMBER(bram_r);
 	DECLARE_READ8_MEMBER(intf_r);
 	DECLARE_READ8_MEMBER(acard_r);
@@ -146,6 +147,8 @@ private:
 	UINT8   *m_subcode_buffer;
 	UINT8   m_end_mark;
 
+	required_device<msm5205_device> m_msm;
+	required_device<cdda_device> m_cdda;
 	required_device<nvram_device> m_nvram;
 	required_device<cdrom_image_device> m_cdrom;
 	
@@ -159,7 +162,7 @@ private:
 	double  m_cdda_volume;
 	emu_timer   *m_adpcm_fadeout_timer;
 	emu_timer   *m_adpcm_fadein_timer;
-	double  m_adpcm_volume;	
+	double  m_adpcm_volume;
 };
 
 
@@ -172,8 +175,8 @@ extern const device_type PCE_CD;
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-#define MCFG_PCE_CD_ADD(_tag, _cd_tag) \
-	MCFG_DEVICE_ADD(_tag, PCE_CD, 0) \
+#define MCFG_PCE_CD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PCE_CD, 0)
 
 
 #endif

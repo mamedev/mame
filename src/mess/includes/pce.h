@@ -11,7 +11,6 @@
 
 #include "cdrom.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/msm5205.h"
 #include "machine/pce_slot.h"
 #include "machine/pce_cd.h"
 #include "video/huc6260.h"
@@ -19,7 +18,6 @@
 #define C6280_TAG           "c6280"
 
 #define MAIN_CLOCK      21477270
-#define PCE_CD_CLOCK    9216000
 
 #define TG_16_JOY_SIG       0x00
 #define PCE_JOY_SIG         0x40
@@ -39,7 +37,6 @@ public:
 		m_cd_ram(*this, "cd_ram"),
 		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260"),
-		m_msm5205(*this, "msm5205"),
 		m_cartslot(*this, "cartslot"),
 		m_cd(*this, "pce_cd")
 	{ }
@@ -48,11 +45,8 @@ public:
 	required_shared_ptr<UINT8> m_cd_ram;
 	required_shared_ptr<UINT8> m_user_ram;
 	optional_device<huc6260_device> m_huc6260;
-	optional_device<msm5205_device> m_msm5205;
 	required_device<pce_cart_slot_device> m_cartslot;
 	optional_device<pce_cd_device> m_cd;
-
-	DECLARE_WRITE_LINE_MEMBER(pce_cd_msm5205_int);
 
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
@@ -62,11 +56,8 @@ public:
 	UINT8 m_joy_6b_packet[5];
 	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
 	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_bram_w);
 	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
 	DECLARE_READ8_MEMBER(pce_cd_intf_r);
-	DECLARE_READ8_MEMBER(pce_cd_acard_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_acard_w);
 	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
 	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
 	DECLARE_DRIVER_INIT(sgx);
@@ -75,13 +66,6 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_MACHINE_START(pce);
 	DECLARE_MACHINE_RESET(mess_pce);
-	TIMER_CALLBACK_MEMBER(pce_cd_data_timer_callback);
-	TIMER_CALLBACK_MEMBER(pce_cd_cdda_fadeout_callback);
-	TIMER_CALLBACK_MEMBER(pce_cd_cdda_fadein_callback);
-	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_fadeout_callback);
-	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_fadein_callback);
-	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
-	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
 };
 

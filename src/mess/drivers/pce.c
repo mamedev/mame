@@ -358,19 +358,6 @@ static const huc6260_interface sgx_huc6260_config =
 };
 
 
-// MSM5205 ADPCM decoder definition (it should be eventually moved to pce_cd.c)
-const msm5205_interface pce_cd_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pce_state, pce_cd_msm5205_int), /* interrupt function */
-	MSM5205_S48_4B      /* 1/48 prescaler, 4bit data */
-};
-
-WRITE_LINE_MEMBER(pce_state::pce_cd_msm5205_int)
-{
-	m_cd->msm5205_int(m_msm5205);
-}
-
-
 static SLOT_INTERFACE_START(pce_cart)
 	SLOT_INTERFACE_INTERNAL("rom", PCE_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("cdsys3u", PCE_ROM_CDSYS3)
@@ -406,19 +393,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_FRAGMENT( pce_cdslot )
-	MCFG_PCE_CD_ADD("pce_cd", "cdrom")
+	MCFG_PCE_CD_ADD("pce_cd")
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END
@@ -427,16 +402,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pce, pce_common )
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
-
-	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tg16, pce_common )
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
-
-	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 
@@ -469,20 +440,13 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.00 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.00 )
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, NULL, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pce_list","pce")
 
-	MCFG_FRAGMENT_ADD( pce_cdslot )
+	MCFG_PCE_CD_ADD("pce_cd")
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","pcecd")
 MACHINE_CONFIG_END
 
 /***************************************************************************
