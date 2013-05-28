@@ -644,10 +644,10 @@ static const centronics_interface centronics_intf =
 
 
 //-------------------------------------------------
-//  Z80DART_INTERFACE( sio_intf )
+//  Z80SIO_INTERFACE( sio_intf )
 //-------------------------------------------------
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 

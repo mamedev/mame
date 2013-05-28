@@ -415,7 +415,7 @@ static Z80PIO_INTERFACE( rdpio_intf )
 
 /* Z80 SIO */
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 

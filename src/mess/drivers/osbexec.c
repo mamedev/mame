@@ -455,7 +455,7 @@ static const pia6821_interface osbexec_pia1_config =
 };
 
 
-static Z80DART_INTERFACE( osbexec_sio_config )
+static Z80SIO_INTERFACE( osbexec_sio_config )
 {
 	0, 0, 0, 0,
 

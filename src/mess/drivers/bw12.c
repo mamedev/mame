@@ -447,7 +447,7 @@ static const centronics_interface bw12_centronics_intf =
 
 /* Z80-SIO/0 Interface */
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 

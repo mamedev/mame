@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(amu880_state::cassette_w)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 

@@ -669,7 +669,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 
 //-------------------------------------------------
-//  Z80DART_INTERFACE( sio_intf )
+//  Z80SIO_INTERFACE( sio_intf )
 //-------------------------------------------------
 
 void abc800_state::clock_cassette(int state)
@@ -736,7 +736,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 	}
 }
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 

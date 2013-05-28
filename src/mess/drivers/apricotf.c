@@ -216,7 +216,7 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 
 
 //-------------------------------------------------
-//  Z80DART_INTERFACE( sio_intf )
+//  Z80SIO_INTERFACE( sio_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( f1_state::sio_int_w )
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER( f1_state::sio_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int || m_sio_int);
 }
 
-static Z80DART_INTERFACE( sio_intf )
+static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
