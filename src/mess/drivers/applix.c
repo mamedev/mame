@@ -16,7 +16,7 @@
     After 60 seconds, boots to the ramdisk. You can enter commands.
 
     TODO:
-    - Cassette interface
+    - Cassette interface (coded but not working)
     - Floppy disk drives
     - Use kbtro device (tried and failed)
     - Optional serial device Z8530 Z80SCC
@@ -198,7 +198,7 @@ WRITE16_MEMBER( applix_state::applix_register_w )
 }
 
 /*
-d0   = dac output + external signal
+d0   = dac output + external signal = analog input
 d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
@@ -232,8 +232,6 @@ d7 = /(out) reset keyboard flipflop
 */
 WRITE8_MEMBER( applix_state::applix_pa_w )
 {//printf("pa=%X ",data);
-	m_pa = data;
-
 	// Reset flipflop counter
 	if (!BIT(data, 7))
 		m_clock_count = 0;
@@ -245,6 +243,16 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 		m_last_write_addr = 0;
 	}
 	m_cass->output(BIT(data, 5) ? -1.0 : +1.0);
+
+	// high-to-low of PA5 when reading cassette - /PRE on IC32b
+	if (BIT(m_pa, 5) && !BIT(data, 5) && !BIT(data, 4))
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+
+	// low-to-high of PA2 when writing cassette - /PRE on IC49
+	if (!BIT(m_pa, 2) && BIT(data, 2))
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+
+	m_pa = data;
 }
 
 /*
@@ -252,7 +260,12 @@ d0-6 = user
 d7   = square wave output for cassette IRQ
 */
 WRITE8_MEMBER( applix_state::applix_pb_w )
-{//printf("%X ",data);
+{
+	// low-to-high of PB7 when writing cassette - CLK on IC49
+	if (!BIT(m_pb, 7) && BIT(data, 7))
+		if (!BIT(m_pa, 2))
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+
 	m_pb = data;
 }
 
@@ -402,7 +415,7 @@ static ADDRESS_MAP_START( subcpu_io, AS_IO, 8, applix_state )
 	AM_RANGE(0x08, 0x0f) AM_READWRITE(port08_r,port08_w) //Disk select
 	AM_RANGE(0x10, 0x17) AM_READWRITE(port10_r,port10_w) //IRQ
 	AM_RANGE(0x18, 0x1f) AM_READWRITE(port18_r,port18_w) //data&command
-	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI 5380
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x18) AM_READWRITE(port20_r,port20_w) //SCSI NCR5380
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE("wd1772", wd1772_t, read, write) //FDC
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_READWRITE(port60_r,port60_w) //anotherZ80SCC
 ADDRESS_MAP_END
@@ -788,6 +801,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 		m_cass_data[0] = cass_ws;
 		m_cass_data[2] = ((m_cass_data[1] < 12) ? 2 : 0);
 		m_cass_data[1] = 0;
+		// low-to-high transition when reading cassette - CLK on IC32b
+		if ((cass_ws) && !BIT(m_pa, 4))
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
 }
 
