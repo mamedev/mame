@@ -70,12 +70,13 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 
 	switch ( cs )
 	{
-		case 1:
-			return m_cpuregion[offset];
-
 		case 4:
 			offset &=0x3fff;
 			return (m_mainram[offset]);
+
+		case 1:if (offset < 0x100000) // make sure to log an error instead of crashing when reading beyond end of region
+			return m_cpuregion[offset];
+
 
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
