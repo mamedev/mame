@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( abc806_state::hs_w )
 		if (m_d_vsync != vsync)
 		{
 			// signal _DEW to DART
-			m_dart->ri_w(1, !vsync);
+			m_dart->rib_w(!vsync);
 		}
 
 		m_d_vsync = vsync;

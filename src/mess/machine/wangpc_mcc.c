@@ -201,33 +201,21 @@ UINT16 wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, 
 		{
 		case 0x00/2:
 		case 0x02/2:
-			if (ACCESSING_BITS_0_7)
-			{
-				data = 0xff00 | m_sio->data_read(offset & 0x01);
-			}
-			break;
-
 		case 0x04/2:
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_sio->control_read(offset & 0x01);
+				data = 0xff00 | m_sio->cd_ba_r(space, offset >> 1);
 			}
 			break;
 
 		case 0x08/2:
 		case 0x0a/2:
-			if (ACCESSING_BITS_0_7)
-			{
-				data = 0xff00 | m_dart->data_read(offset & 0x01);
-			}
-			break;
-
 		case 0x0c/2:
 		case 0x0e/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_dart->control_read(offset & 0x01);
+				data = 0xff00 | m_dart->cd_ba_r(space, offset >> 1);
 			}
 			break;
 
@@ -280,22 +268,16 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 		{
 		case 0x00/2:
 		case 0x02/2:
-			m_sio->data_write(offset & 0x01, data & 0xff);
-			break;
-
 		case 0x04/2:
 		case 0x06/2:
-			m_sio->control_write(offset & 0x01, data & 0xff);
+			m_sio->cd_ba_w(space, offset >> 1, data & 0xff);
 			break;
-
+		
 		case 0x08/2:
 		case 0x0a/2:
-			m_dart->data_write(offset & 0x01, data & 0xff);
-			break;
-
 		case 0x0c/2:
 		case 0x0e/2:
-			m_dart->control_write(offset & 0x01, data & 0xff);
+			m_dart->cd_ba_w(space, offset >> 1, data & 0xff);
 			break;
 
 		case 0x12/2:

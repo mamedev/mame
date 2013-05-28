@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 	}
 
 	// signal _DEW to DART
-	m_dart->ri_w(1, !state);
+	m_dart->rib_w(!state);
 }
 
 

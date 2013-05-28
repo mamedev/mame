@@ -1031,10 +1031,10 @@ void abc800_state::machine_reset()
 	m_fetch_charram = 0;
 	bankswitch();
 
-	m_dart->ri_w(0, 1);
+	m_dart->ria_w(1);
 
 	// 50/60 Hz
-	m_dart->cts_w(1, 0); // 0 = 50Hz, 1 = 60Hz
+	m_dart->ctsb_w(0); // 0 = 50Hz, 1 = 60Hz
 
 	m_dfd_in = 0;
 }
@@ -1170,10 +1170,10 @@ void abc806_state::machine_reset()
 	m_rtc->clk_w(1);
 	m_rtc->dio_w(1);
 
-	m_dart->ri_w(0, 1);
+	m_dart->ria_w(1);
 
 	// 50/60 Hz
-	m_dart->cts_w(1, 0); // 0 = 50Hz, 1 = 60Hz
+	m_dart->ctsb_w(0); // 0 = 50Hz, 1 = 60Hz
 
 	m_dfd_in = 0;
 }
