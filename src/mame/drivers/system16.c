@@ -359,7 +359,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 {
-	msm5205_data_w(machine().device("5205"), (m_sample_buffer >> 4) & 0x0f);
+	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
 
 	m_sample_buffer <<=  4;
 	m_sample_select ^=  1;
@@ -1159,7 +1159,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 {
-	msm5205_data_w(machine().device("5205"), m_sample_buffer & 0x0f);
+	m_msm->data_w(m_sample_buffer & 0x0f);
 
 	m_sample_buffer >>=  4;
 	m_sample_select ^=  1;

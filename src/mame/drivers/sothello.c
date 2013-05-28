@@ -180,8 +180,8 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-	msm5205_playmode_w(m_msm, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
-	msm5205_reset_w(m_msm,data&1);
+	m_msm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_msm->reset_w(data & 1);
 }
 
 WRITE8_MEMBER(sothello_state::msm_data_w)
@@ -336,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	msm5205_data_w(m_msm, m_msm_data & 0x0f );
+	m_msm->data_w(m_msm_data & 0x0f );
 	m_soundcpu->set_input_line(0, ASSERT_LINE );
 }
 

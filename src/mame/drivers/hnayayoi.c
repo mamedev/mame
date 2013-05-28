@@ -69,22 +69,22 @@ WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 {
-	msm5205_data_w(m_msm, data);
+	m_msm->data_w(data);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_vclk_w)
 {
-	msm5205_vclk_w(m_msm, data & 1);
+	m_msm->vclk_w(data & 1);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_reset_w)
 {
-	msm5205_reset_w(m_msm, data & 1);
+	m_msm->reset_w(data & 1);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_reset_inv_w)
 {
-	msm5205_reset_w(m_msm, ~data & 1);
+	m_msm->reset_w(~data & 1);
 }
 
 
@@ -535,7 +535,7 @@ void hnayayoi_state::machine_start()
 void hnayayoi_state::machine_reset()
 {
 	/* start with the MSM5205 reset */
-	msm5205_reset_w(m_msm, 1);
+	m_msm->reset_w(1);
 
 	m_palbank = 0;
 	m_blit_layer = 0;

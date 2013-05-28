@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 
 WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 {
-	msm5205_data_w(m_msm5205,m_sample_data >> 4);
+	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)
 	{
 		if(m_nmi_enable)
@@ -539,8 +539,8 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 	membank("sample_bank")->set_entry(m_sample_bank);
 	m_msm_prescaler = (data & 0x30) >> 4;
 	m_nmi_enable = (~data & 0x80);
-	msm5205_playmode_w(m_msm5205,prescale[m_msm_prescaler]);
-	msm5205_reset_w(m_msm5205,data & 0x40);
+	m_msm5205->playmode_w(prescale[m_msm_prescaler]);
+	m_msm5205->reset_w(data & 0x40);
 }
 
 static const msm5205_interface msm5205_intf =

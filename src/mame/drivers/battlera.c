@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(battlera_state::battlera_adpcm_int)
 {
-	msm5205_data_w(m_msm,m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -100,7 +100,7 @@ WRITE8_MEMBER(battlera_state::battlera_adpcm_data_w)
 
 WRITE8_MEMBER(battlera_state::battlera_adpcm_reset_w)
 {
-	msm5205_reset_w(m_msm, 0);
+	m_msm->reset_w(0);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )

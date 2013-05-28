@@ -61,9 +61,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_2);
 	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_3);
-	void borntofi_adpcm_start( device_t *device, int voice );
-	void borntofi_adpcm_stop( device_t *device, int voice );
-	void borntofi_adpcm_int( device_t *device, int voice );
+	void borntofi_adpcm_start( msm5205_device *device, int voice );
+	void borntofi_adpcm_stop( msm5205_device *device, int voice );
+	void borntofi_adpcm_int( msm5205_device *device, int voice );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 };

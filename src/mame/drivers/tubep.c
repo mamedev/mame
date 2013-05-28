@@ -547,7 +547,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
-	msm5205_reset_w (m_msm, (data&1)^1 );
+	m_msm->reset_w((data & 1)^1);
 
 	return;
 }
@@ -558,9 +558,9 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data & 1)
-		msm5205_playmode_w(m_msm, MSM5205_S48_4B); /* 8 KHz */
+		m_msm->playmode_w(MSM5205_S48_4B); /* 8 KHz */
 	else
-		msm5205_playmode_w(m_msm, MSM5205_S96_4B); /* 4 KHz */
+		m_msm->playmode_w(MSM5205_S96_4B); /* 4 KHz */
 
 	return;
 }
@@ -572,12 +572,12 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 
 	if (m_ls74 == 1)
 	{
-		msm5205_data_w(m_msm, (m_ls377 >> 0) & 15 );
-		m_soundcpu->set_input_line(0, ASSERT_LINE );
+		m_msm->data_w((m_ls377 >> 0) & 15);
+		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 	{
-		msm5205_data_w(m_msm, (m_ls377 >> 4) & 15 );
+		m_msm->data_w((m_ls377 >> 4) & 15);
 	}
 
 }

@@ -37,7 +37,6 @@ public:
 	required_shared_ptr<UINT16> m_sharedram;
 
 	/* adpcm */
-	device_t *m_msm_chip[2];
 	UINT8 *m_msm_rom[2];
 	UINT16 m_msm_start[2];
 	UINT16 m_msm_loop[2];
@@ -78,7 +77,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
 	void reset_sound_region(  );
-	void topspeed_msm5205_clock(device_t *device, int chip);
+	void topspeed_msm5205_clock(int chip);
 	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_1);
 	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_2);
 

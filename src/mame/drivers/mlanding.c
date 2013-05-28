@@ -308,7 +308,7 @@ WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 {
 	UINT8 data = m_adpcm_rom->base()[m_adpcm_pos];
-	msm5205_data_w(m_msm, m_adpcm_trigger ? (data & 0xf) : (data >> 4));
+	m_msm->data_w(m_adpcm_trigger ? (data & 0xf) : (data >> 4));
 	m_adpcm_pos = (m_adpcm_pos + m_adpcm_trigger) & 0x7ffff;
 	m_adpcm_trigger ^= 1;
 }
@@ -494,12 +494,12 @@ WRITE8_MEMBER(mlanding_state::ml_adpcm_start_w)
 {
 	m_adpcm_pos = m_adpcm_address << 8;
 	m_adpcm_trigger = 0;
-	msm5205_reset_w(m_msm, 0);
+	m_msm->reset_w(0);
 }
 
 WRITE8_MEMBER(mlanding_state::ml_adpcm_stop_w)
 {
-	msm5205_reset_w(m_msm, 1);
+	m_msm->reset_w(1);
 }
 
 WRITE8_MEMBER(mlanding_state::ml_adpcm_address_lo_w)
@@ -700,7 +700,7 @@ void mlanding_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	msm5205_reset_w(m_msm, 1);
+	m_msm->reset_w(1);
 	m_dsp_HOLD_signal = 0;
 }
 

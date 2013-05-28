@@ -112,7 +112,7 @@ WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
 
 WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
 {
-	msm5205_data_w(m_msm, m_adpcm_data >> 4);
+	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
 }
 
@@ -577,7 +577,7 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int1)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
-		msm5205_data_w(m_msm1, m_msm_data1 >> 4);
+		m_msm1->data_w(m_msm_data1 >> 4);
 		m_msm_data1 <<= 4;
 		m_msm_toggle1 ^= 1;
 		if (m_msm_toggle1 == 0)
@@ -592,7 +592,7 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{
-		msm5205_data_w(m_msm2, m_msm_data2 >> 4);
+		m_msm2->data_w(m_msm_data2 >> 4);
 		m_msm_data2 <<= 4;
 		m_msm_toggle2 ^= 1;
 		if (m_msm_toggle2 == 0)

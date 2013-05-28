@@ -71,7 +71,7 @@ WRITE8_MEMBER(goal92_state::adpcm_control_w)
 {
 	membank("bank1")->set_entry(data & 0x01);
 
-	msm5205_reset_w(m_msm, data & 0x08);
+	m_msm->reset_w(data & 0x08);
 }
 
 WRITE8_MEMBER(goal92_state::adpcm_data_w)
@@ -223,7 +223,7 @@ static const ay8910_interface ay8910_config =
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 

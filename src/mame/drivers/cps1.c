@@ -243,7 +243,6 @@ Stephh's log (2006.09.20) :
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
-#include "sound/msm5205.h"
 #include "machine/kabuki.h"
 #include "includes/cps1.h"       /* External CPS1 definitions */
 

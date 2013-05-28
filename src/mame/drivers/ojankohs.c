@@ -52,7 +52,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 	if (!m_adpcm_reset)
 		m_vclk_left = 0;
 
-	msm5205_reset_w(m_msm, !m_adpcm_reset);
+	m_msm->reset_w(!m_adpcm_reset);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
@@ -60,7 +60,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
 	m_adpcm_reset = BIT(data, 0);
 	m_vclk_left = 0;
 
-	msm5205_reset_w(m_msm, !m_adpcm_reset);
+	m_msm->reset_w(!m_adpcm_reset);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		msm5205_data_w(m_msm, (m_adpcm_data >> 4));
+		m_msm->data_w((m_adpcm_data >> 4));
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
@@ -93,7 +93,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 	membank("bank1")->set_entry(data & 0x0f);
 
 	m_adpcm_reset = BIT(data, 4);
-	msm5205_reset_w(m_msm, !BIT(data, 4));
+	m_msm->reset_w(!BIT(data, 4));
 	ojankoc_flipscreen(space, data);
 }
 

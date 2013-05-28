@@ -100,9 +100,9 @@ enum {
 /* CD Unit RAM */
 
 /* MSM5205 ADPCM decoder definition */
-static void pce_cd_msm5205_int(device_t *device,int state);
-const msm5205_interface pce_cd_msm5205_interface = {
-	DEVCB_LINE(pce_cd_msm5205_int), /* interrupt function */
+const msm5205_interface pce_cd_msm5205_interface =
+{
+	DEVCB_DRIVER_LINE_MEMBER(pce_state, pce_cd_msm5205_int), /* interrupt function */
 	MSM5205_S48_4B      /* 1/48 prescaler, 4bit data */
 };
 
@@ -298,21 +298,20 @@ static void adpcm_play(running_machine &machine)
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-static void pce_cd_msm5205_int(device_t *device, int st)
+WRITE_LINE_MEMBER(pce_state::pce_cd_msm5205_int)
 {
-	pce_state *state = device->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	UINT8 msm_data;
 
 //  popmessage("%08x %08x %08x %02x %02x",pce_cd.msm_start_addr,pce_cd.msm_end_addr,pce_cd.msm_half_addr,pce_cd.regs[0x0c],pce_cd.regs[0x0d]);
 
-	if ( pce_cd.msm_idle )
+	if (pce_cd.msm_idle)
 		return;
 
 	/* Supply new ADPCM data */
 	msm_data = (pce_cd.msm_nibble) ? (pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0x0f) : ((pce_cd.adpcm_ram[pce_cd.msm_start_addr] & 0xf0) >> 4);
 
-	msm5205_data_w(device, msm_data);
+	m_msm5205->data_w(msm_data);
 	pce_cd.msm_nibble ^= 1;
 
 	if(pce_cd.msm_nibble == 0)
@@ -321,16 +320,16 @@ static void pce_cd_msm5205_int(device_t *device, int st)
 
 		if(pce_cd.msm_start_addr == pce_cd.msm_half_addr)
 		{
-			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE );
+			//pce_cd_set_irq_line(machine(), PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE);
+			//pce_cd_set_irq_line(machine(), PCE_CD_IRQ_SAMPLE_HALF_PLAY, ASSERT_LINE);
 		}
 
 		if(pce_cd.msm_start_addr > pce_cd.msm_end_addr)
 		{
-			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
-			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-			adpcm_stop(device->machine(),1);
-			msm5205_reset_w(device, 1);
+			//pce_cd_set_irq_line(machine(), PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE);
+			//pce_cd_set_irq_line(machine(), PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE);
+			adpcm_stop(machine(),1);
+			m_msm5205->reset_w(1);
 		}
 	}
 }
@@ -1033,7 +1032,7 @@ static void pce_cd_init( running_machine &machine )
 	pce_cd.adpcm_ram = auto_alloc_array(machine, UINT8, PCE_ADPCM_RAM_SIZE );
 	memset( pce_cd.adpcm_ram, 0, PCE_ADPCM_RAM_SIZE );
 	pce_cd.adpcm_clock_divider = 1;
-	msm5205_change_clock_w(machine.device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
+	machine.device<msm5205_device>("msm5205")->change_clock_w((PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 
 	/* Set up cd command buffer */
 	pce_cd.command_buffer = auto_alloc_array(machine, UINT8, PCE_CD_COMMAND_BUFFER_SIZE );
@@ -1150,12 +1149,12 @@ TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadeout_callback)
 	if(pce_cd.adpcm_volume <= 0)
 	{
 		pce_cd.adpcm_volume = 0.0;
-		msm5205_set_volume(m_msm5205, 0.0);
+		m_msm5205->set_volume(0.0);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(m_msm5205, pce_cd.adpcm_volume);
+		m_msm5205->set_volume(pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1168,12 +1167,12 @@ TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadein_callback)
 	if(pce_cd.adpcm_volume >= 100.0)
 	{
 		pce_cd.adpcm_volume = 100.0;
-		msm5205_set_volume(m_msm5205, 100.0);
+		m_msm5205->set_volume(100.0);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(m_msm5205, pce_cd.adpcm_volume);
+		m_msm5205->set_volume(pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1257,7 +1256,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 			pce_cd.msm_half_addr = 0;
 			pce_cd.msm_nibble = 0;
 			adpcm_stop(machine(), 0);
-			msm5205_reset_w( machine().device( "msm5205"), 1 );
+			m_msm5205->reset_w(1);
 		}
 
 		if ( ( data & 0x40) && ((pce_cd.regs[0x0D] & 0x40) == 0) ) // ADPCM play
@@ -1267,7 +1266,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / 2)) & 0xffff;
 			pce_cd.msm_nibble = 0;
 			adpcm_play(machine());
-			msm5205_reset_w( machine().device( "msm5205"), 0 );
+			m_msm5205->reset_w(0);
 
 			//popmessage("%08x %08x",pce_cd.adpcm_read_ptr,pce_cd.adpcm_length);
 		}
@@ -1275,7 +1274,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 		{
 			/* used by Buster Bros to cancel an in-flight sample */
 			adpcm_stop(machine(), 0);
-			msm5205_reset_w( machine().device( "msm5205"), 1 );
+			m_msm5205->reset_w(1);
 		}
 
 		pce_cd.msm_repeat = (data & 0x20) >> 5;
@@ -1297,7 +1296,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 		break;
 	case 0x0E:  /* ADPCM playback rate */
 		pce_cd.adpcm_clock_divider = 0x10 - ( data & 0x0F );
-		msm5205_change_clock_w(m_msm5205, (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
+		m_msm5205->change_clock_w((PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 		break;
 	case 0x0F:  /* ADPCM and CD audio fade timer */
 		/* TODO: timers needs HW tests */

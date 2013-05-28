@@ -165,17 +165,17 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
 	{
 		m_adpcm_idle = 1;
-		msm5205_reset_w(m_msm, 1);
+		m_msm->reset_w(1);
 	}
 	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(m_msm, m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		msm5205_data_w(m_msm, m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
@@ -191,13 +191,13 @@ WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 	if (data & 0x80)
 	{
 		m_adpcm_idle = 1;
-		msm5205_reset_w(m_msm, 1);
+		m_msm->reset_w(1);
 	}
 	else
 	{
 		m_adpcm_pos = (data & 0x7f) * 0x200;
 		m_adpcm_idle = 0;
-		msm5205_reset_w(m_msm, 0);
+		m_msm->reset_w(0);
 	}
 }
 

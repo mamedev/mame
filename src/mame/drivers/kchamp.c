@@ -87,7 +87,7 @@ WRITE8_MEMBER(kchamp_state::sound_reset_w)
 
 WRITE8_MEMBER(kchamp_state::sound_control_w)
 {
-	msm5205_reset_w(m_msm, !(data & 1));
+	m_msm->reset_w(!(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
@@ -347,9 +347,9 @@ INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 WRITE_LINE_MEMBER(kchamp_state::msmint)
 {
 	if (m_msm_play_lo_nibble)
-		msm5205_data_w(m_msm, m_msm_data & 0x0f);
+		m_msm->data_w(m_msm_data & 0x0f);
 	else
-		msm5205_data_w(m_msm, (m_msm_data >> 4) & 0x0f);
+		m_msm->data_w((m_msm_data >> 4) & 0x0f);
 
 	m_msm_play_lo_nibble ^= 1;
 

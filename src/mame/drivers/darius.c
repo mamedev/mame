@@ -526,8 +526,8 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)
 {
-	msm5205_data_w(m_msm, data);
-	msm5205_reset_w(m_msm, !(data & 0x20));    /* my best guess, but it could be output enable as well */
+	m_msm->data_w(data);
+	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
 static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8, darius_state )

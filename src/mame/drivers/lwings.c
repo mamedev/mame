@@ -48,7 +48,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/msm5205.h"
 #include "includes/lwings.h"
 
 /* Avengers runs on hardware almost identical to Trojan, but with a protection
@@ -267,11 +266,10 @@ READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 
 WRITE8_MEMBER(lwings_state::msm5205_w)
 {
-	device_t *device = machine().device("5205");
-	msm5205_reset_w(device, (data >> 7) & 1);
-	msm5205_data_w(device, data);
-	msm5205_vclk_w(device, 1);
-	msm5205_vclk_w(device, 0);
+	m_msm->reset_w(BIT(data, 7));
+	m_msm->data_w(data);
+	m_msm->vclk_w(1);
+	m_msm->vclk_w(0);
 }
 
 static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )

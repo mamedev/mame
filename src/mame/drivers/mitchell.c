@@ -1178,7 +1178,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_sample_buffer & 0x0f);
+	m_msm->data_w(m_sample_buffer & 0x0f);
 	m_sample_buffer >>= 4;
 	m_sample_select ^= 1;
 	if(m_sample_select == 0)

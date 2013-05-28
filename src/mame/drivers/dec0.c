@@ -1378,11 +1378,11 @@ WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
 {
 	if (m_automat_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(m_msm, m_automat_adpcm_byte & 0xf);
+		m_msm->data_w(m_automat_adpcm_byte & 0xf);
 	}
 	else
 	{
-		msm5205_data_w(m_msm, m_automat_adpcm_byte >> 4);
+		m_msm->data_w(m_automat_adpcm_byte >> 4);
 		//device->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
 	}
 

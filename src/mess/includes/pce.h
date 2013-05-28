@@ -122,6 +122,8 @@ public:
 	optional_device<msm5205_device> m_msm5205;
 	required_device<pce_cart_slot_device> m_cartslot;
 
+	DECLARE_WRITE_LINE_MEMBER(pce_cd_msm5205_int);
+
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
 	UINT8 m_acard;

@@ -105,7 +105,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 	void draw_sprites(  bitmap_ind16 &bitmap,const rectangle &cliprect );
 	int scanline_to_vcount( int scanline );
-	void dd_adpcm_int(device_t *device, int chip);
+	void dd_adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 };

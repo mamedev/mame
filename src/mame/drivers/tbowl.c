@@ -145,9 +145,9 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tbowl_state::tbowl_adpcm_start_w)
 {
-	device_t *adpcm = machine().device((offset & 1) ? "msm2" : "msm1");
+	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	m_adpcm_pos[offset & 1] = data << 8;
-	msm5205_reset_w(adpcm,0);
+	adpcm->reset_w(0);
 }
 
 WRITE8_MEMBER(tbowl_state::tbowl_adpcm_end_w)
@@ -157,18 +157,18 @@ WRITE8_MEMBER(tbowl_state::tbowl_adpcm_end_w)
 
 WRITE8_MEMBER(tbowl_state::tbowl_adpcm_vol_w)
 {
-	device_t *adpcm = machine().device((offset & 1) ? "msm2" : "msm1");
-	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
+	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
+	adpcm->set_volume((data & 0x7f) * 100 / 0x7f);
 }
 
-void tbowl_state::tbowl_adpcm_int( device_t *device, int num )
+void tbowl_state::tbowl_adpcm_int( msm5205_device *device, int num )
 {
 	if (m_adpcm_pos[num] >= m_adpcm_end[num] ||
 				m_adpcm_pos[num] >= memregion("adpcm")->bytes()/2)
-		msm5205_reset_w(device,1);
+		device->reset_w(1);
 	else if (m_adpcm_data[num] != -1)
 	{
-		msm5205_data_w(device,m_adpcm_data[num] & 0x0f);
+		device->data_w(m_adpcm_data[num] & 0x0f);
 		m_adpcm_data[num] = -1;
 	}
 	else
@@ -176,7 +176,7 @@ void tbowl_state::tbowl_adpcm_int( device_t *device, int num )
 		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
-		msm5205_data_w(device,m_adpcm_data[num] >> 4);
+		device->data_w(m_adpcm_data[num] >> 4);
 	}
 }
 

@@ -392,7 +392,7 @@ WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 {
-	msm5205_data_w(m_msm, m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -406,7 +406,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 {
-	msm5205_data_w(m_msm, m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle_cpu1 = 1 - m_toggle_cpu1;
@@ -426,14 +426,14 @@ WRITE8_MEMBER(dynax_state::adpcm_data_w)
 WRITE8_MEMBER(dynax_state::adpcm_reset_w)
 {
 	m_resetkludge = data & 1;
-	msm5205_reset_w(m_msm, ~data & 1);
+	m_msm->reset_w(~data & 1);
 }
 
 MACHINE_RESET_MEMBER(dynax_state,adpcm)
 {
 	/* start with the MSM5205 reset */
 	m_resetkludge = 0;
-	msm5205_reset_w(m_msm, 1);
+	m_msm->reset_w(1);
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_layer_half_w)

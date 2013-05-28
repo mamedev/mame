@@ -291,7 +291,7 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
 	update_sound_irq(m_sound_irq_cause | 2);
-	msm5205_data_w(m_adpcm, m_adpcm_data);
+	m_adpcm->data_w(m_adpcm_data);
 }
 
 
@@ -393,8 +393,8 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
        bit 2 = S2
        bit 3 = S1
 */
-	msm5205_playmode_w(m_adpcm, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
-	msm5205_reset_w(m_adpcm, data & 1);
+	m_adpcm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_adpcm->reset_w(data & 1);
 }
 
 READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)

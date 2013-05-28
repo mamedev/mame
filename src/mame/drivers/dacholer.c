@@ -565,7 +565,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		msm5205_data_w(m_msm, m_msm_data >> 4);
+		m_msm->data_w(m_msm_data >> 4);
 		m_msm_data <<= 4;
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)

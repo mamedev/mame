@@ -47,38 +47,98 @@
     Timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585)
 
    TODO:
-   - convert to modern
    - lowpass filter for MSM6585
 
  */
 
-struct msm5205_state
-{
-	const msm5205_interface *intf;
-	device_t *device;
-	sound_stream * stream;    /* number of stream system      */
-	INT32 clock;              /* clock rate                   */
-	emu_timer *timer;         /* VCLK callback timer          */
-	INT32 data;               /* next adpcm data              */
-	INT32 vclk;               /* vclk signal (external mode)  */
-	INT32 reset;              /* reset pin signal             */
-	INT32 prescaler;          /* prescaler selector S1 and S2 */
-	INT32 bitwidth;           /* bit width selector -3B/4B    */
-	INT32 signal;             /* current ADPCM signal         */
-	INT32 step;               /* current ADPCM step           */
-	int diff_lookup[49*16];
-	devcb_resolved_write_line vclk_callback;
-};
+const device_type MSM5205 = &device_creator<msm5205_device>;
+const device_type MSM6585 = &device_creator<msm6585_device>;
 
-INLINE msm5205_state *get_safe_token(device_t *device)
+
+msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock),
+						device_sound_interface(mconfig, *this)
 {
-	assert(device != NULL);
-	assert(device->type() == MSM5205 || device->type() == MSM6585);
-	return (msm5205_state *)downcast<msm5205_device *>(device)->token();
+}
+
+msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+					: device_t(mconfig, type, name, tag, owner, clock),
+						device_sound_interface(mconfig, *this)
+{
 }
 
 
-static void msm5205_playmode(msm5205_state *voice,int select);
+msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void msm5205_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const msm5205_interface *intf = reinterpret_cast<const msm5205_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<msm5205_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_vclk_cb, 0, sizeof(m_vclk_cb));
+		m_select = 0;
+	}
+	
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void msm5205_device::device_start()
+{
+	m_mod_clock = clock();
+	m_vclk_callback.resolve(m_vclk_cb, *this);
+	
+	/* compute the difference tables */
+	compute_tables();
+	
+	/* stream system initialize */
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::vclk_callback), this));
+	
+	/* register for save states */
+	save_item(NAME(m_mod_clock));
+	save_item(NAME(m_data));
+	save_item(NAME(m_vclk));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_prescaler));
+	save_item(NAME(m_bitwidth));
+	save_item(NAME(m_signal));
+	save_item(NAME(m_step));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void msm5205_device::device_reset()
+{	
+	/* initialize work */
+	m_data    = 0;
+	m_vclk    = 0;
+	m_reset   = 0;
+	m_signal  = 0;
+	m_step    = 0;
+	
+	/* timer and bitwidth set */
+	playmode_w(m_select);
+}
+
 
 /*
  * ADPCM lookup table
@@ -91,7 +151,7 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
  *   Compute the difference table
  */
 
-static void ComputeTables (msm5205_state *voice)
+void msm5205_device::compute_tables()
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -113,7 +173,7 @@ static void ComputeTables (msm5205_state *voice)
 		/* loop over all nibbles and compute the difference */
 		for (nib = 0; nib < 16; nib++)
 		{
-			voice->diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
+			m_diff_lookup[step*16 + nib] = nbl2bit[nib][0] *
 				(stepval   * nbl2bit[nib][1] +
 					stepval/2 * nbl2bit[nib][2] +
 					stepval/4 * nbl2bit[nib][3] +
@@ -122,135 +182,63 @@ static void ComputeTables (msm5205_state *voice)
 	}
 }
 
-/* stream update callbacks */
-static STREAM_UPDATE( MSM5205_update )
-{
-	msm5205_state *voice = (msm5205_state *)param;
-	stream_sample_t *buffer = outputs[0];
-
-	/* if this voice is active */
-	if(voice->signal)
-	{
-		short val = voice->signal * 16;
-		while (samples)
-		{
-			*buffer++ = val;
-			samples--;
-		}
-	}
-	else
-		memset (buffer,0,samples*sizeof(*buffer));
-}
-
 /* timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585) */
-static TIMER_CALLBACK( MSM5205_vclk_callback )
+TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
 {
-	msm5205_state *voice = (msm5205_state *)ptr;
 	int val;
 	int new_signal;
 
 	/* callback user handler and latch next data */
-	if(!voice->vclk_callback.isnull()) voice->vclk_callback(1);
+	if (!m_vclk_callback.isnull()) 
+		m_vclk_callback(1);
 
 	/* reset check at last hiedge of VCLK */
-	if(voice->reset)
+	if (m_reset)
 	{
 		new_signal = 0;
-		voice->step = 0;
+		m_step = 0;
 	}
 	else
 	{
 		/* update signal */
 		/* !! MSM5205 has internal 12bit decoding, signal width is 0 to 8191 !! */
-		val = voice->data;
-		new_signal = voice->signal + voice->diff_lookup[voice->step * 16 + (val & 15)];
+		val = m_data;
+		new_signal = m_signal + m_diff_lookup[m_step * 16 + (val & 15)];
+
 		if (new_signal > 2047) new_signal = 2047;
 		else if (new_signal < -2048) new_signal = -2048;
-		voice->step += index_shift[val & 7];
-		if (voice->step > 48) voice->step = 48;
-		else if (voice->step < 0) voice->step = 0;
+
+		m_step += index_shift[val & 7];
+
+		if (m_step > 48) m_step = 48;
+		else if (m_step < 0) m_step = 0;
 	}
 
 	/* update when signal changed */
-	if( voice->signal != new_signal)
+	if( m_signal != new_signal)
 	{
-		voice->stream->update();
-		voice->signal = new_signal;
+		m_stream->update();
+		m_signal = new_signal;
 	}
 }
 
-/*
- *    Reset emulation of an MSM5205-compatible chip
- */
-static DEVICE_RESET( msm5205 )
-{
-	msm5205_state *voice = get_safe_token(device);
 
-	/* initialize work */
-	voice->data    = 0;
-	voice->vclk    = 0;
-	voice->reset   = 0;
-	voice->signal  = 0;
-	voice->step    = 0;
-
-	/* timer and bitwidth set */
-	msm5205_playmode(voice,voice->intf->select);
-}
-
-
-/*
- *    Start emulation of an MSM5205-compatible chip
- */
-
-static DEVICE_START( msm5205 )
-{
-	msm5205_state *voice = get_safe_token(device);
-
-	/* save a global pointer to our interface */
-	voice->intf = (const msm5205_interface *)device->static_config();
-	voice->device = device;
-	voice->clock = device->clock();
-	voice->vclk_callback.resolve(voice->intf->vclk_callback,*device);
-
-	/* compute the difference tables */
-	ComputeTables (voice);
-
-	/* stream system initialize */
-	voice->stream = device->machine().sound().stream_alloc(*device,0,1,device->clock(),voice,MSM5205_update);
-	voice->timer = device->machine().scheduler().timer_alloc(FUNC(MSM5205_vclk_callback), voice);
-
-	/* initialize */
-	DEVICE_RESET_CALL(msm5205);
-
-	/* register for save states */
-	device->save_item(NAME(voice->clock));
-	device->save_item(NAME(voice->data));
-	device->save_item(NAME(voice->vclk));
-	device->save_item(NAME(voice->reset));
-	device->save_item(NAME(voice->prescaler));
-	device->save_item(NAME(voice->bitwidth));
-	device->save_item(NAME(voice->signal));
-	device->save_item(NAME(voice->step));
-}
 
 /*
  *    Handle an update of the vclk status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-void msm5205_vclk_w (device_t *device, int vclk)
+void msm5205_device::vclk_w(int vclk)
 {
-	msm5205_state *voice = get_safe_token(device);
-
-	if( voice->prescaler != 0 )
-	{
-		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag());
-	}
+	if (m_prescaler != 0)
+		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", this->device().tag());
 	else
 	{
-		if( voice->vclk != vclk)
+		if (m_vclk != vclk)
 		{
-			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(voice->device->machine(), voice, 0);
+			m_vclk = vclk;
+			if (!vclk) 
+				vclk_callback(this, 0);
 		}
 	}
 }
@@ -259,36 +247,28 @@ void msm5205_vclk_w (device_t *device, int vclk)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-void msm5205_reset_w (device_t *device, int reset)
+void msm5205_device::reset_w(int reset)
 {
-	msm5205_state *voice = get_safe_token(device);
-	voice->reset = reset;
+	m_reset = reset;
 }
 
 /*
  *    Handle an update of the data to the chip
  */
 
-void msm5205_data_w (device_t *device, int data)
+void msm5205_device::data_w(int data)
 {
-	msm5205_state *voice = get_safe_token(device);
-	if( voice->bitwidth == 4)
-		voice->data = data & 0x0f;
+	if (m_bitwidth == 4)
+		m_data = data & 0x0f;
 	else
-		voice->data = (data & 0x07)<<1; /* unknown */
+		m_data = (data & 0x07) << 1; /* unknown */
 }
 
 /*
  *    Handle a change of the selector
  */
 
-void msm5205_playmode_w(device_t *device, int select)
-{
-	msm5205_state *voice = get_safe_token(device);
-	msm5205_playmode(voice, select);
-}
-
-static void msm5205_playmode(msm5205_state *voice, int select)
+void msm5205_device::playmode_w(int select)
 {
 	static const int prescaler_table[2][4] =
 	{
@@ -298,92 +278,45 @@ static void msm5205_playmode(msm5205_state *voice, int select)
 	int prescaler = prescaler_table[select >> 3 & 1][select & 3];
 	int bitwidth = (select & 4) ? 4 : 3;
 
-
-	if( voice->prescaler != prescaler )
+	if (m_prescaler != prescaler)
 	{
-		voice->stream->update();
+		m_stream->update();
 
-		voice->prescaler = prescaler;
+		m_prescaler = prescaler;
 
 		/* timer set */
-		if( prescaler )
+		if (prescaler)
 		{
-			attotime period = attotime::from_hz(voice->clock) * prescaler;
-			voice->timer->adjust(period, 0, period);
+			attotime period = attotime::from_hz(m_mod_clock) * prescaler;
+			m_timer->adjust(period, 0, period);
 		}
 		else
-			voice->timer->adjust(attotime::never);
+			m_timer->adjust(attotime::never);
 	}
 
-	if( voice->bitwidth != bitwidth )
+	if (m_bitwidth != bitwidth)
 	{
-		voice->stream->update();
-
-		voice->bitwidth = bitwidth;
+		m_stream->update();
+		m_bitwidth = bitwidth;
 	}
 }
 
 
-void msm5205_set_volume(device_t *device,int volume)
+void msm5205_device::set_volume(int volume)
 {
-	msm5205_state *voice = get_safe_token(device);
-
-	voice->stream->set_output_gain(0,volume / 100.0);
+	m_stream->set_output_gain(0,volume / 100.0);
 }
 
-void msm5205_change_clock_w(device_t *device, INT32 clock)
+void msm5205_device::change_clock_w(INT32 clock)
 {
-	msm5205_state *voice = get_safe_token(device);
 	attotime period;
 
-	voice->clock = clock;
+	m_mod_clock = clock;
 
-	period = attotime::from_hz(voice->clock) * voice->prescaler;
-	voice->timer->adjust(period, 0, period);
+	period = attotime::from_hz(m_mod_clock) * m_prescaler;
+	m_timer->adjust(period, 0, period);
 }
 
-const device_type MSM5205 = &device_creator<msm5205_device>;
-
-msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(msm5205_state);
-}
-msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(msm5205_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm5205_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void msm5205_device::device_start()
-{
-	DEVICE_START_NAME( msm5205 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void msm5205_device::device_reset()
-{
-	DEVICE_RESET_NAME( msm5205 )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -391,17 +324,22 @@ void msm5205_device::device_reset()
 
 void msm5205_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t *buffer = outputs[0];
+	
+	/* if this voice is active */
+	if(m_signal)
+	{
+		short val = m_signal * 16;
+		while (samples)
+		{
+			*buffer++ = val;
+			samples--;
+		}
+	}
+	else
+		memset(buffer, 0, samples * sizeof(*buffer));
 }
 
-
-const device_type MSM6585 = &device_creator<msm6585_device>;
-
-msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock)
-{
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -409,6 +347,6 @@ msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, d
 
 void msm6585_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	// should this be different?
+	msm5205_device::sound_stream_update(stream, inputs, outputs,samples);
 }

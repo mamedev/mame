@@ -3,6 +3,7 @@
 
 #include "video/sega16sp.h"
 #include "machine/segaic16.h"
+#include "sound/msm5205.h"
 
 class segas1x_bootleg_state : public sega_16bit_common_base
 {
@@ -17,7 +18,8 @@ public:
 		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu")
+		m_soundcpu(*this, "soundcpu"),
+		m_msm(*this, "5205")
 		{ }
 
 	required_shared_ptr<UINT16> m_textram;
@@ -112,6 +114,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<msm5205_device> m_msm;
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);

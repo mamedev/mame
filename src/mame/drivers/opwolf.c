@@ -448,33 +448,33 @@ MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 	m_sprite_ctrl = 0;
 	m_sprites_flipscreen = 0;
 
-	msm5205_reset_w(m_msm1, 1);
-	msm5205_reset_w(m_msm2, 1);
+	m_msm1->reset_w(1);
+	m_msm2->reset_w(1);
 }
 
-void opwolf_state::opwolf_msm5205_vck(device_t *device,int chip)
+void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 {
 	if (m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device, m_adpcm_data[chip] & 0x0f);
+		device->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 		if (m_adpcm_pos[chip] == m_adpcm_end[chip])
-			msm5205_reset_w(device, 1);
+			device->reset_w(1);
 	}
 	else
 	{
 		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
-		msm5205_data_w(device, m_adpcm_data[chip] >> 4);
+		device->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
 {
-	opwolf_msm5205_vck(m_msm1,0);
+	opwolf_msm5205_vck(m_msm1, 0);
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
 {
-	opwolf_msm5205_vck(m_msm2,1);
+	opwolf_msm5205_vck(m_msm2, 1);
 }
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
@@ -492,7 +492,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		end   *= 16;
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
-		msm5205_reset_w(m_msm1, 0);
+		m_msm1->reset_w(0);
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -514,7 +514,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		end   *= 16;
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
-		msm5205_reset_w(m_msm2, 0);
+		m_msm2->reset_w(0);
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );

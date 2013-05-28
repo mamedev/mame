@@ -50,13 +50,13 @@ WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 		if (~m_pcm_adr & 1)
 			data >>= 4;
 
-		msm5205_data_w(m_msm, data & 0x0f);
-		msm5205_reset_w(m_msm, 0);
+		m_msm->data_w(data & 0x0f);
+		m_msm->reset_w(0);
 
 		m_pcm_adr = (m_pcm_adr + 1) & 0x7fff;
 	}
 	else
-		msm5205_reset_w(m_msm, 1);
+		m_msm->reset_w(1);
 }
 
 WRITE8_MEMBER(drmicro_state::pcm_set_w)

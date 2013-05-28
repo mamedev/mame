@@ -58,7 +58,7 @@ READ16_MEMBER(toki_state::pip16_r)
 
 WRITE_LINE_MEMBER(toki_state::toki_adpcm_int)
 {
-	msm5205_data_w (m_msm, m_msm5205next);
+	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
 
 	m_toggle ^= 1;
@@ -76,7 +76,7 @@ WRITE8_MEMBER(toki_state::toki_adpcm_control_w)
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	membank("bank1")->set_base(&RAM[bankaddress]);
 
-	msm5205_reset_w(m_msm,data & 0x08);
+	m_msm->reset_w(data & 0x08);
 }
 
 WRITE8_MEMBER(toki_state::toki_adpcm_data_w)

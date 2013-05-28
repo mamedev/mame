@@ -79,7 +79,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
 {
 	m_adpcm_pos = data << 8;
-	msm5205_reset_w(m_msm, 0);
+	m_msm->reset_w(0);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
@@ -89,17 +89,17 @@ WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
 {
-	msm5205_set_volume(m_msm,(data & 0x0f) * 100 / 15);
+	m_msm->set_volume((data & 0x0f) * 100 / 15);
 }
 
 WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
 				m_adpcm_pos >= memregion("adpcm")->bytes())
-		msm5205_reset_w(m_msm,1);
+		m_msm->reset_w(1);
 	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(m_msm,m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 		UINT8 *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ROM[m_adpcm_pos++];
-		msm5205_data_w(m_msm,m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 

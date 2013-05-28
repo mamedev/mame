@@ -210,19 +210,19 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
-	msm5205_reset_w(m_msm1,(data>>7)&1);
+	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	msm5205_data_w(m_msm1,data);
-	msm5205_vclk_w(m_msm1,1);
-	msm5205_vclk_w(m_msm1,0);
+	m_msm1->data_w(data);
+	m_msm1->vclk_w(1);
+	m_msm1->vclk_w(0);
 }
 WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
-	msm5205_reset_w(m_msm2,(data>>7)&1);
+	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	msm5205_data_w(m_msm2,data);
-	msm5205_vclk_w(m_msm2,1);
-	msm5205_vclk_w(m_msm2,0);
+	m_msm2->data_w(data);
+	m_msm2->vclk_w(1);
+	m_msm2->vclk_w(0);
 }
 static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP

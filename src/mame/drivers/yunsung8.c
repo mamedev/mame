@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(yunsung8_state::yunsung8_sound_bankswitch_w)
 {
-	msm5205_reset_w(m_msm, data & 0x20);
+	m_msm->reset_w(data & 0x20);
 
 	membank("bank2")->set_entry(data & 0x07);
 
@@ -444,7 +444,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(yunsung8_state::yunsung8_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_adpcm >> 4);
+	m_msm->data_w(m_adpcm >> 4);
 	m_adpcm <<= 4;
 
 	m_toggle ^= 1;

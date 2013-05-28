@@ -148,7 +148,7 @@ WRITE8_MEMBER( cps_state::knightsb_snd_bankswitch_w )
 
 WRITE_LINE_MEMBER(cps_state::m5205_int1)
 {
-	msm5205_data_w(m_msm_1, m_sample_buffer1 & 0x0f);
+	m_msm_1->data_w(m_sample_buffer1 & 0x0f);
 	m_sample_buffer1 >>= 4;
 	m_sample_select1 ^= 1;
 	if (m_sample_select1 == 0)
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER(cps_state::m5205_int1)
 
 WRITE_LINE_MEMBER(cps_state::m5205_int2)
 {
-	msm5205_data_w(m_msm_2, m_sample_buffer2 & 0x0f);
+	m_msm_2->data_w(m_sample_buffer2 & 0x0f);
 	m_sample_buffer2 >>= 4;
 	m_sample_select2 ^= 1;
 }

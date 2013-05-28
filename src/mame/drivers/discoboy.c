@@ -334,7 +334,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 {
 	/* Note: this is bit 5 on yunsung8.c */
-	msm5205_reset_w(m_msm, (data & 0x08) >> 3);
+	m_msm->reset_w((data & 0x08) >> 3);
 
 	membank("sndbank")->set_entry(data & 0x07);
 
@@ -474,7 +474,7 @@ void discoboy_state::machine_reset()
 
 WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_adpcm >> 4);
+	m_msm->data_w(m_adpcm >> 4);
 	m_adpcm <<= 4;
 
 	m_toggle ^= 1;

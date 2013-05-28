@@ -48,8 +48,8 @@ WRITE8_MEMBER(pcktgal_state::pcktgal_sound_w)
 
 WRITE_LINE_MEMBER(pcktgal_state::pcktgal_adpcm_int)
 {
-	msm5205_data_w(m_msm,m_msm5205next >> 4);
-	m_msm5205next<<=4;
+	m_msm->data_w(m_msm5205next >> 4);
+	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
 	if (m_toggle)
@@ -58,12 +58,12 @@ WRITE_LINE_MEMBER(pcktgal_state::pcktgal_adpcm_int)
 
 WRITE8_MEMBER(pcktgal_state::pcktgal_adpcm_data_w)
 {
-	m_msm5205next=data;
+	m_msm5205next = data;
 }
 
 READ8_MEMBER(pcktgal_state::pcktgal_adpcm_reset_r)
 {
-	msm5205_reset_w(m_msm,0);
+	m_msm->reset_w(0);
 	return 0;
 }
 

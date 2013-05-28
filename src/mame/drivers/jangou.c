@@ -355,10 +355,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		msm5205_data_w(m_msm, m_adpcm_byte >> 4);
+		m_msm->data_w(m_adpcm_byte >> 4);
 	else
 	{
-		msm5205_data_w(m_msm, m_adpcm_byte & 0xf);
+		m_msm->data_w(m_adpcm_byte & 0xf);
 		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 

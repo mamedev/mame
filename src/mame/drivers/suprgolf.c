@@ -436,16 +436,16 @@ static const ay8910_interface ay8910_config =
 
 WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 {
-	msm5205_reset_w(m_msm,0);
+	m_msm->reset_w(0);
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		msm5205_data_w(m_msm, (m_msm5205next & 0xf0) >> 4);
+		m_msm->data_w((m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 	}
 	else
 	{
-		msm5205_data_w(m_msm, (m_msm5205next & 0x0f) >> 0);
+		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
 	}
 }
 

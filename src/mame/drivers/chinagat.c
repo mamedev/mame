@@ -247,7 +247,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 	{
 		logerror("ADPCM output disabled\n");
 		m_pcm_nibble = 0x0f;
-		msm5205_reset_w(m_adpcm, 1);
+		m_adpcm->reset_w(1);
 	}
 	else
 	{
@@ -276,7 +276,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 
 		if (((m_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
 		{
-			msm5205_data_w (m_adpcm, m_pcm_nibble);
+			m_adpcm->data_w(m_pcm_nibble);
 			logerror("Writing %02x to m5205\n", m_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", m_adpcm_addr, m_i8748_P1, data, m_i8748_P2, m_pcm_shift, m_pcm_nibble);
@@ -295,11 +295,11 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
 	m_m5205_clk++;
 	if (m_m5205_clk == 8)
 	{
-		msm5205_vclk_w(m_adpcm, 1);      /* ??? */
+		m_adpcm->vclk_w(1);      /* ??? */
 		m_m5205_clk = 0;
 	}
 	else
-		msm5205_vclk_w(m_adpcm, 0);      /* ??? */
+		m_adpcm->vclk_w(0);      /* ??? */
 #endif
 }
 

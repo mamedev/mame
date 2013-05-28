@@ -307,17 +307,17 @@ ADDRESS_MAP_END
                            Born To Fight
 ***************************************************************************/
 
-void fantland_state::borntofi_adpcm_start( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_start( msm5205_device *device, int voice )
 {
-	msm5205_reset_w(device, 0);
+	device->reset_w(0);
 	m_adpcm_playing[voice] = 1;
 	m_adpcm_nibble[voice] = 0;
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine().describe_context(), m_adpcm_addr[0][voice], m_adpcm_addr[1][voice]);
 }
 
-void fantland_state::borntofi_adpcm_stop( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_stop( msm5205_device *device, int voice )
 {
-	msm5205_reset_w(device, 1);
+	device->reset_w(1);
 	m_adpcm_playing[voice] = 0;
 }
 
@@ -325,7 +325,7 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
-	device_t *msm;
+	msm5205_device *msm;
 
 	switch (voice)
 	{
@@ -356,7 +356,7 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 	}
 }
 
-void fantland_state::borntofi_adpcm_int( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 {
 	UINT8 *rom;
 	size_t len;
@@ -384,7 +384,7 @@ void fantland_state::borntofi_adpcm_int( device_t *device, int voice )
 	}
 	else
 	{
-		msm5205_data_w(device, rom[start / 2] >> ((start & 1) * 4));
+		device->data_w(rom[start / 2] >> ((start & 1) * 4));
 		m_adpcm_nibble[voice]++;
 	}
 }

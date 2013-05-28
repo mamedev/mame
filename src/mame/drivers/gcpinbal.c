@@ -183,7 +183,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 				/* data written here is adpcm param? */
 				//popmessage("%08x %08x", m_msm_start + m_msm_bank, m_msm_end);
 				m_adpcm_idle = 0;
-				msm5205_reset_w(m_msm, 0);
+				m_msm->reset_w(0);
 				m_adpcm_start = m_msm_start + m_msm_bank;
 				m_adpcm_end = m_msm_end;
 //              ADPCM_stop(0);
@@ -208,10 +208,10 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
 	if (m_adpcm_idle)
-		msm5205_reset_w(m_msm, 1);
+		m_msm->reset_w(1);
 	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
 	{
-		//msm5205_reset_w(m_msm,1);
+		//m_msm->reset_w(1);
 		m_adpcm_start = m_msm_start + m_msm_bank;
 		m_adpcm_trigger = 0;
 	}
@@ -220,7 +220,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 		UINT8 *ROM = memregion("msm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
-		msm5205_data_w(m_msm, m_adpcm_data & 0xf);
+		m_msm->data_w(m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 			m_adpcm_start++;

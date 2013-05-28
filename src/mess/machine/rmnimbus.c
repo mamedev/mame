@@ -2671,7 +2671,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 {
 	int pc=space.device().safe_pc();
-	device_t *msm5205 = machine().device(MSM5205_TAG);
+	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
 
 	if(LOG_IOU)
 		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
@@ -2679,7 +2679,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 	if(offset==0)
 	{
 		m_iou_reg092=data;
-		msm5205_reset_w(msm5205, (data & MSM5205_INT_ENABLE) ? 0 : 1);
+		msm5205->reset_w((data & MSM5205_INT_ENABLE) ? 0 : 1);
 	}
 }
 
@@ -2705,13 +2705,13 @@ void rmnimbus_state::iou_reset()
 void rmnimbus_state::rmni_sound_reset()
 {
 	//device_t *ay8910 = machine().device(AY8910_TAG);
-	device_t *msm5205 = machine().device(MSM5205_TAG);
+	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
 
 	//ay8910->reset();
-	msm5205_reset_w(msm5205, 1);
+	msm5205->reset_w(1);
 
-	m_last_playmode=MSM5205_S48_4B;
-	msm5205_playmode_w(msm5205,m_last_playmode);
+	m_last_playmode = MSM5205_S48_4B;
+	msm5205->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
 }
@@ -2743,9 +2743,9 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_w)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 {
-	device_t *msm5205 = machine().device(MSM5205_TAG);
+	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
 
-	msm5205_data_w(msm5205, data);
+	msm5205->data_w(data);
 
 	// Mouse code needs a copy of this.
 	m_ay8910_a=data;
@@ -2753,12 +2753,12 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 {
-	device_t *msm5205 = machine().device(MSM5205_TAG);
+	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
 
-	if((data & 0x07)!=m_last_playmode)
+	if ((data & 0x07) != m_last_playmode)
 	{
-		m_last_playmode=(data & 0x07);
-		msm5205_playmode_w(msm5205, m_last_playmode);
+		m_last_playmode = (data & 0x07);
+		msm5205->playmode_w(m_last_playmode);
 	}
 }
 

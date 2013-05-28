@@ -309,7 +309,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
 
 WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
 {
-	msm5205_reset_w(m_msm, ~data & 0x01);
+	m_msm->reset_w(~data & 0x01);
 	m_sound_irq_enable = data & 0x02;
 }
 
@@ -320,7 +320,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
 
 WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_adpcm_toggle ^= 1;

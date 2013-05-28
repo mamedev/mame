@@ -491,13 +491,13 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	if (m_toggle)
 		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 
-	msm5205_data_w(m_msm, m_msm5205next >> 4);
+	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 }
 
 READ8_MEMBER(dec8_state::csilver_adpcm_reset_r)
 {
-	msm5205_reset_w(m_msm, 0);
+	m_msm->reset_w(0);
 	return 0;
 }
 

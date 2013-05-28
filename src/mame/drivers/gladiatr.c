@@ -284,9 +284,9 @@ WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
 	/* bit6 = bank offset */
 	membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
 
-	msm5205_data_w(m_msm,data);         /* bit0..3  */
-	msm5205_reset_w(m_msm,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w (m_msm,(data>>4)&1); /* bit4     */
+	m_msm->data_w(data);         /* bit0..3  */
+	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
+	m_msm->vclk_w (BIT(data, 4)); /* bit4     */
 }
 
 WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)

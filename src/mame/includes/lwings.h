@@ -1,4 +1,5 @@
 #include "video/bufsprite.h"
+#include "sound/msm5205.h"
 
 class lwings_state : public driver_device
 {
@@ -9,7 +10,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "5205") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -68,4 +70,5 @@ public:
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int avengers_fetch_paldata(  );
 	required_device<cpu_device> m_maincpu;
+	optional_device<msm5205_device> m_msm;
 };

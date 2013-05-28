@@ -642,7 +642,7 @@ WRITE8_MEMBER(mastboy_state::backupram_enable_w)
 WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit0_w)
 {
 	m_m5205_sambit0 = data & 1;
-	msm5205_playmode_w(m_msm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
+	m_msm->playmode_w((1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
@@ -651,7 +651,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
 {
 	m_m5205_sambit1 = data & 1;
 
-	msm5205_playmode_w(m_msm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
+	m_msm->playmode_w((1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
@@ -659,7 +659,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
 WRITE8_MEMBER(mastboy_state::mastboy_msm5205_reset_w)
 {
 	m_m5205_part = 0;
-	msm5205_reset_w(m_msm,data&1);
+	m_msm->reset_w(data & 1);
 }
 
 WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
@@ -669,7 +669,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
 {
-	msm5205_data_w(m_msm, m_m5205_next);
+	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
@@ -877,7 +877,7 @@ void mastboy_state::machine_reset()
 	memset( m_vram, 0x00, 0x10000);
 
 	m_m5205_part = 0;
-	msm5205_reset_w(m_msm,1);
+	m_msm->reset_w(1);
 	m_irq0_ack = 0;
 }
 

@@ -404,10 +404,10 @@ WRITE8_MEMBER(combatsc_state::combatscb_dac_w)
 
 	membank("bl_abank")->set_entry((data & 0x80) >> 7);
 
-	//msm5205_reset_w(m_msm5205, (data >> 4) & 1);
-	msm5205_data_w(m_msm5205, (data & 0x0f));
-	msm5205_vclk_w(m_msm5205, 1);
-	msm5205_vclk_w(m_msm5205, 0);
+	//m_msm5205->reset_w(BIT(data, 4));
+	m_msm5205->data_w(data & 0x0f);
+	m_msm5205->vclk_w(1);
+	m_msm5205->vclk_w(0);
 }
 
 static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )

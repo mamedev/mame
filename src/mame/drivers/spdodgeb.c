@@ -38,13 +38,13 @@ WRITE8_MEMBER(spdodgeb_state::sound_command_w)
 WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 {
 	int chip = offset & 1;
-	device_t *adpcm = machine().device((chip == 0) ? "msm1" : "msm2");
+	msm5205_device *adpcm = chip ? m_msm2 : m_msm1;
 
 	switch (offset/2)
 	{
 		case 3:
 			m_adpcm_idle[chip] = 1;
-			msm5205_reset_w(adpcm,1);
+			adpcm->reset_w(1);
 			break;
 
 		case 2:
@@ -57,21 +57,21 @@ WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 
 		case 0:
 			m_adpcm_idle[chip] = 0;
-			msm5205_reset_w(adpcm,0);
+			adpcm->reset_w(0);
 			break;
 	}
 }
 
-void spdodgeb_state::spd_adpcm_int( device_t *device, int chip )
+void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 {
 	if (m_adpcm_pos[chip] >= m_adpcm_end[chip] || m_adpcm_pos[chip] >= 0x10000)
 	{
 		m_adpcm_idle[chip] = 1;
-		msm5205_reset_w(device,1);
+		device->reset_w(1);
 	}
 	else if (m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device,m_adpcm_data[chip] & 0x0f);
+		device->data_w(m_adpcm_data[chip] & 0x0f);
 		m_adpcm_data[chip] = -1;
 	}
 	else
@@ -79,7 +79,7 @@ void spdodgeb_state::spd_adpcm_int( device_t *device, int chip )
 		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
-		msm5205_data_w(device,m_adpcm_data[chip] >> 4);
+		device->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
 

@@ -187,7 +187,7 @@ WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
 		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
 		m_adpcm_end = m_adpcm_pos+0x1000;
 		m_adpcm_idle = 0;
-		msm5205_reset_w(m_adpcm, 0);
+		m_adpcm->reset_w(0);
 	}
 
 	m_adpcm_play_reg = data & 1;
@@ -399,7 +399,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_idle)
 	{
 		//m_adpcm_idle = 1;
-		msm5205_reset_w(m_adpcm, 1);
+		m_adpcm->reset_w(1);
 		m_adpcm_trigger = 0;
 	}
 	else
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 		UINT8 *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(m_adpcm, m_adpcm_data & 0xf);
+		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 		{
