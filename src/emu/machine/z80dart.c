@@ -48,29 +48,11 @@
 
 
 //**************************************************************************
-//  CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
-
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define RXD \
-	m_in_rxd_func()
-
-#define TXD(_state) \
-	m_out_txd_func(_state)
-
-#define RTS(_state) \
-	m_out_rts_func(_state)
-
-#define DTR(_state) \
-	m_out_dtr_func(_state)
 
 
 
@@ -433,25 +415,18 @@ int z80dart_device::m1_r()
 
 z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80DART_CHANNEL, "Z80-DART channel", tag, owner, clock),
-		m_rx_shift(0),
+		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
 		m_rx_fifo(-1),
 		m_rx_clock(0),
-		m_rx_state(0),
-		m_rx_bits(0),
 		m_rx_first(0),
-		m_rx_parity(0),
 		m_rx_break(0),
 		m_rx_rr0_latch(0),
 		m_ri(0),
 		m_cts(0),
 		m_dcd(0),
 		m_tx_data(0),
-		m_tx_shift(0),
 		m_tx_clock(0),
-		m_tx_state(0),
-		m_tx_bits(0),
-		m_tx_parity(0),
 		m_dtr(0),
 		m_rts(0),
 		m_sync(0)
@@ -487,43 +462,22 @@ void z80dart_channel::device_start()
 	m_out_rxdrq_func.resolve(m_out_rxdrq_cb, *m_uart);
 	m_out_txdrq_func.resolve(m_out_txdrq_cb, *m_uart);
 
-	// allocate timers
-	if (m_rxc > 0)
-	{
-		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::from_hz(m_rxc), 0, attotime::from_hz(m_rxc));
-	}
-
-	if (m_txc > 0)
-	{
-		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::from_hz(m_txc), 0, attotime::from_hz(m_txc));
-	}
-
 	// state saving
 	save_item(NAME(m_rr));
 	save_item(NAME(m_wr));
 	save_item(NAME(m_rx_data_fifo));
 	save_item(NAME(m_rx_error_fifo));
-	save_item(NAME(m_rx_shift));
 	save_item(NAME(m_rx_error));
 	save_item(NAME(m_rx_fifo));
 	save_item(NAME(m_rx_clock));
-	save_item(NAME(m_rx_state));
-	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_first));
-	save_item(NAME(m_rx_parity));
 	save_item(NAME(m_rx_break));
 	save_item(NAME(m_rx_rr0_latch));
 	save_item(NAME(m_ri));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_tx_data));
-	save_item(NAME(m_tx_shift));
 	save_item(NAME(m_tx_clock));
-	save_item(NAME(m_tx_state));
-	save_item(NAME(m_tx_bits));
-	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_sync));
@@ -536,18 +490,19 @@ void z80dart_channel::device_start()
 
 void z80dart_channel::device_reset()
 {
+	receive_register_reset();
+	transmit_register_reset();
+
 	// disable receiver
 	m_wr[3] &= ~WR3_RX_ENABLE;
-	m_rx_state = STATE_START;
 
 	// disable transmitter
 	m_wr[5] &= ~WR5_TX_ENABLE;
-	m_tx_state = STATE_START;
 	m_rr[0] |= RR0_TX_BUFFER_EMPTY;
 
 	// reset external lines
-	RTS(1);
-	DTR(1);
+	set_rts(1);
+	set_dtr(1);
 
 	// reset interrupts
 	if (m_index == z80dart_device::CHANNEL_A)
@@ -558,20 +513,98 @@ void z80dart_channel::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  tra_callback -
 //-------------------------------------------------
 
-void z80dart_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void z80dart_channel::tra_callback()
 {
-	switch (id)
-	{
-	case TIMER_RX:
-		rxc_w(1);
-		break;
+	if (m_out_txd_func.isnull())
+		transmit_register_send_bit();
+	else
+		m_out_txd_func(transmit_register_get_data_bit());
+}
 
-	case TIMER_TX:
-		txc_w(1);
-		break;
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void z80dart_channel::tra_complete()
+{
+	if ((m_wr[5] & WR5_TX_ENABLE) && !(m_rr[0] & RR0_TX_BUFFER_EMPTY))
+	{
+		transmit_register_setup(m_tx_data);
+
+		// empty transmit buffer
+		m_rr[0] |= RR0_TX_BUFFER_EMPTY;
+
+		if (m_wr[1] & WR1_TX_INT_ENABLE)
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+	}
+	else if (m_wr[5] & WR5_SEND_BREAK)
+	{
+		// transmit break
+		set_out_data_bit(0);
+	}
+	else
+	{
+		// transmit marking line
+		set_out_data_bit(1);
+	}
+
+	// if transmit buffer is empty
+	if (m_rr[0] & RR0_TX_BUFFER_EMPTY)
+	{
+		// then all characters have been sent
+		m_rr[1] |= RR1_ALL_SENT;
+
+		// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+		if (!m_rts)
+			set_rts(1);
+	}
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void z80dart_channel::rcv_callback()
+{
+	if (m_wr[3] & WR3_RX_ENABLE)
+	{
+		if (m_in_rxd_func.isnull())
+			receive_register_update_bit(get_in_data_bit());
+		else
+			receive_register_update_bit(m_in_rxd_func());
+	}
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void z80dart_channel::rcv_complete()
+{
+	receive_register_extract();
+	receive_data(get_received_char());
+}
+
+
+//-------------------------------------------------
+//  input_callback -
+//-------------------------------------------------
+
+void z80dart_channel::input_callback(UINT8 state)
+{
+	UINT8 changed = m_input_state ^ state;
+
+	m_input_state = state;
+
+	if (changed & SERIAL_STATE_CTS)
+	{
+		cts_w(state);
 	}
 }
 
@@ -652,299 +685,6 @@ int z80dart_channel::get_tx_word_length()
 	}
 
 	return bits;
-}
-
-
-//-------------------------------------------------
-//  detect_start_bit - detect start bit
-//-------------------------------------------------
-
-int z80dart_channel::detect_start_bit()
-{
-	if (!(m_wr[3] & WR3_RX_ENABLE)) return 0;
-
-	return !RXD;
-}
-
-
-//-------------------------------------------------
-//  shift_data_in - shift in serial data
-//-------------------------------------------------
-
-void z80dart_channel::shift_data_in()
-{
-	if (m_rx_bits < 8)
-	{
-		int rxd = RXD;
-
-		m_rx_shift >>= 1;
-		m_rx_shift = (rxd << 7) | (m_rx_shift & 0x7f);
-		m_rx_parity ^= rxd;
-		m_rx_bits++;
-	}
-}
-
-
-//-------------------------------------------------
-//  character_completed - check if complete
-//  data word has been transferred
-//-------------------------------------------------
-
-bool z80dart_channel::character_completed()
-{
-	return m_rx_bits == get_rx_word_length();
-}
-
-
-//-------------------------------------------------
-//  detect_parity_error - detect parity error
-//-------------------------------------------------
-
-void z80dart_channel::detect_parity_error()
-{
-	int parity = (m_wr[1] & WR4_PARITY_EVEN) ? 1 : 0;
-
-	if (RXD != (m_rx_parity ^ parity))
-	{
-		// parity error detected
-		m_rx_error |= RR1_PARITY_ERROR;
-
-		switch (m_wr[1] & WR1_RX_INT_MODE_MASK)
-		{
-		case WR1_RX_INT_FIRST:
-			if (!m_rx_first)
-			{
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			}
-			break;
-
-		case WR1_RX_INT_ALL_PARITY:
-			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			break;
-
-		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
-			break;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  detect_framing_error - detect framing error
-//-------------------------------------------------
-
-void z80dart_channel::detect_framing_error()
-{
-	if (!RXD)
-	{
-		// framing error detected
-		m_rx_error |= RR1_CRC_FRAMING_ERROR;
-
-		switch (m_wr[1] & WR1_RX_INT_MODE_MASK)
-		{
-		case WR1_RX_INT_FIRST:
-			if (!m_rx_first)
-			{
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			}
-			break;
-
-		case WR1_RX_INT_ALL_PARITY:
-		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-			break;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  receive - receive serial data
-//-------------------------------------------------
-
-void z80dart_channel::receive()
-{
-	float stop_bits = get_stop_bits();
-
-	switch (m_rx_state)
-	{
-	case STATE_START:
-		// check for start bit
-		if (detect_start_bit())
-		{
-			// start bit detected
-			m_rx_shift = 0;
-			m_rx_error = 0;
-			m_rx_bits = 0;
-			m_rx_parity = 0;
-
-			// next bit is a data bit
-			m_rx_state = STATE_DATA;
-		}
-		break;
-
-	case STATE_DATA:
-		// shift bit into shift register
-		shift_data_in();
-
-		if (character_completed())
-		{
-			// all data bits received
-			if (m_wr[4] & WR4_PARITY_ENABLE)
-			{
-				// next bit is the parity bit
-				m_rx_state = STATE_PARITY;
-			}
-			else
-			{
-				// next bit is a STOP bit
-				if (stop_bits == 1)
-					m_rx_state = STATE_STOP2;
-				else
-					m_rx_state = STATE_STOP;
-			}
-		}
-		break;
-
-	case STATE_PARITY:
-		// shift bit into shift register
-		shift_data_in();
-
-		// check for parity error
-		detect_parity_error();
-
-		// next bit is a STOP bit
-		if (stop_bits == 1)
-			m_rx_state = STATE_STOP2;
-		else
-			m_rx_state = STATE_STOP;
-		break;
-
-	case STATE_STOP:
-		// shift bit into shift register
-		shift_data_in();
-
-		// check for framing error
-		detect_framing_error();
-
-		// next bit is the second STOP bit
-		m_rx_state = STATE_STOP2;
-		break;
-
-	case STATE_STOP2:
-		// shift bit into shift register
-		shift_data_in();
-
-		// check for framing error
-		detect_framing_error();
-
-		// store data into FIFO
-		receive_data(m_rx_shift);
-
-		// next bit is the START bit
-		m_rx_state = STATE_START;
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  transmit - transmit serial data
-//-------------------------------------------------
-
-void z80dart_channel::transmit()
-{
-	int word_length = get_tx_word_length();
-	float stop_bits = get_stop_bits();
-
-	switch (m_tx_state)
-	{
-	case STATE_START:
-		if ((m_wr[5] & WR5_TX_ENABLE) && !(m_rr[0] & RR0_TX_BUFFER_EMPTY))
-		{
-			// transmit start bit
-			TXD(0);
-
-			m_tx_bits = 0;
-			m_tx_shift = m_tx_data;
-
-			// empty transmit buffer
-			m_rr[0] |= RR0_TX_BUFFER_EMPTY;
-
-			if (m_wr[1] & WR1_TX_INT_ENABLE)
-				m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
-
-			m_tx_state = STATE_DATA;
-		}
-		else if (m_wr[5] & WR5_SEND_BREAK)
-		{
-			// transmit break
-			TXD(0);
-		}
-		else
-		{
-			// transmit marking line
-			TXD(1);
-		}
-
-		break;
-
-	case STATE_DATA:
-		// transmit data bit
-		TXD(BIT(m_tx_shift, 0));
-
-		// shift data
-		m_tx_shift >>= 1;
-		m_tx_bits++;
-
-		if (m_tx_bits == word_length)
-		{
-			if (m_wr[4] & WR4_PARITY_ENABLE)
-				m_tx_state = STATE_PARITY;
-			else
-			{
-				if (stop_bits == 1)
-					m_tx_state = STATE_STOP2;
-				else
-					m_tx_state = STATE_STOP;
-			}
-		}
-		break;
-
-	case STATE_PARITY:
-		// TODO: calculate parity
-		if (stop_bits == 1)
-			m_tx_state = STATE_STOP2;
-		else
-			m_tx_state = STATE_STOP;
-		break;
-
-	case STATE_STOP:
-		// transmit stop bit
-		TXD(1);
-
-		m_tx_state = STATE_STOP2;
-		break;
-
-	case STATE_STOP2:
-		// transmit stop bit
-		TXD(1);
-
-		// if transmit buffer is empty
-		if (m_rr[0] & RR0_TX_BUFFER_EMPTY)
-		{
-			// then all characters have been sent
-			m_rr[1] |= RR1_ALL_SENT;
-
-			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
-			if (!m_rts)
-				RTS(1);
-		}
-
-		m_tx_state = STATE_START;
-		break;
-	}
 }
 
 
@@ -1105,6 +845,8 @@ void z80dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Receiver Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR3_RX_ENABLE) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Auto Enables %u\n", m_owner->tag(), 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", m_owner->tag(), 'A' + m_index, get_rx_word_length()));
+
+		update_serial();
 		break;
 
 	case 4:
@@ -1112,6 +854,8 @@ void z80dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
 		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", m_owner->tag(), 'A' + m_index, get_stop_bits()));
 		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", m_owner->tag(), 'A' + m_index, get_clock_mode()));
+		
+		update_serial();
 		break;
 
 	case 5:
@@ -1121,11 +865,12 @@ void z80dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Request to Send %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0));
 
+		update_serial();
+
 		if (data & WR5_RTS)
 		{
 			// when the RTS bit is set, the _RTS output goes low
-			RTS(0);
-
+			set_rts(0);
 			m_rts = 1;
 		}
 		else
@@ -1135,8 +880,7 @@ void z80dart_channel::control_write(UINT8 data)
 		}
 
 		// data terminal ready output follows the state programmed into the DTR bit*/
-		m_dtr = (data & WR5_DTR) ? 0 : 1;
-		DTR(m_dtr);
+		set_dtr((data & WR5_DTR) ? 0 : 1);
 		break;
 
 	case 6:
@@ -1192,7 +936,21 @@ void z80dart_channel::data_write(UINT8 data)
 {
 	m_tx_data = data;
 
-	m_rr[0] &= ~RR0_TX_BUFFER_EMPTY;
+	if ((m_wr[5] & WR5_TX_ENABLE) && is_transmit_register_empty())
+	{
+		transmit_register_setup(m_tx_data);
+
+		// empty transmit buffer
+		m_rr[0] |= RR0_TX_BUFFER_EMPTY;
+
+		if (m_wr[1] & WR1_TX_INT_ENABLE)
+			m_uart->trigger_interrupt(m_index, INT_TRANSMIT);
+	}
+	else
+	{
+		m_rr[0] &= ~RR0_TX_BUFFER_EMPTY;
+	}
+
 	m_rr[1] &= ~RR1_ALL_SENT;
 
 	LOG(("Z80DART \"%s\" Channel %c : Data Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data));
@@ -1390,11 +1148,10 @@ void z80dart_channel::rxc_w(int state)
 
 	LOG(("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 
-	m_rx_clock++;
-	if (m_rx_clock == clocks)
+	if (++m_rx_clock == clocks)
 	{
 		m_rx_clock = 0;
-		receive();
+		rcv_clock();
 	}
 }
 
@@ -1411,12 +1168,81 @@ void z80dart_channel::txc_w(int state)
 
 	LOG(("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 
-	m_tx_clock++;
-	if (m_tx_clock == clocks)
+	if (++m_tx_clock == clocks)
 	{
 		m_tx_clock = 0;
-		transmit();
+		tra_clock();
 	}
+}
+
+
+//-------------------------------------------------
+//  update_serial -
+//-------------------------------------------------
+
+void z80dart_channel::update_serial()
+{
+	int clocks = get_clock_mode();
+
+	if (m_rxc > 0)
+	{
+		set_rcv_rate(m_rxc / clocks);
+	}
+
+	if (m_txc > 0)
+	{
+		set_tra_rate(m_txc / clocks);
+	}
+
+	int num_data_bits = get_rx_word_length();
+	int stop_bit_count = get_stop_bits();
+	int parity_code = SERIAL_PARITY_NONE;
+
+	if (m_wr[1] & WR4_PARITY_ENABLE)
+	{
+		if (m_wr[1] & WR4_PARITY_EVEN)
+			parity_code = SERIAL_PARITY_EVEN;
+		else 
+			parity_code = SERIAL_PARITY_ODD;
+	}
+
+	set_data_frame(num_data_bits, stop_bit_count, parity_code);
+}
+
+
+//-------------------------------------------------
+//  set_dtr -
+//-------------------------------------------------
+
+void z80dart_channel::set_dtr(int state)
+{
+	m_dtr = state;
+
+	m_out_dtr_func(m_dtr);
+
+	if (state)
+		m_connection_state &= ~SERIAL_STATE_DTR;
+	else
+		m_connection_state |= SERIAL_STATE_DTR;
+
+	serial_connection_out();
+}
+
+
+//-------------------------------------------------
+//  set_rts -
+//-------------------------------------------------
+
+void z80dart_channel::set_rts(int state)
+{
+	m_out_rts_func(state);
+
+	if (state)
+		m_connection_state &= ~SERIAL_STATE_RTS;
+	else
+		m_connection_state |= SERIAL_STATE_RTS;
+
+	serial_connection_out();
 }
 
 

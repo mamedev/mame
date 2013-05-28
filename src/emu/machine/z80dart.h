@@ -241,7 +241,8 @@ struct z80dart_interface
 
 class z80dart_device;
 
-class z80dart_channel : public device_t
+class z80dart_channel : public device_t,
+						public device_serial_interface
 {
 	friend class z80dart_device;
 
@@ -251,7 +252,13 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_serial_interface overrides
+	virtual void tra_callback();
+	virtual void tra_complete();
+	virtual void rcv_callback();
+	virtual void rcv_complete();
+	virtual void input_callback(UINT8 state);
 
 	UINT8 control_read();
 	void control_write(UINT8 data);
@@ -285,21 +292,6 @@ public:
 	UINT8 m_wr[6];              // write register
 
 protected:
-	enum
-	{
-		TIMER_RX,
-		TIMER_TX
-	};
-
-	enum
-	{
-		STATE_START = 0,
-		STATE_DATA,
-		STATE_PARITY,
-		STATE_STOP,
-		STATE_STOP2
-	};
-
 	enum
 	{
 		INT_TRANSMIT = 0,
@@ -399,8 +391,8 @@ protected:
 
 	enum
 	{
-		WR4_PARITY_ENABLE         = 0x01, // not supported
-		WR4_PARITY_EVEN           = 0x02, // not supported
+		WR4_PARITY_ENABLE         = 0x01,
+		WR4_PARITY_EVEN           = 0x02,
 		WR4_STOP_BITS_MASK        = 0x0c,
 		WR4_STOP_BITS_1           = 0x04,
 		WR4_STOP_BITS_1_5         = 0x08, // not supported
@@ -432,18 +424,14 @@ protected:
 		WR5_DTR                   = 0x80
 	};
 
-	void take_interrupt(int level);
+	void update_serial();
+	void set_dtr(int state);
+	void set_rts(int state);
+
 	int get_clock_mode();
 	float get_stop_bits();
 	int get_rx_word_length();
 	int get_tx_word_length();
-	int detect_start_bit();
-	void shift_data_in();
-	bool character_completed();
-	void detect_parity_error();
-	void detect_framing_error();
-	void receive();
-	void transmit();
 
 	devcb_resolved_read_line    m_in_rxd_func;
 	devcb_resolved_write_line   m_out_txd_func;
@@ -457,15 +445,11 @@ protected:
 	// receiver state
 	UINT8 m_rx_data_fifo[3];    // receive data FIFO
 	UINT8 m_rx_error_fifo[3];   // receive error FIFO
-	UINT8 m_rx_shift;           // 8-bit receive shift register
 	UINT8 m_rx_error;           // current receive error
 	int m_rx_fifo;              // receive FIFO pointer
 
 	int m_rx_clock;             // receive clock pulse count
-	int m_rx_state;             // receive state
-	int m_rx_bits;              // bits received
 	int m_rx_first;             // first character received
-	int m_rx_parity;            // received data parity
 	int m_rx_break;             // receive break condition
 	UINT8 m_rx_rr0_latch;       // read register 0 latched
 
@@ -475,21 +459,13 @@ protected:
 
 	// transmitter state
 	UINT8 m_tx_data;            // transmit data register
-	UINT8 m_tx_shift;           // transmit shift register
-
 	int m_tx_clock;             // transmit clock pulse count
-	int m_tx_state;             // transmit state
-	int m_tx_bits;              // bits transmitted
-	int m_tx_parity;            // transmitted data parity
 
 	int m_dtr;                  // data terminal ready
 	int m_rts;                  // request to send
 
 	// synchronous state
 	UINT16 m_sync;              // sync character
-
-	emu_timer *m_rx_timer;
-	emu_timer *m_tx_timer;
 
 	int m_index;
 	z80dart_device *m_uart;
