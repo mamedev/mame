@@ -154,6 +154,23 @@ public:
 	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
 	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
+
+//private:
+	// cd related
+	void pce_set_cd_bram();
+	void adpcm_stop(UINT8 irq_flag);
+	void adpcm_play();
+	void pce_cd_reply_status_byte(UINT8 status);
+	void pce_cd_handle_data_output();
+	void pce_cd_handle_data_input();
+	void pce_cd_handle_message_output();
+	void pce_cd_handle_message_input();
+	void pce_cd_update();
+	void pce_cd_set_irq_line(int num, int state);
+	void pce_cd_init();
+	void pce_cd_set_adpcm_ram_byte(UINT8 val);
+	UINT8 pce_cd_get_cd_data_byte();
+	UINT8 pce_cd_get_adpcm_ram_byte();
 };
 
 
