@@ -10050,7 +10050,7 @@ GAME( 1991, quizdais,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   RO
 GAME( 1991, quizdaisk,  quizdais, neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Quiz Daisousa Sen - The Last Count Down (Korean release)", GAME_SUPPORTS_SAVE )
 GAME( 1992, lresort,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Last Resort", GAME_SUPPORTS_SAVE )
 GAME( 1991, eightman,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "Eight Man (NGM-025)(NGH-025)", GAME_SUPPORTS_SAVE )
-GAME( 1991, legendos,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Legend of Success Joe / Ashitano Joe Densetsu", GAME_SUPPORTS_SAVE )
+GAME( 1991, legendos,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Legend of Success Joe / Ashita no Joe Densetsu", GAME_SUPPORTS_SAVE )
 GAME( 1991, 2020bb,     neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, 2020bba,    2020bb,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, 2020bbh,    2020bb,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 3)", GAME_SUPPORTS_SAVE )
