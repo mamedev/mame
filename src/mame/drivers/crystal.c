@@ -916,7 +916,7 @@ ROM_START( topbladv )
 	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
 
 
-	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
 	ROM_REGION( 0x10000, "user2",   ROMREGION_ERASEFF ) //Unmapped flash
@@ -931,7 +931,7 @@ ROM_START( officeye )
 	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
 
 
-	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
 	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
 
@@ -946,7 +946,7 @@ ROM_START( donghaer )
 	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
 	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
 
-	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000, CRC(6d82f1a5) SHA1(036bd45f0daac1ffeaa5ad9774fc1b56e3c75ff9) )
 
