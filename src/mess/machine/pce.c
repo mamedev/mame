@@ -349,28 +349,26 @@ void pce_state::pce_cd_reply_status_byte( UINT8 status )
 }
 
 /* 0x00 - TEST UNIT READY */
-static void pce_cd_test_unit_ready( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_test_unit_ready()
+{	
+	pce_cd_t &pce_cd = m_cd;
 	logerror("test unit ready\n");
 	if ( pce_cd.cd )
 	{
 		logerror( "Sending STATUS_OK status\n" );
-		state->pce_cd_reply_status_byte(SCSI_STATUS_OK );
+		pce_cd_reply_status_byte(SCSI_STATUS_OK );
 	}
 	else
 	{
 		logerror( "Sending CHECK_CONDITION status\n" );
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION );
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION );
 	}
 }
 
 /* 0x08 - READ (6) */
-static void pce_cd_read_6( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_read_6()
+{	
+	pce_cd_t &pce_cd = m_cd;
 	UINT32 frame = ( ( pce_cd.command_buffer[1] & 0x1f ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
 	UINT32 frame_count = pce_cd.command_buffer[4];
 	printf("%08x %08x\n",frame,frame_count);
@@ -378,14 +376,14 @@ static void pce_cd_read_6( running_machine &machine )
 	/* Check for presence of a CD */
 	if (!pce_cd.cd)
 	{
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
 	if ( pce_cd.cdda_status != PCE_CD_CDDA_OFF )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		machine.device<cdda_device>("cdda")->stop_audio();
+		machine().device<cdda_device>("cdda")->stop_audio();
 		pce_cd.end_mark = 0;
 	}
 
@@ -396,7 +394,7 @@ static void pce_cd_read_6( running_machine &machine )
 	{
 		/* Star Breaker uses this */
 		popmessage("Read Sector frame count == 0, contact MESSdev");
-		state->pce_cd_reply_status_byte(SCSI_STATUS_OK );
+		pce_cd_reply_status_byte(SCSI_STATUS_OK );
 	}
 	else
 	{
@@ -404,20 +402,19 @@ static void pce_cd_read_6( running_machine &machine )
 	}
 
 	/* TODO: correct place? */
-	state->pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_READY, ASSERT_LINE);
+	pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_READY, ASSERT_LINE);
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
-static void pce_cd_nec_set_audio_start_position( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_nec_set_audio_start_position()
+{	
+	pce_cd_t &pce_cd = m_cd;
 	UINT32  frame = 0;
 
 	if (!pce_cd.cd)
 	{
 		/* Throw some error here */
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
@@ -455,7 +452,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine &machine )
 	if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		machine.device<cdda_device>("cdda")->stop_audio();
+		machine().device<cdda_device>("cdda")->stop_audio();
 		pce_cd.end_frame = pce_cd.last_frame;
 		pce_cd.end_mark = 0;
 	}
@@ -465,7 +462,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine &machine )
 		{
 			pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 			pce_cd.end_frame = pce_cd.last_frame; //get the end of the CD
-			machine.device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			machine().device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 			pce_cd.cdda_play_mode = (pce_cd.command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
 			pce_cd.end_mark =  (pce_cd.command_buffer[1] & 0x02) ? 1 : 0;
 		}
@@ -473,27 +470,26 @@ static void pce_cd_nec_set_audio_start_position( running_machine &machine )
 		{
 			pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 			pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].logframeofs; //get the end of THIS track
-			machine.device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			machine().device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 			pce_cd.end_mark = 0;
 			pce_cd.cdda_play_mode = 3;
 		}
 	}
 
-	state->pce_cd_reply_status_byte(SCSI_STATUS_OK);
-	state->pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	pce_cd_reply_status_byte(SCSI_STATUS_OK);
+	pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
-static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
+void pce_state::pce_cd_nec_set_audio_stop_position()
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	UINT32  frame = 0;
 
 	if (!pce_cd.cd)
 	{
 		/* Throw some error here */
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
@@ -532,12 +528,12 @@ static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
 	{
 		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED )
 		{
-			machine.device<cdda_device>("cdda")->pause_audio( 0 );
+			machine().device<cdda_device>("cdda")->pause_audio( 0 );
 		}
 		else
 		{
 			//printf("%08x %08x\n",pce_cd.current_frame,pce_cd.end_frame - pce_cd.current_frame);
-			machine.device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			machine().device<cdda_device>("cdda")->start_audio( pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 			pce_cd.end_mark = 1;
 		}
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
@@ -545,54 +541,52 @@ static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
 	else
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		machine.device<cdda_device>("cdda")->stop_audio();
+		machine().device<cdda_device>("cdda")->stop_audio();
 		pce_cd.end_frame = pce_cd.last_frame;
 		pce_cd.end_mark = 0;
 //      assert( NULL == pce_cd_nec_set_audio_stop_position );
 	}
 
-	state->pce_cd_reply_status_byte(SCSI_STATUS_OK);
-	state->pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	pce_cd_reply_status_byte(SCSI_STATUS_OK);
+	pce_cd_set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xDA - PAUSE (NEC) */
-static void pce_cd_nec_pause( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_nec_pause()
+{	
+	pce_cd_t &pce_cd = m_cd;
 
 	/* If no cd mounted throw an error */
 	if (!pce_cd.cd)
 	{
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
 	/* If there was no cdda playing, throw an error */
 	if ( pce_cd.cdda_status == PCE_CD_CDDA_OFF )
 	{
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
 	pce_cd.cdda_status = PCE_CD_CDDA_PAUSED;
-	pce_cd.current_frame = machine.device<cdda_device>("cdda")->get_audio_lba();
-	machine.device<cdda_device>("cdda")->pause_audio( 1 );
-	state->pce_cd_reply_status_byte(SCSI_STATUS_OK);
+	pce_cd.current_frame = machine().device<cdda_device>("cdda")->get_audio_lba();
+	machine().device<cdda_device>("cdda")->pause_audio( 1 );
+	pce_cd_reply_status_byte(SCSI_STATUS_OK);
 }
 
 /* 0xDD - READ SUBCHANNEL Q (NEC) */
-static void pce_cd_nec_get_subq( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_nec_get_subq()
+{	
+	pce_cd_t &pce_cd = m_cd;
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
 	UINT32 msf_abs, msf_rel, track, frame;
 
 	if (!pce_cd.cd)
 	{
 		/* Throw some error here */
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
@@ -602,11 +596,11 @@ static void pce_cd_nec_get_subq( running_machine &machine )
 	{
 	case PCE_CD_CDDA_PAUSED:
 		pce_cd.data_buffer[0] = 2;
-		frame = machine.device<cdda_device>("cdda")->get_audio_lba();
+		frame = machine().device<cdda_device>("cdda")->get_audio_lba();
 		break;
 	case PCE_CD_CDDA_PLAYING:
 		pce_cd.data_buffer[0] = 0;
-		frame = machine.device<cdda_device>("cdda")->get_audio_lba();
+		frame = machine().device<cdda_device>("cdda")->get_audio_lba();
 		break;
 	default:
 		pce_cd.data_buffer[0] = 3;
@@ -635,10 +629,9 @@ static void pce_cd_nec_get_subq( running_machine &machine )
 }
 
 /* 0xDE - GET DIR INFO (NEC) */
-static void pce_cd_nec_get_dir_info( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+void pce_state::pce_cd_nec_get_dir_info()
+{	
+	pce_cd_t &pce_cd = m_cd;
 	UINT32 frame, msf, track = 0;
 	const cdrom_toc *toc;
 	logerror("nec get dir info\n");
@@ -646,7 +639,7 @@ static void pce_cd_nec_get_dir_info( running_machine &machine )
 	if (!pce_cd.cd)
 	{
 		/* Throw some error here */
-		state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+		pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 	}
 
 	toc = cdrom_get_toc( pce_cd.cd );
@@ -703,11 +696,12 @@ static void pce_cd_nec_get_dir_info( running_machine &machine )
 	pce_cd.scsi_CD = 0;
 }
 
-static void pce_cd_end_of_list( running_machine &machine )
-{
-	pce_state *state = machine.driver_data<pce_state>();
-	state->pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
+void pce_state::pce_cd_end_of_list()
+{	
+	pce_cd_reply_status_byte(SCSI_CHECK_CONDITION);
 }
+
+typedef void (pce_state::*command_handler_func)();
 
 void pce_state::pce_cd_handle_data_output()
 {
@@ -715,16 +709,16 @@ void pce_state::pce_cd_handle_data_output()
 	static const struct {
 		UINT8   command_byte;
 		UINT8   command_size;
-		void    (*command_handler)(running_machine &machine);
+		command_handler_func command_handler;
 	} pce_cd_commands[] = {
-		{ 0x00, 6, pce_cd_test_unit_ready },                /* TEST UNIT READY */
-		{ 0x08, 6, pce_cd_read_6 },                         /* READ (6) */
-		{ 0xD8,10, pce_cd_nec_set_audio_start_position },   /* NEC SET AUDIO PLAYBACK START POSITION */
-		{ 0xD9,10, pce_cd_nec_set_audio_stop_position },    /* NEC SET AUDIO PLAYBACK END POSITION */
-		{ 0xDA,10, pce_cd_nec_pause },                      /* NEC PAUSE */
-		{ 0xDD,10, pce_cd_nec_get_subq },                   /* NEC GET SUBCHANNEL Q */
-		{ 0xDE,10, pce_cd_nec_get_dir_info },               /* NEC GET DIR INFO */
-		{ 0xFF, 1, pce_cd_end_of_list }                     /* end of list marker */
+		{ 0x00, 6, &pce_state::pce_cd_test_unit_ready },                /* TEST UNIT READY */
+		{ 0x08, 6, &pce_state::pce_cd_read_6 },                         /* READ (6) */
+		{ 0xD8,10, &pce_state::pce_cd_nec_set_audio_start_position },   /* NEC SET AUDIO PLAYBACK START POSITION */
+		{ 0xD9,10, &pce_state::pce_cd_nec_set_audio_stop_position },    /* NEC SET AUDIO PLAYBACK END POSITION */
+		{ 0xDA,10, &pce_state::pce_cd_nec_pause },                      /* NEC PAUSE */
+		{ 0xDD,10, &pce_state::pce_cd_nec_get_subq },                   /* NEC GET SUBCHANNEL Q */
+		{ 0xDE,10, &pce_state::pce_cd_nec_get_dir_info },               /* NEC GET DIR INFO */
+		{ 0xFF, 1, &pce_state::pce_cd_end_of_list }                     /* end of list marker */
 	};
 
 	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK )
@@ -760,7 +754,7 @@ void pce_state::pce_cd_handle_data_output()
 		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size )
 		{
 			//printf("%02x command issued\n",pce_cd.command_buffer[0]);
-			(pce_cd_commands[i].command_handler)(machine());
+			(this->*pce_cd_commands[i].command_handler)();
 			pce_cd.command_buffer_index = 0;
 		}
 		else

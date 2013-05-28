@@ -171,6 +171,14 @@ public:
 	void pce_cd_set_adpcm_ram_byte(UINT8 val);
 	UINT8 pce_cd_get_cd_data_byte();
 	UINT8 pce_cd_get_adpcm_ram_byte();
+	void pce_cd_test_unit_ready();
+	void pce_cd_read_6();
+	void pce_cd_nec_set_audio_start_position();
+	void pce_cd_nec_set_audio_stop_position();
+	void pce_cd_nec_pause();
+	void pce_cd_nec_get_subq();
+	void pce_cd_nec_get_dir_info();
+	void pce_cd_end_of_list();
 };
 
 
