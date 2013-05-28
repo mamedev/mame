@@ -12,8 +12,8 @@
 #include "cdrom.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/msm5205.h"
-#include "machine/nvram.h"
 #include "machine/pce_slot.h"
+#include "machine/pce_cd.h"
 #include "video/huc6260.h"
 
 #define C6280_TAG           "c6280"
@@ -29,78 +29,6 @@
 #define CONST_SIG           0x30
 
 
-struct pce_cd_t
-{
-	UINT8   regs[16];
-	UINT8   *bram;
-	UINT8   *adpcm_ram;
-	int     bram_locked;
-	int     adpcm_read_ptr;
-	UINT8   adpcm_read_buf;
-	int     adpcm_write_ptr;
-	UINT8   adpcm_write_buf;
-	int     adpcm_length;
-	int     adpcm_clock_divider;
-	UINT32  msm_start_addr;
-	UINT32  msm_end_addr;
-	UINT32  msm_half_addr;
-	UINT8   msm_nibble;
-	UINT8   msm_idle;
-	UINT8   msm_repeat;
-
-	/* SCSI signals */
-	int     scsi_BSY;   /* Busy. Bus in use */
-	int     scsi_SEL;   /* Select. Initiator has won arbitration and has selected a target */
-	int     scsi_CD;    /* Control/Data. Target is sending control (data) information */
-	int     scsi_IO;    /* Input/Output. Target is sending (receiving) information */
-	int     scsi_MSG;   /* Message. Target is sending or receiving a message */
-	int     scsi_REQ;   /* Request. Target is requesting a data transfer */
-	int     scsi_ACK;   /* Acknowledge. Initiator acknowledges that it is ready for a data transfer */
-	int     scsi_ATN;   /* Attention. Initiator has a message ready for the target */
-	int     scsi_RST;   /* Reset. Initiator forces all targets and any other initiators to do a warm reset */
-	int     scsi_last_RST;  /* To catch setting of RST signal */
-	int     cd_motor_on;
-	int     selected;
-	UINT8   *command_buffer;
-	int     command_buffer_index;
-	int     status_sent;
-	int     message_after_status;
-	int     message_sent;
-	UINT8   *data_buffer;
-	int     data_buffer_size;
-	int     data_buffer_index;
-	int     data_transferred;
-
-	/* Arcade Card specific */
-	UINT8   *acard_ram;
-	UINT8   acard_latch;
-	UINT8   acard_ctrl[4];
-	UINT32  acard_base_addr[4];
-	UINT16  acard_addr_offset[4];
-	UINT16  acard_addr_inc[4];
-	UINT32  acard_shift;
-	UINT8   acard_shift_reg;
-
-	UINT32  current_frame;
-	UINT32  end_frame;
-	UINT32  last_frame;
-	UINT8   cdda_status;
-	UINT8   cdda_play_mode;
-	UINT8   *subcode_buffer;
-	UINT8   end_mark;
-	cdrom_file  *cd;
-	const cdrom_toc*    toc;
-	emu_timer   *data_timer;
-	emu_timer   *adpcm_dma_timer;
-
-	emu_timer   *cdda_fadeout_timer;
-	emu_timer   *cdda_fadein_timer;
-	double  cdda_volume;
-	emu_timer   *adpcm_fadeout_timer;
-	emu_timer   *adpcm_fadein_timer;
-	double  adpcm_volume;
-};
-
 
 class pce_state : public driver_device
 {
@@ -112,7 +40,8 @@ public:
 		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260"),
 		m_msm5205(*this, "msm5205"),
-		m_cartslot(*this, "cartslot")
+		m_cartslot(*this, "cartslot"),
+		m_cd(*this, "pce_cd")
 	{ }
 
 	required_device<h6280_device> m_maincpu;
@@ -121,13 +50,13 @@ public:
 	optional_device<huc6260_device> m_huc6260;
 	optional_device<msm5205_device> m_msm5205;
 	required_device<pce_cart_slot_device> m_cartslot;
+	optional_device<pce_cd_device> m_cd;
 
 	DECLARE_WRITE_LINE_MEMBER(pce_cd_msm5205_int);
 
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
 	UINT8 m_acard;
-	pce_cd_t m_cd;
 	int m_joystick_port_select;
 	int m_joystick_data_select;
 	UINT8 m_joy_6b_packet[5];
@@ -154,35 +83,6 @@ public:
 	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
 	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
-
-//private:
-	// cd related
-	void pce_set_cd_bram();
-	void adpcm_stop(UINT8 irq_flag);
-	void adpcm_play();
-	void pce_cd_reply_status_byte(UINT8 status);
-	void pce_cd_handle_data_output();
-	void pce_cd_handle_data_input();
-	void pce_cd_handle_message_output();
-	void pce_cd_handle_message_input();
-	void pce_cd_update();
-	void pce_cd_set_irq_line(int num, int state);
-	void pce_cd_init();
-	void pce_cd_set_adpcm_ram_byte(UINT8 val);
-	UINT8 pce_cd_get_cd_data_byte();
-	UINT8 pce_cd_get_adpcm_ram_byte();
-	void pce_cd_test_unit_ready();
-	void pce_cd_read_6();
-	void pce_cd_nec_set_audio_start_position();
-	void pce_cd_nec_set_audio_stop_position();
-	void pce_cd_nec_pause();
-	void pce_cd_nec_get_subq();
-	void pce_cd_nec_get_dir_info();
-	void pce_cd_end_of_list();
 };
-
-
-/*----------- defined in machine/pce.c -----------*/
-extern const msm5205_interface pce_cd_msm5205_interface;
 
 #endif /* PCE_H_ */

@@ -1382,7 +1382,8 @@ $(MESSOBJ)/nec.a:               \
 	$(MESS_DRIVERS)/apc.o       \
 	$(MESS_MACHINE)/pce.o       \
 	$(MESS_MACHINE)/pce_slot.o  \
-	$(MESS_MACHINE)/pce_rom.o  \
+	$(MESS_MACHINE)/pce_rom.o   \
+	$(MESS_MACHINE)/pce_cd.o    \
 	$(MESS_DRIVERS)/pce.o       \
 	$(MESS_DRIVERS)/pcfx.o      \
 	$(MESS_DRIVERS)/pc6001.o    \
