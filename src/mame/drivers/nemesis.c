@@ -22,6 +22,10 @@
 
 driver by Bryan McPhail
 
+TODO:
+- hcrash: coin insertion isn't always recognized.
+- hcrash: Konami GT-type inputs doesn't work properly.
+
 modified by Hau
 03/27/2009
  spthx to Unagi,rassy,hina,nori,Tobikage,Tommy,Crimson,yasuken,cupmen,zoo
