@@ -20,6 +20,7 @@
 
     TODO:
 
+	- devcb2
 	- i8274 DMA scheme
     - break detection
     - wr0 reset tx interrupt pending
@@ -30,20 +31,7 @@
 
 */
 
-#include "emu.h"
 #include "z80dart.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-
-
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define VERBOSE 0
-
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -51,13 +39,17 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
+#define VERBOSE 0
+
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
 
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
@@ -72,6 +64,10 @@ const device_type I8274 = &device_creator<i8274_device>;
 const device_type UPD7201 = &device_creator<upd7201_device>;
 
 
+//-------------------------------------------------
+//  device_mconfig_additions -
+//-------------------------------------------------
+
 MACHINE_CONFIG_FRAGMENT( z80dart )
 	MCFG_DEVICE_ADD(CHANA_TAG, Z80DART_CHANNEL, 0)
 	MCFG_DEVICE_ADD(CHANB_TAG, Z80DART_CHANNEL, 0)
@@ -82,6 +78,11 @@ machine_config_constructor z80dart_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( z80dart );
 }
 
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 //-------------------------------------------------
 //  z80dart_device - constructor
@@ -238,11 +239,6 @@ void z80dart_device::device_reset()
 }
 
 
-
-//**************************************************************************
-//  DAISY CHAIN INTERFACE
-//**************************************************************************
-
 //-------------------------------------------------
 //  z80daisy_irq_state - get interrupt status
 //-------------------------------------------------
@@ -334,11 +330,6 @@ void z80dart_device::z80daisy_irq_reti()
 }
 
 
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
 //-------------------------------------------------
 //  check_interrupts -
 //-------------------------------------------------
@@ -401,6 +392,68 @@ void z80dart_device::trigger_interrupt(int index, int state)
 int z80dart_device::m1_r()
 {
 	return z80daisy_irq_ack();
+}
+
+
+//-------------------------------------------------
+//  cd_ba_r -
+//-------------------------------------------------
+
+READ8_MEMBER( z80dart_device::cd_ba_r )
+{
+	int ba = BIT(offset, 0);
+	int cd = BIT(offset, 1);
+	z80dart_channel *channel = ba ? m_chanB : m_chanA;
+
+	return cd ? channel->control_read() : channel->data_read();
+}
+
+
+//-------------------------------------------------
+//  cd_ba_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80dart_device::cd_ba_w )
+{
+	int ba = BIT(offset, 0);
+	int cd = BIT(offset, 1);
+	z80dart_channel *channel = ba ? m_chanB : m_chanA;
+
+	if (cd)
+		channel->control_write(data);
+	else
+		channel->data_write(data);
+}
+
+
+//-------------------------------------------------
+//  ba_cd_r -
+//-------------------------------------------------
+
+READ8_MEMBER( z80dart_device::ba_cd_r )
+{
+	int ba = BIT(offset, 1);
+	int cd = BIT(offset, 0);
+	z80dart_channel *channel = ba ? m_chanB : m_chanA;
+
+	return cd ? channel->control_read() : channel->data_read();
+}
+
+
+//-------------------------------------------------
+//  ba_cd_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( z80dart_device::ba_cd_w )
+{
+	int ba = BIT(offset, 1);
+	int cd = BIT(offset, 0);
+	z80dart_channel *channel = ba ? m_chanB : m_chanA;
+
+	if (cd)
+		channel->control_write(data);
+	else
+		channel->data_write(data);
 }
 
 
@@ -1020,7 +1073,7 @@ void z80dart_channel::receive_data(UINT8 data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-void z80dart_channel::cts_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::cts_w )
 {
 	LOG(("Z80DART \"%s\" Channel %c : CTS %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1059,7 +1112,7 @@ void z80dart_channel::cts_w(int state)
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
 
-void z80dart_channel::dcd_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::dcd_w )
 {
 	LOG(("Z80DART \"%s\" Channel %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1097,7 +1150,7 @@ void z80dart_channel::dcd_w(int state)
 //  ri_w - ring indicator handler
 //-------------------------------------------------
 
-void z80dart_channel::ri_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::ri_w )
 {
 	LOG(("Z80DART \"%s\" Channel %c : RI %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1130,7 +1183,7 @@ void z80dart_channel::ri_w(int state)
 //  sync_w - sync handler
 //-------------------------------------------------
 
-void z80dart_channel::sync_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::sync_w )
 {
 	LOG(("Z80DART \"%s\" Channel %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
 }
@@ -1140,7 +1193,7 @@ void z80dart_channel::sync_w(int state)
 //  rxc_w - receive clock
 //-------------------------------------------------
 
-void z80dart_channel::rxc_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 {
 	int clocks = get_clock_mode();
 
@@ -1160,7 +1213,7 @@ void z80dart_channel::rxc_w(int state)
 //  txc_w - transmit clock
 //-------------------------------------------------
 
-void z80dart_channel::txc_w(int state)
+WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 {
 	int clocks = get_clock_mode();
 
@@ -1243,40 +1296,4 @@ void z80dart_channel::set_rts(int state)
 		m_connection_state |= SERIAL_STATE_RTS;
 
 	serial_connection_out();
-}
-
-
-
-//**************************************************************************
-//  GLOBAL STUBS
-//**************************************************************************
-
-READ8_MEMBER( z80dart_device::cd_ba_r )
-{
-	return (offset & 2) ? control_read(offset & 1) : data_read(offset & 1);
-}
-
-WRITE8_MEMBER( z80dart_device::cd_ba_w )
-{
-	if (offset & 2)
-		control_write(offset & 1, data);
-	else
-		data_write(offset & 1, data);
-}
-
-READ8_MEMBER( z80dart_device::ba_cd_r )
-{
-	int channel = BIT(offset, 1);
-
-	return (offset & 1) ? control_read(channel) : data_read(channel);
-}
-
-WRITE8_MEMBER( z80dart_device::ba_cd_w )
-{
-	int channel = BIT(offset, 1);
-
-	if (offset & 1)
-		control_write(channel, data);
-	else
-		data_write(channel, data);
 }

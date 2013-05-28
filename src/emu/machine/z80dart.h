@@ -146,6 +146,7 @@
 #ifndef __Z80DART_H__
 #define __Z80DART_H__
 
+#include "emu.h"
 #include "cpu/z80/z80daisy.h"
 
 
@@ -268,12 +269,12 @@ public:
 
 	void receive_data(UINT8 data);
 
-	void cts_w(int state);
-	void dcd_w(int state);
-	void ri_w(int state);
-	void rxc_w(int state);
-	void txc_w(int state);
-	void sync_w(int state);
+	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	DECLARE_WRITE_LINE_MEMBER( dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( ri_w );
+	DECLARE_WRITE_LINE_MEMBER( rxc_w );
+	DECLARE_WRITE_LINE_MEMBER( txc_w );
+	DECLARE_WRITE_LINE_MEMBER( sync_w );
 
 	devcb_read_line    m_in_rxd_cb;
 	devcb_write_line   m_out_txd_cb;
@@ -493,19 +494,19 @@ public:
 	// interrupt acknowledge
 	int m1_r();
 
-	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { cts_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { cts_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { dcd_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { dcd_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { ri_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { ri_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { rxc_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { rxc_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( txca_w ) { txc_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { txc_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { rxc_w(1, state); txc_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( synca_w ) { sync_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { sync_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_chanA->cts_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_chanB->dcd_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->ri_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->ri_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_chanB->txc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_chanA->sync_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
 
 protected:
 	// device-level overrides
@@ -523,7 +524,6 @@ protected:
 	void check_interrupts();
 	void reset_interrupts();
 	void trigger_interrupt(int index, int state);
-	z80dart_channel *get_channel(int chan) { return chan == 0 ? m_chanA : m_chanB; }
 	int get_channel_index(z80dart_channel *ch) { return (ch == m_chanA) ? 0 : 1; }
 
 	enum
@@ -543,22 +543,6 @@ protected:
 		CHANNEL_A = 0,
 		CHANNEL_B
 	};
-
-	// control register access
-	UINT8 control_read(int which) { return get_channel(which)->control_read(); }
-	void control_write(int which, UINT8 data) { return get_channel(which)->control_write(data); }
-
-	// data register access
-	UINT8 data_read(int which) { return get_channel(which)->data_read(); }
-	void data_write(int which, UINT8 data) { return get_channel(which)->data_write(data); }
-
-	// control line access
-	void cts_w(int which, int state) { get_channel(which)->cts_w(state); }
-	void dcd_w(int which, int state) { get_channel(which)->dcd_w(state); }
-	void ri_w(int which, int state) { get_channel(which)->ri_w(state); }
-	void rxc_w(int which, int state) { get_channel(which)->rxc_w(state); }
-	void txc_w(int which, int state) { get_channel(which)->txc_w(state); }
-	void sync_w(int which, int state) { get_channel(which)->sync_w(state); }
 
 	required_device<z80dart_channel> m_chanA;
 	required_device<z80dart_channel> m_chanB;
