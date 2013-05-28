@@ -1031,7 +1031,7 @@ public:
 	{
 		// perform the lookup
 		byteaddress &= m_bytemask;
-		UINT32 entry = read_lookup(byteaddress);
+		UINT32 entry = write_lookup(byteaddress);
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// 8-bit case: RAM/ROM
