@@ -8,19 +8,19 @@
 	MCFG_DEVICE_ADD(_tag, QX10_KEYBOARD, 1200) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-class qx10_keyboard_device : public generic_keyboard_device
+class qx10_keyboard_device : public serial_keyboard_device
 {
 public:
 	qx10_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_WRITE16_MEMBER(tx_w);
-
 protected:
 	virtual void device_start();
+	virtual void rcv_complete();
 
 private:
 	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
+	void write(UINT8 data);
 
 	required_ioport m_io_kbd8;
 	required_ioport m_io_kbd9;

@@ -1,9 +1,9 @@
-// TODO: when z80sio becomes a serial device, inherit from serial_keyboard_device; dump 8049 mcu; key repeat
+// TODO: dump 8049 mcu; key repeat
 
 #include "machine/qx10kbd.h"
 
 qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
-	generic_keyboard_device(mconfig, QX10_KEYBOARD, "QX10 Keyboard", tag, owner, 0, "qx10_keyboard", __FILE__),
+	serial_keyboard_device(mconfig, QX10_KEYBOARD, "QX10 Keyboard", tag, owner, 0, "qx10_keyboard", __FILE__),
 	m_io_kbd8(*this, "TERM_LINE8"),
 	m_io_kbd9(*this, "TERM_LINE9"),
 	m_io_kbda(*this, "TERM_LINEA"),
@@ -14,10 +14,8 @@ qx10_keyboard_device::qx10_keyboard_device(const machine_config& mconfig, const 
 {
 }
 
-WRITE16_MEMBER(qx10_keyboard_device::tx_w)
+void qx10_keyboard_device::write(UINT8 data)
 {
-	if(offset)
-		return;
 	switch(data & 0xe0)
 	{
 		default:
@@ -259,22 +257,29 @@ static INPUT_PORTS_START( qx10_keyboard )
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CLS/LINE")
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED)
 
-/*	PORT_START("TERM_FRAME")
+	PORT_START("TERM_FRAME")
 	PORT_CONFNAME(0x0f, 0x03, "Baud") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_keyboard_device, update_frame, 0)
 	PORT_CONFSETTING( 0x03, "1200")
 	PORT_CONFNAME(0x30, 0x30, "Format") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_keyboard_device, update_frame, 0)
-	PORT_CONFSETTING( 0x30, "8O1")*/
+	PORT_CONFSETTING( 0x30, "8E1")
 INPUT_PORTS_END
-
-void qx10_keyboard_device::device_start()
-{
-	generic_keyboard_device::device_start();
-	memset(m_state, '\0', sizeof(m_state));
-}
 
 ioport_constructor qx10_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(qx10_keyboard);
+}
+
+void qx10_keyboard_device::device_start()
+{
+	serial_keyboard_device::device_start();
+	memset(m_state, '\0', sizeof(m_state));
+	set_rcv_rate(1200);
+}
+
+void qx10_keyboard_device::rcv_complete()
+{
+	receive_register_extract();
+	write(get_received_char());
 }
 
 const device_type QX10_KEYBOARD = &device_creator<qx10_keyboard_device>;

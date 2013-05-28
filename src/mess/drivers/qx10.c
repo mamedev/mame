@@ -6,7 +6,6 @@
 
     Status:
     Driver boots and load CP/M from floppy image. Needs upd7220 for gfx
-    and keyboard hooked to upd7021.
 
     Done:
     - preliminary memory map
@@ -34,7 +33,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/z80sio.h"
+#include "machine/z80dart.h"
 #include "machine/mc146818.h"
 #include "machine/i8255.h"
 #include "machine/am9517a.h"
@@ -77,7 +76,7 @@ public:
 	required_device<pit8253_device> m_pit_2;
 	required_device<pic8259_device> m_pic_m;
 	required_device<pic8259_device> m_pic_s;
-	required_device<z80sio_device> m_scc;
+	required_device<upd7201_device> m_scc;
 	required_device<i8255_device> m_ppi;
 	required_device<am9517a_device> m_dma_1;
 	required_device<am9517a_device> m_dma_2;
@@ -119,7 +118,8 @@ public:
 	DECLARE_WRITE8_MEMBER( vram_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
+	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 
 	UINT8 *m_char_rom;
 
@@ -466,61 +466,44 @@ READ8_MEMBER(qx10_state::mc146818_r)
     Channel B: RS232
 */
 
-#if 0
 static UPD7201_INTERFACE(qx10_upd7201_interface)
 {
-	DEVCB_NULL,                 /* interrupt */
-	{
-		{
-			0,                  /* receive clock */
-			0,                  /* transmit clock */
-			DEVCB_NULL,         /* receive DRQ */
-			DEVCB_NULL,         /* transmit DRQ */
-			DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, tx_r),
-			DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, rx_w),
-			DEVCB_NULL,         /* clear to send */
-			DEVCB_NULL,         /* data carrier detect */
-			DEVCB_NULL,         /* ready to send */
-			DEVCB_NULL,         /* data terminal ready */
-			DEVCB_NULL,         /* wait */
-			DEVCB_NULL          /* sync output */
-		}, {
-			0,                  /* receive clock */
-			0,                  /* transmit clock */
-			DEVCB_NULL,         /* receive DRQ */
-			DEVCB_NULL,         /* transmit DRQ */
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, cts_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dcd_r),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
-			DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
-			DEVCB_NULL,         /* wait */
-			DEVCB_NULL          /* sync output */
-		}
-	}
-};
-#endif
+	0, 0, 0, 0, // channel b clock set by pit2 channel 2
 
-static struct z80sio_interface qx10_upd7201_interface =
+	DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, rx_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_irq)
+};
+
+static struct serial_keyboard_interface qx10_keyboard_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir4_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER16("kbd", qx10_keyboard_device, tx_w),
 	DEVCB_NULL
 };
 
-WRITE8_MEMBER(qx10_state::keyboard_w)
+WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
 {
-	m_scc->receive_data(0, data);
+	m_scc->m1_r(); // always set
+	m_pic_m->ir4_w(state);
 }
 
-static struct keyboard_interface qx10_keyboard_interface =
+WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 {
-	DEVCB_DRIVER_MEMBER(qx10_state, keyboard_w)
-};
+	// clock keyboard too
+	m_scc->rxca_w(state);
+	m_scc->txca_w(state);
+}
 
 /*
     Timer 0
@@ -550,8 +533,8 @@ static const struct pit8253_config qx10_pit8253_2_config =
 {
 	{
 		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
-		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
-		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
+		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_clk) },
+		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("upd7201", z80dart_device, rxtxcb_w) },
 	}
 };
 
@@ -691,7 +674,7 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("pit8253_2", pit8253_r, pit8253_w)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("upd7201", z80sio_device, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("upd7201", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(prom_sel_w)
@@ -900,7 +883,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
 	MCFG_PIC8259_ADD("pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(qx10_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
-	MCFG_Z80SIO_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
+	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
 	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)

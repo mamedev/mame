@@ -571,6 +571,12 @@ void z80dart_channel::device_reset()
 
 void z80dart_channel::tra_callback()
 {
+	if (!(m_wr[5] & WR5_TX_ENABLE))
+	{
+		if (!(m_out_txd_func.isnull()))
+			m_out_txd_func(1);
+		return;
+	}
 	if (m_out_txd_func.isnull())
 		transmit_register_send_bit();
 	else

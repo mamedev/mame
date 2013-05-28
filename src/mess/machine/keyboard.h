@@ -57,6 +57,7 @@ protected:
 	required_ioport m_io_kbd6;
 	required_ioport m_io_kbd7;
 	required_ioport m_io_kbdc;
+
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -82,6 +83,7 @@ class serial_keyboard_device :
 {
 public:
 	serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE_LINE_MEMBER(rx_w) { m_tbit = state; check_for_start(state); }
 	DECLARE_READ_LINE_MEMBER(tx_r);
@@ -102,6 +104,7 @@ private:
 	UINT8 m_curr_key;
 	bool m_key_valid;
 	devcb_resolved_write_line m_out_tx_func;
+	required_ioport m_io_term_frame;
 };
 
 extern const device_type SERIAL_KEYBOARD;

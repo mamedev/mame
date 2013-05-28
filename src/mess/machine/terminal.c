@@ -441,7 +441,7 @@ static INPUT_PORTS_START(serial_terminal)
 	PORT_CONFSETTING( 0x00, "8N1")
 	PORT_CONFSETTING( 0x10, "7E1")
 	PORT_CONFSETTING( 0x20, "8N2")
-	PORT_CONFSETTING( 0x30, "8O1")
+	PORT_CONFSETTING( 0x30, "8E1")
 INPUT_PORTS_END
 
 ioport_constructor serial_terminal_device::device_input_ports() const
@@ -513,6 +513,9 @@ void serial_terminal_device::device_reset()
 		break;
 	case 0x20:
 		set_data_frame(8, 2, SERIAL_PARITY_NONE);
+		break;
+	case 0x30:
+		set_data_frame(8, 1, SERIAL_PARITY_EVEN);
 		break;
 	}
 }
