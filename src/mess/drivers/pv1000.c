@@ -8,12 +8,16 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cartslot.h"
 
+// PV-1000 Sound device
 
 class pv1000_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE8_MEMBER(voice_w);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -21,8 +25,18 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
+
 	// internal state
+	struct
+	{
+		UINT32  count;
+		UINT16  period;
+		UINT8   val;
+	}       m_voice[4];
+	
+	sound_stream    *m_sh_channel;
 };
 
 extern const device_type PV1000;
@@ -30,8 +44,8 @@ extern const device_type PV1000;
 const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock),
+					device_sound_interface(mconfig, *this)
 {
 }
 
@@ -48,23 +62,78 @@ void pv1000_sound_device::device_config_complete()
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-static DEVICE_START( pv1000_sound );
+
 void pv1000_sound_device::device_start()
 {
-	DEVICE_START_NAME( pv1000_sound )(this);
+	m_sh_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 1024, this);
+
+	save_item(NAME(m_voice[0].count));
+	save_item(NAME(m_voice[0].period));
+	save_item(NAME(m_voice[0].val));
+	save_item(NAME(m_voice[1].count));
+	save_item(NAME(m_voice[1].period));
+	save_item(NAME(m_voice[1].val));
+	save_item(NAME(m_voice[2].count));
+	save_item(NAME(m_voice[2].period));
+	save_item(NAME(m_voice[2].val));
+	// are these ever used?
+	save_item(NAME(m_voice[3].count));
+	save_item(NAME(m_voice[3].period));
+	save_item(NAME(m_voice[3].val));
+}
+
+WRITE8_MEMBER(pv1000_sound_device::voice_w)
+{
+	offset &= 0x03;
+	m_voice[offset].period = data;
 }
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
+
+/*
+ plgDavid's audio implementation/analysis notes:
+ 
+ Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
+ then by the value of the 6bit period registers.
+ This creates a surprisingly accurate pitch range.
+ 
+ Note: the register periods are inverted.
+ */
+
 void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t *buffer = outputs[0];
+	
+	while (samples > 0)
+	{
+		*buffer=0;
+		
+		for (int i = 0; i < 3; i++)
+		{
+			UINT32 per = (0x3f - (m_voice[i].period & 0x3f));
+			
+			if (per != 0)	//OFF!
+				*buffer += m_voice[i].val * 8192;
+			
+			m_voice[i].count++;
+			
+			if (m_voice[i].count >= per)
+			{
+				m_voice[i].count = 0;
+				m_voice[i].val = !m_voice[i].val;
+			}
+		}
+		
+		buffer++;
+		samples--;
+	}
 }
 
 
+// PV-1000 System
 
 
 class pv1000_state : public driver_device
@@ -73,6 +142,7 @@ public:
 	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_sound(*this, "pv1000_sound"),
 		m_screen(*this, "screen"),
 		m_p_videoram(*this, "p_videoram")
 		{ }
@@ -82,14 +152,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pv1000_gfxram_w);
 	UINT8   m_io_regs[8];
 	UINT8   m_fd_data;
-	struct
-	{
-		UINT32  count;
-		UINT16  period;
-		UINT8   val;
-	}       m_voice[4];
 
-	sound_stream    *m_sh_channel;
 	emu_timer       *m_irq_on_timer;
 	emu_timer       *m_irq_off_timer;
 	UINT8 m_pcg_bank;
@@ -97,7 +160,11 @@ public:
 	UINT8 m_fd_buffer_flag;
 	UINT8 m_border_col;
 
+	UINT8 * m_gfxram;
+	void pv1000_postload();
+
 	required_device<cpu_device> m_maincpu;
+	required_device<pv1000_sound_device> m_sound;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_start();
@@ -134,13 +201,13 @@ WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 
 WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 {
-	switch ( offset )
+	switch (offset)
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
 		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
-		m_voice[offset].period = data;
+		m_sound->voice_w(space, offset, data);
 	break;
 
 	case 0x03:
@@ -181,13 +248,12 @@ READ8_MEMBER( pv1000_state::pv1000_io_r )
 		break;
 	case 0x05:
 		static const char *const joynames[] = { "IN0", "IN1", "IN2", "IN3" };
-		int i;
 
 		data = 0;
 
-		for(i=0;i<4;i++)
+		for (int i = 0; i < 4; i++)
 		{
-			if(m_io_regs[5] & 1 << i)
+			if (m_io_regs[5] & 1 << i)
 			{
 				data |= ioport(joynames[i])->read();
 				m_fd_data &= ~(1 << i);
@@ -231,10 +297,8 @@ INPUT_PORTS_END
 
 void pv1000_state::palette_init()
 {
-	int i;
-
-	for(i=0;i<8;i++)
-		palette_set_color_rgb( machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	for (int i = 0; i < 8; i++)
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 
@@ -304,54 +368,6 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 }
 
 
-/*
- plgDavid's audio implementation/analysis notes:
-
- Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
- then by the value of the 6bit period registers.
- This creates a surprisingly accurate pitch range.
-
- Note: the register periods are inverted.
- */
-
-static STREAM_UPDATE( pv1000_sound_update )
-{
-	pv1000_state *state = device->machine().driver_data<pv1000_state>();
-	stream_sample_t *buffer = outputs[0];
-
-	while ( samples > 0 )
-	{
-		*buffer=0;
-
-		for (size_t i=0;i<3;i++)
-		{
-			UINT32 per = (0x3F-(state->m_voice[i].period & 0x3f));
-
-			if( per != 0)//OFF!
-				*buffer += state->m_voice[i].val * 8192;
-
-			state->m_voice[i].count++;
-
-			if (state->m_voice[i].count >= per)
-			{
-				state->m_voice[i].count = 0;
-				state->m_voice[i].val = !state->m_voice[i].val;
-			}
-		}
-
-		buffer++;
-		samples--;
-	}
-
-}
-
-
-static DEVICE_START( pv1000_sound )
-{
-	pv1000_state *state = device->machine().driver_data<pv1000_state>();
-	state->m_sh_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
-}
-
 
 /* Interrupt is triggering 16 times during vblank. */
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
@@ -382,10 +398,29 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 }
 
 
+void pv1000_state::pv1000_postload()
+{
+	// restore GFX ram
+	for (int i = 0; i < 0x400; i++)
+		pv1000_gfxram_w(m_maincpu->space(AS_PROGRAM), i, m_gfxram[i]);
+}
+
 void pv1000_state::machine_start()
 {
 	m_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_on_cb),this));
 	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_off_cb),this));
+
+	m_gfxram = memregion("gfxram")->base();
+	save_pointer(NAME(m_gfxram), 0x400);
+	
+	save_item(NAME(m_io_regs));
+	save_item(NAME(m_fd_data));
+	save_item(NAME(m_pcg_bank));
+	save_item(NAME(m_force_pattern));
+	save_item(NAME(m_fd_buffer_flag));
+	save_item(NAME(m_border_col));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(pv1000_state::pv1000_postload), this));
 }
 
 
@@ -393,8 +428,8 @@ void pv1000_state::machine_reset()
 {
 	m_io_regs[5] = 0;
 	m_fd_data = 0;
-	m_irq_on_timer->adjust( m_screen->time_until_pos(195, 0 ) );
-	m_irq_off_timer->adjust( attotime::never );
+	m_irq_on_timer->adjust(m_screen->time_until_pos(195, 0));
+	m_irq_off_timer->adjust(attotime::never);
 }
 
 
