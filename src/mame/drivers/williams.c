@@ -2959,7 +2959,7 @@ GAME( 1983, playball,   0,        playball,            playball, williams_state,
 GAME( 1983, blaster,    0,        blaster,             blaster, williams_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", GAME_SUPPORTS_SAVE )
 GAME( 1983, blastero,   blaster,  blaster,             blaster, williams_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", GAME_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,            blastkit, williams_state, blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", GAME_SUPPORTS_SAVE ) // mono sound
-GAME( 1985, spdball,    0,        spdball,             spdball, williams_state,  spdball,  ROT0,   "Williams", "Speed Ball (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1985, spdball,    0,        spdball,             spdball, williams_state,  spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienar,    0,        alienar,             alienar, williams_state,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", GAME_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  alienar,             alienar, williams_state,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", GAME_SUPPORTS_SAVE )
 GAME( 1987, lottofun,   0,        lottofun,            lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", GAME_SUPPORTS_SAVE )
