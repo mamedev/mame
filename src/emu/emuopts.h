@@ -107,6 +107,7 @@ enum
 #define OPTION_SNAPNAME             "snapname"
 #define OPTION_SNAPSIZE             "snapsize"
 #define OPTION_SNAPVIEW             "snapview"
+#define OPTION_STATENAME            "statename"
 #define OPTION_BURNIN               "burnin"
 
 // core performance options
@@ -266,6 +267,7 @@ public:
 	const char *snap_name() const { return value(OPTION_SNAPNAME); }
 	const char *snap_size() const { return value(OPTION_SNAPSIZE); }
 	const char *snap_view() const { return value(OPTION_SNAPVIEW); }
+	const char *state_name() const { return value(OPTION_STATENAME); }
 	bool burnin() const { return bool_value(OPTION_BURNIN); }
 
 	// core performance options
