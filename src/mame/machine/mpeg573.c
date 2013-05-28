@@ -42,7 +42,7 @@ static MACHINE_CONFIG_FRAGMENT( mpeg573 )
 MACHINE_CONFIG_END
 
 mpeg573_device::mpeg573_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-  : device_t(mconfig, MPEG573, "Konami 573 digital audio board", tag, owner, clock),
+  : device_t(mconfig, MPEG573, "Konami 573 digital audio board", tag, owner, clock, "mpeg573", __FILE__),
 	mas3507d(*this, "mpeg"),
 	digital_id(*this, "digital_id"),
     output_cb(*this)
@@ -60,6 +60,16 @@ void mpeg573_device::device_reset()
 {
 	ram_adr = 0;
 	memset(output_data, 0, sizeof(output_data));
+}
+
+ROM_START( mpeg573 )
+	ROM_REGION( 0x000008, "digital_id", 0 )
+	ROM_LOAD( "digital-id.bin",   0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
+ROM_END
+
+const rom_entry *mpeg573_device::device_rom_region() const
+{
+	return ROM_NAME(mpeg573);
 }
 
 machine_config_constructor mpeg573_device::device_mconfig_additions() const
