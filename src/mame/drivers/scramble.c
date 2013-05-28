@@ -1171,7 +1171,7 @@ static INPUT_PORTS_START( harem ) /* Switch 8 doesn't appear to mapped (just lik
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")   // $6101 - PPI0 Port B
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
