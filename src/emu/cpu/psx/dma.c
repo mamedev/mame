@@ -147,7 +147,7 @@ void psxdma_device::dma_finished( int index )
 				if( n_address == 0xffffff )
 				{
 					dma->n_base = n_address;
-					//HACK: fixes pse bios 2.x & other texture uploading issues, breaks kdeadeye test mode.
+					//HACK: fixes pse bios 2.x & other texture uploading issues, breaks kdeadeye test mode, gtrfrk7m & gtrkfrk8m loading
 					//dma_start_timer( index, 19000 );
 					dma_start_timer( index, 500 );
 					return;
