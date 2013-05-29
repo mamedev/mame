@@ -40,6 +40,7 @@
 #include "machine/wd_fdc.h"
 #include "formats/applix_dsk.h"
 #include "imagedev/cassette.h"
+#include "machine/ctronics.h"
 
 
 
@@ -51,6 +52,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
+		m_centronics(*this, "centronics"),
 		m_fdc(*this, "wd1772"),
 		m_floppy0(*this, "wd1772:0"),
 		m_floppy1(*this, "wd1772:1"),
@@ -133,6 +135,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
+	required_device<centronics_device> m_centronics;
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -223,7 +226,7 @@ WRITE16_MEMBER( applix_state::palette_w )
 {
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
-		{} //centronics
+		m_centronics->write(space, 0, data);
 	else
 		m_palette_latch[offset] = (data >> 8) & 15;
 }
@@ -261,7 +264,7 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 
 READ8_MEMBER( applix_state::applix_pa_r )
 {
-	return m_pa;
+	return (m_pa & 0xfe) | m_centronics->busy_r();
 }
 
 READ8_MEMBER( applix_state::applix_pb_r )
@@ -300,6 +303,8 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 	// low-to-high of PA2 when writing cassette - /PRE on IC49
 	if (!BIT(m_pa, 2) && BIT(data, 2))
 		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+
+	m_centronics->strobe_w(BIT(data, 1));
 
 	m_pa = data;
 }
@@ -877,6 +882,13 @@ static const cassette_interface applix_cassette_interface =
 	NULL
 };
 
+static const centronics_interface applix_centronics_config =
+{
+	DEVCB_DEVICE_LINE_MEMBER("via6522", via6522_device, write_ca1), // ack
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( applix, applix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
@@ -909,6 +921,7 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
