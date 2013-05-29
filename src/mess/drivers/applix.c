@@ -926,8 +926,8 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", applix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", applix_floppies, "35dd", applix_state::floppy_formats)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("applix_c", applix_state, cass_timer, attotime::from_hz(100000))
 MACHINE_CONFIG_END
 
