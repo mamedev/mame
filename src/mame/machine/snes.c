@@ -406,7 +406,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-		return spc_port_out(m_spc700, space, offset & 0x3);
+		return m_spc700->spc_port_out(space, offset & 0x3);
 	}
 
 	// DMA accesses are from 4300 to 437f
@@ -506,7 +506,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	if (offset >= APU00 && offset < WMDATA)
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,space.device().safe_pc());
-		spc_port_in(m_spc700, space, offset & 0x3, data);
+		m_spc700->spc_port_in(space, offset & 0x3, data);
 		space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}

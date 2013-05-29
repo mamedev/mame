@@ -168,19 +168,17 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
-	device_t *device = machine().device("spc700");
-	return spc_ram_r(device, space, offset + 0x100);
+	return m_spc700->spc_ram_r(space, offset + 0x100);
 }
 
 WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 {
-	device_t *device = machine().device("spc700");
-	spc_ram_w(device, space, offset + 0x100, data);
+	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, sfcbox_state )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)   /* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
 ADDRESS_MAP_END
 

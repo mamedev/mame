@@ -143,102 +143,80 @@ static const int ENVCNT[0x20]
 
 
 /* Make reading the ADSR code easier */
-#define SL( v )         (spc700->dsp_regs[((v) << 4) + 6] >> 5)         /* Returns SUSTAIN level        */
-#define SR( v )         (spc700->dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
+#define SL( v )         (m_dsp_regs[((v) << 4) + 6] >> 5)         /* Returns SUSTAIN level        */
+#define SR( v )         (m_dsp_regs[((v) << 4) + 6] & 0x1f)       /* Returns SUSTAIN rate         */
 
 /* Handle endianness */
 #define LEtoME16( x ) LITTLE_ENDIANIZE_INT16(x)
 #define MEtoLE16( x ) LITTLE_ENDIANIZE_INT16(x)
 
 
-static int advance_envelope( device_t *device, int v);
+const device_type SNES = &device_creator<snes_sound_device>;
 
-/***************************************************************************
- TYPE DEFINITIONS
-***************************************************************************/
-
-enum env_state_t32                        /* ADSR state type              */
+snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+						: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock),
+							device_sound_interface(mconfig, *this)
 {
-	ATTACK,
-	DECAY,
-	SUSTAIN,
-	RELEASE
-};
-
-ALLOW_SAVE_TYPE(env_state_t32);
-
-struct voice_state_type                      /* Voice state type             */
-{
-	UINT16          mem_ptr;        /* Sample data memory pointer   */
-	int             end;            /* End or loop after block      */
-	int             envcnt;         /* Counts to envelope update    */
-	env_state_t32   envstate;       /* Current envelope state       */
-	int             envx;           /* Last env height (0-0x7FFF)   */
-	int             filter;         /* Last header's filter         */
-	int             half;           /* Active nybble of BRR         */
-	int             header_cnt;     /* Bytes before new header (0-8)*/
-	int             mixfrac;        /* Fractional part of smpl pstn */
-	int             on_cnt;         /* Is it time to turn on yet?   */
-	int             pitch;          /* Sample pitch (4096->32000Hz) */
-	int             range;          /* Last header's range          */
-	UINT32          samp_id;        /* Sample ID#                   */
-	int             sampptr;        /* Where in sampbuf we are      */
-	INT32           smp1;           /* Last sample (for BRR filter) */
-	INT32           smp2;           /* Second-to-last sample decoded*/
-	short           sampbuf[4];   /* Buffer for Gaussian interp   */
-};
-
-struct src_dir_type                      /* Source directory entry       */
-{
-	UINT16  vptr;           /* Ptr to start of sample data  */
-	UINT16  lptr;           /* Loop pointer in sample data  */
-};
-
-
-struct snes_sound_state
-{
-	UINT8                   *ram;
-	sound_stream            *channel;
-	UINT8                   dsp_regs[256];      /* DSP registers */
-	UINT8                   ipl_region[64];     /* SPC top 64 bytes */
-
-	int                     keyed_on;
-	int                     keys;               /* 8-bits for 8 voices */
-	voice_state_type        voice_state[8];
-
-	/* Noise stuff */
-	int                     noise_cnt;
-	int                     noise_lev;
-
-	/* These are for the FIR echo filter */
-#ifndef NO_ECHO
-	short                   fir_lbuf[8];
-	short                   fir_rbuf[8];
-	int                     fir_ptr;
-	int                     echo_ptr;
-#endif
-
-	/* timers */
-	emu_timer               *timer[3];
-	UINT8                   enabled[3];
-	UINT16                  counter[3];
-
-	/* IO ports */
-	UINT8                   port_in[4];         /* SPC input ports */
-	UINT8                   port_out[4];        /* SPC output ports */
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE snes_sound_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == SNES);
-
-	return (snes_sound_state *)downcast<snes_sound_device *>(device)->token();
 }
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void snes_sound_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void snes_sound_device::device_start()
+{
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000, this);
+	
+	m_ram = auto_alloc_array_clear(machine(), UINT8, SNES_SPCRAM_SIZE);
+	
+	/* put IPL image at the top of RAM */
+	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
+	
+	/* Initialize the timers */
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
+	m_timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
+	m_timer[0]->enable(false);
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
+	m_timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
+	m_timer[1]->enable(false);
+	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
+	m_timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
+	m_timer[2]->enable(false);
+	
+	state_register();
+	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void snes_sound_device::device_reset()
+{
+	/* default to ROM visible */
+	m_ram[0xf1] = 0x80;
+	
+	/* Sort out the ports */
+	for (int i = 0; i < 4; i++)
+	{
+		m_port_in[i] = 0;
+		m_port_out[i] = 0;
+	}
+	
+	dsp_reset();
+}
+
+
 
 /*****************************************************************************
     IMPLEMENTATION
@@ -251,36 +229,33 @@ INLINE snes_sound_state *get_safe_token( device_t *device )
  Reset emulated DSP
 -------------------------------------------------*/
 
-static void dsp_reset( device_t *device )
+void snes_sound_device::dsp_reset()
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-	int   i;
-
 #ifdef DEBUG
 	logerror("dsp_reset\n");
 #endif
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 #ifndef NO_ECHO
-		spc700->fir_lbuf[i] = 0;
-		spc700->fir_rbuf[i] = 0;
+		m_fir_lbuf[i] = 0;
+		m_fir_rbuf[i] = 0;
 #endif
-		spc700->voice_state[i].on_cnt = 0;
+		m_voice_state[i].on_cnt = 0;
 	}
 
 #ifndef NO_ECHO
-	spc700->fir_ptr   = 0;
-	spc700->echo_ptr = 0;
+	m_fir_ptr   = 0;
+	m_echo_ptr = 0;
 #endif
 
-	spc700->keys      = 0;
-	spc700->keyed_on  = 0;
-	spc700->noise_cnt = 0;
-	spc700->noise_lev = 0x4000;
-	spc700->dsp_regs[0x6c] |= 0xe0;
-	spc700->dsp_regs[0x4c] = 0;
-	spc700->dsp_regs[0x5c] = 0;
+	m_keys      = 0;
+	m_keyed_on  = 0;
+	m_noise_cnt = 0;
+	m_noise_lev = 0x4000;
+	m_dsp_regs[0x6c] |= 0xe0;
+	m_dsp_regs[0x4c] = 0;
+	m_dsp_regs[0x5c] = 0;
 }
 
 
@@ -291,9 +266,8 @@ static void dsp_reset( device_t *device )
  to mix audio into
 -------------------------------------------------*/
 
-static void dsp_update( device_t *device, short *sound_ptr )
+void snes_sound_device::dsp_update( short *sound_ptr )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
 	int V;
 
 #ifndef NO_ECHO
@@ -313,11 +287,11 @@ static void dsp_update( device_t *device, short *sound_ptr )
 	voice_state_type * vp;
 	int vr;
 
-	sd = (src_dir_type *) &spc700->ram[(int) spc700->dsp_regs[0x5d] << 8];
+	sd = (src_dir_type *) &m_ram[(int) m_dsp_regs[0x5d] << 8];
 
 	/* Check for reset */
-	if (spc700->dsp_regs[0x6c] & 0x80)
-		dsp_reset(device);
+	if (m_dsp_regs[0x6c] & 0x80)
+		dsp_reset();
 
 	/* Here we check for keys on/off.  Docs say that successive writes to KON/KOF
 	must be separated by at least 2 Ts periods or risk being neglected.
@@ -325,11 +299,11 @@ static void dsp_update( device_t *device, short *sound_ptr )
 	the write.  Only need to do this once however, since the regs haven't
 	changed over the whole period we need to catch up with. */
 #ifdef DBG_KEY
-	spc700->dsp_regs[0x4c] &= mask;
+	m_dsp_regs[0x4c] &= mask;
 #endif
 
 	/* Keying on a voice resets that bit in ENDX */
-	spc700->dsp_regs[0x7c] &= ~spc700->dsp_regs[0x4c];
+	m_dsp_regs[0x7c] &= ~m_dsp_regs[0x4c];
 
 	/* Question: what is the expected behavior when pitch modulation is enabled on
 	voice 0?  Jurassic Park 2 does this.  For now, using outx of zero for first
@@ -337,11 +311,11 @@ static void dsp_update( device_t *device, short *sound_ptr )
 	outx = 0;
 
 	/* Same table for noise and envelope */
-	spc700->noise_cnt -= ENVCNT[spc700->dsp_regs[0x6c] & 0x1f];
-	if (spc700->noise_cnt <= 0)
+	m_noise_cnt -= ENVCNT[m_dsp_regs[0x6c] & 0x1f];
+	if (m_noise_cnt <= 0)
 	{
-		spc700->noise_cnt = CNT_INIT;
-		spc700->noise_lev = (((spc700->noise_lev << 13) ^ (spc700->noise_lev << 14)) & 0x4000) | (spc700->noise_lev >> 1);
+		m_noise_cnt = CNT_INIT;
+		m_noise_lev = (((m_noise_lev << 13) ^ (m_noise_lev << 14)) & 0x4000) | (m_noise_lev >> 1);
 	}
 
 	outl  = 0;
@@ -354,14 +328,14 @@ static void dsp_update( device_t *device, short *sound_ptr )
 
 	for (v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
 	{
-		vp = &spc700->voice_state[v];
+		vp = &m_voice_state[v];
 
 		if (vp->on_cnt && (--vp->on_cnt == 0))
 		{
 			/* Voice was keyed on */
-			spc700->keys       |= m;
-			spc700->keyed_on   |= m;
-			vl          = spc700->dsp_regs[(v << 4) + 4];
+			m_keys       |= m;
+			m_keyed_on   |= m;
+			vl          = m_dsp_regs[(v << 4) + 4];
 			vp->samp_id = *( UINT32 * )&sd[vl];
 			vp->mem_ptr = LEtoME16(sd[vl].vptr);
 
@@ -385,10 +359,10 @@ static void dsp_update( device_t *device, short *sound_ptr )
 			vp->envstate = ATTACK;
 		}
 
-		if (spc700->dsp_regs[0x4c] & m & ~spc700->dsp_regs[0x5c])
+		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
 		{
 			/* Voice doesn't come on if key off is set */
-			spc700->dsp_regs[0x4c] &= ~m;
+			m_dsp_regs[0x4c] &= ~m;
 			vp->on_cnt       = 8;
 
 #ifdef DBG_KEY
@@ -396,7 +370,7 @@ static void dsp_update( device_t *device, short *sound_ptr )
 #endif
 		}
 
-		if (spc700->keys & spc700->dsp_regs[0x5c] & m)
+		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
 			vp->envstate = RELEASE;
@@ -407,20 +381,20 @@ static void dsp_update( device_t *device, short *sound_ptr )
 #endif
 		}
 
-		if (!(spc700->keys & m & mask) || ((envx = advance_envelope(device, v)) < 0))
+		if (!(m_keys & m & mask) || ((envx = advance_envelope(v)) < 0))
 		{
-			spc700->dsp_regs[V + 8] = 0;
-			spc700->dsp_regs[V + 9] = 0;
+			m_dsp_regs[V + 8] = 0;
+			m_dsp_regs[V + 9] = 0;
 			outx             = 0;
 			continue;
 		}
 
-		vp->pitch = LEtoME16(*((UINT16 *)&spc700->dsp_regs[V + 2])) & 0x3fff;
+		vp->pitch = LEtoME16(*((UINT16 *)&m_dsp_regs[V + 2])) & 0x3fff;
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
 		modified OUTX since it was used for last voice. */
-		if (spc700->dsp_regs[0x2d] & m)
+		if (m_dsp_regs[0x2d] & m)
 		{
 #ifdef DBG_PMOD
 			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp->pitch);
@@ -448,10 +422,10 @@ static void dsp_update( device_t *device, short *sound_ptr )
 						/* Docs say ENDX bit is set when decode of block with source
 						end flag set is done.  Does this apply to looping samples?
 						Some info I've seen suggests yes. */
-						spc700->dsp_regs[0x7c] |= m;
+						m_dsp_regs[0x7c] |= m;
 						if (vp->end & 2)
 						{
-							vp->mem_ptr = LEtoME16(sd[spc700->dsp_regs[V + 4]].lptr);
+							vp->mem_ptr = LEtoME16(sd[m_dsp_regs[V + 4]].lptr);
 
 #ifdef DBG_BRR
 							logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
@@ -463,8 +437,8 @@ static void dsp_update( device_t *device, short *sound_ptr )
 							logerror("BRR decode end, voice %d\n", v);
 #endif
 
-							spc700->keys &= ~m;
-							spc700->dsp_regs[V + 8] = 0;
+							m_keys &= ~m;
+							m_dsp_regs[V + 8] = 0;
 							vp->envx         = 0;
 							while (vp->mixfrac >= 0)
 							{
@@ -478,7 +452,7 @@ static void dsp_update( device_t *device, short *sound_ptr )
 					}
 
 					vp->header_cnt = 8;
-					vl = (UINT8)spc700->ram[vp->mem_ptr++];
+					vl = (UINT8)m_ram[vp->mem_ptr++];
 					vp->range  = vl >> 4;
 					vp->end    = vl & 3;
 					vp->filter = (vl & 12) >> 2;
@@ -491,13 +465,13 @@ static void dsp_update( device_t *device, short *sound_ptr )
 				if (vp->half == 0)
 				{
 					vp->half = 1;
-					outx     = ((signed char)spc700->ram[vp->mem_ptr]) >> 4;
+					outx     = ((signed char)m_ram[vp->mem_ptr]) >> 4;
 				}
 				else
 				{
 					vp->half = 0;
 					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (signed char)(spc700->ram[vp->mem_ptr++] << 4);
+					outx   = (signed char)(m_ram[vp->mem_ptr++] << 4);
 					outx >>= 4;
 					vp->header_cnt--;
 				}
@@ -571,12 +545,12 @@ static void dsp_update( device_t *device, short *sound_ptr )
 				vp->sampptr = (vp->sampptr + 1) & 3;
 			}
 
-			if (spc700->dsp_regs[0x3d] & m)
+			if (m_dsp_regs[0x3d] & m)
 			{
 #ifdef DBG_PMOD
 				logerror("Noise enabled, voice %d\n", v);
 #endif
-				outx = (signed short)(spc700->noise_lev << 1);
+				outx = (signed short)(m_noise_lev << 1);
 			}
 			else
 			{
@@ -622,14 +596,14 @@ static void dsp_update( device_t *device, short *sound_ptr )
 		vp->mixfrac += vp->pitch;
 
 		outx = ((outx * envx) >> 11) & ~1;
-		spc700->dsp_regs[V + 9] = outx >> 8;
+		m_dsp_regs[V + 9] = outx >> 8;
 
-		vl = (((int)(signed char)spc700->dsp_regs[V    ]) * outx) >> 7;
-		vr = (((int)(signed char)spc700->dsp_regs[V + 1]) * outx) >> 7;
+		vl = (((int)(signed char)m_dsp_regs[V    ]) * outx) >> 7;
+		vr = (((int)(signed char)m_dsp_regs[V + 1]) * outx) >> 7;
 		outl += vl;
 		outr += vr;
 
-		if (spc700->dsp_regs[0x4d] & m)
+		if (m_dsp_regs[0x4d] & m)
 		{
 #ifndef NO_ECHO
 			echol += vl;
@@ -638,73 +612,73 @@ static void dsp_update( device_t *device, short *sound_ptr )
 		}
 	}
 
-	outl = (outl * (signed char)spc700->dsp_regs[0x0c]) >> 7;
-	outr = (outr * (signed char)spc700->dsp_regs[0x1c]) >> 7;
+	outl = (outl * (signed char)m_dsp_regs[0x0c]) >> 7;
+	outr = (outr * (signed char)m_dsp_regs[0x1c]) >> 7;
 
 #ifndef NO_ECHO
 	/* Perform echo.  First, read mem at current location, and put those samples
 	into the FIR filter queue. */
 #ifdef DBG_ECHO
-	logerror("Echo delay=%dms, feedback=%d%%\n", spc700->dsp_regs[0x7d] * 16,
-		((signed char)spc700->dsp_regs[0x0d] * 100) / 0x7f);
+	logerror("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
+		((signed char)m_dsp_regs[0x0d] * 100) / 0x7f);
 #endif
 
-	echo_base = ((spc700->dsp_regs[0x6d] << 8) + spc700->echo_ptr) & 0xffff;
-	spc700->fir_lbuf[spc700->fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&spc700->ram[echo_base]);
-	spc700->fir_rbuf[spc700->fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&spc700->ram[echo_base + sizeof(short)]);
+	echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
+	m_fir_lbuf[m_fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&m_ram[echo_base]);
+	m_fir_rbuf[m_fir_ptr] = (signed short)LEtoME16(*(UINT16 *)&m_ram[echo_base + sizeof(short)]);
 
 	/* Now, evaluate the FIR filter, and add the results into the final output. */
-	vl = spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x7f];
-	vr = spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x7f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x6f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x6f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x5f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x5f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x4f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x4f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x3f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x3f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x2f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x2f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x1f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x1f];
-	spc700->fir_ptr = (spc700->fir_ptr + 1) & 7;
-	vl += spc700->fir_lbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x0f];
-	vr += spc700->fir_rbuf[spc700->fir_ptr] * (signed char)spc700->dsp_regs[0x0f];
+	vl = m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x7f];
+	vr = m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x7f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x6f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x6f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x5f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x5f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x4f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x4f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x3f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x3f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x2f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x2f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x1f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x1f];
+	m_fir_ptr = (m_fir_ptr + 1) & 7;
+	vl += m_fir_lbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x0f];
+	vr += m_fir_rbuf[m_fir_ptr] * (signed char)m_dsp_regs[0x0f];
 
 #ifdef DBG_ECHO
 	logerror("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
-		spc700->dsp_regs[0x0f],
-		spc700->dsp_regs[0x1f],
-		spc700->dsp_regs[0x2f],
-		spc700->dsp_regs[0x3f],
-		spc700->dsp_regs[0x4f],
-		spc700->dsp_regs[0x5f],
-		spc700->dsp_regs[0x6f],
-		spc700->dsp_regs[0x7f]);
+		m_dsp_regs[0x0f],
+		m_dsp_regs[0x1f],
+		m_dsp_regs[0x2f],
+		m_dsp_regs[0x3f],
+		m_dsp_regs[0x4f],
+		m_dsp_regs[0x5f],
+		m_dsp_regs[0x6f],
+		m_dsp_regs[0x7f]);
 #endif
 
 	/* FIR_ptr is left in the position of the oldest sample, the one that will be replaced next update. */
-	outl += vl * (signed char)spc700->dsp_regs[0x2c] >> 14;
-	outr += vr * (signed char)spc700->dsp_regs[0x3c] >> 14;
+	outl += vl * (signed char)m_dsp_regs[0x2c] >> 14;
+	outr += vr * (signed char)m_dsp_regs[0x3c] >> 14;
 
-	if (!(spc700->dsp_regs[0x6c] & 0x20))
+	if (!(m_dsp_regs[0x6c] & 0x20))
 	{
 		/* Add the echo feedback back into the original result, and save that into memory for use later. */
-		echol += vl * (signed char)spc700->dsp_regs[0x0d] >> 14;
+		echol += vl * (signed char)m_dsp_regs[0x0d] >> 14;
 
 		if (echol > 32767)
 			echol = 32767;
 		else if (echol < -32768)
 			echol = -32768;
 
-		echor += vr * (signed char)spc700->dsp_regs[0x0D ] >> 14;
+		echor += vr * (signed char)m_dsp_regs[0x0D ] >> 14;
 
 		if (echor > 32767)
 			echor = 32767;
@@ -715,21 +689,21 @@ static void dsp_update( device_t *device, short *sound_ptr )
 		logerror("Echo: Writing %04X,%04X at location %04X\n", (UINT16)echol, (UINT16)echor, echo_base);
 #endif
 
-		*(UINT16 *)&spc700->ram[echo_base]                 = MEtoLE16((UINT16)echol);
-		*(UINT16 *)&spc700->ram[echo_base + sizeof(short)] = MEtoLE16((UINT16)echor);
+		*(UINT16 *)&m_ram[echo_base]                 = MEtoLE16((UINT16)echol);
+		*(UINT16 *)&m_ram[echo_base + sizeof(short)] = MEtoLE16((UINT16)echor);
 	}
 
-	spc700->echo_ptr += 2 * sizeof(short);
+	m_echo_ptr += 2 * sizeof(short);
 
-	if (spc700->echo_ptr >= ((spc700->dsp_regs[0x7d] & 0x0f) << 11))
+	if (m_echo_ptr >= ((m_dsp_regs[0x7d] & 0x0f) << 11))
 	{
-		spc700->echo_ptr = 0;
+		m_echo_ptr = 0;
 	}
 #endif                              /* !defined( NO_ECHO ) */
 
 	if (sound_ptr != NULL)
 	{
-		if (spc700->dsp_regs[0x6c] & 0x40)
+		if (m_dsp_regs[0x6c] & 0x40)
 		{
 			/* MUTE */
 #ifdef DEBUG
@@ -772,17 +746,16 @@ static void dsp_update( device_t *device, short *sound_ptr )
  to process envelope for.
 -------------------------------------------------*/
 
-static int advance_envelope( device_t *device, int v )
+int snes_sound_device::advance_envelope( int v )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
 	int envx;
 	int cnt;
 	int adsr1;
 	int t;
 
-	envx = spc700->voice_state[v].envx;
+	envx = m_voice_state[v].envx;
 
-	if (spc700->voice_state[v].envstate == RELEASE)
+	if (m_voice_state[v].envstate == RELEASE)
 	{
 		/* Docs: "When in the state of "key off". the "click" sound is prevented
 		by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
@@ -794,12 +767,12 @@ static int advance_envelope( device_t *device, int v )
 		if (envx <= 0)
 		{
 			envx = 0;
-			spc700->keys &= ~(1 << v);
+			m_keys &= ~(1 << v);
 			return -1;
 		}
 
-		spc700->voice_state[v].envx = envx;
-		spc700->dsp_regs[(v << 4) + 8] = envx >> 8;
+		m_voice_state[v].envx = envx;
+		m_dsp_regs[(v << 4) + 8] = envx >> 8;
 
 #ifdef DBG_ENV
 		logerror("ENV voice %d: envx=%03X, state=RELEASE\n", v, envx);
@@ -808,12 +781,12 @@ static int advance_envelope( device_t *device, int v )
 		return envx;
 	}
 
-	cnt = spc700->voice_state[v].envcnt;
-	adsr1 = spc700->dsp_regs[(v << 4) + 5];
+	cnt = m_voice_state[v].envcnt;
+	adsr1 = m_dsp_regs[(v << 4) + 5];
 
 	if (adsr1 & 0x80)
 	{
-		switch (spc700->voice_state[v].envstate)
+		switch (m_voice_state[v].envstate)
 		{
 		case ATTACK:
 			/* Docs are very confusing.  "AR is multiplied by the fixed value
@@ -843,14 +816,14 @@ static int advance_envelope( device_t *device, int v )
 			if (envx > 0x7ff)
 			{
 				envx = 0x7ff;
-				spc700->voice_state[v].envstate = DECAY;
+				m_voice_state[v].envstate = DECAY;
 			}
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=ATTACK\n", v, envx);
 #endif
 
-			spc700->voice_state[v].envx = envx;
+			m_voice_state[v].envx = envx;
 			break;
 
 		case DECAY:
@@ -863,11 +836,11 @@ static int advance_envelope( device_t *device, int v )
 			{
 				cnt   = CNT_INIT;
 				envx -= ((envx - 1) >> 8) + 1;
-				spc700->voice_state[v].envx = envx;
+				m_voice_state[v].envx = envx;
 			}
 
 			if (envx <= 0x100 * (SL(v) + 1))
-				spc700->voice_state[v].envstate = SUSTAIN;
+				m_voice_state[v].envstate = SUSTAIN;
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
@@ -894,7 +867,7 @@ static int advance_envelope( device_t *device, int v )
 			logerror("ENV voice %d: envx=%03X, state=SUSTAIN\n", v, envx);
 #endif
 
-			spc700->voice_state[v].envx = envx;
+			m_voice_state[v].envx = envx;
 
 			/* Note: no way out of this state except by explicit KEY OFF (or switch to GAIN). */
 			break;
@@ -914,12 +887,12 @@ static int advance_envelope( device_t *device, int v )
 		update the count, unless I see a game that obviously wants the
 		other behavior.  The effect would be pretty subtle, in any case.
 		*/
-		t = spc700->dsp_regs[(v << 4) + 7];
+		t = m_dsp_regs[(v << 4) + 7];
 
 		if (t < 0x80)
 		{
 			envx = t << 4;
-			spc700->voice_state[v].envx = envx;
+			m_voice_state[v].envx = envx;
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=DIRECT\n", v, envx);
@@ -946,7 +919,7 @@ static int advance_envelope( device_t *device, int v )
 				logerror("ENV voice %d: envx=%03X, state=DECREASE\n", v, envx);
 #endif
 
-				spc700->voice_state[v].envx = envx;
+				m_voice_state[v].envx = envx;
 				break;
 
 			case 5:
@@ -963,7 +936,7 @@ static int advance_envelope( device_t *device, int v )
 				logerror("ENV voice %d: envx=%03X, state=EXP\n", v, envx);
 #endif
 
-				spc700->voice_state[v].envx = envx;
+				m_voice_state[v].envx = envx;
 				break;
 
 			case 6:
@@ -982,7 +955,7 @@ static int advance_envelope( device_t *device, int v )
 				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 #endif
 
-				spc700->voice_state[v].envx = envx;
+				m_voice_state[v].envx = envx;
 				break;
 
 			case 7:
@@ -1007,46 +980,29 @@ static int advance_envelope( device_t *device, int v )
 				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 #endif
 
-				spc700->voice_state[v].envx = envx;
+				m_voice_state[v].envx = envx;
 				break;
 			}
 		}
 	}
 
-	spc700->voice_state[v].envcnt = cnt;
-	spc700->dsp_regs[(v << 4) + 8] = envx >> 4;
+	m_voice_state[v].envcnt = cnt;
+	m_dsp_regs[(v << 4) + 8] = envx >> 4;
 
 	return envx;
 }
 
 
-static TIMER_CALLBACK( snes_spc_timer  )
+TIMER_CALLBACK_MEMBER( snes_sound_device::spc_timer )
 {
-	snes_sound_state *spc700 = (snes_sound_state *)ptr;
 	int which = param;
 
-	spc700->counter[which]++;
-	if (spc700->counter[which] >= spc700->ram[0xfa + which] ) // minus =
+	m_counter[which]++;
+	if (m_counter[which] >= m_ram[0xfa + which] ) // minus =
 	{
-		spc700->counter[which] = 0;
-		spc700->ram[0xfd + which]++;
-		spc700->ram[0xfd + which] &= 0x0f;
-	}
-}
-
-static STREAM_UPDATE( snes_sh_update )
-{
-	int i;
-	short mix[2];
-
-	for (i = 0; i < samples; i++)
-	{
-		mix[0] = mix[1] = 0;
-		dsp_update(device, mix);
-
-		/* Update the buffers */
-		outputs[0][i] = (stream_sample_t)mix[0];
-		outputs[1][i] = (stream_sample_t)mix[1];
+		m_counter[which] = 0;
+		m_ram[0xfd + which]++;
+		m_ram[0xfd + which] &= 0x0f;
 	}
 }
 
@@ -1055,12 +1011,10 @@ static STREAM_UPDATE( snes_sh_update )
     for both speakers, used for fade in/out effects
 -------------------------------------------------*/
 
-void spc700_set_volume(device_t *device,int volume)
+void snes_sound_device::set_volume(int volume)
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
-	spc700->channel->set_output_gain(0,volume / 100.0);
-	spc700->channel->set_output_gain(1,volume / 100.0);
+	m_channel->set_output_gain(0, volume / 100.0);
+	m_channel->set_output_gain(1, volume / 100.0);
 }
 
 
@@ -1068,38 +1022,32 @@ void spc700_set_volume(device_t *device,int volume)
          I/O for DSP
  ***************************/
 
-static DECLARE_READ8_DEVICE_HANDLER( snes_dsp_io_r );
-static READ8_DEVICE_HANDLER( snes_dsp_io_r )
+READ8_MEMBER( snes_sound_device::dsp_io_r )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
-	spc700->channel->update();
+	m_channel->update();
 
 #ifdef NO_ENVX
-	if (8 == (spc700->ram[0xf2] & 0x0f))
-		spc700->dsp_regs[spc700->ram[0xf2]] = 0;
+	if (8 == (m_ram[0xf2] & 0x0f))
+		m_dsp_regs[m_ram[0xf2]] = 0;
 #endif
 
 	/* All reads simply return the contents of the addressed register. */
-	return spc700->dsp_regs[offset & 0x7f];
+	return m_dsp_regs[offset & 0x7f];
 }
 
-static DECLARE_WRITE8_DEVICE_HANDLER( snes_dsp_io_w );
-static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
+WRITE8_MEMBER( snes_sound_device::dsp_io_w )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
-	spc700->channel->update();
+	m_channel->update();
 
 	if (offset == 0x7c)
 	{
 		/* Writes to register 0x7c (ENDX) clear ALL bits no matter which value is written */
-		spc700->dsp_regs[offset] = 0;
+		m_dsp_regs[offset] = 0;
 	}
 	else
 	{
 		/* All other writes store the value in the addressed register as expected. */
-		spc700->dsp_regs[offset] = data;
+		m_dsp_regs[offset] = data;
 	}
 }
 
@@ -1107,10 +1055,8 @@ static WRITE8_DEVICE_HANDLER( snes_dsp_io_w )
        I/O for SPC700
  ***************************/
 
-READ8_DEVICE_HANDLER( spc_io_r )
+READ8_MEMBER( snes_sound_device::spc_io_r )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
 	switch (offset) /* Offset is from 0x00f0 */
 	{
 		case 0x0: //FIXME: Super Bomberman PBW reads from there, is it really write-only?
@@ -1118,18 +1064,18 @@ READ8_DEVICE_HANDLER( spc_io_r )
 		case 0x1:
 			return 0; //Super Kick Boxing reads port 1 and wants it to be zero.
 		case 0x2:       /* Register address */
-			return spc700->ram[0xf2];
+			return m_ram[0xf2];
 		case 0x3:       /* Register data */
-			return snes_dsp_io_r(device, space, spc700->ram[0xf2]);
+			return dsp_io_r(space, m_ram[0xf2]);
 		case 0x4:       /* Port 0 */
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// mame_printf_debug("SPC: rd %02x @ %d, PC=%x\n", spc700->port_in[offset - 4], offset - 4, space.device().safe_pc());
-			return spc700->port_in[offset - 4];
+			// mame_printf_debug("SPC: rd %02x @ %d, PC=%x\n", m_port_in[offset - 4], offset - 4, space.device().safe_pc());
+			return m_port_in[offset - 4];
 		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
 		case 0x9:
-			return spc700->ram[0xf0 + offset];
+			return m_ram[0xf0 + offset];
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */
 		case 0xc:       /* Timer 2 */
@@ -1138,8 +1084,8 @@ READ8_DEVICE_HANDLER( spc_io_r )
 		case 0xe:       /* Counter 1 */
 		case 0xf:       /* Counter 2 */
 		{
-			UINT8 value = spc700->ram[0xf0 + offset] & 0x0f;
-			spc700->ram[0xf0 + offset] = 0;
+			UINT8 value = m_ram[0xf0 + offset] & 0x0f;
+			m_ram[0xf0 + offset] = 0;
 			return value;
 		}
 	}
@@ -1147,39 +1093,36 @@ READ8_DEVICE_HANDLER( spc_io_r )
 	return 0;
 }
 
-WRITE8_DEVICE_HANDLER( spc_io_w )
+WRITE8_MEMBER( snes_sound_device::spc_io_w )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-	int i;
-
 	switch (offset) /* Offset is from 0x00f0 */
 	{
 		case 0x0:
 			printf("Warning: write to SOUND TEST register with data %02x!\n", data);
 			break;
 		case 0x1:       /* Control */
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				if (BIT(data, i) && !spc700->enabled[i])
+				if (BIT(data, i) && !m_enabled[i])
 				{
-					spc700->counter[i] = 0;
-					spc700->ram[0xfd + i] = 0;
+					m_counter[i] = 0;
+					m_ram[0xfd + i] = 0;
 				}
 
-				spc700->enabled[i] = BIT(data, i);
-				spc700->timer[i]->enable(spc700->enabled[i]);
+				m_enabled[i] = BIT(data, i);
+				m_timer[i]->enable(m_enabled[i]);
 			}
 
 			if (BIT(data, 4))
 			{
-				spc700->port_in[0] = 0;
-				spc700->port_in[1] = 0;
+				m_port_in[0] = 0;
+				m_port_in[1] = 0;
 			}
 
 			if (BIT(data, 5))
 			{
-				spc700->port_in[2] = 0;
-				spc700->port_in[3] = 0;
+				m_port_in[2] = 0;
+				m_port_in[3] = 0;
 			}
 
 			/* bit 7 = IPL ROM enable */
@@ -1187,15 +1130,15 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 		case 0x2:       /* Register address */
 			break;
 		case 0x3:       /* Register data - 0x80-0xff is a read-only mirror of 0x00-0x7f */
-			if (!(spc700->ram[0xf2] & 0x80))
-				snes_dsp_io_w(device, space, spc700->ram[0xf2] & 0x7f, data);
+			if (!(m_ram[0xf2] & 0x80))
+				dsp_io_w(space, m_ram[0xf2] & 0x7f, data);
 			break;
 		case 0x4:       /* Port 0 */
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
 			// mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, space.device().safe_pc());
-			spc700->port_out[offset - 4] = data;
+			m_port_out[offset - 4] = data;
 			space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
@@ -1210,191 +1153,86 @@ WRITE8_DEVICE_HANDLER( spc_io_w )
 			return;
 	}
 
-	spc700->ram[0xf0 + offset] = data;
+	m_ram[0xf0 + offset] = data;
 }
 
-READ8_DEVICE_HANDLER( spc_ram_r )
+READ8_MEMBER( snes_sound_device::spc_ram_r )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
 	/* IPL ROM enabled */
-	if(offset >= 0xffc0 && spc700->ram[0xf1] & 0x80)
-		return spc700->ipl_region[offset & 0x3f];
+	if (offset >= 0xffc0 && m_ram[0xf1] & 0x80)
+		return m_ipl_region[offset & 0x3f];
 
-	return spc700->ram[offset];
+	return m_ram[offset];
 }
 
-WRITE8_DEVICE_HANDLER( spc_ram_w )
+WRITE8_MEMBER( snes_sound_device::spc_ram_w )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
-	spc700->ram[offset] = data;
+	m_ram[offset] = data;
 }
 
 
-READ8_DEVICE_HANDLER( spc_port_out )
+READ8_MEMBER( snes_sound_device::spc_port_out )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
 	assert(offset < 4);
 
-	return spc700->port_out[offset];
+	return m_port_out[offset];
 }
 
-WRITE8_DEVICE_HANDLER( spc_port_in )
+WRITE8_MEMBER( snes_sound_device::spc_port_in )
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-
 	assert(offset < 4);
 
-	spc700->port_in[offset] = data;
+	m_port_in[offset] = data;
 }
 
-UINT8 *spc_get_ram( device_t *device )
-{
-	snes_sound_state *spc700 = get_safe_token(device);
-
-	return spc700->ram;
-}
 
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
-static void state_register( device_t *device )
+void snes_sound_device::state_register()
 {
-	snes_sound_state *spc700 = get_safe_token(device);
-	int v;
+	save_item(NAME(m_dsp_regs));
+	save_item(NAME(m_ipl_region));
 
-	device->save_item(NAME(spc700->dsp_regs));
-	device->save_item(NAME(spc700->ipl_region));
+	save_item(NAME(m_keyed_on));
+	save_item(NAME(m_keys));
 
-	device->save_item(NAME(spc700->keyed_on));
-	device->save_item(NAME(spc700->keys));
-
-	device->save_item(NAME(spc700->noise_cnt));
-	device->save_item(NAME(spc700->noise_lev));
+	save_item(NAME(m_noise_cnt));
+	save_item(NAME(m_noise_lev));
 
 #ifndef NO_ECHO
-	device->save_item(NAME(spc700->fir_lbuf));
-	device->save_item(NAME(spc700->fir_rbuf));
-	device->save_item(NAME(spc700->fir_ptr));
-	device->save_item(NAME(spc700->echo_ptr));
+	save_item(NAME(m_fir_lbuf));
+	save_item(NAME(m_fir_rbuf));
+	save_item(NAME(m_fir_ptr));
+	save_item(NAME(m_echo_ptr));
 #endif
 
-	device->save_item(NAME(spc700->enabled));
-	device->save_item(NAME(spc700->counter));
-	device->save_item(NAME(spc700->port_in));
-	device->save_item(NAME(spc700->port_out));
+	save_item(NAME(m_enabled));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_port_in));
+	save_item(NAME(m_port_out));
 
-	for (v = 0; v < 8; v++)
+	for (int v = 0; v < 8; v++)
 	{
-		device->save_item(NAME(spc700->voice_state[v].mem_ptr), v);
-		device->save_item(NAME(spc700->voice_state[v].end), v);
-		device->save_item(NAME(spc700->voice_state[v].envcnt), v);
-		device->save_item(NAME(spc700->voice_state[v].envstate), v);
-		device->save_item(NAME(spc700->voice_state[v].envx), v);
-		device->save_item(NAME(spc700->voice_state[v].filter), v);
-		device->save_item(NAME(spc700->voice_state[v].half), v);
-		device->save_item(NAME(spc700->voice_state[v].header_cnt), v);
-		device->save_item(NAME(spc700->voice_state[v].mixfrac), v);
-		device->save_item(NAME(spc700->voice_state[v].on_cnt), v);
-		device->save_item(NAME(spc700->voice_state[v].pitch), v);
-		device->save_item(NAME(spc700->voice_state[v].range), v);
-		device->save_item(NAME(spc700->voice_state[v].samp_id), v);
-		device->save_item(NAME(spc700->voice_state[v].sampptr), v);
-		device->save_item(NAME(spc700->voice_state[v].smp1), v);
-		device->save_item(NAME(spc700->voice_state[v].smp2), v);
-		device->save_item(NAME(spc700->voice_state[v].sampbuf), v);
+		save_item(NAME(m_voice_state[v].mem_ptr), v);
+		save_item(NAME(m_voice_state[v].end), v);
+		save_item(NAME(m_voice_state[v].envcnt), v);
+		save_item(NAME(m_voice_state[v].envstate), v);
+		save_item(NAME(m_voice_state[v].envx), v);
+		save_item(NAME(m_voice_state[v].filter), v);
+		save_item(NAME(m_voice_state[v].half), v);
+		save_item(NAME(m_voice_state[v].header_cnt), v);
+		save_item(NAME(m_voice_state[v].mixfrac), v);
+		save_item(NAME(m_voice_state[v].on_cnt), v);
+		save_item(NAME(m_voice_state[v].pitch), v);
+		save_item(NAME(m_voice_state[v].range), v);
+		save_item(NAME(m_voice_state[v].samp_id), v);
+		save_item(NAME(m_voice_state[v].sampptr), v);
+		save_item(NAME(m_voice_state[v].smp1), v);
+		save_item(NAME(m_voice_state[v].smp2), v);
+		save_item(NAME(m_voice_state[v].sampbuf), v);
 	}
-}
-
-static DEVICE_START( snes_sound )
-{
-	snes_sound_state *spc700 = get_safe_token(device);
-	running_machine &machine = device->machine();
-
-	spc700->channel = device->machine().sound().stream_alloc(*device, 0, 2, 32000, 0, snes_sh_update);
-
-	spc700->ram = auto_alloc_array_clear(device->machine(), UINT8, SNES_SPCRAM_SIZE);
-
-	/* put IPL image at the top of RAM */
-	memcpy(spc700->ipl_region, machine.root_device().memregion("sound_ipl")->base(), 64);
-
-	/* Initialize the timers */
-	spc700->timer[0] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
-	spc700->timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
-	spc700->timer[0]->enable(false);
-	spc700->timer[1] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
-	spc700->timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
-	spc700->timer[1]->enable(false);
-	spc700->timer[2] = machine.scheduler().timer_alloc(FUNC(snes_spc_timer), spc700);
-	spc700->timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
-	spc700->timer[2]->enable(false);
-
-	state_register(device);
-	device->save_pointer(NAME(spc700->ram), SNES_SPCRAM_SIZE);
-}
-
-void spc700_reset(device_t *device)
-{
-	snes_sound_state *spc700 = get_safe_token(device);
-	int ii;
-
-	/* default to ROM visible */
-	spc700->ram[0xf1] = 0x80;
-
-	/* Sort out the ports */
-	for (ii = 0; ii < 4; ii++)
-	{
-		spc700->port_in[ii] = 0;
-		spc700->port_out[ii] = 0;
-	}
-
-	dsp_reset(device);
-}
-
-
-static DEVICE_RESET( snes_sound )
-{
-	spc700_reset(device);
-}
-
-const device_type SNES = &device_creator<snes_sound_device>;
-
-snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(snes_sound_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snes_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void snes_sound_device::device_start()
-{
-	DEVICE_START_NAME( snes_sound )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void snes_sound_device::device_reset()
-{
-	DEVICE_RESET_NAME( snes_sound )(this);
 }
 
 //-------------------------------------------------
@@ -1403,6 +1241,15 @@ void snes_sound_device::device_reset()
 
 void snes_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	short mix[2];
+	
+	for (int i = 0; i < samples; i++)
+	{
+		mix[0] = mix[1] = 0;
+		dsp_update(mix);
+		
+		/* Update the buffers */
+		outputs[0][i] = (stream_sample_t)mix[0];
+		outputs[1][i] = (stream_sample_t)mix[1];
+	}
 }
