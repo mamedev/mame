@@ -12,6 +12,7 @@
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -394,14 +395,20 @@ class rmnimbus_state : public driver_device
 public:
 	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_scsibus(*this, SCSIBUS_TAG ":host"),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_ay8910(*this, AY8910_TAG)
+		m_msm(*this, MSM5205_TAG),
+		m_ay8910(*this, AY8910_TAG),
+		m_scsibus(*this, SCSIBUS_TAG ":host"),
+		m_ram(*this, RAM_TAG)
 	{
 	}
 
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	required_device<ay8910_device> m_ay8910;
 	required_device<scsicb_device> m_scsibus;
+	required_device<ram_device> m_ram;
+
 	UINT32 m_debug_machine;
 	i186_state m_i186;
 	keyboard_t m_keyboard;
@@ -473,9 +480,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<ay8910_device> m_ay8910;
 	UINT8 get_pixel(UINT16 x, UINT16 y);
 	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
 	UINT16 read_pixel_data(UINT16 x, UINT16 y);

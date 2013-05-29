@@ -68,7 +68,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/scsibus.h"
-#include "sound/msm5205.h"
 
 #include "includes/rmnimbus.h"
 
@@ -2671,7 +2670,6 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 {
 	int pc=space.device().safe_pc();
-	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
 
 	if(LOG_IOU)
 		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
@@ -2679,7 +2677,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 	if(offset==0)
 	{
 		m_iou_reg092=data;
-		msm5205->reset_w((data & MSM5205_INT_ENABLE) ? 0 : 1);
+		m_msm->reset_w((data & MSM5205_INT_ENABLE) ? 0 : 1);
 	}
 }
 
@@ -2704,14 +2702,11 @@ void rmnimbus_state::iou_reset()
 
 void rmnimbus_state::rmni_sound_reset()
 {
-	//device_t *ay8910 = machine().device(AY8910_TAG);
-	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
-
-	//ay8910->reset();
-	msm5205->reset_w(1);
+	//m_ay8910->reset();
+	m_msm->reset_w(1);
 
 	m_last_playmode = MSM5205_S48_4B;
-	msm5205->playmode_w(m_last_playmode);
+	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
 }
@@ -2743,9 +2738,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_w)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 {
-	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
-
-	msm5205->data_w(data);
+	m_msm->data_w(data);
 
 	// Mouse code needs a copy of this.
 	m_ay8910_a=data;
@@ -2753,12 +2746,10 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 {
-	msm5205_device *msm5205 = machine().device<msm5205_device>(MSM5205_TAG);
-
 	if ((data & 0x07) != m_last_playmode)
 	{
 		m_last_playmode = (data & 0x07);
-		msm5205->playmode_w(m_last_playmode);
+		m_msm->playmode_w(m_last_playmode);
 	}
 }
 
