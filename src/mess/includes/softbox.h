@@ -36,15 +36,17 @@ public:
 	required_device<ieee488_device> m_ieee;
 
 	DECLARE_WRITE8_MEMBER( dbrg_w );
-	DECLARE_READ8_MEMBER( pia0_pa_r );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
-	DECLARE_READ8_MEMBER( pia1_pc_r );
-	DECLARE_WRITE8_MEMBER( pia1_pc_w );
+
+	DECLARE_READ8_MEMBER( ppi0_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
+
+	DECLARE_READ8_MEMBER( ppi1_pa_r );
+	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
+	DECLARE_READ8_MEMBER( ppi1_pc_r );
+	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( ft_w );
-	DECLARE_WRITE8_MEMBER( dummy_w );
 
 	enum
 	{

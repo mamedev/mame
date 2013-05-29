@@ -465,10 +465,12 @@ void c8280_device::ieee488_atn(int state)
 
 void c8280_device::ieee488_ifc(int state)
 {
-	if (!state)
+	if (!m_ifc && state)
 	{
 		device_reset();
 	}
+
+	m_ifc = state;
 }
 
 READ8_MEMBER( c8280_device::fk5_r )

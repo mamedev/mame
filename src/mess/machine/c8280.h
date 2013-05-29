@@ -75,6 +75,7 @@ private:
 	int m_rfdo;                         // not ready for data output
 	int m_daco;                         // not data accepted output
 	int m_atna;                         // attention acknowledge
+	int m_ifc;
 
 	UINT8 m_fk5;
 };

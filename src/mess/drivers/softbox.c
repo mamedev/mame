@@ -104,22 +104,22 @@ static const i8251_interface usart_intf =
 //  I8255A_INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::pia0_pa_r )
+READ8_MEMBER( softbox_state::ppi0_pa_r )
 {
 	return m_ieee->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( softbox_state::pia0_pb_w )
+WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 {
 	m_ieee->dio_w(data ^ 0xff);
 }
 
 static I8255A_INTERFACE( ppi0_intf )
 {
-	DEVCB_DRIVER_MEMBER(softbox_state, pia0_pa_r),
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi0_pa_r),
 	DEVCB_NULL, // Port A write
 	DEVCB_NULL, // Port B read
-	DEVCB_DRIVER_MEMBER(softbox_state, pia0_pb_w),
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi0_pb_w),
 	DEVCB_INPUT_PORT("SW1"), // Port C read
 	DEVCB_NULL  // Port C write
 };
@@ -129,7 +129,7 @@ static I8255A_INTERFACE( ppi0_intf )
 //  I8255A_INTERFACE( ppi1_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::pia1_pa_r )
+READ8_MEMBER( softbox_state::ppi1_pa_r )
 {
 	/*
 
@@ -160,7 +160,7 @@ READ8_MEMBER( softbox_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::pia1_pb_w )
+WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 {
 	/*
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER( softbox_state::pia1_pb_w )
 	m_ieee->ifc_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( softbox_state::pia1_pc_r )
+READ8_MEMBER( softbox_state::ppi1_pc_r )
 {
 	/*
 
@@ -207,7 +207,7 @@ READ8_MEMBER( softbox_state::pia1_pc_r )
 	return 0;
 }
 
-WRITE8_MEMBER( softbox_state::pia1_pc_w )
+WRITE8_MEMBER( softbox_state::ppi1_pc_w )
 {
 	/*
 
@@ -231,12 +231,12 @@ WRITE8_MEMBER( softbox_state::pia1_pc_w )
 
 static I8255A_INTERFACE( ppi1_intf )
 {
-	DEVCB_DRIVER_MEMBER(softbox_state, pia1_pa_r),
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pa_r),
 	DEVCB_NULL, // Port A write
 	DEVCB_NULL, // Port B read
-	DEVCB_DRIVER_MEMBER(softbox_state, pia1_pb_w),
-	DEVCB_DRIVER_MEMBER(softbox_state, pia1_pc_r),
-	DEVCB_DRIVER_MEMBER(softbox_state, pia1_pc_w)
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pb_w),
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pc_r),
+	DEVCB_DRIVER_MEMBER(softbox_state, ppi1_pc_w)
 };
 
 
@@ -338,4 +338,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1981, softbox,    0,      0,      softbox,        softbox, driver_device, 0,      "Small Systems Engineering",  "SoftBox",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1981, softbox,    0,      0,      softbox,        softbox, driver_device, 0,      "Small Systems Engineering",  "SoftBox",  GAME_NO_SOUND_HW )

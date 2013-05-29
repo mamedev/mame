@@ -1306,7 +1306,7 @@ inline void c2040_device::update_gcr_data()
 
 
 //-------------------------------------------------
-//  update_ieee_signals -
+//  read_current_track -
 //-------------------------------------------------
 
 inline void c2040_device::read_current_track(int unit)
@@ -1703,10 +1703,12 @@ void c2040_device::ieee488_atn(int state)
 
 void c2040_device::ieee488_ifc(int state)
 {
-	if (!state)
+	if (!m_ifc && state)
 	{
 		device_reset();
 	}
+
+	m_ifc = state;
 }
 
 

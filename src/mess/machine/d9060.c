@@ -569,8 +569,10 @@ void base_d9060_device::ieee488_atn(int state)
 
 void base_d9060_device::ieee488_ifc(int state)
 {
-	if (!state)
+	if (!m_ifc && state)
 	{
 		device_reset();
 	}
+
+	m_ifc = state;
 }

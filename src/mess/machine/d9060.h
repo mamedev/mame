@@ -95,6 +95,7 @@ private:
 	int m_rfdo;                         // not ready for data output
 	int m_daco;                         // not data accepted output
 	int m_atna;                         // attention acknowledge
+	int m_ifc;
 
 	// SASI bus
 	int m_enable;

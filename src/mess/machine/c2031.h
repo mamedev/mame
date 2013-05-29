@@ -74,6 +74,7 @@ protected:
 	int m_nrfd_out;             // not ready for data
 	int m_ndac_out;             // not data accepted
 	int m_atna;                 // attention acknowledge
+	int m_ifc;
 
 	// interrupts
 	int m_via0_irq;             // VIA #0 interrupt request
