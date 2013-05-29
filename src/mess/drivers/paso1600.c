@@ -20,13 +20,12 @@ class paso1600_state : public driver_device
 public:
 	paso1600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pic(*this, "pic8259"),
-	m_dma(*this, "8237dma"),
-	m_crtc(*this, "crtc")
-	,
-		m_p_vram(*this, "p_vram"),
-		m_p_gvram(*this, "p_gvram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_pic(*this, "pic8259"),
+		m_dma(*this, "8237dma"),
+		m_crtc(*this, "crtc"),
+		m_p_vram(*this, "vram"),
+		m_p_gvram(*this, "gvram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
@@ -36,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
 	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
 	DECLARE_WRITE8_MEMBER(paso1600_6845_data_w);
+	DECLARE_READ8_MEMBER(paso1600_6845_data_r);
+	DECLARE_READ8_MEMBER(paso1600_6845_status_r);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
@@ -139,7 +140,7 @@ UINT32 paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_ind1
 					if(yi & 0x10)
 						pen = -1;
 
-					//if(pen != -1)
+					if(pen != -1)
 						if(y*19 < 475 && x*8+xi < 640) /* TODO: safety check */
 							bitmap.pix16(y*19+yi, x*8+xi) = machine().pens[pen];
 				}
@@ -188,9 +189,14 @@ WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
 	m_crtc->register_w(space, offset, data);
 }
 
-READ8_MEMBER( paso1600_state::test_r )
+READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
 {
-	return 0;
+	return m_crtc->register_r(space, offset);
+}
+
+READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
+{
+	return m_crtc->status_r(space, offset);
 }
 
 READ8_MEMBER( paso1600_state::key_r )
@@ -221,9 +227,9 @@ READ16_MEMBER( paso1600_state::test_hi_r )
 static ADDRESS_MAP_START(paso1600_map, AS_PROGRAM, 16, paso1600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("p_vram") // tvram
+	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("vram") // tvram
 	AM_RANGE(0xbfff0,0xbffff) AM_READWRITE8(paso1600_pcg_r,paso1600_pcg_w,0xffff)
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("p_gvram")// gvram
+	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("gvram")// gvram
 	AM_RANGE(0xe0000,0xeffff) AM_ROM AM_REGION("kanji",0)// kanji rom, banked via port 0x93
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -235,9 +241,10 @@ static ADDRESS_MAP_START(paso1600_io, AS_IO, 16, paso1600_state)
 	AM_RANGE(0x001a,0x001b) AM_READ(test_hi_r) // causes RAM error otherwise?
 	AM_RANGE(0x0030,0x0033) AM_READWRITE8(key_r,key_w,0xffff) //UART keyboard?
 	AM_RANGE(0x0048,0x0049) AM_READ(test_hi_r)
-	AM_RANGE(0x0090,0x0091) AM_READWRITE8(test_r,paso1600_6845_address_w,0x00ff)
-	AM_RANGE(0x0090,0x0091) AM_READWRITE8(test_r,paso1600_6845_data_w,0xff00)
+	AM_RANGE(0x0090,0x0091) AM_READWRITE8(paso1600_6845_status_r,paso1600_6845_address_w,0x00ff)
+	AM_RANGE(0x0090,0x0091) AM_READWRITE8(paso1600_6845_data_r,paso1600_6845_data_w,0xff00)
 //  AM_RANGE(0x00d8,0x00df) //fdc, unknown type
+// other undefined ports: 18, 1C, 92
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -256,7 +263,8 @@ static const gfx_layout paso1600_charlayout =
 };
 
 static GFXDECODE_START( paso1600 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, paso1600_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "pcg", 0x0000, paso1600_charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, paso1600_charlayout, 0, 4 )
 GFXDECODE_END
 
 
