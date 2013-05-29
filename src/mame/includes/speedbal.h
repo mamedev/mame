@@ -6,7 +6,11 @@ public:
 		m_background_videoram(*this, "bg_videoram"),
 		m_foreground_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{
+		m_bitcount = 0;
+		m_writeval = 0;
+	}
 
 	required_shared_ptr<UINT8> m_background_videoram;
 	required_shared_ptr<UINT8> m_foreground_videoram;
@@ -16,6 +20,17 @@ public:
 	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);
 	DECLARE_WRITE8_MEMBER(speedbal_foreground_videoram_w);
 	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
+
+	DECLARE_WRITE8_MEMBER(speedbal_maincpu_50_w);
+	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_40_w);
+	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_80_w);
+	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_82_w);
+	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_c1_w);
+
+	void write_data_bit(UINT8 bit);
+	int m_bitcount;
+	UINT8 m_writeval;
+
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	virtual void video_start();

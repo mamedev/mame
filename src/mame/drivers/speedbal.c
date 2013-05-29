@@ -1,5 +1,16 @@
 /***************************************************************************
 
+ Speed Ball
+
+ this was available in a number of cabinet types including 'Super Pin-Ball'
+ which mimicked a Pinball table in design, complete with 7-seg scoreboard.
+
+ not dumped yet: Music Ball (also likely encrypted, has epoxy block)
+
+ todo:
+ hookup 7-segs used by Super Pinball cabinet type
+ verify clock speeds etc.
+
 Speed Ball map
 
 driver by Joseba Epalza
@@ -55,6 +66,7 @@ c1  ??
 #include "sound/3812intf.h"
 #include "includes/speedbal.h"
 #include "machine/nvram.h"
+#include "speedbal.lh"
 
 WRITE8_MEMBER(speedbal_state::speedbal_coincounter_w)
 {
@@ -74,6 +86,11 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(speedbal_state::speedbal_maincpu_50_w)
+{
+	logerror("%s: speedbal_maincpu_50_w %02x\n", this->machine().describe_context(), data);
+}
+
 static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")
@@ -81,7 +98,7 @@ static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("P2")
 	AM_RANGE(0x40, 0x40) AM_WRITE(speedbal_coincounter_w)
-	AM_RANGE(0x50, 0x50) AM_WRITENOP
+	AM_RANGE(0x50, 0x50) AM_WRITE(speedbal_maincpu_50_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
@@ -91,13 +108,69 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+/* this is wrong.. needs more investigation / tracing of the code */
+
+WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_40_w)
+{
+	// some kind of multiplexer for the 7-segs?
+	m_bitcount = 0;
+	m_writeval = 0;
+
+
+	//logerror("%s: speedbal_sndcpu_40_w %02x\n", this->machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_80_w)
+{
+	//logerror("%s: speedbal_sndcpu_80_w %02x\n", this->machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_82_w)
+{
+	//logerror("%s: speedbal_sndcpu_82_w %02x\n", this->machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_c1_w)
+{
+	// I think it writes the data for the 7-segs here as a sequence of 7-bit data packed into 28 byte blocks?
+//	logerror("%s: speedbal_sndcpu_c1_w %02x\n", this->machine().describe_context(), data);
+	write_data_bit(data&0x80);
+	write_data_bit(data&0x40);
+	write_data_bit(data&0x20);
+	write_data_bit(data&0x10);
+	write_data_bit(data&0x08);
+	write_data_bit(data&0x04);
+	write_data_bit(data&0x02);
+	write_data_bit(data&0x01);
+}
+
+void speedbal_state::write_data_bit(UINT8 bit)
+{
+	int bitdat;
+
+	if (bit) bitdat = 1;
+	else bitdat = 0;
+	
+	m_writeval = (m_writeval << 1) | bitdat;
+
+	m_bitcount++;
+
+	if (m_bitcount==7)
+	{
+		// not right..
+		//logerror("m_writeval was %02x\n", m_writeval);
+		m_bitcount = 0;
+		m_writeval = 0;
+	}
+}
+
 static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, speedbal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP
-	AM_RANGE(0x80, 0x80) AM_WRITENOP
-	AM_RANGE(0x82, 0x82) AM_WRITENOP
-	AM_RANGE(0xc1, 0xc1) AM_WRITENOP
+	AM_RANGE(0x40, 0x40) AM_WRITE(speedbal_sndcpu_40_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(speedbal_sndcpu_80_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(speedbal_sndcpu_82_w)
+	AM_RANGE(0xc1, 0xc1) AM_WRITE(speedbal_sndcpu_c1_w)
 ADDRESS_MAP_END
 
 
@@ -133,7 +206,7 @@ static INPUT_PORTS_START( speedbal )
 	PORT_DIPSETTING(    0x04, "100000 300000" )
 	PORT_DIPSETTING(    0x01, "200000 1M" )
 	PORT_DIPSETTING(    0x05, "200000" )
-/*  PORT_DIPSETTING(    0x02, "200000" ) */
+	PORT_DIPSETTING(    0x02, "200000 (duplicate)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -175,9 +248,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
-	1024,   /* 1024 characters */
+	RGN_FRAC(1,2),   /* 1024 characters */
 	4,      /* actually 2 bits per pixel - two of the planes are empty */
-	{ 1024*16*8+4, 1024*16*8+0, 4, 0 },
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
 	{ 8+3, 8+2, 8+1, 8+0, 3, 2, 1, 0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },   /* characters are rotated 90 degrees */
 	16*8       /* every char takes 16 bytes */
@@ -186,7 +259,7 @@ static const gfx_layout charlayout =
 static const gfx_layout tilelayout =
 {
 	16,16,  /* 16*16 tiles */
-	1024,   /* 1024 tiles */
+	RGN_FRAC(1,1),   /* 1024 tiles */
 	4,      /* 4 bits per pixel */
 	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one nibble */
 	{ 0*8+0, 0*8+1, 7*8+0, 7*8+1, 6*8+0, 6*8+1, 5*8+0, 5*8+1,
@@ -199,7 +272,7 @@ static const gfx_layout tilelayout =
 static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
-	512,    /* 512 sprites */
+	RGN_FRAC(1,1),    /* 512 sprites */
 	4,      /* 4 bits per pixel */
 	{ 0, 2, 4, 6 }, /* the bitplanes are packed in one nibble */
 	{ 7*8+1, 7*8+0, 6*8+1, 6*8+0, 5*8+1, 5*8+0, 4*8+1, 4*8+0,
@@ -282,4 +355,4 @@ ROM_START( speedbal )
 ROM_END
 
 
-GAME( 1987, speedbal, 0, speedbal, speedbal, driver_device, 0, ROT270, "Tecfri", "Speed Ball", 0 )
+GAMEL( 1987, speedbal, 0, speedbal, speedbal, driver_device, 0, ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )

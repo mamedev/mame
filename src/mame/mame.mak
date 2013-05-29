@@ -2322,6 +2322,8 @@ $(DRIVERS)/spectra.o:   $(LAYOUT)/spectra.lh
 
 $(DRIVERS)/splus.o:     $(LAYOUT)/splus.lh
 
+$(DRIVERS)/speedbal.o:  $(LAYOUT)/speedbal.lh
+
 $(DRIVERS)/sspeedr.o:   $(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:  $(LAYOUT)/stactics.lh
