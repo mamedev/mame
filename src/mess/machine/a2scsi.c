@@ -37,11 +37,10 @@ const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 #define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
-static const ncr5380n_interface ncr5380_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("^^^", a2bus_scsi_device, drq_w)
-};
+static MACHINE_CONFIG_FRAGMENT( ncr5380 )
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
+MACHINE_CONFIG_END
 
 static SLOT_INTERFACE_START( scsi_devices )
 	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
@@ -60,8 +59,8 @@ MACHINE_CONFIG_FRAGMENT( scsi )
 	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_CONFIG("ncr5380", &ncr5380_interface)
 	MCFG_DEVICE_CARD_CLOCK("ncr5380", 10000000)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
 MACHINE_CONFIG_END
 
 ROM_START( scsi )

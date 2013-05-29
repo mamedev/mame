@@ -27,7 +27,9 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
 ADDRESS_MAP_END
 
 ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__)
+		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__),
+	m_irq_handler(*this),
+	m_drq_handler(*this)
 {
 }
 
@@ -45,8 +47,8 @@ void ncr5380n_device::device_start()
 	save_item(NAME(clock_conv));
 	save_item(NAME(m_dmalatch));
 
-	m_irq_func.resolve(m_irq_cb, *this);
-	m_drq_func.resolve(m_drq_cb, *this);
+	m_irq_handler.resolve_safe();
+	m_drq_handler.resolve_safe();
 
 	tcount = 0;
 	status = 0;
@@ -67,26 +69,8 @@ void ncr5380n_device::device_reset()
 	istatus = 0;
 	m_busstatus = 0;
 	irq = false;
-	if(!m_irq_func.isnull())
-		m_irq_func(irq);
+	m_irq_handler(irq);
 	reset_soft();
-}
-
-void ncr5380n_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ncr5380n_interface *intf = reinterpret_cast<const ncr5380n_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<ncr5380n_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-		memset(&m_drq_cb, 0, sizeof(m_drq_cb));
-	}
 }
 
 void ncr5380n_device::reset_soft()
@@ -96,8 +80,7 @@ void ncr5380n_device::reset_soft()
 	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
 	status = 0;
 	drq = false;
-	if(!m_drq_func.isnull())
-		m_drq_func(drq);
+	m_drq_handler(drq);
 	reset_disconnect();
 }
 
@@ -416,8 +399,8 @@ void ncr5380n_device::check_irq()
 	#if 0
 	bool oldirq = irq;
 	irq = istatus != 0;
-	if(irq != oldirq && !m_irq_func.isnull())
-		m_irq_func(irq);
+	if(irq != oldirq)
+		m_irq_handler(irq);
 	#endif
 }
 
@@ -512,8 +495,7 @@ void ncr5380n_device::drq_set()
 	{
 		drq = true;
 		m_busstatus |= BAS_DMAREQUEST;
-		if(!m_drq_func.isnull())
-			m_drq_func(drq);
+		m_drq_handler(drq);
 	}
 }
 
@@ -523,8 +505,7 @@ void ncr5380n_device::drq_clear()
 	{
 		drq = false;
 		m_busstatus &= ~BAS_DMAREQUEST;
-		if(!m_drq_func.isnull())
-			m_drq_func(drq);
+		m_drq_handler(drq);
 	}
 }
 
