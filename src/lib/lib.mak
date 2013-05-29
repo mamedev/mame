@@ -104,11 +104,12 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/apridisk.o    \
 	$(LIBOBJ)/formats/apollo_dsk.o  \
 	$(LIBOBJ)/formats/ap_dsk35.o    \
+	$(LIBOBJ)/formats/applix_dsk.o  \
 	$(LIBOBJ)/formats/asst128_dsk.o \
 	$(LIBOBJ)/formats/atari_dsk.o   \
 	$(LIBOBJ)/formats/atarist_dsk.o \
 	$(LIBOBJ)/formats/atom_tap.o    \
-	$(LIBOBJ)/formats/bw2_dsk.o \
+	$(LIBOBJ)/formats/bw2_dsk.o     \
 	$(LIBOBJ)/formats/bw12_dsk.o    \
 	$(LIBOBJ)/formats/cbm_tap.o     \
 	$(LIBOBJ)/formats/cgen_cas.o    \
@@ -143,7 +144,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/kc85_dsk.o    \
 	$(LIBOBJ)/formats/kim1_cas.o    \
 	$(LIBOBJ)/formats/lviv_lvt.o    \
-	$(LIBOBJ)/formats/m20_dsk.o \
+	$(LIBOBJ)/formats/m20_dsk.o     \
 	$(LIBOBJ)/formats/m5_dsk.o      \
 	$(LIBOBJ)/formats/mm_dsk.o      \
 	$(LIBOBJ)/formats/msx_dsk.o     \

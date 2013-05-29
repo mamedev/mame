@@ -31,13 +31,14 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "video/mc6845.h"
 #include "machine/6522via.h"
-#include "machine/wd_fdc.h"
-#include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
-#include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "machine/wd_fdc.h"
+#include "formats/applix_dsk.h"
+#include "imagedev/cassette.h"
 
 
 
@@ -50,6 +51,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
 		m_fdc(*this, "wd1772"),
+		m_floppy0(*this, "wd1772:0"),
+		m_floppy1(*this, "wd1772:1"),
 		m_dacl(*this, "dacl"),
 		m_dacr(*this, "dacr"),
 		m_cass(*this, "cassette"),
@@ -130,6 +133,8 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
 	required_device<wd1772_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<dac_device> m_dacl;
 	required_device<dac_device> m_dacr;
 	required_device<cassette_image_device> m_cass;
@@ -348,6 +353,18 @@ WRITE8_MEMBER( applix_state::port08_w )
 {
 	m_port08 = data;
 	membank("bank1")->set_entry(BIT(data, 6));
+
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 2)) floppy = m_floppy0->get_device();
+	if (BIT(data, 3)) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 5));
+	}
 }
 
 READ8_MEMBER( applix_state::port10_r )
@@ -715,13 +732,13 @@ void applix_state::machine_reset()
 	m_maincpu->reset();
 }
 
-//FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
-//	FLOPPY_APPLIX_FORMAT
-//FLOPPY_FORMATS_END
+FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
+	FLOPPY_APPLIX_FORMAT
+FLOPPY_FORMATS_END
 
-//static SLOT_INTERFACE_START( applix_floppies )
-//	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-//SLOT_INTERFACE_END
+static SLOT_INTERFACE_START( applix_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
 
 
 void applix_state::palette_init()
@@ -800,7 +817,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 static MC6845_INTERFACE( applix_crtc )
 {
 	"screen",           /* name of screen */
-	false,
+	false, // should show a border
 	8,          /* number of dots per character */
 	NULL,
 	applix_update_row,      /* handler to display a scanline */
@@ -894,7 +911,8 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("wd1772", XTAL_16MHz / 2) //connected to Z80H clock pin
-	//MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", applix_floppies, "35dd", 0, applix_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", applix_floppies, "35dd", 0, applix_state::floppy_formats)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("applix_c", applix_state, cass_timer, attotime::from_hz(100000))
 MACHINE_CONFIG_END
 
