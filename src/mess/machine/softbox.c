@@ -352,7 +352,7 @@ ioport_constructor softbox_device::device_input_ports() const
 //-------------------------------------------------
 
 softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SOFTBOX, "SoftBox", tag, owner, clock, "softbox", __FILE__),
+	: device_t(mconfig, SOFTBOX, "PET SoftBox", tag, owner, clock, "pet_softbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_usart(*this, I8251_TAG),
