@@ -179,6 +179,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 	DECLARE_VIDEO_START(seta_no_layers);
 	DECLARE_VIDEO_START(twineagl_1_layer);
+	DECLARE_VIDEO_START(setaroul_1_layer);
 	DECLARE_VIDEO_START(seta_1_layer);
 	DECLARE_MACHINE_RESET(calibr50);
 	DECLARE_PALETTE_INIT(usclssic);

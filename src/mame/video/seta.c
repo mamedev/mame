@@ -190,8 +190,8 @@ static const game_offset game_offsets[] =
 	{ "daioha",   {  1,  1 }, { -1, -1 } }, // "
 	{ "msgundam", {  0,  0 }, { -2, -2 } }, // correct (test grid, banpresto logo)
 	{ "msgundam1",{  0,  0 }, { -2, -2 } }, // "
-	{ "oisipuzl", {  0,  0 }, { -1, -1 } }, // correct (test mode) flip screen not supported?
-	{ "triplfun", {  0,  0 }, { -1, -1 } }, // "
+	{ "oisipuzl", {  1,  1 }, { -1, -1 } }, // correct (test mode) flip screen not supported?
+	{ "triplfun", {  1,  1 }, { -1, -1 } }, // "
 	{ "wrofaero", {  0,  0 }, {  0,  0 } }, // unknown
 	{ "jjsquawk", {  1,  1 }, { -1, -1 } }, // correct (test mode)
 	{ "jjsquawkb",{  1,  1 }, { -1, -1 } }, // "
@@ -466,6 +466,15 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	m_tilemap_3->set_transparent_pen(0);
 }
 
+VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
+{
+	VIDEO_START_CALL_MEMBER(seta_2_layers);
+	m_tilemaps_flip = 1;
+
+	// position kludges
+	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+}
+
 
 /* 1 layer */
 VIDEO_START_MEMBER(seta_state,seta_1_layer)
@@ -486,6 +495,15 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 
 	m_tilemap_0->set_transparent_pen(0);
 	m_tilemap_1->set_transparent_pen(0);
+}
+
+VIDEO_START_MEMBER(seta_state,setaroul_1_layer)
+{
+	VIDEO_START_CALL_MEMBER(seta_1_layer);
+
+	// position kludges
+	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
 }
 
 VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
@@ -538,11 +556,6 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 
 }
 
-VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
-{
-	VIDEO_START_CALL_MEMBER(seta_2_layers);
-	m_tilemaps_flip = 1;
-}
 
 
 /***************************************************************************
@@ -1037,9 +1050,6 @@ UINT32 seta_state::screen_update_seta_layers(screen_device &screen, bitmap_ind16
 UINT32 seta_state::screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x0, cliprect);
-
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
 
 	seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
 

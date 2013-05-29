@@ -8032,7 +8032,7 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT_OVERRIDE(seta_state,setaroul)
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(seta_state,setaroul_1_layer)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
