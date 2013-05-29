@@ -690,11 +690,6 @@ static double adc0838_callback( device_t *device, UINT8 input )
 }
 
 
-static const adc083x_interface zr107_adc_interface = {
-	adc0838_callback
-};
-
-
 void zr107_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -798,7 +793,8 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_ADC0838_ADD("adc0838", zr107_adc_interface)
+	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
+	MCFG_ADC083X_INPUT_CALLBACK(adc0838_callback)
 MACHINE_CONFIG_END
 
 
@@ -856,7 +852,8 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_ADC0838_ADD("adc0838", zr107_adc_interface)
+	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
+	MCFG_ADC083X_INPUT_CALLBACK(adc0838_callback)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

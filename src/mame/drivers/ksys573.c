@@ -2475,10 +2475,6 @@ void ksys573_state::punchmania_output_callback( int offset, int data )
 	popmessage( "%s", pad );
 }
 
-static const adc083x_interface punchmania_adc_interface = {
-	punchmania_inputs_callback
-};
-
 DRIVER_INIT_MEMBER(ksys573_state,pnchmn)
 {
 	gx700pwfbf_init( &ksys573_state::punchmania_output_callback );
@@ -2641,10 +2637,6 @@ static double analogue_inputs_callback( device_t *device, UINT8 input )
 }
 
 
-static const adc083x_interface konami573_adc_interface = {
-	analogue_inputs_callback
-};
-
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
@@ -2688,7 +2680,8 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	MCFG_M48T58_ADD( "m48t58" )
 
-	MCFG_ADC0834_ADD( "adc0834", konami573_adc_interface )
+	MCFG_DEVICE_ADD( "adc0834", ADC0834, 0 )
+	MCFG_ADC083X_INPUT_CALLBACK(analogue_inputs_callback)
 MACHINE_CONFIG_END
 
 // Variants with additional digital sound board
@@ -3004,7 +2997,8 @@ static MACHINE_CONFIG_DERIVED( pnchmn, konami573 )
 
 	MCFG_FRAGMENT_ADD( cassxi )
 	MCFG_FRAGMENT_ADD( pccard1 )
-	MCFG_ADC0838_ADD( "adc0838", punchmania_adc_interface )
+	MCFG_DEVICE_ADD( "adc0838", ADC0838, 0 )
+	MCFG_ADC083X_INPUT_CALLBACK(punchmania_inputs_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pnchmn2, pnchmn )

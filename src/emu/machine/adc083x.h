@@ -15,12 +15,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef double (*adc083x_input_convert_func)(device_t *device, UINT8 input);
+typedef double (*adc083x_input_callback)(device_t *device, UINT8 input);
 
-struct adc083x_interface
-{
-	adc083x_input_convert_func input_callback_r;
-};
+#define MCFG_ADC083X_INPUT_CALLBACK(input_callback) \
+	adc083x_device::set_input_callback(*device, input_callback);
 
 /***************************************************************************
     CONSTANTS
@@ -47,6 +45,9 @@ class adc083x_device : public device_t
 public:
 	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration helpers
+	static void set_input_callback(device_t &device, adc083x_input_callback input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
+
 	DECLARE_WRITE_LINE_MEMBER( cs_write );
 	DECLARE_WRITE_LINE_MEMBER( clk_write );
 	DECLARE_WRITE_LINE_MEMBER( di_write );
@@ -56,7 +57,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	INT32 m_mux_bits;
@@ -81,7 +81,7 @@ private:
 	INT32 m_bit;
 	INT32 m_output;
 
-	adc083x_input_convert_func m_input_callback_r;
+	adc083x_input_callback m_input_callback;
 };
 
 class adc0831_device : public adc083x_device
@@ -90,11 +90,17 @@ public:
 	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+extern const device_type ADC0831;
+
+
 class adc0832_device : public adc083x_device
 {
 public:
 	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
+
+extern const device_type ADC0832;
+
 
 class adc0834_device : public adc083x_device
 {
@@ -102,31 +108,16 @@ public:
 	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+extern const device_type ADC0834;
+
+
 class adc0838_device : public adc083x_device
 {
 public:
 	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-#define MCFG_ADC0831_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, ADC0831, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_ADC0832_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, ADC0832, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_ADC0834_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, ADC0834, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_ADC0838_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, ADC0838, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-extern const device_type ADC0831;
-extern const device_type ADC0832;
-extern const device_type ADC0834;
 extern const device_type ADC0838;
+
 
 #endif  /* __ADC083X_H__ */

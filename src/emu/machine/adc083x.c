@@ -44,11 +44,6 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct adc0831_state
-{
-	adc083x_input_convert_func input_callback_r;
-};
-
 const device_type ADC0831 = &device_creator<adc0831_device>;
 const device_type ADC0832 = &device_creator<adc0832_device>;
 const device_type ADC0834 = &device_creator<adc0834_device>;
@@ -94,22 +89,6 @@ adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, d
 {
 	m_mux_bits = 4;
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void adc083x_device::device_config_complete()
-{
-	const adc083x_interface *intf = (const adc083x_interface *) static_config();
-
-	/* resolve callbacks */
-	m_input_callback_r = intf->input_callback_r;
-}
-
-
 
 /*-------------------------------------------------
     adc083x_device::device_start
@@ -199,8 +178,8 @@ UINT8 adc083x_device::conversion()
 	int negative_channel = ADC083X_AGND;
 	double positive = 0;
 	double negative = 0;
-	double gnd = m_input_callback_r( this, ADC083X_AGND );
-	double vref = m_input_callback_r( this, ADC083X_VREF );
+	double gnd = m_input_callback( this, ADC083X_AGND );
+	double vref = m_input_callback( this, ADC083X_VREF );
 
 	if( type() == ADC0831 )
 	{
@@ -246,12 +225,12 @@ UINT8 adc083x_device::conversion()
 
 	if( positive_channel != ADC083X_AGND )
 	{
-		positive = m_input_callback_r( this, positive_channel ) - gnd;
+		positive = m_input_callback( this, positive_channel ) - gnd;
 	}
 
 	if( negative_channel != ADC083X_AGND )
 	{
-		negative = m_input_callback_r( this, negative_channel ) - gnd;
+		negative = m_input_callback( this, negative_channel ) - gnd;
 	}
 
 	result = (int) ( ( ( positive - negative ) * 255 ) / vref );

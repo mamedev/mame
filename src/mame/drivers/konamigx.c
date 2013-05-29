@@ -879,10 +879,6 @@ static double adc0834_callback( device_t *device, UINT8 input )
 	return 0;
 }
 
-static const adc083x_interface konamigx_adc_interface = {
-	adc0834_callback
-};
-
 
 READ32_MEMBER(konamigx_state::le2_gun_H_r)
 {
@@ -1840,7 +1836,8 @@ static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
 
-	MCFG_ADC0834_ADD( "adc0834", konamigx_adc_interface )
+	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
+	MCFG_ADC083X_INPUT_CALLBACK(adc0834_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
@@ -1853,7 +1850,8 @@ static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
 
-	MCFG_ADC0834_ADD( "adc0834", konamigx_adc_interface )
+	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
+	MCFG_ADC083X_INPUT_CALLBACK(adc0834_callback)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
