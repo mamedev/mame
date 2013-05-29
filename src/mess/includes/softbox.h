@@ -5,6 +5,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/harddriv.h"
+#include "includes/corvushd.h"
 #include "machine/cbmipt.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
@@ -27,13 +29,16 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_usart(*this, I8251_TAG),
 			m_dbrg(*this, COM8116_TAG),
-			m_ieee(*this, IEEE488_TAG)
+			m_ieee(*this, IEEE488_TAG),
+			m_corvus_active(false)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
+
+	virtual void machine_start();
 
 	DECLARE_WRITE8_MEMBER( dbrg_w );
 
@@ -54,6 +59,8 @@ public:
 		LED_B,
 		LED_READY
 	};
+
+	bool m_corvus_active;
 };
 
 #endif

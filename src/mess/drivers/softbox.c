@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( softbox_io, AS_IO, 8, softbox_state )
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dbrg_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	//AM_RANGE(0x18, 0x18) AM_WRITE(corvus_data_r, corvus_data_w)
+	AM_RANGE(0x18, 0x18) AM_READWRITE_LEGACY(corvus_hdc_data_r, corvus_hdc_data_w)
 ADDRESS_MAP_END
 
 
@@ -204,7 +204,12 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 
 	*/
 
-	return 0;
+	UINT8 data = 0;
+
+	data |= (corvus_hdc_status_r(space, 0) & CONTROLLER_BUSY) ? 0x10 : 0;
+	data |= m_corvus_active ? 0x20 : 0;
+
+	return data;
 }
 
 WRITE8_MEMBER( softbox_state::ppi1_pc_w )
@@ -285,6 +290,24 @@ static const rs232_port_interface rs232_intf =
 
 
 //**************************************************************************
+//  MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( softbox )
+//-------------------------------------------------
+
+void softbox_state::machine_start()
+{
+	if (corvus_hdc_init(machine()) == TRUE)
+	{
+		m_corvus_active = true;
+	}
+}
+
+
+
+//**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
@@ -304,6 +327,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
 	MCFG_CBM_IEEE488_ADD("c8050")
+	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
