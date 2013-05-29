@@ -81,18 +81,6 @@ OBJDIRS += $(RENDOBJ)
 
 
 #-------------------------------------------------
-# configure the resource compiler
-#-------------------------------------------------
-
-RC = @windres --use-temp-file
-
-RCDEFS = -DNDEBUG -D_WIN32_IE=0x0501
-
-RCFLAGS = -O coff -I $(RENDSRC) -I $(RENDOBJ)
-
-
-
-#-------------------------------------------------
 # overrides for the CYGWIN compiler
 #-------------------------------------------------
 

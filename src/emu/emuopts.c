@@ -115,7 +115,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_WINDOW ";w",                                "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ OPTION_KEEPASPECT ";ka",                           "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ OPTION_MAXIMIZE ";max",                            "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
-#if !defined(SDLMAME) || (SDL_VERSION_ATLEAST(1,2,10))
+#if !defined(SDLMAME) //TODO: || (SDL_VERSION_ATLEAST(1,2,10))
 	{ OPTION_WAITVSYNC ";vs",                      		 "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ OPTION_SYNCREFRESH ";srf",                         "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
 #endif
