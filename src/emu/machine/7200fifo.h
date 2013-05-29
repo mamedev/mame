@@ -104,7 +104,7 @@ public:
 
 	// use these for configurations in cascaded width expansion mode using more than 16 bits
 	DECLARE_WRITE32_MEMBER( data_dword_w ) { fifo_write(data); }
-	DECLARE_READ32_MEMBER( data_dword_r ) { return (UINT16)fifo_read(); }
+	DECLARE_READ32_MEMBER( data_dword_r ) { return (UINT32)fifo_read(); }
 
 protected:
 	// device-level overrides
