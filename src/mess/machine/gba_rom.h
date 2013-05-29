@@ -54,7 +54,7 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
 
 private:
-	UINT32 m_flash_size;
+	//UINT32 m_flash_size;
 	UINT32 m_flash_mask;
 	required_device<intelfsh8_device> m_flash;
 };
@@ -76,7 +76,7 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
 	
 private:
-	UINT32 m_flash_size;
+	//UINT32 m_flash_size;
 	UINT32 m_flash_mask;
 	required_device<intelfsh8_device> m_flash;
 };

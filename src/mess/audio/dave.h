@@ -94,7 +94,7 @@ private:
 	/* bit 1: 50kHz timer irq */
 	int m_timer_irq;
 	/* 1khz timer - divided into 1kHz, 50Hz and 1Hz timer */
-	emu_timer   *m_int_timer;
+	//emu_timer   *m_int_timer;
 	/* state of 1kHz timer */
 	UINT32 m_one_khz_state;
 	/* state of 50Hz timer */
@@ -124,7 +124,7 @@ private:
 	int m_mame_volumes[8];
 	
 	/* update step */
-	int m_update_step;
+	//int m_update_step;
 	
 	sound_stream *m_sound_stream_var;
 	
