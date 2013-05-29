@@ -1340,6 +1340,8 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 	m_pia2->reset();
 
 	m_exp->reset();
+
+	m_ieee->ren_w(0);
 }
 
 
