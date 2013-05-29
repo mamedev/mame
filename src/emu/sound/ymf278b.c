@@ -333,8 +333,8 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 void ymf278b_device::irq_check()
 {
 	int prev_line = m_irq_line;
-	m_irq_line = m_current_irq ? ASSERT_LINE : CLEAR_LINE;
-	if(m_irq_line != prev_line && !m_irq_handler.isnull())
+	m_irq_line = m_current_irq ? 1 : 0;
+	if (m_irq_line != prev_line && !m_irq_handler.isnull())
 		m_irq_handler(m_irq_line);
 }
 
@@ -756,7 +756,7 @@ READ8_MEMBER( ymf278b_device::read )
 			if (m_exp & 2)
 				newbits = (m_status_ld << 1) | m_status_busy;
 
-			ret = newbits | m_current_irq | (m_irq_line == ASSERT_LINE ? 0x80 : 0x00);
+			ret = newbits | m_current_irq | (m_irq_line ? 0x80 : 0x00);
 			break;
 		}
 
@@ -850,7 +850,10 @@ void ymf278b_device::device_reset()
 	m_timer_busy->reset();  m_status_busy = 0;
 	m_timer_ld->reset();    m_status_ld = 0;
 
-	m_irq_line = CLEAR_LINE;
+	m_irq_line = 0;
+	m_current_irq = 0;
+	if (!m_irq_handler.isnull())
+		m_irq_handler(0);
 }
 
 void ymf278b_device::precompute_rate_tables()

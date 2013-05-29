@@ -662,7 +662,7 @@ static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
 
 WRITE_LINE_MEMBER(lordgun_state::soundirq)
 {
-	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state);
+	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MACHINE_CONFIG_START( lordgun, lordgun_state )

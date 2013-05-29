@@ -254,7 +254,7 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 
 WRITE_LINE_MEMBER(metro_state::ymf278b_interrupt)
 {
-	m_maincpu->set_input_line(2, state);
+	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
