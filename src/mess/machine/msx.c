@@ -94,7 +94,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		/* Load software from software list */
 		/* TODO: Add proper SRAM (size) handling */
 
-		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
+		const char *mapper = image.get_feature("mapper");
 		if (mapper != NULL)
 		{
 			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =

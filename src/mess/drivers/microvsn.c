@@ -493,7 +493,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
 
 		// Detect settings for PCB type
-		const char *pcb = software_part_get_feature((software_part*)image.part_entry(), "pcb");
+		const char *pcb = image.get_feature("pcb");
 
 		if ( pcb != NULL )
 		{
@@ -515,7 +515,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		}
 
 		// Detect settings for RC types
-		const char *rc = software_part_get_feature((software_part*)image.part_entry(), "rc");
+		const char *rc = image.get_feature("rc");
 
 		if ( rc != NULL )
 		{

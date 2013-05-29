@@ -585,7 +585,7 @@ DEVICE_IMAGE_LOAD_MEMBER( a2600_state, a2600_cart )
 	{
 		memcpy(cart, image.get_software_region("rom"), m_cart_size);
 
-		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
+		const char *mapper = image.get_feature("mapper");
 
 		if ( mapper != NULL )
 		{
