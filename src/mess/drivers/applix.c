@@ -14,6 +14,7 @@
 
     Current Status:
     After 60 seconds, boots to the ramdisk. You can enter commands.
+    If you have a floppy mounted, it will boot from the disk.
 
     TODO:
     - Cassette interface (coded but not working)
@@ -22,7 +23,7 @@
     - Optional serial device Z8530 Z80SCC
     - Optional SCSI controller NCR5380 and hard drive (max 40mb)
     - Joystick
-    - Sound to fix; code looks ok but system isn't sending data to latches
+    - Audio: it could be better
     - DAC output is used to compare against analog inputs; core doesn't permit
       audio outputs to be used for non-speaker purposes.
 
@@ -194,16 +195,10 @@ d4,5,6 = audio select
 d7     = cassette relay, low=on
 */
 WRITE16_MEMBER( applix_state::analog_latch_w )
-{//printf("A:%X ",data);
+{
 	data &= 0xff;
 	if (data != m_analog_latch)
 	{
-		if ((data & 0x70) == 0)
-			m_dacr->write_unsigned8(m_dac_latch);
-		else
-		if ((data & 0x70) == 0x10)
-			m_dacl->write_unsigned8(m_dac_latch);
-
 		m_cass->change_state(
 			(BIT(data,7)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
@@ -211,11 +206,16 @@ WRITE16_MEMBER( applix_state::analog_latch_w )
 	}
 }
 
-// system not using this?
 WRITE16_MEMBER( applix_state::dac_latch_w )
-{//printf("B:%X ",data);
+{
 	data &= 0xff;
 	m_dac_latch = data;
+
+	if ((m_analog_latch & 0x70) == 0) // right
+		m_dacr->write_unsigned8(m_dac_latch);
+	else
+	if ((m_analog_latch & 0x70) == 0x10) // left
+		m_dacl->write_unsigned8(m_dac_latch);
 }
 
 //cent = odd, video = even
@@ -229,7 +229,7 @@ WRITE16_MEMBER( applix_state::palette_w )
 }
 
 WRITE16_MEMBER( applix_state::video_latch_w )
-{//printf("%X ",data);
+{
 	if (ACCESSING_BITS_0_7)
 		m_video_latch = data;
 }
@@ -280,7 +280,7 @@ d6 = /(out) reset keyboard by pulling kbd clock low
 d7 = /(out) reset keyboard flipflop
 */
 WRITE8_MEMBER( applix_state::applix_pa_w )
-{//printf("pa=%X ",data);
+{
 	// Reset flipflop counter
 	if (!BIT(data, 7))
 		m_clock_count = 0;
@@ -900,9 +900,9 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dacl", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0 )
 	MCFG_SOUND_ADD("dacr", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75 )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
