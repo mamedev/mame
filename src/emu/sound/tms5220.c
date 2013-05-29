@@ -1087,6 +1087,19 @@ INT32 tms5220_device::lattice_filter()
 	  Kn = m_current_k[n-1]
 	  bn = m_x[n-1]
 	 */
+	/*
+		int ep = matrix_multiply(m_previous_energy, (m_excitation_data<<6));  //Y(11)
+		 m_u[10] = ep;
+		for (int i = 0; i < 10; i++)
+		{
+			int ii = 10-i; // for m = 10, this would be 11 - i, and since i is from 1 to 10, then ii ranges from 10 to 1
+			//int jj = ii+1; // this variable, even on the fortran version, is never used. it probably was intended to be used on the two lines below the next one to save some redundant additions on each.
+			ep = ep - (((m_current_k[ii-1] * m_x[ii-1])>>9)|1); // subtract reflection from lower stage 'top of lattice'
+			 m_u[ii-1] = ep;
+			m_x[ii] = m_x[ii-1] + (((m_current_k[ii-1] * ep)>>9)|1); // add reflection from upper stage 'bottom of lattice'
+		}
+	m_x[0] = ep; // feed the last section of the top of the lattice directly to the bottom of the lattice
+	*/
 		m_u[10] = matrix_multiply(m_previous_energy, (m_excitation_data<<6));  //Y(11)
 		m_u[9] = m_u[10] - matrix_multiply(m_current_k[9], m_x[9]);
 		m_u[8] = m_u[9] - matrix_multiply(m_current_k[8], m_x[8]);
