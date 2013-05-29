@@ -16,9 +16,13 @@
     After 60 seconds, boots to the ramdisk. You can enter commands.
     If you have a floppy mounted, it will boot from the disk.
 
+    The system could support 1 or 2 5.25 or 3.5 floppy drives, although 3.5
+    was the recommended hardware. Format is similar to the PC 720kb, except
+    it has 5 sectors of 1024 bytes, giving 800kb total. We only support the
+    3.5-sized disks.
+
     TODO:
     - Cassette interface (coded but not working)
-    - Floppy disk drives
     - Use kbtro device (tried and failed)
     - Optional serial device Z8530 Z80SCC
     - Optional SCSI controller NCR5380 and hard drive (max 40mb)
@@ -257,8 +261,6 @@ d4-7 = SW2 dipswitch block
 */
 READ16_MEMBER( applix_state::applix_inputs_r )
 {
-// set dips to Off,Off,Off,On for a video test.
-
 	return m_io_dsw->read() | m_cass_data[2];
 }
 
@@ -808,7 +810,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		// 320 x 200 x 16 mode
 		{
 			mem = vidbase + ma + x + (ra<<12);
-			chr = state->m_expansion[mem]; // could be m_base, we dont know yet
+			chr = state->m_base[mem];
 			for (i = 0; i < 4; i++)
 			{
 				*p++ = palette[chr>>12];
