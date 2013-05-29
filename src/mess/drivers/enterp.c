@@ -17,11 +17,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "audio/dave.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
-#include "machine/ram.h"
 #include "includes/enterp.h"
 
 #define ENTERPRISE_XTAL_X1  XTAL_8MHz
@@ -117,23 +115,17 @@ WRITE8_MEMBER(ep_state::enterprise_dave_reg_write)
 
 READ8_MEMBER(ep_state::enterprise_dave_reg_read)
 {
-	static const char *const keynames[] =
-	{
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
-	};
-
 	switch (offset)
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(machine().device("custom"), 0x015, ioport(keynames[keyboard_line])->read());
+			m_dave->set_reg(0x015, m_key[keyboard_line]->read());
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = ioport("JOY1")->read();
+			int ExternalJoystickPortInput = m_joy->read();
 
 			if (keyboard_line <= 4)
 			{
@@ -144,7 +136,7 @@ READ8_MEMBER(ep_state::enterprise_dave_reg_read)
 				ExternalJoystickInputs = 1;
 			}
 
-			dave_set_reg(machine().device("custom"), 0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
+			m_dave->set_reg(0x016, (0x0fe | (ExternalJoystickInputs & 0x01)));
 		}
 		break;
 
@@ -164,6 +156,19 @@ static const dave_interface enterprise_dave_interface =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
+
+void ep_state::machine_start()
+{
+	m_maincpu->set_input_line_vector(0, 0xff);
+	
+	for (int i = 0; i < 10; i++)
+	{
+		char str[5];
+		sprintf(str, "LINE%i", i);
+		m_key[i] = ioport(str);
+	}
+	
+}
 
 void ep_state::machine_reset()
 {
@@ -247,7 +252,7 @@ static ADDRESS_MAP_START( enterprise_io, AS_IO, 8, ep_state )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
 	AM_RANGE(0x80, 0x8f) AM_WRITE(epnick_reg_w)
-	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE_LEGACY("custom", dave_reg_r, dave_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE("custom", dave_sound_device, reg_r, reg_w)
 ADDRESS_MAP_END
 
 
@@ -441,7 +446,6 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_CPU_PROGRAM_MAP(enterprise_mem)
 	MCFG_CPU_IO_MAP(enterprise_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -451,7 +455,6 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ep_state, screen_update_epnick)
 
 	MCFG_PALETTE_LENGTH(NICK_PALETTE_SIZE)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
