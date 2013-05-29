@@ -16,6 +16,7 @@
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
 #include "machine/mb3773.h"
+#include "machine/7200fifo.h"
 #include "machine/znsec.h"
 #include "machine/zndip.h"
 #include "machine/idectrl.h"
@@ -40,7 +41,9 @@ public:
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_ram(*this, "maincpu:ram")
+		m_ram(*this, "maincpu:ram"),
+		m_cbaj_fifo1(*this, "cbaj_fifo1"),
+		m_cbaj_fifo2(*this, "cbaj_fifo2")
 	{
 	}
 
@@ -75,12 +78,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coh1001l_ymz_irq);
 	DECLARE_WRITE8_MEMBER(coh1002v_bank_w);
 	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
-	DECLARE_READ8_MEMBER(cbaj_from_z80_latch_r);
-	DECLARE_WRITE8_MEMBER(cbaj_to_z80_latch_w);
-	DECLARE_READ8_MEMBER(cbaj_from_z80_status_r);
-	DECLARE_READ8_MEMBER(cbaj_to_z80_latch_r);
-	DECLARE_WRITE8_MEMBER(cbaj_from_z80_latch_w);
-	DECLARE_READ8_MEMBER(cbaj_to_z80_status_r);
+	DECLARE_READ8_MEMBER(cbaj_sound_main_status_r);
+	DECLARE_READ8_MEMBER(cbaj_sound_z80_status_r);
 	DECLARE_READ8_MEMBER(jdredd_idestat_r);
 	DECLARE_READ16_MEMBER(jdredd_ide_r);
 	DECLARE_WRITE16_MEMBER(jdredd_ide_w);
@@ -97,7 +96,6 @@ public:
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
-	DECLARE_MACHINE_RESET(coh1002msnd);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
 	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
@@ -120,10 +118,6 @@ private:
 	size_t m_nbajamex_eeprom_size;
 	UINT8 *m_nbajamex_eeprom;
 
-	UINT8 m_cbaj_fifo_buffer[2][0x400];
-	int m_cbaj_fifo_main_ptr[2];
-	int m_cbaj_fifo_z80_ptr[2];
-
 	required_device<psxgpu_device> m_gpu;
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
@@ -131,6 +125,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<ram_device> m_ram;
+	optional_device<fifo7200_device> m_cbaj_fifo1;
+	optional_device<fifo7200_device> m_cbaj_fifo2;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -2422,47 +2418,23 @@ static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(zn_state::cbaj_from_z80_latch_r)
+READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 {
-	UINT8 ret = m_cbaj_fifo_buffer[1][m_cbaj_fifo_main_ptr[1]];
-	m_cbaj_fifo_main_ptr[1] = (m_cbaj_fifo_main_ptr[1] + 1) & 0x3ff;
-	return ret;
-}
-
-WRITE8_MEMBER(zn_state::cbaj_to_z80_latch_w)
-{
-	m_cbaj_fifo_buffer[0][m_cbaj_fifo_main_ptr[0]] = data;
-	m_cbaj_fifo_main_ptr[0] = (m_cbaj_fifo_main_ptr[0] + 1) & 0x3ff;
-}
-
-READ8_MEMBER(zn_state::cbaj_from_z80_status_r)
-{
-	return (m_cbaj_fifo_main_ptr[1] != m_cbaj_fifo_z80_ptr[1]) ? 0x02 : 0x00;
+	// d1: fifo empty flag, other bits: unused(?)
+	return ~(m_cbaj_fifo2->ef_r() << 1);
 }
 
 static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE8(cbaj_from_z80_latch_r, cbaj_to_z80_latch_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_from_z80_status_r, 0xff000000)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_sound_main_status_r, 0xff000000)
 	
 	AM_IMPORT_FROM(coh1002m_map)
 ADDRESS_MAP_END
 
-READ8_MEMBER(zn_state::cbaj_to_z80_latch_r)
+READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
 {
-	UINT8 ret = m_cbaj_fifo_buffer[0][m_cbaj_fifo_z80_ptr[0]];
-	m_cbaj_fifo_z80_ptr[0] = (m_cbaj_fifo_z80_ptr[0] + 1) & 0x3ff;
-	return ret;
-}
-
-WRITE8_MEMBER(zn_state::cbaj_from_z80_latch_w)
-{
-	m_cbaj_fifo_buffer[1][m_cbaj_fifo_z80_ptr[1]] = data;
-	m_cbaj_fifo_z80_ptr[1] = (m_cbaj_fifo_z80_ptr[1] + 1) & 0x3ff;
-}
-
-READ8_MEMBER(zn_state::cbaj_to_z80_status_r)
-{
-	return (m_cbaj_fifo_main_ptr[0] != m_cbaj_fifo_z80_ptr[0]) ? 0x02 : 0x00;
+	// d1: fifo empty flag, other bits: unused
+	return ~(m_cbaj_fifo1->ef_r() << 1);
 }
 
 static ADDRESS_MAP_START( cbaj_z80_map, AS_PROGRAM, 8, zn_state )
@@ -2473,17 +2445,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x85) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0x90, 0x90) AM_READWRITE(cbaj_to_z80_latch_r, cbaj_from_z80_latch_w)
-	AM_RANGE(0x91, 0x91) AM_READ(cbaj_to_z80_status_r)
+	AM_RANGE(0x90, 0x90) AM_DEVREAD("cbaj_fifo1", fifo7200_device, data_byte_r) AM_DEVWRITE("cbaj_fifo2", fifo7200_device, data_byte_w)
+	AM_RANGE(0x91, 0x91) AM_READ(cbaj_sound_z80_status_r)
 ADDRESS_MAP_END
-
-MACHINE_RESET_MEMBER(zn_state,coh1002msnd)
-{
-	m_cbaj_fifo_main_ptr[0] = m_cbaj_fifo_main_ptr[1] = 0;
-	m_cbaj_fifo_z80_ptr[0] = m_cbaj_fifo_z80_ptr[1] = 0;
-
-	MACHINE_RESET_CALL_MEMBER(coh1002m);
-}
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_MODIFY("maincpu")
@@ -2492,9 +2456,11 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
 	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
+	
+	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
+	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // LH540202
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002msnd)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)

@@ -152,6 +152,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/6840ptm.o     \
 	$(EMUMACHINE)/6850acia.o    \
 	$(EMUMACHINE)/68681.o       \
+	$(EMUMACHINE)/7200fifo.o    \
 	$(EMUMACHINE)/74123.o       \
 	$(EMUMACHINE)/74145.o       \
 	$(EMUMACHINE)/74148.o       \
