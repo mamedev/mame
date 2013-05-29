@@ -6,7 +6,6 @@
 #include "machine/latch8.h"
 
 #include "sound/tms5110.h"
-#include "machine/tms6100.h"
 
 #include "includes/dkong.h"
 
@@ -1354,11 +1353,11 @@ static const nes_interface nes_interface_2 = { "n2a03b" };
 const tms5110_interface tms_interface = {
 	NULL,
 	NULL,
-	DEVCB_DEVICE_LINE("m58819", tms6100_m0_w),
-	DEVCB_DEVICE_LINE("m58819", tms6100_m1_w),
-	DEVCB_DEVICE_HANDLER("m58819", tms6100_addr_w),
-	DEVCB_DEVICE_LINE("m58819", tms6100_data_r),
-	DEVCB_DEVICE_LINE("m58819", tms6100_romclock_w)
+	DEVCB_DEVICE_LINE_MEMBER("m58819", tms6100_device, tms6100_m0_w),
+	DEVCB_DEVICE_LINE_MEMBER("m58819", tms6100_device, tms6100_m1_w),
+	DEVCB_DEVICE_MEMBER("m58819", tms6100_device, tms6100_addr_w),
+	DEVCB_DEVICE_LINE_MEMBER("m58819", tms6100_device, tms6100_data_r),
+	DEVCB_DEVICE_LINE_MEMBER("m58819", tms6100_device, tms6100_romclock_w)
 };
 
 /*************************************

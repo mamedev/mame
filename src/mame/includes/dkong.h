@@ -1,5 +1,6 @@
 #include "sound/discrete.h"
 #include "machine/eeprom.h"
+#include "machine/tms6100.h"
 
 /*
  * From the schematics:
@@ -81,26 +82,33 @@ class dkong_state : public driver_device
 public:
 	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this,"video_ram"),
-		m_sprite_ram(*this,"sprite_ram"),
-		m_dev_n2a03a(*this, "n2a03a"),
-		m_dev_n2a03b(*this, "n2a03b"),
-		m_vidhw(DKONG_BOARD),
-		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_dev_n2a03a(*this, "n2a03a"),
+		m_dev_n2a03b(*this, "n2a03b"),
+		m_m58819(*this, "m58819"),
+		m_discrete(*this, "discrete"),
+		m_video_ram(*this,"video_ram"),
+		m_sprite_ram(*this,"sprite_ram"),
+		m_vidhw(DKONG_BOARD)
+		{ }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<eeprom_device> m_eeprom;
+	optional_device<cpu_device> m_dev_n2a03a;
+	optional_device<cpu_device> m_dev_n2a03b;
+	optional_device<m58819_device> m_m58819;
+	device_t *m_dev_vp2;        /* virtual port 2 */
+	device_t *m_dev_6h;
+	optional_device<discrete_device> m_discrete;
+	
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
-
-	/* devices */
-	optional_device<cpu_device> m_dev_n2a03a;
-	optional_device<cpu_device> m_dev_n2a03b;
-	device_t *m_dev_vp2;        /* virtual port 2 */
-	device_t *m_dev_6h;
-
+	
 	/* machine states */
 	UINT8               m_hardware_type;
 	UINT8               m_nmi_mask;
@@ -116,7 +124,6 @@ public:
 	emu_timer *       m_scanline_timer;
 	INT8              m_vidhw;          /* Selected video hardware RS Conversion / TKG04 */
 
-	optional_device<discrete_device> m_discrete;
 	/* radar scope */
 
 	UINT8 *           m_gfx4;
@@ -243,9 +250,6 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<eeprom_device> m_eeprom;
 };
 
 /*----------- defined in audio/dkong.c -----------*/

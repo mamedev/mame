@@ -73,205 +73,26 @@
 #define TMS6100_READ_PENDING        0x01
 #define TMS6100_NEXT_READ_IS_DUMMY  0x02
 
-struct tms6100_state
-{
-	/* Rom interface */
-	UINT32 address;
-	UINT32 address_latch;
-	UINT8  loadptr;
-	UINT8  m0;
-	UINT8  m1;
-	UINT8  addr_bits;
-	UINT8  clock;
-	UINT8  data;
-	UINT8  state;
-
-	const UINT8 *rom;
-
-	device_t *device;
-
-#if 0
-	const tms5110_interface *intf;
-#endif
-};
-
-/**********************************************************************************************
-
-     get_safe_token -- get tms6100_state
-
-***********************************************************************************************/
-
-INLINE tms6100_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TMS6100 ||
-			device->type() == M58819);
-	return (tms6100_state *)downcast<tms6100_device *>(device)->token();
-}
-
-/**********************************************************************************************
-
-     register_save_states -- register state vars for saving
-
-***********************************************************************************************/
-
-static void register_for_save_states(tms6100_state *tms)
-{
-	tms->device->save_item(NAME(tms->addr_bits));
-	tms->device->save_item(NAME(tms->address));
-	tms->device->save_item(NAME(tms->address_latch));
-	tms->device->save_item(NAME(tms->data));
-	tms->device->save_item(NAME(tms->loadptr));
-	tms->device->save_item(NAME(tms->m0));
-	tms->device->save_item(NAME(tms->m1));
-	tms->device->save_item(NAME(tms->state));
-}
-
-/******************************************************************************
-
-     DEVICE_START( tms6100 ) -- allocate buffers and reset the 6100
-
-******************************************************************************/
-
-static DEVICE_START( tms6100 )
-{
-	//static const tms5110_interface dummy = { 0 };
-	tms6100_state *tms = get_safe_token(device);
-
-	assert_always(tms != NULL, "Error creating TMS6100 chip");
-
-	//tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
-	tms->rom = *device->region();
-
-	tms->device = device;
-
-	register_for_save_states(tms);
-}
-
-static DEVICE_START( m58819 )
-{
-	//tms6100_state *tms = get_safe_token(device);
-	DEVICE_START_CALL( tms6100 );
-	//tms5110_set_variant(tms, TMS5110_IS_5100);
-}
-
-static DEVICE_RESET( tms6100 )
-{
-	tms6100_state *tms = get_safe_token(device);
-
-	/* initialize the chip */
-	tms->addr_bits = 0;
-	tms->address = 0;
-	tms->address_latch = 0;
-	tms->loadptr = 0;
-	tms->m0 = 0;
-	tms->m1 = 0;
-	tms->state = 0;
-	tms->clock = 0;
-	tms->data = 0;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_m0_w )
-{
-	tms6100_state *tms = get_safe_token(device);
-	if (state != tms->m0)
-		tms->m0 = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_m1_w )
-{
-	tms6100_state *tms = get_safe_token(device);
-	if (state != tms->m1)
-		tms->m1 = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( tms6100_romclock_w )
-{
-	tms6100_state *tms = get_safe_token(device);
-
-	/* process on falling edge */
-	if (tms->clock && !state)
-	{
-		switch ((tms->m1<<1) | tms->m0)
-		{
-		case 0x00:
-			/* NOP in datasheet, not really ... */
-			if (tms->state & TMS6100_READ_PENDING)
-			{
-				if (tms->state & TMS6100_NEXT_READ_IS_DUMMY)
-				{
-					tms->address = (tms->address_latch << 3);
-					tms->address_latch = 0;
-					tms->loadptr = 0;
-					tms->state &= ~TMS6100_NEXT_READ_IS_DUMMY;
-					LOG(("loaded address %08x\n", tms->address));
-				}
-				else
-				{
-					/* read bit at address */
-					tms->data = (tms->rom[tms->address >> 3] >> ((tms->address & 0x07) ^ 0x07)) & 1;
-					tms->address++;
-				}
-				tms->state &= ~TMS6100_READ_PENDING;
-			}
-			break;
-		case 0x01:
-			/* READ */
-			tms->state |= TMS6100_READ_PENDING;
-			break;
-		case 0x02:
-			/* LOAD ADDRESS */
-			tms->state |= TMS6100_NEXT_READ_IS_DUMMY;
-			tms->address_latch |= (tms->addr_bits << tms->loadptr);
-			LOG(("loaded address latch %08x\n", tms->address_latch));
-			tms->loadptr += 4;
-			break;
-		case 0x03:
-			/* READ AND BRANCH */
-			if (tms->state & TMS6100_NEXT_READ_IS_DUMMY)
-			{
-				tms->state &= ~TMS6100_NEXT_READ_IS_DUMMY;  // clear - no dummy read according to datasheet
-				LOG(("loaded address latch %08x\n", tms->address_latch));
-				tms->address = tms->rom[tms->address_latch] | (tms->rom[tms->address_latch+1]<<8);
-				tms->address &= 0x3fff; // 14 bits
-				LOG(("loaded indirect address %04x\n", tms->address));
-				tms->address = (tms->address << 3);
-				tms->address_latch = 0;
-				tms->loadptr = 0;
-			}
-			break;
-		}
-	}
-	tms->clock = state;
-}
-
-WRITE8_DEVICE_HANDLER( tms6100_addr_w )
-{
-	tms6100_state *tms = get_safe_token(device);
-	if (data != tms->addr_bits)
-		tms->addr_bits = data;
-}
-
-READ_LINE_DEVICE_HANDLER( tms6100_data_r )
-{
-	tms6100_state *tms = get_safe_token(device);
-
-	return tms->data;
-}
 
 const device_type TMS6100 = &device_creator<tms6100_device>;
+
+tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
+{
+}
 
 tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock)
 {
-	m_token = global_alloc_clear(tms6100_state);
 }
-tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
-{
-	m_token = global_alloc_clear(tms6100_state);
-}
+	
+const device_type M58819 = &device_creator<m58819_device>;
 
+m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms6100_device(mconfig, M58819, "M58819", tag, owner, clock)
+{
+}
+	
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -288,7 +109,28 @@ void tms6100_device::device_config_complete()
 
 void tms6100_device::device_start()
 {
-	DEVICE_START_NAME( tms6100 )(this);
+	//static const tms5110_interface dummy = { 0 };
+
+	//tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
+	m_rom = *region();
+
+	// save device variables
+	save_item(NAME(m_addr_bits));
+	save_item(NAME(m_address));
+	save_item(NAME(m_address_latch));
+	save_item(NAME(m_tms_clock));
+	save_item(NAME(m_data));
+	save_item(NAME(m_loadptr));
+	save_item(NAME(m_m0));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_state));
+
+}
+
+void m58819_device::device_start()
+{
+	//tms5110_set_variant(tms, TMS5110_IS_5100);
+	tms6100_device::device_start();
 }
 
 //-------------------------------------------------
@@ -297,22 +139,97 @@ void tms6100_device::device_start()
 
 void tms6100_device::device_reset()
 {
-	DEVICE_RESET_NAME( tms6100 )(this);
+	/* initialize the chip */
+	m_addr_bits = 0;
+	m_address = 0;
+	m_address_latch = 0;
+	m_loadptr = 0;
+	m_m0 = 0;
+	m_m1 = 0;
+	m_state = 0;
+	m_tms_clock = 0;
+	m_data = 0;
 }
 
-
-const device_type M58819 = &device_creator<m58819_device>;
-
-m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms6100_device(mconfig, M58819, "M58819", tag, owner, clock)
+WRITE_LINE_MEMBER(tms6100_device::tms6100_m0_w)
 {
+	if (state != m_m0)
+		m_m0 = state;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m58819_device::device_start()
+WRITE_LINE_MEMBER(tms6100_device::tms6100_m1_w)
 {
-	DEVICE_START_NAME( m58819 )(this);
+	if (state != m_m1)
+		m_m1 = state;
 }
+
+WRITE_LINE_MEMBER(tms6100_device::tms6100_romclock_w)
+{
+	/* process on falling edge */
+	if (m_tms_clock && !state)
+	{
+		switch ((m_m1<<1) | m_m0)
+		{
+		case 0x00:
+			/* NOP in datasheet, not really ... */
+			if (m_state & TMS6100_READ_PENDING)
+			{
+				if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
+				{
+					m_address = (m_address_latch << 3);
+					m_address_latch = 0;
+					m_loadptr = 0;
+					m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;
+					LOG(("loaded address %08x\n", m_address));
+				}
+				else
+				{
+					/* read bit at address */
+					m_data = (m_rom[m_address >> 3] >> ((m_address & 0x07) ^ 0x07)) & 1;
+					m_address++;
+				}
+				m_state &= ~TMS6100_READ_PENDING;
+			}
+			break;
+		case 0x01:
+			/* READ */
+			m_state |= TMS6100_READ_PENDING;
+			break;
+		case 0x02:
+			/* LOAD ADDRESS */
+			m_state |= TMS6100_NEXT_READ_IS_DUMMY;
+			m_address_latch |= (m_addr_bits << m_loadptr);
+			LOG(("loaded address latch %08x\n", m_address_latch));
+			m_loadptr += 4;
+			break;
+		case 0x03:
+			/* READ AND BRANCH */
+			if (m_state & TMS6100_NEXT_READ_IS_DUMMY)
+			{
+				m_state &= ~TMS6100_NEXT_READ_IS_DUMMY;  // clear - no dummy read according to datasheet
+				LOG(("loaded address latch %08x\n", m_address_latch));
+				m_address = m_rom[m_address_latch] | (m_rom[m_address_latch+1]<<8);
+				m_address &= 0x3fff; // 14 bits
+				LOG(("loaded indirect address %04x\n", m_address));
+				m_address = (m_address << 3);
+				m_address_latch = 0;
+				m_loadptr = 0;
+			}
+			break;
+		}
+	}
+	m_tms_clock = state;
+}
+
+WRITE8_MEMBER(tms6100_device::tms6100_addr_w)
+{
+	if (data != m_addr_bits)
+		m_addr_bits = data;
+}
+
+READ_LINE_MEMBER(tms6100_device::tms6100_data_r)
+{
+	return m_data;
+}
+
+
