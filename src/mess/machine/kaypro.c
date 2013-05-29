@@ -278,16 +278,23 @@ WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 
 *************************************************************************************/
 
-TIMER_CALLBACK_MEMBER(kaypro_state::kaypro_timer_callback)
+void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (m_maincpu->state_int(Z80_HALT))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_FLOPPY:
+		if (m_maincpu->state_int(Z80_HALT))
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in kaypro_state::device_timer");
+	}
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 {
 	if (state)
-		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
+		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
 	else
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -295,7 +302,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 {
 	if (state)
-		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
+		timer_set(attotime::from_usec(25), TIMER_FLOPPY);
 	else
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 

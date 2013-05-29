@@ -580,6 +580,27 @@ void lynx_state::lynx_blit_lines()
 	}
 }
 
+void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_BLITTER:
+		lynx_blitter_timer(ptr, param);
+		break;
+	case TIMER_SHOT:
+		lynx_timer_shot(ptr, param);
+		break;
+	case TIMER_UART_LOOPBACK:
+		lynx_uart_loopback_timer(ptr, param);
+		break;
+	case TIMER_UART:
+		lynx_uart_timer(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in lynx_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
 {
 	m_blitter.busy=0; // blitter finished
@@ -763,7 +784,7 @@ void lynx_state::lynx_blitter()
 		}
 	}
 
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_blitter.memory_accesses), timer_expired_delegate(FUNC(lynx_state::lynx_blitter_timer),this));
+	timer_set(m_maincpu->cycles_to_attotime(m_blitter.memory_accesses), TIMER_BLITTER);
 }
 
 
@@ -1356,7 +1377,7 @@ TIM_BORROWOUT   EQU %00000001
 void lynx_state::lynx_timer_init(int which)
 {
 	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
-	m_timer[which].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lynx_state::lynx_timer_shot),this));
+	m_timer[which].timer = timer_alloc(TIMER_SHOT);
 
 	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].bakup);
 	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].cntrl1);
@@ -1586,14 +1607,14 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 	{
 		m_uart.data_to_send = m_uart.buffer;
 		m_uart.buffer_loaded = FALSE;
-		machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_timer),this));
+		timer_set(attotime::from_usec(11*16), TIMER_UART);
 	}
 	else
 	{
 		m_uart.sending = FALSE;
 		m_uart.received = TRUE;
 		m_uart.data_received = m_uart.data_to_send;
-		machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_loopback_timer),this));
+		timer_set(attotime::from_usec(11*16), TIMER_UART_LOOPBACK);
 		if (m_uart.serctl & 0x40)
 		{
 			m_mikey.data[0x81] |= 0x10;
@@ -1652,7 +1673,7 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 				m_uart.sending = TRUE;
 				m_uart.data_to_send = data;
 				// timing not accurate, baude rate should be calculated from timer 4 backup value and clock rate
-				machine().scheduler().timer_set(attotime::from_usec(11*16), timer_expired_delegate(FUNC(lynx_state::lynx_uart_timer),this));
+				timer_set(attotime::from_usec(11*16), TIMER_UART);
 			}
 			break;
 	}

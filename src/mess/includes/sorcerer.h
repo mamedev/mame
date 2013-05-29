@@ -40,6 +40,13 @@ struct cass_data_t {
 class sorcerer_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SERIAL,
+		TIMER_CASSETTE,
+		TIMER_RESET
+	};
+
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
@@ -91,6 +98,9 @@ public:
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* SORCERER_H_ */

@@ -51,6 +51,12 @@ private:
 class dai_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BOOTSTRAP,
+		TIMER_TMS5501
+	};
+
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_pit(*this, "pit8253"),
@@ -83,12 +89,13 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(dai_bootstrap_callback);
-	TIMER_CALLBACK_MEMBER(dai_timer);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	void dai_update_memory(int dai_rom_bank);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

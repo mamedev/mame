@@ -341,6 +341,22 @@ const pia6821_interface osborne1_video_pia_config =
 //};
 
 
+void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VIDEO:
+		osborne1_video_callback(ptr, param);
+		break;
+	case TIMER_SETUP:
+		setup_osborne1(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in osborne1_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 {
 	int y = machine().primary_screen->vpos();
@@ -460,10 +476,10 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
-	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::osborne1_video_callback),this));
+	m_video_timer = timer_alloc(TIMER_VIDEO);
 	m_video_timer->adjust(machine().primary_screen->time_until_pos(1, 0 ));
 
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(osborne1_state::setup_osborne1),this));
+	timer_set(attotime::zero, TIMER_SETUP);
 }
 
 

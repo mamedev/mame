@@ -101,15 +101,30 @@ I8255_INTERFACE( specialist_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(special_state, specialist_8255_portc_w)
 };
 
-TIMER_CALLBACK_MEMBER(special_state::special_reset)
+void special_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_bank1->set_entry(0);
+	switch (id)
+	{
+	case TIMER_RESET:
+		m_bank1->set_entry(0);
+		break;
+	case TIMER_PIT8253_GATES:
+	{
+		device_t *pit8253 = machine().device("pit8253");
+		pit8253_gate0_w(pit8253, 0);
+		pit8253_gate1_w(pit8253, 0);
+		pit8253_gate2_w(pit8253, 0);
+		break;
+	}
+	default:
+		assert_always(FALSE, "Unknown id in special_state::device_timer");
+	}
 }
 
 
 MACHINE_RESET_MEMBER(special_state,special)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(special_state::special_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
 }
 
@@ -225,19 +240,10 @@ MACHINE_START_MEMBER(special_state,specimx)
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(special_state::fdc_drq), this));
 }
 
-TIMER_CALLBACK_MEMBER(special_state::setup_pit8253_gates)
-{
-	device_t *pit8253 = machine().device("pit8253");
-
-	pit8253_gate0_w(pit8253, 0);
-	pit8253_gate1_w(pit8253, 0);
-	pit8253_gate2_w(pit8253, 0);
-}
-
 MACHINE_RESET_MEMBER(special_state,specimx)
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(special_state::setup_pit8253_gates),this));
+	timer_set(attotime::zero, TIMER_PIT8253_GATES);
 }
 
 READ8_MEMBER( special_state::specimx_disk_ctrl_r )

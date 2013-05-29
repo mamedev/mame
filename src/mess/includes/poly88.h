@@ -14,6 +14,14 @@
 class poly88_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_USART,
+		TIMER_KEYBOARD,
+		TIMER_CASSETTE,
+		TIMER_SETUP_MACHINE_STATE
+	};
+
 	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
@@ -55,6 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
@@ -69,6 +78,7 @@ protected:
 	required_ioport m_line5;
 	required_ioport m_line6;
 	UINT8 row_number(UINT8 code);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

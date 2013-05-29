@@ -12,6 +12,28 @@
 #include "includes/poly88.h"
 
 
+void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_USART:
+		poly88_usart_timer_callback(ptr, param);
+		break;
+	case TIMER_KEYBOARD:
+		keyboard_callback(ptr, param);
+		break;
+	case TIMER_CASSETTE:
+		poly88_cassette_timer_callback(ptr, param);
+		break;
+	case TIMER_SETUP_MACHINE_STATE:
+		setup_machine_state(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in poly88_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
 {
 	m_int_vector = 0xe7;
@@ -21,7 +43,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
 WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
-	m_usart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(poly88_state::poly88_usart_timer_callback),this));
+	m_usart_timer = timer_alloc(TIMER_USART);
 	m_usart_timer->adjust(attotime::zero, 0, attotime::from_hz(300));
 
 }
@@ -128,6 +150,8 @@ TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
 	} else {
 		m_last_code = key_code;
 	}
+
+	timer_set(attotime::from_hz(24000), TIMER_KEYBOARD);
 }
 
 IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
@@ -199,10 +223,10 @@ DRIVER_INIT_MEMBER(poly88_state,poly88)
 {
 	m_previous_level = 0;
 	m_clk_level = m_clk_level_tape = 1;
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(poly88_state::poly88_cassette_timer_callback),this));
+	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(600));
 
-	machine().scheduler().timer_pulse(attotime::from_hz(24000), timer_expired_delegate(FUNC(poly88_state::keyboard_callback),this));
+	timer_set(attotime::from_hz(24000), TIMER_KEYBOARD);
 }
 
 void poly88_state::machine_reset()
@@ -211,7 +235,7 @@ void poly88_state::machine_reset()
 	m_intr = 0;
 	m_last_code = 0;
 
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(poly88_state::setup_machine_state),this));
+	timer_set(attotime::zero, TIMER_SETUP_MACHINE_STATE);
 }
 
 INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)

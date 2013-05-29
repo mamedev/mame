@@ -95,6 +95,14 @@ struct LYNX_TIMER
 class lynx_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BLITTER,
+		TIMER_SHOT,
+		TIMER_UART_LOOPBACK,
+		TIMER_UART
+	};
+
 	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mem_0000(*this, "mem_0000"),
@@ -169,6 +177,9 @@ public:
 	void lynx_uart_reset();
 	int lynx_verify_cart (char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

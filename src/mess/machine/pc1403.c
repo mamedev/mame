@@ -146,9 +146,16 @@ void pc1403_state::machine_start()
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x8000);
 }
 
-TIMER_CALLBACK_MEMBER(pc1403_state::pc1403_power_up)
+void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_power=0;
+	switch (id)
+	{
+	case TIMER_POWER_UP:
+		m_power=0;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in pc1403_state::device_timer");
+	}
 }
 
 DRIVER_INIT_MEMBER(pc1403_state,pc1403)
@@ -159,7 +166,7 @@ DRIVER_INIT_MEMBER(pc1403_state,pc1403)
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	m_power = 1;
-	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1403_state::pc1403_power_up),this));
+	timer_set(attotime::from_seconds(1), TIMER_POWER_UP);
 
 	membank("bank1")->set_base(memregion("user1")->base());
 }

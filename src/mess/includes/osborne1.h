@@ -22,6 +22,12 @@
 class osborne1_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_VIDEO,
+		TIMER_SETUP
+	};
+
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -111,6 +117,8 @@ protected:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_memory_region m_region_maincpu;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

@@ -92,6 +92,13 @@ struct asic_t
 class amstrad_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_PC2_LOW,
+		TIMER_VIDEO_UPDATE,
+		TIMER_SET_RESOLUTION
+	};
+
 	amstrad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -290,6 +297,7 @@ protected:
 	void update_psg();
 	void amstrad_common_init();
 	unsigned char kccomp_get_colour_element(int colour_value);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

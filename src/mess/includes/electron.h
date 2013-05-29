@@ -56,6 +56,13 @@ struct ULA
 class electron_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TAPE_HANDLER,
+		TIMER_SETUP_BEEP,
+		TIMER_SCANLINE_INTERRUPT
+	};
+
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -91,6 +98,9 @@ public:
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( electron_cart );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

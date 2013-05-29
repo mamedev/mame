@@ -12,6 +12,25 @@
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
 
+void electron_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_TAPE_HANDLER:
+		electron_tape_timer_handler(ptr, param);
+		break;
+	case TIMER_SETUP_BEEP:
+		setup_beep(ptr, param);
+		break;
+	case TIMER_SCANLINE_INTERRUPT:
+		electron_scanline_interrupt(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in electron_state::device_timer");
+	}
+}
+
+
 void electron_state::electron_tape_start()
 {
 	if (m_ula.tape_running )
@@ -335,8 +354,8 @@ void electron_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(electron_state::setup_beep),this));
-	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler),this));
+	timer_set(attotime::zero, TIMER_SETUP_BEEP);
+	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )

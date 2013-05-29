@@ -224,6 +224,25 @@ TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 }
 
 
+void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_PC2_LOW:
+		amstrad_pc2_low(ptr, param);
+		break;
+	case TIMER_VIDEO_UPDATE:
+		amstrad_video_update_timer(ptr, param);
+		break;
+	case TIMER_SET_RESOLUTION:
+		cb_set_resolution(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in amstrad_state::device_timer");
+	}
+}
+
+
 /*************************************************************************/
 /* KC Compact
 
@@ -590,7 +609,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, UINT16 hw_colour_inde
 	{
 		int val;
 
-		machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),1);
+		timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
 
 		/* CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette */
 		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; /* red */
@@ -601,7 +620,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, UINT16 hw_colour_inde
 	}
 	else
 	{
-		machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),0);
+		timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
 	}
 	m_GateArray_render_colours[PenIndex] = hw_colour_index;
 }
@@ -609,7 +628,7 @@ void amstrad_state::amstrad_vh_update_colour(int PenIndex, UINT16 hw_colour_inde
 
 void amstrad_state::aleste_vh_update_colour(int PenIndex, UINT16 hw_colour_index)
 {
-	machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),0);
+	timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
 	m_GateArray_render_colours[PenIndex] = hw_colour_index+32;
 }
 
@@ -960,7 +979,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
+	timer_set(attotime::zero, TIMER_PC2_LOW);
 }
 
 
@@ -982,7 +1001,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 	m_gate_array.vsync = state ? 1 : 0;
 
 	/* Schedule a write to PC2 */
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
+	timer_set(attotime::zero, TIMER_PC2_LOW);
 }
 
 
@@ -2017,9 +2036,9 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 			break;
 		case 0x01:      /* Write to selected internal 6845 register Write Only */
 			if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
-				machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),1);
+				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 1);
 			else
-				machine().scheduler().timer_set( attotime::from_usec(0), timer_expired_delegate(FUNC(amstrad_state::amstrad_video_update_timer),this),0);
+				timer_set(attotime::from_usec(0), TIMER_VIDEO_UPDATE, 0);
 			m_crtc->register_w( space, 0, data );
 
 			/* printer port bit 8 */
@@ -2555,7 +2574,7 @@ READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 
 logerror("amstrad_ppi_portb_r\n");
 	/* Schedule a write to PC2 */
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::amstrad_pc2_low),this));
+	timer_set(attotime::zero, TIMER_PC2_LOW);
 
 	return data;
 }
@@ -2935,7 +2954,7 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 	m_gate_array.hsync = 0;
 	m_gate_array.vsync = 0;
 
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::cb_set_resolution),this));
+	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
 
@@ -2987,7 +3006,7 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
 
 	//  multiface_init();
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::cb_set_resolution),this));
+	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
 MACHINE_START_MEMBER(amstrad_state,gx4000)
@@ -3036,7 +3055,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
 	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
 
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::cb_set_resolution),this));
+	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
 MACHINE_START_MEMBER(amstrad_state,kccomp)
@@ -3088,7 +3107,7 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 	amstrad_common_init();
 	amstrad_reset_machine();
 
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(amstrad_state::cb_set_resolution),this));
+	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
 

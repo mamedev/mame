@@ -18,6 +18,12 @@
 class ut88_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RESET,
+		TIMER_UPDATE_DISPLAY
+	};
+
 	ut88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cassette(*this, "cassette"),
@@ -77,6 +83,7 @@ protected:
 	optional_ioport m_io_line7;
 	optional_ioport m_io_line8;
 	required_device<cpu_device> m_maincpu;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

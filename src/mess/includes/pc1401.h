@@ -17,6 +17,11 @@
 class pc1401_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_POWER_UP
+	};
+
 	pc1401_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
@@ -28,7 +33,6 @@ public:
 	UINT8 m_reg[0x100];
 	DECLARE_DRIVER_INIT(pc1401);
 	UINT32 screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pc1401_power_up);
 	DECLARE_READ_LINE_MEMBER(pc1401_reset);
 	DECLARE_READ_LINE_MEMBER(pc1401_brk);
 	DECLARE_WRITE8_MEMBER(pc1401_outa);
@@ -41,6 +45,9 @@ public:
 
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* PC1401_H_ */

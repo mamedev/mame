@@ -17,6 +17,11 @@
 class pc1403_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_POWER_UP
+	};
+
 	pc1403_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
@@ -31,7 +36,6 @@ public:
 
 	DECLARE_DRIVER_INIT(pc1403);
 	UINT32 screen_update_pc1403(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pc1403_power_up);
 	DECLARE_READ_LINE_MEMBER(pc1403_reset);
 	DECLARE_READ_LINE_MEMBER(pc1403_brk);
 	DECLARE_WRITE8_MEMBER(pc1403_outa);
@@ -45,6 +49,9 @@ public:
 	virtual void video_start();
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* PC1403_H_ */

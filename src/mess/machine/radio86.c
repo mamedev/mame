@@ -157,9 +157,16 @@ I8257_INTERFACE( radio86_dma )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
 };
 
-TIMER_CALLBACK_MEMBER(radio86_state::radio86_reset)
+void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_bank1->set_entry(0);
+	switch (id)
+	{
+	case TIMER_RESET:
+		m_bank1->set_entry(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in radio86_state::device_timer");
+	}
 }
 
 
@@ -180,7 +187,7 @@ WRITE8_MEMBER(radio86_state::radio_io_w)
 
 MACHINE_RESET_MEMBER(radio86_state,radio86)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(radio86_state::radio86_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
 
 	m_keyboard_mask = 0;

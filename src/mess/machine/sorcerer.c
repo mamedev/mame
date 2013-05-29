@@ -27,6 +27,27 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
 #endif
 
 
+void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_SERIAL:
+#if SORCERER_USING_RS232
+		sorcerer_serial_tc(ptr, param);
+#endif
+		break;
+	case TIMER_CASSETTE:
+		sorcerer_cassette_tc(ptr, param);
+		break;
+	case TIMER_RESET:
+		sorcerer_reset(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sorcerer_state::device_timer");
+	}
+}
+
+
 /* timer to read cassette waveforms */
 
 TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
@@ -338,9 +359,9 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 
 void sorcerer_state::machine_start()
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_cassette_tc),this));
+	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 #if SORCERER_USING_RS232
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_serial_tc),this));
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
 #endif
 
 	UINT16 endmem = 0xbfff;
@@ -365,9 +386,9 @@ void sorcerer_state::machine_start()
 
 MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 {
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_cassette_tc),this));
+	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 #if SORCERER_USING_RS232
-	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sorcerer_state::sorcerer_serial_tc),this));
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
 #endif
 
 	UINT16 endmem = 0xbbff;
@@ -404,7 +425,7 @@ void sorcerer_state::machine_reset()
 	sorcerer_fe_w(space, 0, 0, 0xff);
 
 	membank("boot")->set_entry(1);
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(sorcerer_state::sorcerer_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_RESET);
 }
 
 

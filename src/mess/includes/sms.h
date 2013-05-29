@@ -22,6 +22,14 @@
 class sms_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RAPID_FIRE,
+		TIMER_LIGHTGUN_TICK,
+		TIMER_LPHASER_1,
+		TIMER_LPHASER_2
+	};
+
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -213,7 +221,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 
 protected:
-
 	void setup_bios();
 	void setup_rom();
 	void setup_sms_cart();
@@ -224,6 +231,7 @@ protected:
 	UINT16 screen_vpos_nonscaled(int scaled_vpos);
 	int lgun_bright_aim_area(emu_timer *timer, int lgun_x, int lgun_y);
 	void sms_get_inputs(address_space &space);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class smssdisp_state : public sms_state

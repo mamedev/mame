@@ -26,6 +26,12 @@ class specimx_sound_device; // defined below
 class special_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RESET,
+		TIMER_PIT8253_GATES
+	};
+
 	special_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -114,8 +120,6 @@ public:
 	UINT32 screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(special_reset);
-	TIMER_CALLBACK_MEMBER(setup_pit8253_gates);
 	void fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 
@@ -140,6 +144,8 @@ protected:
 	required_ioport m_io_line10;
 	required_ioport m_io_line11;
 	required_ioport m_io_line12;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

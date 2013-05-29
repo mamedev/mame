@@ -16,6 +16,27 @@
 #define LGUN_RADIUS           6
 #define LGUN_X_INTERVAL       4
 
+void sms_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_RAPID_FIRE:
+		rapid_fire_callback(ptr, param);
+		break;
+	case TIMER_LIGHTGUN_TICK:
+		lightgun_tick(ptr, param);
+		break;
+	case TIMER_LPHASER_1:
+		lphaser_1_callback(ptr, param);
+		break;
+	case TIMER_LPHASER_2:
+		lphaser_2_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sms_state::device_timer");
+	}
+}
+
 
 TIMER_CALLBACK_MEMBER(sms_state::rapid_fire_callback)
 {
@@ -329,7 +350,7 @@ void sms_state::sms_get_inputs( address_space &space )
 	}
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	/* Player 1 */
 	switch (m_port_ctrlsel->read_safe(0x00) & 0x0f)
@@ -1035,18 +1056,18 @@ MACHINE_START_MEMBER(sms_state,sms)
 {
 	char str[6];
 	
-	m_rapid_fire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::rapid_fire_callback),this));
+	m_rapid_fire_timer = timer_alloc(TIMER_RAPID_FIRE);
 	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
-	m_lphaser_1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_1_callback),this));
-	m_lphaser_2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_2_callback),this));
+	m_lphaser_1_timer = timer_alloc(TIMER_LPHASER_1);
+	m_lphaser_2_timer = timer_alloc(TIMER_LPHASER_2);
 
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),this));
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	// alibaba and blockhol are ports of games for the MSX system. The
 	// MSX bios usually initializes callback "vectors" at the top of RAM.

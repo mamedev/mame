@@ -17,6 +17,23 @@
 #define LOG_DAI_PORT_R(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port read : %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 #define LOG_DAI_PORT_W(_port, _data, _comment) do { if (DEBUG_DAI_PORTS) logerror ("DAI port write: %04x, Data: %02x (%s)\n", _port, _data, _comment); } while (0)
 
+void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_BOOTSTRAP:
+		m_maincpu->set_pc(0xc000);
+		break;
+	case TIMER_TMS5501:
+		m_tms5501->set_pio_bit_7((ioport("IN8")->read() & 0x04) ? 1:0);
+		timer_set(attotime::from_hz(100), TIMER_TMS5501);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in dai_state::device_timer");
+	}
+}
+
+
 /* Discrete I/O devices */
 
 
@@ -31,11 +48,6 @@ WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 void dai_state::dai_update_memory(int dai_rom_bank)
 {
 	membank("bank2")->set_entry(dai_rom_bank);
-}
-
-TIMER_CALLBACK_MEMBER(dai_state::dai_bootstrap_callback)
-{
-	m_maincpu->set_pc(0xc000);
 }
 
 
@@ -105,16 +117,11 @@ const struct pit8253_config dai_pit8253_intf =
 	}
 };
 
-TIMER_CALLBACK_MEMBER(dai_state::dai_timer)
-{
-	m_tms5501->set_pio_bit_7((ioport("IN8")->read() & 0x04) ? 1:0);
-}
-
 void dai_state::machine_start()
 {
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(dai_state::dai_bootstrap_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this)); /* timer for tms5501 */
+	timer_set(attotime::zero, TIMER_BOOTSTRAP);
+	timer_set(attotime::from_hz(100), TIMER_TMS5501);
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 }

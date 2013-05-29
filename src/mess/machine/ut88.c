@@ -14,6 +14,14 @@
 #include "machine/i8255.h"
 #include "includes/ut88.h"
 
+static const UINT8 hex_to_7seg[16] =
+{
+	0x3F, 0x06, 0x5B, 0x4F,
+	0x66, 0x6D, 0x7D, 0x07,
+	0x7F, 0x6F, 0x77, 0x7c,
+	0x39, 0x5e, 0x79, 0x71
+};
+
 
 /* Driver initialization */
 DRIVER_INIT_MEMBER(ut88_state,ut88)
@@ -24,6 +32,25 @@ DRIVER_INIT_MEMBER(ut88_state,ut88)
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xf800);
 }
+
+
+void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_RESET:
+		m_bank1->set_entry(0);
+		break;
+	case TIMER_UPDATE_DISPLAY:
+		for (int i=0;i<6;i++)
+			output_set_digit_value(i, hex_to_7seg[m_lcd_digit[i]]);
+		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in ut88_state::device_timer");
+	}
+}
+
 
 READ8_MEMBER( ut88_state::ut88_8255_portb_r )
 {
@@ -69,14 +96,9 @@ I8255A_INTERFACE( ut88_ppi8255_interface )
 	DEVCB_NULL,
 };
 
-TIMER_CALLBACK_MEMBER(ut88_state::ut88_reset)
-{
-	m_bank1->set_entry(0);
-}
-
 MACHINE_RESET_MEMBER(ut88_state,ut88)
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(ut88_state::ut88_reset),this));
+	timer_set(attotime::from_usec(10), TIMER_RESET);
 	m_bank1->set_entry(1);
 	m_keyboard_mask = 0;
 }
@@ -148,29 +170,13 @@ WRITE8_MEMBER( ut88_state::ut88mini_write_led )
 		}
 }
 
-static const UINT8 hex_to_7seg[16] =
-{
-		0x3F, 0x06, 0x5B, 0x4F,
-		0x66, 0x6D, 0x7D, 0x07,
-		0x7F, 0x6F, 0x77, 0x7c,
-		0x39, 0x5e, 0x79, 0x71
-};
-
-TIMER_CALLBACK_MEMBER(ut88_state::update_display)
-{
-	int i;
-	for (i=0;i<6;i++)
-		output_set_digit_value(i, hex_to_7seg[m_lcd_digit[i]]);
-}
-
-
 DRIVER_INIT_MEMBER(ut88_state,ut88mini)
 {
 }
 
 MACHINE_START_MEMBER(ut88_state,ut88mini)
 {
-	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(ut88_state::update_display),this));
+	timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 }
 
 MACHINE_RESET_MEMBER(ut88_state,ut88mini)

@@ -16,6 +16,11 @@
 class radio86_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_RESET
+	};
+
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -61,7 +66,6 @@ public:
 	DECLARE_DRIVER_INIT(radio86);
 	DECLARE_MACHINE_RESET(radio86);
 	DECLARE_PALETTE_INIT(radio86);
-	TIMER_CALLBACK_MEMBER(radio86_reset);
 	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
 	DECLARE_READ8_MEMBER(radio86_8255_portc_r2);
 	DECLARE_WRITE8_MEMBER(radio86_8255_porta_w2);
@@ -75,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	required_device<cpu_device> m_maincpu;
+
 protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8257_device> m_dma8257;
@@ -101,6 +106,7 @@ protected:
 	optional_ioport m_io_cline7;
 
 	void radio86_init_keyboard();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
