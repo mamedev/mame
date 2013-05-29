@@ -1,8 +1,7 @@
 #include "machine/intelfsh.h"
 #include "machine/eeprom.h"
+#include "machine/7200fifo.h"
 #include "sound/okim6295.h"
-
-#define FIFO_SIZE 512
 
 class seibuspi_state : public driver_device
 {
@@ -14,6 +13,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_eeprom(*this, "eeprom"),
+		m_soundfifo1(*this, "soundfifo1"),
+		m_soundfifo2(*this, "soundfifo2"),
 		m_oki2(*this, "oki2") { }
 
 	optional_shared_ptr<UINT32> m_spi_scrollram;
@@ -23,14 +24,6 @@ public:
 	UINT8 *m_z80_rom;
 	int m_z80_prg_fifo_pos;
 	int m_z80_lastbank;
-	int m_fifoin_rpos;
-	int m_fifoin_wpos;
-	UINT8 m_fifoin_data[FIFO_SIZE];
-	int m_fifoin_read_request;
-	int m_fifoout_rpos;
-	int m_fifoout_wpos;
-	UINT8 m_fifoout_data[FIFO_SIZE];
-	int m_fifoout_read_request;
 	UINT8 m_sb_coin_latch;
 	UINT8 m_ejsakura_input_port;
 	tilemap_t *m_text_layer;
@@ -66,8 +59,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 	DECLARE_READ32_MEMBER(sb_coin_r);
 	DECLARE_WRITE8_MEMBER(sb_coin_w);
-	DECLARE_READ32_MEMBER(sound_fifo_r);
-	DECLARE_WRITE32_MEMBER(sound_fifo_w);
 	DECLARE_READ32_MEMBER(sound_fifo_status_r);
 	DECLARE_READ32_MEMBER(spi_int_r);
 	DECLARE_READ32_MEMBER(spi_unknown_r);
@@ -75,8 +66,6 @@ public:
 	DECLARE_WRITE32_MEMBER(z80_enable_w);
 	DECLARE_READ32_MEMBER(spi_controls1_r);
 	DECLARE_READ32_MEMBER(spi_controls2_r);
-	DECLARE_READ8_MEMBER(z80_soundfifo_r);
-	DECLARE_WRITE8_MEMBER(z80_soundfifo_w);
 	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
 	DECLARE_WRITE8_MEMBER(z80_bank_w);
 	DECLARE_READ8_MEMBER(z80_jp1_r);
@@ -131,10 +120,6 @@ public:
 	void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows);
 	void set_scroll(tilemap_t *layer, int scroll);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll);
-	UINT8 z80_fifoout_pop(address_space &space);
-	void z80_fifoout_push(address_space &space, UINT8 data);
-	UINT8 z80_fifoin_pop(address_space &space);
-	void z80_fifoin_push(address_space &space, UINT8 data);
 	void init_spi();
 	void init_rf2_common();
 	void init_rfjet_common();
@@ -142,9 +127,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	required_device<eeprom_device> m_eeprom;
+	optional_device<fifo7200_device> m_soundfifo1;
+	optional_device<fifo7200_device> m_soundfifo2;
 	optional_device<okim6295_device> m_oki2;
 };
+
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
-/*----------- defined in video/seibuspi.c -----------*/
-void rf2_set_layer_banks(running_machine &machine, int banks);

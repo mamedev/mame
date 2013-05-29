@@ -201,6 +201,7 @@ INTERRUPT_GEN_MEMBER(horse_state::horse_interrupt)
 }
 
 static MACHINE_CONFIG_START( horse, horse_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)

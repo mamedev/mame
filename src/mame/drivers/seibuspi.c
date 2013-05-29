@@ -730,6 +730,7 @@ Notes:
 #include "machine/ds2404.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
+#include "machine/7200fifo.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
@@ -737,78 +738,6 @@ Notes:
 #include "includes/seibuspi.h"
 
 /********************************************************************/
-
-UINT8 seibuspi_state::z80_fifoout_pop(address_space &space)
-{
-	UINT8 r;
-	if (m_fifoout_wpos == m_fifoout_rpos)
-	{
-		logerror("Sound FIFOOUT underflow at %08X\n", space.device().safe_pc());
-	}
-	r = m_fifoout_data[m_fifoout_rpos++];
-	if(m_fifoout_rpos == FIFO_SIZE)
-	{
-		m_fifoout_rpos = 0;
-	}
-
-	if (m_fifoout_wpos == m_fifoout_rpos)
-	{
-		m_fifoout_read_request = 0;
-	}
-
-	return r;
-}
-
-void seibuspi_state::z80_fifoout_push(address_space &space, UINT8 data)
-{
-	m_fifoout_data[m_fifoout_wpos++] = data;
-	if (m_fifoout_wpos == FIFO_SIZE)
-	{
-		m_fifoout_wpos = 0;
-	}
-	if(m_fifoout_wpos == m_fifoout_rpos)
-	{
-		fatalerror("Sound FIFOOUT overflow at %08X\n", space.device().safe_pc());
-	}
-
-	m_fifoout_read_request = 1;
-}
-
-UINT8 seibuspi_state::z80_fifoin_pop(address_space &space)
-{
-	UINT8 r;
-	if (m_fifoin_wpos == m_fifoin_rpos)
-	{
-		fatalerror("Sound FIFOIN underflow at %08X\n", space.device().safe_pc());
-	}
-	r = m_fifoin_data[m_fifoin_rpos++];
-	if(m_fifoin_rpos == FIFO_SIZE)
-	{
-		m_fifoin_rpos = 0;
-	}
-
-	if (m_fifoin_wpos == m_fifoin_rpos)
-	{
-		m_fifoin_read_request = 0;
-	}
-
-	return r;
-}
-
-void seibuspi_state::z80_fifoin_push(address_space &space, UINT8 data)
-{
-	m_fifoin_data[m_fifoin_wpos++] = data;
-	if(m_fifoin_wpos == FIFO_SIZE)
-	{
-		m_fifoin_wpos = 0;
-	}
-	if(m_fifoin_wpos == m_fifoin_rpos)
-	{
-		fatalerror("Sound FIFOIN overflow at %08X\n", space.device().safe_pc());
-	}
-
-	m_fifoin_read_request = 1;
-}
 
 READ32_MEMBER(seibuspi_state::sb_coin_r)
 {
@@ -826,33 +755,17 @@ WRITE8_MEMBER(seibuspi_state::sb_coin_w)
 		m_sb_coin_latch = 0;
 }
 
-READ32_MEMBER(seibuspi_state::sound_fifo_r)
-{
-	UINT8 r = z80_fifoout_pop(space);
-
-	return r;
-}
-
-WRITE32_MEMBER(seibuspi_state::sound_fifo_w)
-{
-	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(space, data & 0xff);
-	}
-}
-
 READ32_MEMBER(seibuspi_state::sound_fifo_status_r)
 {
-	UINT32 r = 0;
-	if (m_fifoout_read_request)
-	{
-		r |= 2;
-	}
-	return r | 1;
+	// d0: ?
+	// d1: fifo empty flag
+	// other bits: unused?
+	return (~m_soundfifo2->ef_r() << 1 & 0x02) | 0x01;
 }
 
 READ32_MEMBER(seibuspi_state::spi_int_r)
 {
-	m_maincpu->set_input_line(0,CLEAR_LINE );
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xffffffff;
 }
 
@@ -893,12 +806,16 @@ WRITE32_MEMBER(seibuspi_state::z80_enable_w)
 	}
 
 logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
-	if( ACCESSING_BITS_0_7 ) {
-		if( data & 0x1 ) {
+	if( ACCESSING_BITS_0_7 )
+	{
+		if( data & 0x1 )
+		{
 			m_z80_prg_fifo_pos = 0;
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE );
-		} else {
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+		else
+		{
+			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
@@ -942,26 +859,12 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 }
 /********************************************************************/
 
-READ8_MEMBER(seibuspi_state::z80_soundfifo_r)
-{
-	UINT8 r = z80_fifoin_pop(space);
-
-	return r;
-}
-
-WRITE8_MEMBER(seibuspi_state::z80_soundfifo_w)
-{
-	z80_fifoout_push(space, data);
-}
-
 READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 {
-	UINT8 r = 0;
-	if (m_fifoin_read_request)
-	{
-		r |= 2;
-	}
-	return r | 1;
+	// d0: ?
+	// d1: fifo empty flag
+	// other bits: unused?
+	return (~m_soundfifo1->ef_r() << 1 & 0x02) | 0x01;
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_bank_w)
@@ -1029,7 +932,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)   /* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)     /* Unknown */
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)   /* Player controls (start) */
-	AM_RANGE(0x00000680, 0x00000683) AM_READ(sound_fifo_r) AM_WRITE(sound_fifo_w)
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ(sound_fifo_status_r)
 	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP                /* Unknown */
 	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE(z80_prg_fifo_w)
@@ -1049,7 +952,7 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP            /* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP            /* Unknown */
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)    /* single board systems */
-	AM_RANGE(0x4008, 0x4008) AM_READWRITE(z80_soundfifo_r, z80_soundfifo_w)
+	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(z80_jp1_r)
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP            /* Unknown */
@@ -1864,6 +1767,9 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
+
+	MCFG_FIFO7200_ADD("soundfifo1", 0x200) // LH5496D, but on single board hw it's one CY7C421
+	MCFG_FIFO7200_ADD("soundfifo2", 0x200) // "
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
