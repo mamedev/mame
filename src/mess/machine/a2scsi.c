@@ -39,6 +39,7 @@ const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 
 static MACHINE_CONFIG_FRAGMENT( ncr5380 )
 	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
 MACHINE_CONFIG_END
 
@@ -59,7 +60,6 @@ MACHINE_CONFIG_FRAGMENT( scsi )
 	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_CLOCK("ncr5380", 10000000)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
 MACHINE_CONFIG_END
 

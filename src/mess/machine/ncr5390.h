@@ -3,17 +3,20 @@
 
 #include "machine/nscsi_bus.h"
 
-struct ncr5390_interface
-{
-	devcb_write_line    m_irq_cb;
-	devcb_write_line    m_drq_cb;
-};
+#define MCFG_NCR5390_IRQ_HANDLER(_devcb) \
+	devcb = &ncr5390_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-class ncr5390_device : public nscsi_device,
-						public ncr5390_interface
+#define MCFG_NCR5390_DRQ_HANDLER(_devcb) \
+	devcb = &ncr5390_device::set_drq_handler(*device, DEVCB2_##_devcb);
+
+class ncr5390_device : public nscsi_device
 {
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5390_device &>(device).m_drq_handler.set_callback(object); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -45,7 +48,6 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -192,9 +194,6 @@ private:
 
 	bool irq, drq;
 
-	devcb_resolved_write_line   m_irq_func;
-	devcb_resolved_write_line   m_drq_func;
-
 	void dma_set(int dir);
 	void drq_set();
 	void drq_clear();
@@ -221,6 +220,9 @@ private:
 
 	void delay(int cycles);
 	void delay_cycles(int cycles);
+
+	devcb2_write_line m_irq_handler;
+	devcb2_write_line m_drq_handler;
 };
 
 extern const device_type NCR5390;

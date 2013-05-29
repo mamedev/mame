@@ -845,6 +845,7 @@ WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 
 static MACHINE_CONFIG_FRAGMENT( ncr53c700 )
 	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_DEVICE_CLOCK(66000000)
 	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
 	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
 	MCFG_NCR53C7XX_HOST_WRITE(DEVWRITE32(":", rastersp_state, ncr53c700_write))
@@ -895,7 +896,6 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", rastersp_scsi_devices, "harddisk", true)
 	MCFG_NSCSI_ADD("scsibus:7", rastersp_scsi_devices, "ncr53c700", true)
-	MCFG_DEVICE_CARD_CLOCK("ncr53c700", 66000000)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr53c700", ncr53c700)
 
 	/* Video */

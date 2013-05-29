@@ -932,11 +932,12 @@ static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
 
-static const ncr5390_interface next_ncr5390_interface =
-{
-		DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_irq),
-		DEVCB_DRIVER_LINE_MEMBER(next_state, scsi_drq)
-};
+static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_DEVICE_CLOCK(10000000)
+	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
+	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( next_base, next_state )
 
@@ -965,8 +966,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_DEVICE_CARD_CONFIG("ncr5390", &next_ncr5390_interface)
-	MCFG_DEVICE_CARD_CLOCK("ncr5390", 10000000)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 
 	MCFG_MB8795_ADD("net",
 					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
