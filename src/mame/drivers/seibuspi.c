@@ -25,12 +25,9 @@
       It has a 40MHz AMD 386 and a considerably weaker sound system (dual MSM6295).
 
 TODO:
-- Alpha blending. Screen shot on www.system16.com show that during attract mode
-  in Viper Phase 1 the "Viper" part of the logo (the red part) should be partially
-  transparent. Same thing with the blu "Viper" logo when on the "push 1 or 2
-  players button" screen. Note that the red logo is tiles, the blue logo is sprites.
-  Same thing with the lights on the ground at the beginning of the game. They are
-  opaque now, you should see the background tiles through.
+- Alpha blending on sprites. In Viper Phase 1, see the blue "Viper" logo when on the
+  "push 1 or 2 players button" screen. Note that the alpha blended red logo on the
+  title screen is tiles(that effect is emulated), this blue logo is sprites.
 
 */
 

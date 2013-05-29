@@ -2458,7 +2458,7 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
 	
 	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
-	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // LH540202
+	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
