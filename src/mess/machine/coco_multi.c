@@ -108,10 +108,10 @@ static const cococart_interface multi_cococart_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT(coco_multi)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL, NULL)
-	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, multi_cococart_interface, coco_cart_slot4, "fdcv11", NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT2_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT3_TAG, multi_cococart_interface, coco_cart_slot1_3, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(SLOT4_TAG, multi_cococart_interface, coco_cart_slot4, "fdcv11")
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -595,8 +595,8 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 
 	MCFG_CASSETTE_ADD( "cassette", elwro800jr_cassette_interface )
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", elwro800jr_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

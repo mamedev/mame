@@ -811,8 +811,8 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
 	MCFG_I8272A_ADD("i8272", true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_SOUND_CONFIG(nes_apu_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL)
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","nes")
 	MCFG_SOFTWARE_LIST_ADD("ntb_list","nes_ntbrom") // Nantettate Baseball mini_carts
 MACHINE_CONFIG_END
@@ -568,7 +568,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_DEVICE_REMOVE("nes_slot")
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL)
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL)
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)

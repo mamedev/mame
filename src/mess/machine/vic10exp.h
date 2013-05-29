@@ -54,9 +54,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_VIC10_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_VIC10_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, VIC10_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 #define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _res) \

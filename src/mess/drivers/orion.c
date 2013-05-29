@@ -125,10 +125,10 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
 
 	MCFG_CARTSLOT_ADD("cart")
@@ -195,10 +195,10 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
 
 	MCFG_CARTSLOT_ADD("cart")
@@ -255,10 +255,10 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","orionpro_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop128_list","orion_flop")
 

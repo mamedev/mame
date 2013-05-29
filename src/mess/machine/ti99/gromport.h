@@ -56,7 +56,7 @@ SLOT_INTERFACE_EXTERN(gromport);
 #define MCFG_TI99_GROMPORT_ADD( _tag, _conf )   \
 	MCFG_DEVICE_ADD(_tag, GROMPORT, 0) \
 	MCFG_DEVICE_CONFIG(_conf)   \
-	MCFG_DEVICE_SLOT_INTERFACE(gromport, "single", NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(gromport, "single", false)
 
 /****************************************************************************/
 

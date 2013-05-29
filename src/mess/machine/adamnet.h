@@ -31,9 +31,9 @@
 #define MCFG_ADAMNET_BUS_ADD() \
 	MCFG_DEVICE_ADD(ADAMNET_TAG, ADAMNET, 0)
 
-#define MCFG_ADAMNET_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ADAMNET_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ADAMNET_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 

@@ -2684,8 +2684,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

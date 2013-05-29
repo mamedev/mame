@@ -773,10 +773,10 @@ static MACHINE_CONFIG_START( einstein, einstein_state )
 
 	MCFG_WD1770x_ADD(IC_I042, XTAL_X002)
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", 0, einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "525dd", einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "525dd", einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525dd", einstein_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525dd", einstein_state::floppy_formats)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")

@@ -126,7 +126,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_fdc )
 
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_4MHz/4)
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525dd", 0, adam_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525dd", adam_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

@@ -2270,7 +2270,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SOUND_ADD("direct_b_right", DAC, 0)        // GBA direct sound B right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spkright", 0.50)
 
-	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, NULL, NULL)
+	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_CONFIG_END
 

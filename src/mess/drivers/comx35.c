@@ -695,7 +695,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

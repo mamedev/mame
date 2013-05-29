@@ -1885,8 +1885,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_UPD71071_ADD("dmac",pc88va_dma_config)
 
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
 	MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)

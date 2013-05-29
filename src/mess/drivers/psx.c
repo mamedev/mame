@@ -496,8 +496,8 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad", NULL)
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad", NULL)
+	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
+	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -532,8 +532,8 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad", NULL)
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad", NULL)
+	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
+	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */

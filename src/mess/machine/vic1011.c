@@ -45,7 +45,7 @@ static const rs232_port_interface rs232_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1011 )
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 MACHINE_CONFIG_END
 
 

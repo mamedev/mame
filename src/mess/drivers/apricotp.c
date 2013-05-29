@@ -656,8 +656,8 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PIT8253_ADD(I8253A5_TAG, pit_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	/* internal ram */

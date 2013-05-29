@@ -357,8 +357,8 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal", NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -283,7 +283,7 @@ static MACHINE_CONFIG_FRAGMENT( c1581 )
 
 	MCFG_WD1772x_ADD(WD1772_TAG, XTAL_16MHz/2)
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", 0, c1581_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", c1581_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

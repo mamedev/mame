@@ -79,16 +79,16 @@ SLOT_INTERFACE_EXTERN(joystick_port_gen);
 #define MCFG_GENEVE_JOYPORT_ADD( _tag, _conf )  \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
-	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_gen, "twinjoy", NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_gen, "twinjoy", false)
 
 #define MCFG_TI_JOYPORT4A_ADD( _tag, _conf )    \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
-	MCFG_DEVICE_SLOT_INTERFACE(joystick_port, "twinjoy", NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(joystick_port, "twinjoy", false)
 
 #define MCFG_TI_JOYPORT4_ADD( _tag, _conf ) \
 	MCFG_DEVICE_ADD(_tag, JOYPORT, 0) \
 	MCFG_DEVICE_CONFIG( _conf ) \
-	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_994, "twinjoy", NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(joystick_port_994, "twinjoy", false)
 
 #endif /* __JOYPORT__ */

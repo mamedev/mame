@@ -1294,8 +1294,8 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", 0, pcw_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", 0, pcw_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 

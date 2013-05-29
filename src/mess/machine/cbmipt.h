@@ -107,19 +107,19 @@
 
 
 #define MCFG_CBM_IEC_ADD(_default_drive) \
-	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL) \
-	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec4", 4, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec8", 8, cbm_iec_devices, _default_drive) \
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL) \
+	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL) \
 	MCFG_CBM_IEC_BUS_ADD()
 
 
 #define MCFG_CBM_IEEE488_ADD(_default_drive) \
-	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, _default_drive, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL, NULL) \
-	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, _default_drive) \
+	MCFG_IEEE488_SLOT_ADD("ieee9", 9, cbm_ieee488_devices, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee10", 10, cbm_ieee488_devices, NULL) \
+	MCFG_IEEE488_SLOT_ADD("ieee11", 11, cbm_ieee488_devices, NULL) \
 	MCFG_IEEE488_BUS_ADD()
 
 

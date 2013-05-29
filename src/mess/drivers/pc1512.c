@@ -1268,15 +1268,15 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1314,15 +1314,15 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", 0, pc1512_state::floppy_formats)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

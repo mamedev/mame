@@ -145,10 +145,10 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	// FDC9266 location U43 XTAL_8MHz
 	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", 0, tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", 0, tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":2", tim011_floppies, "35dd", 0, tim011_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":3", tim011_floppies, "35dd", 0, tim011_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":2", tim011_floppies, "35dd", tim011_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":3", tim011_floppies, "35dd", tim011_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

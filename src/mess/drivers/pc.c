@@ -1003,10 +1003,10 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1019,7 +1019,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1029,8 +1029,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1087,10 +1087,10 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* video hardware */
@@ -1111,8 +1111,8 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1137,8 +1137,8 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1171,7 +1171,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_DEVICE_REMOVE("fdc:0")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
@@ -1191,8 +1191,8 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1215,7 +1215,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1240,8 +1240,8 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
@@ -1264,7 +1264,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1309,8 +1309,8 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pcjr )
@@ -1337,7 +1337,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	MCFG_UPD765A_ADD("upd765", false, false)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")
@@ -1372,8 +1372,8 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_CPU_IO_MAP(ibmpcjx_io)
 
 	MCFG_DEVICE_REMOVE("upd765:0");
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	MCFG_GFXDECODE(ibmpcjx)
 MACHINE_CONFIG_END
@@ -1415,8 +1415,8 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )    // has no motor control
 
 	MCFG_FD1793x_ADD("vg93", XTAL_16MHz / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", mc1502_floppies, "525qd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", mc1502_floppies, "525qd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", mc1502_floppies, "525qd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", mc1502_floppies, "525qd", pc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
@@ -1463,14 +1463,14 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
 	/* keyboard -- needs dump */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram -- up to 4 banks of 512K */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1500,10 +1500,10 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1516,7 +1516,7 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1525,8 +1525,8 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1545,8 +1545,8 @@ static MACHINE_CONFIG_DERIVED( asst128, iskr1031 )
 
 	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
 	
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", pc_state::asst128_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 
 	MCFG_DEVICE_REMOVE(CGA_SCREEN_NAME)
 	MCFG_DEVICE_REMOVE(CGA_MC6845_NAME)
@@ -1576,10 +1576,10 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 //  MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
@@ -1591,7 +1591,7 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1601,8 +1601,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1631,10 +1631,10 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
@@ -1647,7 +1647,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1657,8 +1657,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1686,10 +1686,10 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1702,7 +1702,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1712,8 +1712,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1741,10 +1741,10 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1757,7 +1757,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1767,8 +1767,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1796,10 +1796,10 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1812,7 +1812,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	/* keyboard */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
@@ -1822,8 +1822,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

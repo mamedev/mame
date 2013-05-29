@@ -37,9 +37,9 @@
 	const econet_interface (_name) =
 
 
-#define MCFG_ECONET_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ECONET_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECONET_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	econet_slot_device::static_set_slot(*device, _num);
 
 

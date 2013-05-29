@@ -147,8 +147,8 @@ static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf) // ?
 	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_4MHz/2) // ?
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", abc_fd2_floppies, "525sssd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", abc_fd2_floppies, "525sssd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", abc_fd2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", abc_fd2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 

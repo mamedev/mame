@@ -34,7 +34,7 @@ static MACHINE_CONFIG_FRAGMENT( cpc_rom )
 	MCFG_ROMSLOT_ADD("rom6")
 
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL)
 
 MACHINE_CONFIG_END
 

@@ -862,8 +862,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	MCFG_TMS9927_ADD("crtc", 12324000, crtc_interface)
 

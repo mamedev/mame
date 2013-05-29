@@ -1032,8 +1032,8 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL) // wired as DCE
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL) // wired as DTE
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL) // wired as DCE
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL) // wired as DTE
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

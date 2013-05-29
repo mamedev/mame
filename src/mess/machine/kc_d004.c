@@ -78,10 +78,10 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_Z80CTC_ADD( Z80CTC_TAG, XTAL_8MHz/2, kc_d004_ctc_intf )
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)

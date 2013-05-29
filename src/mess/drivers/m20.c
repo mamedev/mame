@@ -989,8 +989,8 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	/* Devices */
 	MCFG_FD1797x_ADD("fd1797", 1000000)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)

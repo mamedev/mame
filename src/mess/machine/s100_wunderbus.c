@@ -179,9 +179,10 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal", terminal)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, rs232c_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, rs232c_intf, default_rs232_devices, NULL)
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, rtc_intf)
 MACHINE_CONFIG_END
 

@@ -160,11 +160,11 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, "m011", NULL)
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, "m011")
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL)
 
 	/* expansion interface */
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL, NULL)
+	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")
@@ -212,11 +212,11 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc85_exp_interface, kc85_cart, NULL)
 
 	/* expansion interface */
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL, NULL)
+	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc85_exp_interface, kc85_exp , NULL)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "kc_cart")

@@ -3533,8 +3533,8 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
-	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26", NULL)
-	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL, NULL)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
+	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 
@@ -3570,10 +3570,10 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
@@ -3637,8 +3637,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 
@@ -3703,8 +3703,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 

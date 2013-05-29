@@ -1375,7 +1375,7 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
 
 	MCFG_PC_FDC_AT_ADD(APOLLO_FDC_TAG)
-	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", 0, apollo_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", apollo_state::floppy_formats)
 
 	MCFG_OMTI8621_ADD(APOLLO_WDC_TAG, apollo_wdc_config)
 	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)

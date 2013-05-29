@@ -243,7 +243,7 @@ static MACHINE_CONFIG_FRAGMENT( fd2000 )
 	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
 	MCFG_DP8473_ADD(DP8473V_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(DP8473V_TAG":0", fd2000_floppies, "35hd", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -258,7 +258,7 @@ static MACHINE_CONFIG_FRAGMENT( fd4000 )
 	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
 	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

@@ -957,14 +957,17 @@ static MACHINE_CONFIG_START( next_base, next_state )
 						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
 						line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
 						line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, 0, 0, 0, false)
-	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", 0, &next_ncr5390_interface, 10000000, true)
+	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, false)
+	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
+	MCFG_DEVICE_CARD_CONFIG("ncr5390", &next_ncr5390_interface)
+	MCFG_DEVICE_CARD_CLOCK("ncr5390", 10000000)
+
 	MCFG_MB8795_ADD("net",
 					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::net_rx_irq), static_cast<next_state *>(owner)),
@@ -982,7 +985,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", 0, next_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")

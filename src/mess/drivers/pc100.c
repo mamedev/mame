@@ -497,8 +497,8 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_MSM58321_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

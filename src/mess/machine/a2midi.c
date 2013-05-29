@@ -65,8 +65,8 @@ static const serial_port_interface midiout_intf =
 MACHINE_CONFIG_FRAGMENT( midi )
 	MCFG_PTM6840_ADD(MIDI_PTM_TAG, ptm_interface)
 	MCFG_ACIA6850_ADD(MIDI_ACIA_TAG, acia_interface)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

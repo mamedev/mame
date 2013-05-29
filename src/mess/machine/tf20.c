@@ -129,8 +129,8 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_UPD765A_ADD("5a", true, true)
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// serial interface to another device
 	MCFG_EPSON_SIO_ADD("sio", NULL)

@@ -57,10 +57,10 @@
 	const comx_expansion_slot_interface (_name) =
 
 
-#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 

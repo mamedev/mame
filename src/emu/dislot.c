@@ -8,19 +8,18 @@
 #include "emuopts.h"
 
 device_slot_interface::device_slot_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device)
+	: device_interface(device),
+	m_slot_interfaces(NULL),
+	m_default_card(NULL),
+	m_fixed(false)
 {
-	m_default_card = 0;
-	m_input_defaults = 0;
-	m_slot_interfaces = 0;
 }
 
 device_slot_interface::~device_slot_interface()
 {
 }
 
-
-void device_slot_interface::static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, const void *default_config, UINT32 default_clock, bool fixed)
+void device_slot_interface::static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card, bool fixed)
 {
 	device_slot_interface *slot;
 	if (!device.interface(slot))
@@ -28,10 +27,60 @@ void device_slot_interface::static_set_slot_info(device_t &device, const slot_in
 
 	slot->m_slot_interfaces = slots_info;
 	slot->m_default_card = default_card;
-	slot->m_input_defaults = default_input;
-	slot->m_default_config = default_config;
-	slot->m_default_clock = default_clock;
 	slot->m_fixed = fixed;
+}
+
+device_card_options *device_slot_interface::static_alloc_card_options(device_t &device, const char *card)
+{
+	device_slot_interface &intf = dynamic_cast<device_slot_interface &>(device);
+
+	device_card_options *options = intf.m_card_options.find(card);
+	if (options == NULL)
+	{
+		options = pool_alloc(intf.m_card_options.pool(), device_card_options());
+		intf.m_card_options.append(card, *options);
+	}
+
+	return options;
+}
+	
+void device_slot_interface::static_set_card_device_input_defaults(device_t &device, const char *card, const input_device_default *input_device_defaults)
+{
+	static_alloc_card_options(device, card)->m_input_device_defaults = input_device_defaults;
+}
+
+void device_slot_interface::static_set_card_config(device_t &device, const char *card, const void *config)
+{
+	static_alloc_card_options(device, card)->m_config = config;
+}
+
+void device_slot_interface::static_set_card_clock(device_t &device, const char *card, UINT32 clock)
+{
+	static_alloc_card_options(device, card)->m_clock = clock;
+}
+
+const input_device_default *device_slot_interface::card_input_device_defaults(const char *card) const
+{
+	device_card_options *options = m_card_options.find(card);
+	if (options != NULL)
+		return options->m_input_device_defaults;
+	return NULL;
+}
+
+const void *device_slot_interface::card_config(const char *card) const
+{
+	device_card_options *options = m_card_options.find(card);
+	if (options != NULL)
+		return options->m_config;
+	return NULL;
+}
+
+const UINT32 device_slot_interface::card_clock(const char *card) const
+{
+	device_card_options *options = m_card_options.find(card);
+	if (options != NULL)
+		return options->m_clock;
+	return 0;
 }
 
 device_t* device_slot_interface::get_card_device()

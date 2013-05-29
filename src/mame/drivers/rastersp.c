@@ -893,8 +893,10 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_NVRAM_HANDLER(rastersp)
 
 	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", rastersp_scsi_devices, "harddisk", 0, 0, 0, true)
-	MCFG_NSCSI_ADD("scsibus:7", rastersp_scsi_devices, "ncr53c700", 0, &ncr53c700_intf, 66000000, true)
+	MCFG_NSCSI_ADD("scsibus:0", rastersp_scsi_devices, "harddisk", true)
+	MCFG_NSCSI_ADD("scsibus:7", rastersp_scsi_devices, "ncr53c700", true)
+	MCFG_DEVICE_CARD_CONFIG("ncr53c700", &ncr53c700_intf)
+	MCFG_DEVICE_CARD_CLOCK("ncr53c700", 66000000)
 
 	/* Video */
 	MCFG_SCREEN_ADD("screen", RASTER)

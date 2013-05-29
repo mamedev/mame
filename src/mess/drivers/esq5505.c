@@ -648,8 +648,8 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
@@ -666,7 +666,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_ESQPANEL1x22_ADD("panel", esqpanel_config)
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
 	MCFG_HD63450_ADD( "mc68450", dmac_interface )   // MC68450 compatible
 MACHINE_CONFIG_END
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
@@ -690,8 +690,8 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
@@ -700,7 +700,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(sq1, vfx32)

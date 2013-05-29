@@ -6,9 +6,9 @@
 #define MCFG_NSCSI_BUS_ADD(_tag)        \
 	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
 
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)  \
+#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
-	MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 class nscsi_device;
 

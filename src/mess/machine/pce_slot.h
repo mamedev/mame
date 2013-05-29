@@ -112,14 +112,14 @@ extern const device_type PCE_CART_SLOT;
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-#define MCFG_PCE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_PCE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<pce_cart_slot_device *>(device)->set_intf("pce_cart");
 
-#define MCFG_TG16_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_TG16_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, PCE_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<pce_cart_slot_device *>(device)->set_intf("tg16_cart");
 
 

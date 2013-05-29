@@ -91,10 +91,10 @@ static MACHINE_CONFIG_FRAGMENT( com_config )
 	MCFG_INS8250_ADD( "uart_1", genpc_com_interface[1], XTAL_1_8432MHz )
 	//MCFG_INS8250_ADD( "uart_2", genpc_com_interface[2], XTAL_1_8432MHz )
 	//MCFG_INS8250_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
-	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse", NULL )
-	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
-	//MCFG_RS232_PORT_ADD( "serport2", serport_config[2], isa_com, NULL, NULL )
-	//MCFG_RS232_PORT_ADD( "serport3", serport_config[3], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse" )
+	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL )
+	//MCFG_RS232_PORT_ADD( "serport2", serport_config[2], isa_com, NULL )
+	//MCFG_RS232_PORT_ADD( "serport3", serport_config[3], isa_com, NULL )
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -160,10 +160,10 @@ static MACHINE_CONFIG_FRAGMENT( com_at_config )
 	MCFG_NS16450_ADD( "uart_1", genpc_com_interface[1], XTAL_1_8432MHz )
 //  MCFG_NS16450_ADD( "uart_2", genpc_com_interface[2], XTAL_1_8432MHz )
 //  MCFG_NS16450_ADD( "uart_3", genpc_com_interface[3], XTAL_1_8432MHz )
-	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse", NULL )
-	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL, NULL )
-//  MCFG_RS232_PORT_ADD( "serport2", serport_config[2], isa_com, NULL, NULL )
-//  MCFG_RS232_PORT_ADD( "serport3", serport_config[3], isa_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", serport_config[0], isa_com, "microsoft_mouse" )
+	MCFG_RS232_PORT_ADD( "serport1", serport_config[1], isa_com, NULL )
+//  MCFG_RS232_PORT_ADD( "serport2", serport_config[2], isa_com, NULL )
+//  MCFG_RS232_PORT_ADD( "serport3", serport_config[3], isa_com, NULL )
 MACHINE_CONFIG_END
 
 //**************************************************************************

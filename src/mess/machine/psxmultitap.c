@@ -15,10 +15,10 @@ psx_multitap_device::psx_multitap_device(const machine_config& mconfig, const ch
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx_multitap )
-	MCFG_PSX_CTRL_PORT_ADD("a", psx_controllers_nomulti, "digital_pad", NULL)
-	MCFG_PSX_CTRL_PORT_ADD("b", psx_controllers_nomulti, NULL, NULL)
-	MCFG_PSX_CTRL_PORT_ADD("c", psx_controllers_nomulti, NULL, NULL)
-	MCFG_PSX_CTRL_PORT_ADD("d", psx_controllers_nomulti, NULL, NULL)
+	MCFG_PSX_CTRL_PORT_ADD("a", psx_controllers_nomulti, "digital_pad")
+	MCFG_PSX_CTRL_PORT_ADD("b", psx_controllers_nomulti, NULL)
+	MCFG_PSX_CTRL_PORT_ADD("c", psx_controllers_nomulti, NULL)
+	MCFG_PSX_CTRL_PORT_ADD("d", psx_controllers_nomulti, NULL)
 MACHINE_CONFIG_END
 
 machine_config_constructor psx_multitap_device::device_mconfig_additions() const

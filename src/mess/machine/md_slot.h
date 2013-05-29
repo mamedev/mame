@@ -228,13 +228,13 @@ extern const device_type PICO_CART_SLOT;
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-#define MCFG_MD_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_MD_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, MD_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_PICO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_PICO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, PICO_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_MD_CARTRIDGE_NOT_MANDATORY                                     \
 	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(FALSE);

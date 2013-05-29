@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	/* devices */
 	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	MCFG_MC6854_ADD("mc6854", adlc_intf)
 	MCFG_ECONET_ADD(econet_intf)
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL, NULL)
+	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
 MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */

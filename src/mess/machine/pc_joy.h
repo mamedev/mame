@@ -13,7 +13,7 @@
 
 #define MCFG_PC_JOY_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PC_JOY, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, "basic_joy", NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, "basic_joy", false)
 
 SLOT_INTERFACE_EXTERN(pc_joysticks);
 

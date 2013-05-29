@@ -891,7 +891,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
-	MCFG_RS232_PORT_ADD( "serport", avigo_serport_config, avigo_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport", avigo_serport_config, avigo_com, NULL )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

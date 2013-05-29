@@ -1572,7 +1572,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
 	MCFG_DEVICE_REMOVE("drive_0")
-	MCFG_IDE_SLOT_ADD("drive_0", ide_devices, NULL, NULL, true)
+	MCFG_IDE_SLOT_ADD("drive_0", ide_devices, NULL, true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )

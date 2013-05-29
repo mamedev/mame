@@ -159,8 +159,8 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", 8000000/6, hgdc_intf, upd7220_map) // unk clock
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

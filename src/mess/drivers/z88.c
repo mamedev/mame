@@ -672,9 +672,9 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K,256K,512k")
 
 	// cartridges
-	MCFG_Z88_CARTRIDGE_ADD("slot1", z88_cart_interface, z88_cart, NULL, NULL)
-	MCFG_Z88_CARTRIDGE_ADD("slot2", z88_cart_interface, z88_cart, NULL, NULL)
-	MCFG_Z88_CARTRIDGE_ADD("slot3", z88_cart_interface, z88_cart, NULL, NULL)
+	MCFG_Z88_CARTRIDGE_ADD("slot1", z88_cart_interface, z88_cart, NULL)
+	MCFG_Z88_CARTRIDGE_ADD("slot2", z88_cart_interface, z88_cart, NULL)
+	MCFG_Z88_CARTRIDGE_ADD("slot3", z88_cart_interface, z88_cart, NULL)
 MACHINE_CONFIG_END
 
 

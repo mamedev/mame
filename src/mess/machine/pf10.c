@@ -68,7 +68,7 @@ static MACHINE_CONFIG_FRAGMENT( pf10 )
 	MCFG_CPU_IO_MAP(cpu_io)
 
 	MCFG_UPD765A_ADD("upd765a", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "35dd", 0, floppy_image_device::default_floppy_formats) // SMD-165
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "35dd", floppy_image_device::default_floppy_formats) // SMD-165
 
 	MCFG_EPSON_SIO_ADD("sio", NULL)
 MACHINE_CONFIG_END

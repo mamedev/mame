@@ -20,12 +20,17 @@ struct slot_interface
 	bool            internal;
 };
 
-#define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, _fixed) \
-	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), NULL, 0, _fixed);
+#define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_card, _fixed) \
+	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_card, _fixed);
 
-#define MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed) \
-	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_slot, DEVICE_INPUT_DEFAULTS_NAME(_def_inp), _def_config, _def_clock, _fixed);
+#define MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS(card, _dev_inp_def) \
+	device_slot_interface::static_set_card_device_input_defaults(*device, card, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
 
+#define MCFG_DEVICE_CARD_CONFIG(card, _config) \
+	device_slot_interface::static_set_card_config(*device, card, _config);
+
+#define MCFG_DEVICE_CARD_CLOCK(card, _clock) \
+	device_slot_interface::static_set_card_clock(*device, card, _clock);
 
 #define SLOT_INTERFACE_NAME(name)   slot_interface_##name
 
@@ -42,7 +47,19 @@ struct slot_interface
 
 #define SLOT_INTERFACE_EXTERN(name) extern const slot_interface slot_interface_##name[]
 
-class device_slot_card_interface;
+class device_card_options
+{
+	friend class device_slot_interface;
+	friend class simple_list<device_card_options>;
+
+private:
+	const input_device_default *m_input_device_defaults;
+	const void *m_config;
+	UINT32 m_clock;
+
+	// internal state
+	device_card_options *        m_next;             // link to the next reference
+};
 
 class device_slot_interface : public device_interface
 {
@@ -51,23 +68,25 @@ public:
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
 
-	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,const input_device_default *default_input, const void *default_config, UINT32 default_clock, bool fixed);
+	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,bool fixed);
+	static device_card_options *static_alloc_card_options(device_t &device, const char *card);
+	static void static_set_card_device_input_defaults(device_t &device, const char *card, const input_device_default *default_input);
+	static void static_set_card_config(device_t &device, const char *card, const void *config);
+	static void static_set_card_clock(device_t &device, const char *card, UINT32 default_clock);
 	const slot_interface* get_slot_interfaces() const { return m_slot_interfaces; };
 	const char * get_default_card() const { return m_default_card; };
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) { return NULL; };
-	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
-	const void *default_config() const { return m_default_config; }
-	const UINT32 default_clock() const { return m_default_clock; }
+	const input_device_default *card_input_device_defaults(const char *card) const;
+	const void *card_config(const char *card) const;
+	const UINT32 card_clock(const char *card) const;
 	const bool fixed() const { return m_fixed; }
 	const bool all_internal() const;
 	bool is_internal_option(const char *option) const;
 	device_t* get_card_device();
 protected:
-	const char *m_default_card;
-	const input_device_default *m_input_defaults;
 	const slot_interface *m_slot_interfaces;
-	const void *m_default_config;
-	UINT32 m_default_clock;
+	const char *m_default_card;
+	tagged_list<device_card_options> m_card_options;
 	bool m_fixed;
 };
 

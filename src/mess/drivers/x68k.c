@@ -2731,14 +2731,14 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_UPD72065_ADD("upd72065", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:3", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:3", x68k_floppies, "525hd", x68k_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 
-	MCFG_X68K_EXPANSION_SLOT_ADD("exp",x68k_exp_intf,x68000_exp_cards,NULL,NULL)
+	MCFG_X68K_EXPANSION_SLOT_ADD("exp",x68k_exp_intf,x68000_exp_cards,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

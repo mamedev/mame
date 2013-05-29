@@ -21,7 +21,7 @@
 
 #define MCFG_EPSON_SIO_ADD(_tag, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, EPSON_SIO, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 
 //**************************************************************************

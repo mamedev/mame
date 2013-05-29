@@ -813,7 +813,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* cartridge */
-	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
+	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 	MCFG_CPU_IO_MAP(omv_io_map)
 
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
-	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
+	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
@@ -866,7 +866,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	/* cartridge */
-	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL, NULL)
+	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -902,10 +902,10 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, usart_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", 0, sf7000_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")

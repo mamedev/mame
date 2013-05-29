@@ -58,13 +58,13 @@ static ABCBUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc890 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem1", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem2", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem3", abcbus_intf, abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem1", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem2", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem3", abcbus_intf, abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -84,9 +84,9 @@ machine_config_constructor abc890_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc894 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -106,13 +106,14 @@ machine_config_constructor abc894_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc850 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, "fast", abc850_fast)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, "hdc", NULL)
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io6", abcbus_intf, abcbus_cards, NULL, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io7", abcbus_intf, abcbus_cards, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, "fast")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, "hdc")
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io6", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io7", abcbus_intf, abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 

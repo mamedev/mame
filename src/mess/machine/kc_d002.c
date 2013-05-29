@@ -65,13 +65,13 @@ static const kcexp_interface kc_d002_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( kc_d002 )
-	MCFG_KC85_CARTRIDGE_ADD("m0", "m4", kc_d002_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m4", "m8", kc_d002_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc_d002_interface, kc85_cart, NULL, NULL)
-	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc_d002_interface, kc85_cart, NULL, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m0", "m4", kc_d002_interface, kc85_cart, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m4", "m8", kc_d002_interface, kc85_cart, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc_d002_interface, kc85_cart, NULL)
+	MCFG_KC85_CARTRIDGE_ADD("mc", "exp", kc_d002_interface, kc85_cart, NULL)
 
 	// expansion interface
-	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc85_exp , NULL, NULL)
+	MCFG_KC85_EXPANSION_ADD("exp", NULL, kc_d002_interface, kc85_exp, NULL)
 MACHINE_CONFIG_END
 
 //**************************************************************************

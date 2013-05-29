@@ -304,7 +304,8 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
 	MCFG_CBM_IEEE488_ADD("c8050")
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")

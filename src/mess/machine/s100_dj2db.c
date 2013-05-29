@@ -114,10 +114,10 @@ static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, brg_intf)
 	MCFG_MB8866x_ADD(MB8866_TAG, XTAL_10MHz/5)
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 

@@ -810,7 +810,7 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-U")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -820,7 +820,7 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","PAL")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -830,7 +830,7 @@ MACHINE_CONFIG_DERIVED( saturnjp, saturn )
 	MCFG_SOFTWARE_LIST_ADD("cd_list","saturn")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","NTSC-J")
 
-	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL, NULL)
+	MCFG_SATURN_CARTRIDGE_ADD("exp", saturn_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END

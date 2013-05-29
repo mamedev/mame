@@ -1641,8 +1641,8 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_DEVICE_REMOVE("rtc")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
 	MCFG_MC146818_ADD( "mc", MC146818_STANDARD )
 

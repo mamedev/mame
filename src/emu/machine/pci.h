@@ -169,9 +169,9 @@ extern const device_type PCI_BUS;
 #define MCFG_PCI_BUS_ADD(_tag, _busnum) \
 	MCFG_DEVICE_ADD(_tag, PCI_BUS, 0) \
 	downcast<pci_bus_device *>(device)->set_busnum(_busnum);
-#define MCFG_PCI_BUS_DEVICE(_tag, _slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed) \
+#define MCFG_PCI_BUS_DEVICE(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, PCI_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE_FULL(_slot_intf, _def_slot, _def_inp, _def_config, _def_clock, _fixed)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 #define MCFG_PCI_BUS_SIBLING(_father_tag) \
 	downcast<pci_bus_device *>(device)->set_father(_father_tag);

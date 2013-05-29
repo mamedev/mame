@@ -124,15 +124,15 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "adlib", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "adlib", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -148,15 +148,15 @@ static MACHINE_CONFIG_START( pcherc, genpc_state )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "adlib", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "adlib", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -174,15 +174,15 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "sblaster1_0", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "hdc", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "sblaster1_0", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -200,15 +200,15 @@ static MACHINE_CONFIG_START( pcega, genpc_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "com", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "hdc", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "sblaster1_0", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "ega", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "hdc", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "sblaster1_0", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "ega", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -226,15 +226,15 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa1", pc_isa8_cards, "com", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa2", pc_isa8_cards, "fdc_xt", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa3", pc_isa8_cards, "hdc", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa4", pc_isa8_cards, "sblaster1_0", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, "svga_et4k", NULL, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa","isa6", pc_isa8_cards, NULL, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa1", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa2", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa3", pc_isa8_cards, "hdc", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa4", pc_isa8_cards, "sblaster1_0", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa5", pc_isa8_cards, "svga_et4k", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa","isa6", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270, NULL)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

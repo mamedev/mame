@@ -1953,8 +1953,8 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_NTSC / 3, r6532_interface)
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -1990,8 +1990,8 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* devices */
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK_PAL / 3, r6532_interface)
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

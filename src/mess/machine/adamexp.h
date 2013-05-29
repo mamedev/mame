@@ -34,10 +34,10 @@
 	const adam_expansion_slot_interface (_name) =
 
 
-#define MCFG_ADAM_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_ADAM_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ADAM_EXPANSION_SLOT, _clock) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 

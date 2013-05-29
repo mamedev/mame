@@ -6,9 +6,9 @@
 #include "cpu/psx/siodev.h"
 #include "machine/psxcard.h"
 
-#define MCFG_PSX_CTRL_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_PSX_CTRL_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PSX_CONTROLLER_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 SLOT_INTERFACE_EXTERN(psx_controllers);
 

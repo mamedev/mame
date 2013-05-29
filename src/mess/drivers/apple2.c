@@ -674,14 +674,14 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 
 	/* slot devices */
 	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl0", apple2_slot0_cards, "lang", NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard", NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii", NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl0", apple2_slot0_cards, "lang")
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii")
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 MACHINE_CONFIG_END
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
 
 	MCFG_A2EAUXSLOT_BUS_ADD(AUXSLOT_TAG, "maincpu", a2eauxbus_intf)
-	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80", NULL)   // default to an extended 80-column card
+	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
 MACHINE_CONFIG_END
 

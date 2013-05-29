@@ -454,8 +454,8 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
 
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)

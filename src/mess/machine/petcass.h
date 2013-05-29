@@ -38,9 +38,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _devcb) \
+#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _devcb) \
 	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	devcb = &pet_datassette_port_device::set_read_handler(*device, DEVCB2_##_devcb);
 
 

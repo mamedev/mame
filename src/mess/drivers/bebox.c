@@ -226,13 +226,15 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	/* pci */
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "mpc105", NULL, &mpc105_config, 0, true)
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", NULL, NULL,     0, true)
+	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "mpc105", true)
+	MCFG_DEVICE_CARD_CONFIG("mpc105", &mpc105_config)
+
+	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", true)
 
 	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	MCFG_SMC37C78_ADD("smc37c78")
-	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", 0, bebox_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

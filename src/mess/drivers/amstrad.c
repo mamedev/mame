@@ -877,7 +877,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -891,8 +891,8 @@ FLOPPY_FORMATS_END
 static MACHINE_CONFIG_DERIVED( amstrad, amstrad_nofdc )
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, amstrad_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 MACHINE_CONFIG_END
@@ -954,10 +954,10 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1021,8 +1021,8 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_DEVICE_REMOVE("upd765")
 	MCFG_I8272A_ADD("upd765", true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

@@ -717,10 +717,10 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT0), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT1), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 
 	// software lists

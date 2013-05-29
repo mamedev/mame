@@ -58,7 +58,7 @@ static SLOT_INTERFACE_START(pc_centronics)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( pc_lpt )
-	MCFG_CENTRONICS_ADD("centronics", pc_centronics_config, pc_centronics, "printer", NULL)
+	MCFG_CENTRONICS_ADD("centronics", pc_centronics_config, pc_centronics, "printer")
 MACHINE_CONFIG_END
 
 

@@ -43,10 +43,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_C64_USER_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _reset) \
+#define MCFG_C64_USER_PORT_ADD(_tag, _slot_intf, _def_slot, _reset) \
 	MCFG_DEVICE_ADD(_tag, C64_USER_PORT, 0) \
 	downcast<c64_user_port_device *>(device)->set_reset_callback(DEVCB2_##_reset); \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 #define MCFG_C64_USER_PORT_CIA1_CALLBACKS(_cnt, _sp) \

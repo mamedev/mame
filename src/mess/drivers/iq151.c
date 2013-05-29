@@ -448,11 +448,11 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */
-	MCFG_IQ151_CARTRIDGE_ADD("slot1", iq151_cart_interface, iq151_cart, NULL, NULL)
-	MCFG_IQ151_CARTRIDGE_ADD("slot2", iq151_cart_interface, iq151_cart, NULL, NULL)
-	MCFG_IQ151_CARTRIDGE_ADD("slot3", iq151_cart_interface, iq151_cart, NULL, NULL)
-	MCFG_IQ151_CARTRIDGE_ADD("slot4", iq151_cart_interface, iq151_cart, NULL, NULL)
-	MCFG_IQ151_CARTRIDGE_ADD("slot5", iq151_cart_interface, iq151_cart, "video32", NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot1", iq151_cart_interface, iq151_cart, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot2", iq151_cart_interface, iq151_cart, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot3", iq151_cart_interface, iq151_cart, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot4", iq151_cart_interface, iq151_cart, NULL)
+	MCFG_IQ151_CARTRIDGE_ADD("slot5", iq151_cart_interface, iq151_cart, "video32")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq151_cart")

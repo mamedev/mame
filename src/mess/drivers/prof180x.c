@@ -246,10 +246,10 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
 
 	/* devices */
 	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
 
 	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

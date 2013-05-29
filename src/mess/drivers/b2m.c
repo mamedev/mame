@@ -219,8 +219,8 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","b2m")
 
 	/* internal ram */

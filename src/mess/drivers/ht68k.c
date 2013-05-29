@@ -149,10 +149,10 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

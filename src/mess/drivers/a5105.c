@@ -614,10 +614,10 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525qd", a5105_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

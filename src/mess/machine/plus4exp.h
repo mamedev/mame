@@ -56,13 +56,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp, _irq) \
+#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _irq) \
 	MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
 	downcast<plus4_expansion_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL, DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
 	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r), DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w), DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
 
 

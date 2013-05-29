@@ -782,8 +782,8 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_SOUND_CONFIG_DISCRETE(vip)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, byteio_intf, vip_byteio_cards, NULL, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, expansion_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, byteio_intf, vip_byteio_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, expansion_intf, vip_expansion_cards, NULL)
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)

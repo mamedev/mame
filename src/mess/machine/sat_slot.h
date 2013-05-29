@@ -111,9 +111,9 @@ extern const device_type SATURN_CART_SLOT;
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
 
-#define MCFG_SATURN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_SATURN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SATURN_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
 #endif

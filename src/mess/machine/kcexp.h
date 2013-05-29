@@ -122,16 +122,16 @@ extern const device_type KCCART_SLOT;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_KC85_EXPANSION_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, KCEXP_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
 
-#define MCFG_KC85_CARTRIDGE_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot,_def_inp) \
+#define MCFG_KC85_CARTRIDGE_ADD(_tag,_next_slot_tag,_config,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	kcexp_slot_device::static_set_next_slot(*device, _next_slot_tag);
 
 #endif /* __KCEXP_H__ */

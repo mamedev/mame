@@ -53,12 +53,12 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, VIC20_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD(_tag) \
-	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, NULL, NULL) \
+	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, NULL) \
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w), DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w), DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
 
 

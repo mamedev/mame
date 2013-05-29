@@ -276,10 +276,10 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
@@ -299,8 +299,8 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -349,10 +349,10 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
@@ -372,8 +372,8 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_IGNORE_CENTURY )
 

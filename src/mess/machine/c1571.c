@@ -817,7 +817,7 @@ static MACHINE_CONFIG_FRAGMENT( mini_chief )
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, M6502_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, NULL/*"wd1002a_wx1"*/, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, NULL/*"wd1002a_wx1"*/, false)
 MACHINE_CONFIG_END
 
 

@@ -40,9 +40,9 @@
 	const wangpcbus_interface (_name) =
 
 
-#define MCFG_WANGPC_BUS_SLOT_ADD(_tag, _sid, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_WANGPC_BUS_SLOT_ADD(_tag, _sid, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, WANGPC_BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	wangpcbus_slot_device::static_set_wangpcbus_slot(*device, _sid);
 
 

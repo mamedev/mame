@@ -426,7 +426,7 @@ static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_MACHINE_START_OVERRIDE( md_cons_state, ms_megadriv )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_MACHINE_START_OVERRIDE( md_cons_state, ms_megadriv )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
-	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL, NULL)
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
@@ -1089,7 +1089,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL, NULL)
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 MACHINE_CONFIG_END
 
@@ -1104,7 +1104,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_state, ms_megadriv )
 
-	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL, NULL)
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 MACHINE_CONFIG_END
 

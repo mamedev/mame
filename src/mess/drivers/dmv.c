@@ -339,8 +339,8 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_UPD7220_ADD( "upd7220", XTAL_5MHz/2, hgdc_intf, upd7220_map ) // unk clock
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
 	MCFG_UPD765A_ADD( "upd765", true, true )
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1296,7 +1296,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_EPSON_SIO_ADD("sio", NULL)
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
 
 	// rom capsules
 	MCFG_CARTSLOT_ADD("capsule1")

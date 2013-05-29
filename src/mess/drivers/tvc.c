@@ -716,10 +716,10 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CARTSLOT_INTERFACE("tvc_cart")
 
 	/* expansion interface */
-	MCFG_TVC64_EXPANSION_ADD("exp1", tvc_exp_interface, tvc_exp , NULL, NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp2", tvc_exp_interface, tvc_exp , NULL, NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp3", tvc_exp_interface, tvc_exp , NULL, NULL)
-	MCFG_TVC64_EXPANSION_ADD("exp4", tvc_exp_interface, tvc_exp , NULL, NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp1", tvc_exp_interface, tvc_exp , NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp2", tvc_exp_interface, tvc_exp , NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp3", tvc_exp_interface, tvc_exp , NULL)
+	MCFG_TVC64_EXPANSION_ADD("exp4", tvc_exp_interface, tvc_exp , NULL)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", tvc_cassette_interface )

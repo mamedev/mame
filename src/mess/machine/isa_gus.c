@@ -1253,8 +1253,8 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )

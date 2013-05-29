@@ -26,7 +26,7 @@ CPC_EXPANSION_INTERFACE(sub_exp_intf)
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
 	// pass-through
-	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL,NULL)
+	MCFG_CPC_EXPANSION_SLOT_ADD("exp",sub_exp_intf,cpc_exp_cards,NULL)
 MACHINE_CONFIG_END
 
 DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )

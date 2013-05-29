@@ -259,7 +259,7 @@ static const nes_cart_interface gg_crt_interface =
 };
 
 static MACHINE_CONFIG_FRAGMENT( sub_slot )
-	MCFG_NES_CARTRIDGE_ADD("gg_slot", gg_crt_interface, nes_cart, NULL, NULL)
+	MCFG_NES_CARTRIDGE_ADD("gg_slot", gg_crt_interface, nes_cart, NULL)
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END
 

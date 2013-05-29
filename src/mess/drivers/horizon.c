@@ -221,23 +221,24 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	// devices
 	MCFG_I8251_ADD(I8251_L_TAG, usart_l_intf)
 	MCFG_I8251_ADD(I8251_R_TAG, usart_r_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal", terminal)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 
 	// S-100
 	MCFG_S100_BUS_ADD(s100_intf)
 	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, NULL, NULL) // CPU
-	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, NULL, NULL) // RAM
-	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad", NULL) // MDS
-	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, NULL, NULL) // FPB
-	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, NULL, NULL)
-	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, NULL) // RAM
+	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS
+	MCFG_S100_SLOT_ADD("s100_4", horizon_s100_cards, NULL) // FPB
+	MCFG_S100_SLOT_ADD("s100_5", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_6", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_7", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_8", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_9", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_10", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_11", horizon_s100_cards, NULL)
+	MCFG_S100_SLOT_ADD("s100_12", horizon_s100_cards, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "horizon")

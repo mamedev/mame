@@ -1024,8 +1024,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, apc_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", 0, apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", 0, apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
 
 	/* video hardware */

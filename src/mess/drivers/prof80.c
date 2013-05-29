@@ -618,20 +618,20 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)
-	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21", NULL)
-	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", prof80_ecb_cards, NULL, NULL)
-	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL, NULL)
-	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL, NULL)
-	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL, NULL)
+	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", prof80_ecb_cards, "grip21")
+	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", prof80_ecb_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL)
+	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL)
 
 	// V24
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

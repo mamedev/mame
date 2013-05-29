@@ -99,11 +99,11 @@ static VIP_EXPANSION_INTERFACE( expansion5_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp575 )
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, expansion1_intf, vip_expansion_cards, NULL, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, expansion2_intf, vip_expansion_cards, NULL, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, expansion3_intf, vip_expansion_cards, NULL, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, expansion4_intf, vip_expansion_cards, NULL, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, expansion5_intf, vip_expansion_cards, NULL, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, expansion1_intf, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, expansion2_intf, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, expansion3_intf, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, expansion4_intf, vip_expansion_cards, NULL)
+	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, expansion5_intf, vip_expansion_cards, NULL)
 MACHINE_CONFIG_END
 
 

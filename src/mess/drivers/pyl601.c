@@ -576,8 +576,8 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_2MHz, pyl601_crtc6845_interface)
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", 0, pyl601_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", 0, pyl601_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", pyl601_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
 
 	/* internal ram */

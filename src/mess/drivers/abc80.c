@@ -588,8 +588,9 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_11_9808MHz/2/2, pio_intf)
 	MCFG_CASSETTE_ADD("cassette", abc80_cassette_interface)
 	MCFG_ABC80_KEYBOARD_ADD(kb_intf)
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "slow", abc830_slow)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "slow")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("slow", abc830_slow)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal ram

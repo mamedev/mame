@@ -1017,8 +1017,8 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )

@@ -890,9 +890,9 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
 	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, qx10_mc146818_config )
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_QX10_KEYBOARD_ADD("kbd", qx10_keyboard_interface)
 
 	/* internal ram */

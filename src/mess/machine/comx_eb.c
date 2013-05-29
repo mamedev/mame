@@ -139,10 +139,10 @@ static COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_eb )
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, expansion_intf, comx_expansion_cards, "fd", NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, expansion_intf, comx_expansion_cards, "clm", NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, expansion_intf, comx_expansion_cards, "joy", NULL)
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, expansion_intf, comx_expansion_cards, "ram", NULL)
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, expansion_intf, comx_expansion_cards, "fd")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, expansion_intf, comx_expansion_cards, "clm")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, expansion_intf, comx_expansion_cards, "joy")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, expansion_intf, comx_expansion_cards, "ram")
 MACHINE_CONFIG_END
 
 

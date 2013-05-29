@@ -1067,7 +1067,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, dbrg_intf)
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )

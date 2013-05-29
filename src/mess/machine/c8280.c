@@ -341,8 +341,8 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 
 	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 

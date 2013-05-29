@@ -1419,8 +1419,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( newbrain_eim, newbrain_a, newbrain_eim_stat
 	MCFG_ADC0808_ADD(ADC0809_TAG, 500000, adc_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
 	MCFG_RAM_MODIFY(RAM_TAG)

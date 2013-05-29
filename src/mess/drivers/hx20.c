@@ -868,7 +868,7 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 
 	// devices
 	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
 	

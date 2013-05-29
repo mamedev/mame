@@ -611,8 +611,8 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525dd", NULL, tiki100_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525dd", NULL, tiki100_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525dd", tiki100_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525dd", tiki100_state::floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

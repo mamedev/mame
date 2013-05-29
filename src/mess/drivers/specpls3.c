@@ -393,8 +393,8 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", 0, spectrum_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", 0, spectrum_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", spectrum_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", spectrum_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","spectrum_flop")
 MACHINE_CONFIG_END

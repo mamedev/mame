@@ -162,7 +162,7 @@ static MACHINE_CONFIG_DERIVED( dragon32, dragon_base )
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc", NULL)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
@@ -171,7 +171,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc", NULL)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc")
 
 	// acia
 	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
@@ -183,7 +183,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon_base, dragon64_state )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc", NULL)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc")
 
 	// acia
 	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_alpha_state::cartridge_config, dragon_cart, NULL, NULL)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_alpha_state::cartridge_config, dragon_cart, NULL)
 
 	// acia
 	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
@@ -219,7 +219,7 @@ static MACHINE_CONFIG_DERIVED( tanodr64, dragon_base )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// cartridge
-	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "sdtandy_fdc", NULL)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "sdtandy_fdc")
 MACHINE_CONFIG_END
 
 

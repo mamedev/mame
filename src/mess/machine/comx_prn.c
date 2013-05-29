@@ -65,7 +65,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_prn )
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics, comx_centronics_printer, "pl80", NULL)
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics, comx_centronics_printer, "pl80")
 MACHINE_CONFIG_END
 
 

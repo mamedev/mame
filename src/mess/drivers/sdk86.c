@@ -184,7 +184,8 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	/* Devices */
 	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))
 MACHINE_CONFIG_END
 

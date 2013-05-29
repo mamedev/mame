@@ -58,9 +58,9 @@
 	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB2_##_write);
 
 
-#define MCFG_IEEE488_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_IEEE488_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, IEEE488_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	ieee488_slot_device::static_set_slot(*device, _num);
 
 

@@ -381,8 +381,8 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 	MCFG_I8272A_ADD("i8272a", true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_COMPIS_KEYBOARD_ADD()
 
 	/* software lists */
@@ -421,8 +421,8 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
 	MCFG_I8272A_ADD("i8272a", true)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:0", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("i8272a:1", compis_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_COMPIS_KEYBOARD_ADD()
 
 	/* software lists */
