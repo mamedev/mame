@@ -8059,6 +8059,7 @@ src/mess/video/ef9345.c svneol=native#text/plain
 src/mess/video/ef9345.h svneol=native#text/plain
 src/mess/video/electron.c svneol=native#text/plain
 src/mess/video/epnick.c svneol=native#text/plain
+src/mess/video/epnick.h svneol=native#text/plain
 src/mess/video/fm7.c svneol=native#text/plain
 src/mess/video/fmtowns.c svneol=native#text/plain
 src/mess/video/galaxy.c svneol=native#text/plain

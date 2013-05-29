@@ -160,6 +160,7 @@ static const dave_interface enterprise_dave_interface =
 void ep_state::machine_start()
 {
 	m_maincpu->set_input_line_vector(0, 0xff);
+	m_nick->set_vram(m_ram->pointer());
 	
 	for (int i = 0; i < 10; i++)
 	{
@@ -167,12 +168,55 @@ void ep_state::machine_start()
 		sprintf(str, "LINE%i", i);
 		m_key[i] = ioport(str);
 	}
-	
 }
 
 void ep_state::machine_reset()
 {
 	m_maincpu->set_input_line_vector(0, 0xff);
+}
+
+
+UINT32 ep_state::screen_update_enterp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_nick->screen_update_epnick(screen, bitmap, cliprect);
+	return 0;
+}
+
+// FIXME: Should this be here or in the Nick device?!?
+
+/* Enterprise has 256 colours, all may be on the screen at once!
+ the NICK_GET_RED8, NICK_GET_GREEN8, NICK_GET_BLUE8 macros
+ return a 8-bit colour value for the index specified.  */
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_RED8(x) \
+	((      \
+		(BIT(x, 0) << 2) | \
+		(BIT(x, 3) << 1) | \
+		(BIT(x, 6) << 0) \
+	) << 5)
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_GREEN8(x) \
+	((  \
+		(BIT(x, 1) << 2) | \
+		(BIT(x, 4) << 1) | \
+		(BIT(x, 7) << 0) \
+	) << 5)
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_BLUE8(x) \
+	(( \
+		(BIT(x, 2) << 1) | \
+		(BIT(x, 5) << 0) \
+	) << 6)
+
+
+/* initial the palette */
+void ep_state::palette_init()
+{
+	for (int i = 0; i < 256; i++)
+		palette_set_color_rgb(machine(), i, NICK_GET_RED8(i), NICK_GET_GREEN8(i), NICK_GET_BLUE8(i));
 }
 
 
@@ -251,7 +295,7 @@ static ADDRESS_MAP_START( enterprise_io, AS_IO, 8, ep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(epnick_reg_w)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("nick", nick_device, reg_w)
 	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE("custom", dave_sound_device, reg_r, reg_w)
 ADDRESS_MAP_END
 
@@ -452,9 +496,11 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ep_state, screen_update_epnick)
+	MCFG_SCREEN_UPDATE_DRIVER(ep_state, screen_update_enterp)
 
 	MCFG_PALETTE_LENGTH(NICK_PALETTE_SIZE)
+
+	MCFG_NICK_ADD("nick")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
