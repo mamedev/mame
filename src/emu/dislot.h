@@ -23,6 +23,9 @@ struct slot_interface
 #define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_card, _fixed) \
 	device_slot_interface::static_set_slot_info(*device, SLOT_INTERFACE_NAME(_slot_intf), _def_card, _fixed);
 
+#define MCFG_DEVICE_CARD_MACHINE_CONFIG(card, _machine_config_name) \
+	device_slot_interface::static_set_card_machine_config(*device, card, MACHINE_CONFIG_NAME(_machine_config_name));
+
 #define MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS(card, _dev_inp_def) \
 	device_slot_interface::static_set_card_device_input_defaults(*device, card, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
 
@@ -53,6 +56,7 @@ class device_card_options
 	friend class simple_list<device_card_options>;
 
 private:
+	machine_config_constructor m_machine_config;
 	const input_device_default *m_input_device_defaults;
 	const void *m_config;
 	UINT32 m_clock;
@@ -70,12 +74,14 @@ public:
 
 	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card,bool fixed);
 	static device_card_options *static_alloc_card_options(device_t &device, const char *card);
+	static void static_set_card_machine_config(device_t &device, const char *card, const machine_config_constructor machine_config);
 	static void static_set_card_device_input_defaults(device_t &device, const char *card, const input_device_default *default_input);
 	static void static_set_card_config(device_t &device, const char *card, const void *config);
 	static void static_set_card_clock(device_t &device, const char *card, UINT32 default_clock);
 	const slot_interface* get_slot_interfaces() const { return m_slot_interfaces; };
 	const char * get_default_card() const { return m_default_card; };
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options) { return NULL; };
+	const machine_config_constructor card_machine_config(const char *card) const;
 	const input_device_default *card_input_device_defaults(const char *card) const;
 	const void *card_config(const char *card) const;
 	const UINT32 card_clock(const char *card) const;

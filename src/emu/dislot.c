@@ -44,6 +44,11 @@ device_card_options *device_slot_interface::static_alloc_card_options(device_t &
 	return options;
 }
 	
+void device_slot_interface::static_set_card_machine_config(device_t &device, const char *card, const machine_config_constructor machine_config)
+{
+	static_alloc_card_options(device, card)->m_machine_config = machine_config;
+}
+
 void device_slot_interface::static_set_card_device_input_defaults(device_t &device, const char *card, const input_device_default *input_device_defaults)
 {
 	static_alloc_card_options(device, card)->m_input_device_defaults = input_device_defaults;
@@ -57,6 +62,14 @@ void device_slot_interface::static_set_card_config(device_t &device, const char 
 void device_slot_interface::static_set_card_clock(device_t &device, const char *card, UINT32 clock)
 {
 	static_alloc_card_options(device, card)->m_clock = clock;
+}
+
+const machine_config_constructor device_slot_interface::card_machine_config(const char *card) const
+{
+	device_card_options *options = m_card_options.find(card);
+	if (options != NULL)
+		return options->m_machine_config;
+	return NULL;
 }
 
 const input_device_default *device_slot_interface::card_input_device_defaults(const char *card) const

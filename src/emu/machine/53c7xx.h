@@ -56,33 +56,35 @@
 #define DSTAT_ABRT          0x10
 #define DSTAT_DFE           0x80
 
+#define MCFG_NCR53C7XX_IRQ_HANDLER(_devcb) \
+	devcb = &ncr53c7xx_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-struct NCR53C7XXinterface
-{
-	devcb_write_line    m_out_irq_cb;
-	UINT32              (*host_r)(running_machine &machine, bool io, offs_t addr);
-	void                (*host_w)(running_machine &machine, bool io, offs_t addr, UINT32 data, UINT32 mem_mask);
-};
+#define MCFG_NCR53C7XX_HOST_WRITE(_devcb) \
+	devcb = &ncr53c7xx_device::set_host_write(*device, DEVCB2_##_devcb);
 
+#define MCFG_NCR53C7XX_HOST_READ(_devcb) \
+	devcb = &ncr53c7xx_device::set_host_read(*device, DEVCB2_##_devcb);
 
 class ncr53c7xx_device : public nscsi_device,
-							public device_execute_interface,
-							public NCR53C7XXinterface
+							public device_execute_interface
 {
 public:
 	// construction/destruction
 	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_host_write(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_host_write.set_callback(object); }
+	template<class _Object> static devcb2_base &set_host_read(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_host_read.set_callback(object); }
+
 	// our API
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);
-
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void execute_run();
 
@@ -215,8 +217,9 @@ private:
 	void    (ncr53c7xx_device::*m_scripts_op)();
 
 	// callbacks
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_drq_func;
+	devcb2_write_line m_irq_handler;
+	devcb2_write32 m_host_write;
+	devcb2_read32 m_host_read;
 };
 
 // device type definition

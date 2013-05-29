@@ -113,6 +113,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_486_int_w);
 	DECLARE_READ32_MEMBER(dsp_speedup_r);
 	DECLARE_WRITE32_MEMBER(dsp_speedup_w);
+	DECLARE_READ32_MEMBER(ncr53c700_read);
+	DECLARE_WRITE32_MEMBER(ncr53c700_write);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer1);
@@ -831,24 +833,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static UINT32 ncr53c700_r(running_machine &machine, bool io, offs_t addr)
+READ32_MEMBER(rastersp_state::ncr53c700_read)
 {
-	rastersp_state *state = machine.driver_data<rastersp_state>();
-	return state->m_maincpu->space(io ? AS_IO : AS_PROGRAM).read_dword(addr);
+	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
 }
 
-static void ncr53c700_w(running_machine &machine, bool io, offs_t addr, UINT32 data, UINT32 mem_mask)
+WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 {
-	rastersp_state *state = machine.driver_data<rastersp_state>();
-	state->m_maincpu->space(io ? AS_IO : AS_PROGRAM).write_dword(addr, data, mem_mask);
+	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-static const struct NCR53C7XXinterface ncr53c700_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rastersp_state, scsi_irq),
-	&ncr53c700_r,
-	&ncr53c700_w,
-};
+static MACHINE_CONFIG_FRAGMENT( ncr53c700 )
+	MCFG_DEVICE_MODIFY(DEVICE_SELF)
+	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
+	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
+	MCFG_NCR53C7XX_HOST_WRITE(DEVWRITE32(":", rastersp_state, ncr53c700_write))
+MACHINE_CONFIG_END
 
 static SLOT_INTERFACE_START( rastersp_scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
@@ -895,8 +895,8 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_NSCSI_ADD("scsibus:0", rastersp_scsi_devices, "harddisk", true)
 	MCFG_NSCSI_ADD("scsibus:7", rastersp_scsi_devices, "ncr53c700", true)
-	MCFG_DEVICE_CARD_CONFIG("ncr53c700", &ncr53c700_intf)
 	MCFG_DEVICE_CARD_CLOCK("ncr53c700", 66000000)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr53c700", ncr53c700)
 
 	/* Video */
 	MCFG_SCREEN_ADD("screen", RASTER)
