@@ -83,15 +83,11 @@ Smitdogg
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pic8259.h"
-#include "machine/mc146818.h"
 #include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "video/pc_vga.h"
 #include "machine/nvram.h"
-#include "machine/8042kbdc.h"
-#include "machine/pit8253.h"
 
 class pcat_nit_state : public pcat_base_state
 {
@@ -126,7 +122,7 @@ WRITE_LINE_MEMBER(pcat_nit_state::microtouch_in)
 
 WRITE_LINE_MEMBER(pcat_nit_state::at_com_interrupt_1)
 {
-	machine().device<pic8259_device>("pic8259_1")->ir4_w(state);
+	m_pic8259_1->ir4_w(state);
 }
 
 static const ins8250_interface pcat_nit_com0_interface =
@@ -247,8 +243,6 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )
 	MCFG_FRAGMENT_ADD( pcat_common )

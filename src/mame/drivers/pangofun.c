@@ -94,10 +94,6 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/mc146818.h"
-#include "machine/8042kbdc.h"
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
 
@@ -128,7 +124,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pangofun_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x00e0, 0x00e3) AM_WRITENOP
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
@@ -186,7 +181,6 @@ static MACHINE_CONFIG_START( pangofun, pangofun_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_FRAGMENT_ADD( pcat_common )
 MACHINE_CONFIG_END
 

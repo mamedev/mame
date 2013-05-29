@@ -1,6 +1,7 @@
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/mc146818.h"
 
 class pcat_base_state : public driver_device
 {
@@ -9,17 +10,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dma8237_1(*this, "dma8237_1"),
+		m_dma8237_2(*this, "dma8237_2"),
 		m_pic8259_1(*this, "pic8259_1"),
 		m_pic8259_2(*this, "pic8259_2"),
-		m_pit8254(*this, "pit8254") { }
+		m_pit8254(*this, "pit8254"),
+		m_mc146818(*this, "rtc") { }
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<i8237_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
+	required_device<mc146818_device> m_mc146818;
 
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);

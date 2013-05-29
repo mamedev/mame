@@ -27,29 +27,18 @@ clocks 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/8237dma.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/mc146818.h"
 #include "machine/pci.h"
-#include "machine/8042kbdc.h"
+#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
 #if ENABLE_VGA
 #include "video/pc_vga.h"
 #endif
 
-class taitowlf_state : public driver_device
+class taitowlf_state : public pcat_base_state
 {
 public:
 	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit8254(*this, "pit8254"),
-		m_pic8259_1(*this, "pic8259_1"),
-		m_pic8259_2(*this, "pic8259_2"),
-		m_dma8237_1(*this, "dma8237_1"),
-		m_dma8237_2(*this, "dma8237_2"),
+		: pcat_base_state(mconfig, type, tag),
 		m_region_user1(*this, "user1"),
 		m_region_user5(*this, "user5"),
 		m_bank1(*this, "bank1") { }
@@ -57,48 +46,20 @@ public:
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
-	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
 
-	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pit8254;
-	required_device<pic8259_device> m_pic8259_1;
-	required_device<pic8259_device> m_pic8259_2;
-	required_device<i8237_device> m_dma8237_1;
-	required_device<i8237_device> m_dma8237_2;
 	required_memory_region m_region_user1;
 	required_memory_region m_region_user5;
 	required_memory_bank m_bank1;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_READ8_MEMBER(at_page8_r);
-	DECLARE_WRITE8_MEMBER(at_page8_w);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	DECLARE_READ8_MEMBER(at_dma8237_2_r);
-	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(taitowlf_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(taitowlf);
-	DECLARE_READ8_MEMBER(get_out2);
 	virtual void machine_start();
 	virtual void machine_reset();
 	#if !ENABLE_VGA
 	virtual void palette_init();
 	#endif
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 	void intel82439tx_init();
 };
 
@@ -131,16 +92,6 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 }
 #endif
 
-
-READ8_MEMBER(taitowlf_state::at_dma8237_2_r)
-{
-	return m_dma8237_2->i8237_r(space, offset / 2);
-}
-
-WRITE8_MEMBER(taitowlf_state::at_dma8237_2_w)
-{
-	m_dma8237_2->i8237_w(space, offset / 2, data);
-}
 
 // Intel 82439TX System Controller (MXTC)
 
@@ -305,33 +256,6 @@ WRITE32_MEMBER(taitowlf_state::pnp_data_w)
 
 
 
-READ32_MEMBER(taitowlf_state::ide_r)
-{
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitowlf_state::ide_w)
-{
-	device_t *device = machine().device("ide");
-	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(taitowlf_state::fdc_r)
-{
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(taitowlf_state::fdc_w)
-{
-	device_t *device = machine().device("ide");
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_w(device, space, 0x3f0/4 + offset, data, mem_mask);
-}
-
-
-
 WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 {
 	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
@@ -340,130 +264,6 @@ WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 	}
 }
 
-
-/*************************************************************************
- *
- *      PC DMA stuff
- *
- *************************************************************************/
-
-
-
-READ8_MEMBER(taitowlf_state::at_page8_r)
-{
-	UINT8 data = m_at_pages[offset % 0x10];
-
-	switch(offset % 8)
-	{
-	case 1:
-		data = m_dma_offset[(offset / 8) & 1][2];
-		break;
-	case 2:
-		data = m_dma_offset[(offset / 8) & 1][3];
-		break;
-	case 3:
-		data = m_dma_offset[(offset / 8) & 1][1];
-		break;
-	case 7:
-		data = m_dma_offset[(offset / 8) & 1][0];
-		break;
-	}
-	return data;
-}
-
-
-WRITE8_MEMBER(taitowlf_state::at_page8_w)
-{
-	m_at_pages[offset % 0x10] = data;
-
-	switch(offset % 8)
-	{
-	case 1:
-		m_dma_offset[(offset / 8) & 1][2] = data;
-		break;
-	case 2:
-		m_dma_offset[(offset / 8) & 1][3] = data;
-		break;
-	case 3:
-		m_dma_offset[(offset / 8) & 1][1] = data;
-		break;
-	case 7:
-		m_dma_offset[(offset / 8) & 1][0] = data;
-		break;
-	}
-}
-
-
-WRITE_LINE_MEMBER(taitowlf_state::pc_dma_hrq_changed)
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_dma8237_1->i8237_hlda_w( state );
-}
-
-
-READ8_MEMBER(taitowlf_state::pc_dma_read_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	return space.read_byte(page_offset + offset);
-}
-
-
-WRITE8_MEMBER(taitowlf_state::pc_dma_write_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	space.write_byte(page_offset + offset, data);
-}
-
-
-WRITE_LINE_MEMBER(taitowlf_state::pc_dack0_w)
-{
-	if (state) m_dma_channel = 0;
-}
-
-WRITE_LINE_MEMBER(taitowlf_state::pc_dack1_w)
-{
-	if (state) m_dma_channel = 1;
-}
-
-WRITE_LINE_MEMBER(taitowlf_state::pc_dack2_w)
-{
-	if (state) m_dma_channel = 2;
-}
-
-WRITE_LINE_MEMBER(taitowlf_state::pc_dack3_w)
-{
-	if (state) m_dma_channel = 3;
-}
-
-static I8237_INTERFACE( dma8237_1_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitowlf_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(taitowlf_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,pc_dack3_w) }
-};
-
-static I8237_INTERFACE( dma8237_2_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-/*****************************************************************************/
 
 static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
@@ -486,16 +286,9 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,              at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_IMPORT_FROM(pcat32_io_common)
+
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
@@ -504,7 +297,6 @@ static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
 	#endif
-	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
@@ -547,11 +339,6 @@ static INPUT_PORTS_START(taitowlf)
 INPUT_PORTS_END
 #endif
 
-IRQ_CALLBACK_MEMBER(taitowlf_state::irq_callback)
-{
-	return m_pic8259_1->acknowledge();
-}
-
 void taitowlf_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitowlf_state::irq_callback),this));
@@ -562,51 +349,6 @@ void taitowlf_state::machine_reset()
 	m_bank1->set_base(m_region_user1->base() + 0x30000);
 }
 
-
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-
-WRITE_LINE_MEMBER(taitowlf_state::taitowlf_pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(taitowlf_state::get_slave_ack)
-{
-	if (offset==2) { // IRQ = 2
-		return m_pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
-
-/*************************************************************
- *
- * pit8254 configuration
- *
- *************************************************************/
-
-static const struct pit8253_config taitowlf_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
 
 #if !ENABLE_VGA
 /* debug purpose*/
@@ -620,23 +362,6 @@ void taitowlf_state::palette_init()
 }
 #endif
 
-READ8_MEMBER(taitowlf_state::get_out2)
-{
-	return pit8253_get_output( m_pit8254, 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(taitowlf_state,get_out2)
-};
-
 static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 
 	/* basic machine hardware */
@@ -649,16 +374,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MCFG_PIT8254_ADD( "pit8254", taitowlf_pit8254_config )
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(taitowlf_state,taitowlf_pic8259_1_set_int_line), VCC, READ8(taitowlf_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-
-	MCFG_KBDC8042_ADD("kbdc", at8042)
+	MCFG_FRAGMENT_ADD( pcat_common )
 
 	/* video hardware */
 	#if ENABLE_VGA

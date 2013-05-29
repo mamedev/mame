@@ -30,14 +30,10 @@ Additional CD-ROM games: "99 Bottles of Beer"
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/cr589.h"
-#include "machine/8237dma.h"
-#include "machine/pic8259.h"
 //#include "machine/i82371sb.h"
 //#include "machine/i82439tx.h"
-#include "machine/pit8253.h"
-#include "machine/mc146818.h"
 #include "machine/pci.h"
-#include "machine/8042kbdc.h"
+#include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
 
@@ -71,27 +67,11 @@ Additional CD-ROM games: "99 Bottles of Beer"
 
 #define MAX_TRANSFER_SIZE ( 63488 )
 
-class gammagic_state : public driver_device
+class gammagic_state : public pcat_base_state
 {
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_pit8254(*this, "pit8254" ),
-		m_pic8259_1(*this, "pic8259_1" ),
-		m_pic8259_2(*this,  "pic8259_2" ),
-		m_dma8237_1(*this, "dma8237_1" ),
-		m_dma8237_2(*this, "dma8237_2" ),
-		m_maincpu(*this, "maincpu") { }
-
-	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
-
-	required_device<device_t> m_pit8254;
-	required_device<pic8259_device> m_pic8259_1;
-	required_device<pic8259_device> m_pic8259_2;
-	required_device<i8237_device> m_dma8237_1;
-	required_device<i8237_device> m_dma8237_2;
+		: pcat_base_state(mconfig, type, tag) { }
 
 	emu_timer *m_atapi_timer;
 	//SCSIInstance *m_inserted_cdrom;
@@ -107,139 +87,12 @@ public:
 	UINT8 m_atapi_data[ATAPI_DATA_SIZE];
 
 	DECLARE_DRIVER_INIT(gammagic);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	DECLARE_READ8_MEMBER(get_out2);
-	DECLARE_READ8_MEMBER(at_page8_r);
-	DECLARE_WRITE8_MEMBER(at_page8_w);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
-	DECLARE_READ8_MEMBER(at_dma8237_2_r);
-	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	void set_dma_channel(int channel, int state);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(gammagic_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 
 	virtual void machine_start();
 	virtual void machine_reset();
 	void atapi_init();
-	required_device<cpu_device> m_maincpu;
 };
 
-READ8_MEMBER(gammagic_state::at_dma8237_2_r)
-{
-	return m_dma8237_2->i8237_r(space, offset / 2);
-}
-
-WRITE8_MEMBER(gammagic_state::at_dma8237_2_w)
-{
-	m_dma8237_2->i8237_w(space, offset / 2, data);
-}
-
-READ8_MEMBER(gammagic_state::at_page8_r)
-{
-	UINT8 data = m_at_pages[offset % 0x10];
-
-	switch(offset % 8) {
-	case 1:
-		data = m_dma_offset[(offset / 8) & 1][2];
-		break;
-	case 2:
-		data = m_dma_offset[(offset / 8) & 1][3];
-		break;
-	case 3:
-		data = m_dma_offset[(offset / 8) & 1][1];
-		break;
-	case 7:
-		data = m_dma_offset[(offset / 8) & 1][0];
-		break;
-	}
-	return data;
-}
-
-
-WRITE8_MEMBER(gammagic_state::at_page8_w)
-{
-	m_at_pages[offset % 0x10] = data;
-
-	switch(offset % 8) {
-	case 1:
-		m_dma_offset[(offset / 8) & 1][2] = data;
-		break;
-	case 2:
-		m_dma_offset[(offset / 8) & 1][3] = data;
-		break;
-	case 3:
-		m_dma_offset[(offset / 8) & 1][1] = data;
-		break;
-	case 7:
-		m_dma_offset[(offset / 8) & 1][0] = data;
-		break;
-	}
-}
-
-
-WRITE_LINE_MEMBER(gammagic_state::pc_dma_hrq_changed)
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_dma8237_1->i8237_hlda_w(state);
-}
-
-
-READ8_MEMBER(gammagic_state::pc_dma_read_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	return space.read_byte(page_offset + offset);
-}
-
-
-WRITE8_MEMBER(gammagic_state::pc_dma_write_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	space.write_byte(page_offset + offset, data);
-}
-
-void gammagic_state::set_dma_channel(int channel, int state)
-{
-	if (!state) m_dma_channel = channel;
-}
-
-WRITE_LINE_MEMBER(gammagic_state::pc_dack0_w){ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(gammagic_state::pc_dack1_w){ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(gammagic_state::pc_dack2_w){ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(gammagic_state::pc_dack3_w){ set_dma_channel(3, state); }
-
-static I8237_INTERFACE( dma8237_1_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(gammagic_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(gammagic_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack3_w) }
-};
-
-static I8237_INTERFACE( dma8237_2_config )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
 /*
 READ32_MEMBER( gammagic_state::atapi_r )
 {
@@ -571,14 +424,7 @@ static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 	AM_RANGE(0x00f0, 0x01ef) AM_NOP
 	//AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(atapi_r, atapi_w)
@@ -642,11 +488,6 @@ static INPUT_PORTS_START( gammagic )
 INPUT_PORTS_END
 #endif
 
-IRQ_CALLBACK_MEMBER(gammagic_state::irq_callback)
-{
-	return m_pic8259_1->acknowledge();
-}
-
 void gammagic_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),this));
@@ -689,77 +530,13 @@ void gammagic_state::atapi_init()
 }
 
 
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-
-WRITE_LINE_MEMBER(gammagic_state::gammagic_pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(gammagic_state::get_slave_ack)
-{
-	if (offset==2) {
-		return m_pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
-/*************************************************************
- *
- * pit8254 configuration
- *
- *************************************************************/
-
-static const struct pit8253_config gammagic_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
-		}, {
-			4772720/4,              /* dram refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
-
-READ8_MEMBER(gammagic_state::get_out2)
-{
-	return pit8253_get_output( m_pit8254, 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(gammagic_state,get_out2)
-};
-
 static MACHINE_CONFIG_START( gammagic, gammagic_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
 	MCFG_CPU_PROGRAM_MAP(gammagic_map)
 	MCFG_CPU_IO_MAP(gammagic_io)
-	MCFG_PIT8254_ADD( "pit8254", gammagic_pit8254_config )
-	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
-	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(gammagic_state,gammagic_pic8259_1_set_int_line), VCC, READ8(gammagic_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
+
+	MCFG_FRAGMENT_ADD( pcat_common )
+
 //  MCFG_I82371SB_ADD("i82371sb")
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
 	MCFG_PCI_BUS_ADD("pcibus", 0)
@@ -767,8 +544,6 @@ static MACHINE_CONFIG_START( gammagic, gammagic_state )
 //  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-
-	MCFG_KBDC8042_ADD("kbdc", at8042)
 
 MACHINE_CONFIG_END
 

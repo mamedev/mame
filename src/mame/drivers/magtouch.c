@@ -78,9 +78,6 @@ video card
 #include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "machine/8042kbdc.h"
-#include "machine/pckeybrd.h"
-#include "machine/pit8253.h"
 #include "video/pc_vga.h"
 
 
@@ -219,9 +216,6 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-
-//  MCFG_FRAGMENT_ADD( at_kbdc8042 )
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_NS16450_ADD( "ns16450_0", magtouch_com0_interface, XTAL_1_8432MHz )
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", magtouch_microtouch_interface, 9600 ) // rate?

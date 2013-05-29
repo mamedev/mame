@@ -33,16 +33,10 @@
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
-#include "machine/8237dma.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/mc146818.h"
 #include "machine/pcshare.h"
-#include "machine/8042kbdc.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-
+#include "machine/pckeybrd.h"
 
 /*************************************
  *
@@ -69,12 +63,6 @@ class su2000_state : public pcat_base_state
 public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
-
-	device_t    *m_pit8254;
-	pic8259_device  *m_pic8259_1;
-	pic8259_device  *m_pic8259_2;
-	device_t    *m_dma8237_1;
-	device_t    *m_dma8237_2;
 
 	UINT32      *m_pc_ram;
 	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
@@ -144,51 +132,11 @@ READ8_MEMBER(su2000_state::get_slave_ack)
 	if (offset == 2)
 	{
 		// IRQ = 2
-		logerror("pic8259_slave_ACK!\n");
+		//logerror("pic8259_slave_ACK!\n");
 		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
-
-//static const struct pic8259_interface su2000_pic8259_1_config =
-//{
-//  DEVCB_DRIVER_LINE_MEMBER(su2000_state,su2000_pic8259_1_set_int_line),
-//  DEVCB_LINE_VCC,
-//  DEVCB_DRIVER_MEMBER(su2000_state,get_slave_ack)
-//};
-//
-//static const struct pic8259_interface su2000_pic8259_2_config =
-//{
-//  DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-//  DEVCB_LINE_GND,
-//  DEVCB_NULL
-//};
-
-
-/*************************************************************
- *
- * PIT8254 Configuration
- *
- *************************************************************/
-
-static const struct pit8253_config su2000_pit8254_config =
-{
-	{
-		{
-			4772720/4,              /* Heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
-		}, {
-			4772720/4,              /* DRAM refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			4772720/4,              /* PIO port C pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}
-	}
-};
 
 /*************************************
  *
@@ -199,12 +147,6 @@ static const struct pit8253_config su2000_pit8254_config =
 void su2000_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	m_pit8254 = machine().device("pit8254");
-	m_pic8259_1 = machine().device<pic8259_device>("pic8259_1");
-	m_pic8259_2 = machine().device<pic8259_device>("pic8259_2");
-	m_dma8237_1 = machine().device("dma8237_1");
-	m_dma8237_2 = machine().device("dma8237_2");
 
 	/* Configure RAM */
 	m_pc_ram = auto_alloc_array_clear(machine(), UINT32, PC_RAM_SIZE);
