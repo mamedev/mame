@@ -254,7 +254,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="nebulaa" cloneof="nebula">
-		<description>Nebula (alt)</description>
+		<description>Nebula (Alt)</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -334,14 +334,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="starspdr">
+	<software name="starspdr" supported="partial">
 		<description>Star Speeder</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<dataarea name="rom" size="40960">
-				<rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
-				<rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="0x8000" />
+			<dataarea name="rom" size="65536">
+				<rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6bb5ff3946867fa7adb6561dc084ef5a7a92c507" offset="0" />
+				<rom size="8192" offset="0x2000" loadflag="reload" />
+				<rom size="8192" offset="0x4000" loadflag="reload" />
+				<rom size="8192" offset="0x6000" loadflag="reload" />
+				<rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0x8000" />
 			</dataarea>
 		</part>
 	</software>
@@ -384,7 +387,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 
 	<!-- maybe pal, name taken from boxart -->
 	<software name="soccera" cloneof="soccer">
-		<description>Super Soccer (alt)</description>
+		<description>Super Soccer (Alt)</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
