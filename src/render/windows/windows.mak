@@ -73,10 +73,10 @@
 # object and source roots
 #-------------------------------------------------
 
-RENDSRC = $(SRC)/render/$(RENDER)
-RENDOBJ = $(OBJ)/render/$(RENDER)
+RENDSRC = $(SRC)/render
+RENDOBJ = $(OBJ)/render
 
-OBJDIRS += $(RENDOBJ)
+OBJDIRS += $(RENDOBJ) $(RENDOBJ)/windows
 
 
 
@@ -84,10 +84,10 @@ OBJDIRS += $(RENDOBJ)
 # overrides for the CYGWIN compiler
 #-------------------------------------------------
 
-ifdef CYGWIN_BUILD
-CCOMFLAGS += -mno-cygwin
-LDFLAGS += -mno-cygwin
-endif
+# ifdef CYGWIN_BUILD
+# CCOMFLAGS += -mno-cygwin
+# LDFLAGS += -mno-cygwin
+# endif
 
 
 
@@ -96,7 +96,7 @@ endif
 # explicitly specify the current path
 #-------------------------------------------------
 
-CURPATH = ./
+# CURPATH = ./
 
 
 
@@ -105,16 +105,16 @@ CURPATH = ./
 #-------------------------------------------------
 
 # define the x64 ABI to be Windows
-DEFS += -DX64_WINDOWS_ABI
+# DEFS += -DX64_WINDOWS_ABI
 
 # enable UNICODE flags
-DEFS += -DUNICODE -D_UNICODE
-LDFLAGS += -municode
+# DEFS += -DUNICODE -D_UNICODE
+# LDFLAGS += -municode
 
 # debug build: enable guard pages on all memory allocations
-ifdef DEBUG
-DEFS += -DMALLOC_DEBUG
-endif
+# ifdef DEBUG
+# DEFS += -DMALLOC_DEBUG
+# endif
 
 
 
@@ -123,34 +123,34 @@ endif
 #-------------------------------------------------
 
 # ensure we statically link the gcc runtime lib
-LDFLAGS += -static-libgcc
+# LDFLAGS += -static-libgcc
 # TODO: needs to use $(CC)
-TEST_GCC = $(shell gcc --version)
-ifeq ($(findstring 4.4.,$(TEST_GCC)),)
+# TEST_GCC = $(shell gcc --version)
+# ifeq ($(findstring 4.4.,$(TEST_GCC)),)
 	#if we use new tools
-	LDFLAGS += -static-libstdc++
-endif
-ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
-	CCOMFLAGS += -Wno-narrowing -Wno-attributes
-endif
+# 	LDFLAGS += -static-libstdc++
+# endif
+# ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
+# 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
+# endif
 # add the windows libraries
-LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
+# LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -lwsock32
 
-ifeq ($(DIRECTINPUT),8)
-LIBS += -ldinput8
-CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800
-else
-LIBS += -ldinput
-CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
-endif
+# ifeq ($(DIRECTINPUT),8)
+# LIBS += -ldinput8
+# CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800
+# else
+# LIBS += -ldinput
+# CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
+# endif
 
-LIBS += -lcomdlg32
+# LIBS += -lcomdlg32
 
 #-------------------------------------------------
 # Render core library
 #-------------------------------------------------
 
-RENDCOREOBJS = \
+RENDOBJS = \
 	$(RENDOBJ)/drawhal.o    \
 	$(RENDOBJ)/video.o \
 	$(RENDOBJ)/window.o \
@@ -159,7 +159,7 @@ RENDCOREOBJS = \
 	$(RENDOBJ)/windows/window.o
 
 
-CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
+# CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 
 # extra dependencies
 # $(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.c
@@ -175,7 +175,5 @@ CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 #-------------------------------------------------
 # rules for building the libaries
 #-------------------------------------------------
-
-$(LIBRCORE): $(RENDCOREOBJS)
 
 $(LIBRENDER): $(RENDOBJS)

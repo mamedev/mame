@@ -46,60 +46,6 @@
 namespace render
 {
 
-window_info::~window_info()
-{
-	remove_from_list();
-
-	// free the render target
-	window->machine().render().target_free(window->target);
-
-	// free the lock
-	osd_lock_free(m_render_lock);
-}
-
-window_info::window_info(running_machine &machine, threadid main_threadid, threadid window_threadid)
-	: m_machine(machine)
-{
-	// create a lock that we can use to skip blitting
-	m_render_lock = osd_lock_alloc();
-
-	m_main_threadid = main_threadid;
-	m_window_threadid = window_threadid;
-
-	// load the layout
-	m_target = machine.render().target_alloc();
-
-	// remember the current values in case they change
-	m_targetview = m_target->view();
-	m_targetorient = m_target->orientation();
-	m_targetlayerconfig = m_target->layer_config();
-
-	set_starting_view(index, m_machine.options.view(), m_machine.options.view(index));
-
-	m_init_state = 0;
-
-	m_multithreading_enabled = m_machine.options.multithreading();
-}
-
-render_primitive_list &window_info::get_primitives()
-{
-	m_hal->update_bounds();
-	return window->target->get_primitives();
-}
-
-void window_info::set_starting_view(int index, const char *defview, const char *view)
-{
-	// choose non-auto over auto
-	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
-		view = defview;
-
-	// query the video system to help us pick a view
-	int viewindex = m_target->configured_view(view, index, video_config.numscreens);
-
-	// set the view
-	m_target->set_view(viewindex);
-}
-
 int draw_hal::create_resources()
 {
 	return 0;
