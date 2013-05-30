@@ -756,7 +756,7 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 	}
 
 	// one last pass at events
-	m_video->process_events(false);
+	m_video->window()->process_events(false);
 }
 
 

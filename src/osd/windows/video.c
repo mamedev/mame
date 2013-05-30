@@ -86,7 +86,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	}
 
 	// poll the joystick values here
-	m_video->process_events(true);
+	m_video->window()->process_events(true);
 	wininput_poll(machine());
 	check_osd_inputs();
 }
