@@ -257,7 +257,7 @@ CCOMFLAGS += -include $(WINSRC)/winprefix.h
 # ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
 # TODO: needs to use $(CC)
-TEST_GCC = $(shell gcc --version)
+TEST_GCC := $(shell gcc --version)
 ifeq ($(findstring 4.4.,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
@@ -345,8 +345,9 @@ RESFILE = $(WINOBJ)/mame.res
 # QT Debug library
 #-------------------------------------------------
 ifdef USE_QTDEBUG
-QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
-LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4
+QT_INSTALL_HEADERS := $(shell qmake -query QT_INSTALL_HEADERS)
+QT_LIBS := -L$(shell qmake -query QT_INSTALL_LIBS)
+LIBS += $(QT_LIBS) -lqtmain -lQtGui4 -lQtCore4
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
 SDLOBJ := $(WINOBJ)/../sdl
 SDLSRC := $(WINSRC)/../sdl
