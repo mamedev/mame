@@ -1,6 +1,6 @@
 //============================================================
 //
-//  drawhal.cpp - Generic render abstraction layer
+//  monitor.cpp - Windows monitor management
 //
 //============================================================
 //
@@ -39,41 +39,54 @@
 //
 //============================================================
 
-#include "drawhal.h"
-#include "osdepend.h"
-#include "winutf8.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include "emu.h"
+#include "strconv.h"
+
+#include "render/windows/monitor.h"
 
 namespace render
 {
 
-int draw_hal::create_resources()
+namespace windows
 {
-	return 0;
+
+//============================================================
+//  monitor_info::get_aspect
+//============================================================
+
+float monitor_info::get_aspect()
+{
+	// refresh the monitor information and compute the aspect
+	if (m_video->get_video_config().keepaspect)
+	{
+		refresh();
+		int width = m_info.rcMonitor.right - m_info.rcMonitor.left;
+		int height = m_info.rcMonitor.bottom - m_info.rcMonitor.top;
+		return m_aspect / ((float)width / (float)height);
+	}
+	return 0.0f;
 }
 
-int draw_hal::delete_resources()
+
+//============================================================
+//  monitor_info::refresh
+//============================================================
+
+void monitor_info::refresh()
 {
-	return 0;
+	// fetch the latest info about the monitor
+	m_info.cbSize = sizeof(m_info);
+	BOOL result = GetMonitorInfo(m_handle, (LPMONITORINFO)&m_info);
+	assert(result);
+	(void)result; // to silence gcc 4.6
 }
 
-int	draw_hal::set_view_size(vec2f& size)
+char *monitor_info::device_name()
 {
+	return utf8_from_tstring(m_info.szDevice);
 }
 
-void draw_hal::begin_frame()
-{
-}
-
-void draw_hal::end_frame()
-{
-}
-
-void draw_hal::process_primitives()
-{
-}
-
-void draw_hal::draw_primitives()
-{
-}
-
-}; // namespace render
+}}; // namespace render::windows

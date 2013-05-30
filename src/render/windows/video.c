@@ -39,8 +39,20 @@
 //
 //============================================================
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include "emu.h"
+#include "strconv.h"
+#include "winmain.h"
+
 #include "render/windows/video.h"
+#include "render/windows/window.h"
+#include "render/windows/monitor.h"
 #include "osd/windows/debugwin.h"
+#include "osd/windows/input.h"
+
+#define WM_USER_UI_TEMP_PAUSE           (WM_USER + 6)
 
 namespace render
 {
@@ -52,7 +64,10 @@ video_system::video_system(running_machine &machine) :
 	render::video_system(machine)
 {
 	if (m_video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(m_window_list->hwnd());
+	{
+		render::windows::window_info *window_list = (render::windows::window_info *)m_window->window_list();
+		SetForegroundWindow(window_list->hwnd());
+	}
 
 	// possibly create the debug window, but don't show it yet
 	if (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
@@ -61,7 +76,8 @@ video_system::video_system(running_machine &machine) :
 
 void video_system::update()
 {
-	for (window_info *window = m_window_list; window != NULL; window = window->next())
+	render::windows::window_info *window = (render::windows::window_info *)m_window->window_list();
+	for ( ; window != NULL; window = window->next())
 	{
 		window->update();
 	}
@@ -72,7 +88,7 @@ void video_system::exit()
 	// free all of our monitor information
 	while (m_monitor_list != NULL)
 	{
-		monitor_info *temp = m_monitor_list;
+		windows::monitor_info *temp = (windows::monitor_info *)m_monitor_list;
 		m_monitor_list = temp->next();
 		global_free(temp);
 	}
@@ -85,7 +101,7 @@ void video_system::exit()
 void video_system::extract_video_config()
 {
 	render::video_system::extract_video_config();
-	windows_options &options = downcast<windows_options &>(machine.options());
+	windows_options &options = downcast<windows_options &>(m_machine.options());
 	const char *stemp;
 
 	m_video_config.prescale      = options.prescale();
@@ -135,15 +151,17 @@ void video_system::extract_video_config()
 //  monitor_from_handle
 //============================================================
 
-monitor_info *video_system::monitor_from_handle(HMONITOR hmonitor)
+render::monitor_info *video_system::monitor_from_handle(HMONITOR hmonitor)
 {
 	// find the matching monitor
-	for (monitor_info *monitor = win_monitor_list; monitor != NULL; monitor = monitor->next())
+	windows::monitor_info *monitor = (windows::monitor_info *)m_monitor_list;
+	while (monitor != NULL)
 	{
 		if (monitor->handle() == hmonitor)
 		{
 			return monitor;
 		}
+		monitor = (windows::monitor_info *)monitor->next();
 	}
 	return NULL;
 }
@@ -157,11 +175,11 @@ void video_system::init_monitors()
 {
 	// make a list of monitors
 	m_monitor_list = NULL;
-	win_monitor_info **tailptr = &m_monitor_list;
-	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)&tailptr);
+	EnumDisplayMonitors(NULL, NULL, monitor_enum_callback, (LPARAM)this);
 
 	// if we're verbose, print the list of monitors
-	for (monitor_info *monitor = m_monitor_list; monitor != NULL; monitor = monitor->next())
+	windows::monitor_info *monitor = (windows::monitor_info *)m_monitor_list;
+	while(monitor != NULL)
 	{
 		char *utf8_device = utf8_from_tstring(monitor->info().szDevice);
 		if (utf8_device != NULL)
@@ -169,6 +187,7 @@ void video_system::init_monitors()
 			mame_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle(), utf8_device, (monitor == m_primary_monitor) ? "(primary)" : "");
 			osd_free(utf8_device);
 		}
+		monitor = (windows::monitor_info *)monitor->next();
 	}
 }
 
@@ -179,6 +198,8 @@ void video_system::init_monitors()
 
 BOOL CALLBACK video_system::monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 {
+	video_system *video = (video_system *)data;
+
 	// get the monitor info
 	MONITORINFOEX info;
 	info.cbSize = sizeof(info);
@@ -190,140 +211,19 @@ BOOL CALLBACK video_system::monitor_enum_callback(HMONITOR handle, HDC dc, LPREC
 	float aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
 
 	// allocate a new monitor info
-	monitor_info *monitor = global_alloc_clear(monitor_info(aspect, handle, info));
+	monitor_info *monitor = global_alloc_clear(monitor_info(video, aspect, handle, info));
 
 	// save the primary monitor handle
 	if (monitor->info().dwFlags & MONITORINFOF_PRIMARY)
-		m_primary_monitor = monitor;
+		video->set_primary_monitor(monitor);
 
 	// hook us into the list
-	monitor_info ***tailptr = (monitor_info ***)data;
-	**tailptr = monitor;
-	*tailptr = &monitor->next();
+	video->set_last_monitor(monitor);
 
 	// enumerate all the available monitors so to list their names in verbose mode
 	return TRUE;
 }
 
-
-//============================================================
-//  video_system::ui_pause_from_main_thread
-//  (main thread)
-//============================================================
-
-void video_system::ui_pause_from_main_thread(bool pause)
-{
-	assert(GetCurrentThreadId() == m_main_threadid);
-
-	bool old_temp_pause = ui_temp_pause;
-
-	// if we're pausing, increment the pause counter
-	if (pause)
-	{
-		// if we're the first to pause, we have to actually initiate it
-		if (m_ui_temp_pause++ == 0)
-		{
-			// only call mame_pause if we weren't already paused due to some external reason
-			m_ui_temp_was_paused = m_machine.paused();
-			if (!m_ui_temp_was_paused)
-			{
-				m_machine.pause();
-			}
-
-			set_pause_event();
-		}
-	}
-	else // if we're resuming, decrement the pause counter
-	{
-		// if we're the last to resume, unpause MAME
-		if (--m_ui_temp_pause == 0)
-		{
-			// but only do it if we were the ones who initiated it
-			if (!m_ui_temp_was_paused)
-			{
-				m_machine.resume();
-			}
-
-			reset_pause_event();
-		}
-	}
-}
-
-void video_system::set_pause_event()
-{
-	SetEvent(m_ui_pause_event);
-}
-
-void video_system::reset_pause_event()
-{
-	ResetEvent(m_ui_pause_event);
-}
-
-//============================================================
-//  video_system::ui_pause_from_window_thread
-//  (window thread)
-//============================================================
-
-void video_system::ui_pause_from_window_thread(bool pause)
-{
-	assert(GetCurrentThreadId() == m_window_threadid);
-
-	// if we're multithreaded, we have to request a pause on the main thread
-	if (m_multithreading_enabled)
-	{
-		// request a pause from the main thread
-		PostThreadMessage((DWORD)m_main_threadid, WM_USER_UI_TEMP_PAUSE, pause, 0);
-
-		// if we're pausing, block until it happens
-		if (pause)
-		{
-			WaitForSingleObject(m_ui_pause_event, INFINITE);
-		}
-	}
-	else // otherwise, we just do it directly
-	{
-		ui_pause_from_main_thread(pause);
-	}
-}
-
-
-//============================================================
-//  get_aspect
-//============================================================
-
-float video_system::get_aspect(const char *defdata, const char *data, int report_error)
-{
-	int num = 0, den = 1;
-
-	if (strcmp(data, "auto") == 0)
-	{
-		if (strcmp(defdata, "auto") == 0)
-			return 0;
-		data = defdata;
-	}
-	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		mame_printf_error("Illegal aspect ratio value = %s\n", data);
-	return (float)num / (float)den;
-}
-
-
-
-//============================================================
-//  get_resolution
-//============================================================
-
-void video_system::get_resolution(const char *defdata, const char *data, window_system::window_config *config, int report_error)
-{
-	config->width = config->height = config->refresh = 0;
-	if (strcmp(data, "auto") == 0)
-	{
-		if (strcmp(defdata, "auto") == 0)
-			return;
-		data = defdata;
-	}
-	if (sscanf(data, "%dx%d@%d", &config->width, &config->height, &config->refresh) < 2 && report_error)
-		mame_printf_error("Illegal resolution value = %s\n", data);
-}
 
 //============================================================
 //  window_has_focus
@@ -335,9 +235,15 @@ bool video_system::window_has_focus()
 	HWND focuswnd = GetFocus();
 
 	// see if one of the video windows has focus
-	for (window_info *window = m_window_list; window != NULL; window = window->next())
+	windows::window_info *window = (windows::window_info *)m_window->window_list();
+	while(window != NULL)
+	{
 		if (focuswnd == window->hwnd())
+		{
 			return TRUE;
+		}
+		window = (windows::window_info *)window->next();
+	}
 
 	return FALSE;
 }
@@ -362,7 +268,7 @@ void video_system::update_cursor_state()
 	//      the input system requests it
 	if (window_has_focus() && ((!m_video_config.windowed && !has_menu()) || (!m_machine.paused() && wininput_should_hide_mouse())))
 	{
-		window_info *window = win_window_list;
+		windows::window_info *window = (windows::window_info *)m_window->window_list();
 		RECT bounds;
 
 		// hide cursor
@@ -395,4 +301,4 @@ void video_system::update_cursor_state()
 }
 
 
-}; // namespace render::windows
+}}; // namespace render::windows

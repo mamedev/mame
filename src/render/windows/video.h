@@ -42,6 +42,7 @@
 #ifndef __RENDER_WINDOWS_VIDEO__
 #define __RENDER_WINDOWS_VIDEO__
 
+#include "emu.h"
 #include "video.h"
 #include "render.h"
 
@@ -74,7 +75,7 @@ public:
 
 	virtual void			update();
 
-	BOOL CALLBACK			monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
+	static BOOL CALLBACK	monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 	virtual void			init_monitors();
 	virtual monitor_info *	monitor_from_handle(HMONITOR hmonitor);
 
@@ -82,19 +83,12 @@ public:
 
 	virtual bool			has_menu();
 
-	virtual void			process_events(bool ingame);
+	virtual void			exit();
+
+	virtual void			update_cursor_state();
 
 protected:
 	virtual void 			extract_video_config();
-
-	virtual void			set_pause_event();
-	virtual void			reset_pause_event();
-
-private:
-	float					get_aspect(const char *defdata, const char *data, int report_error);
-	void					get_resolution(const char *defdata, const char *data, window_system::window_config *config, int report_error);
-
-	HANDLE 					m_ui_pause_event;
 };
 
 }}; // render::windows

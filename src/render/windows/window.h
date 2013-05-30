@@ -53,7 +53,7 @@
 namespace render
 {
 
-class draw_hal;
+//class draw_hal;
 
 namespace windows
 {
@@ -64,40 +64,77 @@ public:
 	window_system(running_machine &machine, video_system *video);
 	virtual ~window_system();
 
+	virtual draw_hal *	hal() { return m_hal; }
+
 	virtual void		process_events_periodic();
 
 	virtual void		toggle_full_screen();
 
-	virtual window_info *	window_alloc(monitor_info *monitor);
+	virtual render::window_info *window_alloc(render::monitor_info *monitor, int index);
 
 	virtual void		take_snap();
 	virtual void		toggle_fsfx();
 	virtual void		take_video();
 
+	virtual window_info *	window_list() { return m_window_list; }
+
+	void				shutdown();
+
 	void				create_window_class();
-	void				is_mame_window(HWND hwnd);
+	bool				is_mame_window(HWND hwnd);
 	void				ui_exec_on_main_thread(void (*func)(void *), void *param);
-	unsigned __stdcall 	thread_entry(void *param);
+	static unsigned __stdcall thread_entry(void *param);
+
+	void				ui_pause_from_main_thread(bool pause);
+	void				ui_pause_from_window_thread(bool pause);
+
+	bool				ui_is_paused() { return m_machine.paused() && m_ui_temp_was_paused; }
+
+	HANDLE				window_thread_ready_event() { return m_window_thread_ready_event; }
+
+	virtual void		process_events(bool ingame);
+	void				dispatch_message(MSG *message);
+
+	LRESULT CALLBACK 	window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+	LRESULT CALLBACK	window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+protected:
+	virtual void		set_pause_event();
+	virtual void		reset_pause_event();
+
+	draw_hal *			m_hal;
+
+	int					m_ui_temp_pause;
+	int					m_ui_temp_was_paused;
 
 private:
 	HANDLE 				m_window_thread;
-
 	HANDLE 				m_window_thread_ready_event;
+	HANDLE 				m_ui_pause_event;
 
 	UINT32				m_last_event_check;
 
 	bool				m_classes_created;
+
+	bool				m_in_background;
 };
 
 class window_info : public render::window_info
 {
 public:
-	window_info(running_machine &machine, UINT64 main_threadid, UINT64 window_threadid, window_system *system,
-				monitor_info *monitor)
-		: render::window_info(machine, main_threadid, window_threadid, system, monitor) { }
+	window_info(running_machine &machine, int index, UINT64 main_threadid, UINT64 window_threadid,
+				window_system *system, monitor_info *monitor)
+		: render::window_info(machine, index, main_threadid, window_threadid, system, monitor) { }
 	~window_info();
 
-	draw_hal *			hal() { return m_hal; }
+	virtual void		init_hal();
+
+	virtual void		update();
+
+	virtual window_info *next() { return (render::windows::window_info *)m_next; }
+
+	virtual bool		complete_create();
+	virtual void		wait_for_ready();
 
 	DWORD				lastclicktime() { return m_lastclicktime; }
 	int					lastclickx() { return m_lastclickx; }
@@ -126,33 +163,30 @@ public:
 
 	virtual int			resize_state() { return m_resize_state; }
 
+	virtual void		get_window_rect(math::rectf *bounds);
+
 	void				draw_video_contents(HDC dc, int update);
 
-	LRESULT CALLBACK 	window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
-	LRESULT CALLBACK	window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+	void				constrain_to_aspect_ratio(RECT *rect, int adjustment);
 
 private:
-	draw_hal *				m_hal;
-
-	void					get_max_bounds(RECT *bounds, bool constrain);
+	void					get_min_bounds(math::rectf *bounds, bool constrain);
+	void					get_max_bounds(math::rectf *bounds, bool constrain);
 	void					adjust_window_position_after_major_change();
-	void					constrain_to_aspect_ratio(RECT *rect, int adjustment);
+
+	monitor_info *			monitor(const RECT *proposed);
 
 	// window handle and info
 	HWND                	m_hwnd;
-	char                	m_title[256];
 	RECT                	m_non_fullscreen_bounds;
-	int                 	m_startmaximized;
-	int                 	m_isminimized;
-	int                 	m_ismaximized;
 	int                 	m_resize_state;
+
+	DWORD 					m_last_update_time;
 
 	// input info
 	DWORD               	m_lastclicktime;
 	int                 	m_lastclickx;
 	int                 	m_lastclicky;
-
-	bool					m_in_background;
 
 	int						m_win_physical_width;
 	int						m_win_physical_height;

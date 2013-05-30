@@ -49,19 +49,33 @@
 namespace render
 {
 
+class video_system;
+
 class monitor_info
 {
 public:
-	monitor_info() { }
+	monitor_info(video_system *video, float aspect) : m_video(video), m_aspect(aspect) { }
 
 	virtual char *			device_name() = 0;
 
-private:
-	static monitor_info *	m_next;					// pointer to next monitor in list
+	virtual monitor_info *	next() { return m_next; }
+	virtual monitor_info ** next_ptr() { return &m_next; }
 
-	float					m_aspect;				// computed/configured aspect ratio of the physical device
-	int                 	m_width;				// requested width for this monitor
-	int                 	m_height;				// requested height for this monitor
+	void					set_aspect(float aspect) { m_aspect = aspect; }
+	virtual float			get_aspect() { return 0.0f; }
+
+	virtual void			refresh() { }
+
+protected:
+	video_system *	m_video;				// pointer to video subsystem
+
+	float			m_aspect;				// computed/configured aspect ratio of the physical device
+
+	monitor_info *	m_next;					// pointer to next monitor in list
+
+private:
+	int           	m_width;				// requested width for this monitor
+	int          	m_height;				// requested height for this monitor
 };
 
 }; // namespace render

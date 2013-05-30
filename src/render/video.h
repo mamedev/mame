@@ -42,9 +42,6 @@
 #ifndef __RENDER_VIDEO__
 #define __RENDER_VIDEO__
 
-#include "video.h"
-#include "render.h"
-
 #include "window.h"
 #include "monitor.h"
 #include "drawhal.h"
@@ -65,6 +62,7 @@ namespace render
 
 class window_system;
 class window_info;
+//struct window_config;
 
 class video_system
 {
@@ -80,6 +78,12 @@ public:
 
 	virtual monitor_info *	pick_monitor(int index);
 
+	virtual void			init_monitors() { }
+
+	virtual void			exit();
+
+	virtual void			set_primary_monitor(monitor_info *primary_monitor) { m_primary_monitor = primary_monitor; }
+	virtual void			set_last_monitor(monitor_info *last_monitor);
 	struct video_config
 	{
 		// global configuration
@@ -90,7 +94,7 @@ public:
 		render_layer_config layerconfig;                // default configuration of layers
 
 		// per-window configuration
-		window_system::window_config window[MAX_WINDOWS];		// configuration data per-window
+		window_config 		window[MAX_WINDOWS];		// configuration data per-window
 
 		// hardware options
 		int                 mode;                       // output mode
@@ -112,20 +116,18 @@ public:
 
 	virtual window_info *	window_list() { return m_window->window_list(); }
 
-	bool					ui_is_paused() { return m_machine.paused() && m_ui_temp_was_paused; }
+	virtual void			update_cursor_state() { }
 
 protected:
 	virtual void 			extract_video_config();
 
-	virtual void			set_pause_event() { }
-	virtual void			reset_pause_event() { }
+	float					get_aspect(const char *defdata, const char *data, int report_error);
+	void					get_resolution(const char *defdata, const char *data, window_config *config, int report_error);
 
-private:
+protected:
 	running_machine &		m_machine;
 
 	video_config 			m_video_config;
-
-	window_info **			m_last_window_ptr;
 
 	window_system *			m_window;
 
@@ -134,8 +136,8 @@ private:
 	monitor_info *			m_monitor_list;
 	monitor_info *			m_primary_monitor;
 
-	int						m_ui_temp_pause;
-	int						m_ui_temp_was_paused;
+private:
+	window_info **			m_last_window_ptr;
 };
 
 };

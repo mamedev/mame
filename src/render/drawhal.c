@@ -1,6 +1,6 @@
 //============================================================
 //
-//  monitor.cpp - Windows monitor management
+//  drawhal.cpp - Generic render abstraction layer
 //
 //============================================================
 //
@@ -39,45 +39,43 @@
 //
 //============================================================
 
-#include "render/windows/monitor.h"
+#include "drawhal.h"
+#include "osdepend.h"
+//#include "winutf8.h"
 
-namespace render::windows
+namespace render
 {
 
-//============================================================
-//  monitor_info::get_aspect
-//============================================================
-
-float monitor_info::get_aspect()
+int draw_hal::create_resources()
 {
-	// refresh the monitor information and compute the aspect
-	if (video_config.keepaspect)
-	{
-		refresh();
-		int width = rect_width(&info.rcMonitor);
-		int height = rect_height(&info.rcMonitor);
-		return m_aspect / ((float)width / (float)height);
-	}
-	return 0.0f;
+	return 0;
 }
 
-
-//============================================================
-//  monitor_info::refresh
-//============================================================
-
-void monitor_info::refresh()
+int draw_hal::delete_resources()
 {
-	// fetch the latest info about the monitor
-	m_info.cbSize = sizeof(m_info);
-	BOOL result = GetMonitorInfo(m_handle, (LPMONITORINFO)&m_info);
-	assert(result);
-	(void)result; // to silence gcc 4.6
+	return 0;
 }
 
-char *monitor_info::device_name()
+int	draw_hal::set_view_size(math::vec2f& size)
 {
-	return utf8_from_tstring(m_info.szDevice)
+	return 0;
 }
 
-}; // namespace render::windows
+int draw_hal::begin_frame()
+{
+	return 0;
+}
+
+void draw_hal::end_frame()
+{
+}
+
+void draw_hal::process_primitives()
+{
+}
+
+void draw_hal::draw_primitives()
+{
+}
+
+}; // namespace render

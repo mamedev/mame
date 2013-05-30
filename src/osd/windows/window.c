@@ -39,7 +39,6 @@
 //
 //============================================================
 
-#define LOG_THREADS         0
 #define LOG_TEMP_PAUSE      0
 
 // Needed for RAW Input

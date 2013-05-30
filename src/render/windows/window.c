@@ -39,11 +39,28 @@
 //
 //============================================================
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <windowsx.h>
+#include <mmsystem.h>
+#include <process.h>
+
+#include "emu.h"
+#include "emuopts.h"
+#include "uiinput.h"
+
+#include "window.h"
+#include "winutf8.h"
+#include "osd/windows/winmain.h"
+#include "osd/windows/input.h"
 #include "render/window.h"
+#include "render/windows/monitor.h"
 
 //============================================================
 //  PARAMETERS
 //============================================================
+
+#define LOG_THREADS         0
 
 // window styles
 #define WINDOW_STYLE                    WS_OVERLAPPEDWINDOW
@@ -111,6 +128,21 @@ void mtlog_add(const char *event) { }
 static void mtlog_dump(void) { }
 #endif
 
+//============================================================
+//  rect_width / rect_height
+//============================================================
+
+INLINE int rect_width(const RECT *rect)
+{
+	return rect->right - rect->left;
+}
+
+
+INLINE int rect_height(const RECT *rect)
+{
+	return rect->bottom - rect->top;
+}
+
 namespace render
 {
 
@@ -120,6 +152,9 @@ namespace windows
 window_system::window_system(running_machine &machine, video_system *video) :
 	render::window_system(machine, video)
 {
+	// ensure we get called on the way out
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(window_system::shutdown), this));
+
 	m_classes_created = false;
 
 	// get the main thread ID before anything else
@@ -142,7 +177,7 @@ window_system::window_system(running_machine &machine, video_system *video) :
 			fatalerror("Failed to create window thread ready event\n");
 
 		// create a thread to run the windows from
-		size_t temp = _beginthreadex(NULL, 0, thread_entry, NULL, 0, (unsigned *)&m_window_threadid);
+		size_t temp = _beginthreadex(NULL, 0, thread_entry, (void *)this, 0, (unsigned *)&m_window_threadid);
 		m_window_thread = (HANDLE)temp;
 		if (m_window_thread == NULL)
 			fatalerror("Failed to create window thread\n");
@@ -154,63 +189,34 @@ window_system::window_system(running_machine &machine, video_system *video) :
 	// otherwise, treat the window thread as the main thread
 	else
 	{
-		m_window_thread = (UINT64)GetCurrentThread();
+		m_window_thread = GetCurrentThread();
 		m_window_threadid = m_main_threadid;
 	}
 
 	// initialize the drawers
-	if (m_video_config.mode == VIDEO_MODE_D3D)
+	if (m_video->get_video_config().mode == VIDEO_MODE_D3D)
 	{
-		if (drawd3d_init(machine, &draw))
-			m_video_config.mode = VIDEO_MODE_GDI;
+		//if (drawd3d_init(machine, &draw))
+			//m_video->get_video_config().mode = VIDEO_MODE_GDI;
 	}
-	if (m_video_config.mode == VIDEO_MODE_DDRAW)
+	if (m_video->get_video_config().mode == VIDEO_MODE_DDRAW)
 	{
-		if (drawdd_init(machine, &draw))
-			m_video_config.mode = VIDEO_MODE_GDI;
+		//if (drawdd_init(machine, &draw))
+			//m_video->get_video_config().mode = VIDEO_MODE_GDI;
 	}
-	if (m_video_config.mode == VIDEO_MODE_GDI)
-		drawgdi_init(machine, &draw);
-	if (m_video_config.mode == VIDEO_MODE_NONE)
-		drawnone_init(machine, &draw);
+	if (m_video->get_video_config().mode == VIDEO_MODE_GDI)
+	{
+		//drawgdi_init(machine, &draw);
+	}
+	if (m_video->get_video_config().mode == VIDEO_MODE_NONE)
+	{
+		//drawnone_init(machine, &draw);
+	}
 }
 
-window_info *window_system::window_alloc(monitor_info *monitor)
+render::window_info *window_system::window_alloc(render::monitor_info *monitor, int index)
 {
-	return global_alloc_clear(window_info(m_machine, m_main_threadid, m_window_threadid, monitor));
-}
-
-void window_system::window_create(int index, monitor_info *monitor, const window_config *config)
-{
-	assert(GetCurrentThreadId() == m_main_threadid);
-
-	// allocate a new window object
-
-	window_info *window = window_alloc(machine, m_main_threadid, m_window_threadid, monitor));
-	window->set_maxdims(config->width, config->height);
-	window->set_refresh(config->refresh);
-	window->set_fullscreen(!m_video_config.windowed);
-
-	// see if we are safe for fullscreen
-	window->set_fullscreen_safe(TRUE);
-	for (window_info *win = m_window_list; win != NULL; win = win->next())
-		if (win->monitor() == monitor)
-			window->set_fullscreen_safe(FALSE);
-
-	// add us to the list
-	*m_last_window_ptr = window;
-	m_last_window_ptr = &window->next();
-
-	// make the window title
-	if (m_video_config.numscreens == 1)
-		sprintf(window->title(), "%s: %s [%s]", emulator_info::get_appname(), m_machine.system().description, m_machine.system().name);
-	else
-		sprintf(window->title(), "%s: %s [%s] - Screen %d", emulator_info::get_appname(), m_machine.system().description, m_machine.system().name, index);
-
-	// set the initial maximized state
-	window->startmaximized = options.maximize();
-
-	window->wait_for_ready();
+	return (render::window_info *)global_alloc_clear(window_info(m_machine, index, m_main_threadid, m_window_threadid, this, monitor));
 }
 
 //============================================================
@@ -223,12 +229,14 @@ void window_system::toggle_full_screen()
 	assert(GetCurrentThreadId() == m_main_threadid);
 
 	// if we are in debug mode, never go full screen
-	for (window_info *window = m_window_list; window != NULL; window = window->next())
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while(window != NULL)
 	{
 		if (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
 			return;
 		}
+		window = (windows::window_info *)window->next();
 	}
 
 	// toggle the window mode
@@ -236,37 +244,66 @@ void window_system::toggle_full_screen()
 	video_config.windowed = !video_config.windowed;
 
 	// iterate over windows and toggle their fullscreen state
-	for (window_info *window = win_window_list; window != NULL; window = window->next())
+	window = (windows::window_info *)m_window_list;
+	while(window != NULL)
 	{
 		SendMessage(window->hwnd(), WM_USER_SET_FULLSCREEN, !video_config.windowed, 0);
+		window = (windows::window_info *)window->next();
 	}
-	SetForegroundWindow(m_window_list->hwnd());
+
+	window = (windows::window_info *)m_window_list;
+	SetForegroundWindow(window->hwnd());
 }
 
+
 //============================================================
-//  exit
+//  is_mame_window
+//============================================================
+
+bool window_system::is_mame_window(HWND hwnd)
+{
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while (window != NULL)
+	{
+		if (window->hwnd() == hwnd)
+		{
+			return TRUE;
+		}
+		window = (windows::window_info *)window->next();
+	}
+
+	return FALSE;
+}
+
+
+//============================================================
+//  shutdown
 //  (main thread)
 //============================================================
 
-void window_system::exit()
+void window_system::shutdown()
 {
 	assert(GetCurrentThreadId() == m_main_threadid);
 
 	// possibly kill the debug window
 	if (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		debugwin_destroy_windows();
+	{
+		//debugwin_destroy_windows();
+	}
+
+	//render::window_system::exit();
 
 	// free all the windows
-	window_info *curr = m_window_list;
-	while (curr != NULL)
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while (window != NULL)
 	{
-		window_info *temp = curr;
-		curr = temp->next();
+		window_info *temp = window;
+		window = (windows::window_info *)temp->next();
 		global_free(temp);
 	}
 
 	// kill the drawers
-	m_hal->exit();
+	m_hal->shutdown();
 
 	// if we're multithreaded, clean up the window thread
 	if (m_multithreading_enabled)
@@ -291,6 +328,85 @@ void window_system::exit()
 
 
 //============================================================
+//  window_system::ui_pause_from_main_thread
+//  (main thread)
+//============================================================
+
+void window_system::ui_pause_from_main_thread(bool pause)
+{
+	assert(GetCurrentThreadId() == m_main_threadid);
+
+	// if we're pausing, increment the pause counter
+	if (pause)
+	{
+		// if we're the first to pause, we have to actually initiate it
+		if (m_ui_temp_pause++ == 0)
+		{
+			// only call mame_pause if we weren't already paused due to some external reason
+			m_ui_temp_was_paused = m_machine.paused();
+			if (!m_ui_temp_was_paused)
+			{
+				m_machine.pause();
+			}
+
+			set_pause_event();
+		}
+	}
+	else // if we're resuming, decrement the pause counter
+	{
+		// if we're the last to resume, unpause MAME
+		if (--m_ui_temp_pause == 0)
+		{
+			// but only do it if we were the ones who initiated it
+			if (!m_ui_temp_was_paused)
+			{
+				m_machine.resume();
+			}
+
+			reset_pause_event();
+		}
+	}
+}
+
+void window_system::set_pause_event()
+{
+	SetEvent(m_ui_pause_event);
+}
+
+void window_system::reset_pause_event()
+{
+	ResetEvent(m_ui_pause_event);
+}
+
+//============================================================
+//  window_system::ui_pause_from_window_thread
+//  (window thread)
+//============================================================
+
+void window_system::ui_pause_from_window_thread(bool pause)
+{
+	assert(GetCurrentThreadId() == m_window_threadid);
+
+	// if we're multithreaded, we have to request a pause on the main thread
+	if (m_machine.options().multithreading())
+	{
+		// request a pause from the main thread
+		PostThreadMessage((DWORD)m_main_threadid, WM_USER_UI_TEMP_PAUSE, pause, 0);
+
+		// if we're pausing, block until it happens
+		if (pause)
+		{
+			WaitForSingleObject(m_ui_pause_event, INFINITE);
+		}
+	}
+	else // otherwise, we just do it directly
+	{
+		ui_pause_from_main_thread(pause);
+	}
+}
+
+
+//============================================================
 //  window_system::process_events_periodic()
 //  (main thread)
 //============================================================
@@ -302,9 +418,9 @@ void window_system::process_events_periodic()
 	assert(GetCurrentThreadId() == m_main_threadid);
 
 	// update once every 1/8th of a second
-	if (currticks - last_event_check < 1000 / 8)
+	if (currticks - m_last_event_check < 1000 / 8)
 		return;
-	process_events(TRUE);
+	process_events(true);
 }
 
 
@@ -318,8 +434,8 @@ void window_system::process_events(bool ingame)
 	assert(GetCurrentThreadId() == m_main_threadid);
 
 	// if we're running, disable some parts of the debugger
-	if (ingame && (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(m_machine);
+	//if (ingame && (m_machine.debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+		//debugwin_update_during_game(m_machine);
 
 	// remember the last time we did this
 	m_last_event_check = (UINT32)GetTickCount();
@@ -327,7 +443,7 @@ void window_system::process_events(bool ingame)
 	do
 	{
 		// if we are paused, lets wait for a message
-		if (ui_temp_pause > 0)
+		if (m_ui_temp_pause > 0)
 			WaitMessage();
 
 		// loop over all messages in the queue
@@ -384,12 +500,14 @@ void window_system::process_events(bool ingame)
 
 			// dispatch if necessary
 			if (dispatch)
+			{
 				dispatch_message(&message);
+			}
 		}
-	} while (ui_temp_pause > 0);
+	} while (m_ui_temp_pause > 0);
 
 	// update the cursor state after processing events
-	update_cursor_state();
+	m_video->update_cursor_state();
 }
 
 
@@ -400,23 +518,25 @@ void window_system::process_events(bool ingame)
 
 unsigned __stdcall window_system::thread_entry(void *param)
 {
+	windows::window_system *system = (windows::window_system *)param;
+
 	MSG message;
 
 	// make a bogus user call to make us a message thread
 	PeekMessage(&message, NULL, 0, 0, PM_NOREMOVE);
 
 	// attach our input to the main thread
-	AttachThreadInput(m_main_threadid, m_window_threadid, TRUE);
+	AttachThreadInput(system->main_threadid(), system->window_threadid(), TRUE);
 
 	// signal to the main thread that we are ready to receive events
-	SetEvent(m_window_thread_ready_event);
+	SetEvent(system->window_thread_ready_event());
 
 	// run the message pump
 	while (GetMessage(&message, NULL, 0, 0))
 	{
 		int dispatch = TRUE;
 
-		if ((message.hwnd == NULL) || is_mame_window(message.hwnd))
+		if ((message.hwnd == NULL) || system->is_mame_window(message.hwnd))
 		{
 			switch (message.message)
 			{
@@ -547,7 +667,7 @@ void window_system::dispatch_message(MSG *message)
 	{
 		// special case for quit
 		case WM_QUIT:
-			machine.schedule_exit();
+			m_machine.schedule_exit();
 			break;
 
 		// temporary pause from the window thread
@@ -586,9 +706,11 @@ void window_system::take_snap()
 		//return;
 
 	// iterate over windows and request a snap
-	for (window_info *window = m_window_list; window != NULL; window = window->get_next())
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while (window != NULL)
 	{
 		//(*draw.window_save)(window);
+		window = (windows::window_info *)window->next();
 	}
 }
 
@@ -606,9 +728,11 @@ void window_system::toggle_fsfx()
 		//return;
 
 	// iterate over windows and request a snap
-	for (window_info *window = m_window_list; window != NULL; window = window->next())
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while (window != NULL)
 	{
 		//(*draw.window_toggle_fsfx)(window);
+		window = (windows::window_info *)window->next();
 	}
 }
 
@@ -621,6 +745,36 @@ void window_system::toggle_fsfx()
 LRESULT CALLBACK window_system::window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	return window_proc(wnd, message, wparam, lparam);
+}
+
+
+//============================================================
+//  window_info::init_hal
+//============================================================
+void window_info::init_hal()
+{
+	m_hal = global_alloc_clear(draw_hal());
+	if (!m_hal->initialize())
+	{
+		exit(1);
+	}
+}
+
+//============================================================
+//  window_info::draw_video_contents
+//  (window thread)
+//============================================================
+
+void window_info::get_window_rect(math::rectf *bounds)
+{
+	assert(GetCurrentThreadId() == m_window_threadid);
+
+	RECT rbounds;
+	GetWindowRect(m_hwnd, &rbounds);
+	bounds->p[0].c.x = rbounds.left;
+	bounds->p[0].c.y = rbounds.top;
+	bounds->p[1].c.x = rbounds.right;
+	bounds->p[1].c.y = rbounds.bottom;
 }
 
 
@@ -653,7 +807,7 @@ void window_info::draw_video_contents(HDC dc, int update)
 		// otherwise, render with our drawing system
 		else
 		{
-			(*draw.window_draw)(window, dc, update);
+			//(*draw.window_draw)(window, dc, update);
 			mtlog_add("draw_video_contents: drawing finished");
 		}
 	}
@@ -678,9 +832,11 @@ void window_system::take_video()
 		//return;
 
 	// iterate over windows and request a snap
-	for (window_info *window = m_window_list; window != NULL; window = window->get_next())
+	windows::window_info *window = (windows::window_info *)m_window_list;
+	while(window != NULL)
 	{
 		//(*draw.window_record)(window);
+		window = (windows::window_info *)window->next();
 	}
 }
 
@@ -777,14 +933,14 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 		case WM_ENTERSIZEMOVE:
 			window->set_resize_state(RESIZE_STATE_RESIZING);
 		case WM_ENTERMENULOOP:
-			m_video->ui_pause_from_window_thread(true);
+			ui_pause_from_window_thread(true);
 			break;
 
 		// unpause the system when we stop a menu or resize and force a redraw
 		case WM_EXITSIZEMOVE:
 			window->set_resize_state(RESIZE_STATE_PENDING);
 		case WM_EXITMENULOOP:
-			m_video->ui_pause_from_window_thread(false);
+			ui_pause_from_window_thread(false);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 
@@ -821,7 +977,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 			if ((wparam & 0xfff0) == SC_MAXIMIZE)
 			{
 				window->update_minmax_state();
-				if (window->ismaximized)
+				if (window->ismaximized())
 					window->minimize_window();
 				else
 					window->maximize_window();
@@ -899,7 +1055,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 }
 
 
-void window_info::remove_from_list()
+/*void window_info::remove_from_list()
 {
 	window_info *curr;
 
@@ -917,7 +1073,7 @@ void window_info::remove_from_list()
 	{
 		m_window_list = m_next;
 	}
-}
+}*/
 
 window_info::~window_info()
 {
@@ -983,7 +1139,7 @@ void window_info::update()
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
-		if (m_machine.video().throttled() || timeGetTime() - last_update_time > 250)
+		if (m_machine.video().throttled() || timeGetTime() - m_last_update_time > 250)
 		{
 			osd_lock_acquire(m_render_lock);
 		}
@@ -995,20 +1151,18 @@ void window_info::update()
 		// only render if we were able to get the lock
 		if (got_lock)
 		{
-			render_primitive_list *primlist;
-
 			mtlog_add("winwindow_video_window_update: got lock");
 
 			// don't hold the lock; we just used it to see if rendering was still happening
 			osd_lock_release(m_render_lock);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			primlist = get_primitives();
+			render_primitive_list *primlist = get_primitives();
 
 			// post a redraw request with the primitive list as a parameter
-			last_update_time = timeGetTime();
+			m_last_update_time = timeGetTime();
 			mtlog_add("winwindow_video_window_update: PostMessage start");
-			if (multithreading_enabled)
+			if (m_machine.options().multithreading())
 				PostMessage(m_hwnd, WM_USER_REDRAW, 0, (LPARAM)primlist);
 			else
 				SendMessage(m_hwnd, WM_USER_REDRAW, 0, (LPARAM)primlist);
@@ -1029,8 +1183,9 @@ void window_info::minimize_window()
 {
 	assert(GetCurrentThreadId() == m_window_threadid);
 
-	vec2f newsize = get_min_bounds(m_video_config.keepaspect);
-	SetWindowPos(m_hwnd, NULL, newsize.c.x, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	math::rectf newsize;
+	get_min_bounds(&newsize, m_system->video()->get_video_config().keepaspect);
+	SetWindowPos(m_hwnd, NULL, newsize.p[0].c.x, newsize.p[0].c.y, newsize.width(), newsize.height(), SWP_NOZORDER);
 }
 
 
@@ -1043,9 +1198,9 @@ void window_info::maximize_window()
 {
 	assert(GetCurrentThreadId() == m_window_threadid);
 
-	RECT newsize;
-	get_max_bounds(window, &newsize, m_video_config.keepaspect);
-	SetWindowPos(m_hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
+	math::rectf newsize;
+	get_max_bounds(&newsize, m_system->video()->get_video_config().keepaspect);
+	SetWindowPos(m_hwnd, NULL, newsize.p[0].c.x, newsize.p[0].c.y, newsize.width(), newsize.height(), SWP_NOZORDER);
 }
 
 
@@ -1054,7 +1209,7 @@ void window_info::maximize_window()
 //  (window thread)
 //============================================================
 
-void window_info::get_min_bounds(RECT *bounds, bool constrain)
+void window_info::get_min_bounds(math::rectf *bounds, bool constrain)
 {
 	assert(GetCurrentThreadId() == m_window_threadid);
 
@@ -1081,13 +1236,13 @@ void window_info::get_min_bounds(RECT *bounds, bool constrain)
 		test1.top = test1.left = 0;
 		test1.right = minwidth;
 		test1.bottom = 10000;
-		constrain_to_aspect_ratio(window, &test1, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(&test1, WMSZ_BOTTOMRIGHT);
 
 		// then constrain with no width limit
-		test2.top = test2.left = 0;
+		test2.top = test1.left = 0;
 		test2.right = 10000;
 		test2.bottom = minheight;
-		constrain_to_aspect_ratio(window, &test2, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(&test2, WMSZ_BOTTOMRIGHT);
 
 		// pick the larger
 		if (rect_width(&test1) > rect_width(&test2))
@@ -1102,12 +1257,15 @@ void window_info::get_min_bounds(RECT *bounds, bool constrain)
 		}
 	}
 
+	RECT rbounds;
 	// get the window rect
-	GetWindowRect(m_hwnd, bounds);
+	GetWindowRect(m_hwnd, &rbounds);
 
 	// now adjust
-	bounds->right = bounds->left + minwidth;
-	bounds->bottom = bounds->top + minheight;
+	bounds->p[0].c.x = rbounds.left;
+	bounds->p[0].c.y = rbounds.top;
+	bounds->p[1].c.x = rbounds.left + minwidth;
+	bounds->p[1].c.y = rbounds.top + minheight;
 }
 
 
@@ -1116,13 +1274,14 @@ void window_info::get_min_bounds(RECT *bounds, bool constrain)
 //  (window thread)
 //============================================================
 
-void window_info::get_max_bounds(RECT *bounds, bool constrain)
+void window_info::get_max_bounds(math::rectf *bounds, bool constrain)
 {
 	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// compute the maximum client area
-	winvideo_monitor_refresh(m_monitor);
-	RECT maximum = m_monitor->info.rcWork;
+	m_monitor->refresh();
+	windows::monitor_info *monitor = (windows::monitor_info *)m_monitor;
+	RECT maximum = monitor->info().rcWork;
 
 	// clamp to the window's max
 	if (m_maxwidth != 0)
@@ -1141,7 +1300,7 @@ void window_info::get_max_bounds(RECT *bounds, bool constrain)
 	// constrain to fit
 	if (constrain)
 	{
-		constrain_to_aspect_ratio(window, &maximum, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(&maximum, WMSZ_BOTTOMRIGHT);
 	}
 	else
 	{
@@ -1150,10 +1309,10 @@ void window_info::get_max_bounds(RECT *bounds, bool constrain)
 	}
 
 	// center within the work area
-	bounds->left = m_monitor->info.rcWork.left + (rect_width(&m_monitor->info.rcWork) - rect_width(&maximum)) / 2;
-	bounds->top = m_monitor->info.rcWork.top + (rect_height(&m_monitor->info.rcWork) - rect_height(&maximum)) / 2;
-	bounds->right = bounds->left + rect_width(&maximum);
-	bounds->bottom = bounds->top + rect_height(&maximum);
+	bounds->p[0].c.x = monitor->info().rcWork.left + (rect_width(&monitor->info().rcWork) - rect_width(&maximum)) / 2;
+	bounds->p[0].c.y = monitor->info().rcWork.top + (rect_height(&monitor->info().rcWork) - rect_height(&maximum)) / 2;
+	bounds->p[1].c.x = bounds->p[0].c.x + rect_width(&maximum);
+	bounds->p[1].c.y = bounds->p[0].c.y + rect_height(&maximum);
 }
 
 
@@ -1195,7 +1354,7 @@ void window_info::toggle_fullscreen(bool fullscreen)
 		else // otherwise, set a small size and maximize from there
 		{
 			SetWindowPos(m_hwnd, HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
-			maximize_window(window);
+			maximize_window();
 		}
 	}
 
@@ -1220,12 +1379,10 @@ void window_info::toggle_fullscreen(bool fullscreen)
 	// show ourself
 	if (!m_fullscreen || m_fullscreen_safe)
 	{
-		if (m_video_config.mode != VIDEO_MODE_NONE)
+		if (m_system->video()->get_video_config().mode != VIDEO_MODE_NONE)
 			ShowWindow(m_hwnd, SW_SHOW);
 		// TODO: HAL type selection (GDI, DDraw, D3D, GL)
-		m_hal = global_alloc_clear(draw_hal());
-		if (!m_hal->initialize())
-			exit(1);
+		init_hal();
 	}
 
 	// ensure we're still adjusted correctly
@@ -1251,15 +1408,15 @@ void window_info::adjust_window_position_after_major_change()
 	{
 		// constrain the existing size to the aspect ratio
 		newrect = oldrect;
-		if (m_video_config.keepaspect)
+		if (m_system->video()->get_video_config().keepaspect)
 			constrain_to_aspect_ratio(&newrect, WMSZ_BOTTOMRIGHT);
 	}
 
 	// in full screen, make sure it covers the primary display
 	else
 	{
-		win_monitor_info *monitor = winwindow_video_window_monitor(window, NULL);
-		newrect = monitor->info.rcMonitor;
+		monitor_info *new_monitor = (windows::monitor_info *)monitor(NULL);
+		newrect = new_monitor->info().rcMonitor;
 	}
 
 	// adjust the position if different
@@ -1270,11 +1427,11 @@ void window_info::adjust_window_position_after_major_change()
 				rect_width(&newrect), rect_height(&newrect), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
-	if (window == win_window_list)
+	if (this == m_system->window_list())
 	{
 		m_win_physical_width = rect_width(&newrect);
 		m_win_physical_height = rect_height(&newrect);
-		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
+		logerror("Physical width %d, height %d\n", m_win_physical_width, m_win_physical_height);
 	}
 }
 
@@ -1287,20 +1444,19 @@ void window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 {
 	assert(GetCurrentThreadId() == m_window_threadid);
 
-	win_monitor_info *monitor = winwindow_video_window_monitor(window, rect);
+	monitor_info *mon = (windows::monitor_info *)monitor(rect);
 	INT32 extrawidth = extra_width();
 	INT32 extraheight = extra_height();
 
 	// get the pixel aspect ratio for the target monitor
-	float pixel_aspect = m_monitor->get_aspect();
+	float pixel_aspect = mon->get_aspect();
 
 	// determine the proposed width/height
-	propwidth = rect_width(rect) - extrawidth;
-	propheight = rect_height(rect) - extraheight;
+	INT32 propwidth = rect_width(rect) - extrawidth;
+	INT32 propheight = rect_height(rect) - extraheight;
 
 	// based on which edge we are adjusting, take either the width, height, or both as gospel
 	// and scale to fit using that as our parameter
-	INT32 propwidth, propheight;
 	switch (adjustment)
 	{
 		case WMSZ_BOTTOM:
@@ -1334,13 +1490,13 @@ void window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 	INT32 maxwidth, maxheight;
 	if (m_fullscreen)
 	{
-		maxwidth = rect_width(&m_info.rcMonitor) - extrawidth;
-		maxheight = rect_height(&m_info.rcMonitor) - extraheight;
+		maxwidth = rect_width(&mon->info().rcMonitor) - extrawidth;
+		maxheight = rect_height(&mon->info().rcMonitor) - extraheight;
 	}
 	else
 	{
-		maxwidth = rect_width(&m_info.rcWork) - extrawidth;
-		maxheight = rect_height(&m_info.rcWork) - extraheight;
+		maxwidth = rect_width(&mon->info().rcWork) - extrawidth;
+		maxheight = rect_height(&mon->info().rcWork) - extraheight;
 
 		// further clamp to the maximum width/height in the window
 		if (m_maxwidth != 0)
@@ -1396,20 +1552,20 @@ void window_info::constrain_to_aspect_ratio(RECT *rect, int adjustment)
 //  (window thread)
 //============================================================
 
-monitor_info *window_info::monitor(const RECT *proposed)
+render::monitor_info *window_info::monitor(const RECT *proposed)
 {
-	monitor_info *monitor;
-
+	render::monitor_info *monitor;
+	windows::video_system *vidsys = (windows::video_system *)m_system->video();
 	// in window mode, find the nearest
 	if (!m_fullscreen)
 	{
 		if (proposed != NULL)
 		{
-			monitor = winvideo_monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
+			monitor = vidsys->monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
 		}
 		else
 		{
-			monitor = winvideo_monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
+			monitor = vidsys->monitor_from_handle(MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST));
 		}
 	}
 	else // in full screen, just use the configured monitor
@@ -1429,7 +1585,7 @@ int window_info::extra_width()
 	{
 		return 0;
 	}
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, m_system->video()->has_menu(), WINDOW_STYLE_EX);
 	return rect_width(&temprect) - 100;
 }
 
@@ -1441,11 +1597,11 @@ int window_info::extra_height()
 	{
 		return 0;
 	}
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, m_system->video()->has_menu(), WINDOW_STYLE_EX);
 	return rect_height(&temprect) - 100;
 }
 
-void window_info::complete_create()
+bool window_info::complete_create()
 {
 	RECT client;
 	HDC dc;
@@ -1453,8 +1609,8 @@ void window_info::complete_create()
 	assert(GetCurrentThreadId() == m_window_threadid);
 
 	// get the monitor bounds
-	RECT monitorbounds = m_monitor->info.rcMonitor;
-
+	windows::monitor_info *mon = (windows::monitor_info *)m_monitor;
+	RECT monitorbounds = mon->info().rcMonitor;
 	// create the window, but don't show it yet
 	m_hwnd = win_create_window_ex_utf8(
 						m_fullscreen ? FULLSCREEN_STYLE_EX : WINDOW_STYLE_EX,
@@ -1470,25 +1626,25 @@ void window_info::complete_create()
 	if (m_hwnd == NULL)
 	{
 		m_init_state = 1;
-		return;
+		return false;
 	}
 
 	// set a pointer back to us
-	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)window);
+	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// skip the positioning stuff for -video none */
-	if (m_video_config.mode == VIDEO_MODE_NONE)
+	if (m_system->video()->get_video_config().mode == VIDEO_MODE_NONE)
 	{
 		m_init_state = 0;
-		return;
+		return true;
 	}
 
 	// adjust the window position to the initial width/height
 	int tempwidth = (m_maxwidth != 0) ? m_maxwidth : 640;
 	int tempheight = (m_maxheight != 0) ? m_maxheight : 480;
 	SetWindowPos(m_hwnd, NULL, monitorbounds.left + 20, monitorbounds.top + 20,
-			monitorbounds.left + tempwidth + extra_width(window),
-			monitorbounds.top + tempheight + extra_height(window),
+			monitorbounds.left + tempwidth + extra_width(),
+			monitorbounds.top + tempheight + extra_height(),
 			SWP_NOZORDER);
 
 	// maximum or minimize as appropriate
@@ -1503,7 +1659,9 @@ void window_info::complete_create()
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
 		if(!m_hal->initialize())
-			return 1;
+		{
+			return false;
+		}
 		ShowWindow(m_hwnd, SW_SHOW);
 	}
 
@@ -1512,7 +1670,7 @@ void window_info::complete_create()
 	GetClientRect(m_hwnd, &client);
 	FillRect(dc, &client, (HBRUSH)GetStockObject(BLACK_BRUSH));
 	ReleaseDC(m_hwnd, dc);
-	return 0;
+	return true;
 }
 
 void window_info::wait_for_ready()
@@ -1522,9 +1680,9 @@ void window_info::wait_for_ready()
 	{
 		// wait until the window thread is ready to respond to events
 		// TODO:
-		WaitForSingleObject(window_thread_ready_event, INFINITE);
+		WaitForSingleObject(((windows::window_system *)m_system)->window_thread_ready_event(), INFINITE);
 
-		PostThreadMessage((DWORD)m_window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)window);
+		PostThreadMessage((DWORD)m_window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)this);
 		while (m_init_state == 0)
 			Sleep(1);
 	}
@@ -1540,4 +1698,4 @@ void window_info::wait_for_ready()
 	}
 }
 
-}; // namespace render::windows
+}}; // namespace render::windows

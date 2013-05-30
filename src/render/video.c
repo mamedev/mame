@@ -39,6 +39,15 @@
 //
 //============================================================
 
+#include "emu/emu.h"
+#include "emu/emuopts.h"
+#include "osd/osdepend.h"
+#include "emu/video/vector.h"
+#include "emu/render.h"
+#include "emu/rendutil.h"
+#include "emu/ui.h"
+#include "emu/uiinput.h"
+
 #include "render/video.h"
 
 namespace render
@@ -48,7 +57,7 @@ video_system::video_system(running_machine &machine) :
 	m_machine(machine)
 {
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit), &machine));
+	m_machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_system::exit), this));
 
 	// extract data from the options
 	extract_video_config();
@@ -57,7 +66,7 @@ video_system::video_system(running_machine &machine) :
 	init_monitors();
 
 	// initialize the window system so we can make windows
-	m_window = global_alloc_clear(window_system(machine));
+	m_window = global_alloc_clear(window_system(machine, this));
 
 	// create the windows
 	for (int index = 0; index < m_video_config.numscreens; index++)
@@ -66,7 +75,7 @@ video_system::video_system(running_machine &machine) :
 	}
 
 	// set up the window list
-	m_last_window_ptr = &m_window_list;
+	m_last_window_ptr = m_window->window_list_ptr();
 }
 
 void video_system::extract_video_config()
@@ -80,6 +89,62 @@ void video_system::extract_video_config()
 		m_video_config.windowed = true;
 	}
 }
+
+void video_system::exit()
+{
+}
+
+//============================================================
+//  get_aspect
+//============================================================
+
+float video_system::get_aspect(const char *defdata, const char *data, int report_error)
+{
+	int num = 0, den = 1;
+
+	if (strcmp(data, "auto") == 0)
+	{
+		if (strcmp(defdata, "auto") == 0)
+			return 0;
+		data = defdata;
+	}
+	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
+		mame_printf_error("Illegal aspect ratio value = %s\n", data);
+	return (float)num / (float)den;
+}
+
+
+
+//============================================================
+//  get_resolution
+//============================================================
+
+void video_system::get_resolution(const char *defdata, const char *data, window_config *config, int report_error)
+{
+	config->width = config->height = config->refresh = 0;
+	if (strcmp(data, "auto") == 0)
+	{
+		if (strcmp(defdata, "auto") == 0)
+			return;
+		data = defdata;
+	}
+	if (sscanf(data, "%dx%d@%d", &config->width, &config->height, &config->refresh) < 2 && report_error)
+		mame_printf_error("Illegal resolution value = %s\n", data);
+}
+
+
+//============================================================
+//  last_monitor
+//============================================================
+
+void video_system::set_last_monitor(monitor_info *last_monitor)
+{
+	monitor_info **tailptr = (monitor_info **)&m_monitor_list;
+	monitor_info ***tailptrptr = (monitor_info ***)&tailptr;
+	**tailptrptr = last_monitor;
+	*tailptrptr = last_monitor->next_ptr();
+}
+
 
 //============================================================
 //  pick_monitor
@@ -96,7 +161,7 @@ monitor_info *video_system::pick_monitor(int index)
 		scrname = scrname2;
 
 	// get the aspect ratio
-	float aspect = get_aspect(m_machine.options().aspect(), m_machine.options().aspect(index), TRUE);
+	float aspect = get_aspect(m_machine.options().aspect(), m_machine.options().aspect(index), true);
 
 	// look for a match in the name first
 	monitor_info *monitor;
@@ -110,13 +175,19 @@ monitor_info *video_system::pick_monitor(int index)
 			char *monitor_name = monitor->device_name();
 			if (monitor_name == NULL)
 			{
-				goto finishit;
+				if (aspect != 0.0f)
+					monitor->set_aspect(aspect);
+				return monitor;
 			}
 
 			int match = strcmp(scrname, monitor_name);
 			osd_free(monitor_name);
 			if (match == 0)
-				goto finishit;
+			{
+				if (aspect != 0.0f)
+					monitor->set_aspect(aspect);
+				return monitor;
+			}
 		}
 	}
 
@@ -139,7 +210,7 @@ monitor_info *video_system::pick_monitor(int index)
 		monitor = m_primary_monitor;
 	}
 
-	if (aspect != 0)
+	if (aspect != 0.0f)
 	{
 		monitor->set_aspect(aspect);
 	}

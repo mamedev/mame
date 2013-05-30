@@ -46,6 +46,9 @@
 #include "render.h"
 #include "render/monitor.h"
 
+namespace render
+{
+
 namespace windows
 {
 
@@ -56,17 +59,30 @@ namespace windows
 class monitor_info : public render::monitor_info
 {
 public:
-	monitor_info() { }
+	monitor_info(video_system *video, float aspect, HMONITOR handle, MONITORINFOEX info) :
+		render::monitor_info(video, aspect),
+		m_handle(handle),
+		m_info(info)
+	{ }
 
 	static monitor_info *	from_handle(HMONITOR monitor);
 
 	virtual char *			device_name();
+
+	virtual render::monitor_info *	next() { return m_next; }
+	virtual render::monitor_info ** next_ptr() { return (render::monitor_info **)&m_next; }
+
+	virtual float			get_aspect();
+
+	virtual void			refresh();
+	virtual HMONITOR		handle() { return m_handle; }
+	virtual MONITORINFOEX &	info() { return m_info; }
 
 private:
 	HMONITOR            	m_handle;				// handle to the monitor
 	MONITORINFOEX       	m_info;					// most recently retrieved info
 };
 
-}; // namespace windows
+}}; // namespace render::windows
 
 #endif // __RENDER_WINDOWS_MONITOR__
