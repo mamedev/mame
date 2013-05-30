@@ -213,6 +213,9 @@ window_system::window_system(running_machine &machine, video_system *video) :
 		//drawnone_init(machine, &draw);
 	}
 }
+window_system::~window_system()
+{
+}
 
 render::window_info *window_system::window_alloc(render::monitor_info *monitor, int index)
 {

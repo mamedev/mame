@@ -46,6 +46,15 @@
 namespace render
 {
 
+void draw_hal::shutdown()
+{
+}
+
+int draw_hal::initialize()
+{
+	return 0;
+}
+
 int draw_hal::create_resources()
 {
 	return 0;
