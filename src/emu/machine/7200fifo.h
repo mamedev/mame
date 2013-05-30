@@ -102,18 +102,14 @@ public:
 	DECLARE_WRITE8_MEMBER( data_byte_w ) { fifo_write(data); }
 	DECLARE_READ8_MEMBER( data_byte_r ) { return (UINT8)fifo_read(); }
 
-	// use these for configurations in cascaded width expansion mode using more than 16 bits
-	DECLARE_WRITE32_MEMBER( data_dword_w ) { fifo_write(data); }
-	DECLARE_READ32_MEMBER( data_dword_r ) { return (UINT32)fifo_read(); }
-
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	void fifo_write(UINT32 data);
-	UINT32 fifo_read();
+	void fifo_write(UINT16 data);
+	UINT16 fifo_read();
 
 	UINT16* m_buffer;
 	int m_ram_size;

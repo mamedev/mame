@@ -4,6 +4,7 @@
 
     TODO:
     - retransmit (RT pin)
+    - cascaded width expansion mode (when needed)
 
 **********************************************************************/
 
@@ -71,7 +72,7 @@ void fifo7200_device::device_reset()
 
 
 
-void fifo7200_device::fifo_write(UINT32 data)
+void fifo7200_device::fifo_write(UINT16 data)
 {
 	if (m_ff)
 	{
@@ -79,7 +80,7 @@ void fifo7200_device::fifo_write(UINT32 data)
 		return;
 	}
 
-	m_buffer[m_write_ptr] = data;
+	m_buffer[m_write_ptr] = data & 0x1ff;
 	m_write_ptr = (m_write_ptr + 1) % m_ram_size;
 	
 	// update flags
@@ -102,12 +103,12 @@ void fifo7200_device::fifo_write(UINT32 data)
 	}
 }
 
-UINT32 fifo7200_device::fifo_read()
+UINT16 fifo7200_device::fifo_read()
 {
 	if (m_ef)
 	{
 		logerror("IDT7200 %s fifo_read underflow!\n", tag());
-		return ~0;
+		return 0x1ff;
 	}
 	
 	UINT16 ret = m_buffer[m_read_ptr];
