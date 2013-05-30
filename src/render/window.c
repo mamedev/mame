@@ -72,11 +72,6 @@ window_info::~window_info()
 	osd_lock_free(m_render_lock);
 }
 
-window_info *window_system::window_alloc(monitor_info *monitor, int index)
-{
-	return global_alloc_clear(window_info(m_machine, index, m_main_threadid, m_window_threadid, this, monitor));
-}
-
 
 //============================================================
 //  window_create

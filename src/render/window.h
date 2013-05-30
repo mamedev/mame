@@ -87,7 +87,7 @@ public:
 	virtual UINT64			main_threadid() { return m_main_threadid; }
 	virtual UINT64			window_threadid() { return m_window_threadid; }
 
-	virtual window_info *	window_alloc(monitor_info *monitor, int index);
+	virtual window_info *	window_alloc(monitor_info *monitor, int index) = 0;
 
 	virtual void			toggle_full_screen() { }
 
@@ -144,7 +144,7 @@ public:
 	virtual void			set_fullscreen_safe(bool safe) { m_fullscreen_safe = safe; }
 	virtual void			toggle_fullscreen(bool fullscreen) { };
 
-	virtual void			wait_for_ready() { }
+	virtual void			wait_for_ready() = 0;
 
 	virtual bool			complete_create() { m_init_state = -1; return true; }
 

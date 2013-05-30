@@ -63,6 +63,22 @@ namespace windows
 video_system::video_system(running_machine &machine) :
 	render::video_system(machine)
 {
+
+	// set up monitors first
+	init_monitors();
+
+	// initialize the window system so we can make windows
+	m_window = global_alloc_clear(window_system(machine, this));
+
+	// create the windows
+	for (int index = 0; index < m_video_config.numscreens; index++)
+	{
+		m_window->window_create(index, pick_monitor(index), &m_video_config.window[index]);
+	}
+
+	// set up the window list
+	m_last_window_ptr = m_window->window_list_ptr();
+	
 	if (m_video_config.mode != VIDEO_MODE_NONE)
 	{
 		render::windows::window_info *window_list = (render::windows::window_info *)m_window->window_list();

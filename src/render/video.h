@@ -135,8 +135,6 @@ protected:
 
 	monitor_info *			m_monitor_list;
 	monitor_info *			m_primary_monitor;
-
-private:
 	window_info **			m_last_window_ptr;
 };
 
