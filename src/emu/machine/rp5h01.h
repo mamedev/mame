@@ -8,7 +8,16 @@
 #ifndef __RP5H01_H__
 #define __RP5H01_H__
 
-#include "devlegcy.h"
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+/* these also work as the address masks */
+enum {
+	COUNTER_MODE_6_BITS = 0x3f,
+	COUNTER_MODE_7_BITS = 0x7f
+};
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -18,10 +27,15 @@ class rp5h01_device : public device_t
 {
 public:
 	rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~rp5h01_device() { global_free(m_token); }
+	
+	DECLARE_WRITE8_MEMBER( enable_w );   /* /CE */
+	DECLARE_WRITE8_MEMBER( reset_w );    /* RESET */
+	DECLARE_WRITE8_MEMBER( cs_w );   /* CS */
+	DECLARE_WRITE8_MEMBER( clock_w );    /* DATA CLOCK (active low) */
+	DECLARE_WRITE8_MEMBER( test_w );     /* TEST */
+	DECLARE_READ8_MEMBER( counter_r );   /* COUNTER OUT */
+	DECLARE_READ8_MEMBER( data_r );      /* DATA */
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -29,7 +43,12 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	int m_counter;
+	int m_counter_mode;   /* test pin */
+	int m_enabled;        /* chip enable */
+	int m_old_reset;      /* reset pin state (level-triggered) */
+	int m_old_clock;      /* clock pin state (level-triggered) */
+	UINT8 *m_data;
 };
 
 extern const device_type RP5H01;
@@ -43,17 +62,5 @@ extern const device_type RP5H01;
  * with the same tag as the one
  * assigned to device.
  */
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_enable_w );   /* /CE */
-DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_reset_w );    /* RESET */
-DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_cs_w );   /* CS */
-DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_clock_w );    /* DATA CLOCK (active low) */
-DECLARE_WRITE8_DEVICE_HANDLER( rp5h01_test_w );     /* TEST */
-DECLARE_READ8_DEVICE_HANDLER( rp5h01_counter_r );   /* COUNTER OUT */
-DECLARE_READ8_DEVICE_HANDLER( rp5h01_data_r );      /* DATA */
 
 #endif /* __RP5H01_H__ */

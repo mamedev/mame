@@ -3,11 +3,15 @@ class vsnes_state : public driver_device
 public:
 	vsnes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_work_ram(*this, "work_ram"),
-		m_work_ram_1(*this, "work_ram_1"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_work_ram(*this, "work_ram"),
+		m_work_ram_1(*this, "work_ram_1")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+		
 	required_shared_ptr<UINT8> m_work_ram;
 	optional_shared_ptr<UINT8> m_work_ram_1;
 	int m_coin;
@@ -110,8 +114,6 @@ public:
 	void mapper4_irq( int scanline, int vblank, int blanked );
 	void ppu_irq_1(int *ppu_regs);
 	void ppu_irq_2(int *ppu_regs);
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 };
 
 /*----------- defined in video/vsnes.c -----------*/

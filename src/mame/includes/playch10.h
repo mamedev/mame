@@ -1,3 +1,5 @@
+#include "machine/rp5h01.h"
+
 struct chr_bank
 {
 	int writable;   // 1 for RAM, 0 for ROM
@@ -9,12 +11,17 @@ class playch10_state : public driver_device
 public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_rp5h01(*this, "rp5h01"),
 		m_ram_8w(*this, "ram_8w"),
 		m_videoram(*this, "videoram"),
 		m_timedata(*this, "timedata"),
-		m_work_ram(*this, "work_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_work_ram(*this, "work_ram")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<rp5h01_device> m_rp5h01;
+	
 	required_shared_ptr<UINT8> m_ram_8w;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_timedata;
@@ -125,7 +132,6 @@ public:
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
 	void ppu_irq(int *ppu_regs);
 	void mapper9_latch(offs_t offset);
-	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/playch10.c -----------*/

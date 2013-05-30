@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "video/ppu2c0x.h"
-#include "machine/rp5h01.h"
 #include "machine/nvram.h"
 #include "includes/playch10.h"
 
@@ -12,8 +11,6 @@
 
 void playch10_state::machine_reset()
 {
-	device_t *rp5h01 = machine().device("rp5h01");
-
 	/* initialize latches and flip-flops */
 	m_pc10_nmi_enable = m_pc10_dog_di = m_pc10_dispmask = m_pc10_sdcs = m_pc10_int_detect = 0;
 
@@ -30,10 +27,10 @@ void playch10_state::machine_reset()
 
 	/* reset the security chip */
 	address_space &space = generic_space();
-	rp5h01_enable_w(rp5h01, space, 0, 0);
-	rp5h01_reset_w(rp5h01, space, 0, 0);
-	rp5h01_reset_w(rp5h01, space, 0, 1);
-	rp5h01_enable_w(rp5h01, space, 0, 1);
+	m_rp5h01->enable_w(space, 0, 0);
+	m_rp5h01->reset_w(space, 0, 0);
+	m_rp5h01->reset_w(space, 0, 1);
+	m_rp5h01->enable_w(space, 0, 1);
 
 	pc10_set_mirroring(m_mirroring);
 }
@@ -158,31 +155,29 @@ WRITE8_MEMBER(playch10_state::pc10_CARTSEL_w)
 
 READ8_MEMBER(playch10_state::pc10_prot_r)
 {
-	device_t *rp5h01 = machine().device("rp5h01");
 	int data = 0xe7;
 
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(rp5h01, space, 0, 0);
-		data |= ((~rp5h01_counter_r(rp5h01, space, 0)) << 4) & 0x10;    /* D4 */
-		data |= ((rp5h01_data_r(rp5h01, space, 0)) << 3) & 0x08;        /* D3 */
-		rp5h01_enable_w(rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 0);
+		data |= ((~m_rp5h01->counter_r(space, 0)) << 4) & 0x10;    /* D4 */
+		data |= ((m_rp5h01->data_r(space, 0)) << 3) & 0x08;        /* D3 */
+		m_rp5h01->enable_w(space, 0, 1);
 	}
 	return data;
 }
 
 WRITE8_MEMBER(playch10_state::pc10_prot_w)
 {
-	device_t *rp5h01 = machine().device("rp5h01");
 	/* we only support a single cart connected at slot 0 */
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(rp5h01, space, 0, 0);
-		rp5h01_test_w(rp5h01, space, 0, data & 0x10);       /* D4 */
-		rp5h01_clock_w(rp5h01, space, 0, data & 0x08);      /* D3 */
-		rp5h01_reset_w(rp5h01, space, 0, ~data & 0x01); /* D0 */
-		rp5h01_enable_w(rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 0);
+		m_rp5h01->test_w(space, 0, data & 0x10);       /* D4 */
+		m_rp5h01->clock_w(space, 0, data & 0x08);      /* D3 */
+		m_rp5h01->reset_w(space, 0, ~data & 0x01); /* D0 */
+		m_rp5h01->enable_w(space, 0, 1);
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */

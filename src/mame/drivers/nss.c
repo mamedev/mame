@@ -463,13 +463,13 @@ READ8_MEMBER(nss_state::nss_prot_r)
 
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(m_rp5h01, space, 0, 0);
-		data |= ((~rp5h01_counter_r(m_rp5h01, space, 0)) << 4) & 0x10;  /* D4 */
-		data |= ((rp5h01_data_r(m_rp5h01, space, 0)) << 3) & 0x08;      /* D3 */
-		rp5h01_enable_w(m_rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 0);
+		data |= ((~m_rp5h01->counter_r(space, 0)) << 4) & 0x10;  /* D4 */
+		data |= ((m_rp5h01->data_r(space, 0)) << 3) & 0x08;      /* D3 */
+		m_rp5h01->enable_w(space, 0, 1);
 	}
 	else
-		rp5h01_enable_w(m_rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 1);
 
 	return data;
 }
@@ -478,14 +478,14 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 {
 	if (m_cart_sel == 0)
 	{
-		rp5h01_enable_w(m_rp5h01, space, 0, 0);
-		rp5h01_test_w(m_rp5h01, space, 0, data & 0x10);     /* D4 */
-		rp5h01_clock_w(m_rp5h01, space, 0, data & 0x08);        /* D3 */
-		rp5h01_cs_w(m_rp5h01, space, 0, ~data & 0x01);
-		rp5h01_enable_w(m_rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 0);
+		m_rp5h01->test_w(space, 0, data & 0x10);     /* D4 */
+		m_rp5h01->clock_w(space, 0, data & 0x08);        /* D3 */
+		m_rp5h01->cs_w(space, 0, ~data & 0x01);
+		m_rp5h01->enable_w(space, 0, 1);
 	}
 	else
-		rp5h01_enable_w(m_rp5h01, space, 0, 1);
+		m_rp5h01->enable_w(space, 0, 1);
 
 	ioport("EEPROMOUT")->write(data, 0xff);
 }
