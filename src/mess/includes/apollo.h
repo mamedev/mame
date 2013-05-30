@@ -213,6 +213,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
+	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
