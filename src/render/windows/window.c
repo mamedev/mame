@@ -855,10 +855,11 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	window_info *window = (window_info *)ptr;
 
-	windows::window_system *system = (windows::window_system *)window->system();
+	windows::window_system *system = NULL;
 	// we may get called before SetWindowLongPtr is called
 	if (window != NULL)
 	{
+		system = (windows::window_system *)window->system();
 		assert(GetCurrentThreadId() == system->window_threadid());
 		window->update_minmax_state();
 	}
@@ -1637,12 +1638,12 @@ bool window_info::complete_create()
 	SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
 
 	// skip the positioning stuff for -video none */
-	if (m_system->video()->get_video_config().mode == VIDEO_MODE_NONE)
+/*	if (m_system->video()->get_video_config().mode == VIDEO_MODE_NONE)
 	{
 		m_init_state = 0;
 		return true;
 	}
-
+*/
 	// adjust the window position to the initial width/height
 	int tempwidth = (m_maxwidth != 0) ? m_maxwidth : 640;
 	int tempheight = (m_maxheight != 0) ? m_maxheight : 480;
@@ -1662,10 +1663,10 @@ bool window_info::complete_create()
 	if (!m_fullscreen || m_fullscreen_safe)
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
-		if(!m_hal->initialize())
+/*		if(!m_hal->initialize())
 		{
 			return false;
-		}
+		}*/
 		ShowWindow(m_hwnd, SW_SHOW);
 	}
 
