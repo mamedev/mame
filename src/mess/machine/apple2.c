@@ -293,7 +293,7 @@ READ8_MEMBER(apple2_state::apple2_c0xx_r)
 {
 	if(!space.debugger_access())
 	{
-		static read8_delegate handlers[] =
+		read8_delegate handlers[] =
 		{
 			read8_delegate(FUNC(apple2_state::apple2_c00x_r), this),
 			read8_delegate(FUNC(apple2_state::apple2_c01x_r), this),
@@ -321,7 +321,7 @@ READ8_MEMBER(apple2_state::apple2_c0xx_r)
 
 WRITE8_MEMBER(apple2_state::apple2_c0xx_w)
 {
-	static write8_delegate handlers[] =
+	write8_delegate handlers[] =
 	{
 		write8_delegate(FUNC(apple2_state::apple2_c00x_w), this),
 		write8_delegate(FUNC(apple2_state::apple2_c01x_w), this),
