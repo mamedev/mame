@@ -295,8 +295,14 @@ void ui_menu_file_create::handle()
 			case IPT_UI_SELECT:
 				if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 				{
-					current_file.cpy(filename_buffer);
-					ui_menu::stack_pop(machine());
+					astring tmp_file(filename_buffer);
+					if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.len() - 1)
+					{
+						current_file.cpy(filename_buffer);
+						ui_menu::stack_pop(machine());
+					}
+					else
+						ui_popup_time(1, "Please enter a file extension too");
 				}
 				break;
 
