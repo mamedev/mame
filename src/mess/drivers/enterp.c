@@ -164,7 +164,7 @@ void ep_state::machine_start()
 	
 	for (int i = 0; i < 10; i++)
 	{
-		char str[5];
+		char str[6];
 		sprintf(str, "LINE%i", i);
 		m_key[i] = ioport(str);
 	}

@@ -1054,7 +1054,7 @@ void sms_state::setup_bios()
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
-	char str[6];
+	char str[7];
 	
 	m_rapid_fire_timer = timer_alloc(TIMER_RAPID_FIRE);
 	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));

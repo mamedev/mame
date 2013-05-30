@@ -637,19 +637,19 @@ void intv_state::machine_start()
 	// TODO: split these for intvkbd & intvecs??
 	for (int i = 0; i < 4; i++)
 	{
-		char str[7];
+		char str[8];
 		sprintf(str, "KEYPAD%i", i + 1);
 		m_keypad[i] = ioport(str);
 	}
 	for (int i = 0; i < 4; i++)
 	{
-		char str[5];
+		char str[6];
 		sprintf(str, "DISC%i", i + 1);
 		m_disc[i] = ioport(str);
 	}
 	for (int i = 0; i < 4; i++)
 	{
-		char str[6];
+		char str[7];
 		sprintf(str, "DISCX%i", i + 1);
 		m_discx[i] = ioport(str);
 		sprintf(str, "DISCY%i", i + 1);
@@ -668,13 +668,13 @@ void intv_state::machine_start()
 	{
 		for (int i = 0; i < 7; i++)
 		{
-			char str[8];
+			char str[9];
 			sprintf(str, "ECS_ROW%i", i);
 			m_ecs_keyboard[i] = ioport(str);
 		}
 		for (int i = 0; i < 7; i++)
 		{
-			char str[14];
+			char str[15];
 			sprintf(str, "ECS_SYNTH_ROW%i", i);
 			m_ecs_synth[i] = ioport(str);
 		}
