@@ -2503,7 +2503,7 @@ render_target* shaders::get_vector_target()
 #if HLSL_VECTOR
 	if (!vector_enable)
 	{
-		return false;
+		return NULL;
 	}
 
 	renderer *d3d = (renderer *)window->drawdata;
