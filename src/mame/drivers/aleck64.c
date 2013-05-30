@@ -2,6 +2,10 @@
 /* N64 based hardware */
 /*
 
+TODO:
+- starsldr: credit display is busted, it displays a 0 if credit is between 0 and 9. Silly protection/core bug?
+- mtetrisc: a black square covers the playfield, n64 version works fine so it's protection related.
+
 If you want to boot eleven beat on any n64 emu ?(tested on nemu, 1964
 and project64) patch the rom :
 write 0 to offset $67b,$67c,$67d,$67e
