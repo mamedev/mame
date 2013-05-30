@@ -131,7 +131,7 @@ void winvideo_init(running_machine &machine)
 
 	// possibly create the debug window, but don't show it yet
 	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		debugwin_init_windows(machine);
+		machine.osd().init_debugger();
 }
 
 

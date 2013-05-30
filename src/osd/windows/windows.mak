@@ -77,6 +77,9 @@ WINSRC = $(SRC)/osd/$(OSD)
 WINOBJ = $(OBJ)/osd/$(OSD)
 
 OBJDIRS += $(WINOBJ)
+ifdef USE_QTDEBUG
+OBJDIRS += $(WINOBJ)/../sdl
+endif
 
 
 
@@ -329,14 +332,44 @@ $(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.c
 $(WINOBJ)/winmidi.o:    $(SRC)/osd/portmedia/pmmidi.c
 
+ifndef USE_QTDEBUG
 # add debug-specific files
 OSDOBJS += \
 	$(WINOBJ)/debugwin.o
+endif
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res
 
+#-------------------------------------------------
+# QT Debug library
+#-------------------------------------------------
+ifdef USE_QTDEBUG
+QTPATH := $(dir $(shell where gcc.exe))../Qt
+LIBS += -L$(QTPATH)/lib -lqtmain -lQtGui4 -lQtCore4
+INCPATH += -I$(QTPATH)/include/QtCore -I$(QTPATH)/include/QtGui -I$(QTPATH)/include
+SDLOBJ := $(WINOBJ)/../sdl
+SDLSRC := $(WINSRC)/../sdl
 
+MOC = @$(QTPATH)/bin/moc
+$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+	$(MOC) $(INCPATH) $(DEFS) $< -o $@
+
+OSDOBJS += \
+ $(SDLOBJ)/debugqt.o \
+ $(SDLOBJ)/debugqtview.o \
+ $(SDLOBJ)/debugqtwindow.o \
+ $(SDLOBJ)/debugqtlogwindow.o \
+ $(SDLOBJ)/debugqtdasmwindow.o \
+ $(SDLOBJ)/debugqtmainwindow.o \
+ $(SDLOBJ)/debugqtmemorywindow.o \
+ $(SDLOBJ)/debugqtview.moc.o \
+ $(SDLOBJ)/debugqtwindow.moc.o \
+ $(SDLOBJ)/debugqtlogwindow.moc.o \
+ $(SDLOBJ)/debugqtdasmwindow.moc.o \
+ $(SDLOBJ)/debugqtmainwindow.moc.o \
+ $(SDLOBJ)/debugqtmemorywindow.moc.o
+endif
 
 #-------------------------------------------------
 # rules for building the libaries

@@ -296,10 +296,6 @@ static void winwindow_exit(running_machine &machine)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
-	// possibly kill the debug window
-	if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		debugwin_destroy_windows();
-
 	// free all the windows
 	while (win_window_list != NULL)
 	{

@@ -335,7 +335,7 @@ public:
 	virtual void update(bool skip_redraw);
 
 	// debugger overridables
-//  virtual void init_debugger();
+	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
 
 	// audio overridables

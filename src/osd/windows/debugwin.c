@@ -393,7 +393,7 @@ static int debugwin_seq_pressed(running_machine &machine)
 //  debugwin_init_windows
 //============================================================
 
-void debugwin_init_windows(running_machine &machine)
+void windows_osd_interface::init_debugger()
 {
 	static int class_registered;
 
@@ -439,7 +439,7 @@ void debugwin_init_windows(running_machine &machine)
 
 		if (temp_dc != NULL)
 		{
-			windows_options &options = downcast<windows_options &>(machine.options());
+			windows_options &options = downcast<windows_options &>(machine().options());
 			int size = options.debugger_font_size();
 			TCHAR *t_face;
 
@@ -469,6 +469,9 @@ void debugwin_init_windows(running_machine &machine)
 	// get other metrics
 	hscroll_height = GetSystemMetrics(SM_CYHSCROLL);
 	vscroll_width = GetSystemMetrics(SM_CXVSCROLL);
+	
+	// ensure we get called on the way out
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugwin_destroy_windows), &machine()));
 }
 
 
@@ -477,7 +480,7 @@ void debugwin_init_windows(running_machine &machine)
 //  debugwin_destroy_windows
 //============================================================
 
-void debugwin_destroy_windows(void)
+void debugwin_destroy_windows(running_machine &machine)
 {
 	// loop over windows and free them
 	while (window_list != NULL)
@@ -488,21 +491,6 @@ void debugwin_destroy_windows(void)
 	}
 
 	main_console = NULL;
-}
-
-
-
-//============================================================
-//  debugwin_show
-//============================================================
-
-void debugwin_show(int type)
-{
-	debugwin_info *info;
-
-	// loop over windows and show/hide them
-	for (info = window_list; info != NULL; info = info->next)
-		ShowWindow(info->wnd, type);
 }
 
 

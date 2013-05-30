@@ -15,7 +15,13 @@
 #include <QtGui/QApplication>
 
 #include "emu.h"
+#if defined(SDL)
 #include "osdsdl.h"
+#define xxx_osd_interface sdl_osd_interface
+#elif defined(WIN32)
+#include "winmain.h"
+#define xxx_osd_interface windows_osd_interface
+#endif
 #include "config.h"
 #include "debugger.h"
 
@@ -179,7 +185,7 @@ static void bring_main_window_to_front()
 //  Core functionality
 //============================================================
 
-void sdl_osd_interface::init_debugger()
+void xxx_osd_interface::init_debugger()
 {
 	if (qApp == NULL)
 	{
@@ -214,9 +220,11 @@ void sdl_osd_interface::init_debugger()
 extern int sdl_entered_debugger;
 #endif
 
-void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
+void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
+#if defined(SDL)
 	sdl_entered_debugger = 1;
+#endif
 
 	// Dialog initialization
 	if (oneShot)
