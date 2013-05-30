@@ -327,7 +327,7 @@ void MainWindow::mountImage(bool changedTo)
 													QDir::currentPath(),
 													tr("All files (*.*)"));
 	
-	if (!img->load(filename.toUtf8().data()))
+	if (img->load(filename.toUtf8().data()) != IMAGE_INIT_PASS)
 	{
 		debug_console_printf(*m_machine, "Image could not be mounted.\n");
 		refreshAll();
@@ -336,8 +336,15 @@ void MainWindow::mountImage(bool changedTo)
 	
 	// Activate the unmount menu option
 	QAction* unmountAct = sender()->parent()->findChild<QAction*>("unmount");
-    unmountAct->setEnabled(true);
+	unmountAct->setEnabled(true);
 	
+	// Set the mount name
+	QMenu* parentMenuItem = menuBar()->findChild<QMenu*>(img->device().name());
+	QString baseString = parentMenuItem->title();
+	baseString.truncate(baseString.lastIndexOf(QString(" : ")));
+	const QString newTitle = baseString + QString(" : ") + QString(img->filename());
+	parentMenuItem->setTitle(newTitle);
+
 	debug_console_printf(*m_machine, "Image %s mounted successfully.\n", filename.toUtf8().data());
 	refreshAll();
 }
@@ -355,6 +362,13 @@ void MainWindow::unmountImage(bool changedTo)
 	// Deactivate the unmount menu option
 	dynamic_cast<QAction*>(sender())->setEnabled(false);
 	
+	// Set the mount name
+	QMenu* parentMenuItem = menuBar()->findChild<QMenu*>(img->device().name());
+	QString baseString = parentMenuItem->title();
+	baseString.truncate(baseString.lastIndexOf(QString(" : ")));
+	const QString newTitle = baseString + QString(" : ") + QString("[empty slot]");
+	parentMenuItem->setTitle(newTitle);
+
 	debug_console_printf(*m_machine, "Image successfully unmounted.\n");
 	refreshAll();
 }
@@ -398,7 +412,7 @@ void MainWindow::createImagesMenu()
 		menuName.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 		
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.cstr());
-		interfaceMenu->setObjectName(img->device().name()); // TODO: FIX
+		interfaceMenu->setObjectName(img->device().name());
 		
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);
 		QAction* unmountAct = new QAction("Unmount", interfaceMenu);
