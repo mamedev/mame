@@ -66,22 +66,6 @@ Notes:
 #define I8035_Z5_TAG        "z5"
 
 
-enum
-{
-	LED_1 = 0,
-	LED_2,
-	LED_3,
-	LED_4,
-	LED_5,
-	LED_6,
-	LED_7,
-	LED_8,
-	LED_INS,
-	LED_ALT,
-	LED_CAPS_LOCK
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -191,10 +175,10 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc99_z5_io, AS_IO, 8, abc99_device )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(z5_p1_r)
+/*	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(z5_p1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(z5_p2_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(z5_t0_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(z5_t1_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITENOP // Z2 CLK
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(z5_t1_r)*/
 ADDRESS_MAP_END
 
 
@@ -212,6 +196,7 @@ static MACHINE_CONFIG_FRAGMENT( abc99 )
 	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
 	MCFG_CPU_IO_MAP(abc99_z5_io)
+	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -237,7 +222,10 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 {
-	m_mousecpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	if (newval)
+	{
+		m_mousecpu->reset();
+	}
 }
 
 
@@ -457,23 +445,8 @@ ioport_constructor abc99_device::device_input_ports() const
 
 inline void abc99_device::serial_input()
 {
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, (m_si | m_si_en) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, (m_si || m_si_en) ? CLEAR_LINE : ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_IRQ, m_si ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  serial_output -
-//-------------------------------------------------
-
-inline void abc99_device::serial_output()
-{
-	int so = m_so_z2 & m_so_z5;
-
-	if (m_so != so)
-	{
-		m_so = so;
-	}
 }
 
 
@@ -529,14 +502,13 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 		m_mouseb(*this, "MOUSEB"),
 		m_si(1),
 		m_si_en(1),
-		m_so(1),
 		m_so_z2(1),
 		m_so_z5(1),
 		m_keydown(0),
 		m_t1_z2(0),
 		m_t1_z5(0),
 		m_led_en(0),
-		m_reset(0)
+		m_reset(1)
 {
 }
 
@@ -560,7 +532,6 @@ void abc99_device::device_start()
 	// state saving
 	save_item(NAME(m_si));
 	save_item(NAME(m_si_en));
-	save_item(NAME(m_so));
 	save_item(NAME(m_so_z2));
 	save_item(NAME(m_so_z5));
 	save_item(NAME(m_keydown));
@@ -643,13 +614,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	*/
 
 	// serial output
-	int so_z2 = BIT(data, 0);
-
-	if (m_so_z2 != so_z2)
-	{
-		m_so_z2 = so_z2;
-		serial_output();
-	}
+	m_so_z2 = BIT(data, 0);
 
 	// key down
 	key_down(!BIT(data, 1));
@@ -783,33 +748,18 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 	// Z2 reset
 	int reset = BIT(data, 5);
 
-	if (m_reset != reset)
+	if (!m_reset && reset)
 	{
-		m_reset = reset;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, m_reset ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->reset();
 	}
+
+	m_reset = reset;
 
 	// serial output
-	int so_z5 = BIT(data, 6);
-
-	if (m_so_z5 != so_z5)
-	{
-		m_so_z5 = so_z5;
-		serial_output();
-	}
+	m_so_z5 = BIT(data, 6);
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  z5_t0_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( abc99_device::z5_t0_w )
-{
-	// clock output to Z2, not necessary to emulate
 }
 
 
@@ -832,7 +782,6 @@ WRITE_LINE_MEMBER( abc99_device::rxd_w )
 	if (m_si != state)
 	{
 		m_si = state;
-
 		serial_input();
 	}
 }
@@ -844,15 +793,5 @@ WRITE_LINE_MEMBER( abc99_device::rxd_w )
 
 READ_LINE_MEMBER( abc99_device::txd_r )
 {
-	return m_so;
-}
-
-
-//-------------------------------------------------
-//  reset_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc99_device::reset_w )
-{
-	m_mousecpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	return m_so_z2 && m_so_z5;
 }

@@ -75,12 +75,10 @@ public:
 	DECLARE_READ8_MEMBER( z2_t1_r );
 	DECLARE_READ8_MEMBER( z5_p1_r );
 	DECLARE_WRITE8_MEMBER( z5_p2_w );
-	DECLARE_WRITE8_MEMBER( z5_t0_w );
 	DECLARE_READ8_MEMBER( z5_t1_r );
 
 	DECLARE_WRITE_LINE_MEMBER( rxd_w );
 	DECLARE_READ_LINE_MEMBER( txd_r );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
 	// device-level overrides
@@ -90,11 +88,28 @@ protected:
 	virtual void device_config_complete();
 
 private:
-	static const device_timer_id TIMER_SERIAL = 0;
-	static const device_timer_id TIMER_MOUSE = 1;
+	enum
+	{
+		TIMER_SERIAL,
+		TIMER_MOUSE
+	};
+	
+	enum
+	{
+		LED_1 = 0,
+		LED_2,
+		LED_3,
+		LED_4,
+		LED_5,
+		LED_6,
+		LED_7,
+		LED_8,
+		LED_INS,
+		LED_ALT,
+		LED_CAPS_LOCK
+	};
 
 	inline void serial_input();
-	inline void serial_output();
 	inline void serial_clock();
 	inline void key_down(int state);
 	inline void scan_mouse();
@@ -113,7 +128,6 @@ private:
 
 	int m_si;
 	int m_si_en;
-	int m_so;
 	int m_so_z2;
 	int m_so_z5;
 	int m_keydown;
