@@ -95,8 +95,10 @@ public:
 	virtual void		process_events(bool ingame);
 	void				dispatch_message(MSG *message);
 
-	LRESULT CALLBACK 	window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
-	LRESULT CALLBACK	window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+	static LRESULT CALLBACK	window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+	void				set_in_background(bool in_background) { m_in_background = in_background; }
 
 protected:
 	virtual void		set_pause_event();

@@ -80,6 +80,8 @@ public:
 	window_system(running_machine &machine, video_system *video);
 	virtual ~window_system();
 
+	running_machine &		machine() const { return m_machine; }
+
 	virtual void			process_events_periodic() { }
 
 	virtual UINT64			main_threadid() { return m_main_threadid; }
@@ -104,6 +106,8 @@ public:
 	virtual void			reset_pause_event() { }
 
 	virtual void			process_events(bool ingame) { }
+
+	bool					multithreading_enabled() { return m_multithreading_enabled; }
 
 protected:
 	running_machine &		m_machine;
@@ -170,6 +174,8 @@ public:
 	virtual monitor_info *	monitor() { return m_monitor; }
 
 	char *					title() { return m_title; }
+
+	virtual window_system *	system() { return m_system; }
 
 protected:
 	virtual void			set_starting_view(int index, const char *defview, const char *view);

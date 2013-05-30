@@ -641,7 +641,7 @@ void window_system::create_window_class()
 		// initialize the description of the window class
 		wc.lpszClassName    = TEXT("MAME");
 		wc.hInstance        = GetModuleHandle(NULL);
-		wc.lpfnWndProc      = window_proc_ui;
+		wc.lpfnWndProc      = &window_proc_ui;
 		wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
 		wc.hIcon            = LoadIcon(wc.hInstance, MAKEINTRESOURCE(2));
 
@@ -852,10 +852,11 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	window_info *window = (window_info *)ptr;
 
+	windows::window_system *system = (windows::window_system *)window->system();
 	// we may get called before SetWindowLongPtr is called
 	if (window != NULL)
 	{
-		assert(GetCurrentThreadId() == m_window_threadid);
+		assert(GetCurrentThreadId() == system->window_threadid());
 		window->update_minmax_state();
 	}
 
@@ -868,7 +869,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
 			window->draw_video_contents(hdc, TRUE);
-			if (m_video->has_menu())
+			if (system->video()->has_menu())
 				DrawMenuBar(window->hwnd());
 			EndPaint(wnd, &pstruct);
 			break;
@@ -876,7 +877,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 
 		// non-client paint: punt if full screen
 		case WM_NCPAINT:
-			if (!window->fullscreen() || m_video->has_menu())
+			if (!window->fullscreen() || system->video()->has_menu())
 				return DefWindowProc(wnd, message, wparam, lparam);
 			break;
 
@@ -892,17 +893,17 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 
 		// input events
 		case WM_MOUSEMOVE:
-			ui_input_push_mouse_move_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_move_event(system->machine(), window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_MOUSELEAVE:
-			ui_input_push_mouse_leave_event(m_machine, window->target());
+			ui_input_push_mouse_leave_event(system->machine(), window->target());
 			break;
 
 		case WM_LBUTTONDOWN:
 		{
 			DWORD ticks = GetTickCount();
-			ui_input_push_mouse_down_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_down_event(system->machine(), window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
 			if (ticks - window->lastclicktime() < GetDoubleClickTime() &&
@@ -910,7 +911,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 				GET_Y_LPARAM(lparam) >= window->lastclicky() - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky() + 4)
 			{
 				window->set_lastclicktime(0);
-				ui_input_push_mouse_double_click_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+				ui_input_push_mouse_double_click_event(system->machine(), window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			}
 			else
 			{
@@ -922,25 +923,25 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 		}
 
 		case WM_LBUTTONUP:
-			ui_input_push_mouse_up_event(m_machine, window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_up_event(system->machine(), window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_CHAR:
-			ui_input_push_char_event(m_machine, window->target(), (unicode_char) wparam);
+			ui_input_push_char_event(system->machine(), window->target(), (unicode_char) wparam);
 			break;
 
 		// pause the system when we start a menu or resize
 		case WM_ENTERSIZEMOVE:
 			window->set_resize_state(RESIZE_STATE_RESIZING);
 		case WM_ENTERMENULOOP:
-			ui_pause_from_window_thread(true);
+			system->ui_pause_from_window_thread(true);
 			break;
 
 		// unpause the system when we stop a menu or resize and force a redraw
 		case WM_EXITSIZEMOVE:
 			window->set_resize_state(RESIZE_STATE_PENDING);
 		case WM_EXITMENULOOP:
-			ui_pause_from_window_thread(false);
+			system->ui_pause_from_window_thread(false);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 
@@ -957,7 +958,7 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 		case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
-			if (m_video->get_video_config().keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			if (system->video()->get_video_config().keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 				window->constrain_to_aspect_ratio(rect, wparam);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
@@ -988,15 +989,15 @@ LRESULT CALLBACK window_system::window_proc(HWND wnd, UINT message, WPARAM wpara
 
 		// track whether we are in the foreground
 		case WM_ACTIVATEAPP:
-			m_in_background = !wparam;
+			system->set_in_background(!wparam);
 			break;
 
 		// close: cause MAME to exit
 		case WM_CLOSE:
-			if (m_multithreading_enabled)
-				PostThreadMessage(m_main_threadid, WM_QUIT, 0, 0);
+			if (system->multithreading_enabled())
+				PostThreadMessage(system->main_threadid(), WM_QUIT, 0, 0);
 			else
-				m_machine.schedule_exit();
+				system->machine().schedule_exit();
 			break;
 
 		// destroy: clean up all attached rendering bits and NULL out our hwnd
