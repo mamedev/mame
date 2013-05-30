@@ -68,8 +68,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
 	UINT8 bit_sel(UINT8 data);
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
 };
 
 
@@ -431,21 +429,11 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_NULL
 };
 
-WRITE_LINE_MEMBER( vt100_state::fr_w )
-{
-	m_uart->receive_clock();
-}
-
-WRITE_LINE_MEMBER( vt100_state::ft_w )
-{
-	m_uart->transmit_clock();
-}
-
 static COM8116_INTERFACE( dbrg_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(vt100_state, fr_w),
-	DEVCB_DRIVER_LINE_MEMBER(vt100_state, ft_w),
+	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, rxc_w),
+	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, txc_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };

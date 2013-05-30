@@ -244,8 +244,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	UINT8 vram_read();
 	void vram_write(UINT8 data);
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -1033,21 +1031,11 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_NULL
 };
 
-WRITE_LINE_MEMBER( vk100_state::fr_w )
-{
-	m_uart->receive_clock();
-}
-
-WRITE_LINE_MEMBER( vk100_state::ft_w )
-{
-	m_uart->transmit_clock();
-}
-
 static COM8116_INTERFACE( dbrg_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, fr_w),
-	DEVCB_DRIVER_LINE_MEMBER(vk100_state, ft_w),
+	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, rxc_w),
+	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, txc_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
