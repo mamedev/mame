@@ -70,11 +70,11 @@ public:
 	video_system(running_machine &machine);
 	virtual ~video_system();
 
-	virtual void			update();
+	virtual void			update() = 0;
 
-	virtual bool			window_has_focus();
+	virtual bool			window_has_focus() = 0;
 
-	virtual bool			has_menu();
+	virtual bool			has_menu() = 0;
 
 	virtual monitor_info *	pick_monitor(int index);
 

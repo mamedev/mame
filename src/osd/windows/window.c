@@ -72,3 +72,5 @@ extern int drawnone_init(running_machine &machine, win_draw_callbacks *callbacks
 extern int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks);
 extern int drawdd_init(running_machine &machine, win_draw_callbacks *callbacks);
 extern int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks);
+void winwindow_process_events_periodic(running_machine &machine) { }
+void winwindow_dispatch_message(running_machine &machine, MSG *message) { }

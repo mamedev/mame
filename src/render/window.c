@@ -57,6 +57,10 @@ window_system::window_system(running_machine &machine, video_system *video) :
 	m_multithreading_enabled = machine.options().multithreading();
 }
 
+window_system::~window_system()
+{
+}
+
 window_info::~window_info()
 {
 	//remove_from_list();

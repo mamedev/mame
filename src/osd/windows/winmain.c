@@ -279,7 +279,7 @@ static sampling_profiler *profiler = NULL;
 static symbol_manager *symbols = NULL;
 
 bool stack_walker::s_initialized = false;
-
+render::windows::video_system *windows_osd_interface::m_video = NULL;
 
 //**************************************************************************
 //  FUNCTION PROTOTYPES
@@ -646,7 +646,7 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// initialize the subsystems
 	m_video = global_alloc_clear(render::windows::video_system(machine));
-	winsound_init(machine);
+	winsound_init(machine, this);
 	wininput_init(machine, this);
 	winoutput_init(machine);
 #ifdef USE_NETWORK

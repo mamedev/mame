@@ -74,6 +74,15 @@ video_system::video_system(running_machine &machine) :
 		debugwin_init_windows(m_machine, this);
 }
 
+video_system::~video_system()
+{
+}
+
+bool video_system::has_menu()
+{
+	return false;
+}
+
 void video_system::update()
 {
 	render::windows::window_info *window = (render::windows::window_info *)m_window->window_list();

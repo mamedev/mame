@@ -78,6 +78,10 @@ video_system::video_system(running_machine &machine) :
 	m_last_window_ptr = m_window->window_list_ptr();
 }
 
+video_system::~video_system()
+{
+}
+
 void video_system::extract_video_config()
 {
 	m_video_config.windowed     = m_machine.options().window();
@@ -216,5 +220,4 @@ monitor_info *video_system::pick_monitor(int index)
 	}
 	return monitor;
 }
-
 };
