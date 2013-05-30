@@ -1306,7 +1306,7 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 				default:
 					c->xmit_bytes = 1;
 					c->buffer.single_byte_response.status = STAT_FAULT | STAT_FATAL_ERR;
-					logerror("corvus_hdc_data_w: Unimplemented Prep command, returning FATAL FAULT status!\n");
+					logerror("corvus_hdc_data_w: Unimplemented Prep command %02x, returning FATAL FAULT status!\n", c->buffer.command.code);
 			}
 		}
 		if (VERBOSE_RESPONSES)
@@ -1328,7 +1328,7 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 		c->buffer.single_byte_response.status =
 			STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;      // Respond with an Illegal Op Code
 
-		logerror("corvus_hdc_data_w: Illegal Command, status: 0x%2.2x\n", c->buffer.single_byte_response.status);
+		logerror("corvus_hdc_data_w: Illegal Command %02x, status: 0x%2.2x\n", c->buffer.single_byte_response.status, c->buffer.command.code);
 	}
 	//
 	// Command execution complete, free up the controller

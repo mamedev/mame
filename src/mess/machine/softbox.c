@@ -16,7 +16,7 @@
 //**************************************************************************
 
 #define Z80_TAG         "z80"
-#define I8251_TAG       "i8251"
+#define I8251_TAG       "ic15"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG     "ic14"
@@ -199,16 +199,17 @@ READ8_MEMBER( softbox_device::ppi1_pc_r )
 	  PC2
 	  PC3
 	  PC4     Corvus READY
-	  PC5     Corvus ACTIVE
+	  PC5     Corvus DIRC
 	  PC6
 	  PC7
 
 	*/
 
+	UINT8 status = corvus_hdc_status_r(space, 0);
 	UINT8 data = 0;
 
-	data |= (corvus_hdc_status_r(space, 0) & CONTROLLER_BUSY) ? 0x10 : 0;
-	data |= m_corvus_active ? 0x20 : 0;
+	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
+	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;
 
 	return data;
 }
@@ -250,21 +251,11 @@ static I8255A_INTERFACE( ppi1_intf )
 //  COM8116_INTERFACE( dbrg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( softbox_device::fr_w )
-{
-	m_usart->receive_clock();
-}
-
-WRITE_LINE_MEMBER( softbox_device::ft_w )
-{
-	m_usart->transmit_clock();
-}
-
 static COM8116_INTERFACE( dbrg_intf )
 {
 	DEVCB_NULL, // fX/4
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, softbox_device, fr_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, softbox_device, ft_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, rxc_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, txc_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
@@ -354,10 +345,7 @@ ioport_constructor softbox_device::device_input_ports() const
 softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SOFTBOX, "PET SoftBox", tag, owner, clock, "pet_softbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG),
-		m_usart(*this, I8251_TAG),
-		m_dbrg(*this, COM8116_TAG),
-		m_corvus_active(false)
+		m_dbrg(*this, COM8116_TAG)
 {
 }
 
@@ -368,19 +356,7 @@ softbox_device::softbox_device(const machine_config &mconfig, const char *tag, d
 
 void softbox_device::device_start()
 {
-	if (corvus_hdc_init(machine()) == TRUE)
-	{
-		m_corvus_active = true;
-	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void softbox_device::device_reset()
-{
+	corvus_hdc_init(machine());
 }
 
 

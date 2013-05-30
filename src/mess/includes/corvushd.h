@@ -4,6 +4,10 @@
  *
  * Implementation of the Corvus Systems Flat Cable Hard Disk controller
  *
+ * Corvus Model 6 (5 MB): IMI 5006H hard disk (-chs 144,4,20 -ss 512)
+ * Corvus Model 11 (10 MB): IMI 5012H hard disk (-chs 358,3,20 -ss 512)
+ * Corvus Model 20 (20 MB): IMI 5018H hard disk (-chs 388,5,20 -ss 512)
+ *
  ****************************************************************************/
 
 #ifndef CORVUSHD_H_

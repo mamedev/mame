@@ -15,7 +15,7 @@
 #include "machine/serial.h"
 
 #define Z80_TAG         "z80"
-#define I8251_TAG       "i8251"
+#define I8251_TAG       "ic15"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG     "ic14"
@@ -26,15 +26,10 @@ class softbox_state : public driver_device
 public:
 	softbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_usart(*this, I8251_TAG),
 			m_dbrg(*this, COM8116_TAG),
-			m_ieee(*this, IEEE488_TAG),
-			m_corvus_active(false)
+			m_ieee(*this, IEEE488_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_usart;
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
 
@@ -50,17 +45,12 @@ public:
 	DECLARE_READ8_MEMBER( ppi1_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
-
 	enum
 	{
 		LED_A,
 		LED_B,
 		LED_READY
 	};
-
-	bool m_corvus_active;
 };
 
 #endif

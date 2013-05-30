@@ -12,7 +12,6 @@
 #ifndef __PET_SOFTBOX__
 #define __PET_SOFTBOX__
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
@@ -54,13 +53,9 @@ public:
 	DECLARE_READ8_MEMBER( ppi1_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 private:
 	enum
@@ -70,11 +65,7 @@ private:
 		LED_READY
 	};
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8251_device> m_usart;
 	required_device<com8116_device> m_dbrg;
-
-	bool m_corvus_active;
 };
 
 

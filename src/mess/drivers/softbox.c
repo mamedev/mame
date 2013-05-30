@@ -198,16 +198,17 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 	  PC2
 	  PC3
 	  PC4     Corvus READY
-	  PC5     Corvus ACTIVE
+	  PC5     Corvus DIRC
 	  PC6
 	  PC7
 
 	*/
 
+	UINT8 status = corvus_hdc_status_r(space, 0);
 	UINT8 data = 0;
 
-	data |= (corvus_hdc_status_r(space, 0) & CONTROLLER_BUSY) ? 0x10 : 0;
-	data |= m_corvus_active ? 0x20 : 0;
+	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
+	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;
 
 	return data;
 }
@@ -249,21 +250,11 @@ static I8255A_INTERFACE( ppi1_intf )
 //  COM8116_INTERFACE( dbrg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( softbox_state::fr_w )
-{
-	m_usart->receive_clock();
-}
-
-WRITE_LINE_MEMBER( softbox_state::ft_w )
-{
-	m_usart->transmit_clock();
-}
-
 static COM8116_INTERFACE( dbrg_intf )
 {
 	DEVCB_NULL, // fX/4
-	DEVCB_DRIVER_LINE_MEMBER(softbox_state, fr_w),
-	DEVCB_DRIVER_LINE_MEMBER(softbox_state, ft_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, rxc_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, txc_w),
 	COM8116_DIVISORS_16X_5_0688MHz, // receiver
 	COM8116_DIVISORS_16X_5_0688MHz // transmitter
 };
@@ -299,10 +290,7 @@ static const rs232_port_interface rs232_intf =
 
 void softbox_state::machine_start()
 {
-	if (corvus_hdc_init(machine()) == TRUE)
-	{
-		m_corvus_active = true;
-	}
+	corvus_hdc_init(machine());
 }
 
 
