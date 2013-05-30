@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "machine/zs01.h"
-#include "machine/ds2401.h"
 
 #define VERBOSE_LEVEL 0
 
@@ -53,6 +52,12 @@ void zs01_device::device_start()
 	save_item(NAME(response_to_reset));
 	save_item(NAME(command_key));
 	save_item(NAME(data_key));
+
+	m_ds2401 = siblingdevice<ds2401_device>(ds2401_tag);
+	if( m_ds2401 == NULL )
+	{
+		logerror( "ds2401 '%s' not found\n", ds2401_tag );
+	}
 }
 
 void zs01_device::device_reset()
@@ -412,9 +417,9 @@ void zs01_device::scl_1()
 								switch(write_buffer[1]) {
 								case 0xfd: {
 									/* TODO: use read/write to talk to the ds2401, which will require a timer. */
-									ds2401_device *ds2401 = machine().device<ds2401_device>(ds2401_tag);
-									for(int i = 0; i < SIZE_DATA_BUFFER; i++)
-										read_buffer[2+i] = ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
+									if( m_ds2401 != NULL )
+										for(int i = 0; i < SIZE_DATA_BUFFER; i++)
+											read_buffer[2+i] = m_ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
 									break;
 								}
 								default:

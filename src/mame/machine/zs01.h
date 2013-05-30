@@ -8,10 +8,12 @@
 #ifndef __ZS01_H__
 #define __ZS01_H__
 
+#include "machine/ds2401.h"
+#include "machine/secflash.h"
+
 #define MCFG_ZS01_ADD(_tag, ds2401_tag) \
 	MCFG_DEVICE_ADD(_tag, ZS01, 0) \
 	zs01_device::static_set_ds2401_tag(*device, ds2401_tag);
-#include "machine/secflash.h"
 
 class zs01_device : public device_secure_serial_flash
 {
@@ -82,6 +84,8 @@ protected:
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ...);
+
+	ds2401_device *m_ds2401;
 };
 
 
