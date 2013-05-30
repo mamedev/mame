@@ -42,6 +42,9 @@ private slots:
 
 	void executeCommand(bool withClear=true);
 
+	void mountImage(bool changedTo);
+	void unmountImage(bool changedTo);
+
 	// Closing the main window actually exits the program
 	void debugActClose();
 
@@ -57,6 +60,8 @@ private:
 	int m_historyIndex;
 	std::vector<QString> m_inputHistory;
 	void addToHistory(const QString& command);
+
+	void createImagesMenu();
 };
 
 
