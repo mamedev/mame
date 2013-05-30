@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 
 
 
@@ -24,6 +24,7 @@ public:
 	b16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
+		m_dma8237(*this, "8237dma"),
 		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_char_rom;
@@ -43,7 +44,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	mc6845_device *m_mc6845;
-	i8237_device  *m_dma8237;
+	required_device<am9517a_device> m_dma8237;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -241,7 +242,6 @@ GFXDECODE_END
 
 void b16_state::machine_start()
 {
-	m_dma8237 = machine().device<i8237_device>( "dma8237" );
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 

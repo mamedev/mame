@@ -100,7 +100,7 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/idectrl.h"
 #include "machine/pci.h"
 #include "machine/intelfsh.h"
@@ -453,17 +453,13 @@ const ins8250_interface bebox_uart_inteface_3 =
 void bebox_state::fdc_interrupt(bool state)
 {
 	bebox_set_irq_bit(machine(), 13, state);
-	if ( m_devices.pic8259_master ) {
-		m_devices.pic8259_master->ir6_w(state);
-	}
+	m_pic8259_1->ir6_w(state);
 }
 
 
 void bebox_state::fdc_dma_drq(bool state)
 {
-	if ( m_devices.dma8237_1 ) {
-		m_devices.dma8237_1->i8237_dreq2_w(state);
-	}
+	m_dma8237_1->dreq2_w(state);
 }
 
 /*************************************
@@ -475,7 +471,7 @@ void bebox_state::fdc_dma_drq(bool state)
 READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
 	UINT32 result;
-	result = m_devices.pic8259_master->acknowledge();
+	result = m_pic8259_1->acknowledge();
 	bebox_set_irq_bit(space.machine(), 5, 0);   /* HACK */
 	return ((UINT64) result) << 56;
 }
@@ -494,16 +490,12 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 {
-	if (m_devices.pic8259_master)
-		m_devices.pic8259_master->ir2_w(state);
+	m_pic8259_1->ir2_w(state);
 }
 
 READ8_MEMBER(bebox_state::get_slave_ack)
 {
-	if (offset==2) { // IRQ = 2
-		return m_devices.pic8259_slave->acknowledge();
-	}
-	return 0x00;
+	return m_pic8259_2->acknowledge();
 }
 
 
@@ -543,9 +535,7 @@ WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
 WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
 	bebox_set_irq_bit(machine(), 7, state);
-	if ( m_devices.pic8259_master ) {
-		m_devices.pic8259_master->ir6_w(state);
-	}
+	m_pic8259_1->ir6_w(state);
 }
 
 
@@ -692,7 +682,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 	m_ppc1->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	machine().device<i8237_device>("dma8237_1")->i8237_hlda_w( state );
+	m_dma8237_1->hack_w( state );
 }
 
 
@@ -772,8 +762,7 @@ I8237_INTERFACE( bebox_dma8237_2_config )
 
 WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 {
-	if (m_devices.pic8259_master)
-		m_devices.pic8259_master->ir0_w(state);
+	m_pic8259_1->ir0_w(state);
 }
 
 
@@ -959,10 +948,6 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_GET_DEVICES:
-		m_devices.pic8259_master = machine().device<pic8259_device>("pic8259_master");
-		m_devices.pic8259_slave = machine().device<pic8259_device>("pic8259_slave");
-		m_devices.dma8237_1 = machine().device<i8237_device>("dma8237_1");
-		m_devices.dma8237_2 = machine().device<i8237_device>("dma8237_2");
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in bebox_state::device_timer");
@@ -978,11 +963,6 @@ void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void bebox_state::machine_reset()
 {
-	m_devices.pic8259_master = NULL;
-	m_devices.pic8259_slave = NULL;
-	m_devices.dma8237_1 = NULL;
-	m_devices.dma8237_2 = NULL;
-
 	timer_set(attotime::zero, TIMER_GET_DEVICES);
 
 	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);

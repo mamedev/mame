@@ -24,7 +24,7 @@
 #include "machine/3c505.h"
 #include "machine/68681.h"
 #include "machine/pc_fdc.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pic8259.h"
 
 #ifndef VERBOSE
@@ -116,16 +116,21 @@ public:
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, MAINCPU),
 			m_ctape(*this, APOLLO_CTAPE_TAG),
-			m_messram_ptr(*this, "messram")
+			m_messram_ptr(*this, "messram"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_master(*this, "pic8259_master"),
+			m_pic8259_slave(*this, "pic8259_slave")
 			{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sc499_device> m_ctape;
+	required_shared_ptr<UINT32> m_messram_ptr;
 
-	i8237_device *dma8237_1;
-	i8237_device *dma8237_2;
-	pic8259_device *pic8259_master;
-	pic8259_device *pic8259_slave;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<pic8259_device> m_pic8259_master;
+	required_device<pic8259_device> m_pic8259_slave;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
 	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
@@ -182,7 +187,6 @@ public:
 	DECLARE_DRIVER_INIT(dn5500);
 	DECLARE_DRIVER_INIT(apollo);
 
-	required_shared_ptr<UINT32> m_messram_ptr;
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(apollo);

@@ -1057,10 +1057,6 @@ static void apollo_reset_instr_callback(device_t *device)
 
 	// reset the CPU board devices
 	apollo->MACHINE_RESET_CALL_MEMBER(apollo);
-	apollo->dma8237_1->reset();
-	apollo->dma8237_2->reset();
-	apollo->pic8259_master->reset();
-	apollo->pic8259_slave->reset();
 
 	// reset the ISA bus devices
 	apollo->m_ctape->device_reset();

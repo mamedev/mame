@@ -11,20 +11,11 @@
 
 #include "emu.h"
 #include "machine/ins8250.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/53c810.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "machine/pic8259.h"
-
-struct bebox_devices_t
-{
-	pic8259_device *pic8259_master;
-	pic8259_device *pic8259_slave;
-	i8237_device *dma8237_1;
-	i8237_device *dma8237_2;
-};
-
 
 class bebox_state : public driver_device
 {
@@ -39,16 +30,23 @@ public:
 			m_ppc1(*this, "ppc1"),
 			m_ppc2(*this, "ppc2"),
 			m_lsi53c810(*this, "scsi:lsi53c810"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_pic8259_2(*this, "pic8259_2"),
 			m_ram(*this, RAM_TAG){ }
 
 	required_device<cpu_device> m_ppc1;
 	required_device<cpu_device> m_ppc2;
 	required_device<lsi53c810_device> m_lsi53c810;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<pic8259_device> m_pic8259_1;
+	required_device<pic8259_device> m_pic8259_2;
 	required_device<ram_device> m_ram;
 	UINT32 m_cpu_imask[2];
 	UINT32 m_interrupts;
 	UINT32 m_crossproc_interrupts;
-	bebox_devices_t m_devices;
 	int m_dma_channel;
 	UINT16 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -113,8 +111,8 @@ protected:
 /*----------- defined in machine/bebox.c -----------*/
 
 extern const struct pit8253_config bebox_pit8254_config;
-extern const i8237_interface bebox_dma8237_1_config;
-extern const i8237_interface bebox_dma8237_2_config;
+extern const am9517a_interface bebox_dma8237_1_config;
+extern const am9517a_interface bebox_dma8237_2_config;
 extern const ins8250_interface bebox_uart_inteface_0;
 extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;

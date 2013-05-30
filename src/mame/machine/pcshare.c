@@ -24,6 +24,15 @@
 DMA8237 Controller
 ******************/
 
+READ8_MEMBER(pcat_base_state::at_dma8237_2_r)
+{
+	return m_dma8237_2->read(space, offset / 2);
+}
+
+WRITE8_MEMBER(pcat_base_state::at_dma8237_2_w)
+{
+	m_dma8237_2->write(space, offset / 2, data);
+}
 
 WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
 {
@@ -150,10 +159,7 @@ IRQ_CALLBACK_MEMBER(pcat_base_state::irq_callback)
 
 WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out0_changed )
 {
-	if (m_pic8259_1 )
-	{
-		m_pic8259_1->ir0_w(state);
-	}
+	m_pic8259_1->ir0_w(state);
 }
 
 
@@ -218,7 +224,7 @@ ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT(pcat_common)

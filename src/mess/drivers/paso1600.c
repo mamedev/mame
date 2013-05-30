@@ -12,7 +12,7 @@
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 
 
 class paso1600_state : public driver_device
@@ -29,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
-	required_device<i8237_device> m_dma;
+	required_device<am9517a_device> m_dma;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(paso1600_pcg_r);
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(paso1600_io, AS_IO, 16, paso1600_state)
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8("8237dma", i8237_device, i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8("8237dma", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0010,0x0011) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259
 	AM_RANGE(0x001a,0x001b) AM_READ(test_hi_r) // causes RAM error otherwise?
 	AM_RANGE(0x0030,0x0033) AM_READWRITE8(key_r,key_w,0xffff) //UART keyboard?

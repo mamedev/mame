@@ -160,7 +160,6 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/74181.o       \
 	$(EMUMACHINE)/7474.o        \
 	$(EMUMACHINE)/8042kbdc.o    \
-	$(EMUMACHINE)/8237dma.o     \
 	$(EMUMACHINE)/8257dma.o     \
 	$(EMUMACHINE)/aakart.o      \
 	$(EMUMACHINE)/adc0808.o     \

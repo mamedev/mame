@@ -19,7 +19,7 @@
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
 #include "machine/pci.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
@@ -36,8 +36,8 @@
 #include "machine/ram.h"
 #include "machine/8042kbdc.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return machine().device<i8237_device>("dma8237_2")->i8237_r(space, offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { machine().device<i8237_device>("dma8237_2")->i8237_w(space, offset / 2, data); }
+READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237_2->read(space, offset / 2); }
+WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237_2->write(space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
@@ -46,13 +46,13 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE8(bebox_800001F0_r, bebox_800001F0_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
@@ -154,9 +154,7 @@ const struct mpc105_interface mpc105_config =
 WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 {
 	bebox_set_irq_bit(machine(), 16, state);
-	if ( m_devices.pic8259_master ) {
-		m_devices.pic8259_master->ir1_w(state);
-	}
+	m_pic8259_1->ir1_w(state);
 }
 
 READ8_MEMBER(bebox_state::bebox_get_out2)
@@ -197,9 +195,9 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
 
-	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
 
-	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NULL )
+	MCFG_PIC8259_ADD( "pic8259_2", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NULL )
 
 	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )   /* TODO: Verify model */
 	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )   /* TODO: Verify model */
