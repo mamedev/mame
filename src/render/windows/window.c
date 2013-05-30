@@ -1663,10 +1663,7 @@ bool window_info::complete_create()
 	if (!m_fullscreen || m_fullscreen_safe)
 	{
 		// finish off by trying to initialize DirectX; if we fail, ignore it
-/*		if(!m_hal->initialize())
-		{
-			return false;
-		}*/
+		init_hal();
 		ShowWindow(m_hwnd, SW_SHOW);
 	}
 

@@ -52,7 +52,7 @@ void draw_hal::shutdown()
 
 int draw_hal::initialize()
 {
-	return 0;
+	return 1;
 }
 
 int draw_hal::create_resources()
