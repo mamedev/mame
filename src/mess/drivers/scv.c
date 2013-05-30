@@ -776,7 +776,7 @@ void scv_state::machine_start()
 
 	for (int i = 0; i < 8; i++)
 	{
-		char str[3];
+		char str[4];
 		sprintf(str, "PA%i", i);
 		m_key[i] = ioport(str);
 	}
