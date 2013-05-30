@@ -898,6 +898,9 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")
 MACHINE_CONFIG_END
 
 /* ROM definition */
