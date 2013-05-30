@@ -339,7 +339,7 @@ void MainWindow::mountImage(bool changedTo)
 	unmountAct->setEnabled(true);
 	
 	// Set the mount name
-	QMenu* parentMenuItem = menuBar()->findChild<QMenu*>(img->device().name());
+	QMenu* parentMenuItem = dynamic_cast<QMenu*>(sender()->parent());
 	QString baseString = parentMenuItem->title();
 	baseString.truncate(baseString.lastIndexOf(QString(" : ")));
 	const QString newTitle = baseString + QString(" : ") + QString(img->filename());
@@ -363,7 +363,7 @@ void MainWindow::unmountImage(bool changedTo)
 	dynamic_cast<QAction*>(sender())->setEnabled(false);
 	
 	// Set the mount name
-	QMenu* parentMenuItem = menuBar()->findChild<QMenu*>(img->device().name());
+	QMenu* parentMenuItem = dynamic_cast<QMenu*>(sender()->parent());
 	QString baseString = parentMenuItem->title();
 	baseString.truncate(baseString.lastIndexOf(QString(" : ")));
 	const QString newTitle = baseString + QString(" : ") + QString("[empty slot]");
