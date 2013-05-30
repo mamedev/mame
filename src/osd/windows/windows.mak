@@ -345,13 +345,13 @@ RESFILE = $(WINOBJ)/mame.res
 # QT Debug library
 #-------------------------------------------------
 ifdef USE_QTDEBUG
-QTPATH := $(dir $(shell where gcc.exe))../Qt
-LIBS += -L$(QTPATH)/lib -lqtmain -lQtGui4 -lQtCore4
-INCPATH += -I$(QTPATH)/include/QtCore -I$(QTPATH)/include/QtGui -I$(QTPATH)/include
+QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
+LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4
+INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
 SDLOBJ := $(WINOBJ)/../sdl
 SDLSRC := $(WINSRC)/../sdl
 
-MOC = @$(QTPATH)/bin/moc
+MOC = @moc
 $(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
 	$(MOC) $(INCPATH) $(DEFS) $< -o $@
 
