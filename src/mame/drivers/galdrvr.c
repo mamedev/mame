@@ -6022,6 +6022,59 @@ ROM_START( scramblebf )
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+
+
+
+ROM_START( scrambp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b1-2716.cpu",     0x0000, 0x0800, CRC(63420017) SHA1(82e7c448297bf789033ed03cbe8fc9ac4525a826) )
+	ROM_LOAD( "b2-2716.cpu",     0x0800, 0x0800, CRC(66ebc070) SHA1(ada52d7880185d1ac3a39c94896d5127ea05b14a) )
+	ROM_LOAD( "b3-2716.cpu",     0x1000, 0x0800, CRC(317548fd) SHA1(687c309d476cd5fc830d90e9e6293d1dcab96df7) )
+	ROM_LOAD( "b4-2716.cpu",     0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) )
+	ROM_LOAD( "b5-2716.cpu",     0x2000, 0x0800, CRC(fa4f1a70) SHA1(9d797eaab0f19a2ed003f782716719c9d752bd56) )
+	ROM_LOAD( "b6-2716.cpu",     0x2800, 0x0800, CRC(9fd96374) SHA1(c8456dd8a012353a023a2d3fa5d508e49c36ace8) )
+	ROM_LOAD( "b7-2716.cpu",     0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) )
+	ROM_LOAD( "b8-2716.cpu",     0x3800, 0x0800, CRC(d20088ee) SHA1(4b2deb64f1185780e5b6d1527ed5f691591b9ea0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b11-2716.cpu",     0x0000, 0x0800, CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) )
+	ROM_LOAD( "b12-2716.cpu",     0x0800, 0x0800, CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "b13-2716.cpu",     0x1000, 0x0800, CRC(ba2fa933) SHA1(1f976d8595706730e29f93027e7ab4620075c078) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "b9-2716.cpu",         0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "b10-2716.cpu",        0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not verified
+	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+
+ROM_START( scrampt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cx8-2716.cpu",     0x0000, 0x0800, CRC(12b97cc6) SHA1(edcd98fafe1001d033a73279d6dfb8336ce164de) )
+	ROM_LOAD( "cx4-2716.cpu",     0x0800, 0x0800, CRC(66ebc070) SHA1(ada52d7880185d1ac3a39c94896d5127ea05b14a) )
+	ROM_LOAD( "cx9-2716.cpu",     0x1000, 0x0800, CRC(317548fd) SHA1(687c309d476cd5fc830d90e9e6293d1dcab96df7) )
+	ROM_LOAD( "cx5-2716.cpu",     0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) )
+	ROM_LOAD( "cx10-2716.cpu",    0x2000, 0x0800, CRC(fa4f1a70) SHA1(9d797eaab0f19a2ed003f782716719c9d752bd56) )
+	ROM_LOAD( "cx6-2716.cpu",     0x2800, 0x0800, CRC(9fd96374) SHA1(c8456dd8a012353a023a2d3fa5d508e49c36ace8) )
+	ROM_LOAD( "cx11-2716.cpu",    0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) )
+	ROM_LOAD( "cx7-2716.cpu",     0x3800, 0x0800, CRC(c9a6c489) SHA1(01aa49c5c75f76affcd2057afc5f9b57098a3374) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "cx3-2716.cpu",       0x0000, 0x0800, CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) )
+	ROM_LOAD( "cx2-2716.cpu",       0x0800, 0x0800, CRC(de7912da) SHA1(8558b4eff5d7e63029b325edef9914feda5834c3) )
+	ROM_LOAD( "cx1-2716.cpu",       0x1000, 0x0800, CRC(ba2fa933) SHA1(1f976d8595706730e29f93027e7ab4620075c078) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "cx12-2716.cpu",        0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) )
+	ROM_LOAD( "cx13-2716.cpu",        0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not verified
+	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+
 ROM_START( scramblebb ) // no PCB, just eproms...
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",      0x0000, 0x0800, CRC(8ba174c4) SHA1(9ff48669054e4f55a19cb2d317a9d7a5e400e86c) )
@@ -7002,9 +7055,14 @@ GAME( 1980, theendb,  theend,   theend,   theend, galaxian_state,   theend,   RO
 GAME( 1981, scramble, 0,        scramble, scramble, galaxian_state, scramble, ROT90,  "Konami", "Scramble", GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambles,scramble, scramble, scramble, galaxian_state, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scrambles2,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, strfbomb, scramble, scramble, strfbomb, galaxian_state, scramble, ROT90,  "bootleg (Omni)", "Strafe Bomb (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
-GAME( 1981, explorer, scramble, explorer, explorer, galaxian_state, explorer, ROT90,  "bootleg", "Explorer (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scramblebf,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Karateko)", "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, strfbomb, scramble, scramble, strfbomb, galaxian_state, scramble, ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
+GAME( 1981, explorer, scramble, explorer, explorer, galaxian_state, explorer, ROT90,  "bootleg",                            "Explorer (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scramblebf,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Karateko)",                 "Scramble (Karateko, French bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, scrambp,   scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)", GAME_SUPPORTS_SAVE ) // similar to the Karateko set above
+GAME( 1981, scrampt,   scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)", GAME_SUPPORTS_SAVE ) // ^^
+
+
+
 GAME( 1981, scramblebb,scramble,scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg?", "Scramble (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 198?, bomber,   scramble, scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Alca)", "Bomber (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
 
