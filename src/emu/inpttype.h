@@ -49,7 +49,7 @@
 	typelist.append(*global_alloc(input_type_entry(IPT_##_type, IPG_##_group, (_player == 0) ? _player : (_player) - 1, (_player == 0) ? #_type : ("P" #_player "_" #_type), _name, _seq, _decseq, _incseq)));
 
 #if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
-__attribute__((optimize("O0")))
+__attribute__((optimize("O1")))
 #endif
 #ifdef _MSC_VER
 #pragma optimize("", off)
