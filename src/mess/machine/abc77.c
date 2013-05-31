@@ -64,28 +64,6 @@ const device_type ABC55 = &device_creator<abc55_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void abc77_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const abc77_interface *intf = reinterpret_cast<const abc77_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<abc77_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( abc77 )
 //-------------------------------------------------
 
@@ -415,7 +393,7 @@ inline void abc77_device::serial_clock()
 {
 	m_clock = !m_clock;
 
-	m_out_clock_func(!m_clock);
+	m_slot->trxc_w(!m_clock);
 }
 
 
@@ -427,7 +405,7 @@ inline void abc77_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
-		m_out_keydown_func(state);
+		m_slot->keydown_w(state);
 		m_keydown = state;
 	}
 }
@@ -444,6 +422,7 @@ inline void abc77_device::key_down(int state)
 
 abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
+		abc_keyboard_interface(mconfig, *this),
 		m_maincpu(*this, I8035_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_x0(*this, "X0"),
@@ -468,6 +447,7 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 
 abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		abc_keyboard_interface(mconfig, *this),
 		m_maincpu(*this, I8035_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_x0(*this, "X0"),
@@ -505,10 +485,6 @@ void abc77_device::device_start()
 	m_serial_timer->adjust(attotime::from_hz(19200), 0, attotime::from_hz(19200)); // ALE/32
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
-
-	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
-	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 }
 
 
@@ -545,6 +521,26 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  rxd_r -
+//-------------------------------------------------
+
+int abc77_device::rxd_r()
+{
+	return m_txd;
+}
+
+
+//-------------------------------------------------
+//  txd_w -
+//-------------------------------------------------
+
+void abc77_device::txd_w(int state)
+{
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -666,39 +662,4 @@ WRITE8_MEMBER( abc77_device::prog_w )
 WRITE8_MEMBER( abc77_device::j3_w )
 {
 	m_j3 = data;
-}
-
-
-//-------------------------------------------------
-//  rxd_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc77_device::rxd_w )
-{
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  txd_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc77_device::txd_r )
-{
-	return m_txd;
-}
-
-
-//-------------------------------------------------
-//  reset_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc77_device::reset_w )
-{
-	if (m_reset && !state)
-	{
-		device_reset();
-	}
-
-	m_reset = state;
 }

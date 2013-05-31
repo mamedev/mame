@@ -11,7 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
-#include "machine/abc77.h"
+#include "machine/abckb.h"
 #include "machine/abc800kb.h"
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
@@ -219,13 +219,11 @@ public:
 	abc802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
-			m_abc77(*this, ABC77_TAG),
 			m_char_rom(*this, MC6845_TAG),
 			m_config(*this, "CONFIG")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
-	optional_device<abc77_device> m_abc77;
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 
@@ -263,7 +261,6 @@ public:
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
 			m_rtc(*this, E0516_TAG),
-			m_abc77(*this, ABC77_TAG),
 			m_rad_prom(*this, "rad"),
 			m_hru2_prom(*this, "hru"),
 			m_char_rom(*this, MC6845_TAG)
@@ -271,7 +268,6 @@ public:
 
 	required_device<mc6845_device> m_crtc;
 	required_device<e0516_device> m_rtc;
-	optional_device<abc77_device> m_abc77;
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;

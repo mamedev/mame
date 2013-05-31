@@ -75,28 +75,6 @@ const device_type ABC99 = &device_creator<abc99_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void abc99_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const abc99_interface *intf = reinterpret_cast<const abc99_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<abc99_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( abc99 )
 //-------------------------------------------------
 
@@ -456,8 +434,8 @@ inline void abc99_device::serial_input()
 
 inline void abc99_device::serial_clock()
 {
-	m_out_clock_func(1);
-	m_out_clock_func(0);
+	m_slot->trxc_w(1);
+	m_slot->trxc_w(0);
 }
 
 
@@ -469,7 +447,7 @@ inline void abc99_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
-		m_out_keydown_func(state);
+		m_slot->keydown_w(state);
 		m_keydown = state;
 	}
 }
@@ -495,6 +473,7 @@ inline void abc99_device::scan_mouse()
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
+		abc_keyboard_interface(mconfig, *this),
 		m_maincpu(*this, I8035_Z2_TAG),
 		m_mousecpu(*this, I8035_Z5_TAG),
 		m_speaker(*this, "speaker"),
@@ -524,10 +503,6 @@ void abc99_device::device_start()
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz/3), 0, MCS48_ALE_CLOCK(XTAL_6MHz/3));
 
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
-
-	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
-	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 
 	// state saving
 	save_item(NAME(m_si));
@@ -569,6 +544,30 @@ void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_MOUSE:
 		scan_mouse();
 		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  rxd_r -
+//-------------------------------------------------
+
+int abc99_device::rxd_r()
+{
+	return m_so_z2 && m_so_z5;
+}
+
+
+//-------------------------------------------------
+//  txd_w -
+//-------------------------------------------------
+
+void abc99_device::txd_w(int state)
+{
+	if (m_si != state)
+	{
+		m_si = state;
+		serial_input();
 	}
 }
 
@@ -770,28 +769,4 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 READ8_MEMBER( abc99_device::z5_t1_r )
 {
 	return m_t1_z5;
-}
-
-
-//-------------------------------------------------
-//  rxd_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc99_device::rxd_w )
-{
-	if (m_si != state)
-	{
-		m_si = state;
-		serial_input();
-	}
-}
-
-
-//-------------------------------------------------
-//  txd_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc99_device::txd_r )
-{
-	return m_so_z2 && m_so_z5;
 }

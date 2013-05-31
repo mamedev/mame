@@ -1531,8 +1531,8 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC99_TAG, abc99_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1728,17 +1728,6 @@ void abc1600_state::fdc_drq_w(bool state)
 {
 	update_drdy0();
 }
-
-
-//-------------------------------------------------
-//  ABC99_INTERFACE( abc99_intf )
-//-------------------------------------------------
-
-static ABC99_INTERFACE( abc99_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z8470AB1_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z8470AB1_TAG, z80dart_device, dcdb_w)
-};
 
 
 //-------------------------------------------------
@@ -1955,7 +1944,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ABC99_ADD(abc99_intf)
+	MCFG_ABC_KEYBOARD_PORT_ADD("abc99", DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
 
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL)
 	MCFG_ABC1600BUS_SLOT_ADD("bus0x", bus0x_intf, abc1600bus_cards, NULL)

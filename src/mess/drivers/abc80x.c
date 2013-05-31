@@ -773,8 +773,8 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC800_KEYBOARD_TAG, abc800_keyboard_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC800_KEYBOARD_TAG, abc800_keyboard_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -811,8 +811,8 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, lrs_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, mux80_40_w),
 	DEVCB_NULL,
@@ -844,36 +844,14 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, txd_r),
-	DEVCB_DEVICE_LINE_MEMBER(ABC77_TAG, abc77_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
+	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc806_state, keydtr_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
-};
-
-
-//-------------------------------------------------
-//  ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
-//-------------------------------------------------
-
-static ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, dcdb_w)
-};
-
-
-//-------------------------------------------------
-//  ABC77_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static ABC77_INTERFACE( kb_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, dcdb_w)
 };
 
 
@@ -1211,7 +1189,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
+	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
@@ -1254,7 +1232,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
+	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
@@ -1297,7 +1275,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ABC55_ADD(kb_intf)
+	MCFG_ABC_KEYBOARD_PORT_ADD("abc55", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
@@ -1330,7 +1308,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_ABC77_ADD(kb_intf)
+	MCFG_ABC_KEYBOARD_PORT_ADD("abc77", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
@@ -1338,8 +1316,8 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
-	MCFG_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("512K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc806")

@@ -92,27 +92,6 @@ const device_type ABC80_KEYBOARD = &device_creator<abc80_keyboard_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void abc80_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const abc80_keyboard_interface *intf = reinterpret_cast<const abc80_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<abc80_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( abc80_keyboard )
 //-------------------------------------------------
 
@@ -191,6 +170,7 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 
 abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock, "abc80kb", __FILE__),
+		m_write_keydown(*this),
 		m_maincpu(*this, I8048_TAG)
 {
 }
@@ -203,7 +183,7 @@ abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, cons
 void abc80_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
+	m_write_keydown.resolve_safe();
 }
 
 

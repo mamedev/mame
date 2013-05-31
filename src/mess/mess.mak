@@ -1293,6 +1293,7 @@ $(MESSOBJ)/luxor.a:             \
 	$(MESS_MACHINE)/abc_slutprov.o  \
 	$(MESS_MACHINE)/abc_turbo.o \
 	$(MESS_MACHINE)/abc_xebec.o \
+	$(MESS_MACHINE)/abckb.o     \
 	$(MESS_MACHINE)/abc77.o     \
 	$(MESS_MACHINE)/abc99.o     \
 	$(MESS_MACHINE)/lux10828.o  \

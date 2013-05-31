@@ -433,11 +433,6 @@ WRITE_LINE_MEMBER( abc80_state::keydown_w )
 	m_pio->port_a_write(m_key_strobe << 7);
 }
 
-static ABC80_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(abc80_state, keydown_w)
-};
-
 WRITE8_MEMBER( abc80_state::kbd_w )
 {
 	m_key_data = data;
@@ -587,7 +582,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	// devices
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_11_9808MHz/2/2, pio_intf)
 	MCFG_CASSETTE_ADD("cassette", abc80_cassette_interface)
-	MCFG_ABC80_KEYBOARD_ADD(kb_intf)
+	MCFG_ABC80_KEYBOARD_ADD(WRITELINE(abc80_state, keydown_w))
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "slow")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("slow", abc830_slow)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)

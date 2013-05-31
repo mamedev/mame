@@ -15,29 +15,8 @@
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/abckb.h"
 #include "sound/discrete.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define ABC800_KEYBOARD_TAG "abc800kb"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ABC800_KEYBOARD_ADD(_config) \
-	MCFG_DEVICE_ADD(ABC800_KEYBOARD_TAG, ABC800_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define ABC800_KEYBOARD_INTERFACE(_name) \
-	const abc800_keyboard_interface (_name) =
 
 
 
@@ -45,19 +24,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc800_keyboard_interface
-
-struct abc800_keyboard_interface
-{
-	devcb_write_line    m_out_clock_cb;
-	devcb_write_line    m_out_keydown_cb;
-};
-
-
 // ======================> abc800_keyboard_device
 
 class abc800_keyboard_device :  public device_t,
-								public abc800_keyboard_interface
+								public abc_keyboard_interface
 {
 public:
 	// construction/destruction
@@ -68,8 +38,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
-	DECLARE_READ_LINE_MEMBER( txd_r );
+	// abc_keyboard_interface overrides
+	virtual int rxd_r();
+	virtual void txd_w(int state);
 
 	// not really public
 	DECLARE_READ8_MEMBER( kb_p1_r );
@@ -79,7 +50,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

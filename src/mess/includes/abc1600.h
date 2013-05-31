@@ -5,13 +5,13 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/ram.h"
 #include "machine/8530scc.h"
-#include "machine/abc99.h"
+#include "machine/abckb.h"
 #include "machine/abc1600_bus.h"
 #include "machine/e0516.h"
 #include "machine/lux4105.h"
 #include "machine/nmc9306.h"
+#include "machine/ram.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dart.h"
@@ -42,8 +42,8 @@
 #define BUS0X_TAG           "bus0x"
 #define BUS1_TAG            "bus1"
 #define BUS2_TAG            "bus2"
-#define RS232_A_TAG     "rs232a"
-#define RS232_B_TAG     "rs232b"
+#define RS232_A_TAG     	"rs232a"
+#define RS232_B_TAG     	"rs232b"
 
 
 

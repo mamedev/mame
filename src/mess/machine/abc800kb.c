@@ -89,28 +89,6 @@ const device_type ABC800_KEYBOARD = &device_creator<abc800_keyboard_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void abc800_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const abc800_keyboard_interface *intf = reinterpret_cast<const abc800_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<abc800_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( abc800_keyboard )
 //-------------------------------------------------
 
@@ -325,7 +303,7 @@ inline void abc800_keyboard_device::serial_clock()
 {
 	m_clk = !m_clk;
 
-	m_out_clock_func(!m_clk);
+	m_slot->trxc_w(!m_clk);
 }
 
 
@@ -339,7 +317,7 @@ inline void abc800_keyboard_device::key_down(int state)
 	{
 		m_keydown = state;
 
-		m_out_keydown_func(state);
+		m_slot->keydown_w(state);
 	}
 }
 
@@ -355,6 +333,7 @@ inline void abc800_keyboard_device::key_down(int state)
 
 abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock, "abc800kb", __FILE__),
+		abc_keyboard_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_x0(*this, "X0"),
 		m_x1(*this, "X1"),
@@ -387,10 +366,6 @@ void abc800_keyboard_device::device_start()
 	m_serial_timer = timer_alloc();
 	m_serial_timer->adjust(attotime::from_hz(XTAL_5_9904MHz/(3*5)/20), 0, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)); // ???
 
-	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
-	m_out_keydown_func.resolve(m_out_keydown_cb, *this);
-
 	// state saving
 	save_item(NAME(m_row));
 	save_item(NAME(m_clk));
@@ -420,22 +395,22 @@ void abc800_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 
 //-------------------------------------------------
-//  rxd_w - keyboard receive data write
+//  rxd_r -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc800_keyboard_device::rxd_w )
+int abc800_keyboard_device::rxd_r()
 {
-	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+	return m_txd;
 }
 
 
 //-------------------------------------------------
-//  txd_r - keyboard transmit data read
+//  txd_w -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( abc800_keyboard_device::txd_r )
+void abc800_keyboard_device::txd_w(int state)
 {
-	return m_txd;
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

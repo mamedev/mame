@@ -12,38 +12,11 @@
 #ifndef __ABC77__
 #define __ABC77__
 
-
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/abckb.h"
 #include "sound/discrete.h"
 #include "sound/speaker.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define ABC77_TAG   "abc77"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ABC55_ADD(_config) \
-	MCFG_DEVICE_ADD(ABC77_TAG, ABC55, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define MCFG_ABC77_ADD(_config) \
-	MCFG_DEVICE_ADD(ABC77_TAG, ABC77, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define ABC77_INTERFACE(_name) \
-	const abc77_interface (_name) =
 
 
 
@@ -51,19 +24,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc77_interface
-
-struct abc77_interface
-{
-	devcb_write_line    m_out_clock_cb;
-	devcb_write_line    m_out_keydown_cb;
-};
-
-
 // ======================> abc77_device
 
 class abc77_device :  public device_t,
-						public abc77_interface
+						public abc_keyboard_interface
 {
 public:
 	// construction/destruction
@@ -75,6 +39,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	// abc_keyboard_interface overrides
+	virtual int rxd_r();
+	virtual void txd_w(int state);
+
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
 	DECLARE_READ8_MEMBER( p1_r );
@@ -83,19 +51,17 @@ public:
 	DECLARE_WRITE8_MEMBER( prog_w );
 	DECLARE_WRITE8_MEMBER( j3_w );
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
-	DECLARE_READ_LINE_MEMBER( txd_r );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
-	static const device_timer_id TIMER_SERIAL = 0;
-	static const device_timer_id TIMER_RESET = 1;
+	enum
+	{
+		TIMER_SERIAL,
+		TIMER_RESET
+	};
 
 	inline void serial_output(int state);
 	inline void serial_clock();
