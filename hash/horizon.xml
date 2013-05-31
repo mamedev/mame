@@ -1680,4 +1680,1648 @@
 		</part>
 	</software>
 
+	<software name="010disk">
+		<description>AUTOLOAD DOS &amp; BASIC, DOC - WORD PROCESSOR NORTHSTAR IN 5/20/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="010disk.nsi" size="179200" crc="8bc7ae20" sha1="69ff3a9639028689d52b0515ccbb96e89b09be27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="011disk">
+		<description>ARTICLE, SYNC BUSTER PRIME DISK 3/19/87</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="011disk.nsi" size="179200" crc="343800ef" sha1="8f4036c850455399e77821cf02c57e8538b54c2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="012disk">
+		<description>WORD PROCESSOR FILES, ARTICLE - RBG MONITOR, NORTHSTAR IN 8/20/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="012disk.nsi" size="179200" crc="ed2f9eae" sha1="352d00ebfe37fdaa1a45c31816298a8aa59b9737" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="013disk">
+		<description>AUTOLOAD DOS &amp; BASIC, REPORT, PEMBROOK, NORTHSTAR IN 3/26/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="013disk.nsi" size="179200" crc="ce73cbe1" sha1="b2f5e9e5055cb4954b12802d720f2fda05fadab7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="014disk">
+		<description>START 6/18/85, REPORT FILES #34</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="014disk.nsi" size="179200" crc="c23b0bf5" sha1="b447f28dd5fe9c901a4ef3ccbd15a5438d451b4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="015disk">
+		<description>WORD PROCESSOR FILES, ARTICLES - RBG MONITOR, NORTHSTAR IN 5/20/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="015disk.nsi" size="179200" crc="5cb460b5" sha1="3ac8a7d59fefd64e64d40fc3ae4c061a0a43eb85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="016disk">
+		<description>DOS &amp; BASIC AUTOLOAD &amp; UTILITIES, STORE, PRINT, PRINT1, PRINT2, NORTHSTAR, IN 4/25/85, USE 3/12/85. USE 5/17/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="016disk.nsi" size="179200" crc="6ce81f89" sha1="49e000cd84c67152b709d862a6d0b1c5a52ce594" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="017disk">
+		<description>VIDEO GAMES FILES, VIRGINIA, FUN-PUTT, IN 4/29/84, USE 5/17/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="017disk.nsi" size="179200" crc="73077f43" sha1="e8fab042e1ae961272ac847ac4d5026d465591cc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="018disk">
+		<description>DOS &amp; BASIC AUTOLOAD &amp; UTILITIES, STORE, PRINT, PRINT1, PRINT2, NORTHSTAR, IN 3/27/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="018disk.nsi" size="179200" crc="6ed7a490" sha1="072ac847381c98c3bdff5986008364ca0350ac1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="019disk">
+		<description>VIDEO GAME FILES - 3/12/85, IN 4/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="019disk.nsi" size="179200" crc="5ece7133" sha1="02ab5b30db1d9b70557140ac4eb4f4a2a1a85ba8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="020disk">
+		<description>BAUDOT RTTY, IN 4/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="020disk.nsi" size="179200" crc="fc75979f" sha1="aa97590df2721e2ddb04ab935176d58644110152" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="021disk">
+		<description>DOS &amp; BASIC AUTOLOAD W/CF, INVOICE &amp; BID, IN 3/26/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="021disk.nsi" size="179200" crc="543c37e3" sha1="0e42f8f772a43cede962fff81971690bec3e25e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="022disk">
+		<description>VIDEO GAMES - FILE 6/1/84, NORTHSTAR, IN 4/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="022disk.nsi" size="179200" crc="c971df34" sha1="ee30af2da36470da1dc24036ee12cdfd7ac24c37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="023disk">
+		<description>VIDEO GAME FILES INCLUDING MASTER, NORTHSTAR, IN 3/27/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="023disk.nsi" size="179200" crc="72eef414" sha1="3529b3ad4e2857eb48564c3522e022e99122beb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="024disk">
+		<description>AUTOLOAD DOS &amp; BASIC, BILLING SERVICE, NORTHSTAR, IN 6/23/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="024disk.nsi" size="179200" crc="1160c663" sha1="b078ca03fdd01743c7d63b86988adb47f7d55c09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="025disk">
+		<description>CHART OF ACCOUNTS - GENERAL LEDGER WITH DOS, BASIC, CF   DD, IN 4/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="025disk.nsi" size="179200" crc="f6108ce6" sha1="ccfbb6bdd3665396f6e231625a362947ebaa71b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="026disk">
+		<description>AUTOLOAD DOS &amp; MODEM 3/30/84, NONWORKING DOS - SD?, NORTHSTAR, IN 3/26/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="026disk.nsi" size="179200" crc="83b1b307" sha1="c2a465fccf531d422857f4409c0e4acd46603da8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="027disk">
+		<description>WORD PROCESSING, MIKE, BACKUP 6/23/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="027disk.nsi" size="179200" crc="b9585584" sha1="1bb42db73a32cc9bace8f370ebc6d660cad77d8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="028disk">
+		<description>AUTOLOAD DOS &amp; BASIC, LOAD MENU   NORTHSTAR, PRIME BACK-UP, 3/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="028disk.nsi" size="179200" crc="76662967" sha1="82b34187ba2efba9eaadf7e5914a1130af9ddb40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="029disk">
+		<description>FULL 6/18/85, START18, REPORT FILES</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="029disk.nsi" size="179200" crc="e3fdb427" sha1="52f946e1351fe9f038028412e02c1eb6eb944151" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="030disk">
+		<description>PRIME MASTER BACKUP, IN 3/28/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="030disk.nsi" size="179200" crc="22fce681" sha1="7ad44e7a937a1ef39f99264d4db2cd863993e784" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="031disk">
+		<description>AUTOLOAD DOS &amp; MODEM, CF, M2D00, MODEM 0100, NORTHSTAR, IN 6/23/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="031disk.nsi" size="179200" crc="1d83dbd6" sha1="2009d221cc8bd74f53bad28d98b1abb186fbd601" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="032disk">
+		<description>MRP DEMO, JOBS DRIVE #1, SINGLE DENSITY</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="032disk.nsi" size="89600" crc="3a0e020a" sha1="c69b43c9b3b3b75f20848755f3f690b8b071612f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="033disk">
+		<description>MRP DEMO, FILES DRIVE #2, SINGLE DENSE</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="033disk.nsi" size="89600" crc="db5f9ff7" sha1="1b7db22c0106dfba162121591e9b608afb15ac0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="034disk">
+		<description>WP FILE, JOHN LETTER, MDEM1, 6/20/85</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="034disk.nsi" size="89600" crc="0c1e88da" sha1="2712e0494a22ac69d8ed6e298319c22d2a18aebb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="035disk">
+		<description>AUTOLOAD DOS &amp; BASIC, DOC - WORD PROCESSOR, NORTHSTAR, 6/25/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="035disk.nsi" size="179200" crc="2a32157c" sha1="bd6609cdc7b37b57e0f99c4ceb83a8b3d731fc44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="036disk">
+		<description>MRP DEMO - FILES   DRIVE #2, IN 8/30/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="036disk.nsi" size="179200" crc="45f239d2" sha1="369600185111649321da0f5337086f4d4557761c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="037disk">
+		<description>REPORT FILES, DRIVE #2, FULL, IN 3/27/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="037disk.nsi" size="179200" crc="e4e55ecc" sha1="4026fa999e07a451da5b2df0cdd30a254b208949" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="038disk">
+		<description>DOS &amp; BASIC &amp; CF, MRP DEMO - JOBS   DRIVE #1, IN 8/30/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="038disk.nsi" size="179200" crc="e1ac1749" sha1="1d9a8716fcfc42d754eb01fbdcd76860df2cb935" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="039disk">
+		<description>FILES FOR BILLING SERVICE, NORTHSTAR, 3/24/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="039disk.nsi" size="179200" crc="24576c69" sha1="e7db42a1a5e65ba26ae277466c75211a5065d4c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="040disk">
+		<description>PRIME MASTER, BACK UP, SYSTEM START UP, DD</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="040disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="041disk">
+		<description>AUTOLOAD DOS &amp; BASIC, LOAD 'CHECK', NORTHSTAR, IN 4/29/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="041disk.nsi" size="179200" crc="dd0967a7" sha1="af5dc4cc2dd4f1de72984165a11a4596985f769d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="042disk">
+		<description>AUTOLOAD DOS &amp; BASIC &amp; CF, 'LOAD CHECK', NORTHSTAR, IN 4/29/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="042disk.nsi" size="179200" crc="5793a154" sha1="8b3cfa84e222212a988f503cfff0e7a1f57f6ef7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="043disk">
+		<description>LIBRARY - CLIPPER DD 4/27/84, IN 3/27/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="043disk.nsi" size="179200" crc="50e74ad9" sha1="4e67c35dab4fafb9ec2d17d869d6540996b5b2ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="044disk">
+		<description>AUTOLOAD DOS &amp; BASIC PRINTER, 'FILL 8206, 128', 'FILL 8206, 176', LOAD MENU, BILLING SERVICE NORTHSTAR, IN 3/21/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="044disk.nsi" size="179200" crc="4b74f2f0" sha1="69775851c35c76057fb8f663826ae9eaa324927e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="045disk">
+		<description>DOC, WORD PROCESSOR, MASTER, SER #998, DD</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="045disk.nsi" size="179200" crc="2ba5c324" sha1="dbdf4c7ef9ca5aa5a60df9ac8a05ed747e473c5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="046disk">
+		<description>ASSEMBLER - PLAY, IN 3/26/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="046disk.nsi" size="179200" crc="f6b69df2" sha1="0c1edc56b715c0ce0f8221e611bc916944baf713" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="047disk">
+		<description>ASSEMBLER, HOMEBREW, MASTER MIKES DOS, BASIC, MONITOR - M2A00</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="047disk.nsi" size="89600" crc="1807f94b" sha1="9d912ab95760a6f4403c6288ca6a3308d1f0bd65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="048disk">
+		<description>DOS, BASIC, DAZZ D800, TIC TAC, 11/4/83</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="048disk.nsi" size="89600" crc="c619b9c6" sha1="0de26dbe361508d0d2d020a9a5ff224613942649" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="049disk">
+		<description>SYNCBUSTER   COPY 1, IN 4/12/87</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="049disk.nsi" size="179200" crc="3d055bd8" sha1="5ef49a119579f22b122572c7e1b65315d09a6f09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="050disk">
+		<description>NSUG #7, GAME PACK, N*TREK, MEMSET 40959</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="050disk.nsi" size="89600" crc="69365cd8" sha1="a071b795bc71f7fbf62d1fc6352136625517fea3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="051disk">
+		<description>NSUG #10, GAME PACK, ED, SCH2222, ENTER 0 IF NO CHANGE</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="051disk.nsi" size="89600" crc="10f70d25" sha1="2b23588d2e253f213c28c879f9b92dc4e59f4570" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="052disk">
+		<description>NSUG #11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="052disk.nsi" size="89600" crc="aac847d3" sha1="76620bd02e2ae8b06b120fec51a992bd2fb0b7a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="053disk">
+		<description>NSUG #12</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="053disk.nsi" size="89600" crc="20124471" sha1="c932241532a80e4bf97df3c907eac01b92c44754" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="054disk">
+		<description>NSUG #13, BANNER 2, COPY-DOC, (SINGLE DRIVE)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="054disk.nsi" size="89600" crc="9cbcaff1" sha1="bb2644d6dc6a73c90f69245388cbe90eda2ff270" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="055disk">
+		<description>NSUG #14, GAME PACK, (MEMSET  40959)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="055disk.nsi" size="89600" crc="fe57cd2a" sha1="1290a6bc9f603f52645c6d6dbfe09a73d6fa9978" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="056disk">
+		<description>NSUG #15</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="056disk.nsi" size="89600" crc="0dfe79f2" sha1="31246269dfb70755cfd5aa9b6499cd97054a7732" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="057disk">
+		<description>NSUG #16, STORM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="057disk.nsi" size="89600" crc="a9fb7782" sha1="90d0448532493c2c87a0c0ae515475b5e97a9454" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="058disk">
+		<description>NSUG #17</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="058disk.nsi" size="89600" crc="6a750933" sha1="2987055930b561a3ca8f8c8d3f2367a5499f30d5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="059disk">
+		<description>NSUG #18, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="059disk.nsi" size="89600" crc="676836bf" sha1="4ba45b0b25838593c21da12eabef86c84d1cc680" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="060disk">
+		<description>NSSE #1, GAME PACK, STARTREK MEMSET 40959, HOMEBREW NORTHSTAR 57343</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="060disk.nsi" size="89600" crc="bbc20b7c" sha1="18fc3407ff609cce3a6bbe06dcc2ffa44a3ce2f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="061disk">
+		<description>NSSE #2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="061disk.nsi" size="89600" crc="e3615a30" sha1="891d78febb0ee9ab6e7c29fa25cf25f1943e16e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="062disk">
+		<description>NSSE #3, GUESS, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="062disk.nsi" size="89600" crc="2053e724" sha1="171e120ed96263efa5516512fb55e800db4d9dd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="063disk">
+		<description>NSSE #4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="063disk.nsi" size="89600" crc="6fe4faf0" sha1="dd1e558df4a018b5435fc5504e3853a402163457" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="064disk">
+		<description>NSSE #5, GAUSS, LF PILOT 2A00</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="064disk.nsi" size="89600" crc="f8d18bef" sha1="08dcebaed11f7141f7a638cce4e069090171fef5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="065disk">
+		<description>NSSE #6</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="065disk.nsi" size="89600" crc="c60d227a" sha1="f278f5cd05a3c295edf6581607cb628768a337fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="066disk">
+		<description>NSSE #7, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="066disk.nsi" size="89600" crc="7d43c4a7" sha1="169464a1dca4ac3a59117ddb4f8859d8ad590a56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="067disk">
+		<description>NSSE #8, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="067disk.nsi" size="89600" crc="430df895" sha1="f3420eb1727fdbeff2ba34ed559bd351a9f9695a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="068disk">
+		<description>NSSE #9, GOOD DISASSEMBLER, DASM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="068disk.nsi" size="89600" crc="564931e2" sha1="d439c2dcb65964026cddb0c264afaf47c918bea4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="069disk">
+		<description>NSSE #10, FINANCIAL</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="069disk.nsi" size="89600" crc="ce8af2ad" sha1="0a6d581c9bd9cc02ebb6c4dd1df35375b2794b2a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="070disk">
+		<description>NSSE #11, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="070disk.nsi" size="89600" crc="52741e29" sha1="34ccbe91cfe43c2508bbeb20dadd772d044e7001" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="071disk">
+		<description>NSSE #12</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="071disk.nsi" size="89600" crc="6000988f" sha1="8cdf538181d8069e2b0908a10edcc147aa031ede" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="072disk">
+		<description>NSSE #13, GAME PACK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="072disk.nsi" size="89600" crc="f7f9f10b" sha1="d15d6ab0d89d57003a014988152576e0920f1d72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="073disk">
+		<description>GENERAL LEDGER, SINGLE DENSITY</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="073disk.nsi" size="89600" crc="5eedbe0f" sha1="f6e4d0149078eea525b77c21176576d4225aaa77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="074disk">
+		<description>AUTOLOAD DOS &amp; BASIC, GENERAL LEDGER - CHART OF ACCOUNTS, HOMEBREW, IN 4/29/84</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="074disk.nsi" size="89600" crc="8192ab41" sha1="fefc6d14ef26b9b0974bb3335a93c3eab4846f50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="075disk">
+		<description>PHONE BOOK (A) 7/22/83</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="075disk.nsi" size="89600" crc="2e79e711" sha1="a1c0718c74dc45bd231575b235e1973c29bb9e35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="076disk">
+		<description>DICK'S INVOICE, XMAS LETTER, FUN &amp; PIZZA (GYRUSS) (A), CHARLIE'S ESTIMATES (LOAD 'JOB')</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="89600">
+				<rom name="076disk.nsi" size="89600" crc="7000a0b3" sha1="0b83efb7ed370bb57d95d39e0b68cd92d8c98597" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="077disk">
+		<description>SYSTEM MASTER DISK, SYSTEM START UP, *SPARE*</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="077disk.nsi" size="179200" crc="a9e6ff37" sha1="65b01d98e3ff0f62d409d534381d1651abc5a0fc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="078disk">
+		<description>HORIZON, SYSTEM DISK, VERSION 5.1DQ, 2034</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="078disk.nsi" size="179200" crc="f50c58d7" sha1="6df124516bf90b40490a82a6e10a0d099f749d1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="079disk">
+		<description>CP/M 2.011, 48K SYSTEM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="079disk.nsi" size="179200" crc="071f4aa1" sha1="40d00cd395227f75cefbcd86e99f5d995ef8d122" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="080disk">
+		<description>NORTHSTAR DOS &amp; BASIC, SERIAL IN FLASHWRITER I</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="080disk.nsi" size="179200" crc="6a0460a7" sha1="ad100dfc092efdf039567f98d0a70dfc8407e5a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101disk">
+		<description>WORKING DOS BACKUP</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="101disk.nsi" size="179200" crc="eec6923e" sha1="a513f1c30662ed7cbf88a71e22ebfd21425c50fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="102disk">
+		<description>COPY OF ORIGINAL CPM 2.011 (UNCONF)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="102disk.nsi" size="179200" crc="57f0fa36" sha1="26219bb4665817bc7eae06cf5b86f73eb5c5f22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="103disk">
+		<description>GRAPHICS BACKUP</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="103disk.nsi" size="179200" crc="4d07ace2" sha1="e416d1ceaa5f77b1c74827f9f43ed2305377122c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="104disk">
+		<description>BIOS BACKUP</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="104disk.nsi" size="179200" crc="89477ad2" sha1="8261bdcd02798a08d3f6e7967f4e218e16f08c92" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="105disk">
+		<description>WORDSTAR + DOCUMENT FILES, BOOT</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="105disk.nsi" size="179200" crc="b0b2b657" sha1="a3258a917ae7404c923fb332a83d00f703d7cf3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="106disk">
+		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="106disk.nsi" size="179200" crc="502880c5" sha1="ec8bdd0a5689878e340afb0444bcb53b6329402d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="107disk">
+		<description>CONFIGURED CPM 2.2 BACKUP</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="107disk.nsi" size="179200" crc="79b1f126" sha1="cc589a3f6409cf022ab2b213520a8db536ec9007" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="108disk">
+		<description>PICTURES (N-DOS)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="108disk.nsi" size="179200" crc="3a49d613" sha1="917321551321462187e45867dd2196cd185c1e57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="109disk">
+		<description>BDS 'C' COMPILER, VERSION 1.42 (COPY) S/N 0425 - VOL 2/2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="109disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="110disk">
+		<description>BDS 'C' COMPILER, VERSION 1.42 (COPY) S/N 0425 - VOL 1/2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="110disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="111disk">
+		<description>BDS C COMPILER, VOL 2/2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="111disk.nsi" size="179200" crc="91d2f716" sha1="e542a7a61159b636c601de684c16a47d32dc7e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="112disk">
+		<description>BDS C COMPILER, VOL 1/2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="112disk.nsi" size="179200" crc="2602040e" sha1="685006273d70d21aa0e7d6fc089667bcd774b733" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="113disk">
+		<description>PASCAL/Z FOR CP/M, VOL 1/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="113disk.nsi" size="179200" crc="3bca147f" sha1="cd040ffd5d29001196704dd857f9603a87833cf2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="114disk">
+		<description>PASCAL/Z FOR CP/M, VOL 2/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="114disk.nsi" size="179200" crc="416677e2" sha1="41dbcf8b888a17be84aaf9cfeea0009bc5813f9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="115disk">
+		<description>PASCAL/Z FOR CP/M, VOL 3/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="115disk.nsi" size="179200" crc="b56ba086" sha1="9ff8a972c574058540fa81de5198bf73aa4b59d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="116disk">
+		<description>PASCAL/Z FOR CP/M, VOL 4/4</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="116disk.nsi" size="179200" crc="cc083aa1" sha1="ba1e02852b6079e97bbf7965bcff118527a0a03a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="117disk">
+		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT (Alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="117disk.nsi" size="179200" crc="b5f4c7f4" sha1="708d41cbd7bcf4e7aefef8d642596c0979fc5651" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="118disk">
+		<description>ADA COMPILER, ORIGINAL, QUAD</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="118disk.nsi" size="358400" crc="29f505f6" sha1="a131d93d791bc26f165f39d4ec12ffaa252083d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="119disk">
+		<description>AZTEC C COMPILER</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="119disk.nsi" size="179200" crc="4ae84221" sha1="8c5faac5e7c8cce4ac2e4b0d282ff15df538cd76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="120disk">
+		<description>ADA COMPILER, WORKING DISK, QUAD</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="120disk.nsi" size="358400" crc="024f2f9e" sha1="2b8c8d35cf030ef8e0588284d5ea2375c4e9031c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d01b01">
+		<description>CP/M RELEASE 2.2 1.2.0 DQH 013658</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d01b01.nsi" size="179200" crc="2bfe39ea" sha1="7c6c7ecc89abdff5c0bc7e831bedb448c34e8f54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d01b02">
+		<description>DOS/BASIC 2.1.1 QG SYSTEM DISK (SUPERCEDES DOS 5.2)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d01b02.nsi" size="358400" crc="ea3d8d5f" sha1="d9348238c94a4ec770d6143bb88017fe35f10fe6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d01b03">
+		<description>MIKE BERNSONS SMALL 'C'</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d01b03.nsi" size="179200" crc="7d8201de" sha1="9a25f3b9de5f6291fcfe655b32c8730d7eb95abd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d02b01">
+		<description>CP/M RELEASE 2.2 1.2.0 DQH 014254 FOR 15MB WIN</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d02b01.nsi" size="179200" crc="8886f4b7" sha1="100ea1a3950c234e7e63aac5175b241afc9192c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d02b03">
+		<description>WORDSTAR (INSTALLED)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d02b03.nsi" size="179200" crc="6f6d93a7" sha1="ee89f84b6aea18c753a621b00ae15b6bdfaee1ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d03b01">
+		<description>CP/M RELEASE 2.2 1.2.0 DQH 013860</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d03b01.nsi" size="179200" crc="aa1bd919" sha1="f9463ebe4da6c80fd99b930a10908b7e5464efa6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d03b03">
+		<description>MBASIC V5.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d03b03.nsi" size="179200" crc="8dc5da6d" sha1="b673eedf44ac92308ec7fe084d9a891150e337de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d04b01">
+		<description>HDOS 2.2.0 H SYSTEM DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d04b01.nsi" size="358400" crc="96fbb1b7" sha1="70c3ef926905ecd6d24aa79757168b2c3c6058bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d04b02">
+		<description>NORTH STAR REL 5 DOUBLE DENSITY BITSTREAMER II SYSTEM DISKETTE</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d04b02.nsi" size="179200" crc="4268d449" sha1="fc571b9fa91ba679ba54ad845d1782617535d807" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d04b03">
+		<description>DOS/BASIC 2.1.1 DQ</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d04b03.nsi" size="179200" crc="18d2adaf" sha1="cbb5bf988a6ba8f4284b78abd7da47806f660a53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d05b01">
+		<description>HDOS 2.0.0 H SYSTEM DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d05b01.nsi" size="358400" crc="f7c55e63" sha1="d18ad669c9217ac04d9a0e3ff947779a217df192" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d05b02">
+		<description>FORTRAN-80 1.0.0.*DQH</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d05b02.nsi" size="179200" crc="dfbfae31" sha1="0fd61cf3ba8b58327724e6d1cd7edadb3a8ed6b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d05b03">
+		<description>BACKUP MICROMOTION FORTH 79 FLOATING POINT PACKAGE NORTHSTAR CPM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d05b03.nsi" size="179200" crc="0eb48d88" sha1="94bbfcb8e90ad94f6bd8ea398758d8345657544b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d06b01">
+		<description>HDOS 2.1.0 H SYSTEM DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d06b01.nsi" size="358400" crc="17d90714" sha1="c9ebb8357c90b7cd7ef689b22259a6033d0fd335" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d06b02">
+		<description>APPLICATION SOFTWARE UTILITIES 1.1.0 DQ TRANSFER UTILITIES HORIZON VERSION</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d06b02.nsi" size="179200" crc="29bfffdf" sha1="0ff07f40f896646f45d4783ae2e23abfef255535" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d06b03">
+		<description>MICROMOTION FORTH 79 NORTHSTAR - CPM</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d06b03.nsi" size="179200" crc="b0ba07b2" sha1="c6100cf5928866336cc900011cd69ed4e301d554" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d07b01">
+		<description>HDOS 2.2.1 H INITIAL RECOVERY DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d07b01.nsi" size="358400" crc="017173d9" sha1="da66374229b1e3dee8156cdc7ed1637ee92c78db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d07b02">
+		<description>MICRO 80, MACRO 80, SER 39138 VER 3.44, FORMAT NS</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d07b02.nsi" size="179200" crc="0e0e0b83" sha1="cd422bc1e8675cf93150c5278679aeab5e23c408" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d07b03">
+		<description>MICROMOTION FORTH 79 FLOATING POINT PACKAGE</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d07b03.nsi" size="179200" crc="c1be5783" sha1="ba0e89a59c0a08a4e5f1830111a21ed23dfb76ab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d08b01">
+		<description>HDOS 2.0.0 H INITIAL RECOVERY DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d08b01.nsi" size="358400" crc="dd235ba3" sha1="dea43bfbe98a6759068e6c016979ebcd25857ca4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d08b02">
+		<description>DBASE II 2.35 1.0.0 *QH</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d08b02.nsi" size="358400" crc="5938c796" sha1="ba13fdfb30dcb9308a333cfb17e14dc4db9508a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d08b03">
+		<description>MICROMOTION FORTH 79</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d08b03.nsi" size="179200" crc="f40d828c" sha1="bdecfc75850ea8880d3faa134eb1f37b0fd63dfb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d09b01">
+		<description>HDOS 2.1.0 H INITIAL RECOVERY DISK</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d09b01.nsi" size="358400" crc="839d3910" sha1="7cf81a305cec58f2d406f55105174ba203d387bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d09b02">
+		<description>MICROPLAN 1.1.0 *QH 001934</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d09b02.nsi" size="358400" crc="177f53ef" sha1="fbec35004b09f30111741dd758bf50958e31e69d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d09b03">
+		<description>PASCAL Z</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d09b03.nsi" size="179200" crc="1e0f2e9b" sha1="1484c1d75f82926f4a954ceed4dbe2aafb9e3267" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d10b01">
+		<description>TSS/C INSTALLATION DISK 1.1.0 H 301792</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d10b01.nsi" size="179200" crc="1075bd80" sha1="467920cd8e20ee1208a2c71eb437d7c695f87c5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d10b02">
+		<description>MICROPRO WORDSTAR 3.0 1.0.0 *DQH WORDSTAR 3.0 XG7995TZ</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="d10b02.nsi" size="358400" crc="ab137d1b" sha1="5e054b3396a2ad443993653f0a61949250db2854" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d10b03">
+		<description>SAVE DISK - SUPERCALC</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d10b03.nsi" size="179200" crc="309c4ca4" sha1="92d1ba7c26637045c85db05b077729128522bf00" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d11b01">
+		<description>TSS/C CP/M UTILITIES DISK 1.1.0 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d11b01.nsi" size="179200" crc="d0f58c04" sha1="1433808f6ab95103987fc82190b77d14ba244925" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d11b02">
+		<description>MICROPRO WORDSTAR 3.0 WH6454S1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d11b02.nsi" size="179200" crc="90760f6b" sha1="148350769c52a511cca5332d82d7c2ee65abe757" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d11b03">
+		<description>DISK FROM CRAY CMOS 1.1 UTILITIES</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d11b03.nsi" size="179200" crc="d5d236b6" sha1="b1d6a9ebcb04b990defd268857682bf945ddeb8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d12b01">
+		<description>TSS/A START-UP DISK 2.1.1 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d12b01.nsi" size="179200" crc="537b1872" sha1="0e89060479686db952d06c535210e3acb92e8cda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d12b02">
+		<description>MICROPRO SPELLSTAR 1.2 1.0.0 *DQH SPELLSTAR 1.21 S26396BE</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d12b02.nsi" size="179200" crc="874b968d" sha1="45dc4c9d5c5119e61f82dbe7a8290b5e5574ece9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d13b01">
+		<description>TSS/A UPDATE DISK 2.1.1 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d13b01.nsi" size="179200" crc="a00101f9" sha1="d1c45c5dc64916fc1c4f4aba94e0b8e2878f83e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d14b01">
+		<description>TSS/A UTILITIES DISK 1 OF 2 2.1.1 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d14b01.nsi" size="179200" crc="0f802d79" sha1="a5d22a1e59eb7ecd1ae4bb2d1694193195586cf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d15b01">
+		<description>TSS/A UTILITIES DISK 2 OF 2 2.1.1 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d15b01.nsi" size="179200" crc="a3104d2b" sha1="f58d7e5c00b35e10eab862b04ad28bf62eb9998d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="d16b01">
+		<description>TSS/A PASSWORD DISK 2.1.1 H</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="d16b01.nsi" size="179200" crc="ce22c5cd" sha1="05f01d0cfbed306a1a9436647dc5fd3c20e19676" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r0">
+		<description>TINY</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="r0.nsi" size="358400" crc="f130d4fd" sha1="0711ba1991557669e851f1277e2a878106c38f76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r1">
+		<description>CP/M PDS</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="r1.nsi" size="358400" crc="8ae51fd8" sha1="fcf3834b3db47110704909797175fe6071855c3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r2">
+		<description>COMSTAR</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="r2.nsi" size="179200" crc="ddd37545" sha1="2ed6ccd55d7b8a576e641efec88d30de3c0f3d4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r3">
+		<description>ALL GAMES BACKUP 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="r3.nsi" size="358400" crc="49c5f52c" sha1="3671adef02cd20826a2531bfb9e2b5f4ab1eeaac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r4">
+		<description>ALL GAMES BACKUP 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="r4.nsi" size="358400" crc="c2a0bcac" sha1="fb8c48324646fd8c2ac35255ef7b63b0519ea883" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r5">
+		<description>FORMATMW CM5619 [ON JACKET]</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="358400">
+				<rom name="r5.nsi" size="358400" crc="08283968" sha1="4ec5413fbf6b5bdf668407f120496625ed24880a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r6">
+		<description>WORKING CP/M C</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="r6.nsi" size="179200" crc="088c3450" sha1="b1dc72af994e7d32e72d4c1162d3c2ade4967252" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r7">
+		<description>DEFENDER EPROMS</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="r7.nsi" size="179200" crc="7f70b20d" sha1="e709ce1c3a3b2cf6f77eaf16ea6b199b75e44732" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="r8">
+		<description>PDS CP/M</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="r8.nsi" size="179200" crc="e0a4e269" sha1="24c53ff1ce76258112d9e355cbe668c2c164e3a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
