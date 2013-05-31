@@ -15,12 +15,12 @@
 #include <QtGui/QApplication>
 
 #include "emu.h"
-#if defined(SDL)
-#include "osdsdl.h"
-#define xxx_osd_interface sdl_osd_interface
-#elif defined(WIN32)
+#if defined(WIN32)
 #include "winmain.h"
 #define xxx_osd_interface windows_osd_interface
+#else
+#include "osdsdl.h"
+#define xxx_osd_interface sdl_osd_interface
 #endif
 #include "config.h"
 #include "debugger.h"
