@@ -60,26 +60,19 @@ TODO:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/pic8259.h"
-/* Insert IBM PC includes here */
+#include "machine/pcshare.h"
 
 
-class quakeat_state : public driver_device
+class quakeat_state : public pcat_base_state
 {
 public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: pcat_base_state(mconfig, type, tag)
+		{ }
 
-	pic8259_device    *m_pic8259_1;
-	pic8259_device    *m_pic8259_2;
-	DECLARE_WRITE_LINE_MEMBER(quakeat_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -97,14 +90,7 @@ static ADDRESS_MAP_START( quake_map, AS_PROGRAM, 32, quakeat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
-//  AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-//  AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-//  AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,          kbdc8042_32le_w)
-//  AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-//  AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,              at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-//  AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
@@ -115,25 +101,6 @@ static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
 //  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-
-WRITE_LINE_MEMBER(quakeat_state::quakeat_pic8259_1_set_int_line)
-{
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-}
-
-READ8_MEMBER(quakeat_state::get_slave_ack)
-{
-	if (offset==2) { // IRQ = 2
-		return m_pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
 /*************************************************************/
 
 static INPUT_PORTS_START( quake )
@@ -141,17 +108,10 @@ INPUT_PORTS_END
 
 /*************************************************************/
 
-IRQ_CALLBACK_MEMBER(quakeat_state::irq_callback)
-{
-	return m_pic8259_1->acknowledge();
-}
-
 void quakeat_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(quakeat_state::irq_callback),this));
 
-	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
-	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 }
 /*************************************************************/
 
@@ -161,9 +121,7 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 	MCFG_CPU_PROGRAM_MAP(quake_map)
 	MCFG_CPU_IO_MAP(quake_io)
 
-
-	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(quakeat_state,quakeat_pic8259_1_set_int_line), VCC, READ8(quakeat_state,get_slave_ack) )
-	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
+	MCFG_FRAGMENT_ADD( pcat_common )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

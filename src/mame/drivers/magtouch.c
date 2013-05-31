@@ -92,11 +92,8 @@ public:
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_serial_device> m_microtouch;
 
-	DECLARE_WRITE_LINE_MEMBER(microtouch_out);
-	DECLARE_WRITE_LINE_MEMBER(microtouch_in);
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
-	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
 };
@@ -108,34 +105,19 @@ public:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(magtouch_state::microtouch_out)
-{
-	m_microtouch->rx(state);
-}
-
-WRITE_LINE_MEMBER(magtouch_state::microtouch_in)
-{
-	m_uart->rx_w(state);
-}
-
-WRITE_LINE_MEMBER(magtouch_state::at_com_interrupt_1)
-{
-	machine().device<pic8259_device>("pic8259_1")->ir4_w(state);
-}
-
 static const ins8250_interface magtouch_com0_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(magtouch_state, microtouch_out),
+	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(magtouch_state,at_com_interrupt_1),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
 static const microtouch_serial_interface magtouch_microtouch_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(magtouch_state, microtouch_in)
+	DEVCB_DEVICE_LINE_MEMBER("ns16450_0", ins8250_uart_device, rx_w)
 };
 
 /*************************************
