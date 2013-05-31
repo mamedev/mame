@@ -1,3 +1,11 @@
+/***************************************************************************
+
+    Seibu SPI hardware
+    
+    Functions to emulate the video hardware
+
+***************************************************************************/
+
 #include "emu.h"
 #include "includes/seibuspi.h"
 
@@ -23,23 +31,23 @@ WRITE32_MEMBER(seibuspi_state::spi_layer_bank_w)
 	}
 }
 
-void seibuspi_state::rf2_set_layer_banks(int banks)
+WRITE8_MEMBER(seibuspi_state::spi_set_layer_banks_w)
 {
-	if (m_rf2_layer_bank[0] != BIT(banks,0))
+	if (m_rf2_layer_bank[0] != BIT(data,0))
 	{
-		m_rf2_layer_bank[0] = BIT(banks,0);
+		m_rf2_layer_bank[0] = BIT(data,0);
 		m_back_layer->mark_all_dirty();
 	}
 
-	if (m_rf2_layer_bank[1] != BIT(banks,1))
+	if (m_rf2_layer_bank[1] != BIT(data,1))
 	{
-		m_rf2_layer_bank[1] = BIT(banks,1);
+		m_rf2_layer_bank[1] = BIT(data,1);
 		m_mid_layer->mark_all_dirty();
 	}
 
-	if (m_rf2_layer_bank[2] != BIT(banks,2))
+	if (m_rf2_layer_bank[2] != BIT(data,2))
 	{
-		m_rf2_layer_bank[2] = BIT(banks,2);
+		m_rf2_layer_bank[2] = BIT(data,2);
 		m_fore_layer->mark_all_dirty();
 	}
 }

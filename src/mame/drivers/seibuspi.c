@@ -739,7 +739,7 @@ Notes:
 
 /********************************************************************/
 
-READ32_MEMBER(seibuspi_state::sb_coin_r)
+READ8_MEMBER(seibuspi_state::sb_coin_r)
 {
 	UINT8 r = m_sb_coin_latch;
 
@@ -755,7 +755,7 @@ WRITE8_MEMBER(seibuspi_state::sb_coin_w)
 		m_sb_coin_latch = 0;
 }
 
-READ32_MEMBER(seibuspi_state::sound_fifo_status_r)
+READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 {
 	// d0: ?
 	// d1: fifo empty flag
@@ -774,68 +774,48 @@ READ32_MEMBER(seibuspi_state::spi_unknown_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(seibuspi_state::eeprom_w)
+WRITE8_MEMBER(seibuspi_state::sb_unknown_w)
 {
-	// tile banks
-	if( ACCESSING_BITS_16_23 ) {
-		rf2_set_layer_banks(data >> 16);
-
-		m_eeprom->write_bit((data & 0x800000) ? 1 : 0);
-		m_eeprom->set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
-	}
-
-	// oki banking
-	if (m_oki2 != NULL)
-		m_oki2->set_bank_base((data & 0x4000000) ? 0x40000 : 0);
 }
 
-WRITE32_MEMBER(seibuspi_state::z80_prg_fifo_w)
+WRITE8_MEMBER(seibuspi_state::eeprom_w)
 {
-	if( ACCESSING_BITS_0_7 ) {
-		if (m_z80_prg_fifo_pos<0x40000) m_z80_rom[m_z80_prg_fifo_pos] = data & 0xff;
-		m_z80_prg_fifo_pos++;
-	}
+	m_eeprom->write_bit((data & 0x80) ? 1 : 0);
+	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE32_MEMBER(seibuspi_state::z80_enable_w)
+WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
 {
-	// tile banks
-	if( ACCESSING_BITS_16_23 ) {
-		rf2_set_layer_banks(data >> 16);
-	}
+	// low bits: tile banks
+	spi_set_layer_banks_w(space, 0, data);
 
-logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
-	if( ACCESSING_BITS_0_7 )
+	// high bits: eeprom
+	eeprom_w(space, 0, data);
+}
+
+WRITE8_MEMBER(seibuspi_state::oki_bank_w)
+{
+	m_oki2->set_bank_base((data & 0x04) ? 0x40000 : 0);
+}
+
+WRITE8_MEMBER(seibuspi_state::z80_prg_fifo_w)
+{
+	if (m_z80_prg_fifo_pos<0x40000) m_z80_rom[m_z80_prg_fifo_pos] = data;
+	m_z80_prg_fifo_pos++;
+}
+
+WRITE8_MEMBER(seibuspi_state::z80_enable_w)
+{
+	if (data & 0x1)
 	{
-		if( data & 0x1 )
-		{
-			m_z80_prg_fifo_pos = 0;
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
-		else
-		{
-			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		}
+		m_z80_prg_fifo_pos = 0;
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
-}
-
-READ32_MEMBER(seibuspi_state::spi_controls1_r)
-{
-	if( ACCESSING_BITS_0_7 )
+	else
 	{
-		return ioport("INPUTS")->read();
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
-	return 0xffffffff;
-}
-
-READ32_MEMBER(seibuspi_state::spi_controls2_r)
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		return ioport("SYSTEM")->read();
-	}
-	return 0xffffffff;
 }
 
 CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
@@ -874,16 +854,6 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 		m_z80_lastbank = (data & 7);
 		membank("bank4")->set_base(m_z80_rom + (0x8000 * m_z80_lastbank));
 	}
-}
-
-READ8_MEMBER(seibuspi_state::z80_jp1_r)
-{
-	return ioport("JP1")->read();
-}
-
-READ8_MEMBER(seibuspi_state::z80_coin_r)
-{
-	return ioport("COIN")->read();
 }
 
 READ32_MEMBER(seibuspi_state::soundrom_r)
@@ -929,14 +899,16 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         /* Clear Interrupt */
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP                /* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)   /* Player controls */
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     /* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)     /* Unknown */
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)   /* Player controls (start) */
-	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ(sound_fifo_status_r)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     /* Player controls (start) */
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
+	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
+	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP                /* Unknown */
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE(z80_prg_fifo_w)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(z80_enable_w)
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_fifo_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_set_layer_banks_w, 0x00ff0000)
 	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
@@ -952,11 +924,12 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP            /* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP            /* Unknown */
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)    /* single board systems */
-	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
+	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r)
+	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
-	AM_RANGE(0x400a, 0x400a) AM_READ(z80_jp1_r)
+	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JP1")
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP            /* Unknown */
-	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)   /* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
@@ -966,15 +939,17 @@ ADDRESS_MAP_END
 /********************************************************************/
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000680, 0x00000683) AM_READ(sb_coin_r)
-	AM_RANGE(0x00000688, 0x0000068f) AM_WRITENOP
+	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITENOP
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP
 	AM_IMPORT_FROM( spi_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000680, 0x00000683) AM_READ(sb_coin_r)
+	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000688, 0x0000068b) AM_WRITENOP
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(sb_unknown_w, 0x000000ff)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_IMPORT_FROM( spi_map )
 ADDRESS_MAP_END
 
@@ -993,10 +968,11 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         /* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)   /* Player controls */
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     /* Player controls */
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)   /* Player controls (start) */
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     /* Player controls (start) */
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
@@ -1006,13 +982,6 @@ ADDRESS_MAP_END
 
 
 /********************************************************************/
-
-WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
-{
-	m_eeprom->write_bit((data & 0x80) ? 1 : 0);
-	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-}
 
 WRITE32_MEMBER(seibuspi_state::input_select_w)
 {
@@ -1024,7 +993,7 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)             /* Unknown */
 	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(input_select_w)
-	AM_RANGE(0x00000404, 0x00000407) AM_WRITE(sys386f2_eeprom_w)
+	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1033,7 +1002,7 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls1_r)   /* Player controls */
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("INPUTS")     /* Player controls */
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")        /* ROM location in real-mode */
@@ -1784,6 +1753,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,spi)
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)

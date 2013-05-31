@@ -2425,7 +2425,8 @@ READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 }
 
 static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
-	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_sound_main_status_r, 0xff000000)
 	
 	AM_IMPORT_FROM(coh1002m_map)
@@ -2445,11 +2446,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x85) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0x90, 0x90) AM_DEVREAD("cbaj_fifo1", fifo7200_device, data_byte_r) AM_DEVWRITE("cbaj_fifo2", fifo7200_device, data_byte_w)
+	AM_RANGE(0x90, 0x90) AM_DEVREAD("cbaj_fifo1", fifo7200_device, data_byte_r)
+	AM_RANGE(0x90, 0x90) AM_DEVWRITE("cbaj_fifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x91, 0x91) AM_READ(cbaj_sound_z80_status_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002msnd_map)
 
@@ -2462,6 +2466,7 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	/* sound hardware */
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
