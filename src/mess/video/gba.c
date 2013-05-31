@@ -1835,11 +1835,11 @@ void gba_state::draw_scanline(int y)
 	else
 		submode = GBA_SUBMODE2;
 
-	if (m_DISPCNT & 7 == 3)
+	if ((m_DISPCNT & 7) == 3)
 		depth = 16;
-	else if (m_DISPCNT & 7 == 4)
+	else if ((m_DISPCNT & 7) == 4)
 		depth = 8;
-	else if (m_DISPCNT & 7 == 5)
+	else if ((m_DISPCNT & 7) == 5)
 		depth = 4;
 	
 	//printf("mode = %d, %d\n", m_DISPCNT & 7, submode);
