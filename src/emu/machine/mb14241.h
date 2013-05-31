@@ -7,25 +7,27 @@
 #ifndef __MB14241_H__
 #define __MB14241_H__
 
-#include "devlegcy.h"
-
 
 class mb14241_device : public device_t
 {
 public:
 	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mb14241_device() { global_free(m_token); }
+	
+	DECLARE_WRITE8_MEMBER ( shift_count_w );
+	DECLARE_WRITE8_MEMBER ( shift_data_w );
+	DECLARE_READ8_MEMBER( shift_result_r );
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	
+	UINT16 m_shift_data;  /* 15 bits only */
+	UINT8 m_shift_count;  /* 3 bits */
 };
 
 extern const device_type MB14241;
@@ -37,15 +39,5 @@ extern const device_type MB14241;
 
 #define MCFG_MB14241_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MB14241, 0)
-
-
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
-
-DECLARE_WRITE8_DEVICE_HANDLER ( mb14241_shift_count_w );
-DECLARE_WRITE8_DEVICE_HANDLER ( mb14241_shift_data_w );
-DECLARE_READ8_DEVICE_HANDLER( mb14241_shift_result_r );
-
 
 #endif /* __MB14241_H__ */

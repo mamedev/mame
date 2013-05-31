@@ -214,7 +214,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 }
 
 
-WRITE8_MEMBER( redbaron_sound_device::redbaron_sounds_w )
+WRITE8_MEMBER( redbaron_sound_device::sounds_w )
 {
 	/* If sound is off, don't bother playing samples */
 	if( data == m_latch )
@@ -226,7 +226,7 @@ WRITE8_MEMBER( redbaron_sound_device::redbaron_sounds_w )
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER( redbaron_sound_device::redbaron_pokey_w )
+WRITE8_MEMBER( redbaron_sound_device::pokey_w )
 {
 	if( m_latch & 0x20 )
 		pokey_w(device, offset, data);

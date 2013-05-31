@@ -2610,6 +2610,7 @@ src/mame/audio/pulsar.c svneol=native#text/plain
 src/mame/audio/qix.c svneol=native#text/plain
 src/mame/audio/redalert.c svneol=native#text/plain
 src/mame/audio/redbaron.c svneol=native#text/plain
+src/mame/audio/redbaron.h svneol=native#text/plain
 src/mame/audio/scramble.c svneol=native#text/plain
 src/mame/audio/segag80r.c svneol=native#text/plain
 src/mame/audio/segag80v.c svneol=native#text/plain

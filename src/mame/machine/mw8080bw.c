@@ -98,7 +98,6 @@ MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
 	m_sn = machine().device("snsnd");
 	m_sn1 = machine().device("sn1");
 	m_sn2 = machine().device("sn2");
-	m_mb14241 = machine().device("mb14241");
 }
 
 

@@ -18,7 +18,6 @@ Differences between these sets include
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/mb14241.h"
 #include "includes/fgoal.h"
 
 
@@ -147,13 +146,13 @@ READ8_MEMBER(fgoal_state::fgoal_row_r)
 WRITE8_MEMBER(fgoal_state::fgoal_row_w)
 {
 	m_row = data;
-	mb14241_shift_data_w(m_mb14241, space, 0, 0);
+	m_mb14241->shift_data_w(space, 0, 0);
 }
 
 WRITE8_MEMBER(fgoal_state::fgoal_col_w)
 {
 	m_col = data;
-	mb14241_shift_count_w(m_mb14241, space, 0, data);
+	m_mb14241->shift_count_w(space, 0, data);
 }
 
 READ8_MEMBER(fgoal_state::fgoal_address_hi_r)
@@ -168,14 +167,14 @@ READ8_MEMBER(fgoal_state::fgoal_address_lo_r)
 
 READ8_MEMBER(fgoal_state::fgoal_shifter_r)
 {
-	UINT8 v = mb14241_shift_result_r(m_mb14241, space, 0);
+	UINT8 v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
 {
-	UINT8 v = mb14241_shift_result_r(m_mb14241, space, 0);
+	UINT8 v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -225,7 +224,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
@@ -339,8 +338,6 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
-	m_mb14241 = machine().device("mb14241");
-
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
 	save_item(NAME(m_current_color));

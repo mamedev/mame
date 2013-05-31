@@ -4,6 +4,7 @@
 
 ****************************************************************************/
 
+#include "machine/mb14241.h"
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
@@ -37,6 +38,7 @@ public:
 	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_mb14241(*this,"mb14241"),
 		m_main_ram(*this, "main_ram"),
 		m_colorram(*this, "colorram"),
 		m_discrete(*this, "discrete"),
@@ -47,6 +49,7 @@ public:
 
 	/* device/memory pointers */
 	required_device<cpu_device> m_maincpu;
+	optional_device<mb14241_device> m_mb14241;
 	required_shared_ptr<UINT8> m_main_ram;
 	optional_shared_ptr<UINT8> m_colorram;
 	optional_device<discrete_device> m_discrete;
@@ -75,7 +78,6 @@ public:
 	emu_timer   *m_interrupt_timer;
 
 	/* other devices */
-	device_t *m_mb14241;
 	optional_device<samples_device> m_samples;
 	optional_device<samples_device> m_samples1;
 	optional_device<samples_device> m_samples2;
