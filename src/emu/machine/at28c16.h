@@ -24,20 +24,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> at28c16_interface
-
-struct at28c16_interface
-{
-};
-
-
 // ======================> at28c16_device
 
 class at28c16_device :
 	public device_t,
 	public device_memory_interface,
-	public device_nvram_interface,
-	public at28c16_interface
+	public device_nvram_interface
 {
 public:
 	// construction/destruction
