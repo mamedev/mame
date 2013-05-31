@@ -1278,6 +1278,42 @@ ROM_START( ccbootmr )  /* Model Racing bootleg */
 	ROM_LOAD( "212.n4 ",      0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+
+ROM_START( cclimbroper )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cc5-2532.cpu",       0x0000, 0x1000, CRC(f94b96e8) SHA1(b13dceb0a73d1a4eeb9c3e2d2307f0c82c365393))
+	ROM_LOAD( "cc4-2532.cpu",       0x1000, 0x1000, CRC(4b1abea6) SHA1(eae7c96fc0b64d313bed4a75bd6d397b37eaac7e) )
+	ROM_LOAD( "cc3-2532.cpu",       0x2000, 0x1000, CRC(5612bb3c) SHA1(213846bb3393467260f401b00b821cbab7ac9636) )
+	ROM_LOAD( "cc2-2532.cpu",       0x3000, 0x1000, CRC(653cebc4) SHA1(c0b664389f7a6f58e880ba0870118aa26c636a37) )
+	ROM_LOAD( "cc1-2532.cpu",       0x4000, 0x1000, CRC(3fcf912b) SHA1(d540895018bc409ae011ce5841c8c5384bbbb1b9) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "cc13-2716.cpu",         0x0000, 0x0800, CRC(9324846d) SHA1(fc04635663ed9fb0f1b7924caff94fb3a1728050) )
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "cc12-2716.cpu",         0x1000, 0x0800, CRC(6d15ba36) SHA1(03d5b8866a27d70a8ddd9eb30717f42fe9164f4a) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "cc11-2716.cpu",         0x2000, 0x0800, CRC(25886f13) SHA1(c83b133448f20b689d84509d4f0f01c38452ed51) )
+	/* 0x2800-0x2fff - empty */
+	ROM_LOAD( "cc10-2716.cpu",         0x3000, 0x0800, CRC(437471ec) SHA1(07be06d4d82e862a1e73f51e331b0cd6c9e7889b) )
+	/* 0x3800-0x3fff - empty */
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "cc9-2716.cpu",         0x0000, 0x0800, CRC(a546a18f) SHA1(302ba08cef61b1badc361666fd559713037a2e43) )
+	ROM_LOAD( "cc8-2716.cpu",         0x0800, 0x0800, CRC(0224e507) SHA1(c9b534246b6bb743294581a5e74608a295cf0734) )
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples - these are much lower quality than the original with most bytes being duplicated? verify... */
+	ROM_LOAD( "cc7-2532.cpu",    0x0000, 0x1000, BAD_DUMP CRC(fcca3f74) SHA1(4b85c078334731de5332c55a6f15f49001dc7ad5) )
+	ROM_LOAD( "cc6-2532.cpu",    0x1000, 0x1000, BAD_DUMP CRC(e4f54000) SHA1(4662d54cc2ceacfa194de0309041b7565f1ce4a2) )
+
+	ROM_REGION( 0x0060, "proms", 0 ) // NOT verified on this board
+	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "cclimber.pr2", 0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
+	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
+ROM_END
+
+
+
+
 /* Sets below are Crazy Kong Part II and have an extra screen in attract mode, showing a caged Kong and copyright */
 
 ROM_START( ckongpt2 )
@@ -2320,6 +2356,7 @@ GAME( 1980, cclimberj,   cclimber, cclimber, cclimberj, cclimber_state,cclimberj
 GAME( 1980, ccboot,      cclimber, cclimber, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
 GAME( 1980, ccboot2,     cclimber, cclimber, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
 GAME( 1980, ccbootmr,    cclimber, cclimber, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", 0 )
+GAME( 1980, cclimbroper, cclimber, cclimber, cclimber, driver_device,  0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", 0 )
 
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
