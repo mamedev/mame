@@ -336,9 +336,15 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	{
 	case PIO_SEL_8910_DATA:
 		ret = m_psg->data_r(space,0);
+		logerror("PSG: data read %02x\n",ret);
+		break;
+	case PIO_SEL_5832_WRITE:
+		ret = m_rtc->data_r(space,0);
+		logerror("CMOS: read %02x (write)\n",ret);
 		break;
 	case PIO_SEL_5832_READ:
 		ret = m_rtc->data_r(space,0);
+		logerror("CMOS: read %02x\n",ret);
 		break;
 	case PIO_SEL_5101_WRITE:
 		ret = m_cmos_ram[m_cmos_select] & 0x0f;
@@ -374,16 +380,20 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 	{
 	case PIO_SEL_8910_ADDR:
 		m_psg->address_w(space,0,data);
+		logerror("PSG: address write %02x\n",data);
 		break;
 	case PIO_SEL_8910_DATA:
 		m_psg->data_w(space,0,data);
+		logerror("PSG: data write %02x\n",data);
 		break;
 	case PIO_SEL_5832_WRITE:
 		m_rtc->address_w((data & 0xf0) >> 4);
 		m_rtc->data_w(space,0,data & 0x0f);
+		logerror("CMOS: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
 		m_rtc->address_w((data & 0xf0) >> 4);
+		logerror("CMOS: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5101_WRITE:
 		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
@@ -439,7 +449,7 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	//B5 = /'138 OPERATION STROBE
 	//B6 = /KEYBOARD DATA IN
 	//B7 = /KEYBOARD CLOCK OUT
-	if(!(data & 0x20) && (m_pio_portb & 0x20))
+	if((data & 0x20) && !(m_pio_portb & 0x20))
 		operation_strobe(space,m_pio_porta);
 	m_pio_portb = data;
 	m_pio_select = (data & 0x1c) >> 2;
@@ -478,7 +488,6 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	{
 	case DISP_CRTC:
 		tms9927_w(m_crtc,space,m_crtc_reg_select,data);
-		logerror("CRTC: write %02x to register %01x\n",data,m_crtc_reg_select);
 		break;
 	case DISP_ATTR:
 		m_attr_ram[(m_attr_line*128)+(param & 0x7f)] = data;
@@ -821,6 +830,11 @@ void attache_state::driver_start()
 
 void attache_state::machine_start()
 {
+	// initialise RAM
+	memset(m_cmos_ram,0,64);
+	memset(m_attr_ram,0,128*32);
+	memset(m_char_ram,0,128*32);
+
 	// FDC callbacks
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(attache_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(attache_state::fdc_drq_w), this));
