@@ -173,6 +173,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/at29040a.o    \
 	$(EMUMACHINE)/at45dbxx.o    \
 	$(EMUMACHINE)/ay31015.o     \
+	$(EMUMACHINE)/bankdev.o     \
 	$(EMUMACHINE)/cdp1852.o     \
 	$(EMUMACHINE)/cdp1871.o     \
 	$(EMUMACHINE)/com8116.o     \

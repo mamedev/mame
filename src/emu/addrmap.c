@@ -790,7 +790,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 				subentry->m_addrend = entry->m_addrstart + (end_offset / slot_count) * databytes + databytes - 1;
 
 				// Clip the entry to the end of the range
-				if (subentry->m_addrend > entry->m_addrend)
+				if (subentry->m_addrend > entry->m_addrend || subentry->m_addrend < entry->m_addrstart)
 					subentry->m_addrend = entry->m_addrend;
 
 				// Detect special unhandled case (range straddling

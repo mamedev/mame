@@ -325,6 +325,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/znsec.h"
 #include "machine/zndip.h"
 #include "machine/idectrl.h"
+#include "machine/bankdev.h"
 #include "machine/mb3773.h"
 #include "sound/spu.h"
 #include "audio/taito_zm.h"
@@ -339,17 +340,10 @@ public:
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_card(*this,"card"),
 		m_maincpu(*this, "maincpu"),
-		m_mn10200(*this, "mn10200") {
+		m_mn10200(*this, "mn10200"),
+		m_flashbank(*this, "flashbank")
+	{
 	}
-
-	required_device<znsec_device> m_znsec0;
-	required_device<znsec_device> m_znsec1;
-	required_device<zndip_device> m_zndip;
-	required_device<ide_controller_device> m_card;
-
-	intel_te28f160_device *m_biosflash;
-	intel_e28f400_device *m_pgmflash;
-	intel_te28f160_device *m_sndflash[3];
 
 	unsigned char m_cis[512];
 	int m_locked;
@@ -388,9 +382,14 @@ public:
 	DECLARE_MACHINE_RESET(coh3002t);
 	void rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
 	UINT8 rf5c296_reg_r(ATTR_UNUSED UINT8 reg);
-	void install_handlers(int mode);
+
+	required_device<znsec_device> m_znsec0;
+	required_device<znsec_device> m_znsec1;
+	required_device<zndip_device> m_zndip;
+	required_device<ide_controller_device> m_card;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
+	required_device<address_map_bank_device> m_flashbank;
 };
 
 
@@ -496,24 +495,6 @@ WRITE16_MEMBER(taitogn_state::rf5c296_mem_w)
 	}
 }
 
-void taitogn_state::install_handlers(int mode)
-{
-	address_space &a = m_maincpu->space(AS_PROGRAM);
-	if(mode == 0) {
-		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read16_delegate(FUNC(intelfsh16_device::read),m_biosflash), write16_delegate(FUNC(intel_te28f160_device::write),m_biosflash), 0xffffffff);
-		a.install_readwrite_handler(0x1f200000, 0x1f2fffff, read16_delegate(FUNC(taitogn_state::rf5c296_mem_r),this), write16_delegate(FUNC(taitogn_state::rf5c296_mem_w),this), 0xffffffff);
-		a.install_readwrite_handler(0x1f300000, 0x1f37ffff, read16_delegate(FUNC(intelfsh16_device::read),m_pgmflash), write16_delegate(FUNC(intelfsh16_device::write),m_pgmflash), 0xffffffff);
-		a.nop_readwrite(0x1f380000, 0x1f5fffff);
-
-	} else {
-		// Mode 1 has access to the 3 samples flashes
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[0]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[0]), 0xffffffff);
-		a.install_readwrite_handler(0x1f200000, 0x1f3fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[1]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[1]), 0xffffffff);
-		a.install_readwrite_handler(0x1f400000, 0x1f5fffff, read16_delegate(FUNC(intelfsh16_device::read),m_sndflash[2]), write16_delegate(FUNC(intelfsh16_device::write),m_sndflash[2]), 0xffffffff);
-	}
-}
-
 // Misc. controls
 
 READ8_MEMBER(taitogn_state::control_r)
@@ -551,7 +532,7 @@ WRITE8_MEMBER(taitogn_state::control_w)
 #endif
 
 	if((p ^ m_control) & 0x04)
-		install_handlers(m_control & 4 ? 1 : 0);
+		m_flashbank->set_bank(m_control & 4 ? 1 : 0);
 }
 
 WRITE16_MEMBER(taitogn_state::control2_w)
@@ -684,12 +665,6 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 {
-	m_biosflash = machine().device<intel_te28f160_device>("biosflash");
-	m_pgmflash = machine().device<intel_e28f400_device>("pgmflash");
-	m_sndflash[0] = machine().device<intel_te28f160_device>("sndflash0");
-	m_sndflash[1] = machine().device<intel_te28f160_device>("sndflash1");
-	m_sndflash[2] = machine().device<intel_te28f160_device>("sndflash2");
-
 	m_znsec0->init(tt10);
 	m_znsec1->init(tt16);
 
@@ -708,7 +683,6 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 {
 	m_locked = 0x1ff;
-	install_handlers(0);
 	m_control = 0;
 
 	m_card->reset();
@@ -719,9 +693,7 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
-//  AM_RANGE(0x1f000000, 0x1f1fffff) AM_DEVREADWRITE16("sndflash0", intelfsh16_device, read, write, 0xffffffff)
-//  AM_RANGE(0x1f200000, 0x1f3fffff) AM_DEVREADWRITE16("sndflash1", intelfsh16_device, read, write, 0xffffffff)
-//  AM_RANGE(0x1f400000, 0x1f5fffff) AM_DEVREADWRITE16("sndflash2", intelfsh16_device, read, write, 0xffffffff)
+	AM_RANGE(0x1f000000, 0x1f7fffff) AM_DEVICE16("flashbank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
@@ -740,6 +712,18 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
+	// Bank 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
+	AM_RANGE(0x00000000, 0x001fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
+	AM_RANGE(0x00200000, 0x002fffff) AM_READWRITE( rf5c296_mem_r, rf5c296_mem_w )
+	AM_RANGE(0x00300000, 0x0037ffff) AM_DEVREADWRITE("pgmflash", intelfsh16_device, read, write)
+
+	// Bank 1 has access to the 3 samples flashes
+	AM_RANGE(0x08000000, 0x081fffff) AM_DEVREADWRITE("sndflash0", intelfsh16_device, read, write)
+	AM_RANGE(0x08200000, 0x083fffff) AM_DEVREADWRITE("sndflash1", intelfsh16_device, read, write)
+	AM_RANGE(0x08400000, 0x085fffff) AM_DEVREADWRITE("sndflash2", intelfsh16_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -772,6 +756,12 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_IDE_CONTROLLER_ADD( "card", ide_devices, "hdd", NULL, true)
 
 	MCFG_MB3773_ADD("mb3773")
+
+	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000000)
 
 	MCFG_INTEL_TE28F160_ADD("biosflash")
 	MCFG_INTEL_E28F400_ADD("pgmflash")
