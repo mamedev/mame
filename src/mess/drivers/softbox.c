@@ -4,6 +4,48 @@
 
     http://mikenaberezny.com/hardware/pet-cbm/sse-softbox-z80-computer/
 
+
+	Installing CP/M to the hard disk
+	--------------------------------
+
+	DIAG.COM
+
+	On the SoftBox disk, there's a program DIAG.COM that has the Corvus diagnostics.  This will do the low-level format.
+	
+	Choose option 6 ("Update controller code").  This writes the "firmware", which is some code stored on the drive that 
+	the ROM loads on power-up.  When prompted for a firmware image, enter "CORVB184.FMT".  You'll see a file "CORVB184.CLR" 
+	in the SoftBox disk directory, but you won't see "CORVB184.FMT".  This file doesn't actually exist (or may be a CP/M 
+	hidden file, haven't checked that).  By entering "CORVB184.FMT" at the prompt, it will cause DIAG.COM to first format 
+	the disk, then try to install the firmware.
+	
+	If that succeeds, choose option 3 (Read controller code version).  That should return version information.
+
+	NEWSYS.COM
+
+	You need to tell the SoftBox BIOS about the Corvus drive.  Run NEWSYS.COM, and select "A" for the source drive.  It will
+	load the existing SoftBox configuration data from that drive.
+
+	Choose option "D" (Disk drive assignment).  Choose CP/M drive letter(s) for your CP/M drive.  Exit back to the menu, and
+	save your configuration back to the floppy (A:), and execute the new system.
+
+	FORMAT.COM
+
+	The last step is to format the drive under CP/M.  Run FORMAT.COM and use the drive letter(s) you assigned with NEWSYS.COM.
+	This will write the CP/M filesystem to the drive.
+
+	After, you should be able to get a directory on the Corvus ("DIR C:").  You can use PIP to copy files from the floppy to
+	the Corvus.  The command "A:PIP C:=A:DIAG.ASM" will run PIP from drive A:, and copy DIAG.ASM to drive C:.
+
+
+	If you want to boot CP/M from the Corvus:
+
+	There must be no IEEE-488 device 8.  Put it on device 9 or any other.
+
+	Use NEWSYS.COM to create a configuration where the Corvus will be drive A:, and tell it to write the configuration to the Corvus.
+
+	In standalone mode (RS-232 terminal), the SoftBox should boot from the Corvus after power on.  In PET mode, you'll still need to
+	load "K" from floppy somehow (e.g. device 9) but then it should boot CP/M from the Corvus.
+
 */
 
 #include "includes/softbox.h"
