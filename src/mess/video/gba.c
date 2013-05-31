@@ -45,6 +45,56 @@ INLINE UINT32 decrease_brightness(UINT32 color, int coeff_);
 #define GBA_SUBMODE1    1
 #define GBA_SUBMODE2    2
 
+inline void gba_state::update_mask(UINT8* mask, int mode, int submode, UINT32* obj_win, UINT8 inwin0, UINT8 inwin1, UINT8 in0_mask, UINT8 in1_mask, UINT8 out_mask)
+{
+	UINT8 mode_mask = 0;
+	if (submode == GBA_SUBMODE2)
+	{
+		for (int x = 0; x < 240; x++)
+		{
+			mask[x] = out_mask;
+			
+			if ((obj_win[x] & 0x80000000) == 0)
+				mask[x] = m_WINOUT >> 8;
+			
+			if (inwin1)
+			{
+				if (is_in_window(x, 1))
+					mask[x] = in1_mask;
+			}
+			
+			if (inwin0)
+			{
+				if (is_in_window(x, 0))
+					mask[x] = in0_mask;
+			}
+		}
+	}
+
+	if (mode == GBA_MODE1)
+	{
+		// disable line3
+		mode_mask = ~0x08;
+	}
+	else if (mode == GBA_MODE2)
+	{
+		// disable line0 & line1
+		mode_mask = ~0x03;
+	}
+	else if (mode == GBA_MODE345)
+	{
+		// disable line0, line1 & line3
+		mode_mask = ~0x0b;
+	}
+
+	
+	if (mode_mask)
+	{
+		for (int x = 0; x < 240; x++)
+			mask[x] &= mode_mask;
+	}
+}
+
 void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	UINT32 backdrop = ((UINT16*)m_gba_pram.target())[0] | 0x30000000;
@@ -53,6 +103,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 	UINT8 inWin0Mask = m_WININ & 0x00ff;
 	UINT8 inWin1Mask = m_WININ >> 8;
 	UINT8 outMask = m_WINOUT & 0x00ff;
+	UINT8 masks[240];	// this puts together WinMasks with the fact that some modes/submodes skip specific layers!
 	
 	if (submode == GBA_SUBMODE2)
 	{
@@ -108,101 +159,75 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 	draw_gba_oam(lineOBJ, y);
 	if (submode == GBA_SUBMODE2)
 		draw_gba_oam_window(lineOBJWin, y);
+
+	memset(masks, 0xff, sizeof(masks));
+	update_mask(&masks[0], mode, submode, lineOBJWin, inWindow0, inWindow1, inWin0Mask, inWin1Mask, outMask);
 	
 	for (int x = 0; x < 240; x++)
 	{
 		UINT32 color = backdrop;
 		UINT8 top = 0x20;
-		UINT8 mask = outMask;
 		
-		if (submode == GBA_SUBMODE2)
+		if ((UINT8)(line0[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x01)
 		{
-			if ((lineOBJWin[x] & 0x80000000) == 0)
-				mask = m_WINOUT >> 8;
-			
-			if (inWindow1)
-			{
-				if (is_in_window(x, 1))
-					mask = inWin1Mask;
-			}
-			
-			if (inWindow0)
-			{
-				if (is_in_window(x, 0))
-					mask = inWin0Mask;
-			}
-			
+			color = line0[x];
+			top = 0x01;
 		}
 		
-		if (mode == GBA_MODE0 || mode == GBA_MODE1)
-			if ((UINT8)(line0[x] >> 24) < (UINT8)(color >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x01)))
-			{
-				color = line0[x];
-				top = 0x01;
-			}
+		if ((UINT8)(line1[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x02)
+		{
+			color = line1[x];
+			top = 0x02;
+		}
 		
-		if (mode == GBA_MODE0 || mode == GBA_MODE1)
-			if ((UINT8)(line1[x] >> 24) < (UINT8)(color >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x02)))
-			{
-				color = line1[x];
-				top = 0x02;
-			}
+		if ((UINT8)(line2[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x04)
+		{
+			color = line2[x];
+			top = 0x04;
+		}
 		
-		if (mode == GBA_MODE0 || mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-			if ((UINT8)(line2[x] >> 24) < (UINT8)(color >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x04)))
-			{
-				color = line2[x];
-				top = 0x04;
-			}
+		if ((UINT8)(line3[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x08)
+		{
+			color = line3[x];
+			top = 0x08;
+		}
 		
-		if (mode == GBA_MODE0 || mode == GBA_MODE2)
-			if ((UINT8)(line3[x] >> 24) < (UINT8)(color >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x08)))
-			{
-				color = line3[x];
-				top = 0x08;
-			}
-		
-		if (mode == GBA_MODE0 || mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-			if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(color >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x10)))
-			{
-				color = lineOBJ[x];
-				top = 0x10;
-			}
+		if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x10)
+		{
+			color = lineOBJ[x];
+			top = 0x10;
+		}
 		
 		if (color & 0x00010000)
 		{
-			if ((submode == GBA_SUBMODE0 && top == 0x10) || submode == GBA_SUBMODE1 || submode == GBA_SUBMODE2)
+			if (submode != GBA_SUBMODE0 || top == 0x10)
 			{
 				UINT32 back = backdrop;
 				UINT8 top2 = 0x20;
 				
-				if (mode == GBA_MODE0 || mode == GBA_MODE1)
-					if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x01)))
-					{
-						back = line0[x];
-						top2 = 0x01;
-					}
+				if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
+				{
+					back = line0[x];
+					top2 = 0x01;
+				}
 				
-				if (mode == GBA_MODE0 || mode == GBA_MODE1)
-					if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x02)))
-					{
-						back = line1[x];
-						top2 = 0x02;
-					}
+				if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
+				{
+					back = line1[x];
+					top2 = 0x02;
+				}
 				
-				if (mode == GBA_MODE0 || mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-					if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x04)))
-					{
-						back = line2[x];
-						top2 = 0x04;
-					}
+				if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
+				{
+					back = line2[x];
+					top2 = 0x04;
+				}
 				
-				if (mode == GBA_MODE0 || mode == GBA_MODE2)
-					if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE0 || submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x08)))
-					{
-						back = line3[x];
-						top2 = 0x08;
-					}
+				if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
+				{
+					back = line3[x];
+					top2 = 0x08;
+				}
 				
 				if (top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 					color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
@@ -223,7 +248,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 				}
 			}
 		}
-		else if (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x20))
+		else if (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && masks[x] & 0x20))
 		{
 			if (top & m_BLDCNT)
 			{
@@ -236,55 +261,50 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 						UINT32 back = backdrop;
 						UINT8 top2 = 0x20;
 						
-						if (mode == GBA_MODE0 || mode == GBA_MODE1)
-							if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x01)))
+						if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
+						{
+							if (top != 0x01)
 							{
-								if (top != 0x01)
-								{
-									back = line0[x];
-									top2 = 0x01;
-								}
+								back = line0[x];
+								top2 = 0x01;
 							}
+						}
 						
-						if (mode == GBA_MODE0 || mode == GBA_MODE1)
-							if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x02)))
+						if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
+						{
+							if (top != 0x02)
 							{
-								if (top != 0x02)
-								{
-									back = line1[x];
-									top2 = 0x02;
-								}
+								back = line1[x];
+								top2 = 0x02;
 							}
+						}
 						
-						if (mode == GBA_MODE0 || mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-							if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x04)))
+						if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
+						{
+							if (top != 0x04)
 							{
-								if (top != 0x04)
-								{
-									back = line2[x];
-									top2 = 0x04;
-								}
+								back = line2[x];
+								top2 = 0x04;
 							}
+						}
 						
-						if (mode == GBA_MODE0 || mode == GBA_MODE2)
-							if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x08)))
+						if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
+						{
+							if (top != 0x08)
 							{
-								if (top != 0x08)
-								{
-									back = line3[x];
-									top2 = 0x08;
-								}
+								back = line3[x];
+								top2 = 0x08;
 							}
+						}
 						
-						if (mode == GBA_MODE0 || mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
-							if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(back >> 24) && (submode == GBA_SUBMODE1 || (submode == GBA_SUBMODE2 && mask & 0x10)))
+						if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x10)
+						{
+							if (top != 0x10)
 							{
-								if (top != 0x10)
-								{
-									back = lineOBJ[x];
-									top2 = 0x10;
-								}
+								back = lineOBJ[x];
+								top2 = 0x10;
 							}
+						}
 						
 						if (top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 							color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
@@ -1852,13 +1872,13 @@ void gba_state::draw_scanline(int y)
 		case 3:
 		case 4:
 		case 5:
-			draw_modes( m_DISPCNT & 7, submode, y, &m_xferscan[0][1024], &m_xferscan[1][1024], &m_xferscan[2][1024], &m_xferscan[3][1024], &m_xferscan[4][1024], &m_xferscan[5][1024], &m_xferscan[6][1024], depth);
+			draw_modes(m_DISPCNT & 7, submode, y, &m_xferscan[0][1024], &m_xferscan[1][1024], &m_xferscan[2][1024], &m_xferscan[3][1024], &m_xferscan[4][1024], &m_xferscan[5][1024], &m_xferscan[6][1024], depth);
 			break;
 		default:
-			fatalerror( "Invalid screen mode (6 or 7)!\n" );
+			fatalerror("Invalid screen mode (6 or 7)!\n");
 			break;
 	}
-
+	
 	for (int x = 0; x < 240; x++)
 	{
 		scanline[x] = m_xferscan[6][1024 + x] & 0x7fff;
