@@ -2193,11 +2193,6 @@ $(MESS_MACHINE)/snescx4.o: $(MESSSRC)/machine/cx4ops.c \
 				$(MESSSRC)/machine/cx4fn.c \
 				$(MESSSRC)/machine/cx4data.c \
 
-$(MESS_VIDEO)/gba.o:        $(MESSSRC)/video/gbamode0.c \
-				$(MESSSRC)/video/gbamode1.c \
-				$(MESSSRC)/video/gbamode2.c \
-				$(MESSSRC)/video/gbam345.c
-
 $(MESS_MACHINE)/nes_slot.o:  $(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_pcb.c \
 				$(MESSSRC)/machine/nes_unif.c \
