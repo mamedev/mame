@@ -17,6 +17,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	required_shared_ptr<UINT8> m_spriteram;
+	required_device<cpu_device> m_maincpu;
+
+	DECLARE_DRIVER_INIT(musicbal);
+
 	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);
 	DECLARE_WRITE8_MEMBER(speedbal_foreground_videoram_w);
 	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
@@ -36,5 +40,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_speedbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+
+	
 };

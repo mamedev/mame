@@ -1,15 +1,15 @@
 /***************************************************************************
 
- Speed Ball
+ Speed Ball / Music Ball
 
  this was available in a number of cabinet types including 'Super Pin-Ball'
  which mimicked a Pinball table in design, complete with 7-seg scoreboard.
 
- not dumped yet: Music Ball (also likely encrypted, has epoxy block)
-
  todo:
+ decrypt Music Ball
  hookup 7-segs used by Super Pinball cabinet type
  verify clock speeds etc.
+
 
 Speed Ball map
 
@@ -355,4 +355,62 @@ ROM_START( speedbal )
 ROM_END
 
 
-GAMEL( 1987, speedbal, 0, speedbal, speedbal, driver_device, 0, ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )
+ROM_START( musicbal )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main - encrypted */
+	ROM_LOAD( "01.bin",  0x0000,  0x8000, CRC(412298a2) SHA1(3c3247b466880cd78dd7f7f73911f475352c15df) )
+	ROM_LOAD( "03.bin",  0x8000,  0x8000, CRC(fdf14446) SHA1(9e52810ebc2b18d83f349fb78884b3c380d93903) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
+	ROM_LOAD( "02.bin",  0x0000, 0x8000, CRC(b7d3840d) SHA1(825289c3ca51284a47cfc4937a18d098183c396a) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD("10.bin",  0x00000, 0x08000, CRC(5afd3c42) SHA1(5b9a44ef03e5519c9601bb636eb26768cf800278) )    /* chars */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "09.bin",  0x00000, 0x08000, CRC(dcde4233) SHA1(99f204ddc97ee45330ea3cb0bc2971cd95f8e1ac) )    /* bg tiles */
+	ROM_LOAD( "05.bin",  0x08000, 0x08000, CRC(e1eec437) SHA1(ce77f3bb01db80ec69da9639d193d8656f9c6692) )
+	ROM_LOAD( "08.bin",  0x10000, 0x08000, CRC(7e7af52b) SHA1(3bb1c5abfb1fe53f01520e93124708df6750d8b5) )
+	ROM_LOAD( "04.bin",  0x18000, 0x08000, CRC(bf931a33) SHA1(b2ab5c6103af0e0508f08fd58b425e5acfe9ef8a) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT ) // still contain Speed Ball logos!
+	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )   /* sprites */
+	ROM_LOAD( "06.bin",  0x08000, 0x08000, CRC(2e7772f8) SHA1(caded1a72356501282e627e23718c30cb8f09370) )
+ROM_END
+
+DRIVER_INIT_MEMBER(speedbal_state,musicbal)
+{
+	UINT8* rom = memregion("maincpu")->base();
+
+	// significant blocks of text etc. should be the same as speedbal
+
+	for (int i=0;i<0x8000;i++)
+	{
+		rom[i] = rom[i] ^ 0x84;
+		// some bits are ^ 0x05
+	
+
+		if (i&0x0020) { rom[i] = BITSWAP8(rom[i],2,6,5,4,3,7,0,1); }
+		else          { rom[i] = BITSWAP8(rom[i],7,6,5,4,3,0,2,1); }
+
+	}
+
+#if 0
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(rom, 0x8000, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
+
+}
+
+
+
+GAMEL( 1987, speedbal, 0,        speedbal, speedbal, driver_device,  0,        ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )
+GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / DESystem S.A.", "Music Ball", GAME_NOT_WORKING, layout_speedbal )
