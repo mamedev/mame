@@ -806,6 +806,13 @@ static INPUT_PORTS_START( ebases )
 
 	PORT_START("TRACKY2")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+
+	PORT_START("FAKE")
+	/* Cocktail cabinets had a B/W monitor and color overlay (same one as Space Zap!),
+	   upright cabinets had a color monitor and baseball stadium background. */
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
+	PORT_CONFSETTING(    0x00, "B/W" )
+	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
 
 
@@ -1718,7 +1725,7 @@ DRIVER_INIT_MEMBER(astrocde_state,seawolf2)
 
 DRIVER_INIT_MEMBER(astrocde_state,ebases)
 {
-	m_video_config = AC_SOUND_PRESENT;
+	m_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_coin_w),this));
 	m_maincpu->space(AS_IO).install_write_handler(0x28, 0x28, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_trackball_select_w),this));
 }
@@ -1817,7 +1824,7 @@ DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
 GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_seawolf2 )
 
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
-GAME( 1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", GAME_SUPPORTS_SAVE )
+GAMEL(1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", GAME_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
 GAMEL(1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE, layout_spacezap )
