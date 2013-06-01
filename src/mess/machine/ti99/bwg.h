@@ -14,6 +14,7 @@
 
 #include "ti99defs.h"
 #include "imagedev/flopdrv.h"
+#include "machine/mm58274c.h"
 
 extern const device_type TI99_BWG;
 
@@ -79,7 +80,7 @@ private:
 	device_t*       m_controller;
 
 	// Link to the real-time clock on the board.
-	device_t*       m_clock;
+	required_device<mm58274c_device> m_clock;
 
 	// count 4.23s from rising edge of motor_on
 	emu_timer*      m_motor_on_timer;

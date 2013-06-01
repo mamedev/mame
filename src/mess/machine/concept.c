@@ -59,8 +59,6 @@ void concept_state::machine_start()
 	m_KeyQueueHead = m_KeyQueueLen = 0;
 	memset(m_KeyStateSave, 0, sizeof(m_KeyStateSave));
 	
-	m_mm58274 = machine().device("mm58274c");
-
 	m_exp[0] = machine().device<concept_exp_port_device>("exp1");
 	m_exp[1] = machine().device<concept_exp_port_device>("exp2");
 	m_exp[2] = machine().device<concept_exp_port_device>("exp3");
@@ -280,7 +278,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return mm58274c_r(m_mm58274, space, m_clock_address);
+			return m_mm58274->read(space, m_clock_address);
 		break;
 
 	case 7:
@@ -405,7 +403,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			mm58274c_w(m_mm58274, space, m_clock_address, data & 0xf);
+			m_mm58274->write(space, m_clock_address, data & 0xf);
 		break;
 
 	case 7:

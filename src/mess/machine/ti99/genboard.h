@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "ti99defs.h"
+#include "machine/mm58274c.h"
 #include "video/v9938.h"
 
 extern const device_type GENEVE_MOUSE;
@@ -180,7 +181,7 @@ private:
 	int   m_waitcount;
 
 	// Devices
-	device_t*               m_clock;
+	mm58274c_device*        m_clock;
 	geneve_keyboard_device* m_keyboard;
 	bus8z_device*           m_video;
 	bus8z_device*           m_peribox;

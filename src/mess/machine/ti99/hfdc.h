@@ -17,6 +17,7 @@
 #include "ti99defs.h"
 #include "ti99_hd.h"
 #include "machine/smc92x4.h"
+#include "machine/mm58274c.h"
 
 #define HFDC_MAX_FLOPPY 4
 #define HFDC_MAX_HARD 4
@@ -70,10 +71,10 @@ private:
 
 	// Link to the HDC9234 controller on the board. In fact, the proper name
 	// is HDC 9234, the manufacturer is Standard Microsystems Corp.
-	smc92x4_device* m_hdc9234;
+	required_device<smc92x4_device> m_hdc9234;
 
 	/* Link to the clock chip on the board. */
-	device_t*       m_clock;
+	required_device<mm58274c_device> m_clock;
 
 	/* Determines whether we have access to the CRU bits. */
 	bool            m_cru_select;

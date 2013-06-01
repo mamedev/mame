@@ -35,14 +35,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_acia0(*this, ACIA_0_TAG),
 		m_acia1(*this, ACIA_1_TAG),
+		m_mm58274(*this,"mm58274c"),
 		m_videoram(*this,"videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
+	required_device<mm58274c_device> m_mm58274;
 	required_shared_ptr<UINT16> m_videoram;
 
-	device_t *m_mm58274;
 	concept_exp_port_device *m_exp[4];
 	ioport_port *m_key[6];
 

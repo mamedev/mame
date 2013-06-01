@@ -17,7 +17,6 @@
 
 #include "hfdc.h"
 #include "imagedev/flopdrv.h"
-#include "machine/mm58274c.h"
 #include "formats/ti99_dsk.h"       // Format
 
 #define BUFFER "ram"
@@ -39,7 +38,9 @@
 #define LOG logerror
 
 myarc_hfdc_device::myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__)
+	: ti_expansion_card_device(mconfig, TI99_HFDC, "Myarc Hard and Floppy Disk Controller", tag, owner, clock, "ti99_hfdc", __FILE__),
+		m_hdc9234(*this, FDC_TAG),
+		m_clock(*this, CLOCK_TAG)
 {
 }
 
@@ -85,7 +86,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 				if ((offset & 0x1fe1)==CLK_ADDR)
 				{
-					*value = mm58274c_r(m_clock, space, (offset & 0x001e) >> 1);
+					*value = m_clock->read(space, (offset & 0x001e) >> 1);
 					if (VERBOSE>7) LOG("hfdc: read from clock address %04x: %02x\n", offset & 0xffff, *value);
 					return;
 				}
@@ -139,7 +140,7 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if ((offset & 0x1fe1)==CLK_ADDR)
 		{
 			if (VERBOSE>7) LOG("hfdc: write to clock address %04x: %02x\n", offset & 0xffff, data);
-			mm58274c_w(m_clock, space, (offset & 0x001e) >> 1, data);
+			m_clock->write(space, (offset & 0x001e) >> 1, data);
 			return;
 		}
 
@@ -495,8 +496,6 @@ INPUT_PORTS_END
 void myarc_hfdc_device::device_start()
 {
 	if (VERBOSE>5) LOG("hfdc: start\n");
-	m_hdc9234 = static_cast<smc92x4_device *>(subdevice(FDC_TAG));
-	m_clock = subdevice(CLOCK_TAG);
 	m_dsrrom = memregion(DSRROM)->base();
 	m_buffer_ram = memregion(BUFFER)->base();
 

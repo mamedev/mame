@@ -33,7 +33,6 @@
 #include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/mm58274c.h"
 
 #define LOG logerror
 #define VERBOSE 1
@@ -45,7 +44,8 @@
 #define BUFFER "ram"
 
 snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__)
+			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__),
+				m_clock(*this, CLOCK_TAG)
 {
 }
 
@@ -131,7 +131,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 					if ((offset & 0x03e1)==0x03e0)
 					{
 						// .... ..11 111x xxx0
-						*value = mm58274c_r(m_clock, space, (offset & 0x001e) >> 1);
+						*value = m_clock->read(space, (offset & 0x001e) >> 1);
 					}
 					else
 					{
@@ -210,7 +210,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 					if ((offset & 0x03e1)==0x03e0)
 					{
 						// .... ..11 111x xxx0
-						mm58274c_w(m_clock, space, (offset & 0x001e) >> 1, data);
+						m_clock->write(space, (offset & 0x001e) >> 1, data);
 					}
 					else
 					{
@@ -386,7 +386,6 @@ void snug_bwg_device::device_start(void)
 	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_controller = subdevice(FDC_TAG);
-	m_clock = subdevice(CLOCK_TAG);
 	m_cru_base = 0x1100;
 }
 
