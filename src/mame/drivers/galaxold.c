@@ -649,6 +649,33 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+
+	AM_RANGE(0x4800, 0x4bff) AM_RAM // mirror, leftovers?
+
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
+
+	AM_RANGE(0x5880, 0x58ff) AM_RAM
+	AM_RANGE(0x5800, 0x583f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
+	AM_RANGE(0x5840, 0x585f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x5860, 0x587f) AM_RAM AM_SHARE("bulletsram")
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")
+
+//	AM_RANGE(0x6000, 0x6002) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
+//	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_noise_enable_w) // should this disable the stars too?
+//	AM_RANGE(0x6005, 0x6005) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)
+//	AM_RANGE(0x6006, 0x6007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
+
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2")
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(galaxold_nmi_enable_w)
+
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")    /* banked game code */
@@ -2252,6 +2279,21 @@ static MACHINE_CONFIG_DERIVED( scrambler, galaxian )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,scrambold)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( guttang, galaxian )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(guttang_map)
+
+	/* video hardware */
+	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
+
+//	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
+MACHINE_CONFIG_END
+
+
+
 static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
 
 	/* basic machine hardware */
@@ -3144,6 +3186,28 @@ ROM_START( trvchlng )
 ROM_END
 
 
+// PCB made by Recreativos Franco
+ROM_START( guttangt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gg1-2716.rom",           0x0000, 0x0800, CRC(7f338d91) SHA1(d203f229f4f5934467b80ed0f2208e5551aaa383) )
+	ROM_LOAD( "gg2-2758.rom",           0x0800, 0x0800, CRC(ecdbb62b) SHA1(c2eb0316ab789a69b74aeec25e5c690b4334c7c2) )
+	ROM_LOAD( "gg3-2716.rom",           0x1000, 0x0800, CRC(38d71df3) SHA1(f1771256b52ba1bfc1bd472f8a78d6302a7b1299) )
+	ROM_LOAD( "gg4-2716.rom",           0x1800, 0x0800, CRC(7623125a) SHA1(3f3abb9c66751908918fa52e22e153da5fdc0902) )
+	ROM_LOAD( "gg5-2732.rom",           0x2000, 0x0800, CRC(1fe33f92) SHA1(d3e00459015b8bf43fe2e8f6cb57cef775bbb330) )
+	ROM_CONTINUE(0x4000,0x800) // is this important?
+	ROM_LOAD( "gg6-2716.rom",           0x2800, 0x0800, CRC(60606cd5) SHA1(9a4bf0134c7fa66d2ecd3a745421091b0a086572) )
+	ROM_LOAD( "gg7-2516.rom",           0x3000, 0x0800, CRC(ce0d0a93) SHA1(339bd9c6c40eb2501d1a1adcea0cfa82e3224967) )
+	ROM_LOAD( "gg8-2716.rom",           0x3800, 0x0800, CRC(b8716081) SHA1(e2d1db27ad44876b891cc0a2232ac887bcc5516f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "gg9-2732.rom",           0x0000, 0x1000, CRC(be6bf522) SHA1(23a09409b7de4bfdb970e4ff23d89a2439a0aee5) )
+	ROM_LOAD( "gg10-2732.rom",          0x1000, 0x1000, CRC(b04c34c5) SHA1(a37db70ce67d64daa5f0c41cce1136d1c9d8c175) )
+	
+	ROM_REGION( 0x0020, "proms", 0 ) // no PROM was present..
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+
 /*
 Bulls Eye Darts conversion by Senko Industries Ltd (1984)
 
@@ -3209,6 +3273,7 @@ GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        RO
 GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, vstars,   0,        mooncrst, porter,   driver_device,  0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
+GAME( 1982, guttangt, locomotn, guttang,  scrambler,driver_device,  0,        ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak, hunchbkg, hunchbkg, driver_device,  0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
