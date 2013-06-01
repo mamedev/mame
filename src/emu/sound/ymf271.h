@@ -40,7 +40,8 @@ protected:
 private:
 	struct YMF271Slot
 	{
-		INT8  extout;
+		INT8  ext_en;
+		INT8  ext_out;
 		UINT8 lfoFreq;
 		INT8  lfowave;
 		INT8  pms, ams;

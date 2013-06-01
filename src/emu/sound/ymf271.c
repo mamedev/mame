@@ -1004,7 +1004,8 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 	{
 		case 0:
 		{
-			slot->extout = (data>>3)&0xf;
+			slot->ext_en = (data & 0x80) ? 1 : 0;
+			slot->ext_out = (data>>3)&0xf;
 
 			if (data & 1)
 			{
@@ -1024,7 +1025,6 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 			{
 				if (slot->active)
 				{
-					//slot->active = 0;
 					slot->env_state = ENV_RELEASE;
 				}
 			}
@@ -1088,8 +1088,6 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 		{
 			slot->fns &= ~0xff;
 			slot->fns |= data;
-
-			calculate_step(slot);
 			break;
 		}
 
@@ -1445,6 +1443,8 @@ void ymf271_device::ymf271_write_timer(int data)
 
 WRITE8_MEMBER( ymf271_device::write )
 {
+	m_stream->update();
+
 	switch (offset)
 	{
 		case 0:
@@ -1596,7 +1596,8 @@ void ymf271_device::init_state()
 
 	for (i = 0; i < ARRAY_LENGTH(m_slots); i++)
 	{
-		save_item(NAME(m_slots[i].extout), i);
+		save_item(NAME(m_slots[i].ext_en), i);
+		save_item(NAME(m_slots[i].ext_out), i);
 		save_item(NAME(m_slots[i].lfoFreq), i);
 		save_item(NAME(m_slots[i].pms), i);
 		save_item(NAME(m_slots[i].ams), i);
