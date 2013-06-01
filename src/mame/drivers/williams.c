@@ -1959,11 +1959,27 @@ ROM_START( maydayb )
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic28-8.bin",  0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 
-	ROM_REGION( 0x2000, "user1", 0 )
-	ROM_LOAD( "rom11.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) )
-	ROM_LOAD( "rom12.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) )
+	ROM_REGION( 0x2000, "user1", 0 ) // what are these? alt (bad?) roms?
+	ROM_LOAD( "rom11.bin",   0x0000, 0x0800, CRC(7e113979) SHA1(ac908afb6aa756fc4db1ffddbd3688aa07080693) ) // 11xxxxxxxxx = 0x00
+	ROM_LOAD( "rom12.bin",   0x0800, 0x0800, CRC(a562c506) SHA1(a0bae41732f05caa80b9c13fba6ae4f01647e680) ) // 11xxxxxxxxx = 0x00
 	ROM_LOAD( "rom6a.bin",   0x1000, 0x0800, CRC(8e4e981f) SHA1(685c1fca9373f4129c7c6b86f18900a1bd324019) )
-	ROM_LOAD( "rom8-sos.bin",0x1800, 0x0800, CRC(6a9b383f) SHA1(10e71a3bb9492b6c34ff06760dd55c442611ca75) )
+	ROM_LOAD( "rom8-sos.bin",0x1800, 0x0800, CRC(6a9b383f) SHA1(10e71a3bb9492b6c34ff06760dd55c442611ca75) ) // FIXED BITS (xxxxxx1x)
+ROM_END
+
+
+
+ROM_START( batlzone )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "43-2732.rom.bin",  0x0d000, 0x1000, CRC(244334f8) SHA1(ac625a1858c372db6a748ef8aa504569aef6cad7) )
+	ROM_LOAD( "42-2732.rom.bin",  0x0e000, 0x1000, CRC(62183aea) SHA1(3843fe055ab6d3bb5a3362f57a63ce99e36cec47) )
+	ROM_LOAD( "41-2732.rom.bin",  0x0f000, 0x1000, CRC(a7e9093e) SHA1(d9d9641c9f8c060b2fa227b0620454067d0b0acc) )
+	ROM_LOAD( "44-8532.rom.bin",  0x10000, 0x1000, CRC(bba3e626) SHA1(f2a364a25ee0cf91e25f8a20173bd9fb56cc2a72) )
+	ROM_LOAD( "45-8532.rom.bin",  0x11000, 0x1000, CRC(43b3a0de) SHA1(674ff7110d07aeb09889eddb0d3dd0e7b16fe979) )
+	ROM_LOAD( "46-8532.rom.bin",  0x12000, 0x1000, CRC(3df9b901) SHA1(6b2be3292b60e197154688ffd40789e937e17b4c) )
+	ROM_LOAD( "47-8532.rom.bin",  0x16000, 0x1000, CRC(55a27e02) SHA1(23064ba59caed9b21e4ef6b944313e5bd2809dc5) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "48-2716.rom.bin",  0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
 ROM_END
 
 
@@ -2937,6 +2953,7 @@ GAME( 1981, startrkd,   defender, defender,            defender, williams_state,
 GAME( 1980, mayday,     0,        defender,            mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", GAME_SUPPORTS_SAVE ) // original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,            mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, maydayb,    mayday,   defender,            mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, batlzone,   mayday,   defender,            mayday, williams_state,   mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", GAME_SUPPORTS_SAVE )
 GAME( 1981, colony7,    0,        defender,            colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, colony7a,   colony7,  defender,            colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jin,        0,        jin,                 jin, williams_state,      defender, ROT90,  "Falcon", "Jin", GAME_SUPPORTS_SAVE )
