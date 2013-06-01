@@ -148,62 +148,54 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #define GP9001_PRIMASK (0x000e)
 
 
-static WRITE16_DEVICE_HANDLER( gp9001_bg_tmap_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_bg_tmap_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->bg.vram16[offset]);
-	vdp->bg.tmap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&bg.vram16[offset]);
+	bg.tmap->mark_tile_dirty(offset/2);
 }
 
-static WRITE16_DEVICE_HANDLER( gp9001_fg_tmap_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_fg_tmap_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->fg.vram16[offset]);
-	vdp->fg.tmap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&fg.vram16[offset]);
+	fg.tmap->mark_tile_dirty(offset/2);
 }
 
-static WRITE16_DEVICE_HANDLER( gp9001_top_tmap_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_top_tmap_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->top.vram16[offset]);
-	vdp->top.tmap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&top.vram16[offset]);
+	top.tmap->mark_tile_dirty(offset/2);
 }
 
-static READ16_DEVICE_HANDLER( gp9001_bg_tmap_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_bg_tmap_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->bg.vram16[offset];
+	return bg.vram16[offset];
 }
 
-static READ16_DEVICE_HANDLER( gp9001_fg_tmap_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_fg_tmap_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->fg.vram16[offset];
+	return fg.vram16[offset];
 }
 
-static READ16_DEVICE_HANDLER( gp9001_top_tmap_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_top_tmap_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->top.vram16[offset];
+	return top.vram16[offset];
 }
 
-static READ16_DEVICE_HANDLER( gp9001_spram_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_spram_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	return vdp->sp.vram16[offset];
+	return sp.vram16[offset];
 }
 
-static WRITE16_DEVICE_HANDLER( gp9001_spram_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_spram_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	COMBINE_DATA(&vdp->sp.vram16[offset]);
+	COMBINE_DATA(&sp.vram16[offset]);
 }
 
 static ADDRESS_MAP_START( gp9001vdp_map, AS_0, 16, gp9001vdp_device )
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_bg_tmap_r, gp9001_bg_tmap_w)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_fg_tmap_r, gp9001_fg_tmap_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_top_tmap_r, gp9001_top_tmap_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_spram_r, gp9001_spram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(gp9001_bg_tmap_r, gp9001_bg_tmap_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(gp9001_fg_tmap_r, gp9001_fg_tmap_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(gp9001_top_tmap_r, gp9001_top_tmap_w)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(gp9001_spram_r, gp9001_spram_w)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
 
@@ -391,65 +383,43 @@ void gp9001vdp_device::device_reset()
 }
 
 
-static void gp9001_voffs_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_voffs_w(offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	COMBINE_DATA(&vdp->gp9001_voffs);
+	COMBINE_DATA(&gp9001_voffs);
 }
 
-static int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
+int gp9001vdp_device::gp9001_videoram16_r(offs_t offset)
 {
-	int offs = vdp->gp9001_voffs;
-	vdp->gp9001_voffs++;
-	return vdp->space().read_word(offs*2);
-}
-
-
-static void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
-{
-	int offs = vdp->gp9001_voffs;
-	vdp->gp9001_voffs++;
-	vdp->space().write_word(offs*2, data, mem_mask);
-}
-
-static WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
-{
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-
-	gp9001_voffs_w(vdp, offset, data, mem_mask);
+	int offs = gp9001_voffs;
+	gp9001_voffs++;
+	return space().read_word(offs*2);
 }
 
 
-static READ16_DEVICE_HANDLER( gp9001_devvideoram16_r )
+void gp9001vdp_device::gp9001_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-	return gp9001_videoram16_r(vdp, offset);
-}
-
-static WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
-{
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-	gp9001_videoram16_w(vdp, offset, data, mem_mask);
+	int offs = gp9001_voffs;
+	gp9001_voffs++;
+	space().write_word(offs*2, data, mem_mask);
 }
 
 
-static READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
+UINT16 gp9001vdp_device::gp9001_vdpstatus_r()
 {
-	return ((space.machine().primary_screen->vpos() + 15) % 262) >= 245;
+	return ((machine().primary_screen->vpos() + 15) % 262) >= 245;
 }
 
-static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
+void gp9001vdp_device::gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-
 	if (ACCESSING_BITS_0_7)
 	{
-		vdp->gp9001_scroll_reg = data & 0x8f;
+		gp9001_scroll_reg = data & 0x8f;
 		if (data & 0x70)
-			logerror("Hmmm, selecting unknown LSB video control register (%04x)  Video controller %01x  \n",vdp->gp9001_scroll_reg,vdp->tile_region>>1);
+			logerror("Hmmm, selecting unknown LSB video control register (%04x)  Video controller %01x  \n",gp9001_scroll_reg,tile_region>>1);
 	}
 	else
 	{
-		logerror("Hmmm, selecting unknown MSB video control register (%04x)  Video controller %01x  \n",vdp->gp9001_scroll_reg,vdp->tile_region>>1);
+		logerror("Hmmm, selecting unknown MSB video control register (%04x)  Video controller %01x  \n",gp9001_scroll_reg,tile_region>>1);
 	}
 }
 
@@ -530,7 +500,7 @@ static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, UIN
 	}
 }
 
-static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independently, so emulate it ******/
@@ -539,21 +509,21 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 	//printf("gp9001_scroll_reg_data_w %04x %04x\n", offset, data);
 
 	// writes with 8x set turn on flip for the specified layer / axis
-	int flip = vdp->gp9001_scroll_reg & 0x80;
+	int flip = gp9001_scroll_reg & 0x80;
 
-	switch(vdp->gp9001_scroll_reg&0x7f)
+	switch(gp9001_scroll_reg&0x7f)
 	{
-		case 0x00: gp9001_set_scrollx_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;
-		case 0x01: gp9001_set_scrolly_and_flip_reg(&vdp->bg, data, mem_mask, flip); break;
+		case 0x00: gp9001_set_scrollx_and_flip_reg(&bg, data, mem_mask, flip); break;
+		case 0x01: gp9001_set_scrolly_and_flip_reg(&bg, data, mem_mask, flip); break;
 
-		case 0x02: gp9001_set_scrollx_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;
-		case 0x03: gp9001_set_scrolly_and_flip_reg(&vdp->fg, data, mem_mask, flip); break;
+		case 0x02: gp9001_set_scrollx_and_flip_reg(&fg, data, mem_mask, flip); break;
+		case 0x03: gp9001_set_scrolly_and_flip_reg(&fg, data, mem_mask, flip); break;
 
-		case 0x04: gp9001_set_scrollx_and_flip_reg(&vdp->top,data, mem_mask, flip); break;
-		case 0x05: gp9001_set_scrolly_and_flip_reg(&vdp->top,data, mem_mask, flip); break;
+		case 0x04: gp9001_set_scrollx_and_flip_reg(&top,data, mem_mask, flip); break;
+		case 0x05: gp9001_set_scrolly_and_flip_reg(&top,data, mem_mask, flip); break;
 
-		case 0x06: gp9001_set_sprite_scrollx_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
-		case 0x07: gp9001_set_sprite_scrolly_and_flip_reg(&vdp->sp, data,mem_mask,flip); break;
+		case 0x06: gp9001_set_sprite_scrollx_and_flip_reg(&sp, data,mem_mask,flip); break;
+		case 0x07: gp9001_set_sprite_scrolly_and_flip_reg(&sp, data,mem_mask,flip); break;
 
 
 		case 0x0e:  /******* Initialise video controller register ? *******/
@@ -561,7 +531,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 		case 0x0f:  break;
 
 
-		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,vdp->gp9001_scroll_reg,vdp->tile_region>>1);
+		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x)  Video controller %01x  !!!\n",data ,gp9001_scroll_reg,tile_region>>1);
 					break;
 	}
 }
@@ -579,24 +549,17 @@ void gp9001vdp_device::init_scroll_regs()
 }
 
 
-static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
-{
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-	gp9001_scroll_reg_data_w(vdp, offset, data, mem_mask);
-}
 
-
-
-READ16_DEVICE_HANDLER( gp9001_vdp_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_vdp_r )
 {
 	switch (offset)
 	{
 		case 0x04/2:
 		case 0x06/2:
-			return gp9001_devvideoram16_r(device, space, offset-0x04/2, mem_mask);
+			return gp9001_videoram16_r(offset-0x04/2);
 
 		case 0x0c/2:
-			return gp9001_vdpstatus_r(device, space, offset-0x0c/2, mem_mask);
+			return gp9001_vdpstatus_r();
 
 		default:
 			logerror("gp9001_vdp_r: read from unhandled offset %04x\n",offset*2);
@@ -605,25 +568,25 @@ READ16_DEVICE_HANDLER( gp9001_vdp_r )
 	return 0xffff;
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_vdp_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_w )
 {
 	switch (offset)
 	{
 		case 0x00/2:
-			gp9001_devvoffs_w(device, space, offset-0x00/2, data, mem_mask);
+			gp9001_voffs_w(offset-0x00/2, data, mem_mask);
 			break;
 
 		case 0x04/2:
 		case 0x06/2:
-			gp9001_devvideoram16_w(device, space, offset-0x04/2, data, mem_mask);
+			gp9001_videoram16_w(offset-0x04/2, data, mem_mask);
 			break;
 
 		case 0x08/2:
-			gp9001_scroll_reg_select_w(device, space, offset-0x08/2, data, mem_mask);
+			gp9001_scroll_reg_select_w(offset-0x08/2, data, mem_mask);
 			break;
 
 		case 0x0c/2:
-			gp9001_scroll_reg_devvdata_w(device, space, offset-0x0c/2, data, mem_mask);
+			gp9001_scroll_reg_data_w(offset-0x0c/2, data, mem_mask);
 			break;
 
 		default:
@@ -633,16 +596,16 @@ WRITE16_DEVICE_HANDLER( gp9001_vdp_w )
 }
 
 /* some raizing games have a different layout */
-READ16_DEVICE_HANDLER( gp9001_vdp_alt_r )
+READ16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_r )
 {
 	switch (offset)
 	{
 		case 0x00/2:
-			return gp9001_vdpstatus_r(device, space, offset-0x0c/2, mem_mask);
+			return gp9001_vdpstatus_r();
 
 		case 0x08/2:
 		case 0x0a/2:
-			return gp9001_devvideoram16_r(device, space, offset-0x04/2, mem_mask);
+			return gp9001_videoram16_r(offset-0x04/2);
 
 
 		default:
@@ -652,25 +615,25 @@ READ16_DEVICE_HANDLER( gp9001_vdp_alt_r )
 	return 0xffff;
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_vdp_alt_w )
+WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_w )
 {
 	switch (offset)
 	{
 		case 0x00/2:
-			gp9001_scroll_reg_devvdata_w(device, space, offset-0x0c/2, data, mem_mask);
+			gp9001_scroll_reg_data_w(offset-0x0c/2, data, mem_mask);
 			break;
 
 		case 0x04/2:
-			gp9001_scroll_reg_select_w(device, space, offset-0x08/2, data, mem_mask);
+			gp9001_scroll_reg_select_w(offset-0x08/2, data, mem_mask);
 			break;
 
 		case 0x08/2:
 		case 0x0a/2:
-			gp9001_devvideoram16_w(device, space, offset-0x04/2, data, mem_mask);
+			gp9001_videoram16_w(offset-0x04/2, data, mem_mask);
 			break;
 
 		case 0x0c/2:
-			gp9001_devvoffs_w(device, space, offset-0x00/2, data, mem_mask);
+			gp9001_voffs_w(offset-0x00/2, data, mem_mask);
 			break;
 
 		default:
@@ -684,10 +647,8 @@ WRITE16_DEVICE_HANDLER( gp9001_vdp_alt_w )
 /***************************************************************************/
 /**************** PIPIBIBI bootleg interface into this video driver ********/
 
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w )
+WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_scroll_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 	{
 		switch(offset)
@@ -703,41 +664,33 @@ WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w )
 			default:    logerror("PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
 		}
 
-		vdp->gp9001_scroll_reg = offset;
-		gp9001_scroll_reg_data_w(vdp, offset, data, mem_mask);
+		gp9001_scroll_reg = offset;
+		gp9001_scroll_reg_data_w(offset, data, mem_mask);
 	}
 }
 
-READ16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_r )
+READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-
-	gp9001_voffs_w(vdp, 0, offset, 0xffff);
-	return gp9001_videoram16_r(vdp, 0);
+	gp9001_voffs_w(0, offset, 0xffff);
+	return gp9001_videoram16_r(0);
 }
 
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_w )
+WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-
-	gp9001_voffs_w(vdp, 0, offset, 0xffff);
-	gp9001_videoram16_w(vdp, 0, data, mem_mask);
+	gp9001_voffs_w(0, offset, 0xffff);
+	gp9001_videoram16_w(0, data, mem_mask);
 }
 
-READ16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_r )
+READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_r )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-
-	gp9001_voffs_w(vdp, 0, (0x1800 + offset), 0);
-	return gp9001_videoram16_r(vdp, 0);
+	gp9001_voffs_w(0, (0x1800 + offset), 0);
+	return gp9001_videoram16_r(0);
 }
 
-WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w )
+WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
 {
-	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
-
-	gp9001_voffs_w(vdp, 0, (0x1800 + offset), mem_mask);
-	gp9001_videoram16_w(vdp, 0, data, mem_mask);
+	gp9001_voffs_w(0, (0x1800 + offset), mem_mask);
+	gp9001_videoram16_w(0, data, mem_mask);
 }
 
 /***************************************************************************

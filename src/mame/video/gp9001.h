@@ -63,6 +63,29 @@ public:
 
 	bitmap_ind8 *custom_priority_bitmap;
 
+	// access to VDP
+	DECLARE_READ16_MEMBER( gp9001_vdp_r );
+	DECLARE_WRITE16_MEMBER( gp9001_vdp_w );
+	DECLARE_READ16_MEMBER( gp9001_vdp_alt_r );
+	DECLARE_WRITE16_MEMBER( gp9001_vdp_alt_w );
+
+	// this bootleg has strange access
+	DECLARE_READ16_MEMBER( pipibibi_bootleg_videoram16_r );
+	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_videoram16_w );
+	DECLARE_READ16_MEMBER( pipibibi_bootleg_spriteram16_r );
+	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_spriteram16_w );
+	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_scroll_w );
+
+	// internal handlers
+	DECLARE_WRITE16_MEMBER( gp9001_bg_tmap_w );
+	DECLARE_WRITE16_MEMBER( gp9001_fg_tmap_w );
+	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
+	DECLARE_READ16_MEMBER( gp9001_bg_tmap_r );
+	DECLARE_READ16_MEMBER( gp9001_fg_tmap_r );
+	DECLARE_READ16_MEMBER( gp9001_top_tmap_r );
+	DECLARE_READ16_MEMBER( gp9001_spram_r );
+	DECLARE_WRITE16_MEMBER( gp9001_spram_w );
+
 protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
@@ -76,6 +99,14 @@ protected:
 	TILE_GET_INFO_MEMBER(get_top0_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+
+private:
+	void gp9001_voffs_w(offs_t offset, UINT16 data, UINT16 mem_mask);
+	int gp9001_videoram16_r(offs_t offset);
+	void gp9001_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask);
+	UINT16 gp9001_vdpstatus_r();
+	void gp9001_scroll_reg_select_w( offs_t offset, UINT16 data, UINT16 mem_mask );
+	void gp9001_scroll_reg_data_w(offs_t offset, UINT16 data, UINT16 mem_mask);
 };
 
 extern const device_type GP9001_VDP;
@@ -97,15 +128,3 @@ extern const device_type GP9001_VDP;
 #define MCFG_DEVICE_ADD_VDP1 \
 	MCFG_DEVICE_ADD("gp9001vdp1", GP9001_VDP, 0) \
 	gp9001vdp_device::static_set_gfx_region(*device, 2);
-
-// access to VDP
-DECLARE_READ16_DEVICE_HANDLER( gp9001_vdp_r );
-DECLARE_WRITE16_DEVICE_HANDLER( gp9001_vdp_w );
-DECLARE_READ16_DEVICE_HANDLER( gp9001_vdp_alt_r );
-DECLARE_WRITE16_DEVICE_HANDLER( gp9001_vdp_alt_w );
-// this bootleg has strange access
-DECLARE_READ16_DEVICE_HANDLER ( pipibibi_bootleg_videoram16_r );
-DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_videoram16_w  );
-DECLARE_READ16_DEVICE_HANDLER ( pipibibi_bootleg_spriteram16_r );
-DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_spriteram16_w );
-DECLARE_WRITE16_DEVICE_HANDLER( pipibibi_bootleg_scroll_w );
