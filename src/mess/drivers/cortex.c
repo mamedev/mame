@@ -20,28 +20,32 @@
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
+#include "video/tms9928a.h"
 
 class cortex_state : public driver_device
 {
 public:
 	cortex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "ram")
+		{ }
 
 	virtual void machine_reset();
-	virtual void video_start();
-	UINT32 screen_update_cortex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_p_ram;
 };
 
 static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xf11f) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xf121, 0xf121) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0xfffa, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x10000, 0x10000) AM_NOP
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -51,15 +55,9 @@ INPUT_PORTS_END
 
 void cortex_state::machine_reset()
 {
-}
-
-void cortex_state::video_start()
-{
-}
-
-UINT32 cortex_state::screen_update_cortex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
+	UINT8* ROM = memregion("maincpu")->base();
+	memcpy(m_p_ram, ROM, 0x6000);
+	m_maincpu->reset();
 }
 
 static const struct tms9995reset_param cortex_processor_config =
@@ -69,6 +67,12 @@ static const struct tms9995reset_param cortex_processor_config =
 	0   /* no MP9537 mask */
 };
 
+static TMS9928A_INTERFACE(cortex_tms9929a_interface)
+{
+	"screen",   // screen tag
+	0x4000,     // vram size
+	DEVCB_NULL  // write line if int changes
+};
 
 static MACHINE_CONFIG_START( cortex, cortex_state )
 	/* basic machine hardware */
@@ -78,16 +82,10 @@ static MACHINE_CONFIG_START( cortex, cortex_state )
 	MCFG_CPU_PROGRAM_MAP(cortex_mem)
 	MCFG_CPU_IO_MAP(cortex_io)
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cortex_state, screen_update_cortex)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, cortex_tms9929a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
 /* ROM definition */
