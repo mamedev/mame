@@ -2657,6 +2657,7 @@ src/mame/audio/tx1.c svneol=native#text/plain
 src/mame/audio/vicdual.c svneol=native#text/plain
 src/mame/audio/videopin.c svneol=native#text/plain
 src/mame/audio/warpwarp.c svneol=native#text/plain
+src/mame/audio/warpwarp.h svneol=native#text/plain
 src/mame/audio/williams.c svneol=native#text/plain
 src/mame/audio/williams.h svneol=native#text/plain
 src/mame/audio/wiping.c svneol=native#text/plain
