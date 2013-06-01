@@ -354,6 +354,7 @@ ROM_START( speedbal )
 	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
 ROM_END
 
+//#define USE_DECRYPTION_HELPER
 
 ROM_START( musicbal )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main - encrypted */
@@ -375,7 +376,23 @@ ROM_START( musicbal )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT ) // still contain Speed Ball logos!
 	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )   /* sprites */
 	ROM_LOAD( "06.bin",  0x08000, 0x08000, CRC(2e7772f8) SHA1(caded1a72356501282e627e23718c30cb8f09370) )
+
+#ifdef USE_DECRYPTION_HELPER
+/* speed ball code for decryption comparison help */
+
+	ROM_REGION( 0x10000, "helper", 0 )
+	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
+	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
+#endif
+
 ROM_END
+
+
+#define MUSICBALL_XOR05  { rom[i] = rom[i] ^ 0x05; }
+#define MUSICBALL_XOR84  { rom[i] = rom[i] ^ 0x84; }
+#define MUSICBALL_SWAP1  { rom[i] = BITSWAP8(rom[i],2,6,5,4,3,7,0,1); }
+#define MUSICBALL_SWAP2  { rom[i] = BITSWAP8(rom[i],7,6,5,4,3,0,2,1); }
+// are bits 6,5,4,3 affected, or does this work on only the 4 bits?
 
 DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 {
@@ -385,16 +402,61 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 
 	for (int i=0;i<0x8000;i++)
 	{
-		rom[i] = rom[i] ^ 0x84;
+		
 		// some bits are ^ 0x05
-	
+		/*if ((i&0x30) == 0x00)
+		{
+			if ((( i & 0x0f ) > 0x08)  &&  (( i & 0x0f ) < 0x0f)) MUSICBALL_XOR05
+		}
+		*/
 
-		if (i&0x0020) { rom[i] = BITSWAP8(rom[i],2,6,5,4,3,7,0,1); }
-		else          { rom[i] = BITSWAP8(rom[i],7,6,5,4,3,0,2,1); }
+		if (i&0x0020) { MUSICBALL_XOR84   MUSICBALL_SWAP1 }
+		else
+		{
+			if (i&0x08) { MUSICBALL_XOR84  MUSICBALL_SWAP2 }
+			else { MUSICBALL_SWAP1 }
+		
+		}
+	}
+
+#ifdef USE_DECRYPTION_HELPER
+	UINT8* helper = memregion("helper")->base();
+
+	int speedball_position = 0x590c; // a block of text that should mostly match here (terminators seem to be changed 1F 60 <-> DD 52 tho)
+	int musicball_position = 0x6610; // it's mostly the pattern of where xor 0x05 gets applied we're interested in
+	int blocklength = 0x2e0; // there is a clear change in pattern  > 6800
+
+
+	if (helper)
+	{
+		int bytecount = 0;
+
+		for (int i=0;i<blocklength;i++)
+		{
+			UINT8 music = rom[musicball_position+i];
+			UINT8 speed = helper[speedball_position+i];
+
+			if (bytecount==0) printf("%04x:  ", musicball_position+i);
+
+			UINT8 display = music ^ speed;
+
+			// filter out the terminators
+			if (display == 0xc2) display = 0x00;
+			if (display == 0x32) display = 0x00;
+
+			if (display == 0xc7) display = 0x05;
+			if (display == 0x37) display = 0x05;
+
+			//printf("%02x-%02x, ", music, speed);
+			printf("%02x, ", display);
+
+			bytecount++;
+			if (bytecount==16) { bytecount = 0; printf("\n"); }
+
+		}
 
 	}
 
-#if 0
 	{
 		FILE *fp;
 		char filename[256];
