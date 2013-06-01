@@ -2110,8 +2110,8 @@ ROM_END
 
 ROM_START( j6dmnjkra )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "demonjok_77501.b8", 0x000000, 0x020000, CRC(8f2aa8a7) SHA1(ea5b8c1418deaaf2bda58a40cacca3c77d6d5a08) )
-	ROM_LOAD16_BYTE( "demonjok_73002.b8", 0x000001, 0x020000, CRC(2a7658ab) SHA1(4286a4a76b8d95a4da4e8aad2f81b091d2d2f96a) ) // aka demonjok_77502.b8
+	ROM_LOAD16_BYTE( "demonjok_77501.b8", 0x000000, 0x020000, CRC(8f2aa8a7) SHA1(ea5b8c1418deaaf2bda58a40cacca3c77d6d5a08) ) // j6reddmn
+	ROM_LOAD16_BYTE( "demonjok_73002.b8", 0x000001, 0x020000, CRC(2a7658ab) SHA1(4286a4a76b8d95a4da4e8aad2f81b091d2d2f96a) ) // j6reddmn - aka demonjok_77502.b8
 	j6dmnjkr_sound
 ROM_END
 

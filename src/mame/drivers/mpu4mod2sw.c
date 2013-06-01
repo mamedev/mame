@@ -1267,13 +1267,13 @@ ROM_END
 
 ROM_START( m4atlan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dat14.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) )
+	ROM_LOAD( "dat14.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4tridic
 ROM_END
 
 
 ROM_START( m4tridic )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) )
+	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) ) // == m4atlan
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "tdice.chr", 0x0000, 0x000048, CRC(6d28754a) SHA1(beb7724e9f621d315b2f16abfd3bbc6a99077a05) )

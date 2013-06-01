@@ -339,7 +339,7 @@ M4TRG_SET( 199?, m4trg__y,  m4trg,  "trgu1.1b",     0x0000, 0x020000, CRC(0f207e
 M4TRG_SET( 199?, m4trg__z,  m4trg,  "trgu1.2b",     0x0000, 0x020000, CRC(a718f459) SHA1(3f2e28c67d442be89fab3514f3397d58c0b54f3f), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 27)" )
 M4TRG_SET( 199?, m4trg__0,  m4trg,  "trglatv1.3s",  0x0000, 0x010000, CRC(03a6e6d0) SHA1(d73c921ee29054084ffe70ecd6f165f7930526cc), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 28)" )
 M4TRG_SET( 199?, m4trg__1,  m4trg,  "trglatv1.4s",  0x0000, 0x010000, CRC(61f97a62) SHA1(9b0b55d2c3a00d6095307480587b71ee12e03eb7), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 29)" )
-M4TRG_SET( 199?, m4trg__2,  m4trg,  "mbpl3.2c",     0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 30)" )
+M4TRG_SET( 199?, m4trg__2,  m4trg,  "mbpl3.2c",     0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 30)" ) // == m4bel__az
 M4TRG_SET( 199?, m4trg__3,  m4trg,  "rmtp.s8",      0x0000, 0x010000, CRC(91570052) SHA1(4a7a084403057e193602ee36a623a61c9ccad726), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 31)" )
 M4TRG_SET( 199?, m4trg__4,  m4trg,  "rmtp4cz",      0x0000, 0x010000, CRC(1c5fd88b) SHA1(a25b78b0a88ec9468c9ede4b3784e017e7cb571c), "Avantime?","Turbo Reel Gambler (Avantime?) (MPU4) (set 32)" )
 
@@ -509,7 +509,7 @@ M4MBEL_SET( 199?, m4mbel__av,   m4mbel, "mbpl2.5.5",        0x0000, 0x020000, CR
 M4MBEL_SET( 199?, m4mbel__aw,   m4mbel, "mbplv25v",         0x0000, 0x020000, CRC(00a98ead) SHA1(c7811385552e2effbe39538ef15f341504e297c6), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 60)" )
 M4MBEL_SET( 199?, m4mbel__ax,   m4mbel, "mbpu2.5",          0x0000, 0x020000, CRC(73bf7c1c) SHA1(2b92b77624c0bc6cd4986f75e143b8858f132de4), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 61)" )
 M4MBEL_SET( 199?, m4mbel__ay,   m4mbel, "mbpu2.5v",         0x0000, 0x020000, CRC(f81b831b) SHA1(734950b9fadd956bc16b927c05296a9346e0927a), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 62)" )
-M4MBEL_SET( 199?, m4mbel__az,   m4mbel, "mbpl3.2c",         0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 63)" )
+M4MBEL_SET( 199?, m4mbel__az,   m4mbel, "mbpl3.2c",         0x0000, 0x020000, CRC(ea8e58fb) SHA1(186f519fd4ebfa0e61cac8f392d6253df72523ec), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 63)" ) // == m4trg__2
 M4MBEL_SET( 199?, m4mbel__a0,   m4mbel, "mbpl3.3c",         0x0000, 0x020000, CRC(638903a8) SHA1(27f0ed58d98f8f9d5c909afdc04a4570df57161f), "Avantime?","Millennium Bells (Avantime?) (MPU4) (set 64)" )
 
 // Casino Monte Carlo

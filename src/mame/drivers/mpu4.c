@@ -971,7 +971,7 @@ ROM_END
 
 ROM_START( m4reeltm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) )
+	ROM_LOAD( "real.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4wildtm
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
@@ -1367,7 +1367,7 @@ ROM_END
 
 ROM_START( m4wildtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) )
+	ROM_LOAD( "wildtimer.bin", 0x0000, 0x010000, CRC(5bd54924) SHA1(23fcf13c52ee7b9b39f30f999a9102171fffd642) ) // == m4reeltm
 
 	ROM_REGION( 0x48, "fakechr", 0 )
 	ROM_LOAD( "charter.chr", 0x0000, 0x000048, CRC(4ff4eda2) SHA1(092435e34d79775910316a7bed0f90c4f086e5c4) )
