@@ -37,6 +37,15 @@ READ_LINE_MEMBER(pccard_slot_device::read_line_inserted)
 	return m_pccard != NULL;
 }
 
+DEVICE_ADDRESS_MAP_START(memory, 16, pccard_slot_device)
+	AM_RANGE(0x00000000, 0x03ffffff) AM_READWRITE(read_memory, write_memory)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(reg, 16, pccard_slot_device)
+	AM_RANGE(0x00000000, 0x03ffffff) AM_READWRITE(read_reg, write_reg)
+ADDRESS_MAP_END
+
+
 READ16_MEMBER( pccard_slot_device::read_memory )
 {
 	if( m_pccard != NULL )

@@ -743,8 +743,8 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
 	AM_RANGE(0x0800000, 0x0bfffff) AM_DEVREADWRITE8("29f016a.27j", intelfsh8_device, read, write, 0xff00)
 	AM_RANGE(0x0c00000, 0x0ffffff) AM_DEVREADWRITE8("29f016a.31h", intelfsh8_device, read, write, 0x00ff)
 	AM_RANGE(0x0c00000, 0x0ffffff) AM_DEVREADWRITE8("29f016a.27h", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x4000000, 0x7ffffff) AM_DEVREADWRITE("pccard1", pccard_slot_device, read_memory, write_memory)
-	AM_RANGE(0x8000000, 0xbffffff) AM_DEVREADWRITE("pccard2", pccard_slot_device, read_memory, write_memory)
+	AM_RANGE(0x4000000, 0x7ffffff) AM_DEVICE("pccard1", pccard_slot_device, memory)
+	AM_RANGE(0x8000000, 0xbffffff) AM_DEVICE("pccard2", pccard_slot_device, memory)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami573d_map, AS_PROGRAM, 32, ksys573_state )

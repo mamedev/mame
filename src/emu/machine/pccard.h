@@ -18,15 +18,18 @@ public:
 	pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ_LINE_MEMBER(read_line_inserted);
-	DECLARE_READ16_MEMBER(read_memory);
-	DECLARE_READ16_MEMBER(read_reg);
-	DECLARE_WRITE16_MEMBER(write_memory);
-	DECLARE_WRITE16_MEMBER(write_reg);
+	DECLARE_ADDRESS_MAP(memory, 16);
+	DECLARE_ADDRESS_MAP(reg, 16);
 
 protected:
 	virtual void device_start();
 
 private:
+	DECLARE_READ16_MEMBER(read_memory);
+	DECLARE_READ16_MEMBER(read_reg);
+	DECLARE_WRITE16_MEMBER(write_memory);
+	DECLARE_WRITE16_MEMBER(write_reg);
+
 	// internal state
 	pccard_interface *m_pccard;
 };
