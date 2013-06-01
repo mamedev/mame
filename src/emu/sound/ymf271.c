@@ -1323,23 +1323,15 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 UINT8 ymf271_device::ymf271_read_ext_memory(UINT32 address)
 {
 	if( !m_ext_read_handler.isnull() )
-	{
 		return m_ext_read_handler(address);
-	}
 	else
-	{
-		if( address < 0x800000)
-			return m_rom[address];
-	}
-	return 0xff;
+		return m_rom[address];
 }
 
 void ymf271_device::ymf271_write_ext_memory(UINT32 address, UINT8 data)
 {
 	if( !m_ext_write_handler.isnull() )
-	{
 		m_ext_write_handler(address, data);
-	}
 }
 
 void ymf271_device::ymf271_write_timer(int data)
@@ -1376,11 +1368,13 @@ void ymf271_device::ymf271_write_timer(int data)
 
 			case 0x13:
 				if (data & 1)
-				{   // timer A load
+				{
+					// timer A load
 					m_timerAVal = m_timerA;
 				}
 				if (data & 2)
-				{   // timer B load
+				{
+					// timer B load
 					m_timerBVal = m_timerB;
 				}
 				if (data & 4)
@@ -1394,7 +1388,8 @@ void ymf271_device::ymf271_write_timer(int data)
 					m_enable |= 8;
 				}
 				if (data & 0x10)
-				{   // timer A reset
+				{
+					// timer A reset
 					m_irqstate &= ~1;
 					m_status &= ~1;
 
@@ -1405,7 +1400,8 @@ void ymf271_device::ymf271_write_timer(int data)
 					m_timA->adjust(period, 0, period);
 				}
 				if (data & 0x20)
-				{   // timer B reset
+				{
+					// timer B reset
 					m_irqstate &= ~2;
 					m_status &= ~2;
 
