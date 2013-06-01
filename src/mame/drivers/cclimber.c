@@ -1301,9 +1301,9 @@ ROM_START( cclimbroper )
 	ROM_LOAD( "cc9-2716.cpu",         0x0000, 0x0800, CRC(a546a18f) SHA1(302ba08cef61b1badc361666fd559713037a2e43) )
 	ROM_LOAD( "cc8-2716.cpu",         0x0800, 0x0800, CRC(0224e507) SHA1(c9b534246b6bb743294581a5e74608a295cf0734) )
 
-	ROM_REGION( 0x2000, "samples", 0 )  /* samples - these are much lower quality than the original with most bytes being duplicated? verify... */
-	ROM_LOAD( "cc7-2532.cpu",    0x0000, 0x1000, BAD_DUMP CRC(fcca3f74) SHA1(4b85c078334731de5332c55a6f15f49001dc7ad5) )
-	ROM_LOAD( "cc6-2532.cpu",    0x1000, 0x1000, BAD_DUMP CRC(e4f54000) SHA1(4662d54cc2ceacfa194de0309041b7565f1ce4a2) )
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "cc7-2532.cpu",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "cc6-2532.cpu",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 
 	ROM_REGION( 0x0060, "proms", 0 ) // NOT verified on this board
 	ROM_LOAD( "cclimber.pr1", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
