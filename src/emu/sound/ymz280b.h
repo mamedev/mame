@@ -105,9 +105,10 @@ private:
 	UINT8 m_irq_enable;               /* current IRQ enable */
 	UINT8 m_keyon_enable;             /* key on enable */
 	UINT8 m_ext_mem_enable;           /* external memory enable */
-	UINT32 m_rom_addr_hi;
-	UINT32 m_rom_addr_mid;
-	UINT32 m_rom_readback_addr;       /* where the CPU can read the ROM */
+	UINT8 m_ext_readlatch;            /* external memory prefetched data */
+	UINT32 m_ext_mem_address_hi;
+	UINT32 m_ext_mem_address_mid;
+	UINT32 m_ext_mem_address;         /* where the CPU can read the ROM */
 
 	devcb2_write_line m_irq_handler;  /* IRQ callback */
 	devcb2_read8 m_ext_read_handler;  /* external RAM read handler */
