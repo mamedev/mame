@@ -548,7 +548,7 @@ endif
 
 # libs that Haiku doesn't want but are mandatory on *IX
 ifneq ($(TARGETOS),haiku)
-LIBS += -lm -lutil
+LIBS += -lm -lutil -lpthread
 endif
 
 endif # not Mac OS X
