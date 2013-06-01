@@ -816,7 +816,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 					if (mdata.m_type == AMH_NONE)
 						continue;
 
-					if (mdata.m_type != AMH_DEVICE_DELEGATE)
+					if (mdata.m_type != AMH_DEVICE_DELEGATE && mdata.m_type != AMH_NOP)
 						throw emu_fatalerror("Only normal read/write methods are accepted in device submaps.\n");
 
 					if (mdata.m_bits == 0 && entry_bits != m_databits)
