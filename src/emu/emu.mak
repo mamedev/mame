@@ -217,6 +217,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ldstub.o      \
 	$(EMUMACHINE)/ldv1000.o     \
 	$(EMUMACHINE)/ldvp931.o     \
+	$(EMUMACHINE)/linflash.o    \
 	$(EMUMACHINE)/m6m80011ap.o  \
 	$(EMUMACHINE)/matsucd.o     \
 	$(EMUMACHINE)/mb14241.o     \
@@ -252,6 +253,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/nscsi_hd.o    \
 	$(EMUMACHINE)/nvram.o       \
 	$(EMUMACHINE)/pc16552d.o    \
+	$(EMUMACHINE)/pccard.o      \
 	$(EMUMACHINE)/pcf8593.o     \
 	$(EMUMACHINE)/pci.o         \
 	$(EMUMACHINE)/pckeybrd.o    \

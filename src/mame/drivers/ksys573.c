@@ -480,22 +480,21 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
   */
 
-#include "emu.h"
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
-#include "machine/intelfsh.h"
-#include "machine/cr589.h"
-#include "machine/timekpr.h"
 #include "machine/adc083x.h"
+#include "machine/bankdev.h"
+#include "machine/cr589.h"
 #include "machine/ds2401.h"
+#include "machine/linflash.h"
+#include "machine/k573cass.h"
 #include "machine/mb89371.h"
 #include "machine/mpeg573.h"
+#include "machine/timekpr.h"
 #include "machine/upd4701.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
-#include "cdrom.h"
-#include "machine/k573cass.h"
+#include "video/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -542,6 +541,7 @@ public:
 		m_cr589(*this, ":cdrom"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
+		m_flashbank(*this, "flashbank"),
 		m_out1(*this, "OUT1"),
 		m_out2(*this, "OUT2"),
 		m_cd(*this, "CD"),
@@ -559,8 +559,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(gn845pwbb_read);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_tank_shutter_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
-	DECLARE_READ_LINE_MEMBER(read_line_pcard1_detect);
-	DECLARE_READ_LINE_MEMBER(read_line_pcard2_detect);
 	DECLARE_READ16_MEMBER(control_r);
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(atapi_r);
@@ -568,8 +566,6 @@ public:
 	DECLARE_WRITE16_MEMBER(atapi_reset_w);
 	DECLARE_WRITE16_MEMBER(security_w);
 	DECLARE_READ16_MEMBER(security_r);
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
 	DECLARE_READ16_MEMBER(ge765pwbba_r);
 	DECLARE_WRITE16_MEMBER(ge765pwbba_w);
 	DECLARE_READ16_MEMBER(gx700pwbf_io_r);
@@ -629,7 +625,6 @@ protected:
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void atapi_init();
-	void flash_init();
 	void update_mode();
 	void gx700pwbf_output( int offset, UINT8 data );
 	void gx700pwfbf_init( void (ksys573_state::*output_callback_func)( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask ) );
@@ -637,11 +632,6 @@ private:
 	void gn845pwbb_clk_w( int offset, int data );
 
 	required_device<psxirq_device> m_psxirq;
-
-	int m_flash_bank;
-	fujitsu_29f016a_device *m_flash_device[5][16];
-
-	UINT32 m_control;
 
 	emu_timer *m_atapi_timer;
 	required_device<scsihle_device> m_cr589;
@@ -653,6 +643,7 @@ private:
 	int m_atapi_cdata_wait;
 	int m_atapi_xfermod;
 
+	UINT32 m_control;
 	UINT16 m_n_security_control;
 
 	UINT8 m_gx700pwbf_output_data[ 4 ];
@@ -700,6 +691,7 @@ private:
 
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_flashbank;
 	required_ioport m_out1;
 	required_ioport m_out2;
 	required_ioport m_cd;
@@ -727,7 +719,7 @@ void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt
 }
 
 static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_DEVICE16("flashbank", address_map_bank_device, amap16, 0xffffffff)
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT("IN0") AM_WRITE_PORT("OUT0")
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ_PORT("IN1")
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT("IN2")
@@ -740,6 +732,19 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE16(security_r, security_w, 0x0000ffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, ksys573_state )
+	AM_RANGE(0x0000000, 0x03fffff) AM_DEVREADWRITE8("29f016a.31m", intelfsh8_device, read, write, 0x00ff)
+	AM_RANGE(0x0000000, 0x03fffff) AM_DEVREADWRITE8("29f016a.27m", intelfsh8_device, read, write, 0xff00)
+	AM_RANGE(0x0400000, 0x07fffff) AM_DEVREADWRITE8("29f016a.31l", intelfsh8_device, read, write, 0x00ff)
+	AM_RANGE(0x0400000, 0x07fffff) AM_DEVREADWRITE8("29f016a.27l", intelfsh8_device, read, write, 0xff00)
+	AM_RANGE(0x0800000, 0x0bfffff) AM_DEVREADWRITE8("29f016a.31j", intelfsh8_device, read, write, 0x00ff)
+	AM_RANGE(0x0800000, 0x0bfffff) AM_DEVREADWRITE8("29f016a.27j", intelfsh8_device, read, write, 0xff00)
+	AM_RANGE(0x0c00000, 0x0ffffff) AM_DEVREADWRITE8("29f016a.31h", intelfsh8_device, read, write, 0x00ff)
+	AM_RANGE(0x0c00000, 0x0ffffff) AM_DEVREADWRITE8("29f016a.27h", intelfsh8_device, read, write, 0xff00)
+	AM_RANGE(0x4000000, 0x7ffffff) AM_DEVREADWRITE("pccard1", pccard_slot_device, read_memory, write_memory)
+	AM_RANGE(0x8000000, 0xbffffff) AM_DEVREADWRITE("pccard2", pccard_slot_device, read_memory, write_memory)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami573d_map, AS_PROGRAM, 32, ksys573_state )
@@ -762,16 +767,6 @@ static ADDRESS_MAP_START(gunmania_map, AS_PROGRAM, 32, ksys573_state)
 	AM_RANGE( 0x1f640000, 0x1f6400ff) AM_READWRITE16(gunmania_r, gunmania_w, 0xffffffff)
 ADDRESS_MAP_END
 
-READ_LINE_MEMBER(ksys573_state::read_line_pcard1_detect)
-{
-	return m_flash_device[1][0] != NULL;
-}
-
-READ_LINE_MEMBER(ksys573_state::read_line_pcard2_detect)
-{
-	return m_flash_device[2][0] != NULL;
-}
-
 READ16_MEMBER(ksys573_state::control_r)
 {
 	verboselog(2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
@@ -781,41 +776,13 @@ READ16_MEMBER(ksys573_state::control_r)
 
 WRITE16_MEMBER(ksys573_state::control_w)
 {
-	int old_bank = m_flash_bank;
-
 	COMBINE_DATA(&m_control);
 
 	verboselog(2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	m_flash_bank = -1;
-
 	m_out2->write( data, mem_mask );
 
-	if( m_flash_device[0][0] != NULL && ( m_control & ~0x43 ) == 0x00 )
-	{
-		m_flash_bank = (0 << 8) + ( ( m_control & 3 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "onboard %d\n", m_control & 3 );
-	}
-	else if( m_flash_device[1][0] != NULL && ( m_control & ~0x47 ) == 0x10 )
-	{
-		m_flash_bank = (1 << 8) + ( ( m_control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard1 %d\n", m_control & 7 );
-	}
-	else if( m_flash_device[2][0] != NULL && ( m_control & ~0x47 ) == 0x20 )
-	{
-		m_flash_bank = (2 << 8) + ( ( m_control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard2 %d\n", m_control & 7 );
-	}
-	else if( m_flash_device[3][0] != NULL && ( m_control & ~0x47 ) == 0x20 )
-	{
-		m_flash_bank = (3 << 8) + ( ( m_control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard3 %d\n", m_control & 7 );
-	}
-	else if( m_flash_device[4][0] != NULL && ( m_control & ~0x47 ) == 0x28 )
-	{
-		m_flash_bank = (4 << 8) + ( ( m_control & 7 ) * 2 );
-		if( m_flash_bank != old_bank ) verboselog(1, "pccard4 %d\n", m_control & 7 );
-	}
+	m_flashbank->set_bank( m_control & 0x3f );
 }
 
 TIMER_CALLBACK_MEMBER(ksys573_state::atapi_xfer_end)
@@ -1308,76 +1275,6 @@ READ16_MEMBER(ksys573_state::security_r)
 	return data;
 }
 
-READ16_MEMBER(ksys573_state::flash_r)
-{
-	UINT32 data = 0;
-
-	if( m_flash_bank < 0 )
-	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", m_maincpu->pc(), offset, mem_mask, m_control );
-		data = 0xffff;
-	}
-	else
-	{
-		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
-
-		if( ACCESSING_BITS_0_7 )
-		{
-			data |= ( flash_base[0]->read( offset ) & 0xff ) << 0; // 31m/31l/31j/31h
-		}
-		if( ACCESSING_BITS_8_15 )
-		{
-			data |= ( flash_base[1]->read( offset ) & 0xff ) << 8; // 27m/27l/27j/27h
-		}
-	}
-
-	verboselog(2, "flash_r( %08x, %04x) %04x bank = %04x\n", offset, mem_mask, data, m_flash_bank );
-
-	return data;
-}
-
-WRITE16_MEMBER(ksys573_state::flash_w)
-{
-	verboselog(2, "flash_w( %08x, %04x, %04x) bank = %04x\n", offset, mem_mask, data, m_flash_bank );
-
-	if( m_flash_bank < 0 )
-	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", m_maincpu->pc(), offset, mem_mask, data, m_control );
-	}
-	else
-	{
-		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
-
-		if( ACCESSING_BITS_0_7 )
-		{
-			flash_base[0]->write( offset, ( data >> 0 ) & 0xff );
-		}
-		if( ACCESSING_BITS_8_15 )
-		{
-			flash_base[1]->write( offset, ( data >> 8 ) & 0xff );
-		}
-	}
-}
-
-void ksys573_state::flash_init()
-{
-	// find onboard flash devices
-	astring tempstr;
-	for (int index = 0; index < 8; index++)
-		m_flash_device[0][index] = machine().device<fujitsu_29f016a_device>(tempstr.format("onboard.%d", index));
-
-	// find pccard flash devices
-	for (int card = 1; card <= 4; card++)
-		for (int index = 0; index < 16; index++)
-			m_flash_device[card][index] = machine().device<fujitsu_29f016a_device>(tempstr.format("pccard%d.%d", card, index));
-
-	m_flash_bank = -1;
-	m_control = 0;
-
-	save_item( NAME(m_flash_bank) );
-	save_item( NAME(m_control) );
-}
-
 void ksys573_state::update_mode()
 {
 	int cd = m_cd->read();
@@ -1407,15 +1304,15 @@ void ksys573_state::driver_start()
 {
 	atapi_init();
 
-	save_item( NAME(m_n_security_control) );
+	m_n_security_control = 0;
+	m_control = 0;
 
-	flash_init();
+	save_item( NAME(m_n_security_control) );
+	save_item( NAME(m_control) );
 }
 
 MACHINE_RESET_MEMBER(ksys573_state,konami573)
 {
-	m_flash_bank = -1;
-
 	update_mode();
 }
 
@@ -2676,14 +2573,26 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_DEVICE_SLOT_INTERFACE(slot_empty, NULL, false)
 
 	// onboard flash
-	MCFG_FUJITSU_29F016A_ADD("onboard.0")
-	MCFG_FUJITSU_29F016A_ADD("onboard.1")
-	MCFG_FUJITSU_29F016A_ADD("onboard.2")
-	MCFG_FUJITSU_29F016A_ADD("onboard.3")
-	MCFG_FUJITSU_29F016A_ADD("onboard.4")
-	MCFG_FUJITSU_29F016A_ADD("onboard.5")
-	MCFG_FUJITSU_29F016A_ADD("onboard.6")
-	MCFG_FUJITSU_29F016A_ADD("onboard.7")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.31m")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.27m")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.31l")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.27l")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.31j")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.27j")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.31h")
+	MCFG_FUJITSU_29F016A_ADD("29f016a.27h")
+
+	MCFG_DEVICE_ADD("pccard1", PCCARD_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(slot_empty, NULL, false)
+
+	MCFG_DEVICE_ADD("pccard2", PCCARD_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(slot_empty, NULL, false)
+
+	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400000)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
@@ -2719,84 +2628,36 @@ static MACHINE_CONFIG_DERIVED(k573a, konami573)
 	MCFG_CPU_PROGRAM_MAP(konami573a_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard1 )
-	// flash for pccard 1
-	MCFG_FUJITSU_29F016A_ADD("pccard1.0")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.1")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.2")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.3")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.4")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.5")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.6")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.7")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.8")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.9")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.10")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.11")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.12")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.13")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.14")
-	MCFG_FUJITSU_29F016A_ADD("pccard1.15")
+SLOT_INTERFACE_START(slot_linflash16mb)
+	SLOT_INTERFACE("16mb", LINEAR_FLASH_16MB)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(slot_linflash32mb)
+	SLOT_INTERFACE("32mb", LINEAR_FLASH_32MB)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(slot_linflash64mb)
+	SLOT_INTERFACE("64mb", LINEAR_FLASH_64MB)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_FRAGMENT( pccard1_16mb )
+	MCFG_DEVICE_MODIFY("pccard1")
+	MCFG_DEVICE_SLOT_INTERFACE(slot_linflash16mb, "16mb", false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard2 )
-	// flash for pccard 2
-	MCFG_FUJITSU_29F016A_ADD("pccard2.0")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.1")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.2")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.3")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.4")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.5")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.6")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.7")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.8")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.9")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.10")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.11")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.12")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.13")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.14")
-	MCFG_FUJITSU_29F016A_ADD("pccard2.15")
+static MACHINE_CONFIG_FRAGMENT( pccard1_32mb )
+	MCFG_DEVICE_MODIFY("pccard1")
+	MCFG_DEVICE_SLOT_INTERFACE(slot_linflash32mb, "32mb", false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard3 )
-	// flash for pccard 3
-	MCFG_FUJITSU_29F016A_ADD("pccard3.0")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.1")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.2")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.3")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.4")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.5")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.6")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.7")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.8")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.9")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.10")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.11")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.12")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.13")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.14")
-	MCFG_FUJITSU_29F016A_ADD("pccard3.15")
+static MACHINE_CONFIG_FRAGMENT( pccard2_32mb )
+	MCFG_DEVICE_MODIFY("pccard2")
+	MCFG_DEVICE_SLOT_INTERFACE(slot_linflash32mb, "32mb", false)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( pccard4 )
-	// flash for pccard 4
-	MCFG_FUJITSU_29F016A_ADD("pccard4.0")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.1")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.2")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.3")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.4")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.5")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.6")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.7")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.8")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.9")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.10")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.11")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.12")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.13")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.14")
-	MCFG_FUJITSU_29F016A_ADD("pccard4.15")
+static MACHINE_CONFIG_FRAGMENT( pccard2_64mb )
+	MCFG_DEVICE_MODIFY("pccard2")
+	MCFG_DEVICE_SLOT_INTERFACE(slot_linflash64mb, "64mb", false)
 MACHINE_CONFIG_END
 
 // Security eeprom variants
@@ -2878,68 +2739,68 @@ MACHINE_CONFIG_END
 // Dance Dance Revolution
 
 static MACHINE_CONFIG_DERIVED(ddr, k573a)
-	MCFG_FRAGMENT_ADD(cassx)
+	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(ddr2ml, k573a)
-	MCFG_FRAGMENT_ADD(pccard1)
-	MCFG_FRAGMENT_ADD(cassx)
+	MCFG_FRAGMENT_ADD( pccard1_16mb )
+	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr3m, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(pccard2)
-	MCFG_FRAGMENT_ADD(cassyyi)
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
+	MCFG_FRAGMENT_ADD( cassyyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr3mp, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(pccard2)
-	MCFG_FRAGMENT_ADD(cassxzi)
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
+	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddrusa, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(casszi)
+	MCFG_FRAGMENT_ADD( casszi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr5m, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(pccard2)
-	MCFG_FRAGMENT_ADD(casszi)
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
+	MCFG_FRAGMENT_ADD( casszi )
 MACHINE_CONFIG_END
 
 // Dancing Stage
 
 static MACHINE_CONFIG_DERIVED(dsfdcta, k573a)
-	MCFG_FRAGMENT_ADD(pccard2)
-	MCFG_FRAGMENT_ADD(cassyyi)
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
+	MCFG_FRAGMENT_ADD( cassyyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(dsftkd, k573a)
-	MCFG_FRAGMENT_ADD(cassyi)
+	MCFG_FRAGMENT_ADD( cassyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(dsfdr, k573d)
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(cassxzi)
+	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dsem, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddr_output_callback))
 
-	MCFG_FRAGMENT_ADD(cassxi)
+	MCFG_FRAGMENT_ADD( cassxi )
 MACHINE_CONFIG_END
 
 // Dance Dance Revolution Solo
@@ -2962,14 +2823,14 @@ static MACHINE_CONFIG_DERIVED( ddr4ms, k573d )
 	MCFG_DEVICE_MODIFY( "mpeg573" )
 	MCFG_MPEG573_OUTPUT_CALLBACK(WRITE8(ksys573_state, ddrsolo_output_callback))
 
-	MCFG_FRAGMENT_ADD( pccard2 )
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
 	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 // DrumMania
 
 static MACHINE_CONFIG_DERIVED(drmn, k573a)
-	MCFG_FRAGMENT_ADD(cassx)
+	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drmn2m, k573d )
@@ -2989,22 +2850,22 @@ MACHINE_CONFIG_END
 // Guitar Freaks
 
 static MACHINE_CONFIG_DERIVED(gtrfrks, k573a)
-	MCFG_FRAGMENT_ADD(cassx)
+	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(gtrfrk2m, k573a)
-	MCFG_FRAGMENT_ADD(pccard1)
-	MCFG_FRAGMENT_ADD(cassyi)
+	MCFG_FRAGMENT_ADD( pccard1_16mb )
+	MCFG_FRAGMENT_ADD( cassyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtrfrk3m, k573d )
 	MCFG_FRAGMENT_ADD( cassxzi )
-	MCFG_FRAGMENT_ADD( pccard1 )
+	MCFG_FRAGMENT_ADD( pccard1_16mb )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtrfrk5m, k573d )
 	MCFG_FRAGMENT_ADD( casszi )
-	MCFG_FRAGMENT_ADD( pccard1 )
+	MCFG_FRAGMENT_ADD( pccard1_16mb )
 MACHINE_CONFIG_END
 
 // Miscellaneous
@@ -3018,7 +2879,7 @@ static MACHINE_CONFIG_DERIVED(fbaitbc, konami573)
 	MCFG_CPU_PROGRAM_MAP(fbaitbc_map)
 
 	MCFG_UPD4701_ADD("upd4701")
-	MCFG_FRAGMENT_ADD(cassx)
+	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hyperbbc, konami573 )
@@ -3043,7 +2904,7 @@ static MACHINE_CONFIG_DERIVED( salarymc, konami573 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gchgchmp, konami573 )
-	MCFG_FRAGMENT_ADD( pccard1 )
+	MCFG_FRAGMENT_ADD( pccard1_16mb )
 	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
 
@@ -3052,15 +2913,14 @@ static MACHINE_CONFIG_DERIVED( pnchmn, konami573 )
 	MCFG_CPU_PROGRAM_MAP(konami573a_map)
 
 	MCFG_FRAGMENT_ADD( cassxi )
-	MCFG_FRAGMENT_ADD( pccard1 )
+	MCFG_FRAGMENT_ADD( pccard1_32mb )
 
 	MCFG_DEVICE_MODIFY("cassette")
 	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pnchmn2, pnchmn )
-	MCFG_FRAGMENT_ADD( pccard3 )
-	MCFG_FRAGMENT_ADD( pccard4 )
+	MCFG_FRAGMENT_ADD( pccard2_64mb )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gunmania, konami573 )
@@ -3068,7 +2928,7 @@ static MACHINE_CONFIG_DERIVED( gunmania, konami573 )
 	MCFG_CPU_PROGRAM_MAP(gunmania_map)
 
 	MCFG_DS2401_ADD( "gunmania_id" )
-	MCFG_FRAGMENT_ADD( pccard2 )
+	MCFG_FRAGMENT_ADD( pccard2_32mb )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dmx, k573d )
@@ -3130,8 +2990,8 @@ static INPUT_PORTS_START( konami573 )
 //  PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, ksys573_state, read_line_pcard1_detect)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, ksys573_state, read_line_pcard2_detect)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("pccard1", pccard_slot_device, read_line_inserted)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("pccard2", pccard_slot_device, read_line_inserted)
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 //  PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3640,21 +3500,21 @@ ROM_START( ddrja )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31m",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.27m",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31l",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.27l",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31j",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.27j",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31h",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
@@ -3670,21 +3530,21 @@ ROM_START( ddrjb )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.27m",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31l",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.27l",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31j",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.27j",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31h",  0x000000, 0x200000, NO_DUMP )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
@@ -4106,9 +3966,9 @@ ROM_START( drmn )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq881ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(7dca0b3f) SHA1(db6d5c527e2a99133b516e01433024d3173848c6) )
 
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "gq881ja.31h",  0x000000, 0x200000, CRC(a5b86ece) SHA1(9696f0c512501574bae6e436306675894bb2352e) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "gq881ja.27h",  0x000000, 0x200000, CRC(fc0b94c1) SHA1(967d374288db757d161d0e9e8e396a1176071c5f) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 )
@@ -4187,9 +4047,9 @@ ROM_START( drmn4m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gea25jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(356bbbf4) SHA1(a20a8fcaed2dce50451346b1683739c96067feb1) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gea25jaa.31m", 0x000000, 0x200000, CRC(a0dd0ef4) SHA1(be4c1d3f2eb3c484b515be12b692c30cc780c36c) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gea25jaa.27m", 0x000000, 0x200000, CRC(118fa45a) SHA1(6bc6129e328f6f97a27b9f524066297b29efff5a) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4224,9 +4084,9 @@ ROM_START( drmn6m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcb16jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(f6933041) SHA1(1839bb99d2db9413c58a2ed95e9039d2c7dd62ba) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb16jaa.31m",  0x000000, 0x200000, CRC(19de3e53) SHA1(bbb7a247bdd617a124330a946c2e8dd565b2a09c) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb16jaa.27m",  0x000000, 0x200000, CRC(5696e133) SHA1(aad39cc25ce5279adac8a10fb10158f4f4418c0a) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4245,9 +4105,9 @@ ROM_START( drmn7m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcc07jba.u1",   0x000000, 0x001014, BAD_DUMP CRC(8d9bcf10) SHA1(3d486df924ba41669675d62982396aebf8d12052) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc07jba.31m",  0x000000, 0x200000, CRC(7120d1ce) SHA1(4df9828150120762b99c5b212bc7a91b0d525bce) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc07jba.27m",  0x000000, 0x200000, CRC(9393fe8e) SHA1(f60752e3e397121f3d4856a634e1c8ce5fc465b5) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4266,9 +4126,9 @@ ROM_START( drmn7ma )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcc07jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(b675b39b) SHA1(9639db913821641cee619d7cc520de5d0c3ae7fa) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc07jaa.31m",  0x000000, 0x200000, CRC(1e1cbfe3) SHA1(6c942820f915ea0e01f0e736d70780ad8408aa69) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc07jaa.27m",  0x000000, 0x200000, CRC(49d27b57) SHA1(e62737fe8665d837c2cebd1dcf4577a021d8cdb1) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4361,9 +4221,9 @@ ROM_START( dmx2majp )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gca38ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(99a746b8) SHA1(333236e59a707ecaf840a66f9b947ceade2cf2c9) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gca38ja.31m",  0x000000, 0x200000, CRC(a0f54ab5) SHA1(a5ae67d7619393779c79a2e227cac0675eeef538) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gca38ja.27m",  0x000000, 0x200000, CRC(6c3934b8) SHA1(f0e4a692b6caaf60fefaec87fd23da577439f69d) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4558,9 +4418,9 @@ ROM_START( fghtmn )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918eaa.u1",  0x000000, 0x000224, CRC(f3342ff5) SHA1(d3d6ecc22396f74b99ad7aab7908cd542c518977) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4576,9 +4436,9 @@ ROM_START( fghtmna )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918aaa.u1",  0x000000, 0x000224, CRC(1a2c5d53) SHA1(ab7e44a83e8cd271e2bf8580881a3050d35641df) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4594,9 +4454,9 @@ ROM_START( fghtmnk )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918kaa.u1",  0x000000, 0x000224, CRC(cf32990b) SHA1(bf49b8560f008696b45a3f7f03fa7b3395635b0f) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4612,9 +4472,9 @@ ROM_START( fghtmnu )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918uaa.u1",  0x000000, 0x000224, CRC(e1b7e9ef) SHA1(5767f47cb9a689601fb92c6a494563c5ffdde04c) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4627,21 +4487,21 @@ ROM_END
 ROM_START( hndlchmp )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31m",    0x000000, 0x200000, CRC(f5f71b1d) SHA1(7d518e5333f44e6ec921a1e882df970953814b6e) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27m",    0x000000, 0x200000, CRC(b3d8c037) SHA1(678b88c37111d1fde8996c7d71b66ec1c4f161fe) )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31l",    0x000000, 0x200000, CRC(78e8556c) SHA1(9f6bb651ddeb042ebf1ba057d4932494149f47d6) )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27l",    0x000000, 0x200000, CRC(f6a87155) SHA1(269bfdf05ee4ab2e4b87b6e92045e56d0557a576) )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31j",    0x000000, 0x200000, CRC(bdc05d16) SHA1(ee397950f7e7e910fdc05737f99604e43d288719) )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27j",    0x000000, 0x200000, CRC(ad925ed3) SHA1(e3222308961851cccee2de9da804f74854907451) )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31h",    0x000000, 0x200000, CRC(a0293108) SHA1(2e5651a4c1b8e021cc3060db138c9fe7c28caa3b) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27h",    0x000000, 0x200000, CRC(aed26efe) SHA1(20b6fccd0bc5495d8258b976f72d330d6315c6f6) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 )
@@ -4651,52 +4511,52 @@ ROM_END
 ROM_START( gchgchmp )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31m",    0x000000, 0x200000, CRC(f5f71b1d) SHA1(7d518e5333f44e6ec921a1e882df970953814b6e) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27m",    0x000000, 0x200000, CRC(b3d8c037) SHA1(678b88c37111d1fde8996c7d71b66ec1c4f161fe) )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31l",    0x000000, 0x200000, CRC(78e8556c) SHA1(9f6bb651ddeb042ebf1ba057d4932494149f47d6) )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27l",    0x000000, 0x200000, CRC(f6a87155) SHA1(269bfdf05ee4ab2e4b87b6e92045e56d0557a576) )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31j",    0x000000, 0x200000, CRC(bdc05d16) SHA1(ee397950f7e7e910fdc05737f99604e43d288719) )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27j",    0x000000, 0x200000, CRC(ad925ed3) SHA1(e3222308961851cccee2de9da804f74854907451) )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.31h",    0x000000, 0x200000, CRC(a0293108) SHA1(2e5651a4c1b8e021cc3060db138c9fe7c28caa3b) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "710ja.27h",    0x000000, 0x200000, CRC(aed26efe) SHA1(20b6fccd0bc5495d8258b976f72d330d6315c6f6) )
 
-	ROM_REGION( 0x200000, "pccard1.0", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:1l", 0 )
 	ROM_LOAD( "ge877ja.1l",   0x100000, 0x100000, CRC(06b95144) SHA1(870fc99ba6c6b0c314ddc270b8ba0f44412978bd) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.1", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:1u", 0 )
 	ROM_LOAD( "ge877ja.1u",   0x100000, 0x100000, CRC(2a3b639f) SHA1(c810a16a36c5e3f5a67a760d488d22108b8a35f7) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.2", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:2l", 0 )
 	ROM_LOAD( "ge877ja.2l",   0x100000, 0x100000, CRC(e2b273ac) SHA1(73eda00d9a32e252e66ad166d35c5bc8a1a1bf97) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.3", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:2u", 0 )
 	ROM_LOAD( "ge877ja.2u",   0x100000, 0x100000, CRC(247a6c18) SHA1(145a8bbf35f71ebf5c9232ad1a860ee4c10083c1) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.4", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:3l", 0 )
 	ROM_LOAD( "ge877ja.3l",   0x100000, 0x100000, CRC(174a4551) SHA1(32c24c99824719cd3057281ac1114e624c16df81) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.5", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:3u", 0 )
 	ROM_LOAD( "ge877ja.3u",   0x100000, 0x100000, CRC(45398c5f) SHA1(ec5f7e83dbd86807fb78e852e31c6f5db187204a) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.6", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:4l", 0 )
 	ROM_LOAD( "ge877ja.4l",   0x100000, 0x100000, CRC(351cbbd6) SHA1(eccb5dc03dc668b0690a6209d57b37fb5cdc200a) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard1.7", 0 )
+	ROM_REGION( 0x200000, "pccard1:16mb:4u", 0 )
 	ROM_LOAD( "ge877ja.4u",   0x100000, 0x100000, CRC(7b28d962) SHA1(27a46e41dc53cb85f83ec4558bc1f88504d725eb) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
@@ -4836,9 +4696,9 @@ ROM_START( gtrfrk5m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gea26jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(c2725fca) SHA1(b70a3266c61af5cbe0478a6f3dd850ebcab980dc) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gea26jaa.31m", 0x000000, 0x200000, CRC(1a25e660) SHA1(dbd8fad0bac307723c70d00763cadf4261a7ed73) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gea26jaa.27m", 0x000000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4867,9 +4727,9 @@ ROM_START( gtrfrk7m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcb17jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(5a338c31) SHA1(0fd9ee306335858dd6bef680a62557a8bf055cc3) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb17jaa.31m", 0x000000, 0x200000, CRC(1e1cbfe3) SHA1(6c942820f915ea0e01f0e736d70780ad8408aa69) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb17jaa.27m", 0x000000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4885,9 +4745,9 @@ ROM_START( gtrfrk8m )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcc08jba.u1",   0x000000, 0x001014, BAD_DUMP CRC(db4b3027) SHA1(65ca32fcacda18954a4e8352dbb9bf583dfdd121) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc08jba.31m", 0x000000, 0x200000, CRC(ddef5efe) SHA1(7c3a219eacf63f55894e81cb0e41753176191708) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc08jba.27m", 0x000000, 0x200000, CRC(9393fe8e) SHA1(f60752e3e397121f3d4856a634e1c8ce5fc465b5) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4903,9 +4763,9 @@ ROM_START( gtrfrk8ma )
 	ROM_REGION( 0x0001014, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gcc08jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(9c58f22b) SHA1(41ade23bac86e437b1f12c5730b8cce292ffe4f8) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc08jaa.31m", 0x000000, 0x200000, CRC(aa723d4c) SHA1(5f55ddaf7f21b624deac99cc40b89989cd6f3a3d) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gcc08jaa.27m", 0x000000, 0x200000, CRC(49d27b57) SHA1(e62737fe8665d837c2cebd1dcf4577a021d8cdb1) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -4989,84 +4849,84 @@ ROM_START( gunmania )
 	ROM_REGION( 0x000008, "gunmania_id", 0 ) /* digital board id */     \
 	ROM_LOAD( "ds2401",        0x000000, 0x000008, CRC(2b977f4d) SHA1(2b108a56653f91cb3351718c45dfcf979bc35ef1) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.31m",  0x000000, 0x200000, CRC(6c02d360) SHA1(961bd9df4928a3dead9da6a88641547cae4c4dbd) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.27m",  0x000000, 0x200000, CRC(057b5bce) SHA1(979e3fb5496920c3f9eb7111425c08d80c9076a5) )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.31l",  0x000000, 0x200000, CRC(3f3abf8f) SHA1(9c93e58fad16ccbe4bc4499a1a15af134243c154) )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.27l",  0x000000, 0x200000, CRC(f2be642d) SHA1(6c46197a0d114ac90824de1fc4df12db561844e5) )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.31j",  0x000000, 0x200000, CRC(889a4733) SHA1(1f6578d95c0331fdf3235ef7d899d5bd083ff6a0) )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.27j",  0x000000, 0x200000, CRC(984193a8) SHA1(1a310e22a80cb4854b138f737f679384c98b2e46) )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.31h",  0x000000, 0x200000, CRC(202236c1) SHA1(ecd58f2b325fdefe2ac6cdd6f4edd212432e149a) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "gl906jaa.27h",  0x000000, 0x200000, CRC(8861b858) SHA1(2a67d465786759a74162ebebc0a44ba9309ffa60) )
 
-	ROM_REGION( 0x200000, "pccard2.0", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:1l", 0 )
 	ROM_LOAD( "gl906jaa.1l",   0x100000, 0x100000, BAD_DUMP CRC(4ad00681) SHA1(93fb97bd148c72f13d6d3b713d8bc6eeda7383ef) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.1", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:1u", 0 )
 	ROM_LOAD( "gl906jaa.1u",   0x100000, 0x100000, BAD_DUMP CRC(6730d49a) SHA1(4f1810c04f078ef6de3a582d1982c6d54223998b) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.2", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:2l", 0 )
 	ROM_LOAD( "gl906jaa.2l",   0x100000, 0x100000, BAD_DUMP CRC(383c80f6) SHA1(b540aba095526ce956a9a81e43bf46cb3eca6a9e) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.3", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:2u", 0 )
 	ROM_LOAD( "gl906jaa.2u",   0x100000, 0x100000, BAD_DUMP CRC(68a92d52) SHA1(05584cd7e94ac551a82cfb435c637aabe6d4d044) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.4", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:3l", 0 )
 	ROM_LOAD( "gl906jaa.3l",   0x100000, 0x100000, BAD_DUMP CRC(390b3ff7) SHA1(9ff79043125c11d5338a32443693259c728f8640) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:3u", 0 )
 	ROM_LOAD( "gl906jaa.3u",   0x100000, 0x100000, BAD_DUMP CRC(b2ba1f4d) SHA1(1cd9227b99498d3f6bf464d7185fb511babb135e) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.6", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:4l", 0 )
 	ROM_LOAD( "gl906jaa.4l",   0x100000, 0x100000, BAD_DUMP CRC(fed293be) SHA1(9109a18a342f455d7ee6f08c09e494781b6ae400) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.7", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:4u", 0 )
 	ROM_LOAD( "gl906jaa.4u",   0x100000, 0x100000, BAD_DUMP CRC(ac42d147) SHA1(0dcb9515f6f8c609cc10a73f07683aa132927f18) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.8", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:5l", 0 )
 	ROM_LOAD( "gl906jaa.5l",   0x100000, 0x100000, BAD_DUMP CRC(8209c1e0) SHA1(9f1f47f49e45bd3c71cd07c6719f8616c2518014) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.9", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:5u", 0 )
 	ROM_LOAD( "gl906jaa.5u",   0x100000, 0x100000, BAD_DUMP CRC(1e3f0f1a) SHA1(2e6134a1d64ae3367261adfad5af61265d00340a) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.10", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:6l", 0 )
 	ROM_LOAD( "gl906jaa.6l",   0x100000, 0x100000, BAD_DUMP CRC(53ca942e) SHA1(4d82bf406a338e4f96eb28c5c6f2707d73e53086) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.11", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:6u", 0 )
 	ROM_LOAD( "gl906jaa.6u",   0x100000, 0x100000, BAD_DUMP CRC(82cfd213) SHA1(cd18de5d93541c64bdacc76ab8cd41656827284e) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.12", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:7l", 0 )
 	ROM_LOAD( "gl906jaa.7l",   0x100000, 0x100000, BAD_DUMP CRC(bcf3ed36) SHA1(8c9c97b0c5a21222ce1d680110509231abb58b9e) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.13", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:7u", 0 )
 	ROM_LOAD( "gl906jaa.7u",   0x100000, 0x100000, BAD_DUMP CRC(b5d5da7d) SHA1(000c2db950c3a4ac6296edb45b7c89b4be724071) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.14", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:8l", 0 )
 	ROM_LOAD( "gl906jaa.8l",   0x100000, 0x100000, BAD_DUMP CRC(96c5e4fe) SHA1(9c7429f0352357b4b370d39b0e0fb9ce4b514a1b) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
-	ROM_REGION( 0x200000, "pccard2.15", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x200000, "pccard1:32mb:8u", 0 )
 	ROM_LOAD( "gl906jaa.8u",   0x100000, 0x100000, BAD_DUMP CRC(030fff86) SHA1(5a04fde970fe542b13327ef54b9b6ad6c79a9e3c) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 ROM_END
@@ -5074,21 +4934,21 @@ ROM_END
 ROM_START( hyperbbc )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31m",    0x000000, 0x200000, CRC(a76043cb) SHA1(1c37034298abf3219d0bba29f4fcea8d83782926) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27m",    0x000000, 0x200000, CRC(689ddd94) SHA1(512ca1529695f4f79ca8c1b8f64bb0067137e430) )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31l",    0x000000, 0x200000, CRC(d011c7a5) SHA1(8861b62c8b654b8e719600a37337ae44e6438899) )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27l",    0x000000, 0x200000, CRC(950a5267) SHA1(373a7305a090d1e347bfeb62cc2db55cde2a106e) )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31j",    0x000000, 0x200000, CRC(ae497ebc) SHA1(ef131e60726db94f0d9ceab70bce02c0de080ede) )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27j",    0x000000, 0x200000, CRC(9c156b1b) SHA1(bf07d71cc1f7e9e14beb9f9dfb71667ef2b54f8d) )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31h",    0x000000, 0x200000, CRC(368372fb) SHA1(5cc4cb72e182c9e4d0737352e029fd703ba2f516) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27h",    0x000000, 0x200000, CRC(49175f99) SHA1(0154f6332ed210b6f0af20ba622133cde0994b7f) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 )
@@ -5098,21 +4958,21 @@ ROM_END
 ROM_START( hyperbbca )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "876aa.31m",    0x000000, 0x200000, CRC(677f8b0a) SHA1(a4c1029a70f5733f64a4f4dde4a568d2cb4dd11d) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "876aa.27m",    0x000000, 0x200000, CRC(0af35a7d) SHA1(086ad70c8bf4bbe5d9748e4d47c639b4250270fc) )
-	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31l",    0x000000, 0x200000, CRC(d011c7a5) SHA1(8861b62c8b654b8e719600a37337ae44e6438899) )
-	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27l",    0x000000, 0x200000, CRC(950a5267) SHA1(373a7305a090d1e347bfeb62cc2db55cde2a106e) )
-	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31j",    0x000000, 0x200000, CRC(ae497ebc) SHA1(ef131e60726db94f0d9ceab70bce02c0de080ede) )
-	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27j",    0x000000, 0x200000, CRC(9c156b1b) SHA1(bf07d71cc1f7e9e14beb9f9dfb71667ef2b54f8d) )
-	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.31h",    0x000000, 0x200000, CRC(368372fb) SHA1(5cc4cb72e182c9e4d0737352e029fd703ba2f516) )
-	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
 	ROM_LOAD( "876ea.27h",    0x000000, 0x200000, CRC(49175f99) SHA1(0154f6332ed210b6f0af20ba622133cde0994b7f) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 )
@@ -5250,9 +5110,9 @@ ROM_START( pnchmn )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(e4769787) SHA1(d60c6598c7c58b5cd8f86350ebf7f3f32c1ebe9b) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -5268,9 +5128,9 @@ ROM_START( pnchmna )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gq918jab.u1",  0x000000, 0x000224, BAD_DUMP CRC(e4769787) SHA1(d60c6598c7c58b5cd8f86350ebf7f3f32c1ebe9b) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.31m", 0x000000, 0x200000, CRC(3653b5d7) SHA1(1deb44335b7a38506fb30da40e0ca61b96aea7bb) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gq918xxb.27m", 0x000000, 0x200000, CRC(27d48c97) SHA1(c140d4bdfa869fbcae1133bbfe73a346e6f46cb8) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
@@ -5286,9 +5146,9 @@ ROM_START( pnchmn2 )
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "gqa09ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(e1e4108f) SHA1(0605e2c7a7dcb2f4928350e96d2ffcc2ede4a762) )
 
-	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "gqa09ja.31m",  0x000000, 0x200000, CRC(b1043a91) SHA1(b474439c1a7da7855d9b6d2162d4a522f499d6ab) )
-	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
 	ROM_LOAD( "gqa09ja.27m",  0x000000, 0x200000, CRC(09b1a70b) SHA1(0f3bcad879e05faaf8130133d774a2071031ee74) )
 
 	ROM_REGION( 0x000008, "cassette:game:id", 0 )
