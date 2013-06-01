@@ -19,10 +19,10 @@ J5,J6 Joystick ports
 
 XTAL 10.738 MHz
 
-Output is to a TV on Australian Channel 1 (no monitor output)
+Output is to a TV on Australian Channel 1.
 
 U1     uPD780C-1 (Z80A)
-U2     Video chip with heatsink stuck on top, possibly TMS9928
+U2     Video chip with heatsink stuck on top, TMS9929
 U3     SN76489AN
 U4     2764 bios rom
 U5     uPD4016C-2 (assumed to be equivalent of 6116 2K x 8bit static RAM)
