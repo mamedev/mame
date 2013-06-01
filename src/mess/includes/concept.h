@@ -12,8 +12,8 @@
 #define CONCEPT_H_
 
 #include "machine/6522via.h"
-#include "machine/wd17xx.h"
 #include "machine/mos6551.h"
+#include "machine/concept_exp.h"
 
 #define ACIA_0_TAG  "acia0"
 #define ACIA_1_TAG  "acia1"
@@ -25,28 +25,25 @@ enum
 	MaxKeyMessageLen = 1
 };
 
-struct expansion_slot_t
-{
-	read8_delegate reg_read;
-	write8_delegate reg_write;
-	read8_delegate rom_read;
-	write8_delegate rom_write;
-};
-
 
 class concept_state : public driver_device
 {
 public:
 	concept_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_acia0(*this, ACIA_0_TAG),
 		m_acia1(*this, ACIA_1_TAG),
-		m_videoram(*this,"videoram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_videoram(*this,"videoram") { }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
 	required_shared_ptr<UINT16> m_videoram;
+
+	concept_exp_port_device *m_exp[4];
+	ioport_port *m_key[6];
+
 	UINT8 m_pending_interrupts;
 	char m_clock_enable;
 	char m_clock_address;
@@ -54,9 +51,6 @@ public:
 	int m_KeyQueueHead;
 	int m_KeyQueueLen;
 	UINT32 m_KeyStateSave[3];
-	UINT8 m_fdc_local_status;
-	UINT8 m_fdc_local_command;
-	expansion_slot_t m_expansion_slots[4];
 	DECLARE_READ16_MEMBER(concept_io_r);
 	DECLARE_WRITE16_MEMBER(concept_io_w);
 	virtual void machine_start();
@@ -64,28 +58,11 @@ public:
 	UINT32 screen_update_concept(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(concept_interrupt);
 
-	void install_expansion_slot(int slot,
-		read8_delegate reg_read, write8_delegate reg_write,
-		read8_delegate rom_read, write8_delegate rom_write);
-
-	void concept_fdc_init(int slot);
-	void concept_hdc_init(int slot);
-
-	DECLARE_READ8_MEMBER(concept_fdc_reg_r);
-	DECLARE_WRITE8_MEMBER(concept_fdc_reg_w);
-	DECLARE_READ8_MEMBER(concept_fdc_rom_r);
-
-	DECLARE_READ8_MEMBER(concept_hdc_reg_r);
-	DECLARE_WRITE8_MEMBER(concept_hdc_reg_w);
-	DECLARE_READ8_MEMBER(concept_hdc_rom_r);
 	DECLARE_READ8_MEMBER(via_in_a);
 	DECLARE_WRITE8_MEMBER(via_out_a);
 	DECLARE_READ8_MEMBER(via_in_b);
 	DECLARE_WRITE8_MEMBER(via_out_b);
 	DECLARE_WRITE8_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(concept_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(concept_fdc_drq_w);
-	required_device<cpu_device> m_maincpu;
 	void concept_set_interrupt(int level, int state);
 	inline void post_in_KeyQueue(int keycode);
 	void poll_keyboard();
@@ -95,6 +72,5 @@ public:
 /*----------- defined in machine/concept.c -----------*/
 
 extern const via6522_interface concept_via6522_intf;
-extern const wd17xx_interface concept_wd17xx_interface;
 
 #endif /* CONCEPT_H_ */

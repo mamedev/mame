@@ -1018,6 +1018,7 @@ $(MESSOBJ)/comx.a:              \
 $(MESSOBJ)/concept.a:           \
 	$(MESS_DRIVERS)/concept.o   \
 	$(MESS_MACHINE)/concept.o   \
+	$(MESS_MACHINE)/concept_exp.o   \
 	$(MESS_MACHINE)/corvushd.o  \
 
 $(MESSOBJ)/conitec.a:           \
