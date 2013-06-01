@@ -32,10 +32,6 @@ protected:
 extern const device_type CONCEPT_EXP_PORT;
 
 
-// supported devices
-//SLOT_INTERFACE_EXTERN( abc_keyboard_devices );
-
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************

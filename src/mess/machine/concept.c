@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/concept.h"
-#include "machine/mm58274c.h"   /* mm58274 seems to be compatible with mm58174 */
 #include "cpu/m68000/m68000.h"
 
 
@@ -54,11 +53,13 @@ void concept_state::machine_start()
 	m_pending_interrupts = 0;
 
 	/* initialize clock interface */
-	m_clock_enable = 0/*1*/;
+	m_clock_enable = FALSE /*TRUE*/;
 
 	/* clear keyboard interface state */
 	m_KeyQueueHead = m_KeyQueueLen = 0;
 	memset(m_KeyStateSave, 0, sizeof(m_KeyStateSave));
+	
+	m_mm58274 = machine().device("mm58274c");
 
 	m_exp[0] = machine().device<concept_exp_port_device>("exp1");
 	m_exp[1] = machine().device<concept_exp_port_device>("exp2");
@@ -71,6 +72,14 @@ void concept_state::machine_start()
 		sprintf(str, "KEY%i", i);
 		m_key[i] = ioport(str);
 	}
+
+	save_item(NAME(m_pending_interrupts));
+	save_item(NAME(m_clock_enable));
+	save_item(NAME(m_clock_address));
+	save_item(NAME(m_KeyQueue));
+	save_item(NAME(m_KeyQueueHead));
+	save_item(NAME(m_KeyQueueLen));
+	save_item(NAME(m_KeyStateSave));
 }
 
 
@@ -115,7 +124,7 @@ void concept_state::concept_set_interrupt(int level, int state)
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-inline  void concept_state::post_in_KeyQueue(int keycode)
+inline void concept_state::post_in_KeyQueue(int keycode)
 {
 	m_KeyQueue[(m_KeyQueueHead+m_KeyQueueLen) % KeyQueueSize] = keycode;
 	m_KeyQueueLen++;
@@ -127,11 +136,10 @@ void concept_state::poll_keyboard()
 	UINT32 key_transitions;
 	int i, j;
 	int keycode;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	for(i = 0; (i < /*4*/3) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = ioport(keynames[2*i])->read() | (ioport(keynames[2*i + 1])->read() << 16);
+		keystate = m_key[2 * i]->read() | (m_key[2 * i + 1]->read() << 16);
 		key_transitions = keystate ^ m_KeyStateSave[i];
 		if(key_transitions)
 		{
@@ -272,7 +280,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!m_clock_enable)
-			return mm58274c_r(machine().device("mm58274c"), space, m_clock_address);
+			return mm58274c_r(m_mm58274, space, m_clock_address);
 		break;
 
 	case 7:
@@ -397,7 +405,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!m_clock_enable)
-			mm58274c_w(machine().device("mm58274c"), space, m_clock_address, data & 0xf);
+			mm58274c_w(m_mm58274, space, m_clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -430,7 +438,7 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 			/* NCALM clock calendar address and strobe register */
 			if (m_clock_enable != ((data & 0x10) != 0))
 			{
-				m_clock_enable = (data & 0x10) != 0;
+				m_clock_enable = ((data & 0x10) != 0);
 				if (! m_clock_enable)
 					/* latch address when enable goes low */
 					m_clock_address = data & 0x0f;

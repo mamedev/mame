@@ -31,7 +31,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/concept.h"
-#include "machine/mm58274c.h"
 
 static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
@@ -250,19 +249,23 @@ ROM_START( concept )
 	ROM_REGION16_BE(0x100000,"maincpu",0)   /* 68k rom and ram */
 
 	// concept boot ROM
+	ROM_SYSTEM_BIOS(0, "lvl8", "Level 8" )	// v0?
+	ROMX_LOAD("bootl08h", 0x010000, 0x1000, CRC(ee479f51) SHA1(b20ba18564672196076e46507020c6d69a640a2f), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("bootl08l", 0x010001, 0x1000, CRC(acaefd07) SHA1(de0c7eaacaf4c0652aa45e523cebce2b2993c437), ROM_BIOS(1) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(1, "lvl7", "Level 7" )	// v0? v1?
+	ROMX_LOAD("cc07h", 0x010000, 0x1000, CRC(455abac8) SHA1(b12e1580220242d34eafed1b486cebd89e823c8b), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("cc07l", 0x010001, 0x1000, CRC(107a3830) SHA1(0ea12ef13b0d11fcd83b306b3a1bb8014ba910c0), ROM_BIOS(2) | ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(2, "lvl6", "Level 6" )	// v0?
+	ROMX_LOAD("cc06h", 0x010000, 0x1000, CRC(66b6b259) SHA1(1199a38ef3e94f695e8da6a7c80c6432da3cb80c), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("cc06l", 0x010001, 0x1000, CRC(600940d3) SHA1(c3278bf23b3b1c35ea1e3da48a05e877862a8345), ROM_BIOS(3) | ROM_SKIP(1))
+
 #if 0
-	// version 0 level 6 release
-	ROM_LOAD16_BYTE("bootl06h", 0x010000, 0x1000, CRC(66b6b259))
-	ROM_LOAD16_BYTE("bootl06l", 0x010001, 0x1000, CRC(600940d3))
-#elif 0
 	// version 1 lvl 7 release
-	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))
+	ROM_LOAD16_BYTE("bootl17h", 0x010000, 0x1000, CRC(6dd9718f))	// where does this come from?
 	ROM_LOAD16_BYTE("bootl17l", 0x010001, 0x1000, CRC(107a3830))
-#elif 1
-	// version 0 lvl 8 release
-	ROM_LOAD16_BYTE("bootl08h", 0x010000, 0x1000, CRC(ee479f51) SHA1(b20ba18564672196076e46507020c6d69a640a2f))
-	ROM_LOAD16_BYTE("bootl08l", 0x010001, 0x1000, CRC(acaefd07) SHA1(de0c7eaacaf4c0652aa45e523cebce2b2993c437))
-#else
+#elif 0
 	// version $F lvl 8 (development version found on a floppy disk along with
 	// the source code)
 	ROM_LOAD16_WORD("cc.prm", 0x010000, 0x2000, CRC(b5a87dab) SHA1(0da59af6cfeeb38672f71731527beac323d9c3d6))

@@ -13,6 +13,7 @@
 
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "machine/mm58274c.h"   /* mm58274 seems to be compatible with mm58174 */
 #include "machine/concept_exp.h"
 
 #define ACIA_0_TAG  "acia0"
@@ -41,12 +42,13 @@ public:
 	required_device<mos6551_device> m_acia1;
 	required_shared_ptr<UINT16> m_videoram;
 
+	device_t *m_mm58274;
 	concept_exp_port_device *m_exp[4];
 	ioport_port *m_key[6];
 
 	UINT8 m_pending_interrupts;
-	char m_clock_enable;
-	char m_clock_address;
+	bool m_clock_enable;
+	UINT8 m_clock_address;
 	UINT8 m_KeyQueue[KeyQueueSize];
 	int m_KeyQueueHead;
 	int m_KeyQueueLen;

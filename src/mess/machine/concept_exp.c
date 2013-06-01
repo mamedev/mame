@@ -48,10 +48,6 @@ concept_exp_port_device::concept_exp_port_device(const machine_config &mconfig, 
 void concept_exp_port_device::device_start()
 {
 	m_card = dynamic_cast<concept_exp_card_device *>(get_card_device());
-
-	// resolve callbacks
-//	m_write_trxc.resolve_safe();
-//	m_write_keydown.resolve_safe();
 }
 
 
