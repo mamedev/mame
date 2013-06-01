@@ -53,7 +53,7 @@ READ_LINE_MEMBER(konami573_cassette_interface::read_line_adc083x_sars)
 const device_type KONAMI573_CASSETTE_X = &device_creator<konami573_cassette_x_device>;
 
 konami573_cassette_x_device::konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, KONAMI573_CASSETTE_X, "KONAMI 573 CASSETTE X", tag, owner, clock, "sys573", __FILE__),
+	device_t(mconfig, KONAMI573_CASSETTE_X, "KONAMI 573 CASSETTE X", tag, owner, clock, "sys573c", __FILE__),
 	device_slot_card_interface(mconfig, *this),
 	m_x76f041(*this, "eeprom")
 {
