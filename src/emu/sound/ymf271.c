@@ -15,6 +15,7 @@
     - A/L bit (alternate loop)
     - EN and EXT Out bits
     - Src B and Src NOTE bits
+    - statusreg Busy and End bits
     - oh, and a lot more...
 */
 
@@ -1301,21 +1302,29 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	case 0:
 		m_status |= 1;
 
+		// assert IRQ
 		if (m_enable & 4)
 		{
 			m_irqstate |= 1;
 			if (!m_irq_handler.isnull()) m_irq_handler(1);
 		}
+		
+		// reload timer
+		m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (1024 - m_timerA)), 0);
 		break;
 
 	case 1:
 		m_status |= 2;
 
+		// assert IRQ
 		if (m_enable & 8)
 		{
 			m_irqstate |= 2;
 			if (!m_irq_handler.isnull()) m_irq_handler(1);
 		}
+		
+		// reload timer
+		m_timB->adjust(attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB)), 0);
 		break;
 	}
 }
@@ -1338,7 +1347,6 @@ void ymf271_device::ymf271_write_timer(int data)
 {
 	int slotnum;
 	YMF271Group *group;
-	attotime period;
 
 	slotnum = fm_tab[m_timerreg & 0xf];
 	group = &m_groups[slotnum];
@@ -1367,51 +1375,39 @@ void ymf271_device::ymf271_write_timer(int data)
 				break;
 
 			case 0x13:
-				if (data & 1)
+				// timer A load
+				if (~m_enable & data & 1)
 				{
-					// timer A load
-					m_timerAVal = m_timerA;
+					attotime period = attotime::from_hz(m_clock) * (384 * 4 * (1024 - m_timerA));
+					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
-				if (data & 2)
+
+				// timer B load
+				if (~m_enable & data & 2)
 				{
-					// timer B load
-					m_timerBVal = m_timerB;
+					attotime period = attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB));
+					m_timB->adjust((data & 2) ? period : attotime::never, 0);
 				}
-				if (data & 4)
-				{
-					// timer A IRQ enable
-					m_enable |= 4;
-				}
-				if (data & 8)
-				{
-					// timer B IRQ enable
-					m_enable |= 8;
-				}
+
+				// timer A reset
 				if (data & 0x10)
 				{
-					// timer A reset
 					m_irqstate &= ~1;
 					m_status &= ~1;
 
-					if (!m_irq_handler.isnull()) m_irq_handler(0);
-
-					period = attotime::from_hz(m_clock) * (384 * 4 * (1024 - m_timerAVal));
-
-					m_timA->adjust(period, 0, period);
+					if (!m_irq_handler.isnull() && ~m_irqstate & 2) m_irq_handler(0);
 				}
+
+				// timer B reset
 				if (data & 0x20)
 				{
-					// timer B reset
 					m_irqstate &= ~2;
 					m_status &= ~2;
 
-					if (!m_irq_handler.isnull()) m_irq_handler(0);
-
-					period = attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerBVal));
-
-					m_timB->adjust(period, 0, period);
+					if (!m_irq_handler.isnull() && ~m_irqstate & 1) m_irq_handler(0);
 				}
 
+				m_enable = data;
 				break;
 
 			case 0x14:
@@ -1648,8 +1644,6 @@ void ymf271_device::init_state()
 
 	save_item(NAME(m_timerA));
 	save_item(NAME(m_timerB));
-	save_item(NAME(m_timerAVal));
-	save_item(NAME(m_timerBVal));
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_status));
 	save_item(NAME(m_enable));
@@ -1677,6 +1671,7 @@ void ymf271_device::device_start()
 	m_timB = timer_alloc(1);
 
 	m_rom = *region();
+	m_rom_size = region()->bytes();
 	m_irq_handler.resolve();
 
 	m_ext_read_handler.resolve();
@@ -1714,6 +1709,15 @@ void ymf271_device::device_reset()
 		m_slots[i].active = 0;
 		m_slots[i].volume = 0;
 	}
+	
+	// reset timers and IRQ
+	m_timA->reset();
+	m_timB->reset();
+	
+	m_irqstate = 0;
+	m_status = 0;
+	m_enable = 0;
+	if (!m_irq_handler.isnull()) m_irq_handler(0);
 }
 
 const device_type YMF271 = &device_creator<ymf271_device>;
@@ -1723,8 +1727,6 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 		device_sound_interface(mconfig, *this),
 		m_timerA(0),
 		m_timerB(0),
-		m_timerAVal(0),
-		m_timerBVal(0),
 		m_irqstate(0),
 		m_status(0),
 		m_enable(0),

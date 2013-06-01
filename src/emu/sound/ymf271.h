@@ -119,8 +119,6 @@ private:
 
 	INT32 m_timerA;
 	INT32 m_timerB;
-	INT32 m_timerAVal;
-	INT32 m_timerBVal;
 	INT32 m_irqstate;
 	INT8  m_status;
 	INT8  m_enable;
@@ -135,6 +133,7 @@ private:
 	UINT8 m_ext_read;
 
 	const UINT8 *m_rom;
+	UINT32 m_rom_size;
 	UINT32 m_clock;
 
 	emu_timer *m_timA, *m_timB;
