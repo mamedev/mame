@@ -879,8 +879,8 @@ const via6522_interface via_intf =
 	DEVCB_DRIVER_MEMBER(pet_state, via_pa_w),
 	DEVCB_DRIVER_MEMBER(pet_state, via_pb_w),
 	DEVCB_DEVICE_LINE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, ca1_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_ca2_w),
 	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_ca2_w),
 	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_cb2_w),
 	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_irq_w)
 };
