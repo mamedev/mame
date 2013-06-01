@@ -2,7 +2,7 @@
 #include "intelfsh.h"
 #include "machine/pccard.h"
 
-class linear_flash_card_device : public device_t,
+class linear_flash_pccard_device : public device_t,
 	public pccard_interface,
 	public device_memory_interface,
 	public device_slot_card_interface
@@ -12,7 +12,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_memory);
 
 protected:
-	linear_flash_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
 
 	// device-level overrides
 	virtual void device_start();
@@ -25,12 +25,12 @@ protected:
 };
 
 
-extern const device_type LINEAR_FLASH_16MB;
+extern const device_type LINEAR_FLASH_PCCARD_16MB;
 
-class linear_flash_card_16mb_device : public linear_flash_card_device
+class linear_flash_pccard_16mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_card_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -38,24 +38,24 @@ protected:
 };
 
 
-extern const device_type LINEAR_FLASH_32MB;
+extern const device_type LINEAR_FLASH_PCCARD_32MB;
 
-class linear_flash_card_32mb_device : public linear_flash_card_device
+class linear_flash_pccard_32mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_card_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
-extern const device_type LINEAR_FLASH_64MB;
+extern const device_type LINEAR_FLASH_PCCARD_64MB;
 
-class linear_flash_card_64mb_device : public linear_flash_card_device
+class linear_flash_pccard_64mb_device : public linear_flash_pccard_device
 {
 public:
-	linear_flash_card_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
