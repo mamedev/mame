@@ -19,7 +19,7 @@ DEVICE_ADDRESS_MAP_START(amap8, 8, address_map_bank_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(amap16, 16, address_map_bank_device)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read16, write16) /// TODO: fix memory.c bug that ignores the upper limit on the AM_DEVICE
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read16, write16)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(amap32, 32, address_map_bank_device)
