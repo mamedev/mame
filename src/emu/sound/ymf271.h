@@ -64,6 +64,7 @@ private:
 		UINT32 startaddr;
 		UINT32 loopaddr;
 		UINT32 endaddr;
+		INT8   altloop;
 		INT8   fs, srcnote, srcb;
 
 		INT64 step;

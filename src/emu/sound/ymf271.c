@@ -10,6 +10,11 @@
     MAME and properly licensed derivatives, it is available under the
     terms of the GNU Lesser General Public License (LGPL), version 2.1.
     You may read the LGPL at http://www.gnu.org/licenses/lgpl.html
+
+    TODO:
+    - A/L bit (alternate loop)
+    - EN and EXT Out
+    - oh, and a lot more...
 */
 
 #include "emu.h"
@@ -1252,7 +1257,8 @@ void ymf271_device::ymf271_write_pcm(int data)
 			break;
 		case 2:
 			slot->startaddr &= ~0xff0000;
-			slot->startaddr |= data<<16;
+			slot->startaddr |= (data & 0x7f)<<16;
+			slot->altloop = (data & 0x80) ? 1 : 0;
 			break;
 		case 3:
 			slot->endaddr &= ~0xff;
@@ -1264,7 +1270,7 @@ void ymf271_device::ymf271_write_pcm(int data)
 			break;
 		case 5:
 			slot->endaddr &= ~0xff0000;
-			slot->endaddr |= data<<16;
+			slot->endaddr |= (data & 0x7f)<<16;
 			break;
 		case 6:
 			slot->loopaddr &= ~0xff;
@@ -1276,7 +1282,7 @@ void ymf271_device::ymf271_write_pcm(int data)
 			break;
 		case 8:
 			slot->loopaddr &= ~0xff0000;
-			slot->loopaddr |= data<<16;
+			slot->loopaddr |= (data & 0x7f)<<16;
 			break;
 		case 9:
 			slot->fs = data & 0x3;
@@ -1364,7 +1370,7 @@ void ymf271_device::ymf271_write_timer(int data)
 					m_timerA &= 0x00ff;
 					if ((data & 0x3) != 0x3)
 					{
-						m_timerA |= (data & 0xff)<<8;
+						m_timerA |= data<<8;
 					}
 				}
 				break;
@@ -1623,6 +1629,7 @@ void ymf271_device::init_state()
 		save_item(NAME(m_slots[i].startaddr), i);
 		save_item(NAME(m_slots[i].loopaddr), i);
 		save_item(NAME(m_slots[i].endaddr), i);
+		save_item(NAME(m_slots[i].altloop), i);
 		save_item(NAME(m_slots[i].fs), i);
 		save_item(NAME(m_slots[i].srcnote), i);
 		save_item(NAME(m_slots[i].srcb), i);
