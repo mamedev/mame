@@ -13,7 +13,8 @@
 
     TODO:
     - A/L bit (alternate loop)
-    - EN and EXT Out
+    - EN and EXT Out bits
+    - Src B and Src NOTE bits
     - oh, and a lot more...
 */
 
@@ -1365,14 +1366,8 @@ void ymf271_device::ymf271_write_timer(int data)
 				break;
 
 			case 0x11:
-				if (!(data & 0xfc))
-				{
-					m_timerA &= 0x00ff;
-					if ((data & 0x3) != 0x3)
-					{
-						m_timerA |= data<<8;
-					}
-				}
+				m_timerA &= 0xff;
+				m_timerA |= (data & 0x3)<<8;
 				break;
 
 			case 0x12:
@@ -1402,7 +1397,6 @@ void ymf271_device::ymf271_write_timer(int data)
 				{   // timer A reset
 					m_irqstate &= ~1;
 					m_status &= ~1;
-					m_timerAVal |= 0x300;
 
 					if (!m_irq_handler.isnull()) m_irq_handler(0);
 
