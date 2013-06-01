@@ -44,6 +44,9 @@ void speedbal_state::video_start()
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
 	m_fg_tilemap->set_transmask(1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
+
+
+
 }
 
 
@@ -94,7 +97,7 @@ void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		x = 243 - spriteram[offset + 3];
 		y = 239 - spriteram[offset + 0];
 
-		code = BITSWAP8(spriteram[offset + 1],0,1,2,3,4,5,6,7) | ((spriteram[offset + 2] & 0x40) << 2);
+		code = (spriteram[offset + 1]) | ((spriteram[offset + 2] & 0x40) << 2);
 
 		color = spriteram[offset + 2] & 0x0f;
 

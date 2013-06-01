@@ -19,6 +19,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 
+	DECLARE_DRIVER_INIT(speedbal);
 	DECLARE_DRIVER_INIT(musicbal);
 
 	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);

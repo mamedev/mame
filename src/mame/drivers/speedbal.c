@@ -285,7 +285,7 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( speedbal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  512, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
 
@@ -325,6 +325,23 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 MACHINE_CONFIG_END
 
 
+DRIVER_INIT_MEMBER(speedbal_state,speedbal)
+{
+	// sprite tiles are in an odd order, rearrange to simplify video drawing function
+	UINT8* rom = memregion("sprites")->base();
+	UINT8* temp = auto_alloc_array(machine(), UINT8, 0x200*128);
+
+	for (int i=0;i<0x200;i++)
+	{
+		int j = BITSWAP16(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
+		memcpy(temp+i*128, rom+j*128, 128);
+	}
+
+	memcpy(rom,temp,0x200*128);
+	auto_free(machine(), temp);
+}
+
+
 
 /***************************************************************************
 
@@ -349,7 +366,7 @@ ROM_START( speedbal )
 	ROM_LOAD( "sb8.bin",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
 	ROM_LOAD( "sb4.bin",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT )
+	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "sb7.bin",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )   /* sprites */
 	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
 ROM_END
@@ -373,10 +390,9 @@ ROM_START( musicbal )
 	ROM_LOAD( "08.bin",  0x10000, 0x08000, CRC(7e7af52b) SHA1(3bb1c5abfb1fe53f01520e93124708df6750d8b5) )
 	ROM_LOAD( "04.bin",  0x18000, 0x08000, CRC(bf931a33) SHA1(b2ab5c6103af0e0508f08fd58b425e5acfe9ef8a) )
 
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT ) // still contain Speed Ball logos!
+	ROM_REGION( 0x10000, "sprites", ROMREGION_INVERT ) // still contain Speed Ball logos!
 	ROM_LOAD( "07.bin",  0x00000, 0x08000, CRC(310e1e23) SHA1(290f3e1c7b907165fe60a4ebe7a8b04b2451b3b1) )   /* sprites */
 	ROM_LOAD( "06.bin",  0x08000, 0x08000, CRC(2e7772f8) SHA1(caded1a72356501282e627e23718c30cb8f09370) )
-
 #ifdef USE_DECRYPTION_HELPER
 /* speed ball code for decryption comparison help */
 
@@ -386,6 +402,11 @@ ROM_START( musicbal )
 #endif
 
 ROM_END
+
+
+
+
+
 
 
 #define MUSICBALL_XOR05  { rom[i] = rom[i] ^ 0x05; }
@@ -410,13 +431,62 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 		}
 		*/
 
-		if (i&0x0020) { MUSICBALL_XOR84   MUSICBALL_SWAP1 }
+		if (!(i&0x0800))
+		{
+			if (i&0x0020) { MUSICBALL_XOR84 }
+			else
+			{
+				if (i&0x08) { MUSICBALL_XOR84 }
+			}
+		}
 		else
 		{
-			if (i&0x08) { MUSICBALL_XOR84  MUSICBALL_SWAP2 }
-			else { MUSICBALL_SWAP1 }
-		
+			MUSICBALL_XOR84
 		}
+
+/*
+6608:  00, 00, 00, 00, 00, 00, 00, 00, // wrong
+6618:  00, 05, 05, 00, 00, 00, 05, 05,
+
+6648:  00, 05, 05, 05, 05, 05, 05, 00,
+6658:  05, 05, 00, 05, 00, 00, 00, 00,
+
+6688:  05, 05, 05, 05, 05, 05, 05, 00,
+6698:  00, 00, 00, 00, 05, 00, 00, 05,
+
+66c8:  05, 00, 05, 00, 05, 00, 00, 05,
+66d8:  05, 05, 05, 05, 00, 05, 05, 05,
+
+6708:  00, 05, 00, 05, 05, 00, 05, 00,
+6718:  00, 05, 00, 05, 05, 00, 05, 00,
+
+6748:  05, 05, 05, 05, 05, 05, 05, 00,
+6758:  05, 00, 00, 05, 00, 05, 00, 05,
+
+6788:  05, 00, 00, 05, 05, 00, 05, 00,
+6798:  05, 00, 05, 00, 05, 05, 05, 05,
+
+67c8:  00, 00, 05, 00, 05, 05, 05, 05,
+67d8:  00, 00, 05, 00, 05, 05, 05, 05,
+*/
+
+
+
+
+		if (!(i&0x0800))
+		{
+			if (i&0x0020) { MUSICBALL_SWAP1 }
+			else
+			{
+				if (i&0x08) { MUSICBALL_SWAP2 }
+				else { MUSICBALL_SWAP1 }
+			}
+		}
+		else
+		{
+			MUSICBALL_SWAP1
+		}
+
 	}
 
 #ifdef USE_DECRYPTION_HELPER
@@ -470,9 +540,11 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 	}
 #endif
 
+	DRIVER_INIT_CALL(speedbal);
+
 }
 
 
 
-GAMEL( 1987, speedbal, 0,        speedbal, speedbal, driver_device,  0,        ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )
+GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )
 GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / DESystem S.A.", "Music Ball", GAME_NOT_WORKING, layout_speedbal )
