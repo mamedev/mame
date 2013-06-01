@@ -945,10 +945,10 @@ ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, d
 		m_irq_enable(0),
 		m_keyon_enable(0),
 		m_ext_mem_enable(0),
+		m_ext_readlatch(0),
 		m_ext_mem_address_hi(0),
 		m_ext_mem_address_mid(0),
 		m_ext_mem_address(0),
-		m_ext_readlatch(0),
 		m_irq_handler(*this),
 		m_ext_read_handler(*this),
 		m_ext_write_handler(*this)
