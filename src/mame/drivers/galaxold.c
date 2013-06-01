@@ -649,30 +649,46 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
+WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
+{
+//	printf("rombank %02x\n",data);
+	if (data&1)
+	{
+		UINT8 *rom = memregion("maincpu")->base();
+		membank("cpubank")->set_base(rom + 0x4000);
+	}
+	else
+	{
+		UINT8 *rom = memregion("maincpu")->base();
+		membank("cpubank")->set_base(rom + 0x2000);
+	}
+}
 
-	AM_RANGE(0x4800, 0x4bff) AM_RAM // mirror, leftovers?
+
+static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP // 0x2000-0x27ff is banked (so they have room for the new music player), see init
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
 
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0x5880, 0x58ff) AM_RAM
 	AM_RANGE(0x5800, 0x583f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x5840, 0x585f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5860, 0x587f) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
+	AM_RANGE(0x5880, 0x58ff) AM_RAM
+
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0") AM_WRITE( guttang_rombank_w )
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")
 
-//	AM_RANGE(0x6000, 0x6002) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
-//	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_noise_enable_w) // should this disable the stars too?
-//	AM_RANGE(0x6005, 0x6005) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)
-//	AM_RANGE(0x6006, 0x6007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
+	AM_RANGE(0x6800, 0x6802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
+	AM_RANGE(0x6803, 0x6803) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_noise_enable_w)
+	AM_RANGE(0x6805, 0x6805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)
+	AM_RANGE(0x6806, 0x6807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
+
 
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2")
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(galaxold_nmi_enable_w)
 
-	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)  AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 
 ADDRESS_MAP_END
 
@@ -2056,6 +2072,70 @@ static INPUT_PORTS_START( trvchlng )
 INPUT_PORTS_END
 
 
+
+static INPUT_PORTS_START( guttangt )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_DIPNAME( 0x40, 0x40, "IN0:6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_DIPNAME( 0x04, 0x00, "IN1:3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN1:4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN1:5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN1:6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN1:7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN1:8" ) 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2:1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN2:2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "IN2:3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN2:4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN2:5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN2:6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN2:7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN2:8" ) 
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout galaxold_charlayout =
 {
 	8,8,
@@ -3194,7 +3274,7 @@ ROM_START( guttangt )
 	ROM_LOAD( "gg3-2716.rom",           0x1000, 0x0800, CRC(38d71df3) SHA1(f1771256b52ba1bfc1bd472f8a78d6302a7b1299) )
 	ROM_LOAD( "gg4-2716.rom",           0x1800, 0x0800, CRC(7623125a) SHA1(3f3abb9c66751908918fa52e22e153da5fdc0902) )
 	ROM_LOAD( "gg5-2732.rom",           0x2000, 0x0800, CRC(1fe33f92) SHA1(d3e00459015b8bf43fe2e8f6cb57cef775bbb330) )
-	ROM_CONTINUE(0x4000,0x800) // is this important?
+	ROM_CONTINUE(0x4000,0x800) // banked code, maps at 0x2000
 	ROM_LOAD( "gg6-2716.rom",           0x2800, 0x0800, CRC(60606cd5) SHA1(9a4bf0134c7fa66d2ecd3a745421091b0a086572) )
 	ROM_LOAD( "gg7-2516.rom",           0x3000, 0x0800, CRC(ce0d0a93) SHA1(339bd9c6c40eb2501d1a1adcea0cfa82e3224967) )
 	ROM_LOAD( "gg8-2716.rom",           0x3800, 0x0800, CRC(b8716081) SHA1(e2d1db27ad44876b891cc0a2232ac887bcc5516f) )
@@ -3255,6 +3335,15 @@ ROM_START( bullsdrtg )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(16b19bfa) SHA1(a0e9217f9bc5b06212d5f22dcc3dc4b2838788ba) )
 ROM_END
 
+DRIVER_INIT_MEMBER(galaxold_state,guttangt)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_bank( 0x2000, 0x27ff, 0, 0, "cpubank" );
+	UINT8 *rom = memregion("maincpu")->base();
+	membank("cpubank")->set_base(rom + 0x2000);
+}
+
+
 /* Z80 games */
 GAME( 1981, vpool,    hustler,  mooncrst, vpool,    driver_device,  0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device,  0,        ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
@@ -3273,7 +3362,7 @@ GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        RO
 GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, vstars,   0,        mooncrst, porter,   driver_device,  0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
-GAME( 1982, guttangt, locomotn, guttang,  scrambler,driver_device,  0,        ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // or by 'Tren' ?
+GAME( 1982, guttangt, locomotn, guttang,  guttangt, galaxold_state, guttangt, ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 /* S2650 games */
 GAME( 1983, hunchbkg, hunchbak, hunchbkg, hunchbkg, driver_device,  0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )

@@ -127,6 +127,10 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxold_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(rockclim_videoram_w);
 	DECLARE_WRITE8_MEMBER(rockclim_scroll_w);
+	DECLARE_WRITE8_MEMBER(guttang_rombank_w);
+
+	
+
 	DECLARE_READ8_MEMBER(rockclim_videoram_r);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
@@ -138,6 +142,7 @@ public:
 	DECLARE_DRIVER_INIT(bullsdrtg);
 	DECLARE_DRIVER_INIT(ladybugg);
 	DECLARE_DRIVER_INIT(4in1);
+	DECLARE_DRIVER_INIT(guttangt);
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
