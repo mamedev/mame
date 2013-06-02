@@ -463,15 +463,15 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 		if (slot->bits == 8)
 		{
 			// 8bit
-			sample = m_rom[slot->startaddr + (slot->stepptr>>16)]<<8;
+			sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>16))<<8;
 		}
 		else
 		{
 			// 12bit
 			if (slot->stepptr & 0x10000)
-				sample = m_rom[slot->startaddr + (slot->stepptr>>17)*3 + 2]<<8 | ((m_rom[slot->startaddr + (slot->stepptr>>17)*3 + 1] << 4) & 0xf0);
+				sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 2)<<8 | ((ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 1) << 4) & 0xf0);
 			else
-				sample = m_rom[slot->startaddr + (slot->stepptr>>17)*3]<<8 | (m_rom[slot->startaddr + (slot->stepptr>>17)*3 + 1] & 0xf0);
+				sample = ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3)<<8 | (ymf271_read_memory(slot->startaddr + (slot->stepptr>>17)*3 + 1) & 0xf0);
 		}
 
 		update_envelope(slot);
@@ -1307,7 +1307,9 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		if (m_enable & 4)
 		{
 			m_irqstate |= 1;
-			if (!m_irq_handler.isnull()) m_irq_handler(1);
+
+			if (!m_irq_handler.isnull())
+				m_irq_handler(1);
 		}
 		
 		// reload timer
@@ -1321,7 +1323,9 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		if (m_enable & 8)
 		{
 			m_irqstate |= 2;
-			if (!m_irq_handler.isnull()) m_irq_handler(1);
+
+			if (!m_irq_handler.isnull())
+				m_irq_handler(1);
 		}
 		
 		// reload timer
@@ -1330,18 +1334,22 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-UINT8 ymf271_device::ymf271_read_ext_memory(UINT32 address)
+UINT8 ymf271_device::ymf271_read_memory(UINT32 offset)
 {
-	if( !m_ext_read_handler.isnull() )
-		return m_ext_read_handler(address);
-	else
-		return m_rom[address];
-}
+	if (m_ext_read_handler.isnull())
+	{
+		if (offset < m_region_size)
+			return m_region_base[offset];
 
-void ymf271_device::ymf271_write_ext_memory(UINT32 address, UINT8 data)
-{
-	if( !m_ext_write_handler.isnull() )
-		m_ext_write_handler(address, data);
+		/* 8MB chip limit (shouldn't happen) */
+		else if (offset > 0x7fffff)
+			return m_region_base[offset & 0x7fffff];
+
+		else
+			return 0;
+	}
+	else
+		return m_ext_read_handler(offset);
 }
 
 void ymf271_device::ymf271_write_timer(int data)
@@ -1397,7 +1405,8 @@ void ymf271_device::ymf271_write_timer(int data)
 					m_irqstate &= ~1;
 					m_status &= ~1;
 
-					if (!m_irq_handler.isnull() && ~m_irqstate & 2) m_irq_handler(0);
+					if (!m_irq_handler.isnull() && ~m_irqstate & 2)
+						m_irq_handler(0);
 				}
 
 				// timer B reset
@@ -1406,7 +1415,8 @@ void ymf271_device::ymf271_write_timer(int data)
 					m_irqstate &= ~2;
 					m_status &= ~2;
 
-					if (!m_irq_handler.isnull() && ~m_irqstate & 1) m_irq_handler(0);
+					if (!m_irq_handler.isnull() && ~m_irqstate & 1)
+						m_irq_handler(0);
 				}
 
 				m_enable = data;
@@ -1423,13 +1433,12 @@ void ymf271_device::ymf271_write_timer(int data)
 			case 0x16:
 				m_ext_address &= ~0xff0000;
 				m_ext_address |= (data & 0x7f) << 16;
-				m_ext_read = (data & 0x80) ? 1 : 0;
-				if( !m_ext_read )
-					m_ext_address = (m_ext_address + 1) & 0x7fffff;
+				m_ext_rw = (data & 0x80) ? 1 : 0;
 				break;
 			case 0x17:
-				ymf271_write_ext_memory( m_ext_address, data );
 				m_ext_address = (m_ext_address + 1) & 0x7fffff;
+				if (!m_ext_rw && !m_ext_write_handler.isnull())
+					m_ext_write_handler(m_ext_address, data);
 				break;
 		}
 	}
@@ -1482,17 +1491,21 @@ WRITE8_MEMBER( ymf271_device::write )
 
 READ8_MEMBER( ymf271_device::read )
 {
-	UINT8 value;
-
 	switch(offset)
 	{
 		case 0:
 			return m_status;
 
 		case 2:
-			value = ymf271_read_ext_memory( m_ext_address );
+		{
+			if (!m_ext_rw)
+				return 0xff;
+
+			UINT8 ret = m_ext_readlatch;
 			m_ext_address = (m_ext_address + 1) & 0x7fffff;
-			return value;
+			m_ext_readlatch = ymf271_read_memory(m_ext_address);
+			return ret;
+		}
 	}
 
 	return 0;
@@ -1656,7 +1669,8 @@ void ymf271_device::init_state()
 	save_item(NAME(m_pcmreg));
 	save_item(NAME(m_timerreg));
 	save_item(NAME(m_ext_address));
-	save_item(NAME(m_ext_read));
+	save_item(NAME(m_ext_rw));
+	save_item(NAME(m_ext_readlatch));
 }
 
 //-------------------------------------------------
@@ -1672,8 +1686,8 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	m_rom = *region();
-	m_rom_size = region()->bytes();
+	m_region_base = *region();
+	m_region_size = region()->bytes();
 	m_irq_handler.resolve();
 
 	m_ext_read_handler.resolve();
@@ -1719,7 +1733,9 @@ void ymf271_device::device_reset()
 	m_irqstate = 0;
 	m_status = 0;
 	m_enable = 0;
-	if (!m_irq_handler.isnull()) m_irq_handler(0);
+
+	if (!m_irq_handler.isnull())
+		m_irq_handler(0);
 }
 
 const device_type YMF271 = &device_creator<ymf271_device>;
@@ -1739,7 +1755,8 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 		m_pcmreg(0),
 		m_timerreg(0),
 		m_ext_address(0),
-		m_ext_read(0),
+		m_ext_rw(0),
+		m_ext_readlatch(0),
 		m_irq_handler(*this),
 		m_ext_read_handler(*this),
 		m_ext_write_handler(*this)

@@ -109,8 +109,7 @@ private:
 	void write_register(int slotnum, int reg, int data);
 	void ymf271_write_fm(int grp, int adr, int data);
 	void ymf271_write_pcm(int data);
-	UINT8 ymf271_read_ext_memory(UINT32 address);
-	void ymf271_write_ext_memory(UINT32 address, UINT8 data);
+	UINT8 ymf271_read_memory(UINT32 offset);
 	void ymf271_write_timer(int data);
 
 	// internal state
@@ -130,10 +129,11 @@ private:
 	INT8  m_pcmreg;
 	INT8  m_timerreg;
 	UINT32 m_ext_address;
-	UINT8 m_ext_read;
+	UINT8 m_ext_rw;
+	UINT8 m_ext_readlatch;
 
-	const UINT8 *m_rom;
-	UINT32 m_rom_size;
+	UINT8 *m_region_base;
+	UINT32 m_region_size;
 	UINT32 m_clock;
 
 	emu_timer *m_timA, *m_timB;
