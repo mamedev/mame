@@ -649,8 +649,6 @@ void ymz280b_device::device_start()
 
 void ymz280b_device::device_reset()
 {
-	m_ext_mem_enable = 0;
-
 	/* initial clear registers */
 	for (int i = 0xff; i >= 0; i--)
 	{
