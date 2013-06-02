@@ -396,13 +396,13 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		logerror("CMOS: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5101_WRITE:
-		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
+		m_cmos_select = (m_cmos_select & 0xf0) | ((data & 0xf0) >> 4);
 		m_cmos_ram[m_cmos_select] = data & 0x0f;
-		logerror("CMOS: write %02x to byte %02x\n",data & 0x0f, m_cmos_select);
+		logerror("CMOS: write %01x to byte %02x\n",data & 0x0f, m_cmos_select);
 		break;
 	case PIO_SEL_5101_READ:
-		m_cmos_select = (m_cmos_select & 0xf0) | (data & 0x0f);
-		logerror("CMOS: write %02x to byte %02x (read)\n",data & 0x0f, m_cmos_select);
+		m_cmos_select = (m_cmos_select & 0xf0) | ((data & 0xf0) >> 4);
+		logerror("CMOS: write %01x to byte %02x (read)\n",data & 0x0f, m_cmos_select);
 		break;
 	case PIO_SEL_LATCH:
 		m_pio_latch = data;
