@@ -16,12 +16,20 @@
 const device_type MICROTOUCH = &device_creator<microtouch_device>;
 
 microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	m_out_tx_func(*this),
+	m_touch(*this, "TOUCH"),
+	m_touchx(*this, "TOUCH_X"),
+	m_touchy(*this, "TOUCH_Y")
 {
 }
 
 microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock)
+	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock),
+	m_out_tx_func(*this),
+	m_touch(*this, "TOUCH"),
+	m_touchx(*this, "TOUCH_X"),
+	m_touchy(*this, "TOUCH_Y")
 {
 }
 
@@ -82,10 +90,10 @@ void microtouch_device::send_format_decimal_packet(int x, int y)
 
 void microtouch_device::send_touch_packet()
 {
-	int tx = ioport("TOUCH_X")->read();
-	int ty = ioport("TOUCH_Y")->read();
+	int tx = m_touchx->read();
+	int ty = m_touchy->read();
 
-	if ( m_out_touch_cb == NULL ||
+	if ( m_out_touch_cb.isnull() ||
 			m_out_touch_cb( &tx, &ty ) != 0 )
 	{
 		ty = 0x4000 - ty;
@@ -127,7 +135,7 @@ void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 
 	// send format tablet packet
-	if ( ioport("TOUCH")->read() & 0x01 )
+	if (m_touch->read())
 	{
 		send_touch_packet();
 	}
@@ -148,18 +156,6 @@ void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int p
 					break;
 			}
 		}
-	}
-}
-
-void microtouch_device::device_config_complete()
-{
-	const microtouch_interface *intf = reinterpret_cast<const microtouch_interface *>(static_config());
-	if(intf != NULL)
-		*static_cast<microtouch_interface *>(this) = *intf;
-	else
-	{
-		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
-		memset(&m_out_touch_cb, 0, sizeof(m_out_touch_cb));
 	}
 }
 
@@ -194,7 +190,7 @@ void microtouch_device::device_start()
 	save_item(NAME(m_tx_buffer_ptr));
 	save_item(NAME(m_format));
 	save_item(NAME(m_mode));
-	m_out_tx_func.resolve(m_out_tx_cb, *this);
+	m_out_tx_func.resolve_safe();
 }
 
 
@@ -288,21 +284,9 @@ const device_type MICROTOUCH_SERIAL = &device_creator<microtouch_serial_device>;
 
 microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock),
-		device_serial_interface(mconfig, *this)
+	device_serial_interface(mconfig, *this),
+	m_out_stx_func(*this)
 {
-}
-
-void microtouch_serial_device::device_config_complete()
-{
-	const microtouch_serial_interface *intf = reinterpret_cast<const microtouch_serial_interface *>(static_config());
-	if(intf != NULL)
-		*static_cast<microtouch_serial_interface *>(this) = *intf;
-	else
-	{
-		memset(&m_out_stx_cb, 0, sizeof(m_out_stx_cb));
-	}
-	memset(&(microtouch_interface::m_out_tx_cb), 0, sizeof(microtouch_interface::m_out_tx_cb));
-	memset(&m_out_touch_cb, 0, sizeof(m_out_touch_cb));
 }
 
 void microtouch_serial_device::device_start()
@@ -311,7 +295,7 @@ void microtouch_serial_device::device_start()
 	set_data_frame(8, 1, SERIAL_PARITY_NONE); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
-	m_out_stx_func.resolve(m_out_stx_cb, *this);
+	m_out_stx_func.resolve_safe();
 	m_output_valid = false;
 
 	save_item(NAME(m_output_valid));

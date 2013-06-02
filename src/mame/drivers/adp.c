@@ -294,12 +294,6 @@ static UINT8 duart_input( device_t *device )
 	return device->machine().root_device().ioport("DSW1")->read();
 }
 
-static const microtouch_interface adb_microtouch_config =
-{
-	DEVCB_DRIVER_MEMBER(adp_state, microtouch_tx),
-	NULL
-};
-
 MACHINE_START_MEMBER(adp_state,skattv)
 {
 	m_duart = machine().device("duart68681");
@@ -667,7 +661,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
-	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(adp_state, microtouch_tx) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -699,7 +693,7 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
-	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(adp_state, microtouch_tx) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -727,7 +721,7 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
-	MCFG_MICROTOUCH_ADD( "microtouch", adb_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(adp_state, microtouch_tx) )
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)

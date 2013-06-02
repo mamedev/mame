@@ -769,12 +769,6 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static const microtouch_interface cd32_microtouch_config =
-{
-	DEVCB_DRIVER_MEMBER(cd32_state, microtouch_tx),
-	NULL
-};
-
 static MACHINE_CONFIG_START( cd32base, cd32_state )
 
 	/* basic machine hardware */
@@ -817,7 +811,7 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_0_intf)
 	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, 0, cia_1_intf)
 
-	MCFG_MICROTOUCH_ADD( "microtouch", cd32_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(cd32_state, microtouch_tx) )
 
 	/* fdc */
 	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)

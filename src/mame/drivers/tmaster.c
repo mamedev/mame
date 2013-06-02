@@ -242,12 +242,6 @@ WRITE8_MEMBER( tmaster_state::microtouch_tx )
 	duart68681_rx_data(m_duart68681, 0, data);
 }
 
-static const microtouch_interface tmaster_microtouch_config =
-{
-	DEVCB_DRIVER_MEMBER(tmaster_state, microtouch_tx),
-	NULL
-};
-
 /***************************************************************************
 
   DS1644 RTC
@@ -936,7 +930,7 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
 	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
-	MCFG_MICROTOUCH_ADD( "microtouch", tmaster_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(tmaster_state, microtouch_tx) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

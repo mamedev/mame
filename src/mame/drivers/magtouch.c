@@ -115,11 +115,6 @@ static const ins8250_interface magtouch_com0_interface =
 	DEVCB_NULL
 };
 
-static const microtouch_serial_interface magtouch_microtouch_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER("ns16450_0", ins8250_uart_device, rx_w)
-};
-
 /*************************************
  *
  *  ROM banking
@@ -181,8 +176,6 @@ void magtouch_state::machine_start()
 
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
-
-//  microtouch_init(machine(), magtouch_microtouch_tx_callback, NULL);
 }
 
 static MACHINE_CONFIG_START( magtouch, magtouch_state )
@@ -200,7 +193,7 @@ static MACHINE_CONFIG_START( magtouch, magtouch_state )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_NS16450_ADD( "ns16450_0", magtouch_com0_interface, XTAL_1_8432MHz )
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", magtouch_microtouch_interface, 9600 ) // rate?
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 MACHINE_CONFIG_END
 
 

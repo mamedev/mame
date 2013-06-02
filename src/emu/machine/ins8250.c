@@ -613,7 +613,7 @@ void ns16550_device::set_fcr(UINT8 data)
 	}
 	m_rintlvl = bytes_per_int[(data>>6)&3];
 	m_regs.iir |= 0xc0;
-	m_regs.fcr = data & ~0xc9;
+	m_regs.fcr = data & 0xc9;
 	m_regs.lsr |= 0x20;
 	trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 }

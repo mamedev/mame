@@ -101,43 +101,20 @@ public:
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_serial_device> m_microtouch;
 
-	DECLARE_WRITE_LINE_MEMBER(microtouch_out);
-	DECLARE_WRITE_LINE_MEMBER(microtouch_in);
 	DECLARE_WRITE8_MEMBER(pcat_nit_rombank_w);
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
-	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(pcat_nit);
 	virtual void machine_start();
 };
 
-WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)
-{
-	m_microtouch->rx(state);
-}
-
-WRITE_LINE_MEMBER(pcat_nit_state::microtouch_in)
-{
-	m_uart->rx_w(state);
-}
-
-WRITE_LINE_MEMBER(pcat_nit_state::at_com_interrupt_1)
-{
-	m_pic8259_1->ir4_w(state);
-}
-
 static const ins8250_interface pcat_nit_com0_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(pcat_nit_state, microtouch_out),
+	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pcat_nit_state,at_com_interrupt_1),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
-};
-
-static const microtouch_serial_interface pcat_nit_microtouch_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pcat_nit_state, microtouch_in)
 };
 
 /*************************************
@@ -244,10 +221,9 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-//  MCFG_FRAGMENT_ADD( at_kbdc8042 )
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", pcat_nit_microtouch_interface, 9600 ) // rate?
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

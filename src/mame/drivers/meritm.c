@@ -161,7 +161,7 @@ Not all regional versions are available for each Megatouch series
 #include "video/v9938.h"
 #include "machine/i8255.h"
 #include "machine/z80pio.h"
-#include "machine/pc16552d.h"
+#include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
 
@@ -188,7 +188,8 @@ public:
 			m_v9938_0(*this, "v9938_0"),
 			m_v9938_1(*this, "v9938_1"),
 			m_microtouch(*this, "microtouch") ,
-		m_maincpu(*this, "maincpu") { }
+			m_uart(*this, "ns16550"),
+			m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT8* m_ram;
@@ -205,7 +206,8 @@ public:
 	ds1204_t m_ds1204;
 	required_device<v9938_device> m_v9938_0;
 	required_device<v9938_device> m_v9938_1;
-	required_device<microtouch_device> m_microtouch;
+	optional_device<microtouch_serial_device> m_microtouch;
+	optional_device<ns16550_device> m_uart;
 	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
 	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
 	DECLARE_WRITE8_MEMBER(meritm_bank_w);
@@ -251,6 +253,7 @@ public:
 	void ds1204_init(const UINT8* key, const UINT8* nvram);
 	void meritm_crt250_switch_banks(  );
 	void meritm_switch_banks(  );
+	int meritm_touch_coord_transform(int *touch_x, int *touch_y);
 	UINT8 binary_to_BCD(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
@@ -259,7 +262,7 @@ public:
 
 
 #define SYSTEM_CLK  21470000
-#define UART_CLK    XTAL_18_432MHz
+#define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
 
 
 
@@ -377,28 +380,26 @@ void meritm_state::ds1204_init(const UINT8* key, const UINT8* nvram)
 
 /*************************************
  *
- *  Microtouch <-> pc16650 interface
+ *  Microtouch <-> pc16550 interface
  *
  *************************************/
 
-static void pc16650d_tx_callback(running_machine &machine, int channel, int count, UINT8* data)
+static const ins8250_interface meritm_ns16550_interface =
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	for(int i = 0; i < count; i++)
-		state->m_microtouch->rx(machine.driver_data()->generic_space(), 0, data[i]);
-}
-
-WRITE8_MEMBER(meritm_state::microtouch_tx)
-{
-	pc16552d_rx_data(space.machine(), 0, 0, data);
-}
+	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 /*************************************
  *
  *  Microtouch touch coordinate transformation
  *
  *************************************/
-MICROTOUCH_TOUCH(meritm_touch_coord_transform)
+int meritm_state::meritm_touch_coord_transform(int *touch_x, int *touch_y)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
 	int yscr = (int)((double)(*touch_y)/0x4000*480);
@@ -422,12 +423,6 @@ MICROTOUCH_TOUCH(meritm_touch_coord_transform)
 
 	return 1;
 }
-
-static const microtouch_interface meritm_microtouch_config =
-{
-	DEVCB_DRIVER_MEMBER(meritm_state, microtouch_tx),
-	meritm_touch_coord_transform
-};
 
 /*************************************
  *
@@ -698,7 +693,7 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
@@ -719,7 +714,7 @@ static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
@@ -1129,7 +1124,6 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
 MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
 {
 	MACHINE_START_CALL_MEMBER(meritm_crt250_questions);
-	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
 }
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt260)
@@ -1144,7 +1138,6 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	m_psd_a15 = 0;
 	meritm_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
-	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
 	save_pointer(NAME(m_ram), 0x8000);
@@ -1215,8 +1208,6 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_MICROTOUCH_ADD("microtouch", meritm_microtouch_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
@@ -1229,6 +1220,10 @@ static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questi
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
+
+	MCFG_NS16550_ADD("ns16550", meritm_ns16550_interface, UART_CLK)
+	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
@@ -1242,6 +1237,9 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt260)
 
+	MCFG_NS16550_ADD("ns16550", meritm_ns16550_interface, UART_CLK)
+	MCFG_MICROTOUCH_SERIAL_ADD("microtouch", 9600, DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
 

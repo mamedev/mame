@@ -439,11 +439,6 @@ WRITE8_MEMBER( nevada_state::microtouch_tx )
 	duart68681_rx_data(m_duart40_68681, 0, data);
 }
 
-static const microtouch_interface nevada_microtouch_config =
-{
-	DEVCB_DRIVER_MEMBER(nevada_state, microtouch_tx),
-	NULL
-};
 /***************************************************************************/
 static UINT8 duart40_input( device_t *device )
 {
@@ -741,7 +736,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_DUART68681_ADD( "duart18_68681", XTAL_3_6864MHz , nevada_duart18_68681_config )  // UARTA = Modem 1200Baud
 	MCFG_DUART68681_ADD( "duart39_68681", XTAL_3_6864MHz , nevada_duart39_68681_config )  // UARTA = Printer
 	MCFG_DUART68681_ADD( "duart40_68681", XTAL_3_6864MHz , nevada_duart40_68681_config )  // UARTA = Touch , UARTB = Bill Acceptor
-	MCFG_MICROTOUCH_ADD( "microtouch", nevada_microtouch_config )
+	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(nevada_state, microtouch_tx) )
 	/* devices */
 	MCFG_MSM6242_ADD("rtc", nevada_rtc_intf)
 
