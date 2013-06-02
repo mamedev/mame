@@ -2,7 +2,7 @@
 
         Powertran Cortex
 
-        20/04/2012 Skeleton driver.
+        2012-04-20 Skeleton driver.
 
         ftp://ftp.whtech.com/Powertran Cortex/
         http://www.powertrancortex.com/index.html
@@ -11,10 +11,12 @@
         It was designed by TI engineers, so it may perhaps be a clone
         of another TI or the Geneve.
 
-        Video chip is TMS9928 or TMS9929.
-
-        64K RAM.
-        I saw somewhere that the roms are copied into ram at startup.
+        Chips:
+        TMS9995   - CPU
+        TMS9929   - Video
+        TMS9911   - DMA to floppy
+        TMS9909   - Floppy Disk Controller
+	AY-5-2376 - Keyboard controller
 
 ****************************************************************************/
 
@@ -37,14 +39,24 @@ public:
 };
 
 static ADDRESS_MAP_START( cortex_mem, AS_PROGRAM, 8, cortex_state )
-	AM_RANGE(0x0000, 0xf11f) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xf100, 0xf11f) AM_RAM // memory mapping unit
 	AM_RANGE(0xf120, 0xf120) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xf121, 0xf121) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xfffa, 0xffff) AM_RAM
+	//AM_RANGE(0xf140, 0xf147) // fdc tms9909
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cortex_io, AS_IO, 8, cortex_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0x0000, 0x000f) AM_READWRITE(pio_r,pio_w)
+	//AM_RANGE(0x0010, 0x001f) AM_READ(keyboard_r)
+	//AM_RANGE(0x0080, 0x00bf) AM_READWRITE(rs232_r,rs232_w)
+	//AM_RANGE(0x0180, 0x01bf) AM_READWRITE(cass_r,cass_w)
+	//AM_RANGE(0x0800, 0x080f) AM_WRITE(cent_data_w)
+	//AM_RANGE(0x0810, 0x0811) AM_WRITE(cent_strobe_w)
+	//AM_RANGE(0x0812, 0x0813) AM_READ(cent_stat_r)
+	//AM_RANGE(0x1ee0, 0x1eef) AM_READWRITE(cpu_int_r,cpu_int_w)
+	//AM_RANGE(0x1fda, 0x1fdb) AM_READWRITE(cpu_int1_r,cpu_int1_w)
 	AM_RANGE(0x10000, 0x10000) AM_NOP
 ADDRESS_MAP_END
 
