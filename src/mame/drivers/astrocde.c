@@ -808,8 +808,8 @@ static INPUT_PORTS_START( ebases )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("FAKE")
-	/* Cocktail cabinets had a B/W monitor and color overlay (same one as Space Zap!),
-	   upright cabinets had a color monitor and baseball stadium background. */
+	/* Cocktail cabinets had a B/W monitor with color overlay (same one as Space Zap!),
+	   upright cabinets at factory default had a B/W monitor too, with a baseball stadium background. */
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrocde_state,spacezap_monitor, 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )
