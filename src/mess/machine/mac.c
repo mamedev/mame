@@ -1356,7 +1356,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 
 WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
-	device_t *sound = machine().device("custom");
+	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1379,12 +1379,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 
 	if (m_model < MODEL_MAC_SE) // SE no longer has dual buffers
 	{
-		mac_set_sound_buffer(sound, (data & 0x08) >> 3);
+		sound->set_sound_buffer((data & 0x08) >> 3);
 	}
 
 	if (m_model < MODEL_MAC_II)
 	{
-		mac_set_volume(sound, data & 0x07);
+		sound->set_volume(data & 0x07);
 	}
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
@@ -1398,7 +1398,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
-	device_t *sound = machine().device("custom");
+	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
@@ -1467,7 +1467,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 
 	if (AUDIO_IS_CLASSIC)
 	{
-		mac_enable_sound(sound, (data & 0x80) == 0);
+		sound->enable_sound((data & 0x80) == 0);
 	}
 
 	// SE and Classic have SCSI enable/disable here
@@ -1859,7 +1859,7 @@ void mac_state::machine_reset()
 	/* setup 'classic' sound */
 	if (machine().device("custom") != NULL)
 	{
-		mac_set_sound_buffer(machine().device("custom"), 0);
+		machine().device<mac_sound_device>("custom")->set_sound_buffer(0);
 	}
 	else if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
 	{
@@ -1874,7 +1874,7 @@ void mac_state::machine_reset()
 
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 	{
-		mac_set_sound_buffer(machine().device("custom"), 1);
+		machine().device<mac_sound_device>("custom")->set_sound_buffer(1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
 		memset(m_ram->pointer(), 0, m_ram->size());
@@ -2205,7 +2205,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 
 	if (machine().device("custom") != NULL)
 	{
-		mac_sh_updatebuffer(machine().device("custom"));
+		machine().device<mac_sound_device>("custom")->sh_updatebuffer();
 	}
 
 	if (m_rbv_vbltime > 0)

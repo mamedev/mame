@@ -147,14 +147,17 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 /*----------- defined in audio/mac.c -----------*/
 
 class mac_sound_device : public device_t,
-									public device_sound_interface
+							public device_sound_interface
 {
 public:
 	mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mac_sound_device() { global_free(m_token); }
+	~mac_sound_device() {}
+	
+	void enable_sound(int on);
+	void set_sound_buffer(int buffer);
+	void set_volume(int volume);
+	void sh_updatebuffer();
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -164,17 +167,22 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
+	
+	ram_device *m_ram;
+	model_t m_mac_model;
+
+	sound_stream *m_mac_stream;
+	int m_sample_enable;
+	UINT16 *m_mac_snd_buf_ptr;
+	UINT8 *m_snd_cache;
+	int m_snd_cache_len;
+	int m_snd_cache_head;
+	int m_snd_cache_tail;
+	int m_indexx;
 };
 
 extern const device_type MAC_SOUND;
 
-
-void mac_enable_sound( device_t *device, int on );
-void mac_set_sound_buffer( device_t *device, int buffer );
-void mac_set_volume( device_t *device, int volume );
-
-void mac_sh_updatebuffer(device_t *device);
 
 /* Mac driver data */
 
