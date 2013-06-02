@@ -581,7 +581,7 @@ SXX2F V1.2
 |-----------------------------------------------------------------------------|
 Notes:
       i386DX    - Intel i386DX (QFP132), running at 25.000MHz [50/2]
-      Z80       - Zilog Z84C0006PCS (DIP40) - Uknown clock
+      Z80       - Zilog Z84C0006PCS (DIP40) - Unknown clock
       YMF271-F  - Yamaha YMF271-F running at 16.9344MHz
       TC551664  - Toshiba TC551664J-20 64k x16 SRAM (SOJ44)
       YAC516-M  - Yamaha YAC516-M DAC (SOP28)
@@ -1718,17 +1718,17 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2)   /* Intel 386DX, 25MHz */
+	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(spi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_28_63636MHz/4)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_28_63636MHz/4) // Z84C0008PEC, 7.159MHz
 	MCFG_CPU_PROGRAM_MAP(spisound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,spi)
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,spi)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state, spi)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -1746,12 +1746,12 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,spi)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
+	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1759,11 +1759,13 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
 	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
-	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state,flashrom_write))
+	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
+
+/* single boards */
 
 MACHINE_START_MEMBER(seibuspi_state,sxx2e)
 {
@@ -1784,71 +1786,55 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( sxx2e, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz */
+static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sxx2e_map)
 
-	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2e)
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2e)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state, sxx2e)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
 
 	MCFG_DEVICE_REMOVE("flash0")
 	MCFG_DEVICE_REMOVE("flash1")
-MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(seibuspi_state,sxx2f)
-{
-	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
-}
-
-MACHINE_RESET_MEMBER(seibuspi_state,sxx2f)
-{
-	UINT8 *rom = memregion("soundcpu")->base();
-
-	membank("bank4")->set_base(m_z80_rom);
-	membank("bank5")->set_base(m_z80_rom);
-
-	memcpy(m_z80_rom, rom, 0x40000);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
-
-	m_sb_coin_latch = 0;
-}
-
-static MACHINE_CONFIG_DERIVED( sxx2f, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxx2f_map)
-
-	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2f)
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2f)
-
-	MCFG_DEVICE_REMOVE("flash0")
-	MCFG_DEVICE_REMOVE("flash1")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measured clocks */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sxx2f_map)
-	MCFG_CPU_CLOCK(XTAL_28_63636MHz) /* AMD AM386DX/DX-40, 28.63636MHz */
-
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
-
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz)
+	/* sound hardware */
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_9344MHz)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
 	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
-	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state,flashrom_write))
+	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2f)
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2f)
+static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 
-	MCFG_DEVICE_REMOVE("flash0")
-	MCFG_DEVICE_REMOVE("flash1")
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sxx2f_map)
+	
+	// Z80 is Z84C0006PCS instead of Z84C0008PEC
+	// clock is unknown, possibly slower than 7.159MHz
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise same hw as sxx2f
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
+	MCFG_CPU_CLOCK(XTAL_28_63636MHz)
+
+	MCFG_CPU_MODIFY("soundcpu") // Z84C0004PCS, 4.9152MHz
+	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
+
+	/* sound hardware */
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
+	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
+
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
@@ -2099,11 +2085,11 @@ MACHINE_RESET_MEMBER(seibuspi_state,seibu386)
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 40000000) /* AMD 386DX, 40MHz */
+	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
 	MCFG_CPU_PROGRAM_MAP(seibu386_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, seibu386)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2117,15 +2103,16 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,spi)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", 1431815, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", 1431815, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2152,11 +2139,9 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f2)
 static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 25000000) /* 25mhz */
+	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(sys386f2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
-
-	/* no z80? */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
 
@@ -2172,12 +2157,13 @@ static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 	MCFG_GFXDECODE(sys386f2)
 	MCFG_PALETTE_LENGTH(8192)
 
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state,sys386f2)
+	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f2)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f2)
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

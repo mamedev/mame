@@ -107,8 +107,6 @@ public:
 	DECLARE_VIDEO_START(sys386f2);
 	DECLARE_MACHINE_START(sxx2e);
 	DECLARE_MACHINE_RESET(sxx2e);
-	DECLARE_MACHINE_START(sxx2f);
-	DECLARE_MACHINE_RESET(sxx2f);
 	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
