@@ -16,6 +16,7 @@
     - EN and EXT Out bits
     - Src B and Src NOTE bits
     - statusreg Busy and End bits
+    - timer register 0x11
     - oh, and a lot more...
 */
 
@@ -1310,7 +1311,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 		
 		// reload timer
-		m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (1024 - m_timerA)), 0);
+		m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA)), 0);
 		break;
 
 	case 1:
@@ -1361,13 +1362,14 @@ void ymf271_device::ymf271_write_timer(int data)
 		switch (m_timerreg)
 		{
 			case 0x10:
-				m_timerA &= ~0xff;
-				m_timerA |= data;
+				m_timerA = data;
 				break;
 
 			case 0x11:
-				m_timerA &= 0xff;
-				m_timerA |= (data & 0x3)<<8;
+				// According to Yamaha's documentation, this sets timer A upper 2 bits
+				// (it says timer A is 10 bits). But, PCB audio recordings proves
+				// otherwise: it doesn't affect timer A frequency. (see ms32.c tetrisp)
+				// Does this register have another function regarding timer A/B?
 				break;
 
 			case 0x12:
@@ -1378,7 +1380,7 @@ void ymf271_device::ymf271_write_timer(int data)
 				// timer A load
 				if (~m_enable & data & 1)
 				{
-					attotime period = attotime::from_hz(m_clock) * (384 * 4 * (1024 - m_timerA));
+					attotime period = attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA));
 					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
 
