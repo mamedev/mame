@@ -101,7 +101,7 @@
     - Policenauts: EMS error at boot;
 
     Notes:
-    - Animahjong V3 makes advantage of the
+    - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS
 

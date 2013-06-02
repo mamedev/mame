@@ -5,11 +5,11 @@
     TODO:
     - key repeat
 
-        - Some keys to be found:
-          NFER, XFER, GRPH, kana-only key next to right-shift
+    - Some keys to be found:
+      NFER, XFER, GRPH, kana-only key next to right-shift
 
-        - Problems with natural keyboard (ex: shift and capslock not working,
-          various keys producing wrong outputs)
+    - Problems with natural keyboard (ex: shift and capslock not working,
+      various keys producing wrong outputs)
 
 ***************************************************************************/
 
