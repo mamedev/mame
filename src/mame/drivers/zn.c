@@ -43,7 +43,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_cbaj_fifo1(*this, "cbaj_fifo1"),
-		m_cbaj_fifo2(*this, "cbaj_fifo2")
+		m_cbaj_fifo2(*this, "cbaj_fifo2"),
+		m_mb3773(*this, "mb3773")
 	{
 	}
 
@@ -127,6 +128,7 @@ private:
 	required_device<ram_device> m_ram;
 	optional_device<fifo7200_device> m_cbaj_fifo1;
 	optional_device<fifo7200_device> m_cbaj_fifo2;
+	optional_device<mb3773_device> m_mb3773;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1081,9 +1083,10 @@ Notes:
 
 WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 {
-	device_t *mb3773 = machine().device("mb3773");
-	mb3773_set_ck(mb3773, (data & 0x20) >> 5);
 	verboselog(1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+
+	m_mb3773->write_line_ck((data & 0x20) >> 5);
+
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 

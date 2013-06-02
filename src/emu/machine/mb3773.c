@@ -32,33 +32,12 @@ mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, de
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mb3773_device::device_config_complete()
-{
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void mb3773_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mb3773_device::device_start()
 {
-	m_watchdog_timer = machine().scheduler().timer_alloc( FUNC(watchdog_timeout), this );
+	m_watchdog_timer = timer_alloc();
 	reset_timer();
 
 	save_item( NAME(m_ck) );
@@ -74,40 +53,22 @@ void mb3773_device::device_reset()
 	m_ck = 0;
 }
 
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE_LINE_DEVICE_HANDLER( mb3773_set_ck )
+void mb3773_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	downcast<mb3773_device *>( device )->set_ck( state );
+	machine().schedule_soft_reset();
 }
-
-void mb3773_device::set_ck( int state )
-{
-	state &= 1;
-
-	if( state == 0 && m_ck != 0 )
-	{
-		reset_timer();
-	}
-
-	m_ck = state;
-}
-
-
-//**************************************************************************
-//  INTERNAL HELPERS
-//**************************************************************************
 
 void mb3773_device::reset_timer()
 {
 	m_watchdog_timer->adjust( attotime::from_seconds( 5 ) );
 }
 
-TIMER_CALLBACK( mb3773_device::watchdog_timeout )
+WRITE_LINE_MEMBER( mb3773_device::write_line_ck )
 {
-	reinterpret_cast<mb3773_device *>(ptr)->machine().schedule_soft_reset();
+	if( state == 0 && m_ck != 0 )
+	{
+		reset_timer();
+	}
+
+	m_ck = state;
 }

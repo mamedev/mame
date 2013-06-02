@@ -341,7 +341,8 @@ public:
 		m_card(*this,"card"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
-		m_flashbank(*this, "flashbank")
+		m_flashbank(*this, "flashbank"),
+		m_mb3773(*this, "mb3773")
 	{
 	}
 
@@ -393,6 +394,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
 	required_device<address_map_bank_device> m_flashbank;
+	required_device<mb3773_device> m_mb3773;
 };
 
 
@@ -511,15 +513,9 @@ WRITE8_MEMBER(taitogn_state::control_w)
 	// 20 = watchdog
 	// 04 = select bank
 
-	// According to the rom code, bits 1-0 may be part of the bank
-	// selection too, but they're always 0.
-
-	UINT32 p = m_control;
-	device_t *mb3773 = machine().device("mb3773");
-
 	COMBINE_DATA(&m_control);
 
-	mb3773_set_ck(mb3773, (m_control & 0x20) >> 5);
+	m_mb3773->write_line_ck((data & 0x20) >> 5);
 
 #if 0
 	if((p ^ control) & ~0x20)
@@ -534,8 +530,9 @@ WRITE8_MEMBER(taitogn_state::control_w)
 				machine().describe_context());
 #endif
 
-	if((p ^ m_control) & 0x04)
-		m_flashbank->set_bank(m_control & 4 ? 1 : 0);
+	// According to the rom code, bits 1-0 may be part of the bank
+	// selection too, but they're always 0.
+	m_flashbank->set_bank(m_control & 4);
 }
 
 WRITE16_MEMBER(taitogn_state::control2_w)
@@ -756,17 +753,17 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 
 	MCFG_MB3773_ADD("mb3773")
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000000)
-
 	MCFG_INTEL_TE28F160_ADD("biosflash")
 	MCFG_INTEL_E28F400_ADD("pgmflash")
 	MCFG_INTEL_TE28F160_ADD("sndflash0")
 	MCFG_INTEL_TE28F160_ADD("sndflash1")
 	MCFG_INTEL_TE28F160_ADD("sndflash2")
+
+	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000000)
 
 	MCFG_FRAGMENT_ADD( taito_zoom_sound )
 MACHINE_CONFIG_END

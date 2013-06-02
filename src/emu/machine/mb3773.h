@@ -30,17 +30,16 @@ public:
 	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
 
 	// I/O operations
-	void set_ck( int state );
+	WRITE_LINE_MEMBER( write_line_ck );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
 
-	// internal helpers
-	static TIMER_CALLBACK( watchdog_timeout );
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
 	void reset_timer();
 
 	// internal state
@@ -51,12 +50,5 @@ protected:
 
 // device type definition
 extern const device_type MB3773;
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE_LINE_DEVICE_HANDLER( mb3773_set_ck );
 
 #endif
