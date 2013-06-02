@@ -172,6 +172,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/at28c16.o     \
 	$(EMUMACHINE)/at29040a.o    \
 	$(EMUMACHINE)/at45dbxx.o    \
+	$(EMUMACHINE)/ataflash.o    \
 	$(EMUMACHINE)/ay31015.o     \
 	$(EMUMACHINE)/bankdev.o     \
 	$(EMUMACHINE)/cdp1852.o     \
@@ -262,6 +263,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/pit8253.o     \
 	$(EMUMACHINE)/pla.o         \
 	$(EMUMACHINE)/ram.o         \
+	$(EMUMACHINE)/rf5c296.o     \
 	$(EMUMACHINE)/roc10937.o    \
 	$(EMUMACHINE)/rp5c01.o      \
 	$(EMUMACHINE)/rp5c15.o      \

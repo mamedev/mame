@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __PCCARD_H__
+#define __PCCARD_H__
+
 #include "emu.h"
 
 class pccard_interface
@@ -18,18 +23,17 @@ public:
 	pccard_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ_LINE_MEMBER(read_line_inserted);
-	DECLARE_ADDRESS_MAP(memory, 16);
-	DECLARE_ADDRESS_MAP(reg, 16);
-
-protected:
-	virtual void device_start();
-
-private:
 	DECLARE_READ16_MEMBER(read_memory);
 	DECLARE_READ16_MEMBER(read_reg);
 	DECLARE_WRITE16_MEMBER(write_memory);
 	DECLARE_WRITE16_MEMBER(write_reg);
 
+protected:
+	virtual void device_start();
+
+private:
 	// internal state
 	pccard_interface *m_pccard;
 };
+
+#endif

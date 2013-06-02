@@ -318,17 +318,18 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 */
 
 #include "emu.h"
+#include "audio/taito_zm.h"
 #include "cpu/psx/psx.h"
-#include "video/psx.h"
 #include "machine/at28c16.h"
+#include "machine/ataflash.h"
+#include "machine/bankdev.h"
 #include "machine/intelfsh.h"
+#include "machine/mb3773.h"
+#include "machine/rf5c296.h"
 #include "machine/znsec.h"
 #include "machine/zndip.h"
-#include "machine/idectrl.h"
-#include "machine/bankdev.h"
-#include "machine/mb3773.h"
 #include "sound/spu.h"
-#include "audio/taito_zm.h"
+#include "video/psx.h"
 
 class taitogn_state : public driver_device
 {
@@ -338,7 +339,6 @@ public:
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
-		m_card(*this,"card"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
 		m_flashbank(*this, "flashbank"),
@@ -346,10 +346,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(rf5c296_io_w);
-	DECLARE_READ16_MEMBER(rf5c296_io_r);
-	DECLARE_READ16_MEMBER(rf5c296_mem_r);
-	DECLARE_WRITE16_MEMBER(rf5c296_mem_w);
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE16_MEMBER(control2_w);
@@ -370,14 +366,6 @@ protected:
 	virtual void driver_start();
 
 private:
-	void rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
-	UINT8 rf5c296_reg_r(ATTR_UNUSED UINT8 reg);
-
-	unsigned char m_cis[512];
-	int m_locked;
-
-	unsigned char m_rf5c296_reg;
-
 	UINT8 m_control;
 	UINT16 m_control2;
 	UINT8 m_control3;
@@ -390,115 +378,12 @@ private:
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
 	required_device<zndip_device> m_zndip;
-	required_device<ide_controller_device> m_card;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
 };
 
-
-// rf5c296 is very inaccurate at that point, it hardcodes the gnet config
-
-void taitogn_state::rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data)
-{
-	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine().describe_context());
-	switch (reg)
-	{
-		// Interrupt and General Control Register
-		case 0x03:
-			// Check for card reset
-			if (!(data & 0x40))
-			{
-				m_card->reset();
-				m_locked = 0x1ff;
-				m_card->ide_set_gnet_readlock(1);
-			}
-		break;
-
-		default:
-		break;
-	}
-}
-
-UINT8 taitogn_state::rf5c296_reg_r(ATTR_UNUSED UINT8 reg)
-{
-	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine().describe_context());
-	return 0x00;
-}
-
-WRITE16_MEMBER(taitogn_state::rf5c296_io_w)
-{
-	if(offset < 4) {
-		ide_controller16_pcmcia_w(m_card, space, offset, data, mem_mask);
-		return;
-	}
-
-	if(offset == 0x3e0/2)
-	{
-		if(ACCESSING_BITS_0_7)
-			m_rf5c296_reg = data;
-		if(ACCESSING_BITS_8_15)
-			rf5c296_reg_w(m_rf5c296_reg, data >> 8);
-	}
-}
-
-READ16_MEMBER(taitogn_state::rf5c296_io_r)
-{
-	if(offset < 4)
-		return ide_controller16_pcmcia_r(m_card, space, offset, mem_mask);
-
-	offset *= 2;
-
-	if(offset == 0x3e0/2)
-	{
-		UINT32 res = 0x0000;
-		if(ACCESSING_BITS_0_7)
-			res |= m_rf5c296_reg;
-		if(ACCESSING_BITS_8_15)
-			res |= rf5c296_reg_r(m_rf5c296_reg) << 8;
-		return res;
-	}
-
-	return 0xffff;
-}
-
-// Hardcoded to reach the pcmcia CIS
-
-READ16_MEMBER(taitogn_state::rf5c296_mem_r)
-{
-	if(offset < 0x100)
-		return m_cis[offset];
-
-	switch(offset) {
-	case 0x100: return 0x0041;
-	case 0x101: return 0x0080;
-	case 0x102: return 0x002e;
-	case 0x201: return m_locked ? 0x0001 : 0;
-	default:
-		return 0;
-	}
-}
-
-WRITE16_MEMBER(taitogn_state::rf5c296_mem_w)
-{
-	if(offset >= 0x280 && offset <= 0x288) {
-		dynamic_buffer key(get_disk_handle(machine(), ":drive_0")->hunk_bytes());
-
-		int pos = offset - 0x280;
-		UINT8 v = data, k;
-		get_disk_handle(machine(), ":drive_0")->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
-		k = pos < key.count() ? key[pos] : 0;
-		if(v == k)
-			m_locked &= ~(1 << pos);
-		else
-			m_locked |= 1 << pos;
-		if (!m_locked)
-		{
-			m_card->ide_set_gnet_readlock(0);
-		}
-	}
-}
 
 // Misc. controls
 
@@ -664,20 +549,11 @@ void taitogn_state::driver_start()
 {
 	m_znsec0->init(tt10);
 	m_znsec1->init(tt16);
-
-	UINT32 metalength;
-	memset(m_cis, 0xff, 512);
-	if (get_disk_handle(machine(), ":drive_0") != NULL)
-		get_disk_handle(machine(), ":drive_0")->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
 }
 
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 {
-	m_locked = 0x1ff;
 	m_control = 0;
-
-	m_card->reset();
-	m_card->ide_set_gnet_readlock(1);
 
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
@@ -698,7 +574,7 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READNOP // systematic read at spu_address + 250000, result dropped, maybe other accesses
 	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ16(hack1_r, 0xffffffff)
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE16(rf5c296_io_r, rf5c296_io_w, 0xffffffff)
+	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_DEVREADWRITE16("rf5c296", rf5c296_device, io_r, io_w, 0xffffffff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
@@ -708,7 +584,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
 	// Bank 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
 	AM_RANGE(0x00000000, 0x001fffff) AM_DEVREADWRITE("biosflash", intelfsh16_device, read, write)
-	AM_RANGE(0x00200000, 0x002fffff) AM_READWRITE( rf5c296_mem_r, rf5c296_mem_w )
+	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE("rf5c296", rf5c296_device, mem_r, mem_w )
 	AM_RANGE(0x00300000, 0x0037ffff) AM_DEVREADWRITE("pgmflash", intelfsh16_device, read, write)
 
 	// Bank 1 has access to the 3 samples flashes
@@ -722,6 +598,9 @@ static ADDRESS_MAP_START( taitogn_mp_map, AS_PROGRAM, 32, taitogn_state )
 	AM_IMPORT_FROM(taitogn_map)
 ADDRESS_MAP_END
 
+SLOT_INTERFACE_START(slot_ataflash)
+	SLOT_INTERFACE("ataflash", ATA_FLASH_PCCARD)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* basic machine hardware */
@@ -749,7 +628,11 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_MACHINE_RESET_OVERRIDE(taitogn_state, coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
-	MCFG_IDE_CONTROLLER_ADD( "card", ide_devices, "hdd", NULL, true)
+	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
+	MCFG_RF5C296_SLOT(":pccard")
+
+	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, "ataflash", false)
 
 	MCFG_MB3773_ADD("mb3773")
 
@@ -912,7 +795,7 @@ ROM_END
 ROM_START(raycris)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "raycris", 0, SHA1(015cb0e6c4421cc38809de28c4793b4491386aee))
 ROM_END
 
@@ -920,28 +803,28 @@ ROM_END
 ROM_START(gobyrc)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "gobyrc", 0, SHA1(0bee1f495fc8b033fd56aad9260ae94abb35eb58))
 ROM_END
 
 ROM_START(rcdego)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "rcdego", 0, SHA1(9e177f2a3954cfea0c8c5a288e116324d10f5dd1))
 ROM_END
 
 ROM_START(chaoshea)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "chaosheat", 0, SHA1(c13b7d7025eee05f1f696d108801c7bafb3f1356))
 ROM_END
 
 ROM_START(chaosheaj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "chaosheatj", 0, SHA1(2f211ac08675ea8ec33c7659a13951db94eaa627))
 ROM_END
 
@@ -949,7 +832,7 @@ ROM_END
 ROM_START(flipmaze)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "flipmaze", 0, SHA1(423b6c06f4f2d9a608ce20b61a3ac11687d22c40) )
 ROM_END
 
@@ -957,42 +840,42 @@ ROM_END
 ROM_START(spuzbobl)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
 ROM_START(spuzboblj)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "spuzbobj", 0, SHA1(dac433cf88543d2499bf797d7406b82ae4338726))
 ROM_END
 
 ROM_START(soutenry)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "soutenry", 0, SHA1(9204d0be833d29f37b8cd3fbdf09da69b622254b))
 ROM_END
 
 ROM_START(shanghss)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "shanghss", 0, SHA1(7964f71ec5c81d2120d83b63a82f97fbad5a8e6d))
 ROM_END
 
 ROM_START(sianniv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
 ROM_END
 
 ROM_START(kollon)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
 ROM_END
 
@@ -1000,14 +883,14 @@ ROM_START(kollonc)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "kollonc", 0, SHA1(ce62181659701cfb8f7c564870ab902be4d8e060)) /* Original Taito Compact Flash version */
 ROM_END
 
 ROM_START(shikigam)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
 ROM_END
 
@@ -1017,7 +900,7 @@ ROM_END
 ROM_START(otenamih)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "otenamih", 0, SHA1(b3babe3a1876c43745616ee1e7d87276ce7dad0b) )
 ROM_END
 
@@ -1025,28 +908,28 @@ ROM_END
 ROM_START(psyvaria)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "psyvaria", 0,  SHA1(b981a42a10069322b77f7a268beae1d409b4156d))
 ROM_END
 
 ROM_START(psyvarrv)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "psyvarrv", 0, SHA1(277c4f52502bcd7acc1889840962ec80d56465f3))
 ROM_END
 
 ROM_START(zooo)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "zooo", 0, SHA1(e275b3141b2bc49142990e6b497a5394a314a30b))
 ROM_END
 
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
@@ -1054,7 +937,7 @@ ROM_START(otenamhf)
 	TAITOGNET_BIOS
 	ROM_DEFAULT_BIOS( "v2" )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "otenamhf", 0, SHA1(5b15c33bf401e5546d78e905f538513d6ffcf562)) /* Original Taito Compact Flash version */
 ROM_END
 
@@ -1066,14 +949,14 @@ ROM_END
 ROM_START(nightrai)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "nightrai", 0, SHA1(74d0458f851cbcf10453c5cc4c47bb4388244cdf))
 ROM_END
 
 ROM_START(otenki)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "otenki", 0, SHA1(7e745ca4c4570215f452fd09cdd56a42c39caeba))
 ROM_END
 
@@ -1082,21 +965,21 @@ ROM_END
 ROM_START(usagi)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "usagi", 0, SHA1(edf9dd271957f6cb06feed238ae21100514bef8e))
 ROM_END
 
 ROM_START(mahjngoh)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "mahjngoh", 0, SHA1(3ef1110d15582d7c0187438d7ad61765dd121cff))
 ROM_END
 
 ROM_START(shangtou)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "shanghaito", 0, SHA1(9901db5a9aae77e3af4157aa2c601eaab5b7ca85) )
 ROM_END
 
@@ -1106,7 +989,7 @@ ROM_END
 ROM_START(xiistag)
 	TAITOGNET_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "pccard:ataflash:drive_0" )
 	DISK_IMAGE( "xiistag", 0, SHA1(586e37c8d926293b2bd928e5f0d693910cfb05a2))
 ROM_END
 
