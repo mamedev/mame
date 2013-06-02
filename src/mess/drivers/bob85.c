@@ -2,8 +2,20 @@
 
         BOB85 driver by Miodrag Milanovic
 
-        24/05/2008 Preliminary driver.
-        12/05/2009 Skeleton driver.
+        2008-05-24 Preliminary driver.
+        2009-05-12 Skeleton driver.
+        2013-06-02 Working driver.
+
+Pasting:
+        0-F : as is
+        NEXT : ^
+        SMEM : -
+        GO : X
+
+Test Paste:
+        -0600^11^22^33^44^55^66^77^88^99^--0600^
+        Now press up-arrow to confirm the data has been entered.
+
 
 ****************************************************************************/
 
@@ -90,7 +102,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 			case 0x04 : retVal |= 0xB0; break;
 			case 0x08 : retVal |= 0xC0; break;
 			case 0x10 : retVal |= 0xD0; break;
-			case 0x20 : retVal |= 0xF0; break;
+			case 0x20 : retVal |= 0xE0; break;
 			default : break;
 		}
 	}
@@ -161,12 +173,12 @@ static INPUT_PORTS_START( bob85 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SMEM") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REC") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("VEK1") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("VEK2") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEXT") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SMEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REC") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("VEK1") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("VEK2") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
 	PORT_BIT(0xC0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -208,7 +220,6 @@ static MACHINE_CONFIG_START( bob85, bob85_state )
 	MCFG_CPU_IO_MAP(bob85_io)
 	MCFG_CPU_CONFIG(cpu_config)
 
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_bob85)
 
@@ -224,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1984, bob85,  0,       0,     bob85,  bob85, driver_device,    0,       "Josef Kratochvil",   "BOB-85", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT COMPANY             FULLNAME       FLAGS */
+COMP( 1984, bob85,  0,       0,     bob85,   bob85, driver_device,    0, "Josef Kratochvil", "BOB-85", GAME_NO_SOUND_HW)
