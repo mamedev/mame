@@ -38,8 +38,12 @@ protected:
 	virtual void device_reset();
 
 	// overrides of standard a2bus slot functions
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
 	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 	virtual bool take_c800();
+
+private:
+	UINT8 m_latch0, m_latch1, m_latch2;
 };
 
 // device type definition

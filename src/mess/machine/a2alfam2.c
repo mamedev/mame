@@ -2,7 +2,7 @@
 
     a2alfsm2.c
 
-    Implementation of the ALF Apple Music II card
+    Implementation of the ALF Apple Music II card (originally marketed as the "MC1")
 
 *********************************************************************/
 
@@ -35,14 +35,14 @@ static const sn76496_config psg_intf =
 
 MACHINE_CONFIG_FRAGMENT( a2alfam2 )
 	MCFG_SPEAKER_STANDARD_STEREO("alf_l", "alf_r")
-	MCFG_SOUND_ADD(SN1_TAG, SN76489, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD(SN1_TAG, SN76489, 1020484)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
-	MCFG_SOUND_ADD(SN2_TAG, SN76489, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD(SN2_TAG, SN76489, 1020484)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_l", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
-	MCFG_SOUND_ADD(SN3_TAG, SN76489, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD(SN3_TAG, SN76489, 1020484)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "alf_r", 0.50)
 MACHINE_CONFIG_END
@@ -75,7 +75,7 @@ a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, device_t
 }
 
 a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, A2BUS_ALFAM2, "ALF Apple Music II", tag, owner, clock, "a2alfam2", __FILE__),
+	device_t(mconfig, A2BUS_ALFAM2, "ALF MC1 / Apple Music II", tag, owner, clock, "a2alfam2", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
@@ -91,10 +91,34 @@ void a2bus_alfam2_device::device_start()
 {
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
+	m_latch0 = m_latch1 = m_latch2 = 0;
+
+	save_item(NAME(m_latch0));
+	save_item(NAME(m_latch1));
+	save_item(NAME(m_latch2));
 }
 
 void a2bus_alfam2_device::device_reset()
 {
+	m_latch0 = m_latch1 = m_latch2 = 0;
+}
+
+UINT8 a2bus_alfam2_device::read_c0nx(address_space &space, UINT8 offset)
+{
+	// SN76489 can't be read, it appears from the schematics this is what happens
+	switch (offset)
+	{
+		case 0:
+			return m_latch0;
+
+		case 1:
+			return m_latch1;
+
+		case 2:
+			return m_latch2;
+	}
+
+	return 0xff;
 }
 
 void a2bus_alfam2_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
@@ -103,14 +127,17 @@ void a2bus_alfam2_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
 	{
 		case 0:
 			m_sn1->write(space, 0, data);
+			m_latch0 = data;
 			break;
 
 		case 1:
 			m_sn2->write(space, 0, data);
+			m_latch1 = data;
 			break;
 
 		case 2:
 			m_sn3->write(space, 0, data);
+			m_latch2 = data;
 			break;
 	}
 }
