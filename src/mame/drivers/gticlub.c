@@ -835,14 +835,14 @@ MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(gticlub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
@@ -870,11 +870,11 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, 64000000/4)
+	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, XTAL_64MHz/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", 33868800/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -939,17 +939,17 @@ static const voodoo_config voodoo_r_intf =
 static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(gticlub_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(hangplt_sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(hangplt_sharc1_map)
 
@@ -987,11 +987,11 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, 64000000/4)
+	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, XTAL_64MHz/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", 33868800/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -10,7 +10,7 @@
     ZR107 CPU board:
     ----------------
         IBM PowerPC 403GA at 32MHz (main CPU)
-        Motorola MC68EC000 at 16MHz (sound CPU)
+        Motorola MC68EC000 at 8MHz (sound CPU)
         Konami K056800 (MIRAC), sound system interface
         Konami K056230 (LANC), LAN interface
         Konami K058141 sound chip (same as 2x K054539)
@@ -751,14 +751,14 @@ void zr107_state::machine_reset()
 static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(zr107_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)    /* 8MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/8)    /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
@@ -781,7 +781,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface, 64000000/4)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface, XTAL_64MHz/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -809,14 +809,14 @@ static const k001604_interface jetwave_k001604_intf =
 static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(jetwave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zr107_state,  zr107_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 64000000/8)    /* 8MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/8)    /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface, 64000000/4)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface, XTAL_64MHz/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
