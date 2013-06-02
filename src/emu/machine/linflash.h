@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __LINFLASH_H__
+#define __LINFLASH_H__
+
 #include "emu.h"
 #include "intelfsh.h"
 #include "machine/pccard.h"
@@ -61,3 +66,5 @@ protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
+
+#endif
