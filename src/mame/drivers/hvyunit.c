@@ -81,7 +81,9 @@ public:
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
 		m_mermaid(*this, "mermaid"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_pandora(*this, "pandora")
+		{ }
 
 	/* Video */
 	required_shared_ptr<UINT8> m_videoram;
@@ -103,7 +105,8 @@ public:
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<cpu_device> m_mermaid;
-	device_t    *m_pandora;
+	required_device<cpu_device> m_soundcpu;
+	required_device<kaneko_pandora_device> m_pandora;
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mermaid_data_w);
@@ -132,7 +135,6 @@ public:
 	UINT32 screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_hvyunit(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_scanline);
-	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -144,8 +146,6 @@ public:
 
 void hvyunit_state::machine_start()
 {
-	m_pandora = machine().device("pandora");
-
 	// TODO: Save state
 }
 
@@ -186,7 +186,7 @@ UINT32 hvyunit_state::screen_update_hvyunit(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	pandora_update(m_pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -196,7 +196,7 @@ void hvyunit_state::screen_eof_hvyunit(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		pandora_eof(m_pandora);
+		m_pandora->eof();
 	}
 }
 
@@ -401,7 +401,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
 static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END

@@ -70,7 +70,6 @@ out of the sprite list at that point.. (verify on real hw)
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "video/kan_pand.h" // for the original pandora
 #include "video/kan_panb.h" // for bootlegs / non-original hw
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 
@@ -84,11 +83,9 @@ WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
 
 UINT32 snowbros_state::screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *pandora = machine().device("pandora");
-
 	/* This clears & redraws the entire screen each pass */
 	bitmap.fill(0xf0, cliprect);
-	pandora_update(pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -98,8 +95,7 @@ void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = machine().device("pandora");
-		pandora_eof(pandora);
+		m_pandora->eof();
 	}
 }
 
@@ -202,7 +198,7 @@ static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
@@ -382,7 +378,7 @@ static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r,pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
@@ -537,7 +533,7 @@ static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)  /* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)  /* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
@@ -2788,7 +2784,7 @@ DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
 
 DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 {
-	pandora_set_bg_pen(machine().device("pandora"), 0xc0);
+	m_pandora->set_bg_pen(0xc0);
 }
 
 GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 1)", 0 )

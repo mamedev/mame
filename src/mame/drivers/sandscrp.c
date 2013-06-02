@@ -86,10 +86,15 @@ class sandscrp_state : public driver_device
 public:
 	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_view2_0(*this, "view2_0"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_pandora(*this, "pandora"),
+		m_view2_0(*this, "view2_0")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<kaneko_pandora_device> m_pandora;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 
 	UINT8 m_sprite_irq;
@@ -114,15 +119,12 @@ public:
 	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
 	void update_irq_state();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 };
 
 
 
 UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *pandora = machine().device("pandora");
 	bitmap.fill(0, cliprect);
 
 	int i;
@@ -137,7 +139,7 @@ UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind1
 	}
 
 	// copy sprite bitmap to screen
-	pandora_update(pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -176,10 +178,9 @@ void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = machine().device("pandora");
 		m_sprite_irq = 1;
 		update_irq_state();
-		pandora_eof(pandora);
+		m_pandora->eof();
 	}
 }
 
@@ -264,7 +265,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
+	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")    // Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)  // Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")

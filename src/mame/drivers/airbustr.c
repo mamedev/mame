@@ -221,7 +221,6 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "video/kan_pand.h"
 #include "includes/airbustr.h"
 
 /* Read/Write Handlers */
@@ -275,7 +274,7 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 	flip_screen_set(data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	pandora_set_clear_bitmap(m_pandora, data & 0x20);
+	m_pandora->set_clear_bitmap(data & 0x20);
 }
 
 WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
@@ -340,7 +339,7 @@ WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("devram") // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -574,8 +573,6 @@ void airbustr_state::machine_start()
 	membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
 	membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
 	membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
-
-	m_pandora = machine().device("pandora");
 
 	save_item(NAME(m_soundlatch_status));
 	save_item(NAME(m_soundlatch2_status));

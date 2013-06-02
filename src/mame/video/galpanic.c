@@ -98,14 +98,12 @@ void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &clipre
 
 UINT32 galpanic_state::screen_update_galpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *pandora = machine().device("pandora");
-
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(bitmap, cliprect);
 
-	pandora_update(pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 
 	return 0;
 }

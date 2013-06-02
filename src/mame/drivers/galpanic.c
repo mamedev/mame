@@ -129,8 +129,7 @@ void galpanic_state::screen_eof_galpanic(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		device_t *pandora = machine().device("pandora");
-		pandora_eof(pandora);
+		m_pandora->eof();
 	}
 }
 
@@ -165,8 +164,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::galhustl_scanline)
 
 WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
 {
-	device_t *pandora = machine().device("pandora");
-
 	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 *rom = memregion("oki")->base();
@@ -174,7 +171,7 @@ WRITE16_MEMBER(galpanic_state::galpanic_6295_bankswitch_w)
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
 		// used before title screen
-		pandora_set_clear_bitmap(pandora, (data & 0x8000)>>15);
+		m_pandora->set_clear_bitmap((data & 0x8000)>>15);
 	}
 }
 
@@ -217,7 +214,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")  /* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_SHARE("paletteram")  /* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")

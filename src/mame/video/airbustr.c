@@ -130,7 +130,7 @@ UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// copy the sprite bitmap to the screen
-	pandora_update(m_pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -141,6 +141,6 @@ void airbustr_state::screen_eof_airbustr(screen_device &screen, bool state)
 	if (state)
 	{
 		// update the sprite bitmap
-		pandora_eof(m_pandora);
+		m_pandora->eof();
 	}
 }

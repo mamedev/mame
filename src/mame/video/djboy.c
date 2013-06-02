@@ -68,7 +68,7 @@ UINT32 djboy_state::screen_update_djboy(screen_device &screen, bitmap_ind16 &bit
 	m_background->set_scrolly(0, scroll);
 
 	m_background->draw(bitmap, cliprect, 0, 0);
-	pandora_update(m_pandora, bitmap, cliprect);
+	m_pandora->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -78,6 +78,6 @@ void djboy_state::screen_eof_djboy(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		pandora_eof(m_pandora);
+		m_pandora->eof();
 	}
 }

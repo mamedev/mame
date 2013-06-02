@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/kan_pand.h"
+
 #define PROT_OUTPUT_BUFFER_SIZE 8
 
 class djboy_state : public driver_device
@@ -16,7 +18,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cpu1(*this, "cpu1"),
 		m_cpu2(*this, "cpu2"),
-		m_beast(*this, "beast") { }
+		m_beast(*this, "beast"),
+		m_pandora(*this, "pandora")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -46,8 +50,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;
-	device_t *m_pandora;
 	required_device<cpu_device> m_beast;
+	required_device<kaneko_pandora_device> m_pandora;
 	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_data_r);
 	DECLARE_READ8_MEMBER(beast_status_r);

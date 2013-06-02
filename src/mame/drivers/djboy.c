@@ -141,7 +141,6 @@ Notes:
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "video/kan_pand.h"
 #include "includes/djboy.h"
 
 
@@ -243,7 +242,7 @@ WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
 static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -523,8 +522,6 @@ void djboy_state::machine_start()
 	membank("bank3")->configure_entries(0, 3,  &CPU2[0x00000], 0x4000);
 	membank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
 	membank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
-
-	m_pandora = machine().device("pandora");
 
 	save_item(NAME(m_videoreg));
 	save_item(NAME(m_scrollx));

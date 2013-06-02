@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/kan_pand.h"
+
 class airbustr_state : public driver_device
 {
 public:
@@ -17,7 +19,9 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_master(*this, "master"),
 		m_slave(*this, "slave"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_pandora(*this, "pandora")
+		{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_devram;
@@ -45,7 +49,7 @@ public:
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_pandora;
+	required_device<kaneko_pandora_device> m_pandora;
 	DECLARE_READ8_MEMBER(devram_r);
 	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);

@@ -8,6 +8,7 @@
 #define __KANEKO16_H__
 
 #include "machine/nvram.h"
+#include "video/kan_pand.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
 #include "machine/kaneko_calc3.h"
@@ -22,23 +23,31 @@ public:
 	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2"),
+		m_eeprom(*this, "eeprom"),
 		m_spriteram(*this, "spriteram"),
 		m_mainram(*this, "mainram"),
 		m_view2_0(*this, "view2_0"),
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_eeprom(*this, "eeprom") { }
+		m_pandora(*this, "pandora")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;
+	optional_device<eeprom_device> m_eeprom;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_mainram;
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 	optional_device<kaneko_view2_tilemap_device> m_view2_1;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
+	optional_device<kaneko_pandora_device> m_pandora;
 
 	UINT16 m_disp_enable;
 
@@ -75,11 +84,6 @@ public:
 	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
 	void kaneko16_unscramble_tiles(const char *region);
 	void kaneko16_expand_sample_banks(const char *region);
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<okim6295_device> m_oki;
-	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;
-	optional_device<eeprom_device> m_eeprom;
 };
 
 class kaneko16_gtmr_state : public kaneko16_state

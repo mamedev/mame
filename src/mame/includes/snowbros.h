@@ -1,25 +1,31 @@
 #include "emu.h"
 #include "sound/okim6295.h"
+#include "video/kan_pand.h" // for the original pandora
 
 class snowbros_state : public driver_device
 {
 public:
 	snowbros_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_hyperpac_ram(*this, "hyperpac_ram"),
-		m_bootleg_spriteram16(*this, "spriteram16b"),
 		m_maincpu(*this,"maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_pandora(*this, "pandora"),
+		m_hyperpac_ram(*this, "hyperpac_ram"),
+		m_bootleg_spriteram16(*this, "spriteram16b")
+		{ }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<kaneko_pandora_device> m_pandora;
 	optional_shared_ptr<UINT16> m_hyperpac_ram;
+	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;
 	UINT8 *m_spriteram;
-	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
-
-	required_device<cpu_device> m_maincpu;
+	
 	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
@@ -57,6 +63,4 @@ public:
 	void sb3_play_music(int data);
 	void sb3_play_sound (okim6295_device *oki, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<okim6295_device> m_oki;
 };
