@@ -231,9 +231,9 @@ WRITE8_MEMBER( softbox_device::ppi1_pc_w )
 
 	*/
 
-	output_set_led_value(LED_A, BIT(data, 0));
-	output_set_led_value(LED_B, BIT(data, 1));
-	output_set_led_value(LED_READY, BIT(data, 2));
+	output_set_led_value(LED_A, !BIT(data, 0));
+	output_set_led_value(LED_B, !BIT(data, 1));
+	output_set_led_value(LED_READY, !BIT(data, 2));
 }
 
 static I8255A_INTERFACE( ppi1_intf )
