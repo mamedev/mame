@@ -649,6 +649,8 @@ void ymz280b_device::device_start()
 
 void ymz280b_device::device_reset()
 {
+	m_ext_mem_enable = 0;
+
 	/* initial clear registers */
 	for (int i = 0xff; i >= 0; i--)
 	{
@@ -823,11 +825,11 @@ void ymz280b_device::write_to_register(int data)
 			case 0x87:      /* RAM write */
 				if (m_ext_mem_enable)
 				{
-					m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 					if (!m_ext_write_handler.isnull())
 						m_ext_write_handler(m_ext_mem_address, data);
 					else
 						logerror("YMZ280B attempted RAM write to %X\n", m_ext_mem_address);
+					m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 				}
 				break;
 
