@@ -885,7 +885,7 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 
 	if ( ioport("mconfig")->read() & 1 )
 	{
-		return mea8000_r( m_mea8000, space, offset );
+		return m_mea8000->read(space, offset);
 	}
 	else
 	{
@@ -903,7 +903,7 @@ WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
 {
 	if ( ioport("mconfig")->read() & 1 )
 	{
-		mea8000_w( m_mea8000, space, offset, data );
+		m_mea8000->write(space, offset, data);
 	}
 	else
 	{

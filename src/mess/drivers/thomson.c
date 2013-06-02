@@ -968,7 +968,7 @@ static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo5_gatearray_r, mo5_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
 	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
 	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(mo5_cartridge_w )
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
 
@@ -1854,7 +1854,7 @@ static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w )*/
 	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
 	AM_RANGE ( 0xb000, 0xefff ) AM_ROMBANK   ( THOM_CART_BANK )
 								AM_WRITE(mo6_cartridge_w )
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
@@ -2170,7 +2170,7 @@ static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 /*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
 	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
+	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
 	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(mo6_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 

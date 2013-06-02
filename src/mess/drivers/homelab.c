@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(brailab4_io, AS_IO, 8, homelab_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf8, 0xf9 ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r,mea8000_w)
+	AM_RANGE( 0xf8, 0xf9 ) AM_DEVREADWRITE("mea8000", mea8000_device, read, write)
 	AM_RANGE( 0x7f, 0x7f ) AM_WRITE(brailab4_port7f_w)
 	AM_RANGE( 0xff, 0xff ) AM_WRITE(brailab4_portff_w)
 ADDRESS_MAP_END

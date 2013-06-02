@@ -315,7 +315,7 @@ protected:
 	required_device<pia6821_device> m_pia_game;
 	required_device<device_image_interface> m_serial;
 	required_device<acia6850_device> m_acia;
-	required_device<device_t> m_mea8000;
+	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
 	optional_device<device_t> m_mc6846;
 
