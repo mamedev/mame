@@ -484,15 +484,17 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 		m_rts(0),
 		m_sync(0)
 {
-	memset(&m_in_rxd_func, 0, sizeof(m_in_rxd_func));
-	memset(&m_out_txd_func, 0, sizeof(m_out_txd_func));
-	memset(&m_out_dtr_func, 0, sizeof(m_out_dtr_func));
-	memset(&m_out_rts_func, 0, sizeof(m_out_rts_func));
-	memset(&m_out_wrdy_func, 0, sizeof(m_out_wrdy_func));
-	memset(&m_rr, 0, sizeof(m_rr));
-	memset(&m_wr, 0, sizeof(m_wr));
-	memset(&m_rx_data_fifo, 0, sizeof(m_rx_data_fifo));
-	memset(&m_rx_error_fifo, 0, sizeof(m_rx_error_fifo));
+	for (int i = 0; i < 3; i++)
+		m_rr[i] = 0;
+
+	for (int i = 0; i < 6; i++)
+		m_wr[i] = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_rx_data_fifo[i] = 0;
+		m_rx_error_fifo[i] = 0;
+	}	
 }
 
 
@@ -573,14 +575,24 @@ void z80dart_channel::tra_callback()
 {
 	if (!(m_wr[5] & WR5_TX_ENABLE))
 	{
-		if (!(m_out_txd_func.isnull()))
-			m_out_txd_func(1);
-		return;
+		// transmit mark
+		m_out_txd_func(1);
+		set_out_data_bit(1);
 	}
-	if (m_out_txd_func.isnull())
-		transmit_register_send_bit();
-	else
-		m_out_txd_func(transmit_register_get_data_bit());
+	else if (m_wr[5] & WR5_SEND_BREAK)
+	{
+		// transmit break
+		m_out_txd_func(0);
+		set_out_data_bit(0);
+	}
+	else if (!is_transmit_register_empty())
+	{
+		// transmit data
+		if (m_out_txd_func.isnull())
+			transmit_register_send_bit();
+		else
+			m_out_txd_func(transmit_register_get_data_bit());
+	}
 }
 
 
@@ -590,8 +602,10 @@ void z80dart_channel::tra_callback()
 
 void z80dart_channel::tra_complete()
 {
-	if ((m_wr[5] & WR5_TX_ENABLE) && !(m_rr[0] & RR0_TX_BUFFER_EMPTY))
+	if ((m_wr[5] & WR5_TX_ENABLE) && !(m_wr[5] & WR5_SEND_BREAK) && !(m_rr[0] & RR0_TX_BUFFER_EMPTY))
 	{
+		LOG(("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data));
+
 		transmit_register_setup(m_tx_data);
 
 		// empty transmit buffer
@@ -603,11 +617,13 @@ void z80dart_channel::tra_complete()
 	else if (m_wr[5] & WR5_SEND_BREAK)
 	{
 		// transmit break
+		m_out_txd_func(0);
 		set_out_data_bit(0);
 	}
 	else
 	{
-		// transmit marking line
+		// transmit mark
+		m_out_txd_func(1);
 		set_out_data_bit(1);
 	}
 
@@ -777,7 +793,7 @@ UINT8 z80dart_channel::control_read()
 		break;
 	}
 
-	LOG(("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data));
+	//LOG(("Z80DART \"%s\" Channel %c : Control Register Read '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
 	return data;
 }
@@ -997,6 +1013,8 @@ void z80dart_channel::data_write(UINT8 data)
 
 	if ((m_wr[5] & WR5_TX_ENABLE) && is_transmit_register_empty())
 	{
+		LOG(("Z80DART \"%s\" Channel %c : Transmit Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, m_tx_data));
+
 		transmit_register_setup(m_tx_data);
 
 		// empty transmit buffer
@@ -1205,7 +1223,7 @@ WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 
 	if (!state) return;
 
-	LOG(("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
+	//LOG(("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 
 	if (++m_rx_clock == clocks)
 	{
@@ -1225,7 +1243,7 @@ WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 
 	if (!state) return;
 
-	LOG(("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
+	//LOG(("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 
 	if (++m_tx_clock == clocks)
 	{

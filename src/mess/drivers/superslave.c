@@ -456,16 +456,16 @@ void superslave_state::machine_reset()
 
 static MACHINE_CONFIG_START( superslave, superslave_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superslave_mem)
 	MCFG_CPU_IO_MAP(superslave_io)
 	MCFG_CPU_CONFIG(superslave_daisy_chain)
 
 	// devices
 	MCFG_PIC8259_ADD(AM9519_TAG, INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), VCC, NULL)
-	MCFG_Z80DART_ADD(Z80DART_0_TAG, 4000000, dart0_intf)
-	MCFG_Z80DART_ADD(Z80DART_1_TAG, 4000000, dart1_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_TAG, 4000000, pio_intf)
+	MCFG_Z80DART_ADD(Z80DART_0_TAG, XTAL_8MHz/2, dart0_intf)
+	MCFG_Z80DART_ADD(Z80DART_1_TAG, XTAL_8MHz/2, dart1_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, dbrg_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)

@@ -41,7 +41,7 @@ public:
 	virtual ~serial_port_device();
 
 	DECLARE_WRITE_LINE_MEMBER( tx ) { if(m_dev) m_dev->tx(state); }
-	DECLARE_READ_LINE_MEMBER( rx )  { return (m_dev) ? m_dev->rx() : 0; }
+	DECLARE_READ_LINE_MEMBER( rx )  { return (m_dev) ? m_dev->rx() : 1; }
 
 	void out_rx(UINT8 param)  { m_out_rx_func(param); }
 protected:
