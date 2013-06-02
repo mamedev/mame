@@ -460,3 +460,25 @@ void gba_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 {
 }
 
+
+/*-------------------------------------------------
+ Install ROM - directly point system address map 
+ to the cart ROM region so to avoid the memory
+ system additional load
+ -------------------------------------------------*/
+
+void gba_cart_slot_device::install_rom()
+{
+	if (m_cart)
+	{
+		astring tempstring;
+		address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+		space.install_read_bank(0x08000000, 0x09ffffff, 0, 0, "rom1");
+		space.install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
+		space.install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
+		machine().root_device().membank("rom1")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
+		machine().root_device().membank("rom2")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
+		machine().root_device().membank("rom3")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
+	}
+}
+

@@ -1920,9 +1920,7 @@ static ADDRESS_MAP_START( gba_map, AS_PROGRAM, 32, gba_state )
 	AM_RANGE(0x05000000, 0x050003ff) AM_RAM_WRITE(gba_pram_w) AM_SHARE("gba_pram")  // Palette RAM
 	AM_RANGE(0x06000000, 0x06017fff) AM_RAM_WRITE(gba_vram_w) AM_SHARE("gba_vram")  // VRAM
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM_WRITE(gba_oam_w) AM_SHARE("gba_oam")    // OAM
-	AM_RANGE(0x08000000, 0x09ffffff) AM_DEVREAD("cartslot", gba_cart_slot_device, read_rom)   // cartridge ROM (mirror 0)
-	AM_RANGE(0x0a000000, 0x0bffffff) AM_DEVREAD("cartslot", gba_cart_slot_device, read_rom)   // cartridge ROM (mirror 1)
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_DEVREAD("cartslot", gba_cart_slot_device, read_rom)   // final mirror
+	//AM_RANGE(0x08000000, 0x0cffffff)	// cart ROM + mirrors, mapped here at machine_start if a cart is present
 	AM_RANGE(0x10000000, 0xffffffff) AM_READ(gba_10000000_r) // for "Justice League Chronicles" (game bug)
 ADDRESS_MAP_END
 
@@ -2119,7 +2117,11 @@ void gba_state::machine_start()
 	/* and an IRQ handling timer */
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::handle_irq),this));
 	m_irq_timer->adjust(attotime::never);
+	
+	// install the cart ROM into the address map, if present
+	m_cartslot->install_rom();
 
+	// install the cart NVRAM handlers if necessary
 	if (m_cartslot->get_type() == GBA_SRAM)
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cartslot));
@@ -2142,7 +2144,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cartslot));
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cartslot));
 	}
-
+	
 	save_item(NAME(m_DISPSTAT));
 	save_item(NAME(m_BG2X));
 	save_item(NAME(m_BG2Y));
