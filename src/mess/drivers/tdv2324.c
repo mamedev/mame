@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( tdv2324_sub_io, AS_IO, 8, tdv2324_state )
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY(P8253_5_1_TAG, pit8253_r, pit8253_w)
-	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE_LEGACY(TMS9937NL_TAG, tms9927_r, tms9927_w) // TODO: this is supposed to be a 9937, which is not quite the same as 9927
+	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE(TMS9937NL_TAG, tms9927_device, read, write) // TODO: this is supposed to be a 9937, which is not quite the same as 9927
 ADDRESS_MAP_END
 
 

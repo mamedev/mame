@@ -466,7 +466,7 @@ READ8_MEMBER(attache_state::display_data_r)
 	switch(m_current_cmd)
 	{
 	case DISP_CRTC:
-		ret = tms9927_r(m_crtc,space,m_crtc_reg_select);
+		ret = m_crtc->read(space, m_crtc_reg_select);
 		break;
 	case DISP_ATTR:
 		ret = m_attr_ram[(m_attr_line*128)+(param & 0x7f)];
@@ -487,7 +487,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	switch(m_current_cmd)
 	{
 	case DISP_CRTC:
-		tms9927_w(m_crtc,space,m_crtc_reg_select,data);
+		m_crtc->write(space, m_crtc_reg_select, data);
 		break;
 	case DISP_ATTR:
 		m_attr_ram[(m_attr_line*128)+(param & 0x7f)] = data;

@@ -1,4 +1,5 @@
 #include "sound/samples.h"
+#include "video/tms9927.h"
 
 struct coprocessor_t {
 	UINT8 *context_ram;
@@ -13,7 +14,8 @@ public:
 	thief_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_tms(*this, "tms") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_input_select;
@@ -44,4 +46,5 @@ public:
 	void tape_set_motor( samples_device *samples, int bOn );
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
+	required_device<tms9927_device> m_tms;
 };

@@ -3,7 +3,6 @@
 */
 
 #include "emu.h"
-#include "video/tms9927.h"
 #include "includes/thief.h"
 
 
@@ -105,7 +104,7 @@ UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bit
 	int flipscreen = m_video_control&1;
 	const UINT8 *source = videoram;
 
-	if (tms9927_screen_reset(machine().device("tms")))
+	if (m_tms->screen_reset())
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;

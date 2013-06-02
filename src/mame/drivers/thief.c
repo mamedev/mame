@@ -26,7 +26,6 @@ Credits:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "video/tms9927.h"
 #include "includes/thief.h"
 
 #define MASTER_CLOCK    XTAL_20MHz
@@ -180,7 +179,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, thief_state )
 	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x43, 0x43) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(thief_color_plane_w)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("tms", tms9927_device, read, write)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(thief_color_map_w)
 ADDRESS_MAP_END
 
@@ -428,7 +427,8 @@ static const samples_interface natodef_samples_interface =
 static const tms9927_interface tms9927_intf =
 {
 	"screen",
-	8
+	8,
+	NULL
 };
 
 
