@@ -1183,6 +1183,20 @@ static INPUT_PORTS_START( mooncreg )
 	PORT_DIPSETTING(    0x0f, "Free Play (duplicate 3)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mooncrsl )
+	PORT_INCLUDE(mooncrst)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* the game will crash at round 3 otherwise, could be protection (or a bad rom / bad hack) the same code is mostly patched out in mooncreg */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, "Player's Bullet Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x80, "Fast" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( mooncptc )
 	PORT_INCLUDE(smooncrs)
 
@@ -5029,6 +5043,28 @@ ROM_START( mooncreg ) // similar to the spcdraga 'Space Dragon (set 2)' set but 
 ROM_END
 
 
+ROM_START( mooncrsl ) // similar to above
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "01.bin",     0x0000, 0x0800, CRC(a67ca4af) SHA1(0422be6b3549418c19ece3de6dd165e690d40fdd) )
+	ROM_LOAD( "02.bin",     0x0800, 0x0800, CRC(16edce3e) SHA1(59a21d69aba42be265fa3f9166a031ef510c59ed) )
+	ROM_LOAD( "03.bin",     0x1000, 0x0800, CRC(a1939def) SHA1(c9be93d325dde496d89e0735ec4e7abca932c0f6) )
+	ROM_LOAD( "04.bin",     0x1800, 0x0800, CRC(068f8830) SHA1(e12d590401878d9f2695e5c7aa38387ed9ccfb06) )
+	ROM_LOAD( "05.bin",     0x2000, 0x0800, CRC(28ae612d) SHA1(f1c224be95659e716f0d4f0dc2704503cfc46c07) )
+	ROM_LOAD( "06.bin",     0x2800, 0x0800, CRC(803da987) SHA1(41ce0401a142f2fc41ea2db95d1067a2386e9e70) )
+	ROM_LOAD( "07.bin",     0x3000, 0x0800, CRC(8e9ac0fc) SHA1(ddc11ad20ecbd954098becf7d7a1bbe6cddeda1b) )
+	ROM_LOAD( "08.bin",     0x3800, 0x0800, CRC(020a8e2f) SHA1(b64438cb043252565d8a4f3f58f4a4f78a276ba2) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )	// not present in this set
+	ROM_LOAD( "mcs_b",        0x0000, 0x0800, CRC(fb0f1f81) SHA1(38a6679a8b69bc1870a0e67e692131c42f9535c8) )
+	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(13932a15) SHA1(b8885c555c6ad7021be55c6925a0a0872c1b6abd) )
+	ROM_LOAD( "mcs_a",        0x1000, 0x0800, CRC(631ebb5a) SHA1(5bc9493afa76c55858b8c8849524cbc77dc838fc) )
+	ROM_LOAD( "mcs_c",        0x1800, 0x0800, CRC(24cfd145) SHA1(08c6599db170dd6ee364c44f70a0f5c0f881b6ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not present in this set
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
+
 ROM_START( stera )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "stera.1",      0x0000, 0x0800, CRC(cd04fea8) SHA1(f3ba58f276c784f4ad4a53f9f961c269faa8fa87) )
@@ -6967,6 +7003,7 @@ GAME( 198?, starfgmc, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, RO
 GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncreg, mooncrst, mooncrst, mooncreg, galaxian_state, mooncrsu, ROT90,  "bootleg (Electrogame S.A.)", "Moon Cresta (Electrogame S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrsl, mooncrst, mooncrst, mooncrsl, galaxian_state, mooncrsu, ROT90,  "bootleg (Laguna S.A.)", "Cresta Mundo (Laguna S.A. Spanish Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, stera,    mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx, mooncrst, galaxian, mooncrgx, galaxian_state, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonqsr,  0,        mooncrst, moonqsr, galaxian_state,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
