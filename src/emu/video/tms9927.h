@@ -48,7 +48,6 @@ private:
 	void generic_access(address_space &space, offs_t offset);
 	
 	// internal state
-	//const tms9927_interface *intf;
 	screen_device *m_screen;
 	const UINT8 *m_selfload;
 	

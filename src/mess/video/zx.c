@@ -18,12 +18,6 @@
 
 #include "includes/zx.h"
 
-emu_timer *ula_nmi = NULL;
-//emu_timer *ula_irq = NULL;
-//int ula_nmi_active;
-int ula_frame_vsync = 0;
-//int ula_scancode_count = 0;
-int ula_scanline_count = 0;
 
 void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
