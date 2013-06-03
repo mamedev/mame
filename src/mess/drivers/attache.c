@@ -101,6 +101,7 @@ public:
 		  m_membank7(*this, "bank7"),
 		  m_membank8(*this, "bank8"),
 		  m_rom_active(true),
+		  m_gfx_enabled(false),
 		  m_kb_clock(true),
 		  m_kb_empty(true)
 	{ }
@@ -198,6 +199,7 @@ private:
 	required_memory_bank m_membank8;
 
 	bool m_rom_active;
+	bool m_gfx_enabled;
 	UINT8 m_pio_porta;
 	UINT8 m_pio_portb;
 	UINT8 m_pio_select;
@@ -206,8 +208,10 @@ private:
 	UINT8 m_current_cmd;
 	UINT8 m_char_ram[128*32];
 	UINT8 m_attr_ram[128*32];
+	UINT8 m_gfx_ram[128*32*5];
 	UINT8 m_char_line;
 	UINT8 m_attr_line;
+	UINT8 m_gfx_line;
 	UINT8 m_cmos_ram[64];
 	UINT8 m_cmos_select;
 	UINT16 m_kb_current_key;
@@ -232,7 +236,41 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	UINT8 dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
 	                     // as it can start on either odd or even character cells.
 
-	// TODO: Graphics RAM
+	// Graphics output (if enabled)
+	if(m_gfx_enabled)
+	{
+		for(y=0;y<bitmap.height()/10;y++)
+		{
+			for(x=0;x<bitmap.width()/8;x++)
+			{
+				// graphics pixels use half the clock of text, so 4 graphics pixels per character
+				for(scan=0;scan<10;scan+=2)
+				{
+					data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
+					bitmap.pix32(y*10+scan,x*8)   = (BIT(data,7) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+1) = (BIT(data,7) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+2) = (BIT(data,6) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+3) = (BIT(data,6) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+4) = (BIT(data,5) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+5) = (BIT(data,5) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+6) = (BIT(data,4) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8+7) = (BIT(data,4) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8)   = (BIT(data,3) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+1) = (BIT(data,3) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+2) = (BIT(data,2) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+3) = (BIT(data,2) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+4) = (BIT(data,1) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+5) = (BIT(data,1) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+6) = (BIT(data,0) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan+1,x*8+7) = (BIT(data,0) ? 0x00ff00 : 0x000000);
+				}
+			}
+		}
+	}
+	else
+		bitmap.fill(0);
+
+	// Text output
 	for(y=0;y<bitmap.height()/10;y++)  // lines
 	{
 		for(x=0;x<bitmap.width()/8;x++)  // columns
@@ -293,12 +331,12 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					UINT16 xpos = x*8+bit;
 					UINT16 ypos = y*10+scan;
-					UINT32 fg = 0x7f7f7f;
-					UINT32 bg = 0x000000;
+					UINT32 fg = 0x009f00;
 
 					if(m_attr_ram[(y*128)+x] & 0x08) // brightness
-						fg = 0xffffff;
-					bitmap.pix32(ypos,xpos) = (BIT(data,7-bit)) ? fg : bg;
+						fg = 0x00ff00;
+					if(BIT(data,7-bit))
+						bitmap.pix32(ypos,xpos) = fg;
 				}
 			}
 		}
@@ -474,7 +512,8 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		m_rom_active = ~data & 0x04;
 		m_floppy0->mon_w((data & 0x01) ? 0 : 1);
 		m_floppy1->mon_w((data & 0x01) ? 0 : 1);
-		// TODO: graphics enable, display brightness
+		m_gfx_enabled = data & 0x02;
+		// TODO: display brightness
 		break;
 	case PIO_SEL_NOP:
 		logerror("PIO: NOP write\n");
@@ -530,6 +569,21 @@ READ8_MEMBER(attache_state::display_data_r)
 
 	switch(m_current_cmd)
 	{
+	case DISP_GFX_0:
+		ret = m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)];
+		break;
+	case DISP_GFX_1:
+		ret = m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32)];
+		break;
+	case DISP_GFX_2:
+		ret = m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*2)];
+		break;
+	case DISP_GFX_3:
+		ret = m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*3)];
+		break;
+	case DISP_GFX_4:
+		ret = m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*4)];
+		break;
 	case DISP_CRTC:
 		ret = m_crtc->read(space, m_crtc_reg_select);
 		break;
@@ -551,6 +605,21 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	UINT8 param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
 	{
+	case DISP_GFX_0:
+		m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)] = data;
+		break;
+	case DISP_GFX_1:
+		m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32)] = data;
+		break;
+	case DISP_GFX_2:
+		m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*2)] = data;
+		break;
+	case DISP_GFX_3:
+		m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*3)] = data;
+		break;
+	case DISP_GFX_4:
+		m_gfx_ram[(m_gfx_line*128)+(param & 0x7f)+(128*32*4)] = data;
+		break;
 	case DISP_CRTC:
 		m_crtc->write(space, m_crtc_reg_select, data);
 		break;
@@ -578,7 +647,7 @@ WRITE8_MEMBER(attache_state::display_command_w)
 	case DISP_GFX_2:
 	case DISP_GFX_3:
 	case DISP_GFX_4:
-		// TODO: Graphics segments
+		m_gfx_line = data & 0x1f;
 		break;
 	case DISP_CRTC:
 		// CRT5027/TMS9927 registers
@@ -890,6 +959,7 @@ void attache_state::driver_start()
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);
+	save_pointer(m_gfx_ram,"Graphics RAM",128*32*5);
 	save_pointer(m_cmos_ram,"CMOS RAM",64);
 }
 
@@ -899,6 +969,7 @@ void attache_state::machine_start()
 	memset(m_cmos_ram,0,64);
 	memset(m_attr_ram,0,128*32);
 	memset(m_char_ram,0,128*32);
+	memset(m_gfx_ram,0,128*32*5);
 
 	// FDC callbacks
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(attache_state::fdc_intrq_w), this));
