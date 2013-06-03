@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8_LEGACY("upd1771c", upd1771_r, upd1771_w, 0x00ff )
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8("upd1771c", upd1771c_device, read, write, 0x00ff)
 //  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
 //  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 //  0x71, 0x77 IDA Controller
