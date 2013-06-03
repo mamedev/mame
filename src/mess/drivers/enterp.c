@@ -1,3 +1,168 @@
+/*
+
+Enterprise Sixty Four / Enterprise One Two Eight
+Enterprise Computers Ltd. 1985
+
+MAIN PCB Layout
+---------------  
+                                        DUAL
+|-----------| 9V                        TAPE_IN/OUT                             RES
+|HEATSINK   | DC_IN             MON1    AND REMOTE     SR1    PR1   CN2A CN1A   |-|                      
+|           |--||---|--||--|--| |--| |-||-||-||-||-| |----| |-----| |--| |--| |-|-|------|
+|-----------|7805   | MOD  |  |-|  |-|             |-|    |-|     |-|  |-|  |-|   EXP2 --|EXTERNAL            
+        |---+7805   |      |                         74LS06 74LS273 74LS86 74LS32      --|EXPANSION
+        |   |       |------|             74LS244                                       --|CONNECTOR
+        |   |78L12 POT1  LM386                               |-----|   |-----|   EXP1  --|
+   CART |   |          LM1889 LM1886                   74LS04|NICK |   |DAVE |         --|
+   CONN |   |   KEYB_8     POT2     KEYB_10                  |     |   |     |         --|
+        |   |            4.433619MHz     74LS145 POT3 LED    |-----|   |-----|         --|
+        |---+                                                                          --|
+            |                            74LS74      74LS244  74LS244  74LS245 |---------|
+            |                                                                  |            
+            | 74LS373                    4164  4164  74F157                    |
+            |                                                                  |
+            | 16-2-103   LM339    LM324  4164  4164  74F157           EXOS.IC2 |
+            |                                                 8MHz             |
+            | 74LS373                    4164  4164                            |
+            |                                                74LS04    Z80A    |
+            | 74LS273                    4164  4164                            |
+            |------------------------------------------------------------------|
+Notes: (all IC's shown)
+           Z80A - Z80A CPU, clock input 4MHz [8/2]
+       EXOS.IC2 - 32k x8-bit mask ROM usually 23256 manufactured by GI (DIP24). Contains EXOS operating 
+                  system and built-in word processor software. A few official revisions were made and 
+                  there were a few unofficial revision made with additional capabilities and bug-fixes
+                  ROM labelling of some official versions found....
+                  9256DS-0019 (C)1984 INTELLIGENT SOFTWARE LTD ENTER 08-45-A GI
+                  9256DS-0036 (C)1984 INTELLIGENT SOFTWARE LTD ENTER 05-23-A GI
+           4164 - 64k x1-bit Dynamic RAM with Page Mode (DIP16)
+           NICK - Custom graphics chip (QFP72)
+           DAVE - Custom sound chip (QFP72)
+          LM386 - National Semiconductor LM386 Low Voltage Audio Power Amplifier (DIP8)
+         LM1889 - National Semiconductor LM1889 TV Video Modulator (DIP18)
+         LM1886 - National Semiconductor LM1886 TV Video Matrix DAC (DIP20)
+          LM339 - SGS LM339 Low Power Low Offset Voltage Quad Comparator (DIP8)
+          LM324 - SGS LM324 Quad Operational Amplifier (DIP8)
+         74LS04 - Hex Inverter (DIP14)
+         74LS06 - Hex Inverter/Buffer with Open-Collector Outputs (DIP14)
+         74LS32 - Quad 2-Input Positive OR Gate (DIP14)
+         74LS74 - Dual Positive-Edge-Triggered D Flip-Flops with Preset, Clear and Complementary Outputs (DIP14)
+         74LS86 - Quad 2-Input Exclusive OR Gate (DIP14)
+        74LS145 - BCD to Deccimal Decoder/Driver (DIP16)
+         74F157 - Quad 2-Line to 1-Line Data Selector/Multiplexer (DIP16). Early rev mainboards use 74LS158 instead
+        74LS244 - Octal 3-State Noninverting Buffer/Line Driver/Line Receiver (DIP20)
+        74LS245 - Octal Bus Tranceiver with Tri-State Outputs (DIP20)
+        74LS273 - Octal D-Type Flip-Flop With Clear (DIP20)
+        74LS373 - Octal D-Type Transparent Latches and Edge-Triggered Flip-Flops (DIP20)
+           7805 - Voltage regulator. +9V DC input from DC power pack, +5V DC output
+          78L12 - Voltage regulator. Voltage input via small transformer on PCB. +12V DC output
+           POT1 - Potentiometer located near modulator and video output circuitry
+           POT2 - Potentiometer located near video output circuitry. Probably used to fine-tune the video clock
+           POT3 - Potentiometer. Possibly for video/NICK-related adjustments
+            LED - LED to show +5V is present
+       16-2-103 - Resistor Array (DIP16)
+         KEYB_8 - 8 pin keyboard connector
+        KEYB_10 - 10 pin keyboard connector
+           EXP1 - 28 pin internal expansion connector (solder holes only) used for internal 64k memory expansion card
+           EXP2 - 10 pin internal expansion connector (solder holes only) used for internal 64k memory expansion card
+            MOD - Astec UM1233 TV modulator
+            RES - Reset push button switch
+           MON1 - Monitor output connector. Pinout is....
+           
+                            Green  A1 B1 NC
+                            Ground A2 B2 Ground
+                  Mono Comp. Video A3 B3 Blue
+                             HSync A4 B4 Red
+                             VSync A5 B5 Composite Sync
+                                NC A6 B6 Mode Switch
+                        Left Audio A7 B7 Right Audio
+           
+            SR1 - Serial/Network connector. Pinout is....
+            
+                         Reference A1 B1 Ground
+                                 - A2 B2 -
+                               RTS A3 B3 Data Out
+                               CTS A4 B4 Data In
+
+            PR1 - Printer connector. Pinout is....
+                  
+                            Ground A1 B1 Ground
+                            Strobe A2 B2 Ready
+                            Data 3 A3 B3 Data 4
+                                 - A4 B4 -
+                            Data 2 A5 B5 Data 5
+                            Data 1 A6 B6 Data 6
+                            Data 0 A7 B7 Data 7
+
+           CN2A - Joystick 2 connector
+           CN1A - Joystick 1 connector 
+                  Pinout is....
+                  
+                          Keyboard J A1 B1 Ground
+                          Keyboard L A2 B2 Keyboard K
+                                   - A3 B3 -
+                               Right A4 B4 +5V
+                                Down A5 B5 Left
+                                Fire A6 B6 Up
+
+
+Floppy Drive Controller PCB Layout
+----------------------------------
+
+INTELLIGENT SOFTWARE LTD DISK CONTROLLER 
+ISS1
+ |--------------------------------------------|
+ |                                            |
+ |                                            |
+|-|  7438  74LS273             WD1770         |
+|I|                                           |
+|D|                                           |
+|C|                                  EPROM.IC2|
+|3|           74LS32  74LS02  74LS266         |
+|4|  7438                                     |
+|-|      74LS126  74LS10  74LS245  74LS266    |
+ |                                            |
+ |                                            |
+ |----------------------------|||||||||||||||||
+                              |---------------|
+Notes: (All IC's shown)
+
+This PCB plugs into the external expansion connector on the right side of the mainboard
+
+      EPROM.IC2 - 16k x8-bit EPROM labelled 'EXDOS V1.0 P/N 08-60' (DIP28)
+         WD1770 - Western Digital WD1770 Floppy Drive Controller (DIP28)
+         74LS02 - Quad 2-Input NOR Gate (DIP14)
+         74LS10 - Triple 3-input NAND Gate (DIP14)
+         74LS32 - Quad 2-Input Positive OR Gate (DIP14)
+           7438 - Quad 2-input NAND Buffer (DIP14)
+        74LS126 - Quad Bus Buffer (DIP14)
+        74LS245 - Octal Bus Tranceiver with Tri-State Outputs (DIP20)
+        74LS266 - Quad EXCLUSIVE-NOR Gate (DIP14)
+        74LS273 - Octal D-Type Flip-Flop With Clear (DIP20)
+          IDC34 - IDC 34-way flat cable connector for floppy drive data cable
+
+
+Internal Memory Expansion PCB Layout
+------------------------------------     
+
+|---------------------|
+|  4164 74LS00 PL3 PL2|
+|4164 74LS30 74F157   |
+|4164 4164            |
+|4164 4164   74F157   |
+|4164 4164 74LS32  PL1|
+|---------------------|
+Notes: (All IC's shown)
+          PL1 - 28-pin connector (solder pads only) hard-wired to solder pads EXP1 on mainboard
+      PL2/PL3 - 5-pin connectors (solder pads only) hard-wired to solder pads EXP2 on mainboard
+         4164 - 64k x1-bit Dynamic RAM with Page Mode (DIP16)
+       74LS00 - Quad 2-Input NAND Gate (DIP14)
+       74LS30 - 8-input NAND Gate (DIP14)
+       74LS32 - Quad 2-Input Positive OR Gate (DIP14)
+       74F157 - Quad 2-Line to 1-Line Data Selector/Multiplexer (DIP16). Early rev memory boards use 74LS158 instead
+
+*/
+
 /******************************************************************************
  * Enterprise 128k driver
  *
@@ -582,6 +747,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY                 FULLNAME */
-COMP( 1985, ep64,  0,      0,      ep64,    ep64, driver_device, 0,     "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
-COMP( 1985, ep128, ep64,   0,      ep128,   ep64, driver_device, 0,     "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep64,  0,      0,      ep64,    ep64, driver_device, 0,     "Enterprise Computers", "Enterprise Sixty Four", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep128, ep64,   0,      ep128,   ep64, driver_device, 0,     "Enterprise Computers", "Enterprise One Two Eight", GAME_IMPERFECT_SOUND )
 COMP( 1985, phc64, ep64,   0,      ep64,    ep64, driver_device, 0,     "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )
