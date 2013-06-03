@@ -1,7 +1,6 @@
 #ifndef _SNES_H_
 #define _SNES_H_
 
-#include "devlegcy.h"
 #include "devcb.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"

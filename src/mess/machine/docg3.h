@@ -9,8 +9,6 @@
 #ifndef __DOCG3_H__
 #define __DOCG3_H__
 
-#include "devlegcy.h"
-
 #define MCFG_DISKONCHIP_G3_ADD(_tag, _size) \
 	MCFG_DEVICE_ADD(_tag, DISKONCHIP_G3, 0) \
 	static_cast<diskonchip_g3_device *>(device)->set_size(_size);
