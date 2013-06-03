@@ -371,16 +371,10 @@ CPU_DISASSEMBLE( m6809 )
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
 	int i, p = 0, page = 0, opcode_found = FALSE;
-	
-	// FIXME (qix.c kram3 is the only set that uses it)
-	bool encrypt_only_first_byte = false;
-	
+
 	do
 	{
-		if (encrypt_only_first_byte)
-			opcode = page == 0 ? oprom[p++] :  opram[p++];
-		else
-			opcode = oprom[p++];
+		opcode = oprom[p++];
 
 		for (i = 0; i < m6809_numops[page]; i++)
 			if (m6809_pgpointers[page][i].opcode == opcode)

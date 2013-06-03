@@ -13,15 +13,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-/* encrypt only the first byte in 10 xx and 11 xx opcodes */
-#define MCFG_CPU_M6809_ENCRYPT_ONLY_FIRST_BYTE() \
-	m6809_base_device::set_encrypt_only_first_byte(*device, true);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -40,9 +31,6 @@ class m6809_base_device : public cpu_device
 public:
 	// construction/destruction
 	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider);
-
-	// inline configuration helpers
-	static void set_encrypt_only_first_byte(device_t &device, bool b) { downcast<m6809_base_device &>(device).m_encrypt_only_first_byte = b; }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 	DECLARE_WRITE_LINE_MEMBER( firq_line );
@@ -261,7 +249,6 @@ private:
 
 	// incidentals
 	int                         m_clock_divider;
-	bool                        m_encrypt_only_first_byte;
 
 	// functions
 	void execute_one();

@@ -109,8 +109,7 @@ const device_type M6809E = &device_creator<m6809e_device>;
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider)
 	: cpu_device(mconfig, type, name, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
-	m_clock_divider(divider),
-	m_encrypt_only_first_byte(false)
+	m_clock_divider(divider)
 {
 }
 

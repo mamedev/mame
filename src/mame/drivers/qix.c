@@ -28,6 +28,9 @@
     TODO:
         * The Kram encryption algorithm is not understood. I merely provide tables to
           decrypt it, derived by comparison with the not encrypted versions.
+          The kram3 set used to be playable with the implementation in the MAME M6809
+          CPU core, encrypting only the first byte in 10 xx and 11 xx opcodes.
+          This should be moved to the driver file. Until then, kram3 is broken on purpose.
         * I applied the interleave change only to elecyoyo because these games are
           really sensitive to timing, and kram's service mode was disturbed by it (the
           high score and audit pages were broken).
@@ -549,7 +552,6 @@ static MACHINE_CONFIG_START( qix_base, qix_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_M6809_ENCRYPT_ONLY_FIRST_BYTE() // for kram3
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
@@ -1320,20 +1322,20 @@ DRIVER_INIT_MEMBER(qix_state,slither)
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (Rev 2)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
-GAME( 1981, qixa,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
-GAME( 1981, qixo,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
-GAME( 1981, qix2,     qix,      qix,      qix, driver_device,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
-GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
-GAME( 1982, kram,     0,        mcu,      kram, driver_device,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram, driver_device,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     qix,      kram, qix_state,     kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zookeep,  0,        zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep, qix_state,  zookeep, ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, slither,  0,        slither,  slither, qix_state,  slither, ROT270, "Century II",                "Slither (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, slithera, slither,  slither,  slither, qix_state,  slither, ROT270, "Century II",                "Slither (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, complexx, 0,        qix,      complexx, driver_device, 0,       ROT270, "Taito America Corporation", "Complex X", GAME_SUPPORTS_SAVE )
+GAME( 1981, qix,      0,        qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (Rev 2)", GAME_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixb,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", GAME_SUPPORTS_SAVE )
+GAME( 1981, qixo,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", GAME_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
+GAME( 1981, qix2,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
+GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
+GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram2,    kram,     mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram3,    kram,     qix,      kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, slither,  0,        slither,  slither,  qix_state,     slither,  ROT270, "Century II", "Slither (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, slithera, slither,  slither,  slither,  qix_state,     slither,  ROT270, "Century II", "Slither (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, complexx, 0,        qix,      complexx, driver_device, 0,        ROT270, "Taito America Corporation", "Complex X", GAME_SUPPORTS_SAVE )
