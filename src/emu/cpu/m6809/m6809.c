@@ -109,21 +109,9 @@ const device_type M6809E = &device_creator<m6809e_device>;
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider)
 	: cpu_device(mconfig, type, name, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
-	m_clock_divider(divider)
+	m_clock_divider(divider),
+	m_encrypt_only_first_byte(false)
 {
-}
-
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void m6809_base_device::static_set_config(device_t &device, const m6809_config &config)
-{
-	m6809_base_device &m6809 = downcast<m6809_base_device &>(device);
-	static_cast<m6809_config &>(m6809) = config;
-	static_set_static_config(device, &config);
 }
 
 
@@ -133,17 +121,6 @@ void m6809_base_device::static_set_config(device_t &device, const m6809_config &
 
 void m6809_base_device::device_start()
 {
-	// default configuration
-	static const m6809_config default_config =
-	{
-		false
-	};
-
-	if (!static_config())
-	{
-		static_set_config(*this, default_config);
-	}
-
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 

@@ -398,16 +398,10 @@ static MC6845_INTERFACE( mc6845_intf )
 };
 
 
-static const m6809_config encryption_config =
-{
-	TRUE,       /* encrypt only the first byte in 10 xx and 11 xx opcodes */
-};
-
-
 MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
-	MCFG_CPU_CONFIG(encryption_config)  // for kram3
+	MCFG_CPU_M6809_ENCRYPT_ONLY_FIRST_BYTE() // for kram3
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 

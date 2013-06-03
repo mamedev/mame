@@ -544,17 +544,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const m6809_config encryption_config =
-{
-	TRUE,       /* encrypt only the first byte in 10 xx and 11 xx opcodes */
-};
-
 static MACHINE_CONFIG_START( qix_base, qix_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_M6809_CONFIG(encryption_config)    // for kram3
+	MCFG_CPU_M6809_ENCRYPT_ONLY_FIRST_BYTE() // for kram3
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */

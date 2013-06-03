@@ -270,7 +270,7 @@ MAIN:
 	return;
 
 DISPATCH10:
-	@m_opcode = read_opcode();
+	@m_opcode = m_encrypt_only_first_byte ? read_opcode_arg() : read_opcode();
 	switch(m_opcode)
 	{
 		case 0x20:				set_cond(true);						%LBRANCH;	return;
@@ -323,7 +323,7 @@ DISPATCH10:
 	return;
 
 DISPATCH11:
-	@m_opcode = read_opcode();
+	@m_opcode = m_encrypt_only_first_byte ? read_opcode_arg() : read_opcode();
 	switch(m_opcode)
 	{
 		case 0x3F:													%SWI3;		return;
