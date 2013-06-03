@@ -8,7 +8,6 @@
 
     TODO:
     - Add RTC (type DS12887)
-    - Add UART (type mc6850)
 
     All of the address and i/o decoding is done by a pair of XC9536
     mask-programmed custom devices.
@@ -27,7 +26,8 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
+#include "machine/6850acia.h"
+#include "machine/serial.h"
 
 
 class c68ksbc_state : public driver_device
@@ -35,39 +35,19 @@ class c68ksbc_state : public driver_device
 public:
 	c68ksbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( c68ksbc_status_r );
-	DECLARE_READ16_MEMBER( c68ksbc_terminal_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
 	virtual void machine_reset();
 };
-
-//bit 0 high = a key is ready; bit 1 high = ready to output to terminal
-READ16_MEMBER( c68ksbc_state::c68ksbc_status_r )
-{
-	return (m_term_data) ? 3 : 2;
-}
-
-READ16_MEMBER( c68ksbc_state::c68ksbc_terminal_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
 
 static ADDRESS_MAP_START(c68ksbc_mem, AS_PROGRAM, 16, c68ksbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x002fff) AM_ROM
 	AM_RANGE(0x003000, 0x5fffff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(c68ksbc_status_r)
-	AM_RANGE(0x600002, 0x600003) AM_READ(c68ksbc_terminal_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("acia", acia6850_device, status_read, control_write, 0x00ff)
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("acia", acia6850_device, data_read, data_write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -78,17 +58,27 @@ INPUT_PORTS_END
 
 void c68ksbc_state::machine_reset()
 {
-	m_term_data = 0;
 }
 
-WRITE8_MEMBER( c68ksbc_state::kbd_put )
+static ACIA6850_INTERFACE( acia_intf )
 {
-	m_term_data = data;
-}
+	153600,
+	153600,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static const rs232_port_interface rs232_intf =
 {
-	DEVCB_DRIVER_MEMBER(c68ksbc_state, kbd_put)
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
@@ -96,7 +86,8 @@ static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_ACIA6850_ADD("acia", acia_intf)
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -107,5 +98,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY                FULLNAME               FLAGS */
 COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, driver_device,  0,  "Ichit Sirichote", "68k Single Board Computer", GAME_NO_SOUND_HW)
