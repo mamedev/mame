@@ -30,7 +30,8 @@
           decrypt it, derived by comparison with the not encrypted versions.
           The kram3 set used to be playable with the implementation in the MAME M6809
           CPU core, encrypting only the first byte in 10 xx and 11 xx opcodes.
-          This should be moved to the driver file. Until then, kram3 is broken on purpose.
+          This should get a cleaner implementation, such as a derived CPU class or a
+          callback on when it fetches opcodes. Until then, kram3 is broken on purpose.
         * I applied the interleave change only to elecyoyo because these games are
           really sensitive to timing, and kram's service mode was disturbed by it (the
           high score and audit pages were broken).
