@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 READ8_MEMBER( vt100_state::vt100_flags_r )
 {
 	UINT8 ret = 0;
-	ret |= vt_video_lba7_r(m_crtc, space, 0) << 6;
+	ret |= m_crtc->lba7_r(space, 0) << 6;
 	ret |= m_keyboard_int << 7;
 	return ret;
 }
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
 	// 0x42 Flags buffer
 	AM_RANGE (0x42, 0x42) AM_READ(vt100_flags_r)
 	// 0x42 Brightness D/A latch
-	AM_RANGE (0x42, 0x42) AM_DEVWRITE_LEGACY("vt100_video", vt_video_brightness_w)
+	AM_RANGE (0x42, 0x42) AM_DEVWRITE("vt100_video", vt100_video_device, brightness_w)
 	// 0x62 NVR latch
 	AM_RANGE (0x62, 0x62) AM_WRITE(vt100_nvr_latch_w)
 	// 0x82 Keyboard UART data output
@@ -197,9 +197,9 @@ static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
 	// 0x82 Keyboard UART data input
 	AM_RANGE (0x82, 0x82) AM_WRITE(vt100_keyboard_w)
 	// 0xA2 Video processor DC012
-	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)
+	AM_RANGE (0xa2, 0xa2) AM_DEVWRITE("vt100_video", vt100_video_device, dc012_w)
 	// 0xC2 Video processor DC011
-	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc011_w)
+	AM_RANGE (0xc2, 0xc2) AM_DEVWRITE("vt100_video", vt100_video_device, dc011_w)
 	// 0xE2 Graphics port
 	// AM_RANGE (0xe2, 0xe2)
 ADDRESS_MAP_END
@@ -324,8 +324,7 @@ INPUT_PORTS_END
 
 UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *devconf = machine().device("vt100_video");
-	vt_video_update( devconf, bitmap, cliprect);
+	m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
 

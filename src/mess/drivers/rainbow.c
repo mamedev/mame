@@ -80,12 +80,11 @@ public:
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
-		m_shared(*this, "sh_ram")
-	,
+		m_shared(*this, "sh_ram"),
 		m_maincpu(*this, "maincpu") { }
 
 
-	required_device<vt100_video_device> m_crtc;
+	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
 	required_device<cpu_device> m_z80;
 	required_device<fd1793_device> m_fdc;
@@ -164,11 +163,11 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE (0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
 	// 0x04 Video processor DC011
-	AM_RANGE (0x04, 0x04) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc011_w)
+	AM_RANGE (0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
 
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 	// 0x0C Video processor DC012
-	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE_LEGACY("vt100_video", vt_video_dc012_w)
+	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
@@ -210,8 +209,7 @@ void rainbow_state::machine_reset()
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *devconf = machine().device("vt100_video");
-	rainbow_video_update( devconf, bitmap, cliprect);
+	m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
 
@@ -470,7 +468,6 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
 	MCFG_CPU_IO_MAP(rainbowz80_io)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -481,7 +478,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_GFXDECODE(rainbow)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)
-	MCFG_VT100_VIDEO_ADD("vt100_video", video_interface)
+	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)

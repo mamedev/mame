@@ -14,62 +14,89 @@
 #define __VT_VIDEO__
 
 #include "emu.h"
-#include "devcb.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
+struct vt_video_interface
+{
+	const char *m_screen_tag;     /* screen we are acting on */
+	const char *m_char_rom_tag; /* character rom region */
+	
+	/* this gets called for every memory read */
+	devcb_read8         m_in_ram_cb;
+	devcb_write8        m_clear_video_cb;
+};
 
-class vt100_video_device : public device_t
+
+class vt100_video_device : public device_t,
+							public vt_video_interface
 {
 public:
+	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~vt100_video_device() { global_free(m_token); }
+	~vt100_video_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ8_MEMBER(lba7_r);
+	DECLARE_WRITE8_MEMBER(dc012_w);
+	DECLARE_WRITE8_MEMBER(dc011_w);
+	DECLARE_WRITE8_MEMBER(brightness_w);
+
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-private:
+
 	// internal state
-	void *m_token;
+	void recompute_parameters();
+	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
+	TIMER_CALLBACK_MEMBER(lba7_change);
+
+	devcb_resolved_read8        m_in_ram_func;
+	devcb_resolved_write8       m_clear_video_interrupt;
+	
+	screen_device *m_screen;  /* screen */
+	UINT8 *m_gfx;     /* content of char rom */
+	
+	int m_lba7;
+	
+	// dc012 attributes
+	UINT8 m_scroll_latch;
+	UINT8 m_blink_flip_flop;
+	UINT8 m_reverse_field;
+	UINT8 m_basic_attribute;
+	// dc011 attributes
+	UINT8 m_columns;
+	UINT8 m_height;
+	UINT8 m_skip_lines;
+	UINT8 m_frequency;
+	UINT8 m_interlaced;
+};
+
+
+class rainbow_video_device : public vt100_video_device
+{
+public:
+	rainbow_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
+
 };
 
 extern const device_type VT100_VIDEO;
+extern const device_type RAINBOW_VIDEO;
 
 
 #define MCFG_VT100_VIDEO_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-struct vt_video_interface
-{
-	const char *screen_tag;     /* screen we are acting on */
-	const char *char_rom_region_tag; /* character rom region */
+#define MCFG_RAINBOW_VIDEO_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, RAINBOW_VIDEO, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-	/* this gets called for every memory read */
-	devcb_read8         in_ram_func;
-	devcb_write8        clear_video_interrupt;
-};
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-/* register access */
-DECLARE_READ8_DEVICE_HANDLER  ( vt_video_lba7_r );
-DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_dc012_w );
-DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_dc011_w );
-DECLARE_WRITE8_DEVICE_HANDLER ( vt_video_brightness_w );
-
-
-/* screen update */
-void vt_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
-void rainbow_video_update(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 #endif
