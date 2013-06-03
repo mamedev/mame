@@ -11,11 +11,13 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/mc68328.h"
+#include "machine/mc68328.h"
+#include "machine/ram.h"
 #include "sound/dac.h"
 #include "debugger.h"
-#include "machine/ram.h"
 #include "rendlay.h"
+
+#define MC68328_TAG "dragonball"
 
 class palm_state : public driver_device
 {
@@ -35,7 +37,6 @@ public:
 	required_device<mc68328_device> m_lsi;
 	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
-	// mc68328 needs modernising
 	//DECLARE_WRITE8_MEMBER(palm_dac_transition);
 	//DECLARE_WRITE8_MEMBER(palm_port_f_out);
 	//DECLARE_READ8_MEMBER(palm_port_c_in);
@@ -54,6 +55,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE8_MEMBER(palm_dac_transition);
+	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
@@ -73,16 +75,15 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 	UINT8 button = m_io_penb->read();
 
 	if(button)
-		mc68328_set_penirq_line(m_lsi, 1);
+		m_lsi->set_penirq_line(1);
 	else
-		mc68328_set_penirq_line(m_lsi, 0);
+		m_lsi->set_penirq_line(0);
 }
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
 	UINT8 button_state = m_io_portd->read();
-
-	mc68328_set_port_d_lines(m_lsi, button_state, (int)(FPTR)param);
+	m_lsi->set_port_d_lines(button_state, (int)(FPTR)param);
 }
 
 WRITE8_MEMBER(palm_state::palm_port_f_out)
@@ -110,20 +111,19 @@ READ16_MEMBER(palm_state::palm_spim_in)
 	return m_spim_data;
 }
 
-static void palm_spim_exchange( device_t *device )
+WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 {
-	palm_state *state = device->machine().driver_data<palm_state>();
-	UINT8 x = state->m_io_penx->read();
-	UINT8 y = state->m_io_peny->read();
+	UINT8 x = m_io_penx->read();
+	UINT8 y = m_io_peny->read();
 
-	switch( state->m_port_f_latch & 0x0f )
+	switch (m_port_f_latch & 0x0f)
 	{
 		case 0x06:
-			state->m_spim_data = (0xff - x) * 2;
+			m_spim_data = (0xff - x) * 2;
 			break;
 
 		case 0x09:
-			state->m_spim_data = (0xff - y) * 2;
+			m_spim_data = (0xff - y) * 2;
 			break;
 	}
 }
@@ -159,7 +159,7 @@ void palm_state::machine_reset()
 
 static ADDRESS_MAP_START(palm_map, AS_PROGRAM, 16, palm_state)
 	AM_RANGE(0xc00000, 0xe07fff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE_LEGACY(MC68328_TAG, mc68328_r, mc68328_w)
+	AM_RANGE(0xfff000, 0xffffff) AM_DEVREADWRITE(MC68328_TAG, mc68328_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -176,6 +176,14 @@ WRITE8_MEMBER(palm_state::palm_dac_transition)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
+
+/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
+PALETTE_INIT( palm )
+{
+	palette_set_color_rgb(machine, 0, 0x7b, 0x8c, 0x5a);
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
+}
+
 static MC68328_INTERFACE(palm_dragonball_iface)
 {
 	"maincpu",
@@ -206,7 +214,7 @@ static MC68328_INTERFACE(palm_dragonball_iface)
 
 	DEVCB_DRIVER_MEMBER16(palm_state,palm_spim_out),
 	DEVCB_DRIVER_MEMBER16(palm_state,palm_spim_in),
-	palm_spim_exchange
+	DEVCB_DRIVER_LINE_MEMBER(palm_state, palm_spim_exchange)
 };
 
 
@@ -219,15 +227,13 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(1260) )
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 
-
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES( VIDEO_UPDATE_BEFORE_VBLANK )
 	MCFG_SCREEN_SIZE( 160, 220 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
-	MCFG_VIDEO_START( mc68328 )
-	MCFG_SCREEN_UPDATE_STATIC( mc68328 )
+	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
 	MCFG_PALETTE_LENGTH( 2 )
-	MCFG_PALETTE_INIT( mc68328 )
+	MCFG_PALETTE_INIT( palm )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */
@@ -235,7 +241,7 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_MC68328_ADD( palm_dragonball_iface ) // lsi device
+	MCFG_MC68328_ADD( MC68328_TAG, palm_dragonball_iface ) // lsi device
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palm )

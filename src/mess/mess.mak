@@ -1525,7 +1525,6 @@ $(MESSOBJ)/osi.a:               \
 $(MESSOBJ)/palm.a:              \
 	$(MESS_DRIVERS)/palm.o      \
 	$(MESS_MACHINE)/mc68328.o   \
-	$(MESS_VIDEO)/mc68328.o     \
 	$(MESS_DRIVERS)/palmz22.o   \
 
 $(MESSOBJ)/parker.a:            \
