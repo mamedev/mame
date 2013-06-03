@@ -105,6 +105,7 @@ public:
 	m_mainram(*this, "mainram"),
 	m_lpt0(*this, "lpt_0"),
 	m_pit(*this, "pit8254"),
+	m_newport(*this, "newport"),
 	m_dac(*this, "dac"),
 	m_kbdc8042(*this, "kbdc")
 	{ }
@@ -149,6 +150,7 @@ public:
 	required_shared_ptr<UINT32> m_mainram;
 	required_device<device_t> m_lpt0;
 	required_device<pit8254_device> m_pit;
+	required_device<newport_video_device> m_newport;
 	required_device<dac_device> m_dac;
 	required_device<kbdc8042_device> m_kbdc8042;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
@@ -1197,7 +1199,7 @@ WRITE32_MEMBER(ip22_state::hpc3_unkpbus0_w)
 static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )    /* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)     /* 128 MB of main RAM */
-	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE_LEGACY(newport_rex3_r, newport_rex3_w )
+	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_DEVREADWRITE("newport", newport_video_device, rex3_r, rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE(hpc3_hd_enet_r, hpc3_hd_enet_w )
 	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM   /* unknown, but read a lot and discarded */
@@ -1627,6 +1629,18 @@ static const pc_lpt_interface ip22_lpt_config =
 	DEVCB_NULL /* no idea if the lpt irq is connected and where */
 };
 
+
+SCREEN_UPDATE_RGB32( ip22 )
+{
+	ip22_state *state = screen.machine().driver_data<ip22_state>();
+
+	bitmap.fill(get_black_pen(screen.machine()), cliprect);
+	state->m_newport->render_screen(bitmap, cliprect);
+	
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -1645,11 +1659,11 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1280+64, 1024+64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_SCREEN_UPDATE_STATIC( newport )
+	MCFG_SCREEN_UPDATE_STATIC( ip22 )
 
 	MCFG_PALETTE_LENGTH(65536)
 
-	MCFG_VIDEO_START( newport )
+	MCFG_NEWPORT_ADD("newport")
 
 	MCFG_PC_LPT_ADD("lpt_0", ip22_lpt_config)
 
