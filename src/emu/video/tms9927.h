@@ -10,9 +10,6 @@
 #ifndef __TMS9927__
 #define __TMS9927__
 
-#include "devlegcy.h"
-
-
 /* interface */
 struct tms9927_interface
 {
