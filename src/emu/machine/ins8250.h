@@ -27,7 +27,7 @@ class ins8250_uart_device : public device_t,
 							public ins8250_interface
 {
 public:
-	ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 	DECLARE_WRITE8_MEMBER( ins8250_w );
 	DECLARE_READ8_MEMBER( ins8250_r );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
@@ -58,7 +58,6 @@ protected:
 			TYPE_NS16450,
 			TYPE_NS16550,
 			TYPE_NS16550A,
-			TYPE_PC16550D,
 	};
 	int m_device_type;
 	struct {
@@ -124,6 +123,23 @@ private:
 	emu_timer *m_timeout;
 };
 
+class pc16552_device : public device_t
+{
+public:
+	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ8_MEMBER(read) { return ((offset & 8) ? m_chan1 : m_chan0)->ins8250_r(space, offset & 7, mem_mask); }
+	DECLARE_WRITE8_MEMBER(write) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(space, offset & 7, data, mem_mask); }
+
+protected:
+	virtual void device_start();
+
+private:
+	ns16550_device *m_chan0;
+	ns16550_device *m_chan1;
+};
+
+extern const device_type PC16552D;
 extern const device_type INS8250;
 extern const device_type NS16450;
 extern const device_type NS16550;
@@ -145,5 +161,10 @@ extern const device_type NS16550;
 #define MCFG_NS16550_ADD(_tag, _intrf, _clock) \
 	MCFG_DEVICE_ADD(_tag, NS16550, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_PC16552D_ADD(_tag, _intf0, _intf1, _clock) \
+	MCFG_DEVICE_ADD(_tag, PC16552D, 0) \
+	MCFG_NS16550_ADD(_tag ":chan0", _intf0, _clock) \
+	MCFG_NS16550_ADD(_tag ":chan1", _intf1, _clock)
 
 #endif

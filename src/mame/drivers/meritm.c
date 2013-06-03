@@ -191,7 +191,6 @@ public:
 			m_uart(*this, "ns16550"),
 			m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT8* m_ram;
 	required_device<z80pio_device> m_z80pio_0;
 	required_device<z80pio_device> m_z80pio_1;
