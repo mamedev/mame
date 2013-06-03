@@ -193,9 +193,9 @@ WRITE8_MEMBER( tandy_pc_state::tandy1000_pio_w )
 	case 2:
 		m_tandy_ppi_portc = data;
 		if (data & 8)
-			space.machine().device("maincpu")->set_clock_scale(1);
+			m_maincpu->set_clock_scale(1);
 		else
-			space.machine().device("maincpu")->set_clock_scale(4.77/8);
+			m_maincpu->set_clock_scale(4.77/8);
 		break;
 	}
 }
@@ -224,7 +224,36 @@ READ8_MEMBER(tandy_pc_state::tandy1000_pio_r)
 
 void tandy_pc_state::tandy1000_set_bios_bank()
 {
-	membank("bank11")->set_base( memregion("maincpu")->base() + ( m_tandy_bios_bank & 0x07 ) * 0x10000 );
+	UINT8 *p = NULL;
+
+	assert( m_romcs0 != NULL );
+	assert( m_romcs1 != NULL );
+	assert( m_biosbank != NULL );
+
+	if ( m_tandy_bios_bank & 0x10 )
+	{
+		if ( m_tandy_bios_bank & 0x04 )
+		{
+			p = m_romcs0->base() + ( m_tandy_bios_bank & 0x03 ) * 0x10000;
+		}
+		else
+		{
+			p = m_romcs1->base() + ( m_tandy_bios_bank & 0x03 ) * 0x10000;
+		}
+	}
+	else
+	{
+		if ( m_tandy_bios_bank & 0x08 )
+		{
+			p = m_romcs0->base() + ( m_tandy_bios_bank & 0x07 ) * 0x10000;
+		}
+		else
+		{
+			p = m_romcs1->base() + ( m_tandy_bios_bank & 0x07 ) * 0x10000;
+		}
+	}
+
+	m_biosbank->set_base( p );
 }
 
 
@@ -233,6 +262,29 @@ MACHINE_RESET_MEMBER(tandy_pc_state,tandy1000rl)
 	MACHINE_RESET_CALL_MEMBER( pc );
 	m_tandy_bios_bank = 6;
 	tandy1000_set_bios_bank();
+}
+
+
+DRIVER_INIT_MEMBER(tandy_pc_state,t1000hx)
+{
+	mess_init_pc_common(pc_set_keyb_int);
+	pc_turbo_setup(4.77/12, 1);
+}
+
+
+DRIVER_INIT_MEMBER(tandy_pc_state,t1000sl)
+{
+	// Fix up memory region (highest address bit flipped??)
+	UINT8 *rom = memregion("romcs0")->base();
+
+	for( int i = 0; i < 0x40000; i++ )
+	{
+		UINT8 d = rom[0x40000 + i];
+		rom[0x40000 + i] = rom[i];
+		rom[i] = d;
+	}
+
+	DRIVER_INIT_NAME(t1000hx)();
 }
 
 
@@ -245,7 +297,7 @@ READ8_MEMBER( tandy_pc_state::tandy1000_bank_r )
 	switch( offset )
 	{
 	case 0x00:  /* FFEA */
-		data = m_tandy_bios_bank;
+		data = m_tandy_bios_bank ^ 0x10; // Bit 4 is read back inverted
 		break;
 	}
 
@@ -262,6 +314,16 @@ WRITE8_MEMBER( tandy_pc_state::tandy1000_bank_w )
 	case 0x00:  /* FFEA */
 		m_tandy_bios_bank = data;
 		tandy1000_set_bios_bank();
+		break;
+
+	// UART clock, joystick, and sound enable
+	// bit 0 - 0 = Clock divided by 13
+	//         1 = Clock divided by 1
+	// bit 1 - 0 = Disable joystick
+	//         1 = Enable joystick
+	// bit 2 - 0 = Disable Sound Chip
+	//         1 = Enable Sound Chip
+	case 0x01:
 		break;
 	}
 }

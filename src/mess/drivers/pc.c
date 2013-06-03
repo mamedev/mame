@@ -397,10 +397,9 @@ static ADDRESS_MAP_START(tandy1000_16_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
-	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("bank11")                     /* Banked part of the BIOS */
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x70000)
+	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("biosbank")                     /* Banked part of the BIOS */
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION( "romcs0", 0x70000 )
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy_pc_state )
@@ -1063,6 +1062,7 @@ static const gfx_layout europc_16_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
+
 static GFXDECODE_START( europc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, europc_8_charlayout, 3, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
@@ -1120,6 +1120,23 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 MACHINE_CONFIG_END
 
 
+static const gfx_layout t1000_charlayout =
+{
+	8, 16,
+	256,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0, 2048, 4096, 6144, 8192, 10240, 12288, 14336, 16384, 18432, 20480, 22528, 24576, 26624, 28672, 30720 },
+	8
+};
+
+
+static GFXDECODE_START( t1000 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
@@ -1142,7 +1159,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
-	MCFG_GFXDECODE(europc)
+	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1196,7 +1213,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
-	MCFG_GFXDECODE(europc)
+	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1223,6 +1240,12 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( t1000_16_8, t1000_16 )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_CLOCK( XTAL_24MHz / 3 )
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
@@ -1245,7 +1268,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
-	MCFG_GFXDECODE(europc)
+	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1959,16 +1982,16 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000 )
+	// Schematics displays 2 32KB ROMs at U9 and U10
 	ROM_REGION(0x100000,"maincpu", 0)
-	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
 	ROMX_LOAD("v010000.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
 	ROMX_LOAD("v010100.f0", 0xf0000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(2))
+
+	// Part of video array at u76?
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u76", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
 ROM_START( t1000a )
@@ -1976,35 +1999,49 @@ ROM_START( t1000a )
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_LOAD("v010100.f0", 0xf0000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9))
+
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
 ROM_START( t1000ex )
 	ROM_REGION(0x100000,"maincpu", 0)
-	// partlist says it has 1 128kbyte rom
+	// partlist says it has 1 128kb rom, schematics list a 32k x 8 rom
+	// "8040328.u17"
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_LOAD("v010200.f0", 0xf0000, 0x10000, CRC(0e016ecf) SHA1(2f5ac8921b7cba56b02122ef772f5f11bbf6d8a2))
+
+	// TODO: Add dump of the 8048 at u8 if it ever gets dumped
+	ROM_REGION(0x400, "kbdc", 0)
+	ROM_LOAD("8048.u8", 0x000, 0x400, NO_DUMP)
+
+	// Most likely part of big blue at u28
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u28", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 #endif
 
 ROM_START( t1000hx )
 	ROM_REGION(0x100000,"maincpu", 0)
-	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))
-	ROM_LOAD("v020000.f0", 0xf0000, 0x10000, CRC(d37a1d5f) SHA1(5ec031c31a7967cc3fd53a535d81833e4a1c385e))
+	ROM_LOAD("v020000.u12", 0xe0000, 0x20000, CRC(6f3acd80) SHA1(976af8c04c3f6fde14d7047f6521d302bdc2d017)) // TODO: Rom label
+
+	// TODO: Add dump of the 8048 at u9 if it ever gets dumped
+	ROM_REGION(0x400, "kbdc", 0)
+	ROM_LOAD("8048.u9", 0x000, 0x400, NO_DUMP)
+
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u31", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location, probably internal to "big blue" at u31
 ROM_END
 
 #ifdef UNUSED_DEFINITION
+// The T1000SL and T1000SL/2 only differ in amount of RAM installed and BIOS version (SL/2 has v01.04.04)
 ROM_START( t1000sl )
 	ROM_REGION(0x100000,"maincpu", 0)
+
+    // 8076312.hu1 - most likely v01.04.00
+    // 8075312.hu2
+
+
 	// partlist says it has 1 128kbyte rom
 	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_SYSTEM_BIOS( 0, "v010400", "v010400" )
@@ -2015,66 +2052,103 @@ ROM_START( t1000sl )
 	ROMX_LOAD("v010402.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "v020001", "v020001" )
 	ROMX_LOAD("v020001.f0", 0xf0000, 0x10000, NO_DUMP, ROM_BIOS(4) )
+
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
 ROM_END
 
-ROM_START( t1000sl2 )
-	ROM_REGION(0x100000,"maincpu", 0)
-	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
-	ROM_LOAD("v010404.f0", 0xf0000, 0x10000, NO_DUMP )
-	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+
+ROM_START( t1000tl )
+	ROM_REGIoN(0x100000, "maincpu", ROMREGION_ERASE00)
+
+	ROM_REGION(0x80000, "romcs0", 0)
+	// These 2 sets most likely have the same contents
+	// v01.04.00
+	// 8076323.u55 - Sharp - 256KB
+	// 8075323.u57 - Sharp - 256KB
+	// v01.04.00
+	// 8079025.u54 - Hitachi - 256KB
+	// 8079026.u56 - Hitachi - 256KB
+	ROM_REGION(0x80000, "romcs1", 0)
+
+	// 2x 128x8 eeprom?? @ u58 and u59 - not mentioned in parts list
+
+	ROM_REGION(0x80, "eeprom", 0)
+	ROM_LOAD("8040346_9346.u12", xxx ) // 64x16 eeprom
+
+	ROM_REGION(0x08000, "gfx1", 0)
+	ROM_LOAD("8079027.u24", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
 ROM_END
 #endif
 
+
 ROM_START( t1000sx )
 	ROM_REGION(0x100000,"maincpu", 0)
-	// partlist says it has 1 128kbyte rom
-	ROM_LOAD("t1000hx.e0", 0xe0000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
-	ROM_LOAD("v010200.f0", 0xf0000, 0x10000, CRC(0e016ecf) SHA1(2f5ac8921b7cba56b02122ef772f5f11bbf6d8a2))
+	ROM_LOAD("8040328.u41", 0xf8000, 0x8000, CRC(4e2b9f0b) SHA1(e79a9ed9e885736e30d9b135557f0e596ce5a70b))
+
+	// No character rom is listed in the schematics?
+	// But disabling it results in no text being printed
+	// Part of bigblue at u30??
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u30", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
 
 ROM_START( t1000tx )
 	ROM_REGION(0x100000,"maincpu", 0)
-	/* There might be a second 32KB rom, but it seems to work fine with just this one */
-	ROM_LOAD("t1000tx.bin", 0xf8000, 0x8000, CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
+	// There should be 2 32KBx8 ROMs, one for odd at u38, one for even at u39
+	// The machine already boots up with just this one rom
+	ROM_LOAD("t1000tx.bin", 0xf8000, 0x8000, BAD_DUMP CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
 
+	// No character rom is listed in the schematics?
+	// It is most likely part of the big blue chip at u36
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u36", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
 
 ROM_START( t1000rl )
-	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASE00)
 
+	// bankable ROM regions
+	ROM_REGION(0x80000, "romcs0", 0)
 	/* v2.0.0.1 */
 	/* Rom is labeled "(C) TANDY CORP. 1990 // 8079073 // LH534G70 JAPAN // 9034 D" */
 	ROM_LOAD("8079073.u23", 0x00000, 0x80000, CRC(6fab50f7) SHA1(2ccc02bee4c250dc1b7c17faef2590bc158860b0) )
+	ROM_REGION(0x80000, "romcs1", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
 	/* Character rom located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_LOAD("8079027.u3", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
+
+
+ROM_START( t1000sl2 )
+	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASE00)
+
+	// bankable ROM regions
+	ROM_REGION(0x80000, "romcs0", 0)
+	// v01.04.04 BIOS
+	ROM_LOAD16_BYTE("8079047.hu1", 0x00000, 0x40000, CRC(c773ec0e) SHA1(7deb71f14c2c418400b639d60066ab61b7e9df32))
+	ROM_LOAD16_BYTE("8079048.hu2", 0x00001, 0x40000, CRC(0f3e6586) SHA1(10f1a7204f69b82a18bc94a3010c9660aec0c802))
+	ROM_REGION(0x80000, "romcs1", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x08000,"gfx1", 0)
+	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+
+	ROM_REGION(0x80, "nmc9246n", 0)
+	ROM_LOAD("seeprom.bin", 0, 0x80, CRC(4fff41df) SHA1(41a7009694550c017996932beade608cff968f4a))
+ROM_END
+
 
 ROM_START( t1000tl2 )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "t10000tl2.bin", 0xf0000, 0x10000, CRC(e288f12c) SHA1(9d54ccf773cd7202c9906323f1b5a68b1b3a3a67))
 
-		ROM_REGION(0x08000,"gfx1", 0)
-	// expects 8x9 charset!
-	/* Character rom located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
-	ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+	ROM_REGION(0x08000,"gfx1", 0)
+	ROM_LOAD("8079027.u24", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
+
 
 ROM_START( dgone )
 	ROM_REGION(0x100000,"maincpu", 0)
@@ -2413,11 +2487,12 @@ COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr,  pc_state, 
 COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pc_state,    pcjr,       "International Business Machines", "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 SX", GAME_NOT_WORKING)
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
+COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    tandy1t, tandy_pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
+COMP( 1987, t1000sx,    ibm5150,    0,          t1000sx,    tandy1t, tandy_pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 SX", GAME_NOT_WORKING)
+COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t, tandy_pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
+COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t, tandy_pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
+COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t, tandy_pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
+COMP( 1988, t1000sl2,   ibm5150,    0,          t1000_16_8, tandy1t, tandy_pc_state,    t1000sl,    "Tandy Radio Shack", "Tandy 1000 SL/2", GAME_NOT_WORKING)
 
 COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1031", GAME_NOT_WORKING)
 COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
@@ -2449,4 +2524,4 @@ COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, pc_state,    
 COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sanyo", "MBC-16" , GAME_NOT_WORKING)
 
 COMP( 198?, ataripc3,   ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Atari", "PC-3" , GAME_NOT_WORKING)
-COMP( 1989, ssam88s,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Samsung", "Samtron 88S" , GAME_NOT_WORKING)
+COMP( 1989, ssam88s,    ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Samsung", "Samtron 88S" , GAME_NOT_WORKING)

@@ -1428,12 +1428,6 @@ DRIVER_INIT_MEMBER(pc_state,pcmda)
 	mess_init_pc_common(pc_set_keyb_int);
 }
 
-DRIVER_INIT_MEMBER(pc_state,t1000hx)
-{
-	mess_init_pc_common(pc_set_keyb_int);
-	pc_turbo_setup(4.77/12, 1);
-}
-
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
 	mess_init_pc_common(pcjr_set_keyb_int);
