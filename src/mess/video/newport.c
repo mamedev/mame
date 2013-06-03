@@ -207,20 +207,21 @@ void newport_video_device::device_reset()
 }	
 
 
-void newport_video_device::render_screen( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+UINT32 newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* loop over rows and copy to the destination */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++ )
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *src = &m_base[1344 * y];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 		
 		/* loop over columns */
-		for (int x = cliprect.min_x; x < cliprect.max_x; x++ )
+		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{
 			*dest++ = (*src++) & 0x00f8f8f8;
 		}
 	}
+	return 0;
 }
 
 

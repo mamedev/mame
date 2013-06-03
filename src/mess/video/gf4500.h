@@ -20,7 +20,7 @@ public:
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
 
-	void render_screen(bitmap_rgb32 &bitmap);
+	UINT32 screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

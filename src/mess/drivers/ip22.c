@@ -1630,17 +1630,6 @@ static const pc_lpt_interface ip22_lpt_config =
 };
 
 
-SCREEN_UPDATE_RGB32( ip22 )
-{
-	ip22_state *state = screen.machine().driver_data<ip22_state>();
-
-	bitmap.fill(get_black_pen(screen.machine()), cliprect);
-	state->m_newport->render_screen(bitmap, cliprect);
-	
-	return 0;
-}
-
-
 static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	MCFG_CPU_CONFIG( config )
@@ -1659,7 +1648,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(1280+64, 1024+64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_SCREEN_UPDATE_STATIC( ip22 )
+	MCFG_SCREEN_UPDATE_DEVICE("newport", newport_video_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(65536)
 

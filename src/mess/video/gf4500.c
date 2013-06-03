@@ -96,7 +96,7 @@ static rgb_t gf4500_get_color_16( UINT16 data )
 	return MAKE_RGB(r, g, b);
 }
 
-void gf4500_device::render_screen( bitmap_rgb32 &bitmap )
+UINT32 gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT16 *vram = (UINT16 *)(m_data + GF4500_FRAMEBUF_OFFSET / 4);
 	int x, y;
@@ -109,6 +109,7 @@ void gf4500_device::render_screen( bitmap_rgb32 &bitmap )
 		}
 		vram += 1;
 	}
+	return 0;
 }
 
 READ32_MEMBER( gf4500_device::read )

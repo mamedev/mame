@@ -198,20 +198,6 @@ static S3C2440_INTERFACE( gizmondo_s3c2440_intf )
 	{ 0 }
 };
 
-VIDEO_START( gizmondo )
-{
-	gizmondo_state *state = machine.driver_data<gizmondo_state>();
-	machine.primary_screen->register_screen_bitmap(state->m_bitmap);
-}
-
-SCREEN_UPDATE_RGB32( gizmondo )
-{
-	gizmondo_state *state = screen.machine().driver_data<gizmondo_state>();
-	state->m_gf4500->render_screen(state->m_bitmap);
-	copybitmap(bitmap, state->m_bitmap, 0, 0, 0, 0, cliprect);
-	return 0;
-}
-
 static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 	MCFG_CPU_ADD("maincpu", ARM9, 40000000)
 	MCFG_CPU_PROGRAM_MAP(gizmondo_map)
@@ -223,11 +209,9 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 240 - 1)
-	MCFG_SCREEN_UPDATE_STATIC(gizmondo)
+	MCFG_SCREEN_UPDATE_DEVICE("gf4500", gf4500_device, screen_update)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_VIDEO_START(gizmondo)
 
 	MCFG_GF4500_ADD("gf4500")
 
