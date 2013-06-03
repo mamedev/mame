@@ -247,22 +247,22 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				for(scan=0;scan<10;scan+=2)
 				{
 					data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
-					bitmap.pix32(y*10+scan,x*8)   = (BIT(data,7) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+1) = (BIT(data,7) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+2) = (BIT(data,6) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+3) = (BIT(data,6) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+4) = (BIT(data,5) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+5) = (BIT(data,5) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+6) = (BIT(data,4) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan,x*8+7) = (BIT(data,4) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8)   = (BIT(data,3) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+1) = (BIT(data,3) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+2) = (BIT(data,2) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+3) = (BIT(data,2) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+4) = (BIT(data,1) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+5) = (BIT(data,1) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+6) = (BIT(data,0) ? 0x00ff00 : 0x000000);
-					bitmap.pix32(y*10+scan+1,x*8+7) = (BIT(data,0) ? 0x00ff00 : 0x000000);
+					bitmap.pix32(y*10+scan,x*8)   = (BIT(data,7) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+1) = (BIT(data,7) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+2) = (BIT(data,6) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+3) = (BIT(data,6) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+4) = (BIT(data,5) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+5) = (BIT(data,5) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+6) = (BIT(data,4) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8+7) = (BIT(data,4) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8)   = (BIT(data,3) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+1) = (BIT(data,3) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+2) = (BIT(data,2) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+3) = (BIT(data,2) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+4) = (BIT(data,1) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+5) = (BIT(data,1) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+6) = (BIT(data,0) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan+1,x*8+7) = (BIT(data,0) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
 				}
 			}
 		}
@@ -331,10 +331,10 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					UINT16 xpos = x*8+bit;
 					UINT16 ypos = y*10+scan;
-					UINT32 fg = 0x009f00;
+					UINT32 fg = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];;
 
 					if(m_attr_ram[(y*128)+x] & 0x08) // brightness
-						fg = 0x00ff00;
+						fg = RGB_MONOCHROME_GREEN_HIGHLIGHT[2];
 					if(BIT(data,7-bit))
 						bitmap.pix32(ypos,xpos) = fg;
 				}
