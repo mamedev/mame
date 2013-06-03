@@ -337,9 +337,7 @@ READ8_MEMBER( c65_state::sid_poty_r )
 
 UINT32 c65_state::screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *vic3 = machine().device("vic3");
-
-	vic3_video_update(vic3, bitmap, cliprect);
+	machine().device<vic3_device>("vic3")->video_update(bitmap, cliprect);
 	return 0;
 }
 
@@ -393,9 +391,7 @@ static const vic3_interface c65_vic3_pal_intf = {
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_raster_irq)
 {
-	device_t *vic3 = machine().device("vic3");
-
-	vic3_raster_interrupt_gen(vic3);
+	machine().device<vic3_device>("vic3")->raster_interrupt_gen();
 }
 
 /*************************************

@@ -91,8 +91,8 @@ READ8_MEMBER(c65_state::c65_cia0_port_b_r)
 WRITE8_MEMBER(c65_state::c65_cia0_port_b_w)
 {
 //  was there lightpen support in c65 video chip?
-//  device_t *vic3 = machine().device("vic3");
-//  vic3_lightpen_write(vic3, data & 0x10);
+//  vic3_device *vic3 = machine().device<vic3_device>("vic3");
+//  vic3->lightpen_write(data & 0x10);
 }
 
 void c65_state::c65_irq( int level )
@@ -108,7 +108,7 @@ void c65_state::c65_irq( int level )
 /* is this correct for c65 as well as c64? */
 WRITE_LINE_MEMBER(c65_state::c65_cia0_interrupt)
 {
-	c65_irq (state || m_vicirq);
+	c65_irq(state || m_vicirq);
 }
 
 /* is this correct for c65 as well as c64? */
@@ -631,25 +631,25 @@ WRITE8_MEMBER( c65_state::c65_write_io )
 {
 	mos6581_device *sid_0 = machine().device<mos6581_device>("sid_r");
 	mos6581_device *sid_1 = machine().device<mos6581_device>("sid_l");
-	device_t *vic3 = machine().device("vic3");
+	vic3_device *vic3 = machine().device<vic3_device>("vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			vic3_port_w(vic3, space, offset & 0x7f, data);
+			vic3->port_w(space, offset & 0x7f, data);
 		else if (offset < 0xa0)
-			c65_fdc_w(offset&0x1f,data);
+			c65_fdc_w(offset & 0x1f, data);
 		else
 		{
-			c65_ram_expansion_w(space, offset&0x1f, data, mem_mask);
+			c65_ram_expansion_w(space, offset & 0x1f, data, mem_mask);
 			/*ram expansion crtl optional */
 		}
 		break;
 	case 0x100:
 	case 0x200:
 	case 0x300:
-		vic3_palette_w(vic3, space, offset - 0x100, data);
+		vic3->palette_w(space, offset - 0x100, data);
 		break;
 	case 0x400:
 		if (offset<0x420) /* maybe 0x20 */
@@ -663,10 +663,10 @@ WRITE8_MEMBER( c65_state::c65_write_io )
 		DBG_LOG(machine(), 1, "io write", ("%.3x %.2x\n", offset, data));
 		break;
 	case 0x600:
-		c65_6511_port_w(offset&0xff,data);
+		c65_6511_port_w(offset & 0xff,data);
 		break;
 	case 0x700:
-		c65_dma_port_w(offset&0xff, data);
+		c65_dma_port_w(offset & 0xff, data);
 		break;
 	}
 }
@@ -695,18 +695,18 @@ READ8_MEMBER( c65_state::c65_read_io )
 {
 	mos6581_device *sid_0 = machine().device<mos6581_device>("sid_r");
 	mos6581_device *sid_1 = machine().device<mos6581_device>("sid_l");
-	device_t *vic3 = machine().device("vic3");
+	vic3_device *vic3 = machine().device<vic3_device>("vic3");
 
 	switch (offset & 0xf00)
 	{
 	case 0x000:
 		if (offset < 0x80)
-			return vic3_port_r(vic3, space, offset & 0x7f);
+			return vic3->port_r(space, offset & 0x7f);
 		if (offset < 0xa0)
-			return c65_fdc_r(offset&0x1f);
+			return c65_fdc_r(offset & 0x1f);
 		else
 		{
-			return c65_ram_expansion_r(space, offset&0x1f, mem_mask);
+			return c65_ram_expansion_r(space, offset & 0x1f, mem_mask);
 			/*return; ram expansion crtl optional */
 		}
 		break;
