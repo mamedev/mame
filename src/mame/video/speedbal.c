@@ -1,10 +1,10 @@
-	/****************************************************************************
-	*                                                                           *
-	* video.c                                                                 *
-	*                                                                           *
-	* Functions to emulate the video hardware of the machine.                   *
-	*                                                                           *
-	****************************************************************************/
+/****************************************************************************
+ *                                                                          *
+ *  Speed Ball                                                              *
+ *                                                                          *
+ *  Functions to emulate the video hardware of the machine.                 *
+ *                                                                          *
+ ****************************************************************************/
 
 #include "emu.h"
 #include "includes/speedbal.h"
@@ -44,9 +44,6 @@ void speedbal_state::video_start()
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
 	m_fg_tilemap->set_transmask(1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
-
-
-
 }
 
 

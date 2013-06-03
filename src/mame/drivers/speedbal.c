@@ -5,10 +5,10 @@
  this was available in a number of cabinet types including 'Super Pin-Ball'
  which mimicked a Pinball table in design, complete with 7-seg scoreboard.
 
- todo:
- decrypt Music Ball
- hookup 7-segs used by Super Pinball cabinet type
- verify clock speeds etc.
+ TODO:
+ - decrypt Music Ball
+ - hookup 7-segs used by Super Pinball cabinet type
+ - verify clock speeds etc.
 
 
 Speed Ball map
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(speedbal_state::speedbal_maincpu_50_w)
 {
-	logerror("%s: speedbal_maincpu_50_w %02x\n", this->machine().describe_context(), data);
+	//logerror("%s: speedbal_maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
@@ -103,9 +103,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xd000, 0xdbff) AM_RAM
+	AM_RANGE(0xd000, 0xdbff) AM_RAM // ?
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /* this is wrong.. needs more investigation / tracing of the code */
@@ -315,7 +314,6 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 
 	MCFG_GFXDECODE(speedbal)
 	MCFG_PALETTE_LENGTH(768)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

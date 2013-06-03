@@ -22,110 +22,103 @@
 		</screen>
 	
     <!-- no idea how many digits there really are, cabinet shows
-       8 digits 'P1 score'
+       7 digits 'P1 score'
        2 digit  'credits'
        1 digit  'ball'
        2 digits 'bonus'
-       8 digits 'P2 score'
+       7 digits 'P2 score'
     
       but it could be the cabinet design obscures some
       http://pinballspain.comyr.com/proyecto1/image/superpinball.jpg
     
     -->
 
-    <!-- 8 digits 'score 1' -->
+    <!-- 7 digits 'score 1' -->
       
- 		<bezel name="digit101" element="digit">
+ 		<bezel name="digit0" element="digit">
 			<bounds left="10" top="-010" right="20" bottom="000" />
 		</bezel> 
   
-  	<bezel name="digit102" element="digit">
+  	<bezel name="digit1" element="digit">
 			<bounds left="20" top="-010" right="30" bottom="000" />
 		</bezel> 
     
- 		<bezel name="digit103" element="digit">
+ 		<bezel name="digit2" element="digit">
 			<bounds left="30" top="-010" right="40" bottom="000" />
 		</bezel> 
 
-   	<bezel name="digit104" element="digit">
+   	<bezel name="digit3" element="digit">
 			<bounds left="40" top="-010" right="50" bottom="000" />
 		</bezel>  
   
-    <bezel name="digit105" element="digit">
+    <bezel name="digit4" element="digit">
 			<bounds left="50" top="-010" right="60" bottom="000" />
 		</bezel>  
     
-   	<bezel name="digit106" element="digit">
+   	<bezel name="digit5" element="digit">
 			<bounds left="60" top="-010" right="70" bottom="000" />
 		</bezel>  
   
-   	<bezel name="digit107" element="digit">
+   	<bezel name="digit6" element="digit">
 			<bounds left="70" top="-010" right="80" bottom="000" />
-		</bezel>  
-
-   	<bezel name="digit108" element="digit">
-			<bounds left="80" top="-010" right="90" bottom="000" />
 		</bezel>  
 
     <!-- 2 digit 'credits' -->
       
-   	<bezel name="digit109" element="digit">
+   	<bezel name="digit7" element="digit">
 			<bounds left="100" top="-010" right="110" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit110" element="digit">
+   	<bezel name="digit8" element="digit">
 			<bounds left="110" top="-010" right="120" bottom="000" />
 		</bezel>  
 
     <!-- 1 digit 'ball' -->
     
-   	<bezel name="digit111" element="digit">
+   	<bezel name="digit9" element="digit">
 			<bounds left="130" top="-010" right="140" bottom="000" />
 		</bezel>  
 
     <!-- 2 digits 'bonus' -->
     
-   	<bezel name="digit112" element="digit">
+   	<bezel name="digit10" element="digit">
 			<bounds left="150" top="-010" right="160" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit113" element="digit">
+   	<bezel name="digit11" element="digit">
 			<bounds left="160" top="-010" right="170" bottom="000" />
 		</bezel>  
 
-    <!-- 8 digits 'score 2' -->
+    <!-- 7 digits 'score 2' -->
       
-   	<bezel name="digit114" element="digit">
+   	<bezel name="digit12" element="digit">
 			<bounds left="180" top="-010" right="190" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit115" element="digit">
+   	<bezel name="digit13" element="digit">
 			<bounds left="190" top="-010" right="200" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit116" element="digit">
+   	<bezel name="digit14" element="digit">
 			<bounds left="200" top="-010" right="210" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit117" element="digit">
+   	<bezel name="digit15" element="digit">
 			<bounds left="210" top="-010" right="220" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit118" element="digit">
+   	<bezel name="digit16" element="digit">
 			<bounds left="220" top="-010" right="230" bottom="000" />
 		</bezel>  
 
-   	<bezel name="digit119" element="digit">
+   	<bezel name="digit17" element="digit">
 			<bounds left="230" top="-010" right="240" bottom="000" />
 		</bezel>  
   
-   	<bezel name="digit120" element="digit">
+   	<bezel name="digit18" element="digit">
 			<bounds left="240" top="-010" right="250" bottom="000" />
 		</bezel>   
   
-   	<bezel name="digit121" element="digit">
-			<bounds left="250" top="-010" right="260" bottom="000" />
-		</bezel>  
      
   
   
