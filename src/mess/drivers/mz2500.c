@@ -66,11 +66,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, RP5C15_TAG),
+		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c15_device> m_rtc;
+	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
 
 	UINT8 *m_main_ram;
@@ -1402,14 +1404,12 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 
 WRITE8_MEMBER(mz2500_state::timer_w)
 {
-	device_t *pit8253 = machine().device("pit");
-
-	pit8253_gate0_w(pit8253, 1);
-	pit8253_gate1_w(pit8253, 1);
-	pit8253_gate0_w(pit8253, 0);
-	pit8253_gate1_w(pit8253, 0);
-	pit8253_gate0_w(pit8253, 1);
-	pit8253_gate1_w(pit8253, 1);
+	m_pit->gate0_w(1);
+	m_pit->gate1_w(1);
+	m_pit->gate0_w(0);
+	m_pit->gate1_w(0);
+	m_pit->gate0_w(1);
+	m_pit->gate1_w(1);
 }
 
 
@@ -1541,7 +1541,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xde, 0xde) AM_WRITENOP
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0xef, 0xef) AM_READWRITE(mz2500_joystick_r,mz2500_joystick_w)
 	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
@@ -2075,13 +2075,13 @@ WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,m_irq_vector[1]);
 }
 
-static const struct pit8253_config mz2500_pit8253_intf =
+static const struct pit8253_interface mz2500_pit8253_intf =
 {
 	{
 		{
 			31250,
 			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(mz2500_state,pit8253_clk0_irq)
+			DEVCB_DRIVER_LINE_MEMBER(mz2500_state, pit8253_clk0_irq)
 		},
 		{
 			0,
@@ -2091,7 +2091,7 @@ static const struct pit8253_config mz2500_pit8253_intf =
 		{
 			16, //CH2, trusted, used by Super MZ demo / The Black Onyx and a bunch of others (TODO: timing of this)
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pit", pit8253_clk1_w)
+			DEVCB_DEVICE_LINE_MEMBER("pit", pit8253_device, clk1_w)
 		}
 	}
 };

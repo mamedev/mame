@@ -126,7 +126,7 @@ IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)
 
 /* PIT8253 Configuration */
 
-const struct pit8253_config mbc55x_pit8253_config =
+const struct pit8253_interface mbc55x_pit8253_config =
 {
 	{
 		{
@@ -149,12 +149,12 @@ const struct pit8253_config mbc55x_pit8253_config =
 
 READ8_MEMBER(mbc55x_state::mbcpit8253_r)
 {
-	return pit8253_r(m_pit, space, offset>>1);
+	return m_pit->read(space, offset >> 1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
 {
-	pit8253_w(m_pit, space, offset>>1, data);
+	m_pit->write(space, offset >> 1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )

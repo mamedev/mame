@@ -17,8 +17,12 @@ public:
 	pp01_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pit(*this, "pit8253"),
 		m_ram(*this, RAM_TAG) { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<pit8253_device> m_pit;
+	required_device<ram_device> m_ram;
 	UINT8 m_video_scroll;
 	UINT8 m_memory_block[16];
 	UINT8 m_video_write_mode;
@@ -45,15 +49,13 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(pp01_8255_portc_w);
 	DECLARE_READ8_MEMBER(pp01_8255_portc_r);
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
 	void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part);
 	void pp01_set_memory(UINT8 block, UINT8 data);
 };
 
 
 /*----------- defined in machine/pp01.c -----------*/
-extern const struct pit8253_config pp01_pit8253_intf;
+extern const struct pit8253_interface pp01_pit8253_intf;
 extern const i8255_interface pp01_ppi8255_interface;
 
 #endif

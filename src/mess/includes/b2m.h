@@ -22,6 +22,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
+		m_pit(*this, "pit8253"),
 		m_ram(*this, RAM_TAG) { }
 
 	UINT8 m_b2m_8255_porta;
@@ -39,12 +40,13 @@ public:
 	UINT8 m_b2m_localmachine;
 	UINT8 m_vblank_state;
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<pit8253_device> m_pit;
+	required_device<ram_device> m_ram;
 
 	/* devices */
 	fd1793_t *m_fdc;
 	pic8259_device *m_pic;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
 	DECLARE_READ8_MEMBER(b2m_keyboard_r);
 	DECLARE_WRITE8_MEMBER(b2m_palette_w);
 	DECLARE_READ8_MEMBER(b2m_palette_r);
@@ -76,7 +78,7 @@ public:
 
 /*----------- defined in machine/b2m.c -----------*/
 
-extern const struct pit8253_config b2m_pit8253_intf;
+extern const struct pit8253_interface b2m_pit8253_intf;
 
 extern const i8255_interface b2m_ppi8255_interface_1;
 extern const i8255_interface b2m_ppi8255_interface_2;

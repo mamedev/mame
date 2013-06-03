@@ -86,10 +86,15 @@ class vertigo_state : public driver_device
 public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_vectorram(*this, "vectorram") ,
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),  
+			m_pit(*this, "pit8254"),
+			m_vectorram(*this, "vectorram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<pit8254_device> m_pit;
 	required_shared_ptr<UINT16> m_vectorram;
 	device_t *m_ttl74148;
 	device_t *m_custom;
@@ -122,12 +127,10 @@ public:
 	void vertigo_vgen (vector_generator *vg);
 	void vertigo_vproc(int cycles, int irq4);
 	void update_irq_encoder(int line, int state);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in machine/vertigo.c -----------*/
 
 void vertigo_update_irq(device_t *device);
 
-extern const struct pit8253_config vertigo_pit8254_config;
+extern const struct pit8253_interface vertigo_pit8254_config;

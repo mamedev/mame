@@ -513,7 +513,7 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
     2       Clock 1,9668MHz             Memory register D7      8259 (12E) IR1  Software timer
 */
 
-static const struct pit8253_config qx10_pit8253_1_config =
+static const struct pit8253_interface qx10_pit8253_1_config =
 {
 	{
 		{ 1200,         DEVCB_NULL,     DEVCB_NULL },
@@ -529,7 +529,7 @@ static const struct pit8253_config qx10_pit8253_1_config =
     1       Clock 1,9668MHz     +5V         Keyboard clock      1200bps (Clock / 1664)
     2       Clock 1,9668MHz     +5V         RS-232C baud rate   9600bps (Clock / 208)
 */
-static const struct pit8253_config qx10_pit8253_2_config =
+static const struct pit8253_interface qx10_pit8253_2_config =
 {
 	{
 		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
@@ -670,8 +670,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253_1", pit8253_r, pit8253_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("pit8253_2", pit8253_r, pit8253_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253_1", pit8253_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("pit8253_2", pit8253_device, read, write)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("upd7201", z80dart_device, cd_ba_r, cd_ba_w)

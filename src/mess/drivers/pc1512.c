@@ -124,7 +124,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 
 		m_port61 = data;
 
-		pit8253_gate2_w(m_pit, BIT(data, 0));
+		m_pit->gate2_w(BIT(data, 0));
 
 		m_speaker_drive = BIT(data, 1);
 		update_speaker();
@@ -475,7 +475,7 @@ READ8_MEMBER( pc1640_state::io_r )
 
 	if		(                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
 	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x040 && addr <= 0x043) { data = pit8253_r(m_pit, space, offset & 0x03); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( pc1512_io, AS_IO, 16, pc1512_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x000, 0x00f) AM_DEVREADWRITE8(I8237A5_TAG, am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVREADWRITE8(I8259A2_TAG, pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x040, 0x043) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0xffff)
 	AM_RANGE(0x060, 0x06f) AM_READWRITE8(system_r, system_w, 0xffff)
 	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVREADWRITE8(MC146818_TAG, mc146818_device, read, write, 0xffff)
 	AM_RANGE(0x078, 0x07f) AM_READWRITE8(mouse_r, mouse_w, 0xffff)
@@ -572,7 +572,7 @@ static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 
 	AM_RANGE(0x000, 0x00f) AM_DEVWRITE8(I8237A5_TAG, am9517a_device, write, 0xffff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(I8259A2_TAG, pic8259_device, write, 0xffff)
-	AM_RANGE(0x040, 0x043) AM_DEVWRITE8_LEGACY(I8253_TAG, pit8253_w, 0xffff)
+	AM_RANGE(0x040, 0x043) AM_DEVWRITE8(I8253_TAG, pit8253_device, write, 0xffff)
 	AM_RANGE(0x060, 0x06f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x070, 0x071) AM_MIRROR(0x02) AM_DEVWRITE8(MC146818_TAG, mc146818_device, write, 0xffff)
 	AM_RANGE(0x078, 0x07f) AM_WRITE8(mouse_w, 0xffff)
@@ -947,7 +947,7 @@ WRITE_LINE_MEMBER( pc1512_state::pit2_w )
 	update_speaker();
 }
 
-static const struct pit8253_config pit_intf =
+static const struct pit8253_interface pit_intf =
 {
 	{
 		{

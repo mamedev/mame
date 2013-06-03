@@ -37,7 +37,7 @@
 /* Result of the last ADC channel sampled */
 
 /* 8254 timer config */
-const struct pit8253_config vertigo_pit8254_config =
+const struct pit8253_interface vertigo_pit8254_config =
 {
 	{
 		{

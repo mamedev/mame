@@ -36,6 +36,7 @@ public:
 			m_uart(*this, I8251_TAG),
 			m_fdc(*this, WD2797_TAG),
 			m_lcdc(*this, MSM6255_TAG),
+			m_pit(*this, I8253_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_exp(*this, BW2_EXPANSION_SLOT_TAG),
 			m_ram(*this, RAM_TAG),
@@ -60,6 +61,7 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<wd2797_t> m_fdc;
 	required_device<msm6255_device> m_lcdc;
+	required_device<pit8253_device> m_pit;
 	required_device<centronics_device> m_centronics;
 	required_device<bw2_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;

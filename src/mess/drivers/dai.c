@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( dai_mem , AS_PROGRAM, 8, dai_state )
 	AM_RANGE( 0xf000, 0xf7ff) AM_WRITE(dai_stack_interrupt_circuit_w )
 	AM_RANGE( 0xf800, 0xf8ff) AM_RAM
 	AM_RANGE( 0xfb00, 0xfbff) AM_READWRITE(dai_amd9511_r, dai_amd9511_w )
-	AM_RANGE( 0xfc00, 0xfcff) AM_READWRITE(dai_pit_r, dai_pit_w) // AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w )
+	AM_RANGE( 0xfc00, 0xfcff) AM_READWRITE(dai_pit_r, dai_pit_w) // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE(dai_io_discrete_devices_r, dai_io_discrete_devices_w )
 	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0xff00, 0xffff) AM_DEVREADWRITE("tms5501", tms5501_device, read, write )

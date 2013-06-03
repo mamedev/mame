@@ -182,7 +182,7 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 
 
 
-static const struct pit8253_config ip22_pit8254_config =
+static const struct pit8253_interface ip22_pit8254_config =
 {
 	{
 		{
@@ -312,19 +312,19 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return m_int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r(m_pit, space, 0);
+		ret8 = m_pit->read(space, 0);
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r(m_pit, space, 1);
+		ret8 = m_pit->read(space, 1);
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r(m_pit, space, 2);
+		ret8 = m_pit->read(space, 2);
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r(m_pit, space, 3);
+		ret8 = m_pit->read(space, 3);
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -409,19 +409,19 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		break;
 	case 0xb0/4:
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(m_pit, space, 0, data & 0x000000ff);
+		m_pit->write(space, 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(m_pit, space, 1, data & 0x000000ff);
+		m_pit->write(space, 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(m_pit, space, 2, data & 0x000000ff);
+		m_pit->write(space, 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(m_pit, space, 3, data & 0x000000ff);
+		m_pit->write(space, 3, data & 0x000000ff);
 		return;
 	default:
 		//verboselog(0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
@@ -1503,7 +1503,7 @@ static const struct WD33C93interface wd33c93_intf =
 
 READ8_MEMBER(ip22_state::ip22_get_out2)
 {
-	return pit8253_get_output(m_pit, 2 );
+	return m_pit->get_output(2);
 }
 
 void ip22_state::machine_start()

@@ -266,10 +266,10 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_clk1_out )
 
 WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_clk2_out )
 {
-	pit8253_clk1_w(m_d8253, state);
+	m_d8253->clk1_w(state);
 }
 
-static const struct pit8253_config d8253_intf =
+static const struct pit8253_interface d8253_intf =
 {
 	{
 		{
@@ -409,7 +409,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 		case 0x6:
 		case 0x7:
 		{
-			pit8253_w(m_d8253, space, offset & 3, data);
+			m_d8253->write(space, offset & 3, data);
 			break;
 		}
 

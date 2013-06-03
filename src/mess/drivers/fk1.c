@@ -264,7 +264,7 @@ WRITE_LINE_MEMBER( fk1_state::fk1_pit_out2 )
 }
 
 
-static const struct pit8253_config fk1_pit8253_intf =
+static const struct pit8253_interface fk1_pit8253_intf =
 {
 	{
 		{
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START(fk1_io, AS_IO, 8, fk1_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
+	AM_RANGE( 0x10, 0x13 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE( 0x30, 0x30 ) AM_READWRITE(fk1_bank_ram_r,fk1_intr_w)
 	AM_RANGE( 0x40, 0x40 ) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)

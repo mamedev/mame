@@ -346,7 +346,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
-	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8_LEGACY(I8253A5_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio0_device, ba_cd_r, ba_cd_w, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(CENTRONICS_TAG, centronics_device, write, 0x00ff)
 	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
@@ -438,7 +438,7 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-static const struct pit8253_config pit_intf =
+static const struct pit8253_interface pit_intf =
 {
 	{
 		{

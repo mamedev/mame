@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8253_TAG, pit8253_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE(MSM6255_TAG, msm6255_device, read, write)
 	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, slot_r, slot_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 	if (m_floppy) m_floppy->mon_w(m_mtron);
 }
 
-static const struct pit8253_config pit_intf =
+static const struct pit8253_interface pit_intf =
 {
 	{
 		{
@@ -531,7 +531,7 @@ static const struct pit8253_config pit_intf =
 		{
 			11000,      // LCD controller
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8253_TAG, pit8253_clk2_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8253_TAG, pit8253_device, clk2_w)
 		},
 		{
 			0,      // Floppy /MTRON

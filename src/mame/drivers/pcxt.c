@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
 }
 
 
-static const struct pit8253_config pc_pit8253_config =
+static const struct pit8253_interface pc_pit8253_config =
 {
 	{
 		{
@@ -310,7 +310,7 @@ READ8_MEMBER(pcxt_state::port_b_r)
 
 READ8_MEMBER(pcxt_state::port_c_r)
 {
-	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int timer2_output = m_pit8253->get_output(2);
 	if ( m_port_b_data & 0x01 )
 	{
 		m_wss2_data = ( m_wss2_data & ~0x10 ) | ( timer2_output ? 0x10 : 0x00 );
@@ -326,7 +326,7 @@ READ8_MEMBER(pcxt_state::port_c_r)
 WRITE8_MEMBER(pcxt_state::port_b_w)
 {
 	/* PPI controller port B*/
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	pcxt_speaker_set_spkrdata( data & 0x02 );
 	m_port_b_data = data;
 // device_t *beep = machine().device<beep_device>("beep");
@@ -530,7 +530,7 @@ static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", am9517a_device, read, write ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_device, read, write ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)    //8253 PIT
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)

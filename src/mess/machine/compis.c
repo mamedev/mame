@@ -255,7 +255,7 @@ I8255A_INTERFACE( compis_ppi_interface )
 /*  PIT 8253                                                               */
 /*-------------------------------------------------------------------------*/
 
-const struct pit8253_config compis_pit8253_config =
+const struct pit8253_interface compis_pit8253_config =
 {
 	{
 		/* Timer0 */
@@ -267,7 +267,7 @@ const struct pit8253_config compis_pit8253_config =
 	}
 };
 
-const struct pit8253_config compis_pit8254_config =
+const struct pit8253_interface compis_pit8254_config =
 {
 	{
 		/* Timer0 */
@@ -285,12 +285,12 @@ const struct pit8253_config compis_pit8254_config =
 
 READ16_MEMBER( compis_state::compis_osp_pit_r )
 {
-	return pit8253_r(m_8254, space, offset);
+	return m_8254->read(space, offset);
 }
 
 WRITE16_MEMBER( compis_state::compis_osp_pit_w )
 {
-	pit8253_w(m_8254, space, offset, data);
+	m_8254->write(space, offset, data);
 }
 
 

@@ -11,7 +11,6 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
@@ -30,7 +29,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
@@ -43,7 +42,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)

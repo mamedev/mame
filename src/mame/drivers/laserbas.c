@@ -150,8 +150,8 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("IN2")
 //  AM_RANGE(0x23, 0x23) AM_WRITE(test_w) bit 2 presumably is a mux for 0x20?
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("pit0", pit8253_r, pit8253_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("pit1", pit8253_r, pit8253_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_device, read, write)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_device, read, write)
 	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
@@ -255,7 +255,7 @@ static MC6845_INTERFACE( mc6845_intf )
 
 
 /* TODO: clocks aren't known */
-static const struct pit8253_config laserbas_pit8253_intf_0 =
+static const struct pit8253_interface laserbas_pit8253_intf_0 =
 {
 	{
 		{
@@ -276,7 +276,7 @@ static const struct pit8253_config laserbas_pit8253_intf_0 =
 	}
 };
 
-static const struct pit8253_config laserbas_pit8253_intf_1 =
+static const struct pit8253_interface laserbas_pit8253_intf_1 =
 {
 	{
 		{

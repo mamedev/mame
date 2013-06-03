@@ -1242,7 +1242,7 @@ READ8_MEMBER(pc9801_state::pc9801_70_r)
 		if(offset & 0x08)
 			printf("Read to undefined port [%02x]\n",offset+0x70);
 		else
-			return pit8253_r(machine().device("pit8253"), space, (offset & 6) >> 1);
+			return machine().device<pit8253_device>("pit8253")->read(space, (offset & 6) >> 1);
 	}
 
 	return 0xff;
@@ -1260,7 +1260,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 	else // odd
 	{
 		if(offset < 0x08)
-			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
+			machine().device<pit8253_device>("pit8253")->write(space, (offset & 6) >> 1, data);
 		//else
 		//  printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
 	}
@@ -2166,7 +2166,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_pit_mirror_r)
 		if(offset & 0x08)
 			printf("Read to undefined port [%02x]\n",offset+0x3fd8);
 		else
-			return pit8253_r(machine().device("pit8253"), space, (offset & 6) >> 1);
+			return machine().device<pit8253_device>("pit8253")->read(space, (offset & 6) >> 1);
 	}
 
 	return 0xff;
@@ -2181,7 +2181,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_pit_mirror_w)
 	else // odd
 	{
 		if(offset < 0x08)
-			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
+			machine().device<pit8253_device>("pit8253")->write(space, (offset & 6) >> 1, data);
 		else
 			printf("Write to undefined port [%04x] <- %02x\n",offset+0x3fd8,data);
 	}
@@ -2943,7 +2943,7 @@ READ8_MEMBER(pc9801_state::get_slave_ack)
 #define MAIN_CLOCK_X1 XTAL_1_9968MHz
 #define MAIN_CLOCK_X2 XTAL_2_4576MHz
 
-static const struct pit8253_config pc9801_pit8253_config =
+static const struct pit8253_interface pc9801_pit8253_config =
 {
 	{
 		{
@@ -2962,7 +2962,7 @@ static const struct pit8253_config pc9801_pit8253_config =
 	}
 };
 
-static const struct pit8253_config pc9821_pit8253_config =
+static const struct pit8253_interface pc9821_pit8253_config =
 {
 	{
 		{

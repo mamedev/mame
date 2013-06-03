@@ -50,22 +50,22 @@ I8255_INTERFACE( mz700_ppi8255_interface )
 
 
 
-const struct pit8253_config mz700_pit8253_config =
+const struct pit8253_interface mz700_pit8253_config =
 {
 	{
 		/* clockin             gate            callback */
 		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk2_w)   },
 		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
 	}
 };
 
-const struct pit8253_config mz800_pit8253_config =
+const struct pit8253_interface mz800_pit8253_config =
 {
 	{
 		/* clockin             gate            callback */
 		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_out0_changed) },
-		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("pit8253", pit8253_clk2_w)   },
+		{             15611.0, DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk2_w)   },
 		{                   0, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(mz_state,pit_irq_2)        },
 	}
 };
@@ -103,9 +103,6 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 
 void mz_state::machine_start()
 {
-	m_pit = machine().device("pit8253");
-	m_ppi = machine().device<i8255_device>("ppi8255");
-
 	/* reset memory map to defaults */
 	mz700_bank_4_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
@@ -130,7 +127,7 @@ READ8_MEMBER(mz_state::mz700_e008_r)
 
 WRITE8_MEMBER(mz_state::mz700_e008_w)
 {
-	pit8253_gate0_w(m_pit, BIT(data, 0));
+	m_pit->gate0_w(BIT(data, 0));
 }
 
 
@@ -276,13 +273,13 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 			if (m_mz700)
 			{
 				spc.install_readwrite_handler(0xe000, 0xfff3, 0, 0x1ff0, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
-				spc.install_legacy_readwrite_handler(*m_pit, 0xe004, 0xfff7, 0, 0x1ff0, FUNC(pit8253_r), FUNC(pit8253_w));
+				spc.install_readwrite_handler(0xe004, 0xfff7, 0, 0x1ff0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit));
 				spc.install_readwrite_handler(0xe008, 0xfff8, 0, 0x1ff0, read8_delegate(FUNC(mz_state::mz700_e008_r),this), write8_delegate(FUNC(mz_state::mz700_e008_w),this));
 			}
 			else
 			{
 				spc.install_readwrite_handler(0xe000, 0xe003, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
-				spc.install_legacy_readwrite_handler(*m_pit, 0xe004, 0xe007, FUNC(pit8253_r), FUNC(pit8253_w));
+				spc.install_readwrite_handler(0xe004, 0xe007, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit));
 				spc.install_readwrite_handler(0xe008, 0xe008, read8_delegate(FUNC(mz_state::mz700_e008_r),this), write8_delegate(FUNC(mz_state::mz700_e008_w),this));
 			}
 		}

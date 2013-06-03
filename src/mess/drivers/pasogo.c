@@ -161,7 +161,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<am9517a_device> m_dma8237;
-	required_device<pit8253_device> m_pit8253;
+	required_device<pit8254_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_READ8_MEMBER(ems_r);
@@ -505,7 +505,7 @@ static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff )
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff )
 ADDRESS_MAP_END
@@ -649,7 +649,7 @@ WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
 }
 
 
-static const pit8253_config pc_pit8254_config =
+static const pit8253_interface pc_pit8254_config =
 {
 	{
 		{
@@ -840,7 +840,7 @@ READ8_MEMBER (pasogo_state::ppi_porta_r)
 
 READ8_MEMBER ( pasogo_state::ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -874,7 +874,7 @@ WRITE8_MEMBER( pasogo_state::ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;

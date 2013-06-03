@@ -18,6 +18,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 
 class pc_state : public driver_device
 {
@@ -25,16 +26,18 @@ public:
 	pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_pic8259(*this, "pic8259"),
 		m_dma8237(*this, "dma8237"),
+		m_pit8253(*this, "pit8253"),
 		m_pc_kbdc(*this, "pc_kbdc"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
-	pic8259_device *m_pic8259;
+	optional_device<pic8259_device> m_pic8259;
 	optional_device<am9517a_device> m_dma8237;
-	device_t *m_pit8253;
+	optional_device<pit8253_device> m_pit8253;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
@@ -189,9 +192,9 @@ void pc_set_keyb_int(running_machine &machine, int state);
 /*----------- defined in machine/pc.c -----------*/
 
 extern const struct am9517a_interface ibm5150_dma8237_config;
-extern const struct pit8253_config ibm5150_pit8253_config;
-extern const struct pit8253_config pcjr_pit8253_config;
-extern const struct pit8253_config mc1502_pit8253_config;
+extern const struct pit8253_interface ibm5150_pit8253_config;
+extern const struct pit8253_interface pcjr_pit8253_config;
+extern const struct pit8253_interface mc1502_pit8253_config;
 extern const ins8250_interface ibm5150_com_interface[4];
 extern const rs232_port_interface ibm5150_serport_config[4];
 extern const i8255_interface ibm5160_ppi8255_interface;

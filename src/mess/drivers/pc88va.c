@@ -1285,7 +1285,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 //  AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
 	AM_RANGE(0x0198, 0x0199) AM_WRITE(backupram_wp_1_w) //Backup RAM write inhibit
 	AM_RANGE(0x019a, 0x019b) AM_WRITE(backupram_wp_0_w) //Backup RAM write permission
-	AM_RANGE(0x01a0, 0x01a7) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0x00ff)// vTCU (timer counter unit)
+	AM_RANGE(0x01a0, 0x01a7) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)// vTCU (timer counter unit)
 	AM_RANGE(0x01a8, 0x01a9) AM_WRITE8(timer3_ctrl_reg_w,0x00ff) // General-purpose timer 3 control port
 	AM_RANGE(0x01b0, 0x01b7) AM_READWRITE8(pc88va_fdc_r,pc88va_fdc_w,0x00ff)// FDC related (765)
 	AM_RANGE(0x01b8, 0x01bb) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff)
@@ -1741,7 +1741,7 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 	}
 }
 
-static const struct pit8253_config pc88va_pit8253_config =
+static const struct pit8253_interface pc88va_pit8253_config =
 {
 	{
 		{

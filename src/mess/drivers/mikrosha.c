@@ -36,7 +36,7 @@ static ADDRESS_MAP_START(mikrosha_mem, AS_PROGRAM, 8, mikrosha_state )
 	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
 	AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
 	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
-	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
+	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x07fc) // Timer
 	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
 	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, i8257_w)    // DMA
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
 }
 
-static const struct pit8253_config mikrosha_pit8253_intf =
+static const struct pit8253_interface mikrosha_pit8253_intf =
 {
 	{
 		{

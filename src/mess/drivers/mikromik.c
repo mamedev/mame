@@ -99,7 +99,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 3:
-			data = pit8253_r(m_pit, space, offset & 0x03);
+			data = m_pit->read(space, offset & 0x03);
 			break;
 
 		case 4:
@@ -168,7 +168,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 3:
-			pit8253_w(m_pit, space, offset & 0x03, data);
+			m_pit->write(space, offset & 0x03, data);
 			break;
 
 		case 4:
@@ -582,7 +582,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 	m_mpsc->rxcb_w(state);
 }
 
-static const struct pit8253_config pit_intf =
+static const struct pit8253_interface pit_intf =
 {
 	{
 		{

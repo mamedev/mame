@@ -148,7 +148,7 @@ READ8_MEMBER(pk8020_state::devices_r)
 {
 	switch(offset & 0x38)
 	{
-		case 0x00: return pit8253_r(m_pit8253,space, offset & 3);
+		case 0x00: return m_pit8253->read(space, offset & 3);
 		case 0x08: return m_ppi8255_3->read(space,offset & 3);
 		case 0x10: switch(offset & 1) {
 						case 0 : return m_rs232->data_r(space,0);
@@ -178,7 +178,7 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 {
 	switch(offset & 0x38)
 	{
-		case 0x00: pit8253_w(m_pit8253,space, offset & 3,data); break;
+		case 0x00: m_pit8253->write(space, offset & 3, data); break;
 		case 0x08: m_ppi8255_3->write(space,offset & 3,data); break;
 		case 0x10: switch(offset & 1) {
 						case 0 : m_rs232->data_w(space,0,data); break;
@@ -920,7 +920,7 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out1)
 }
 
 
-const struct pit8253_config pk8020_pit8253_intf =
+const struct pit8253_interface pk8020_pit8253_intf =
 {
 	{
 		{

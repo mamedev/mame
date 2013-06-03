@@ -107,15 +107,15 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_extclk = BIT(data, 1);
 
 	// m_speaker gate
-	pit8253_gate0_w(m_pit, BIT(data, 2));
+	m_pit->gate0_w(BIT(data, 2));
 
 	// m_speaker data
 	m_spkrdata = BIT(data, 3);
 	speaker_update();
 
 	// refresh and baud rate clocks
-	pit8253_gate1_w(m_pit, BIT(data, 4));
-	pit8253_gate2_w(m_pit, BIT(data, 4));
+	m_pit->gate1_w(BIT(data, 4));
+	m_pit->gate2_w(BIT(data, 4));
 
 	// FDC reset
 	if(BIT(data, 5))
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00004, 0x00005) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
 	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x00030, 0x00033) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
-	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8_LEGACY(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x00052, 0x00053) AM_READ8(kbint_clr_r, 0x00ff)
 	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
@@ -443,7 +443,7 @@ WRITE_LINE_MEMBER( tandy2k_state::rfrqpulse_w )
 {
 }
 
-static const struct pit8253_config pit_intf =
+static const struct pit8253_interface pit_intf =
 {
 	{
 		{

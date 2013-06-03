@@ -780,9 +780,9 @@ READ8_MEMBER(towns_state::towns_port60_r)
 {
 	UINT8 val = 0x00;
 
-	if ( pit8253_get_output(m_pit, 0 ) )
+	if (m_pit->get_output(0))
 		val |= 0x01;
-	if ( pit8253_get_output(m_pit, 1 ) )
+	if (m_pit->get_output(1))
 		val |= 0x02;
 
 	val |= (m_towns_timer_mask & 0x07) << 2;
@@ -2216,8 +2216,8 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffffffff)
-	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8_LEGACY("pit",pit8253_r, pit8253_w, 0x00ff00ff)
-	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8_LEGACY("pit2",pit8253_r, pit8253_w, 0x00ff00ff)
+	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8("pit2", pit8253_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x0060,0x0063) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x000000ff)
 	AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffffffff)
 	AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
@@ -2268,8 +2268,8 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffff)
-	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8_LEGACY("pit",pit8253_r, pit8253_w, 0x00ff)
-	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8_LEGACY("pit2",pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8("pit2", pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x0060,0x0061) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x00ff)
 	AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffff)
 	AM_RANGE(0x006c,0x006d) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x00ff)
@@ -2570,8 +2570,6 @@ INPUT_PORTS_END
 
 void towns_state::driver_start()
 {
-	m_pic_master = machine().device<pic8259_device>("pic8259_master");
-	m_pic_slave = machine().device<pic8259_device>("pic8259_slave");
 	m_towns_vram = auto_alloc_array(machine(),UINT32,0x20000);
 	m_towns_gfxvram = auto_alloc_array(machine(),UINT8,0x80000);
 	m_towns_txtvram = auto_alloc_array(machine(),UINT8,0x20000);
@@ -2610,9 +2608,6 @@ void towns_state::machine_reset()
 	m_dma_1 = machine().device("dma_1");
 	m_dma_2 = machine().device("dma_2");
 	m_fdc = machine().device("fdc");
-	m_pic_master = machine().device<pic8259_device>("pic8259_master");
-	m_pic_slave = machine().device<pic8259_device>("pic8259_slave");
-	m_pit = machine().device("pit");
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device<cdda_device>("cdda");
@@ -2642,7 +2637,7 @@ void towns_state::machine_reset()
 	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
 }
 
-static const struct pit8253_config towns_pit8253_config =
+static const struct pit8253_interface towns_pit8253_config =
 {
 	{
 		{
@@ -2663,7 +2658,7 @@ static const struct pit8253_config towns_pit8253_config =
 	}
 };
 
-static const struct pit8253_config towns_pit8253_config_2 =
+static const struct pit8253_interface towns_pit8253_config_2 =
 {
 	{
 		{
@@ -2803,8 +2798,8 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIT8253_ADD("pit",towns_pit8253_config)
-	MCFG_PIT8253_ADD("pit2",towns_pit8253_config_2)
+	MCFG_PIT8253_ADD("pit", towns_pit8253_config)
+	MCFG_PIT8253_ADD("pit2", towns_pit8253_config_2)
 
 	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(towns_state,towns_pic_irq), VCC, READ8(towns_state,get_slave_ack))
 

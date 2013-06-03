@@ -118,7 +118,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_mb8877a;
-	required_device<device_t> m_pit8253;
+	required_device<pit8253_device> m_pit8253;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_region_tvram;
 	required_memory_region m_region_gvram;
@@ -367,12 +367,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 
 WRITE8_MEMBER(mz2000_state::timer_w)
 {
-	pit8253_gate0_w(m_pit8253, 1);
-	pit8253_gate1_w(m_pit8253, 1);
-	pit8253_gate0_w(m_pit8253, 0);
-	pit8253_gate1_w(m_pit8253, 0);
-	pit8253_gate0_w(m_pit8253, 1);
-	pit8253_gate1_w(m_pit8253, 1);
+	m_pit8253->gate0_w(1);
+	m_pit8253->gate1_w(1);
+	m_pit8253->gate0_w(0);
+	m_pit8253->gate1_w(0);
+	m_pit8253->gate0_w(1);
+	m_pit8253->gate1_w(1);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START(mz2000_io, AS_IO, 8, mz2000_state )
 	AM_RANGE(0xd8, 0xdb) AM_READWRITE(mz2000_wd17xx_r, mz2000_wd17xx_w)
 	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2000_fdc_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE_LEGACY("pit", pit8253_r, pit8253_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 //  AM_RANGE(0xf4, 0xf7) CRTC
@@ -826,7 +826,7 @@ static const floppy_interface mz2000_floppy_interface =
 /* PIT8253 Interface */
 
 /* TODO: clocks aren't known */
-static const struct pit8253_config mz2000_pit8253_intf =
+static const struct pit8253_interface mz2000_pit8253_intf =
 {
 	{
 		{

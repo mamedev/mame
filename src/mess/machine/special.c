@@ -110,10 +110,9 @@ void special_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 	case TIMER_PIT8253_GATES:
 	{
-		device_t *pit8253 = machine().device("pit8253");
-		pit8253_gate0_w(pit8253, 0);
-		pit8253_gate1_w(pit8253, 0);
-		pit8253_gate2_w(pit8253, 0);
+		m_pit->gate0_w(0);
+		m_pit->gate1_w(0);
+		m_pit->gate2_w(0);
 		break;
 	}
 	default:
@@ -212,7 +211,7 @@ WRITE_LINE_MEMBER( special_state::specimx_pit8253_out2_changed )
 
 
 
-const struct pit8253_config specimx_pit8253_intf =
+const struct pit8253_interface specimx_pit8253_intf =
 {
 	{
 		{

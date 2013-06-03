@@ -38,6 +38,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_fdc(*this, "fd1793"),
 		m_dac(*this, "dac"),
+		m_pit(*this, "pit8253"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_p_videoram(*this, "p_videoram"),
@@ -100,6 +101,7 @@ public:
 	optional_device<i8255_device> m_ppi;
 	optional_device<fd1793_t> m_fdc;
 	optional_device<dac_device> m_dac;
+	optional_device<pit8253_device> m_pit;
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<UINT8> m_p_videoram;
@@ -151,7 +153,7 @@ protected:
 
 /*----------- defined in machine/special.c -----------*/
 
-extern const struct pit8253_config specimx_pit8253_intf;
+extern const struct pit8253_interface specimx_pit8253_intf;
 extern const i8255_interface specialist_ppi8255_interface;
 
 

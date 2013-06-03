@@ -96,7 +96,7 @@ I8255A_INTERFACE( dai_ppi82555_intf )
 	DEVCB_NULL  /* Port C write */
 };
 
-const struct pit8253_config dai_pit8253_intf =
+const struct pit8253_interface dai_pit8253_intf =
 {
 	{
 		{
@@ -230,12 +230,12 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 
 READ8_MEMBER(dai_state::dai_pit_r)
 {
-	return pit8253_r(m_pit, space, (offset>>1) & 3);
+	return m_pit->read(space, (offset >> 1) & 3);
 }
 
 WRITE8_MEMBER(dai_state::dai_pit_w)
 {
-	pit8253_w(m_pit, space, (offset>>1) & 3, data);
+	m_pit->write(space, (offset >> 1) & 3, data);
 }
 
 /***************************************************************************

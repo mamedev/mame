@@ -201,8 +201,8 @@ public:
 /*----------- defined in machine/compis.c -----------*/
 
 extern const i8255_interface compis_ppi_interface;
-extern const struct pit8253_config compis_pit8253_config;
-extern const struct pit8253_config compis_pit8254_config;
+extern const struct pit8253_interface compis_pit8253_config;
+extern const struct pit8253_interface compis_pit8254_config;
 extern const i8251_interface compis_usart_interface;
 
 #endif /* COMPIS_H_ */

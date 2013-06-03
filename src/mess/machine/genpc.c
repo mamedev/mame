@@ -219,7 +219,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 }
 
 
-const struct pit8253_config pc_pit8253_config =
+const struct pit8253_interface pc_pit8253_config =
 {
 	{
 		{
@@ -356,7 +356,7 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -392,7 +392,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
@@ -617,7 +617,7 @@ void ibm5160_mb_device::device_start()
 {
 	install_device(0x0000, 0x000f, 0, 0, read8_delegate(FUNC(am9517a_device::read), (am9517a_device*)m_dma8237), write8_delegate(FUNC(am9517a_device::write), (am9517a_device*)m_dma8237) );
 	install_device(0x0020, 0x0021, 0, 0, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_pic8259), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_pic8259) );
-	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );
+	install_device(0x0040, 0x0043, 0, 0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit8253), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit8253) );
 
 	//  install_device(m_ppi8255, 0x0060, 0x0063, 0, 0, FUNC(i8255a_r), FUNC(i8255a_w) );
 	int buswidth = machine().firstcpu->space_config(AS_IO)->m_databus_width;
@@ -777,7 +777,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 
 READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 {
-	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -851,7 +851,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);

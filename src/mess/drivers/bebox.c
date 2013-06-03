@@ -22,7 +22,6 @@
 #include "machine/am9517a.h"
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
-#include "machine/pit8253.h"
 #include "machine/idectrl.h"
 #include "machine/mpc105.h"
 #include "machine/intelfsh.h"
@@ -48,7 +47,7 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 
 	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
@@ -159,7 +158,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 
 READ8_MEMBER(bebox_state::bebox_get_out2)
 {
-	return pit8253_get_output(machine().device("pit8254"), 2 );
+	return m_pit8254->get_output(2);
 }
 
 static const struct kbdc8042_interface bebox_8042_interface =

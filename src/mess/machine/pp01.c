@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(pp01_state::pp01_pit_out1)
 {
 }
 
-const struct pit8253_config pp01_pit8253_intf =
+const struct pit8253_interface pp01_pit8253_intf =
 {
 	{
 		{
@@ -178,7 +178,7 @@ const struct pit8253_config pp01_pit8253_intf =
 		{
 			2000000,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pit8253", pit8253_clk0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pit8253", pit8253_device, clk0_w)
 		}
 	}
 };

@@ -58,6 +58,6 @@ public:
 /*----------- defined in machine/irisha.c -----------*/
 
 extern const i8255_interface irisha_ppi8255_interface;
-extern const struct pit8253_config irisha_pit8253_intf;
+extern const struct pit8253_interface irisha_pit8253_intf;
 
 #endif /* IRISHA_H_ */

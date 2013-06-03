@@ -10,7 +10,7 @@
 #include "machine/pc_keyboards.h"
 
 
-const struct pit8253_config at_pit8254_config =
+const struct pit8253_interface at_pit8254_config =
 {
 	{
 		{
@@ -182,7 +182,7 @@ void southbridge_device::device_start()
 
 	spaceio.install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read),&(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write),&(*m_dma8237_1)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_master)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_master)), 0xffffffff);
-	spaceio.install_legacy_readwrite_handler(*m_pit8254, 0x0040, 0x005f, FUNC(pit8253_r), FUNC(pit8253_w), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0040, 0x005f, read8_delegate(FUNC(pit8254_device::read),&(*m_pit8254)), write8_delegate(FUNC(pit8254_device::write),&(*m_pit8254)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_keybc_r),this), write8_delegate(FUNC(southbridge_device::at_keybc_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(at_keyboard_controller_device::status_r),&(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::command_w),&(*m_keybc)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read),&(*m_mc146818)), write8_delegate(FUNC(mc146818_device::write),&(*m_mc146818)), 0xffffffff);
@@ -428,7 +428,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	}
 	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
 
-	if ( pit8253_get_output(m_pit8254, 2 ) )
+	if (m_pit8254->get_output(2))
 		data |= 0x20;
 	else
 		data &= ~0x20; /* ps2m30 wants this */
@@ -439,7 +439,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 WRITE8_MEMBER( southbridge_device::at_portb_w )
 {
 	m_at_speaker = data;
-	pit8253_gate2_w(m_pit8254, BIT(data, 0));
+	m_pit8254->gate2_w(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));

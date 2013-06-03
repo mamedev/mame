@@ -63,7 +63,7 @@ public:
 /*----------- defined in machine/mz80.c -----------*/
 
 extern const i8255_interface mz80k_8255_int;
-extern const struct pit8253_config mz80k_pit8253_config;
+extern const struct pit8253_interface mz80k_pit8253_config;
 
 
 /*----------- defined in video/mz80.c -----------*/

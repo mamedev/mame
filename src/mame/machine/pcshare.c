@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 }
 
 
-static const struct pit8253_config at_pit8254_config =
+static const struct pit8253_interface at_pit8254_config =
 {
 	{
 		{
@@ -196,7 +196,7 @@ static const struct pit8253_config at_pit8254_config =
 
 READ8_MEMBER(pcat_base_state::get_out2)
 {
-	return pit8253_get_output( m_pit8254, 2 );
+	return m_pit8254->get_output(2);
 }
 
 static const struct kbdc8042_interface at8042 =
@@ -219,7 +219,7 @@ static const struct mc146818_interface at_mc146818_config =
 ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO

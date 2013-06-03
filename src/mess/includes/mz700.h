@@ -26,13 +26,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
+		m_pit(*this, "pit8253"),
+		m_ppi(*this, "ppi8255"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG) { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
-
-	device_t *m_pit;
-	i8255_device *m_ppi;
 
 	int m_cursor_timer;
 	int m_other_timer;
@@ -99,6 +98,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<pit8253_device> m_pit;
+	required_device<i8255_device> m_ppi;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 };
@@ -106,8 +107,8 @@ public:
 
 /*----------- defined in machine/mz700.c -----------*/
 
-extern const struct pit8253_config mz700_pit8253_config;
-extern const struct pit8253_config mz800_pit8253_config;
+extern const struct pit8253_interface mz700_pit8253_config;
+extern const struct pit8253_interface mz800_pit8253_config;
 extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 

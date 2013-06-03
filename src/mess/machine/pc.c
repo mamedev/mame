@@ -360,7 +360,7 @@ WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out2_changed)
 }
 
 
-const struct pit8253_config ibm5150_pit8253_config =
+const struct pit8253_interface ibm5150_pit8253_config =
 {
 	{
 		{
@@ -386,7 +386,7 @@ const struct pit8253_config ibm5150_pit8253_config =
   supported yet.
  */
 
-const struct pit8253_config pcjr_pit8253_config =
+const struct pit8253_interface pcjr_pit8253_config =
 {
 	{
 		{
@@ -407,7 +407,7 @@ const struct pit8253_config pcjr_pit8253_config =
 
 /* MC1502 uses single XTAL for everything -- incl. CGA? check */
 
-const struct pit8253_config mc1502_pit8253_config =
+const struct pit8253_interface mc1502_pit8253_config =
 {
 	{
 		{
@@ -764,7 +764,7 @@ READ8_MEMBER(pc_state::ibm5160_ppi_porta_r)
 
 READ8_MEMBER(pc_state::ibm5160_ppi_portc_r)
 {
-	int timer2_output = pit8253_get_output( m_pit8253, 2 );
+	int timer2_output = m_pit8253->get_output(2);
 	int data=0xff;
 
 	data&=~0x80; // no parity error
@@ -801,7 +801,7 @@ WRITE8_MEMBER(pc_state::ibm5160_ppi_portb_w)
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
@@ -862,7 +862,7 @@ WRITE8_MEMBER(pc_state::pc_ppi_portb_w)
 	m_ppi_portc_switch_high = data & 0x08;
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
-	pit8253_gate2_w(m_pit8253, BIT(data, 0));
+	m_pit8253->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 	pc_keyb_set_clock( m_ppi_keyb_clock );
 
@@ -947,13 +947,13 @@ WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
 {
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
-	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
+	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 }
 
 READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
 {
-	int timer2_output = pit8253_get_output( machine().device("pit8253"), 2 );
+	int timer2_output = machine().device<pit8253_device>("pit8253")->get_output(2);
 	int data = 0xff;
 	double tap_val = m_cassette->input();
 
@@ -1015,7 +1015,7 @@ WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
 	/* KB controller port B */
 	m_ppi_portb = data;
 	m_ppi_portc_switch_high = data & 0x08;
-	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
+	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
@@ -1048,7 +1048,7 @@ READ8_MEMBER(pc_state::pcjr_ppi_porta_r)
  */
 READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
 {
-	int timer2_output = pit8253_get_output( machine().device("pit8253"), 2 );
+	int timer2_output = machine().device<pit8253_device>("pit8253")->get_output(2);
 	int data=0xff;
 
 	data&=~0x80;
@@ -1453,8 +1453,6 @@ IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 
 MACHINE_START_MEMBER(pc_state,pc)
 {
-	m_pic8259 = machine().device<pic8259_device>("pic8259");
-	m_pit8253 = machine().device("pit8253");
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
@@ -1490,9 +1488,6 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
-	m_pic8259 = machine().device<pic8259_device>("pic8259");
-	m_pit8253 = machine().device("pit8253");
-
 	/*
 	       Keyboard polling circuit holds IRQ1 high until a key is
 	       pressed, then it starts a timer that pulses IRQ1 low each
@@ -1518,10 +1513,6 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
-
-
-	m_pic8259 = machine().device<pic8259_device>("pic8259");
-	m_pit8253 = machine().device("pit8253");
 }
 
 MACHINE_RESET_MEMBER(pc_state,pcjr)
@@ -1559,7 +1550,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 	UINT32  address;
 	UINT32  size;
 
-	address = ( ! strcmp( ":cart2", image.device().tag() ) ) ? 0xd0000 : 0xe0000;
+	address = (!strcmp(":cart2", image.device().tag())) ? 0xd0000 : 0xe6000;
 
 	if ( image.software_entry() )
 	{

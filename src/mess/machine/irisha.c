@@ -99,7 +99,7 @@ WRITE8_MEMBER(irisha_state::irisha_8255_portc_w)
 	//logerror("irisha_8255_portc_w %02x\n",data);
 
 	if (data & 0x40)
-		pit8253_gate2_w(m_pit, (BIT(m_ppi_porta,5) && !BIT(data,5)) ? 1 : 0);
+		m_pit->gate2_w((BIT(m_ppi_porta, 5) && !BIT(data, 5)) ? 1 : 0);
 
 	m_ppi_portc = data;
 
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(irisha_state::irisha_pic_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct pit8253_config irisha_pit8253_intf =
+const struct pit8253_interface irisha_pit8253_intf =
 {
 	{
 		{

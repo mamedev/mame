@@ -99,7 +99,6 @@
 #include "machine/upd765.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
-#include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "machine/idectrl.h"
 #include "machine/pci.h"
@@ -766,7 +765,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 }
 
 
-const struct pit8253_config bebox_pit8254_config =
+const struct pit8253_interface bebox_pit8254_config =
 {
 	{
 		{

@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( mz80k_mem, AS_PROGRAM, 8, mz80_state )
 	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_SHARE("p_ram") // 48 KB of RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("p_videoram") // Video RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
-	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r,pit8253_w)  /* PIT 8253  */
+	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)  /* PIT 8253  */
 	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_ROM
 ADDRESS_MAP_END
