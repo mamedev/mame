@@ -250,4 +250,382 @@
 		</part>
 	</software>
 
+	<software name="assorted">
+		<!-- assorted.d80-d82 from zimmers.net, needs cleaning and splitting up -->
+		<description>Assorted PET software</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<feature name="part_id" value="" />
+				<rom name="disk0013.d82" size="1066496" crc="a928a5b8" sha1="7120f0c9b6067222640dc168bf2eafa7a71f0a1e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="voorraadbeheer" />
+				<rom name="disk1001.d80" size="533248" crc="b5f2a740" sha1="58a872fd4febcb969c3690a200f25b7fd359986e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="orderverwerking" />
+				<rom name="disk1002.d80" size="533248" crc="213b8d34" sha1="3b2618317660cb464ae0c25dd03aad2e457487b9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="voorraadbeheer, master key disk" />
+				<rom name="disk1003.d80" size="533248" crc="29a029c2" sha1="5d9ec48f2d54a525001d6b638bcc9a3590dff038" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="debiteuren, master key disk" />
+				<rom name="disk1004.d80" size="533248" crc="d9f95934" sha1="44f5386a05c867eaa44106eac433fc1d4a15731e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="debiteuren" />
+				<rom name="disk1005.d80" size="533248" crc="1d9b1c89" sha1="0f03741b3120637382d7b760afac3a237a62f7f9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Master adcom, boekhouding" />
+				<rom name="disk1006.d80" size="533248" crc="a3a20f61" sha1="eede3ce6098b20fd0b3b861fa75ff6f52292b071" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="master servicom drive 1" />
+				<rom name="disk1008.d80" size="533248" crc="e5c13e2b" sha1="39d9774a8412de6b21d45a2b53a3e459dfb34965" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Master adcom demo, boekhouding" />
+				<rom name="disk1009.d80" size="533248" crc="5135f408" sha1="ebafe73eef2447c4bde8056ff34e9f7ec61f907f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/23-31 Defakto key" />
+				<rom name="disk1010.d80" size="533248" crc="70f00921" sha1="235d15917927e65bda75eb21f304bf6361167c0b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/23-31 Defakto 1" />
+				<rom name="disk1011.d80" size="533248" crc="deca3a67" sha1="1ea79df742a62bc4036e1a4949186766bf7f887a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop12" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/23-31 Defakto 2" />
+				<rom name="disk1012.d80" size="533248" crc="3ea874bb" sha1="d8ab67fecffb2e066ed15aba2714c10e3af9f8c9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop13" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/23-31 Defakto 3" />
+				<rom name="disk1013.d80" size="533248" crc="51662e21" sha1="ac63b1892f552d17e3fdbe563a27d5ac1d3b8b67" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop14" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="" />
+				<rom name="disk1014.d80" size="533248" crc="ed6431a8" sha1="880b9e30b29217c7c48dcf95f5226adc448b085a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop15" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Update defakto V3.0 - V3.1" />
+				<rom name="disk1015.d80" size="533248" crc="ac29fceb" sha1="85d3b04207046358db89f2fedc2840b90e58aa9e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop16" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes compas key" />
+				<rom name="disk1016.d80" size="533248" crc="c86c3f47" sha1="a5fceb616201df668cc2a772ce7178505dbce9aa" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop17" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes defakto key" />
+				<rom name="disk1017.d80" size="533248" crc="04b5f888" sha1="332bd812625e4e1e33769e006c9a8bbd9ca31571" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop18" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes fasdc key" />
+				<rom name="disk1018.d80" size="533248" crc="790eb634" sha1="9263068a3529dd14651d3cc9f2524a36bd9e6e32" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop19" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes aladin key" />
+				<rom name="disk1019.d80" size="533248" crc="f77070f1" sha1="81f4d20c79935152ed1cccdc0ab41569a29e2bed" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop20" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes locom-a key" />
+				<rom name="disk1020.d80" size="533248" crc="4b51ab7d" sha1="ef1cf56de7b5e6172f3ff3fd5499d42953eb94ff" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop21" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes locom-b key" />
+				<rom name="disk1021.d80" size="533248" crc="e8b0b508" sha1="6265e99476c119eff24646a31d26917a1dcd204f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop22" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="sourcecodes wordcraft visicalc link" />
+				<rom name="disk1022.d80" size="533248" crc="53564ad5" sha1="020c14cea669485d4a4628b7a083d98d2d30722c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop23" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="diverse sources" />
+				<rom name="disk1023.d80" size="533248" crc="fd4a5fb3" sha1="f83015b0a354539647ebf83e02976f2975cdc21f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop24" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="disk filler start 000-223" />
+				<rom name="disk1024.d80" size="533248" crc="4789d866" sha1="f0ffcf691bda3f4f16be4ae446cbfdf2e5a21de6" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop25" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="development protection" />
+				<rom name="disk1025.d80" size="533248" crc="0a399ff3" sha1="9e7d03e7202c626c0a9fdec8eff114c90b8c42f2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop26" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="wordprocessor IV" />
+				<rom name="disk1026.d80" size="533248" crc="10555a49" sha1="dc47030ed8ce4ec314b51f4cecd53b153cfe2cb1" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop27" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="FASDC-1" />
+				<rom name="disk1027.d80" size="533248" crc="a36399a3" sha1="945c65adb9c1efd1fba718b3fd98a0fc7d32605e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop28" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="FASDC key" />
+				<rom name="disk1028.d80" size="533248" crc="3a65ae2a" sha1="29366a40f7fec370bd05407f64a20a5198cc881a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop29" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Master Comal C 82540/17-11" />
+				<rom name="disk1029.d80" size="533248" crc="77380200" sha1="ab602b1f1da7c7f5fd63c6511b8325d2b2438754" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop30" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Master Ordermodule compas" />
+				<rom name="disk1030.d80" size="533248" crc="d6390ddf" sha1="be10d8365a30de40a35fbcd314f6b69c8b9954b9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop31" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="Master Ordermodule defakto" />
+				<rom name="disk1031.d80" size="533248" crc="0caad2c6" sha1="579cde5895520bae6b5b181bb49819a6491f0de7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop32" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="hulpprogramma's wifi" />
+				<rom name="disk1032.d80" size="533248" crc="bfa23ad9" sha1="6c8fced20643f6380937e5bf54c9074bcfab5bcf" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop33" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="master wifi geprotect" />
+				<rom name="disk1033.d80" size="533248" crc="5c16e907" sha1="97297bdc5fdc87c7bdb4edade3b3d99460160f0f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop34" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="master wifi key disk" />
+				<rom name="disk1034.d80" size="533248" crc="09af94ed" sha1="1d30835328b27ef01a80b76f6396ff21ad6d13fe" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop35" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A Compas Defakto 1" />
+				<rom name="disk1035.d80" size="533248" crc="7381e0c4" sha1="9dae3810d9c38ffdf197f5aa776b135f1d14d156" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop36" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A Compas Defakto 2" />
+				<rom name="disk1036.d80" size="533248" crc="cbfc00f5" sha1="ddb3659a29c03e180aa5672df625d821c70b2d46" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop37" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A Cred prg" />
+				<rom name="disk1037.d80" size="533248" crc="b9803097" sha1="700e60e97ba6de3a152f51840d7623b37163de99" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop38" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A Compas Defakto 3" />
+				<rom name="disk1038.d80" size="533248" crc="5740c184" sha1="0cc18b32a9b32166334721fa06406b503dc825c1" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop39" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A fas prg" />
+				<rom name="disk1039.d80" size="533248" crc="59218c0b" sha1="406e63eb90a8d0f6fa3b0f717779e3416ca3e137" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop40" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="update 1 diskette Compas" />
+				<rom name="disk1040.d80" size="533248" crc="ccd99444" sha1="e589a7ee3a3ca458de31b4ec3db89f7b93c747bd" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop41" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="update 2 diskette Compas" />
+				<rom name="disk1041.d80" size="533248" crc="d77947c9" sha1="d75ce5bfbcdde590718d8cabfb4c9033f93b0d41" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop42" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="update Compas hulpprogramma's V2.3-V3.1" />
+				<rom name="disk1042.d80" size="533248" crc="39856a8f" sha1="2e69d679844b131b283b5c30fcbd480d15b99b11" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop43" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-3 update compas defakto 1" />
+				<rom name="disk1043.d80" size="533248" crc="f76b7730" sha1="11648138fd026b06e9bb45289a89354cb90eeb8f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop44" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-3 update compas defakto 2" />
+				<rom name="disk1044.d80" size="533248" crc="58dc04e1" sha1="0dfcbeb6e1aeb8d54ea7f602cd8a36ee53a29018" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop45" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-3 update compas defakto 3" />
+				<rom name="disk1045.d80" size="533248" crc="3465e2d1" sha1="9de8000becad45a959cbdab9e1038236cda086e4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop46" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-10a c-master compas" />
+				<rom name="disk1046.d80" size="533248" crc="c892a4ed" sha1="e0c66da118dda82826ea8f342fbc421e6e128c56" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop47" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="I 82540/24-31A update compas cred" />
+				<rom name="disk1047.d80" size="533248" crc="9893e956" sha1="ab008c75177d8b5198660df898d258afbaedffff" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop48" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="update compas V3.0 - V3.1A disk 2" />
+				<rom name="disk1048.d80" size="533248" crc="86bc8304" sha1="8fd7334cb3cfe7db61451d034c2a77f3bb3b5353" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop49" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="update compas V3.0 - V3.1A disk 1" />
+				<rom name="disk1049.d80" size="533248" crc="3462c735" sha1="212ad11c1234e070b09e285cbea24eac397c21a2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop50" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="PET Forth 8000 Int. version" />
+				<rom name="disk2003.d80" size="533248" crc="8eab22d8" sha1="0dfd3802f1a3b245fc6311038841e8ccba08d6e7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop51" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<feature name="part_id" value="CALC RESULT V1.0  handic" />
+				<rom name="disk2004.d82" size="1066496" crc="89dab38c" sha1="4703442660b7de732105200feab008c394511718" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop52" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="CALC RESULT V1.0  datatronic ab" />
+				<rom name="disk2005.d80" size="533248" crc="a2629f4a" sha1="b0a0307e0c7e24ffc7c2cea64cd5d773324d5fe7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop53" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<feature name="part_id" value="CBM faktuur ASCII versie" />
+				<rom name="disk9900.d80" size="533248" crc="387442d1" sha1="31a32d33357ce58e7320674c1280d68a3292836f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
