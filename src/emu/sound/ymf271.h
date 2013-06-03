@@ -132,8 +132,8 @@ private:
 	UINT8 m_ext_rw;
 	UINT8 m_ext_readlatch;
 
-	UINT8 *m_region_base;
-	UINT32 m_region_size;
+	UINT8 *m_mem_base;
+	UINT32 m_mem_size;
 	UINT32 m_clock;
 
 	emu_timer *m_timA, *m_timB;

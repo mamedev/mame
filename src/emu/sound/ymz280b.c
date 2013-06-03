@@ -17,6 +17,11 @@
    8-bit PCM, 16-bit PCM ...... 0.172 to 88.2kHz in 512 steps
   256 steps total level and 16 steps panpot can be set
   Voice signal is output in stereo 16-bit 2's complement MSB-first format
+  
+  TODO:
+  - Is memory handling 100% correct? At the moment, Konami firewave.c is the only
+    hardware currently emulated that uses external handlers.
+    It also happens to be the only one using 16-bit PCM.
 
 */
 
@@ -51,12 +56,12 @@ UINT8 ymz280b_device::ymz280b_read_memory(UINT32 offset)
 {
 	if (m_ext_read_handler.isnull())
 	{
-		if (offset < m_region_size)
-			return m_region_base[offset];
+		if (offset < m_mem_size)
+			return m_mem_base[offset];
 
 		/* 16MB chip limit (shouldn't happen) */
 		else if (offset > 0xffffff)
-			return m_region_base[offset & 0xffffff];
+			return m_mem_base[offset & 0xffffff];
 
 		else
 			return 0;
@@ -583,8 +588,8 @@ void ymz280b_device::device_start()
 
 	/* initialize the rest of the structure */
 	m_master_clock = (double)clock() / 384.0;
-	m_region_base = *region();
-	m_region_size = region()->bytes();
+	m_mem_base = *region();
+	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
 
 	for (int i = 0; i < 8; i++)

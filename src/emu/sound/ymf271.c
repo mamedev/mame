@@ -17,6 +17,8 @@
     - Src B and Src NOTE bits
     - statusreg Busy and End bits
     - timer register 0x11
+    - Is memory handling 100% correct? At the moment, seibuspi.c is the only
+      hardware currently emulated that uses external handlers.
     - oh, and a lot more...
 */
 
@@ -1338,12 +1340,12 @@ UINT8 ymf271_device::ymf271_read_memory(UINT32 offset)
 {
 	if (m_ext_read_handler.isnull())
 	{
-		if (offset < m_region_size)
-			return m_region_base[offset];
+		if (offset < m_mem_size)
+			return m_mem_base[offset];
 
 		/* 8MB chip limit (shouldn't happen) */
 		else if (offset > 0x7fffff)
-			return m_region_base[offset & 0x7fffff];
+			return m_mem_base[offset & 0x7fffff];
 
 		else
 			return 0;
@@ -1686,8 +1688,8 @@ void ymf271_device::device_start()
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
-	m_region_base = *region();
-	m_region_size = region()->bytes();
+	m_mem_base = *region();
+	m_mem_size = region()->bytes();
 	m_irq_handler.resolve();
 
 	m_ext_read_handler.resolve();

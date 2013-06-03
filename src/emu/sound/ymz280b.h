@@ -115,8 +115,8 @@ private:
 	devcb2_write8 m_ext_write_handler;/* external RAM write handler */
 
 	double m_master_clock;            /* master clock frequency */
-	UINT8 *m_region_base;             /* pointer to the base of the region */
-	UINT32 m_region_size;
+	UINT8 *m_mem_base;                /* pointer to the base of external memory */
+	UINT32 m_mem_size;
 	sound_stream *m_stream;           /* which stream are we using */
 	INT16 *m_scratch;
 #if MAKE_WAVS
