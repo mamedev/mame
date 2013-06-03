@@ -217,23 +217,88 @@ private:
 	UINT8 m_memmap;
 };
 
-
+// Attributes (based on schematics):
+// bit 0 = ALT
+// bit 1 = RW
+// bit 2 = BKG (reverse?)
+// bit 3 = brightness
+// bit 4 = double-size (width)
+// bit 5 = underline
+// bit 6 = superscript
+// bit 7 = subscript (superscript and subscript combined produces strikethrough)
 UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 x,y,bit,scan,data;
+	UINT8 dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
+	                     // as it can start on either odd or even character cells.
 
+	// TODO: Graphics RAM
 	for(y=0;y<bitmap.height()/10;y++)  // lines
 	{
 		for(x=0;x<bitmap.width()/8;x++)  // columns
 		{
 			UINT8 ch = m_char_ram[(y*128)+x];
+			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+				dbl_mode++;
+			else
+				dbl_mode = 0;
+
 			for(scan=0;scan<10;scan++)  // 10 scanlines per line
 			{
 				data = m_char_rom->base()[ch*16+scan];
+				if((m_attr_ram[(y*128)+x] & 0xc0) != 0xc0)  // if not strikethrough
+				{
+					if(m_attr_ram[(y*128)+x] & 0x40)  // superscript
+					{
+						if(scan >= 5)
+							data = 0;
+						else
+							data = m_char_rom->base()[ch*16+(scan*2)+1];
+					}
+					if(m_attr_ram[(y*128)+x] & 0x80)  // subscript
+					{
+						if(scan < 5)
+							data = 0;
+						else
+							data = m_char_rom->base()[ch*16+((scan-5)*2)+1];
+					}
+				}
+				if((m_attr_ram[(y*128)+x] & 0x20) && scan == 9)  // underline
+					data = 0xff;
+				if((m_attr_ram[(y*128)+x] & 0xc0) == 0xc0 && scan == 3)  // strikethrough
+					data = 0xff;
+				if(m_attr_ram[(y*128)+x] & 0x04)  // reverse
+					data = ~data;
+				if(m_attr_ram[(y*128)+x] & 0x10) // double-size
+				{
+					UINT8 newdata = 0;
+					if(dbl_mode & 1)
+					{
+						newdata = (data & 0x80) | ((data & 0x80) >> 1)
+								| ((data & 0x40) >> 1) | ((data & 0x40) >> 2)
+								| ((data & 0x20) >> 2) | ((data & 0x20) >> 3)
+								| ((data & 0x10) >> 3) | ((data & 0x10) >> 4);
+					}
+					else
+					{
+						newdata = ((data & 0x08) << 4) | ((data & 0x08) << 3)
+								| ((data & 0x04) << 3) | ((data & 0x04) << 2)
+								| ((data & 0x02) << 2) | ((data & 0x02) << 1)
+								| ((data & 0x01) << 1) | (data & 0x01);
+					}
+					data = newdata;
+				}
+
 				for(bit=0;bit<8;bit++)  // 8 pixels per character
 				{
-					if(x >= cliprect.min_x && x < cliprect.max_x && y >= cliprect.min_y && y < cliprect.max_y)
-						bitmap.pix32(y*10+scan,x*8+bit) = (BIT(data,7-bit)) ? 0xffffff : 0x000000;
+					UINT16 xpos = x*8+bit;
+					UINT16 ypos = y*10+scan;
+					UINT32 fg = 0x7f7f7f;
+					UINT32 bg = 0x000000;
+
+					if(m_attr_ram[(y*128)+x] & 0x08) // brightness
+						fg = 0xffffff;
+					bitmap.pix32(ypos,xpos) = (BIT(data,7-bit)) ? fg : bg;
 				}
 			}
 		}
@@ -340,11 +405,11 @@ READ8_MEMBER(attache_state::pio_portA_r)
 		break;
 	case PIO_SEL_5832_WRITE:
 		ret = m_rtc->data_r(space,0);
-		logerror("CMOS: read %02x (write)\n",ret);
+		logerror("RTC: read %02x (write)\n",ret);
 		break;
 	case PIO_SEL_5832_READ:
 		ret = m_rtc->data_r(space,0);
-		logerror("CMOS: read %02x\n",ret);
+		logerror("RTC: read %02x\n",ret);
 		break;
 	case PIO_SEL_5101_WRITE:
 		ret = m_cmos_ram[m_cmos_select] & 0x0f;
@@ -389,11 +454,11 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 	case PIO_SEL_5832_WRITE:
 		m_rtc->address_w((data & 0xf0) >> 4);
 		m_rtc->data_w(space,0,data & 0x0f);
-		logerror("CMOS: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
+		logerror("RTC: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
 		m_rtc->address_w((data & 0xf0) >> 4);
-		logerror("CMOS: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
+		logerror("RTC: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5101_WRITE:
 		m_cmos_select = (m_cmos_select & 0xf0) | ((data & 0xf0) >> 4);
