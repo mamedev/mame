@@ -351,6 +351,7 @@ LIBS += $(QT_LIBS) -lqtmain -lQtGui4 -lQtCore4
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
 SDLOBJ := $(WINOBJ)/../sdl
 SDLSRC := $(WINSRC)/../sdl
+CFLAGS += -DUSE_QTDEBUG
 
 MOC = @moc
 $(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h

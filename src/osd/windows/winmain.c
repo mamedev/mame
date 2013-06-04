@@ -777,7 +777,7 @@ void windows_osd_interface::osd_exit(running_machine &machine)
 		timeEndPeriod(caps.wPeriodMin);
 
 	// one last pass at events
-	winwindow_process_events(machine, 0);
+	winwindow_process_events(machine, 0, 0);
 }
 
 

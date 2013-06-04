@@ -162,7 +162,7 @@ void winwindow_take_video(void);
 void winwindow_toggle_fsfx(void);
 
 void winwindow_process_events_periodic(running_machine &machine);
-void winwindow_process_events(running_machine &machine, int ingame);
+void winwindow_process_events(running_machine &machine, int ingame, bool nodispatch);
 
 void winwindow_ui_pause_from_window_thread(running_machine &machine, int pause);
 void winwindow_ui_pause_from_main_thread(running_machine &machine, int pause);

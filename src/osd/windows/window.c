@@ -344,7 +344,7 @@ void winwindow_process_events_periodic(running_machine &machine)
 	// update once every 1/8th of a second
 	if (currticks - last_event_check < 1000 / 8)
 		return;
-	winwindow_process_events(machine, TRUE);
+	winwindow_process_events(machine, TRUE, FALSE);
 }
 
 
@@ -371,7 +371,7 @@ static BOOL is_mame_window(HWND hwnd)
 //  (main thread)
 //============================================================
 
-void winwindow_process_events(running_machine &machine, int ingame)
+void winwindow_process_events(running_machine &machine, int ingame, bool nodispatch)
 {
 	MSG message;
 
@@ -393,10 +393,12 @@ void winwindow_process_events(running_machine &machine, int ingame)
 		// loop over all messages in the queue
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
-			int dispatch = TRUE;
+			// prevent debugger windows from getting messages during reset
+			int dispatch = TRUE && !nodispatch;
 
 			if (message.hwnd == NULL || is_mame_window(message.hwnd))
 			{
+				dispatch = TRUE;
 				switch (message.message)
 				{
 					// ignore keyboard messages
@@ -723,7 +725,10 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 
 		PostThreadMessage(window_threadid, WM_USER_FINISH_CREATE_WINDOW, 0, (LPARAM)window);
 		while (window->init_state == 0)
+		{
+			winwindow_process_events(machine, 0, 1); //pump the message queue
 			Sleep(1);
+		}
 	}
 	else
 		window->init_state = complete_create(window) ? -1 : 1;
@@ -1922,3 +1927,24 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	// ensure we're still adjusted correctly
 	adjust_window_position_after_major_change(window);
 }
+
+#ifdef USE_QTDEBUG
+bool winwindow_qt_filter(void *message)
+{
+	MSG *msg = (MSG *)message;
+
+	if(is_mame_window(msg->hwnd) || (!msg->hwnd && (msg->message >= WM_USER)))
+	{
+		LONG_PTR ptr;
+		if(msg->hwnd) // get the machine associated with this window
+			ptr = GetWindowLongPtr(msg->hwnd, GWLP_USERDATA);
+		else // any one will have to do
+			ptr = (LONG_PTR)win_window_list;
+
+		winwindow_dispatch_message(((win_window_info *)ptr)->machine(), msg);
+		return true;
+	}
+	return false;
+}
+#endif
+

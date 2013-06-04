@@ -19,7 +19,7 @@
 #include <QtGui/QApplication>
 
 #include "emu.h"
-#if defined(WIN32)
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
 #include "winmain.h"
 #define xxx_osd_interface windows_osd_interface
 #else
@@ -196,12 +196,19 @@ static void bring_main_window_to_front()
 //  Core functionality
 //============================================================
 
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+bool winwindow_qt_filter(void *message);
+#endif
+
 void xxx_osd_interface::init_debugger()
 {
 	if (qApp == NULL)
 	{
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+		QAbstractEventDispatcher::instance()->setEventFilter((QAbstractEventDispatcher::EventFilter)&winwindow_qt_filter);
+#endif
 	}
 	else
 	{
@@ -227,13 +234,13 @@ void xxx_osd_interface::init_debugger()
 //  Core functionality
 //============================================================
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 extern int sdl_entered_debugger;
 #endif
 
 void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 	sdl_entered_debugger = 1;
 #endif
 

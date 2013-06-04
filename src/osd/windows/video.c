@@ -221,7 +221,7 @@ void windows_osd_interface::update(bool skip_redraw)
 			winwindow_video_window_update(window);
 
 	// poll the joystick values here
-	winwindow_process_events(machine(), TRUE);
+	winwindow_process_events(machine(), TRUE, FALSE);
 	wininput_poll(machine());
 	check_osd_inputs(machine());
 }
