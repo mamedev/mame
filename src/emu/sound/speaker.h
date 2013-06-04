@@ -11,8 +11,6 @@
 #ifndef __SOUND_SPEAKER_H__
 #define __SOUND_SPEAKER_H__
 
-#include "devlegcy.h"
-
 // Length of anti-aliasing filter kernel, measured in number of intermediate samples
 enum 
 {
