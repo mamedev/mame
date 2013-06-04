@@ -9,96 +9,6 @@
 #ifndef __S3C44B0_H__
 #define __S3C44B0_H__
 
-#include "devlegcy.h"
-
-/*******************************************************************************
-    MACROS / CONSTANTS
-*******************************************************************************/
-
-#define S3C44B0_TAG "s3c44b0"
-
-#define MCFG_S3C44B0_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, S3C44B0, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define S3C44B0_INTERFACE(name) \
-	const s3c44b0_interface(name) =
-
-enum
-{
-	S3C44B0_GPIO_PORT_A = 0,
-	S3C44B0_GPIO_PORT_B,
-	S3C44B0_GPIO_PORT_C,
-	S3C44B0_GPIO_PORT_D,
-	S3C44B0_GPIO_PORT_E,
-	S3C44B0_GPIO_PORT_F,
-	S3C44B0_GPIO_PORT_G
-};
-
-class s3c44b0_device : public device_t
-{
-public:
-	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~s3c44b0_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type S3C44B0;
-
-
-/*******************************************************************************
-    TYPE DEFINITIONS
-*******************************************************************************/
-
-struct s3c44b0_interface_gpio
-{
-	devcb_read32 port_r;
-	devcb_write32 port_w;
-};
-
-struct s3c44b0_interface_i2c
-{
-	devcb_write_line scl_w;
-	devcb_read_line sda_r;
-	devcb_write_line sda_w;
-};
-
-struct s3c44b0_interface_adc
-{
-	devcb_read32 data_r;
-};
-
-struct s3c44b0_interface_i2s
-{
-	devcb_write16 data_w;
-};
-
-struct s3c44b0_interface
-{
-	s3c44b0_interface_gpio gpio;
-	s3c44b0_interface_i2c i2c;
-	s3c44b0_interface_adc adc;
-	s3c44b0_interface_i2s i2s;
-};
-
-/*******************************************************************************
-    PROTOTYPES
-*******************************************************************************/
-
-VIDEO_START( s3c44b0 );
-SCREEN_UPDATE_RGB32( s3c44b0 );
-
-void s3c44b0_request_eint( device_t *device, UINT32 number);
 
 /*******************************************************************************
     MACROS & CONSTANTS
@@ -367,8 +277,44 @@ void s3c44b0_request_eint( device_t *device, UINT32 number);
 #define S3C44B0_GPIO_PORT_G S3C44B0_GPIO_PORT_G
 
 /*******************************************************************************
-    TYPE DEFINITIONS
-*******************************************************************************/
+ TYPE DEFINITIONS
+ *******************************************************************************/
+
+struct s3c44b0_interface_gpio
+{
+	devcb_read32 port_r;
+	devcb_write32 port_w;
+};
+
+struct s3c44b0_interface_i2c
+{
+	devcb_write_line scl_w;
+	devcb_read_line sda_r;
+	devcb_write_line sda_w;
+};
+
+struct s3c44b0_interface_adc
+{
+	devcb_read32 data_r;
+};
+
+struct s3c44b0_interface_i2s
+{
+	devcb_write16 data_w;
+};
+
+struct s3c44b0_interface
+{
+	s3c44b0_interface_gpio gpio_itf;
+	s3c44b0_interface_i2c i2c_itf;
+	s3c44b0_interface_adc adc_itf;
+	s3c44b0_interface_i2s i2s_itf;
+};
+
+/*******************************************************************************
+ MACROS / CONSTANTS
+ *******************************************************************************/
+
 
 struct s3c44b0_memcon_regs_t
 {
@@ -671,34 +617,207 @@ struct s3c44b0_cpuwrap_t
 	s3c44b0_cpuwrap_regs_t regs;
 };
 
-struct s3c44b0_t
+
+enum
 {
-	const s3c44b0_interface *iface;
-	address_space* space;
-	cpu_device *cpu;
-	s3c44b0_memcon_t memcon;
-	s3c44b0_irq_t irq;
-	s3c44b0_dma_t zdma[2];
-	s3c44b0_dma_t bdma[2];
-	s3c44b0_clkpow_t clkpow;
-	s3c44b0_lcd_t lcd;
-	s3c44b0_uart_t uart[2];
-	s3c44b0_sio_t sio;
-	s3c44b0_pwm_t pwm;
-	s3c44b0_wdt_t wdt;
-	s3c44b0_iic_t iic;
-	s3c44b0_iis_t iis;
-	s3c44b0_gpio_t gpio;
-	s3c44b0_rtc_t rtc;
-	s3c44b0_adc_t adc;
-	s3c44b0_cpuwrap_t cpuwrap;
-	devcb_resolved_read32 port_r;
-	devcb_resolved_write32 port_w;
-	devcb_resolved_write_line scl_w;
-	devcb_resolved_read_line sda_r;
-	devcb_resolved_write_line sda_w;
-	devcb_resolved_read32 adc_data_r;
-	devcb_resolved_write16 i2s_data_w;
+	S3C44B0_GPIO_PORT_A = 0,
+	S3C44B0_GPIO_PORT_B,
+	S3C44B0_GPIO_PORT_C,
+	S3C44B0_GPIO_PORT_D,
+	S3C44B0_GPIO_PORT_E,
+	S3C44B0_GPIO_PORT_F,
+	S3C44B0_GPIO_PORT_G
 };
+
+class s3c44b0_device : public device_t,
+						public s3c44b0_interface
+{
+public:
+	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~s3c44b0_device() {}
+	
+	DECLARE_READ32_MEMBER(lcd_r);
+	DECLARE_READ32_MEMBER(clkpow_r);
+	DECLARE_READ32_MEMBER(irq_r);
+	DECLARE_READ32_MEMBER(pwm_r);
+	DECLARE_READ32_MEMBER(iic_r);
+	DECLARE_READ32_MEMBER(gpio_r);
+	DECLARE_READ32_MEMBER(uart_0_r);
+	DECLARE_READ32_MEMBER(uart_1_r);
+	DECLARE_READ32_MEMBER(wdt_r);
+	DECLARE_READ32_MEMBER(cpuwrap_r);
+	DECLARE_READ32_MEMBER(adc_r);
+	DECLARE_READ32_MEMBER(sio_r);
+	DECLARE_READ32_MEMBER(iis_r);
+	DECLARE_READ32_MEMBER(zdma_0_r);
+	DECLARE_READ32_MEMBER(zdma_1_r);
+	DECLARE_READ32_MEMBER(bdma_0_r);
+	DECLARE_READ32_MEMBER(bdma_1_r);
+
+	DECLARE_WRITE32_MEMBER(lcd_w);
+	DECLARE_WRITE32_MEMBER(clkpow_w);
+	DECLARE_WRITE32_MEMBER(irq_w);
+	DECLARE_WRITE32_MEMBER(pwm_w);
+	DECLARE_WRITE32_MEMBER(iic_w);
+	DECLARE_WRITE32_MEMBER(gpio_w);
+	DECLARE_WRITE32_MEMBER(uart_0_w);
+	DECLARE_WRITE32_MEMBER(uart_1_w);
+	DECLARE_WRITE32_MEMBER(wdt_w);
+	DECLARE_WRITE32_MEMBER(cpuwrap_w);
+	DECLARE_WRITE32_MEMBER(adc_w);
+	DECLARE_WRITE32_MEMBER(sio_w);
+	DECLARE_WRITE32_MEMBER(iis_w);
+	DECLARE_WRITE32_MEMBER(zdma_0_w);
+	DECLARE_WRITE32_MEMBER(zdma_1_w);
+	DECLARE_WRITE32_MEMBER(bdma_0_w);
+	DECLARE_WRITE32_MEMBER(bdma_1_w);
+
+	void request_eint(UINT32 number);
+	UINT32 video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	
+private:
+	// internal state
+	// LCD Controller
+	rgb_t lcd_get_color_stn_04(UINT8 data);
+	UINT8 lcd_get_color_stn_08_r(UINT8 data);
+	UINT8 lcd_get_color_stn_08_g(UINT8 data);
+	UINT8 lcd_get_color_stn_08_b(UINT8 data);
+	void lcd_dma_reload();
+	void lcd_dma_init();
+	void lcd_dma_read(int count, UINT8 *data);
+	void lcd_render_stn_04();
+	void lcd_render_stn_08();
+	attotime time_until_pos(int vpos, int hpos);
+	int lcd_get_vpos();
+	int lcd_get_hpos();
+	void video_start();
+	void lcd_configure();
+	void lcd_start();
+	void lcd_stop();
+	void lcd_recalc();
+	TIMER_CALLBACK_MEMBER(lcd_timer_exp);
+
+	// Clock & Power Management
+	UINT32 get_mclk();
+
+	// Interrupt Controller
+	void check_pending_irq();
+	void request_irq(UINT32 int_type);
+	void check_pending_eint();
+
+	// PWM Timer
+	UINT16 pwm_calc_observation(int ch);
+	void pwm_start(int timer);
+	void pwm_stop(int timer);
+	void pwm_recalc(int timer);
+	TIMER_CALLBACK_MEMBER(pwm_timer_exp);
+	//void dma_request_pwm();
+
+	// IIC
+	inline void iface_i2c_scl_w(int state);
+	inline void iface_i2c_sda_w(int state);
+	inline int iface_i2c_sda_r();
+	void i2c_send_start();
+	void i2c_send_stop();
+	UINT8 i2c_receive_byte(int ack);
+	int i2c_send_byte(UINT8 data);
+	void iic_start();
+	void iic_stop();
+	void iic_resume();
+	TIMER_CALLBACK_MEMBER(iic_timer_exp);
+
+	// I/O Port
+	inline UINT32 iface_gpio_port_r(int port);
+	inline void iface_gpio_port_w(int port, UINT32 data);
+
+	// UART
+	UINT32 uart_r(int ch, UINT32 offset);
+	void uart_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	void uart_fifo_w(int uart, UINT8 data);
+	TIMER_CALLBACK_MEMBER(uart_timer_exp);
+
+	// Watchdog Timer
+	UINT16 wdt_calc_current_count();
+	void wdt_start();
+	void wdt_stop();
+	void wdt_recalc();
+	TIMER_CALLBACK_MEMBER(wdt_timer_exp);
+
+	// A/D Converter
+	void adc_start();
+	void adc_stop();
+	void adc_recalc();
+	TIMER_CALLBACK_MEMBER(adc_timer_exp);
+	
+	// SIO
+	void sio_start();
+	void sio_stop();
+	void sio_recalc();
+	TIMER_CALLBACK_MEMBER(sio_timer_exp);
+
+	// IIS
+	inline void iface_i2s_data_w(address_space &space, int ch, UINT16 data);
+	void iis_start();
+	void iis_stop();
+	TIMER_CALLBACK_MEMBER(iis_timer_exp);
+
+	// ZDMA
+	void zdma_trigger(int ch);
+	void zdma_start(int ch);
+	UINT32 zdma_r(int ch, UINT32 offset);
+	void zdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	TIMER_CALLBACK_MEMBER(zdma_timer_exp);
+
+	// BDMA
+	void bdma_trigger(int ch);
+	void bdma_request_iis();
+	UINT32 bdma_r(int ch, UINT32 offset);
+	void bdma_start(int ch);
+	void bdma_stop(int ch);
+	void bdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	TIMER_CALLBACK_MEMBER(bdma_timer_exp);
+
+	cpu_device *m_cpu;
+	s3c44b0_memcon_t m_memcon;
+	s3c44b0_irq_t m_irq;
+	s3c44b0_dma_t m_zdma[2];
+	s3c44b0_dma_t m_bdma[2];
+	s3c44b0_clkpow_t m_clkpow;
+	s3c44b0_lcd_t m_lcd;
+	s3c44b0_uart_t m_uart[2];
+	s3c44b0_sio_t m_sio;
+	s3c44b0_pwm_t m_pwm;
+	s3c44b0_wdt_t m_wdt;
+	s3c44b0_iic_t m_iic;
+	s3c44b0_iis_t m_iis;
+	s3c44b0_gpio_t m_gpio;
+	s3c44b0_rtc_t m_rtc;
+	s3c44b0_adc_t m_adc;
+	s3c44b0_cpuwrap_t m_cpuwrap;
+	devcb_resolved_read32       m_port_r;
+	devcb_resolved_write32      m_port_w;
+	devcb_resolved_write_line   m_scl_w;
+	devcb_resolved_read_line    m_sda_r;
+	devcb_resolved_write_line   m_sda_w;
+	devcb_resolved_read32       m_adc_data_r;
+	devcb_resolved_write16      m_i2s_data_w;
+};
+
+extern const device_type S3C44B0;
+
+
+#define MCFG_S3C44B0_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, S3C44B0, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
+
+#define S3C44B0_INTERFACE(name) \
+	const s3c44b0_interface(name) =
+
 
 #endif
