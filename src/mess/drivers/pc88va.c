@@ -1141,7 +1141,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 				timer_set(attotime::from_msec(100), TIMER_PC88VA_FDC_TIMER);
 
 			if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
-				upd71071_dmarq(m_dmac,1,2);
+				m_dmac->dmarq(1, 2);
 
 			if(data & 0x80) // correct?
 				machine().device<upd765a_device>("upd765")->reset();
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0156, 0x0157) AM_READ8(rom_bank_r,0x00ff) // ROM bank status
 //  AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //  AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
-	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8_LEGACY("dmac", upd71071_r, upd71071_w,0xffff) // DMA Controller
+	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8("dmac", upd71071_device, read, write, 0xffff) // DMA Controller
 	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // ICU, also controls 8214 emulation
 //  AM_RANGE(0x0190, 0x0191) System Port 5
@@ -1769,7 +1769,7 @@ static const struct pit8253_interface pc88va_pit8253_config =
 void pc88va_state::fdc_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
-	upd71071_dmarq(m_dmac,state,2);
+	m_dmac->dmarq(state, 2);
 }
 
 void pc88va_state::fdc_irq(bool state)
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
 
-	MCFG_UPD71071_ADD("dmac",pc88va_dma_config)
+	MCFG_UPD71071_ADD("dmac", pc88va_dma_config)
 
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", pc88va_state::floppy_formats)

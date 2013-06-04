@@ -458,25 +458,25 @@ WRITE8_MEMBER(towns_state::towns_sys6c_w)
 READ8_MEMBER(towns_state::towns_dma1_r)
 {
 //  logerror("DMA#1: read register %i\n",offset);
-	return upd71071_r(m_dma_1,space, offset);
+	return m_dma_1->read(space, offset);
 }
 
 WRITE8_MEMBER(towns_state::towns_dma1_w)
 {
 //  logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
-	upd71071_w(m_dma_1,space, offset,data);
+	m_dma_1->write(space, offset, data);
 }
 
 READ8_MEMBER(towns_state::towns_dma2_r)
 {
 	logerror("DMA#2: read register %i\n",offset);
-	return upd71071_r(m_dma_2,space, offset);
+	return m_dma_2->read(space, offset);
 }
 
 WRITE8_MEMBER(towns_state::towns_dma2_w)
 {
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
-	upd71071_w(m_dma_2,space, offset,data);
+	m_dma_2->write(space, offset, data);
 }
 
 /*
@@ -493,7 +493,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_irq_w )
 
 WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 {
-	upd71071_dmarq(m_dma_1, state, 0);
+	m_dma_1->dmarq(state, 0);
 }
 
 READ8_MEMBER(towns_state::towns_floppy_r)
@@ -1394,14 +1394,14 @@ UINT8 towns_state::towns_cd_get_track()
 
 TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 {
-	device_t* device = (device_t* )ptr;
+	upd71071_device* device = (upd71071_device* )ptr;
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
 	if(m_towns_cd.buffer_ptr < 0) // transfer has ended
 		return;
 
-	masked = upd71071_dmarq(device,param,3);  // CD-ROM controller uses DMA1 channel 3
+	masked = device->dmarq(param, 3);  // CD-ROM controller uses DMA1 channel 3
 //  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,m_towns_cd.buffer_ptr);
 	if(param != 0)
 	{
@@ -1993,7 +1993,7 @@ WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
 
 WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
 {
-	upd71071_dmarq(m_dma_1,state,1);  // SCSI HDs use channel 1
+	m_dma_1->dmarq(state, 1);  // SCSI HDs use channel 1
 }
 
 
@@ -2605,8 +2605,6 @@ void marty_state::driver_start()
 void towns_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_dma_1 = machine().device("dma_1");
-	m_dma_2 = machine().device("dma_2");
 	m_fdc = machine().device("fdc");
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");

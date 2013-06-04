@@ -83,6 +83,8 @@ class towns_state : public driver_device
 			m_pic_master(*this, "pic8259_master"),
 			m_pic_slave(*this, "pic8259_slave"),
 			m_pit(*this, "pit"),
+			m_dma_1(*this, "dma_1"),
+			m_dma_2(*this, "dma_2"),
 			m_ram(*this, RAM_TAG),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16")
@@ -94,9 +96,9 @@ class towns_state : public driver_device
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;
 	required_device<pit8253_device> m_pit;
+	required_device<upd71071_device> m_dma_1;
+	required_device<upd71071_device> m_dma_2;
 	required_device<ram_device> m_ram;
-	device_t* m_dma_1;
-	device_t* m_dma_2;
 	device_t* m_fdc;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
