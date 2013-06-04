@@ -1311,8 +1311,10 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	if(data_completion)
 		data_irq = true;
 	else
+	{
 		other_irq = true;
-	fi.st0_filled = true;
+		fi.st0_filled = true;
+	}
 	check_irq();
 }
 
