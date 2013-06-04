@@ -247,7 +247,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 				m_cass_data.input.level = cass_ws;
 				m_cass_data.input.bit = ((m_cass_data.input.length < 0x6) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 				m_cass_data.input.length = 0;
-				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
+				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 1200 and 2400 Hz frequencies.
@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 0x1f))
 			{
-				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				cass_ws = m_uart->get_output_pin(AY31015_SO);
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -288,7 +288,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 					m_cass_data.input.length = 0;
 					m_cass_data.input.level = cass_ws;
 				}
-				ay31015_set_input_pin( m_uart, AY31015_SI, m_cass_data.input.bit );
+				m_uart->set_input_pin(AY31015_SI, m_cass_data.input.bit);
 			}
 
 			/* saving a tape - convert the serial stream from the uart, into 600 and 1200 Hz frequencies. */
@@ -296,7 +296,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			m_cass_data.output.length++;
 			if (!(m_cass_data.output.length & 7))
 			{
-				cass_ws = ay31015_get_output_pin( m_uart, AY31015_SO );
+				cass_ws = m_uart->get_output_pin(AY31015_SO);
 				if (cass_ws != m_cass_data.output.bit)
 				{
 					m_cass_data.output.bit = cass_ws;
@@ -322,22 +322,22 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 	/* set unemulated bits (CTS/DSR/CD) high */
 	UINT8 data = 0x23;
 
-	ay31015_set_input_pin( m_uart_s, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( m_uart_s, AY31015_TBMT ) ? 0x80 : 0;
-	data |= ay31015_get_output_pin( m_uart_s, AY31015_DAV  ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( m_uart_s, AY31015_OR   ) ? 0x10 : 0;
-	data |= ay31015_get_output_pin( m_uart_s, AY31015_PE   ) ? 0x08 : 0;
-	data |= ay31015_get_output_pin( m_uart_s, AY31015_FE   ) ? 0x04 : 0;
-	ay31015_set_input_pin( m_uart_s, AY31015_SWE, 1 );
+	m_uart_s->set_input_pin(AY31015_SWE, 0);
+	data |= m_uart_s->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
+	data |= m_uart_s->get_output_pin(AY31015_DAV ) ? 0x40 : 0;
+	data |= m_uart_s->get_output_pin(AY31015_OR  ) ? 0x10 : 0;
+	data |= m_uart_s->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
+	data |= m_uart_s->get_output_pin(AY31015_FE  ) ? 0x04 : 0;
+	m_uart_s->set_input_pin(AY31015_SWE, 1);
 
 	return data;
 }
 
 READ8_MEMBER( sol20_state::sol20_f9_r)
 {
-	UINT8 data = ay31015_get_received_data( m_uart_s );
-	ay31015_set_input_pin( m_uart_s, AY31015_RDAV, 0 );
-	ay31015_set_input_pin( m_uart_s, AY31015_RDAV, 1 );
+	UINT8 data = m_uart_s->get_received_data();
+	m_uart_s->set_input_pin(AY31015_RDAV, 0);
+	m_uart_s->set_input_pin(AY31015_RDAV, 1);
 	return data;
 }
 
@@ -346,12 +346,12 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	/* set unused bits high */
 	UINT8 data = 0x26;
 
-	ay31015_set_input_pin( m_uart, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( m_uart, AY31015_TBMT ) ? 0x80 : 0;
-	data |= ay31015_get_output_pin( m_uart, AY31015_DAV  ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( m_uart, AY31015_OR   ) ? 0x10 : 0;
-	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
+	m_uart->set_input_pin(AY31015_SWE, 0);
+	data |= m_uart->get_output_pin(AY31015_TBMT) ? 0x80 : 0;
+	data |= m_uart->get_output_pin(AY31015_DAV ) ? 0x40 : 0;
+	data |= m_uart->get_output_pin(AY31015_OR  ) ? 0x10 : 0;
+	data |= m_uart->get_output_pin(AY31015_FE  ) ? 0x08 : 0;
+	m_uart->set_input_pin(AY31015_SWE, 1);
 
 	bool arrowkey = m_iop_arrows->read() ? 0 : 1;
 	bool keydown = m_sol20_fa & 1;
@@ -361,9 +361,9 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 
 READ8_MEMBER( sol20_state::sol20_fb_r)
 {
-	UINT8 data = ay31015_get_received_data( m_uart );
-	ay31015_set_input_pin( m_uart, AY31015_RDAV, 0 );
-	ay31015_set_input_pin( m_uart, AY31015_RDAV, 1 );
+	UINT8 data = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV, 0);
+	m_uart->set_input_pin(AY31015_RDAV, 1);
 	return data;
 }
 
@@ -392,7 +392,7 @@ WRITE8_MEMBER( sol20_state::sol20_f8_w )
 
 WRITE8_MEMBER( sol20_state::sol20_f9_w )
 {
-	ay31015_set_transmit_data( m_uart_s, data );
+	m_uart_s->set_transmit_data(data);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fa_w )
@@ -414,13 +414,13 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		m_cassette_timer->adjust(attotime::zero);
 
 	// bit 5 baud rate */
-	ay31015_set_receiver_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);
-	ay31015_set_transmitter_clock( m_uart, (BIT(data, 5)) ? 4800.0 : 19200.0);
+	m_uart->set_receiver_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
+	m_uart->set_transmitter_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fb_w )
 {
-	ay31015_set_transmit_data( m_uart, data );
+	m_uart->set_transmit_data(data);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fd_w )
@@ -549,7 +549,6 @@ INPUT_PORTS_END
 
 static const ay31015_config sol20_ay31015_config =
 {
-	AY_3_1015,
 	4800.0,
 	4800.0,
 	DEVCB_NULL,
@@ -587,23 +586,23 @@ void sol20_state::machine_reset()
 	m_sol20_fa=1;
 
 	// set hard-wired uart pins
-	ay31015_set_input_pin( m_uart, AY31015_CS, 0 );
-	ay31015_set_input_pin( m_uart, AY31015_NB1, 1);
-	ay31015_set_input_pin( m_uart, AY31015_NB2, 1);
-	ay31015_set_input_pin( m_uart, AY31015_TSB, 1);
-	ay31015_set_input_pin( m_uart, AY31015_EPS, 1);
-	ay31015_set_input_pin( m_uart, AY31015_NP,  1);
-	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
+	m_uart->set_input_pin(AY31015_CS, 0);
+	m_uart->set_input_pin(AY31015_NB1, 1);
+	m_uart->set_input_pin(AY31015_NB2, 1);
+	m_uart->set_input_pin(AY31015_TSB, 1);
+	m_uart->set_input_pin(AY31015_EPS, 1);
+	m_uart->set_input_pin(AY31015_NP,  1);
+	m_uart->set_input_pin(AY31015_CS, 1);
 
 	// set switched uart pins
 	data = m_iop_s4->read();
-	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
-	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
-	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
-	ay31015_set_input_pin( m_uart_s, AY31015_TSB, BIT(data, 3) ? 1 : 0);
-	ay31015_set_input_pin( m_uart_s, AY31015_EPS, BIT(data, 0) ? 1 : 0);
-	ay31015_set_input_pin( m_uart_s, AY31015_NP, BIT(data, 4) ? 1 : 0);
-	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
+	m_uart_s->set_input_pin(AY31015_CS, 0);
+	m_uart_s->set_input_pin(AY31015_NB1, BIT(data, 1));
+	m_uart_s->set_input_pin(AY31015_NB2, BIT(data, 2));
+	m_uart_s->set_input_pin(AY31015_TSB, BIT(data, 3));
+	m_uart_s->set_input_pin(AY31015_EPS, BIT(data, 0));
+	m_uart_s->set_input_pin(AY31015_NP, BIT(data, 4));
+	m_uart_s->set_input_pin(AY31015_CS, 1);
 
 	// set rs232 baud rate
 	data = m_iop_s3->read();
@@ -622,8 +621,8 @@ void sol20_state::machine_reset()
 		s_clock = s_bauds[s_count] << 4;
 
 	// these lines could be commented out for now if you want better performance
-	ay31015_set_receiver_clock( m_uart_s, s_clock);
-	ay31015_set_transmitter_clock( m_uart_s, s_clock);
+	m_uart_s->set_receiver_clock(s_clock);
+	m_uart_s->set_transmitter_clock(s_clock);
 
 	// boot-bank
 	membank("boot")->set_entry(1);

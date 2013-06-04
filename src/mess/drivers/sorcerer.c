@@ -386,7 +386,6 @@ UINT32 sorcerer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 static const ay31015_config sorcerer_ay31015_config =
 {
-	AY_3_1015,
 	4800.0,
 	4800.0,
 	DEVCB_NULL,

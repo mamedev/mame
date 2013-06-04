@@ -123,13 +123,13 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
     d2..d0 Not used */
 
 	UINT8 data=7;
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_TBMT ) ? 0x40 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_DAV  ) ? 0x80 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_OR   ) ? 0x20 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_FE   ) ? 0x10 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_PE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 1 );
+	m_ay31015->set_input_pin(AY31015_SWE, 0);
+	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0x40 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x80 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_OR  ) ? 0x20 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_FE  ) ? 0x10 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
+	m_ay31015->set_input_pin(AY31015_SWE, 1);
 
 	return data;
 }
@@ -137,9 +137,9 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
 READ8_MEMBER( trs80_state::trs80m4_eb_r )
 {
 /* UART received data */
-	UINT8 data = ay31015_get_received_data( m_ay31015 );
-	ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 0 );
-	ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 1 );
+	UINT8 data = m_ay31015->get_received_data();
+	m_ay31015->set_input_pin(AY31015_RDAV, 0);
+	m_ay31015->set_input_pin(AY31015_RDAV, 1);
 	return data;
 }
 
@@ -162,14 +162,14 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
     d1 Overrun
     d0 Data Available */
 
-	UINT8 data=70;
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 0 );
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_TBMT ) ? 0 : 0x80;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_DAV  ) ? 0x01 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_OR   ) ? 0x02 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_FE   ) ? 0x04 : 0;
-	data |= ay31015_get_output_pin( m_ay31015, AY31015_PE   ) ? 0x08 : 0;
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 1 );
+	UINT8 data = 70;
+	m_ay31015->set_input_pin(AY31015_SWE, 0);
+	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0 : 0x80;
+	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x01 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_OR  ) ? 0x02 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_FE  ) ? 0x04 : 0;
+	data |= m_ay31015->get_output_pin(AY31015_PE  ) ? 0x08 : 0;
+	m_ay31015->set_input_pin(AY31015_SWE, 1);
 
 	return data;
 }
@@ -421,8 +421,8 @@ WRITE8_MEMBER( trs80_state::trs80m4_e9_w )
     FFh    19200 */
 
 	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
-	ay31015_set_receiver_clock( m_ay31015, baud_clock[data & 0x0f]);
-	ay31015_set_transmitter_clock( m_ay31015, baud_clock[data>>4]);
+	m_ay31015->set_receiver_clock(baud_clock[data & 0x0f]);
+	m_ay31015->set_transmitter_clock(baud_clock[data >> 4]);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
@@ -442,13 +442,13 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
     d0 Data-Terminal-Ready (DTR), pin 20 */
 
 	{
-		ay31015_set_input_pin( m_ay31015, AY31015_CS, 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_NB1, ( data & 0x40 ) ? 1 : 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_NB2, ( data & 0x20 ) ? 1 : 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_TSB, ( data & 0x10 ) ? 1 : 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_EPS, ( data & 0x80 ) ? 1 : 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_NP,  ( data & 0x08 ) ? 1 : 0 );
-		ay31015_set_input_pin( m_ay31015, AY31015_CS, 1 );
+		m_ay31015->set_input_pin(AY31015_CS, 0);
+		m_ay31015->set_input_pin(AY31015_NB1, BIT(data, 6));
+		m_ay31015->set_input_pin(AY31015_NB2, BIT(data, 5));
+		m_ay31015->set_input_pin(AY31015_TSB, BIT(data, 4));
+		m_ay31015->set_input_pin(AY31015_EPS, BIT(data, 7));
+		m_ay31015->set_input_pin(AY31015_NP,  BIT(data, 3));
+		m_ay31015->set_input_pin(AY31015_CS, 1);
 	}
 	else
 	{
@@ -466,7 +466,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
 
 WRITE8_MEMBER( trs80_state::trs80m4_eb_w )
 {
-	ay31015_set_transmit_data( m_ay31015, data );
+	m_ay31015->set_transmit_data(data);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4_ec_w )

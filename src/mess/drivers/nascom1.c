@@ -55,7 +55,6 @@ Nascom Memory map
 /* Components */
 #include "cpu/z80/z80.h"
 #include "machine/wd17xx.h"
-#include "machine/ay31015.h"
 #include "machine/z80pio.h"
 
 /* Devices */
@@ -254,7 +253,6 @@ INPUT_PORTS_END
 
 static const ay31015_config nascom1_ay31015_config =
 {
-	AY_3_1015,
 	( XTAL_16MHz / 16 ) / 256,
 	( XTAL_16MHz / 16 ) / 256,
 	DEVCB_DRIVER_MEMBER(nascom1_state, nascom1_hd6402_si),

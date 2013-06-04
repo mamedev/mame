@@ -97,7 +97,6 @@
 #include "machine/ram.h"
 
 /* peripheral chips */
-#include "machine/ay31015.h"
 #include "machine/kr2376.h"
 #include "machine/wd17xx.h"
 
@@ -405,7 +404,6 @@ static const UINT32 lx388palette[] =
 
 static const ay31015_config z80ne_ay31015_config =
 {
-	AY_3_1015,
 	4800.0,
 	4800.0,
 	DEVCB_NULL,

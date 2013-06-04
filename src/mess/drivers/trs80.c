@@ -554,7 +554,6 @@ static const cassette_interface trs80l2_cassette_interface =
 
 static const ay31015_config trs80_ay31015_config =
 {
-	AY_3_1015,
 	0.0,
 	0.0,
 	DEVCB_NULL,

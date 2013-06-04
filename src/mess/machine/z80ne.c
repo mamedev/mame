@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		m_cass_data.input.level = cass_ws;
 		m_cass_data.input.bit = ((m_cass_data.input.length < m_cass_data.wave_filter) || (m_cass_data.input.length > 0x20)) ? 1 : 0;
 		m_cass_data.input.length = 0;
-		ay31015_set_input_pin( m_ay31015, AY31015_SI, m_cass_data.input.bit );
+		m_ay31015->set_input_pin(AY31015_SI, m_cass_data.input.bit);
 	}
 	m_cass_data.input.level = cass_ws;
 
@@ -64,7 +64,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 		else
 		{
 			m_cass_data.output.level=1;
-			cass_ws = ay31015_get_output_pin( m_ay31015, AY31015_SO );
+			cass_ws = m_ay31015->get_output_pin(AY31015_SO);
 			m_cass_data.wave_length = cass_ws ? m_cass_data.wave_short : m_cass_data.wave_long;
 		}
 		cassette_device_image()->output(m_cass_data.output.level ? -1.0 : +1.0);
@@ -312,15 +312,15 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 	m_cass_data.input.length = 0;
 	m_cass_data.input.bit = 1;
 
-	ay31015_set_input_pin( m_ay31015, AY31015_CS, 0 );
-	ay31015_set_input_pin( m_ay31015, AY31015_NB1, 1 );
-	ay31015_set_input_pin( m_ay31015, AY31015_NB2, 1 );
-	ay31015_set_input_pin( m_ay31015, AY31015_TSB, 1 );
-	ay31015_set_input_pin( m_ay31015, AY31015_EPS, 1 );
-	ay31015_set_input_pin( m_ay31015, AY31015_NP, m_io_lx_385->read() & 0x80 ? 1 : 0 );
-	ay31015_set_input_pin( m_ay31015, AY31015_CS, 1 );
-	ay31015_set_receiver_clock( m_ay31015, m_cass_data.speed * 16.0);
-	ay31015_set_transmitter_clock( m_ay31015, m_cass_data.speed * 16.0);
+	m_ay31015->set_input_pin(AY31015_CS, 0);
+	m_ay31015->set_input_pin(AY31015_NB1, 1);
+	m_ay31015->set_input_pin(AY31015_NB2, 1);
+	m_ay31015->set_input_pin(AY31015_TSB, 1);
+	m_ay31015->set_input_pin(AY31015_EPS, 1);
+	m_ay31015->set_input_pin(AY31015_NP, m_io_lx_385->read() & 0x80 ? 1 : 0);
+	m_ay31015->set_input_pin(AY31015_CS, 1);
+	m_ay31015->set_receiver_clock(m_cass_data.speed * 16.0);
+	m_ay31015->set_transmitter_clock(m_cass_data.speed * 16.0);
 
 	m_nmi_delay_counter = 0;
 	lx385_ctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0);
@@ -518,7 +518,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
  */
 READ8_MEMBER(z80ne_state::lx385_data_r)
 {
-	return ay31015_get_received_data( m_ay31015 );
+	return m_ay31015->get_received_data();
 }
 
 READ8_MEMBER(z80ne_state::lx385_ctrl_r)
@@ -526,21 +526,21 @@ READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 	/* set unused bits high */
 	UINT8 data = 0xc0;
 
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 0 );
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_OR   ) ? 0x01 : 0);
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_FE   ) ? 0x02 : 0);
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_PE   ) ? 0x04 : 0);
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_TBMT ) ? 0x08 : 0);
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_DAV  ) ? 0x10 : 0);
-	data |= (ay31015_get_output_pin( m_ay31015, AY31015_EOC  ) ? 0x20 : 0);
-	ay31015_set_input_pin( m_ay31015, AY31015_SWE, 1 );
+	m_ay31015->set_input_pin(AY31015_SWE, 0);
+	data |= (m_ay31015->get_output_pin(AY31015_OR  ) ? 0x01 : 0);
+	data |= (m_ay31015->get_output_pin(AY31015_FE  ) ? 0x02 : 0);
+	data |= (m_ay31015->get_output_pin(AY31015_PE  ) ? 0x04 : 0);
+	data |= (m_ay31015->get_output_pin(AY31015_TBMT) ? 0x08 : 0);
+	data |= (m_ay31015->get_output_pin(AY31015_DAV ) ? 0x10 : 0);
+	data |= (m_ay31015->get_output_pin(AY31015_EOC ) ? 0x20 : 0);
+	m_ay31015->set_input_pin(AY31015_SWE, 1);
 
 	return data;
 }
 
 WRITE8_MEMBER(z80ne_state::lx385_data_w)
 {
-	ay31015_set_transmit_data( m_ay31015, data );
+	m_ay31015->set_transmit_data(data);
 }
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
@@ -566,23 +566,23 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	motor_b = ((data & 0x10) == 0x00);
 
 	/* UART Reset and RDAV */
-	if(uart_reset)
+	if (uart_reset)
 	{
-		ay31015_set_input_pin( m_ay31015, AY31015_XR, 1 );
-		ay31015_set_input_pin( m_ay31015, AY31015_XR, 0 );
+		m_ay31015->set_input_pin(AY31015_XR, 1);
+		m_ay31015->set_input_pin(AY31015_XR, 0);
 	}
 
-	if(uart_rdav)
+	if (uart_rdav)
 	{
-		ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 1 );
-		ay31015_set_input_pin( m_ay31015, AY31015_RDAV, 0 );
+		m_ay31015->set_input_pin(AY31015_RDAV, 1);
+		m_ay31015->set_input_pin(AY31015_RDAV, 0);
 	}
 
 	if (!changed_bits) return;
 
 	/* UART Tx Clock enable/disable */
-	if(changed_bits & 0x04)
-		ay31015_set_transmitter_clock( m_ay31015, uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
+	if (changed_bits & 0x04)
+		m_ay31015->set_transmitter_clock(uart_tx_clock ? m_cass_data.speed * 16.0 : 0.0);
 
 	/* motors */
 	if(changed_bits & 0x18)

@@ -8,9 +8,10 @@
 #define NASCOM1_H_
 
 #include "imagedev/snapquik.h"
-#include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
+#include "machine/wd17xx.h"
 #include "machine/ram.h"
+#include "machine/ay31015.h"
 
 struct nascom1_portstat_t
 {
@@ -31,13 +32,18 @@ class nascom1_state : public driver_device
 public:
 	nascom1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_hd6402(*this, "hd6402"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_videoram(*this, "videoram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<ay31015_device> m_hd6402;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_videoram;
-	device_t *m_hd6402;
 	int m_tape_size;
 	UINT8 *m_tape_image;
 	int m_tape_index;
@@ -61,9 +67,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 };
 
