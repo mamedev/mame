@@ -87,7 +87,6 @@
     - Dragon Buster: slight issue with window masking;
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
     - Jan Borg Suzume: gets stuck at a pic8259 read;
-    - Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
     - Quarth: uploads a PCG charset
