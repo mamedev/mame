@@ -36,6 +36,12 @@ SOUNDS += SN76496
 
 
 #-------------------------------------------------
+# specify available video cores
+#-------------------------------------------------
+
+VIDEOS += TMS9928A
+
+#-------------------------------------------------
 # This is the list of files that are necessary
 # for building all of the drivers referenced
 # in tiny.c

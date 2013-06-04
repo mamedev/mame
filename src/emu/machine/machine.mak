@@ -19,6 +19,8 @@ MACHINEOBJ = $(EMUOBJ)/machine
 #-------------------------------------------------
 
 MACHINEOBJS +=  $(MACHINEOBJ)/generic.o   	\
+				$(MACHINEOBJ)/nvram.o       \
+				$(MACHINEOBJ)/ram.o         \
 
 
 MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
@@ -130,7 +132,6 @@ MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/nscsi_bus.o   \
 				$(MACHINEOBJ)/nscsi_cd.o    \
 				$(MACHINEOBJ)/nscsi_hd.o    \
-				$(MACHINEOBJ)/nvram.o       \
 				$(MACHINEOBJ)/pc16552d.o    \
 				$(MACHINEOBJ)/pccard.o      \
 				$(MACHINEOBJ)/pcf8593.o     \
@@ -140,7 +141,6 @@ MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/pic8259.o     \
 				$(MACHINEOBJ)/pit8253.o     \
 				$(MACHINEOBJ)/pla.o         \
-				$(MACHINEOBJ)/ram.o         \
 				$(MACHINEOBJ)/rf5c296.o     \
 				$(MACHINEOBJ)/roc10937.o    \
 				$(MACHINEOBJ)/rp5c01.o      \

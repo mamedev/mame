@@ -63,6 +63,9 @@ SOUNDS += YM3812
 SOUNDS += CEM3394
 
 
+#-------------------------------------------------
+# specify available video cores
+#-------------------------------------------------
 
 #-------------------------------------------------
 # This is the list of files that are necessary
