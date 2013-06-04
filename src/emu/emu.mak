@@ -135,243 +135,9 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/flt_rc.o \
 	$(EMUOBJ)/sound/wavwrite.o \
 
-EMUAUDIOOBJS = \
-
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \
 	$(EMUDRIVERS)/testcpu.o \
-
-EMUMACHINEOBJS = \
-	$(EMUMACHINE)/53c7xx.o      \
-	$(EMUMACHINE)/53c810.o      \
-	$(EMUMACHINE)/6522via.o     \
-	$(EMUMACHINE)/6525tpi.o     \
-	$(EMUMACHINE)/6526cia.o     \
-	$(EMUMACHINE)/6532riot.o    \
-	$(EMUMACHINE)/6821pia.o     \
-	$(EMUMACHINE)/6840ptm.o     \
-	$(EMUMACHINE)/6850acia.o    \
-	$(EMUMACHINE)/68681.o       \
-	$(EMUMACHINE)/7200fifo.o    \
-	$(EMUMACHINE)/74123.o       \
-	$(EMUMACHINE)/74145.o       \
-	$(EMUMACHINE)/74148.o       \
-	$(EMUMACHINE)/74153.o       \
-	$(EMUMACHINE)/74181.o       \
-	$(EMUMACHINE)/7474.o        \
-	$(EMUMACHINE)/8042kbdc.o    \
-	$(EMUMACHINE)/8257dma.o     \
-	$(EMUMACHINE)/aakart.o      \
-	$(EMUMACHINE)/adc0808.o     \
-	$(EMUMACHINE)/adc083x.o     \
-	$(EMUMACHINE)/adc1038.o     \
-	$(EMUMACHINE)/adc1213x.o    \
-	$(EMUMACHINE)/am53cf96.o    \
-	$(EMUMACHINE)/am9517a.o     \
-	$(EMUMACHINE)/amigafdc.o    \
-	$(EMUMACHINE)/at28c16.o     \
-	$(EMUMACHINE)/at29040a.o    \
-	$(EMUMACHINE)/at45dbxx.o    \
-	$(EMUMACHINE)/ataflash.o    \
-	$(EMUMACHINE)/ay31015.o     \
-	$(EMUMACHINE)/bankdev.o     \
-	$(EMUMACHINE)/cdp1852.o     \
-	$(EMUMACHINE)/cdp1871.o     \
-	$(EMUMACHINE)/com8116.o     \
-	$(EMUMACHINE)/cr589.o       \
-	$(EMUMACHINE)/ctronics.o    \
-	$(EMUMACHINE)/ds1302.o      \
-	$(EMUMACHINE)/ds2401.o      \
-	$(EMUMACHINE)/ds2404.o      \
-	$(EMUMACHINE)/ds75160a.o    \
-	$(EMUMACHINE)/ds75161a.o    \
-	$(EMUMACHINE)/e0516.o       \
-	$(EMUMACHINE)/eeprom.o      \
-	$(EMUMACHINE)/er2055.o      \
-	$(EMUMACHINE)/er59256.o     \
-	$(EMUMACHINE)/f3853.o       \
-	$(EMUMACHINE)/fdc_pll.o     \
-	$(EMUMACHINE)/generic.o     \
-	$(EMUMACHINE)/i2cmem.o      \
-	$(EMUMACHINE)/i8155.o       \
-	$(EMUMACHINE)/i8212.o       \
-	$(EMUMACHINE)/i8214.o       \
-	$(EMUMACHINE)/i8243.o       \
-	$(EMUMACHINE)/i8251.o       \
-	$(EMUMACHINE)/i8255.o       \
-	$(EMUMACHINE)/i8279.o       \
-	$(EMUMACHINE)/i8355.o       \
-	$(EMUMACHINE)/idectrl.o     \
-	$(EMUMACHINE)/im6402.o      \
-	$(EMUMACHINE)/ins8154.o     \
-	$(EMUMACHINE)/ins8250.o     \
-	$(EMUMACHINE)/intelfsh.o    \
-	$(EMUMACHINE)/jvsdev.o      \
-	$(EMUMACHINE)/jvshost.o     \
-	$(EMUMACHINE)/k033906.o     \
-	$(EMUMACHINE)/k053252.o     \
-	$(EMUMACHINE)/k056230.o     \
-	$(EMUMACHINE)/laserdsc.o    \
-	$(EMUMACHINE)/latch8.o      \
-	$(EMUMACHINE)/lc89510.o     \
-	$(EMUMACHINE)/ldpr8210.o    \
-	$(EMUMACHINE)/ldstub.o      \
-	$(EMUMACHINE)/ldv1000.o     \
-	$(EMUMACHINE)/ldvp931.o     \
-	$(EMUMACHINE)/linflash.o    \
-	$(EMUMACHINE)/m6m80011ap.o  \
-	$(EMUMACHINE)/matsucd.o     \
-	$(EMUMACHINE)/mb14241.o     \
-	$(EMUMACHINE)/mb3773.o      \
-	$(EMUMACHINE)/mb87078.o     \
-	$(EMUMACHINE)/mb89371.o     \
-	$(EMUMACHINE)/mc146818.o    \
-	$(EMUMACHINE)/mc2661.o      \
-	$(EMUMACHINE)/mc6843.o      \
-	$(EMUMACHINE)/mc6846.o      \
-	$(EMUMACHINE)/mc6852.o      \
-	$(EMUMACHINE)/mc6854.o      \
-	$(EMUMACHINE)/mc68901.o     \
-	$(EMUMACHINE)/mccs1850.o    \
-	$(EMUMACHINE)/mcf5206e.o    \
-	$(EMUMACHINE)/microtch.o    \
-	$(EMUMACHINE)/mm58274c.o    \
-	$(EMUMACHINE)/mm74c922.o    \
-	$(EMUMACHINE)/mos6526.o     \
-	$(EMUMACHINE)/mos6529.o     \
-	$(EMUMACHINE)/mos6530.o     \
-	$(EMUMACHINE)/mos6551.o     \
-	$(EMUMACHINE)/msm5832.o     \
-	$(EMUMACHINE)/msm58321.o    \
-	$(EMUMACHINE)/msm6242.o     \
-	$(EMUMACHINE)/n68681.o      \
-	$(EMUMACHINE)/ncr539x.o     \
-	$(EMUMACHINE)/net_lib.o     \
-	$(EMUMACHINE)/netlist.o     \
-	$(EMUMACHINE)/nmc9306.o     \
-	$(EMUMACHINE)/nscsi_bus.o   \
-	$(EMUMACHINE)/nscsi_cd.o    \
-	$(EMUMACHINE)/nscsi_hd.o    \
-	$(EMUMACHINE)/nvram.o       \
-	$(EMUMACHINE)/pc16552d.o    \
-	$(EMUMACHINE)/pccard.o      \
-	$(EMUMACHINE)/pcf8593.o     \
-	$(EMUMACHINE)/pci.o         \
-	$(EMUMACHINE)/pckeybrd.o    \
-	$(EMUMACHINE)/pd4990a.o     \
-	$(EMUMACHINE)/pic8259.o     \
-	$(EMUMACHINE)/pit8253.o     \
-	$(EMUMACHINE)/pla.o         \
-	$(EMUMACHINE)/ram.o         \
-	$(EMUMACHINE)/rf5c296.o     \
-	$(EMUMACHINE)/roc10937.o    \
-	$(EMUMACHINE)/rp5c01.o      \
-	$(EMUMACHINE)/rp5c15.o      \
-	$(EMUMACHINE)/rp5h01.o      \
-	$(EMUMACHINE)/rtc4543.o     \
-	$(EMUMACHINE)/rtc65271.o    \
-	$(EMUMACHINE)/rtc9701.o     \
-	$(EMUMACHINE)/s3520cf.o     \
-	$(EMUMACHINE)/s3c2400.o     \
-	$(EMUMACHINE)/s3c2410.o     \
-	$(EMUMACHINE)/s3c2440.o     \
-	$(EMUMACHINE)/saturn.o      \
-	$(EMUMACHINE)/scsibus.o     \
-	$(EMUMACHINE)/scsicb.o      \
-	$(EMUMACHINE)/scsicd.o      \
-	$(EMUMACHINE)/scsidev.o     \
-	$(EMUMACHINE)/scsihd.o      \
-	$(EMUMACHINE)/scsihle.o     \
-	$(EMUMACHINE)/scudsp.o      \
-	$(EMUMACHINE)/secflash.o    \
-	$(EMUMACHINE)/seibu_cop.o   \
-	$(EMUMACHINE)/smc91c9x.o    \
-	$(EMUMACHINE)/smpc.o        \
-	$(EMUMACHINE)/stvcd.o       \
-	$(EMUMACHINE)/tc009xlvc.o   \
-	$(EMUMACHINE)/timekpr.o     \
-	$(EMUMACHINE)/tmp68301.o    \
-	$(EMUMACHINE)/tms6100.o     \
-	$(EMUMACHINE)/tms9901.o     \
-	$(EMUMACHINE)/tms9902.o     \
-	$(EMUMACHINE)/upd1990a.o    \
-	$(EMUMACHINE)/upd4701.o     \
-	$(EMUMACHINE)/upd7002.o     \
-	$(EMUMACHINE)/upd765.o      \
-	$(EMUMACHINE)/v3021.o       \
-	$(EMUMACHINE)/wd_fdc.o      \
-	$(EMUMACHINE)/wd11c00_17.o  \
-	$(EMUMACHINE)/wd17xx.o      \
-	$(EMUMACHINE)/wd2010.o      \
-	$(EMUMACHINE)/wd33c93.o     \
-	$(EMUMACHINE)/x2212.o       \
-	$(EMUMACHINE)/x76f041.o     \
-	$(EMUMACHINE)/x76f100.o     \
-	$(EMUMACHINE)/z80ctc.o      \
-	$(EMUMACHINE)/z80dart.o     \
-	$(EMUMACHINE)/z80dma.o      \
-	$(EMUMACHINE)/z80pio.o      \
-	$(EMUMACHINE)/z80sio.o      \
-	$(EMUMACHINE)/z80sti.o      \
-	$(EMUMACHINE)/z8536.o       \
-
-EMUVIDEOOBJS = \
-	$(EMUVIDEO)/315_5124.o      \
-	$(EMUVIDEO)/bufsprite.o     \
-	$(EMUVIDEO)/cdp1861.o       \
-	$(EMUVIDEO)/cdp1862.o       \
-	$(EMUVIDEO)/cgapal.o        \
-	$(EMUVIDEO)/crt9007.o       \
-	$(EMUVIDEO)/crt9021.o       \
-	$(EMUVIDEO)/crt9212.o       \
-	$(EMUVIDEO)/dl1416.o        \
-	$(EMUVIDEO)/dm9368.o        \
-	$(EMUVIDEO)/ef9340_1.o      \
-	$(EMUVIDEO)/generic.o       \
-	$(EMUVIDEO)/h63484.o        \
-	$(EMUVIDEO)/hd44102.o       \
-	$(EMUVIDEO)/hd44352.o       \
-	$(EMUVIDEO)/hd44780.o       \
-	$(EMUVIDEO)/hd61830.o       \
-	$(EMUVIDEO)/hd63484.o       \
-	$(EMUVIDEO)/hd66421.o       \
-	$(EMUVIDEO)/huc6202.o       \
-	$(EMUVIDEO)/huc6260.o       \
-	$(EMUVIDEO)/huc6261.o       \
-	$(EMUVIDEO)/huc6270.o       \
-	$(EMUVIDEO)/huc6272.o       \
-	$(EMUVIDEO)/i8244.o         \
-	$(EMUVIDEO)/i8275.o         \
-	$(EMUVIDEO)/i8275x.o        \
-	$(EMUVIDEO)/k053250.o       \
-	$(EMUVIDEO)/m50458.o        \
-	$(EMUVIDEO)/mb90082.o       \
-	$(EMUVIDEO)/mc6845.o        \
-	$(EMUVIDEO)/mc6847.o        \
-	$(EMUVIDEO)/msm6255.o       \
-	$(EMUVIDEO)/pc_cga.o        \
-	$(EMUVIDEO)/pc_vga.o        \
-	$(EMUVIDEO)/poly.o          \
-	$(EMUVIDEO)/psx.o           \
-	$(EMUVIDEO)/ramdac.o        \
-	$(EMUVIDEO)/resnet.o        \
-	$(EMUVIDEO)/rgbutil.o       \
-	$(EMUVIDEO)/s2636.o         \
-	$(EMUVIDEO)/saa5050.o       \
-	$(EMUVIDEO)/sed1330.o       \
-	$(EMUVIDEO)/stvvdp1.o       \
-	$(EMUVIDEO)/stvvdp2.o       \
-	$(EMUVIDEO)/tlc34076.o      \
-	$(EMUVIDEO)/tms34061.o      \
-	$(EMUVIDEO)/tms3556.o       \
-	$(EMUVIDEO)/tms9927.o       \
-	$(EMUVIDEO)/tms9928a.o      \
-	$(EMUVIDEO)/upd3301.o       \
-	$(EMUVIDEO)/upd7220.o       \
-	$(EMUVIDEO)/upd7227.o       \
-	$(EMUVIDEO)/v9938.o         \
-	$(EMUVIDEO)/vector.o        \
-	$(EMUVIDEO)/voodoo.o        \
 
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \
@@ -388,7 +154,7 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/snapquik.o   \
 
 
-LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUAUDIOOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS) $(EMUVIDEOOBJS)
+LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUIMAGEDEVOBJS)
 
 $(LIBEMU): $(LIBEMUOBJS)
 
@@ -417,17 +183,30 @@ $(LIBSOUND): $(SOUNDOBJS)
 
 
 #-------------------------------------------------
+# video core objects
+#-------------------------------------------------
+
+include $(EMUSRC)/video/video.mak
+
+$(LIBVIDEO): $(VIDEOOBJS)
+
+
+#-------------------------------------------------
+# machine core objects
+#-------------------------------------------------
+
+include $(EMUSRC)/machine/machine.mak
+
+$(LIBMACHINE): $(MACHINEOBJS)
+
+
+#-------------------------------------------------
 # additional dependencies
 #-------------------------------------------------
 
 $(EMUOBJ)/rendfont.o:   $(EMUOBJ)/uismall.fh
 
 $(EMUOBJ)/video.o:  $(EMUSRC)/rendersw.c
-
-$(EMUMACHINE)/s3c2400.o:    $(EMUSRC)/machine/s3c24xx.c
-$(EMUMACHINE)/s3c2410.o:    $(EMUSRC)/machine/s3c24xx.c
-$(EMUMACHINE)/s3c2440.o:    $(EMUSRC)/machine/s3c24xx.c
-
 
 #-------------------------------------------------
 # core layouts
