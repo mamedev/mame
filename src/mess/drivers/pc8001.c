@@ -146,7 +146,7 @@ WRITE8_MEMBER( pc8001_state::port40_w )
 	m_rtc->clk_w(BIT(data, 2));
 	m_rtc->stb_w(BIT(data, 1));
 
-	speaker_level_w(m_speaker, BIT(data, 5));
+	m_speaker->level_w(BIT(data, 5));
 }
 
 /* Memory Maps */

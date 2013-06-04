@@ -155,7 +155,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
     d1 address digit 3
     d0 address digit 4 */
 
-	speaker_level_w(m_speaker, BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 
 	m_digit = data & 0x3f;
 }
@@ -171,7 +171,7 @@ WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
     d1 address digit 3
     d0 address digit 4 */
 
-	speaker_level_w(m_speaker, BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 	m_digit = data & 0x3f;
 }

@@ -610,7 +610,7 @@ READ8_MEMBER(avigo_state::ad_data_r)
 WRITE8_MEMBER(avigo_state::speaker_w)
 {
 	/* Speaker output state */
-	speaker_level_w(m_speaker, BIT(data, 3));
+	m_speaker->level_w(BIT(data, 3));
 }
 
 

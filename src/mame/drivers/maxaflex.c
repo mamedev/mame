@@ -94,7 +94,7 @@ READ8_MEMBER(maxaflex_state::mcu_portA_r)
 WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
 {
 	m_portA_out = data;
-	speaker_level_w(m_speaker, data >> 7);
+	m_speaker->level_w(data >> 7);
 }
 
 /* Port B:

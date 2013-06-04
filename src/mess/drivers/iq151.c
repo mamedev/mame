@@ -152,8 +152,7 @@ READ8_MEMBER(iq151_state::ppi_portc_r)
 
 WRITE8_MEMBER(iq151_state::ppi_portc_w)
 {
-	speaker_level_w(m_speaker, BIT(data, 3));
-
+	m_speaker->level_w(BIT(data, 3));
 	m_cassette_data = data;
 }
 

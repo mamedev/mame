@@ -627,7 +627,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	output_set_led_value(LED_CAPS_LOCK, BIT(data, 5));
 
 	// speaker output
-	speaker_level_w(m_speaker, !BIT(data, 6));
+	m_speaker->level_w(!BIT(data, 6));
 
 	// Z8 enable
 	m_led_en = BIT(data, 7);

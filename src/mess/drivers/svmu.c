@@ -95,7 +95,7 @@ READ8_MEMBER(svmu_state::p1_r)
 
 WRITE8_MEMBER(svmu_state::p1_w)
 {
-	speaker_level_w(m_speaker, BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 }
 
 

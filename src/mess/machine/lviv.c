@@ -94,7 +94,7 @@ WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off
 {
 	m_ppi_port_outputs[0][2] = data;
 	if (m_ppi_port_outputs[0][1]&0x80)
-		speaker_level_w(m_speaker, data&0x01);
+		m_speaker->level_w(data & 0x01);
 	m_cassette->output((data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory();
 }

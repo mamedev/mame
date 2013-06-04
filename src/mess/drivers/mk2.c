@@ -173,8 +173,8 @@ READ8_MEMBER( mk2_state::mk2_read_b )
 
 WRITE8_MEMBER( mk2_state::mk2_write_b )
 {
-	if ((data&0x06) == 0x06)
-			speaker_level_w(m_speaker, BIT(data, 0));
+	if ((data & 0x06) == 0x06)
+			m_speaker->level_w(BIT(data, 0));
 
 	m_led[4]|=data;
 

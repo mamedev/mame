@@ -188,7 +188,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	optional_device<upd765a_device> m_upd765;
 	optional_device<floppy_connector> m_upd765_0;
 	optional_device<floppy_connector> m_upd765_1;

@@ -968,7 +968,7 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	m_buzzer = BIT(data, 2);
 	m_bell = BIT(data, 5);
 
-	if (m_buzzer) speaker_level_w(m_speaker, m_bell);
+	if (m_buzzer) m_speaker->level_w(m_bell);
 
 	// RS-232
 	m_rs232->dtr_w(BIT(data, 6));
@@ -1010,7 +1010,7 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 {
 	if (!m_buzzer && m_bell)
 	{
-		speaker_level_w(m_speaker, state);
+		m_speaker->level_w(state);
 	}
 
 	m_uart->trc_w(state);
@@ -1074,7 +1074,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pb_w )
 	m_buzzer = BIT(data, 2);
 	m_bell = BIT(data, 5);
 
-	if (m_buzzer) speaker_level_w(m_speaker, m_bell);
+	if (m_buzzer) m_speaker->level_w(m_bell);
 }
 
 READ8_MEMBER( tandy200_state::i8155_pc_r )
@@ -1108,7 +1108,7 @@ WRITE_LINE_MEMBER( tandy200_state::i8155_to_w )
 {
 	if (!m_buzzer && m_bell)
 	{
-		speaker_level_w(m_speaker, state);
+		m_speaker->level_w(state);
 	}
 }
 

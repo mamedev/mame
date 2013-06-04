@@ -71,7 +71,7 @@ protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -320,7 +320,7 @@ static const cassette_interface jr100_cassette_interface =
 
 TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
-	speaker_level_w(m_speaker,m_speaker_data);
+	m_speaker->level_w(m_speaker_data);
 	m_speaker_data = 0;
 
 	double level = (m_cassette->input());

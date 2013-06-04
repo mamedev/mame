@@ -149,7 +149,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_74145_output_3_w),  /* connected to DS3 */
 	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_74145_output_4_w),  /* connected to DS4 */
 	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_74145_output_5_w),  /* connected to DS5 */
-	DEVCB_DEVICE_LINE("speaker", speaker_level_w),
+	DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w),
 	DEVCB_NULL, /* not connected */
 	DEVCB_NULL, /* not connected */
 	DEVCB_NULL  /* not connected */

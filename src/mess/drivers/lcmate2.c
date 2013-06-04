@@ -62,7 +62,7 @@ public:
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
 {
-	speaker_level_w(m_speaker, BIT(data, 6));
+	m_speaker->level_w(BIT(data, 6));
 }
 
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed

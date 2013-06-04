@@ -260,7 +260,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 
 	/* bit 7, tape output, tone and led */
 	set_led_status(machine(), 0, !BIT(data, 7));
-	speaker_level_w(m_speaker, BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 	m_cassette->output( BIT(data, 7));
 }
 

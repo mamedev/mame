@@ -43,8 +43,7 @@ void tandy2k_state::dma_request(int line, int state)
 void tandy2k_state::speaker_update()
 {
 	int level = !(m_spkrdata & m_outspkr);
-
-	speaker_level_w(m_speaker, level);
+	m_speaker->level_w(level);
 }
 
 READ8_MEMBER( tandy2k_state::videoram_r )

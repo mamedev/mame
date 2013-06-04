@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER( grip_device::speaker_w )
 {
 	int level = state && ((m_vol1 << 1) | m_vol0);
 
-	speaker_level_w(m_speaker, level);
+	m_speaker->level_w(level);
 }
 
 static Z80STI_INTERFACE( sti_intf )

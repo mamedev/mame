@@ -379,7 +379,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 {
 	m_pia0_portb = data;
 
-	speaker_level_w( m_speaker, ( data & 0x08 ) ? 0 : 1 );
+	m_speaker->level_w(!BIT(data, 3));
 
 	switch ( data & 0x06 )
 	{

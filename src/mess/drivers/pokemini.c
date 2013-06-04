@@ -303,7 +303,7 @@ void pokemini_state::pokemini_update_sound()
 	/* Check if sound should be muted */
 	if ( m_pm_reg[0x70] & 0x03 )
 	{
-		speaker_level_w( m_speaker, 0 );
+		m_speaker->level_w(0);
 	}
 	else
 	{
@@ -316,7 +316,7 @@ void pokemini_state::pokemini_update_sound()
 			level = 0;
 //      }
 
-		speaker_level_w( m_speaker, level );
+		m_speaker->level_w(level);
 	}
 }
 

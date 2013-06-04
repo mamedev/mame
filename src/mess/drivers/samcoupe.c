@@ -273,7 +273,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
 	m_cassette->output( BIT(data, 3) ? -1.0 : +1.0);
 
 	/* bit 4, beep */
-	speaker_level_w(m_speaker, BIT(data, 4));
+	m_speaker->level_w(BIT(data, 4));
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_attributes_r)

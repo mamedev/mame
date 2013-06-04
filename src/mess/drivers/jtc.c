@@ -76,7 +76,7 @@ WRITE8_MEMBER( jtc_state::p3_w )
 	m_cassette->output( BIT(data, 6) ? +1.0 : -1.0);
 
 	/* speaker */
-	speaker_level_w(m_speaker, BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 }
 
 READ8_MEMBER( jtces40_state::videoram_r )

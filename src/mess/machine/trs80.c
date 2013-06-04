@@ -341,7 +341,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 
 WRITE8_MEMBER( trs80_state::trs80m4_90_w )
 {
-	speaker_level_w(m_speaker, ~data & 1);
+	m_speaker->level_w(~data & 1);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )     /* model 4P only - swaps the ROM with read-only RAM */
@@ -602,7 +602,7 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 
 	/* Speaker for System-80 MK II - only sounds if relay is off */
 	if (~data & 4)
-		speaker_level_w(m_speaker, data & 3);
+		m_speaker->level_w(data & 3);
 }
 
 WRITE8_MEMBER( trs80_state::trs80m4_ff_w )

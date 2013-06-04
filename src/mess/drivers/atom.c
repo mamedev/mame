@@ -547,7 +547,7 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
 	m_pc1 = BIT(data, 1);
 
 	/* speaker output */
-	speaker_level_w(m_speaker, BIT(data, 2));
+	m_speaker->level_w(BIT(data, 2));
 
 	/* MC6847 CSS */
 	m_vdg->css_w(BIT(data, 3));

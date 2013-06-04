@@ -697,7 +697,7 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	m_gpib->eoi_w(!BIT(data, 4));
 
 	// speaker
-	speaker_level_w(m_speaker, !BIT(data, 7));
+	m_speaker->level_w(!BIT(data, 7));
 
 	// remote enable
 	m_gpib->ren_w(!BIT(data, 7));

@@ -190,7 +190,7 @@ I8237_INTERFACE( pc_dma8237_config )
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 {
 	m_pc_spkrdata = state ? 1 : 0;
-	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
 }
 
 
@@ -215,7 +215,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
 WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 {
 	m_pc_input = state ? 1 : 0;
-	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
 }
 
 
@@ -672,7 +672,7 @@ void ibm5160_mb_device::device_reset()
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
 	m_nmi_enabled = 0;
-	speaker_level_w( m_speaker, 0 );
+	m_speaker->level_w(0);
 }
 
 

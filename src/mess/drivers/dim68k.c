@@ -98,14 +98,14 @@ READ16_MEMBER( dim68k_state::dim68k_speaker_r )
 // Any read or write of this address will toggle the position of the speaker cone
 {
 	m_speaker_bit ^= 1;
-	speaker_level_w(m_speaker, m_speaker_bit);
+	m_speaker->level_w(m_speaker_bit);
 	return 0;
 }
 
 WRITE16_MEMBER( dim68k_state::dim68k_speaker_w )
 {
 	m_speaker_bit ^= 1;
-	speaker_level_w(m_speaker, m_speaker_bit);
+	m_speaker->level_w(m_speaker_bit);
 }
 
 WRITE16_MEMBER( dim68k_state::dim68k_fdc_w )

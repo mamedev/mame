@@ -137,7 +137,7 @@ WRITE16_MEMBER(merlin_state::write_o)
 
 	m_o = data;
 
-	speaker_level_w( m_speaker, m_o & 0x70 );
+	m_speaker->level_w(m_o & 0x70);
 }
 
 

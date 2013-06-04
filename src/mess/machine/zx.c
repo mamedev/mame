@@ -223,7 +223,7 @@ READ8_MEMBER( zx_state::pc8300_io_r )
 	if (offs == 0xf5)
 	{
 		m_speaker_state ^= 1;
-		speaker_level_w(m_speaker, m_speaker_state);
+		m_speaker->level_w(m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)
@@ -291,7 +291,7 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 	if (offs == 0xf5)
 	{
 		m_speaker_state ^= 1;
-		speaker_level_w(m_speaker, m_speaker_state);
+		m_speaker->level_w(m_speaker_state);
 	}
 	else
 	if (offs == 0xfe)

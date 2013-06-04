@@ -102,7 +102,7 @@ protected:
 	required_device<floppy_connector> m_fd2;
 	required_device<floppy_connector> m_fd3;
 	optional_device<mc146818_device> m_rtc;
-	optional_device<device_t> m_speaker;
+	optional_device<speaker_sound_device> m_speaker;
 	optional_device<ay8910_device> m_ay8912;
 	required_memory_bank m_bank2;
 	optional_memory_bank m_bank3;

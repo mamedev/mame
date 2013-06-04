@@ -214,7 +214,7 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 	m_cassette->output( BIT(data, 1) ? +1.0 : -1.0);
 
 	/* speaker */
-	speaker_level_w(m_speaker, !BIT(data, 1));
+	m_speaker->level_w(!BIT(data, 1));
 
 	/* OUT led */
 	output_set_led_value(0, !BIT(data, 1));

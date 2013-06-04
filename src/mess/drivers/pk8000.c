@@ -58,7 +58,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -153,10 +153,10 @@ WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
 {
 	m_keyboard_line = data & 0x0f;
 
-	speaker_level_w(m_speaker, BIT(data,7));
+	m_speaker->level_w(BIT(data, 7));
 
-	m_cassette->change_state( (BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	m_cassette->output((BIT(data,6)) ? +1.0 : 0.0);
+	m_cassette->change_state((BIT(data, 4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )

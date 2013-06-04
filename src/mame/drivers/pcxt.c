@@ -245,19 +245,19 @@ UINT8 pcxt_state::pcxt_speaker_get_spk()
 void pcxt_state::pcxt_speaker_set_spkrdata(UINT8 data)
 {
 	m_pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( m_speaker, pcxt_speaker_get_spk() );
+	m_speaker->level_w(pcxt_speaker_get_spk());
 }
 
 void pcxt_state::pcxt_speaker_set_input(UINT8 data)
 {
 	m_pc_input = data ? 1 : 0;
-	speaker_level_w( m_speaker, pcxt_speaker_get_spk() );
+	m_speaker->level_w(pcxt_speaker_get_spk());
 }
 
 
 WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
 {
-	pcxt_speaker_set_input( state );
+	pcxt_speaker_set_input(state);
 }
 
 
@@ -689,7 +689,7 @@ void pcxt_state::machine_reset()
 	m_pc_spkrdata = 0;
 	m_pc_input = 0;
 	m_wss2_data = 0;
-	speaker_level_w( m_speaker, 0 );
+	m_speaker->level_w(0);
 }
 
 static MACHINE_CONFIG_START( filetto, pcxt_state )

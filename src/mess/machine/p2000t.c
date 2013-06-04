@@ -131,7 +131,7 @@ WRITE8_MEMBER( p2000t_state::p2000t_port_303f_w )
 */
 WRITE8_MEMBER( p2000t_state::p2000t_port_505f_w )
 {
-	speaker_level_w(m_speaker, BIT(data,0));
+	m_speaker->level_w(BIT(data, 0));
 }
 
 /*

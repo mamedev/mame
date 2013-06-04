@@ -214,8 +214,7 @@ READ8_MEMBER(photon2_state::photon2_fe_r)
 WRITE8_MEMBER(photon2_state::photon2_fe_w)
 {
 	m_spectrum_port_fe = data;
-
-	speaker_level_w(m_speaker, BIT(data,4));
+	m_speaker->level_w(BIT(data,4));
 }
 
 WRITE8_MEMBER(photon2_state::photon2_misc_w)

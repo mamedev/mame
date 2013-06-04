@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER( pcm_state::pcm_82_w )
 	if (state)
 	{
 		m_cone ^= 1;
-		speaker_level_w(m_speaker, m_cone);
+		m_speaker->level_w(m_cone);
 	}
 }
 

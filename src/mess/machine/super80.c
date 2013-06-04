@@ -182,7 +182,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data;
-	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
+	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
 	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 
@@ -193,7 +193,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 {
 	UINT8 bits = data ^ m_last_data;
 	m_shared = data | 0x14;
-	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
+	m_speaker->level_w(BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(BIT(data, 1));  /* bit 1 - cassette motor */
 	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 

@@ -286,7 +286,7 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 			logerror("bank #%d write to I/O [$%05X] $%02X\n", bank+1, offs, data);
 			/* Toggle between graphics and text modes? */
 			if ((data ^ m_laser_latch) & 0x01)
-				speaker_level_w(m_speaker, data & 1);
+				m_speaker->level_w(data & 1);
 			m_laser_latch = data;
 		}
 		break;

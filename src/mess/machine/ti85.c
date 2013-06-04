@@ -398,13 +398,13 @@ WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 {
-	speaker_level_w(m_speaker, ( (data>>2)|(data>>3) ) & 0x01);
-	m_red_out=(data>>2)&0x01;
-	m_white_out=(data>>3)&0x01;
+	m_speaker->level_w(BIT(data, 2) | BIT(data, 3));
+	m_red_out = BIT(data, 2);
+	m_white_out = BIT(data, 3);
 	//ti85serial_red_out( m_serial, 0, m_red_out );
 	//ti85serial_white_out( m_serial, 0, m_white_out );
 	//ti85_update_serial(m_serial);
-	m_PCR = data&0xf0;
+	m_PCR = data & 0xf0;
 }
 
 WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
@@ -450,13 +450,13 @@ WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 {
-	speaker_level_w(m_speaker,( (data>>0)|(data>>1) )&0x01 );
-	m_red_out=(data>>0)&0x01;
-	m_white_out=(data>>1)&0x01;
+	m_speaker->level_w(BIT(data, 0) | BIT(data, 1));
+	m_red_out = BIT(data, 0);
+	m_white_out = BIT(data, 1);
 	//ti85serial_red_out( m_serial, 0, m_red_out );
 	//ti85serial_white_out( m_serial, 0, m_white_out );
 	//ti85_update_serial(m_serial);
-	m_PCR = data&0xf0;
+	m_PCR = data & 0xf0;
 }
 
 WRITE8_MEMBER(ti85_state::ti83p_port_0002_w)

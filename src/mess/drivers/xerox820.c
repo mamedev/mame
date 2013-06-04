@@ -113,7 +113,7 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 
 WRITE8_MEMBER( xerox820ii_state::bell_w )
 {
-	speaker_level_w(m_speaker, offset);
+	m_speaker->level_w(offset);
 }
 
 WRITE8_MEMBER( xerox820ii_state::slden_w )

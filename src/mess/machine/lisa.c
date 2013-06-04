@@ -718,7 +718,7 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 
 WRITE8_MEMBER(lisa_state::COPS_via_out_cb2)
 {
-	speaker_level_w(m_speaker, data);
+	m_speaker->level_w(data);
 }
 
 void lisa_state::COPS_via_irq_func(int val)

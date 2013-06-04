@@ -306,7 +306,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 	if ((Changed & (1<<4))!=0)
 	{
 		/* DAC output state */
-		speaker_level_w(m_speaker,(data>>4) & 0x01);
+		m_speaker->level_w(BIT(data, 4));
 	}
 
 	if ((Changed & (1<<3))!=0)

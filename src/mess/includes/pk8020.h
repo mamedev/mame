@@ -83,7 +83,7 @@ protected:
 	required_device<device_t> m_wd1793;
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	ioport_port *m_io_port[16];

@@ -425,7 +425,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
 {
-	speaker_level_w(m_speaker, state);
+	m_speaker->level_w(state);
 }
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )

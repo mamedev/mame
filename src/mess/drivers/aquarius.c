@@ -63,8 +63,8 @@ READ8_MEMBER(aquarius_state::cassette_r)
 */
 WRITE8_MEMBER(aquarius_state::cassette_w)
 {
-	speaker_level_w(m_speaker, BIT(data, 0));
-	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
+	m_speaker->level_w(BIT(data, 0));
+	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
 

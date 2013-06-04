@@ -626,7 +626,7 @@ void pasogo_state::machine_reset()
 WRITE_LINE_MEMBER(pasogo_state::speaker_set_spkrdata)
 {
 	m_pc_spkrdata = state ? 1 : 0;
-	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
 }
 
 
@@ -645,7 +645,7 @@ WRITE_LINE_MEMBER( pasogo_state::pit8253_out1_changed )
 WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
 {
 	m_pc_input = state ? 1 : 0;
-	speaker_level_w( m_speaker, m_pc_spkrdata & m_pc_input );
+	m_speaker->level_w(m_pc_spkrdata & m_pc_input);
 }
 
 

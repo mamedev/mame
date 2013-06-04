@@ -300,7 +300,7 @@ WRITE8_MEMBER( digel804_state::op45 ) // speaker write
 	logerror("Digel804: port 0x45 speaker had %02x written to it!\n", data);
 #endif
 	m_speaker_state ^= 0xFF;
-	speaker_level_w(m_speaker, m_speaker_state);
+	m_speaker->level_w(m_speaker_state);
 }
 
 READ8_MEMBER( digel804_state::ip46 ) // keypad read

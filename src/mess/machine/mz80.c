@@ -63,7 +63,7 @@ WRITE_LINE_MEMBER( mz80_state::pit_out0_changed )
 		m_speaker_level++;
 
 	m_prev_state = state;
-	speaker_level_w(m_speaker, BIT(m_speaker_level, 1));
+	m_speaker->level_w(BIT(m_speaker_level, 1));
 }
 
 WRITE_LINE_MEMBER( mz80_state::pit_out2_changed )

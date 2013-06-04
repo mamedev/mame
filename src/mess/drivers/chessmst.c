@@ -21,10 +21,11 @@ class chessmst_state : public driver_device
 public:
 	chessmst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker")
-		,
-		m_maincpu(*this, "maincpu") { }
+			 { }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_matrix;
@@ -38,7 +39,6 @@ public:
 	DECLARE_READ8_MEMBER( pio2_port_a_r );
 	DECLARE_WRITE8_MEMBER( pio2_port_b_w );
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
 	m_matrix = (m_matrix & 0xff) | ((data & 0x01)<<8);
 	m_led_sel = (m_led_sel & 0xff) | ((data & 0x03)<<8);
 
-	speaker_level_w(m_speaker, BIT(data, 6));
+	m_speaker->level_w(BIT(data, 6));
 };
 
 READ8_MEMBER( chessmst_state::pio2_port_a_r )

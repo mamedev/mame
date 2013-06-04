@@ -358,7 +358,7 @@ WRITE8_MEMBER( hx20_state::slave_p1_w )
 	*/
 
 	// speaker
-	speaker_level_w(m_speaker, BIT(data, 5));
+	m_speaker->level_w(BIT(data, 5));
 }
 
 

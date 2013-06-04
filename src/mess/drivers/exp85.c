@@ -130,7 +130,7 @@ WRITE8_MEMBER( exp85_state::i8355_a_w )
 	m_tape_control = BIT(data, 0);
 
 	/* speaker output */
-	speaker_level_w(m_speaker, !BIT(data, 7));
+	m_speaker->level_w(!BIT(data, 7));
 }
 
 static I8355_INTERFACE( i8355_intf )

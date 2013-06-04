@@ -169,13 +169,13 @@ READ8_MEMBER( homelab_state::exxx_r )
 	else
 	if (offset == 0x80)
 	{
-		speaker_level_w(m_speaker, 0 );
+		m_speaker->level_w(0);
 		m_cass->output(-1.0);
 	}
 	else
 	if (offset == 0x02)
 	{
-		speaker_level_w(m_speaker, 1 );
+		m_speaker->level_w(1);
 		m_cass->output(+1.0);
 	}
 

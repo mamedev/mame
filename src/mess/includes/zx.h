@@ -90,7 +90,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_gfx1;
 	required_ioport m_io_row0;

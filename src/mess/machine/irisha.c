@@ -48,7 +48,7 @@ void irisha_state::update_speaker()
 {
 	int level = ((m_ppi_portc & 0x20) || (m_ppi_porta & 0x10) || !m_sg1_line) ? 1 : 0;
 
-	speaker_level_w(m_speaker, level);
+	m_speaker->level_w(level);
 }
 
 

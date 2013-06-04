@@ -766,14 +766,14 @@ UINT8 towns_state::speaker_get_spk()
 void towns_state::speaker_set_spkrdata(UINT8 data)
 {
 	m_towns_spkrdata = data ? 1 : 0;
-	speaker_level_w( m_speaker, speaker_get_spk() );
+	m_speaker->level_w(speaker_get_spk());
 }
 
 
 void towns_state::speaker_set_input(UINT8 data)
 {
 	m_towns_speaker_input = data ? 1 : 0;
-	speaker_level_w( m_speaker, speaker_get_spk() );
+	m_speaker->level_w(speaker_get_spk());
 }
 
 READ8_MEMBER(towns_state::towns_port60_r)

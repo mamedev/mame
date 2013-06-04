@@ -140,7 +140,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	// bit 5 - V.24 (2) / tape control (not emulated)
 
 	// bit 4 - speaker
-	speaker_level_w(m_speaker, (data&0x10)>>4);
+	m_speaker->level_w(BIT(data, 4));
 
 	// bit 3 - display buffer
 	if (data & 0x08)
@@ -288,7 +288,7 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 	m_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
-	speaker_level_w(m_speaker, (snapshot_data[30]&0x10)>>4);
+	m_speaker->level_w(BIT(snapshot_data[30], 4));
 
 
 	/* memory */

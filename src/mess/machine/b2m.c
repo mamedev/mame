@@ -143,7 +143,7 @@ void b2m_state::b2m_set_bank(int bank)
 
 WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
 {
-	speaker_level_w(m_speaker, state);
+	m_speaker->level_w(state);
 }
 
 const struct pit8253_interface b2m_pit8253_intf =

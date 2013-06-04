@@ -188,7 +188,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 	*/
 
 	// speaker
-	speaker_level_w(m_speaker, BIT(data, 1));
+	m_speaker->level_w(BIT(data, 1));
 
 	// interrupts
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);

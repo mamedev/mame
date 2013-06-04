@@ -129,7 +129,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 	}
 
 	/* b3 - speaker output (manual says it is bit 1)*/
-	speaker_level_w(m_speaker, BIT(data, 1));
+	m_speaker->level_w(BIT(data, 1));
 
 	/* b4 - -REV MDCR output */
 	/* b5 - -FWD MDCR output */

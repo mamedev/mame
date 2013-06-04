@@ -325,14 +325,14 @@ UINT8 pc_state::pc_speaker_get_spk()
 void pc_state::pc_speaker_set_spkrdata(UINT8 data)
 {
 	m_pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( m_speaker, pc_speaker_get_spk() );
+	m_speaker->level_w(pc_speaker_get_spk());
 }
 
 
 void pc_state::pc_speaker_set_input(UINT8 data)
 {
 	m_pc_input = data ? 1 : 0;
-	speaker_level_w( m_speaker, pc_speaker_get_spk() );
+	m_speaker->level_w(pc_speaker_get_spk());
 }
 
 
@@ -1474,7 +1474,7 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
 
-	speaker_level_w( m_speaker, 0 );
+	m_speaker->level_w(0);
 }
 
 
@@ -1528,7 +1528,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
 	m_pcjr_dor = 0;
-	speaker_level_w( m_speaker, 0 );
+	m_speaker->level_w(0);
 
 	m_pcjx_1ff_count = 0;
 	m_pcjx_1ff_val = 0;

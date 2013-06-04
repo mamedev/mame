@@ -207,7 +207,7 @@ READ8_MEMBER(pyl601_state::timer_r)
 
 WRITE8_MEMBER(pyl601_state::speaker_w)
 {
-	speaker_level_w(m_speaker, BIT(data, 3));
+	m_speaker->level_w(BIT(data, 3));
 }
 
 WRITE8_MEMBER(pyl601_state::led_w)

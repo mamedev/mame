@@ -884,7 +884,7 @@ WRITE8_MEMBER(pk8020_state::pk8020_2_portc_w)
 {
 	m_sound_gate = BIT(data,3);
 
-	speaker_level_w(m_speaker, m_sound_gate ? m_sound_level : 0);
+	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 }
 
 I8255A_INTERFACE( pk8020_ppi8255_interface_2 )
@@ -911,7 +911,7 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out0)
 {
 	m_sound_level = state;
 
-	speaker_level_w(m_speaker, m_sound_gate ? m_sound_level : 0);
+	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 }
 
 

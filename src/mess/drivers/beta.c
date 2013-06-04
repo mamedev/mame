@@ -183,7 +183,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_ls145_p = data & 0x0f;
 
 	/* speaker */
-	speaker_level_w(m_speaker, !BIT(data, 4));
+	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
 	output_set_led_value(0, BIT(data, 5));

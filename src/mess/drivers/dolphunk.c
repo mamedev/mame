@@ -108,7 +108,7 @@ WRITE8_MEMBER( dolphunk_state::port00_w )
 WRITE8_MEMBER( dolphunk_state::port06_w )
 {
 	m_speaker_state ^=1;
-	speaker_level_w(m_speaker, m_speaker_state);
+	m_speaker->level_w(m_speaker_state);
 }
 
 READ8_MEMBER( dolphunk_state::port07_r )

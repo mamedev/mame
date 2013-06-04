@@ -183,7 +183,7 @@ READ8_MEMBER( ace_state::io_r )
 		data &= ioport("A15")->read();
 
 		m_cassette->output(-1);
-		speaker_level_w(m_speaker, 0);
+		m_speaker->level_w(0);
 	}
 
 	if (m_cassette->input() > 0)
@@ -202,7 +202,7 @@ READ8_MEMBER( ace_state::io_r )
 WRITE8_MEMBER( ace_state::io_w )
 {
 	m_cassette->output(1);
-	speaker_level_w(m_speaker, 1);
+	m_speaker->level_w(1);
 }
 
 

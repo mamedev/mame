@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(mz_state::pit_out0_changed)
 		m_speaker_level ^= 1;
 	}
 	m_prev_state = state;
-	speaker_level_w(m_speaker, m_speaker_level);
+	m_speaker->level_w(m_speaker_level);
 }
 
 /* timer 2 is the AM/PM (12 hour) interrupt */

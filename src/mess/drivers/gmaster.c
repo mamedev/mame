@@ -170,7 +170,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_port_w)
 	{
 		case UPD7810_PORTC:
 			m_video.y = BLITTER_Y;
-			speaker_level_w( m_speaker, ( data & 0x10 ) ? 1 : 0 );
+			m_speaker->level_w(BIT(data, 4));
 			break;
 	}
 }

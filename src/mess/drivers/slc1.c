@@ -91,7 +91,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 	else
 	if (data < 12)
 	{
-		speaker_level_w(m_speaker, BIT(data, 1) );
+		m_speaker->level_w(BIT(data, 1));
 		return;
 	}
 	else

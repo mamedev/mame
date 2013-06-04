@@ -1726,7 +1726,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			device_t *speaker_device = space.machine().device("a2speaker");
+			speaker_sound_device *speaker = space.machine().device<speaker_sound_device>("a2speaker");
 
 			if (m_a2_speaker_state == 1)
 			{
@@ -1736,7 +1736,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
 			{
 				m_a2_speaker_state = 1;
 			}
-			speaker_level_w(speaker_device, m_a2_speaker_state);
+			speaker->level_w(m_a2_speaker_state);
 		}
 	}
 	return apple2_getfloatingbusvalue();

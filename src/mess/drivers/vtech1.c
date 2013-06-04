@@ -583,7 +583,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_latch_w)
 	m_mc6847->css_w(BIT(data, 4));
 
 	/* bit 0 and 5, speaker */
-	speaker_level_w(m_speaker, (BIT(data, 5) << 1) | BIT(data, 0));
+	m_speaker->level_w((BIT(data, 5) << 1) | BIT(data, 0));
 }
 
 

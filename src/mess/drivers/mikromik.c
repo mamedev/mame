@@ -662,7 +662,7 @@ static I8085_CONFIG( i8085_intf )
 	DEVCB_NULL,         // STATUS changed callback
 	DEVCB_NULL,         // INTE changed callback
 	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),    // SID changed callback (I8085A only)
-	DEVCB_DEVICE_LINE("speaker", speaker_level_w) // SOD changed callback (I8085A only)
+	DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) // SOD changed callback (I8085A only)
 };
 
 

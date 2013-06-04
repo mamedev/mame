@@ -927,7 +927,7 @@ IRQ_CALLBACK_MEMBER(pc1512_state::pc1512_irq_callback)
 
 void pc1512_state::update_speaker()
 {
-	speaker_level_w(m_speaker, m_speaker_drive & m_pit2);
+	m_speaker->level_w(m_speaker_drive & m_pit2);
 }
 
 WRITE_LINE_MEMBER( pc1512_state::pit1_w )

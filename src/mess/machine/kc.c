@@ -738,7 +738,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
 void kc_state::speaker_update()
 {
 	/* this might not be correct, the range might be logarithmic and not linear! */
-	speaker_level_w(m_speaker, m_k0_line ? (m_speaker_level | (m_k1_line ? 0x01 : 0)) : 0);
+	m_speaker->level_w(m_k0_line ? (m_speaker_level | (m_k1_line ? 0x01 : 0)) : 0);
 }
 
 /* keyboard callback */

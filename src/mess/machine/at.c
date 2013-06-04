@@ -30,13 +30,13 @@ READ8_MEMBER( at_state::get_slave_ack )
 void at_state::at_speaker_set_spkrdata(UINT8 data)
 {
 	m_at_spkrdata = data ? 1 : 0;
-	speaker_level_w( m_speaker, m_at_spkrdata & m_at_speaker_input);
+	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
 }
 
 void at_state::at_speaker_set_input(UINT8 data)
 {
 	m_at_speaker_input = data ? 1 : 0;
-	speaker_level_w( m_speaker, m_at_spkrdata & m_at_speaker_input);
+	m_speaker->level_w(m_at_spkrdata & m_at_speaker_input);
 }
 
 

@@ -113,7 +113,7 @@ READ8_MEMBER(photon_state::pk8000_80_portb_r)
 
 WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
 {
-	speaker_level_w(m_speaker, BIT(data,7));
+	m_speaker->level_w(BIT(data,7));
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )

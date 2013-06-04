@@ -108,7 +108,7 @@ WRITE8_MEMBER(_8080bw_state::spcewars_sh_port_w)
 	if (rising_bits & 0x04) m_samples->start(1, 1);     /* Base Hit */
 	if (rising_bits & 0x08) m_samples->start(2, 2);     /* Invader Hit */
 
-	speaker_level_w(m_speaker, (data & 0x10) ? 1 : 0);      /* Various bitstream tunes */
+	m_speaker->level_w(BIT(data, 4));      /* Various bitstream tunes */
 
 	m_port_1_last_extra = data;
 }
@@ -167,7 +167,7 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 	if (rising_bits & 0x02) m_samples->start(1, 7);     /* Footstep low tone */
 	if (rising_bits & 0x04) m_samples->start(1, 4);     /* Bonus when counting men saved */
 
-	speaker_level_w(m_speaker, (data & 0x08) ? 1 : 0);      /* Bitstream tunes - endlevel and bonus1 */
+	m_speaker->level_w(BIT(data, 3));                   /* Bitstream tunes - endlevel and bonus1 */
 
 	if (rising_bits & 0x10) m_samples->start(3, 6);     /* Shooting Star and Rescue Ship sounds */
 	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3); /* This makes the rescue ship sound beep on and off */
@@ -1192,7 +1192,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 {
-	speaker_level_w(m_speaker, (data & 0x01) ? 1 : 0);      /* End-of-Level */
+	m_speaker->level_w(BIT(data, 0));      /* End-of-Level */
 
 	machine().sound().system_enable(data & 0x10);
 

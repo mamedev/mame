@@ -210,7 +210,7 @@ READ8_MEMBER(llc_state::llc2_port1_b_r)
 
 WRITE8_MEMBER(llc_state::llc2_port1_b_w)
 {
-	speaker_level_w(m_speaker, BIT(data, 6) );
+	m_speaker->level_w(BIT(data, 6));
 	m_rv = BIT(data, 5);
 }
 

@@ -300,7 +300,7 @@ WRITE8_MEMBER( portfolio_state::speaker_w )
 
 	*/
 
-	speaker_level_w(m_speaker, !BIT(data, 7));
+	m_speaker->level_w(!BIT(data, 7));
 
 	//logerror("SPEAKER %02x\n", data);
 }

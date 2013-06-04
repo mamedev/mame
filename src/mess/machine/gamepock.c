@@ -217,7 +217,7 @@ int gamepock_io_callback( device_t *device, int ioline, int state )
 	gamepock_state *driver_state = device->machine().driver_data<gamepock_state>();
 	if ( ioline == UPD7810_TO )
 	{
-		speaker_level_w(driver_state->m_speaker, state & 1 );
+		driver_state->m_speaker->level_w(state & 1);
 	}
 	return 0;
 }

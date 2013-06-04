@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER( apf_state::apf_m1000_pia_out_ca2_func)
 
 WRITE8_MEMBER( apf_state::apf_m1000_pia_out_cb2_func)
 {
-	speaker_level_w(m_speaker, data);
+	m_speaker->level_w(data);
 }
 
 /* use bit 0 to identify state of irq from pia 0 */

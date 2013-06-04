@@ -377,7 +377,7 @@ WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			m_speaker->level_w((data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// serial dataflash
@@ -418,7 +418,7 @@ WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			m_speaker->level_w((data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// serial dataflash
@@ -459,7 +459,7 @@ WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 		// speaker
 		case H8S_IO_P1DR :
 		{
-			speaker_level_w(m_speaker, (data & H8S_P1_TIOCB1) ? 1 : 0);
+			m_speaker->level_w((data & H8S_P1_TIOCB1) ? 1 : 0);
 		}
 		break;
 		// rs232

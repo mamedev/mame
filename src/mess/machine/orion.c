@@ -239,13 +239,13 @@ WRITE8_MEMBER(orion_state::orionz80_sound_w)
 	{
 		m_speaker_data = 0;
 	}
-	speaker_level_w(m_speaker,m_speaker_data);
+	m_speaker->level_w(m_speaker_data);
 
 }
 
 WRITE8_MEMBER(orion_state::orionz80_sound_fe_w)
 {
-	speaker_level_w(m_speaker,(data>>4) & 0x01);
+	m_speaker->level_w(BIT(data, 4));
 }
 
 

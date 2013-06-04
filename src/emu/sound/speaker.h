@@ -13,23 +13,30 @@
 
 #include "devlegcy.h"
 
-struct speaker_interface
+// Length of anti-aliasing filter kernel, measured in number of intermediate samples
+enum 
 {
-	int num_level;  /* optional: number of levels (if not two) */
-	const INT16 *levels;    /* optional: pointer to level lookup table */
+	FILTER_LENGTH = 64
 };
 
-void speaker_level_w (device_t *device, int new_level);
+
+struct speaker_interface
+{
+	int          m_num_levels;  /* optional: number of levels (if not two) */
+	const INT16  *m_levels;     /* optional: pointer to level lookup table */
+};
+
 
 class speaker_sound_device : public device_t,
-									public device_sound_interface
+								public device_sound_interface,
+								public speaker_interface
 {
 public:
 	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~speaker_sound_device() { global_free(m_token); }
+	~speaker_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void level_w(int new_level);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -37,9 +44,42 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
 	// internal state
-	void *m_token;
+
+	// Updates the composed volume array according to time
+	void update_interm_samples(attotime time, int volume);
+	
+	// Updates the composed volume array and returns final filtered volume of next stream sample
+	double update_interm_samples_get_filtered_volume(int volume);
+	
+	void finalize_interm_sample(int volume);
+	void init_next_interm_sample();
+	inline double make_fraction(attotime a, attotime b, double timediv);
+	double get_filtered_volume();
+	
+	// Kernel (pulse response) for filtering across samples (while we avoid fancy filtering within samples)
+	double m_ampl[FILTER_LENGTH];
+	
+	sound_stream *m_channel;
+	int m_level;
+	
+	/* The volume of a composed sample grows incrementally each time the speaker is over-sampled.
+	 * That is in effect a basic average filter.
+	 * Another filter can and will be applied to the array of composed samples.
+	 */
+	double        m_composed_volume[FILTER_LENGTH];   /* integrator(s) */
+	int           m_composed_sample_index;            /* array index for composed_volume */
+	attoseconds_t m_channel_sample_period;            /* in as */
+	double        m_channel_sample_period_secfrac;    /* in fraction of second */
+	attotime      m_channel_last_sample_time;
+	attotime      m_channel_next_sample_time;
+	attoseconds_t m_interm_sample_period;
+	double        m_interm_sample_period_secfrac;
+	attotime      m_next_interm_sample_time;
+	int           m_interm_sample_index;              /* counts interm. samples between stream samples */
+	attotime      m_last_update_time;                 /* internal timestamp */
 };
 
 extern const device_type SPEAKER_SOUND;
