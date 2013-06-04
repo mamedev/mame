@@ -643,9 +643,9 @@ static const floppy_interface enterprise_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_3_5_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(enterprise),
-	"floppy_5_25",
+	"floppy_3_5",
 	NULL
 };
 
@@ -676,11 +676,13 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_WD1770_ADD("wd1770", enterp_wd1770_interface )
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(enterprise_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","ep64")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "ep64_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ep128, ep64 )
