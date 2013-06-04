@@ -340,7 +340,7 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 				break;
 
 			default:
-				tc0220ioc_w(m_tc0220ioc, space, offset, data & 0xff);
+				m_tc0220ioc->write(space, offset, data & 0xff);
 		}
 	}
 }
@@ -358,7 +358,7 @@ READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 			return (m_eeprom->read_bit() & 1) << 7;
 
 		default:
-			return tc0220ioc_r(m_tc0220ioc, space, offset);
+			return m_tc0220ioc->read(space, offset);
 	}
 }
 

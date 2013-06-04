@@ -29,6 +29,7 @@ public:
 		m_tc0150rod(*this, "tc0150rod"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt") { }
 
 	/* memory pointers */
@@ -54,6 +55,7 @@ public:
 	optional_device<tc0150rod_device> m_tc0150rod;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<tc0140syt_device> m_tc0140syt;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);

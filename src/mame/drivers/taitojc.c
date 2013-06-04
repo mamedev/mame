@@ -381,7 +381,6 @@ Notes:
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
-#include "machine/taitoio.h"
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 
@@ -752,7 +751,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r, 0xffffffff)
 	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE8(mcu_comm_r, mcu_comm_w, 0xffffffff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
-	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8_LEGACY("tc0640fio", tc0640fio_r, tc0640fio_w, 0xff000000)
+	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8("tc0640fio", tc0640fio_device, read, write, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_ack_w, 0x00ff0000)
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")

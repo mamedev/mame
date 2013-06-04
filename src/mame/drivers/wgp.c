@@ -397,7 +397,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/taitoio.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -634,7 +633,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* main CPUA ram */
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)            /* tilemaps */

@@ -359,7 +359,7 @@ INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_cpub_interrupt)
 
 READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);   /* read port number */
+	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0);
 
 	switch (port)
@@ -371,7 +371,7 @@ READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
+			return m_tc0220ioc->portreg_r(space, offset);
 	}
 }
 
@@ -518,8 +518,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
-	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
+	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)   /* motor CPU */
 ADDRESS_MAP_END
 

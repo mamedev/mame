@@ -222,7 +222,6 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 #include "includes/taitoair.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
-#include "machine/taitoio.h"
 #include "cpu/tms32025/tms32025.h"
 #include "sound/2610intf.h"
 
@@ -400,7 +399,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("backregs")
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
-	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff) /* other I/O */
+	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff) /* other I/O */
 	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0xa80002, 0xa80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM                     /* "power common ram" (mecha drive) */

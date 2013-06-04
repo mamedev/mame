@@ -1105,7 +1105,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 			break;
 
 		default:
-			tc0220ioc_w(m_tc0220ioc, space, offset, data);  /* might be a 510NIO ! */
+			m_tc0220ioc->write(space, offset, data);  /* might be a 510NIO ! */
 	}
 }
 
@@ -1126,7 +1126,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);   /* read port number */
+	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
@@ -1138,7 +1138,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
+			return m_tc0220ioc->portreg_r(space, offset);
 	}
 }
 
@@ -1147,7 +1147,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, space, 0);   /* read port number */
+	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
 	UINT16 steer = 0xff80 + ioport("STEER")->read_safe(0x80);
 
 	switch (port)
@@ -1171,7 +1171,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(m_tc0220ioc, space, offset);
+			return m_tc0220ioc->portreg_r(space, offset);
 	}
 }
 
@@ -1260,7 +1260,7 @@ READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 			return m_eeprom->read_bit() << 7;
 
 		default:
-			return tc0220ioc_r(m_tc0220ioc, space, offset); /* might be a 510NIO ! */
+			return m_tc0220ioc->read(space, offset); /* might be a 510NIO ! */
 	}
 }
 
@@ -1507,8 +1507,8 @@ static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x100000, 0x100001) AM_READ8(contcirc_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff) /* (actually game uses TC040IOC) */
+	AM_RANGE(0x100000, 0x100001) AM_READ8(contcirc_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff) /* (actually game uses TC040IOC) */
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 ADDRESS_MAP_END
 
@@ -1518,8 +1518,8 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
-	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_READ8(chasehq_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(chasehq_cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)  /* palette */
@@ -1554,8 +1554,8 @@ static ADDRESS_MAP_START( enforce_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1563,7 +1563,7 @@ static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -1576,7 +1576,7 @@ static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 //  AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w) /* No analog stick, this is the Joystick version */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -1603,7 +1603,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(cpua_ctrl_w)  // ?? doesn't seem to fit what's written
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -1626,7 +1626,7 @@ static ADDRESS_MAP_START( nightstr_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)  /* palette */
@@ -1661,7 +1661,7 @@ static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800800, 0x80083f) AM_READ(aquajack_unknown_r) // Read regularly after write to 800800...
 //  AM_RANGE(0x800800, 0x800801) AM_WRITE(taitoz_unknown_w)
@@ -1697,7 +1697,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(dblaxle_cpua_ctrl_w)  /* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -1722,7 +1722,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x300010, 0x30001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x520000, 0x520003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)

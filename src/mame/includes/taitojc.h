@@ -1,4 +1,5 @@
 #include "video/polynew.h"
+#include "machine/taitoio.h"
 
 #define TAITOJC_POLYGON_FIFO_SIZE       0x20000
 
@@ -40,6 +41,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_dsp(*this,"dsp"),
+		m_tc0640fio(*this, "tc0640fio"),
 		m_gfx2(*this, "gfx2"),
 		m_vram(*this, "vram"),
 		m_objlist(*this, "objlist"),
@@ -56,6 +58,7 @@ public:
 	// device/memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
+	optional_device<tc0640fio_device> m_tc0640fio;
 	required_memory_region m_gfx2;
 
 	required_shared_ptr<UINT32> m_vram;

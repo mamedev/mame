@@ -182,7 +182,6 @@ TODO!
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "machine/mb87078.h"
-#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
@@ -449,18 +448,18 @@ READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
 			return ioport("COIN")->read() << 8;
 
 		default:
-			return tc0640fio_r(m_tc0640fio, space, offset) << 8;
+			return m_tc0640fio->read(space, offset) << 8;
 	}
 }
 
 WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 {
 	if (ACCESSING_BITS_0_7)
-		tc0220ioc_w(m_tc0220ioc, space, offset, data & 0xff);
+		m_tc0220ioc->write(space, offset, data & 0xff);
 	else
 	{
 		/* &spacedxo also writes here - bug? */
-		tc0220ioc_w(m_tc0220ioc, space, offset, (data >> 8) & 0xff);
+		m_tc0220ioc->write(space, offset, (data >> 8) & 0xff);
 	}
 }
 
@@ -490,13 +489,13 @@ static ADDRESS_MAP_START( rastsag2_map, AS_PROGRAM, 16, taitob_state )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( crimec_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -510,7 +509,7 @@ static ADDRESS_MAP_START( tetrist_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM /* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
@@ -519,8 +518,8 @@ static ADDRESS_MAP_START( tetrista_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -530,7 +529,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x610000, 0x610001) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -548,7 +547,7 @@ static ADDRESS_MAP_START( rambo3_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x600010, 0x600011) AM_READ(tracky1_lo_r) /*player 1*/
 	AM_RANGE(0x600012, 0x600013) AM_READ(tracky1_hi_r)
 	AM_RANGE(0x600014, 0x600015) AM_READ(trackx1_lo_r)
@@ -565,7 +564,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbobble_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")        /* shown in service mode, game omits to read it */
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
@@ -581,7 +580,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spacedx_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x500000, 0x50000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
 	AM_RANGE(0x500024, 0x500025) AM_READ_PORT("P3_P4_A")
 	AM_RANGE(0x500026, 0x500027) AM_READWRITE(eep_latch_r, eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)    /* simply locks coins 3&4 out */
@@ -597,7 +596,7 @@ static ADDRESS_MAP_START( spacedxo_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8_LEGACY("tc0220ioc", tc0220ioc_r, 0x00ff) AM_WRITE(spacedxo_tc0220ioc_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff) AM_WRITE(spacedxo_tc0220ioc_w)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
@@ -610,7 +609,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE_LEGACY("tc0640fio", tc0640fio_halfword_byteswap_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READ(pbobble_input_bypass_r) AM_DEVWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_w)
 	AM_RANGE(0x200024, 0x200025) AM_READ_PORT("P3_P4_A")    /* player 3,4 start */
 	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200028, 0x200029) AM_READWRITE(player_34_coin_ctrl_r, player_34_coin_ctrl_w)
@@ -630,7 +629,7 @@ static ADDRESS_MAP_START( viofight_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
 
@@ -640,8 +639,8 @@ static ADDRESS_MAP_START( masterw_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -653,7 +652,7 @@ static ADDRESS_MAP_START( silentd_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 //  AM_RANGE(0x10001a, 0x10001b) AM_READNOP // ??? read at $1e344
 //  AM_RANGE(0x10001c, 0x10001d) AM_READNOP // ??? read at $1e356
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
@@ -670,8 +669,8 @@ static ADDRESS_MAP_START( selfeena_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x200000 )
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
-	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00) /* mirror address - seems to be only used for coin control */
+	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
+	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00) /* mirror address - seems to be only used for coin control */
 	AM_RANGE(0x500000, 0x500001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -681,7 +680,7 @@ static ADDRESS_MAP_START( sbm_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* Main RAM */
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x900000 )
@@ -692,7 +691,7 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x12ffff) AM_RAM
 	AM_RANGE(0x130000, 0x13ffff) AM_RAM // Check me
-	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_wordswap_r, tc0510nio_halfword_wordswap_w)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x184000, 0x184001) AM_WRITE(realpunc_video_ctrl_w)
 	AM_RANGE(0x188000, 0x188001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_w, 0xff00)

@@ -1,3 +1,4 @@
+#include "machine/taitoio.h"
 #include "sound/okim6295.h"
 
 struct f2_tempsprite
@@ -31,7 +32,10 @@ public:
 			m_tc0360pri(*this, "tc0360pri"),
 			m_tc0280grd(*this, "tc0280grd"),
 			m_tc0430grw(*this, "tc0430grw"),
-			m_tc0480scp(*this, "tc0480scp") { }
+			m_tc0480scp(*this, "tc0480scp"),
+			m_tc0220ioc(*this, "tc0220ioc"),
+			m_tc0510nio(*this, "tc0510nio")
+			{ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_sprite_extension;
@@ -94,6 +98,8 @@ public:
 	optional_device<tc0280grd_device> m_tc0280grd;
 	optional_device<tc0280grd_device> m_tc0430grw;
 	optional_device<tc0480scp_device> m_tc0480scp;
+	optional_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0510nio_device> m_tc0510nio;
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
 	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);

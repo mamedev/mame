@@ -148,7 +148,6 @@ Colscroll effects?
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
-#include "machine/taitoio.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -232,7 +231,7 @@ static ADDRESS_MAP_START( darius2d_map, AS_PROGRAM, 16, warriorb_state )
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)    /* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)    /* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END
@@ -247,7 +246,7 @@ static ADDRESS_MAP_START( warriorb_map, AS_PROGRAM, 16, warriorb_state )
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)    /* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)    /* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE_LEGACY("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
+	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END

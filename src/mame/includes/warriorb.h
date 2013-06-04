@@ -6,6 +6,7 @@
 
 #include "sound/flt_vol.h"
 #include "audio/taitosnd.h"
+#include "machine/taitoio.h"
 
 class warriorb_state : public driver_device
 {
@@ -18,6 +19,8 @@ public:
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0100scn_1(*this, "tc0100scn_1"),
 		m_tc0100scn_2(*this, "tc0100scn_2"),
+		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0510nio(*this, "tc0510nio"),
 		m_2610_1l(*this, "2610.1.l"),
 		m_2610_1r(*this, "2610.1.r"),
 		m_2610_2l(*this, "2610.2.l"),
@@ -36,6 +39,8 @@ public:
 	required_device<tc0140syt_device> m_tc0140syt;
 	required_device<tc0100scn_device> m_tc0100scn_1;
 	required_device<tc0100scn_device> m_tc0100scn_2;
+	optional_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<filter_volume_device> m_2610_1l;
 	required_device<filter_volume_device> m_2610_1r;
 	required_device<filter_volume_device> m_2610_2l;

@@ -27,7 +27,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_tc0180vcu(*this, "tc0180vcu"),
 		m_tc0640fio(*this, "tc0640fio"),
-		m_tc0220ioc(*this, "tc0220ioc") { }
+		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0510nio(*this, "tc0510nio")	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -59,6 +60,7 @@ public:
 	required_device<tc0180vcu_device> m_tc0180vcu;
 	optional_device<tc0640fio_device> m_tc0640fio;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
+	optional_device<tc0510nio_device> m_tc0510nio;
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ16_MEMBER(tracky1_hi_r);
 	DECLARE_READ16_MEMBER(tracky1_lo_r);
