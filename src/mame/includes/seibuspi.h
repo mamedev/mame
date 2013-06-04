@@ -17,7 +17,8 @@ public:
 		m_soundflash2(*this, "soundflash2"),
 		m_soundfifo1(*this, "soundfifo1"),
 		m_soundfifo2(*this, "soundfifo2"),
-		m_oki2(*this, "oki2") { }
+		m_oki2(*this, "oki2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
@@ -77,7 +78,6 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_enable_w);
 	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
 	DECLARE_WRITE8_MEMBER(z80_bank_w);
-	DECLARE_READ32_MEMBER(soundrom_r);
 	DECLARE_WRITE32_MEMBER(input_select_w);
 	DECLARE_READ32_MEMBER(senkyu_speedup_r);
 	DECLARE_READ32_MEMBER(senkyua_speedup_r);
