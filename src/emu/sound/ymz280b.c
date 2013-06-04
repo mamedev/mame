@@ -19,7 +19,7 @@
   Voice signal is output in stereo 16-bit 2's complement MSB-first format
   
   TODO:
-  - Is memory handling 100% correct? At the moment, Konami firewave.c is the only
+  - Is memory handling 100% correct? At the moment, Konami firebeat.c is the only
     hardware currently emulated that uses external handlers.
     It also happens to be the only one using 16-bit PCM.
 
