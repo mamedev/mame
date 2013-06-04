@@ -18,11 +18,6 @@ MACHINEOBJ = $(EMUOBJ)/machine
 # Core machine types
 #-------------------------------------------------
 
-MACHINEOBJS +=  $(MACHINEOBJ)/generic.o   	\
-				$(MACHINEOBJ)/nvram.o       \
-				$(MACHINEOBJ)/ram.o         \
-
-
 MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/53c810.o      \
 				$(MACHINEOBJ)/6522via.o     \

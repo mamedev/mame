@@ -402,9 +402,6 @@ public:
 	DECLARE_READ8_MEMBER( fatal_generic_read );
 	DECLARE_WRITE8_MEMBER( fatal_generic_write );
 
-	// led status handling	
-	void set_led_status(int num, int value);
-
 protected:
 	// helpers called at startup
 	virtual void driver_start();

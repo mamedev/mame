@@ -782,8 +782,3 @@ WRITE8_MEMBER( driver_device::fatal_generic_write )
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
-
-void driver_device::set_led_status(int num, int value)
-{
-	::set_led_status(machine(), num, value);
-}

@@ -138,7 +138,12 @@ EMUSOUNDOBJS = \
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \
 	$(EMUDRIVERS)/testcpu.o \
-
+	
+EMUMACHINEOBJS = \
+    $(EMUMACHINE)/generic.o     \
+	$(EMUMACHINE)/ram.o     	\
+	$(EMUMACHINE)/nvram.o     	\
+	
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \
 	$(EMUIMAGEDEV)/cartslot.o   \
@@ -148,13 +153,13 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/floppy.o     \
 	$(EMUIMAGEDEV)/harddriv.o   \
 	$(EMUIMAGEDEV)/midiin.o     \
-	$(EMUIMAGEDEV)/midiout.o     \
+	$(EMUIMAGEDEV)/midiout.o    \
 	$(EMUIMAGEDEV)/printer.o    \
 	$(EMUIMAGEDEV)/serial.o     \
 	$(EMUIMAGEDEV)/snapquik.o   \
 
 
-LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUIMAGEDEVOBJS)
+LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS)
 
 $(LIBEMU): $(LIBEMUOBJS)
 
