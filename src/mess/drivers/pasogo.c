@@ -229,29 +229,27 @@ protected:
 
 TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
 {
-	vg230_t *vg230 = &m_vg230;
-
-	vg230->rtc.seconds+=1;
-	if (vg230->rtc.seconds>=60)
+	m_vg230.rtc.seconds += 1;
+	if (m_vg230.rtc.seconds >= 60)
 	{
-		vg230->rtc.seconds=00;
-		vg230->rtc.minutes+=1;
-		if (vg230->rtc.minutes>=60)
+		m_vg230.rtc.seconds = 0;
+		m_vg230.rtc.minutes += 1;
+		if (m_vg230.rtc.minutes >= 60)
 		{
-			vg230->rtc.minutes=0;
-			vg230->rtc.hours+=1;
-			if (vg230->rtc.hours>=24)
+			m_vg230.rtc.minutes = 0;
+			m_vg230.rtc.hours += 1;
+			if (m_vg230.rtc.hours >= 24)
 			{
-				vg230->rtc.hours=0;
-				vg230->rtc.days=(vg230->rtc.days+1)&0xfff;
+				m_vg230.rtc.hours = 0;
+				m_vg230.rtc.days = (m_vg230.rtc.days + 1) & 0xfff;
 			}
 		}
 	}
 
-	if (vg230->rtc.seconds==vg230->rtc.alarm_seconds
-		&& vg230->rtc.minutes==vg230->rtc.alarm_minutes
-		&& vg230->rtc.hours==vg230->rtc.alarm_hours
-		&& (vg230->rtc.days&0x1f)==vg230->rtc.alarm_hours)
+	if (m_vg230.rtc.seconds == m_vg230.rtc.alarm_seconds
+		&& m_vg230.rtc.minutes == m_vg230.rtc.alarm_minutes
+		&& m_vg230.rtc.hours == m_vg230.rtc.alarm_hours
+		&& (m_vg230.rtc.days & 0x1f) == m_vg230.rtc.alarm_hours)
 	{
 		// generate alarm
 	}
@@ -259,19 +257,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
 
 void pasogo_state::vg230_reset()
 {
-	vg230_t *vg230 = &m_vg230;
 	system_time systime;
 
-	memset(vg230, 0, sizeof(*vg230));
-	vg230->pmu.write_protected=TRUE;
+	memset(&m_vg230, 0, sizeof(m_vg230));
+	m_vg230.pmu.write_protected = TRUE;
 	machine().base_datetime(systime);
 
-	vg230->rtc.seconds= systime.local_time.second;
-	vg230->rtc.minutes= systime.local_time.minute;
-	vg230->rtc.hours = systime.local_time.hour;
-	vg230->rtc.days = 0;
+	m_vg230.rtc.seconds = systime.local_time.second;
+	m_vg230.rtc.minutes = systime.local_time.minute;
+	m_vg230.rtc.hours = systime.local_time.hour;
+	m_vg230.rtc.days = 0;
 
-	vg230->bios_timer.data=0x7200; // HACK
+	m_vg230.bios_timer.data=0x7200; // HACK
 }
 
 void pasogo_state::vg230_init()
@@ -282,174 +279,237 @@ void pasogo_state::vg230_init()
 
 READ8_MEMBER( pasogo_state::vg230_io_r )
 {
-	vg230_t *vg230 = &m_vg230;
-	int log=TRUE;
-	UINT8 data=0;
+	int log = TRUE;
+	UINT8 data = 0;
 
-	vg230->bios_timer.data+=0x100; //HACK
+	m_vg230.bios_timer.data += 0x100; //HACK
 	if (offset&1)
 	{
-		data=vg230->data[vg230->index];
-		switch (vg230->index)
+		data = m_vg230.data[m_vg230.index];
+		switch (m_vg230.index)
 		{
-			case 0x09: break;
+			case 0x09:
+				break;
+
 			case 0x0a:
-				if (vg230->data[9]&1)
+				if (m_vg230.data[9] & 1)
 					data=ioport("JOY")->read();
 				else
-					data=0xff;
+					data = 0xff;
 				break;
 
 			case 0x30:
-				data=vg230->bios_timer.data&0xff;
+				data = m_vg230.bios_timer.data & 0xff;
 				break;
 
 			case 0x31:
-				data=vg230->bios_timer.data>>8;
-				log=FALSE;
+				data = m_vg230.bios_timer.data >> 8;
+				log = FALSE;
 				break;
 
-			case 0x70: data=vg230->rtc.seconds; log=FALSE; break;
-			case 0x71: data=vg230->rtc.minutes; log=FALSE; break;
-			case 0x72: data=vg230->rtc.hours; log=FALSE; break;
-			case 0x73: data=vg230->rtc.days; break;
-			case 0x74: data=vg230->rtc.days>>8; break;
-			case 0x79: /*rtc status*/log=FALSE; break;
+			case 0x70:
+				data = m_vg230.rtc.seconds;
+				log = FALSE;
+				break;
+
+			case 0x71:
+				data = m_vg230.rtc.minutes;
+				log = FALSE;
+				break;
+
+			case 0x72:
+				data = m_vg230.rtc.hours;
+				log = FALSE;
+				break;
+
+			case 0x73:
+				data = m_vg230.rtc.days;
+				break;
+
+			case 0x74:
+				data = m_vg230.rtc.days >> 8;
+				break;
+
+			case 0x79:
+				/*rtc status*/
+				log = FALSE;
+				break;
+
 			case 0x7a:
-				data&=~3;
-				if (vg230->rtc.alarm_interrupt_request) data|=1<<1;
-				if (vg230->rtc.onehertz_interrupt_request) data|=1<<0;
+				data &= ~3;
+				if (m_vg230.rtc.alarm_interrupt_request)
+					data |= 1<<1;
+				if (m_vg230.rtc.onehertz_interrupt_request)
+					data |= 1<<0;
 				break;
 
 			case 0xc1:
-				data&=~1;
-				if (vg230->pmu.write_protected) data|=1;
-				vg230->pmu.write_protected=FALSE;
-				log=FALSE;
+				data &= ~1;
+				if (m_vg230.pmu.write_protected)
+					data |= 1;
+				m_vg230.pmu.write_protected = FALSE;
+				log = FALSE;
 				break;
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x read %.2x\n",(int) m_maincpu->pc(),vg230->index,data);
+			logerror("%.5x vg230 %02x read %.2x\n",(int) m_maincpu->pc(), m_vg230.index, data);
 		//    data=machine.root_device().memregion("maincpu")->base()[0x4000+offset];
 	}
 	else
-		data=vg230->index;
+		data = m_vg230.index;
 
 	return data;
 }
+
+
 WRITE8_MEMBER( pasogo_state::vg230_io_w )
 {
-	vg230_t *vg230 = &m_vg230;
-	int log=TRUE;
+	int log = TRUE;
 
-	if (offset&1)
+	if (offset & 1)
 	{
 		//  machine.root_device().memregion("maincpu")->base()[0x4000+offset]=data;
-		vg230->data[vg230->index]=data;
-		switch (vg230->index)
+		m_vg230.data[m_vg230.index] = data;
+		switch (m_vg230.index)
 		{
-			case 0x09: break;
-			case 0x70: vg230->rtc.seconds=data&0x3f; break;
-			case 0x71: vg230->rtc.minutes=data&0x3f; break;
-			case 0x72: vg230->rtc.hours=data&0x1f;break;
-			case 0x73: vg230->rtc.days=(vg230->rtc.days&~0xff)|data; break;
-			case 0x74: vg230->rtc.days=(vg230->rtc.days&0xff)|((data&0xf)<<8); break;
-			case 0x75: vg230->rtc.alarm_seconds=data&0x3f; break;
-			case 0x76: vg230->rtc.alarm_minutes=data&0x3f; break;
-			case 0x77: vg230->rtc.alarm_hours=data&0x1f; break;
-			case 0x78: vg230->rtc.days=data&0x1f; break;
+			case 0x09:
+				break;
+
+			case 0x70:
+				m_vg230.rtc.seconds = data & 0x3f;
+				break;
+
+			case 0x71:
+				m_vg230.rtc.minutes = data & 0x3f;
+				break;
+
+			case 0x72:
+				m_vg230.rtc.hours = data & 0x1f;
+				break;
+
+			case 0x73:
+				m_vg230.rtc.days = (m_vg230.rtc.days & ~0xff) | data;
+				break;
+
+			case 0x74:
+				m_vg230.rtc.days = (m_vg230.rtc.days & 0xff) | ((data & 0xf) << 8);
+				break;
+
+			case 0x75:
+				m_vg230.rtc.alarm_seconds = data & 0x3f;
+				break;
+
+			case 0x76:
+				m_vg230.rtc.alarm_minutes = data & 0x3f;
+				break;
+
+			case 0x77:
+				m_vg230.rtc.alarm_hours = data & 0x1f;
+				break;
+
+			case 0x78:
+				m_vg230.rtc.days = data & 0x1f;
+				break;
+
 			case 0x79:
-				vg230->rtc.onehertz_interrupt_on=data&1;
-				vg230->rtc.alarm_interrupt_on=data&2;
-				log=FALSE;
+				m_vg230.rtc.onehertz_interrupt_on = data & 1;
+				m_vg230.rtc.alarm_interrupt_on = data & 2;
+				log = FALSE;
 				break;
 
 			case 0x7a:
-				if (data&2)
+				if (data & 2)
 				{
-					vg230->rtc.alarm_interrupt_request=FALSE; vg230->rtc.onehertz_interrupt_request=FALSE; /* update interrupt */
+					m_vg230.rtc.alarm_interrupt_request = FALSE;
+					m_vg230.rtc.onehertz_interrupt_request = FALSE; /* update interrupt */
 				}
 				break;
 		}
 
 		if (log)
-			logerror("%.5x vg230 %02x write %.2x\n",(int)m_maincpu->pc(),vg230->index,data);
+			logerror("%.5x vg230 %02x write %.2x\n", (int)m_maincpu->pc(), m_vg230.index, data);
 	}
 	else
-		vg230->index=data;
+		m_vg230.index = data;
 }
+
 
 READ8_MEMBER( pasogo_state::ems_r )
 {
-	ems_t *ems = &m_ems;
-	UINT8 data=0;
+	UINT8 data = 0;
 
 	switch (offset)
 	{
-		case 0: data=ems->data; break;
-		case 2: case 3: data=ems->mapper[ems->index].data[offset&1]; break;
+		case 0:
+			data = m_ems.data;
+			break;
+
+		case 2:
+		case 3:
+			data = m_ems.mapper[m_ems.index].data[offset & 1];
+			break;
 	}
 	return data;
 }
 
+
 WRITE8_MEMBER( pasogo_state::ems_w )
 {
-	ems_t *ems = &m_ems;
 	char bank[10];
 
 	switch (offset)
 	{
 	case 0:
-		ems->data=data;
-		switch (data&~3)
+		m_ems.data = data;
+		switch (data & ~3)
 		{
-		case 0x80: ems->index=0; break;
-		case 0x84: ems->index=1; break;
-		case 0x88: ems->index=2; break;
-		case 0x8c: ems->index=3; break;
-		case 0x90: ems->index=4; break;
-		case 0x94: ems->index=5; break;
-		case 0x98: ems->index=6; break;
-		case 0x9c: ems->index=7; break;
-		case 0xa0: ems->index=8; break;
-		case 0xa4: ems->index=9; break;
-		case 0xa8: ems->index=10; break;
-		case 0xac: ems->index=11; break;
-		case 0xb0: ems->index=12; break;
-		case 0xb4: ems->index=13; break;
-		//  case 0xb8: ems->index=14; break;
-		//  case 0xbc: ems->index=15; break;
-		case 0xc0: ems->index=14; break;
-		case 0xc4: ems->index=15; break;
-		case 0xc8: ems->index=16; break;
-		case 0xcc: ems->index=17; break;
-		case 0xd0: ems->index=18; break;
-		case 0xd4: ems->index=19; break;
-		case 0xd8: ems->index=20; break;
-		case 0xdc: ems->index=21; break;
-		case 0xe0: ems->index=22; break;
-		case 0xe4: ems->index=23; break;
-		case 0xe8: ems->index=24; break;
-		case 0xec: ems->index=25; break;
+			case 0x80: m_ems.index = 0; break;
+			case 0x84: m_ems.index = 1; break;
+			case 0x88: m_ems.index = 2; break;
+			case 0x8c: m_ems.index = 3; break;
+			case 0x90: m_ems.index = 4; break;
+			case 0x94: m_ems.index = 5; break;
+			case 0x98: m_ems.index = 6; break;
+			case 0x9c: m_ems.index = 7; break;
+			case 0xa0: m_ems.index = 8; break;
+			case 0xa4: m_ems.index = 9; break;
+			case 0xa8: m_ems.index = 10; break;
+			case 0xac: m_ems.index = 11; break;
+			case 0xb0: m_ems.index = 12; break;
+			case 0xb4: m_ems.index = 13; break;
+			//case 0xb8: m_ems.index = 14; break;
+			//case 0xbc: m_ems.index = 15; break;
+			case 0xc0: m_ems.index = 14; break;
+			case 0xc4: m_ems.index = 15; break;
+			case 0xc8: m_ems.index = 16; break;
+			case 0xcc: m_ems.index = 17; break;
+			case 0xd0: m_ems.index = 18; break;
+			case 0xd4: m_ems.index = 19; break;
+			case 0xd8: m_ems.index = 20; break;
+			case 0xdc: m_ems.index = 21; break;
+			case 0xe0: m_ems.index = 22; break;
+			case 0xe4: m_ems.index = 23; break;
+			case 0xe8: m_ems.index = 24; break;
+			case 0xec: m_ems.index = 25; break;
 		}
 		break;
 
 	case 2:
 	case 3:
-		ems->mapper[ems->index].data[offset&1]=data;
-		ems->mapper[ems->index].address=(ems->mapper[ems->index].data[0]<<14)|((ems->mapper[ems->index].data[1]&0xf)<<22);
-		ems->mapper[ems->index].on=ems->mapper[ems->index].data[1]&0x80;
-		ems->mapper[ems->index].type=(ems->mapper[ems->index].data[1]&0x70)>>4;
-		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n",(int)m_maincpu->pc(),ems->index, ems->data<<12,
-			ems->mapper[ems->index].on, ems->mapper[ems->index].type, ems->mapper[ems->index].address );
+		m_ems.mapper[m_ems.index].data[offset & 1] = data;
+		m_ems.mapper[m_ems.index].address = (m_ems.mapper[m_ems.index].data[0] << 14) | ((m_ems.mapper[m_ems.index].data[1] & 0xf) << 22);
+		m_ems.mapper[m_ems.index].on = m_ems.mapper[m_ems.index].data[1] & 0x80;
+		m_ems.mapper[m_ems.index].type = (m_ems.mapper[m_ems.index].data[1] & 0x70) >> 4;
+		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n", (int)m_maincpu->pc(), m_ems.index, m_ems.data << 12,
+			m_ems.mapper[m_ems.index].on, m_ems.mapper[m_ems.index].type, m_ems.mapper[m_ems.index].address );
 
-		switch (ems->mapper[ems->index].type)
+		switch (m_ems.mapper[m_ems.index].type)
 		{
 		case 0: /*external*/
 		case 1: /*ram*/
-			sprintf(bank,"bank%d",ems->index+1);
-			membank( bank )->set_base( memregion("maincpu")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			sprintf(bank, "bank%d", m_ems.index + 1);
+			membank( bank )->set_base( memregion("maincpu")->base() + (m_ems.mapper[m_ems.index].address & 0xfffff) );
 			break;
 		case 3: /* rom 1 */
 		case 4: /* pc card a */
@@ -457,13 +517,14 @@ WRITE8_MEMBER( pasogo_state::ems_w )
 		default:
 			break;
 		case 2:
-			sprintf(bank,"bank%d",ems->index+1);
-			membank( bank )->set_base( memregion("user1")->base() + (ems->mapper[ems->index].address&0xfffff) );
+			sprintf(bank, "bank%d", m_ems.index + 1);
+			membank( bank )->set_base( memregion("user1")->base() + (m_ems.mapper[m_ems.index].address & 0xfffff) );
 			break;
 		}
 		break;
 	}
 }
+
 
 static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
@@ -500,6 +561,7 @@ static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
@@ -509,6 +571,7 @@ static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff )
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( pasogo )
 PORT_START("JOY")
@@ -524,6 +587,7 @@ PORT_START("JOY")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
 INPUT_PORTS_END
 
+
 /* palette in red, green, blue tribles */
 static const unsigned char pasogo_palette[][3] =
 {
@@ -532,6 +596,7 @@ static const unsigned char pasogo_palette[][3] =
 	{ 130, 159, 166 },
 	{ 255,255,255 }
 };
+
 
 void pasogo_state::palette_init()
 {
@@ -543,59 +608,60 @@ void pasogo_state::palette_init()
 	}
 }
 
+
 UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static int width=-1,height=-1;
+	//static int width = -1, height = -1;
 	UINT8 *rom = memregion("maincpu")->base()+0xb8000;
-	static const UINT16 c[]={ 3, 0 };
+	static const UINT16 c[] = { 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
-	int w=640;
-	int h=240;
+	int w = 640;
+	int h = 240;
 	if (0)
 	{
-		w=320;
-		h=240;
-		for (y=0;y<h; y++)
+		w = 320;
+		h = 240;
+		for (y=0; y<h; y++)
 		{
-			for (x=0;x<w;x+=4)
+			for (x=0; x<w; x+=4)
 			{
-				int a=(y&1)*0x2000;
-				UINT8 d=rom[a+(y&~1)*80/2+x/4];
-				UINT16 *line=&bitmap.pix16(y, x);
-				*line++=(d>>6)&3;
-				*line++=(d>>4)&3;
-				*line++=(d>>2)&3;
-				*line++=(d>>0)&3;
+				int a = (y & 1) * 0x2000;
+				UINT8 d = rom[a + (y & ~1) * 80/2 + x/4];
+				UINT16 *line = &bitmap.pix16(y, x);
+				*line++ = (d >> 6) & 3;
+				*line++ = (d >> 4) & 3;
+				*line++ = (d >> 2) & 3;
+				*line++ = (d >> 0) & 3;
 			}
 		}
 	}
 	else
 	{
-		for (y=0;y<h; y++)
+		for (y=0; y<h; y++)
 		{
-			for (x=0;x<w;x+=8)
+			for (x=0; x<w; x+=8)
 			{
-				int a=(y&3)*0x2000;
-				UINT8 d=rom[a+(y&~3)*80/4+x/8];
-				UINT16 *line=&bitmap.pix16(y, x);
-				*line++=c[(d>>7)&1];
-				*line++=c[(d>>6)&1];
-				*line++=c[(d>>5)&1];
-				*line++=c[(d>>4)&1];
-				*line++=c[(d>>3)&1];
-				*line++=c[(d>>2)&1];
-				*line++=c[(d>>1)&1];
-				*line++=c[(d>>0)&1];
+				int a = (y & 3) * 0x2000;
+				UINT8 d = rom[a + (y & ~3) * 80/4 + x/8];
+				UINT16 *line = &bitmap.pix16(y, x);
+				*line++ = c[(d >> 7) & 1];
+				*line++ = c[(d >> 6) & 1];
+				*line++ = c[(d >> 5) & 1];
+				*line++ = c[(d >> 4) & 1];
+				*line++ = c[(d >> 3) & 1];
+				*line++ = c[(d >> 2) & 1];
+				*line++ = c[(d >> 1) & 1];
+				*line++ = c[(d >> 0) & 1];
 			}
 		}
 	}
 #if 0
 	if (w!=width || h!=height)
 	{
-		width=w; height=h;
-//      machine().primary_screen->set_visible_area(0, width-1, 0, height-1);
-		screen.set_visible_area(0, width-1, 0, height-1);
+		width = w; height = h;
+//      machine().primary_screen->set_visible_area(0, width - 1, 0, height - 1);
+		screen.set_visible_area(0, width - 1, 0, height - 1);
 	}
 #endif
 	return 0;
