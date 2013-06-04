@@ -16,7 +16,7 @@ class DasmWindow : public WindowQt
 
 public:
 	DasmWindow(running_machine* machine, QWidget* parent=NULL);
-	virtual ~DasmWindow() {}
+	virtual ~DasmWindow();
 
 
 private slots:

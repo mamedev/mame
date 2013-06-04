@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "config.h"
+#include "debugger.h"
 
 
 //============================================================
@@ -16,7 +17,7 @@ class WindowQt : public QMainWindow
 
 public:
 	WindowQt(running_machine* machine, QWidget* parent=NULL);
-	virtual ~WindowQt() {}
+	virtual ~WindowQt();
 
 	// The interface to an all-window refresh
 	void refreshAll() { s_refreshAll = true; }

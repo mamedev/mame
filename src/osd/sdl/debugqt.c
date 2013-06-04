@@ -11,6 +11,10 @@
 
 #if !defined(NO_DEBUGGER)
 
+#define NO_MEM_TRACKING
+
+#include <vector>
+
 #include <QtGui/QtGui>
 #include <QtGui/QApplication>
 
@@ -47,7 +51,7 @@ MainWindow* mainQtWindow = NULL;
 //============================================================
 
 // Global variable used to feed the xml configuration callbacks
-simple_list<WindowQtConfig> xmlConfigurations;
+std::vector<WindowQtConfig*> xmlConfigurations;
 
 
 static void xml_configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
@@ -60,23 +64,24 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 	if (parentnode == NULL)
 		return;
 
-	xmlConfigurations.reset();
+    for (int i = 0; i < xmlConfigurations.size(); i++)
+        delete xmlConfigurations[i];
+	xmlConfigurations.clear();
 
 	// Configuration load
 	xml_data_node* wnode = NULL;
 	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
 	{
-		WindowQtConfig* config = NULL;
 		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
 		{
-			case WindowQtConfig::WIN_TYPE_MAIN:   config = &xmlConfigurations.append(*global_alloc(MainWindowQtConfig)); break;
-			case WindowQtConfig::WIN_TYPE_MEMORY: config = &xmlConfigurations.append(*global_alloc(MemoryWindowQtConfig)); break;
-			case WindowQtConfig::WIN_TYPE_DASM:   config = &xmlConfigurations.append(*global_alloc(DasmWindowQtConfig)); break;
-			case WindowQtConfig::WIN_TYPE_LOG:    config = &xmlConfigurations.append(*global_alloc(LogWindowQtConfig)); break;
-			default: break;
+			case WindowQtConfig::WIN_TYPE_MAIN:   xmlConfigurations.push_back(new MainWindowQtConfig()); break;
+			case WindowQtConfig::WIN_TYPE_MEMORY: xmlConfigurations.push_back(new MemoryWindowQtConfig()); break;
+			case WindowQtConfig::WIN_TYPE_DASM:   xmlConfigurations.push_back(new DasmWindowQtConfig()); break;
+			case WindowQtConfig::WIN_TYPE_LOG:    xmlConfigurations.push_back(new LogWindowQtConfig()); break;
+			default: continue;
 		}
-		config->recoverFromXmlNode(wnode);
+		xmlConfigurations.back()->recoverFromXmlNode(wnode);
 	}
 }
 
@@ -87,8 +92,10 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
 
-	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
-	{
+    for (int i = 0; i < xmlConfigurations.size(); i++)
+    {
+        WindowQtConfig* config = xmlConfigurations[i];
+
 		// Create an xml node
 		xml_data_node *debugger_node;
 		debugger_node = xml_add_child(parentnode, "window", NULL);
@@ -103,7 +110,9 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 
 static void gather_save_configurations()
 {
-	xmlConfigurations.reset();
+    for (int i = 0; i < xmlConfigurations.size(); i++)
+        delete xmlConfigurations[i];
+	xmlConfigurations.clear();
 
 	// Loop over all the open windows
 	foreach (QWidget* widget, QApplication::topLevelWidgets())
@@ -115,17 +124,16 @@ static void gather_save_configurations()
 			continue;
 
 		// Figure out its type
-		WindowQtConfig* config = NULL;
 		if (dynamic_cast<MainWindow*>(widget))
-			config = &xmlConfigurations.append(*global_alloc(MainWindowQtConfig));
+			xmlConfigurations.push_back(new MainWindowQtConfig());
 		else if (dynamic_cast<MemoryWindow*>(widget))
-			config = &xmlConfigurations.append(*global_alloc(MemoryWindowQtConfig));
+			xmlConfigurations.push_back(new MemoryWindowQtConfig());
 		else if (dynamic_cast<DasmWindow*>(widget))
-			config = &xmlConfigurations.append(*global_alloc(DasmWindowQtConfig));
+			xmlConfigurations.push_back(new DasmWindowQtConfig());
 		else if (dynamic_cast<LogWindow*>(widget))
-			config = &xmlConfigurations.append(*global_alloc(LogWindowQtConfig));
+			xmlConfigurations.push_back(new LogWindowQtConfig());
 
-		config->buildFromQWidget(widget);
+		xmlConfigurations.back()->buildFromQWidget(widget);
 	}
 }
 
@@ -134,24 +142,27 @@ static void gather_save_configurations()
 //  Utilities
 //============================================================
 
-static void load_and_clear_main_window_config(simple_list<WindowQtConfig>& configList)
+static void load_and_clear_main_window_config(std::vector<WindowQtConfig*>& configList)
 {
-	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
+	for (int i = 0; i < configList.size(); i++)
 	{
+		WindowQtConfig* config = configList[i];
 		if (config->m_type == WindowQtConfig::WIN_TYPE_MAIN)
 		{
 			config->applyToQWidget(mainQtWindow);
-			configList.remove(*config);
+			configList.erase(configList.begin()+i);
 			break;
 		}
 	}
 }
 
 
-static void setup_additional_startup_windows(running_machine& machine, simple_list<WindowQtConfig>& configList)
+static void setup_additional_startup_windows(running_machine& machine, std::vector<WindowQtConfig*>& configList)
 {
-	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
-	{
+    for (int i = 0; i < configList.size(); i++)
+    {
+        WindowQtConfig* config = configList[i];
+        
 		WindowQt* foo = NULL;
 		switch (config->m_type)
 		{
@@ -222,7 +233,7 @@ extern int sdl_entered_debugger;
 
 void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
-#if defined(SDL)
+#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 1;
 #endif
 

@@ -16,7 +16,7 @@ class LogWindow : public WindowQt
 
 public:
 	LogWindow(running_machine* machine, QWidget* parent=NULL);
-	virtual ~LogWindow() {}
+	virtual ~LogWindow();
 
 
 private:

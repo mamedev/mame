@@ -1,3 +1,5 @@
+#define NO_MEM_TRACKING
+
 #include "debugqtdasmwindow.h"
 
 #include "debug/debugcon.h"
@@ -102,6 +104,11 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 }
 
 
+DasmWindow::~DasmWindow()
+{
+}
+        
+        
 void DasmWindow::cpuChanged(int index)
 {
 	m_dasmView->view()->set_source(*m_dasmView->view()->source_list().by_index(index));

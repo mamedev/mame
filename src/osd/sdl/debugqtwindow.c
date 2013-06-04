@@ -1,7 +1,4 @@
-#include <QtGui/QtGui>
-
-#include "emu.h"
-#include "debugger.h"
+#define NO_MEM_TRACKING
 
 #include "debugqtwindow.h"
 #include "debugqtlogwindow.h"
@@ -107,6 +104,10 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	debugMenu->addAction(dbgActQuit);
 }
 
+
+WindowQt::~WindowQt()
+{
+}
 
 void WindowQt::debugActOpenMemory()
 {

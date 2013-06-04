@@ -1,4 +1,4 @@
-#include <QtGui/QtGui>
+#define NO_MEM_TRACKING
 
 #include "debugqtview.h"
 
@@ -214,6 +214,9 @@ void DebuggerView::keyPressEvent(QKeyEvent* event)
 
 void DebuggerView::mousePressEvent(QMouseEvent* event)
 {
+	if (m_view == NULL)
+		return;
+
 	if (event->button() == Qt::LeftButton)
 	{
 		QFontMetrics actualFont = fontMetrics();

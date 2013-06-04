@@ -18,7 +18,7 @@ class MemoryWindow : public WindowQt
 
 public:
 	MemoryWindow(running_machine* machine, QWidget* parent=NULL);
-	virtual ~MemoryWindow() {}
+	virtual ~MemoryWindow();
 
 
 private slots:

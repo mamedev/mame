@@ -1,4 +1,7 @@
+#define NO_MEM_TRACKING
+
 #include "debugqtmainwindow.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
@@ -109,6 +112,11 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	addDockWidget(Qt::TopDockWidgetArea, dasmDock);
 	dockMenu->addAction(dasmDock->toggleViewAction());
+}
+
+
+MainWindow::~MainWindow()
+{
 }
 
 

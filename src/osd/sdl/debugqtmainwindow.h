@@ -22,7 +22,7 @@ class MainWindow : public WindowQt
 
 public:
 	MainWindow(running_machine* machine, QWidget* parent=NULL);
-	virtual ~MainWindow() {}
+	virtual ~MainWindow();
 
 	void setProcessor(device_t* processor);
 

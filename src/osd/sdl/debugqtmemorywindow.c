@@ -1,3 +1,5 @@
+#define NO_MEM_TRACKING
+
 #include "debugqtmemorywindow.h"
 
 #include "debug/dvmemory.h"
@@ -124,6 +126,11 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// Set to the current CPU's memory view
 	setToCurrentCpu();
+}
+
+
+MemoryWindow::~MemoryWindow()
+{
 }
 
 

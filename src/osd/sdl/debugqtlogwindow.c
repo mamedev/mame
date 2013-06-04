@@ -1,3 +1,5 @@
+#define NO_MEM_TRACKING
+
 #include "debugqtlogwindow.h"
 
 #include "debug/debugcon.h"
@@ -33,6 +35,11 @@ LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
 	vLayout->addWidget(m_logView);
 
 	setCentralWidget(mainWindowFrame);
+}
+
+
+LogWindow::~LogWindow()
+{
 }
 
 
