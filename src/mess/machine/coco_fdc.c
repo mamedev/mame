@@ -71,7 +71,6 @@
 #include "imagedev/flopdrv.h"
 #include "includes/coco.h"
 #include "machine/wd17xx.h"
-#include "machine/ds1315.h"
 #include "imagedev/flopdrv.h"
 #include "formats/coco_dsk.h"
 
@@ -207,7 +206,7 @@ void coco_fdc_device::device_start()
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 	m_drq               = 1;
 	m_disto_msm6242     = subdevice<msm6242_device>(DISTO_TAG);
-	m_ds1315            = subdevice(CLOUD9_TAG);
+	m_ds1315            = subdevice<ds1315_device>(CLOUD9_TAG);
 	m_wd17xx            = subdevice(WD_TAG);
 	m_dskreg            = 0x00;
 	m_intrq             = 0;
@@ -359,17 +358,17 @@ READ8_MEMBER(coco_fdc_device::read)
 
 		case 0x38:  /* FF78 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_0(m_ds1315, space, offset);
+				m_ds1315->read_0(space, offset);
 			break;
 
 		case 0x39:  /* FF79 */
 			if (real_time_clock() == RTC_CLOUD9)
-				ds1315_r_1(m_ds1315, space, offset);
+				m_ds1315->read_1(space, offset);
 			break;
 
 		case 0x3C:  /* FF7C */
 			if (real_time_clock() == RTC_CLOUD9)
-				result = ds1315_r_data(m_ds1315, space, offset);
+				result = m_ds1315->read_data(space, offset);
 			break;
 	}
 	return result;
