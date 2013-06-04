@@ -7,19 +7,16 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_background_videoram(*this, "bg_videoram"),
 		m_foreground_videoram(*this, "fg_videoram")
-	{
-		m_bitcount = 0;
-		m_writeval = 0;
-	}
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_background_videoram;
 	required_shared_ptr<UINT8> m_foreground_videoram;
 
-	int m_bitcount;
-	UINT8 m_writeval;
-
+	bool m_leds_start;
+	UINT32 m_leds_shiftreg;
+	
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
@@ -31,12 +28,9 @@ public:
 	DECLARE_WRITE8_MEMBER(speedbal_background_videoram_w);
 
 	DECLARE_WRITE8_MEMBER(speedbal_maincpu_50_w);
-	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_40_w);
-	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_80_w);
-	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_82_w);
-	DECLARE_WRITE8_MEMBER(speedbal_sndcpu_c1_w);
-
-	void write_data_bit(UINT8 bit);
+	DECLARE_WRITE8_MEMBER(leds_output_block);
+	DECLARE_WRITE8_MEMBER(leds_start_block);
+	DECLARE_WRITE8_MEMBER(leds_shift_bit);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);

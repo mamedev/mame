@@ -7,47 +7,15 @@
 
  TODO:
  - decrypt Music Ball
- - hookup 7-segs used by Super Pinball cabinet type
  - verify clock speeds etc.
 
 
-Speed Ball map
-
 driver by Joseba Epalza
 
-Z80 MAIN CPU
-0000-7fff ROM 1 32k
-8000-dbff ROM 2 data
-dc00-dfff for both CPU&SOUND (Shared)
-e000-e1ff Video RAM background tiles 16*16 (2 bytes: 1 for tile char + 1 for color)
-e800-efff Video RAM characters 32*32 (2 bytes: 1 for char and 1 for color)
-f000-feff RAM
-ff00-ffff Sprites (64 total: four bytes to one)
-
-in:
-00  DSW ONE
-10  DSW TWO
-20  IN1  JOY 1 STATUS & COIN & START
-30  IN2  JOY 2 STATUS & TILT
-
-out:
-40  coin counters
-50  ????  maybe VSYNC ????
-
- ======================================================================
-
-Z80 SOUND
-0000-7fff ROM
-dc00-dfff shared with MAIN CPU
-f000-dfff RAM
-
-out:
-00  YM3812 control
-01  YM3812 data
-40  ??
-80  ??
-82  ??
-c1  ??
+- 4MHz XTAL, 20MHz XTAL
+- Z80 main CPU
+- Z80 sound CPU
+- YM3812
 
  ======================================================================
 
@@ -65,7 +33,6 @@ c1  ??
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "includes/speedbal.h"
-#include "machine/nvram.h"
 #include "speedbal.lh"
 
 WRITE8_MEMBER(speedbal_state::speedbal_coincounter_w)
@@ -82,7 +49,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xf600, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -103,73 +70,49 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xd000, 0xdbff) AM_RAM // ?
+	AM_RANGE(0xd800, 0xdbff) AM_RAM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
 ADDRESS_MAP_END
 
-/* this is wrong.. needs more investigation / tracing of the code */
 
-WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_40_w)
+
+WRITE8_MEMBER(speedbal_state::leds_output_block)
 {
-	// some kind of multiplexer for the 7-segs?
-	m_bitcount = 0;
-	m_writeval = 0;
-
-
-	//logerror("%s: speedbal_sndcpu_40_w %02x\n", this->machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_80_w)
-{
-	//logerror("%s: speedbal_sndcpu_80_w %02x\n", this->machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_82_w)
-{
-	//logerror("%s: speedbal_sndcpu_82_w %02x\n", this->machine().describe_context(), data);
-}
-
-WRITE8_MEMBER(speedbal_state::speedbal_sndcpu_c1_w)
-{
-	// I think it writes the data for the 7-segs here as a sequence of 7-bit data packed into 28 byte blocks?
-//	logerror("%s: speedbal_sndcpu_c1_w %02x\n", this->machine().describe_context(), data);
-	write_data_bit(data&0x80);
-	write_data_bit(data&0x40);
-	write_data_bit(data&0x20);
-	write_data_bit(data&0x10);
-	write_data_bit(data&0x08);
-	write_data_bit(data&0x04);
-	write_data_bit(data&0x02);
-	write_data_bit(data&0x01);
-}
-
-void speedbal_state::write_data_bit(UINT8 bit)
-{
-	int bitdat;
-
-	if (bit) bitdat = 1;
-	else bitdat = 0;
+	if (!m_leds_start)
+		return;
 	
-	m_writeval = (m_writeval << 1) | bitdat;
+	m_leds_start = false;
 
-	m_bitcount++;
-
-	if (m_bitcount==7)
-	{
-		// not right..
-		//logerror("m_writeval was %02x\n", m_writeval);
-		m_bitcount = 0;
-		m_writeval = 0;
-	}
+	// Each hypothetical led block has 3 7seg leds.
+	// The shift register is 28 bits, led block number is in the upper bits
+	// and the other 3 bytes in it go to each 7seg led of the current block.
+	int block = m_leds_shiftreg >> 24 & 7;
+	output_set_digit_value(10 * block + 0, ~m_leds_shiftreg >> 0 & 0xff);
+	output_set_digit_value(10 * block + 1, ~m_leds_shiftreg >> 8 & 0xff);
+	output_set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
 }
+
+WRITE8_MEMBER(speedbal_state::leds_start_block)
+{
+	m_leds_shiftreg = 0;
+	m_leds_start = true;
+}
+
+WRITE8_MEMBER(speedbal_state::leds_shift_bit)
+{
+	m_leds_shiftreg <<= 1;
+	m_leds_shiftreg |= (data & 1);
+}
+
+
 
 static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, speedbal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(speedbal_sndcpu_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(speedbal_sndcpu_80_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(speedbal_sndcpu_82_w)
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(speedbal_sndcpu_c1_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(leds_output_block)
+	AM_RANGE(0x80, 0x80) AM_WRITE(leds_start_block)
+	AM_RANGE(0x82, 0x82) AM_WRITENOP // ?
+	AM_RANGE(0xc1, 0xc1) AM_WRITE(leds_shift_bit)
 ADDRESS_MAP_END
 
 
@@ -204,8 +147,8 @@ static INPUT_PORTS_START( speedbal )
 	PORT_DIPSETTING(    0x03, "100000 300000 1M" )
 	PORT_DIPSETTING(    0x04, "100000 300000" )
 	PORT_DIPSETTING(    0x01, "200000 1M" )
-	PORT_DIPSETTING(    0x05, "200000" )
-	PORT_DIPSETTING(    0x02, "200000 (duplicate)" )
+//	PORT_DIPSETTING(    0x05, "200000" ) // dupe
+	PORT_DIPSETTING(    0x02, "200000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -297,12 +240,10 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_CPU_IO_MAP(main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2660000)  /* 2.66 MHz ???  Maybe yes */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 8*60)
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 8*60) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -318,7 +259,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3600000)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)  /* 4 MHz ??? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -353,10 +294,10 @@ ROM_START( speedbal )
 	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
-	ROM_LOAD( "sb2.bin",  0x0000, 0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
+	ROM_LOAD( "sb2.bin",  0x0000,  0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD("sb10.bin",  0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )    /* chars */
+	ROM_LOAD( "sb10.bin", 0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )    /* chars */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "sb9.bin",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )    /* bg tiles */
@@ -377,10 +318,10 @@ ROM_START( musicbal )
 	ROM_LOAD( "03.bin",  0x8000,  0x8000, CRC(fdf14446) SHA1(9e52810ebc2b18d83f349fb78884b3c380d93903) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
-	ROM_LOAD( "02.bin",  0x0000, 0x8000, CRC(b7d3840d) SHA1(825289c3ca51284a47cfc4937a18d098183c396a) )
+	ROM_LOAD( "02.bin",  0x0000,  0x8000, CRC(b7d3840d) SHA1(825289c3ca51284a47cfc4937a18d098183c396a) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD("10.bin",  0x00000, 0x08000, CRC(5afd3c42) SHA1(5b9a44ef03e5519c9601bb636eb26768cf800278) )    /* chars */
+	ROM_LOAD( "10.bin",  0x00000, 0x08000, CRC(5afd3c42) SHA1(5b9a44ef03e5519c9601bb636eb26768cf800278) )    /* chars */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "09.bin",  0x00000, 0x08000, CRC(dcde4233) SHA1(99f204ddc97ee45330ea3cb0bc2971cd95f8e1ac) )    /* bg tiles */
@@ -544,5 +485,5 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 
 
 
-GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / DESystem S.A.", "Speed Ball", 0, layout_speedbal )
-GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / DESystem S.A.", "Music Ball", GAME_NOT_WORKING, layout_speedbal )
+GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", 0, layout_speedbal )
+GAMEL( 1988, musicbal, 0,        speedbal, speedbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", GAME_NOT_WORKING, layout_speedbal )
