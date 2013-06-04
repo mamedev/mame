@@ -148,7 +148,8 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 				m_reg.address_current[channel]--;
 			else
 				m_reg.address_current[channel]++;
-			if (m_reg.count_current[channel] == 0)
+			m_reg.count_current[channel]--;
+			if(m_reg.count_current[channel] == 0xffff)
 			{
 				if (m_reg.mode_control[channel] & 0x10)  // auto-initialise
 				{
@@ -158,8 +159,6 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 				// TODO: send terminal count
 				set_eop(ASSERT_LINE);
 			}
-			else
-				m_reg.count_current[channel]--;
 			break;
 		case 0x08:  // memory -> I/O
 			data = space.read_byte(m_reg.address_current[channel]);
@@ -169,7 +168,8 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 				m_reg.address_current[channel]--;
 			else
 				m_reg.address_current[channel]++;
-			if (m_reg.count_current[channel] == 0)
+			m_reg.count_current[channel]--;
+			if(m_reg.count_current[channel] == 0xffff)
 			{
 				if (m_reg.mode_control[channel] & 0x10)  // auto-initialise
 				{
@@ -179,8 +179,6 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 				// TODO: send terminal count
 				set_eop(ASSERT_LINE);
 			}
-			else
-				m_reg.count_current[channel]--;
 			break;
 		case 0x0c:  // Invalid
 			break;

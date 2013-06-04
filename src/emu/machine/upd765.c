@@ -1219,6 +1219,8 @@ void upd765_family_device::start_command(int cmd)
 		break;
 
 	case C_SEEK:
+		other_irq = false;
+		check_irq();
 		seek_start(flopi[command[1] & 3]);
 		main_phase = PHASE_CMD;
 		break;
