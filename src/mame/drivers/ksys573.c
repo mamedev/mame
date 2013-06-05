@@ -659,13 +659,13 @@ private:
 		int bit;
 	} m_stage_state[ 2 ];
 
-	int m_f;
-	int m_o;
-	int m_s;
-	UINT32 m_a;
-	UINT32 m_b;
-	UINT32 m_c;
-	UINT32 m_d;
+	//int m_f;
+	//int m_o;
+	//int m_s;
+	//UINT32 m_a;
+	//UINT32 m_b;
+	//UINT32 m_c;
+	//UINT32 m_d;
 
 	int m_salarymc_lamp_bits;
 	int m_salarymc_lamp_shift;
