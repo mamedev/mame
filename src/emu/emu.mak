@@ -143,6 +143,7 @@ EMUMACHINEOBJS = \
     $(EMUMACHINE)/generic.o     \
 	$(EMUMACHINE)/ram.o     	\
 	$(EMUMACHINE)/nvram.o     	\
+	$(EMUMACHINE)/laserdsc.o    \
 	
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \

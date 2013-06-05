@@ -86,7 +86,6 @@ MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/k033906.o     \
 				$(MACHINEOBJ)/k053252.o     \
 				$(MACHINEOBJ)/k056230.o     \
-				$(MACHINEOBJ)/laserdsc.o    \
 				$(MACHINEOBJ)/latch8.o      \
 				$(MACHINEOBJ)/lc89510.o     \
 				$(MACHINEOBJ)/ldpr8210.o    \
