@@ -682,6 +682,7 @@ static MACHINE_CONFIG_START( ep64, ep_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "ep64_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "ep64_flop")
 MACHINE_CONFIG_END
 
