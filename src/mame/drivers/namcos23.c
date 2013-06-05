@@ -30,7 +30,7 @@
 
     - Add the sh2 in Gunmen Wars (no rom, controls the camera)
 
-    - Super System 23 tests irqs in the post.  timecrs2c's code can
+    - Super System 23 tests irqs in the post.  timecrs2v4a's code can
     potentially test 7 sources, but only actually test 5.  With each
     source there is code to clear the interrupt and code to raise it.
     Levels 0 and 1 are not connected to anything according to the code.
@@ -67,11 +67,11 @@
                a6400006.h = fffb
                a6400006.h = 0
 
-      RS323  (level 6, not tested by timecrs2c):
+      RS323  (level 6, not tested by timecrs2v4a):
         clear: nothing
         raise: nothing
 
-      Timer  (level 7, not tested by timecrs2c):
+      Timer  (level 7, not tested by timecrs2v4a):
         clear: c0.Compare = 10d880
         raise: c0.Count   = 10c8e0
                c0.Compare = 10d880
@@ -2227,7 +2227,7 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
 {
 	switch (offset)
 	{
-		/* According to timecrs2c, +0 is the status word with bits being:
+		/* According to timecrs2v4a, +0 is the status word with bits being:
 		   15: test mode flag (huh?)
 		   10: fifo data ready
 		   9:  cmd ram data ready
@@ -3369,7 +3369,7 @@ DRIVER_INIT_MEMBER(namcos23_state,s23)
 	if ((!strcmp(machine().system().name, "motoxgo")) ||
 		(!strcmp(machine().system().name, "panicprk")) ||
 		(!strcmp(machine().system().name, "rapidrvr")) ||
-		(!strcmp(machine().system().name, "rapidrvr2")) ||
+		(!strcmp(machine().system().name, "rapidrvrv2c")) ||
 		(!strcmp(machine().system().name, "rapidrvrp")) ||
 		(!strcmp(machine().system().name, "finfurl")) ||
 		(!strcmp(machine().system().name, "gunwars")) ||
@@ -3378,10 +3378,10 @@ DRIVER_INIT_MEMBER(namcos23_state,s23)
 		(!strcmp(machine().system().name, "finfurl2j")) ||
 		(!strcmp(machine().system().name, "raceon")) ||
 		(!strcmp(machine().system().name, "crszone")) ||
-		(!strcmp(machine().system().name, "crszonea")) ||
-		(!strcmp(machine().system().name, "crszoneb")) ||
-		(!strcmp(machine().system().name, "crszonec")) ||
-		(!strcmp(machine().system().name, "timecrs2b")) ||
+		(!strcmp(machine().system().name, "crszonev3b")) ||
+		(!strcmp(machine().system().name, "crszonev3a")) ||
+		(!strcmp(machine().system().name, "crszonev2a")) ||
+		(!strcmp(machine().system().name, "timecrs2v2b")) ||
 		(!strcmp(machine().system().name, "timecrs2")))
 	{
 		m_has_jvsio = 1;
@@ -3575,7 +3575,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2c, ss23 )
+static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
 
 	MCFG_CPU_MODIFY("subcpu")
 	MCFG_CPU_IO_MAP( s23h8iomap )
@@ -3661,7 +3661,7 @@ ROM_START( rapidrvr )
 ROM_END
 
 
-ROM_START( rapidrvr2 )
+ROM_START( rapidrvrv2c )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "rd2verc.ic2",  0x000000, 0x200000, CRC(234fc2f4) SHA1(64374f4de19855f1980d8e088049b0c112107f43) )
 	ROM_LOAD16_BYTE( "rd2verc.ic1",  0x000001, 0x200000, CRC(651c5da4) SHA1(0e73e2cfafda626597d2ce08bf07458509fb79de) )
@@ -3886,7 +3886,7 @@ ROM_START( motoxgo )
 ROM_END
 
 
-ROM_START( motoxgoa )
+ROM_START( motoxgov2a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg2vera.ic2",  0x000000, 0x200000, CRC(66093336) SHA1(c87874245a70a1642fb9ecfc94cbbc89f0fd633f) )
 	ROM_LOAD16_BYTE( "mg2vera.ic1",  0x000001, 0x200000, CRC(3dc7736f) SHA1(c5137aa449918a124415f8ea5581e037f841129c) )
@@ -3934,7 +3934,7 @@ ROM_START( motoxgoa )
 ROM_END
 
 
-ROM_START( motoxgob )
+ROM_START( motoxgov1a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg1vera.ic2",  0x000000, 0x200000, CRC(5ba13d9e) SHA1(7f6484df644772f2478155c05844532f8abbd196) )
 	ROM_LOAD16_BYTE( "mg1vera.ic1",  0x000001, 0x200000, CRC(6b2bda52) SHA1(922ea739c8a62c7147126bf20ed3ffe8faec8842) )
@@ -3982,7 +3982,7 @@ ROM_START( motoxgob )
 ROM_END
 
 
-ROM_START( motoxgoc )
+ROM_START( motoxgov1a2 )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "mg1vera1.ic2",  0x000000, 0x200000, CRC(532ec687) SHA1(1e822b9afa00a897c0ad2341e33ebc93962a8244) )
 	ROM_LOAD16_BYTE( "mg1vera1.ic1",  0x000001, 0x200000, CRC(3154b80a) SHA1(ecec56dfd594f5fc651478fa3ae8963182cb94c3) )
@@ -4073,7 +4073,7 @@ ROM_START( timecrs2 )
 ROM_END
 
 
-ROM_START( timecrs2b )
+ROM_START( timecrs2v2b )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "tss2verb.ic2", 0x000000, 0x200000, BAD_DUMP CRC(9f56a4df) SHA1(5ecb3cd93726ab6be02762853fd6a45266d6c0bc) )
 	ROM_LOAD16_BYTE( "tss2verb.ic1", 0x000001, 0x200000, BAD_DUMP CRC(aa147f71) SHA1(e00267d1a8286942c83dc35289ad65bd3cb6d8db) )
@@ -4116,7 +4116,7 @@ ROM_START( timecrs2b )
 ROM_END
 
 
-ROM_START( timecrs2c )
+ROM_START( timecrs2v4a )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "tss4vera.2",   0x000000, 0x200000, CRC(c84edd3b) SHA1(0b577a8ef6e74afa991dd81c2db19041787724da) )
 	ROM_LOAD16_BYTE( "tss4vera.1",   0x000001, 0x200000, CRC(26f57c83) SHA1(c8983c26b7524a35257a242b66a9413eb354ca0d) )
@@ -4548,7 +4548,7 @@ ROM_START( crszone )
 ROM_END
 
 
-ROM_START( crszonea )
+ROM_START( crszonev3b )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3verb.ic4", 0x400000, 0x400000, CRC(4cb26465) SHA1(078dfd0d8c920707df14e9a26658fa63421fcb0b) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -4601,7 +4601,7 @@ ROM_START( crszonea )
 ROM_END
 
 
-ROM_START( crszoneb )
+ROM_START( crszonev3a )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo3vera.ic4", 0x400000, 0x400000, CRC(09b0c91e) SHA1(226c3788d6a50272e2544d04d9ca20df81014fb6) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -4654,7 +4654,7 @@ ROM_START( crszoneb )
 ROM_END
 
 
-ROM_START( crszonec )
+ROM_START( crszonev2a )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
@@ -4709,26 +4709,26 @@ ROM_END
 
 /* Games */
 #define GAME_FLAGS (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     INIT,                MNTR,  COMPANY, FULLNAME,                      FLAGS
-GAME( 1997, rapidrvr,  0,        gorgon,    rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
-GAME( 1997, rapidrvr2, rapidrvr, gorgon,    rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
-GAME( 1997, rapidrvrp, rapidrvr, gorgon,    rapidrvrp, namcos23_state, s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
-GAME( 1997, finfurl,   0,        gorgon,    finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, downhill,  0,        s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
-GAME( 1997, motoxgo,   0,        s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgoa,  motoxgo,  s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
-GAME( 1997, motoxgob,  motoxgo,  s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 1)",   GAME_FLAGS )
-GAME( 1997, motoxgoc,  motoxgo,  s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 2)",   GAME_FLAGS )
-GAME( 1997, timecrs2,  0,        timecrs2,  timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2b, timecrs2, timecrs2,  timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)", GAME_FLAGS )
-GAME( 1997, timecrs2c, timecrs2, timecrs2c, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)", GAME_FLAGS )
-GAME( 1998, panicprk,  0,        s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1998, gunwars,   0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, raceon,    0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
-GAME( 1998, 500gp,     0,        ss23,      s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
-GAME( 1999, finfurl2,  0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
-GAME( 1999, finfurl2j, finfurl2, gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
-GAME( 2000, crszone,   0,        ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 2000, crszonea,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",   GAME_FLAGS )
-GAME( 2000, crszoneb,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 2000, crszonec,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
+//    YEAR, NAME,        PARENT,   MACHINE,     INPUT,     INIT,                MNTR,  COMPANY, FULLNAME,                      FLAGS
+GAME( 1997, rapidrvr,    0,        gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD3 Ver. C)",     GAME_FLAGS ) // 97/11/27, USA
+GAME( 1997, rapidrvrv2c, rapidrvr, gorgon,      rapidrvr,  namcos23_state, s23, ROT0, "Namco", "Rapid River (RD2 Ver. C)",     GAME_FLAGS ) // 97/11/27, Europe
+GAME( 1997, rapidrvrp,   rapidrvr, gorgon,      rapidrvrp, namcos23_state, s23, ROT0, "Namco", "Rapid River (prototype)",      GAME_FLAGS ) // 97/11/10, USA
+GAME( 1997, finfurl,     0,        gorgon,      finfurl,   namcos23_state, s23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, downhill,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Downhill Bikers (DH3 Ver. A)", GAME_FLAGS )
+GAME( 1997, motoxgo,     0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)",   GAME_FLAGS )
+GAME( 1997, motoxgov2a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG2 Ver. A)",   GAME_FLAGS )
+GAME( 1997, motoxgov1a,  motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 1)", GAME_FLAGS )
+GAME( 1997, motoxgov1a2, motoxgo,  s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Motocross Go! (MG1 Ver. A, set 2)", GAME_FLAGS )
+GAME( 1997, timecrs2,    0,        timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS3 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v2b, timecrs2, timecrs2,    timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)", GAME_FLAGS )
+GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)", GAME_FLAGS )
+GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",     GAME_FLAGS )
+GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
+GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1999, finfurl2,    0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
+GAME( 1999, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 2000, crszone,     0,        ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszonev3b,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszonev3a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 2000, crszonev2a,  crszone,  ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
