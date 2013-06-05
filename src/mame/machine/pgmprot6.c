@@ -211,7 +211,7 @@ void pgm_028_025_state::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT1
 				if (mode==0) dat2 = 0x4e75; // hack
 				if (mode==1) dat2  = ((dat2 & 0xf000) >> 12) | ((dat2 & 0x0f00) >> 4) | ((dat2 & 0x00f0) << 4) | ((dat2 & 0x000f) << 12);
 				if (mode==2) dat2 ^= extraxor;
-				if (mode==5) dat2  = dat2;
+				//if (mode==5) dat2  = dat2;
 				if (mode==6) dat2 += extraxor;
 
 				if (mode==2 || mode==6) dat2 = (dat2<<8)|(dat2>>8);
