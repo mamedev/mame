@@ -24,15 +24,131 @@
 
 */
 
-enum
-{
-	LED_A = 0,
-	LED_B
-};
-
 #include "includes/victor9k.h"
 
-// Memory Maps
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  floppy_p1_r -
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_state::floppy_p1_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       L0MS0
+	    1       L0MS1
+	    2       L0MS2
+	    3       L0MS3
+	    4       L1MS0
+	    5       L1MS1
+	    6       L1MS2
+	    7       L1MS3
+	
+	*/
+
+	return m_lms;
+}
+
+
+//-------------------------------------------------
+//  floppy_p2_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( victor9k_state::floppy_p2_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       START0
+	    1       STOP0
+	    2       START1
+	    3       STOP1
+	    4       SEL1
+	    5       SEL0
+	    6       RDY0
+	    7       RDY1
+	
+	*/
+
+	if (BIT(data, 0)) m_floppy0->mon_w(0);
+	if (BIT(data, 1)) m_floppy0->mon_w(1);
+	if (BIT(data, 2)) m_floppy1->mon_w(0);
+	if (BIT(data, 3)) m_floppy1->mon_w(1);
+
+	int sel0 = BIT(data, 5);
+	
+	if (m_sel0 && !sel0)
+	{
+		m_da0 = m_da;
+		//m_floppy0->set_rpm();
+	}
+
+	m_sel0 = sel0;
+
+	int sel1 = BIT(data, 4);
+	
+	if (m_sel1 && !sel1)
+	{
+		m_da1 = m_da;
+		//m_floppy1->set_rpm();
+	}
+
+	m_sel1 = sel1;
+
+	m_rdy0 = BIT(data, 6);
+	m_via5->write_ca2(m_rdy0);
+
+	m_rdy1 = BIT(data, 7);
+	m_via5->write_cb2(m_rdy1);
+}
+
+
+//-------------------------------------------------
+//  tach0_r -
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_state::tach0_r )
+{
+	return m_tach0;
+}
+
+
+//-------------------------------------------------
+//  tach1_r -
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_state::tach1_r )
+{
+	return m_tach1;
+}
+
+
+//-------------------------------------------------
+//  da_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( victor9k_state::da_w )
+{
+	m_da = data;
+}
+
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ADDRESS_MAP( victor9k_mem )
+//-------------------------------------------------
 
 static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
@@ -52,20 +168,42 @@ static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
 ADDRESS_MAP_END
 
+
+//-------------------------------------------------
+//  ADDRESS_MAP( floppy_io )
+//-------------------------------------------------
+
 static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_NOP
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_NOP
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_NOP
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(floppy_p1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(floppy_p2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tach0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(tach1_r)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(da_w)
 ADDRESS_MAP_END
 
-// Input Ports
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( victor9k )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( victor9k )
 	// defined in machine/victor9kb.c
 INPUT_PORTS_END
 
-// Video
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MC6845_INTERFACE( hd46505s_intf )
+//-------------------------------------------------
 
 #define CODE_NON_DISPLAY    0x1000
 #define CODE_UNDERLINE      0x2000
@@ -107,7 +245,6 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 	}
 }
 
-
 static MC6845_INTERFACE( hd46505s_intf )
 {
 	SCREEN_TAG,
@@ -123,7 +260,10 @@ static MC6845_INTERFACE( hd46505s_intf )
 	NULL
 };
 
-// Intel 8253 Interface
+
+//-------------------------------------------------
+//  pit8253_interface pit_intf
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER(victor9k_state::mux_serial_b_w)
 {
@@ -152,7 +292,11 @@ static const struct pit8253_interface pit_intf =
 	}
 };
 
-// Intel 8259 Interfaces
+
+
+//-------------------------------------------------
+//  PIC8259
+//-------------------------------------------------
 
 /*
 
@@ -169,7 +313,15 @@ static const struct pit8253_interface pit_intf =
 
 */
 
-// NEC uPD7201 Interface
+IRQ_CALLBACK_MEMBER( victor9k_state::victor9k_irq_callback )
+{
+	return m_pic->inta_r();
+}
+
+
+//-------------------------------------------------
+//  UPD7201_INTERFACE( mpsc_intf )
+//-------------------------------------------------
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
@@ -196,7 +348,10 @@ static UPD7201_INTERFACE( mpsc_intf )
 	DEVCB_NULL
 };
 
-// MC6852 Interface
+
+//-------------------------------------------------
+//  MC6852_INTERFACE( ssda_intf )
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
@@ -218,7 +373,10 @@ static MC6852_INTERFACE( ssda_intf )
 	DEVCB_NULL
 };
 
-// M6522 Interface
+
+//-------------------------------------------------
+//  via6522_interface via1_intf
+//-------------------------------------------------
 
 WRITE8_MEMBER( victor9k_state::via1_pa_w )
 {
@@ -259,28 +417,14 @@ READ8_MEMBER( victor9k_state::via1_pb_r )
 
 	UINT8 data = 0;
 
-	// data valid
+	// IEEE-488
 	data |= m_ieee488->dav_r();
-
-	// end or identify
 	data |= m_ieee488->eoi_r() << 1;
-
-	// remote enable
 	data |= m_ieee488->ren_r() << 2;
-
-	// attention
 	data |= m_ieee488->atn_r() << 3;
-
-	// interface clear
 	data |= m_ieee488->ifc_r() << 4;
-
-	// service request
 	data |= m_ieee488->srq_r() << 5;
-
-	// not ready for data
 	data |= m_ieee488->nrfd_r() << 6;
-
-	// data not accepted
 	data |= m_ieee488->ndac_r() << 7;
 
 	return data;
@@ -303,28 +447,14 @@ WRITE8_MEMBER( victor9k_state::via1_pb_w )
 
 	*/
 
-	// data valid
+	// IEEE-488
 	m_ieee488->dav_w(BIT(data, 0));
-
-	// end or identify
 	m_ieee488->eoi_w(BIT(data, 1));
-
-	// remote enable
 	m_ieee488->ren_w(BIT(data, 2));
-
-	// attention
 	m_ieee488->atn_w(BIT(data, 3));
-
-	// interface clear
 	m_ieee488->ifc_w(BIT(data, 4));
-
-	// service request
 	m_ieee488->srq_w(BIT(data, 5));
-
-	// not ready for data
 	m_ieee488->nrfd_w(BIT(data, 6));
-
-	// data not accepted
 	m_ieee488->ndac_w(BIT(data, 7));
 }
 
@@ -358,6 +488,11 @@ static const via6522_interface via1_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via1_irq_w)
 };
 
+
+//-------------------------------------------------
+//  via6522_interface via2_intf
+//-------------------------------------------------
+
 READ8_MEMBER( victor9k_state::via2_pa_r )
 {
 	/*
@@ -376,6 +511,12 @@ READ8_MEMBER( victor9k_state::via2_pa_r )
 	*/
 
 	UINT8 data = 0;
+
+	// serial
+	data |= m_rs232a->ri_r() << 2;
+	data |= m_rs232a->dsr_r() << 3;
+	data |= m_rs232b->ri_r() << 4;
+	data |= m_rs232b->dsr_r() << 5;
 
 	// keyboard data
 	data |= m_kb->kbdata_r() << 6;
@@ -456,6 +597,11 @@ static const via6522_interface via2_intf =
 
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via2_irq_w)
 };
+
+
+//-------------------------------------------------
+//  via6522_interface via3_intf
+//-------------------------------------------------
 
 READ8_MEMBER( victor9k_state::via3_pa_r )
 {
@@ -563,6 +709,11 @@ static const via6522_interface via3_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via3_irq_w)
 };
 
+
+//-------------------------------------------------
+//  via6522_interface via4_intf
+//-------------------------------------------------
+
 WRITE8_MEMBER( victor9k_state::via4_pa_w )
 {
 	/*
@@ -580,6 +731,7 @@ WRITE8_MEMBER( victor9k_state::via4_pa_w )
 
 	*/
 
+	m_lms = (m_lms & 0xf0) | (data & 0x0f);
 	m_st[0] = data >> 4;
 }
 
@@ -600,6 +752,7 @@ WRITE8_MEMBER( victor9k_state::via4_pb_w )
 
 	*/
 
+	m_lms = (data << 4) | (m_lms & 0x0f);
 	m_st[1] = data >> 4;
 }
 
@@ -632,6 +785,11 @@ static const via6522_interface via4_intf =
 
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via4_irq_w)
 };
+
+
+//-------------------------------------------------
+//  via6522_interface via5_intf
+//-------------------------------------------------
 
 READ8_MEMBER( victor9k_state::via5_pa_r )
 {
@@ -671,6 +829,21 @@ WRITE8_MEMBER( victor9k_state::via5_pb_w )
 	*/
 }
 
+READ_LINE_MEMBER( victor9k_state::brdy_r )
+{
+	return m_brdy;
+}
+
+READ_LINE_MEMBER( victor9k_state::rdy0_r )
+{
+	return m_rdy0;
+}
+
+READ_LINE_MEMBER( victor9k_state::rdy1_r )
+{
+	return m_rdy1;
+}
+
 WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
 {
 	m_via5_irq = state;
@@ -682,10 +855,10 @@ static const via6522_interface via5_intf =
 {
 	DEVCB_DRIVER_MEMBER(victor9k_state, via5_pa_r),
 	DEVCB_NULL,
-	DEVCB_NULL, // BRDY
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, brdy_r),
 	DEVCB_NULL,
-	DEVCB_NULL, // RDY0
-	DEVCB_NULL, // RDY1
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, rdy0_r),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, rdy1_r),
 
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(victor9k_state, via5_pb_w),
@@ -697,6 +870,11 @@ static const via6522_interface via5_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via5_irq_w)
 };
 
+
+//-------------------------------------------------
+//  via6522_interface via1_intf
+//-------------------------------------------------
+
 READ8_MEMBER( victor9k_state::via6_pa_r )
 {
 	/*
@@ -704,13 +882,13 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 	    bit     description
 
 	    PA0
-	    PA1     TRK0D0
+	    PA1     _TRK0D0
 	    PA2
-	    PA3     TRK0D1
+	    PA3     _TRK0D1
 	    PA4
 	    PA5
 	    PA6     WPS
-	    PA7     SYNC
+	    PA7     _SYNC
 
 	*/
 
@@ -726,6 +904,7 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 	data |= (m_drive ? m_floppy1->wpt_r() : m_floppy0->wpt_r()) << 6;
 
 	// disk sync detect
+	data |= m_sync << 7;
 
 	return data;
 }
@@ -780,8 +959,10 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 	UINT8 data = 0;
 
 	// motor speed status, drive A
+	data |= m_rdy0;
 
 	// motor speed status, drive B
+	data |= m_rdy1 << 1;
 
 	// door B sense
 
@@ -789,7 +970,7 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 
 	// single/double sided
 	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
-
+	
 	return data;
 }
 
@@ -801,23 +982,29 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
 
 	    PB0
 	    PB1
-	    PB2     SCRESET
+	    PB2     _SCRESET
 	    PB3
 	    PB4
 	    PB5
-	    PB6     stepper enable A
-	    PB7     stepper enable B
+	    PB6     STP0
+	    PB7     STP1
 
 	*/
 
 	// motor speed controller reset
-	m_fdc_cpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2));
+	if (!BIT(data, 2))
+		m_fdc_cpu->reset();
 
 	// stepper enable A
-	m_se[0] = BIT(data, 6);
+	m_stp[0] = BIT(data, 6);
 
 	// stepper enable B
-	m_se[1] = BIT(data, 7);
+	m_stp[1] = BIT(data, 7);
+}
+
+READ_LINE_MEMBER( victor9k_state::gcrerr_r )
+{
+	return m_gcrerr;
 }
 
 WRITE_LINE_MEMBER( victor9k_state::drw_w )
@@ -839,7 +1026,7 @@ static const via6522_interface via6_intf =
 {
 	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pa_r),
 	DEVCB_DRIVER_MEMBER(victor9k_state, via6_pb_r),
-	DEVCB_NULL, // GCRERR
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, gcrerr_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -854,7 +1041,11 @@ static const via6522_interface via6_intf =
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, via6_irq_w)
 };
 
-// Keyboard
+
+
+//-------------------------------------------------
+//  VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
+//-------------------------------------------------
 
 WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
@@ -868,9 +1059,15 @@ static VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, kbrdy_w)
 };
 
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( victor9k_floppies )
+//-------------------------------------------------
+
 static SLOT_INTERFACE_START( victor9k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
+
 
 //-------------------------------------------------
 //  rs232_port_interface rs232a_intf
@@ -899,12 +1096,15 @@ static const rs232_port_interface rs232b_intf =
 	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsb_w)
 };
 
-// Machine Initialization
 
-IRQ_CALLBACK_MEMBER(victor9k_state::victor9k_irq_callback)
-{
-	return m_pic->inta_r();
-}
+
+//**************************************************************************
+//  MACHINE INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_START( victor9k )
+//-------------------------------------------------
 
 void victor9k_state::machine_start()
 {
@@ -916,7 +1116,14 @@ void victor9k_state::machine_start()
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 }
 
-// Machine Driver
+
+//**************************************************************************
+//  MACHINE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( victor9k )
+//-------------------------------------------------
 
 static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	// basic machine hardware
@@ -970,7 +1177,15 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END
 
-// ROMs
+
+
+//**************************************************************************
+//  ROMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  ROM( victor9k )
+//-------------------------------------------------
 
 ROM_START( victor9k )
 	ROM_REGION( 0x2000, I8088_TAG, 0 )
@@ -989,7 +1204,11 @@ ROM_START( victor9k )
 	ROM_LOAD( "100836-001.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
 ROM_END
 
-// System Drivers
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                     FULLNAME        FLAGS
+
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
 COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, driver_device, 0,    "Victor Business Products", "Victor 9000",   GAME_NOT_WORKING )
