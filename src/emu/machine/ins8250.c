@@ -617,15 +617,17 @@ void ns16550_device::set_fcr(UINT8 data)
 	{
 		memset(&m_rfifo, '\0', sizeof(m_rfifo));
 		m_rhead = m_rtail = m_rnum = 0;
+		clear_int(COM_INT_PENDING_CHAR_TIMEOUT | COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+		m_timeout->adjust(attotime::never);
 	}
 	if(data & 4)
 	{
 		memset(&m_tfifo, '\0', sizeof(m_tfifo));
 		m_thead = m_ttail = 0;
+		m_regs.lsr |= 0x20;
+		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 	}
 	m_rintlvl = bytes_per_int[(data>>6)&3];
 	m_regs.iir |= 0xc0;
 	m_regs.fcr = data & 0xc9;
-	m_regs.lsr |= 0x20;
-	trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 }
