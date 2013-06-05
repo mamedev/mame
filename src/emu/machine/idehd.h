@@ -53,6 +53,9 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	void ide_build_features();
 	virtual bool is_ready() { return (m_disk != NULL); }
 protected:
@@ -61,20 +64,3 @@ protected:
 };
 // device type definition
 extern const device_type IDE_HARDDISK;
-
-// ======================> ide_hdd_image_device
-
-class ide_hdd_image_device : public ide_hdd_device
-{
-public:
-	// construction/destruction
-	ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-};
-// device type definition
-extern const device_type IDE_HARDDISK_IMAGE;

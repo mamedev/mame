@@ -1528,10 +1528,6 @@ WRITE16_DEVICE_HANDLER( ide_controller16_w )
 	ide_controller_w(device, offset, size, data >> ((offset & 1) * 8));
 }
 
-SLOT_INTERFACE_START(ide_image_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK_IMAGE)
-SLOT_INTERFACE_END
-
 SLOT_INTERFACE_START(ide_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 SLOT_INTERFACE_END

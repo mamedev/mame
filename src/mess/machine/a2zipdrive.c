@@ -32,7 +32,7 @@ const device_type A2BUS_ZIPDRIVE = &device_creator<a2bus_zipdrive_device>;
 #define ZIPDRIVE_IDE_TAG     "zipdrive_ide"
 
 static MACHINE_CONFIG_FRAGMENT( zipdrive )
-	MCFG_IDE_CONTROLLER_ADD(ZIPDRIVE_IDE_TAG, ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD(ZIPDRIVE_IDE_TAG, ide_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( zipdrive )

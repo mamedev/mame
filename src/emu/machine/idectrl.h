@@ -55,7 +55,7 @@ extern const device_type IDE_SLOT;
 	ide_controller_device::set_bus_master(*device, bmcpu, bmspace);
 
 SLOT_INTERFACE_EXTERN(ide_devices);
-SLOT_INTERFACE_EXTERN(ide_image_devices);
+SLOT_INTERFACE_EXTERN(ide_devices);
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

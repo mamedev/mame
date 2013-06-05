@@ -61,7 +61,7 @@ const rom_entry *powermate_ide_device::device_rom_region() const
 //  MACHINE_CONFIG_FRAGMENT( adam_ide )
 //-------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT( adam_ide )
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_image_devices, "hdd", NULL, false)
+	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_devices, "hdd", NULL, false)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END
 

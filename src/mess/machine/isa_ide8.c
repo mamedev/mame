@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
 }
 
 static MACHINE_CONFIG_FRAGMENT( ide8_config )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_image_devices, "hdd", "hdd", false)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", "hdd", false)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 

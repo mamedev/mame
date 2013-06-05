@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_image_devices, "hdd", NULL, false ) /* FIXME */
+	MCFG_IDE_CONTROLLER_ADD( "ide", ide_devices, "hdd", NULL, false ) /* FIXME */
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))
 
 	/* pci */
