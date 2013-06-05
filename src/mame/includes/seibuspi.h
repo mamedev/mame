@@ -10,8 +10,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_spi_scrollram(*this, "spi_scrollram"),
-		m_spimainram(*this, "spimainram"),
+		m_mainram(*this, "mainram"),
+		m_scrollram(*this, "scrollram"),
+		m_z80_rom(*this, "audiocpu"),
 		m_eeprom(*this, "eeprom"),
 		m_soundflash1(*this, "soundflash1"),
 		m_soundflash2(*this, "soundflash2"),
@@ -23,8 +24,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_shared_ptr<UINT32> m_spi_scrollram;
-	required_shared_ptr<UINT32> m_spimainram;
+	required_shared_ptr<UINT32> m_mainram;
+	optional_shared_ptr<UINT32> m_scrollram;
+	optional_memory_region m_z80_rom;
 	required_device<eeprom_device> m_eeprom;
 	optional_device<intel_e28f008sa_device> m_soundflash1;
 	optional_device<intel_e28f008sa_device> m_soundflash2;
@@ -33,8 +35,7 @@ public:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
 
-	UINT8 *m_z80_rom;
-	int m_z80_prg_fifo_pos;
+	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
 	UINT8 m_sb_coin_latch;
 	UINT8 m_ejsakura_input_port;
@@ -57,6 +58,7 @@ public:
 	UINT32 m_bg_fore_layer_position;
 	UINT8 m_alpha_table[8192];
 	UINT8 m_sprite_bpp;
+
 	DECLARE_READ32_MEMBER(ejanhs_speedup_r);
 	DECLARE_READ32_MEMBER(spi_layer_bank_r);
 	DECLARE_WRITE32_MEMBER(spi_layer_bank_w);
@@ -75,11 +77,11 @@ public:
 	DECLARE_READ8_MEMBER(sound_fifo_status_r);
 	DECLARE_READ32_MEMBER(spi_int_r);
 	DECLARE_READ32_MEMBER(spi_unknown_r);
-	DECLARE_WRITE8_MEMBER(z80_prg_fifo_w);
+	DECLARE_WRITE8_MEMBER(z80_prg_transfer_w);
 	DECLARE_WRITE8_MEMBER(z80_enable_w);
 	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
 	DECLARE_WRITE8_MEMBER(z80_bank_w);
-	DECLARE_WRITE32_MEMBER(input_select_w);
+	DECLARE_WRITE32_MEMBER(ejsakura_input_select_w);
 	DECLARE_READ32_MEMBER(senkyu_speedup_r);
 	DECLARE_READ32_MEMBER(senkyua_speedup_r);
 	DECLARE_READ32_MEMBER(batlball_speedup_r);
@@ -96,16 +98,13 @@ public:
 	DECLARE_DRIVER_INIT(batlball);
 	DECLARE_DRIVER_INIT(senkyu);
 	DECLARE_DRIVER_INIT(viprp1);
-	DECLARE_DRIVER_INIT(rfjet2k);
 	DECLARE_DRIVER_INIT(viprp1o);
 	DECLARE_DRIVER_INIT(rdft);
 	DECLARE_DRIVER_INIT(rfjet);
-	DECLARE_DRIVER_INIT(rdft22kc);
 	DECLARE_DRIVER_INIT(senkyua);
 	DECLARE_DRIVER_INIT(rdft2);
 	DECLARE_DRIVER_INIT(ejanhs);
 	DECLARE_DRIVER_INIT(sys386f2);
-	DECLARE_DRIVER_INIT(rdft2us);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
@@ -113,6 +112,7 @@ public:
 	DECLARE_MACHINE_START(spi);
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_VIDEO_START(spi);
+	DECLARE_MACHINE_START(seibu386);
 	DECLARE_MACHINE_RESET(seibu386);
 	DECLARE_VIDEO_START(sys386f2);
 	DECLARE_MACHINE_START(sxx2e);
@@ -121,15 +121,16 @@ public:
 	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
 	IRQ_CALLBACK_MEMBER(spi_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
 	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_mask);
 	void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows);
 	void set_scroll(tilemap_t *layer, int scroll);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll);
-	void init_spi();
-	void init_rf2_common();
-	void init_rfjet_common();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void init_spi_common();
+	void init_sei252();
+	void init_rise10();
+	void init_rise11();
 };
 
 /*----------- defined in machine/spisprit.c -----------*/

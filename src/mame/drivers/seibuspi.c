@@ -25,7 +25,7 @@
       It has a 40MHz AMD 386 and a considerably weaker sound system (dual MSM6295).
 
 TODO:
-- Alpha blending on sprites. In Viper Phase 1, see the blue "Viper" logo when on the
+- Improve alpha blending. In Viper Phase 1, see the blue "Viper" logo when on the
   "push 1 or 2 players button" screen. Note that the alpha blended red logo on the
   title screen is tiles(that effect is emulated), this blue logo is sprites.
 
@@ -824,23 +824,10 @@ Notes:
 #include "machine/seibuspi.h"
 #include "includes/seibuspi.h"
 
+#define ENABLE_SPEEDUP_HACKS 1 /* speed up at idle loops */
+
+
 /********************************************************************/
-
-READ8_MEMBER(seibuspi_state::sb_coin_r)
-{
-	UINT8 r = m_sb_coin_latch;
-
-	m_sb_coin_latch = 0;
-	return r;
-}
-
-WRITE8_MEMBER(seibuspi_state::sb_coin_w)
-{
-	if (data)
-		m_sb_coin_latch = 0xa0 | data;
-	else
-		m_sb_coin_latch = 0;
-}
 
 READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 {
@@ -882,17 +869,20 @@ WRITE8_MEMBER(seibuspi_state::oki_bank_w)
 	m_oki2->set_bank_base((data & 0x04) ? 0x40000 : 0);
 }
 
-WRITE8_MEMBER(seibuspi_state::z80_prg_fifo_w)
+WRITE8_MEMBER(seibuspi_state::z80_prg_transfer_w)
 {
-	if (m_z80_prg_fifo_pos<0x40000) m_z80_rom[m_z80_prg_fifo_pos] = data;
-	m_z80_prg_fifo_pos++;
+	if (m_z80_prg_transfer_pos < m_z80_rom->bytes())
+	{
+		m_z80_rom->base()[m_z80_prg_transfer_pos] = data;
+		m_z80_prg_transfer_pos++;
+	}
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_enable_w)
 {
-	if (data & 0x1)
+	if (data & 1)
 	{
-		m_z80_prg_fifo_pos = 0;
+		m_z80_prg_transfer_pos = 0;
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
@@ -901,25 +891,20 @@ WRITE8_MEMBER(seibuspi_state::z80_enable_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
+READ8_MEMBER(seibuspi_state::sb_coin_r)
 {
-	switch(m_ejsakura_input_port)
-	{
-		case 0x01:
-			return ioport("INPUT01")->read();
-		case 0x02:
-			return ioport("INPUT02")->read();
-		case 0x04:
-			return ioport("INPUT04")->read();
-		case 0x08:
-			return ioport("INPUT08")->read();
-		case 0x10:
-			return ioport("INPUT10")->read();
-		default:
-			return ioport("SYSTEM")->read();
-	}
-	return 0xffffffff;
+	UINT8 ret = m_sb_coin_latch;
+
+	m_sb_coin_latch = 0;
+	return ret;
 }
+
+WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
+{
+	m_ejsakura_input_port = data;
+}
+
+
 /********************************************************************/
 
 READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
@@ -932,12 +917,23 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 
 WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 {
-	if ((data & 7) != m_z80_lastbank)
+	int bank = data & 7;
+
+	if (bank != m_z80_lastbank)
 	{
-		m_z80_lastbank = (data & 7);
-		membank("bank4")->set_base(m_z80_rom + (0x8000 * m_z80_lastbank));
+		m_z80_lastbank = bank;
+		membank("bank1")->set_entry(bank);
 	}
 }
+
+WRITE8_MEMBER(seibuspi_state::sb_coin_w)
+{
+	if (data)
+		m_sb_coin_latch = 0xa0 | data;
+	else
+		m_sb_coin_latch = 0;
+}
+
 
 /********************************************************************/
 
@@ -946,7 +942,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
 	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("spi_scrollram")
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -962,22 +958,23 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP                /* Unknown */
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_fifo_w, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_set_layer_banks_w, 0x00ff0000)
 	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1")        /* ROM location in real-mode */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x4002, 0x4002) AM_WRITENOP            /* ack RST 10 */
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x4002, 0x4002) AM_WRITENOP            /* Unknown */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP            /* Unknown */
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)    /* single board systems */
 	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r)
@@ -988,7 +985,7 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)   /* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1002,11 +999,8 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITENOP
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP
-	AM_IMPORT_FROM( spi_map )
+	AM_IMPORT_FROM( sxx2e_map )
 ADDRESS_MAP_END
 
 
@@ -1017,7 +1011,7 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
 	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("spi_scrollram")
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1030,7 +1024,7 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     /* Player controls (start) */
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
@@ -1040,16 +1034,11 @@ ADDRESS_MAP_END
 
 /********************************************************************/
 
-WRITE32_MEMBER(seibuspi_state::input_select_w)
-{
-	m_ejsakura_input_port = data;
-}
-
 static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
 	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)             /* Unknown */
 	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
-	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(input_select_w)
+	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(ejsakura_input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
@@ -1060,7 +1049,7 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("INPUTS")     /* Player controls */
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("spimainram")
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1")        /* ROM location in real-mode */
 ADDRESS_MAP_END
@@ -1086,7 +1075,7 @@ WRITE8_MEMBER(seibuspi_state::flashrom_write)
 		m_soundflash2->write(offset & 0x0fffff, data);
 }
 
-WRITE_LINE_MEMBER(seibuspi_state::irqhandler)
+WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
 {
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7);    // IRQ is RST10
@@ -1271,6 +1260,27 @@ static INPUT_PORTS_START( spi_ejanhs )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+
+CUSTOM_INPUT_MEMBER(seibuspi_state::ejsakura_keyboard_r)
+{
+	switch(m_ejsakura_input_port)
+	{
+		case 0x01:
+			return ioport("INPUT01")->read();
+		case 0x02:
+			return ioport("INPUT02")->read();
+		case 0x04:
+			return ioport("INPUT04")->read();
+		case 0x08:
+			return ioport("INPUT08")->read();
+		case 0x10:
+			return ioport("INPUT10")->read();
+		default:
+			return ioport("SYSTEM")->read();
+	}
+	return 0xffffffff;
+}
+
 static INPUT_PORTS_START( spi_ejsakura )
 	PORT_START("INPUTS")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seibuspi_state,ejsakura_keyboard_r, NULL)
@@ -1419,7 +1429,7 @@ static const gfx_layout spi_tilelayout =
 	6,
 	{ 0, 4, 8, 12, 16, 20 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1438,7 +1448,7 @@ static const gfx_layout spi_tilelayout0 =
 	1,
 	{ 0 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1456,7 +1466,7 @@ static const gfx_layout spi_tilelayout1 =
 	1,
 	{ 4 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1474,7 +1484,7 @@ static const gfx_layout spi_tilelayout2 =
 	1,
 	{ 8 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1492,7 +1502,7 @@ static const gfx_layout spi_tilelayout3 =
 	1,
 	{ 12 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1510,7 +1520,7 @@ static const gfx_layout spi_tilelayout4 =
 	1,
 	{ 16 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1528,7 +1538,7 @@ static const gfx_layout spi_tilelayout5 =
 	1,
 	{ 20 },
 	{
-			3, 2, 1, 0,
+		3, 2, 1, 0,
 		27,26,25,24,
 		51,50,49,48,
 		75,74,73,72
@@ -1724,29 +1734,61 @@ IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
 	return 0x20;
 }
 
+
 /* SPI */
+
+void seibuspi_state::init_spi_common()
+{
+	if (m_z80_rom != NULL)
+		membank("bank1")->configure_entries(0, 7, m_z80_rom->base(), 0x8000);
+}
+
+void seibuspi_state::init_sei252()
+{
+	seibuspi_text_decrypt(memregion("gfx1")->base());
+	seibuspi_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_sprite_decrypt(memregion("gfx3")->base(), 0x400000);
+	init_spi_common();
+}
+
+void seibuspi_state::init_rise10()
+{
+	seibuspi_rise10_text_decrypt(memregion("gfx1")->base());
+	seibuspi_rise10_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
+	init_spi_common();
+}
+
+void seibuspi_state::init_rise11()
+{
+	seibuspi_rise11_text_decrypt(memregion("gfx1")->base());
+	seibuspi_rise11_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
+	init_spi_common();
+}
+
 
 MACHINE_START_MEMBER(seibuspi_state,spi)
 {
-	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 }
 
 MACHINE_RESET_MEMBER(seibuspi_state,spi)
 {
-	UINT8 *rombase = memregion("maincpu")->base();
-	UINT8 flash_data = rombase[0x1ffffc];
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
-
-	membank("bank4")->set_base(m_z80_rom);
-	membank("bank5")->set_base(m_z80_rom);
+	membank("bank1")->set_entry(0);
+	m_z80_lastbank = 0;
+	m_z80_prg_transfer_pos = 0;
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
+	UINT8 *rombase = memregion("maincpu")->base();
+	UINT8 country_code = rombase[0x1ffffc];
+
 	m_soundflash1->write(0, 0xff);
 	m_soundflash1->write(0, 0x10);
-	m_soundflash1->write(0, flash_data);           /* country code */
+	m_soundflash1->write(0, country_code);
 
 	m_soundflash1->write(0, 0xff);
 	m_soundflash2->write(0, 0xff);
@@ -1794,7 +1836,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
 	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
 
@@ -1802,24 +1844,18 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+
 /* single boards */
 
 MACHINE_START_MEMBER(seibuspi_state,sxx2e)
 {
-	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 }
 
 MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 {
-	UINT8 *rom = memregion("audiocpu")->base();
-
-	membank("bank4")->set_base(m_z80_rom);
-	membank("bank5")->set_base(m_z80_rom);
-
-	memcpy(m_z80_rom, rom, 0x40000);
-
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
-
+	membank("bank1")->set_entry(0);
+	m_z80_lastbank = 0;
 	m_sb_coin_latch = 0;
 }
 
@@ -1837,7 +1873,7 @@ static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_9344MHz)
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1864,242 +1900,22 @@ static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise sa
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz
-	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
-{
-	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
-	return m_spimainram[(0x0018cb4-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
-{
-	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
-	return m_spimainram[(0x0018c9c-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::batlball_speedup_r)
-{
-//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
-
-	/* batlbalu */
-	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
-
-	/* batlball */
-	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
-
-	return m_spimainram[(0x0018db4-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::rdft_speedup_r)
-{
-	/* rdft */
-	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdftau */
-	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdftj */
-	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdftdi */
-	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdftu */
-	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
-
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
-
-	return m_spimainram[(0x00298d0-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
-{
-	/* viprp1 */
-	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
-
-	/* viprp1s */
-	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
-
-	/* viprp1ot */
-	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
-
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
-
-	return m_spimainram[(0x001e2e0-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
-{
-	/* viperp1o */
-	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
-	return m_spimainram[(0x001d49c-0x800)/4];
-}
-
-#ifdef UNUSED_FUNCTION
-// causes input problems?
-READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
-{
-// mame_printf_debug("%08x\n",space.device().safe_pc());
-	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
-	return m_spimainram[(0x002d224-0x800)/4];
-}
-#endif
-
-READ32_MEMBER(seibuspi_state::rf2_speedup_r)
-{
-	/* rdft22kc */
-	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdft2, rdft2j */
-	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdft2us */
-	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rdft2a */
-	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
-
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
-
-	return m_spimainram[(0x0282AC-0x800)/4];
-}
-
-READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
-{
-	/* rfjet, rfjetu, rfjeta */
-	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
-
-	/* rfjetus */
-	if (space.device().safe_pc()==0x0205b39)
-	{
-		UINT32 r;
-		space.device().execute().spin_until_interrupt(); // idle
-		// Hack to enter test mode
-		r = m_spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
-	}
-
-	/* rfjetj */
-	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
-
-//  mame_printf_debug("%08x\n",space.device().safe_pc());
-
-
-	return m_spimainram[(0x002894c-0x800)/4];
-}
-
-void seibuspi_state::init_spi()
-{
-	seibuspi_text_decrypt(memregion("gfx1")->base());
-	seibuspi_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_sprite_decrypt(memregion("gfx3")->base(), 0x400000);
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,rdft)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,senkyu)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,senkyua)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,batlball)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,ejanhs)
-{
-//  idle skip doesn't work properly?
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
-
-	init_spi();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1o)
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
-
-	init_spi();
-}
-
-
-
-void seibuspi_state::init_rf2_common()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0282ac, 0x0282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
-	seibuspi_rise10_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise10_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise10_sprite_decrypt(memregion("gfx3")->base(), 0x600000);
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
-{
-	init_rf2_common();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,rdft2us)
-{
-	init_rf2_common();
-}
-
-
-void seibuspi_state::init_rfjet_common()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
-	seibuspi_rise11_text_decrypt(memregion("gfx1")->base());
-	seibuspi_rise11_bg_decrypt(memregion("gfx2")->base(), memregion("gfx2")->bytes());
-	seibuspi_rise11_sprite_decrypt_rfjet(memregion("gfx3")->base(), 0x800000);
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
-{
-	init_rfjet_common();
-}
 
 /* SYS386 */
 
-DRIVER_INIT_MEMBER(seibuspi_state,rdft22kc)
+MACHINE_START_MEMBER(seibuspi_state,seibu386)
 {
-	init_rf2_common();
-}
-
-DRIVER_INIT_MEMBER(seibuspi_state,rfjet2k)
-{
-	init_rfjet_common();
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 }
 
 MACHINE_RESET_MEMBER(seibuspi_state,seibu386)
 {
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )
@@ -2109,6 +1925,7 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(seibu386_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state, seibu386)
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, seibu386)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
@@ -2136,7 +1953,9 @@ static MACHINE_CONFIG_START( seibu386, seibuspi_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+
 /* SYS386-F V2.0 */
+
 DRIVER_INIT_MEMBER(seibuspi_state,sys386f2)
 {
 	int i, j;
@@ -2163,7 +1982,8 @@ static MACHINE_CONFIG_START( sys386f2, seibuspi_state )
 	MCFG_CPU_PROGRAM_MAP(sys386f2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,seibu386)
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state, seibu386)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, seibu386)
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
@@ -2190,6 +2010,191 @@ MACHINE_CONFIG_END
 
 
 /*******************************************************************/
+
+DRIVER_INIT_MEMBER(seibuspi_state,senkyu)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,senkyua)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,batlball)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,viprp1)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,viprp1o)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,ejanhs)
+{
+//  idle skip doesn't work properly?
+//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,rdft)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
+	init_sei252();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
+	init_rise10();
+}
+
+DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
+{
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
+	init_rise11();
+}
+
+
+READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
+{
+	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
+
+	return m_mainram[(0x0018cb4-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
+{
+	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
+
+	return m_mainram[(0x0018c9c-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::batlball_speedup_r)
+{
+//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
+
+	/* batlbalu */
+	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
+
+	/* batlball */
+	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
+
+	return m_mainram[(0x0018db4-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
+{
+	/* viprp1 */
+	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
+
+	/* viprp1s */
+	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
+
+	/* viprp1ot */
+	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
+
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
+
+	return m_mainram[(0x001e2e0-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
+{
+	/* viperp1o */
+	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
+	return m_mainram[(0x001d49c-0x800)/4];
+}
+
+#ifdef UNUSED_FUNCTION
+// causes input problems?
+READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
+{
+// mame_printf_debug("%08x\n",space.device().safe_pc());
+	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
+	return m_mainram[(0x002d224-0x800)/4];
+}
+#endif
+
+READ32_MEMBER(seibuspi_state::rdft_speedup_r)
+{
+	/* rdft */
+	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftau */
+	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftj */
+	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftdi */
+	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftu */
+	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
+
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
+
+	return m_mainram[(0x00298d0-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::rf2_speedup_r)
+{
+	/* rdft22kc */
+	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdft2, rdft2j */
+	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdft2us */
+	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdft2a */
+	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
+
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
+
+	return m_mainram[(0x0282ac-0x800)/4];
+}
+
+READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
+{
+	/* rfjet, rfjetu, rfjeta */
+	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rfjetus */
+	if (space.device().safe_pc()==0x0205b39)
+	{
+		UINT32 r;
+		space.device().execute().spin_until_interrupt(); // idle
+		// Hack to enter test mode
+		r = m_mainram[(0x002894c-0x800)/4] & (~0x400);
+		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
+	}
+
+	/* rfjetj */
+	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
+
+//  mame_printf_debug("%08x\n",space.device().safe_pc());
+
+	return m_mainram[(0x002894c-0x800)/4];
+}
+
+
+/*******************************************************************/
+
 #define ROM_LOAD24_BYTE(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_SKIP(2))
 #define ROM_LOAD24_WORD(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(1) | ROM_REVERSE)
 #define ROM_LOAD24_WORD_SWAP(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(1))
@@ -2202,6 +2207,8 @@ ROM_START( senkyu )
 	ROM_LOAD32_BYTE("fb_2.212", 0x100001, 0x40000, CRC(38e90619) SHA1(451ab5f4a5935bb779f9c245c1c4358e80d93c15) )
 	ROM_LOAD32_BYTE("fb_3.210", 0x100002, 0x40000, CRC(226f0429) SHA1(69d0fe6671278d7fe215e455bb50abf631cdb484) )
 	ROM_LOAD32_BYTE("fb_4.29",  0x100003, 0x40000, CRC(b46d66b7) SHA1(1acd0fea9384e1488b44661e0c99b9672a3f9803) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
@@ -2229,6 +2236,8 @@ ROM_START( senkyua )
 	ROM_LOAD32_BYTE("3.bin", 0x100002, 0x40000, CRC(e27ceccd) SHA1(3d6b8e97e89939c72d1a5a4a3856025b5f548645) )
 	ROM_LOAD32_BYTE("4.bin", 0x100003, 0x40000, CRC(7c6d4549) SHA1(efc6920a2e518afe849fb6fe191e7cd0bc483be5) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
 	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
@@ -2254,6 +2263,8 @@ ROM_START( batlball )
 	ROM_LOAD32_BYTE("2.212", 0x100001, 0x40000, CRC(3077720b) SHA1(b65c3d02ac75eb56e0c5dc1bf6bb6a4e445a41cf) )
 	ROM_LOAD32_BYTE("3.210", 0x100002, 0x40000, CRC(520d31e1) SHA1(998ae968113ab5b2891044187d93793903c13452) )
 	ROM_LOAD32_BYTE("4.029", 0x100003, 0x40000, CRC(22419b78) SHA1(67475a654d4ad94e5dfda88cbe2f9c1b5ba6d2cc) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
@@ -2281,6 +2292,8 @@ ROM_START( batlballa )
 	ROM_LOAD32_BYTE("3.210",        0x100002, 0x40000, CRC(520d31e1) SHA1(998ae968113ab5b2891044187d93793903c13452) )
 	ROM_LOAD32_BYTE("4.029",        0x100003, 0x40000, CRC(22419b78) SHA1(67475a654d4ad94e5dfda88cbe2f9c1b5ba6d2cc) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
 	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
@@ -2306,6 +2319,8 @@ ROM_START( batlballe ) /* Early version, PCB serial number of 19, hand written l
 	ROM_LOAD32_BYTE("2_10-16", 0x100001, 0x40000, CRC(3c890639) SHA1(968c4a5efc5ebbe4e4cc81f834c286c02596c24e) )
 	ROM_LOAD32_BYTE("3_10-16", 0x100002, 0x40000, CRC(8c30180e) SHA1(47b99b04e2e74f1ee5095aed3f45aba66cd3da3f) )
 	ROM_LOAD32_BYTE("4_10-16", 0x100003, 0x40000, CRC(048c7aaa) SHA1(5eca2cdf4e6f077988509c3c42c86408b21ffbf1) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
@@ -2333,6 +2348,8 @@ ROM_START( batlballu )
 	ROM_LOAD32_BYTE("sen3.bin", 0x100002, 0x40000, CRC(98e6f19f) SHA1(433f8463e63bba32730d3c098354f8c95257df3f) )
 	ROM_LOAD32_BYTE("sen4.bin", 0x100003, 0x40000, CRC(1343ec56) SHA1(8ecc8d7b425ff6512ffa969a7f26423fa50ad258) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
 	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
@@ -2359,6 +2376,8 @@ ROM_START( ejanhs )
 	ROM_LOAD32_BYTE("ejan3_2.212", 0x100001, 0x40000, CRC(83c39da2) SHA1(9526ffb5d5becccf0aa2e338ab4a3c873d575e6f) )
 	ROM_LOAD32_BYTE("ejan3_3.210", 0x100002, 0x40000, CRC(46897b7d) SHA1(a22e0467c016e72bf99df2c1e6ecc792b2151b15) )
 	ROM_LOAD32_BYTE("ejan3_4.29",  0x100003, 0x40000, CRC(b3187a2b) SHA1(7fc11ed5ceb2e45f784e75307fef8b850a981a2e) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("ejan3_6.413", 0x000000, 0x20000, CRC(837e012c) SHA1(815452083b65885d6e66dfc058ceec81bb3e6678) )
@@ -2389,6 +2408,8 @@ ROM_START( viprp1 )
 	ROM_LOAD32_BYTE("seibu3.210", 0x000002, 0x80000, CRC(990fa76a) SHA1(7619a631d6f83b3677eb47f984aff684e9518d6d) )
 	ROM_LOAD32_BYTE("seibu4.29",  0x000003, 0x80000, CRC(13e3e343) SHA1(aac0c7450059847f53b5081e4abf26303a50f999) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu5.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
 	ROM_LOAD24_BYTE("seibu6.u048",  0x000002, 0x10000, CRC(44844ef8) SHA1(bcbe24d2ffb64f9165ba4ab7de27f44b99b5ff5a) )
@@ -2415,6 +2436,8 @@ ROM_START( viprp1u )
 	ROM_LOAD32_BYTE("seibu2.u0212", 0x000001, 0x80000, CRC(2e6c2376) SHA1(b6e660dc7c89cf565c6e055683e84ffcf8179709) )
 	ROM_LOAD32_BYTE("seibu3.u0210", 0x000002, 0x80000, CRC(c38f7b4e) SHA1(d5bf2c7f2f6c812c65005facfd40ac6d3b61f29d) )
 	ROM_LOAD32_BYTE("seibu4.u029",  0x000003, 0x80000, CRC(523cbef3) SHA1(5d15261b8fb108e0ba4dfd14d259984ef81ce877) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu5.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
@@ -2443,6 +2466,8 @@ ROM_START( viprp1ua )
 	ROM_LOAD32_BYTE("seibus_3", 0x000002, 0x80000, CRC(f9dd9128) SHA1(ff7460699424de9e9d953343c42e0ef0fa1f0e30) )
 	ROM_LOAD32_BYTE("seibus_4", 0x000003, 0x80000, CRC(cb06440c) SHA1(c73647fb72c1579f05298fd884d8aeb3765bfff4) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu5.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
 	ROM_LOAD24_BYTE("seibu6.u048",  0x000002, 0x10000, CRC(44844ef8) SHA1(bcbe24d2ffb64f9165ba4ab7de27f44b99b5ff5a) )
@@ -2469,6 +2494,8 @@ ROM_START( viprp1j )
 	ROM_LOAD32_BYTE("v_2-n.212", 0x000001, 0x80000, CRC(0f888283) SHA1(7e5ac81279b9c7a06f07cb8ae76938cdd5c9beee) )
 	ROM_LOAD32_BYTE("v_3-n.210", 0x000002, 0x80000, CRC(842434ac) SHA1(982d219c1d329122789c552208db2f4aaa4af7e4) )
 	ROM_LOAD32_BYTE("v_4-n.29",  0x000003, 0x80000, CRC(a3948824) SHA1(fe076951427126c8b7fe81be84ecf0699597225b) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu5.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
@@ -2497,6 +2524,8 @@ ROM_START( viprp1s )
 	ROM_LOAD32_BYTE("viper_prg2.bin", 0x000002, 0x80000, CRC(d7ea460b) SHA1(aed10adacd073f7d2b35f12ba4b7876e5c99d142) )
 	ROM_LOAD32_BYTE("viper_prg3.bin", 0x000003, 0x80000, CRC(ca6df094) SHA1(921eec141ce2d449047172fa9cdf39d459b5cc7b) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu5.u0413", 0x000000, 0x20000, CRC(5ece677c) SHA1(b782cf3296f866f79fafa69ff719211c9d4026df) )
 	ROM_LOAD24_BYTE("seibu6.u048",  0x000002, 0x10000, CRC(44844ef8) SHA1(bcbe24d2ffb64f9165ba4ab7de27f44b99b5ff5a) )
@@ -2523,6 +2552,8 @@ ROM_START( viprp1hk )
 	ROM_LOAD32_BYTE("seibu_2", 0x000001, 0x80000, CRC(2c4db249) SHA1(a6372c9a3cde5f262ec5ef446945f6d3ad506e88) )
 	ROM_LOAD32_BYTE("seibu_3", 0x000002, 0x80000, CRC(91989503) SHA1(8c215fac200cc693396dbd57e0939e7efe883342) )
 	ROM_LOAD32_BYTE("seibu_4", 0x000003, 0x80000, CRC(12c9582d) SHA1(a79e26514e5ab8703a7a8c3ac39b359cfa4117c1) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("seibu_5", 0x000000, 0x20000, CRC(80920fed) SHA1(b35ed080925f6d0a0b6d2d1ab4fa919f625b1e6a) ) /* Different from both "new" & "old" versions */
@@ -2551,6 +2582,8 @@ ROM_START( viprp1oj )
 	ROM_LOAD32_BYTE("v_3-o.210", 0x000002, 0x80000, CRC(6146db39) SHA1(04e68bfff320a3ffcb47686fa012a038538adc1a) )
 	ROM_LOAD32_BYTE("v_4-o.29",  0x000003, 0x80000, CRC(dc8dd2b6) SHA1(20970706240c38c54084b4ae24b7ad23b31aa3de) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("v_5-o.413", 0x000000, 0x20000, CRC(6d863acc) SHA1(3e3e14f51b9394b24d7cbf562f1cfffc9ec2216d) )
 	ROM_LOAD24_BYTE("v_6-o.48",  0x000002, 0x10000, CRC(fe7cb8f7) SHA1(55c7ab977c3666c8770deb62718d535673ffd4f8) )
@@ -2577,6 +2610,8 @@ ROM_START( viprp1ot )
 	ROM_LOAD32_BYTE("ov2.bin", 0x000001, 0x80000, CRC(0e2bbcb5) SHA1(5e53d60357fb0f9efa441261fac79e153eb35f3d) )
 	ROM_LOAD32_BYTE("ov3.bin", 0x000002, 0x80000, CRC(0e86686b) SHA1(0af207ea77ef378364d80d20ecbfba2f043f2405) )
 	ROM_LOAD32_BYTE("ov4.bin", 0x000003, 0x80000, CRC(9d7dd325) SHA1(550a8b5ed60e7ac50c40ec3eaa2cd6462be4a619) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_WORD("v_5-o.413", 0x000000, 0x20000, CRC(6d863acc) SHA1(3e3e14f51b9394b24d7cbf562f1cfffc9ec2216d) )
@@ -2606,6 +2641,8 @@ ROM_START( rdft )
 	ROM_LOAD32_BYTE("gd_3.210", 0x000002, 0x80000, CRC(b0f59f44) SHA1(d44fe074ddab35cd0190535cd9fbd7f9e49312a4) )
 	ROM_LOAD32_BYTE("gd_4.29",  0x000003, 0x80000, CRC(cd8705bd) SHA1(b19a1486d6b899a134d7b518863ddc8f07967e8b) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
@@ -2634,6 +2671,8 @@ ROM_START( rdftu )
 	ROM_LOAD32_BYTE("rdftu_gd_2.212", 0x000001, 0x80000, CRC(13911750) SHA1(8899accb059ed84170924750bb39ae7383ebd959) )
 	ROM_LOAD32_BYTE("rdftu_gd_3.210", 0x000002, 0x80000, CRC(10761b03) SHA1(e67db2e7c2176987419158fc4cee00fd9b99d03f) )
 	ROM_LOAD32_BYTE("rdftu_gd_4.29",  0x000003, 0x80000, CRC(e5a3f01d) SHA1(5ca338f85a020d43d2618f88e798a076d13a5c7f) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
@@ -2665,6 +2704,8 @@ ROM_START( rdftj )
 	ROM_LOAD32_BYTE("rf3.bin", 0x000002, 0x80000, CRC(beafcd24) SHA1(2dbc47ecef6f898a371a841df2c72151da9c5a8d) )
 	ROM_LOAD32_BYTE("rf4.bin", 0x000003, 0x80000, CRC(5236f45f) SHA1(8b05d977d3d07796007a00a52d2396475dc2f7dc) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
@@ -2693,6 +2734,8 @@ ROM_START( rdftau )
 	ROM_LOAD32_BYTE("2.u0212", 0x000001, 0x80000, CRC(a88bda02) SHA1(27dc720d28f56cf443a4eb0bbaaf4bf3b194056d) )
 	ROM_LOAD32_BYTE("3.u0210", 0x000002, 0x80000, CRC(a73e337e) SHA1(93323875c676f38eca3298fcf4a34911db2d78a8) )
 	ROM_LOAD32_BYTE("4.u029",  0x000003, 0x80000, CRC(8cc628f0) SHA1(7534eae8a1ea461adad483002b3cecf132e0e325) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
@@ -2723,6 +2766,8 @@ ROM_START( rdftit )
 	ROM_LOAD32_BYTE("u210.bin", 0x000002, 0x80000, CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) )
 	ROM_LOAD32_BYTE("u29.bin",  0x000003, 0x80000, CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
@@ -2752,6 +2797,8 @@ ROM_START( rdfta )
 	ROM_LOAD32_BYTE("u210.bin", 0x000002, 0x80000, CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) )
 	ROM_LOAD32_BYTE("u29.bin",  0x000003, 0x80000, CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
@@ -2780,6 +2827,8 @@ ROM_START( rdftadi ) // Dream Island license
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
 	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
@@ -2806,6 +2855,8 @@ ROM_START( rdftam ) // Metrotainment license
 	ROM_LOAD32_BYTE("seibu_1.u0211",        0x000000, 0x080000, CRC(156D8DB0) SHA1(93662B3EE494E37A56428A7AA3DAD7A957835950) ) // socket is silkscreened on pcb PRG0
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
@@ -2834,6 +2885,9 @@ ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0258",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0262", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
+	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256K ROM for the Z80 */
+	ROM_LOAD("seibu_zprg.u1139", 0x000000, 0x20000, CRC(c1fda3e8) SHA1(c1d3a7ba0601a80534ec32249de71d33a828a162) ) // pads are silkscreened ZPRG
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0535", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
 	ROM_LOAD24_BYTE("seibu_fix2.u0528",   0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIX2
@@ -2851,9 +2905,6 @@ ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
 
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256k for the Z80 */
-	ROM_LOAD("seibu_zprg.u1139", 0x000000, 0x20000, CRC(c1fda3e8) SHA1(c1d3a7ba0601a80534ec32249de71d33a828a162) ) // pads are silkscreened ZPRG
-
 	ROM_REGION( 0x200000, "ymf", ROMREGION_ERASE00 )  /* sound roms */
 	ROM_LOAD("raiden-f_pcm2.u0975", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
 	/* SOUND1 socket is unpopulated */
@@ -2866,6 +2917,8 @@ ROM_START( rdft2 ) /* SPI Cart, Europe */
 	ROM_LOAD32_BYTE("prg1.bin", 0x000001, 0x80000, CRC(cab55d88) SHA1(246e13880d34b6c7c3f4ab5e18fa8a0547c03d9d) )
 	ROM_LOAD32_BYTE("prg2.bin", 0x000002, 0x80000, CRC(83758b0e) SHA1(63adb2d09e7bd7dba47a55b3b579d543dfb553e3) )
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
@@ -2899,6 +2952,8 @@ ROM_START( rdft2u ) /* SPI Cart, USA */
 	ROM_LOAD32_BYTE("3.bin", 0x000002, 0x80000, CRC(86e3d1a8) SHA1(2757cfda57c82dd0f66427caf54eb1f40e85740d) )
 	ROM_LOAD32_BYTE("4.bin", 0x000003, 0x80000, CRC(2e409a76) SHA1(cf90aa14a07b5aa861f6f7cc9b1968171e532557) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
 	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
@@ -2931,6 +2986,8 @@ ROM_START( rdft2j ) /* SPI Cart, Japan */
 	ROM_LOAD32_BYTE("prg2.bin", 0x000002, 0x80000, CRC(83758b0e) SHA1(63adb2d09e7bd7dba47a55b3b579d543dfb553e3) )
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
 	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
@@ -2962,6 +3019,8 @@ ROM_START( rdft2j2 ) /* SPI Cart, Japan */
 	ROM_LOAD32_BYTE("rf2_2.bin", 0x000001, 0x80000, CRC(ec73a767) SHA1(83f3905afe49401793c0ea0193cb31d3ba1e1739) )
 	ROM_LOAD32_BYTE("rf2_3.bin", 0x000002, 0x80000, CRC(e66243b2) SHA1(54e67af37a4586fd1afc79085ed433d599e1bb87) )
 	ROM_LOAD32_BYTE("rf2_4.bin", 0x000003, 0x80000, CRC(92b7b73e) SHA1(128649b2a6a0616113bd0f9846fb6cf814ae326d) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("rf2_5.bin", 0x000001, 0x10000, CRC(377cac2f) SHA1(f7c9323d79b77f6c8c02ba2c6cdca127d6e5cb5c) )
@@ -2996,6 +3055,8 @@ ROM_START( rdft2a ) /* SPI Cart, Asia (Metrotainment license); SPI PCB is marked
 	ROM_LOAD32_BYTE("seibu__3.u0221", 0x000002, 0x80000, CRC(83758b0e) SHA1(63adb2d09e7bd7dba47a55b3b579d543dfb553e3) ) // socket is silkscreened on pcb PRG3
 	ROM_LOAD32_BYTE("seibu__4.u0220", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) ) // socket is silkscreened on pcb PRG4
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* all are 27C512 */
 	ROM_LOAD24_BYTE("seibu__5.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) ) // socket is silkscreened on pcb FIX0
 	ROM_LOAD24_BYTE("seibu__6.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) ) // socket is silkscreened on pcb FIX1
@@ -3027,6 +3088,8 @@ ROM_START( rdft2a2 ) /* SPI Cart, Asia (Dream Island license) */
 	ROM_LOAD32_BYTE("rf2_2.bin", 0x000001, 0x80000, CRC(ec73a767) SHA1(83f3905afe49401793c0ea0193cb31d3ba1e1739) )
 	ROM_LOAD32_BYTE("rf2_3.bin", 0x000002, 0x80000, CRC(e66243b2) SHA1(54e67af37a4586fd1afc79085ed433d599e1bb87) )
 	ROM_LOAD32_BYTE("rf2_4.bin", 0x000003, 0x80000, CRC(92b7b73e) SHA1(128649b2a6a0616113bd0f9846fb6cf814ae326d) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("rf2_5.bin", 0x000001, 0x10000, CRC(377cac2f) SHA1(f7c9323d79b77f6c8c02ba2c6cdca127d6e5cb5c) )
@@ -3060,6 +3123,8 @@ ROM_START( rdft2t ) /* SPI Cart, Asia */
 	ROM_LOAD32_BYTE("prg2", 0x000002, 0x80000, CRC(3eca68dd) SHA1(98378654adf055d72ae685f90e36643c9d6419d7) )
 	ROM_LOAD32_BYTE("prg3", 0x000003, 0x80000, CRC(4124daa4) SHA1(42f225c0328df59ffeacc215d37010f825bf507e) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("rf2_5.bin", 0x000001, 0x10000, CRC(377cac2f) SHA1(f7c9323d79b77f6c8c02ba2c6cdca127d6e5cb5c) )
 	ROM_LOAD24_BYTE("rf2_6.bin", 0x000000, 0x10000, CRC(42bd5372) SHA1(c38df85b25070db9640eac541f71c0511bab0c98) )
@@ -3092,6 +3157,9 @@ ROM_START( rdft2us )    /* Single board version SXX2F */
 	ROM_LOAD32_BYTE("prg2.u0265", 0x000002, 0x80000, CRC(cae87e1f) SHA1(e460aad693eb2702ae11f758b11d37f852d00790) )
 	ROM_LOAD32_BYTE("prg3.u0264", 0x000003, 0x80000, CRC(83f4fb5f) SHA1(73f58daa1aae0c4978db409cedd736fb49b15f1c) )
 
+	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256K ROM for the Z80 */
+	ROM_LOAD("zprg.u091", 0x000000, 0x20000, CRC(cc543c4f) SHA1(6e5c93fd3d21c594571b071d4a830211e1f162b2) )
+
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
 	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
@@ -3113,9 +3181,6 @@ ROM_START( rdft2us )    /* Single board version SXX2F */
 
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256k for the Z80 */
-	ROM_LOAD("zprg.u091", 0x000000, 0x20000, CRC(cc543c4f) SHA1(6e5c93fd3d21c594571b071d4a830211e1f162b2) )
-
 	ROM_REGION( 0x280000, "ymf", ROMREGION_ERASE00 )  /* sound roms */
 	ROM_LOAD("pcm.u0103",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_LOAD("sound1.u0107", 0x200000, 0x080000, CRC(20384b0e) SHA1(9c5d725418543df740f9145974ed6ffbbabee1d0) ) /* Different sound1 then SPI carts */
@@ -3128,6 +3193,8 @@ ROM_START( rfjet ) /* SPI Cart, Europe */
 	ROM_LOAD32_BYTE("prg1.u0212", 0x000001, 0x80000, CRC(395e6da7) SHA1(736f777cb1b6bf5541832b8ea89594738ca6d829) )
 	ROM_LOAD32_BYTE("prg2.u0221", 0x000002, 0x80000, CRC(82f7a57e) SHA1(5300015e25d5f2f82eda3ed54bc105d645518498) )
 	ROM_LOAD32_BYTE("prg3.u0220", 0x000003, 0x80000, CRC(cbdf100d) SHA1(c9efd11103429f7f36c1652cadb5384d925cb767) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
@@ -3158,6 +3225,8 @@ ROM_START( rfjetj ) /* SPI Cart, Japan */
 	ROM_LOAD32_BYTE("prg2.bin", 0x000002, 0x80000, CRC(2f402d55) SHA1(d0d852239abb6f4d73e263de5544fc0893e7a7ab) )
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(d619e2ad) SHA1(9dbff1babf62c3c5478a84d2a82a428de5949154) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
 	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(bded85e7) SHA1(ccb8c438ce6b9a742e3ab15be970b1e636783626) )
@@ -3186,6 +3255,8 @@ ROM_START( rfjetu ) /* SPI Cart, US */
 	ROM_LOAD32_BYTE("prg1.u0212",  0x000001, 0x80000, CRC(395e6da7) SHA1(736f777cb1b6bf5541832b8ea89594738ca6d829) )
 	ROM_LOAD32_BYTE("prg2.u0221",  0x000002, 0x80000, CRC(82f7a57e) SHA1(5300015e25d5f2f82eda3ed54bc105d645518498) )
 	ROM_LOAD32_BYTE("prg3.u0220",  0x000003, 0x80000, CRC(cbdf100d) SHA1(c9efd11103429f7f36c1652cadb5384d925cb767) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
@@ -3216,6 +3287,8 @@ ROM_START( rfjeta ) /* SPI Cart, Asia */
 	ROM_LOAD32_BYTE("prg2(__rfjeta).u0221",  0x000002, 0x80000, CRC(82f7a57e) SHA1(5300015e25d5f2f82eda3ed54bc105d645518498) )
 	ROM_LOAD32_BYTE("prg3(__rfjeta).u0220",  0x000003, 0x80000, CRC(cbdf100d) SHA1(c9efd11103429f7f36c1652cadb5384d925cb767) )
 
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
 	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(bded85e7) SHA1(ccb8c438ce6b9a742e3ab15be970b1e636783626) )
@@ -3244,6 +3317,8 @@ ROM_START( rfjett ) /* SPI Cart, Taiwan */
 	ROM_LOAD32_BYTE( "prg1(__rfjett).u0212",   0x000001, 0x080000, CRC(5e4ad3a4) SHA1(ff66e16f48978b88b298c78e21309208ccb3ff15) )
 	ROM_LOAD32_BYTE( "prg2(__rfjett).u0221",   0x000002, 0x080000, CRC(21c9942e) SHA1(ededa05a4b5dae2dec5c4409f22e9a66d2c8e98e) )
 	ROM_LOAD32_BYTE( "prg3(__rfjett).u0220",   0x000003, 0x080000, CRC(ea3657f4) SHA1(2291e31243af7d2e79ae727d9b5484e8d49cc7d9) )
+
+	ROM_REGION( 0x40000, "audiocpu", ROMREGION_ERASE00 ) /* 256K RAM, ROM from Z80 point-of-view */
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
@@ -3282,6 +3357,9 @@ ROM_START( rfjets ) /* Single board version SXX2G */
 	ROM_LOAD32_BYTE("rfj-08.u0265", 0x000002, 0x80000, CRC(ab6d724b) SHA1(ef7e42b1bf649a354fe22b0edd00475ced4151be) ) /* PRG2 */
 	ROM_LOAD32_BYTE("rfj-09.u0264", 0x000003, 0x80000, CRC(b119a67c) SHA1(4fa7dd0e86a3f7c6efa6ae9cf72991b652c877b9) ) /* PRG3 */
 
+	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256K ROM for the Z80 */
+	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("rfj-01.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) ) /* FIX0 */
 	ROM_LOAD24_BYTE("rfj-02.u0518", 0x000000, 0x10000, CRC(bded85e7) SHA1(ccb8c438ce6b9a742e3ab15be970b1e636783626) ) /* FIX1 */
@@ -3299,9 +3377,6 @@ ROM_START( rfjets ) /* Single board version SXX2G */
 	ROM_LOAD("obj-3.u075", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256k for the Z80 */
-	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
 
 	ROM_REGION( 0x280000, "ymf", ROMREGION_ERASE00 )  /* sound roms */
 	ROM_LOAD("pcm-d.u0103",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
@@ -3315,6 +3390,9 @@ ROM_START( rfjetsa ) /* Single board version SXX2G */
 	ROM_LOAD32_BYTE("rfj-08(__rfjetsa).u0265", 0x000002, 0x80000, CRC(1f5dd06c) SHA1(6f5a8c9035971a470212cd0a89b94181011602c3) ) /* PRG2 */
 	ROM_LOAD32_BYTE("rfj-09(__rfjetsa).u0264", 0x000003, 0x80000, CRC(cc71c402) SHA1(b040e600744e7b3f52de0fa852ce3ae08ae49985) ) /* PRG3 */
 
+	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256K ROM for the Z80 */
+	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
+
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD24_BYTE("rfj-01.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) ) /* FIX0 */
 	ROM_LOAD24_BYTE("rfj-02.u0518", 0x000000, 0x10000, CRC(bded85e7) SHA1(ccb8c438ce6b9a742e3ab15be970b1e636783626) ) /* FIX1 */
@@ -3332,9 +3410,6 @@ ROM_START( rfjetsa ) /* Single board version SXX2G */
 	ROM_LOAD("obj-3.u075", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x40000, "audiocpu", 0 )      /* 256k for the Z80 */
-	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
 
 	ROM_REGION( 0x280000, "ymf", ROMREGION_ERASE00 )  /* sound roms */
 	ROM_LOAD("pcm-d.u0103",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
@@ -3501,15 +3576,15 @@ GAME( 1998, rfjett,     rfjet,    spi,      spi_2button,      seibuspi_state, rf
 GAME( 1996, rdfts,      rdft,     sxx2e,    spi_3button,      seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Single Board)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* SXX2F */
-GAME( 1997, rdft2us,    rdft2,    sxx2f,    spi_2button,      seibuspi_state, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // title screen shows '2.1'
+GAME( 1997, rdft2us,    rdft2,    sxx2f,    spi_2button,      seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // title screen shows '2.1'
 
 /* SXX2G */
 GAME( 1999, rfjets,     rfjet,    sxx2g,    spi_2button,      seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Single Board, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
 GAME( 1999, rfjetsa,    rfjet,    sxx2g,    spi_2button,      seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Single Board, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
 
 /* SYS386 */
-GAME( 2000, rdft22kc,   rdft2,    seibu386, seibu386_2button, seibuspi_state, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, rfjet2kc,   rfjet,    seibu386, seibu386_2button, seibuspi_state, rfjet2k,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, rdft22kc,   rdft2,    seibu386, seibu386_2button, seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, rfjet2kc,   rfjet,    seibu386, seibu386_2button, seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
 
 /* SYS386F V2.0 */
 GAME( 1999, ejsakura,   0,        sys386f2, spi_ejsakura,     seibuspi_state, sys386f2, ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (v2.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

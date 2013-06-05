@@ -559,6 +559,10 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_UNMAP \
 	curentry->set_read_type(AMH_UNMAP); \
 	curentry->set_write_type(AMH_UNMAP);
+#define AM_READUNMAP \
+	curentry->set_read_type(AMH_UNMAP);
+#define AM_WRITEUNMAP \
+	curentry->set_write_type(AMH_UNMAP);
 #define AM_NOP \
 	curentry->set_read_type(AMH_NOP); \
 	curentry->set_write_type(AMH_NOP);
