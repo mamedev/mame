@@ -1,5 +1,3 @@
-#include "devlegcy.h"
-
 class flower_state : public driver_device
 {
 public:
@@ -51,31 +49,74 @@ public:
 };
 
 
-/*----------- defined in audio/flower.c -----------*/
+// ======================> gomoku_sound_device
 
-DECLARE_WRITE8_DEVICE_HANDLER( flower_sound1_w );
-DECLARE_WRITE8_DEVICE_HANDLER( flower_sound2_w );
+
+/* this structure defines the parameters for a channel */
+struct flower_sound_channel
+{
+	UINT32 start;
+	UINT32 pos;
+	UINT16 freq;
+	UINT8 volume;
+	UINT8 voltab;
+	UINT8 oneshot;
+	UINT8 active;
+	UINT8 effect;
+	UINT32 ecount;
+
+};
 
 class flower_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
 	flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~flower_sound_device() { global_free(m_token); }
+	~flower_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	enum
+	{
+	TIMER_CLOCK_EFFECT
+	};
+	
+	DECLARE_WRITE8_MEMBER( sound1_w );
+	DECLARE_WRITE8_MEMBER( sound2_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
+	void make_mixer_table(int voices, int gain);
+	void show_soundregs();
+	
 	// internal state
-	void *m_token;
+	emu_timer *m_effect_timer;
+
+	/* data about the sound system */
+	flower_sound_channel m_channel_list[8];
+	flower_sound_channel *m_last_channel;
+
+	/* global sound parameters */
+	const UINT8 *m_sample_rom;
+	const UINT8 *m_volume_rom;
+	sound_stream * m_stream;
+
+	/* mixer tables and internal buffers */
+	INT16 *m_mixer_table;
+	INT16 *m_mixer_lookup;
+	short *m_mixer_buffer;
+
+	UINT8 m_soundregs1[0x40];
+	UINT8 m_soundregs2[0x40];
+
 };
 
 extern const device_type FLOWER;
