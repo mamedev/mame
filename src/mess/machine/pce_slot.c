@@ -94,7 +94,7 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 	else
 	{
 		// setup the rom_bank_map array to faster ROM read
-		for (i = 0; i < size / 0x20000; i++)
+		for (i = 0; i < size / 0x20000 && i < 8; i++)
 			rom_bank_map[i] = i;
 		
 		// fill up remaining blocks with mirrors
