@@ -784,7 +784,7 @@ private:
 	TIMER_CALLBACK_MEMBER(bdma_timer_exp);
 
 	cpu_device *m_cpu;
-	s3c44b0_memcon_t m_memcon;
+	//s3c44b0_memcon_t m_memcon;
 	s3c44b0_irq_t m_irq;
 	s3c44b0_dma_t m_zdma[2];
 	s3c44b0_dma_t m_bdma[2];
@@ -797,7 +797,7 @@ private:
 	s3c44b0_iic_t m_iic;
 	s3c44b0_iis_t m_iis;
 	s3c44b0_gpio_t m_gpio;
-	s3c44b0_rtc_t m_rtc;
+	//s3c44b0_rtc_t m_rtc;
 	s3c44b0_adc_t m_adc;
 	s3c44b0_cpuwrap_t m_cpuwrap;
 	devcb_resolved_read32       m_port_r;

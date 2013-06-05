@@ -60,8 +60,8 @@ private:
 	int m_buswidth;
 	int m_dmarq[4];
 	emu_timer* m_timer[4];
-	int m_in_progress[4];
-	int m_transfer_size[4];
+	//int m_in_progress[4];
+	//int m_transfer_size[4];
 	int m_base;
 	devcb_resolved_write_line   m_out_hreq_func;
 	devcb_resolved_write_line   m_out_eop_func;
