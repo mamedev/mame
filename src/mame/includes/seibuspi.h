@@ -9,7 +9,7 @@ public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_spi_scrollram(*this, "spi_scrollram"),
 		m_spimainram(*this, "spimainram"),
 		m_eeprom(*this, "eeprom"),
@@ -17,11 +17,12 @@ public:
 		m_soundflash2(*this, "soundflash2"),
 		m_soundfifo1(*this, "soundfifo1"),
 		m_soundfifo2(*this, "soundfifo2"),
+		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
 	required_device<eeprom_device> m_eeprom;
@@ -29,6 +30,7 @@ public:
 	optional_device<intel_e28f008sa_device> m_soundflash2;
 	optional_device<fifo7200_device> m_soundfifo1;
 	optional_device<fifo7200_device> m_soundfifo2;
+	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
 
 	UINT8 *m_z80_rom;
@@ -73,7 +75,6 @@ public:
 	DECLARE_READ8_MEMBER(sound_fifo_status_r);
 	DECLARE_READ32_MEMBER(spi_int_r);
 	DECLARE_READ32_MEMBER(spi_unknown_r);
-	DECLARE_WRITE8_MEMBER(sb_unknown_w);
 	DECLARE_WRITE8_MEMBER(z80_prg_fifo_w);
 	DECLARE_WRITE8_MEMBER(z80_enable_w);
 	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
