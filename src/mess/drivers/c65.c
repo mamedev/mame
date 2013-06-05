@@ -53,7 +53,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 #include "sound/mos6581.h"
-#include "machine/6526cia.h"
+#include "machine/mos6526.h"
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"
 #include "includes/cbm.h"
@@ -204,7 +204,7 @@ PALETTE_INIT_MEMBER(c65_state,c65)
 int c65_state::c64_paddle_read( device_t *device, address_space &space, int which )
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
-	UINT8 cia0porta = mos6526_pa_r(machine().device("cia_0"), space, 0);
+	UINT8 cia0porta = machine().device<mos6526_device>("cia_0")->pa_r(space, 0);
 	int controller1 = ioport("CTRLSEL")->read() & 0x07;
 	int controller2 = ioport("CTRLSEL")->read() & 0x70;
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
@@ -434,8 +434,12 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_QUICKLOAD_ADD("quickload", c65_state, cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MCFG_LEGACY_MOS6526R1_ADD("cia_0", 3500000, 60, c65_cia0)
-	MCFG_LEGACY_MOS6526R1_ADD("cia_1", 3500000, 60, c65_cia1)
+	MCFG_MOS6526_ADD("cia_0", 3500000, 60, WRITELINE(c65_state, c65_cia0_interrupt))
+	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia0_port_a_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c65_state, c65_cia0_port_b_r), WRITE8(c65_state, c65_cia0_port_b_w), NULL)
+
+	MCFG_MOS6526_ADD("cia_1", 3500000, 60, WRITELINE(c65_state, c65_cia1_interrupt))
+	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia1_port_a_r), WRITE8(c65_state, c65_cia1_port_a_w))
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(NULL)
@@ -465,8 +469,12 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	/* cia */
 	MCFG_DEVICE_REMOVE("cia_0")
 	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_LEGACY_MOS6526R1_ADD("cia_0", 3500000, 50, c65_cia0)
-	MCFG_LEGACY_MOS6526R1_ADD("cia_1", 3500000, 50, c65_cia1)
+	MCFG_MOS6526_ADD("cia_0", 3500000, 50, WRITELINE(c65_state, c65_cia0_interrupt))
+	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia0_port_a_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c65_state, c65_cia0_port_b_r), WRITE8(c65_state, c65_cia0_port_b_w), NULL)
+
+	MCFG_MOS6526_ADD("cia_1", 3500000, 50, WRITELINE(c65_state, c65_cia1_interrupt))
+	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia1_port_a_r), WRITE8(c65_state, c65_cia1_port_a_w))
 MACHINE_CONFIG_END
 
 

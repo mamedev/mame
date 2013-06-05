@@ -50,7 +50,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6502/m6510.h"
-#include "machine/6526cia.h"
+#include "machine/mos6526.h"
 #include "sound/ay8910.h"
 #include "machine/terminal.h"
 
@@ -60,8 +60,8 @@ class sbc6510_state : public driver_device
 public:
 	sbc6510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_terminal(*this, TERMINAL_TAG) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu") ,
+		m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);
@@ -72,13 +72,13 @@ public:
 	UINT8 m_term_data;
 	UINT8 m_key_row;
 	UINT8 m_2;
-	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_start();
 	virtual void machine_reset();
 
 protected:
 	ioport_port *m_io_port[8];
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -87,9 +87,9 @@ static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	AM_RANGE(0x0000, 0x0001) AM_RAM
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(a2_r,a2_w)
 	AM_RANGE(0x0003, 0xdfff) AM_RAM
-	AM_RANGE(0xE000, 0xE00F) AM_MIRROR(0x1f0) AM_DEVREADWRITE_LEGACY("cia6526", mos6526_r, mos6526_w)
-	AM_RANGE(0xE800, 0xE800) AM_MIRROR(0x1ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0xEA00, 0xEA00) AM_MIRROR(0x1ff) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
+	AM_RANGE(0xe000, 0xe00f) AM_MIRROR(0x1f0) AM_DEVREADWRITE("cia6526", mos6526_device, read, write)
+	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x1ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0xea00, 0xea00) AM_MIRROR(0x1ff) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -255,18 +255,6 @@ WRITE8_MEMBER( sbc6510_state::key_w )
 	m_key_row = data;
 }
 
-const legacy_mos6526_interface cia_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", M6510_IRQ_LINE), // irq
-	DEVCB_NULL, // pc (timer related) not connected
-	DEVCB_NULL, // cnt (serial related) not connected
-	DEVCB_NULL, // sp (serial related) not connected
-	DEVCB_NULL, // port A in
-	DEVCB_DRIVER_MEMBER(sbc6510_state, key_w),  // port A out
-	DEVCB_DRIVER_MEMBER(sbc6510_state, key_r),  // port B in
-	DEVCB_NULL  // port B out
-};
-
 static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
@@ -282,7 +270,9 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_SOUND_CONFIG(sbc6510_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_LEGACY_MOS6526R1_ADD("cia6526", XTAL_1MHz, 50, cia_intf)
+	MCFG_MOS6526_ADD("cia6526", XTAL_1MHz, 50, INPUTLINE("maincpu", M6510_IRQ_LINE))
+	MCFG_MOS6526_PORT_A_CALLBACKS(NULL, WRITE8(sbc6510_state, key_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(sbc6510_state, key_r), NULL, NULL)
 MACHINE_CONFIG_END
 
 /* ROM definition */

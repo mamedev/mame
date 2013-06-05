@@ -40,14 +40,11 @@
 
 void c65_state::c65_nmi(  )
 {
-	device_t *cia_1 = machine().device("cia_1");
-	int cia1irq = mos6526_irq_r(cia_1);
-
-	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || cia1irq)   /* KEY_RESTORE */
+	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq)   /* KEY_RESTORE */
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq);
 
-		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || cia1irq;
+		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || m_cia1_irq;
 	}
 }
 
@@ -70,7 +67,7 @@ void c65_state::c65_nmi(  )
 
 READ8_MEMBER(c65_state::c65_cia0_port_a_r)
 {
-	UINT8 cia0portb = mos6526_pb_r(machine().device("cia_0"), space, 0);
+	UINT8 cia0portb = machine().device<mos6526_device>("cia_0")->pb_r(space, 0);
 
 	return cbm_common_cia0_port_a_r(machine().device("cia_0"), cia0portb);
 }
@@ -78,7 +75,7 @@ READ8_MEMBER(c65_state::c65_cia0_port_a_r)
 READ8_MEMBER(c65_state::c65_cia0_port_b_r)
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(machine().device("cia_0"), space, 0);
+	UINT8 cia0porta = machine().device<mos6526_device>("cia_0")->pa_r(space, 0);
 
 	value &= cbm_common_cia0_port_b_r(machine().device("cia_0"), cia0porta);
 
@@ -108,33 +105,21 @@ void c65_state::c65_irq( int level )
 /* is this correct for c65 as well as c64? */
 WRITE_LINE_MEMBER(c65_state::c65_cia0_interrupt)
 {
+	m_cia0_irq = state;
 	c65_irq(state || m_vicirq);
 }
 
 /* is this correct for c65 as well as c64? */
 WRITE_LINE_MEMBER(c65_state::c65_vic_interrupt)
 {
-	device_t *cia_0 = machine().device("cia_0");
 #if 1
 	if (state != m_vicirq)
 	{
-		c65_irq (state || mos6526_irq_r(cia_0));
+		c65_irq (state || m_cia0_irq);
 		m_vicirq = state;
 	}
 #endif
 }
-
-const legacy_mos6526_interface c65_cia0 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(c65_state, c65_cia0_interrupt),
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_a_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_b_r),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_cia0_port_b_w)
-};
 
 /*
  * CIA 1 - Port A
@@ -185,20 +170,9 @@ WRITE8_MEMBER(c65_state::c65_cia1_port_a_w)
 
 WRITE_LINE_MEMBER(c65_state::c65_cia1_interrupt)
 {
+	m_cia1_irq = state;
 	c65_nmi();
 }
-
-const legacy_mos6526_interface c65_cia1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(c65_state,c65_cia1_interrupt),
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c65_state,c65_cia1_port_a_r),
-	DEVCB_DRIVER_MEMBER(c65_state,c65_cia1_port_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /***********************************************
 

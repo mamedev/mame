@@ -7,7 +7,7 @@
 #ifndef C65_H_
 #define C65_H_
 
-#include "machine/6526cia.h"
+#include "machine/mos6526.h"
 #include "machine/cbmiec.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
@@ -117,6 +117,7 @@ public:
 	expansion_ram_t m_expansion_ram;
 	int m_io_on;
 	int m_io_dc00_on;
+	int m_cia0_irq, m_cia1_irq;
 	DECLARE_DRIVER_INIT(c65);
 	DECLARE_DRIVER_INIT(c65pal);
 
@@ -180,10 +181,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
-
-/*----------- defined in machine/c65.c -----------*/
-extern const legacy_mos6526_interface c65_cia0;
-extern const legacy_mos6526_interface c65_cia1;
 
 MACHINE_CONFIG_EXTERN( c64_cartslot );
 

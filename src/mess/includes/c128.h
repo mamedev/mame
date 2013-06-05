@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "machine/cbm_snqk.h"
 #include "cpu/m6502/m8502.h"
-#include "machine/6526cia.h"
 #include "machine/c64exp.h"
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
