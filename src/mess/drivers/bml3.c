@@ -5,7 +5,6 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - keyboard shift key is ugly mapped.
     - keyboard is actually tied to crtc hsync timer
     - understand how to load a tape
     - some NEWON commands now makes the keyboard to not work anymore (it does if you
@@ -31,7 +30,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
-#include "machine/mc6843.h"
+// #$# ? remove if not using proper mc6843?
+// #include "machine/mc6843.h"
 #include "sound/beep.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
@@ -39,7 +39,10 @@
 
 //#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+// #$# ? needed
+// #include "formats/basicdsk.h"
+#include "formats/bml3_dsk.h"
+#include "machine/wd17xx.h"
 
 class bml3_state : public driver_device
 {
@@ -61,10 +64,15 @@ public:
 	required_device<ym2203_device> m_ym2203;
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
+	DECLARE_WRITE8_MEMBER(bml3_keyboard_w);
 	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);
 	DECLARE_WRITE8_MEMBER(bml3_vres_reg_w);
 	DECLARE_READ8_MEMBER(bml3_vram_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_w);
+	DECLARE_READ8_MEMBER(bml3_wd179x_r);
+	DECLARE_WRITE8_MEMBER(bml3_wd179x_w);
+	DECLARE_READ8_MEMBER(bml3_mc6843_r);
+	DECLARE_WRITE8_MEMBER(bml3_mc6843_w);
 	DECLARE_READ8_MEMBER(bml3_fdd_r);
 	DECLARE_WRITE8_MEMBER(bml3_fdd_w);
 	DECLARE_READ8_MEMBER(bml3_kanji_r);
@@ -100,6 +108,15 @@ public:
 	UINT8 m_vres_reg;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
+	// #$# change to UINT8?
+	int m_keyb_interrupt_disabled;
+	int m_keyb_nmi_disabled;
+	int m_keyb_counter_operation_disabled;
+	int m_keyb_empty_scan;
+	int m_keyb_scancode;
+	int m_keyb_capslock_led_on;
+	int m_keyb_hiragana_led_on;
+	int m_keyb_katakana_led_on;
 	UINT8 *m_p_chargen;
 	UINT8 m_psg_latch;
 	void m6845_change_clock(UINT8 setting);
@@ -148,15 +165,20 @@ void bml3_state::video_start()
 
 UINT32 bml3_state::screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x,y,count;
+	int x,y,hf,count;
 	int xi,yi;
-	int width; //,height;
+	int width,interlace,lowres;
+	int rawbits,dots[2],color,reverse,graphic;
 	UINT8 *vram = memregion("vram")->base();
 
 	count = 0x0000;
 
 	width = (m_hres_reg & 0x80) ? 80 : 40;
-//  height = (m_vres_reg & 0x08) ? 1 : 0;
+	interlace = (m_vres_reg & 0x08) ? 1 : 0;
+	lowres = (m_hres_reg & 0x40) ? 1 : 0;
+
+	// redundant initializers to keep compiler happy
+	rawbits = dots[0] = dots[1] = color = reverse = graphic = 0;
 
 //  popmessage("%02x %02x",m_hres_reg,m_vres_reg);
 
@@ -164,28 +186,63 @@ UINT32 bml3_state::screen_update_bml3(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for(x=0;x<width;x++)
 		{
-			int tile = vram[count+0x0000] & 0x7f;
-			int tile_bank = (vram[count+0x0000] & 0x80) >> 7;
-			int color = vram[count+0x4000] & 7;
-			int reverse = vram[count+0x4000] & 8;
-			//attr & 0x10 is used ... bitmap mode? (apparently bits 4 and 7 are used for that)
-
-			for(yi=0;yi<mc6845_tile_height;yi++)
+			for(yi=0;yi<8;yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				if (!lowres || yi == 0) {
+					int offset = count + yi * (width / 40 * 0x400) + mc6845_start_addr - 0x400;
+					if (offset >= 0x0000 && offset < 0x4000) {
+						rawbits = vram[offset+0x0000];
+						color = vram[offset+0x4000] & 7;
+						reverse = vram[offset+0x4000] & 8;
+						graphic = vram[offset+0x4000] & 0x10;
+					}
+					else {
+						// outside vram - don't know what should happen here
+						rawbits = color = reverse = graphic = 0;
+					}
+				}
+				if (graphic) {
+					if (lowres) {
+						// low-res graphics, each tile has 8 bits arranged as follows:
+						// 4 0
+						// 5 1
+						// 6 2
+						// 7 3
+						dots[0] = dots[1] = (rawbits >> yi/2 & 0x11) * 0xf;
+					}
+					else {
+						dots[0] = dots[1] = rawbits;
+					}
+				}
+				else {
+					// character mode
+					int tile = rawbits  & 0x7f;
+					int tile_bank = (rawbits & 0x80) >> 7;
+					if (interlace) {
+						dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(yi<<1)];
+						dots[1] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(yi<<1)|tile_bank];
+					}
+					else {
+						dots[0] = dots[1] = m_p_chargen[(tile<<4)|(yi<<1)|tile_bank];
+					}
+				}
+				for(hf=0;hf<=interlace;hf++)
 				{
-					int pen;
+					for(xi=0;xi<8;xi++)
+					{
+						int pen;
 
-					if(reverse)
-						pen = (m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? 0 : color;
-					else
-						pen = (m_p_chargen[tile*16+yi*2+tile_bank] >> (7-xi) & 1) ? color : 0;
+						if(reverse)
+							pen = (dots[hf] >> (7-xi) & 1) ? 0 : color;
+						else
+							pen = (dots[hf] >> (7-xi) & 1) ? color : 0;
 
-					bitmap.pix16(y*mc6845_tile_height+yi, x*8+xi) = pen;
+						bitmap.pix16((y*8+yi)*(interlace+1)+hf, x*8+xi) = pen;
+					}
 				}
 			}
 
-			if(mc6845_cursor_addr-0x400 == count)
+			if(mc6845_cursor_addr-mc6845_start_addr == count)
 			{
 				int xc,yc,cursor_on;
 
@@ -204,7 +261,13 @@ UINT32 bml3_state::screen_update_bml3(screen_device &screen, bitmap_ind16 &bitma
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*mc6845_tile_height+yc+7, x*8+xc) = 7;
+							if(interlace)
+							{
+								bitmap.pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
+								bitmap.pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
+							}
+							else
+								bitmap.pix16(y*8+yc+7, x*8+xc) = 7;
 						}
 					}
 				}
@@ -233,15 +296,21 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 
 READ8_MEMBER( bml3_state::bml3_keyboard_r )
 {
-	if(m_keyb_press_flag)
-	{
-		int res;
-		res = m_keyb_press;
-		m_keyb_press = m_keyb_press_flag = 0;
-		return res | 0x80;
-	}
+	m_keyb_press_flag = 0;
+	logerror("bml_keyboard_r %02x\n", m_keyb_press);
+	// #$# not sure what to return if no key pressed, some number from 0-9?  maybe low three bits of scancode?
+	return m_keyb_press;
+}
 
-	return 0x00;
+WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
+{
+	logerror("bml_keyboard_w %02x\n", data);
+	m_keyb_katakana_led_on = (data & 0x01) != 0;
+	m_keyb_hiragana_led_on = (data & 0x02) != 0;
+	m_keyb_capslock_led_on = (data & 0x04) != 0;
+	m_keyb_counter_operation_disabled = (data & 0x08) != 0;
+	m_keyb_interrupt_disabled = (data & 0x40) == 0;
+	m_keyb_nmi_disabled = (data & 0x80) == 0;
 }
 
 void bml3_state::m6845_change_clock(UINT8 setting)
@@ -287,8 +356,10 @@ READ8_MEMBER( bml3_state::bml3_vram_r )
 {
 	UINT8 *vram = memregion("vram")->base();
 
-	/* TODO: this presumably also triggers an attr latch read, unsure yet */
-	m_attr_latch = vram[offset+0x4000];
+	// Bit 7 masks reading back to the latch
+	if ((m_attr_latch & 0x80) == 0) {
+		m_attr_latch = vram[offset+0x4000];
+	}
 
 	return vram[offset];
 }
@@ -298,7 +369,133 @@ WRITE8_MEMBER( bml3_state::bml3_vram_w )
 	UINT8 *vram = memregion("vram")->base();
 
 	vram[offset] = data;
-	vram[offset+0x4000] = m_attr_latch;
+	// color ram is 5-bit
+	vram[offset+0x4000] = m_attr_latch & 0x1F;
+}
+
+READ8_MEMBER( bml3_state::bml3_wd179x_r)
+{
+	device_t* dev = machine().device("fdc");
+	switch(offset)
+	{
+		case 0:
+			return ~wd17xx_status_r(dev,space,offset);
+		case 1:
+			return ~wd17xx_track_r(dev,space,offset);
+		case 2:
+			return ~wd17xx_sector_r(dev,space,offset);
+		case 3:
+			return ~wd17xx_data_r(dev,space,offset);
+		case 4:
+			return wd17xx_drq_r(dev) ? 0x00 : 0x80;
+		default:
+			return -1;
+	}
+}
+
+WRITE8_MEMBER( bml3_state::bml3_wd179x_w)
+{
+	device_t* dev = machine().device("fdc");
+	switch(offset)
+	{
+		case 0:
+			wd17xx_command_w(dev,space,offset,~data);
+			break;
+		case 1:
+			wd17xx_track_w(dev,space,offset,~data);
+			break;
+		case 2:
+			wd17xx_sector_w(dev,space,offset,~data);
+			break;
+		case 3:
+			wd17xx_data_w(dev,space,offset,~data);
+			break;
+		case 4:
+			// #$# support four drives - should be & 0x03 here?
+			int drive = data & 0x01;
+			int side = BIT(data, 4);
+			int motor = BIT(data, 3);
+			wd17xx_set_drive(dev,drive);
+			floppy_mon_w(floppy_get_device(machine(),drive), !motor);
+			floppy_drive_set_ready_state(floppy_get_device(machine(), drive), ASSERT_LINE, 0);
+			wd17xx_set_side(dev,side);
+			break;
+	}
+}
+
+READ8_MEMBER( bml3_state::bml3_mc6843_r)
+{
+	device_t* dev = machine().device("fdc");
+	// #$# JME debug
+	logerror("bml3_state::bml3_mc6843_r(offset=%04X)\n", offset);
+	switch(offset)
+	{
+		case 0:
+			return wd17xx_data_r(dev,space,offset);
+		case 1:
+			return m_io_latch;
+		case 2:
+			// b3 is something?
+			return 0;
+		case 3:
+			// ???
+			// return 0x04;
+			// return wd17xx_status_r(dev,offset);
+			return 0x04 | (wd17xx_drq_r(dev) ? 0x01 : 0x00) | (wd17xx_status_r(dev,space,offset) & 0x01 ? 0x80 : 0x00);
+		case 4:
+			// ???
+			return 0;
+		default:
+			return 0;
+	}
+}
+
+WRITE8_MEMBER( bml3_state::bml3_mc6843_w)
+{
+	device_t* dev = machine().device("fdc");
+	// #$# JME debug
+	logerror("bml3_state::bml3_mc6843_w(offset=%04X, data=%02X)\n", offset, data);
+	switch(offset)
+	{
+		case 0:
+			break;
+		case 1:
+			// ???
+			m_io_latch = data;
+			break;
+		case 2:
+			// not sure if this is wd17xx command or something a bit different...
+			if (data == 0xE4)
+				// read a sector
+				wd17xx_command_w(dev,space,offset,0x80);
+			else
+				// ROM also uses data == 0xC2, not sure what for
+				wd17xx_command_w(dev,space,offset,data);
+			break;
+		case 3:
+			// ? something here, gets 0x66 written to it
+		{
+			// Nasty hack... code in boot sector sets an NMI handler address
+			// at 010A, but it assumes a JMP opcode (7E) is already in 0109.
+			// But nothing ever writes the opcode 8-(
+			// The workaround here is to write the following NMI handler, which
+			// simply jumps to an RTI instruction in ROM.
+			// JMP $EAD5
+			address_space &mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			mem.write_byte(0x0109, 0x7E);
+			mem.write_byte(0x010A, 0xEA);
+			mem.write_byte(0x010B, 0xD5);
+		}
+			break;
+		case 4:
+			wd17xx_sector_w(dev,space,offset,data);
+			break;
+		case 7:
+			wd17xx_track_w(dev,space,offset,data);
+			break;
+		default:
+			break;
+	}
 }
 
 READ8_MEMBER( bml3_state::bml3_fdd_r )
@@ -310,6 +507,16 @@ READ8_MEMBER( bml3_state::bml3_fdd_r )
 WRITE8_MEMBER( bml3_state::bml3_fdd_w )
 {
 	//printf("FDD 0xff20 W %02x\n",data);
+	device_t* dev = machine().device("fdc");
+	// ? something here, gets 0x81 written to it if latch found at FF19, or 0x00 if not
+	// don't know which bits are what
+	int drive = 0;
+	int side = 0;
+	int motor = BIT(data, 7);
+	wd17xx_set_drive(dev,drive);
+	floppy_mon_w(floppy_get_device(machine(),drive), motor);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), drive), ASSERT_LINE, 0);
+	wd17xx_set_side(dev,side);
 }
 
 READ8_MEMBER( bml3_state::bml3_kanji_r )
@@ -407,9 +614,15 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
-	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
-	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_LEGACY("mc6843",mc6843_r,mc6843_w)
+	// Floppy boot block code and disk basic use this controller
+	AM_RANGE(0xff00, 0xff04) AM_READWRITE(bml3_wd179x_r,bml3_wd179x_w)
+	// #$# WD179X floppy controller also occupies this address space... maybe ym2203 can be relocated?
+	// AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
+	// AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
+	// #$# ? is it possible to use a proper mc6843 driver here? Apparently the wd179x and mc6843 both control the same drive.
+	// Disk bootstrap in ROM uses this controller to load boot blocks from disk
+	AM_RANGE(0xff18, 0xff1f) AM_READWRITE(bml3_mc6843_r,bml3_mc6843_w)
+	// AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_LEGACY("mc6843",mc6843_r,mc6843_w)
 	AM_RANGE(0xff20, 0xff20) AM_READWRITE(bml3_fdd_r,bml3_fdd_w) // FDD drive select
 	AM_RANGE(0xff75, 0xff76) AM_READWRITE(bml3_kanji_r,bml3_kanji_w)// kanji i/f
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
@@ -429,7 +642,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w) // interlace select
 //  AM_RANGE(0xffd7, 0xffd7) baud select
 	AM_RANGE(0xffd8, 0xffd8) AM_READWRITE(bml3_vram_attr_r,bml3_vram_attr_w) // attribute register
-	AM_RANGE(0xffe0, 0xffe0) AM_READ(bml3_keyboard_r) // keyboard mode register
+	AM_RANGE(0xffe0, 0xffe0) AM_READWRITE(bml3_keyboard_r,bml3_keyboard_w) // keyboard mode register
 //  AM_RANGE(0xffe8, 0xffe8) bank register
 //  AM_RANGE(0xffe9, 0xffe9) IG mode register
 //  AM_RANGE(0xffea, 0xffea) IG enable register
@@ -475,17 +688,17 @@ static INPUT_PORTS_START( bml3 )
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("?")
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("? PAD")
 	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X1")
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X1") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Shift")PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X2")
-	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana Lock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana Shift") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X6")
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana Lock") PORT_CODE(KEYCODE_NUMLOCK)
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Kana Shift")  PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8 PAD") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 PAD") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
 	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*')
@@ -494,7 +707,7 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^")
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
@@ -512,8 +725,8 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[")
-	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@")
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0 PAD") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
@@ -527,9 +740,9 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(";")
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]")
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":")
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4 PAD") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
@@ -538,14 +751,14 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5 PAD") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6 PAD") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
-	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
 
 	PORT_START("key3") //0x40-0x5f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/ PAD") PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
@@ -581,29 +794,62 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
+static WRITE_LINE_DEVICE_HANDLER( bml3_fdc_intrq_w )
+{
+	// #$# ? HOLD_LINE or PULSE_LINE
+	// #$#debug
+	logerror("bml3_fdc_intrq_w called %d\n", state);
+	if (state)
+		device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
-	int i,port_i,scancode;
-	scancode = 0;
+ 	int i,port_i,scancode,trigger = 0;
 
-	for(port_i=0;port_i<3;port_i++)
-	{
-		for(i=0;i<32;i++)
-		{
+ 	if(!m_keyb_press_flag)
+ 	{
+ 		m_keyb_scancode = (m_keyb_scancode + 1) & 0x7F;
+ 		scancode = m_keyb_scancode;
+
+ 		if (scancode == 0x7F)
+ 		{
+ 			if (m_keyb_empty_scan == 1)
+ 			{
+ 				// full scan completed with no keypress
+ 				m_keyb_press = 0;
+ 				if (!m_keyb_counter_operation_disabled)
+ 					trigger = !0;
+	  		}
+ 			if (m_keyb_empty_scan > 0)
+ 				m_keyb_empty_scan--;
+	  	}
+ 		else if (scancode < 32*3)
+ 		{
+ 			port_i = scancode / 32;
+ 			i = scancode % 32;
 			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
-				{
-					m_keyb_press = scancode;
-					m_keyb_press_flag = 1;
-					m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-					return;
-				}
-			}
+ 				m_keyb_empty_scan = 2;
+ 				trigger = !0;
+ 			}
+ 		}
+ 		if (trigger)
+ 		{
+ 			m_keyb_press_flag = 1;
+ 			m_keyb_press = m_keyb_scancode | 0x80;
+ 			if (!m_keyb_interrupt_disabled)
+				m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+ 		}
+ 		/*
+ 		else {
+ 			// #$# ? don't need this
+			m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+ 		}
+ 		*/
+ 	}
 
-			scancode++;
-		}
-	}
 }
 
 #if 0
@@ -700,7 +946,8 @@ static GFXDECODE_START( bml3 )
 	GFXDECODE_ENTRY( "chargen", 0, bml3_charlayout8x16, 0, 4 )
 GFXDECODE_END
 
-const mc6843_interface bml3_6843_if = { NULL };
+// #$# ? remove if not using proper mc6843?
+// const mc6843_interface bml3_6843_if = { NULL };
 
 WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
@@ -872,7 +1119,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL  // write B
 };
 
-/* TODO */
 static const floppy_interface bml3_floppy_interface =
 {
 	DEVCB_NULL,
@@ -880,10 +1126,17 @@ static const floppy_interface bml3_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_3_5",
+	FLOPPY_STANDARD_5_25_DSDD,
+	LEGACY_FLOPPY_OPTIONS_NAME(bml3),
 	NULL
+};
+
+const wd17xx_interface bml3_wd17xx_interface =
+{
+	DEVCB_NULL,
+	DEVCB_LINE(bml3_fdc_intrq_w),
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1}
 };
 
 static MACHINE_CONFIG_START( bml3, bml3_state )
@@ -907,12 +1160,17 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_1MHz, mc6845_intf)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(240/8))
-	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
+	// fire once per scan of an individual key
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(15750/2))
+	// #$# ? remove if not using proper mc6843?
+	// MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
 	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_floppy_interface)
+ 	/* floppy */
+	// #$# not sure what wd17xx model, this is just a guess
+ 	MCFG_WD1773_ADD("fdc", bml3_wd17xx_interface )
+ 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bml3_floppy_interface)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
