@@ -1916,4 +1916,64 @@
 		</part>
 	</software>
 
+	<software name="dbase23">
+		<description>dBase II (v2.3)</description>
+		<year>198?</year>
+		<publisher>RSP</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dbase23beng.img" size="737280" crc="23efa558" sha1="99bd27b6621b8c30ad0e37deedbbe3aff87f6e30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbase242hu">
+		<description>dBase II (v2.42) (Hun)</description>
+		<year>1984</year>
+		<publisher>Ashton-Tate/Babsoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dbase242hu.img" size="737280" crc="130473a8" sha1="7394b6c73ba8912d6d12ea3ee5f22e0107dab0bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="isdosa" cloneof="isdos">
+		<description>IS-DOS (Alt)</description>
+		<year>198?</year>
+		<publisher>Intelligent Software</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="is-dos.img" size="737280" crc="546afadf" sha1="d827a8cb74ebf243f061b653bb82b3ca722d4a65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tpascal">
+		<description>Turbo Pascal (v3.03A)</description>
+		<year>1985</year>
+		<publisher>Borland</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="turbopascal3.img" size="737280" crc="00304f67" sha1="5e00d28aaff56d4b9d385f54ff7220f0adbbb717" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar III</description>
+		<year>198?</year>
+		<publisher>MicroPro</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="wordstar.img" size="737280" crc="99f84027" sha1="6acc070e7d24bb46985b6b8b651dff34e33f987f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
