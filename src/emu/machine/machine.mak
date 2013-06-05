@@ -77,6 +77,7 @@ MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/i8279.o       \
 				$(MACHINEOBJ)/i8355.o       \
 				$(MACHINEOBJ)/idectrl.o     \
+				$(MACHINEOBJ)/idehd.o       \
 				$(MACHINEOBJ)/im6402.o      \
 				$(MACHINEOBJ)/ins8154.o     \
 				$(MACHINEOBJ)/ins8250.o     \

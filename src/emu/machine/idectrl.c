@@ -161,7 +161,7 @@ void ide_controller_device::signal_delayed_interrupt(attotime time, int buffer_r
 
 UINT8 *ide_controller_device::ide_get_features(int _drive)
 {
-	return drive[_drive].slot->get_features();
+	return slot[_drive]->dev()->get_features();
 }
 
 void ide_controller_device::ide_set_gnet_readlock(const UINT8 onoff)
@@ -244,25 +244,6 @@ INLINE int convert_to_offset_and_size16(offs_t *offset, UINT32 mem_mask)
 
 /*************************************
  *
- *  Compute the LBA address
- *
- *************************************/
-
-UINT32 ide_controller_device::lba_address()
-{
-	/* LBA direct? */
-	if (drive[cur_drive].cur_head_reg & 0x40)
-		return drive[cur_drive].cur_sector + drive[cur_drive].cur_cylinder * 256 + drive[cur_drive].cur_head * 16777216;
-
-	/* standard CHS */
-	else
-		return (drive[cur_drive].cur_cylinder * drive[cur_drive].slot->get_heads() + drive[cur_drive].cur_head) * drive[cur_drive].slot->get_sectors() + drive[cur_drive].cur_sector - 1;
-}
-
-
-
-/*************************************
- *
  *  Advance to the next sector
  *
  *************************************/
@@ -270,14 +251,15 @@ UINT32 ide_controller_device::lba_address()
 void ide_controller_device::next_sector()
 {
 	/* LBA direct? */
-	if (drive[cur_drive].cur_head_reg & 0x40)
+	ide_device_interface *dev = slot[cur_drive]->dev();
+	if (dev->cur_head_reg & 0x40)
 	{
-		drive[cur_drive].cur_sector++;
-		if (drive[cur_drive].cur_sector == 0)
+		dev->cur_sector++;
+		if (dev->cur_sector == 0)
 		{
-			drive[cur_drive].cur_cylinder++;
-			if (drive[cur_drive].cur_cylinder == 0)
-				drive[cur_drive].cur_head++;
+			dev->cur_cylinder++;
+			if (dev->cur_cylinder == 0)
+				dev->cur_head++;
 		}
 	}
 
@@ -285,199 +267,24 @@ void ide_controller_device::next_sector()
 	else
 	{
 		/* sectors are 1-based */
-		drive[cur_drive].cur_sector++;
-		if (drive[cur_drive].cur_sector > drive[cur_drive].slot->get_sectors())
+		dev->cur_sector++;
+		if (dev->cur_sector > dev->get_sectors())
 		{
 			/* heads are 0 based */
-			drive[cur_drive].cur_sector = 1;
-			drive[cur_drive].cur_head++;
-			if (drive[cur_drive].cur_head >= drive[cur_drive].slot->get_heads())
+			dev->cur_sector = 1;
+			dev->cur_head++;
+			if (dev->cur_head >= dev->get_heads())
 			{
-				drive[cur_drive].cur_head = 0;
-				drive[cur_drive].cur_cylinder++;
+				dev->cur_head = 0;
+				dev->cur_cylinder++;
 			}
 		}
 	}
 
-	drive[cur_drive].cur_lba = lba_address();
+	dev->cur_lba = dev->lba_address();
 }
 
 
-
-/*************************************
- *
- *  Build a features page
- *
- *************************************/
-
-static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
-{
-	int i;
-
-	assert(strlen(src) <= (field_size_in_words*2));
-
-	for (i = 0; i < strlen(src); i++)
-		dst[i ^ 1] = src[i];
-	for ( ; i < field_size_in_words * 2; i++)
-		dst[i ^ 1] = ' ';
-}
-
-
-void ide_hdd_device::ide_build_features()
-{
-	memset(m_features, 0, IDE_DISK_SECTOR_SIZE);
-	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
-
-	/* basic geometry */
-	m_features[ 0*2+0] = 0x5a;                      /*  0: configuration bits */
-	m_features[ 0*2+1] = 0x04;
-	m_features[ 1*2+0] = m_num_cylinders & 0xff;    /*  1: logical cylinders */
-	m_features[ 1*2+1] = m_num_cylinders >> 8;
-	m_features[ 2*2+0] = 0;                         /*  2: reserved */
-	m_features[ 2*2+1] = 0;
-	m_features[ 3*2+0] = m_num_heads & 0xff;        /*  3: logical heads */
-	m_features[ 3*2+1] = 0;/*num_heads >> 8;*/
-	m_features[ 4*2+0] = 0;                         /*  4: vendor specific (obsolete) */
-	m_features[ 4*2+1] = 0;
-	m_features[ 5*2+0] = 0;                         /*  5: vendor specific (obsolete) */
-	m_features[ 5*2+1] = 0;
-	m_features[ 6*2+0] = m_num_sectors & 0xff;  /*  6: logical sectors per logical track */
-	m_features[ 6*2+1] = 0;/*num_sectors >> 8;*/
-	m_features[ 7*2+0] = 0;                         /*  7: vendor-specific */
-	m_features[ 7*2+1] = 0;
-	m_features[ 8*2+0] = 0;                         /*  8: vendor-specific */
-	m_features[ 8*2+1] = 0;
-	m_features[ 9*2+0] = 0;                         /*  9: vendor-specific */
-	m_features[ 9*2+1] = 0;
-	swap_strncpy(&m_features[10*2+0],               /* 10-19: serial number */
-			"00000000000000000000", 10);
-	m_features[20*2+0] = 0;                         /* 20: vendor-specific */
-	m_features[20*2+1] = 0;
-	m_features[21*2+0] = 0;                         /* 21: vendor-specific */
-	m_features[21*2+1] = 0;
-	m_features[22*2+0] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
-	m_features[22*2+1] = 0;
-	swap_strncpy(&m_features[23*2+0],               /* 23-26: firmware revision */
-			"1.0", 4);
-	swap_strncpy(&m_features[27*2+0],               /* 27-46: model number */
-			"MAME Compressed Hard Disk", 20);
-	m_features[47*2+0] = 0x01;                      /* 47: read/write multiple support */
-	m_features[47*2+1] = 0x80;
-	m_features[48*2+0] = 0;                         /* 48: reserved */
-	m_features[48*2+1] = 0;
-	m_features[49*2+0] = 0x03;                      /* 49: capabilities */
-	m_features[49*2+1] = 0x0f;
-	m_features[50*2+0] = 0;                         /* 50: reserved */
-	m_features[50*2+1] = 0;
-	m_features[51*2+0] = 2;                         /* 51: PIO data transfer cycle timing mode */
-	m_features[51*2+1] = 0;
-	m_features[52*2+0] = 2;                         /* 52: single word DMA transfer cycle timing mode */
-	m_features[52*2+1] = 0;
-	m_features[53*2+0] = 3;                         /* 53: field validity */
-	m_features[53*2+1] = 0;
-	m_features[54*2+0] = m_num_cylinders & 0xff;    /* 54: number of current logical cylinders */
-	m_features[54*2+1] = m_num_cylinders >> 8;
-	m_features[55*2+0] = m_num_heads & 0xff;        /* 55: number of current logical heads */
-	m_features[55*2+1] = 0;/*num_heads >> 8;*/
-	m_features[56*2+0] = m_num_sectors & 0xff;  /* 56: number of current logical sectors per track */
-	m_features[56*2+1] = 0;/*num_sectors >> 8;*/
-	m_features[57*2+0] = total_sectors & 0xff;  /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
-	m_features[57*2+1] = total_sectors >> 8;
-	m_features[58*2+0] = total_sectors >> 16;
-	m_features[58*2+1] = total_sectors >> 24;
-	m_features[59*2+0] = 0;                         /* 59: multiple sector timing */
-	m_features[59*2+1] = 0;
-	m_features[60*2+0] = total_sectors & 0xff;      /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
-	m_features[60*2+1] = total_sectors >> 8;
-	m_features[61*2+0] = total_sectors >> 16;
-	m_features[61*2+1] = total_sectors >> 24;
-	m_features[62*2+0] = 0x07;                      /* 62: single word dma transfer */
-	m_features[62*2+1] = 0x00;
-	m_features[63*2+0] = 0x07;                      /* 63: multiword DMA transfer */
-	m_features[63*2+1] = 0x04;
-	m_features[64*2+0] = 0x03;                      /* 64: flow control PIO transfer modes supported */
-	m_features[64*2+1] = 0x00;
-	m_features[65*2+0] = 0x78;                      /* 65: minimum multiword DMA transfer cycle time per word */
-	m_features[65*2+1] = 0x00;
-	m_features[66*2+0] = 0x78;                      /* 66: mfr's recommended multiword DMA transfer cycle time */
-	m_features[66*2+1] = 0x00;
-	m_features[67*2+0] = 0x4d;                      /* 67: minimum PIO transfer cycle time without flow control */
-	m_features[67*2+1] = 0x01;
-	m_features[68*2+0] = 0x78;                      /* 68: minimum PIO transfer cycle time with IORDY */
-	m_features[68*2+1] = 0x00;
-	m_features[69*2+0] = 0x00;                      /* 69-70: reserved */
-	m_features[69*2+1] = 0x00;
-	m_features[71*2+0] = 0x00;                      /* 71: reserved for IDENTIFY PACKET command */
-	m_features[71*2+1] = 0x00;
-	m_features[72*2+0] = 0x00;                      /* 72: reserved for IDENTIFY PACKET command */
-	m_features[72*2+1] = 0x00;
-	m_features[73*2+0] = 0x00;                      /* 73: reserved for IDENTIFY PACKET command */
-	m_features[73*2+1] = 0x00;
-	m_features[74*2+0] = 0x00;                      /* 74: reserved for IDENTIFY PACKET command */
-	m_features[74*2+1] = 0x00;
-	m_features[75*2+0] = 0x00;                      /* 75: queue depth */
-	m_features[75*2+1] = 0x00;
-	m_features[76*2+0] = 0x00;                      /* 76-79: reserved */
-	m_features[76*2+1] = 0x00;
-	m_features[80*2+0] = 0x00;                      /* 80: major version number */
-	m_features[80*2+1] = 0x00;
-	m_features[81*2+0] = 0x00;                      /* 81: minor version number */
-	m_features[81*2+1] = 0x00;
-	m_features[82*2+0] = 0x00;                      /* 82: command set supported */
-	m_features[82*2+1] = 0x00;
-	m_features[83*2+0] = 0x00;                      /* 83: command sets supported */
-	m_features[83*2+1] = 0x00;
-	m_features[84*2+0] = 0x00;                      /* 84: command set/feature supported extension */
-	m_features[84*2+1] = 0x00;
-	m_features[85*2+0] = 0x00;                      /* 85: command set/feature enabled */
-	m_features[85*2+1] = 0x00;
-	m_features[86*2+0] = 0x00;                      /* 86: command set/feature enabled */
-	m_features[86*2+1] = 0x00;
-	m_features[87*2+0] = 0x00;                      /* 87: command set/feature default */
-	m_features[87*2+1] = 0x00;
-	m_features[88*2+0] = 0x00;                      /* 88: additional DMA modes */
-	m_features[88*2+1] = 0x00;
-	m_features[89*2+0] = 0x00;                      /* 89: time required for security erase unit completion */
-	m_features[89*2+1] = 0x00;
-	m_features[90*2+0] = 0x00;                      /* 90: time required for enhanced security erase unit completion */
-	m_features[90*2+1] = 0x00;
-	m_features[91*2+0] = 0x00;                      /* 91: current advanced power management value */
-	m_features[91*2+1] = 0x00;
-	m_features[92*2+0] = 0x00;                      /* 92: master password revision code */
-	m_features[92*2+1] = 0x00;
-	m_features[93*2+0] = 0x00;                      /* 93: hardware reset result */
-	m_features[93*2+1] = 0x00;
-	m_features[94*2+0] = 0x00;                      /* 94: acoustic management values */
-	m_features[94*2+1] = 0x00;
-	m_features[95*2+0] = 0x00;                      /* 95-99: reserved */
-	m_features[95*2+1] = 0x00;
-	m_features[100*2+0] = total_sectors & 0xff;     /* 100-103: maximum 48-bit LBA */
-	m_features[100*2+1] = total_sectors >> 8;
-	m_features[101*2+0] = total_sectors >> 16;
-	m_features[101*2+1] = total_sectors >> 24;
-	m_features[102*2+0] = 0x00;
-	m_features[102*2+1] = 0x00;
-	m_features[103*2+0] = 0x00;
-	m_features[103*2+1] = 0x00;
-	m_features[104*2+0] = 0x00;                     /* 104-126: reserved */
-	m_features[104*2+1] = 0x00;
-	m_features[127*2+0] = 0x00;                     /* 127: removable media status notification */
-	m_features[127*2+1] = 0x00;
-	m_features[128*2+0] = 0x00;                     /* 128: security status */
-	m_features[128*2+1] = 0x00;
-	m_features[129*2+0] = 0x00;                     /* 129-159: vendor specific */
-	m_features[129*2+1] = 0x00;
-	m_features[160*2+0] = 0x00;                     /* 160: CFA power mode 1 */
-	m_features[160*2+1] = 0x00;
-	m_features[161*2+0] = 0x00;                     /* 161-175: reserved for CompactFlash */
-	m_features[161*2+1] = 0x00;
-	m_features[176*2+0] = 0x00;                     /* 176-205: current media serial number */
-	m_features[176*2+1] = 0x00;
-	m_features[206*2+0] = 0x00;                     /* 206-254: reserved */
-	m_features[206*2+1] = 0x00;
-	m_features[255*2+0] = 0x00;                     /* 255: integrity word */
-	m_features[255*2+1] = 0x00;
-}
 
 /*************************************
  *
@@ -594,7 +401,8 @@ void ide_controller_device::write_buffer_to_dma()
 
 void ide_controller_device::read_sector_done()
 {
-	int lba = lba_address(), count = 0;
+	ide_device_interface *dev = slot[cur_drive]->dev();
+	int lba = dev->lba_address(), count = 0;
 
 	/* GNET readlock check */
 	if (gnetreadlock) {
@@ -603,9 +411,7 @@ void ide_controller_device::read_sector_done()
 		return;
 	}
 	/* now do the read */
-	if (drive[cur_drive].slot) {
-		count = drive[cur_drive].slot->read_sector(lba, buffer);
-	}
+	count = dev->read_sector(lba, buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
 	if (!verify_only)
@@ -670,21 +476,22 @@ static TIMER_CALLBACK( read_sector_done_callback )
 
 void ide_controller_device::read_first_sector()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
 	/* mark ourselves busy */
 	status |= IDE_STATUS_BUSY;
 
 	/* just set a timer */
 	if (command == IDE_COMMAND_READ_MULTIPLE_BLOCK)
 	{
-		int new_lba = lba_address();
+		int new_lba = dev->lba_address();
 		attotime seek_time;
 
-		if (new_lba == drive[cur_drive].cur_lba || new_lba == drive[cur_drive].cur_lba + 1)
+		if (new_lba == dev->cur_lba || new_lba == dev->cur_lba + 1)
 			seek_time = TIME_NO_SEEK_MULTISECTOR;
 		else
 			seek_time = TIME_SEEK_MULTISECTOR;
 
-		drive[cur_drive].cur_lba = new_lba;
+		dev->cur_lba = new_lba;
 		machine().scheduler().timer_set(seek_time, FUNC(read_sector_done_callback), 0, this);
 	}
 	else
@@ -800,12 +607,11 @@ void ide_controller_device::read_buffer_from_dma()
 
 void ide_controller_device::write_sector_done()
 {
-	int lba = lba_address(), count = 0;
+	ide_device_interface *dev = slot[cur_drive]->dev();
+	int lba = dev->lba_address(), count = 0;
 
 	/* now do the write */
-	if (drive[cur_drive].slot) {
-		count = drive[cur_drive].slot->write_sector(lba, buffer);
-	}
+	count = dev->write_sector(lba, buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
 	status |= IDE_STATUS_BUFFER_READY;
@@ -881,6 +687,7 @@ static TIMER_CALLBACK( write_sector_done_callback )
 void ide_controller_device::handle_command(UINT8 _command)
 {
 	UINT8 key[5];
+	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	/* implicitly clear interrupts here */
 	clear_interrupt();
@@ -890,7 +697,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_READ_MULTIPLE:
 		case IDE_COMMAND_READ_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -904,7 +711,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_READ_MULTIPLE_BLOCK:
 			LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -919,7 +726,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_VERIFY_MULTIPLE:
 		case IDE_COMMAND_VERIFY_NORETRY:
 			LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -933,7 +740,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_READ_DMA:
 			LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -949,7 +756,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_WRITE_MULTIPLE:
 		case IDE_COMMAND_WRITE_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -962,7 +769,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_WRITE_MULTIPLE_BLOCK:
 			LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -975,7 +782,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_WRITE_DMA:
 			LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				drive[cur_drive].cur_cylinder, drive[cur_drive].cur_head, drive[cur_drive].cur_sector, lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
 			buffer_offset = 0;
@@ -1011,9 +818,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			sector_count = 1;
 
 			/* build the features page */
-			if (drive[cur_drive].slot->get_features()) {
-				memcpy(buffer, drive[cur_drive].slot->get_features(), sizeof(buffer));
-			}
+			memcpy(buffer, slot[cur_drive]->dev()->get_features(), sizeof(buffer));
 
 			/* indicate everything is ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -1056,10 +861,10 @@ void ide_controller_device::handle_command(UINT8 _command)
 			break;
 
 		case IDE_COMMAND_SET_CONFIG:
-			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", drive[cur_drive].cur_head + 1, sector_count));
+			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, sector_count));
 			status &= ~IDE_STATUS_ERROR;
 			error = IDE_ERROR_NONE;
-			drive[cur_drive].slot->set_geometry(sector_count,drive[cur_drive].cur_head + 1);
+			dev->set_geometry(sector_count,dev->cur_head + 1);
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
@@ -1074,7 +879,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			break;
 
 		case IDE_COMMAND_SET_FEATURES:
-			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", precomp_offset, sector_count & 0xff, drive[cur_drive].cur_sector, drive[cur_drive].cur_cylinder & 0xff, drive[cur_drive].cur_cylinder >> 8));
+			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", precomp_offset, sector_count & 0xff, dev->cur_sector, dev->cur_cylinder & 0xff, dev->cur_cylinder >> 8));
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
@@ -1117,8 +922,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE GNET Unlock 3\n"));
 
 			/* key check */
-			drive[cur_drive].slot->read_key(key);
-			if ((precomp_offset == key[0]) && (sector_count == key[1]) && (drive[cur_drive].cur_sector == key[2]) && (drive[cur_drive].cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
+			dev->read_key(key);
+			if ((precomp_offset == key[0]) && (sector_count == key[1]) && (dev->cur_sector == key[2]) && (dev->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
 			{
 				gnetreadlock= 0;
 			}
@@ -1166,14 +971,15 @@ void ide_controller_device::handle_command(UINT8 _command)
 UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int size)
 {
 	UINT32 result = 0;
+	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	/* logit */
 //  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
 		LOG(("%s:IDE read at %d:%X, size=%d\n", machine().describe_context(), bank, offset, size));
 
-	if (drive[cur_drive].slot->is_connected())
+	if (dev != NULL)
 	{
-		if (drive[cur_drive].slot->is_ready()) {
+		if (dev->is_ready()) {
 			status |= IDE_STATUS_DRIVE_READY;
 		} else {
 			status &= ~IDE_STATUS_DRIVE_READY;
@@ -1237,19 +1043,19 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 
 		/* return the current sector */
 		case IDE_BANK0_SECTOR_NUMBER:
-			return drive[cur_drive].cur_sector;
+			return dev->cur_sector;
 
 		/* return the current cylinder LSB */
 		case IDE_BANK0_CYLINDER_LSB:
-			return drive[cur_drive].cur_cylinder & 0xff;
+			return dev->cur_cylinder & 0xff;
 
 		/* return the current cylinder MSB */
 		case IDE_BANK0_CYLINDER_MSB:
-			return drive[cur_drive].cur_cylinder >> 8;
+			return dev->cur_cylinder >> 8;
 
 		/* return the current head */
 		case IDE_BANK0_HEAD_NUMBER:
-			return drive[cur_drive].cur_head_reg;
+			return dev->cur_head_reg;
 
 		/* return the current status and clear any pending interrupts */
 		case IDE_BANK0_STATUS_COMMAND:
@@ -1290,6 +1096,8 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 
 void ide_controller_device::ide_controller_write(int bank, offs_t offset, int size, UINT32 data)
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* logit */
 	if (BANK(bank, offset) != IDE_BANK0_DATA)
 		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", machine().describe_context(), bank, offset, data, size));
@@ -1371,7 +1179,7 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 					{
 						UINT8 key[5] = { 0 };
 						int i, bad = 0;
-						drive[cur_drive].slot->read_key(key);
+						dev->read_key(key);
 
 						for (i=0; !bad && i<512; i++)
 							bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
@@ -1404,24 +1212,24 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 
 		/* current sector */
 		case IDE_BANK0_SECTOR_NUMBER:
-			drive[cur_drive].cur_sector = data;
+			dev->cur_sector = data;
 			break;
 
 		/* current cylinder LSB */
 		case IDE_BANK0_CYLINDER_LSB:
-			drive[cur_drive].cur_cylinder = (drive[cur_drive].cur_cylinder & 0xff00) | (data & 0xff);
+			dev->cur_cylinder = (dev->cur_cylinder & 0xff00) | (data & 0xff);
 			break;
 
 		/* current cylinder MSB */
 		case IDE_BANK0_CYLINDER_MSB:
-			drive[cur_drive].cur_cylinder = (drive[cur_drive].cur_cylinder & 0x00ff) | ((data & 0xff) << 8);
+			dev->cur_cylinder = (dev->cur_cylinder & 0x00ff) | ((data & 0xff) << 8);
 			break;
 
 		/* current head */
 		case IDE_BANK0_HEAD_NUMBER:
 			cur_drive = (data & 0x10) >> 4;
-			drive[cur_drive].cur_head = data & 0x0f;
-			drive[cur_drive].cur_head_reg = data;
+			dev->cur_head = data & 0x0f;
+			dev->cur_head_reg = data;
 			// LBA mode = data & 0x40
 			break;
 
@@ -1776,8 +1584,8 @@ void ide_controller_device::device_start()
 	m_irq_handler.resolve_safe();
 
 	/* set MAME harddisk handle */
-	drive[0].slot = owner()->subdevice<ide_slot_device>("drive_0");
-	drive[1].slot = owner()->subdevice<ide_slot_device>("drive_1");
+	slot[0] = owner()->subdevice<ide_slot_device>("drive_0");
+	slot[1] = owner()->subdevice<ide_slot_device>("drive_1");
 
 	/* find the bus master space */
 	if (bmcpu != NULL)
@@ -1805,7 +1613,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(precomp_offset));
 
 	save_item(NAME(buffer));
-	//save_item(NAME(features));
 	save_item(NAME(buffer_offset));
 	save_item(NAME(sector_count));
 
@@ -1821,17 +1628,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(bus_master_command));
 	save_item(NAME(bus_master_status));
 	save_item(NAME(bus_master_descriptor));
-
-	//save_item(NAME(cur_cylinder));
-	//save_item(NAME(cur_sector));
-	//save_item(NAME(cur_head));
-	//save_item(NAME(cur_head_reg));
-
-	//save_item(NAME(cur_lba));
-
-	//save_item(NAME(num_cylinders));
-	//save_item(NAME(num_sectors));
-	//save_item(NAME(num_heads));
 
 	save_item(NAME(config_unknown));
 	save_item(NAME(config_register));
@@ -1898,158 +1694,4 @@ void ide_slot_device::device_config_complete()
 
 void ide_slot_device::device_start()
 {
-}
-
-//**************************************************************************
-//  IDE DEVICE INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ide_device_interface - constructor
-//-------------------------------------------------
-
-ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-{
-}
-
-
-//**************************************************************************
-//  IDE HARD DISK DEVICE
-//**************************************************************************
-
-// device type definition
-const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
-
-//-------------------------------------------------
-//  ide_hdd_device - constructor
-//-------------------------------------------------
-
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
-		ide_device_interface( mconfig, *this )
-{
-}
-
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		ide_device_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_hdd_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ide_hdd_device::device_reset()
-{
-	m_handle = get_disk_handle(machine(), owner()->tag());
-	m_disk = hard_disk_open(m_handle);
-
-	if (m_disk != NULL)
-	{
-		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
-		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
-		{
-			m_num_cylinders = hdinfo->cylinders;
-			m_num_sectors = hdinfo->sectors;
-			m_num_heads = hdinfo->heads;
-			if (PRINTF_IDE_COMMANDS) mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
-			mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
-		}
-		// build the features page
-		UINT32 metalength;
-		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
-			ide_build_features();
-	}
-}
-
-//-------------------------------------------------
-//  read device key
-//-------------------------------------------------
-
-void ide_hdd_device::read_key(UINT8 key[])
-{
-	UINT32 metalength;
-	m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key, 5, metalength);
-}
-
-//**************************************************************************
-//  IDE HARD DISK IMAGE DEVICE
-//**************************************************************************
-
-// device type definition
-const device_type IDE_HARDDISK_IMAGE = &device_creator<ide_hdd_image_device>;
-
-//-------------------------------------------------
-//  ide_hdd_image_device - constructor
-//-------------------------------------------------
-
-ide_hdd_image_device::ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ide_hdd_device(mconfig, IDE_HARDDISK_IMAGE, "IDE Hard Disk Image", tag, owner, clock, "hdd_image", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_hdd_image_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ide_hdd_image_device::device_reset()
-{
-	m_handle = subdevice<harddisk_image_device>("harddisk")->get_chd_file();
-
-	if (m_handle)
-	{
-		m_disk = subdevice<harddisk_image_device>("harddisk")->get_hard_disk_file();
-
-		if (m_disk != NULL)
-		{
-			const hard_disk_info *hdinfo;
-
-			hdinfo = hard_disk_get_info(m_disk);
-			if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
-			{
-				m_num_cylinders = hdinfo->cylinders;
-				m_num_sectors = hdinfo->sectors;
-				m_num_heads = hdinfo->heads;
-				if (PRINTF_IDE_COMMANDS) printf("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
-			}
-			// build the features page
-			UINT32 metalength;
-			if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
-				ide_build_features();
-		}
-	}
-	else
-		m_disk = NULL;
-
-}
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( hdd_image )
-	MCFG_HARDDISK_ADD( "harddisk" )
-MACHINE_CONFIG_END
-
-machine_config_constructor ide_hdd_image_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hdd_image );
 }

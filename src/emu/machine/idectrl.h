@@ -16,38 +16,12 @@
 
 #include "devlegcy.h"
 
+#include "idehd.h"
 #include "harddisk.h"
-#include "imagedev/harddriv.h"
-
-#define IDE_DISK_SECTOR_SIZE            512
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-// ======================> ide_device_interface
-
-class ide_device_interface : public device_slot_card_interface
-{
-public:
-	ide_device_interface(const machine_config &mconfig, device_t &device);
-public:
-	virtual int  read_sector(UINT32 lba, void *buffer) = 0;
-	virtual int  write_sector(UINT32 lba, const void *buffer) = 0;
-
-	UINT8 *get_features() { return m_features;}
-
-	UINT16 get_cylinders() { return m_num_cylinders; }
-	UINT16 get_sectors() { return m_num_sectors; }
-	UINT16 get_heads() { return m_num_heads; }
-	void set_geometry(UINT8 sectors, UINT8 heads) { m_num_sectors= sectors; m_num_heads=heads; }
-	virtual bool is_ready() { return true; }
-	virtual void read_key(UINT8 key[]) { }
-protected:
-	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
-	UINT16          m_num_cylinders;
-	UINT8           m_num_sectors;
-	UINT8           m_num_heads;
-};
 
 // ======================> ide_slot_device
 
@@ -58,17 +32,7 @@ public:
 	// construction/destruction
 	ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	int  read_sector(UINT32 lba, void *buffer) { return (m_dev) ? m_dev->read_sector(lba,buffer) : 0; }
-	int  write_sector(UINT32 lba, const void *buffer) { return (m_dev) ? m_dev->write_sector(lba,buffer) : 0; }
-	UINT8 *get_features() { return (m_dev) ? m_dev->get_features() : NULL;}
-
-	UINT16 get_cylinders() { return (m_dev) ? m_dev->get_cylinders() : 0; }
-	UINT16 get_sectors() { return (m_dev) ? m_dev->get_sectors() : 0; }
-	UINT16 get_heads() { return (m_dev) ? m_dev->get_heads() : 0; }
-	void set_geometry(UINT8 sectors, UINT8 heads) { if (m_dev) m_dev->set_geometry(sectors,heads); }
-	bool is_ready() { return (m_dev) ? m_dev->is_ready() : false; }
-	bool is_connected() { return (m_dev) ? true : false; }
-	void read_key(UINT8 key[]) { if (m_dev) m_dev->read_key(key); }
+	ide_device_interface *dev() { return m_dev; }
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -79,50 +43,6 @@ private:
 
 // device type definition
 extern const device_type IDE_SLOT;
-
-// ======================> ide_hdd_device
-
-class ide_hdd_device : public device_t,
-						public ide_device_interface
-{
-public:
-	// construction/destruction
-	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-
-	virtual int  read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
-	virtual int  write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
-	virtual void read_key(UINT8 key[]);
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-
-	void ide_build_features();
-	virtual bool is_ready() { return (m_disk != NULL); }
-protected:
-	chd_file       *m_handle;
-	hard_disk_file *m_disk;
-};
-// device type definition
-extern const device_type IDE_HARDDISK;
-
-// ======================> ide_hdd_image_device
-
-class ide_hdd_image_device : public ide_hdd_device
-{
-public:
-	// construction/destruction
-	ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-};
-// device type definition
-extern const device_type IDE_HARDDISK_IMAGE;
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -173,15 +93,6 @@ DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_w );
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-struct ide_device
-{
-	UINT16          cur_cylinder;
-	UINT8           cur_sector;
-	UINT8           cur_head;
-	UINT8           cur_head_reg;
-	UINT32          cur_lba;
-	ide_slot_device *slot;
-};
 
 #define IDE_CONFIG_REGISTERS                0x10
 
@@ -219,7 +130,6 @@ protected:
 
 private:
 	void signal_delayed_interrupt(attotime time, int buffer_ready);
-	UINT32 lba_address();
 	void next_sector();
 	void security_error();
 	void continue_read();
@@ -271,7 +181,7 @@ private:
 	UINT8           gnetreadlock;
 
 	UINT8           cur_drive;
-	ide_device      drive[2];
+	ide_slot_device *slot[2];
 
 	devcb2_write_line m_irq_handler;
 	const char *bmcpu;
