@@ -135,7 +135,8 @@
 #include "machine/intelfsh.h"
 #include "machine/scsicd.h"
 #include "machine/rtc65271.h"
-#include "machine/pc16552d.h"
+#include "machine/ins8250.h"
+#include "machine/midikbd.h"
 #include "sound/ymz280b.h"
 #include "sound/cdda.h"
 #include "cdrom.h"
@@ -173,7 +174,11 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_flash_main(*this, "flash_main"),
 		m_flash_snd1(*this, "flash_snd1"),
-		m_flash_snd2(*this, "flash_snd2")
+		m_flash_snd2(*this, "flash_snd2"),
+		m_duart_midi(*this, "duart_midi"),
+		m_duart_com(*this, "duart_com"),
+		m_kbd0(*this, "kbd0"),
+		m_kbd1(*this, "kbd1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -181,10 +186,14 @@ public:
 	required_device<fujitsu_29f016a_device> m_flash_main;
 	required_device<fujitsu_29f016a_device> m_flash_snd1;
 	required_device<fujitsu_29f016a_device> m_flash_snd2;
+	optional_device<pc16552_device> m_duart_midi;
+	required_device<pc16552_device> m_duart_com;
+	optional_device<midi_keyboard_device> m_kbd0;
+	optional_device<midi_keyboard_device> m_kbd1;
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
-	emu_timer *m_keyboard_timer;
+//	emu_timer *m_keyboard_timer;
 	GCU_REGS m_gcu[2];
 	int m_tick;
 	int m_layer;
@@ -200,7 +209,7 @@ public:
 	UINT8 m_temp_data[64*1024];
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
-	int m_keyboard_state[2];
+//	int m_keyboard_state[2];
 	UINT8 m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
@@ -230,12 +239,12 @@ public:
 	DECLARE_WRITE32_MEMBER(atapi_command_w);
 	DECLARE_READ32_MEMBER(atapi_control_r);
 	DECLARE_WRITE32_MEMBER(atapi_control_w);
-	DECLARE_READ32_MEMBER(comm_uart_r);
-	DECLARE_WRITE32_MEMBER(comm_uart_w);
+//	DECLARE_READ32_MEMBER(comm_uart_r);
+//	DECLARE_WRITE32_MEMBER(comm_uart_w);
 	DECLARE_READ32_MEMBER(cabinet_r);
 	DECLARE_READ32_MEMBER(keyboard_wheel_r);
-	DECLARE_READ32_MEMBER(midi_uart_r);
-	DECLARE_WRITE32_MEMBER(midi_uart_w);
+	DECLARE_READ8_MEMBER(midi_uart_r);
+	DECLARE_WRITE8_MEMBER(midi_uart_w);
 	DECLARE_READ32_MEMBER(extend_board_irq_r);
 	DECLARE_WRITE32_MEMBER(extend_board_irq_w);
 	DECLARE_WRITE32_MEMBER(lamp_output_w);
@@ -248,7 +257,7 @@ public:
 	DECLARE_READ32_MEMBER(ppc_spu_share_r);
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
-	TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
+//	TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	void gcu_draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
 	void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *cmd);
 	void gcu_draw_character(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
@@ -270,6 +279,8 @@ public:
 	void init_firebeat();
 	void init_keyboard();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch0_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch1_irq_callback);
 };
 
 
@@ -1390,7 +1401,7 @@ WRITE32_MEMBER(firebeat_state::atapi_control_w )
 
 
 /*****************************************************************************/
-
+/*
 READ32_MEMBER(firebeat_state::comm_uart_r )
 {
 	UINT32 r = 0;
@@ -1440,6 +1451,26 @@ static void comm_uart_irq_callback(running_machine &machine, int channel, int va
 	// TODO
 	//m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
+*/
+static const ins8250_interface firebeat_com0_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const ins8250_interface firebeat_com1_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 /*****************************************************************************/
 
@@ -1484,52 +1515,58 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 	return 0;
 }
 
-READ32_MEMBER(firebeat_state::midi_uart_r )
+READ8_MEMBER(firebeat_state::midi_uart_r )
 {
-	UINT32 r = 0;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= pc16552d_1_r(space, offset >> 6) << 24;
-	}
-
-	return r;
+	return m_duart_midi->read(space, offset >> 6);
 }
 
-WRITE32_MEMBER(firebeat_state::midi_uart_w )
+WRITE8_MEMBER(firebeat_state::midi_uart_w )
 {
-	if (ACCESSING_BITS_24_31)
-	{
-		pc16552d_1_w(space, offset >> 6, (data >> 24) & 0xff);
-	}
+	m_duart_midi->write(space, offset >> 6, data);
 }
 
-static void midi_uart_irq_callback(running_machine &machine, int channel, int value)
+WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch0_irq_callback)
 {
-	firebeat_state *state = machine.driver_data<firebeat_state>();
-	if (channel == 0)
+	if ((m_extend_board_irq_enable & 0x02) == 0 && state != CLEAR_LINE)
 	{
-		if ((state->m_extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
-		{
-			state->m_extend_board_irq_active |= 0x02;
-			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-		}
-		else
-			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+		m_extend_board_irq_active |= 0x02;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 	else
-	{
-		if ((state->m_extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
-		{
-			state->m_extend_board_irq_active |= 0x01;
-			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-		}
-		else
-			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch1_irq_callback)
+{
+	if ((m_extend_board_irq_enable & 0x01) == 0 && state != CLEAR_LINE)
+	{
+		m_extend_board_irq_active |= 0x01;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+}
 
+static const ins8250_interface firebeat_midi0_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(firebeat_state, midi_uart_ch0_irq_callback),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const ins8250_interface firebeat_midi1_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(firebeat_state, midi_uart_ch1_irq_callback),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+/*
 static const int keyboard_notes[24] =
 {
 	0x3c,   // C1
@@ -1601,7 +1638,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 		m_keyboard_state[keyboard] = kbstate;
 	}
 }
-
+*/
 // Extend board IRQs
 // 0x01: MIDI UART channel 2
 // 0x02: MIDI UART channel 1
@@ -1849,7 +1886,7 @@ MACHINE_START_MEMBER(firebeat_state,firebeat)
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("work_ram")
-	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
+	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE8(midi_uart_r, midi_uart_w, 0xff000000)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
 	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
@@ -1860,7 +1897,7 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
-	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE(comm_uart_r, comm_uart_w)
+	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_DEVREADWRITE8("duart_com", pc16552_device, read, write, 0xffffffff)
 	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
 	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
 	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
@@ -1946,6 +1983,7 @@ static INPUT_PORTS_START(kbm)
 	PORT_START("WHEEL_P2")          // Keyboard modulation wheel (P2)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
+/*
 	PORT_START("KEYBOARD_P1")
 	PORT_BIT( 0x000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1#") PORT_CODE(KEYCODE_W)
@@ -1997,7 +2035,7 @@ static INPUT_PORTS_START(kbm)
 	PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2#") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B2") PORT_CODE(KEYCODE_N)
-
+*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(popn)
@@ -2091,6 +2129,9 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SOUND_MODIFY("scsi1:cdda")
 	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
+
+	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz) // pgmd to 9600baud
+	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz) // in all memory maps, pgmd to 31250baud
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( firebeat2, firebeat_state )
@@ -2144,6 +2185,11 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SOUND_MODIFY("scsi1:cdda")
 	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
+
+	MCFG_PC16552D_ADD("duart_com", firebeat_com0_interface, firebeat_com1_interface, XTAL_19_6608MHz)
+	MCFG_PC16552D_ADD("duart_midi", firebeat_midi0_interface, firebeat_midi1_interface, XTAL_24MHz)
+	MCFG_MIDI_KBD_ADD("kbd0", DEVWRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
+	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
@@ -2309,8 +2355,8 @@ void firebeat_state::init_firebeat()
 
 	atapi_init();
 
-	pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
-	pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
+//	pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
+//	pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
 
 	m_extend_board_irq_enable = 0x3f;
 	m_extend_board_irq_active = 0x00;
@@ -2341,8 +2387,8 @@ DRIVER_INIT_MEMBER(firebeat_state,ppd)
 void firebeat_state::init_keyboard()
 {
 	// set keyboard timer
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
-	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+//	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
+//	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 DRIVER_INIT_MEMBER(firebeat_state,kbm)

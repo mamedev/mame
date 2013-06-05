@@ -16,7 +16,7 @@
 const device_type MICROTOUCH = &device_creator<microtouch_device>;
 
 microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+	: device_t(mconfig, type, name, tag, owner, clock, "microtouch", __FILE__),
 	m_out_tx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
@@ -25,7 +25,7 @@ microtouch_device::microtouch_device(const machine_config &mconfig, device_type 
 }
 
 microtouch_device::microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock),
+	: device_t(mconfig, MICROTOUCH, "Microtouch Touchscreen", tag, owner, clock, "microtouch", __FILE__),
 	m_out_tx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),

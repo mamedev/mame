@@ -984,7 +984,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/fastfred.o $(VIDEO)/fastfred.o \
 	$(DRIVERS)/fastlane.o $(VIDEO)/fastlane.o \
 	$(DRIVERS)/finalizr.o $(VIDEO)/finalizr.o \
-	$(DRIVERS)/firebeat.o \
+	$(DRIVERS)/firebeat.o $(MACHINE)/midikbd.o \
 	$(DRIVERS)/flkatck.o $(VIDEO)/flkatck.o \
 	$(DRIVERS)/gberet.o $(VIDEO)/gberet.o \
 	$(DRIVERS)/gbusters.o $(VIDEO)/gbusters.o \

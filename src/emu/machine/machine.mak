@@ -127,7 +127,6 @@ MACHINEOBJS +=  $(MACHINEOBJ)/53c7xx.o      \
 				$(MACHINEOBJ)/nscsi_bus.o   \
 				$(MACHINEOBJ)/nscsi_cd.o    \
 				$(MACHINEOBJ)/nscsi_hd.o    \
-				$(MACHINEOBJ)/pc16552d.o    \
 				$(MACHINEOBJ)/pccard.o      \
 				$(MACHINEOBJ)/pcf8593.o     \
 				$(MACHINEOBJ)/pci.o         \
