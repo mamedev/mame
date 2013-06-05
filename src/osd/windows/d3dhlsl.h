@@ -110,8 +110,6 @@ struct hlsl_options
 	int                     yiq_phase_count;
 
 	// Vectors
-	float                   vector_time_scale;
-	float                   vector_time_period;
 	float                   vector_length_scale;
 	float                   vector_length_ratio;
 
@@ -181,6 +179,16 @@ public:
 
 	// slider-related functions
 	slider_state *init_slider_list();
+
+	struct slider_desc
+	{
+		const char *		name;
+		int					minval;
+		int					defval;
+		int					maxval;
+		int					step;
+		INT32 (*adjustor)(running_machine &, void *, astring *, INT32);
+	};
 
 private:
 	void                    blit(surface *dst, texture *src, surface *new_dst,
@@ -274,6 +282,7 @@ public:
 	render_target *         targethead;
 	cache_target *          cachehead;
 
+	static slider_desc 		s_sliders[];
 	static hlsl_options     s_hlsl_presets[4];
 };
 
