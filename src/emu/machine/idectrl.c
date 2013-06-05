@@ -1096,7 +1096,16 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 
 void ide_controller_device::ide_controller_write(int bank, offs_t offset, int size, UINT32 data)
 {
+	switch (BANK(bank, offset))
+	{
+		case IDE_BANK0_HEAD_NUMBER:
+			cur_drive = (data & 0x10) >> 4;
+			break;
+	}
+
 	ide_device_interface *dev = slot[cur_drive]->dev();
+	if (dev == NULL)
+		return;
 
 	/* logit */
 	if (BANK(bank, offset) != IDE_BANK0_DATA)
@@ -1227,7 +1236,6 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 
 		/* current head */
 		case IDE_BANK0_HEAD_NUMBER:
-			cur_drive = (data & 0x10) >> 4;
 			dev->cur_head = data & 0x0f;
 			dev->cur_head_reg = data;
 			// LBA mode = data & 0x40
@@ -1439,7 +1447,7 @@ WRITE32_DEVICE_HANDLER( ide_controller32_w )
 }
 
 
-READ32_DEVICE_HANDLER( ide_controller16_pcmcia_r )
+READ16_DEVICE_HANDLER( ide_controller16_pcmcia_r )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
 
@@ -1458,7 +1466,7 @@ READ32_DEVICE_HANDLER( ide_controller16_pcmcia_r )
 }
 
 
-WRITE32_DEVICE_HANDLER( ide_controller16_pcmcia_w )
+WRITE16_DEVICE_HANDLER( ide_controller16_pcmcia_w )
 {
 	int size;
 
