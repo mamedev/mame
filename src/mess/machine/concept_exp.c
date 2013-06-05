@@ -5,6 +5,10 @@
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
  
+ 
+ FIXME: Concept expansion ports should just use the Apple II Bus device!
+ The code below is outdated and inaccurate! 
+ 
  **********************************************************************/
 
 #include "machine/concept_exp.h"
