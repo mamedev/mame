@@ -12,7 +12,6 @@
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/serial.h"
-#include "machine/terminal.h"
 
 
 class altos5_state : public driver_device
@@ -25,8 +24,7 @@ public:
 		m_pio1(*this, "z80pio_1"),
 		m_dart(*this, "z80dart"),
 		m_sio (*this, "z80sio"),
-		m_ctc (*this, "z80ctc"),
-		m_terminal(*this, TERMINAL_TAG)
+		m_ctc (*this, "z80ctc")
 	{ }
 
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -42,7 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(port2e_r);
 	DECLARE_READ8_MEMBER(port2f_r);
-	UINT8 m_term_data;
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	UINT8 m_port08;
 	UINT8 m_port09;
 	bool m_ipl;
@@ -53,9 +51,8 @@ public:
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80dart_device> m_dart;
-	optional_device<z80dart_device> m_sio;
+	required_device<z80sio0_device> m_sio;
 	required_device<z80ctc_device> m_ctc;
-	required_device<generic_terminal_device> m_terminal;
 };
 
 static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
@@ -88,9 +85,7 @@ static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x20, 0x23) // Hard drive
-	AM_RANGE(0x2c, 0x2d) AM_NOP
-	AM_RANGE(0x2e, 0x2e) AM_READ(port2e_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0x2f, 0x2f) AM_READ(port2f_r) AM_WRITENOP
+	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80sio", z80sio0_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -213,12 +208,20 @@ static Z80DMA_INTERFACE( dma_intf )
 };
 
 // baud rate generator and RTC. All inputs are 2MHz.
+WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
+{
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
+	m_sio->rxca_w(state);
+	m_sio->txca_w(state);
+}
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_NULL,         /* ZC/TO0 callback - SIO Ch B */
-	DEVCB_NULL,         /* ZC/TO1 callback - Z80DART Ch A, SIO Ch A */
-	DEVCB_NULL,         /* ZC/TO2 callback - Z80DART Ch B */
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rxtxcb_w),         /* ZC/TO0 callback - SIO Ch B */
+	DEVCB_DRIVER_LINE_MEMBER(altos5_state, ctc_z1_w),         /* ZC/TO1 callback - Z80DART Ch A, SIO Ch A */
+	DEVCB_DEVICE_LINE_MEMBER("z80dart", z80dart_device, rxtxcb_w),         /* ZC/TO2 callback - Z80DART Ch B */
 };
 
 // system functions
@@ -273,6 +276,41 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL
 };
 
+static Z80SIO_INTERFACE( sio_intf )
+{
+	9600, 9600, 153600, 153600, // rxa, txa, rxb, txb clocks (from CTC)
+
+	// console#2
+	DEVCB_NULL, // ChA in data
+	DEVCB_NULL, // out data
+	DEVCB_NULL, // DTR
+	DEVCB_NULL, // RTS
+	DEVCB_NULL, // WRDY
+	DEVCB_NULL, // SYNC
+
+	// console#1
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL, // unused DRQ pins
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, dcda_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsa_w)
+};
 
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
@@ -311,28 +349,6 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
-READ8_MEMBER( altos5_state::port2e_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( altos5_state::port2f_r )
-{
-	return (m_term_data) ? 13 : 12;
-}
-
-WRITE8_MEMBER( altos5_state::kbd_put )
-{
-	m_term_data = data;
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(altos5_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( altos5, altos5_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
@@ -340,15 +356,14 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_CPU_IO_MAP(altos5_io)
 	MCFG_CPU_CONFIG(daisy_chain_intf)
 
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
 	/* Devices */
 	MCFG_Z80DMA_ADD( "z80dma",   XTAL_8MHz / 2, dma_intf)
 	MCFG_Z80PIO_ADD( "z80pio_0", XTAL_8MHz / 2, pio0_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", XTAL_8MHz / 2, pio1_intf )
 	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_8MHz / 2, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
+	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 MACHINE_CONFIG_END
 
 
@@ -367,56 +382,3 @@ ROM_END
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS           INIT    COMPANY    FULLNAME       FLAGS */
 COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state,  altos5, "Altos", "Altos 5-15", GAME_NOT_WORKING | GAME_NO_SOUND)
-
-
-
-
-#if 0
-/****************** UNUSED SERIAL CODE ************************/
-
-	//AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80sio", z80dart_device, ba_cd_r, ba_cd_w)
-
-static Z80SIO_INTERFACE( sio_intf )
-{
-	9600, 9600, 153600, 153600, // rxa, txa, rxb, txb clocks (from CTC)
-
-	// console#2
-	DEVCB_NULL, // ChA in data
-	DEVCB_NULL, // out data
-	DEVCB_NULL, // DTR
-	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
-	DEVCB_NULL, // SYNC
-
-	// console#1
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL, // unused DRQ pins
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const rs232_port_interface rs232_intf =
-{
-	// all outputs
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rxcb_w), // data
-	DEVCB_NULL, // DCD
-	DEVCB_NULL, // DSR
-	DEVCB_NULL, // RI
-	DEVCB_NULL //DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsb_w) // CTS
-};
-
-
-	//MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
-	//MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
-
-
-#endif
-
