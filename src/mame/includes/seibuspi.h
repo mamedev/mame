@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sb_coin_w);
 	DECLARE_READ8_MEMBER(sound_fifo_status_r);
 	DECLARE_READ32_MEMBER(spi_int_r);
-	DECLARE_READ32_MEMBER(spi_unknown_r);
+	DECLARE_READ32_MEMBER(spi_nop_r);
 	DECLARE_WRITE8_MEMBER(z80_prg_transfer_w);
 	DECLARE_WRITE8_MEMBER(z80_enable_w);
 	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);

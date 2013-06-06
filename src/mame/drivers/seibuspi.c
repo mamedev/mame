@@ -843,8 +843,9 @@ READ32_MEMBER(seibuspi_state::spi_int_r)
 	return 0xffffffff;
 }
 
-READ32_MEMBER(seibuspi_state::spi_unknown_r)
+READ32_MEMBER(seibuspi_state::spi_nop_r)
 {
+	// use this if return val must be high
 	return 0xffffffff;
 }
 
@@ -917,6 +918,7 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 
 WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 {
+	// d0-d2: bank @ 8000
 	int bank = data & 7;
 
 	if (bank != m_z80_lastbank)
@@ -924,6 +926,8 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 		m_z80_lastbank = bank;
 		membank("bank1")->set_entry(bank);
 	}
+	
+	// d3: watchdog?
 }
 
 WRITE8_MEMBER(seibuspi_state::sb_coin_w)
@@ -949,15 +953,15 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         /* Clear Interrupt */
-	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP                /* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     /* Player controls */
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)     /* Unknown */
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     /* Player controls (start) */
+	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         // Clear Interrupt
+	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP                // Unknown
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     // Player controls
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_nop_r)         // Unknown
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     // Player controls (start)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
-	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP                /* Unknown */
+	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP                // Unknown
 	AM_RANGE(0x00000688, 0x0000068b) AM_WRITE8(z80_prg_transfer_w, 0x000000ff)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(z80_enable_w, 0x000000ff)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_set_layer_banks_w, 0x00ff0000)
@@ -968,22 +972,21 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1")        /* ROM location in real-mode */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4002, 0x4002) AM_WRITENOP            /* Unknown */
-	AM_RANGE(0x4003, 0x4003) AM_WRITENOP            /* Unknown */
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)    /* single board systems */
+	AM_RANGE(0x4002, 0x4002) AM_WRITENOP                // Unknown
+	AM_RANGE(0x4003, 0x4003) AM_WRITENOP                // Unknown
 	AM_RANGE(0x4008, 0x4008) AM_DEVREAD("soundfifo1", fifo7200_device, data_byte_r)
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JP1")
-	AM_RANGE(0x400b, 0x400b) AM_WRITENOP            /* Unknown */
+	AM_RANGE(0x400b, 0x400b) AM_WRITENOP                // Unknown
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)   /* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
+	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -993,14 +996,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
-	AM_RANGE(0x00000688, 0x0000068b) AM_WRITENOP
-	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP
+	AM_RANGE(0x00000684, 0x00000687) AM_READ(spi_nop_r) // No soundfifo2
+	AM_RANGE(0x00000688, 0x0000068b) AM_WRITENOP        // No z80_prg_transfer
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_set_layer_banks_w, 0x00ff0000)
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP        // No z80_enable
 	AM_IMPORT_FROM( spi_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_IMPORT_FROM( sxx2e_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sbsound_map, AS_PROGRAM, 8, seibuspi_state )
+	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)
+	AM_RANGE(0x4008, 0x4008) AM_WRITENOP                // No soundfifo2
+	AM_IMPORT_FROM( spisound_map )
 ADDRESS_MAP_END
 
 
@@ -1018,17 +1029,17 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         /* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     /* Player controls */
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     /* Player controls (start) */
+	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)         // Unknown
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")     // Player controls
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_nop_r)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")     // Player controls (start)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1")        /* ROM location in real-mode */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
 
@@ -1036,22 +1047,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
-	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)             /* Unknown */
-	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
+	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)         // Unknown
+	AM_RANGE(0x00000090, 0x00000097) AM_RAM                     // Unknown
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(ejsakura_input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
+	AM_RANGE(0x00000500, 0x0000050b) AM_RAM                     // Unknown
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
+	AM_RANGE(0x00000510, 0x0000054f) AM_RAM                     // Unknown
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("INPUTS")     /* Player controls */
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_nop_r)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("INPUTS")     // Player controls
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1")        /* ROM location in real-mode */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
 
@@ -1078,7 +1091,7 @@ WRITE8_MEMBER(seibuspi_state::flashrom_write)
 WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
 {
 	if (state)
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7);    // IRQ is RST10
+		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // IRQ is RST10
 	else
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -1865,11 +1878,16 @@ static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sxx2e_map)
 
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(sbsound_map)
+
 	MCFG_MACHINE_START_OVERRIDE(seibuspi_state, sxx2e)
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
 
 	MCFG_DEVICE_REMOVE("soundflash1")
 	MCFG_DEVICE_REMOVE("soundflash2")
+
+	//MCFG_DEVICE_REMOVE("soundfifo2")
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_9344MHz)
