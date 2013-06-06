@@ -196,7 +196,7 @@ READ8_MEMBER( ep64_exdos_device::read )
 
 	UINT8 data = 0;
 
-	data |= m_fdc->intrq_r();
+	data |= m_fdc->intrq_r() << 1;
 	data |= m_fdc->drq_r() << 7;
 
 	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 6;
