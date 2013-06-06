@@ -134,6 +134,7 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/flt_vol.o \
 	$(EMUOBJ)/sound/flt_rc.o \
 	$(EMUOBJ)/sound/wavwrite.o \
+	$(EMUOBJ)/sound/samples.o	\
 
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \
@@ -162,7 +163,14 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/snapquik.o   \
 
 
-LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS)
+EMUVIDEOOBJS = \
+	$(EMUVIDEO)/generic.o   	\
+	$(EMUVIDEO)/resnet.o    	\
+	$(EMUVIDEO)/rgbutil.o   	\
+	$(EMUVIDEO)/vector.o		\
+
+
+LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS) $(EMUVIDEOOBJS)
 
 $(LIBEMU): $(LIBEMUOBJS)
 
