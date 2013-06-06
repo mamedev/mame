@@ -1335,9 +1335,9 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != NULL; bp = bp->next())
 			{
 				buffer.printf("%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
-				if (bp->condition() != NULL)
+				if (astring(bp->condition()) != astring("1"))
 					buffer.catprintf(" if %s", bp->condition());
-				if (bp->action() != NULL)
+				if (astring(bp->action()) != astring(""))
 					buffer.catprintf(" do %s", bp->action());
 				debug_console_printf(machine, "%s\n", buffer.cstr());
 				printed++;

@@ -57,7 +57,8 @@ enum debug_view_type
 	DVT_MEMORY,
 	DVT_LOG,
 	DVT_TIMERS,
-	DVT_ALLOCS
+	DVT_ALLOCS,
+	DVT_BREAK_POINTS
 };
 
 

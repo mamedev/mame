@@ -33,6 +33,7 @@ protected slots:
 	void debugActOpenMemory();
 	void debugActOpenDasm();
 	void debugActOpenLog();
+	void debugActOpenPoints();
 	void debugActRun();
 	void debugActRunAndHide();
 	void debugActRunToNextCpu();
@@ -63,19 +64,19 @@ class WindowQtConfig
 public:
 	enum WindowType
 	{
-		WIN_TYPE_MAIN       = 0x01,
-		WIN_TYPE_MEMORY     = 0x02,
-		WIN_TYPE_DASM       = 0x04,
-		WIN_TYPE_LOG        = 0x08,
-		WIN_TYPE_UNKNOWN    = 0x10,
+		WIN_TYPE_MAIN         = 0x01,
+		WIN_TYPE_MEMORY       = 0x02,
+		WIN_TYPE_DASM         = 0x04,
+		WIN_TYPE_LOG          = 0x08,
+		WIN_TYPE_BREAK_POINTS = 0x10,
+		WIN_TYPE_UNKNOWN      = 0x20,
 	};
 
 public:
 	WindowQtConfig(const WindowType& type=WIN_TYPE_UNKNOWN) :
 		m_type(type),
 		m_size(800, 600),
-		m_position(120, 120),
-		m_next(NULL)
+		m_position(120, 120)
 	{}
 	virtual ~WindowQtConfig() {}
 
@@ -83,11 +84,6 @@ public:
 	WindowType m_type;
 	QPoint m_size;
 	QPoint m_position;
-
-	// Dues for becoming a member of a simple_list
-	WindowQtConfig* m_next;
-	WindowQtConfig* next() const { return m_next; }
-
 
 	virtual void buildFromQWidget(QWidget* widget);
 	virtual void applyToQWidget(QWidget* widget);
