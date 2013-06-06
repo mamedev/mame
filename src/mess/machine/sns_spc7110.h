@@ -194,8 +194,6 @@ public:
 
 	//this is now allocated in the main snes cart class, to allow saving to nvram
 	//UINT8 m_rtc_ram[16];  // 0-12 secs, min, hrs, etc.; 13-14-15 control registers
-
-	UINT8 m_ram[0x2000];
 };
 
 // ======================> sns_rom_spc7110_device

@@ -48,7 +48,8 @@ void sns_rom_spc7110_device::spc7110_start()
 {
 	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
 
-	memset(m_ram, 0, sizeof(m_ram));
+	// The SPC7110 works in conjunction with 0x2000 of RAM, which is battery backed up (and hence emulated by our m_nvram)
+
 	m_r4801 = 0x00;
 	m_r4802 = 0x00;
 	m_r4803 = 0x00;
@@ -105,7 +106,6 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r4841 = 0x00;
 	m_r4842 = 0x00;
 
-	save_item(NAME(m_ram));
 	save_item(NAME(m_r4801));
 	save_item(NAME(m_r4802));
 	save_item(NAME(m_r4803));
@@ -319,49 +319,49 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 #undef map
 	}
 	
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_mode);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_offset);
-	state_save_register_item_pointer(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_rdoffset);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_wroffset);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_length);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_mode);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_offset);
+	state_save_register_item_pointer(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_rdoffset);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_wroffset);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_length);
 
 	for (int i = 0; i < 32; i++)
 	{
-		state_save_register_item(machine, "SNES_SPC7110", 0, i, m_context[i].index);
-		state_save_register_item(machine, "SNES_SPC7110", 0, i, m_context[i].invert);
+		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].index);
+		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].invert);
 	}
 	
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_val);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_in);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_span);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_out);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_lps);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_in_count);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_val);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_in);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_span);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_out);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_lps);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_in_count);
 
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_pixelorder);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_realorder);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_val);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_in);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_span);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_out);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_lps);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_in_count);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_pixelorder);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_realorder);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_val);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_in);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_span);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_out);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_lps);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_in_count);
 	
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_pixelorder);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_realorder);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_bitplanebuffer);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_buffer_index);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_val);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_in);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_span);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_out0);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_out1);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_lps);
-	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_in_count);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_pixelorder);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_realorder);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_bitplanebuffer);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_buffer_index);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_val);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_in);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_span);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_out0);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_out1);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_lps);
+	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_in_count);
 }
 
 void SPC7110_Decomp::reset()
@@ -1672,10 +1672,10 @@ READ8_MEMBER(sns_rom_spc7110_device::read_h)
 
 READ8_MEMBER( sns_rom_spc7110_device::read_ram )
 {
-	return m_ram[offset & 0x1fff];
+	return m_nvram[offset & 0x1fff];
 }
 
 WRITE8_MEMBER( sns_rom_spc7110_device::write_ram )
 {
-	m_ram[offset & 0x1fff] = data;
+	m_nvram[offset & 0x1fff] = data;
 }
