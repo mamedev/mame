@@ -177,7 +177,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="cart" interface="ep64_cart">
-			<dataarea name="rom" size="0x84000">
+			<dataarea name="rom" size="0x4000">
 				<rom name="brd.rom" size="0x4000" crc="f45a7454" sha1="096c91fad6a4d10323cd67e133b3ebc5c50e2bb2" offset="0" />
 			</dataarea>
 		</part>
