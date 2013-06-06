@@ -435,7 +435,19 @@ void sns_rom_sdd1_device::device_start()
 	save_item(NAME(m_sdd1_enable));
 	save_item(NAME(m_xfer_enable));
 	save_item(NAME(m_mmc));
-	// TODO: save decomp-related and dma-related items and fix their restore...
+	
+	for (int i = 0; i < 8; i++)
+	{
+		save_item(NAME(m_dma[i].addr), i);
+		save_item(NAME(m_dma[i].size), i);
+	}
+
+	save_pointer(NAME(m_buffer.data), 0x10000);
+	save_item(NAME(m_buffer.offset));
+	save_item(NAME(m_buffer.size));
+	save_item(NAME(m_buffer.ready));
+
+	// TODO: save remaining decomp-related items so to fix support if we try to save mid-decompression...
 }
 
 void sns_rom_sdd1_device::device_reset()
