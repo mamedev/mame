@@ -77,6 +77,7 @@ int drawnone_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_draw = drawnone_window_draw;
 	callbacks->window_save = NULL;
 	callbacks->window_record = NULL;
+	callbacks->window_toggle_fsfx = NULL;
 	callbacks->window_destroy = drawnone_window_destroy;
 	return 0;
 }

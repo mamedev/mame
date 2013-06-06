@@ -42,7 +42,6 @@
 #ifndef __WIN_D3DINTF__
 #define __WIN_D3DINTF__
 
-//#include "winmain.h"
 
 //============================================================
 //  CONSTANTS
@@ -267,6 +266,7 @@ struct base
 	int                         version;
 	void *                      d3dobj;
 	HINSTANCE                   dllhandle;
+	bool                        post_fx_available;
 
 	// interface pointers
 	interface               d3d;
@@ -282,7 +282,7 @@ struct base
 //  PROTOTYPES
 //============================================================
 
-base *drawd3d9_init();
+base *drawd3d9_init(void);
 
 };
 
