@@ -365,12 +365,14 @@ OSDOBJS += \
  $(SDLOBJ)/debugqtdasmwindow.o \
  $(SDLOBJ)/debugqtmainwindow.o \
  $(SDLOBJ)/debugqtmemorywindow.o \
+ $(SDLOBJ)/debugqtbreakpointswindow.o \
  $(SDLOBJ)/debugqtview.moc.o \
  $(SDLOBJ)/debugqtwindow.moc.o \
  $(SDLOBJ)/debugqtlogwindow.moc.o \
  $(SDLOBJ)/debugqtdasmwindow.moc.o \
  $(SDLOBJ)/debugqtmainwindow.moc.o \
- $(SDLOBJ)/debugqtmemorywindow.moc.o
+ $(SDLOBJ)/debugqtmemorywindow.moc.o \
+ $(SDLOBJ)/debugqtbreakpointswindow.moc.o
 endif
 
 #-------------------------------------------------
