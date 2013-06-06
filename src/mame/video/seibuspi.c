@@ -666,7 +666,7 @@ UINT32 seibuspi_state::screen_update_spi(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-VIDEO_START_MEMBER(seibuspi_state,sys386f2)
+VIDEO_START_MEMBER(seibuspi_state,sys386f)
 {
 	int i;
 
@@ -685,7 +685,7 @@ VIDEO_START_MEMBER(seibuspi_state,sys386f2)
 	memset(m_alpha_table, 0, 8192 * sizeof(UINT8));
 }
 
-UINT32 seibuspi_state::screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 seibuspi_state::screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(bitmap, cliprect, 0);

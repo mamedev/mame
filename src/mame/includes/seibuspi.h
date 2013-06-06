@@ -43,6 +43,7 @@ public:
 
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
+	UINT8 m_region_code;
 	UINT8 m_sb_coin_latch;
 	UINT8 m_ejsakura_input_port;
 	tilemap_t *m_text_layer;
@@ -110,7 +111,7 @@ public:
 	DECLARE_DRIVER_INIT(senkyua);
 	DECLARE_DRIVER_INIT(rdft2);
 	DECLARE_DRIVER_INIT(ejanhs);
-	DECLARE_DRIVER_INIT(sys386f2);
+	DECLARE_DRIVER_INIT(sys386f);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
@@ -118,13 +119,10 @@ public:
 	DECLARE_MACHINE_START(spi);
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_VIDEO_START(spi);
-	DECLARE_MACHINE_START(seibu386);
-	DECLARE_MACHINE_RESET(seibu386);
-	DECLARE_VIDEO_START(sys386f2);
-	DECLARE_MACHINE_START(sxx2e);
+	DECLARE_VIDEO_START(sys386f);
 	DECLARE_MACHINE_RESET(sxx2e);
 	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
 	IRQ_CALLBACK_MEMBER(spi_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
