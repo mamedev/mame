@@ -1,3 +1,9 @@
+/***************************************************************************
+
+    Seibu SPI hardware
+    
+***************************************************************************/
+
 #include "machine/intelfsh.h"
 #include "machine/eeprom.h"
 #include "machine/7200fifo.h"
@@ -73,7 +79,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ejsakura_keyboard_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 	DECLARE_READ8_MEMBER(sb_coin_r);
-	DECLARE_WRITE8_MEMBER(sb_coin_w);
+	DECLARE_WRITE8_MEMBER(spi_coin_w);
 	DECLARE_READ8_MEMBER(sound_fifo_status_r);
 	DECLARE_READ32_MEMBER(spi_int_r);
 	DECLARE_READ32_MEMBER(spi_nop_r);
