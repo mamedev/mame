@@ -429,7 +429,10 @@ public:
 		m_interrupt_config(*this, "int_config"),
 		m_asic_reset(*this, "asic_reset"),
 		m_rombase(*this, "rombase"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ide(*this, "ide")
+	{
+	}
 
 	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_rambase;
@@ -515,6 +518,7 @@ public:
 	void update_widget_irq();
 	void init_common(int ioasic, int serialnum, int yearoffs, int config);
 	required_device<cpu_device> m_maincpu;
+	required_device<ide_controller_device> m_ide;
 };
 
 /*************************************
@@ -1771,20 +1775,19 @@ PCI Mem  = 08000000-09FFFFFF
 
 READ32_MEMBER(seattle_state::seattle_ide_r)
 {
-	device_t *device = machine().device("ide");
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
 		m_maincpu->eat_cycles(100);
-	return ide_controller32_r(device, space, offset, mem_mask);
+	return m_ide->ide_controller32_r(space, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase") // wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READ(seattle_ide_r) AM_DEVWRITE_LEGACY("ide", ide_controller32_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READ(seattle_ide_r) AM_DEVWRITE("ide", ide_controller_device, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP                     // IDE-related, but annoying
-	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", ide_controller_device, ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)

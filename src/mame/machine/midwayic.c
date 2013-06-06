@@ -1065,13 +1065,15 @@ READ32_DEVICE_HANDLER( midway_ide_asic_r )
 	UINT8 shift = 8 * (offset & 3);
 	UINT32 result;
 
+	ide_controller_device *ide = (ide_controller_device *) device;
+
 	/* offset 0 is a special case */
 	if (offset == 0)
-		result = ide_controller32_r(device, space, ideoffs, 0x0000ffff);
+		result = ide->ide_controller32_r(space, ideoffs, 0x0000ffff);
 
 	/* everything else is byte-sized */
 	else
-		result = ide_controller32_r(device, space, ideoffs, 0xff << shift) >> shift;
+		result = ide->ide_controller32_r(space, ideoffs, 0xff << shift) >> shift;
 	return result;
 }
 
@@ -1082,11 +1084,13 @@ WRITE32_DEVICE_HANDLER( midway_ide_asic_w )
 	offs_t ideoffs = 0x1f0/4 + (offset >> 2);
 	UINT8 shift = 8 * (offset & 3);
 
+	ide_controller_device *ide = (ide_controller_device *) device;
+
 	/* offset 0 is a special case */
 	if (offset == 0)
-		ide_controller32_w(device, space, ideoffs, data, 0x0000ffff);
+		ide->ide_controller32_w(space, ideoffs, data, 0x0000ffff);
 
 	/* everything else is byte-sized */
 	else
-		ide_controller32_w(device, space, ideoffs, data << shift, 0xff << shift);
+		ide->ide_controller32_w(space, ideoffs, data << shift, 0xff << shift);
 }

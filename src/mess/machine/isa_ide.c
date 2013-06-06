@@ -11,22 +11,22 @@
 
 READ16_MEMBER(isa16_ide_device::ide16_r)
 {
-	return ide_controller16_r(m_ide, space, 0x1f0/2 + offset, mem_mask);
+	return m_ide->ide_controller16_r(space, 0x1f0/2 + offset, mem_mask);
 }
 
 WRITE16_MEMBER(isa16_ide_device::ide16_w)
 {
-	ide_controller16_w(m_ide, space, 0x1f0/2 + offset, data, mem_mask);
+	m_ide->ide_controller16_w(space, 0x1f0/2 + offset, data, mem_mask);
 }
 
 READ8_MEMBER(isa16_ide_device::ide16_alt_r )
 {
-	return ide_controller16_r(m_ide, space, 0x3f6/2, 0x00ff);
+	return m_ide->ide_controller16_r(space, 0x3f6/2, 0x00ff);
 }
 
 WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 {
-	ide_controller16_w(m_ide, space, 0x3f6/2, data, 0x00ff);
+	m_ide->ide_controller16_w(space, 0x3f6/2, data, 0x00ff);
 }
 
 DEVICE_ADDRESS_MAP_START(map, 16, isa16_ide_device)

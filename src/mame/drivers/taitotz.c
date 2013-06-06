@@ -566,12 +566,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
-		m_mbox_ram(*this, "mbox_ram") { }
+		m_mbox_ram(*this, "mbox_ram"),
+		m_ide(*this, "ide")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT8>  m_mbox_ram;
+	required_device<ide_controller_device> m_ide;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
@@ -2105,7 +2109,6 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	device_t *device = machine().device("ide");
 	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
@@ -2113,7 +2116,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 	{
 		if ((offset & 1) == 0)
 		{
-			ide_reg_latch = ide_bus_r(device, 0, reg);
+			ide_reg_latch = m_ide->ide_bus_r(0, reg);
 			return (ide_reg_latch & 0xff);
 		}
 		else
@@ -2126,7 +2129,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 		if (offset & 1)
 			fatalerror("tlcs_ide0_r: %02X, odd offset\n", offset);
 
-		UINT8 d = ide_bus_r(device, 0, reg);
+		UINT8 d = m_ide->ide_bus_r(0, reg);
 		if (reg == 7)
 			d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 							// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2136,7 +2139,6 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 
 WRITE8_MEMBER(taitotz_state::tlcs_ide0_w)
 {
-	device_t *device = machine().device("ide");
 	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
@@ -2151,20 +2153,19 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide0_w)
 		{
 			ide_reg_latch &= 0x00ff;
 			ide_reg_latch |= (UINT16)(data) << 8;
-			ide_bus_w(device, 0, reg, ide_reg_latch);
+			m_ide->ide_bus_w(0, reg, ide_reg_latch);
 		}
 	}
 	else
 	{
 		if (offset & 1)
 			fatalerror("tlcs_ide0_w: %02X, %02X, odd offset\n", offset, data);
-		ide_bus_w(device, 0, reg, data);
+		m_ide->ide_bus_w(0, reg, data);
 	}
 }
 
 READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	device_t *device = machine().device("ide");
 	//static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
@@ -2173,7 +2174,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 
 	if ((offset & 1) == 0)
 	{
-		UINT8 d = ide_bus_r(device, 1, reg);
+		UINT8 d = m_ide->ide_bus_r(1, reg);
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
 		return d;
@@ -2181,7 +2182,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 	else
 	{
 		//fatalerror("tlcs_ide1_r: %02X, odd offset\n", offset);
-		UINT8 d = ide_bus_r(device, 1, reg);
+		UINT8 d = m_ide->ide_bus_r(1, reg);
 		d &= ~0x2;
 		return d;
 	}
@@ -2189,7 +2190,6 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 
 WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 {
-	device_t *device = machine().device("ide");
 	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
@@ -2205,7 +2205,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 	{
 		ide_reg_latch &= 0x00ff;
 		ide_reg_latch |= (UINT16)(data) << 16;
-		ide_bus_w(device, 1, reg, ide_reg_latch);
+		m_ide->ide_bus_w(1, reg, ide_reg_latch);
 	}
 }
 
@@ -2541,11 +2541,9 @@ static void set_ide_drive_serial_number(device_t *device, int drive, const char 
 
 void taitotz_state::machine_reset()
 {
-	machine().device("ide")->reset();
-
 	if (m_hdd_serial_number != NULL)
 	{
-		set_ide_drive_serial_number(machine().device("ide"), 0, m_hdd_serial_number);
+		set_ide_drive_serial_number(m_ide, 0, m_hdd_serial_number);
 	}
 }
 

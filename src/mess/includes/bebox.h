@@ -10,13 +10,14 @@
 #define BEBOX_H_
 
 #include "emu.h"
-#include "machine/ins8250.h"
-#include "machine/am9517a.h"
 #include "machine/53c810.h"
-#include "machine/upd765.h"
-#include "machine/ram.h"
+#include "machine/am9517a.h"
+#include "machine/idectrl.h"
+#include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
 
 class bebox_state : public driver_device
 {
@@ -36,7 +37,10 @@ public:
 			m_pic8259_1(*this, "pic8259_1"),
 			m_pic8259_2(*this, "pic8259_2"),
 			m_pit8254(*this, "pit8254"),
-			m_ram(*this, RAM_TAG){ }
+			m_ram(*this, RAM_TAG),
+			m_ide(*this, "ide")
+	{
+	}
 
 	required_device<cpu_device> m_ppc1;
 	required_device<cpu_device> m_ppc2;
@@ -47,6 +51,7 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
 	required_device<ram_device> m_ram;
+	required_device<ide_controller_device> m_ide;
 	UINT32 m_cpu_imask[2];
 	UINT32 m_interrupts;
 	UINT32 m_crossproc_interrupts;

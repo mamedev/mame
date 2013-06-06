@@ -247,7 +247,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_ide(*this, "ide")
+	{
+	}
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -276,6 +279,7 @@ public:
 	DECLARE_DRIVER_INIT(twinkle);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ide_controller_device> m_ide;
 };
 
 /* RTC */
@@ -645,21 +649,19 @@ WRITE_LINE_MEMBER(twinkle_state::ide_interrupt)
 
 READ16_MEMBER(twinkle_state::twinkle_ide_r)
 {
-	device_t *device = machine().device("ide");
 	if (offset == 0)
 	{
-		return ide_controller_r(device, offset+0x1f0, 2);
+		return m_ide->ide_controller_r(0x1f0 + offset, 2);
 	}
 	else
 	{
-		return ide_controller_r(device, offset+0x1f0, 1);
+		return m_ide->ide_controller_r(0x1f0 + offset, 1);
 	}
 }
 
 WRITE16_MEMBER(twinkle_state::twinkle_ide_w)
 {
-	device_t *device = machine().device("ide");
-	ide_controller_w(device, offset+0x1f0, 1, data);
+	m_ide->ide_controller_w(0x1f0 + offset, 1, data);
 }
 
 /*

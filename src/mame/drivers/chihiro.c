@@ -412,7 +412,7 @@ public:
 	struct chihiro_devices {
 		pic8259_device    *pic8259_1;
 		pic8259_device    *pic8259_2;
-		device_t    *ide;
+		ide_controller_device *ide;
 	} chihiro_devs;
 
 	nv2a_renderer *nvidia_nv2a;
@@ -2687,7 +2687,7 @@ READ32_MEMBER( chihiro_state::ide_r )
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
-	return ide_controller_r(chihiro_devs.ide, offset+0x01f0, size) << ((offset & 3) * 8);
+	return chihiro_devs.ide->ide_controller_r(offset+0x01f0, size) << ((offset & 3) * 8);
 }
 
 WRITE32_MEMBER( chihiro_state::ide_w )
@@ -2697,7 +2697,7 @@ WRITE32_MEMBER( chihiro_state::ide_w )
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 	data = data >> ((offset & 3) * 8);
-	ide_controller_w(chihiro_devs.ide, offset+0x01f0, size, data);
+	chihiro_devs.ide->ide_controller_w(offset+0x01f0, size, data);
 }
 
 // ======================> ide_baseboard_device
@@ -3003,7 +3003,7 @@ static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, chihiro_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
-	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE("ide", ide_controller_device, ide_bus_master32_r, ide_bus_master32_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chihiro )
@@ -3021,7 +3021,7 @@ void chihiro_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
 	chihiro_devs.pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
 	chihiro_devs.pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
-	chihiro_devs.ide = machine().device( "ide" );
+	chihiro_devs.ide = machine().device<ide_controller_device>( "ide" );
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine(),"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);
 }

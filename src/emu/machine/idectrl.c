@@ -1370,10 +1370,9 @@ void ide_controller_device::ide_bus_master_write(offs_t offset, int size, UINT32
     select: 0->CS1Fx active, 1->CS3Fx active
     offset: register offset (state of DA2-DA0)
 */
-int ide_bus_r(device_t *device, int select, int offset)
+int ide_controller_device::ide_bus_r(int select, int offset)
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
-	return ide->ide_controller_read(select ? 1 : 0, offset, select == 0 && offset == 0 ? 2 : 1);
+	return ide_controller_read(select ? 1 : 0, offset, select == 0 && offset == 0 ? 2 : 1);
 }
 
 /*
@@ -1385,36 +1384,33 @@ int ide_bus_r(device_t *device, int select, int offset)
     offset: register offset (state of DA2-DA0)
     data: data written (state of D0-D15 or D0-D7)
 */
-void ide_bus_w(device_t *device, int select, int offset, int data)
+void ide_controller_device::ide_bus_w(int select, int offset, int data)
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
 	if (select == 0 && offset == 0)
-		ide->ide_controller_write(0, 0, 2, data);
+		ide_controller_write(0, 0, 2, data);
 	else
-		ide->ide_controller_write(select ? 1 : 0, offset, 1, data & 0xff);
+		ide_controller_write(select ? 1 : 0, offset, 1, data & 0xff);
 }
 
-UINT32 ide_controller_r(device_t *device, int reg, int size)
+UINT32 ide_controller_device::ide_controller_r(int reg, int size)
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
 	if (reg >= 0x1f0 && reg < 0x1f8)
-		return ide->ide_controller_read(0, reg & 7, size);
+		return ide_controller_read(0, reg & 7, size);
 	if (reg >= 0x3f0 && reg < 0x3f8)
-		return ide->ide_controller_read(1, reg & 7, size);
+		return ide_controller_read(1, reg & 7, size);
 	if (reg >= 0x030 && reg < 0x040)
-		return ide->ide_controller_read(2, reg & 0xf, size);
+		return ide_controller_read(2, reg & 0xf, size);
 	return 0xffffffff;
 }
 
-void ide_controller_w(device_t *device, int reg, int size, UINT32 data)
+void ide_controller_device::ide_controller_w(int reg, int size, UINT32 data)
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
 	if (reg >= 0x1f0 && reg < 0x1f8)
-		ide->ide_controller_write(0, reg & 7, size, data);
+		ide_controller_write(0, reg & 7, size, data);
 	if (reg >= 0x3f0 && reg < 0x3f8)
-		ide->ide_controller_write(1, reg & 7, size, data);
+		ide_controller_write(1, reg & 7, size, data);
 	if (reg >= 0x030 && reg < 0x040)
-		ide->ide_controller_write(2, reg & 0xf, size, data);
+		ide_controller_write(2, reg & 0xf, size, data);
 }
 
 
@@ -1424,18 +1420,18 @@ void ide_controller_w(device_t *device, int reg, int size, UINT32 data)
  *
  *************************************/
 
-READ32_DEVICE_HANDLER( ide_controller32_r )
+READ32_MEMBER( ide_controller_device::ide_controller32_r )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide_controller_r(device, offset, size) << ((offset & 3) * 8);
+	return ide_controller_r(offset, size) << ((offset & 3) * 8);
 }
 
 
-WRITE32_DEVICE_HANDLER( ide_controller32_w )
+WRITE32_MEMBER( ide_controller_device::ide_controller32_w )
 {
 	int size;
 
@@ -1443,14 +1439,12 @@ WRITE32_DEVICE_HANDLER( ide_controller32_w )
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 	data = data >> ((offset & 3) * 8);
 
-	ide_controller_w(device, offset, size, data);
+	ide_controller_w(offset, size, data);
 }
 
 
-READ16_DEVICE_HANDLER( ide_controller16_pcmcia_r )
+READ16_MEMBER( ide_controller_device::ide_controller16_pcmcia_r )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
-
 	int size;
 	UINT32 res = 0xffff;
 
@@ -1458,53 +1452,47 @@ READ16_DEVICE_HANDLER( ide_controller16_pcmcia_r )
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
 	if (offset < 0x008)
-		res = ide->ide_controller_read(0, offset & 7, size);
+		res = ide_controller_read(0, offset & 7, size);
 	if (offset >= 0x008 && offset < 0x010)
-		res = ide->ide_controller_read(1, offset & 7, size);
+		res = ide_controller_read(1, offset & 7, size);
 
 	return res << ((offset & 1) * 8);
 }
 
 
-WRITE16_DEVICE_HANDLER( ide_controller16_pcmcia_w )
+WRITE16_MEMBER( ide_controller_device::ide_controller16_pcmcia_w )
 {
 	int size;
-
-	ide_controller_device *ide = (ide_controller_device *) device;
 
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 	data = data >> ((offset & 1) * 8);
 
 	if (offset < 0x008)
-		ide->ide_controller_write(0, offset & 7, size, data);
+		ide_controller_write(0, offset & 7, size, data);
 	if (offset >= 0x008 && offset < 0x010)
-		ide->ide_controller_write(1, offset & 7, size, data);
+		ide_controller_write(1, offset & 7, size, data);
 }
 
-READ32_DEVICE_HANDLER( ide_bus_master32_r )
+READ32_MEMBER( ide_controller_device::ide_bus_master32_r )
 {
 	int size;
-
-	ide_controller_device *ide = (ide_controller_device *) device;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide->ide_bus_master_read(offset, size) << ((offset & 3) * 8);
+	return ide_bus_master_read(offset, size) << ((offset & 3) * 8);
 }
 
 
-WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
+WRITE32_MEMBER( ide_controller_device::ide_bus_master32_w )
 {
 	int size;
-
-	ide_controller_device *ide = (ide_controller_device *) device;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	ide->ide_bus_master_write(offset, size, data >> ((offset & 3) * 8));
+	ide_bus_master_write(offset, size, data >> ((offset & 3) * 8));
 }
 
 
@@ -1515,25 +1503,25 @@ WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
  *
  *************************************/
 
-READ16_DEVICE_HANDLER( ide_controller16_r )
+READ16_MEMBER( ide_controller_device::ide_controller16_r )
 {
 	int size;
 
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	return ide_controller_r(device, offset, size) << ((offset & 1) * 8);
+	return ide_controller_r(offset, size) << ((offset & 1) * 8);
 }
 
 
-WRITE16_DEVICE_HANDLER( ide_controller16_w )
+WRITE16_MEMBER( ide_controller_device::ide_controller16_w )
 {
 	int size;
 
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	ide_controller_w(device, offset, size, data >> ((offset & 1) * 8));
+	ide_controller_w(offset, size, data >> ((offset & 1) * 8));
 }
 
 SLOT_INTERFACE_START(ide_devices)

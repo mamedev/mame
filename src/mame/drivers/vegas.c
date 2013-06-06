@@ -1458,25 +1458,43 @@ static WRITE32_HANDLER( asic_fifo_w )
 
 static READ32_DEVICE_HANDLER( ide_main_r )
 {
-	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
+	ide_controller_device *ide = (ide_controller_device *) device;
+	return ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
-	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller_device *ide = (ide_controller_device *) device;
+	ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
-	return ide_controller32_r(device, space, 0x3f4/4 + offset, mem_mask);
+	ide_controller_device *ide = (ide_controller_device *) device;
+	return ide->ide_controller32_r(space, 0x3f4/4 + offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
-	ide_controller32_w(device, space, 0x3f4/4 + offset, data, mem_mask);
+	ide_controller_device *ide = (ide_controller_device *) device;
+	ide->ide_controller32_w(space, 0x3f4/4 + offset, data, mem_mask);
+}
+
+
+static READ32_DEVICE_HANDLER( ide_bus_master32_r )
+{
+	ide_controller_device *ide = (ide_controller_device *) device;
+	return ide->ide_bus_master32_r(space, offset, mem_mask);
+}
+
+
+static WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
+{
+	ide_controller_device *ide = (ide_controller_device *) device;
+	ide->ide_bus_master32_w(space, offset, data, mem_mask);
 }
 
 

@@ -41,12 +41,12 @@ void ata_flash_pccard_device::device_reset_after_children()
 
 READ16_MEMBER( ata_flash_pccard_device::read_memory )
 {
-	return ide_controller16_pcmcia_r(m_card, space, offset, mem_mask);
+	return m_card->ide_controller16_pcmcia_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 {
-	ide_controller16_pcmcia_w(m_card, space, offset, data, mem_mask);
+	m_card->ide_controller16_pcmcia_w(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER( ata_flash_pccard_device::read_reg )

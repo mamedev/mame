@@ -150,7 +150,10 @@ public:
 		m_rambase2(*this, "rambase2"),
 		m_control(*this, "control"),
 		m_rombase(*this, "rombase"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ide(*this, "ide" )
+	{
+	}
 
 	required_shared_ptr<UINT32> m_rambase;
 	required_shared_ptr<UINT32> m_rambase2;
@@ -172,6 +175,7 @@ public:
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<cpu_device> m_maincpu;
+	required_device<ide_controller_device> m_ide;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -211,8 +215,7 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
-	UINT8 *features = ide->ide_get_features(0);
+	UINT8 *features = m_ide->ide_get_features(0);
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
@@ -322,29 +325,25 @@ WRITE_LINE_MEMBER(kinst_state::ide_interrupt)
 
 READ32_MEMBER(kinst_state::kinst_ide_r)
 {
-	device_t *device = machine().device("ide");
-	return midway_ide_asic_r(device, space, offset / 2, mem_mask);
+	return midway_ide_asic_r(m_ide, space, offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_w)
 {
-	device_t *device = machine().device("ide");
-	midway_ide_asic_w(device, space, offset / 2, data, mem_mask);
+	midway_ide_asic_w(m_ide, space, offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::kinst_ide_extra_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x3f6/4, 0x00ff0000) >> 16;
+	return m_ide->ide_controller32_r(space, 0x3f6/4, 0x00ff0000) >> 16;
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 {
-	device_t *device = machine().device("ide");
-	ide_controller32_w(device, space, 0x3f6/4, data << 16, 0x00ff0000);
+	m_ide->ide_controller32_w(space, 0x3f6/4, data << 16, 0x00ff0000);
 }
 
 

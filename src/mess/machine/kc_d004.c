@@ -454,7 +454,7 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 				data_shift = 8;
 
 			if (io_addr == 0x06 || io_addr == 0x07 || io_addr > 0x08 || (io_addr == 0x08 && !m_lh))
-				m_ide_data = ide_bus_r(m_ide, ide_cs, io_addr & 0x07);
+				m_ide_data = m_ide->ide_bus_r(ide_cs, io_addr & 0x07);
 
 			data = (m_ide_data >> data_shift) & 0xff;
 		}
@@ -494,7 +494,7 @@ WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 			m_ide_data = (data << data_shift) | (m_ide_data & (0xff00 >> data_shift));
 
 			if (io_addr == 0x06 || io_addr == 0x07 || io_addr > 0x08 || (io_addr == 0x08 && m_lh))
-				ide_bus_w(m_ide, ide_cs, io_addr & 0x07, m_ide_data);
+				m_ide->ide_bus_w(ide_cs, io_addr & 0x07, m_ide_data);
 		}
 
 		m_lh = (io_addr == 0x08) ? !m_lh : ((io_addr > 0x08) ? 0 : m_lh);

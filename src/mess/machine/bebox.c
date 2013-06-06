@@ -504,13 +504,8 @@ READ8_MEMBER(bebox_state::get_slave_ack)
  *
  *************************************/
 
-static device_t *ide_device(running_machine &machine)
-{
-	return machine.device("ide");
-}
-
-READ8_MEMBER(bebox_state::bebox_800001F0_r ) { return ide_controller_r(ide_device(space.machine()), offset + 0x1F0, 1); }
-WRITE8_MEMBER(bebox_state::bebox_800001F0_w ) { ide_controller_w(ide_device(space.machine()), offset + 0x1F0, 1, data); }
+READ8_MEMBER(bebox_state::bebox_800001F0_r ) { return m_ide->ide_controller_r(offset + 0x1F0, 1); }
+WRITE8_MEMBER(bebox_state::bebox_800001F0_w ) { m_ide->ide_controller_w(offset + 0x1F0, 1, data); }
 
 READ64_MEMBER(bebox_state::bebox_800003F0_r )
 {
@@ -518,7 +513,7 @@ READ64_MEMBER(bebox_state::bebox_800003F0_r )
 
 	if (((mem_mask >> 8) & 0xFF) == 0)
 	{
-		result |= ide_controller_r(space.machine().device("ide"), 0x3F6, 1) << 8;
+		result |= m_ide->ide_controller_r(0x3F6, 1) << 8;
 	}
 	return result;
 }
@@ -527,7 +522,7 @@ READ64_MEMBER(bebox_state::bebox_800003F0_r )
 WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
 {
 	if (((mem_mask >> 8) & 0xFF) == 0)
-		ide_controller_w(space.machine().device("ide"), 0x3F6, 1, (data >> 8) & 0xFF);
+		m_ide->ide_controller_w(0x3F6, 1, (data >> 8) & 0xFF);
 }
 
 

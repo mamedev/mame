@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "ti99defs.h"
+#include "machine/idectrl.h"
 #include "machine/rtc65271.h"
 
 extern const device_type TI99_IDE;
@@ -44,7 +45,7 @@ protected:
 
 private:
 	rtc65271_device*    m_rtc;
-	device_t*           m_ide;
+	ide_controller_device* m_ide;
 
 	bool    m_clk_irq;
 	bool    m_sram_enable;

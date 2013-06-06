@@ -151,7 +151,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 0, (addr >> 1) & 0x7) : 0;
+					m_input_latch = (! (addr & 0x10)) ? m_ide->ide_bus_r(0, (addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
@@ -162,7 +162,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 3:     /* IDE registers set 2 (CS3Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
 				{   /* first read triggers 16-bit read cycle */
-					m_input_latch = (! (addr & 0x10)) ? ide_bus_r(m_ide, 1, (addr >> 1) & 0x7) : 0;
+					m_input_latch = (! (addr & 0x10)) ? m_ide->ide_bus_r(1, (addr >> 1) & 0x7) : 0;
 				}
 
 				/* return latched input */
@@ -232,7 +232,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{   /* second write triggers 16-bit write cycle */
-					ide_bus_w(m_ide, 0, (addr >> 1) & 0x7, m_output_latch);
+					m_ide->ide_bus_w(0, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			case 3:     /* IDE registers set 2 (CS3Fx) */
@@ -250,7 +250,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 
 				if (m_tms9995_mode ? (addr & 1) : (!(addr & 1)))
 				{   /* second write triggers 16-bit write cycle */
-					ide_bus_w(m_ide, 1, (addr >> 1) & 0x7, m_output_latch);
+					m_ide->ide_bus_w(1, (addr >> 1) & 0x7, m_output_latch);
 				}
 				break;
 			}
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 void nouspikel_ide_interface_device::device_start()
 {
 	m_rtc = subdevice<rtc65271_device>("ide_rtc");
-	m_ide = subdevice("ide");
+	m_ide = subdevice<ide_controller_device>("ide");
 
 	m_ram = memregion(BUFFER_TAG)->base();
 	m_sram_enable_dip = false; // TODO: what is this?

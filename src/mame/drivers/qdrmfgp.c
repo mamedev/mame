@@ -181,47 +181,39 @@ WRITE16_MEMBER(qdrmfgp_state::sndram_w)
 
 /*************/
 
-#define IDE_STD_OFFSET  (0x1f0/2)
-#define IDE_ALT_OFFSET  (0x3f6/2)
-
 READ16_MEMBER(qdrmfgp_state::ide_std_r)
 {
-	device_t *device = machine().device("ide");
 	if (offset & 0x01)
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset/2, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xffff);
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset/2, 0xffff);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::ide_std_w)
 {
-	device_t *device = machine().device("ide");
 	if (offset & 0x01)
-		ide_controller16_w(device, space, IDE_STD_OFFSET + offset/2, data << 8, 0xff00);
+		m_ide->ide_controller16_w(space, 0x1f0/2 + offset/2, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, space, IDE_STD_OFFSET + offset/2, data, 0xffff);
+		m_ide->ide_controller16_w(space, 0x1f0/2 + offset/2, data, 0xffff);
 }
 
 READ16_MEMBER(qdrmfgp_state::ide_alt_r)
 {
-	device_t *device = machine().device("ide");
 	if (offset == 0)
-		return ide_controller16_r(device, space, IDE_ALT_OFFSET, 0x00ff);
+		return m_ide->ide_controller16_r(space, 0x3f6/2, 0x00ff);
 
 	return 0;
 }
 
 WRITE16_MEMBER(qdrmfgp_state::ide_alt_w)
 {
-	device_t *device = machine().device("ide");
 	if (offset == 0)
-		ide_controller16_w(device, space, IDE_ALT_OFFSET, data, 0x00ff);
+		m_ide->ide_controller16_w(space, 0x3f6/2, data, 0x00ff);
 }
 
 
 READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 {
-	device_t *device = machine().device("ide");
 	if (offset & 0x01)
 	{
 		if (offset == 0x07)
@@ -238,9 +230,12 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 					break;
 			}
 		}
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
-	} else {
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset/2, 0xffff);
+
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset/2, 0xff00) >> 8;
+	}
+	else
+	{
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset/2, 0xffff);
 	}
 }
 
@@ -638,7 +633,7 @@ void qdrmfgp_state::machine_reset()
 
 	/* reset the IDE controller */
 	m_gp2_irq_control = 0;
-	machine().device("ide")->reset();
+	m_ide->reset();
 }
 
 

@@ -309,8 +309,10 @@ class viper_state : public driver_device
 public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
-
+		m_maincpu(*this, "maincpu"),
+		m_ide(*this, "ide")
+	{
+	}
 
 	UINT32 m_epic_iack;
 	int m_cf_card_ide;
@@ -361,6 +363,7 @@ public:
 	int ds2430_insert_cmd_bit(int bit);
 	void DS2430_w(int bit);
 	required_device<cpu_device> m_maincpu;
+	required_device<ide_controller_device> m_ide;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1255,7 +1258,6 @@ static const UINT8 cf_card_tuples[] =
 
 READ64_MEMBER(viper_state::cf_card_data_r)
 {
-	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
@@ -1264,7 +1266,7 @@ READ64_MEMBER(viper_state::cf_card_data_r)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				r |= ide_bus_r(device, 0, 0) << 16;
+				r |= m_ide->ide_bus_r(0, 0) << 16;
 				break;
 			}
 
@@ -1279,14 +1281,13 @@ READ64_MEMBER(viper_state::cf_card_data_r)
 
 WRITE64_MEMBER(viper_state::cf_card_data_w)
 {
-	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_16_31)
 	{
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				ide_bus_w(device, 0, 0, (data >> 16) & 0xffff);
+				m_ide->ide_bus_w(0, 0, (data >> 16) & 0xffff);
 				break;
 			}
 
@@ -1300,7 +1301,6 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 
 READ64_MEMBER(viper_state::cf_card_r)
 {
-	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
@@ -1318,7 +1318,7 @@ READ64_MEMBER(viper_state::cf_card_r)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
 				{
-					r |= ide_bus_r(device, 0, offset & 7) << 16;
+					r |= m_ide->ide_bus_r(0, offset & 7) << 16;
 					break;
 				}
 
@@ -1327,13 +1327,13 @@ READ64_MEMBER(viper_state::cf_card_r)
 
 				case 0xd:   // Duplicate Error
 				{
-					r |= ide_bus_r(device, 0, 1) << 16;
+					r |= m_ide->ide_bus_r(0, 1) << 16;
 					break;
 				}
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
 				{
-					r |= ide_bus_r(device, 1, offset & 7) << 16;
+					r |= m_ide->ide_bus_r(1, offset & 7) << 16;
 					break;
 				}
 
@@ -1364,8 +1364,6 @@ READ64_MEMBER(viper_state::cf_card_r)
 
 WRITE64_MEMBER(viper_state::cf_card_w)
 {
-	device_t *device = machine().device("ide");
-
 	#ifdef VIPER_DEBUG_LOG
 	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 	#endif
@@ -1385,7 +1383,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
 				{
-					ide_bus_w(device, 0, offset & 7, (data >> 16) & 0xffff);
+					m_ide->ide_bus_w(0, offset & 7, (data >> 16) & 0xffff);
 					break;
 				}
 
@@ -1394,13 +1392,13 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 
 				case 0xd:   // Duplicate Features
 				{
-					ide_bus_w(device, 0, 1, (data >> 16) & 0xffff);
+					m_ide->ide_bus_w(0, 1, (data >> 16) & 0xffff);
 					break;
 				}
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
 				{
-					ide_bus_w(device, 1, offset & 7, (data >> 16) & 0xffff);
+					m_ide->ide_bus_w(1, offset & 7, (data >> 16) & 0xffff);
 					break;
 				}
 
@@ -1426,12 +1424,12 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 						// cylinder low register is set to 0x00
 						// cylinder high register is set to 0x00
 
-						ide_bus_w(device, 1, 6, 0x04);
+						m_ide->ide_bus_w(1, 6, 0x04);
 
-						ide_bus_w(device, 0, 2, 0x01);
-						ide_bus_w(device, 0, 3, 0x01);
-						ide_bus_w(device, 0, 4, 0x00);
-						ide_bus_w(device, 0, 5, 0x00);
+						m_ide->ide_bus_w(0, 2, 0x01);
+						m_ide->ide_bus_w(0, 3, 0x01);
+						m_ide->ide_bus_w(0, 4, 0x00);
+						m_ide->ide_bus_w(0, 5, 0x00);
 					}
 					break;
 				}
@@ -1457,14 +1455,13 @@ WRITE64_MEMBER(viper_state::unk2_w)
 
 READ64_MEMBER(viper_state::ata_r)
 {
-	device_t *device = machine().device("ide");
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		r |= ide_bus_r(device, (offset & 0x80) ? 1 : 0, reg) << 16;
+		r |= m_ide->ide_bus_r((offset & 0x80) ? 1 : 0, reg) << 16;
 	}
 
 	return r;
@@ -1472,12 +1469,11 @@ READ64_MEMBER(viper_state::ata_r)
 
 WRITE64_MEMBER(viper_state::ata_w)
 {
-	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_16_31)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		ide_bus_w(device, (offset & 0x80) ? 1 : 0, reg, (UINT16)(data >> 16));
+		m_ide->ide_bus_w((offset & 0x80) ? 1 : 0, reg, (UINT16)(data >> 16));
 	}
 }
 
@@ -2019,12 +2015,10 @@ void viper_state::machine_start()
 
 void viper_state::machine_reset()
 {
-	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
-
-	ide->reset();
+	m_ide->reset();
 	mpc8240_epic_reset();
 
-	UINT8 *ide_features = ide->ide_get_features(0);
+	UINT8 *ide_features = m_ide->ide_get_features(0);
 
 	// Viper expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */

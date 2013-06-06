@@ -1,3 +1,4 @@
+#include "machine/idectrl.h"
 #include "sound/k054539.h"
 
 class qdrmfgp_state : public driver_device
@@ -9,7 +10,10 @@ public:
 		m_nvram(*this, "nvram"),
 		m_workram(*this, "workram"),
 		m_k056832(*this, "k056832"),
-		m_k054539(*this, "k054539") { }
+		m_k054539(*this, "k054539"),
+		m_ide(*this, "ide")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_nvram;
@@ -17,6 +21,7 @@ public:
 	required_shared_ptr<UINT16> m_workram;
 	required_device<k056832_device> m_k056832;
 	required_device<k054539_device> m_k054539;
+	required_device<ide_controller_device> m_ide;
 	UINT16 m_control;
 	INT32 m_gp2_irq_control;
 	INT32 m_pal;

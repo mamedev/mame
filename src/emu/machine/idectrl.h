@@ -14,8 +14,6 @@
 #ifndef __IDECTRL_H__
 #define __IDECTRL_H__
 
-#include "devlegcy.h"
-
 #include "idehd.h"
 #include "harddisk.h"
 
@@ -71,26 +69,6 @@ SLOT_INTERFACE_EXTERN(ide_devices);
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-int ide_bus_r(device_t *config, int select, int offset);
-void ide_bus_w(device_t *config, int select, int offset, int data);
-
-UINT32 ide_controller_r(device_t *config, int reg, int size);
-void ide_controller_w(device_t *config, int reg, int size, UINT32 data);
-
-DECLARE_READ32_DEVICE_HANDLER( ide_controller32_r );
-DECLARE_WRITE32_DEVICE_HANDLER( ide_controller32_w );
-DECLARE_READ16_DEVICE_HANDLER( ide_controller16_pcmcia_r );
-DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_pcmcia_w );
-DECLARE_READ32_DEVICE_HANDLER( ide_bus_master32_r );
-DECLARE_WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
-
-DECLARE_READ16_DEVICE_HANDLER( ide_controller16_r );
-DECLARE_WRITE16_DEVICE_HANDLER( ide_controller16_w );
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -111,6 +89,22 @@ public:
 	void ide_set_gnet_readlock(const UINT8 onoff);
 	void ide_set_master_password(const UINT8 *password);
 	void ide_set_user_password(const UINT8 *password);
+
+	int ide_bus_r(int select, int offset);
+	void ide_bus_w(int select, int offset, int data);
+
+	UINT32 ide_controller_r(int reg, int size);
+	void ide_controller_w(int reg, int size, UINT32 data);
+
+	DECLARE_READ32_MEMBER( ide_controller32_r );
+	DECLARE_WRITE32_MEMBER( ide_controller32_w );
+	DECLARE_READ16_MEMBER( ide_controller16_pcmcia_r );
+	DECLARE_WRITE16_MEMBER( ide_controller16_pcmcia_w );
+	DECLARE_READ32_MEMBER( ide_bus_master32_r );
+	DECLARE_WRITE32_MEMBER( ide_bus_master32_w );
+
+	DECLARE_READ16_MEMBER( ide_controller16_r );
+	DECLARE_WRITE16_MEMBER( ide_controller16_w );
 
 	UINT32 ide_controller_read(int bank, offs_t offset, int size);
 	void ide_controller_write(int bank, offs_t offset, int size, UINT32 data);
@@ -189,7 +183,5 @@ private:
 };
 
 extern const device_type IDE_CONTROLLER;
-
-
 
 #endif  /* __IDECTRL_H__ */

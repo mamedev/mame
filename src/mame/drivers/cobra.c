@@ -608,7 +608,8 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_gfxcpu(*this, "gfxcpu"),
 		m_gfx_pagetable(*this, "pagetable"),
-		m_k001604(*this, "k001604")
+		m_k001604(*this, "k001604"),
+		m_ide(*this, "ide")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -616,6 +617,7 @@ public:
 	required_device<cpu_device> m_gfxcpu;
 	required_shared_ptr<UINT64> m_gfx_pagetable;
 	required_device<k001604_device> m_k001604;
+	required_device<ide_controller_device> m_ide;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
@@ -1814,17 +1816,16 @@ WRITE32_MEMBER(cobra_state::sub_config_w)
 
 READ32_MEMBER(cobra_state::sub_ata0_r)
 {
-	device_t *device = machine().device("ide");
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
-		UINT16 v = ide_bus_r(device, 0, (offset << 1) + 0);
+		UINT16 v = m_ide->ide_bus_r(0, (offset << 1) + 0);
 		r |= ((v << 8) | (v >> 8)) << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		UINT16 v = ide_bus_r(device, 0, (offset << 1) + 1);
+		UINT16 v = m_ide->ide_bus_r(0, (offset << 1) + 1);
 		r |= ((v << 8) | (v >> 8)) << 0;
 	}
 
@@ -1833,33 +1834,30 @@ READ32_MEMBER(cobra_state::sub_ata0_r)
 
 WRITE32_MEMBER(cobra_state::sub_ata0_w)
 {
-	device_t *device = machine().device("ide");
-
 	if (ACCESSING_BITS_16_31)
 	{
 		UINT16 d = ((data >> 24) & 0xff) | ((data >> 8) & 0xff00);
-		ide_bus_w(device, 0, (offset << 1) + 0, d);
+		m_ide->ide_bus_w(0, (offset << 1) + 0, d);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		UINT16 d = ((data >> 8) & 0xff) | ((data << 8) & 0xff00);
-		ide_bus_w(device, 0, (offset << 1) + 1, d);
+		m_ide->ide_bus_w(0, (offset << 1) + 1, d);
 	}
 }
 
 READ32_MEMBER(cobra_state::sub_ata1_r)
 {
-	device_t *device = machine().device("ide");
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
-		UINT16 v = ide_bus_r(device, 1, (offset << 1) + 0);
+		UINT16 v = m_ide->ide_bus_r(1, (offset << 1) + 0);
 		r |= ((v << 8) | (v >> 8)) << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		UINT16 v = ide_bus_r(device, 1, (offset << 1) + 1);
+		UINT16 v = m_ide->ide_bus_r(1, (offset << 1) + 1);
 		r |= ((v << 8) | (v >> 8)) << 0;
 	}
 
@@ -1868,17 +1866,15 @@ READ32_MEMBER(cobra_state::sub_ata1_r)
 
 WRITE32_MEMBER(cobra_state::sub_ata1_w)
 {
-	device_t *device = machine().device("ide");
-
 	if (ACCESSING_BITS_16_31)
 	{
 		UINT16 d = ((data >> 24) & 0xff) | ((data >> 8) & 0xff00);
-		ide_bus_w(device, 1, (offset << 1) + 0, d);
+		m_ide->ide_bus_w(1, (offset << 1) + 0, d);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		UINT16 d = ((data >> 8) & 0xff) | ((data << 8) & 0xff00);
-		ide_bus_w(device, 1, (offset << 1) + 1, d);
+		m_ide->ide_bus_w(1, (offset << 1) + 1, d);
 	}
 }
 
@@ -3195,8 +3191,7 @@ void cobra_state::machine_reset()
 {
 	m_sub_interrupt = 0xff;
 
-	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
-	UINT8 *ide_features = ide->ide_get_features(0);
+	UINT8 *ide_features = m_ide->ide_get_features(0);
 
 	// Cobra expects these settings or the BIOS fails
 	ide_features[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */

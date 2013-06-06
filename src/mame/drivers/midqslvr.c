@@ -362,23 +362,23 @@ WRITE32_MEMBER(midqslvr_state::bios_ram_w)
 
 READ32_MEMBER(midqslvr_state::ide_r)
 {
-	return ide_controller32_r(m_ide, space, 0x1f0/4 + offset, mem_mask);
+	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(midqslvr_state::ide_w)
 {
-	ide_controller32_w(m_ide, space, 0x1f0/4 + offset, data, mem_mask);
+	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 READ32_MEMBER(midqslvr_state::fdc_r)
 {
-	return ide_controller32_r(m_ide, space, 0x3f0/4 + offset, mem_mask);
+	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(midqslvr_state::fdc_w)
 {
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_w(m_ide, space, 0x3f0/4 + offset, data, mem_mask);
+	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32, midqslvr_state)

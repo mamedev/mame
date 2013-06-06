@@ -271,42 +271,35 @@ WRITE32_MEMBER(djmain_state::turntable_select_w)
 
 //---------
 
-#define IDE_STD_OFFSET  (0x1f0/2)
-#define IDE_ALT_OFFSET  (0x3f6/2)
-
 READ32_MEMBER(djmain_state::ide_std_r)
 {
-	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_0_7)
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset, 0xff00) >> 8;
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, space, IDE_STD_OFFSET + offset, 0xffff) << 16;
+		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset, 0xffff) << 16;
 }
 
 WRITE32_MEMBER(djmain_state::ide_std_w)
 {
-	device_t *device = machine().device("ide");
 	if (ACCESSING_BITS_0_7)
-		ide_controller16_w(device, space, IDE_STD_OFFSET + offset, data << 8, 0xff00);
+		m_ide->ide_controller16_w(space, 0x1f0/2 + offset, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, space, IDE_STD_OFFSET + offset, data >> 16, 0xffff);
+		m_ide->ide_controller16_w(space, 0x1f0/2 + offset, data >> 16, 0xffff);
 }
 
 
 READ32_MEMBER(djmain_state::ide_alt_r)
 {
-	device_t *device = machine().device("ide");
 	if (offset == 0)
-		return ide_controller16_r(device, space, IDE_ALT_OFFSET, 0x00ff) << 24;
+		return m_ide->ide_controller16_r(space, 0x3f6/2, 0x00ff) << 24;
 
 	return 0;
 }
 
 WRITE32_MEMBER(djmain_state::ide_alt_w)
 {
-	device_t *device = machine().device("ide");
 	if (offset == 0 && ACCESSING_BITS_16_23)
-		ide_controller16_w(device, space, IDE_ALT_OFFSET, data >> 24, 0x00ff);
+		m_ide->ide_controller16_w(space, 0x3f6/2, data >> 24, 0x00ff);
 }
 
 
@@ -1395,12 +1388,10 @@ static const k054539_interface k054539_config =
 
 void djmain_state::machine_start()
 {
-	ide_controller_device *ide = (ide_controller_device *) machine().device("ide");
-
-	if (ide != NULL && m_ide_master_password != NULL)
-		ide->ide_set_master_password(m_ide_master_password);
-	if (ide != NULL && m_ide_user_password != NULL)
-		ide->ide_set_user_password(m_ide_user_password);
+	if (m_ide_master_password != NULL)
+		m_ide->ide_set_master_password(m_ide_master_password);
+	if (m_ide_user_password != NULL)
+		m_ide->ide_set_user_password(m_ide_user_password);
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
@@ -1418,7 +1409,7 @@ void djmain_state::machine_reset()
 	sndram_set_bank();
 
 	/* reset the IDE controller */
-	machine().device("ide")->reset();
+	m_ide->reset();
 
 	/* reset LEDs */
 	set_led_status(machine(), 0, 1);

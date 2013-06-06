@@ -44,7 +44,8 @@ public:
 		m_ram(*this, "maincpu:ram"),
 		m_cbaj_fifo1(*this, "cbaj_fifo1"),
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
-		m_mb3773(*this, "mb3773")
+		m_mb3773(*this, "mb3773"),
+		m_ide(*this, "ide")
 	{
 	}
 
@@ -129,6 +130,7 @@ private:
 	optional_device<fifo7200_device> m_cbaj_fifo1;
 	optional_device<fifo7200_device> m_cbaj_fifo2;
 	optional_device<mb3773_device> m_mb3773;
+	optional_device<ide_controller_device> m_ide;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1331,8 +1333,6 @@ Notes:
 
 void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	device_t *ide = machine().device("ide");
-
 //  logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
 	if (n_address < 0x10000)
@@ -1346,7 +1346,7 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	while( n_size > 0 )
 	{
-		psxwritebyte( p_n_psxram, n_address, ide_controller32_r( ide, space, 0x1f0 / 4, 0x000000ff ) );
+		psxwritebyte( p_n_psxram, n_address, m_ide->ide_controller32_r( space, 0x1f0 / 4, 0x000000ff ) );
 		n_address++;
 		n_size--;
 	}
@@ -1361,15 +1361,15 @@ static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
 	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
-	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w )
-	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w )
+	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w )
+	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w )
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000w)
 {
-	machine().device("ide")->reset();
+	m_ide->reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
@@ -1876,22 +1876,20 @@ Notes:
 
 READ8_MEMBER(zn_state::jdredd_idestat_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller_r( device, 0x1f7, 1 );
+	return m_ide->ide_controller_r( 0x1f7, 1 );
 }
 
 READ16_MEMBER(zn_state::jdredd_ide_r)
 {
-	device_t *device = machine().device("ide");
 	UINT16 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= ide_controller_r( device, 0x1f0 + offset, 1 ) << 0;
+		data |= m_ide->ide_controller_r( 0x1f0 + offset, 1 ) << 0;
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= ide_controller_r( device, 0x1f0 + offset, 1 ) << 8;
+		data |= m_ide->ide_controller_r( 0x1f0 + offset, 1 ) << 8;
 	}
 
 	return data;
@@ -1899,14 +1897,13 @@ READ16_MEMBER(zn_state::jdredd_ide_r)
 
 WRITE16_MEMBER(zn_state::jdredd_ide_w)
 {
-	device_t *device = machine().device("ide");
 	if( ACCESSING_BITS_0_7 )
 	{
-		ide_controller_w( device, 0x1f0 + offset, 1, data >> 0 );
+		m_ide->ide_controller_w( 0x1f0 + offset, 1, data >> 0 );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		ide_controller_w( device, 0x1f0 + offset, 1, data >> 8 );
+		m_ide->ide_controller_w( 0x1f0 + offset, 1, data >> 8 );
 	}
 }
 
@@ -1999,7 +1996,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,jdredd)
 {
-	machine().device("ide")->reset();
+	m_ide->reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )

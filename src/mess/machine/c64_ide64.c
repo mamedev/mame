@@ -181,7 +181,7 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 		if (io1_offset >= 0x20 && io1_offset < 0x30)
 		{
-			m_ide_data = ide_bus_r(m_ide, BIT(offset, 3), offset & 0x07);
+			m_ide_data = m_ide->ide_bus_r(BIT(offset, 3), offset & 0x07);
 
 			data = m_ide_data & 0xff;
 		}
@@ -278,7 +278,7 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 		{
 			m_ide_data = (m_ide_data & 0xff00) | data;
 
-			ide_bus_w(m_ide, BIT(offset, 3), offset & 0x07, m_ide_data);
+			m_ide->ide_bus_w(BIT(offset, 3), offset & 0x07, m_ide_data);
 		}
 		else if (io1_offset == 0x31)
 		{

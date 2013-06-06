@@ -215,27 +215,23 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 #if 0
 READ32_MEMBER(funkball_state::ide_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
+	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(funkball_state::ide_w)
 {
-	device_t *device = machine().device("ide");
-	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
+	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
 }
 
 READ32_MEMBER(funkball_state::fdc_r)
 {
-	device_t *device = machine().device("ide");
-	return ide_controller32_r(device, space, 0x3f0/4 + offset, mem_mask);
+	return m-ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
 }
 
 WRITE32_MEMBER(funkball_state::fdc_w)
 {
-	device_t *device = machine().device("ide");
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_w(device, space, 0x3f0/4 + offset, data, mem_mask);
+	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
 }
 #endif
 
