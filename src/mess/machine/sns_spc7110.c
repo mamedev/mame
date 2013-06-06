@@ -156,7 +156,6 @@ void sns_rom_spc7110_device::spc7110_start()
 	save_item(NAME(m_dx_offset));
 	save_item(NAME(m_ex_offset));
 	save_item(NAME(m_fx_offset));
-	// TODO: save decomp-related items and fix their restore...
 }
 
 void sns_rom_spc7110_device::device_start()
@@ -319,6 +318,50 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 		+ map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
 #undef map
 	}
+	
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_mode);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_offset);
+	state_save_register_item_pointer(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_rdoffset);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_wroffset);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_decomp_buffer_length);
+
+	for (int i = 0; i < 32; i++)
+	{
+		state_save_register_item(machine, "SNES_SPC7110", 0, i, m_context[i].index);
+		state_save_register_item(machine, "SNES_SPC7110", 0, i, m_context[i].invert);
+	}
+	
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_val);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_in);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_span);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_out);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_lps);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m0_in_count);
+
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_pixelorder);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_realorder);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_val);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_in);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_span);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_out);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_lps);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m1_in_count);
+	
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_pixelorder);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_realorder);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_bitplanebuffer);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_buffer_index);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_val);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_in);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_span);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_out0);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_out1);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_inverts);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_lps);
+	state_save_register_item(machine, "SNES_SPC7110", 0, 0, m_m2_in_count);
 }
 
 void SPC7110_Decomp::reset()
@@ -412,17 +455,14 @@ UINT8 SPC7110_Decomp::dataread(UINT8 *ROM, UINT32 len)
 }
 
 void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
-{
-	static UINT8 val, in, span;
-	static INT32 out, inverts, lps, in_count;
-
+{	
 	if (init == 1)
 	{
-		out = inverts = lps = 0;
-		span = 0xff;
-		val = dataread(ROM, len);
-		in = dataread(ROM, len);
-		in_count = 8;
+		m_m0_out = m_m0_inverts = m_m0_lps = 0;
+		m_m0_span = 0xff;
+		m_m0_val = dataread(ROM, len);
+		m_m0_in = dataread(ROM, len);
+		m_m0_in_count = 8;
 		return;
 	}
 
@@ -432,7 +472,7 @@ void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
 		{
 			//get context
 			UINT8 mask = (1 << (bit & 3)) - 1;
-			UINT8 con = mask + ((inverts & mask) ^ (lps & mask));
+			UINT8 con = mask + ((m_m0_inverts & mask) ^ (m_m0_lps & mask));
 			UINT32 prob, mps, flag_lps;
 			UINT32 shift = 0;
 			if (bit > 3)
@@ -442,42 +482,42 @@ void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
 
 			//get prob and mps
 			prob = probability(con);
-			mps = (((out >> 15) & 1) ^ m_context[con].invert);
+			mps = (((m_m0_out >> 15) & 1) ^ m_context[con].invert);
 
 			//get bit
-			if (val <= span - prob) //mps
+			if (m_m0_val <= m_m0_span - prob) //mps
 			{
-				span = span - prob;
-				out = (out << 1) + mps;
+				m_m0_span = m_m0_span - prob;
+				m_m0_out = (m_m0_out << 1) + mps;
 				flag_lps = 0;
 			}
 			else //lps
 			{
-				val = val - (span - (prob - 1));
-				span = prob - 1;
-				out = (out << 1) + 1 - mps;
+				m_m0_val = m_m0_val - (m_m0_span - (prob - 1));
+				m_m0_span = prob - 1;
+				m_m0_out = (m_m0_out << 1) + 1 - mps;
 				flag_lps = 1;
 			}
 
 			//renormalize
-			while (span < 0x7f)
+			while (m_m0_span < 0x7f)
 			{
 				shift++;
 
-				span = (span << 1) + 1;
-				val = (val << 1) + (in >> 7);
+				m_m0_span = (m_m0_span << 1) + 1;
+				m_m0_val = (m_m0_val << 1) + (m_m0_in >> 7);
 
-				in <<= 1;
-				if (--in_count == 0)
+				m_m0_in <<= 1;
+				if (--m_m0_in_count == 0)
 				{
-					in = dataread(ROM, len);
-					in_count = 8;
+					m_m0_in = dataread(ROM, len);
+					m_m0_in_count = 8;
 				}
 			}
 
 			//update processing info
-			lps = (lps << 1) + flag_lps;
-			inverts = (inverts << 1) + m_context[con].invert;
+			m_m0_lps = (m_m0_lps << 1) + flag_lps;
+			m_m0_inverts = (m_m0_inverts << 1) + m_context[con].invert;
 
 			//update context state
 			if (flag_lps & toggle_invert(con))
@@ -495,27 +535,23 @@ void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
 		}
 
 		//save byte
-		write(out);
+		write(m_m0_out);
 	}
 }
 
 void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 {
-	static INT32 pixelorder[4], realorder[4];
-	static UINT8 in, val, span;
-	static INT32 out, inverts, lps, in_count;
-
 	if (init == 1)
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			pixelorder[i] = i;
+			m_m1_pixelorder[i] = i;
 		}
-		out = inverts = lps = 0;
-		span = 0xff;
-		val = dataread(ROM, len);
-		in = dataread(ROM, len);
-		in_count = 8;
+		m_m1_out = m_m1_inverts = m_m1_lps = 0;
+		m_m1_span = 0xff;
+		m_m1_val = dataread(ROM, len);
+		m_m1_in = dataread(ROM, len);
+		m_m1_in_count = 8;
 		return;
 	}
 
@@ -525,73 +561,73 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
 			//get first symbol context
-			UINT32 a = ((out >> (1 * 2)) & 3);
-			UINT32 b = ((out >> (7 * 2)) & 3);
-			UINT32 c = ((out >> (8 * 2)) & 3);
+			UINT32 a = ((m_m1_out >> (1 * 2)) & 3);
+			UINT32 b = ((m_m1_out >> (7 * 2)) & 3);
+			UINT32 c = ((m_m1_out >> (8 * 2)) & 3);
 			UINT32 con = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
 
 			//update pixel order
 			UINT32 m, n;
 			for (m = 0; m < 4; m++)
 			{
-				if (pixelorder[m] == a)
+				if (m_m1_pixelorder[m] == a)
 				{
 					break;
 				}
 			}
 			for (n = m; n > 0; n--)
 			{
-				pixelorder[n] = pixelorder[n - 1];
+				m_m1_pixelorder[n] = m_m1_pixelorder[n - 1];
 			}
-			pixelorder[0] = a;
+			m_m1_pixelorder[0] = a;
 
 			//calculate the real pixel order
 			for (m = 0; m < 4; m++)
 			{
-				realorder[m] = pixelorder[m];
+				m_m1_realorder[m] = m_m1_pixelorder[m];
 			}
 
 			//rotate reference pixel c value to top
 			for (m = 0; m < 4; m++)
 			{
-				if (realorder[m] == c)
+				if (m_m1_realorder[m] == c)
 				{
 					break;
 				}
 			}
 			for (n = m; n > 0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m1_realorder[n] = m_m1_realorder[n - 1];
 			}
-			realorder[0] = c;
+			m_m1_realorder[0] = c;
 
 			//rotate reference pixel b value to top
 			for (m = 0; m < 4; m++)
 			{
-				if (realorder[m] == b)
+				if (m_m1_realorder[m] == b)
 				{
 					break;
 				}
 			}
 			for (n = m; n > 0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m1_realorder[n] = m_m1_realorder[n - 1];
 			}
-			realorder[0] = b;
+			m_m1_realorder[0] = b;
 
 			//rotate reference pixel a value to top
 			for (m = 0; m < 4; m++)
 			{
-				if (realorder[m] == a)
+				if (m_m1_realorder[m] == a)
 				{
 					break;
 				}
 			}
 			for (n = m; n > 0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m1_realorder[n] = m_m1_realorder[n - 1];
 			}
-			realorder[0] = a;
+			m_m1_realorder[0] = a;
 
 			//get 2 symbols
 			for (int bit = 0; bit < 2; bit++)
@@ -602,37 +638,37 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 
 				//get symbol
 				UINT32 flag_lps;
-				if (val <= span - prob) //mps
+				if (m_m1_val <= m_m1_span - prob) //mps
 				{
-					span = span - prob;
+					m_m1_span = m_m1_span - prob;
 					flag_lps = 0;
 				}
 				else //lps
 				{
-					val = val - (span - (prob - 1));
-					span = prob - 1;
+					m_m1_val = m_m1_val - (m_m1_span - (prob - 1));
+					m_m1_span = prob - 1;
 					flag_lps = 1;
 				}
 
 				//renormalize
-				while (span < 0x7f)
+				while (m_m1_span < 0x7f)
 				{
 					shift++;
 
-					span = (span << 1) + 1;
-					val = (val << 1) + (in >> 7);
+					m_m1_span = (m_m1_span << 1) + 1;
+					m_m1_val = (m_m1_val << 1) + (m_m1_in >> 7);
 
-					in <<= 1;
-					if (--in_count == 0)
+					m_m1_in <<= 1;
+					if (--m_m1_in_count == 0)
 					{
-						in = dataread(ROM, len);
-						in_count = 8;
+						m_m1_in = dataread(ROM, len);
+						m_m1_in_count = 8;
 					}
 				}
 
 				//update processing info
-				lps = (lps << 1) + flag_lps;
-				inverts = (inverts << 1) + m_context[con].invert;
+				m_m1_lps = (m_m1_lps << 1) + flag_lps;
+				m_m1_inverts = (m_m1_inverts << 1) + m_context[con].invert;
 
 				//update context state
 				if (flag_lps & toggle_invert(con))
@@ -649,16 +685,16 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 				}
 
 				//get next context
-				con = 5 + (con << 1) + ((lps ^ inverts) & 1);
+				con = 5 + (con << 1) + ((m_m1_lps ^ m_m1_inverts) & 1);
 			}
 
 			//get pixel
-			b = realorder[(lps ^ inverts) & 3];
-			out = (out << 2) + b;
+			b = m_m1_realorder[(m_m1_lps ^ m_m1_inverts) & 3];
+			m_m1_out = (m_m1_out << 2) + b;
 		}
 
 		//turn pixel data into bitplanes
-		data = morton_2x8(out);
+		data = morton_2x8(m_m1_out);
 		write(data >> 8);
 		write(data >> 0);
 	}
@@ -666,23 +702,18 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 
 void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 {
-	static INT32 pixelorder[16], realorder[16];
-	static UINT8 bitplanebuffer[16], buffer_index;
-	static UINT8 in, val, span;
-	static INT32 out0, out1, inverts, lps, in_count;
-
 	if (init == 1)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			pixelorder[i] = i;
+			m_m2_pixelorder[i] = i;
 		}
-		buffer_index = 0;
-		out0 = out1 = inverts = lps = 0;
-		span = 0xff;
-		val = dataread(ROM, len);
-		in = dataread(ROM, len);
-		in_count = 8;
+		m_m2_buffer_index = 0;
+		m_m2_out0 = m_m2_out1 = m_m2_inverts = m_m2_lps = 0;
+		m_m2_span = 0xff;
+		m_m2_val = dataread(ROM, len);
+		m_m2_in = dataread(ROM, len);
+		m_m2_in_count = 8;
 		return;
 	}
 
@@ -692,9 +723,9 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
 			//get first symbol context
-			UINT32 a = ((out0 >> (0 * 4)) & 15);
-			UINT32 b = ((out0 >> (7 * 4)) & 15);
-			UINT32 c = ((out1 >> (0 * 4)) & 15);
+			UINT32 a = ((m_m2_out0 >> (0 * 4)) & 15);
+			UINT32 b = ((m_m2_out0 >> (7 * 4)) & 15);
+			UINT32 c = ((m_m2_out1 >> (0 * 4)) & 15);
 			UINT32 con = 0;
 			UINT32 refcon = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
 
@@ -702,64 +733,64 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 			UINT32 m, n;
 			for (m = 0; m < 16; m++)
 			{
-				if (pixelorder[m] == a)
+				if (m_m2_pixelorder[m] == a)
 				{
 					break;
 				}
 			}
 			for (n = m; n >  0; n--)
 			{
-				pixelorder[n] = pixelorder[n - 1];
+				m_m2_pixelorder[n] = m_m2_pixelorder[n - 1];
 			}
-			pixelorder[0] = a;
+			m_m2_pixelorder[0] = a;
 
 			//calculate the real pixel order
 			for (m = 0; m < 16; m++)
 			{
-				realorder[m] = pixelorder[m];
+				m_m2_realorder[m] = m_m2_pixelorder[m];
 			}
 
 			//rotate reference pixel c value to top
 			for (m = 0; m < 16; m++)
 			{
-				if (realorder[m] == c)
+				if (m_m2_realorder[m] == c)
 				{
 					break;
 				}
 			}
 			for (n = m; n >  0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m2_realorder[n] = m_m2_realorder[n - 1];
 			}
-			realorder[0] = c;
+			m_m2_realorder[0] = c;
 
 			//rotate reference pixel b value to top
 			for (m = 0; m < 16; m++)
 			{
-				if (realorder[m] == b)
+				if (m_m2_realorder[m] == b)
 				{
 					break;
 				}
 			}
 			for (n = m; n >  0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m2_realorder[n] = m_m2_realorder[n - 1];
 			}
-			realorder[0] = b;
+			m_m2_realorder[0] = b;
 
 			//rotate reference pixel a value to top
 			for (m = 0; m < 16; m++)
 			{
-				if (realorder[m] == a)
+				if (m_m2_realorder[m] == a)
 				{
 					break;
 				}
 			}
 			for (n = m; n >  0; n--)
 			{
-				realorder[n] = realorder[n - 1];
+				m_m2_realorder[n] = m_m2_realorder[n - 1];
 			}
-			realorder[0] = a;
+			m_m2_realorder[0] = a;
 
 			//get 4 symbols
 			for (int bit = 0; bit < 4; bit++)
@@ -771,39 +802,39 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 
 				//get symbol
 				UINT32 flag_lps;
-				if (val <= span - prob) //mps
+				if (m_m2_val <= m_m2_span - prob) //mps
 				{
-					span = span - prob;
+					m_m2_span = m_m2_span - prob;
 					flag_lps = 0;
 				}
 				else //lps
 				{
-					val = val - (span - (prob - 1));
-					span = prob - 1;
+					m_m2_val = m_m2_val - (m_m2_span - (prob - 1));
+					m_m2_span = prob - 1;
 					flag_lps = 1;
 				}
 
 				//renormalize
 				shift = 0;
-				while (span < 0x7f)
+				while (m_m2_span < 0x7f)
 				{
 					shift++;
 
-					span = (span << 1) + 1;
-					val = (val << 1) + (in >> 7);
+					m_m2_span = (m_m2_span << 1) + 1;
+					m_m2_val = (m_m2_val << 1) + (m_m2_in >> 7);
 
-					in <<= 1;
-					if (--in_count == 0)
+					m_m2_in <<= 1;
+					if (--m_m2_in_count == 0)
 					{
-						in = dataread(ROM, len);
-						in_count = 8;
+						m_m2_in = dataread(ROM, len);
+						m_m2_in_count = 8;
 					}
 				}
 
 				//update processing info
-				lps = (lps << 1) + flag_lps;
+				m_m2_lps = (m_m2_lps << 1) + flag_lps;
 				invertbit = m_context[con].invert;
-				inverts = (inverts << 1) + invertbit;
+				m_m2_inverts = (m_m2_inverts << 1) + invertbit;
 
 				//update context state
 				if (flag_lps & toggle_invert(con))
@@ -824,25 +855,25 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 			}
 
 			//get pixel
-			b = realorder[(lps ^ inverts) & 0x0f];
-			out1 = (out1 << 4) + ((out0 >> 28) & 0x0f);
-			out0 = (out0 << 4) + b;
+			b = m_m2_realorder[(m_m2_lps ^ m_m2_inverts) & 0x0f];
+			m_m2_out1 = (m_m2_out1 << 4) + ((m_m2_out0 >> 28) & 0x0f);
+			m_m2_out0 = (m_m2_out0 << 4) + b;
 		}
 
 		//convert pixel data into bitplanes
-		data = morton_4x8(out0);
+		data = morton_4x8(m_m2_out0);
 		write(data >> 24);
 		write(data >> 16);
-		bitplanebuffer[buffer_index++] = data >> 8;
-		bitplanebuffer[buffer_index++] = data >> 0;
+		m_m2_bitplanebuffer[m_m2_buffer_index++] = data >> 8;
+		m_m2_bitplanebuffer[m_m2_buffer_index++] = data >> 0;
 
-		if (buffer_index == 16)
+		if (m_m2_buffer_index == 16)
 		{
 			for (int i = 0; i < 16; i++)
 			{
-				write(bitplanebuffer[i]);
+				write(m_m2_bitplanebuffer[i]);
 			}
-			buffer_index = 0;
+			m_m2_buffer_index = 0;
 		}
 	}
 }
