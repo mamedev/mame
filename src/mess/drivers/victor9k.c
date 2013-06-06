@@ -1,13 +1,41 @@
-/***************************************************************************
+/**********************************************************************
 
-    Victor 9000
+    Victor 9000 / ACT Sirius 1 emulation
 
-    - very exciting hardware, disk controller is a direct descendant
-      of the Commodore drives (designed by Chuck Peddle)
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
-    Skeleton driver
+**********************************************************************/
 
-***************************************************************************/
+/*
+
+	Sector format
+	-------------
+
+	Header sync
+	Sector header (header ID, track ID, sector ID, and checksum)
+	Gap 1
+	Data Sync
+	Data field (data sync, data ID, data bytes, and checksum)
+	Gap 2
+
+	Track format
+	------------
+	
+	ZONE		LOWER HEAD	UPPER HEAD 	SECTORS		ROTATIONAL
+	NUMBER		TRACKS		TRACKS		PER TRACK 	PERIOD (MS)
+
+	0 			0-3			unused		19 			237.9
+	1 			4-15		0-7			18 			224.5
+	2 			16-26		8-18		17 			212.2
+	3 			27-37		19-29		16 			199.9
+	4 			38-48		30-40		15 			187.6
+	5 			49-59		41-51		14 			175.3
+	6 			60-70		52-62		13 			163.0
+	7 			71-79		63-74		12			149.6
+	8 			unused		75-79		11 			144.0
+
+*/
 
 /*
 
