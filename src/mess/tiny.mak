@@ -22,7 +22,6 @@ include $(SRC)/mess/messcore.mak
 #-------------------------------------------------
 
 CPUS += Z80
-CPUS += MCS48
 
 
 
@@ -41,6 +40,13 @@ SOUNDS += SN76496
 
 VIDEOS += TMS9928A
 
+
+#-------------------------------------------------
+# specify available machine cores
+#-------------------------------------------------
+
+
+
 #-------------------------------------------------
 # This is the list of files that are necessary
 # for building all of the drivers referenced
@@ -48,7 +54,6 @@ VIDEOS += TMS9928A
 #-------------------------------------------------
 
 DRVLIBS = \
-	$(EMUOBJ)/drivers/emudummy.o \
 	$(MESS_DRIVERS)/coleco.o \
 	$(MESS_MACHINE)/coleco.o \
 

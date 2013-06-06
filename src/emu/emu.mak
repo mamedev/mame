@@ -144,6 +144,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ram.o     	\
 	$(EMUMACHINE)/nvram.o     	\
 	$(EMUMACHINE)/laserdsc.o    \
+	$(EMUMACHINE)/net_lib.o     \
+	$(EMUMACHINE)/netlist.o     \
 	
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \

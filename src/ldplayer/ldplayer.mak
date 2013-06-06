@@ -41,6 +41,17 @@ SOUNDS += WAVE
 
 
 #-------------------------------------------------
+# specify available video cores
+#-------------------------------------------------
+
+#-------------------------------------------------
+# specify available machine cores
+#-------------------------------------------------
+
+MACHINES += LDV1000
+MACHINES += LDPR8210
+
+#-------------------------------------------------
 # this is the list of driver libraries that
 # comprise MAME plus mamedriv.o which contains
 # the list of drivers
