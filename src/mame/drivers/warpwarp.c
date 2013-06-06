@@ -334,8 +334,8 @@ static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0x6010, 0x601f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp", warpwarp_sound_device, music1_w)
-	AM_RANGE(0x6020, 0x602f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp", warpwarp_sound_device, music2_w)
+	AM_RANGE(0x6010, 0x601f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
+	AM_RANGE(0x6020, 0x602f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
 	AM_RANGE(0x6030, 0x603f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
 
