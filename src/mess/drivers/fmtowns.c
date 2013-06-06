@@ -1562,7 +1562,7 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	lba2 = m_towns_cd.parameter[4] << 16;
 	lba2 += m_towns_cd.parameter[3] << 8;
 	lba2 += m_towns_cd.parameter[2];
-	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
+	m_towns_cd.cdda_current = msf_to_lbafm(lba1) + 150;  // don't include gaps
 	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current;
 
 	m_cdda->set_cdrom(device->get_cdrom_file());
