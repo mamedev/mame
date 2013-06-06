@@ -936,6 +936,26 @@ private:
 #define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask = U64(0xffffffffffffffff))
 
 
+// device delegate macros
+#define READ8_DELEGATE(_class, _member)						read8_delegate(FUNC(_class::_member), this)
+#define WRITE8_DELEGATE(_class, _member)					write8_delegate(FUNC(_class::_member), this)
+#define READ16_DELEGATE(_class, _member)					read16_delegate(FUNC(_class::_member), this)
+#define WRITE16_DELEGATE(_class, _member)					write16_delegate(FUNC(_class::_member), this)
+#define READ32_DELEGATE(_class, _member)					read32_delegate(FUNC(_class::_member), this)
+#define WRITE32_DELEGATE(_class, _member)					write32_delegate(FUNC(_class::_member), this)
+#define READ64_DELEGATE(_class, _member)					read64_delegate(FUNC(_class::_member), this)
+#define WRITE64_DELEGATE(_class, _member)					write64_delegate(FUNC(_class::_member), this)
+
+#define READ8_DEVICE_DELEGATE(_class, _device, _member)		read8_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE8_DEVICE_DELEGATE(_class, _device, _member)	write8_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ16_DEVICE_DELEGATE(_class, _device, _member)	read16_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE16_DEVICE_DELEGATE(_class, _device, _member)	write16_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ32_DEVICE_DELEGATE(_class, _device, _member)	read32_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE32_DEVICE_DELEGATE(_class, _device, _member)	write32_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ64_DEVICE_DELEGATE(_class, _device, _member)	read64_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE64_DEVICE_DELEGATE(_class, _device, _member)	write64_delegate(FUNC(_class::_member), (_class *)_device)
+
+
 // helper macro for merging data with the memory mask
 #define COMBINE_DATA(varptr)            (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
 
