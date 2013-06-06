@@ -7,16 +7,16 @@ yiq_enable              0/1             Enables YIQ-colorspace post-processing. 
                                         performance drop but gives a much more authentic
                                         NTSC TV appearance on TV-based systems when configured
                                         properly.
-hlslpath                [path]          Path to the .fx files that are in use. (default: hlsl)
-hlsl_ini_read           0/1             Enable HLSL INI reading.
-hlsl_ini_write          0/1             Enable HLSL INI writing.
-hlslini             	%g              HLSL INI file name for running game. (default: %g)
-hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X (0 for auto).
-hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y (0 for auto).
-hlsl_preset             0-3             HLSL preset to use.
-hlsl_write              0/1		Enable HLSL AVI writing (huge disk bandwidth suggested).
-hlsl_snap_width         [width]         HLSL upscaled-snapshot width. (default: 2048)
-hlsl_snap_height    	[height]        HLSL upscaled-snapshot height. (default: 1536)
+hlslpath                [path]          Path to the .fx files that are in use.  (default: hlsl)
+hlsl_ini_read           0/1             Enable HLSL INI reading.  (default: 0) 
+hlsl_ini_write          0/1             Enable HLSL INI writing.  (default: 0)
+hlslini             	%g              HLSL INI file name for running game.  (default: %g)
+hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
+hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
+hlsl_preset             -1 through 3    HLSL preset to use.  (default: -1)
+hlsl_write              0/1		Enable HLSL AVI writing.  (huge disk bandwidth suggested)
+hlsl_snap_width         [width]         HLSL upscaled-snapshot width.  (default: 2048)
+hlsl_snap_height    	[height]        HLSL upscaled-snapshot height.  (default: 1536)
 
 
 Surface/Color Processing Parameters
@@ -25,8 +25,8 @@ Surface/Color Processing Parameters
 Name                    Values		Description
 shadow_mask_alpha       0.0 to 1.0      The ovearll darkness of each shadow mask pixel.
 shadow_mask_texture     [filename]      A PNG that defines the shadow mask for each pixel.
-shadow_mask_x_count     1+              The count of shadow mask elements, X (usually 640-ish)
-shadow_mask_y_count     1+              The count of shadow mask elements, X (usually 480-ish)
+shadow_mask_x_count     1+              The count of shadow mask elements, X (usually 640-ish).
+shadow_mask_y_count     1+              The count of shadow mask elements, Y (usually 480-ish).
 shadow_mask_usize       0.0 to 1.0      These parameters define the *in-use* pixel count on the
 shadow_mask_vsize       0.0 to 1.0      X and Y axes of the shadow mask texture.
 curvature               0.0 to 1.0      Screen curvature. Affects borders and shadow mask.
@@ -76,14 +76,40 @@ NTSC Processing Parameters
 --------------------------
 
 Name                    Default Values  Description
-yiq_cc                  3.59754545      Color Carrier frequency for NTSC signal processing
-yiq_a                   0.5             A value for NTSC signal processing
-yiq_b                   0.5             B value for NTSC signal processing
-yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing
-yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing
-yiq_n                   1.0             Y filter notch width for NTSC signal processing
-yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing
-yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing
-yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing
-yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing (in usec)
-yiq_phase_count         2               Phase Count value for NTSC signal processing (3 for NES, else 2)
+yiq_cc                  3.59754545      Color Carrier frequency for NTSC signal processing.
+yiq_a                   0.5             A value for NTSC signal processing.
+yiq_b                   0.5             B value for NTSC signal processing.
+yiq_o                   0.0             Outgoing Color Carrier phase offset for NTSC signal processing.
+yiq_p                   1.0             Incoming Pixel Clock scaling value for NTSC signal processing.
+yiq_n                   1.0             Y filter notch width for NTSC signal processing.
+yiq_y                   6.0             Y filter cutoff frequency for NTSC signal processing.
+yiq_i                   1.2             I filter cutoff frequency for NTSC signal processing.
+yiq_q                   0.6             Q filter cutoff frequency for NTSC signal processing.
+yiq_scan_time           52.6            Horizontal scanline duration for NTSC signal processing. (usec)
+yiq_phase_count         2               Phase Count value for NTSC signal processing. (3 for NES, else 2)
+
+
+Vector Post-Processing Options
+------------------------------
+Name                    Default Values  Description
+vector_length_scale     0.8             How much length affects vector fade.  (0.00-1.00)
+vector_length_ratio     500.0           Vector fade length (4.0 - vectors fade the most at and above 4
+                                        pixels, etc.)  (0.000 - 1000.000)
+
+
+Bloom Post-Processing Options
+-----------------------------
+Name                    Default Values  Description
+vector_bloom_scale      0.300           Intensity factor for vector bloom.  (0.000-1.000)
+raster_bloom_scale      0.225           Intensity factor for raster bloom.  (0.000-1.000)
+bloom_lvl0_weight       1.00            Bloom level 0  (full-size target) weight.  (0.00-1.00)
+bloom_lvl1_weight       0.21            Bloom level 1  (half-size target) weight.  (0.00-1.00)
+bloom_lvl2_weight       0.19            Bloom level 2  (quarter-size target) weight.  (0.00-1.00)
+bloom_lvl3_weight       0.17            Bloom level 3  (.) weight.  (0.00-1.00)
+bloom_lvl4_weight       0.14            Bloom level 4  (.) weight.  (0.00-1.00)
+bloom_lvl5_weight       0.14            Bloom level 5  (.) weight.  (0.00-1.00)
+bloom_lvl6_weight       0.13            Bloom level 6  (.) weight.  (0.00-1.00)
+bloom_lvl7_weight       0.12            Bloom level 7  (.) weight.  (0.00-1.00)
+bloom_lvl8_weight       0.11            Bloom level 8  (.) weight.  (0.00-1.00)
+bloom_lvl9_weight       0.10            Bloom level 9  (.) weight.  (0.00-1.00)
+bloom_lvl10_weight      0.09            Bloom level 10 (1x1 target) weight.  (0.00-1.00)
