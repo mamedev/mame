@@ -102,13 +102,12 @@ INLINE void convert_present_params(const present_parameters *params, D3DPRESENT_
 //  drawd3d9_init
 //============================================================
 
-base *drawd3d9_init(void)
+base *drawd3d9_init()
 {
 	direct3dcreate9_ptr direct3dcreate9;
 	HINSTANCE dllhandle;
 	IDirect3D9 *d3d9;
 	base *d3dptr;
-	bool post_available = true;
 
 	// dynamically grab the create function from d3d9.dll
 	dllhandle = LoadLibrary(TEXT("d3d9.dll"));
@@ -139,39 +138,13 @@ base *drawd3d9_init(void)
 	}
 
 	// dynamically grab the shader load function from d3dx9.dll
-	HINSTANCE fxhandle = LoadLibrary(TEXT("d3dx9_43.dll"));
-	if (fxhandle == NULL)
-	{
-		post_available = false;
-		mame_printf_verbose("Direct3D: Warning - Unable to access d3dx9_43.dll; disabling post-effect rendering\n");
-	}
-
-	// import the create function
-	if(post_available)
-	{
-		g_load_effect = (direct3dx9_loadeffect_ptr)GetProcAddress(fxhandle, "D3DXCreateEffectFromFileW");
-		if (g_load_effect == NULL)
-		{
-			printf("Direct3D: Unable to find D3DXCreateEffectFromFileW\n");
-			FreeLibrary(dllhandle);
-			fxhandle = NULL;
-			dllhandle = NULL;
-			return NULL;
-		}
-	}
-	else
-	{
-		g_load_effect = NULL;
-		post_available = false;
-		mame_printf_verbose("Direct3D: Warning - Unable to get a handle to D3DXCreateEffectFromFileW; disabling post-effect rendering\n");
-	}
+	g_load_effect = NULL;
 
 	// allocate an object to hold our data
 	d3dptr = global_alloc(base);
 	d3dptr->version = 9;
 	d3dptr->d3dobj = d3d9;
 	d3dptr->dllhandle = dllhandle;
-	d3dptr->post_fx_available = post_available;
 	set_interfaces(d3dptr);
 
 	mame_printf_verbose("Direct3D: Using Direct3D 9\n");

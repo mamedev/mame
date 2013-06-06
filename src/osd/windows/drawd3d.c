@@ -217,7 +217,6 @@ static void drawd3d_window_destroy(win_window_info *window);
 static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
 static void drawd3d_window_save(win_window_info *window);
 static void drawd3d_window_record(win_window_info *window);
-static void drawd3d_window_toggle_fsfx(win_window_info *window);
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
 
 
@@ -251,22 +250,12 @@ static void drawd3d_exit(void)
 		(*d3dintf->d3d.release)(d3dintf);
 }
 
-static void drawd3d_window_toggle_fsfx(win_window_info *window)
-{
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->set_restarting(true);
-}
-
 static void drawd3d_window_record(win_window_info *window)
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->get_shaders()->window_record();
 }
 
 static void drawd3d_window_save(win_window_info *window)
 {
-	d3d::renderer *d3d = (d3d::renderer *)window->drawdata;
-	d3d->get_shaders()->window_save();
 }
 
 
@@ -282,9 +271,6 @@ static void drawd3d_window_destroy(win_window_info *window)
 	// skip if nothing
 	if (d3d == NULL)
 		return;
-
-	if (d3d->get_shaders()->recording())
-		d3d->get_shaders()->window_record();
 
 	// free the memory in the window
 	global_free(d3d);
@@ -332,7 +318,6 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_draw = drawd3d_window_draw;
 	callbacks->window_save = drawd3d_window_save;
 	callbacks->window_record = drawd3d_window_record;
-	callbacks->window_toggle_fsfx = drawd3d_window_toggle_fsfx;
 	callbacks->window_destroy = drawd3d_window_destroy;
 	return 0;
 }
@@ -369,7 +354,6 @@ void renderer::set_texture(texture_info *texture)
 		m_last_texture = texture;
 		m_last_texture_flags = (texture == NULL ? 0 : texture->get_flags());
 		HRESULT result = (*d3dintf->device.set_texture)(m_device, 0, (texture == NULL) ? get_default_texture()->get_finaltex() : texture->get_finaltex());
-		m_shaders->set_texture(texture);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 	}
 }
@@ -631,111 +615,7 @@ texture_info *texture_manager::find_texinfo(const render_texinfo *texinfo, UINT3
 			texture->get_texinfo().height == texinfo->height &&
 			((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		{
-			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
-			if (m_renderer->get_shaders()->enabled() && texinfo->width != 0 && texinfo->height != 0 && (flags & PRIMFLAG_SCREENTEX_MASK) != 0)
-			{
-				if (m_renderer->get_shaders()->find_render_target(texture) != NULL)
-				{
-					return texture;
-				}
-			}
-			else
-			{
-				return texture;
-			}
-		}
-	}
-
-	// Nothing found
-	/*int checkidx = 0;
-	for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != NULL; texture = texture->get_next())
-	{
-	    printf("Checking texture index %d\n", checkidx);
-	    UINT32 test_screen = (UINT32)texture->get_texinfo().osddata >> 1;
-	    UINT32 test_page = (UINT32)texture->get_texinfo().osddata & 1;
-	    UINT32 prim_screen = (UINT32)texinfo->osddata >> 1;
-	    UINT32 prim_page = (UINT32)texinfo->osddata & 1;
-	    if (test_screen != prim_screen || test_page != prim_page)
-	    {
-	        printf("No screen/page match: %d vs. %d, %d vs. %d\n", test_screen, prim_screen, test_page, prim_page);
-	        continue;
-	    }
-
-	    if (texture->get_hash() == hash &&
-	        texture->get_texinfo().base == texinfo->base &&
-	        texture->get_texinfo().width == texinfo->width &&
-	        texture->get_texinfo().height == texinfo->height &&
-	        ((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
-	    {
-	        // Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
-	        if (m_renderer->get_shaders()->enabled() && texinfo->width != 0 && texinfo->height != 0 && (flags & PRIMFLAG_SCREENTEX_MASK) != 0)
-	        {
-	            if (m_renderer->get_shaders()->find_render_target(texture) != NULL)
-	            {
-	                return texture;
-	            }
-	        }
-	        else
-	        {
-	            return texture;
-	        }
-	    }
-
-	    if (texture->get_hash() != hash)
-	    {
-	        printf("No hash match: %d vs. %d\n", texture->get_hash(), hash);
-	    }
-	    if (texture->get_texinfo().base != texinfo->base)
-	    {
-	        printf("No base match\n");
-	    }
-	    if (texture->get_texinfo().width != texinfo->width)
-	    {
-	        printf("No width match: %d vs. %d\n", texture->get_texinfo().width, texinfo->width);
-	    }
-	    if (texture->get_texinfo().height != texinfo->height)
-	    {
-	        printf("No height match: %d vs. %d\n", texture->get_texinfo().height, texinfo->height);
-	    }
-	    if (((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) != 0)
-	    {
-	        printf("No flag match: %08x & %08x = %08x\n", texture->get_flags(), flags, ((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)));
-	    }
-	    printf("\n");
-	    checkidx++;
-	}
-
-	printf("\n\n\n\n");*/
-
-	// Nothing found, check if we need to unregister something with HLSL
-	if (m_renderer->get_shaders()->enabled())
-	{
-		if (texinfo->width == 0 || texinfo->height == 0)
-		{
-			return NULL;
-		}
-
-		UINT32 prim_screen = texinfo->osddata >> 1;
-		UINT32 prim_page = texinfo->osddata & 1;
-
-		for (texture = m_renderer->get_texture_manager()->get_texlist(); texture != NULL; texture = texture->get_next())
-		{
-			UINT32 test_screen = texture->get_texinfo().osddata >> 1;
-			UINT32 test_page = texture->get_texinfo().osddata & 1;
-			if (test_screen != prim_screen || test_page != prim_page)
-			{
-				continue;
-			}
-
-			// Clear out our old texture reference
-			if (texture->get_hash() == hash &&
-				texture->get_texinfo().base == texinfo->base &&
-				((texture->get_flags() ^ flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
-				(texture->get_texinfo().width != texinfo->width ||
-					texture->get_texinfo().height != texinfo->height))
-			{
-				m_renderer->get_shaders()->remove_render_target(texture);
-			}
+			return texture;
 		}
 	}
 
@@ -747,14 +627,12 @@ renderer::renderer(win_window_info *window)
 	m_device = NULL;
 	m_restarting = false;
 	m_window = window;
-	m_shaders = NULL;
 	m_numverts = 0;
 	m_numpolys = 0;
 	m_vertexbuf = NULL;
 	m_lockedbuf = NULL;
 	m_vectorbatch = NULL;
 	m_last_texture = NULL;
-	m_hlsl_buf = NULL;
 	m_texture_manager = NULL;
 }
 
@@ -780,8 +658,6 @@ int renderer::pre_window_draw_check()
 	// if we're restarting the renderer, leave things alone
 	if (m_restarting)
 	{
-		m_shaders->toggle();
-
 		// free all existing resources and re-create
 		device_delete_resources();
 		device_create_resources();
@@ -835,13 +711,6 @@ void texture_manager::update_textures()
 				}
 			}
 		}
-		else if(m_renderer->get_shaders()->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
-		{
-			if (!m_renderer->get_shaders()->get_vector_target())
-			{
-				m_renderer->get_shaders()->create_vector_target(prim);
-			}
-		}
 	}
 }
 
@@ -849,8 +718,6 @@ void renderer::begin_frame()
 {
 	HRESULT result = (*d3dintf->device.clear)(m_device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
-
-	m_shaders->begin_frame();
 
 	m_window->primlist->acquire_lock();
 
@@ -864,12 +731,6 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 
 	m_lockedbuf = NULL;
 
-	if(m_shaders->enabled())
-	{
-		m_hlsl_buf = (void*)mesh_alloc(6);
-		m_shaders->init_fsfx_quad(m_hlsl_buf);
-	}
-
 	m_line_count = 0;
 	// loop over primitives
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
@@ -879,11 +740,6 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 
 void renderer::process_primitives()
 {
-	if (m_line_count && m_shaders->enabled() && d3dintf->post_fx_available)
-	{
-		batch_vectors();
-	}
-
 	// Rotating index for vector time offsets
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 	{
@@ -908,11 +764,6 @@ void renderer::process_primitives()
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}
 	}
-
-	if (m_line_count && !(m_shaders->enabled() && d3dintf->post_fx_available))
-	{
-		batch_vectors();
-	}
 }
 
 void renderer::end_frame()
@@ -921,8 +772,6 @@ void renderer::end_frame()
 
 	// flush any pending polygons
 	primitive_flush_pending();
-
-	m_shaders->end_frame();
 
 	// finish the scene
 	HRESULT result = (*d3dintf->device.end_scene)(m_device);
@@ -1053,10 +902,6 @@ try_again:
 		}
 	}
 
-	int ret = m_shaders->create_resources(false);
-	if (ret != 0)
-		return ret;
-
 	return device_create_resources();
 }
 
@@ -1072,7 +917,7 @@ int renderer::device_create_resources()
 	HRESULT result = (*d3dintf->device.create_vertex_buffer)(m_device,
 				sizeof(vertex) * VERTEX_BUFFER_SIZE,
 				D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
-				VERTEX_BASE_FORMAT | ((m_shaders->enabled() && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW),
+				VERTEX_BASE_FORMAT | D3DFVF_XYZRHW,
 				D3DPOOL_DEFAULT, &m_vertexbuf);
 	if (result != D3D_OK)
 	{
@@ -1081,8 +926,7 @@ int renderer::device_create_resources()
 	}
 
 	// set the vertex format
-	result = (*d3dintf->device.set_vertex_format)(m_device, (D3DFORMAT)(VERTEX_BASE_FORMAT | ((m_shaders->enabled() &&
-		d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW)));
+	result = (*d3dintf->device.set_vertex_format)(m_device, (D3DFORMAT)(VERTEX_BASE_FORMAT | D3DFVF_XYZRHW));
 	if (result != D3D_OK)
 	{
 		mame_printf_error("Error setting vertex format (%08X)", (UINT32)result);
@@ -1139,12 +983,6 @@ renderer::~renderer()
 
 void renderer::device_delete()
 {
-	// free our effects
-	m_shaders->delete_resources(false);
-
-	// delete the HLSL interface
-	global_free(m_shaders);
-
 	// free our base resources
 	device_delete_resources();
 
@@ -1186,20 +1024,10 @@ int renderer::device_verify_caps()
 {
 	int retval = 0;
 
-	m_shaders = global_alloc_clear(shaders);
-	m_shaders->init(d3dintf, m_window);
-
 	DWORD tempcaps;
-	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
-	if (result != D3D_OK) mame_printf_verbose("Direct3D Error %08X during get_caps_dword call\n", (int)result);
-	if(tempcaps < 512)
-	{
-		mame_printf_verbose("Direct3D: Warning - Device does not support Pixel Shader 3.0, falling back to non-PS rendering\n");
-		d3dintf->post_fx_available = false;
-	}
 
 	// verify presentation capabilities
-	result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_PRESENTATION_INTERVALS, &tempcaps);
+	HRESULT result = (*d3dintf->d3d.get_caps_dword)(d3dintf, m_adapter, D3DDEVTYPE_HAL, CAPS_PRESENTATION_INTERVALS, &tempcaps);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during get_caps_dword call\n", (int)result);
 	if (!(tempcaps & D3DPRESENT_INTERVAL_IMMEDIATE))
 	{
@@ -1266,7 +1094,6 @@ int renderer::device_test_cooperative()
 
 		// free all existing resources and call reset on the device
 		device_delete_resources();
-		m_shaders->delete_resources(true);
 		result = (*d3dintf->device.reset)(m_device, &m_presentation);
 
 		// if it didn't work, punt to GDI
@@ -1280,13 +1107,6 @@ int renderer::device_test_cooperative()
 		if (device_create_resources())
 		{
 			mame_printf_verbose("Direct3D: failed to recreate resources for device; failing permanently\n");
-			device_delete();
-			return 1;
-		}
-
-		if (m_shaders->create_resources(true))
-		{
-			mame_printf_verbose("Direct3D: failed to recreate HLSL resources for device; failing permanently\n");
 			device_delete();
 			return 1;
 		}
@@ -1544,9 +1364,9 @@ void renderer::batch_vectors()
 	m_vectorbatch = mesh_alloc(m_line_count * vector_size);
 	m_batchindex = 0;
 
-	static int start_index = 0;
-	int line_index = 0;
-	float period = options.screen_vector_time_period();
+	//static int start_index = 0;
+	//int line_index = 0;
+	//float period = options.screen_vector_time_period();
 	UINT32 cached_flags = 0;
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 	{
@@ -1555,14 +1375,14 @@ void renderer::batch_vectors()
 			case render_primitive::LINE:
 				if (PRIMFLAG_GET_VECTOR(prim->flags))
 				{
-					if (period == 0.0f || m_line_count == 0)
+					/*if (period == 0.0f || m_line_count == 0)
 					{
 						batch_vector(prim, 1.0f);
 					}
-					else
+					else*/
 					{
-						batch_vector(prim, (float)(start_index + line_index) / ((float)m_line_count * period));
-						line_index++;
+						batch_vector(prim, 1.0f);//(float)(start_index + line_index) / ((float)m_line_count * period));
+						//line_index++;
 					}
 					cached_flags = prim->flags;
 				}
@@ -1579,11 +1399,11 @@ void renderer::batch_vectors()
 		m_texture_manager->get_vector_texture(), D3DTOP_MODULATE, 0.0f, 1.0f, 0.0f, 0.0f);
 	m_numpolys++;
 
-	start_index += (int)((float)line_index * period);
-	if (m_line_count > 0)
-	{
-		start_index %= m_line_count;
-	}
+	//start_index += (int)((float)line_index * period);
+	//if (m_line_count > 0)
+	//{
+	//	start_index %= m_line_count;
+	//}
 }
 
 void renderer::batch_vector(const render_primitive *prim, float line_time)
@@ -1879,14 +1699,7 @@ vertex *renderer::mesh_alloc(int numverts)
 	// if we're going to overflow, flush
 	if (m_lockedbuf != NULL && m_numverts + numverts >= VERTEX_BUFFER_SIZE)
 	{
-		printf("request for %d verts\n", numverts);
 		primitive_flush_pending();
-
-		if(m_shaders->enabled())
-		{
-			m_hlsl_buf = (void*)mesh_alloc(6);
-			m_shaders->init_fsfx_quad(m_hlsl_buf);
-		}
 	}
 
 	// if we don't have a lock, grab it now
@@ -1930,13 +1743,7 @@ void renderer::primitive_flush_pending()
 	result = (*d3dintf->device.set_stream_source)(m_device, 0, m_vertexbuf, sizeof(vertex));
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_stream_source call\n", (int)result);
 
-	m_shaders->begin_draw();
-
 	int vertnum = 0;
-	if (m_shaders->enabled())
-	{
-		vertnum = 6;
-	}
 
 	// now do the polys
 	for (int polynum = 0; polynum < m_numpolys; polynum++)
@@ -1957,8 +1764,6 @@ void renderer::primitive_flush_pending()
 			set_filter(newfilter);
 			set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 			set_modmode(m_poly[polynum].get_modmode());
-
-			m_shaders->init_effect_info(&m_poly[polynum]);
 		}
 
 		// set the blendmode if different
@@ -1972,22 +1777,13 @@ void renderer::primitive_flush_pending()
 
 		assert(vertnum + m_poly[polynum].get_vertcount() <= m_numverts);
 
-		if(m_shaders->enabled() && d3dintf->post_fx_available)
-		{
-			m_shaders->render_quad(&m_poly[polynum], vertnum);
-		}
-		else
-		{
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(m_device, m_poly[polynum].get_type(), vertnum,
-														m_poly[polynum].get_count());
-			if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		}
+		// add the primitives
+		result = (*d3dintf->device.draw_primitive)(m_device, m_poly[polynum].get_type(), vertnum,
+													m_poly[polynum].get_count());
+		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 
 		vertnum += m_poly[polynum].get_vertcount();
 	}
-
-	m_shaders->end_draw();
 
 	// reset the vertex count
 	m_numverts = 0;
@@ -2117,12 +1913,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 				{
 					m_d3dfinaltex = m_d3dtex;
 					m_type = m_texture_manager->is_dynamic_supported() ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-
-					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_texture(this))
-					{
-						goto error;
-					}
-
 					break;
 				}
 			}
@@ -2162,10 +1952,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 				result = (*d3dintf->device.create_texture)(m_renderer->get_device(), scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &m_d3dfinaltex);
 				if (result == D3D_OK)
 				{
-					if (m_renderer->get_shaders()->enabled() && !m_renderer->get_shaders()->register_prescaled_texture(this))
-					{
-						goto error;
-					}
 					break;
 				}
 				(*d3dintf->texture.release)(m_d3dtex);
@@ -2187,7 +1973,6 @@ texture_info::texture_info(texture_manager *manager, const render_texinfo* texso
 	return;
 
 error:
-	d3dintf->post_fx_available = false;
 	printf("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
 	if (m_d3dsurface != NULL)
 		(*d3dintf->surface.release)(m_d3dsurface);

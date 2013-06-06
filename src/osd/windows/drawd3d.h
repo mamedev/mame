@@ -43,9 +43,6 @@
 #define __WIN_DRAWD3D__
 
 
-#include "d3dhlsl.h"
-
-
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -201,8 +198,6 @@ public:
 	texture_info *          get_default_texture() { return m_texture_manager->get_default_texture(); }
 	texture_info *          get_vector_texture() { return m_texture_manager->get_vector_texture(); }
 
-	shaders *               get_shaders() { return m_shaders; }
-
 private:
 	int                     m_adapter;                  // ordinal adapter number
 	int                     m_width;                    // current width
@@ -243,9 +238,6 @@ private:
 	int                     m_last_filter;              // previous texture filter
 	D3DTEXTUREADDRESS       m_last_wrap;                // previous wrap state
 	DWORD                   m_last_modmode;             // previous texture modulation
-
-	void *                  m_hlsl_buf;                 // HLSL vertex data
-	shaders *               m_shaders;                  // HLSL interface
 
 	texture_manager *       m_texture_manager;          // texture manager
 

@@ -306,7 +306,6 @@ OSDCOREOBJS = \
 OSDOBJS = \
 	$(WINOBJ)/d3d9intf.o \
 	$(WINOBJ)/drawd3d.o \
-	$(WINOBJ)/d3dhlsl.o \
 	$(WINOBJ)/drawdd.o \
 	$(WINOBJ)/drawgdi.o \
 	$(WINOBJ)/drawnone.o \

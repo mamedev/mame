@@ -93,7 +93,6 @@ int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_draw = drawgdi_window_draw;
 	callbacks->window_save = NULL;
 	callbacks->window_record = NULL;
-	callbacks->window_toggle_fsfx = NULL;
 	callbacks->window_destroy = drawgdi_window_destroy;
 	return 0;
 }
