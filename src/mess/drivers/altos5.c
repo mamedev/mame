@@ -40,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(port2e_r);
 	DECLARE_READ8_MEMBER(port2f_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	UINT8 m_port08;
 	UINT8 m_port09;
@@ -208,6 +209,16 @@ static Z80DMA_INTERFACE( dma_intf )
 };
 
 // baud rate generator and RTC. All inputs are 2MHz.
+TIMER_DEVICE_CALLBACK_MEMBER(altos5_state::ctc_tick)
+{
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
+	m_ctc->trg1(1);
+	m_ctc->trg1(0);
+	m_ctc->trg2(1);
+	m_ctc->trg2(0);
+}
+
 WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
 {
 	m_dart->rxca_w(state);
@@ -278,7 +289,7 @@ static Z80DART_INTERFACE( dart_intf )
 
 static Z80SIO_INTERFACE( sio_intf )
 {
-	9600, 9600, 153600, 153600, // rxa, txa, rxb, txb clocks (from CTC)
+	0, 0, 0, 0,
 
 	// console#2
 	DEVCB_NULL, // ChA in data
@@ -364,6 +375,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
 MACHINE_CONFIG_END
 
 
