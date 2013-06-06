@@ -46,6 +46,7 @@ enum
 	GAME_KANDUME,                /* Game no Kandume Otokuyou */
 	RADICA,                      /* Radica TV games.. these probably should be a separate driver since they are a separate 'console' */
 
+	TILESMJ2,                    /* 16 Mahjong Tiles II */
 	BUGSLIFE,                    /* A Bug's Life */
 	CHINFIGHT3,                  /* Chinese Fighters 3 */
 	ELFWOR,                      /* Linghuan Daoshi Super Magician */

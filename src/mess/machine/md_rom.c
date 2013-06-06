@@ -40,6 +40,7 @@ const device_type MD_ROM_KOF98 = &device_creator<md_rom_kof98_device>;
 const device_type MD_ROM_KOF99 = &device_creator<md_rom_kof99_device>;
 const device_type MD_ROM_SOULB = &device_creator<md_rom_soulb_device>;
 const device_type MD_ROM_CHINF3 = &device_creator<md_rom_chinf3_device>;
+const device_type MD_ROM_16MJ2 = &device_creator<md_rom_16mj2_device>;
 const device_type MD_ROM_ELFWOR = &device_creator<md_rom_elfwor_device>;
 const device_type MD_ROM_YASECH = &device_creator<md_rom_yasech_device>;
 const device_type MD_ROM_LION2 = &device_creator<md_rom_lion2_device>;
@@ -150,6 +151,11 @@ md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const ch
 
 md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_CHINF3, "MD Chinese Fighter 3", tag, owner, clock, "md_rom_chinf3", __FILE__)
+{
+}
+
+md_rom_16mj2_device::md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_16MJ2, "MD 16 Mahjong Tiles II", tag, owner, clock, "md_rom_16mj2", __FILE__)
 {
 }
 
@@ -642,6 +648,21 @@ WRITE16_MEMBER(md_rom_chinf3_device::write)
 		else
 			logerror("%06x chifi3, bankw? %04x %04x\n", space.device().safe_pc(), offset, data);
 	}
+}
+
+/*-------------------------------------------------
+ 16 MAHJONG II
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_16mj2_device::read)
+{
+	if (offset == 0x400004/2)   return 0xc900;
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------

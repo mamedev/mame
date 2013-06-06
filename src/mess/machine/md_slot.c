@@ -257,6 +257,7 @@ static const md_slot slot_list[] =
 	{ RADICA, "rom_radica" },
 //  { GAME_KANDUME, "rom_gkand" },  // what's needed by this?
 
+	{ TILESMJ2, "rom_16mj2" },
 	{ BUGSLIFE, "rom_bugs" },
 	{ CHINFIGHT3, "rom_chinf3" },
 	{ ELFWOR, "rom_elfwor" },

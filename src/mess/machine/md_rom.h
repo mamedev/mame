@@ -148,6 +148,18 @@ private:
 	int m_bank;
 };
 
+// ======================> md_rom_16mj2_device
+
+class md_rom_16mj2_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+};
+
 // ======================> md_rom_elfwor_device
 
 class md_rom_elfwor_device : public md_std_rom_device
@@ -518,6 +530,7 @@ extern const device_type MD_STD_ROM;
 extern const device_type MD_ROM_SRAM;
 extern const device_type MD_ROM_FRAM;
 extern const device_type MD_ROM_CM2IN1;
+extern const device_type MD_ROM_16MJ2;
 extern const device_type MD_ROM_BUGSLIFE;
 extern const device_type MD_ROM_CHINF3;
 extern const device_type MD_ROM_ELFWOR;
