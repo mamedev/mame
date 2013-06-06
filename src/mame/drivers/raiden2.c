@@ -1367,7 +1367,7 @@ WRITE16_MEMBER(raiden2_state::cop_sort_dma_trig_w)
 				{
 					case 2: xchg_flag = (vali > valj); break;
 					case 1: xchg_flag = (vali < valj); break;
-					default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
+					default: xchg_flag = 0; /* printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); */ break;
 				}
 
 				if(xchg_flag)
