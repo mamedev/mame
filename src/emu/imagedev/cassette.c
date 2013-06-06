@@ -24,7 +24,7 @@ const cassette_interface default_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	CASSETTE_PLAY,
-	NULL,
+	"cass",
 	NULL
 };
 

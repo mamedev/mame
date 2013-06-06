@@ -1,20 +1,21 @@
-/*****************************************************************************
- *
- * video/epnick.c
- *
- * Nick Graphics Chip - found in Enterprise
- *
- * this is a display list graphics chip, with bitmap,
- * character and attribute graphics modes. Each entry in the
- * display list defines a char line, with variable number of
- * scanlines. Colour modes are 2,4, 16 and 256 colour.
- * Nick has 256 colours, 3 bits for R and G, with 2 bits for Blue.
- * It's a nice and flexible graphics processor..........
- *
- ****************************************************************************/
+/**********************************************************************
 
-#include "emu.h"
-#include "video/epnick.h"
+    Intelligent Designs NICK emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#include "nick.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
 
 /* colour mode types */
 #define NICK_2_COLOUR_MODE  0
@@ -60,27 +61,81 @@
 #define ADDR_CH128(x,y)     (((x & 0x01ff)<<7) | (y & 0x07f))
 #define ADDR_CH64(x,y)      (((x & 0x03ff)<<6) | (y & 0x03f))
 
+/* No of highest resolution pixels per "clock" */
+#define NICK_PIXELS_PER_CLOCK   16
+
+/* "clocks" per line */
+#define NICK_TOTAL_CLOCKS_PER_LINE  64
+
+/* Enterprise has 256 colours, all may be on the screen at once!
+ the NICK_GET_RED8, NICK_GET_GREEN8, NICK_GET_BLUE8 macros
+ return a 8-bit colour value for the index specified.  */
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_RED8(x) \
+	((      \
+		(BIT(x, 0) << 2) | \
+		(BIT(x, 3) << 1) | \
+		(BIT(x, 6) << 0) \
+	) << 5)
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_GREEN8(x) \
+	((  \
+		(BIT(x, 1) << 2) | \
+		(BIT(x, 4) << 1) | \
+		(BIT(x, 7) << 0) \
+	) << 5)
+
+/* given a colour index in range 0..255 gives the Red component */
+#define NICK_GET_BLUE8(x) \
+	(( \
+		(BIT(x, 2) << 1) | \
+		(BIT(x, 5) << 0) \
+	) << 6)
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
 
 const device_type NICK = &device_creator<nick_device>;
 
+
+DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(vram_r, vram_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
+	AM_RANGE(0x00, 0x00) AM_WRITE(fixbias_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(border_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(lpl_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(lph_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nick_map, AS_0, 8, nick_device )
+	AM_RANGE(0x0000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
 //-------------------------------------------------
-//  stic_device - constructor
+//  nick_device - constructor
 //-------------------------------------------------
 
-nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-			device_t(mconfig, NICK, "Nick Graphics Chip", tag, owner, clock, "epnick", __FILE__),
-			m_videoram(NULL)
+nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NICK, "NICK", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
+	  m_write_virq(*this)
 {
 }
 
-
-//-------------------------------------------------
-//  ~stic_device - destructor
-//-------------------------------------------------
-
-nick_device::~nick_device()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -88,12 +143,23 @@ nick_device::~nick_device()
 
 void nick_device::device_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
-	
+	screen_device *screen = machine().first_screen();
+
+	screen->register_screen_bitmap(m_bitmap);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 
-	bitmap_ind16 m_bitmap;
-	
+	// initialize palette
+	for (int i = 0; i < 256; i++)
+		palette_set_color_rgb(machine(), i, NICK_GET_RED8(i), NICK_GET_GREEN8(i), NICK_GET_BLUE8(i));
+
+	// resolve callbacks
+	m_write_virq.resolve_safe();
+
+	// allocate timers
+	m_timer_scanline = timer_alloc();
+	m_timer_scanline->adjust(screen->time_until_pos(0, 0), 0, screen->scan_period());
+
+	// state saving
 	save_item(NAME(m_scanline_count));
 	save_item(NAME(m_FIXBIAS));
 	save_item(NAME(m_BORDER));
@@ -118,8 +184,15 @@ void nick_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
 void nick_device::device_reset()
-{	
+{
+	m_write_virq(CLEAR_LINE);
+	m_virq = 0;
+
 	for (int i = 0; i < 256; i++)
 	{
 		int pen_index;
@@ -130,9 +203,116 @@ void nick_device::device_reset()
 		pen_index =  (BIT(i, 7) << 0) | (BIT(i, 3) << 1) |  (BIT(i, 5) << 2) | (BIT(i, 1) << 3);
 		m_pen_idx_16col[i] = pen_index;
 	}
-	
-	//m_BORDER = 0;
-	//m_FIXBIAS = 0;
+
+	m_scanline_count = 0;
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	int scanline = machine().first_screen()->vpos();
+
+	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
+	{
+		/* set write address for line */
+		m_dest = &m_bitmap.pix16(scanline);
+		m_dest_pos = 0;
+		m_dest_max_pos = m_bitmap.width();
+
+		/* write line */
+		do_line();
+	}
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *nick_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+//-------------------------------------------------
+//  update_screen - update screen
+//-------------------------------------------------
+
+UINT32 nick_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  vram_r - video RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( nick_device::vram_r )
+{
+	return m_addrspace[0]->read_byte(offset);
+}
+
+
+//-------------------------------------------------
+//  vram_w - video RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( nick_device::vram_w )
+{
+	m_addrspace[0]->write_byte(offset, data);
+}
+
+
+//-------------------------------------------------
+//  fixbias_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( nick_device::fixbias_w )
+{
+	m_FIXBIAS = data;
+}
+
+
+//-------------------------------------------------
+//  border_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( nick_device::border_w )
+{
+	m_BORDER = data;
+}
+
+
+//-------------------------------------------------
+//  lpl_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( nick_device::lpl_w )
+{
+	m_LPL = m_reg[2] = data;
+
+	update_lpt();
+}
+
+
+//-------------------------------------------------
+//  lph_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( nick_device::lph_w )
+{
+	m_LPH = m_reg[3] = data;
+
+	update_lpt();
 }
 
 
@@ -145,13 +325,6 @@ void nick_device::write_pixel(int ci)
 		m_dest[m_dest_pos++] = ci;
 	}
 }
-
-
-/* No of highest resolution pixels per "clock" */
-#define NICK_PIXELS_PER_CLOCK   16
-
-/* "clocks" per line */
-#define NICK_TOTAL_CLOCKS_PER_LINE  64
 
 /* we align based on the clocks */
 void nick_device::calc_visible_clocks(int width)
@@ -572,10 +745,10 @@ void nick_device::do_pixel(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
 
-		buf2 = fetch_byte(m_LD1);
+		buf2 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
 
 		write_pixels(buf1, buf1);
@@ -590,7 +763,7 @@ void nick_device::do_lpixel(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
 
 		write_pixels_lpixel(buf1, buf1);
@@ -603,10 +776,10 @@ void nick_device::do_attr(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
 
-		buf2 = fetch_byte(m_LD2);
+		buf2 = m_addrspace[0]->read_byte(m_LD2);
 		m_LD2++;
 
 		{
@@ -624,9 +797,9 @@ void nick_device::do_ch256(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
-		buf2 = fetch_byte(ADDR_CH256(m_LD2, buf1));
+		buf2 = m_addrspace[0]->read_byte(ADDR_CH256(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -638,9 +811,9 @@ void nick_device::do_ch128(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
-		buf2 = fetch_byte(ADDR_CH128(m_LD2, buf1));
+		buf2 = m_addrspace[0]->read_byte(ADDR_CH128(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -652,9 +825,9 @@ void nick_device::do_ch64(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = fetch_byte(m_LD1);
+		buf1 = m_addrspace[0]->read_byte(m_LD1);
 		m_LD1++;
-		buf2 = fetch_byte(ADDR_CH64(m_LD2, buf1));
+		buf2 = m_addrspace[0]->read_byte(ADDR_CH64(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -777,28 +950,38 @@ void nick_device::reload_lpt()
 	UINT32 LPT_Addr = ((m_LPL & 0x0ff) << 4) | ((m_LPH & 0x0f) << (8+4));
 
 	/* update internal LPT state */
-	m_LPT.SC = fetch_byte(LPT_Addr);
-	m_LPT.MB = fetch_byte(LPT_Addr + 1);
-	m_LPT.LM = fetch_byte(LPT_Addr + 2);
-	m_LPT.RM = fetch_byte(LPT_Addr + 3);
-	m_LPT.LD1L = fetch_byte(LPT_Addr + 4);
-	m_LPT.LD1H = fetch_byte(LPT_Addr + 5);
-	m_LPT.LD2L = fetch_byte(LPT_Addr + 6);
-	m_LPT.LD2H = fetch_byte(LPT_Addr + 7);
-	m_LPT.COL[0] = fetch_byte(LPT_Addr + 8);
-	m_LPT.COL[1] = fetch_byte(LPT_Addr + 9);
-	m_LPT.COL[2] = fetch_byte(LPT_Addr + 10);
-	m_LPT.COL[3] = fetch_byte(LPT_Addr + 11);
-	m_LPT.COL[4] = fetch_byte(LPT_Addr + 12);
-	m_LPT.COL[5] = fetch_byte(LPT_Addr + 13);
-	m_LPT.COL[6] = fetch_byte(LPT_Addr + 14);
-	m_LPT.COL[7] = fetch_byte(LPT_Addr + 15);
+	m_LPT.SC = m_addrspace[0]->read_byte(LPT_Addr);
+	m_LPT.MB = m_addrspace[0]->read_byte(LPT_Addr + 1);
+	m_LPT.LM = m_addrspace[0]->read_byte(LPT_Addr + 2);
+	m_LPT.RM = m_addrspace[0]->read_byte(LPT_Addr + 3);
+	m_LPT.LD1L = m_addrspace[0]->read_byte(LPT_Addr + 4);
+	m_LPT.LD1H = m_addrspace[0]->read_byte(LPT_Addr + 5);
+	m_LPT.LD2L = m_addrspace[0]->read_byte(LPT_Addr + 6);
+	m_LPT.LD2H = m_addrspace[0]->read_byte(LPT_Addr + 7);
+	m_LPT.COL[0] = m_addrspace[0]->read_byte(LPT_Addr + 8);
+	m_LPT.COL[1] = m_addrspace[0]->read_byte(LPT_Addr + 9);
+	m_LPT.COL[2] = m_addrspace[0]->read_byte(LPT_Addr + 10);
+	m_LPT.COL[3] = m_addrspace[0]->read_byte(LPT_Addr + 11);
+	m_LPT.COL[4] = m_addrspace[0]->read_byte(LPT_Addr + 12);
+	m_LPT.COL[5] = m_addrspace[0]->read_byte(LPT_Addr + 13);
+	m_LPT.COL[6] = m_addrspace[0]->read_byte(LPT_Addr + 14);
+	m_LPT.COL[7] = m_addrspace[0]->read_byte(LPT_Addr + 15);
 }
 
 /* call here to render a line of graphics */
 void nick_device::do_line()
 {
 	UINT8 scanline;
+
+	m_write_virq((m_LPT.MB & NICK_MB_VIRQ) ? ASSERT_LINE : CLEAR_LINE);
+
+	if (m_virq && !(m_LPT.MB & NICK_MB_VIRQ))
+	{
+		screen_device *screen = machine().first_screen();
+		m_timer_scanline->adjust(screen->time_until_pos(0, 0), 0, screen->scan_period());
+	}
+
+	m_virq = (m_LPT.MB & NICK_MB_VIRQ) ? 1 : 0;
 
 	if ((m_LPT.MB & NICK_MB_LPT_RELOAD)!=0)
 	{
@@ -837,66 +1020,4 @@ void nick_device::do_line()
 		update_lpt();
 		reload_lpt();
 	}
-}
-
-WRITE8_MEMBER( nick_device::reg_w )
-{
-	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
-
-	/* write to a nick register */
-	m_reg[offset & 0x0f] = data;
-
-	if ((offset == 0x03) || (offset == 0x02))
-	{
-		/* write LPH */
-
-		/* reload LPT base? */
-		//if (NICK_RELOAD_LPT(data))
-		{
-			/* reload LPT base pointer */
-			m_LPL = m_reg[2];
-			m_LPH = m_reg[3];
-
-			reload_lpt();
-		}
-	}
-
-	if (offset == 0x01)
-	{
-		m_BORDER = data;
-	}
-
-	if (offset == 0x00)
-	{
-		m_FIXBIAS = data;
-	}
-}
-
-void nick_device::do_screen(bitmap_ind16 &bm)
-{
-	int line = 0;
-
-	do
-	{
-		/* set write address for line */
-		m_dest = &bm.pix16(line);
-		m_dest_pos = 0;
-		m_dest_max_pos = bm.width();
-
-		/* write line */
-		do_line();
-
-		/* next line */
-		line++;
-	}
-	while (((m_LPT.MB & 0x080) == 0) && (line < ENTERPRISE_SCREEN_HEIGHT));
-
-}
-
-
-UINT32 nick_device::screen_update_epnick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	do_screen(m_bitmap);
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	return 0;
 }

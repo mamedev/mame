@@ -1,6 +1,35 @@
-#ifndef __EPNICK_H__
-#define __EPNICK_H__
+/**********************************************************************
 
+    Intelligent Designs NICK emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#pragma once
+
+#ifndef __NICK__
+#define __NICK__
+
+#include "emu.h"
+
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MCFG_NICK_ADD(_tag, _screen_tag, _clock, _virq) \
+	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
+	MCFG_SCREEN_REFRESH_RATE(50) \
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
+	MCFG_SCREEN_SIZE(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT) \
+	MCFG_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1) \
+	MCFG_SCREEN_UPDATE_DEVICE(_tag, nick_device, screen_update) \
+	MCFG_DEVICE_ADD(_tag, NICK, _clock) \
+	downcast<nick_device *>(device)->set_virq_callback(DEVCB2_##_virq); \
+	MCFG_PALETTE_LENGTH(256)
 
 
 /* there are 64us per line, although in reality
@@ -12,6 +41,9 @@
 #define ENTERPRISE_SCREEN_HEIGHT    (35*8)
 
 
+///*************************************************************************
+//  TYPE DEFINITIONS
+///*************************************************************************
 
 /* Nick executes a Display list, in the form of a list of Line Parameter
  Tables, this is the form of the data */
@@ -29,24 +61,44 @@ struct LPT_ENTRY
 };
 
 
-class nick_device : public device_t
+// ======================> nick_device
+
+class nick_device :  public device_t,
+					 public device_memory_interface
 {
 public:
+	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~nick_device();
 
-	void set_vram(UINT8 *vram) { m_videoram = vram; }
-	DECLARE_WRITE8_MEMBER(reg_w);
+	template<class _virq> void set_virq_callback(_virq virq) { m_write_virq.set_callback(virq); }
 
-	UINT32 screen_update_epnick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
+	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	DECLARE_READ8_MEMBER( vram_r );
+	DECLARE_WRITE8_MEMBER( vram_w );
+
+	DECLARE_WRITE8_MEMBER( fixbias_w );
+	DECLARE_WRITE8_MEMBER( border_w );
+	DECLARE_WRITE8_MEMBER( lpl_w );
+	DECLARE_WRITE8_MEMBER( lph_w );
+
+	address_space_config m_space_config;
 
 private:
-	inline UINT8 fetch_byte(UINT32 offs) { return m_videoram[offs & 0x0ffff]; }
+	devcb2_write_line m_write_virq;
+
 	void write_pixel(int ci);
 	void calc_visible_clocks(int width);
 	void init();
@@ -70,9 +122,6 @@ private:
 	void update_lpt();
 	void reload_lpt();
 	void do_line();
-	void do_screen(bitmap_ind16 &bm);
-	
-	bitmap_ind16 m_bitmap;
 
 	/* horizontal position */
 	UINT8 horizontal_clock;
@@ -104,22 +153,18 @@ private:
 	UINT8 m_pen_idx_4col[256];
 	/* given a bit pattern, this will get the pen index */
 	UINT8 m_pen_idx_16col[256];
-	
-	UINT8 *m_videoram;
-};
 
+	int m_virq;
+
+	bitmap_ind16 m_bitmap;
+
+	emu_timer *m_timer_scanline;
+};
 
 
 // device type definition
 extern const device_type NICK;
 
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define MCFG_NICK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NICK, 0)
 
 
 #endif

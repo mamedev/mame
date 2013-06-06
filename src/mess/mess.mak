@@ -1462,9 +1462,11 @@ $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/rex6000.o   \
 
 $(MESSOBJ)/intelgnt.a:          \
+	$(MESS_DRIVERS)/ep64.o      \
 	$(MESS_AUDIO)/dave.o        \
-	$(MESS_VIDEO)/epnick.o      \
-	$(MESS_DRIVERS)/enterp.o    \
+	$(MESS_VIDEO)/nick.o        \
+	$(MESS_MACHINE)/ep64exp.o   \
+	$(MESS_MACHINE)/ep64_exdos.o\
 
 $(MESSOBJ)/interton.a:          \
 	$(MESS_AUDIO)/vc4000.o      \

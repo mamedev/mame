@@ -3,9 +3,9 @@
 <softwarelist name="ep64_cass" description="Enterprise Sixty Four cassettes">
 
 	<software name="3dstarfg">
-		<description>3D Starfighter</description>
+		<description>3D Star Fighter</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Code Masters</publisher>
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="905728">
@@ -17,7 +17,7 @@
 	<software name="airwolf">
 		<description>Airwolf</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Elite</publisher>
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="509952">
@@ -27,9 +27,9 @@
 	</software>
 
 	<software name="nodes">
-		<description>Nodes</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Nodes of Yesod</description>
+		<year>1985</year>
+		<publisher>Odin Computer Graphics</publisher>
 
 		<part name="cass1" interface="ep64_cass">
 			<dataarea name="cass" size="582656">
