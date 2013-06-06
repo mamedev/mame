@@ -9,7 +9,6 @@
     BATTLE SQUADRON             PAL
     BEAVIS & BUTTHEAD               PAL
     CAPTAIN PLANET              ASIA
-    CENTURION                   USA/PAL     needs proper dump
     DAVIS CUP TENNIS                JAPAN
     DYNAMITE HEADDY SAMPLE          JAPAN
     ECCO JR                 USA/PAL     graphic corruption on later revision
@@ -74,7 +73,6 @@ Known undumped pirates
   * Thunderbolt II - 雷電伝説II
   * Magic 7 Block - 百変七巧板
   * Chinese Battle Chess (?) - 戦 棊
-  * 16 Tile Mahjong II (by Gamtec)
 
 NOTE
 
@@ -120,11 +118,28 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Fully documented: confirmed dumps + PCB pics -->
 
 
+<!-- Both Euro and USA confirmed -->
+	<software name="688atsub">
+		<description>688 Attack Sub (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1401 (USA), MK-1401-50 (Euro)"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="u1" value="MPR-13956-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-13956-f.u1" size="1048576" crc="f2c58bf7" sha1="6795b9fc9a21167d94a0b4c9c38d4e11214e1ea7" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 	<software name="6pak">
 		<description>6-Pak (USA)</description>
-		<year>1996</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1717"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A"/>
 			<feature name="ic1" value="MPR-18212-MX"/>
@@ -138,25 +153,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Both Euro and USA confirmed -->
-	<software name="688atsub">
-		<description>688 Attack Sub (Euro, USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978BA"/>
-			<feature name="u1" value="MPR-13956-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-13956-f.u1" size="1048576" crc="f2c58bf7" sha1="6795b9fc9a21167d94a0b4c9c38d4e11214e1ea7" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-
 	<software name="aaahhrm">
-		<description>AAAHH!!! Real Monsters (Euro)</description>
+		<description>Aaahh!!! Real Monsters (Euro)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
+		<info name="serial" value="T-139066-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18558-U"/>
@@ -168,12 +169,28 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro is confirmed -->
+	<software name="abrams">
+		<description>Abrams Battle Tank (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="M-1 Abrams Battle Tank (Box)"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703"/>
+			<feature name="ic1" value="MPR-13846 W53"/>
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13846 w53.ic1" size="524288" crc="1e2f74cf" sha1="65248727b0b52106007ec1193832f16545db5378" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only Euro is confirmed -->
 	<software name="addfam">
 		<description>The Addams Family (Euro, USA)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978B"/>
+			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16147-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16147-f.u1" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="0x000000" loadflag="load16_word_swap"/>
@@ -184,8 +201,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="addfamv">
 		<description>Addams Family Values (Euro)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="serial" value="T-164046-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17991 R60"/>
@@ -200,6 +218,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>The Adventures of Batman &amp; Robin (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1535-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18019-U"/>
@@ -228,6 +247,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Aero the Acro-Bat (Euro)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15056-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-16603-MX"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -242,6 +262,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Aero the Acro-Bat 2 (Euro)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<info name="serial" value="T-15166-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17303"/>
@@ -271,6 +292,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Air Buster - Trouble Specialty Raid Unit (USA)</description>
 		<year>1991</year>
 		<publisher>Kaneko</publisher>
+		<info name="serial" value="T-33026"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13681 S98"/>
@@ -284,7 +306,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	<software name="airdiverj" cloneof="airdiver">
 		<description>Air Diver (Jpn)</description>
 		<year>1990</year>
-		<publisher>Asmik Ace</publisher>
+		<publisher>Asmik</publisher>
 		<info name="serial" value="T-20023"/>
 		<info name="release" value="19900309"/>
 		<info name="alt_title" value="エアダイバー"/>
@@ -302,6 +324,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1058-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15939-H, MPR-15939-T"/>
@@ -312,10 +335,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<!-- Release binary equal with parent -->
 	<software name="aladdina" cloneof="aladdin">
 		<description>Disney's Aladdin (Euro, Alt PCB)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1058-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6330A"/>
 			<feature name="ic1" value="MPR-15959 T66"/>
@@ -350,6 +375,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Disney's Aladdin (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1058"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15750-S"/>
@@ -364,6 +390,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Alex Kidd in the Enchanted Castle (Euro, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1005-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-12608A-S"/>
@@ -377,10 +404,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Both Euro and USA are confirmed -->
 	<software name="alien3a" cloneof="alien3">
 		<description>Alien³ (Euro, USA)</description>
-		<year>1993</year>
+		<year>1992</year>
 		<publisher>Arena Entertainment</publisher>
+		<info name="serial" value="T-81096 (USA), T-81096-50 (Euro)"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="670100 REV7"/>      <!-- REV1 found in Euro cart -->
+			<feature name="pcb" value="670100 REV 7"/>      <!-- REV1 found in Euro cart -->
 			<feature name="ic1" value="MPR-15061-F"/>
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15061-f.ic1" size="524288" crc="a3b00d6e" sha1="1f4b969592f98d2692cb06eca550da9c03062593" offset="0x000000" loadflag="load16_word_swap"/>
@@ -393,6 +421,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Alien Soldier (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1186-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17867-H"/>
@@ -425,6 +454,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Alisia Dragoon (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1039-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-14680-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -452,8 +482,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="agassi">
 		<description>Andre Agassi Tennis (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>TecMagik</publisher>
+		<info name="serial" value="T-101016-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-15488-F"/>
@@ -468,6 +499,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Animaniacs (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="T-95176-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
 			<feature name="u1" value="FX014A1"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -482,6 +514,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Another World (Euro)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70106-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15498-H"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -512,6 +545,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Arcade Classics (Euro, USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1715 (USA), MK-1715-50 (Euro)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-18815-SM"/>
@@ -602,7 +636,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="artalive">
-		<description>Art Alive (World)</description>
+		<description>Art Alive! (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4069 (JPN)"/>
@@ -622,6 +656,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Art of Fighting (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1146-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-16597-F"/>
@@ -636,22 +671,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Astérix and the Great Rescue (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-6330A"/>
-			<feature name="ic1" value="MPR-15961-F"/>
-			<feature name="ic2" value="MPR-15962-F"/>
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-15961-f.ic1" size="1048576" crc="5e84f375" sha1="74201ead2acbecb0b6213ace53a1106900c9f459" offset="0x000000" loadflag="load16_word_swap"/>
-				<rom name="mpr-15962-f.ic2" size="1048576" crc="714ac01d" sha1="25468d71702d8fe22af2dc7b9217ae8f304b3606" offset="0x100000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="astergrea" cloneof="astergre">
-		<description>Astérix and the Great Rescue (Euro, Alt PCB)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1532-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-15963-F"/>
@@ -662,10 +682,30 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<!-- Release binary equal with parent -->
+	<software name="astergrea" cloneof="astergre">
+		<description>Astérix and the Great Rescue (Euro, Alt PCB)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1532-50"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6330A"/>
+			<feature name="ic1" value="MPR-15961-F"/>
+			<feature name="ic2" value="MPR-15962-F"/>
+			<feature name="ic3" value="HD74HC00P"/>
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-15961-f.ic1" size="1048576" crc="5e84f375" sha1="74201ead2acbecb0b6213ace53a1106900c9f459" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="mpr-15962-f.ic2" size="1048576" crc="714ac01d" sha1="25468d71702d8fe22af2dc7b9217ae8f304b3606" offset="0x100000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="asterpg">
 		<description>Astérix and the Power of the Gods (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1095-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17719-H"/>
@@ -679,7 +719,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	<software name="atomrun">
 		<description>Atomic Runner (Euro)</description>
 		<year>1992</year>
-		<publisher>Data East</publisher>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1144-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15286-H"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -692,8 +733,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="atptour">
 		<description>ATP Tour Championship Tennis (Euro)</description>
-		<year>1995</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1234-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<feature name="pcb" value="171-6278A"/>
@@ -716,15 +758,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Ayrton Senna's Super Monaco GP II (Euro, Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="G-5514"/>
+		<info name="serial" value="G-5514 (Jpn), MK-1135-50 (Euro)"/>
 		<info name="release" value="19920717"/>
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
-			<feature name="pcb" value="?? (Sega)"/>
+			<feature name="pcb" value="171-5955A"/>
 			<feature name="ic1" value="MPR-14861 W45, MPR-14861-F"/>
 			<feature name="ic2" value="MB8464A-10LL-SK"/>
-			<feature name="ic3" value="IL7-1026B"/>
+			<feature name="ic3" value="MM1026B"/>
 			<feature name="ic4" value="HD74HC00P"/>
 			<feature name="batt" value="(Lithium Cell)"/>
 			<dataarea name="rom" size="1048576">
@@ -736,10 +778,33 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="smgp2u" cloneof="smgp2">
+		<description>Ayrton Senna's Super Monaco GP II (USA)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1135"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<feature name="pcb" value="171-5955A"/>
+			<feature name="ic1" value="MPR-14866 W49"/>
+			<feature name="ic2" value="MB8464A-10LL-SK"/>
+			<feature name="ic3" value="MM1026B"/>
+			<feature name="ic4" value="HD74HC00P"/>
+			<feature name="batt" value="(Lithium Cell)"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14866 w49.ic1" size="1048576" crc="eac8ded6" sha1="1ee87744d86c4bdd4958cc70d77538351aa206e6" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="backtof3">
 		<description>Back to the Future Part III (Euro)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
+		<info name="serial" value="T-69046-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14328-F"/>
@@ -770,8 +835,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="batman">
 		<description>Batman (Euro)</description>
-		<year>1990</year>
+		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1044-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14561-T"/>
@@ -794,6 +860,21 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="u1" value="MPR-14998 T02"/> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14998 t02.u1" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only Euro confirmed -->
+	<software name="battlesq">
+		<description>Battle Squadron (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWB SC40X1 REV A"/>
+			<feature name="-" value="Battle Squadron U1 BAT01"/>
+			<dataarea name="rom" size="524288">
+				<rom name="battle squadron u1 bat01" size="524288" crc="0feaa8bf" sha1="f003f7af0f7edccc317c944b88e57f4c9b66935a" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -841,9 +922,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Both Euro and USA confirmed -->
 	<software name="biohazrb">
-		<description>Bio Hazard Battle (Euro, USA)</description>
+		<description>Bio-Hazard Battle (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1060 (USA), MK-1060-50 (Euro)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA, 171-5978B"/>
 			<feature name="u1" value="MPR-15204 W97"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -854,12 +936,29 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Jpn confirmed -->
+<!-- Only Euro confirmed -->
 	<software name="blockout">
-		<description>Blockout (World)</description>
+		<description>Blockout (Euro, USA)</description>
 		<year>1991</year>
-		<publisher>Electronic Arts</publisher> <!-- This is published by Sega in Jpn -->
-		<info name="serial" value="G-4059 (JPN)"/>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWB SC28X2 REV A"/>
+			<feature name="u1" value="BLOC-U1 BLO03"/>
+			<feature name="u2" value="BLOC-U2 BLO03"/>
+			<dataarea name="rom" size="131072">
+				<rom name="bloc-u1 blo03.u1" size="65536" crc="6bca5f32" sha1="922183932167db09afef929ee58375ef8f5a3513" offset="0x000000" loadflag="load16_byte"/>
+				<rom name="bloc-u2 blo03.u2" size="65536" crc="ebc32a97" sha1="fe221be0ee00f3bcb0b9fe75ea9aea93793c5b3e" offset="0x000001" loadflag="load16_byte"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- Release binary equal with parent -->
+	<software name="blockoutj" cloneof="blockout">
+		<description>Blockout (Jpn)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4059"/>
 		<info name="release" value="19911101"/>
 		<info name="alt_title" value="ブロックアウト"/>
 		<part name="cart" interface="megadriv_cart">
@@ -873,34 +972,16 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro confirmed -->
-	<software name="blockouta" cloneof="blockout">
-		<description>Blockout (World, Alt PCB)</description>
-		<year>1991</year>
-		<publisher>Electronic Arts</publisher> <!-- This is published by Sega in Jpn -->
-		<info name="serial" value="G-4059 (JPN)"/>
-		<info name="release" value="19911101"/>
-		<info name="alt_title" value="ブロックアウト"/>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="PWB SC28X2 REV A"/>
-			<feature name="u1" value="BLOC-U1 BL003"/>   <!-- location not really marked on PCB, using u1 for consistency -->
-			<feature name="u2" value="BLOC-U2 BL003"/>   <!-- location not really marked on PCB, using u2 for consistency -->
-			<dataarea name="rom" size="131072">
-				<rom name="bloc-u1 bl003.u1" size="65536" crc="6bca5f32" sha1="922183932167db09afef929ee58375ef8f5a3513" offset="0x000000" loadflag="load16_byte"/>
-				<rom name="bloc-u2 bl003.u2" size="65536" crc="ebc32a97" sha1="fe221be0ee00f3bcb0b9fe75ea9aea93793c5b3e" offset="0x000001" loadflag="load16_byte"/>
-			</dataarea>
-		</part>
-	</software>
-
-
 	<software name="bloodsht">
-		<description>Bloodshot ~ Battle Frenzy (Euro)</description>
+		<description>Bloodshot (Euro) ~ Battle Frenzy (Ger)</description>
 		<year>1994</year>
-		<publisher>Acclaim Entertainment</publisher>
+		<publisher>Domark</publisher>
+		<info name="serial" value="T-88126-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128 REV 1"/>
-			<feature name="u1" value="BLOODSHOT / BATTLE FRENZY"/>
+			<feature name="u1" value="BLOODSHOT/BATTLE FRENZY"/>
 			<dataarea name="rom" size="2097152">
-				<rom name="bloodshot - battle frenzy.u1" size="2097152" crc="f9f2bceb" sha1="513005efd123539a905986130d15125085837559" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="bloodshot-battle frenzy.u1" size="2097152" crc="f9f2bceb" sha1="513005efd123539a905986130d15125085837559" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -956,6 +1037,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Brutal - Paws of Fury (Euro)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
+		<info name="serial" value="T-83136-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17327-H"/>
@@ -966,10 +1048,45 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="bubba">
+		<description>Bubba 'n' Stix (Euro)</description>
+		<year>1994</year>
+		<publisher>Core Design</publisher>
+		<info name="serial" value="T-115026-50"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA"/>
+			<feature name="-" value="MPR-16678 W53"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16678 w53" size="1048576" crc="b467432e" sha1="4039dfb41c08d17047d2acf90d0ab8bb7932cabd" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only Euro confirmed -->
+	<software name="buckrog">
+		<description>Buck Rogers - Countdown to Doomsday (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWB 4/8M REV B"/>
+			<feature name="u1" value="Buck Rodgers BUC05"/>
+			<feature name="u2" value="UM6264AK-10L"/>
+			<feature name="u3" value="HD74LS138P"/>
+			<feature name="u4" value="MM1026B"/>
+			<feature name="batt" value="(Lithium Cell)"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="buck rodgers buc05.u1" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="budokan">
 		<description>Budokan - The Martial Spirit (Euro)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="T-50016-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV A"/>
 			<feature name="u1" value="Budokan U1 S0015"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -999,6 +1116,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Burning Force (Euro)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1029-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-8342"/>
 			<dataarea name="rom" size="524288">
@@ -1040,10 +1158,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="cal50">
-		<description>Cal.50 - Caliber Fifty (USA)</description>
+		<description>Cal.50 Caliber-Fifty (USA)</description>
 		<year>1991</year>
-		<publisher>Mentrix Software</publisher>
+		<publisher>Mentrix</publisher>
 		<info name="alt_title" value="Caliber.50 (Box)"/>
+		<info name="serial" value="T-58026"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-14337-H"/>   <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1059,6 +1178,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>California Games (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1207 (USA), MK-1207-50 (Euro)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-14372-SM"/>
@@ -1085,8 +1205,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="captaven">
 		<description>Captain America and the Avengers (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1087-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15499"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1101,6 +1222,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Captain Planet and the Planeteers (Euro)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1031-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-15339 T08"/>
@@ -1147,11 +1269,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Castlevania - The New Generation (Euro)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="T-95076-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490"/>
-			<feature name="u1" value="MPR-16378-F"/>   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="1p" value="MPR-16378-F"/>
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16378-f.u1" size="1048576" crc="4dd4e4a5" sha1="61aabb1053f090fb6c13968c86170357c5df4eba" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="mpr-16378-f.1p" size="1048576" crc="4dd4e4a5" sha1="61aabb1053f090fb6c13968c86170357c5df4eba" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1164,13 +1287,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1,32X1 REV A"/>
-			<feature name="u1" value="CENTURION U1 CEN03"/> <!-- location not really marked on PCB, using u1 for consistency -->
-			<!-- U2 not present on the PCB-->
-			<feature name="u3" value="CENTURION U3 CEN03"/> <!-- location not really marked on PCB, using u3 for consistency -->
-			<feature name="u4" value="SN74LS138N"/> <!-- location not really marked on PCB, using u4 for consistency -->
+			<feature name="u1" value="CENTURION U1 CEN03"/>
+			<feature name="u2" value="CENTURION U3 CEN03"/>
+			<feature name="u5" value="SN74LS138N"/>
 			<dataarea name="rom" size="786432">
 				<rom name="centurion u1 cen03.u1" size="524288" crc="47e6d79e" sha1="aa67727152101c54585d255446c2ac0dcf9d9a9a" offset="0x000000" loadflag="load16_word_swap"/>
-				<rom name="centurion u3 cen03.u3" size="131072" crc="323c82c1" sha1="b2b3631472320b380c9f4e3e654bc4de9a2ebbe7" offset="0x080000" loadflag="load16_byte"/>
+				<rom name="centurion u3 cen03.u2" size="131072" crc="323c82c1" sha1="b2b3631472320b380c9f4e3e654bc4de9a2ebbe7" offset="0x080000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1300,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="chakan">
-		<description>Chakan (Euro, USA)</description>
+		<description>Chakan - The Forever Man (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -1194,7 +1316,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only Euro is confirmed -->
 	<software name="champwcs">
 		<description>Champions World Class Soccer (World)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Flying Edge</publisher> <!-- This was published by Acclaim in Jpn, in fact -->
 		<info name="serial" value="T-81063 (JPN)"/>
 		<info name="release" value="19940624 (JPN)"/>
@@ -1228,6 +1350,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Chuck Rock (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70036-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-14833 W48"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1242,6 +1365,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Chuck Rock (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70036"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-14772 W44"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1256,6 +1380,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Chuck Rock II - Son of Chuck (Euro)</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
+		<info name="serial" value="T-115016-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15715 T58"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1267,8 +1392,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="classicc">
 		<description>Classic Collection (Euro)</description>
-		<year>1994</year>
+		<year>1996</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1199-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-19299-MX"/>
@@ -1288,6 +1414,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Cliffhanger (Euro, Alt)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
+		<info name="serial" value="T-93036-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-16262 W11"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1302,6 +1429,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>College Slam (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-81576"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cslam"/>
 			<feature name="pcb" value="670127 REV 1"/>
@@ -1364,7 +1492,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="7100-00002"/>
 			<feature name="ic1" value="ACCOLADE, INC 9447 LHR ACCARSG 1994 ACCOLADE"/>
 			<dataarea name="rom" size="1048576">
-				<rom name="9447 lhr accarsg.ic1" size="1048576" crc="e439b101" sha1="0c7ca93b412c8ab5753ae047de49a3e41271cc3b" offset="0x000000" loadflag="load16_word_swap"/>
+				<rom name="accarsg.ic1" size="1048576" crc="e439b101" sha1="0c7ca93b412c8ab5753ae047de49a3e41271cc3b" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1374,6 +1502,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Comix Zone (Euro)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="MK-1569-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-18301-U"/>
@@ -1386,8 +1515,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="coolspot">
 		<description>Cool Spot (Euro)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70196-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-15477 T34"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1400,8 +1530,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="coolspotu" cloneof="coolspot">
 		<description>Cool Spot (USA)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70196 &amp; MK-1073"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15476 W09"/> <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1416,6 +1547,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Corporation (Euro)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
+		<info name="serial" value="T-70016-50"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
 			<feature name="u1" value="MPR-15065-SM"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -1461,7 +1593,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="cyberbal">
-		<description>CyberBall (World)</description>
+		<description>Cyberball - Football in the 21st Century (World)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4027 (JPN)"/>
@@ -3995,21 +4127,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
     (c)Electronic Arts 1992
     All Rights Reserved
 -->
-	</software>
-
-
-<!-- Only Euro is confirmed -->
-	<software name="m1abrams">
-		<description>M-1 Abrams Battle Tank (Euro, USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5703"/>
-			<feature name="ic1" value="MPR-13846 W53"/>
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13846 w53.ic1" size="524288" crc="1e2f74cf" sha1="65248727b0b52106007ec1193832f16545db5378" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
 	</software>
 
 
@@ -9457,27 +9574,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="smgp2u" cloneof="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
-			<!-- Dump To Be Confirmed -->
-			<feature name="pcb" value="171-5955A"/>
-			<feature name="ic1" value="MPR-14866 W49"/>
-			<feature name="ic2" value="MB8464A-10LL-SK"/>
-			<feature name="ic3" value="237-1026B"/>
-			<feature name="ic4" value="PC74HC00P"/>
-			<feature name="batt" value="(Lithium Cell)"/>
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14866 w49.ic1" size="1048576" crc="eac8ded6" sha1="1ee87744d86c4bdd4958cc70d77538351aa206e6" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-			<dataarea name="sram" size="16384">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bob">
 		<description>B.O.B. (Euro, USA)</description>
 		<year>1993</year>
@@ -9789,17 +9885,6 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="battle mania daiginjou (jpn, kor).bin" size="1048576" crc="312fa0f2" sha1="fbcf7e899ff964f52ade160793d6cb22bf68375c" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="battlesq">
-		<description>Battle Squadron (Euro, USA)</description>
-		<year>1990</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="battle squadron (euro, usa).bin" size="524288" crc="0feaa8bf" sha1="f003f7af0f7edccc317c944b88e57f4c9b66935a" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10639,17 +10724,6 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="bubba">
-		<description>Bubba'n'Stix (Euro)</description>
-		<year>1994</year>
-		<publisher>Core Design</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bubba'n'stix (euro).bin" size="1048576" crc="b467432e" sha1="4039dfb41c08d17047d2acf90d0ab8bb7932cabd" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bubbap" cloneof="bubba">
 		<description>Bubba'n'Stix (Euro, Prototype)</description>
 		<year>1994</year>
@@ -10719,24 +10793,6 @@ but dumps still have to be confirmed.
 			<feature name="u1" value="BU2SG"/>   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="bu2sg.u1" size="2097152" crc="f8beff56" sha1="0cfb6c619798ba47f35069dea094fbc96f974ecb" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="buckrog">
-		<description>Buck Rogers - Countdown to Doomsday (Euro, USA)</description>
-		<year>1991</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<!-- Dump To Be Confirmed -->
-			<feature name="pcb" value="?? (Electronic Arts)"/>
-			<feature name="u1" value="BUCK RODGERS BUC05"/>   <!-- location not really marked on PCB, using u1 for consistency -->
-			<feature name="u2" value="UM6264AL-10LL"/>
-			<feature name="u3" value="SN74LS138N"/>
-			<feature name="u4" value="1K5-1026B"/>
-			<feature name="batt" value="(Lithium Cell)"/>
-			<dataarea name="rom" size="1048576">
-				<rom name="buck rodgers buc05.u1" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12146,7 +12202,7 @@ but dumps still have to be confirmed.
 	<software name="cutiesuz">
 		<description>Cutie Suzuki no Ringside Angel (Jpn)</description>
 		<year>1990</year>
-		<publisher>Asmik Ace</publisher>
+		<publisher>Asmik</publisher>
 		<info name="serial" value="T-20033"/>
 		<info name="release" value="19901212"/>
 		<info name="alt_title" value="キューティー鈴木のリングサイドエンジェル"/>
@@ -21331,7 +21387,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="ransei">
 		<description>Ransei no Hasha (Jpn)</description>
 		<year>1991</year>
-		<publisher>Asmik Ace</publisher>
+		<publisher>Asmik</publisher>
 		<info name="serial" value="T-20053"/>
 		<info name="release" value="19911129"/>
 		<info name="alt_title" value="乱世の覇者"/>
@@ -24754,7 +24810,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="suphydlj" cloneof="suphydl">
 		<description>Super Hydlide (Jpn)</description>
 		<year>1989</year>
-		<publisher>Asmik Ace</publisher>
+		<publisher>Asmik</publisher>
 		<info name="serial" value="T-20013"/>
 		<info name="release" value="19891006"/>
 		<info name="alt_title" value="スーパーハイドライド"/>
@@ -26577,7 +26633,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="verytex">
 		<description>Verytex (Jpn)</description>
 		<year>1991</year>
-		<publisher>Asmik Ace</publisher>
+		<publisher>Asmik</publisher>
 		<info name="serial" value="T-20043"/>
 		<info name="release" value="19910405"/>
 		<info name="alt_title" value="ヴェリテックス"/>
@@ -28835,6 +28891,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- This was both sold as a cart and released as a ROM by the programmers -->
+	<software name="ohmummy">
+		<description>Oh Mummy (Spa)</description>
+		<year>2013</year>
+		<publisher>1985 Alternativo</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="omg.bin" size="1048576" crc="b7f68b29" sha1="8754105230504f5f4fd156353c4d8a91520bd049" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- To be used in conjuction with a MegaCD -->
 	<software name="flux">
 		<description>Flux (Euro)</description>
@@ -28928,6 +28996,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_mcpir"/>
 			<dataarea name="rom" size="2097152">
 				<rom name="4-in-1 (pirate).bin" size="2097152" crc="be72857b" sha1="2aceca16f13d6a7a6a1bff8543d31bded179df3b" offset="00000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="16mj2">
+		<description>16 Tiles Mahjong II</description>
+		<year>199?</year>
+		<publisher>Gamtec</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_16mj2"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="16 tiles mahjong ii (unl).bin" size="1048576" crc="b4f4249f" sha1="c5278d513ac7b627319bdcb840af216d0fc60f4c" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
