@@ -1092,12 +1092,7 @@ READ8_MEMBER(seibuspi_state::flashrom_read)
 {
 	offset &= 0x1fffff;
 	
-	// offset 0 goes directly to the SPI mainboard region code
-	// this data is not stored on the flashrom itself
-	if (offset == 0)
-		return m_region_code;
-	
-	else if (offset < 0x100000)
+	if (offset < 0x100000)
 		return m_soundflash1->read(offset);
 	else
 		return m_soundflash2->read(offset & 0x0fffff);
@@ -1855,6 +1850,15 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	membank("bank1")->set_entry(0);
 	m_z80_lastbank = 0;
 	m_z80_prg_transfer_pos = 0;
+
+	// Indicated by viprp1 testing this byte on several occasions,
+	// it seems likely that the region code is stored on flash at reset.
+	m_soundflash1->write(0, 0xff);
+	m_soundflash1->write(0, 0x10);
+	m_soundflash1->write(0, m_region_code);
+
+	m_soundflash1->write(0, 0xff);
+	m_soundflash2->write(0, 0xff);
 }
 
 static MACHINE_CONFIG_START( spi, seibuspi_state )
