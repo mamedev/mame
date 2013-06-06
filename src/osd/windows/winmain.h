@@ -132,6 +132,7 @@
 #define WINOPTION_VECTOR_LENGTH_SCALE       "vector_length_scale"
 #define WINOPTION_VECTOR_LENGTH_RATIO       "vector_length_ratio"
 #define WINOPTION_VECTOR_BLOOM_SCALE        "vector_bloom_scale"
+#define WINOPTION_VECTOR_TIME_PERIOD        "vector_time_period"
 #define WINOPTION_RASTER_BLOOM_SCALE        "raster_bloom_scale"
 #define WINOPTION_BLOOM_LEVEL0_WEIGHT       "bloom_lvl0_weight"
 #define WINOPTION_BLOOM_LEVEL1_WEIGHT       "bloom_lvl1_weight"
@@ -255,6 +256,7 @@ public:
 	float screen_vector_length_scale() const { return float_value(WINOPTION_VECTOR_LENGTH_SCALE); }
 	float screen_vector_length_ratio() const { return float_value(WINOPTION_VECTOR_LENGTH_RATIO); }
 	float screen_vector_bloom_scale() const { return float_value(WINOPTION_VECTOR_BLOOM_SCALE); }
+	float screen_vector_time_period() const { return float_value(WINOPTION_VECTOR_TIME_PERIOD); }
 	float screen_raster_bloom_scale() const { return float_value(WINOPTION_RASTER_BLOOM_SCALE); }
 	float screen_bloom_lvl0_weight() const { return float_value(WINOPTION_BLOOM_LEVEL0_WEIGHT); }
 	float screen_bloom_lvl1_weight() const { return float_value(WINOPTION_BLOOM_LEVEL1_WEIGHT); }
