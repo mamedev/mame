@@ -2,13 +2,14 @@
 
    "CG24173 6186" & "CG24143 4181" (always used as a pair?)
 
-  - used by suprnova.c
-            galpani3.c
-            jchan.c
+   used by suprnova.c
+           galpani3.c
+           jchan.c
 
-  - ToDo:
-    Get rid of sprite position kludges
-    Fix zooming precision/rounding (most noticeable on jchan backgrounds)
+   TODO:
+   - Get rid of sprite position kludges
+   - Fix zooming precision/rounding (most noticeable on jchan backgrounds)
+   - RLE uses fifo7200 chips
 
 */
 
