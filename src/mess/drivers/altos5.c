@@ -37,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(port09_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port09_w);
+	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_DRIVER_INIT(altos5);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(port2e_r);
@@ -44,6 +45,9 @@ public:
 	UINT8 m_term_data;
 	UINT8 m_port08;
 	UINT8 m_port09;
+	bool m_ipl;
+	bool m_wrpt;
+	void setup_banks();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
@@ -56,8 +60,22 @@ public:
 
 static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0xffff) AM_RAM
+	AM_RANGE( 0x0000, 0x0fff ) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
+	AM_RANGE( 0x1000, 0x1fff ) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
+	AM_RANGE( 0x2000, 0x2fff ) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
+	AM_RANGE( 0x3000, 0x3fff ) AM_READ_BANK("bankr3") AM_WRITE_BANK("bankw3")
+	AM_RANGE( 0x4000, 0x4fff ) AM_READ_BANK("bankr4") AM_WRITE_BANK("bankw4")
+	AM_RANGE( 0x5000, 0x5fff ) AM_READ_BANK("bankr5") AM_WRITE_BANK("bankw5")
+	AM_RANGE( 0x6000, 0x6fff ) AM_READ_BANK("bankr6") AM_WRITE_BANK("bankw6")
+	AM_RANGE( 0x7000, 0x7fff ) AM_READ_BANK("bankr7") AM_WRITE_BANK("bankw7")
+	AM_RANGE( 0x8000, 0x8fff ) AM_READ_BANK("bankr8") AM_WRITE_BANK("bankw8")
+	AM_RANGE( 0x9000, 0x9fff ) AM_READ_BANK("bankr9") AM_WRITE_BANK("bankw9")
+	AM_RANGE( 0xa000, 0xafff ) AM_READ_BANK("bankra") AM_WRITE_BANK("bankwa")
+	AM_RANGE( 0xb000, 0xbfff ) AM_READ_BANK("bankrb") AM_WRITE_BANK("bankwb")
+	AM_RANGE( 0xc000, 0xcfff ) AM_READ_BANK("bankrc") AM_WRITE_BANK("bankwc")
+	AM_RANGE( 0xd000, 0xdfff ) AM_READ_BANK("bankrd") AM_WRITE_BANK("bankwd")
+	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bankre") AM_WRITE_BANK("bankwe")
+	AM_RANGE( 0xf000, 0xffff ) AM_READ_BANK("bankrf") AM_WRITE_BANK("bankwf")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
@@ -67,7 +85,7 @@ static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	//AM_RANGE(0x14, 0x17) AM_WRITE(romoff_w)
+	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x20, 0x23) // Hard drive
 	AM_RANGE(0x2c, 0x2d) AM_NOP
@@ -79,9 +97,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( altos5 )
 INPUT_PORTS_END
 
+void altos5_state::setup_banks()
+{
+	UINT8 *prom =  memregion("proms")->base();
+	UINT8 i;
+	offs_t offset = ((~m_port09 & 0x20) << 3) | (m_port09 & 0xc0) | ((m_port09 & 0x18) << 1);
+printf("\n%X:",offset);
+	for (i = 0; i < 16; i++)
+		printf("%X ",prom[offset+i]);
+	membank("bankr0")->set_entry(49);
+}
+
 void altos5_state::machine_reset()
 {
-	membank("bank1")->set_entry(1);
+	m_port08 = 0;
+	m_port09 = 0;
+	m_wrpt = 0;
+	m_ipl = 1;
+	setup_banks();
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -134,6 +167,14 @@ d6, 7: DMA bank select
 WRITE8_MEMBER( altos5_state::port09_w )
 {
 	m_port09 = data;
+	setup_banks();
+}
+
+// turns off IPL mode, removes boot rom from memory map
+WRITE8_MEMBER( altos5_state::port14_w )
+{
+	m_ipl = 0;
+	setup_banks();
 }
 
 READ8_MEMBER(altos5_state::memory_read_byte)
@@ -236,7 +277,38 @@ static Z80DART_INTERFACE( dart_intf )
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &RAM[0], 0x10000);
+	membank("bankr0")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr1")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr2")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr3")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr4")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr5")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr6")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr7")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr8")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankr9")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankra")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankrb")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankrc")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankrd")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankre")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankrf")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw0")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw1")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw2")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw3")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw4")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw5")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw6")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw7")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw8")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankw9")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwa")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwb")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwc")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwd")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwe")->configure_entries(0, 50, &RAM[0], 0x1000);
+	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
 READ8_MEMBER( altos5_state::port2e_r )
@@ -281,11 +353,11 @@ MACHINE_CONFIG_END
 
 
 /* ROM definition */
-ROM_START( altos5 )
-	ROM_REGION( 0x11000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD("2732.bin",   0x10000, 0x1000, CRC(15fdc7eb) SHA1(e15bdf5d5414ad56f8c4bb84edc6f967a5f01ba9)) // bios
-	ROM_FILL(0x10054, 2, 0) // temp until banking sorted out
-	ROM_FILL(0x10344, 3, 0) // kill self test
+ROM_START( altos5 ) // 00000-2FFFF = ram banks; 30000-30FFF wprt space; 31000-31FFF ROM
+	ROM_REGION( 0x32000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("2732.bin",   0x31000, 0x1000, CRC(15fdc7eb) SHA1(e15bdf5d5414ad56f8c4bb84edc6f967a5f01ba9)) // bios
+	ROM_FILL(0x31054, 2, 0) // temp until banking sorted out
+	ROM_FILL(0x31344, 3, 0) // kill self test
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("82s141.bin", 0x0000, 0x0200, CRC(35c8078c) SHA1(dce24374bfcc5d23959e2c03485d82a119c0c3c9)) // banking control
