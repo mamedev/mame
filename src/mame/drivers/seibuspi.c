@@ -950,6 +950,8 @@ WRITE8_MEMBER(seibuspi_state::spi_coin_w)
 /********************************************************************/
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+//	AM_RANGE(0x00000104, 0x00000107) AM_WRITENOP // ?
+//	AM_RANGE(0x00000108, 0x0000010b) AM_WRITENOP // ?
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM
 	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
@@ -1034,6 +1036,8 @@ ADDRESS_MAP_END
 /********************************************************************/
 
 static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
+//	AM_RANGE(0x00000104, 0x00000107) AM_WRITENOP // ?
+//	AM_RANGE(0x00000108, 0x0000010b) AM_WRITENOP // ?
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM
 	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
@@ -1066,9 +1070,10 @@ ADDRESS_MAP_END
 /********************************************************************/
 
 static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
-	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
-	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r) // ?
-	AM_RANGE(0x00000090, 0x000003ff) AM_RAM
+	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)
+//	AM_RANGE(0x00000090, 0x00000093) AM_WRITENOP // ?
+//	AM_RANGE(0x00000094, 0x00000097) AM_WRITENOP // ?
+	AM_RANGE(0x00000000, 0x000003ff) AM_RAM
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(ejsakura_input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x000000ff)
@@ -1091,7 +1096,6 @@ ADDRESS_MAP_END
 READ8_MEMBER(seibuspi_state::flashrom_read)
 {
 	offset &= 0x1fffff;
-	
 	if (offset < 0x100000)
 		return m_soundflash1->read(offset);
 	else
@@ -1966,7 +1970,7 @@ static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise sa
 	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz(!)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
