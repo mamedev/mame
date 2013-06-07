@@ -318,7 +318,7 @@ WRITE8_MEMBER( altos5_state::port08_w )
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 6));
 		//floppy->dden_w(BIT(data, 4)); // no option to specify disk density
-		m_port08 |= (floppy->twosid_r() << 2); // get number of sides
+		m_port08 |= ((UINT8)floppy->twosid_r() << 3); // get number of sides
 	}
 }
 
