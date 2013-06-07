@@ -22,6 +22,29 @@
           YMF271F Sound chip
           Seibu Custom GFX chip
 
+
+      The SPI mainboard is region locked. You can only play cartridges that are
+      from the same region, otherwise the updater will give a checksum error.
+      The region code is the 1st byte of flashrom u1053. If it is erased somehow,
+      or power goes off during updating, it will show hardware error 81.
+
+      This code is also in the main PRG ROM at offset 0x1ffffc, even on single
+      board games. Known regions are:
+	
+          0x01 Japan
+          0x10 US
+          0x20 Taiwan
+          0x22 Asia / Hong Kong
+          0x24 Korea
+          0x28 China
+          0x80 Europe / Germany
+          0x82 Austria
+          0x92 Italy
+          0x9c Switzerland
+          0x9e Australia
+          0xbe World?
+
+
       SYS386I seems like a lower-cost version of single-board SPI.
       It has a 40MHz AMD 386 and a considerably weaker sound system (dual MSM6295).
 
@@ -45,9 +68,6 @@ to the alternative position. This re-flashes some ROMs for a few minutes
 (accompanied by a techno music track). Afterwards, a message tells you to
 put the jumper back to the original position and reboot the PCB. The new
 game then plays.
-
-The SPI mainboard is region locked. You can only play cartridges that are
-from the same region, otherwise the updater will give a checksum error.
 
 There were a few revisions of this hardware, though most are the same with only
 minor changes such as different IC revisions etc.
@@ -1821,30 +1841,8 @@ MACHINE_START_MEMBER(seibuspi_state,spi)
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 
-	// Where is the region code located? hardcoded on the pcb maybe? or on a PAL?
-	// Luckily for us, it's also on a fixed location in the PRG ROM...
-	m_region_code = memregion("maincpu")->base()[0x1ffffc];
-	logerror("Game region code: %02X\n", m_region_code);
-	
-	/*
-	regions known:
-	
-	0x01 Japan
-	0x10 US
-	0x20 Taiwan
-	0x22 Asia / Hong Kong
-	0x24 Korea
-	0x28 China
-	0x80 Europe / Germany
-	0x82 Austria
-	0x92 Italy
-	0x9c Switzerland
-	0x9e Australia
-	0xbe World?
-	
-	On SPI, 0xff will give a Hardware Error 81,
-	an unmatched region will give a checksum error
-	*/
+	// use this to determine the region code when adding a new SPI cartridge clone set
+	logerror("Game region code: %02X\n", memregion("maincpu")->base()[0x1ffffc]);
 }
 
 MACHINE_RESET_MEMBER(seibuspi_state,spi)
@@ -1854,15 +1852,6 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	membank("bank1")->set_entry(0);
 	m_z80_lastbank = 0;
 	m_z80_prg_transfer_pos = 0;
-
-	// Indicated by viprp1 testing this byte on several occasions,
-	// it seems likely that the region code is stored on flash at reset.
-	m_soundflash1->write(0, 0xff);
-	m_soundflash1->write(0, 0x10);
-	m_soundflash1->write(0, m_region_code);
-
-	m_soundflash1->write(0, 0xff);
-	m_soundflash2->write(0, 0xff);
 }
 
 static MACHINE_CONFIG_START( spi, seibuspi_state )
@@ -2021,7 +2010,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 {
 	int i, j;
 	UINT16 *src = (UINT16 *)memregion("gfx3")->base();
-	UINT16 tmp[0x40 / 2], Offset;
+	UINT16 tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
 	for(i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
@@ -2030,8 +2019,8 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 
 		for(j = 0; j < 0x40 / 2; j++)
 		{
-			Offset = (j >> 1) | (j << 4 & 0x10);
-			*src++ = tmp[Offset];
+			offset = (j >> 1) | (j << 4 & 0x10);
+			*src++ = tmp[offset];
 		}
 	}
 }
@@ -2287,6 +2276,9 @@ ROM_START( senkyu )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( senkyua )
@@ -2315,6 +2307,9 @@ ROM_START( senkyua )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( batlball )
@@ -2343,6 +2338,9 @@ ROM_START( batlball )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
 
 ROM_START( batlballa )
@@ -2371,6 +2369,9 @@ ROM_START( batlballa )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
 
 ROM_START( batlballe ) /* Early version, PCB serial number of 19, hand written labels dated 10/16 (Oct 16, 1995) */
@@ -2399,6 +2400,9 @@ ROM_START( batlballe ) /* Early version, PCB serial number of 19, hand written l
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
 
 ROM_START( batlballu )
@@ -2427,6 +2431,9 @@ ROM_START( batlballu )
 	ROM_LOAD32_BYTE("fb_pcm-1.215",  0x000000, 0x080000, CRC(1d83891c) SHA1(09502437562275c14c0f3a0e62b19e91bedb4693) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("fb_7.216",      0x800000, 0x080000, CRC(874d7b59) SHA1(0236753636c9a818780b23f5f506697b9f6d93c7) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
 
@@ -2458,6 +2465,9 @@ ROM_START( ejanhs )
 	ROM_LOAD32_BYTE("ej3_pcm1.215",  0x000000, 0x080000, CRC(a92a3a82) SHA1(b86c27c5a2831ddd2a1c2b071018a99afec14018) )
 	ROM_CONTINUE(                    0x400000, 0x080000 )
 	ROM_LOAD32_BYTE("ejan3_7.216",   0x800000, 0x080000, CRC(c6fc6bcf) SHA1(d4d8c06d295f8eacfa10c21dbab5858f936121f3) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 
@@ -2488,6 +2498,9 @@ ROM_START( viprp1 )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_regionbe.u1053", 0x000000, 0x100000, CRC(a4c181d0) SHA1(0aeea4cac4030f60ee77d62deca6b67c318c0866) )
 ROM_END
 
 ROM_START( viprp1u )
@@ -2517,6 +2530,9 @@ ROM_START( viprp1u )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
 ROM_START( viprp1ua )
@@ -2546,6 +2562,9 @@ ROM_START( viprp1ua )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
 ROM_START( viprp1j )
@@ -2575,6 +2594,9 @@ ROM_START( viprp1j )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( viprp1s )
@@ -2604,6 +2626,9 @@ ROM_START( viprp1s )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region9c.u1053", 0x000000, 0x100000, CRC(d73d640c) SHA1(61a99af2a153de9d53e28872a2493e2ba797a325) )
 ROM_END
 
 ROM_START( viprp1hk )
@@ -2633,6 +2658,9 @@ ROM_START( viprp1hk )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
 
 ROM_START( viprp1oj )
@@ -2662,6 +2690,9 @@ ROM_START( viprp1oj )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( viprp1ot )
@@ -2691,6 +2722,9 @@ ROM_START( viprp1ot )
 	ROM_REGION32_LE( 0xa00000, "sound01", ROMREGION_ERASE00 )    /* sound roms */
 	ROM_LOAD32_BYTE("v_pcm.215",  0x000000, 0x080000, CRC(e3111b60) SHA1(f7a7747f29c392876e43efcb4e6c0741454082f2) )
 	ROM_CONTINUE(                 0x400000, 0x080000 )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
 
 
@@ -2723,6 +2757,9 @@ ROM_START( rdft )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( rdftu )
@@ -2754,8 +2791,10 @@ ROM_START( rdftu )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
-ROM_END
 
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
+ROM_END
 
 ROM_START( rdftj )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   /* i386 program */
@@ -2786,6 +2825,9 @@ ROM_START( rdftj )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( rdftau )
@@ -2817,6 +2859,9 @@ ROM_START( rdftau )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region9e.u1053", 0x000000, 0x100000, CRC(7ad6f17e) SHA1(9a2cc77a4f86c00208f739bd53aca4f55adf7ea7) )
 ROM_END
 
 ROM_START( rdftit )
@@ -2848,6 +2893,9 @@ ROM_START( rdftit )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region92.u1053", 0x000000, 0x100000, CRC(204d82d0) SHA1(444f4aefa27d8f5d1a2f7f08f826ea84b0ccbd02) )
 ROM_END
 
 ROM_START( rdfta )
@@ -2879,6 +2927,9 @@ ROM_START( rdfta )
 	ROM_LOAD32_WORD("gd_pcm.217", 0x000000, 0x100000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_CONTINUE(                 0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("gd_8.216",   0x800000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region82.u1053", 0x000000, 0x100000, CRC(4f463a87) SHA1(0e27904745da61a3ba7c48c5b4c7d45989bbd05b) )
 ROM_END
 
 ROM_START( rdftadi ) // Dream Island license
@@ -2908,6 +2959,9 @@ ROM_START( rdftadi ) // Dream Island license
 	ROM_LOAD32_WORD("raiden-f_pcm2.u0217", 0x000000, 0x100000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
 	ROM_CONTINUE(                          0x400000, 0x100000 )
 	/* SOUND1 socket is unpopulated */
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region24.u1053", 0x000000, 0x100000, CRC(72a33dc4) SHA1(65a52f576ca4d240418fedd9a4922edcd6c0c8d1) )
 ROM_END
 
 ROM_START( rdftam ) // Metrotainment license
@@ -2937,6 +2991,9 @@ ROM_START( rdftam ) // Metrotainment license
 	ROM_LOAD32_WORD("raiden-f_pcm2.u0217", 0x000000, 0x100000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
 	ROM_CONTINUE(                          0x400000, 0x100000 )
 	/* SOUND1 socket is unpopulated */
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
 
 ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
@@ -3003,6 +3060,9 @@ ROM_START( rdft2 ) /* SPI Cart, Europe */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
 
 ROM_START( rdft2u ) /* SPI Cart, USA */
@@ -3037,6 +3097,9 @@ ROM_START( rdft2u ) /* SPI Cart, USA */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
 ROM_START( rdft2j ) /* SPI Cart, Japan */
@@ -3071,6 +3134,9 @@ ROM_START( rdft2j ) /* SPI Cart, Japan */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( rdft2j2 ) /* SPI Cart, Japan */
@@ -3105,6 +3171,9 @@ ROM_START( rdft2j2 ) /* SPI Cart, Japan */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( rdft2a ) /* SPI Cart, Asia (Metrotainment license); SPI PCB is marked "(C)1997 SXX2C ROM SUB8" */
@@ -3140,6 +3209,9 @@ ROM_START( rdft2a ) /* SPI Cart, Asia (Metrotainment license); SPI PCB is marked
 	ROM_LOAD32_WORD("raiden-f2__pcm.u0217", 0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) ) // pads are silkscreened on pcb SOUND0
 	ROM_CONTINUE(                           0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("seibu__8.u0222",       0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // socket is silkscreened on pcb SOUND1
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region22.u1053", 0x000000, 0x100000, CRC(5fee8413) SHA1(6d6a62fa01293b4ba4b349a39820d024add6ea22) )
 ROM_END
 
 ROM_START( rdft2a2 ) /* SPI Cart, Asia (Dream Island license) */
@@ -3174,9 +3246,12 @@ ROM_START( rdft2a2 ) /* SPI Cart, Asia (Dream Island license) */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region24.u1053", 0x000000, 0x100000, CRC(72a33dc4) SHA1(65a52f576ca4d240418fedd9a4922edcd6c0c8d1) )
 ROM_END
 
-ROM_START( rdft2t ) /* SPI Cart, Asia */
+ROM_START( rdft2t ) /* SPI Cart, Taiwan */
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   /* i386 program */
 	ROM_LOAD32_BYTE("prg0", 0x000000, 0x80000, CRC(7e8c3acc) SHA1(63f4f9f7df7fa028737d9f7dfae96795cde58541) )
 	ROM_LOAD32_BYTE("prg1", 0x000001, 0x80000, CRC(22cb5b68) SHA1(35f86ad7771fe9aaac3904ed34a96d0cc10ef21c) )
@@ -3208,6 +3283,9 @@ ROM_START( rdft2t ) /* SPI Cart, Asia */
 	ROM_LOAD32_WORD("pcm.u0217",    0x000000, 0x100000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region20.u1053", 0x000000, 0x100000, CRC(f2051161) SHA1(45cbd5fd9ae0ca0c5c3450bca5f6806ddce3c56f) )
 ROM_END
 
 ROM_START( rdft2us )    /* Single board version SXX2F */
@@ -3276,6 +3354,9 @@ ROM_START( rfjet ) /* SPI Cart, Europe */
 	ROM_LOAD32_WORD("pcm-d.u0227",  0x000000, 0x100000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region80.u1053", 0x000000, 0x100000, CRC(e2adaff5) SHA1(9297afaf78209724515d8f78de8cee7bc7cb796b) )
 ROM_END
 
 ROM_START( rfjetj ) /* SPI Cart, Japan */
@@ -3307,6 +3388,9 @@ ROM_START( rfjetj ) /* SPI Cart, Japan */
 	ROM_LOAD32_WORD("pcm-d.u0227",  0x000000, 0x100000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region01.u1053", 0x000000, 0x100000, CRC(7ae7ab76) SHA1(a2b196f470bf64af94002fc4e2640fadad00418f) )
 ROM_END
 
 ROM_START( rfjetu ) /* SPI Cart, US */
@@ -3338,6 +3422,9 @@ ROM_START( rfjetu ) /* SPI Cart, US */
 	ROM_LOAD32_WORD("pcm-d.u0227",  0x000000, 0x100000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region10.u1053", 0x000000, 0x100000, CRC(4319d998) SHA1(a064ce647453a9b3bccf7f1d6d0d52b5a72e09dd) )
 ROM_END
 
 ROM_START( rfjeta ) /* SPI Cart, Asia */
@@ -3369,6 +3456,9 @@ ROM_START( rfjeta ) /* SPI Cart, Asia */
 	ROM_LOAD32_WORD("pcm-d.u0227",  0x000000, 0x100000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region24.u1053", 0x000000, 0x100000, CRC(72a33dc4) SHA1(65a52f576ca4d240418fedd9a4922edcd6c0c8d1) )
 ROM_END
 
 ROM_START( rfjett ) /* SPI Cart, Taiwan */
@@ -3400,6 +3490,9 @@ ROM_START( rfjett ) /* SPI Cart, Taiwan */
 	ROM_LOAD32_WORD("pcm-d.u0227",  0x000000, 0x100000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
 	ROM_CONTINUE(                   0x400000, 0x100000 )
 	ROM_LOAD32_BYTE("sound1.u0222", 0x800000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+
+	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
+	ROM_LOAD("flash0_blank_region20.u1053", 0x000000, 0x100000, CRC(f2051161) SHA1(45cbd5fd9ae0ca0c5c3450bca5f6806ddce3c56f) )
 ROM_END
 
 /* Notes on rfjets:

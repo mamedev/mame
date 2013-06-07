@@ -1136,6 +1136,9 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 			slot->ch3_level = data & 0xf;
 			break;
 		}
+		
+		default:
+			break;
 	}
 }
 
@@ -1295,6 +1298,8 @@ void ymf271_device::ymf271_write_pcm(int data)
 			slot->srcnote = (data >> 3) & 0x3;
 			slot->srcb = (data >> 5) & 0x7;
 			break;
+		default:
+			break;
 	}
 }
 
@@ -1442,6 +1447,9 @@ void ymf271_device::ymf271_write_timer(int data)
 				if (!m_ext_rw && !m_ext_write_handler.isnull())
 					m_ext_write_handler(m_ext_address, data);
 				break;
+			
+			default:
+				break;
 		}
 	}
 }
@@ -1487,6 +1495,8 @@ WRITE8_MEMBER( ymf271_device::write )
 			break;
 		case 0xd:
 			ymf271_write_timer(data);
+			break;
+		default:
 			break;
 	}
 }

@@ -43,7 +43,6 @@ public:
 
 	int m_z80_prg_transfer_pos;
 	int m_z80_lastbank;
-	UINT8 m_region_code;
 	UINT8 m_sb_coin_latch;
 	UINT8 m_ejsakura_input_port;
 	tilemap_t *m_text_layer;
