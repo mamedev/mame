@@ -1366,19 +1366,18 @@ const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
 	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
 	{
 		// look in the parent's ROMs
-		device_iterator deviter(m_drivlist.config(clone_of, m_lookup_options).root_device());
-		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-			for (const rom_entry *pregion = rom_first_region(*device); pregion != NULL; pregion = rom_next_region(pregion))
-				for (const rom_entry *prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+		device_t *device = &m_drivlist.config(clone_of, m_lookup_options).root_device();
+		for (const rom_entry *pregion = rom_first_region(*device); pregion != NULL; pregion = rom_next_region(pregion))
+			for (const rom_entry *prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+			{
+				hash_collection phashes(ROM_GETHASHDATA(prom));
+				if (!phashes.flag(hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
 				{
-					hash_collection phashes(ROM_GETHASHDATA(prom));
-					if (!phashes.flag(hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
-					{
-						// stop when we find a match
-						merge_name = ROM_GETNAME(prom);
-						break;
-					}
+					// stop when we find a match
+					merge_name = ROM_GETNAME(prom);
+					break;
 				}
+			}
 	}
 
 	return merge_name;
