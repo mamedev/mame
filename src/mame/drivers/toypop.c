@@ -32,7 +32,6 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/namcoio.h"
 #include "sound/namco.h"
 #include "includes/toypop.h"
 
@@ -92,40 +91,32 @@ void toypop_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 TIMER_CALLBACK_MEMBER(toypop_state::namcoio_run)
 {
-	device_t *io58xx = machine().device("58xx");
-	device_t *io56xx_1 = machine().device("56xx_1");
-	device_t *io56xx_2 = machine().device("56xx_2");
-
 	switch (param)
 	{
 		case 0:
-			namco_customio_58xx_run(io58xx);
+			m_namco58xx->customio_run();
 			break;
 		case 1:
-			namco_customio_56xx_run(io56xx_1);
+			m_namco56xx_1->customio_run();
 			break;
 		case 2:
-			namco_customio_56xx_run(io56xx_2);
+			m_namco56xx_2->customio_run();
 			break;
 	}
 }
 
 INTERRUPT_GEN_MEMBER(toypop_state::toypop_main_vblank_irq)
 {
-	device_t *namcoio_0 = machine().device("58xx");
-	device_t *namcoio_1 = machine().device("56xx_1");
-	device_t *namcoio_2 = machine().device("56xx_2");
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 
-	if (!namcoio_read_reset_line(namcoio_0))        /* give the cpu a tiny bit of time to write the command before processing it */
+	if (!m_namco58xx->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN);
 
-	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
+	if (!m_namco56xx_1->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
 
-	if (!namcoio_read_reset_line(namcoio_2))        /* give the cpu a tiny bit of time to write the command before processing it */
+	if (!m_namco56xx_2->read_reset_line())        /* give the cpu a tiny bit of time to write the command before processing it */
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 2);
 
 }
@@ -196,9 +187,9 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")                                       /* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")     /* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
-	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)               /* custom I/O */
-	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)             /* custom I/O */
-	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)             /* custom I/O */
+	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)               /* custom I/O */
+	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)             /* custom I/O */
+	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE("56xx_2", namco56xx_device, read, write)             /* custom I/O */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(toypop_main_interrupt_enable_w)       /* enable interrupt */
 	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r) AM_WRITE(toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)                /* reset 68000 */
@@ -213,9 +204,9 @@ static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_SHARE("videoram")   /* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("spriteram")                                       /* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")     /* shared RAM with the 68000 CPU */
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)               /* custom I/O */
-	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)             /* custom I/O */
-	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)             /* custom I/O */
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)               /* custom I/O */
+	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)             /* custom I/O */
+	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namco56xx_device, read, write)             /* custom I/O */
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(toypop_main_interrupt_enable_r, toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)                /* reset 68000 */
@@ -524,13 +515,11 @@ static const namcoio_interface intf0_coin =
 {
 	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1_RIGHT"), DEVCB_INPUT_PORT("P2_RIGHT"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
 	{ DEVCB_DRIVER_MEMBER(toypop_state,out_coin0), DEVCB_DRIVER_MEMBER(toypop_state,out_coin1) },       /* port write handlers */
-	NULL    /* device */
 };
 static const namcoio_interface intf0 =
 {
 	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1_RIGHT"), DEVCB_INPUT_PORT("P2_RIGHT"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
 	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
-	NULL    /* device */
 };
 
 /* chip #1: dip switches */
@@ -538,7 +527,6 @@ static const namcoio_interface intf1 =
 {
 	{ DEVCB_DRIVER_MEMBER(toypop_state,dipA_h), DEVCB_DRIVER_MEMBER(toypop_state,dipB_l), DEVCB_DRIVER_MEMBER(toypop_state,dipB_h), DEVCB_DRIVER_MEMBER(toypop_state,dipA_l) }, /* port read handlers */
 	{ DEVCB_DRIVER_MEMBER(toypop_state,flip), DEVCB_NULL },                     /* port write handlers */
-	NULL    /* device */
 };
 
 /* chip #2: test/cocktail, optional buttons */
@@ -546,7 +534,6 @@ static const namcoio_interface intf2 =
 {
 	{ DEVCB_NULL, DEVCB_INPUT_PORT("P1_LEFT"), DEVCB_INPUT_PORT("P2_LEFT"), DEVCB_INPUT_PORT("SERVICE") },  /* port read handlers */
 	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
-	NULL    /* device */
 };
 
 
