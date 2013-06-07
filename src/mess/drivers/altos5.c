@@ -9,7 +9,6 @@
     ToDo:
     - DMA has its own memory banking, activated by BUSACK
     - Get floppy to read the disk (only ones found are .TD0 format)
-    - Find out how to select double density on the fdc
     - Further work once the floppy is fixed
 
 ****************************************************************************/
@@ -317,7 +316,7 @@ WRITE8_MEMBER( altos5_state::port08_w )
 	{
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 6));
-		//floppy->dden_w(BIT(data, 4)); // no option to specify disk density
+		m_fdc->dden_w(!BIT(data, 4));
 		m_port08 |= ((UINT8)floppy->twosid_r() << 3); // get number of sides
 	}
 }
