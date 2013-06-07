@@ -404,10 +404,10 @@ static Z80SIO_INTERFACE( sio_intf )
 static const rs232_port_interface rs232_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, dcda_w),
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, dcdb_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsa_w)
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rib_w),
+	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsb_w)
 };
 
 static SLOT_INTERFACE_START( altos5_floppies )
