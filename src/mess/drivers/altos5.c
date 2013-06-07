@@ -12,6 +12,7 @@
 #include "machine/z80dart.h"
 #include "machine/z80dma.h"
 #include "machine/serial.h"
+#include "machine/wd_fdc.h"
 
 
 class altos5_state : public driver_device
@@ -24,7 +25,8 @@ public:
 		m_pio1(*this, "z80pio_1"),
 		m_dart(*this, "z80dart"),
 		m_sio (*this, "z80sio"),
-		m_ctc (*this, "z80ctc")
+		m_ctc (*this, "z80ctc"),
+		m_fdc (*this, "fd1797")
 	{ }
 
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -39,6 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(altos5);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	//DECLARE_FLOPPY_FORMATS(floppy_formats);
 	UINT8 m_port08;
 	UINT8 m_port09;
 	UINT8 *m_p_prom;
@@ -53,6 +56,7 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<z80sio0_device> m_sio;
 	required_device<z80ctc_device> m_ctc;
+	required_device<fd1797_t> m_fdc;
 };
 
 static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
@@ -78,7 +82,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
-	//AM_RANGE(0x04, 0x07) // FD1797 fdc
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fd1797", fd1797_t, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
@@ -378,8 +382,29 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsa_w)
 };
 
+//FLOPPY_FORMATS_MEMBER( altos5_state::floppy_formats )
+//	FLOPPY_ALTOS5_FORMAT
+//FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( altos5_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
+
+	floppy_connector *con = machine().device<floppy_connector>("fd1797:0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		//m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_intrq_w), this));
+		//m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_drq_w), this));
+
+		floppy->ss_w(0);
+	}
+
+
 	m_p_prom =  memregion("proms")->base();
 
 	UINT8 *RAM = memregion("maincpu")->base();
@@ -434,6 +459,9 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
+	MCFG_FD1797x_ADD("fd1797", XTAL_8MHz / 4)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
