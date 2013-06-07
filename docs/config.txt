@@ -287,11 +287,29 @@ of your command:
         or system.  Notice, this is simply a copy/paste of the .XML file which reside
         in the HASH folder which are allowed to be used.
 
+-verifysoftware [<gamename|wildcard>]
+
+	Checks for invalid or missing ROM images in your software lists. By default
+        all drivers that have valid ZIP files or directories in the rompath are verified;
+	however, you can limit this list by specifying a specific driver name or wildcard
+        after the -verifysoftware command.
+
 -getsoftlist [<gamename|wildcard>]
 
         Posts to screen a specific software list which matches with the gamename
         provided.
+
+-verifysoftlist [softwarelistname]
+
+	Checks a specified software list for missing ROM images if files exist for issued
+        softwarelistname.  By default, all drivers that have valid ZIP files or directories
+        in the rompath are verified;  however, you can limit this list by specifying a
+        specific softwarelistname (without .XML) after the -verifysoftlist command.
  
+-listmidi
+
+        Create a list of list available MIDI I/O devices for use with emulation.
+
         
 
 Configuration options
@@ -382,6 +400,7 @@ Core search path options
 	MAME will look for gamename\cross#.png and then cross#.png in the
 	specified crsshairpath, where # is the player number.  Failing that,
 	MAME will use built-in default crosshairs.
+
 
 
 Core Output Directory Options
@@ -1002,6 +1021,7 @@ Core input options
 	The default is 0.85.
 
 -natural
+
         Specific whether or not to use a natural keyboard or not.  This allows
         you to start your game or system in "partial" keyboard emulation mode,
         giving you the ability to use all normal UI keys.  The default is OFF,
@@ -1123,3 +1143,18 @@ Core misc options
 
         Displays a mouse cursor when using the built-in UI for MAME.  The default
         is (-noui_mouse).
+
+-autoboot_command "<command>"
+
+        Command string to execute after machine boot (in quotes " ").  To issue
+        a quote to the emulation, use """ in the string.  Using \n will issue a
+        create a new line, issuing what was typed prior as a command.
+        Example:  -autoboot_command "load """$""",8,1\n"
+
+-autoboot_delay [n]
+
+        Timer delay (in seconds) to trigger command execution on autoboot.
+
+-autoboot_script / -script [filename.lua]
+
+        File containing scripting to execute after machine boot.
