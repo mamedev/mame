@@ -5,14 +5,14 @@
   driver todo: (SOME OF THIS WILL NEED PCB REFERENCES / MEASUREMENTS)
   - correct colour PROM decoding (resistor values?)
   - correct FG colour handling (currently use a hardcoded white)
-  - correct sound (need interrupt frequencies at least)
+  - correct sound (discrete stuff is for filtering? or drums?)
   - correct remaining GFX / sprite issues (flicker sometimes, might need better vblank timing?)
 
 
 Hardware info (complete):
 Main cpu Z80A
 Sound cpu Z80A
-Sound ic AY-3-8910 x2
+Sound ic AY-3-8910 x2 @ 1.536MHz
 Note: stereo sound output.Op amps LM3900 x3, audio amps TDA2002 x2, many discrete components
 
 Osc: 18.432 Mhz
@@ -461,7 +461,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
 {
-	// it writes $e8 and $f0 for music drums
+	// it writes $e8 and $f0 for music drums?
 	// possibly to discrete sound circuitry?
 	logerror("ay8910_portb_w: %02x\n", data);
 }
@@ -527,11 +527,11 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_CPU_ADD("audiocpu", Z80,  XTAL_18_432MHz/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
 	MCFG_CPU_IO_MAP(stuntair_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 60*8) // timing guessed, probably wrong ?? drives music tempo.. and where is irq ack?
+	MCFG_CPU_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60) // ?
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
