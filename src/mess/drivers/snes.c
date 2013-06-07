@@ -37,6 +37,7 @@
 #include "machine/sns_rom.h"
 #include "machine/sns_rom21.h"
 #include "machine/sns_bsx.h"
+#include "machine/sns_sa1.h"
 #include "machine/sns_sdd1.h"
 #include "machine/sns_sfx.h"
 #include "machine/sns_spc7110.h"
@@ -70,6 +71,10 @@ public:
 	DECLARE_READ8_MEMBER( snessfx_lo_r );
 	DECLARE_WRITE8_MEMBER( snessfx_hi_w );
 	DECLARE_WRITE8_MEMBER( snessfx_lo_w );
+	DECLARE_READ8_MEMBER( snessa1_hi_r );
+	DECLARE_READ8_MEMBER( snessa1_lo_r );
+	DECLARE_WRITE8_MEMBER( snessa1_hi_w );
+	DECLARE_WRITE8_MEMBER( snessa1_lo_w );
 	DECLARE_READ8_MEMBER( snes7110_hi_r );
 	DECLARE_READ8_MEMBER( snes7110_lo_r );
 	DECLARE_WRITE8_MEMBER( snes7110_hi_w );
@@ -512,6 +517,93 @@ WRITE8_MEMBER( snes_console_state::snessfx_hi_w )
 WRITE8_MEMBER( snes_console_state::snessfx_lo_w )
 {
 	snessfx_hi_w(space, offset, data, 0xff);
+}
+
+//---------------------------------------------------------------------------------
+// LoROM + SA-1
+//---------------------------------------------------------------------------------
+
+READ8_MEMBER( snes_console_state::snessa1_hi_r )
+{
+	UINT16 address = offset & 0xffff;
+	
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			return space.read_byte(0x7e0000 + address);
+		else if (address < 0x6000)
+		{
+			if (address >= 0x2200 && address < 0x2400)
+				return m_cartslot->chip_read(space, offset);	// SA-1 Regs
+			else if (address >= 0x3000 && address < 0x3800)
+				return m_cartslot->chip_read(space, offset);	// Internal SA-1 RAM (2K)
+			else
+				return snes_r_io(space, address);
+		}
+		else if (address < 0x8000)
+			return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM
+		else
+			return m_cartslot->read_h(space, offset);
+	}
+	else
+		return m_cartslot->read_h(space, offset);
+}
+
+READ8_MEMBER( snes_console_state::snessa1_lo_r )
+{
+	UINT16 address = offset & 0xffff;
+	
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			return space.read_byte(0x7e0000 + address);
+		else if (address < 0x6000)
+		{
+			if (address >= 0x2200 && address < 0x2400)
+				return m_cartslot->chip_read(space, offset);	// SA-1 Regs
+			else if (address >= 0x3000 && address < 0x3800)
+				return m_cartslot->chip_read(space, offset);	// Internal SA-1 RAM (2K)
+			else
+				return snes_r_io(space, address);
+		}
+		else if (address < 0x8000)
+			return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM
+		else
+			return m_cartslot->read_l(space, offset);
+	}
+	else if (offset < 0x500000)
+		return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM (not mirrored above!)
+	else
+		return snes_r_io(space, address);					// nothing mapped here!
+}
+
+WRITE8_MEMBER( snes_console_state::snessa1_hi_w )
+{
+	UINT16 address = offset & 0xffff;
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			space.write_byte(0x7e0000 + address, data);
+		else if (address < 0x6000)
+		{
+			if (address >= 0x2200 && address < 0x2400)
+				m_cartslot->chip_write(space, offset, data);	// SA-1 Regs
+			else if (address >= 0x3000 && address < 0x3800)
+				m_cartslot->chip_write(space, offset, data);	// Internal SA-1 RAM (2K)
+			else
+				snes_w_io(space, address, data);
+		}
+		else if (address < 0x8000)
+			m_cartslot->chip_write(space, offset, data);		// SA-1 BWRAM
+	}
+}
+
+WRITE8_MEMBER( snes_console_state::snessa1_lo_w )
+{
+	if (offset >= 0x400000 && offset < 0x500000)
+		m_cartslot->chip_write(space, offset, data);		// SA-1 BWRAM (not mirrored above!)
+	else
+		snessfx_hi_w(space, offset, data, 0xff);
 }
 
 //---------------------------------------------------------------------------------
@@ -1484,7 +1576,7 @@ static SLOT_INTERFACE_START(snes_cart)
 	SLOT_INTERFACE_INTERNAL("lorom_dsp",     SNS_LOROM_NECDSP)
 	SLOT_INTERFACE_INTERNAL("lorom_dsp4",    SNS_LOROM_NECDSP)
 	SLOT_INTERFACE_INTERNAL("lorom_obc1",    SNS_LOROM_OBC1)
-	SLOT_INTERFACE_INTERNAL("lorom_sa1",     SNS_LOROM) // Cart + SA1 - unsupported
+	SLOT_INTERFACE_INTERNAL("lorom_sa1",     SNS_LOROM_SA1) // Cart + SA1 - unsupported
 	SLOT_INTERFACE_INTERNAL("lorom_sdd1",    SNS_LOROM_SDD1)
 	SLOT_INTERFACE_INTERNAL("lorom_sfx",     SNS_LOROM_SUPERFX)
 	SLOT_INTERFACE_INTERNAL("lorom_sgb",     SNS_LOROM) // SuperGB base cart - unsupported
@@ -1535,9 +1627,13 @@ void snes_console_state::machine_start()
 		case SNES_CX4:      // this still uses the old simulation instead of emulating the CPU
 		case SNES_ST010:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
 		case SNES_ST011:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
-		case SNES_SA1:      // still unemulated
 		case SNES_ST018:    // still unemulated
 		case SNES_Z80GB:    // still unemulated
+			break;
+		case SNES_SA1:      // skeleton support
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snes_console_state::snessa1_lo_r),this), write8_delegate(FUNC(snes_console_state::snessa1_lo_w),this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snes_console_state::snessa1_hi_r),this), write8_delegate(FUNC(snes_console_state::snessa1_hi_w),this));
+			set_5a22_map(m_maincpu);
 			break;
 		case SNES_DSP:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x208000, 0x20ffff, 0, 0x9f0000, read8_delegate(FUNC(base_sns_cart_slot_device::chip_read),(base_sns_cart_slot_device*)m_cartslot));

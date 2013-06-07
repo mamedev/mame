@@ -1677,6 +1677,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/sns_rom.o   \
 	$(MESS_MACHINE)/sns_rom21.o \
 	$(MESS_MACHINE)/sns_bsx.o   \
+	$(MESS_MACHINE)/sns_sa1.o   \
 	$(MESS_MACHINE)/sns_sdd1.o  \
 	$(MESS_MACHINE)/sns_sfx.o   \
 	$(MESS_MACHINE)/sns_spc7110.o \
