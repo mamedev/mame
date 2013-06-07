@@ -81,7 +81,7 @@
 //  Global variables
 //============================================================
 
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 int sdl_entered_debugger;
 #endif
 
