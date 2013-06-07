@@ -251,6 +251,7 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 		m_ya(*this, "YA"),
 		m_yb(*this, "YB"),
 		m_yc(*this, "YC"),
+		m_write_kbrdy(*this),
 		m_y(0),
 		m_kbrdy(1),
 		m_kbdata(1),
@@ -258,25 +259,6 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void victor9k_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const victor9k_keyboard_interface *intf = reinterpret_cast<const victor9k_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<victor9k_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_kbrdy_cb, 0, sizeof(m_out_kbrdy_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -285,7 +267,7 @@ void victor9k_keyboard_device::device_config_complete()
 void victor9k_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_kbrdy_func.resolve(m_out_kbrdy_cb, *this);
+	m_write_kbrdy.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_y));
@@ -400,7 +382,7 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 	if (m_kbrdy != kbrdy)
 	{
 		m_kbrdy = kbrdy;
-		m_out_kbrdy_func(m_kbrdy);
+		m_write_kbrdy(m_kbrdy);
 	}
 
 	m_kbdata = BIT(data, 3);

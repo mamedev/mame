@@ -74,7 +74,22 @@ public:
 			m_kb(*this, VICTOR9K_KEYBOARD_TAG),
 			m_rs232a(*this, RS232_A_TAG),
 			m_rs232b(*this, RS232_B_TAG),
-			m_video_ram(*this, "video_ram")
+			m_video_ram(*this, "video_ram"),
+			m_da(0),
+			m_da0(0),
+			m_da1(0),
+			m_sel0(0),
+			m_sel1(0),
+			m_tach0(0),
+			m_tach1(0),
+			m_rdy0(0),
+			m_rdy1(0),
+			m_ds0(1),
+			m_ds1(1),
+			m_lms(0),
+			m_brdy(1),
+			m_sync(1),
+			m_gcrerr(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -125,6 +140,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( via4_pa_w );
 	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	DECLARE_READ_LINE_MEMBER( ds0_r );
+	DECLARE_READ_LINE_MEMBER( ds1_r );
 	DECLARE_WRITE_LINE_MEMBER( mode_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
@@ -146,6 +163,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );
+
+	void ready0_cb(floppy_image_device *, int device);
+	int load0_cb(floppy_image_device *device);
+	void unload0_cb(floppy_image_device *device);
+	void ready1_cb(floppy_image_device *, int device);
+	int load1_cb(floppy_image_device *device);
+	void unload1_cb(floppy_image_device *device);
 
 	enum
 	{
@@ -177,6 +201,8 @@ public:
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
+	int m_ds0;
+	int m_ds1;
 	UINT8 m_lms;          	             /* motor speed */
 	int m_st[2];                        /* stepper phase */
 	int m_stp[2];                        /* stepper enable */

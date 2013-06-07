@@ -86,6 +86,36 @@ READ8_MEMBER( victor9k_state::floppy_p1_r )
 
 
 //-------------------------------------------------
+//  floppy_p2_r -
+//-------------------------------------------------
+
+READ8_MEMBER( victor9k_state::floppy_p2_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       RDY0
+	    7       RDY1
+	
+	*/
+
+	UINT8 data = 0;
+
+	data |= m_rdy0 << 6;
+	data |= m_rdy1 << 7;
+
+	return data;
+}
+
+
+//-------------------------------------------------
 //  floppy_p2_w -
 //-------------------------------------------------
 
@@ -101,8 +131,8 @@ WRITE8_MEMBER( victor9k_state::floppy_p2_w )
 	    3       STOP1
 	    4       SEL1
 	    5       SEL0
-	    6       RDY0
-	    7       RDY1
+	    6       
+	    7       
 	
 	*/
 
@@ -130,12 +160,6 @@ WRITE8_MEMBER( victor9k_state::floppy_p2_w )
 	}
 
 	m_sel1 = sel1;
-
-	m_rdy0 = BIT(data, 6);
-	m_via5->write_ca2(m_rdy0);
-
-	m_rdy1 = BIT(data, 7);
-	m_via5->write_cb2(m_rdy1);
 }
 
 
@@ -202,8 +226,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( floppy_io, AS_IO, 8, victor9k_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(floppy_p1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(floppy_p2_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(floppy_p1_r) AM_WRITENOP
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(floppy_p2_r, floppy_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(tach0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(tach1_r)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(da_w)
@@ -784,6 +808,16 @@ WRITE8_MEMBER( victor9k_state::via4_pb_w )
 	m_st[1] = data >> 4;
 }
 
+READ_LINE_MEMBER( victor9k_state::ds0_r )
+{
+	return m_ds0;
+}
+
+READ_LINE_MEMBER( victor9k_state::ds1_r )
+{
+	return m_ds1;
+}
+
 WRITE_LINE_MEMBER( victor9k_state::mode_w )
 {
 }
@@ -799,8 +833,8 @@ static const via6522_interface via4_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL, // DS0
-	DEVCB_NULL, // DS1
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, ds0_r),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, ds1_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -993,8 +1027,10 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 	data |= m_rdy1 << 1;
 
 	// door B sense
+	data |= m_ds1 << 3;
 
 	// door A sense
+	data |= m_ds0 << 4;
 
 	// single/double sided
 	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
@@ -1070,7 +1106,6 @@ static const via6522_interface via6_intf =
 };
 
 
-
 //-------------------------------------------------
 //  VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
@@ -1082,15 +1117,56 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, kbrdy_w)
-};
-
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( victor9k_floppies )
 //-------------------------------------------------
+
+void victor9k_state::ready0_cb(floppy_image_device *device, int state)
+{
+	m_rdy0 = state;
+
+	m_via5->write_ca2(m_rdy0);
+}
+
+int victor9k_state::load0_cb(floppy_image_device *device)
+{
+	m_ds0 = 0;
+
+	m_via4->write_ca1(m_ds0);
+
+	return IMAGE_INIT_PASS;
+}
+
+void victor9k_state::unload0_cb(floppy_image_device *device)
+{
+	m_ds0 = 1;
+
+	m_via4->write_ca1(m_ds0);
+}
+
+void victor9k_state::ready1_cb(floppy_image_device *device, int state)
+{
+	m_rdy1 = state;
+	
+	m_via5->write_cb2(m_rdy1);
+}
+
+int victor9k_state::load1_cb(floppy_image_device *device)
+{
+	m_ds1 = 0;
+
+	m_via4->write_cb1(m_ds1);
+
+	return IMAGE_INIT_PASS;
+}
+
+void victor9k_state::unload1_cb(floppy_image_device *device)
+{
+	m_ds1 = 1;
+
+	m_via4->write_cb1(m_ds1);
+}
 
 static SLOT_INTERFACE_START( victor9k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
@@ -1139,10 +1215,19 @@ void victor9k_state::machine_start()
 	// set interrupt callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(victor9k_state::victor9k_irq_callback),this));
 
+	// set floppy callbacks
+	m_floppy0->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor9k_state::ready0_cb), this));
+	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(victor9k_state::load0_cb), this));
+	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor9k_state::unload0_cb), this));
+	m_floppy1->setup_ready_cb(floppy_image_device::ready_cb(FUNC(victor9k_state::ready1_cb), this));
+	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(victor9k_state::load1_cb), this));
+	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor9k_state::unload1_cb), this));
+
 	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
 }
+
 
 
 //**************************************************************************
@@ -1197,7 +1282,7 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_VICTOR9K_KEYBOARD_ADD(kb_intf)
+	MCFG_VICTOR9K_KEYBOARD_ADD(WRITELINE(victor9k_state, kbrdy_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
