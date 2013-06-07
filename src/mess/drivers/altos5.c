@@ -2,6 +2,16 @@
 
     Altos 5-15
 
+    Boots, terminal works, memory banking works.
+
+    Error when reading floppy disk (record not found)
+
+    ToDo:
+    - DMA has its own memory banking, activated by BUSACK
+    - Get floppy to read the disk (only ones found are .TD0 format)
+    - Find out how to select double density on the fdc
+    - Further work once the floppy is fixed
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -26,7 +36,9 @@ public:
 		m_dart(*this, "z80dart"),
 		m_sio (*this, "z80sio"),
 		m_ctc (*this, "z80ctc"),
-		m_fdc (*this, "fd1797")
+		m_fdc (*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1")
 	{ }
 
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -41,12 +53,12 @@ public:
 	DECLARE_DRIVER_INIT(altos5);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	//DECLARE_FLOPPY_FORMATS(floppy_formats);
 	UINT8 m_port08;
 	UINT8 m_port09;
 	UINT8 *m_p_prom;
 	bool m_ipl;
-	bool m_wrpt;
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 	UINT8 convert(offs_t offset, bool state);
 	void setup_banks();
 	virtual void machine_reset();
@@ -57,6 +69,8 @@ public:
 	required_device<z80sio0_device> m_sio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 static ADDRESS_MAP_START(altos5_mem, AS_PROGRAM, 8, altos5_state)
@@ -82,7 +96,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fd1797", fd1797_t, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
@@ -162,7 +176,6 @@ void altos5_state::machine_reset()
 {
 	m_port08 = 0;
 	m_port09 = 0;
-	m_wrpt = 0;
 	m_ipl = 1;
 	setup_banks();
 	m_maincpu->reset();
@@ -213,7 +226,7 @@ WRITE8_MEMBER(altos5_state::io_write_byte)
 
 static Z80DMA_INTERFACE( dma_intf )
 {
-	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(altos5_state, p8k_dma_irq_w),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), // actually BUSRQ
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(altos5_state, memory_read_byte),
@@ -272,7 +285,7 @@ d7: IRQ from FDC
 */
 READ8_MEMBER( altos5_state::port08_r )
 {
-	return m_port08 | 0x87;
+	return m_port08 | 0x07;
 }
 
 /*
@@ -284,20 +297,36 @@ READ8_MEMBER( altos5_state::port09_r )
 }
 
 /*
-d4: DDEN (H = double density
+d4: DDEN (H = double density)
 d5: DS (H = drive 2)
 d6: SS (H = side 2)
 */
 WRITE8_MEMBER( altos5_state::port08_w )
 {
 	m_port08 = data;
+
+	floppy_image_device *floppy = NULL;
+	if (BIT(data, 5))
+		floppy = m_floppy1->get_device();
+	else
+		floppy = m_floppy0->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 6));
+		//floppy->dden_w(BIT(data, 4)); // no option to specify disk density
+		m_port08 |= (floppy->twosid_r() << 2); // get number of sides
+	}
 }
 
 /*
 d1, 2: Memory Map template selection (0 = diag; 1 = oasis; 2 = mp/m)
 d3, 4: CPU bank select
 d5:    H = Write protect of common area
-d6, 7: DMA bank select
+d6, 7: DMA bank select (not emulated)
 */
 WRITE8_MEMBER( altos5_state::port09_w )
 {
@@ -382,24 +411,31 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsa_w)
 };
 
-//FLOPPY_FORMATS_MEMBER( altos5_state::floppy_formats )
-//	FLOPPY_ALTOS5_FORMAT
-//FLOPPY_FORMATS_END
-
 static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
+void altos5_state::fdc_intrq_w(bool state)
+{
+	m_port08 = (m_port08 & 0x7f) | ((UINT8)(state) << 7);
+	m_pio0->port_a_write(m_port08);
+}
+
+void altos5_state::fdc_drq_w(bool state)
+{
+	// To DMA pin 25 - SDMA
+}
+
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
 
-	floppy_connector *con = machine().device<floppy_connector>("fd1797:0");
+	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);
-		//m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_intrq_w), this));
-		//m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(applix_state::fdc_drq_w), this));
+		m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_intrq_w), this));
+		m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_drq_w), this));
 
 		floppy->ss_w(0);
 	}
@@ -459,9 +495,9 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
-	MCFG_FD1797x_ADD("fd1797", XTAL_8MHz / 4)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 4)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
