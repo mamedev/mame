@@ -33,7 +33,7 @@ public:
 	required_shared_ptr<UINT32> m_mainram;
 	optional_shared_ptr<UINT32> m_scrollram;
 	optional_memory_region m_z80_rom;
-	required_device<eeprom_device> m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	optional_device<intel_e28f008sa_device> m_soundflash1;
 	optional_device<intel_e28f008sa_device> m_soundflash2;
 	optional_device<fifo7200_device> m_soundfifo1;
@@ -76,12 +76,12 @@ public:
 	DECLARE_WRITE32_MEMBER(sprite_dma_start_w);
 	DECLARE_WRITE32_MEMBER(video_dma_length_w);
 	DECLARE_WRITE32_MEMBER(video_dma_address_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ejsakura_keyboard_r);
+	DECLARE_READ32_MEMBER(ejsakura_keyboard_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 	DECLARE_READ8_MEMBER(sb_coin_r);
 	DECLARE_WRITE8_MEMBER(spi_coin_w);
 	DECLARE_READ8_MEMBER(sound_fifo_status_r);
-	DECLARE_READ32_MEMBER(spi_int_r);
+	DECLARE_READ8_MEMBER(spi_int_r);
 	DECLARE_READ32_MEMBER(spi_nop_r);
 	DECLARE_WRITE8_MEMBER(z80_prg_transfer_w);
 	DECLARE_WRITE8_MEMBER(z80_enable_w);
