@@ -37,15 +37,14 @@ public:
 	DECLARE_WRITE8_MEMBER(port09_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_DRIVER_INIT(altos5);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(port2e_r);
-	DECLARE_READ8_MEMBER(port2f_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	UINT8 m_port08;
 	UINT8 m_port09;
+	UINT8 *m_p_prom;
 	bool m_ipl;
 	bool m_wrpt;
+	UINT8 convert(offs_t offset, bool state);
 	void setup_banks();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
@@ -93,15 +92,66 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( altos5 )
 INPUT_PORTS_END
 
+UINT8 altos5_state::convert(offs_t offset, bool state)
+{
+	UINT8 data = m_p_prom[offset];
+
+	// if IPL and /A12, point at rom
+	if (!state & m_ipl & !BIT(offset, 0))
+		data = 0x31;
+	else
+	// if WPRT point at nothing
+	if (state & BIT(data, 7))
+		data = 0x30;
+	else
+	// normalise bank number and use it
+	if (BIT(data, 6))
+		data-= 0x20;
+	else
+		data-= 0x10;
+
+	return data & 0x3f;
+}
+	
 void altos5_state::setup_banks()
 {
-	UINT8 *prom =  memregion("proms")->base();
-	UINT8 i;
-	offs_t offset = ((~m_port09 & 0x20) << 3) | (m_port09 & 0xc0) | ((m_port09 & 0x18) << 1);
-printf("\n%X:",offset);
-	for (i = 0; i < 16; i++)
-		printf("%X ",prom[offset+i]);
-	membank("bankr0")->set_entry(49);
+	// WPRT | template | cpu bank
+	offs_t offs = ((~m_port09 & 0x20) << 3) | ((m_port09 & 0x06) << 5) | ((m_port09 & 0x18) << 1);
+	offs_t temp = offs;
+
+	membank("bankr0")->set_entry(convert(offs++, 0));
+	membank("bankr1")->set_entry(convert(offs++, 0));
+	membank("bankr2")->set_entry(convert(offs++, 0));
+	membank("bankr3")->set_entry(convert(offs++, 0));
+	membank("bankr4")->set_entry(convert(offs++, 0));
+	membank("bankr5")->set_entry(convert(offs++, 0));
+	membank("bankr6")->set_entry(convert(offs++, 0));
+	membank("bankr7")->set_entry(convert(offs++, 0));
+	membank("bankr8")->set_entry(convert(offs++, 0));
+	membank("bankr9")->set_entry(convert(offs++, 0));
+	membank("bankra")->set_entry(convert(offs++, 0));
+	membank("bankrb")->set_entry(convert(offs++, 0));
+	membank("bankrc")->set_entry(convert(offs++, 0));
+	membank("bankrd")->set_entry(convert(offs++, 0));
+	membank("bankre")->set_entry(convert(offs++, 0));
+	membank("bankrf")->set_entry(convert(offs++, 0));
+
+	membank("bankw0")->set_entry(convert(temp++, 1));
+	membank("bankw1")->set_entry(convert(temp++, 1));
+	membank("bankw2")->set_entry(convert(temp++, 1));
+	membank("bankw3")->set_entry(convert(temp++, 1));
+	membank("bankw4")->set_entry(convert(temp++, 1));
+	membank("bankw5")->set_entry(convert(temp++, 1));
+	membank("bankw6")->set_entry(convert(temp++, 1));
+	membank("bankw7")->set_entry(convert(temp++, 1));
+	membank("bankw8")->set_entry(convert(temp++, 1));
+	membank("bankw9")->set_entry(convert(temp++, 1));
+	membank("bankwa")->set_entry(convert(temp++, 1));
+	membank("bankwb")->set_entry(convert(temp++, 1));
+	membank("bankwc")->set_entry(convert(temp++, 1));
+	membank("bankwd")->set_entry(convert(temp++, 1));
+	membank("bankwe")->set_entry(convert(temp++, 1));
+	membank("bankwf")->set_entry(convert(temp++, 1));
 }
 
 void altos5_state::machine_reset()
@@ -111,6 +161,7 @@ void altos5_state::machine_reset()
 	m_wrpt = 0;
 	m_ipl = 1;
 	setup_banks();
+	m_maincpu->reset();
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -120,51 +171,10 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80pio_1" },
 	{ "z80ctc" },
 	{ "z80dart" },
-//	{ "z80sio" },
+	{ "z80sio" },
 	{ NULL }
 };
 
-/*
-d0: L = a HD is present
-d1: L = a 2nd hard drive is present
-d2: unused configuration input (must be H to skip HD boot)
-d3: selected floppy is single(L) or double sided(H) 
-d7: IRQ from FDC
-*/
-READ8_MEMBER( altos5_state::port08_r )
-{
-	return m_port08 | 0x87;
-}
-
-/*
-d0: HD IRQ
-*/
-READ8_MEMBER( altos5_state::port09_r )
-{
-	return m_port09 | 0x01;
-}
-
-/*
-d4: DDEN (H = double density
-d5: DS (H = drive 2)
-d6: SS (H = side 2)
-*/
-WRITE8_MEMBER( altos5_state::port08_w )
-{
-	m_port08 = data;
-}
-
-/*
-d1, 2: Memory Map template selection (0 = diag; 1 = oasis; 2 = mp/m)
-d3, 4: CPU bank select
-d5:    H = Write protect of common area
-d6, 7: DMA bank select
-*/
-WRITE8_MEMBER( altos5_state::port09_w )
-{
-	m_port09 = data;
-	setup_banks();
-}
 
 // turns off IPL mode, removes boot rom from memory map
 WRITE8_MEMBER( altos5_state::port14_w )
@@ -217,6 +227,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(altos5_state::ctc_tick)
 	m_ctc->trg1(0);
 	m_ctc->trg2(1);
 	m_ctc->trg2(0);
+	m_ctc->trg3(1);
+	m_ctc->trg3(0);
 }
 
 WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
@@ -246,6 +258,48 @@ static Z80PIO_INTERFACE( pio0_intf )
 	DEVCB_DRIVER_MEMBER(altos5_state, port09_w),         /* write port B */
 	DEVCB_NULL          /* portB ready active callback */
 };
+
+/*
+d0: L = a HD is present
+d1: L = a 2nd hard drive is present
+d2: unused configuration input (must be H to skip HD boot)
+d3: selected floppy is single(L) or double sided(H) 
+d7: IRQ from FDC
+*/
+READ8_MEMBER( altos5_state::port08_r )
+{
+	return m_port08 | 0x87;
+}
+
+/*
+d0: HD IRQ
+*/
+READ8_MEMBER( altos5_state::port09_r )
+{
+	return m_port09 | 0x01;
+}
+
+/*
+d4: DDEN (H = double density
+d5: DS (H = drive 2)
+d6: SS (H = side 2)
+*/
+WRITE8_MEMBER( altos5_state::port08_w )
+{
+	m_port08 = data;
+}
+
+/*
+d1, 2: Memory Map template selection (0 = diag; 1 = oasis; 2 = mp/m)
+d3, 4: CPU bank select
+d5:    H = Write protect of common area
+d6, 7: DMA bank select
+*/
+WRITE8_MEMBER( altos5_state::port09_w )
+{
+	m_port09 = data;
+	setup_banks();
+}
 
 // parallel port
 static Z80PIO_INTERFACE( pio1_intf )
@@ -287,6 +341,7 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL
 };
 
+// consoles#1 and 2
 static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
@@ -325,7 +380,10 @@ static const rs232_port_interface rs232_intf =
 
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
+	m_p_prom =  memregion("proms")->base();
+
 	UINT8 *RAM = memregion("maincpu")->base();
+
 	membank("bankr0")->configure_entries(0, 50, &RAM[0], 0x1000);
 	membank("bankr1")->configure_entries(0, 50, &RAM[0], 0x1000);
 	membank("bankr2")->configure_entries(0, 50, &RAM[0], 0x1000);
@@ -383,8 +441,6 @@ MACHINE_CONFIG_END
 ROM_START( altos5 ) // 00000-2FFFF = ram banks; 30000-30FFF wprt space; 31000-31FFF ROM
 	ROM_REGION( 0x32000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("2732.bin",   0x31000, 0x1000, CRC(15fdc7eb) SHA1(e15bdf5d5414ad56f8c4bb84edc6f967a5f01ba9)) // bios
-	ROM_FILL(0x31054, 2, 0) // temp until banking sorted out
-	ROM_FILL(0x31344, 3, 0) // kill self test
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("82s141.bin", 0x0000, 0x0200, CRC(35c8078c) SHA1(dce24374bfcc5d23959e2c03485d82a119c0c3c9)) // banking control
@@ -393,4 +449,4 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS           INIT    COMPANY    FULLNAME       FLAGS */
-COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state,  altos5, "Altos", "Altos 5-15", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(1982, altos5, 0,      0,       altos5,  altos5, altos5_state,  altos5, "Altos", "Altos 5-15", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
