@@ -148,7 +148,6 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "machine/nmk004.h"
-#include "machine/nmk112.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/nmk16.h"
 
@@ -1080,7 +1079,7 @@ static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xc800, 0xc800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xc808, 0xc808) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)
+	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 //  AM_RANGE(0xc810, 0xc817) AM_WRITE(okibank_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(raphero_sound_rombank_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)    // main cpu
@@ -1101,7 +1100,7 @@ static ADDRESS_MAP_START( macross2_sound_io_map, AS_IO, 8, nmk16_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x90, 0x97) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
@@ -1113,7 +1112,7 @@ static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
+	AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
@@ -1139,7 +1138,7 @@ static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 //  AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-//  AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
+//  AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */

@@ -86,7 +86,6 @@ Versions known to exist but not dumped:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "machine/nvram.h"
-#include "machine/nmk112.h"
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
 #include "sound/2203intf.h"
@@ -510,7 +509,7 @@ static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_SHARE("paletteram")      // Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)                 // M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)                 //
-	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)                             //
+	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)                             //
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                                                        // Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                                        // Inputs + EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w)                                    // EEPROM
@@ -1164,7 +1163,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  //
-	AM_RANGE(0x10, 0x17) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)         // Samples bank
+	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)         // Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   //
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)                         // To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITENOP                                         // ?? volume

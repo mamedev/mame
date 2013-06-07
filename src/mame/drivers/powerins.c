@@ -31,7 +31,6 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
 #include "includes/powerins.h"
@@ -124,7 +123,7 @@ static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8, powerins_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x90, 0x97) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerinb_sound_io_map, AS_IO, 8, powerins_state )
@@ -133,7 +132,7 @@ static ADDRESS_MAP_START( powerinb_sound_io_map, AS_IO, 8, powerins_state )
 	AM_RANGE(0x01, 0x01) AM_NOP
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x90, 0x97) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)
+	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
 ADDRESS_MAP_END
 
 

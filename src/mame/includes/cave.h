@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 #include "machine/eeprom.h"
+#include "machine/nmk112.h"
 
 struct sprite_cave
 {
@@ -36,6 +37,7 @@ public:
 			m_mirror_ram(*this, "mirror_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_nmk112(*this, "nmk112"),
 			m_int_timer(*this, "int_timer"),
 			m_eeprom(*this, "eeprom") { }
 
@@ -116,6 +118,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<nmk112_device> m_nmk112;
 	required_device<timer_device> m_int_timer;
 	int m_rasflag;
 	int m_old_rasflag;

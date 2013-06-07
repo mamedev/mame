@@ -1,4 +1,6 @@
 #include "machine/eeprom.h"
+#include "machine/nmk112.h"
+
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -29,6 +31,7 @@ public:
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_nmk112(*this, "nmk112"),
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
 		m_eeprom(*this, "eeprom") {
@@ -147,6 +150,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<nmk112_device> m_nmk112;
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_device> m_eeprom;

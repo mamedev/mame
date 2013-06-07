@@ -353,7 +353,6 @@ To Do / Unknowns:
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/eeprom.h"
-#include "machine/nmk112.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -838,10 +837,8 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 
 WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	nmk112_device *nmk112 = machine().device<nmk112_device>("nmk112");
-
-	nmk112_okibank_w(nmk112, space, offset,     data        & 0x0f);
-	nmk112_okibank_w(nmk112, space, offset + 1, (data >> 4) & 0x0f);
+	m_nmk112->okibank_w(space, offset, data & 0x0f);
+	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
 }
 
 

@@ -47,7 +47,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "includes/quizpani.h"
 
@@ -61,7 +60,7 @@ static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP /* IRQ enable? */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(quizpani_tilesbank_w)
 	AM_RANGE(0x104000, 0x104001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
+	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
 	AM_RANGE(0x108000, 0x1083ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
 	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_SHARE("scrollreg")
