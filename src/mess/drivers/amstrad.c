@@ -954,8 +954,8 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	MCFG_FRAGMENT_ADD(cpcplus_cartslot)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", amstrad_state::floppy_formats)
 
 	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL)
 
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_DERIVED( aleste, amstrad )
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
-	MCFG_SOUND_REPLACE("ay", AY8910, XTAL_16MHz / 16)
+	MCFG_SOUND_REPLACE("ay", AY8912, XTAL_16MHz / 16)
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_PALETTE_LENGTH(32+64)
