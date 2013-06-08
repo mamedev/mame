@@ -149,10 +149,6 @@ public:
 	DECLARE_WRITE32_MEMBER(parallel_port_w);
 	DECLARE_READ32_MEMBER(ad1847_r);
 	DECLARE_WRITE32_MEMBER(ad1847_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	DECLARE_DRIVER_INIT(a51site4);
@@ -412,28 +408,6 @@ WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
-
-
-READ32_MEMBER(mediagx_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(mediagx_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(mediagx_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(mediagx_state::fdc_w)
-{
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
-
 
 
 READ32_MEMBER(mediagx_state::memory_ctrl_r)
@@ -784,9 +758,9 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END

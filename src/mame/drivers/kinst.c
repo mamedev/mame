@@ -325,25 +325,25 @@ WRITE_LINE_MEMBER(kinst_state::ide_interrupt)
 
 READ32_MEMBER(kinst_state::kinst_ide_r)
 {
-	return midway_ide_asic_r(m_ide, space, offset / 2, mem_mask);
+	return m_ide->read_cs0(space, offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_w)
 {
-	midway_ide_asic_w(m_ide, space, offset / 2, data, mem_mask);
+	m_ide->write_cs0(space, offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::kinst_ide_extra_r)
 {
-	return m_ide->ide_controller32_r(space, 0x3f6/4, 0x00ff0000) >> 16;
+	return m_ide->read_cs1(space, 6, 0xff);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 {
-	m_ide->ide_controller32_w(space, 0x3f6/4, data << 16, 0x00ff0000);
+	m_ide->write_cs1(space, 6, data, 0xff);
 }
 
 

@@ -1459,28 +1459,50 @@ static WRITE32_HANDLER( asic_fifo_w )
 static READ32_DEVICE_HANDLER( ide_main_r )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
-	return ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
+
+	UINT32 data = 0;
+	if (ACCESSING_BITS_0_15)
+		data |= ide->read_cs0_pc(space, offset * 2, mem_mask);
+	if (ACCESSING_BITS_16_31)
+		data |= ide->read_cs0_pc(space, (offset * 2) + 1, mem_mask >> 16) << 16;
+
+	return data;
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
-	ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
+
+	if (ACCESSING_BITS_0_15)
+		ide->write_cs0_pc(space, offset * 2, data, mem_mask);
+	if (ACCESSING_BITS_16_31)
+		ide->write_cs0_pc(space, (offset * 2) + 1, data >> 16, mem_mask >> 16);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
-	return ide->ide_controller32_r(space, 0x3f4/4 + offset, mem_mask);
+
+	UINT32 data = 0;
+	if (ACCESSING_BITS_0_15)
+		data |= ide->read_cs1_pc(space, (4/2) + (offset * 2), mem_mask);
+	if (ACCESSING_BITS_16_31)
+		data |= ide->read_cs1_pc(space, (4/2) + (offset * 2) + 1, mem_mask >> 16) << 16;
+
+	return data;
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
 	ide_controller_device *ide = (ide_controller_device *) device;
-	ide->ide_controller32_w(space, 0x3f4/4 + offset, data, mem_mask);
+
+	if (ACCESSING_BITS_0_15)
+		ide->write_cs1_pc(space, 6/2 + offset * 2, data, mem_mask);
+	if (ACCESSING_BITS_16_31)
+		ide->write_cs1_pc(space, 6/2 + (offset * 2) + 1, data >> 16, mem_mask >> 16);
 }
 
 

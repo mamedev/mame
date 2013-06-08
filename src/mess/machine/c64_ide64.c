@@ -179,9 +179,15 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 		UINT8 io1_offset = offset & 0xff;
 
-		if (io1_offset >= 0x20 && io1_offset < 0x30)
+		if (io1_offset >= 0x20 && io1_offset < 0x28)
 		{
-			m_ide_data = m_ide->ide_bus_r(BIT(offset, 3), offset & 0x07);
+			m_ide_data = m_ide->read_cs0(space, offset & 0x07, 0xffff);
+
+			data = m_ide_data & 0xff;
+		}
+		else if (io1_offset >= 0x28 && io1_offset < 0x30)
+		{
+			m_ide_data = m_ide->read_cs1(space, offset & 0x07, 0xffff);
 
 			data = m_ide_data & 0xff;
 		}
@@ -274,11 +280,17 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 
 		UINT8 io1_offset = offset & 0xff;
 
-		if (io1_offset >= 0x20 && io1_offset < 0x30)
+		if (io1_offset >= 0x20 && io1_offset < 0x28)
 		{
 			m_ide_data = (m_ide_data & 0xff00) | data;
 
-			m_ide->ide_bus_w(BIT(offset, 3), offset & 0x07, m_ide_data);
+			m_ide->write_cs0(space, offset & 0x07, m_ide_data, 0xffff);
+		}
+		else if (io1_offset >= 0x28 && io1_offset < 0x30)
+		{
+			m_ide_data = (m_ide_data & 0xff00) | data;
+
+			m_ide->write_cs1(space, offset & 0x07, m_ide_data, 0xffff);
 		}
 		else if (io1_offset == 0x31)
 		{

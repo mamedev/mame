@@ -1077,6 +1077,57 @@ static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE(wave_rom_r16, wave_rom_w16 )
 ADDRESS_MAP_END
 
+/// hack for 32 big endian bus talking to 16 bit little endian ide
+READ32_MEMBER(jaguar_state::vt83c461_r)
+{
+	UINT32 data = 0;
+
+	if(offset >= 0x30/4 && offset < 0x40/4)
+	{
+		if (ACCESSING_BITS_0_7)
+			data = m_ide->read_via_config(space, (offset * 4) & 0xf, mem_mask);
+	}
+	else if( offset >= 0x1f0/4 && offset < 0x1f8/4 )
+	{
+		if (ACCESSING_BITS_0_15)
+			data |= m_ide->read_cs0_pc(space, (offset * 2) & 7, mem_mask);
+		if (ACCESSING_BITS_16_31)
+			data |= m_ide->read_cs0_pc(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
+	}
+	else if( offset >= 0x3f0/4 && offset < 0x3f8/4 )
+	{
+		if (ACCESSING_BITS_0_15)
+			data |= m_ide->read_cs1_pc(space, (offset * 2) & 7, mem_mask);
+		if (ACCESSING_BITS_16_31)
+			data |= m_ide->read_cs1_pc(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
+	}
+
+	return data;
+}
+
+WRITE32_MEMBER(jaguar_state::vt83c461_w)
+{
+	if(offset >= 0x30/4 && offset < 0x40/4)
+	{
+		if (ACCESSING_BITS_0_7)
+			m_ide->write_via_config(space, (offset * 4) & 0xf, data, mem_mask);
+	}
+	else if( offset >= 0x1f0/4 && offset < 0x1f8/4 )
+	{
+		if (ACCESSING_BITS_0_15)
+			m_ide->write_cs0_pc(space, (offset * 2) & 7, data, mem_mask);
+		if (ACCESSING_BITS_16_31)
+			m_ide->write_cs0_pc(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
+	}
+	else if( offset >= 0x3f0/4 && offset < 0x3f8/4 )
+	{
+		if (ACCESSING_BITS_0_15)
+			m_ide->write_cs1_pc(space, (offset * 2) & 7, data, mem_mask);
+		if (ACCESSING_BITS_16_31)
+			m_ide->write_cs1_pc(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
+	}
+}
+
 
 
 /*************************************
@@ -1089,7 +1140,7 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("maingfxbank")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("mainsndbank")
-	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0x04e00000, 0x04e003ff) AM_READWRITE(vt83c461_r, vt83c461_w)
 	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -1123,7 +1174,7 @@ static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("mainsndbank")
-	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide",  ide_controller_device, ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0xe00000, 0xe003ff) AM_READWRITE(vt83c461_r, vt83c461_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
@@ -1151,7 +1202,7 @@ static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, jaguar_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("gpugfxbank")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("dspsndbank")
-	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0xe00000, 0xe003ff) AM_READWRITE(vt83c461_r, vt83c461_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE16(tom_regs_r, tom_regs_w, 0xffffffff)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("gpuclut")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)

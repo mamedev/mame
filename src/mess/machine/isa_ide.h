@@ -28,8 +28,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_ADDRESS_MAP(map, 16);
 	DECLARE_ADDRESS_MAP(alt_map, 8);
-	READ16_MEMBER(ide16_r);
-	WRITE16_MEMBER(ide16_w);
 	READ8_MEMBER(ide16_alt_r);
 	WRITE8_MEMBER(ide16_alt_w);
 protected:

@@ -41,12 +41,30 @@ void ata_flash_pccard_device::device_reset_after_children()
 
 READ16_MEMBER( ata_flash_pccard_device::read_memory )
 {
-	return m_card->ide_controller16_pcmcia_r(space, offset, mem_mask);
+	if(offset <= 7)
+	{
+		return m_card->read_cs0(space, offset, mem_mask);
+	}
+	else if(offset <= 15)
+	{
+		return m_card->read_cs1(space, offset & 7, mem_mask);
+	}
+	else
+	{
+		return 0xffff;
+	}
 }
 
 WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 {
-	m_card->ide_controller16_pcmcia_w(space, offset, data, mem_mask);
+	if(offset <= 7)
+	{
+		m_card->write_cs0(space, offset, data, mem_mask);
+	}
+	else if( offset <= 15)
+	{
+		m_card->write_cs1(space, offset, data & 7, mem_mask);
+	}
 }
 
 READ16_MEMBER( ata_flash_pccard_device::read_reg )

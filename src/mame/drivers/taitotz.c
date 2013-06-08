@@ -613,6 +613,9 @@ public:
 
 	UINT8 m_rtcdata[8];
 
+	UINT16 ide_cs0_latch_r;
+	UINT16 ide_cs0_latch_w;
+	UINT16 ide_cs1_latch_w;
 
 
 	UINT32 m_reg105;
@@ -2109,19 +2112,18 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
 	if (reg == 0)
 	{
 		if ((offset & 1) == 0)
 		{
-			ide_reg_latch = m_ide->ide_bus_r(0, reg);
-			return (ide_reg_latch & 0xff);
+			ide_cs0_latch_r = m_ide->read_cs0(space, reg, 0xffff);
+			return (ide_cs0_latch_r & 0xff);
 		}
 		else
 		{
-			return (ide_reg_latch >> 8) & 0xff;
+			return (ide_cs0_latch_r >> 8) & 0xff;
 		}
 	}
 	else
@@ -2129,7 +2131,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 		if (offset & 1)
 			fatalerror("tlcs_ide0_r: %02X, odd offset\n", offset);
 
-		UINT8 d = m_ide->ide_bus_r(0, reg);
+		UINT8 d = m_ide->read_cs0(space, reg, 0xff);
 		if (reg == 7)
 			d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 							// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2139,34 +2141,32 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 
 WRITE8_MEMBER(taitotz_state::tlcs_ide0_w)
 {
-	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
 	if (reg == 7 || reg == 0)
 	{
 		if ((offset & 1) == 0)
 		{
-			ide_reg_latch &= 0xff00;
-			ide_reg_latch |= data;
+			ide_cs0_latch_w &= 0xff00;
+			ide_cs0_latch_w |= data;
 		}
 		else
 		{
-			ide_reg_latch &= 0x00ff;
-			ide_reg_latch |= (UINT16)(data) << 8;
-			m_ide->ide_bus_w(0, reg, ide_reg_latch);
+			ide_cs0_latch_w &= 0x00ff;
+			ide_cs0_latch_w |= (UINT16)(data) << 8;
+			m_ide->write_cs0(space, reg, ide_cs0_latch_w, 0xffff);
 		}
 	}
 	else
 	{
 		if (offset & 1)
 			fatalerror("tlcs_ide0_w: %02X, %02X, odd offset\n", offset, data);
-		m_ide->ide_bus_w(0, reg, data);
+		m_ide->write_cs0(space, reg, data, 0xff);
 	}
 }
 
 READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	//static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
 	if (reg != 6)
@@ -2174,7 +2174,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 
 	if ((offset & 1) == 0)
 	{
-		UINT8 d = m_ide->ide_bus_r(1, reg);
+		UINT8 d = m_ide->read_cs1(space, reg, 0xff);
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
 		return d;
@@ -2182,7 +2182,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 	else
 	{
 		//fatalerror("tlcs_ide1_r: %02X, odd offset\n", offset);
-		UINT8 d = m_ide->ide_bus_r(1, reg);
+		UINT8 d = m_ide->read_cs1(space, reg, 0xff);
 		d &= ~0x2;
 		return d;
 	}
@@ -2190,7 +2190,6 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 
 WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 {
-	static UINT16 ide_reg_latch;
 	int reg = offset >> 1;
 
 	if (reg != 6)
@@ -2198,14 +2197,14 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 
 	if ((offset & 1) == 0)
 	{
-		ide_reg_latch &= 0xff00;
-		ide_reg_latch |= data;
+		ide_cs1_latch_w &= 0xff00;
+		ide_cs1_latch_w |= data;
 	}
 	else
 	{
-		ide_reg_latch &= 0x00ff;
-		ide_reg_latch |= (UINT16)(data) << 16;
-		m_ide->ide_bus_w(1, reg, ide_reg_latch);
+		ide_cs1_latch_w &= 0x00ff;
+		ide_cs1_latch_w |= (UINT16)(data) << 16;
+		m_ide->write_cs1(space, reg, ide_cs1_latch_w, 0xffff);
 	}
 }
 
@@ -2527,23 +2526,16 @@ static INPUT_PORTS_START( pwrshovl )
 INPUT_PORTS_END
 
 
-static void set_ide_drive_serial_number(device_t *device, int drive, const char *serial)
-{
-	ide_controller_device *ide = (ide_controller_device *) device;
-	UINT8 *ide_features = ide->ide_get_features(drive);
-
-	for (int i=0; i < 20; i++)
-	{
-		ide_features[10*2+(i^1)] = serial[i];
-	}
-}
-
-
 void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != NULL)
 	{
-		set_ide_drive_serial_number(m_ide, 0, m_hdd_serial_number);
+		UINT8 *ide_features = m_ide->ide_get_features(0);
+
+		for (int i=0; i < 20; i++)
+		{
+			ide_features[10*2+(i^1)] = m_hdd_serial_number[i];
+		}
 	}
 }
 

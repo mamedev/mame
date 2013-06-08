@@ -34,11 +34,9 @@ class midqslvr_state : public pcat_base_state
 {
 public:
 	midqslvr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_ide(*this, "ide")
-			{ }
-
-	required_device<ide_controller_device> m_ide;
+		: pcat_base_state(mconfig, type, tag)
+	{
+	}
 
 	UINT32 *m_bios_ram;
 	UINT32 *m_bios_ext1_ram;
@@ -59,10 +57,6 @@ public:
 	DECLARE_WRITE32_MEMBER( bios_ext4_ram_w );
 
 	DECLARE_WRITE32_MEMBER( bios_ram_w );
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 	virtual void machine_start();
 	virtual void machine_reset();
 	void intel82439tx_init();
@@ -360,27 +354,6 @@ WRITE32_MEMBER(midqslvr_state::bios_ram_w)
 	}
 }
 
-READ32_MEMBER(midqslvr_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(midqslvr_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(midqslvr_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(midqslvr_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
-
 static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32, midqslvr_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
@@ -399,11 +372,11 @@ static ADDRESS_MAP_START(midqslvr_io, AS_IO, 32, midqslvr_state)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END

@@ -24,49 +24,21 @@ class voyager_state : public pcat_base_state
 {
 public:
 	voyager_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_ide(*this, "ide")
-			{ }
+		: pcat_base_state(mconfig, type, tag)
+	{
+	}
 
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
 	UINT8 m_piix4_config_reg[4][256];
 
-	required_device<ide_controller_device> m_ide;
-
 	UINT32 m_idle_skip_ram;
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_DRIVER_INIT(voyager);
 	virtual void machine_start();
 	virtual void machine_reset();
 	void intel82439tx_init();
 };
-
-
-READ32_MEMBER(voyager_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(voyager_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(voyager_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(voyager_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
 
 
 // Intel 82439TX System Controller (MXTC)
@@ -276,7 +248,7 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
 	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
 	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
@@ -295,7 +267,7 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
 	// AM_RANGE(0x0300, 0x03af) AM_NOP
 	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)

@@ -82,9 +82,6 @@ public:
 	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
 	DECLARE_READ8_MEMBER(cbaj_sound_main_status_r);
 	DECLARE_READ8_MEMBER(cbaj_sound_z80_status_r);
-	DECLARE_READ8_MEMBER(jdredd_idestat_r);
-	DECLARE_READ16_MEMBER(jdredd_ide_r);
-	DECLARE_WRITE16_MEMBER(jdredd_ide_w);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000c);
@@ -109,8 +106,8 @@ protected:
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-	inline UINT8 psxreadbyte( UINT32 *p_n_psxram, UINT32 n_address );
-	inline void psxwritebyte( UINT32 *p_n_psxram, UINT32 n_address, UINT8 n_data );
+	inline UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address );
+	inline void psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data );
 
 	UINT8 m_n_znsecsel;
 
@@ -147,15 +144,15 @@ inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fm
 }
 
 #ifdef UNUSED_FUNCTION
-inline UINT8 zn_state::psxreadbyte( UINT32 *p_n_psxram, UINT32 n_address )
+inline UINT16 zn_state::psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
 {
-	return *( (UINT8 *)p_n_psxram + BYTE4_XOR_LE( n_address ) );
+	return *( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) );
 }
 #endif
 
-inline void zn_state::psxwritebyte( UINT32 *p_n_psxram, UINT32 n_address, UINT8 n_data )
+inline void zn_state::psxwriteword( UINT32 *p_n_psxram, UINT32 n_address, UINT16 n_data )
 {
-	*( (UINT8 *)p_n_psxram + BYTE4_XOR_LE( n_address ) ) = n_data;
+	*( (UINT16 *)( (UINT8 *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
 
 static const UINT8 ac01[ 8 ] = { 0x80, 0x1c, 0xe2, 0xfa, 0xf9, 0xf1, 0x30, 0xc0 };
@@ -1341,15 +1338,19 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 		return;
 	}
 
-	/* dma size is in 32-bit words, convert to bytes */
-	n_size <<= 2;
+//	printf( "%08x %08x %08x\n", n_address, n_size * 4, n_address + n_size * 4 );
+
+	/* dma size is in 32-bit words, convert to words */
+	n_size <<= 1;
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	while( n_size > 0 )
 	{
-		psxwritebyte( p_n_psxram, n_address, m_ide->ide_controller32_r( space, 0x1f0 / 4, 0x000000ff ) );
-		n_address++;
+		psxwriteword( p_n_psxram, n_address, m_ide->read_cs0( space, 0, 0xffff ) );
+		n_address += 2;
 		n_size--;
 	}
+
+//	printf( "%08x\n", n_address );
 }
 
 void zn_state::atpsx_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
@@ -1361,8 +1362,11 @@ static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
 	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
-	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w )
-	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_DEVREADWRITE("ide", ide_controller_device, ide_controller32_r, ide_controller32_w )
+	AM_RANGE(0x1f7e4030, 0x1f7e403f) AM_DEVREADWRITE8("ide", ide_controller_device, read_via_config, write_via_config, 0xffffffff)
+	AM_RANGE(0x1f7e41f0, 0x1f7e41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+	AM_RANGE(0x1f7e43f0, 0x1f7e43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
+	AM_RANGE(0x1f7f41f0, 0x1f7f41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+	AM_RANGE(0x1f7f43f0, 0x1f7f43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
@@ -1874,39 +1878,6 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-READ8_MEMBER(zn_state::jdredd_idestat_r)
-{
-	return m_ide->ide_controller_r( 0x1f7, 1 );
-}
-
-READ16_MEMBER(zn_state::jdredd_ide_r)
-{
-	UINT16 data = 0;
-
-	if( ACCESSING_BITS_0_7 )
-	{
-		data |= m_ide->ide_controller_r( 0x1f0 + offset, 1 ) << 0;
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		data |= m_ide->ide_controller_r( 0x1f0 + offset, 1 ) << 8;
-	}
-
-	return data;
-}
-
-WRITE16_MEMBER(zn_state::jdredd_ide_w)
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		m_ide->ide_controller_w( 0x1f0 + offset, 1, data >> 0 );
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		m_ide->ide_controller_w( 0x1f0 + offset, 1, data >> 8 );
-	}
-}
-
 CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
 {
 	return m_jdredd_gun_mux;
@@ -1988,8 +1959,8 @@ static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
-	AM_RANGE(0x1fbfff8c, 0x1fbfff8f) AM_READ8(jdredd_idestat_r, 0x000000ff) AM_WRITENOP
-	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_READWRITE16(jdredd_ide_r, jdredd_ide_w, 0xffffffff)
+	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
+	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
 
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END

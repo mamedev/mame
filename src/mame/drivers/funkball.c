@@ -125,8 +125,6 @@ public:
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bios_ram_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
 	DECLARE_READ32_MEMBER(fdc_r);
 	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(io20_r);
@@ -211,29 +209,6 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 	//mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
-
-#if 0
-READ32_MEMBER(funkball_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(funkball_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(funkball_state::fdc_r)
-{
-	return m-ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(funkball_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
-#endif
 
 READ8_MEMBER( funkball_state::fdc_r )
 {
@@ -434,8 +409,8 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-//  AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
-//  AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
+//  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+//  AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)

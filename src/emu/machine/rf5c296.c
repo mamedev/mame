@@ -41,40 +41,61 @@ UINT8 rf5c296_device::reg_r(ATTR_UNUSED UINT8 reg)
 
 WRITE16_MEMBER(rf5c296_device::io_w)
 {
-	if(offset < 4)
+	/// TODO: find out if this should be done here.
+	offset *= 2;
+	if (mem_mask == 0xff00)
 	{
-		m_pccard->write_memory(space, offset, data, mem_mask);
+		mem_mask >>= 8;
+		data >>= 8;
+		offset++;
 	}
 
-	if(offset == 0x3e0/2)
+	switch(offset)
 	{
-		if(ACCESSING_BITS_0_7)
-			m_rf5c296_reg = data;
-		if(ACCESSING_BITS_8_15)
-			reg_w(m_rf5c296_reg, data >> 8);
+	case 0x3e0:
+		m_rf5c296_reg = data;
+		break;
+
+	case 0x3e1:
+		reg_w(m_rf5c296_reg, data);
+		break;
+
+	default:
+		m_pccard->write_memory(space, offset, data, mem_mask);
+		break;
 	}
 }
 
 READ16_MEMBER(rf5c296_device::io_r)
 {
-	if(offset < 4)
-	{
-		return m_pccard->read_memory(space, offset, mem_mask);
-	}
-
+	/// TODO: find out if this should be done here.
 	offset *= 2;
-
-	if(offset == 0x3e0/2)
+	int shift = 0;
+	if (mem_mask == 0xff00)
 	{
-		UINT32 res = 0x0000;
-		if(ACCESSING_BITS_0_7)
-			res |= m_rf5c296_reg;
-		if(ACCESSING_BITS_8_15)
-			res |= reg_r(m_rf5c296_reg) << 8;
-		return res;
+		shift = 8;
+		mem_mask >>= 8;
+		offset++;
 	}
 
-	return 0xffff;
+	UINT16 data;
+
+	switch( offset )
+	{
+	case 0x3e0:
+		data = m_rf5c296_reg;
+		break;
+
+	case 0x3e1:
+		data = reg_r(m_rf5c296_reg);
+		break;
+		
+	default:
+		data = m_pccard->read_memory(space, offset, mem_mask);
+		break;
+	}
+
+	return data << shift;
 }
 
 // Hardcoded to reach the pcmcia CIS

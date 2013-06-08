@@ -21,43 +21,17 @@ class photoply_state : public pcat_base_state
 {
 public:
 	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-		m_ide(*this, "ide") { }
+		: pcat_base_state(mconfig, type, tag)
+	{
+	}
 
 	UINT8 m_vga_address;
 
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_DRIVER_INIT(photoply);
 	virtual void machine_start();
-
-	required_device<ide_controller_device> m_ide;
 };
 
 
-
-READ32_MEMBER(photoply_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(photoply_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(photoply_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(photoply_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
 
 static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32, photoply_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
@@ -74,14 +48,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	//AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \

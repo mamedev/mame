@@ -504,28 +504,6 @@ READ8_MEMBER(bebox_state::get_slave_ack)
  *
  *************************************/
 
-READ8_MEMBER(bebox_state::bebox_800001F0_r ) { return m_ide->ide_controller_r(offset + 0x1F0, 1); }
-WRITE8_MEMBER(bebox_state::bebox_800001F0_w ) { m_ide->ide_controller_w(offset + 0x1F0, 1, data); }
-
-READ64_MEMBER(bebox_state::bebox_800003F0_r )
-{
-	UINT64 result = 0;
-
-	if (((mem_mask >> 8) & 0xFF) == 0)
-	{
-		result |= m_ide->ide_controller_r(0x3F6, 1) << 8;
-	}
-	return result;
-}
-
-
-WRITE64_MEMBER(bebox_state::bebox_800003F0_w )
-{
-	if (((mem_mask >> 8) & 0xFF) == 0)
-		m_ide->ide_controller_w(0x3F6, 1, (data >> 8) & 0xFF);
-}
-
-
 WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
 	bebox_set_irq_bit(machine(), 7, state);

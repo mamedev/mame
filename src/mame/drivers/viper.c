@@ -1266,7 +1266,7 @@ READ64_MEMBER(viper_state::cf_card_data_r)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				r |= m_ide->ide_bus_r(0, 0) << 16;
+				r |= m_ide->read_cs0(space, 0, mem_mask >> 16) << 16;
 				break;
 			}
 
@@ -1287,7 +1287,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				m_ide->ide_bus_w(0, 0, (data >> 16) & 0xffff);
+				m_ide->write_cs0(space, 0, data >> 16, mem_mask >> 16);
 				break;
 			}
 
@@ -1318,7 +1318,7 @@ READ64_MEMBER(viper_state::cf_card_r)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
 				{
-					r |= m_ide->ide_bus_r(0, offset & 7) << 16;
+					r |= m_ide->read_cs0(space, offset & 7, mem_mask >> 16) << 16;
 					break;
 				}
 
@@ -1327,13 +1327,13 @@ READ64_MEMBER(viper_state::cf_card_r)
 
 				case 0xd:   // Duplicate Error
 				{
-					r |= m_ide->ide_bus_r(0, 1) << 16;
+					r |= m_ide->read_cs0(space, 1, mem_mask >> 16) << 16;
 					break;
 				}
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
 				{
-					r |= m_ide->ide_bus_r(1, offset & 7) << 16;
+					r |= m_ide->read_cs1(space, offset & 7, mem_mask >> 16) << 16;
 					break;
 				}
 
@@ -1383,7 +1383,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
 				{
-					m_ide->ide_bus_w(0, offset & 7, (data >> 16) & 0xffff);
+					m_ide->write_cs0(space, offset & 7, data >> 16, mem_mask >> 16);
 					break;
 				}
 
@@ -1392,13 +1392,13 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 
 				case 0xd:   // Duplicate Features
 				{
-					m_ide->ide_bus_w(0, 1, (data >> 16) & 0xffff);
+					m_ide->write_cs0(space, 1, data >> 16, mem_mask >> 16);
 					break;
 				}
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
 				{
-					m_ide->ide_bus_w(1, offset & 7, (data >> 16) & 0xffff);
+					m_ide->write_cs1(space, offset & 7, data >> 16, mem_mask >> 16);
 					break;
 				}
 
@@ -1424,12 +1424,12 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 						// cylinder low register is set to 0x00
 						// cylinder high register is set to 0x00
 
-						m_ide->ide_bus_w(1, 6, 0x04);
+						m_ide->write_cs1(space, 6, 0x04, 0xff);
 
-						m_ide->ide_bus_w(0, 2, 0x01);
-						m_ide->ide_bus_w(0, 3, 0x01);
-						m_ide->ide_bus_w(0, 4, 0x00);
-						m_ide->ide_bus_w(0, 5, 0x00);
+						m_ide->write_cs0(space, 2, 0x01, 0xff);
+						m_ide->write_cs0(space, 3, 0x01, 0xff);
+						m_ide->write_cs0(space, 4, 0x00, 0xff);
+						m_ide->write_cs0(space, 5, 0x00, 0xff);
 					}
 					break;
 				}
@@ -1461,7 +1461,15 @@ READ64_MEMBER(viper_state::ata_r)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		r |= m_ide->ide_bus_r((offset & 0x80) ? 1 : 0, reg) << 16;
+		switch(offset & 0x80)
+		{
+		case 0x00:
+			r |= m_ide->read_cs0(space, reg, mem_mask >> 16) << 16;
+			break;
+		case 0x80:
+			r |= m_ide->read_cs1(space, reg, mem_mask >> 16) << 16;
+			break;
+		}
 	}
 
 	return r;
@@ -1473,7 +1481,15 @@ WRITE64_MEMBER(viper_state::ata_w)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		m_ide->ide_bus_w((offset & 0x80) ? 1 : 0, reg, (UINT16)(data >> 16));
+		switch(offset & 0x80)
+		{
+		case 0x00:
+			m_ide->write_cs0(space, reg, data >> 16, mem_mask >> 16);
+			break;
+		case 0x80:
+			m_ide->write_cs1(space, reg, data >> 16, mem_mask >> 16);
+			break;
+		}
 	}
 }
 

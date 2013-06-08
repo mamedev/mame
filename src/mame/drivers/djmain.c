@@ -271,40 +271,6 @@ WRITE32_MEMBER(djmain_state::turntable_select_w)
 
 //---------
 
-READ32_MEMBER(djmain_state::ide_std_r)
-{
-	if (ACCESSING_BITS_0_7)
-		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset, 0xff00) >> 8;
-	else
-		return m_ide->ide_controller16_r(space, 0x1f0/2 + offset, 0xffff) << 16;
-}
-
-WRITE32_MEMBER(djmain_state::ide_std_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_ide->ide_controller16_w(space, 0x1f0/2 + offset, data << 8, 0xff00);
-	else
-		m_ide->ide_controller16_w(space, 0x1f0/2 + offset, data >> 16, 0xffff);
-}
-
-
-READ32_MEMBER(djmain_state::ide_alt_r)
-{
-	if (offset == 0)
-		return m_ide->ide_controller16_r(space, 0x3f6/2, 0x00ff) << 24;
-
-	return 0;
-}
-
-WRITE32_MEMBER(djmain_state::ide_alt_w)
-{
-	if (offset == 0 && ACCESSING_BITS_16_23)
-		m_ide->ide_controller16_w(space, 0x3f6/2, data >> 24, 0x00ff);
-}
-
-
-//---------
-
 // light/coin blocker control
 
 /*
@@ -450,11 +416,11 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)                     // OBJECT ROM readthrough (for POST)
 	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
 	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
-	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE(ide_std_r, ide_std_w)             // IDE control regs (hiphopmania)
-	AM_RANGE(0xd4000c, 0xd4000f) AM_READWRITE(ide_alt_r, ide_alt_w)             // IDE status control reg (hiphopmania)
+	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
+	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
 	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
-	AM_RANGE(0xf00000, 0xf0000f) AM_READWRITE(ide_std_r, ide_std_w)             // IDE control regs (beatmania)
-	AM_RANGE(0xf4000c, 0xf4000f) AM_READWRITE(ide_alt_r, ide_alt_w)             // IDE status control reg (beatmania)
+	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
+	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
 ADDRESS_MAP_END
 
 

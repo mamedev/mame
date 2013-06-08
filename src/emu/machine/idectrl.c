@@ -42,22 +42,20 @@
 #define IDE_STATUS_DRIVE_READY              0x40
 #define IDE_STATUS_BUSY                     0x80
 
-#define BANK(b, v) (((v) << 4) | (b))
+#define IDE_BANK0_DATA                      0
+#define IDE_BANK0_ERROR                     1
+#define IDE_BANK0_SECTOR_COUNT              2
+#define IDE_BANK0_SECTOR_NUMBER             3
+#define IDE_BANK0_CYLINDER_LSB              4
+#define IDE_BANK0_CYLINDER_MSB              5
+#define IDE_BANK0_HEAD_NUMBER               6
+#define IDE_BANK0_STATUS_COMMAND            7
 
-#define IDE_BANK0_DATA                      BANK(0, 0)
-#define IDE_BANK0_ERROR                     BANK(0, 1)
-#define IDE_BANK0_SECTOR_COUNT              BANK(0, 2)
-#define IDE_BANK0_SECTOR_NUMBER             BANK(0, 3)
-#define IDE_BANK0_CYLINDER_LSB              BANK(0, 4)
-#define IDE_BANK0_CYLINDER_MSB              BANK(0, 5)
-#define IDE_BANK0_HEAD_NUMBER               BANK(0, 6)
-#define IDE_BANK0_STATUS_COMMAND            BANK(0, 7)
+#define IDE_BANK1_STATUS_CONTROL            6
 
-#define IDE_BANK1_STATUS_CONTROL            BANK(1, 6)
-
-#define IDE_BANK2_CONFIG_UNK                BANK(2, 4)
-#define IDE_BANK2_CONFIG_REGISTER           BANK(2, 8)
-#define IDE_BANK2_CONFIG_DATA               BANK(2, 0xc)
+#define IDE_BANK2_CONFIG_UNK                4
+#define IDE_BANK2_CONFIG_REGISTER           8
+#define IDE_BANK2_CONFIG_DATA               0xc
 
 #define IDE_COMMAND_READ_MULTIPLE           0x20
 #define IDE_COMMAND_READ_MULTIPLE_NORETRY   0x21
@@ -220,20 +218,6 @@ INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
 	if (ACCESSING_BITS_16_23)
 		return size;
 	size--;
-	if (ACCESSING_BITS_8_15)
-		return size;
-	size--;
-	return size;
-}
-
-INLINE int convert_to_offset_and_size16(offs_t *offset, UINT32 mem_mask)
-{
-	int size = 2;
-
-	/* determine which real offset */
-	if (!ACCESSING_BITS_0_7)
-		(*offset)++, size = 1;
-
 	if (ACCESSING_BITS_8_15)
 		return size;
 	size--;
@@ -968,14 +952,61 @@ void ide_controller_device::handle_command(UINT8 _command)
  *
  *************************************/
 
-UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int size)
+READ8_MEMBER( ide_controller_device::read_via_config )
 {
-	UINT32 result = 0;
+	UINT16 result = 0;
+
+	/* logit */
+	LOG(("%s:IDE via config read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
+
+	switch(offset)
+	{
+		/* unknown config register */
+		case IDE_BANK2_CONFIG_UNK:
+			result = config_unknown;
+			break;
+
+		/* active config register */
+		case IDE_BANK2_CONFIG_REGISTER:
+			result = config_register_num;
+			break;
+
+		/* data from active config register */
+		case IDE_BANK2_CONFIG_DATA:
+			if (config_register_num < IDE_CONFIG_REGISTERS)
+				result = config_register[config_register_num];
+			break;
+
+		default:
+			logerror("%s:unknown IDE via config read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+			break;
+	}
+
+//	printf( "read via config %04x %04x %04x\n", offset, result, mem_mask );
+	return result;
+}
+
+READ16_MEMBER( ide_controller_device::read_cs0_pc )
+{
+	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit read of data register
+	if (mem_mask == 0xff00)
+	{
+		return read_cs0(space, (offset * 2) + 1, 0xff) << 8;
+	}
+	else
+	{
+		return read_cs0(space, offset * 2, mem_mask);
+	}
+}
+
+READ16_MEMBER( ide_controller_device::read_cs0 )
+{
+	UINT16 result = 0;
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	/* logit */
-//  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
-		LOG(("%s:IDE read at %d:%X, size=%d\n", machine().describe_context(), bank, offset, size));
+//  if (offset != IDE_BANK0_DATA && offset != IDE_BANK0_STATUS_COMMAND)
+		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 
 	if (dev != NULL)
 	{
@@ -993,35 +1024,16 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 		return status;
 	}
 
-	switch (BANK(bank, offset))
+	switch (offset)
 	{
-		/* unknown config register */
-		case IDE_BANK2_CONFIG_UNK:
-			return config_unknown;
-
-		/* active config register */
-		case IDE_BANK2_CONFIG_REGISTER:
-			return config_register_num;
-
-		/* data from active config register */
-		case IDE_BANK2_CONFIG_DATA:
-			if (config_register_num < IDE_CONFIG_REGISTERS)
-				return config_register[config_register_num];
-			return 0;
-
 		/* read data if there's data to be read */
 		case IDE_BANK0_DATA:
 			if (status & IDE_STATUS_BUFFER_READY)
 			{
 				/* fetch the correct amount of data */
 				result = buffer[buffer_offset++];
-				if (size > 1)
+				if (mem_mask == 0xffff)
 					result |= buffer[buffer_offset++] << 8;
-				if (size > 2)
-				{
-					result |= buffer[buffer_offset++] << 16;
-					result |= buffer[buffer_offset++] << 24;
-				}
 
 				/* if we're at the end of the buffer, handle it */
 				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
@@ -1035,31 +1047,99 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 
 		/* return the current error */
 		case IDE_BANK0_ERROR:
-			return error;
+			result = error;
+			break;
 
 		/* return the current sector count */
 		case IDE_BANK0_SECTOR_COUNT:
-			return sector_count;
+			result = sector_count;
+			break;
 
 		/* return the current sector */
 		case IDE_BANK0_SECTOR_NUMBER:
-			return dev->cur_sector;
+			result = dev->cur_sector;
+			break;
 
 		/* return the current cylinder LSB */
 		case IDE_BANK0_CYLINDER_LSB:
-			return dev->cur_cylinder & 0xff;
+			result = dev->cur_cylinder & 0xff;
+			break;
 
 		/* return the current cylinder MSB */
 		case IDE_BANK0_CYLINDER_MSB:
-			return dev->cur_cylinder >> 8;
+			result = dev->cur_cylinder >> 8;
+			break;
 
 		/* return the current head */
 		case IDE_BANK0_HEAD_NUMBER:
-			return dev->cur_head_reg;
+			result = dev->cur_head_reg;
+			break;
 
 		/* return the current status and clear any pending interrupts */
 		case IDE_BANK0_STATUS_COMMAND:
+			result = status;
+			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
+			{
+				result |= IDE_STATUS_HIT_INDEX;
+				last_status_timer->adjust(attotime::never);
+			}
+			if (interrupt_pending)
+				clear_interrupt();
+			break;
+
+		/* log anything else */
+		default:
+			logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+			break;
+	}
+
+//	printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
+
+	/* return the result */
+	return result;
+}
+
+
+READ16_MEMBER( ide_controller_device::read_cs1_pc )
+{
+	if (mem_mask == 0xff00)
+	{
+		return read_cs1(space, (offset * 2) + 1, 0xff) << 8;
+	}
+	else
+	{
+		return read_cs1(space, offset * 2, mem_mask);
+	}
+}
+
+READ16_MEMBER( ide_controller_device::read_cs1 )
+{
+	UINT16 result = 0;
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
+	if (dev != NULL)
+	{
+		if (dev->is_ready()) {
+			status |= IDE_STATUS_DRIVE_READY;
+		} else {
+			status &= ~IDE_STATUS_DRIVE_READY;
+		}
+	}
+	else
+	{
+		/* even a do-nothing operation should take a little time */
+
+		status ^= IDE_STATUS_BUSY;
+		return status;
+	}
+
+	/* logit */
+//  if (offset != IDE_BANK1_STATUS_CONTROL)
+		LOG(("%s:IDE cs1 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 		/* return the current status but don't clear interrupts */
+
+	switch (offset)
+	{
 		case IDE_BANK1_STATUS_CONTROL:
 			result = status;
 			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
@@ -1067,25 +1147,19 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 				result |= IDE_STATUS_HIT_INDEX;
 				last_status_timer->adjust(attotime::never);
 			}
-
-			/* clear interrutps only when reading the real status */
-			if (BANK(bank, offset) == IDE_BANK0_STATUS_COMMAND)
-			{
-				if (interrupt_pending)
-					clear_interrupt();
-			}
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%s:unknown IDE read at %03X, size=%d\n", machine().describe_context(), offset, size);
+			logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
 			break;
 	}
+
+//	printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
 
 	/* return the result */
 	return result;
 }
-
 
 
 /*************************************
@@ -1094,24 +1168,14 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
  *
  *************************************/
 
-void ide_controller_device::ide_controller_write(int bank, offs_t offset, int size, UINT32 data)
+WRITE8_MEMBER( ide_controller_device::write_via_config )
 {
-	switch (BANK(bank, offset))
-	{
-		case IDE_BANK0_HEAD_NUMBER:
-			cur_drive = (data & 0x10) >> 4;
-			break;
-	}
-
-	ide_device_interface *dev = slot[cur_drive]->dev();
-	if (dev == NULL)
-		return;
+//	printf( "write via config %04x %04x %04x\n", offset, data, mem_mask );
 
 	/* logit */
-	if (BANK(bank, offset) != IDE_BANK0_DATA)
-		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", machine().describe_context(), bank, offset, data, size));
-	//  fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
-	switch (BANK(bank, offset))
+	LOG(("%s:IDE via config write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
+
+	switch (offset)
 	{
 		/* unknown config register */
 		case IDE_BANK2_CONFIG_UNK:
@@ -1128,20 +1192,51 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 			if (config_register_num < IDE_CONFIG_REGISTERS)
 				config_register[config_register_num] = data;
 			break;
+	}
+}
 
+WRITE16_MEMBER( ide_controller_device::write_cs0_pc )
+{
+	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit write to data register
+	if (mem_mask == 0xff00)
+	{
+		return write_cs0(space, (offset * 2) + 1, data >> 8, 0xff);
+	}
+	else
+	{
+		return write_cs0(space, offset * 2, data, mem_mask);
+	}
+}
+
+WRITE16_MEMBER( ide_controller_device::write_cs0 )
+{
+//	printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
+
+	switch (offset)
+	{
+		case IDE_BANK0_HEAD_NUMBER:
+			cur_drive = (data & 0x10) >> 4;
+			break;
+	}
+
+	ide_device_interface *dev = slot[cur_drive]->dev();
+	if (dev == NULL)
+		return;
+
+	/* logit */
+	if (offset != IDE_BANK0_DATA)
+		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
+	//  fprintf(stderr, "ide write %03x %02x mem_mask=%d\n", offset, data, size);
+	switch (offset)
+	{
 		/* write data */
 		case IDE_BANK0_DATA:
 			if (status & IDE_STATUS_BUFFER_READY)
 			{
 				/* store the correct amount of data */
 				buffer[buffer_offset++] = data;
-				if (size > 1)
+				if (mem_mask == 0xffff)
 					buffer[buffer_offset++] = data >> 8;
-				if (size > 2)
-				{
-					buffer[buffer_offset++] = data >> 16;
-					buffer[buffer_offset++] = data >> 24;
-				}
 
 				/* if we're at the end of the buffer, handle it */
 				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
@@ -1245,7 +1340,30 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 		case IDE_BANK0_STATUS_COMMAND:
 			handle_command(data);
 			break;
+	}
+}
 
+WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
+{
+	if (mem_mask == 0xff00)
+	{
+		return write_cs1(space, (offset * 2) + 1, data >> 8, 0xff);
+	}
+	else
+	{
+		return write_cs1(space, offset * 2, data, mem_mask);
+	}
+}
+
+WRITE16_MEMBER( ide_controller_device::write_cs1 )
+{
+//	printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
+
+	/* logit */
+	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
+
+	switch (offset)
+	{
 		/* adapter control */
 		case IDE_BANK1_STATUS_CONTROL:
 			adapter_control = data;
@@ -1261,7 +1379,6 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 			break;
 	}
 }
-
 
 
 /*************************************
@@ -1354,126 +1471,6 @@ void ide_controller_device::ide_bus_master_write(offs_t offset, int size, UINT32
 		bus_master_descriptor = data & 0xfffffffc;
 }
 
-
-
-/*************************************
- *
- *  IDE direct handlers (16-bit)
- *
- *************************************/
-
-/*
-    ide_bus_r()
-
-    Read a 16-bit word from the IDE bus directly.
-
-    select: 0->CS1Fx active, 1->CS3Fx active
-    offset: register offset (state of DA2-DA0)
-*/
-int ide_controller_device::ide_bus_r(int select, int offset)
-{
-	return ide_controller_read(select ? 1 : 0, offset, select == 0 && offset == 0 ? 2 : 1);
-}
-
-/*
-    ide_bus_w()
-
-    Write a 16-bit word to the IDE bus directly.
-
-    select: 0->CS1Fx active, 1->CS3Fx active
-    offset: register offset (state of DA2-DA0)
-    data: data written (state of D0-D15 or D0-D7)
-*/
-void ide_controller_device::ide_bus_w(int select, int offset, int data)
-{
-	if (select == 0 && offset == 0)
-		ide_controller_write(0, 0, 2, data);
-	else
-		ide_controller_write(select ? 1 : 0, offset, 1, data & 0xff);
-}
-
-UINT32 ide_controller_device::ide_controller_r(int reg, int size)
-{
-	if (reg >= 0x1f0 && reg < 0x1f8)
-		return ide_controller_read(0, reg & 7, size);
-	if (reg >= 0x3f0 && reg < 0x3f8)
-		return ide_controller_read(1, reg & 7, size);
-	if (reg >= 0x030 && reg < 0x040)
-		return ide_controller_read(2, reg & 0xf, size);
-	return 0xffffffff;
-}
-
-void ide_controller_device::ide_controller_w(int reg, int size, UINT32 data)
-{
-	if (reg >= 0x1f0 && reg < 0x1f8)
-		ide_controller_write(0, reg & 7, size, data);
-	if (reg >= 0x3f0 && reg < 0x3f8)
-		ide_controller_write(1, reg & 7, size, data);
-	if (reg >= 0x030 && reg < 0x040)
-		ide_controller_write(2, reg & 0xf, size, data);
-}
-
-
-/*************************************
- *
- *  32-bit IDE handlers
- *
- *************************************/
-
-READ32_MEMBER( ide_controller_device::ide_controller32_r )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-
-	return ide_controller_r(offset, size) << ((offset & 3) * 8);
-}
-
-
-WRITE32_MEMBER( ide_controller_device::ide_controller32_w )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-	data = data >> ((offset & 3) * 8);
-
-	ide_controller_w(offset, size, data);
-}
-
-
-READ16_MEMBER( ide_controller_device::ide_controller16_pcmcia_r )
-{
-	int size;
-	UINT32 res = 0xffff;
-
-	offset *= 2;
-	size = convert_to_offset_and_size16(&offset, mem_mask);
-
-	if (offset < 0x008)
-		res = ide_controller_read(0, offset & 7, size);
-	if (offset >= 0x008 && offset < 0x010)
-		res = ide_controller_read(1, offset & 7, size);
-
-	return res << ((offset & 1) * 8);
-}
-
-
-WRITE16_MEMBER( ide_controller_device::ide_controller16_pcmcia_w )
-{
-	int size;
-
-	offset *= 2;
-	size = convert_to_offset_and_size16(&offset, mem_mask);
-	data = data >> ((offset & 1) * 8);
-
-	if (offset < 0x008)
-		ide_controller_write(0, offset & 7, size, data);
-	if (offset >= 0x008 && offset < 0x010)
-		ide_controller_write(1, offset & 7, size, data);
-}
-
 READ32_MEMBER( ide_controller_device::ide_bus_master32_r )
 {
 	int size;
@@ -1495,34 +1492,6 @@ WRITE32_MEMBER( ide_controller_device::ide_bus_master32_w )
 	ide_bus_master_write(offset, size, data >> ((offset & 3) * 8));
 }
 
-
-
-/*************************************
- *
- *  16-bit IDE handlers
- *
- *************************************/
-
-READ16_MEMBER( ide_controller_device::ide_controller16_r )
-{
-	int size;
-
-	offset *= 2;
-	size = convert_to_offset_and_size16(&offset, mem_mask);
-
-	return ide_controller_r(offset, size) << ((offset & 1) * 8);
-}
-
-
-WRITE16_MEMBER( ide_controller_device::ide_controller16_w )
-{
-	int size;
-
-	offset *= 2;
-	size = convert_to_offset_and_size16(&offset, mem_mask);
-
-	ide_controller_w(offset, size, data >> ((offset & 1) * 8));
-}
 
 SLOT_INTERFACE_START(ide_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)

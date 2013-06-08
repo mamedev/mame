@@ -143,7 +143,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 			break;
 
 		case 8:
-			m_lastdata = m_ide->ide_controller_r(0x1f0+offset-8, 2);
+			m_lastdata = m_ide->read_cs0(space, offset-8, 0xffff);
 			return m_lastdata & 0xff;
 
 		case 9:
@@ -153,7 +153,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ide->ide_controller_r(0x1f0+offset-8, 1);
+			return m_ide->read_cs0(space, offset-8, 0xff);
 	}
 
 	return 0xff;
@@ -184,7 +184,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 8:
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
-			m_ide->ide_controller_w(0x1f0+offset-8, 2, m_lastdata);
+			m_ide->write_cs0(space, offset-8, m_lastdata, 0xffff);
 			break;
 
 		case 9:
@@ -194,7 +194,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ide->ide_controller_w(0x1f0+offset-8, 1, data);
+			m_ide->write_cs0(space, offset-8, data, 0xff);
 			break;
 	}
 }

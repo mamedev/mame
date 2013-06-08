@@ -25,14 +25,11 @@ class fruitpc_state : public pcat_base_state
 public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
-			m_ide(*this, "ide"),
 			m_inp1(*this, "INP1"),
 			m_inp2(*this, "INP2"),
 			m_inp3(*this, "INP3"),
 			m_inp4(*this, "INP4")
 			{ }
-
-	required_device<ide_controller_device> m_ide;
 
 	required_ioport m_inp1;
 	required_ioport m_inp2;
@@ -43,10 +40,6 @@ public:
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -65,27 +58,6 @@ READ8_MEMBER(fruitpc_state::fruit_inp_r)
 	return 0;
 }
 
-READ32_MEMBER(fruitpc_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(fruitpc_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(fruitpc_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(fruitpc_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
-
 static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
@@ -98,12 +70,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0310, 0x0313) AM_READ8(fruit_inp_r, 0xffffffff)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \

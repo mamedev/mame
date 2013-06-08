@@ -62,15 +62,16 @@ static READ8_DEVICE_HANDLER( ide8_r )
 	if(offset == 0)
 	{
 		// Data register transfer low byte and latch high
-		result=ide->ide_controller_read(0, (offset & 0x07), 1);
-		ide8_d->set_latch_in(ide->ide_controller_read(0, (offset & 0x07), 1));
+		UINT16 data16 = ide->read_cs0(space, (offset & 0x07), 0xffff);
+		result = data16 & 0xff;
+		ide8_d->set_latch_in(data16>>8);
 	}
 	else if((offset > 0) && (offset < 8))
-		result=ide->ide_controller_read(0, (offset & 0x07), 1);
+		result=ide->read_cs0(space, (offset & 0x07), 0xff);
 	else if(offset == 8)
 		result=ide8_d->get_latch_in();
 	else if(offset == 14)
-		result=ide->ide_controller_read(1, (offset & 0x07), 1);
+		result=ide->read_cs1(space, (offset & 0x07), 0xff);
 
 //  logerror("%s ide8_r: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
 
@@ -87,15 +88,15 @@ static WRITE8_DEVICE_HANDLER( ide8_w )
 	if(offset == 0)
 	{
 		// Data register transfer low byte and latched high
-		ide->ide_controller_write(0, (offset & 7), 1, data);
-		ide->ide_controller_write(0, (offset & 7), 1, ide8_d->get_latch_out());
+		UINT16 data16 = (ide8_d->get_latch_out() << 8) | data;
+		ide->write_cs0(space, (offset & 7), data16, 0xffff);
 	}
 	else if((offset > 0) && (offset < 8))
-		ide->ide_controller_write(0, (offset & 7), 1, data);
+		ide->write_cs0(space, (offset & 7), data, 0xff);
 	else if(offset == 8)
 		ide8_d->set_latch_out(data);
 	else if(offset == 14)
-		ide->ide_controller_write(1, (offset & 7), 1, data);
+		ide->write_cs1(space, (offset & 7), data, 0xff);
 }
 
 

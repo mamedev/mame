@@ -121,7 +121,7 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			data = m_ide->ide_bus_r(0, offset & 0x07) & 0xff;
+			data = m_ide->read_cs0(space, offset & 0x07, 0xff);
 			break;
 
 		case 0x40: // Printer status
@@ -142,7 +142,7 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 			break;
 
 		case 0x58:
-			m_ide_data = m_ide->ide_bus_r(0, 0);
+			m_ide_data = m_ide->read_cs0(space, 0, 0xffff);
 
 			data = m_ide_data & 0xff;
 			break;
@@ -152,7 +152,7 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 			break;
 
 		case 0x5a:
-			data = m_ide->ide_bus_r(1, 6) & 0xff;
+			data = m_ide->read_cs1(space, 6, 0xff);
 			break;
 
 		case 0x5b: // Digital Input Register
@@ -181,7 +181,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			m_ide->ide_bus_w(0, offset & 0x07, data);
+			m_ide->write_cs0(space, offset & 0x07, data, 0xff);
 			break;
 
 		case 0x40:
@@ -193,7 +193,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 
 		case 0x58:
 			m_ide_data |= data;
-			m_ide->ide_bus_w(0, 0, m_ide_data);
+			m_ide->write_cs0(space, 0, m_ide_data, 0xffff);
 			break;
 
 		case 0x59:

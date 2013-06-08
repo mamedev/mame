@@ -37,8 +37,7 @@ public:
 			m_pic8259_1(*this, "pic8259_1"),
 			m_pic8259_2(*this, "pic8259_2"),
 			m_pit8254(*this, "pit8254"),
-			m_ram(*this, RAM_TAG),
-			m_ide(*this, "ide")
+			m_ram(*this, RAM_TAG)
 	{
 	}
 
@@ -51,7 +50,6 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
 	required_device<ram_device> m_ram;
-	required_device<ide_controller_device> m_ide;
 	UINT32 m_cpu_imask[2];
 	UINT32 m_interrupts;
 	UINT32 m_crossproc_interrupts;
@@ -78,8 +76,6 @@ public:
 	DECLARE_READ64_MEMBER(bebox_cpu1_imask_r);
 	DECLARE_READ64_MEMBER(bebox_interrupt_sources_r);
 	DECLARE_READ64_MEMBER(bebox_crossproc_interrupts_r);
-	DECLARE_READ8_MEMBER(bebox_800001F0_r);
-	DECLARE_READ64_MEMBER(bebox_800003F0_r);
 	DECLARE_READ64_MEMBER(bebox_interrupt_ack_r);
 	DECLARE_READ8_MEMBER(bebox_page_r);
 	DECLARE_READ8_MEMBER(bebox_80000480_r);

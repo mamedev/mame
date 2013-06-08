@@ -610,7 +610,8 @@ public:
 		m_gfx_pagetable(*this, "pagetable"),
 		m_k001604(*this, "k001604"),
 		m_ide(*this, "ide")
-	{ }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -638,10 +639,10 @@ public:
 	DECLARE_WRITE32_MEMBER(sub_config_w);
 	DECLARE_READ32_MEMBER(sub_mainbd_r);
 	DECLARE_WRITE32_MEMBER(sub_mainbd_w);
-	DECLARE_READ32_MEMBER(sub_ata0_r);
-	DECLARE_WRITE32_MEMBER(sub_ata0_w);
-	DECLARE_READ32_MEMBER(sub_ata1_r);
-	DECLARE_WRITE32_MEMBER(sub_ata1_w);
+	DECLARE_READ16_MEMBER(sub_ata0_r);
+	DECLARE_WRITE16_MEMBER(sub_ata0_w);
+	DECLARE_READ16_MEMBER(sub_ata1_r);
+	DECLARE_WRITE16_MEMBER(sub_ata1_w);
 	DECLARE_READ32_MEMBER(sub_psac2_r);
 	DECLARE_WRITE32_MEMBER(sub_psac2_w);
 	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
@@ -1814,68 +1815,39 @@ WRITE32_MEMBER(cobra_state::sub_config_w)
 {
 }
 
-READ32_MEMBER(cobra_state::sub_ata0_r)
+READ16_MEMBER(cobra_state::sub_ata0_r)
 {
-	UINT32 r = 0;
+	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	if (ACCESSING_BITS_16_31)
-	{
-		UINT16 v = m_ide->ide_bus_r(0, (offset << 1) + 0);
-		r |= ((v << 8) | (v >> 8)) << 16;
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		UINT16 v = m_ide->ide_bus_r(0, (offset << 1) + 1);
-		r |= ((v << 8) | (v >> 8)) << 0;
-	}
+	UINT32 data = m_ide->read_cs0(space, offset, mem_mask);
+	data = ( data << 8 ) | ( data >> 8 );
 
-	return r;
+	return data;
 }
 
-WRITE32_MEMBER(cobra_state::sub_ata0_w)
+WRITE16_MEMBER(cobra_state::sub_ata0_w)
 {
-	if (ACCESSING_BITS_16_31)
-	{
-		UINT16 d = ((data >> 24) & 0xff) | ((data >> 8) & 0xff00);
-		m_ide->ide_bus_w(0, (offset << 1) + 0, d);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		UINT16 d = ((data >> 8) & 0xff) | ((data << 8) & 0xff00);
-		m_ide->ide_bus_w(0, (offset << 1) + 1, d);
-	}
+	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
+	data = ( data << 8 ) | ( data >> 8 );
+
+	m_ide->write_cs0(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(cobra_state::sub_ata1_r)
+READ16_MEMBER(cobra_state::sub_ata1_r)
 {
-	UINT32 r = 0;
+	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	if (ACCESSING_BITS_16_31)
-	{
-		UINT16 v = m_ide->ide_bus_r(1, (offset << 1) + 0);
-		r |= ((v << 8) | (v >> 8)) << 16;
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		UINT16 v = m_ide->ide_bus_r(1, (offset << 1) + 1);
-		r |= ((v << 8) | (v >> 8)) << 0;
-	}
+	UINT32 data = m_ide->read_cs1(space, offset, mem_mask);
 
-	return r;
+	return ( data << 8 ) | ( data >> 8 );
 }
 
-WRITE32_MEMBER(cobra_state::sub_ata1_w)
+WRITE16_MEMBER(cobra_state::sub_ata1_w)
 {
-	if (ACCESSING_BITS_16_31)
-	{
-		UINT16 d = ((data >> 24) & 0xff) | ((data >> 8) & 0xff00);
-		m_ide->ide_bus_w(1, (offset << 1) + 0, d);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		UINT16 d = ((data >> 8) & 0xff) | ((data << 8) & 0xff00);
-		m_ide->ide_bus_w(1, (offset << 1) + 1, d);
-	}
+	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
+	data = ( data << 8 ) | ( data >> 8 );
+
+	m_ide->write_cs1(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)
@@ -1983,8 +1955,8 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)         // Double buffered shared RAM between Main and Sub
 //  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP                                           // SCSI controller (unused)
 	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w, 0xffffffff)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
-	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
+	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE16(sub_ata0_r, sub_ata0_w, 0xffffffff)
+	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE16(sub_ata1_r, sub_ata1_w, 0xffffffff)
 	AM_RANGE(0x78200000, 0x782000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)              // PSAC registers
 	AM_RANGE(0x78210000, 0x78217fff) AM_MIRROR(0x80000000) AM_RAM_WRITE(sub_psac_palette_w) AM_SHARE("paletteram")                      // PSAC palette RAM
 	AM_RANGE(0x78220000, 0x7823ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)            // PSAC tile RAM

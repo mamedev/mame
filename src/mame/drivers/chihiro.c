@@ -394,8 +394,6 @@ public:
 	DECLARE_WRITE32_MEMBER( geforce_w );
 	DECLARE_READ32_MEMBER( usbctrl_r );
 	DECLARE_WRITE32_MEMBER( usbctrl_w );
-	DECLARE_READ32_MEMBER( ide_r );
-	DECLARE_WRITE32_MEMBER( ide_w );
 	DECLARE_READ32_MEMBER( smbus_r );
 	DECLARE_WRITE32_MEMBER( smbus_w );
 	DECLARE_READ32_MEMBER( dummy_r );
@@ -2648,58 +2646,6 @@ WRITE32_MEMBER( chihiro_state::dummy_w )
 {
 }
 
-/*
- * IDE
- */
-
-INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
-{
-	int size = 4;
-
-	/* determine which real offset */
-	if (!ACCESSING_BITS_0_7)
-	{
-		(*offset)++, size = 3;
-		if (!ACCESSING_BITS_8_15)
-		{
-			(*offset)++, size = 2;
-			if (!ACCESSING_BITS_16_23)
-				(*offset)++, size = 1;
-		}
-	}
-
-	/* determine the real size */
-	if (ACCESSING_BITS_24_31)
-		return size;
-	size--;
-	if (ACCESSING_BITS_16_23)
-		return size;
-	size--;
-	if (ACCESSING_BITS_8_15)
-		return size;
-	size--;
-	return size;
-}
-
-READ32_MEMBER( chihiro_state::ide_r )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-	return chihiro_devs.ide->ide_controller_r(offset+0x01f0, size) << ((offset & 3) * 8);
-}
-
-WRITE32_MEMBER( chihiro_state::ide_w )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-	data = data >> ((offset & 3) * 8);
-	chihiro_devs.ide->ide_controller_w(offset+0x01f0, size, data);
-}
-
 // ======================> ide_baseboard_device
 
 class ide_baseboard_device : public ide_hdd_device
@@ -2999,7 +2945,7 @@ static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, chihiro_state )
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)

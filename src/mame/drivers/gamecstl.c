@@ -75,10 +75,8 @@ class gamecstl_state : public pcat_base_state
 public:
 	gamecstl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
-		m_ide(*this, "ide"),
 		m_cga_ram(*this, "cga_ram") { }
 
-	required_device<ide_controller_device> m_ide;
 	required_shared_ptr<UINT32> m_cga_ram;
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
@@ -87,10 +85,6 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_READ32_MEMBER(ide_r);
-	DECLARE_WRITE32_MEMBER(ide_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_DRIVER_INIT(gamecstl);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -326,29 +320,6 @@ WRITE32_MEMBER(gamecstl_state::pnp_data_w)
 
 
 
-READ32_MEMBER(gamecstl_state::ide_r)
-{
-	return m_ide->ide_controller32_r(space, 0x1f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(gamecstl_state::ide_w)
-{
-	m_ide->ide_controller32_w(space, 0x1f0/4 + offset, data, mem_mask);
-}
-
-READ32_MEMBER(gamecstl_state::fdc_r)
-{
-	return m_ide->ide_controller32_r(space, 0x3f0/4 + offset, mem_mask);
-}
-
-WRITE32_MEMBER(gamecstl_state::fdc_w)
-{
-	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	m_ide->ide_controller32_w(space, 0x3f0/4 + offset, data, mem_mask);
-}
-
-
-
 WRITE32_MEMBER(gamecstl_state::bios_ram_w)
 {
 	if (m_mxtc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
@@ -374,11 +345,11 @@ static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00ec, 0x00ef) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END

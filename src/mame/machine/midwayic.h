@@ -47,9 +47,3 @@ enum
 	MIDWAY_IOASIC_SFRUSHRK,
 	MIDWAY_IOASIC_HYPRDRIV
 };
-
-
-
-/* IDE ASIC maps the IDE registers */
-DECLARE_READ32_DEVICE_HANDLER( midway_ide_asic_r );
-DECLARE_WRITE32_DEVICE_HANDLER( midway_ide_asic_w );
