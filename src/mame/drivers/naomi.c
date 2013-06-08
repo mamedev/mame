@@ -2498,7 +2498,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_POWERVR2_ADD("powervr2")
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2521,7 +2521,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", "maincpu", naomi_g1_irq)
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2529,7 +2529,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", "maincpu", naomi_g1_irq)
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2537,7 +2537,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim1, naomi_base )
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", naomi_g1_irq)
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2545,7 +2545,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim2, naomi_base )
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", naomi_g1_irq)
+	MCFG_NAOMI_M2_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2553,7 +2553,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim4, naomi_base )
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", naomi_g1_irq)
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2600,7 +2600,7 @@ static MACHINE_CONFIG_DERIVED( aw_base, naomi_aw_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aw_map)
 	MCFG_MACRONIX_29L001MC_ADD("awflash")
-	MCFG_AW_ROM_BOARD_ADD("rom_board", ":rom_key", "maincpu", naomi_g1_irq)
+	MCFG_AW_ROM_BOARD_ADD("rom_board", ":rom_key", "maincpu", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( aw1c, aw_base )

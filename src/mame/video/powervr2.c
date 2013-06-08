@@ -124,7 +124,7 @@ SPG_STATUS
 ---- ---- ---- ---- ---x ---- ---- ---- hsync
 ---- ---- ---- ---- ---- x--- ---- ---- blank
 ---- ---- ---- ---- ---- -x-- ---- ---- field number
----- ---- ---- ---- ---- --xx xxxx xxxx state->scanline
+---- ---- ---- ---- ---- --xx xxxx xxxx scanline
 */
 
 
@@ -832,7 +832,7 @@ void powervr2_device::tex_get_info(texinfo *t)
 
 		static const int mipmap_4_8_offset[8] = { 0x00018, 0x00058, 0x00158, 0x00558, 0x01558, 0x05558, 0x15558, 0x55558 };  // 4bpp (4bit offset) / 8bpp (8bit offset)
 		static const int mipmap_np_offset[8] =  { 0x00030, 0x000B0, 0x002B0, 0x00AB0, 0x02AB0, 0x0AAB0, 0x2AAB0, 0xAAAB0 };  // nonpalette textures
-		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 }; // vq textures
+		static const int mipmap_vq_offset[8] =  { 0x00006, 0x00016, 0x00056, 0x00156, 0x00556, 0x01556, 0x05556, 0x15556 };  // vq textures
 
 		switch (miptype)
 		{
@@ -1106,8 +1106,7 @@ WRITE32_MEMBER( powervr2_device::pvr_ta_w )
 		printf("TA_YUV_TEX_BASE initialized to %08x\n", data);
 
 		// hack, this interrupt is generated after transfering a set amount of data
-		//state->state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
-		//state->state->dc_update_interrupt_status();
+		//irq_cb(EOXFER_YUV_IRQ);
 
 		break;
 	case TA_YUV_TEX_CTRL:
@@ -1160,37 +1159,27 @@ WRITE32_MEMBER( powervr2_device::pvr_ta_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
-	state->dc_update_interrupt_status();
+	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
-	state->dc_update_interrupt_status();
+	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
-	state->dc_update_interrupt_status();
+	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
-	state->dc_update_interrupt_status();
+	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
-	state->dc_update_interrupt_status();
+	irq_cb(EOXFER_PTLST_IRQ);
 }
 
 void powervr2_device::process_ta_fifo()
@@ -1511,16 +1500,6 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 
 WRITE64_MEMBER( powervr2_device::ta_fifo_yuv_w )
 {
-	//dc_state *state = space.machine().driver_data<dc_state>();
-
-//  int reg;
-//  UINT64 shift;
-//  UINT32 dat;
-
-//  reg = decode_reg_64(offset, mem_mask, &shift);
-//  dat = (UINT32)(data >> shift);
-
-//  printf("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x %08x\n", 0x10800000+reg*4, dat, data, offset, mem_mask,test);
 }
 
 // SB_LMMODE0
@@ -2376,18 +2355,14 @@ void powervr2_device::pvr_build_parameterconfig()
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	state->dc_update_interrupt_status();
+	irq_cb(VBL_IN_IRQ);
 
 	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
-	state->dc_update_interrupt_status();
+	irq_cb(VBL_OUT_IRQ);
 
 	vbout_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 }
@@ -2398,17 +2373,13 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 	{
 		if(scanline == next_y)
 		{
-			dc_state *state = machine().driver_data<dc_state>();
-			state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-			state->dc_update_interrupt_status();
+			irq_cb(HBL_IN_IRQ);
 			next_y+=spg_line_comp_val;
 		}
 	}
 	else if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
 	{
-		dc_state *state = machine().driver_data<dc_state>();
-		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-		state->dc_update_interrupt_status();
+		irq_cb(HBL_IN_IRQ);
 	}
 
 //  printf("hbin on scanline %d\n",scanline);
@@ -2428,17 +2399,13 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
-	state->dc_update_interrupt_status();
+	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
 	endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
-{
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;  // TSP end of render
-	state->dc_update_interrupt_status();
+{	
+	irq_cb(EOR_TSP_IRQ); // TSP end of render
 
 	endofrender_timer_tsp->adjust(attotime::never);
 	endofrender_timer_video->adjust(attotime::from_usec(500) );
@@ -2446,9 +2413,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;  // ISP end of render
-	state->dc_update_interrupt_status();
+	irq_cb(EOR_ISP_IRQ); // ISP end of render
 
 	endofrender_timer_isp->adjust(attotime::never);
 	endofrender_timer_tsp->adjust(attotime::from_usec(500) );
@@ -2574,10 +2539,8 @@ WRITE32_MEMBER( powervr2_device::pvrs_ta_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 {
-	dc_state *state = machine().driver_data<dc_state>();
 	m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
-	state->dc_update_interrupt_status();
+	irq_cb(DMA_PVR_IRQ);
 }
 
 READ32_MEMBER(powervr2_device::pvr_ctrl_r)
@@ -2660,12 +2623,15 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 }
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock)
+	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock),
+	  irq_cb(*this)
 {
 }
 
 void powervr2_device::device_start()
 {
+	irq_cb.resolve_safe();
+
 	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
 	memset(pvrta_regs, 0, sizeof(pvrta_regs));
 	memset(grab, 0, sizeof(grab));

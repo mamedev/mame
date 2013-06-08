@@ -2,18 +2,23 @@
 #define _NAOMIG1_H_
 
 #include "cpu/sh4/sh4.h"
+#include "includes/dc.h"
 
 #define MCFG_NAOMI_G1_ADD(_tag, type, _maincpu_tag, _irq_cb)            \
 	MCFG_DEVICE_ADD(_tag, type, 0)                                      \
-	naomi_g1_device::static_set_maincpu_tag(*device, _maincpu_tag);     \
-	naomi_g1_device::static_set_irq_cb(*device, _irq_cb);
+	downcast<naomi_g1_device *>(device)->set_maincpu_tag(_maincpu_tag); \
+	downcast<naomi_g1_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
 
 class naomi_g1_device : public device_t
 {
 public:
+	enum {
+		DMA_GDROM_IRQ
+	};
+
 	naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
-	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
+	void set_maincpu_tag(const char *maincpu_tag);
+	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 
@@ -59,7 +64,7 @@ private:
 	sh4_device *cpu;
 	const char *maincpu_tag;
 	emu_timer *timer;
-	void (*irq_cb)(running_machine &);
+	devcb2_write8 irq_cb;
 
 	void dma(void *dma_ptr, UINT32 main_adr, UINT32 size, bool to_mainram);
 };

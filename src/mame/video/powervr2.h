@@ -1,13 +1,29 @@
 #ifndef __POWERVR2_H__
 #define __POWERVR2_H__
 
-#define MCFG_POWERVR2_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)
+#define MCFG_POWERVR2_ADD(_tag, _irq_cb)				                \
+	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)                                  \
+	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
 
 class powervr2_device : public device_t
 {
 public:
 	enum { NUM_BUFFERS = 4 };
+	enum {
+		EOXFER_YUV_IRQ,
+		EOXFER_OPLST_IRQ,
+		EOXFER_OPMV_IRQ,
+		EOXFER_TRLST_IRQ,
+		EOXFER_TRMV_IRQ,
+		EOXFER_PTLST_IRQ,
+		VBL_IN_IRQ,
+		VBL_OUT_IRQ,
+		HBL_IN_IRQ,
+		EOR_VIDEO_IRQ,
+		EOR_TSP_IRQ,
+		EOR_ISP_IRQ,
+		DMA_PVR_IRQ
+	};
 
 	struct {
 		UINT32 pvr_addr;
@@ -110,6 +126,7 @@ public:
 	int next_y;
 
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 
 	DECLARE_READ32_MEMBER( pvr_ctrl_r );
 	DECLARE_WRITE32_MEMBER( pvr_ctrl_w );
@@ -147,6 +164,8 @@ protected:
 	virtual void device_reset();
 
 private:
+	devcb2_write8 irq_cb;
+
 	static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d);
 
 	static inline INT32 clamp(INT32 in, INT32 min, INT32 max);

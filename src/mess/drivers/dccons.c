@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
-	MCFG_POWERVR2_ADD("powervr2")
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)

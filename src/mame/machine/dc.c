@@ -10,6 +10,8 @@
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
 #include "machine/mie.h"
+#include "machine/naomig1.h"
+#include "video/powervr2.h"
 
 #define DEBUG_REGISTERS (1)
 
@@ -81,12 +83,72 @@ TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 	dc_update_interrupt_status();
 }
 
-void naomi_g1_irq(running_machine &machine)
+WRITE8_MEMBER(dc_state::g1_irq)
 {
-	dc_state *state = machine.driver_data<dc_state>();
+	switch(data) {
+	case naomi_g1_device::DMA_GDROM_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+		break;
+	}
+	dc_update_interrupt_status();
+}
 
-	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
-	state->dc_update_interrupt_status();
+WRITE8_MEMBER(dc_state::pvr_irq)
+{
+	switch(data) {
+	case powervr2_device::EOXFER_YUV_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+		break;
+
+	case powervr2_device::EOXFER_OPLST_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
+		break;
+
+	case powervr2_device::EOXFER_OPMV_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
+		break;
+
+	case powervr2_device::EOXFER_TRLST_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
+		break;
+
+	case powervr2_device::EOXFER_TRMV_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
+		break;
+
+	case powervr2_device::EOXFER_PTLST_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_PTLST;
+		break;
+
+	case powervr2_device::VBL_IN_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN;
+		break;
+
+	case powervr2_device::VBL_OUT_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT;
+		break;
+
+	case powervr2_device::HBL_IN_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN;
+		break;
+
+	case powervr2_device::EOR_VIDEO_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;
+		break;
+
+	case powervr2_device::EOR_TSP_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;
+		break;
+
+	case powervr2_device::EOR_ISP_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;
+		break;
+
+	case powervr2_device::DMA_PVR_IRQ:
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+		break;
+	}
+	dc_update_interrupt_status();
 }
 
 void dc_maple_irq(running_machine &machine)

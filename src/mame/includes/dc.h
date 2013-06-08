@@ -52,7 +52,6 @@ class dc_state : public driver_device
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(aica_dma_irq);
-	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
 	TIMER_CALLBACK_MEMBER(dc_rtc_increment);
@@ -77,6 +76,8 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
 	DECLARE_READ64_MEMBER( dc_rtc_r );
 	DECLARE_WRITE64_MEMBER( dc_rtc_w );
+	DECLARE_WRITE8_MEMBER( g1_irq );
+	DECLARE_WRITE8_MEMBER( pvr_irq );
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -318,29 +319,30 @@ class dc_state : public driver_device
 /* 0x005f8600 - 0x005f8f5c TA_OL_POINTERS (read only) */
 
 /* ------------- normal interrupts ------------- */
-#define IST_EOR_VIDEO   0x00000001
-#define IST_EOR_ISP 0x00000002
-#define IST_EOR_TSP 0x00000004
-#define IST_VBL_IN  0x00000008
-#define IST_VBL_OUT 0x00000010
-#define IST_HBL_IN  0x00000020
-#define IST_EOXFER_YUV  0x00000040
+#define IST_EOR_VIDEO    0x00000001
+#define IST_EOR_ISP      0x00000002
+#define IST_EOR_TSP      0x00000004
+#define IST_VBL_IN       0x00000008
+#define IST_VBL_OUT      0x00000010
+#define IST_HBL_IN       0x00000020
+#define IST_EOXFER_YUV   0x00000040
 #define IST_EOXFER_OPLST 0x00000080
-#define IST_EOXFER_OPMV 0x00000100
+#define IST_EOXFER_OPMV  0x00000100
 #define IST_EOXFER_TRLST 0x00000200
-#define IST_EOXFER_TRMV 0x00000400
-#define IST_DMA_PVR 0x00000800
-#define IST_DMA_MAPLE   0x00001000
-#define IST_DMA_MAPLEVB 0x00002000
-#define IST_DMA_GDROM   0x00004000
-#define IST_DMA_AICA    0x00008000
-#define IST_DMA_EXT1    0x00010000
-#define IST_DMA_EXT2    0x00020000
-#define IST_DMA_DEV 0x00040000
-#define IST_DMA_CH2 0x00080000
-#define IST_DMA_SORT    0x00100000
-#define IST_G1G2EXTSTAT 0x40000000
-#define IST_ERROR   0x80000000
+#define IST_EOXFER_TRMV  0x00000400
+#define IST_DMA_PVR      0x00000800
+#define IST_DMA_MAPLE    0x00001000
+#define IST_DMA_MAPLEVB  0x00002000
+#define IST_DMA_GDROM    0x00004000
+#define IST_DMA_AICA     0x00008000
+#define IST_DMA_EXT1     0x00010000
+#define IST_DMA_EXT2     0x00020000
+#define IST_DMA_DEV      0x00040000
+#define IST_DMA_CH2      0x00080000
+#define IST_DMA_SORT     0x00100000
+#define IST_EOXFER_PTLST 0x00200000
+#define IST_G1G2EXTSTAT  0x40000000
+#define IST_ERROR        0x80000000
 /* ------------ external interrupts ------------ */
 #define IST_EXT_EXTERNAL    0x00000008
 #define IST_EXT_MODEM   0x00000004

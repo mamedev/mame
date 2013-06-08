@@ -24,27 +24,22 @@ DEVICE_ADDRESS_MAP_START(amap, 32, naomi_g1_device)
 ADDRESS_MAP_END
 
 naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  irq_cb(*this)
 {
 	cpu = 0;
 }
 
-void naomi_g1_device::static_set_maincpu_tag(device_t &device, const char *maincpu_tag)
+void naomi_g1_device::set_maincpu_tag(const char *_maincpu_tag)
 {
-	naomi_g1_device &naomi_g1 = downcast<naomi_g1_device &>(device);
-	naomi_g1.maincpu_tag = maincpu_tag;
-}
-
-void naomi_g1_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &))
-{
-	naomi_g1_device &naomi_g1 = downcast<naomi_g1_device &>(device);
-	naomi_g1.irq_cb = irq_cb;
+	maincpu_tag = _maincpu_tag;
 }
 
 void naomi_g1_device::device_start()
 {
 	cpu = machine().device<sh4_device>(maincpu_tag);
 	timer = timer_alloc(G1_TIMER_ID);
+	irq_cb.resolve_safe();
 
 	save_item(NAME(gdstar));
 	save_item(NAME(gdlen));
@@ -68,8 +63,7 @@ void naomi_g1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	if(!gdst)
 		return;
 	gdst = 0;
-	if(irq_cb)
-		irq_cb(machine());
+	irq_cb(DMA_GDROM_IRQ);
 }
 
 READ32_MEMBER(naomi_g1_device::sb_gdstar_r)
