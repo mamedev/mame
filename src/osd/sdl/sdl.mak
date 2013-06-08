@@ -37,11 +37,12 @@
 
 # NO_X11 = 1
 
-# uncomment next line to disable XInput support for e.g. multiple lightguns
+# uncomment next line to disable XInput support for e.g. multiple lightguns and mice on X11 systems
 # using Wiimote driver (see http://spritesmods.com/?art=wiimote-mamegun for more info)
 # enabling NO_X11 also implies no XInput support, of course.
+# (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
 
-# NO_USE_XINPUT = 1
+NO_USE_XINPUT = 1
 
 # uncomment and adapt next line to link against specific GL-Library
 # this will also add a rpath to the executable
@@ -71,10 +72,6 @@ USE_DISPATCH_GL = 1
 # uncomment and change the next line to build the gtk debugger for win32
 # Get what you need here: http://www.gtk.org/download-windows.html
 # GTK_INSTALL_ROOT = y:/couriersud/win/gtk-32
-
-# uncomment to use Xinput for multiple mice on X11 systems
-# (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
-NO_USE_XINPUT = 1
 
 # uncomment to disable the Qt debugger and fall back to a system default
 # NO_USE_QTDEBUG = 1
