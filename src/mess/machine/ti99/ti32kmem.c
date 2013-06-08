@@ -36,40 +36,50 @@ ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, cons
 
 READ8Z_MEMBER(ti_32k_expcard_device::readz)
 {
+	UINT8 val = 0;
+	bool access = true;
 	switch((offset & 0xe000)>>13)
 	{
 	case 1:
-		*value = m_ram_ptr[offset & 0x1fff];
+		val = m_ram_ptr[offset & 0x1fff];
 		break;
 	case 5:
-		*value = m_ram_ptr[(offset & 0x1fff) | 0x2000];
+		val = m_ram_ptr[(offset & 0x1fff) | 0x2000];
 		break;
 	case 6:
-		*value = m_ram_ptr[(offset & 0x1fff) | 0x4000];
+		val = m_ram_ptr[(offset & 0x1fff) | 0x4000];
 		break;
 	case 7:
-		*value = m_ram_ptr[(offset & 0x1fff) | 0x6000];
+		val = m_ram_ptr[(offset & 0x1fff) | 0x6000];
 		break;
 	default:
+		access = false;
 		break;
+	}
+	if (access)
+	{
+		if ((offset&1)!=1) *value = ~val;
+		else *value = val;
 	}
 }
 
 WRITE8_MEMBER(ti_32k_expcard_device::write)
 {
+	UINT8 data1 = data;
+	if ((offset&1)!=1) data1 = ~data;
 	switch((offset & 0xe000)>>13)
 	{
 	case 1:
-		m_ram_ptr[offset & 0x1fff] = data;
+		m_ram_ptr[offset & 0x1fff] = data1;
 		break;
 	case 5:
-		m_ram_ptr[(offset & 0x1fff) | 0x2000] = data;
+		m_ram_ptr[(offset & 0x1fff) | 0x2000] = data1;
 		break;
 	case 6:
-		m_ram_ptr[(offset & 0x1fff) | 0x4000] = data;
+		m_ram_ptr[(offset & 0x1fff) | 0x4000] = data1;
 		break;
 	case 7:
-		m_ram_ptr[(offset & 0x1fff) | 0x6000] = data;
+		m_ram_ptr[(offset & 0x1fff) | 0x6000] = data1;
 		break;
 	default:
 		break;
