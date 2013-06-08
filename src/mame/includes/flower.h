@@ -49,7 +49,7 @@ public:
 };
 
 
-// ======================> gomoku_sound_device
+// ======================> flower_sound_device
 
 
 /* this structure defines the parameters for a channel */

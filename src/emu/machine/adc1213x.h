@@ -10,30 +10,61 @@
 #ifndef __ADC1213X_H__
 #define __ADC1213X_H__
 
-#include "devlegcy.h"
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef double (*adc1213x_input_convert_func)(device_t *device, UINT8 input);
+
+struct adc12138_interface
+{
+	adc1213x_input_convert_func input_callback_r;
+};
 
 /***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class adc12138_device : public device_t
+class adc12138_device : public device_t,
+										public adc12138_interface
 {
 public:
 	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	~adc12138_device() { global_free(m_token); }
+	~adc12138_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( di_w );
+	DECLARE_WRITE8_MEMBER( cs_w );
+	DECLARE_WRITE8_MEMBER( sclk_w );
+	DECLARE_WRITE8_MEMBER( conv_w );
+	DECLARE_READ8_MEMBER( do_r );
+	DECLARE_READ8_MEMBER( eoc_r );
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-private:
+	
+	void convert(int channel, int bits16, int lsbfirst);
+
+	adc1213x_input_convert_func m_input_callback_r_func;
+	
+	private:
 	// internal state
-	void *m_token;
+	int m_cycle;
+	int m_data_out;
+	int m_data_in;
+	int m_conv_mode;
+	int m_auto_cal;
+	int m_auto_zero;
+	int m_acq_time;
+	int m_data_out_sign;
+	int m_mode;
+	int m_input_shift_reg;
+	int m_output_shift_reg;
+	int m_end_conv;
 };
 
 extern const device_type ADC12138;
@@ -66,27 +97,5 @@ extern const device_type ADC12132;
 	MCFG_DEVICE_ADD(_tag, ADC12138, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef double (*adc1213x_input_convert_func)(device_t *device, UINT8 input);
-
-struct adc12138_interface
-{
-	adc1213x_input_convert_func input_callback_r;
-};
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_di_w );
-extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_cs_w );
-extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_sclk_w );
-extern DECLARE_WRITE8_DEVICE_HANDLER( adc1213x_conv_w );
-extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_do_r );
-extern DECLARE_READ8_DEVICE_HANDLER( adc1213x_eoc_r );
 
 #endif  /* __ADC1213X_H__ */

@@ -250,9 +250,16 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
+		m_adc1038(*this, "adc1038"),
 		m_eeprom(*this, "eeprom")  { }
 
 	required_shared_ptr<UINT32> m_work_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_dsp2;
+	required_device<adc1038_device> m_adc1038;
+	required_device<eeprom_device> m_eeprom;
 	UINT32 *m_sharc_dataram_0;
 	UINT32 *m_sharc_dataram_1;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
@@ -278,11 +285,6 @@ public:
 	DECLARE_MACHINE_RESET(gticlub);
 	DECLARE_MACHINE_RESET(hangplt);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
-	optional_device<cpu_device> m_dsp2;
-	required_device<eeprom_device> m_eeprom;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -363,7 +365,6 @@ static const eeprom_interface eeprom_intf =
 READ8_MEMBER(gticlub_state::sysreg_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	device_t *adc1038 = machine().device("adc1038");
 	switch (offset)
 	{
 		case 0:
@@ -372,7 +373,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 			return ioport(portnames[offset])->read();
 
 		case 2:
-			return adc1038_sars_read(adc1038) << 7;
+			return m_adc1038->sars_read() << 7;
 
 		case 4:
 		{
@@ -383,7 +384,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 			// e = EEPROM data out
 
 			UINT32 eeprom_bit = (m_eeprom->read_bit() << 1);
-			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
+			UINT32 adc_bit = (m_adc1038->do_read() << 2);
 			return (eeprom_bit | adc_bit);
 		}
 
@@ -396,7 +397,6 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 
 WRITE8_MEMBER(gticlub_state::sysreg_w)
 {
-	device_t *adc1038 = machine().device("adc1038");
 	switch (offset)
 	{
 		case 0:
@@ -417,8 +417,8 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 			if (data & 0x40)    /* CG Board 0 IRQ Ack */
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			adc1038_di_write(adc1038, (data >> 0) & 1);
-			adc1038_clk_write(adc1038, (data >> 1) & 1);
+			m_adc1038->di_write((data >> 0) & 1);
+			m_adc1038->clk_write((data >> 1) & 1);
 
 			set_cgboard_id((data >> 4) & 0x3);
 			break;

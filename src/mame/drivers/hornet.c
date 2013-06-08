@@ -339,13 +339,23 @@ public:
 		m_dsp2(*this, "dsp2"),
 		m_eeprom(*this, "eeprom"),
 		m_k037122_1(*this, "k037122_1"),
-		m_k037122_2(*this, "k037122_2" ) { }
+		m_k037122_2(*this, "k037122_2" ),
+		m_adc12138(*this, "adc12138") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_sharc_dataram0;
 	optional_shared_ptr<UINT32> m_sharc_dataram1;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_gn680;
+	required_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_dsp2;
+	required_device<eeprom_device> m_eeprom;
+	optional_device<k037122_device> m_k037122_1;
+	optional_device<k037122_device> m_k037122_2;
+	required_device<adc12138_device> m_adc12138;
 	UINT8 *m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	emu_timer *m_sound_irq_timer;
@@ -385,14 +395,6 @@ public:
 	int jvs_encode_data(UINT8 *in, int length);
 	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
 	void jamma_jvs_cmd_exec();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_gn680;
-	required_device<cpu_device> m_dsp;
-	optional_device<cpu_device> m_dsp2;
-	required_device<eeprom_device> m_eeprom;
-	optional_device<k037122_device> m_k037122_1;
-	optional_device<k037122_device> m_k037122_2;
 };
 
 
@@ -487,7 +489,6 @@ READ8_MEMBER(hornet_state::sysreg_r)
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	device_t *adc12138 = machine().device("adc12138");
 	switch (offset)
 	{
 		case 0: /* I/O port 0 */
@@ -507,7 +508,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x01 = ADDO (ADC DO)
 			*/
 			r = 0xf0 | (m_eeprom->read_bit() << 3);
-			r |= adc1213x_do_r(adc12138, space, 0) | (adc1213x_eoc_r(adc12138, space, 0) << 2);
+			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
 			break;
 
 		case 4: /* I/O port 4 - DIP switches */
@@ -519,8 +520,6 @@ READ8_MEMBER(hornet_state::sysreg_r)
 
 WRITE8_MEMBER(hornet_state::sysreg_w)
 {
-	device_t *adc12138 = machine().device("adc12138");
-
 	switch (offset)
 	{
 		case 0: /* LED Register 0 */
@@ -561,10 +560,10 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
-			adc1213x_cs_w(adc12138, space, 0, (data >> 3) & 0x1);
-			adc1213x_conv_w(adc12138, space, 0, (data >> 2) & 0x1);
-			adc1213x_di_w(adc12138, space, 0, (data >> 1) & 0x1);
-			adc1213x_sclk_w(adc12138, space, 0, data & 0x1);
+			m_adc12138->cs_w(space, 0, (data >> 3) & 0x1);
+			m_adc12138->conv_w(space, 0, (data >> 2) & 0x1);
+			m_adc12138->di_w(space, 0, (data >> 1) & 0x1);
+			m_adc12138->sclk_w(space, 0, data & 0x1);
 
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);

@@ -21,7 +21,7 @@ typedef int (*adc1038_input_read_func)(device_t *device, int input);
 
 struct adc1038_interface
 {
-	int gticlub_hack;
+	int m_gticlub_hack;
 	adc1038_input_read_func input_callback_r;
 };
 
@@ -30,22 +30,35 @@ struct adc1038_interface
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class adc1038_device : public device_t
+class adc1038_device : public device_t,
+										public adc1038_interface
 {
 public:
 	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~adc1038_device() { global_free(m_token); }
+	~adc1038_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ_LINE_MEMBER( do_read );
+	DECLARE_READ_LINE_MEMBER( sars_read );
+	DECLARE_WRITE_LINE_MEMBER( di_write );
+	DECLARE_WRITE_LINE_MEMBER( clk_write );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-private:
+	
+	adc1038_input_read_func           m_input_callback_r_func;
+
+	private:
 	// internal state
-	void *m_token;
+	int m_cycle;
+	int m_clk;
+	int m_adr;
+	int m_data_in;
+	int m_data_out;
+	int m_adc_data;
+	int m_sars;
 };
 
 extern const device_type ADC1038;
@@ -55,14 +68,5 @@ extern const device_type ADC1038;
 	MCFG_DEVICE_ADD(_tag, ADC1038, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
-
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
-
-extern READ_LINE_DEVICE_HANDLER( adc1038_do_read );
-extern READ_LINE_DEVICE_HANDLER( adc1038_sars_read );
-extern WRITE_LINE_DEVICE_HANDLER( adc1038_di_write );
-extern WRITE_LINE_DEVICE_HANDLER( adc1038_clk_write );
 
 #endif  /* __ADC1038_H__ */

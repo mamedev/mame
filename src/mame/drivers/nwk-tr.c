@@ -235,11 +235,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
-		m_k001604(*this, "k001604")  { }
+		m_k001604(*this, "k001604"),
+		m_adc12138(*this, "adc12138") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_work_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
+	required_device<k001604_device> m_k001604;
+	required_device<adc12138_device> m_adc12138;
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
@@ -262,10 +268,6 @@ public:
 	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	void lanc2_init();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
-	required_device<k001604_device> m_k001604;
 };
 
 
@@ -307,7 +309,6 @@ UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bit
 
 READ32_MEMBER(nwktr_state::sysreg_r)
 {
-	device_t *adc12138 = machine().device("adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
@@ -325,7 +326,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= adc1213x_do_r(adc12138, space, 0) | (adc1213x_eoc_r(adc12138, space, 0) << 2);
+			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
 		}
 	}
 	else if (offset == 1)
@@ -340,7 +341,6 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 
 WRITE32_MEMBER(nwktr_state::sysreg_w)
 {
-	device_t *adc12138 = machine().device("adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
@@ -362,10 +362,10 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc1213x_cs_w(adc12138, space, 0, cs);
-			adc1213x_conv_w(adc12138, space, 0, conv);
-			adc1213x_di_w(adc12138, space, 0, di);
-			adc1213x_sclk_w(adc12138, space, 0, sclk);
+			m_adc12138->cs_w(space, 0, cs);
+			m_adc12138->conv_w(space, 0, conv);
+			m_adc12138->di_w(space, 0, di);
+			m_adc12138->sclk_w(space, 0, sclk);
 		}
 		if (ACCESSING_BITS_0_7)
 		{

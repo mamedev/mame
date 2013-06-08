@@ -20,25 +20,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct adc12138_state
-{
-	adc1213x_input_convert_func input_callback_r;
-
-	int cycle;
-	int data_out;
-	int data_in;
-	int conv_mode;
-	int auto_cal;
-	int auto_zero;
-	int acq_time;
-	int data_out_sign;
-	int mode;
-	int input_shift_reg;
-	int output_shift_reg;
-	int end_conv;
-};
-
-
 #define ADC1213X_CONV_MODE_12_MSB_FIRST         0
 #define ADC1213X_CONV_MODE_16_MSB_FIRST         1
 #define ADC1213X_CONV_MODE_12_LSB_FIRST         2
@@ -49,309 +30,7 @@ struct adc12138_state
 #define ADC1213X_ACQUISITION_TIME_18_CCLK       2
 #define ADC1213X_ACQUISITION_TIME_34_CCLK       3
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
 
-INLINE adc12138_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == ADC12130) || (device->type() == ADC12132) || (device->type() == ADC12138));
-	return (adc12138_state *)downcast<adc12138_device *>(device)->token();
-}
-
-INLINE const adc12138_interface *get_interface(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == ADC12130) || (device->type() == ADC12132) || (device->type() == ADC12138));
-	return (const adc12138_interface *) device->static_config();
-}
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    adc1213x_di_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( adc1213x_di_w )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-	adc1213x->data_in = data & 1;
-}
-
-/*-------------------------------------------------
-    adc1213x_convert
--------------------------------------------------*/
-
-static void adc1213x_convert(device_t *device, int channel, int bits16, int lsbfirst)
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-	int i;
-	int bits;
-	int input_value;
-	double input = 0;
-
-	if (bits16)
-		fatalerror("ADC1213X: 16-bit mode not supported\n");
-
-	if (lsbfirst)
-		fatalerror("ADC1213X: LSB first not supported\n");
-
-	switch (channel)
-	{
-		case 0x8:       // H L L L - CH0 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 0);
-			break;
-		}
-		case 0xc:       // H H L L - CH1 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 1);
-			break;
-		}
-		case 0x9:       // H L L H - CH2 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 2);
-			break;
-		}
-		case 0xd:       // H H L H - CH3 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 3);
-			break;
-		}
-		case 0xa:       // H L H L - CH4 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 4);
-			break;
-		}
-		case 0xe:       // H H H L - CH5 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 5);
-			break;
-		}
-		case 0xb:       // H L H H - CH6 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 6);
-			break;
-		}
-		case 0xf:       // H H H H - CH7 (single-ended)
-		{
-			input = adc1213x->input_callback_r(device, 7);
-			break;
-		}
-		default:
-		{
-			fatalerror("ADC1213X: unsupported channel %02X\n", channel);
-		}
-	}
-
-	input_value = (int)(input * 2047.0);
-
-	bits = 12;
-
-	// sign-extend if needed
-	if (adc1213x->data_out_sign)
-	{
-		input_value = input_value | ((input_value & 0x800) << 1);
-		bits++;
-	}
-
-	adc1213x->output_shift_reg = 0;
-
-	for (i=0; i < bits; i++)
-	{
-		if (input_value & (1 << ((bits-1) - i)))
-		{
-			adc1213x->output_shift_reg |= (1 << i);
-		}
-	}
-
-	adc1213x->data_out = adc1213x->output_shift_reg & 1;
-	adc1213x->output_shift_reg >>= 1;
-}
-
-/*-------------------------------------------------
-    adc1213x_cs_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( adc1213x_cs_w )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-
-	if (data)
-	{
-		//printf("ADC: CS\n");
-
-		if (adc1213x->cycle >= 7)
-		{
-			int mode = adc1213x->input_shift_reg >> (adc1213x->cycle - 8);
-
-			switch (mode & 0xf)
-			{
-				case 0x0:       // X X X X L L L L - 12 or 13 Bit MSB First conversion
-				{
-					adc1213x_convert(device, (mode >> 4) & 0xf, 0, 0);
-					break;
-				}
-				case 0x1:       // X X X X L L L H - 16 or 17 Bit MSB First conversion
-				{
-					adc1213x_convert(device, (mode >> 4) & 0xf, 1, 0);
-					break;
-				}
-				case 0x4:       // X X X X L H L L - 12 or 13 Bit LSB First conversion
-				{
-					adc1213x_convert(device, (mode >> 4) & 0xf, 0, 1);
-					break;
-				}
-				case 0x5:       // X X X X L H L H - 16 or 17 Bit LSB First conversion
-				{
-					adc1213x_convert(device, (mode >> 4) & 0xf, 1, 1);
-					break;
-				}
-
-				default:
-				{
-					switch (mode)
-					{
-						case 0x08:      // L L L L H L L L - Auto cal
-						{
-							adc1213x->auto_cal = 1;
-							break;
-						}
-
-						case 0x0e:      // L L L L H H H L - Acquisition time 6 CCLK cycles
-						{
-							adc1213x->acq_time = ADC1213X_ACQUISITION_TIME_6_CCLK;
-							break;
-						}
-
-						case 0x8d:      // H L L L H H L H - Data out with sign
-						{
-							adc1213x->data_out_sign = 1;
-							break;
-						}
-
-						case 0x0f:      // L L L L H H H H - User mode
-						{
-							break;
-						}
-
-						default:
-						{
-							fatalerror("ADC1213X: unknown config mode %02X\n", mode);
-						}
-					}
-					break;
-				}
-			}
-		}
-
-		adc1213x->cycle = 0;
-		adc1213x->input_shift_reg = 0;
-
-		adc1213x->end_conv = 0;
-	}
-}
-
-/*-------------------------------------------------
-    adc1213x_sclk_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( adc1213x_sclk_w )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-
-	if (data)
-	{
-		//printf("ADC: cycle %d, DI = %d\n", adc1213x->cycle, adc1213x->data_in);
-
-		adc1213x->input_shift_reg <<= 1;
-		adc1213x->input_shift_reg |= adc1213x->data_in;
-
-		adc1213x->data_out = adc1213x->output_shift_reg & 1;
-		adc1213x->output_shift_reg >>= 1;
-
-		adc1213x->cycle++;
-	}
-}
-
-/*-------------------------------------------------
-    adc1213x_conv_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( adc1213x_conv_w )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-	adc1213x->end_conv = 1;
-}
-
-/*-------------------------------------------------
-    adc1213x_do_r
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( adc1213x_do_r )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-
-	//printf("ADC: DO\n");
-	return adc1213x->data_out;
-}
-
-/*-------------------------------------------------
-    adc1213x_eoc_r
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( adc1213x_eoc_r )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-	return adc1213x->end_conv;
-}
-
-/*-------------------------------------------------
-    DEVICE_START( adc1213x )
--------------------------------------------------*/
-
-static DEVICE_START( adc12138 )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-	const adc12138_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	adc1213x->input_callback_r = intf->input_callback_r;
-
-	/* register for state saving */
-	device->save_item(NAME(adc1213x->cycle));
-	device->save_item(NAME(adc1213x->data_out));
-	device->save_item(NAME(adc1213x->data_in));
-	device->save_item(NAME(adc1213x->conv_mode));
-	device->save_item(NAME(adc1213x->auto_cal));
-	device->save_item(NAME(adc1213x->auto_zero));
-	device->save_item(NAME(adc1213x->acq_time));
-	device->save_item(NAME(adc1213x->data_out_sign));
-	device->save_item(NAME(adc1213x->mode));
-	device->save_item(NAME(adc1213x->input_shift_reg));
-	device->save_item(NAME(adc1213x->output_shift_reg));
-	device->save_item(NAME(adc1213x->end_conv));
-}
-
-
-/*-------------------------------------------------
-    DEVICE_RESET( adc1213x )
--------------------------------------------------*/
-
-static DEVICE_RESET( adc12138 )
-{
-	adc12138_state *adc1213x = get_safe_token(device);
-
-	adc1213x->conv_mode = ADC1213X_CONV_MODE_12_MSB_FIRST;
-	adc1213x->data_out_sign = 1;
-	adc1213x->auto_cal = 0;
-	adc1213x->auto_zero = 0;
-	adc1213x->acq_time = ADC1213X_ACQUISITION_TIME_10_CCLK;
-}
 
 const device_type ADC12130 = &device_creator<adc12130_device>;
 
@@ -374,12 +53,10 @@ const device_type ADC12138 = &device_creator<adc12138_device>;
 adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC12138, "A/D Converter 12138", tag, owner, clock)
 {
-	m_token = global_alloc_clear(adc12138_state);
 }
 adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	m_token = global_alloc_clear(adc12138_state);
 }
 
 //-------------------------------------------------
@@ -390,6 +67,16 @@ adc12138_device::adc12138_device(const machine_config &mconfig, device_type type
 
 void adc12138_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const adc12138_interface *intf = reinterpret_cast<const adc12138_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<adc12138_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		input_callback_r = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -398,7 +85,22 @@ void adc12138_device::device_config_complete()
 
 void adc12138_device::device_start()
 {
-	DEVICE_START_NAME( adc12138 )(this);
+	/* resolve callbacks */
+	m_input_callback_r_func = input_callback_r;
+
+	/* register for state saving */
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_conv_mode));
+	save_item(NAME(m_auto_cal));
+	save_item(NAME(m_auto_zero));
+	save_item(NAME(m_acq_time));
+	save_item(NAME(m_data_out_sign));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_input_shift_reg));
+	save_item(NAME(m_output_shift_reg));
+	save_item(NAME(m_end_conv));
 }
 
 //-------------------------------------------------
@@ -407,5 +109,241 @@ void adc12138_device::device_start()
 
 void adc12138_device::device_reset()
 {
-	DEVICE_RESET_NAME( adc12138 )(this);
+	m_conv_mode = ADC1213X_CONV_MODE_12_MSB_FIRST;
+	m_data_out_sign = 1;
+	m_auto_cal = 0;
+	m_auto_zero = 0;
+	m_acq_time = ADC1213X_ACQUISITION_TIME_10_CCLK;
+}
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    di_w
+-------------------------------------------------*/
+
+WRITE8_MEMBER( adc12138_device::di_w )
+{
+	m_data_in = data & 1;
+}
+
+/*-------------------------------------------------
+    convert
+-------------------------------------------------*/
+
+void adc12138_device::convert(int channel, int bits16, int lsbfirst)
+{
+	int i;
+	int bits;
+	int input_value;
+	double input = 0;
+
+	if (bits16)
+		fatalerror("ADC1213X: 16-bit mode not supported\n");
+
+	if (lsbfirst)
+		fatalerror("ADC1213X: LSB first not supported\n");
+
+	switch (channel)
+	{
+		case 0x8:       // H L L L - CH0 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 0);
+			break;
+		}
+		case 0xc:       // H H L L - CH1 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 1);
+			break;
+		}
+		case 0x9:       // H L L H - CH2 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 2);
+			break;
+		}
+		case 0xd:       // H H L H - CH3 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 3);
+			break;
+		}
+		case 0xa:       // H L H L - CH4 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 4);
+			break;
+		}
+		case 0xe:       // H H H L - CH5 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 5);
+			break;
+		}
+		case 0xb:       // H L H H - CH6 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 6);
+			break;
+		}
+		case 0xf:       // H H H H - CH7 (single-ended)
+		{
+			input = m_input_callback_r_func(this, 7);
+			break;
+		}
+		default:
+		{
+			fatalerror("ADC1213X: unsupported channel %02X\n", channel);
+		}
+	}
+
+	input_value = (int)(input * 2047.0);
+
+	bits = 12;
+
+	// sign-extend if needed
+	if (m_data_out_sign)
+	{
+		input_value = input_value | ((input_value & 0x800) << 1);
+		bits++;
+	}
+
+	m_output_shift_reg = 0;
+
+	for (i=0; i < bits; i++)
+	{
+		if (input_value & (1 << ((bits-1) - i)))
+		{
+			m_output_shift_reg |= (1 << i);
+		}
+	}
+
+	m_data_out = m_output_shift_reg & 1;
+	m_output_shift_reg >>= 1;
+}
+
+/*-------------------------------------------------
+    cs_w
+-------------------------------------------------*/
+
+WRITE8_MEMBER( adc12138_device::cs_w )
+{
+	if (data)
+	{
+		//printf("ADC: CS\n");
+
+		if (m_cycle >= 7)
+		{
+			int mode = m_input_shift_reg >> (m_cycle - 8);
+
+			switch (mode & 0xf)
+			{
+				case 0x0:       // X X X X L L L L - 12 or 13 Bit MSB First conversion
+				{
+					convert((mode >> 4) & 0xf, 0, 0);
+					break;
+				}
+				case 0x1:       // X X X X L L L H - 16 or 17 Bit MSB First conversion
+				{
+					convert((mode >> 4) & 0xf, 1, 0);
+					break;
+				}
+				case 0x4:       // X X X X L H L L - 12 or 13 Bit LSB First conversion
+				{
+					convert((mode >> 4) & 0xf, 0, 1);
+					break;
+				}
+				case 0x5:       // X X X X L H L H - 16 or 17 Bit LSB First conversion
+				{
+					convert((mode >> 4) & 0xf, 1, 1);
+					break;
+				}
+
+				default:
+				{
+					switch (mode)
+					{
+						case 0x08:      // L L L L H L L L - Auto cal
+						{
+							m_auto_cal = 1;
+							break;
+						}
+
+						case 0x0e:      // L L L L H H H L - Acquisition time 6 CCLK cycles
+						{
+							m_acq_time = ADC1213X_ACQUISITION_TIME_6_CCLK;
+							break;
+						}
+
+						case 0x8d:      // H L L L H H L H - Data out with sign
+						{
+							m_data_out_sign = 1;
+							break;
+						}
+
+						case 0x0f:      // L L L L H H H H - User mode
+						{
+							break;
+						}
+
+						default:
+						{
+							fatalerror("ADC1213X: unknown config mode %02X\n", mode);
+						}
+					}
+					break;
+				}
+			}
+		}
+
+		m_cycle = 0;
+		m_input_shift_reg = 0;
+
+		m_end_conv = 0;
+	}
+}
+
+/*-------------------------------------------------
+    sclk_w
+-------------------------------------------------*/
+
+WRITE8_MEMBER( adc12138_device::sclk_w )
+{
+	if (data)
+	{
+		//printf("ADC: cycle %d, DI = %d\n", adc1213x->cycle, adc1213x->data_in);
+
+		m_input_shift_reg <<= 1;
+		m_input_shift_reg |= m_data_in;
+
+		m_data_out = m_output_shift_reg & 1;
+		m_output_shift_reg >>= 1;
+
+		m_cycle++;
+	}
+}
+
+/*-------------------------------------------------
+    conv_w
+-------------------------------------------------*/
+
+WRITE8_MEMBER( adc12138_device::conv_w )
+{
+	m_end_conv = 1;
+}
+
+/*-------------------------------------------------
+    do_r
+-------------------------------------------------*/
+
+READ8_MEMBER( adc12138_device::do_r )
+{
+	//printf("ADC: DO\n");
+	return m_data_out;
+}
+
+/*-------------------------------------------------
+    eoc_r
+-------------------------------------------------*/
+
+READ8_MEMBER( adc12138_device::eoc_r )
+{
+	return m_end_conv;
 }

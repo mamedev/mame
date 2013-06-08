@@ -10,159 +10,12 @@
 #include "emu.h"
 #include "adc1038.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct adc1038_state
-{
-	int cycle;
-	int clk;
-	int adr;
-	int data_in;
-	int data_out;
-	int adc_data;
-	int sars;
-	adc1038_input_read_func input_callback_r;
-
-	int gticlub_hack;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE adc1038_state *adc1038_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == ADC1038);
-
-	return (adc1038_state *)downcast<adc1038_device *>(device)->token();
-}
-
-INLINE const adc1038_interface *adc1038_get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == ADC1038));
-	return (const adc1038_interface *) device->static_config();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ_LINE_DEVICE_HANDLER( adc1038_do_read )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-
-	adc1038->data_out = (adc1038->adc_data & 0x200) ? 1 : 0;
-	adc1038->adc_data <<= 1;
-
-	//printf("ADC DO\n");
-	return adc1038->data_out;
-}
-
-WRITE_LINE_DEVICE_HANDLER( adc1038_di_write )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-
-	adc1038->data_in = state;
-}
-
-WRITE_LINE_DEVICE_HANDLER( adc1038_clk_write )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-
-	// GTI Club doesn't sync on SARS
-	if (adc1038->gticlub_hack)
-	{
-		if (adc1038->clk == 0 && state == 0)
-		{
-			adc1038->cycle = 0;
-
-			/* notice that adc1038->adr is always < 7! */
-			adc1038->adc_data = adc1038->input_callback_r(device, adc1038->adr);
-		}
-	}
-
-	if (state == 1)
-	{
-		//printf("ADC CLK, DI = %d, cycle = %d\n", adc1038->data_in, adc1038->cycle);
-
-		if (adc1038->cycle == 0)            // A2
-		{
-			adc1038->adr = 0;
-			adc1038->adr |= (adc1038->data_in << 2);
-		}
-		else if (adc1038->cycle == 1)   // A1
-		{
-			adc1038->adr |= (adc1038->data_in << 1);
-		}
-		else if (adc1038->cycle == 2)   // A0
-		{
-			adc1038->adr |= (adc1038->data_in << 0);
-		}
-
-		adc1038->cycle++;
-	}
-
-	adc1038->clk = state;
-}
-
-READ_LINE_DEVICE_HANDLER( adc1038_sars_read )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-
-	adc1038->cycle = 0;
-
-	/* notice that adc1038->adr is always < 7! */
-	adc1038->adc_data = adc1038->input_callback_r(device, adc1038->adr);
-
-	adc1038->sars ^= 1;
-	return adc1038->sars;
-}
-
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( adc1038 )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-	const adc1038_interface *intf = adc1038_get_interface(device);
-
-	adc1038->gticlub_hack = intf->gticlub_hack;
-	adc1038->input_callback_r = intf->input_callback_r;
-
-	device->save_item(NAME(adc1038->cycle));
-	device->save_item(NAME(adc1038->clk));
-	device->save_item(NAME(adc1038->adr));
-	device->save_item(NAME(adc1038->data_in));
-	device->save_item(NAME(adc1038->data_out));
-	device->save_item(NAME(adc1038->adc_data));
-	device->save_item(NAME(adc1038->sars));
-}
-
-static DEVICE_RESET( adc1038 )
-{
-	adc1038_state *adc1038 = adc1038_get_safe_token(device);
-
-	adc1038->cycle = 0;
-	adc1038->clk = 0;
-	adc1038->adr = 0;
-	adc1038->data_in = 0;
-	adc1038->data_out = 0;
-	adc1038->adc_data = 0;
-	adc1038->sars = 1;
-}
 
 const device_type ADC1038 = &device_creator<adc1038_device>;
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ADC1038, "A/D Converters 1038", tag, owner, clock)
 {
-	m_token = global_alloc_clear(adc1038_state);
 }
 
 //-------------------------------------------------
@@ -173,6 +26,16 @@ adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, d
 
 void adc1038_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const adc1038_interface *intf = reinterpret_cast<const adc1038_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<adc1038_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		input_callback_r = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -181,7 +44,15 @@ void adc1038_device::device_config_complete()
 
 void adc1038_device::device_start()
 {
-	DEVICE_START_NAME( adc1038 )(this);
+	m_input_callback_r_func = input_callback_r;
+
+	save_item(NAME(m_cycle));
+	save_item(NAME(m_clk));
+	save_item(NAME(m_adr));
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_adc_data));
+	save_item(NAME(m_sars));
 }
 
 //-------------------------------------------------
@@ -190,5 +61,78 @@ void adc1038_device::device_start()
 
 void adc1038_device::device_reset()
 {
-	DEVICE_RESET_NAME( adc1038 )(this);
+	m_cycle = 0;
+	m_clk = 0;
+	m_adr = 0;
+	m_data_in = 0;
+	m_data_out = 0;
+	m_adc_data = 0;
+	m_sars = 1;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+READ_LINE_MEMBER( adc1038_device::do_read )
+{
+	m_data_out = (m_adc_data & 0x200) ? 1 : 0;
+	m_adc_data <<= 1;
+
+	//printf("ADC DO\n");
+	return m_data_out;
+}
+
+WRITE_LINE_MEMBER( adc1038_device::di_write )
+{
+	m_data_in = state;
+}
+
+WRITE_LINE_MEMBER( adc1038_device::clk_write )
+{
+	// GTI Club doesn't sync on SARS
+	if (m_gticlub_hack)
+	{
+		if (m_clk == 0 && state == 0)
+		{
+			m_cycle = 0;
+
+			/* notice that m_adr is always < 7! */
+			m_adc_data = m_input_callback_r_func(this, m_adr);
+		}
+	}
+
+	if (state == 1)
+	{
+		//printf("ADC CLK, DI = %d, cycle = %d\n", m_data_in, m_cycle);
+
+		if (m_cycle == 0)            // A2
+		{
+			m_adr = 0;
+			m_adr |= (m_data_in << 2);
+		}
+		else if (m_cycle == 1)   // A1
+		{
+			m_adr |= (m_data_in << 1);
+		}
+		else if (m_cycle == 2)   // A0
+		{
+			m_adr |= (m_data_in << 0);
+		}
+
+		m_cycle++;
+	}
+
+	m_clk = state;
+}
+
+READ_LINE_MEMBER( adc1038_device::sars_read )
+{
+	m_cycle = 0;
+
+	/* notice that m_adr is always < 7! */
+	m_adc_data = m_input_callback_r_func(this, m_adr);
+
+	m_sars ^= 1;
+	return m_sars;
 }
