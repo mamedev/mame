@@ -24,6 +24,7 @@ enum ds1315_mode_t
 	DS_CALENDAR_IO
 };
 
+ALLOW_SAVE_TYPE(ds1315_mode_t);
 
 class ds1315_device : public device_t
 {

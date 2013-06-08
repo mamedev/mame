@@ -125,6 +125,28 @@ void upd71071_device::device_start()
 		m_out_dack_func[x].resolve(m_out_dack_cb[x], *this);
 	}
 	m_selected_channel = 0;
+
+
+	save_item(NAME(m_reg.initialise));
+	save_item(NAME(m_reg.channel));
+	save_item(NAME(m_reg.count_current));
+	save_item(NAME(m_reg.count_base));
+	save_item(NAME(m_reg.address_current));
+	save_item(NAME(m_reg.address_base));
+	save_item(NAME(m_reg.device_control));
+	save_item(NAME(m_reg.mode_control));
+	save_item(NAME(m_reg.status));
+	save_item(NAME(m_reg.temp_l));
+	save_item(NAME(m_reg.temp_h));
+	save_item(NAME(m_reg.request));
+	save_item(NAME(m_reg.mask));
+
+	save_item(NAME(m_selected_channel));
+	save_item(NAME(m_buswidth));
+	save_item(NAME(m_dmarq));
+	save_item(NAME(m_base));
+	save_item(NAME(m_hreq));
+	save_item(NAME(m_eop));
 }
 
 

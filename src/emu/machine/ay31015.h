@@ -64,6 +64,7 @@ enum state_t
 	PREP_TIME
 };
 
+ALLOW_SAVE_TYPE(state_t);
 
 class ay31015_device : public device_t,
 						public ay31015_config

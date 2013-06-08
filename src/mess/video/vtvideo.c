@@ -86,6 +86,18 @@ void vt100_video_device::device_start()
 	
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change),this));
+
+	
+	save_item(NAME(m_lba7));
+	save_item(NAME(m_scroll_latch));
+	save_item(NAME(m_blink_flip_flop));
+	save_item(NAME(m_reverse_field));
+	save_item(NAME(m_basic_attribute));
+	save_item(NAME(m_columns));
+	save_item(NAME(m_height));
+	save_item(NAME(m_skip_lines));
+	save_item(NAME(m_frequency));
+	save_item(NAME(m_interlaced));
 }
 
 //-------------------------------------------------

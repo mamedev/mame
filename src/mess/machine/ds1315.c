@@ -35,6 +35,9 @@ void ds1315_device::device_config_complete()
 
 void ds1315_device::device_start()
 {
+	save_item(NAME(m_count));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_raw_data));
 }
 
 

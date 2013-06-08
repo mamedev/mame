@@ -152,6 +152,28 @@ void ay31015_device::device_start()
 	
 	update_rx_timer();
 	update_tx_timer();
+
+	save_item(NAME(m_pins));
+	save_item(NAME(m_control_reg));
+	save_item(NAME(m_status_reg));
+	save_item(NAME(m_second_stop_bit));
+	save_item(NAME(m_total_pulses));
+	save_item(NAME(m_internal_sample));
+
+	save_item(NAME(m_rx_state));
+	save_item(NAME(m_rx_data));
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_rx_bit_count));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_rx_pulses));
+	save_item(NAME(m_rx_clock));
+
+	save_item(NAME(m_tx_state));
+	save_item(NAME(m_tx_data));
+	save_item(NAME(m_tx_buffer));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_tx_pulses));
+	save_item(NAME(m_tx_clock));
 }
 
 //-------------------------------------------------
