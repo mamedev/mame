@@ -43,8 +43,13 @@ public:
 	// inline configuration helpers
 	static void static_set_config(device_t &device, int char_clock, const char *screen_tag);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	virtual DECLARE_ADDRESS_MAP(map, 8);
+
+	DECLARE_READ8_MEMBER( ir_r );
+	DECLARE_WRITE8_MEMBER( ir_w );
+
+	DECLARE_READ8_MEMBER( dr_r );
+	DECLARE_WRITE8_MEMBER( dr_w );
 
 	UINT32 screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

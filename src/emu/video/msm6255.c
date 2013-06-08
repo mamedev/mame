@@ -64,12 +64,17 @@ enum
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
 const device_type MSM6255 = &device_creator<msm6255_device>;
 
+// I/O map
+DEVICE_ADDRESS_MAP_START( map, 8, msm6255_device )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(dr_r, dr_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ir_r, ir_w)
+ADDRESS_MAP_END
 
 // default address map
 static ADDRESS_MAP_START( msm6255, AS_0, 8, msm6255_device )
@@ -183,55 +188,68 @@ const address_space_config *msm6255_device::memory_space_config(address_spacenum
 
 
 //-------------------------------------------------
-//  read - register read
+//  ir_r -
 //-------------------------------------------------
 
-READ8_MEMBER( msm6255_device::read )
+READ8_MEMBER( msm6255_device::ir_r )
+{
+	return m_ir;
+}
+
+
+//-------------------------------------------------
+//  ir_w - 
+//-------------------------------------------------
+
+WRITE8_MEMBER( msm6255_device::ir_w )
+{
+	m_ir = data & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  dr_r -
+//-------------------------------------------------
+
+READ8_MEMBER( msm6255_device::dr_r )
 {
 	UINT8 data = 0;
 
-	if (offset & 0x01)
+	switch (m_ir)
 	{
-		return m_ir;
-	}
-	else
-	{
-		switch (m_ir)
-		{
-		case REGISTER_MOR:
-			break; // write-only
+	case REGISTER_MOR:
+		break; // write-only
 
-		case REGISTER_PR:
-			data = m_pr;
-			break;
+	case REGISTER_PR:
+		data = m_pr;
+		break;
 
-		case REGISTER_HNR:
-			data = m_hnr;
-			break;
+	case REGISTER_HNR:
+		data = m_hnr;
+		break;
 
-		case REGISTER_DVR:
-			break; // write-only
+	case REGISTER_DVR:
+		break; // write-only
 
-		case REGISTER_CPR:
-			data = m_cpr;
-			break;
+	case REGISTER_CPR:
+		data = m_cpr;
+		break;
 
-		case REGISTER_SLR:
-			data = m_slr;
-			break;
+	case REGISTER_SLR:
+		data = m_slr;
+		break;
 
-		case REGISTER_SUR:
-			data = m_sur;
-			break;
+	case REGISTER_SUR:
+		data = m_sur;
+		break;
 
-		case REGISTER_CLR:
-			data = m_clr;
-			break;
+	case REGISTER_CLR:
+		data = m_clr;
+		break;
 
-		case REGISTER_CUR:
-			data = m_cur;
-			break;
-		}
+	case REGISTER_CUR:
+		data = m_cur;
+		break;
 	}
 
 	return data;
@@ -239,55 +257,48 @@ READ8_MEMBER( msm6255_device::read )
 
 
 //-------------------------------------------------
-//  write - register write
+//  dr_w - 
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm6255_device::write )
+WRITE8_MEMBER( msm6255_device::dr_w )
 {
-	if (offset & 0x01)
+	switch (m_ir)
 	{
-		m_ir = data & 0x0f;
-	}
-	else
-	{
-		switch (m_ir)
-		{
-		case REGISTER_MOR:
-			m_mor = data & 0x7f;
-			break;
+	case REGISTER_MOR:
+		m_mor = data & 0x7f;
+		break;
 
-		case REGISTER_PR:
-			m_pr = data & 0xf7;
-			break;
+	case REGISTER_PR:
+		m_pr = data & 0xf7;
+		break;
 
-		case REGISTER_HNR:
-			m_hnr = data & 0x7f;
-			break;
+	case REGISTER_HNR:
+		m_hnr = data & 0x7f;
+		break;
 
-		case REGISTER_DVR:
-			m_dvr = data;
-			break;
+	case REGISTER_DVR:
+		m_dvr = data;
+		break;
 
-		case REGISTER_CPR:
-			m_cpr = data;
-			break;
+	case REGISTER_CPR:
+		m_cpr = data;
+		break;
 
-		case REGISTER_SLR:
-			m_slr = data;
-			break;
+	case REGISTER_SLR:
+		m_slr = data;
+		break;
 
-		case REGISTER_SUR:
-			m_sur = data;
-			break;
+	case REGISTER_SUR:
+		m_sur = data;
+		break;
 
-		case REGISTER_CLR:
-			m_clr = data;
-			break;
+	case REGISTER_CLR:
+		m_clr = data;
+		break;
 
-		case REGISTER_CUR:
-			m_cur = data;
-			break;
-		}
+	case REGISTER_CUR:
+		m_cur = data;
+		break;
 	}
 }
 
