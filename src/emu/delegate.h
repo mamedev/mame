@@ -567,7 +567,6 @@ protected:
 	{
 		_FunctionClass *result = dynamic_cast<_FunctionClass *>(&object);
 		if (result == NULL) {
-		  abort();
 			throw binding_type_exception(typeid(_FunctionClass), typeid(object));
 		}
 		return reinterpret_cast<delegate_generic_class *>(result);

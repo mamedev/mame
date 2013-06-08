@@ -61,7 +61,6 @@ protected:
 private:
 	UINT32 gdstar, gdlen, gddir, gden, gdst;
 
-	const char *maincpu_tag;
 	emu_timer *timer;
 	devcb2_write8 irq_cb;
 	dma_cb _dma_cb;
