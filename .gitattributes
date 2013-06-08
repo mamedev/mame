@@ -5682,6 +5682,7 @@ src/mame/video/popeye.c svneol=native#text/plain
 src/mame/video/popper.c svneol=native#text/plain
 src/mame/video/portrait.c svneol=native#text/plain
 src/mame/video/powerins.c svneol=native#text/plain
+src/mame/video/powervr2.h svneol=native#text/plain
 src/mame/video/ppu2c0x.c svneol=native#text/plain
 src/mame/video/ppu2c0x.h svneol=native#text/plain
 src/mame/video/prehisle.c svneol=native#text/plain
