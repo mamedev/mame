@@ -84,6 +84,177 @@ void s3c44b0_device::device_start()
 	m_iis.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::iis_timer_exp),this));
 
 	video_start();
+
+	save_item(NAME(m_irq.regs.intcon));
+	save_item(NAME(m_irq.regs.intpnd));
+	save_item(NAME(m_irq.regs.intmod));
+	save_item(NAME(m_irq.regs.intmsk));
+	save_item(NAME(m_irq.regs.i_pslv));
+	save_item(NAME(m_irq.regs.i_pmst));
+	save_item(NAME(m_irq.regs.i_cslv));
+	save_item(NAME(m_irq.regs.i_cmst));
+	save_item(NAME(m_irq.regs.i_ispr));
+	save_item(NAME(m_irq.regs.i_ispc));
+	save_item(NAME(m_irq.regs.reserved));
+	save_item(NAME(m_irq.regs.f_ispr));
+	save_item(NAME(m_irq.regs.f_ispc));
+	save_item(NAME(m_irq.line_irq));
+	save_item(NAME(m_irq.line_fiq));
+	
+	save_item(NAME(m_clkpow.regs.pllcon));
+	save_item(NAME(m_clkpow.regs.clkcon));
+	save_item(NAME(m_clkpow.regs.clkslow));
+	save_item(NAME(m_clkpow.regs.locktime));
+	
+	// FIXME: how to save m_lcd.bitmap which gets allocated/freed during emulation?
+	save_item(NAME(m_lcd.regs.lcdcon1));
+	save_item(NAME(m_lcd.regs.lcdcon2));
+	save_item(NAME(m_lcd.regs.lcdsaddr1));
+	save_item(NAME(m_lcd.regs.lcdsaddr2));
+	save_item(NAME(m_lcd.regs.lcdsaddr3));
+	save_item(NAME(m_lcd.regs.redlut));
+	save_item(NAME(m_lcd.regs.greenlut));
+	save_item(NAME(m_lcd.regs.bluelut));
+	save_item(NAME(m_lcd.regs.reserved));
+	save_item(NAME(m_lcd.regs.lcdcon3));
+	save_item(NAME(m_lcd.regs.dithmode));
+	save_item(NAME(m_lcd.vramaddr_cur));
+	save_item(NAME(m_lcd.vramaddr_max));
+	save_item(NAME(m_lcd.offsize));
+	save_item(NAME(m_lcd.pagewidth_cur));
+	save_item(NAME(m_lcd.pagewidth_max));
+	save_item(NAME(m_lcd.modesel));
+	save_item(NAME(m_lcd.bswp));
+	save_item(NAME(m_lcd.vpos));
+	save_item(NAME(m_lcd.hpos));
+	save_item(NAME(m_lcd.framerate));
+	save_item(NAME(m_lcd.hpos_min));
+	save_item(NAME(m_lcd.hpos_max));
+	save_item(NAME(m_lcd.hpos_end));
+	save_item(NAME(m_lcd.vpos_min));
+	save_item(NAME(m_lcd.vpos_max));
+	save_item(NAME(m_lcd.vpos_end));
+	save_item(NAME(m_lcd.frame_time));
+	
+	machine().save().register_postload(save_prepost_delegate(FUNC(s3c44b0_device::s3c44b0_postload), this));
+	
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_zdma[i].regs.dcon), i);
+		save_item(NAME(m_zdma[i].regs.disrc), i);
+		save_item(NAME(m_zdma[i].regs.didst), i);
+		save_item(NAME(m_zdma[i].regs.dicnt), i);
+		save_item(NAME(m_zdma[i].regs.dcsrc), i);
+		save_item(NAME(m_zdma[i].regs.dcdst), i);
+		save_item(NAME(m_zdma[i].regs.dccnt), i);
+		
+		save_item(NAME(m_bdma[i].regs.dcon), i);
+		save_item(NAME(m_bdma[i].regs.disrc), i);
+		save_item(NAME(m_bdma[i].regs.didst), i);
+		save_item(NAME(m_bdma[i].regs.dicnt), i);
+		save_item(NAME(m_bdma[i].regs.dcsrc), i);
+		save_item(NAME(m_bdma[i].regs.dcdst), i);
+		save_item(NAME(m_bdma[i].regs.dccnt), i);
+		
+		save_item(NAME(m_uart[i].regs.ulcon), i);
+		save_item(NAME(m_uart[i].regs.ucon), i);
+		save_item(NAME(m_uart[i].regs.ufcon), i);
+		save_item(NAME(m_uart[i].regs.umcon), i);
+		save_item(NAME(m_uart[i].regs.utrstat), i);
+		save_item(NAME(m_uart[i].regs.uerstat), i);
+		save_item(NAME(m_uart[i].regs.ufstat), i);
+		save_item(NAME(m_uart[i].regs.umstat), i);
+		save_item(NAME(m_uart[i].regs.utxh), i);
+		save_item(NAME(m_uart[i].regs.urxh), i);
+		save_item(NAME(m_uart[i].regs.ubrdiv), i);
+	}
+	
+	save_item(NAME(m_sio.regs.siocon));
+	save_item(NAME(m_sio.regs.siodat));
+	save_item(NAME(m_sio.regs.sbrdr));
+	save_item(NAME(m_sio.regs.itvcnt));
+	save_item(NAME(m_sio.regs.dcntz));
+	
+	save_item(NAME(m_pwm.regs.tcfg0));
+	save_item(NAME(m_pwm.regs.tcfg1));
+	save_item(NAME(m_pwm.regs.tcon));
+	save_item(NAME(m_pwm.regs.tcntb0));
+	save_item(NAME(m_pwm.regs.tcmpb0));
+	save_item(NAME(m_pwm.regs.tcnto0));
+	save_item(NAME(m_pwm.regs.tcntb1));
+	save_item(NAME(m_pwm.regs.tcmpb1));
+	save_item(NAME(m_pwm.regs.tcnto1));
+	save_item(NAME(m_pwm.regs.tcntb2));
+	save_item(NAME(m_pwm.regs.tcmpb2));
+	save_item(NAME(m_pwm.regs.tcnto2));
+	save_item(NAME(m_pwm.regs.tcntb3));
+	save_item(NAME(m_pwm.regs.tcmpb3));
+	save_item(NAME(m_pwm.regs.tcnto3));
+	save_item(NAME(m_pwm.regs.tcntb4));
+	save_item(NAME(m_pwm.regs.tcmpb4));
+	save_item(NAME(m_pwm.regs.tcnto4));
+	save_item(NAME(m_pwm.regs.tcntb5));
+	save_item(NAME(m_pwm.regs.tcnto5));
+	save_item(NAME(m_pwm.cnt));
+	save_item(NAME(m_pwm.cmp));
+	save_item(NAME(m_pwm.freq));
+	
+	save_item(NAME(m_wdt.regs.wtcon));
+	save_item(NAME(m_wdt.regs.wtdat));
+	save_item(NAME(m_wdt.regs.wtcnt));
+	
+	save_item(NAME(m_iic.regs.iiccon));
+	save_item(NAME(m_iic.regs.iicstat));
+	save_item(NAME(m_iic.regs.iicadd));
+	save_item(NAME(m_iic.regs.iicds));
+	save_item(NAME(m_iic.count));
+	
+	save_item(NAME(m_iis.regs.iiscon));
+	save_item(NAME(m_iis.regs.iismod));
+	save_item(NAME(m_iis.regs.iispsr));
+	save_item(NAME(m_iis.regs.iisfcon));
+	save_item(NAME(m_iis.regs.iisfifo));
+	save_item(NAME(m_iis.fifo));
+	save_item(NAME(m_iis.fifo_index));
+	
+	save_item(NAME(m_gpio.regs.gpacon));
+	save_item(NAME(m_gpio.regs.gpadat));
+	save_item(NAME(m_gpio.regs.gpbcon));
+	save_item(NAME(m_gpio.regs.gpbdat));
+	save_item(NAME(m_gpio.regs.gpccon));
+	save_item(NAME(m_gpio.regs.gpcdat));
+	save_item(NAME(m_gpio.regs.gpcup));
+	save_item(NAME(m_gpio.regs.gpdcon));
+	save_item(NAME(m_gpio.regs.gpddat));
+	save_item(NAME(m_gpio.regs.gpdup));
+	save_item(NAME(m_gpio.regs.gpecon));
+	save_item(NAME(m_gpio.regs.gpedat));
+	save_item(NAME(m_gpio.regs.gpeup));
+	save_item(NAME(m_gpio.regs.gpfcon));
+	save_item(NAME(m_gpio.regs.gpfdat));
+	save_item(NAME(m_gpio.regs.gpfup));
+	save_item(NAME(m_gpio.regs.gpgcon));
+	save_item(NAME(m_gpio.regs.gpgdat));
+	save_item(NAME(m_gpio.regs.gpgup));
+	save_item(NAME(m_gpio.regs.spucr));
+	save_item(NAME(m_gpio.regs.extint));
+	save_item(NAME(m_gpio.regs.extintpnd));
+	
+	save_item(NAME(m_adc.regs.adccon));
+	save_item(NAME(m_adc.regs.adcpsr));
+	save_item(NAME(m_adc.regs.adcdat));
+	
+	save_item(NAME(m_cpuwrap.regs.syscfg));
+	save_item(NAME(m_cpuwrap.regs.ncachbe0));
+	save_item(NAME(m_cpuwrap.regs.ncachbe1));
+}
+
+
+void s3c44b0_device::s3c44b0_postload()
+{
+	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
+	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
+	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);
 }
 
 //-------------------------------------------------
@@ -424,13 +595,14 @@ void s3c44b0_device::lcd_configure()
 		auto_free(machine(), m_lcd.bitmap);
 	}
 	m_lcd.bitmap = auto_alloc_array(machine(), UINT8, (m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
-	m_lcd.frame_period = HZ_TO_ATTOSECONDS( m_lcd.framerate);
+	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
 	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);
-//  printf( "frame_period %f\n", attotime( 0, m_lcd.frame_period).as_double());
-//  printf( "scantime %f\n", attotime( 0, m_lcd.scantime).as_double());
-//  printf( "pixeltime %f\n", attotime( 0, m_lcd.pixeltime).as_double());
+//  printf("frame_period %f\n", attotime( 0, m_lcd.frame_period).as_double());
+//  printf("scantime %f\n", attotime( 0, m_lcd.scantime).as_double());
+//  printf("pixeltime %f\n", attotime( 0, m_lcd.pixeltime).as_double());
 }
+
 
 void s3c44b0_device::lcd_start()
 {

@@ -78,6 +78,8 @@ private:
 	attotime      m_next_interm_sample_time;
 	int           m_interm_sample_index;              /* counts interm. samples between stream samples */
 	attotime      m_last_update_time;                 /* internal timestamp */
+
+	void speaker_postload();
 };
 
 extern const device_type SPEAKER_SOUND;

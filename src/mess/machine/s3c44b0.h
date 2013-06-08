@@ -807,6 +807,8 @@ private:
 	devcb_resolved_write_line   m_sda_w;
 	devcb_resolved_read32       m_adc_data_r;
 	devcb_resolved_write16      m_i2s_data_w;
+
+	void s3c44b0_postload();
 };
 
 extern const device_type S3C44B0;

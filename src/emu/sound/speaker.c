@@ -173,6 +173,21 @@ void speaker_sound_device::device_start()
 	for (i = 0, i < FILTER_LENGTH; i++)
 		m_ampl[i] = 1;
 #endif
+
+	save_item(NAME(m_level));
+	save_item(NAME(m_composed_volume));
+	save_item(NAME(m_composed_sample_index));
+	save_item(NAME(m_channel_last_sample_time));
+	save_item(NAME(m_interm_sample_index));
+	save_item(NAME(m_last_update_time));
+	
+	machine().save().register_postload(save_prepost_delegate(FUNC(speaker_sound_device::speaker_postload), this));
+}
+
+void speaker_sound_device::speaker_postload()
+{
+	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
+	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
 }
 
 //-------------------------------------------------
@@ -274,7 +289,7 @@ void speaker_sound_device::level_w(int new_level)
 
 	/* Finally update speaker state before returning */
 	m_level = new_level;
-
+	
 }
 
 
