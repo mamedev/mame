@@ -1068,7 +1068,7 @@ static MACHINE_CONFIG_DERIVED( ql_ntsc, ql )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 MACHINE_CONFIG_END
 
-/*
+
 //-------------------------------------------------
 //  MACHINE_CONFIG( opd )
 //-------------------------------------------------
@@ -1079,7 +1079,7 @@ static MACHINE_CONFIG_DERIVED( opd, ql )
     MCFG_RAM_DEFAULT_SIZE("128K")
     MCFG_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
-*/
+
 
 /*
 //-------------------------------------------------
@@ -1303,10 +1303,13 @@ ROM_END
 
 ROM_START( tonto )
 	ROM_REGION( 0x400000, M68008_TAG, 0 )
-	ROM_LOAD( "bios-1.rom", 0x000000, 0x008000, NO_DUMP )
-	ROM_LOAD( "bios-2.rom", 0x008000, 0x008000, NO_DUMP )
-	ROM_LOAD( "bios-3.rom", 0x010000, 0x008000, NO_DUMP )
-	ROM_LOAD( "bios-4.rom", 0x018000, 0x008000, NO_DUMP )
+	ROM_LOAD( "xbaa02.ic4", 0x000000, 0x008000, CRC(86e7915b) SHA1(a4d8369052eaea93d2174cfd3b14e6cf777f54b4) )
+	ROM_LOAD( "xbab03.ic5", 0x008000, 0x008000, CRC(97ef393c) SHA1(450c708e8dfbd42d939a9af6a72ef2a33a3dd3b5) )
+	ROM_LOAD( "xbac02.ic6", 0x010000, 0x008000, CRC(a7950897) SHA1(7cd4d6e33a350420a9ebd5c1b32708c29cb20799) )
+	ROM_LOAD( "xbad02.ic7", 0x018000, 0x008000, CRC(69d59443) SHA1(cdf28b1b4fca00e8cb79930a1963955af2925618) )
+
+	ROM_REGION( 0x800, I8749_TAG, 0 )
+	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
 
 	ROM_REGION( 0x10000, I8051_TAG, 0 )
 	ROM_LOAD( "8051-1.rom", 0x000000, 0x010000, NO_DUMP )
@@ -1315,11 +1318,11 @@ ROM_START( tonto )
 	ROM_LOAD( "tms5220.rom", 0x000000, 0x004000, NO_DUMP )
 
 	ROM_REGION( 0x400000, "rompack", 0 )
-	ROM_LOAD( "rompack-1.rom", 0x000000, 0x008000, NO_DUMP )
-	ROM_LOAD( "rompack-2.rom", 0x008000, 0x008000, NO_DUMP )
-	ROM_LOAD( "rompack-3.rom", 0x010000, 0x008000, NO_DUMP )
-	ROM_LOAD( "rompack-4.rom", 0x018000, 0x008000, NO_DUMP )
-	ROM_LOAD( "rompack-5.rom", 0x020000, 0x008000, NO_DUMP )
+	ROM_LOAD( "xbak02.ic6", 0x000000, 0x008000, CRC(3d61e84e) SHA1(7d0a473b0ed3e3ae3cd6d3fb43cb7a70a550d1d9) )
+	ROM_LOAD( "xbaf01.ic7", 0x008000, 0x008000, CRC(c5724357) SHA1(6e765f8e85d2312c31e4b09c9a6645ab3d166e65) )
+	ROM_LOAD( "xbag01.ic8", 0x010000, 0x008000, CRC(9af3bcbf) SHA1(9a848926f2bf6f632ab198a8bb03a8ee83ea0e5d) )
+	ROM_LOAD( "qcaw02.ic9", 0x018000, 0x008000, CRC(1091a789) SHA1(33881b2a818cbaf610a0746fde4acfef5c91338f) )
+	ROM_LOAD( "qcax02.ic10", 0x020000, 0x008000, CRC(396f13d9) SHA1(b2deb5db4565ff7224730c2f3245fbf9df84d728) )
 ROM_END
 
 
@@ -1364,5 +1367,5 @@ COMP( 1985, ql_it,  ql,     0,      ql,         ql_it, driver_device,  0,      "
 COMP( 1985, ql_se,  ql,     0,      ql,         ql_se, driver_device,  0,      "Sinclair Research Ltd",    "QL (Sweden)",  GAME_NOT_WORKING )
 COMP( 1985, ql_dk,  ql,     0,      ql,         ql_dk, driver_device,  0,      "Sinclair Research Ltd",    "QL (Denmark)", GAME_NOT_WORKING )
 COMP( 1985, ql_gr,  ql,     0,      ql,         ql, driver_device,     0,      "Sinclair Research Ltd",    "QL (Greece)",  GAME_SUPPORTS_SAVE )
-//COMP( 1984, tonto,  0,        0,      opd,        ql, driver_device,     0,      "British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
+COMP( 1984, tonto,  0,      0,      opd,        ql, driver_device,     0,      "British Telecom Business Systems", "Merlin M1800 Tonto", GAME_NOT_WORKING )
 //COMP( 1986, megaopd,tonto,    0,      megaopd,    ql, driver_device,     0,      "International Computer Limited", "MegaOPD (USA)", GAME_NOT_WORKING )
