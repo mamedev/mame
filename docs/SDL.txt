@@ -1,15 +1,15 @@
-This file describes Windows-specific usage information about MAME. It is
+This file describes SDL-specific usage information about MAME. It is
 intended to cover aspects of using and configuring the program that are
-specific to running MAME from the command line on a Windows-based system.
-For common options that apply to all systems, please see config.txt.
+specific to running MAME from the command line on any system which is
+supported by SDL (including Windows).
 
 In addition to the keys described in config.txt, the following additional
-keys are defined for Windows versions of MAME:
+keys are defined for SDL-specific versions of MAME:
 
 
 
-Windows debugging options
--------------------------
+Debugging options
+-----------------
 
 -[no]oslog
 
@@ -26,27 +26,10 @@ Windows debugging options
 	10-30 seconds on a modern system should be plenty in general. By default
 	there is no watchdog.
 
--debugger_font <fontname> / -dfont <fontname>
-
-	Specifies the name of the font to use for debugger windows. By default,
-	the font is Lucida Console.
-	
--debugger_font_size <points> / -dfontsize <points>
-
-	Specifies the size of the font to use for debugger windows, in points.
-	By default, this is set to 9pt.
-	
 
 
-Windows performance options
----------------------------
-
--priority <priority>
-
-	Sets the thread priority for the MAME threads. By default the priority
-	is left alone to guarantee proper cooperation with other applications.
-	The valid range is -15 to 1, with 1 being the highest priority. The
-	default is 0 (NORMAL priority).
+Performance options
+-------------------
 
 -[no]multithreading / -[no]mt
 
@@ -63,9 +46,9 @@ Windows performance options
 	to 4 times the number of processors reported by the system. 
 	The default is "auto".
 
--profile [n]
+-sdlvideofps
 
-        Enables profiling, specifying the stack depth of [n] to track.
+        Enable output of SDL-related video performance.
 
 -bench [n]
 
@@ -74,24 +57,12 @@ Windows performance options
 
 
 
-Windows video options
----------------------
+Video options
+-------------
 
--video <gdi|ddraw|d3d|none>
+-video <soft|opengl|none>
 
-	Specifies which video subsystem to use for drawing. By specifying 'gdi'
-	here, you tell MAME to render video using standard Windows graphics
-	drawing calls. This is the slowest but most compatible option.
-	Specifying 'ddraw' instructs MAME to use DirectDraw for rendering.
-	This causes MAME to render everything at a lower resolution and then
-	upscale the results at the end. This produces high performance,
-	especially on older or low-power video cards, but has a noticeably
-	lower output quality. Specifying 'd3d' tells MAME to use Direct3D for
-	rendering. This produces the highest quality output and enables all
-	rendering options. It is recommended if you have a recent (2002+)
-	video card. The final option 'none' displays no windows and does no
-	drawing. This is primarily present for doing CPU benchmarks without
-	the overhead of the video system. The default is d3d.
+	Specifies which video subsystem to use for drawing.
 
 -numscreens <count>
 
@@ -99,7 +70,9 @@ Windows video options
 	output window is all you need, but some games originally used multiple
 	screens. Each screen (up to 4) has its own independent settings for
 	physical monitor, aspect ratio, resolution, and view, which can be
-	set using the options below. The default is 1.
+	set using the options below. The default is 1.  SDL currently has a
+        limit of 1 with the expectation of increasing this when SDL 2.0 is
+        released.
 
 -[no]window / -[no]w
 
@@ -126,16 +99,18 @@ Windows video options
 	In window mode, it means that you can freely resize the window without
 	any constraints. The default is ON (-keepaspect).
 
--prescale <amount>
+-[no]unevenstretch
 
-	Controls the size of the screen images when they are passed off to the
-	graphics system for scaling. At the minimum setting of 1, the screen
-	is rendered at its original resolution before being scaled. At higher
-	settings, the screen is expanded by a factor of <amount> before being
-	scaled. With -video ddraw or -video d3d, this produces a less blurry
-	image at the expense of some speed. In -video ddraw mode, this also
-	increases the effective resolution of non-screen elements such as
-	artwork and fonts. The default is 1.
+        Allow non-integer stretch factors allowing for great window sizing
+        flexability.  The default is OFF (-nounevenstretch)
+
+-[no]centerh
+
+        Center horizontally within the view area
+
+-[no]centerv
+
+        Center vertically within the view area
 
 -[no]waitvsync
 
@@ -165,38 +140,63 @@ Windows video options
 
 
 
-DirectDraw-specific options
+Video soft-specific options
 ---------------------------
 
--[no]hwstretch / -[no]hws
+-scalemode
 
-	When enabled, MAME uses the hardware stretching abilities of your
-	video card to scale the game image and associated artwork to the
-	target resolution. Depending on the quality of your graphic card and
-	its drivers, this may be a fractional, antialiased scaling (nice) or
-	an integer, blocky scaling (not so nice), in which case you might want
-	to disable this option. In addition, if you have configured specific
-	arcade-like video modes for MAME and don't want MAME to perform any
-	non-integral scaling of the image, you should also disable this option.
-	The default is ON (-hwstretch).
+        Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)
 
 
+Video OpenGL-specific options
+-----------------------------
 
-Direct3D-specific options
--------------------------
+-prescale <amount>
 
--[no]filter / -[no]d3dfilter / -[no]flt
+	Controls the size of the screen images when they are passed off to the
+	graphics system for scaling. At the minimum setting of 1, the screen
+	is rendered at its original resolution before being scaled. At higher
+	settings, the screen is expanded by a factor of <amount> before being
+	scaled. This produces a less blurry image at the expense of some speed
+        and also increases the effective resolution of non-screen elements such
+        as artwork and fonts. The default is 1.
 
-	Enable bilinear filtering on the game screen graphics. When disabled,
-	point filtering is applied, which is crisper but leads to scaling
-	artifacts. If you don't like the filtered look, you are probably better
-	off increasing the -prescale value rather than turning off filtering
-	altogether. The default is ON (-filter).
+-gl_forcepow2texture Force power of two textures  (default no)
+-gl_notexturerect    Don't use OpenGL GL_ARB_texture_rectangle (default on)
+-gl_vbo              Enable OpenGL VBO,  if available (default on)
+-gl_pbo              Enable OpenGL PBO,  if available (default on)
+-gl_glsl             Enable OpenGL GLSL, if available (default off)
+-gl_glsl_filter      Enable OpenGL GLSL filtering instead of FF filtering 0-plain,
+                     1-bilinear (default)
+-glsl_shader_mame0   Custom OpenGL GLSL shader set mame bitmap 0
+-glsl_shader_mame1   Custom OpenGL GLSL shader set mame bitmap 1
+-glsl_shader_mame2   Custom OpenGL GLSL shader set mame bitmap 2
+-glsl_shader_mame3   Custom OpenGL GLSL shader set mame bitmap 3
+-glsl_shader_mame4   Custom OpenGL GLSL shader set mame bitmap 4
+-glsl_shader_mame5   Custom OpenGL GLSL shader set mame bitmap 5
+-glsl_shader_mame6   Custom OpenGL GLSL shader set mame bitmap 6
+-glsl_shader_mame7   Custom OpenGL GLSL shader set mame bitmap 7
+-glsl_shader_mame8   Custom OpenGL GLSL shader set mame bitmap 8
+-glsl_shader_mame9   Custom OpenGL GLSL shader set mame bitmap 9
+-glsl_shader_screen0 Custom OpenGL GLSL shader screen bitmap 0
+-glsl_shader_screen1 Custom OpenGL GLSL shader screen bitmap 1
+-glsl_shader_screen2 Custom OpenGL GLSL shader screen bitmap 2
+-glsl_shader_screen3 Custom OpenGL GLSL shader screen bitmap 3
+-glsl_shader_screen4 Custom OpenGL GLSL shader screen bitmap 4
+-glsl_shader_screen5 Custom OpenGL GLSL shader screen bitmap 5
+-glsl_shader_screen6 Custom OpenGL GLSL shader screen bitmap 6
+-glsl_shader_screen7 Custom OpenGL GLSL shader screen bitmap 7
+-glsl_shader_screen8 Custom OpenGL GLSL shader screen bitmap 8
+-glsl_shader_screen9 Custom OpenGL GLSL shader screen bitmap 9
+-gl_glsl_vid_attr    Enable OpenGL GLSL handling of brightness and contrast.
+                     Better RGB game performance
 
 
 
 Per-window options
 ------------------
+
+NOTE:  Multiple Screens are limited to 1 until SDL 2.0 is released.
 
 -screen <display>
 -screen0 <display>
@@ -253,8 +253,7 @@ Per-window options
 	string "auto" is also supported, and is equivalent to 0x0@0. In window
 	mode, this resolution is used as a maximum size for the window. This
 	option requires the -switchres option as well in order to actually
-	enable resolution switching with -video ddraw or -video d3d. The
-	default value for these options is 'auto'.
+	Enable resolution switching.
 
 	The -resolution0, -resolution1, -resolution2, -resolution3 parameters
 	apply to the specific window. The -resolution parameter applies to all
@@ -284,17 +283,6 @@ Per-window options
 Full screen options
 -------------------
 
--[no]triplebuffer / -[no]tb
-
-	Enables or disables "triple buffering". Normally, MAME just draws
-	directly to the screen, without any fancy buffering. But with this
-	option enabled, MAME creates three buffers to draw to, and cycles
-	between them in order. It attempts to keep things flowing such that one
-	buffer is currently displayed, the second buffer is waiting to be
-	displayed, and the third buffer is being drawn to. -triplebuffer will
-	override -waitvsync, if the buffer is sucessfully created. This option
-	does not work with -video gdi. The default is OFF (-notriplebuffer).
-
 -[no]switchres
 
 	Enables resolution switching. This option is required for the
@@ -306,38 +294,10 @@ Full screen options
 	resolutions on them is just silly. This option does not work with
 	-video gdi. The default is OFF (-noswitchres).
 
--full_screen_brightness / -fsb <value>
-
-	Controls the brightness, or black level, of the entire display. The
-	standard value is 1.0. Selecting lower values (down to 0.1) will produce
-	a darkened display, while selecting higher values (up to 2.0) will
-	give a brighter display. Note that not all video cards have hardware to
-	support this option. This option does not work with -video gdi. The
-	default is 1.0.
-
--full_screen_contrast / -fsc <value>
-
-	Controls the contrast, or white level, of the entire display. The
-	standard value is 1.0. Selecting lower values (down to 0.1) will produce
-	a dimmer display, while selecting higher values (up to 2.0) will
-	give a more saturated display. Note that not all video cards have
-	hardware to support this option. This option does not work with
-	-video gdi. The	default is 1.0.
-
--full_screen_gamma / -fsg <value>
-
-	Controls the gamma, which produces a potentially nonlinear black to
-	white ramp, for the entire display. The standard value is 1.0, which
-	gives a linear ramp from black to white. Selecting lower values (down
-	to 0.1) will increase the nonlinearity toward black, while selecting
-	higher values (up to 3.0) will push the nonlinearity toward white. Note
-	that not all video cards have hardware to support this option. This
-	option does not work with -video gdi. The default is 1.0.
 
 
-
-Windows sound options
----------------------
+Sound options
+-------------
 
 -audio_latency <value>
 
@@ -351,14 +311,33 @@ Windows sound options
 
 
 
-Input device options
+SDL Keyboard Mapping
 --------------------
 
--[no]dual_lightgun / -[no]dual
+-keymap              Enable keymap
+-keymap_file         Keymap Filename
+-uimodekey           Key to toggle keyboard mode.
 
-	Controls whether or not MAME attempts to track two lightguns connected
-	at the same time. This option requires -lightgun. This option is a hack
-	for supporting older dual lightgun setups. If you have multiple
-	lightguns connected, you will probably just need to enable -mouse and
-	configure each lightgun independently. The default is OFF
-	(-nodual_lightgun).
+
+
+SDL Joystick Mapping
+--------------------
+
+-joy_idx1            Name of joystick mapped to joystick #1
+-joy_idx2            Name of joystick mapped to joystick #2
+-joy_idx3            Name of joystick mapped to joystick #3
+-joy_idx4            Name of joystick mapped to joystick #4
+-joy_idx5            Name of joystick mapped to joystick #5
+-joy_idx6            Name of joystick mapped to joystick #6
+-joy_idx7            Name of joystick mapped to joystick #7
+-joy_idx8            Name of joystick mapped to joystick #8
+-sixaxis             Use special handling for PS3 Sixaxis controllers
+
+
+
+SDL Lowlevel driver options
+---------------------------
+
+-videodriver         SDL video driver to use ('x11', 'directfb', ... or 'auto' for SDL default
+-audiodriver         SDL audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default
+-gl_lib              Alternative libGL.so to use; 'auto' for system default

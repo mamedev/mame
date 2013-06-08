@@ -60,6 +60,9 @@ Tab       Toggles the configuration menu.
              Shift+Right - increase the value by 0.1x
              Alt+Right - increase the value by the smallest amount
 
+          If you are running with -debug, this key send a 'break'
+          in emulation.
+
 P         Pauses the game.
 
 Shift+P   While paused, advances to next frame.
@@ -71,6 +74,9 @@ F3        Resets the game.
 Shift+F3  Performs a "hard reset", which tears everything down and re-
           creates it from scratch. This is a more thorough and complete
           reset than an F3.
+
+LCtrl+F3  [SDL ONLY]
+          Toggle Uneven stretch.
 
 F4        Shows the game palette, decoded GFX, and any tilemaps. Use the
           Enter key to switch between the three modes (palette, graphics,
@@ -106,13 +112,26 @@ F4        Shows the game palette, decoded GFX, and any tilemaps. Use the
 
           Note: Not all games have decoded graphics and/or tilemaps.
 
+LCtrl+F4  [SDL ONLY]
+          Toggle Keepaspect ratio.
+
+LCtrl+F5  [SDL ONLY]
+          Toggle Filter.
+
+Alt+Ctrl+F5  [WINDOWS ONLY. NON SDL]
+          Toggle HLSL Post-Processing.
+
 F6        Toggle cheat mode (if started with "-cheat").
+
+LCtrl+F6  Decrease Prescaling.
 
 F7        Load a save state. You will be requested to press a key to
           determine which save state you wish to load. Note that the save
           state feature is not supported for a large number of drivers. If
           support is not enabled for a given driver, you will receive a
           warning when attempting to save or load.
+
+LCtrl+F7  Increase Prescaling.
 
 Shift+F7  Create a save state. Requires an additional keypress to identify
           the state, similar to the load option above.
@@ -127,13 +146,20 @@ F11       Toggles speed display.
 
 Shift+F11 Toggles internal profiler display (if compiled in).
 
+Alt+F11   Record HLSL Rendered Video.
+
 F12       Saves a screen snapshot.
 
-Insert    Fast forward. While held, runs the game with throttling disabled
+Alt+F12   Take HLSL Rendered Snapshot.
+
+Insert    [WINDOW ONLY, NON SDL]
+Page DN   [SDL ONLY]
+          Fast forward. While held, runs the game with throttling disabled
           and with the maximum frameskip.
 
-Escape    Exits emulator.
+Alt+ENTER Toggles between full-screen and windowed mode.
 
+Escape    Exits emulator.
 
 
 
@@ -1022,10 +1048,10 @@ Core input options
 
 -natural
 
-        Specific whether or not to use a natural keyboard or not.  This allows
-        you to start your game or system in "partial" keyboard emulation mode,
-        giving you the ability to use all normal UI keys.  The default is OFF,
-        (-nonatrual)
+        Allows user to specify whether or not to use a natural keyboard or not.
+        This allows you to start your game or system in a 'native' mode, depending
+        on your region,  allowing compatability for non-"QWERTY" style keyboards.
+        The default is OFF (-nonatrual)
 
 -joystick_contradictory
 
