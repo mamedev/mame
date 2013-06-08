@@ -20,8 +20,6 @@ public:
 	DECLARE_WRITE64_MEMBER(dc_pdtra_w);
 	DECLARE_READ64_MEMBER(dc_arm_r);
 	DECLARE_WRITE64_MEMBER(dc_arm_w);
-	DECLARE_WRITE64_MEMBER(ta_texture_directpath0_w);
-	DECLARE_WRITE64_MEMBER(ta_texture_directpath1_w);
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	void gdrom_raise_irq();
 	TIMER_CALLBACK_MEMBER( atapi_xfer_end );

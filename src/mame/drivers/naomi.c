@@ -1519,36 +1519,6 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-// SB_LMMODE0
-WRITE64_MEMBER(naomi_state::ta_texture_directpath0_w )
-{
-	int mode = pvrctrl_regs[SB_LMMODE0]&1;
-	if (mode&1)
-	{
-		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
-	}
-	else
-	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
-	}
-}
-
-// SB_LMMODE1
-WRITE64_MEMBER(naomi_state::ta_texture_directpath1_w )
-{
-	int mode = pvrctrl_regs[SB_LMMODE1]&1;
-	if (mode&1)
-	{
-		printf("ta_texture_directpath1_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
-	}
-	else
-	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
-	}
-}
-
 
 /*
  * Naomi 1 address map
@@ -1564,8 +1534,8 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE(dc_rtc_r, dc_rtc_w )
@@ -1586,11 +1556,11 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1616,8 +1586,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE(dc_rtc_r, dc_rtc_w )
@@ -1628,8 +1598,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 //  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE_LEGACY(pvr2_ta_r, pvr2_ta_w )
+//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w)
+	AM_RANGE(0x025f8000, 0x025f9fff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr2_ta_r, pvr2_ta_w )
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -1639,8 +1609,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 
 	/* Area 2*/
 	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE(dc_sysctrl_w ) // writes to BOTH PVRs
-	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE_LEGACY(pvrs_ta_w ) // writes to BOTH PVRs
-	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32_LEGACY(elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
+	AM_RANGE(0x085f8000, 0x085f9fff) AM_DEVWRITE("powervr2", powervr2_device, pvrs_ta_w ) // writes to BOTH PVRs
+	AM_RANGE(0x08800000, 0x088000ff) AM_DEVREADWRITE32("powervr2", powervr2_device, elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
 	AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
 
@@ -1648,11 +1618,11 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_SHARE("dc_ram")
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x10000000, 0x107fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1769,8 +1739,8 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", aw_rom_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(aw_modem_r, aw_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE(dc_rtc_r, dc_rtc_w )
@@ -1796,11 +1766,11 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("dc_ram") // RAM access through cache
 
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x11000000, 0x117fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x13000000, 0x137fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 
 	/* Area 5 */
@@ -2526,9 +2496,9 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(naomi_state, screen_update_dc)
-
+	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_POWERVR2_ADD("powervr2")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

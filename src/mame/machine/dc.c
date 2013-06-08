@@ -17,7 +17,6 @@
 
 #define DEBUG_SYSCTRL   (0)
 #define DEBUG_AICA_DMA (0)
-#define DEBUG_PVRCTRL   (0)
 
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
@@ -79,13 +78,6 @@ TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 {
 	m_wave_dma.start = g2bus_regs[SB_ADST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
-	dc_update_interrupt_status();
-}
-
-TIMER_CALLBACK_MEMBER(dc_state::pvr_dma_irq)
-{
-	m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 	dc_update_interrupt_status();
 }
 
@@ -156,44 +148,6 @@ void dc_state::wave_dma_execute(address_space &space)
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
 	machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(dc_state::aica_dma_irq),this));
-}
-
-void dc_state::pvr_dma_execute(address_space &space)
-{
-	UINT32 src,dst,size;
-	dst = m_pvr_dma.pvr_addr;
-	src = m_pvr_dma.sys_addr;
-	size = 0;
-
-	/* used so far by usagui and sprtjam*/
-	//printf("PVR-DMA start\n");
-	//printf("%08x %08x %08x\n",m_pvr_dma.pvr_addr,m_pvr_dma.sys_addr,m_pvr_dma.size);
-	//printf("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
-
-	/* 0 rounding size = 16 Mbytes */
-	if(m_pvr_dma.size == 0) { m_pvr_dma.size = 0x100000; }
-
-	if(m_pvr_dma.dir == 0)
-	{
-		for(;size<m_pvr_dma.size;size+=4)
-		{
-			space.write_dword(dst,space.read_dword(src));
-			src+=4;
-			dst+=4;
-		}
-	}
-	else
-	{
-		for(;size<m_pvr_dma.size;size+=4)
-		{
-			space.write_dword(src,space.read_dword(dst));
-			src+=4;
-			dst+=4;
-		}
-	}
-	/* Note: do not update the params, since this DMA type doesn't support it. */
-	/* TODO: timing of this */
-	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate(FUNC(dc_state::pvr_dma_irq),this));
 }
 
 // register decode helpers
@@ -314,14 +268,14 @@ void dc_state::dc_update_interrupt_status()
 	}
 
 	/* PVR-DMA HW trigger */
-	if(m_pvr_dma.flag && ((m_pvr_dma.sel & 1) == 1))
+	if(m_powervr2->m_pvr_dma.flag && ((m_powervr2->m_pvr_dma.sel & 1) == 1))
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
 			address_space &space = m_maincpu->space(AS_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
-			pvr_dma_execute(space);
+			m_powervr2->pvr_dma_execute(space);
 		}
 	}
 }
@@ -582,60 +536,6 @@ int dc_state::decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	return reg;
 }
 
-READ64_MEMBER(dc_state::pvr_ctrl_r )
-{
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg_64(offset, mem_mask, &shift);
-
-	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, space.device().safe_pc());
-	#endif
-
-	return (UINT64)pvrctrl_regs[reg] << shift;
-}
-
-WRITE64_MEMBER(dc_state::pvr_ctrl_w )
-{
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
-	UINT8 old;
-
-	reg = decode_reg_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-
-	switch (reg)
-	{
-		case SB_PDSTAP: m_pvr_dma.pvr_addr = dat; break;
-		case SB_PDSTAR: m_pvr_dma.sys_addr = dat; break;
-		case SB_PDLEN: m_pvr_dma.size = dat; break;
-		case SB_PDDIR: m_pvr_dma.dir = dat & 1; break;
-		case SB_PDTSEL:
-			m_pvr_dma.sel = dat & 1;
-			//if(m_pvr_dma.sel & 1)
-			//  printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
-			break;
-		case SB_PDEN: m_pvr_dma.flag = dat & 1; break;
-		case SB_PDST:
-			old = m_pvr_dma.start & 1;
-			m_pvr_dma.start = dat & 1;
-
-			if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0)) // 0 -> 1
-				pvr_dma_execute(space);
-			break;
-	}
-
-	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x=%x] write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
-	#endif
-
-//  pvrctrl_regs[reg] |= dat;
-	pvrctrl_regs[reg] = dat;
-
-}
-
 READ64_MEMBER(dc_state::dc_modem_r )
 {
 	int reg;
@@ -770,19 +670,6 @@ void dc_state::machine_start()
 	save_item(NAME(m_wave_dma.indirect));
 	save_item(NAME(m_wave_dma.start));
 	save_item(NAME(m_wave_dma.sel));
-	save_item(NAME(m_pvr_dma.pvr_addr));
-	save_item(NAME(m_pvr_dma.sys_addr));
-	save_item(NAME(m_pvr_dma.size));
-	save_item(NAME(m_pvr_dma.sel));
-	save_item(NAME(m_pvr_dma.dir));
-	save_item(NAME(m_pvr_dma.flag));
-	save_item(NAME(m_pvr_dma.start));
-	save_pointer(NAME(pvrta_regs),0x2000/4);
-	save_pointer(NAME(pvrctrl_regs),0x100/4);
-	save_item(NAME(debug_dip_status));
-	save_pointer(NAME(tafifo_buff),32);
-	save_item(NAME(scanline));
-	save_item(NAME(next_y));
 	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes());
 }
 

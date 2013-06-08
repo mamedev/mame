@@ -110,37 +110,6 @@ WRITE64_MEMBER(dc_cons_state::dc_arm_w )
 	COMBINE_DATA((UINT64 *)dc_sound_ram.target() + offset);
 }
 
-
-	// SB_LMMODE0
-WRITE64_MEMBER(dc_cons_state::ta_texture_directpath0_w )
-	{
-	int mode = pvrctrl_regs[SB_LMMODE0]&1;
-	if (mode&1)
-	{
-		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
-	}
-	else
-	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
-	}
-	}
-
-	// SB_LMMODE1
-WRITE64_MEMBER(dc_cons_state::ta_texture_directpath1_w )
-	{
-	int mode = pvrctrl_regs[SB_LMMODE1]&1;
-	if (mode&1)
-	{
-		printf("ta_texture_directpath1_w 32-bit access!\n");
-		COMBINE_DATA(&dc_framebuffer_ram[offset]);
-	}
-	else
-	{
-		COMBINE_DATA(&dc_texture_ram[offset]);
-	}
-	}
-
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)  // flash
@@ -149,8 +118,8 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE(dc_mess_gdrom_r, dc_mess_gdrom_w )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVREADWRITE("powervr2", powervr2_device, pvr_ta_r, pvr_ta_w )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE(dc_rtc_r, dc_rtc_w )
@@ -167,13 +136,13 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("dc_ram")// mirror
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x10000000, 0x107fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x11000000, 0x117fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
-	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x12000000, 0x127fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
+	AM_RANGE(0x12800000, 0x12ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_yuv_w)
+	AM_RANGE(0x13000000, 0x137fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("dc_ram")  // another RAM mirror
 
@@ -235,10 +204,9 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dc_cons_state, screen_update_dc)
-
+	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
-
+	MCFG_POWERVR2_ADD("powervr2")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)

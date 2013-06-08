@@ -683,8 +683,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/megatech.o  \
 	$(MAME_MACHINE)/dc.o        \
 	$(MAME_DRIVERS)/naomi.o     \
-	$(MAME_MACHINE)/dc.o        \
-	$(MAME_VIDEO)/dc.o          \
+	$(MAME_VIDEO)/powervr2.o    \
 	$(MAME_MACHINE)/naomi.o     \
 	$(MAME_MACHINE)/naomig1.o   \
 	$(MAME_MACHINE)/naomibd.o   \
@@ -699,7 +698,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/mapledev.o  \
 	$(MAME_MACHINE)/dc-ctrl.o   \
 	$(MAME_MACHINE)/jvs13551.o  \
-	$(MAME_VIDEO)/dc.o          \
 	$(MAME_VIDEO)/neogeo.o      \
 	$(MAME_MACHINE)/neoprot.o   \
 	$(MAME_MACHINE)/neocrypt.o  \

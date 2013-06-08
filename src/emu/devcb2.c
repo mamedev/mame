@@ -232,6 +232,7 @@ void devcb2_read_base::resolve()
 	}
 	catch (binding_type_exception &binderr)
 	{
+		abort();
 		throw emu_fatalerror("Error performing a late bind of type %s to %s\n", binderr.m_actual_type.name(), binderr.m_target_type.name());
 	}
 }
@@ -449,6 +450,7 @@ void devcb2_write_base::resolve()
 	}
 	catch (binding_type_exception &binderr)
 	{
+		abort();
 		throw emu_fatalerror("Error performing a late bind of type %s to %s\n", binderr.m_actual_type.name(), binderr.m_target_type.name());
 	}
 }

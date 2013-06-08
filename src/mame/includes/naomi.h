@@ -56,8 +56,6 @@ class naomi_state : public dc_state
 	DECLARE_WRITE64_MEMBER( naomi_unknown1_w );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
 	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
-	DECLARE_WRITE64_MEMBER( ta_texture_directpath0_w );
-	DECLARE_WRITE64_MEMBER( ta_texture_directpath1_w );
 	DECLARE_READ64_MEMBER( aw_flash_r );
 	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
