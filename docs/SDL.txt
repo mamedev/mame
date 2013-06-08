@@ -34,9 +34,9 @@ Performance options
 -[no]multithreading / -[no]mt
 
 	Enables multithreading within MAME. At the moment, this causes the
-	window and all DirectDraw/Direct3D code to execute on a second thread,
-	which can improve performance on hyperthreaded and multicore systems.
-	The default is OFF (-nomultithreading).
+	window and code to execute on a second thread, which can improve performance
+        on hyperthreaded and multicore systems.
+        The default is OFF (-nomultithreading).
 	
 -numprocessors <auto|value> / -np <auto|value>
 
@@ -53,7 +53,7 @@ Performance options
 -bench [n]
 
         Benchmark for [n] number of emulated seconds; implies the command string:
-        -str [n] -video none -nosound -nothrottle
+        -str [n] -video none -nosound -nothrottle. Default is OFF (-nobench)
 
 
 
@@ -62,7 +62,7 @@ Video options
 
 -video <soft|opengl|none>
 
-	Specifies which video subsystem to use for drawing.
+	Specifies which video subsystem to use for drawing.  Default is 'soft'.
 
 -numscreens <count>
 
@@ -102,15 +102,15 @@ Video options
 -[no]unevenstretch
 
         Allow non-integer stretch factors allowing for great window sizing
-        flexability.  The default is OFF (-nounevenstretch)
+        flexability.  The default is ON. (-unevenstretch)
 
 -[no]centerh
 
-        Center horizontally within the view area
+        Center horizontally within the view area. Default is ON (-centerh).
 
 -[no]centerv
 
-        Center vertically within the view area
+        Center vertically within the view area. Default is ON (-centerv).
 
 -[no]waitvsync
 
@@ -146,10 +146,20 @@ Video soft-specific options
 -scalemode
 
         Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)
+        Default is 'none'.
+
 
 
 Video OpenGL-specific options
 -----------------------------
+
+-[no]filter / -[no]flt
+
+	Enable bilinear filtering on the game screen graphics. When disabled,
+	point filtering is applied, which is crisper but leads to scaling
+	artifacts. If you don't like the filtered look, you are probably better
+	off increasing the -prescale value rather than turning off filtering
+	altogether. The default is ON (-filter).
 
 -prescale <amount>
 
@@ -189,7 +199,7 @@ Video OpenGL-specific options
 -glsl_shader_screen8 Custom OpenGL GLSL shader screen bitmap 8
 -glsl_shader_screen9 Custom OpenGL GLSL shader screen bitmap 9
 -gl_glsl_vid_attr    Enable OpenGL GLSL handling of brightness and contrast.
-                     Better RGB game performance
+                     Better RGB game performance.  Default is on.
 
 
 
@@ -302,36 +312,37 @@ Sound options
 -audio_latency <value>
 
 	This controls the amount of latency built into the audio streaming. By
-	default MAME tries to keep the DirectSound audio buffer between 1/5 and
-	2/5 full. On some systems, this is pushing it too close to the edge,
-	and you get poor sound sometimes. The latency parameter controls the
-	lower threshold. The default is 1 (meaning lower=1/5 and upper=2/5).
-	Set it to 2 (-audio_latency 2) to keep the sound buffer between 2/5 and
-	3/5 full. If you crank it up to 4, you can definitely notice the lag.
+	default MAME tries to keep the audio buffer between 1/5 and 2/5 full.
+        On some systems, this is pushing it too close to the edge,  and you get
+        poor sound sometimes. The latency parameter controls the lower threshold.
+        The default is 2 (meaning lower=2/5 and upper=3/5). Set it to 3
+        (-audio_latency 3) to keep the sound buffer between 3/5 and 4/5 full.
+        If you crank it up to 4, you can definitely notice the lag.
 
 
 
 SDL Keyboard Mapping
 --------------------
 
--keymap              Enable keymap
--keymap_file         Keymap Filename
--uimodekey           Key to toggle keyboard mode.
+-keymap              Enable keymap. Default is OFF (-nokeymap)
+-keymap_file         Keymap Filename. Default is 'keymap.dat'.
+-uimodekey           Key to toggle keyboard mode. Default is 'SCRLOCK'
 
 
 
 SDL Joystick Mapping
 --------------------
 
--joy_idx1            Name of joystick mapped to joystick #1
--joy_idx2            Name of joystick mapped to joystick #2
--joy_idx3            Name of joystick mapped to joystick #3
--joy_idx4            Name of joystick mapped to joystick #4
--joy_idx5            Name of joystick mapped to joystick #5
--joy_idx6            Name of joystick mapped to joystick #6
--joy_idx7            Name of joystick mapped to joystick #7
--joy_idx8            Name of joystick mapped to joystick #8
--sixaxis             Use special handling for PS3 Sixaxis controllers
+-joy_idx1            Name of joystick mapped to joystick #1, default is auto.
+-joy_idx2            Name of joystick mapped to joystick #2, default is auto.
+-joy_idx3            Name of joystick mapped to joystick #3, default is auto.
+-joy_idx4            Name of joystick mapped to joystick #4, default is auto.
+-joy_idx5            Name of joystick mapped to joystick #5, default is auto.
+-joy_idx6            Name of joystick mapped to joystick #6, default is auto.
+-joy_idx7            Name of joystick mapped to joystick #7, default is auto.
+-joy_idx8            Name of joystick mapped to joystick #8, default is auto.
+-sixaxis             Use special handling for PS3 Sixaxis controllers. 
+                     Default is OFF (-nosixaxis)
 
 
 
@@ -341,3 +352,4 @@ SDL Lowlevel driver options
 -videodriver         SDL video driver to use ('x11', 'directfb', ... or 'auto' for SDL default
 -audiodriver         SDL audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default
 -gl_lib              Alternative libGL.so to use; 'auto' for system default
+
