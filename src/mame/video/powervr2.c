@@ -860,37 +860,9 @@ void powervr2_device::tex_get_info(texinfo *t)
 
 }
 
-// register decode helper
-static inline int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+READ32_MEMBER( powervr2_device::pvr_ta_r )
 {
-	int reg = offset * 2;
-
-	*shift = 0;
-
-	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
-	{
-		/*assume to return the lower 32-bits ONLY*/
-		return reg & 0xffffffff;
-	}
-
-	if (mem_mask == U64(0xffffffff00000000))
-	{
-		reg++;
-		*shift = 32;
-	}
-
-	return reg;
-}
-
-READ64_MEMBER( powervr2_device::pvr_ta_r )
-{
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg_64(offset, mem_mask, &shift);
-
-	switch (reg)
+	switch (offset)
 	{
 	case SPG_STATUS:
 		{
@@ -908,7 +880,7 @@ READ64_MEMBER( powervr2_device::pvr_ta_r )
 			blank = (space.machine().primary_screen->vblank() | space.machine().primary_screen->hblank()) ? 0 : 1;
 			if(spg_blank_pol) { blank^=1; }
 
-			pvrta_regs[reg] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space.machine().primary_screen->vpos() & 0x3ff);
+			pvrta_regs[offset] = (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (space.machine().primary_screen->vpos() & 0x3ff);
 			break;
 		}
 	case SPG_TRIGGER_POS:
@@ -922,40 +894,33 @@ READ64_MEMBER( powervr2_device::pvr_ta_r )
 	if (reg != 0x43)
 		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, space.device().safe_pc());
 	#endif
-	return (UINT64)pvrta_regs[reg] << shift;
+	return (UINT64)pvrta_regs[offset];
 }
 
-WRITE64_MEMBER( powervr2_device::pvr_ta_w )
+WRITE32_MEMBER( powervr2_device::pvr_ta_w )
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
 	UINT32 sizera,offsetra;
 	int a;
 	int sanitycount;
 
-	reg = decode_reg_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-	//old = pvrta_regs[reg];
-
 	// Dreamcast BIOS attempts to set PVRID to zero and then dies
 	// if it succeeds.  Don't allow.
-	if ((reg != PVRID) && (reg != REVISION))
+	if ((offset != PVRID) && (offset != REVISION))
 	{
-		pvrta_regs[reg] = dat; // 5f8000+reg*4=dat
+		pvrta_regs[offset] = data; // 5f8000+reg*4=dat
 	}
 
-	switch (reg)
+	switch (offset)
 	{
 	case SOFTRESET:
-		if (dat & 1)
+		if (data & 1)
 		{
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  TA soft reset\n");
 			#endif
 			listtype_used=0;
 		}
-		if (dat & 2)
+		if (data & 2)
 		{
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
@@ -968,7 +933,7 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 				start_render_received = 0;
 			}
 		}
-		if (dat & 4)
+		if (data & 4)
 		{
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  sdram I/F soft reset\n");
@@ -1068,7 +1033,7 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 		assert_always(0, "TA grabber error A!\n");
 		break;
 	case TA_LIST_INIT:
-		if(dat & 0x80000000)
+		if(data & 0x80000000)
 		{
 			tafifo_pos=0;
 			tafifo_mask=7;
@@ -1138,7 +1103,7 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 		break;
 //#define TA_YUV_TEX_BASE       ((0x005f8148-0x005f8000)/4)
 	case TA_YUV_TEX_BASE:
-		printf("TA_YUV_TEX_BASE initialized to %08x\n", dat);
+		printf("TA_YUV_TEX_BASE initialized to %08x\n", data);
 
 		// hack, this interrupt is generated after transfering a set amount of data
 		//state->state->dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
@@ -1146,7 +1111,7 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 
 		break;
 	case TA_YUV_TEX_CTRL:
-		printf("TA_YUV_TEX_CTRL initialized to %08x\n", dat);
+		printf("TA_YUV_TEX_CTRL initialized to %08x\n", data);
 		break;
 
 	case SPG_VBLANK_INT:
@@ -1162,7 +1127,7 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 	#if DEBUG_PVRTA
 		mame_printf_verbose("List continuation processing\n");
 	#endif
-		if(dat & 0x80000000)
+		if(data & 0x80000000)
 		{
 			tafifo_listtype= -1; // no list being received
 			listtype_used |= (1+4);
@@ -1188,8 +1153,8 @@ WRITE64_MEMBER( powervr2_device::pvr_ta_w )
 	}
 
 	#if DEBUG_PVRTA_REGS
-	if ((reg != 0x14) && (reg != 0x15))
-		mame_printf_verbose("PVRTA: [%08x=%x] write %" I64FMT "x to %x (reg %x %x), mask %" I64FMT "x\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
+	if ((offset != 0x14) && (offset != 0x15))
+		mame_printf_verbose("PVRTA: [%08x=%x] write %x to %x %x, mask %x\n", 0x5f8000+reg*4, data, offset, (reg*4)+0x8000, mem_mask);
 	#endif
 }
 
@@ -2539,23 +2504,14 @@ UINT32 powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /* Naomi 2 attempts (TBD) */
 
-READ64_MEMBER( powervr2_device::pvr2_ta_r )
+READ32_MEMBER( powervr2_device::pvr2_ta_r )
 {
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg_64(offset, mem_mask, &shift);
-
-	switch (reg)
-	{
-	}
-
-	printf("PVR2 %08x R\n",reg);
+	printf("PVR2 %08x R\n", offset);
 
 	return 0;
 }
 
-WRITE64_MEMBER( powervr2_device::pvr2_ta_w )
+WRITE32_MEMBER( powervr2_device::pvr2_ta_w )
 {
 //  int reg;
 //  UINT64 shift;
@@ -2609,7 +2565,7 @@ WRITE32_MEMBER( powervr2_device::elan_regs_w )
 }
 
 
-WRITE64_MEMBER( powervr2_device::pvrs_ta_w )
+WRITE32_MEMBER( powervr2_device::pvrs_ta_w )
 {
 	pvr_ta_w(space,offset,data,mem_mask);
 	pvr2_ta_w(space,offset,data,mem_mask);
@@ -2624,45 +2580,34 @@ TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 	state->dc_update_interrupt_status();
 }
 
-READ64_MEMBER(powervr2_device::pvr_ctrl_r )
+READ32_MEMBER(powervr2_device::pvr_ctrl_r)
 {
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg_64(offset, mem_mask, &shift);
-
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %" I64FMT "x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, space.device().safe_pc());
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x, mask %x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[offset], offset, mem_mask, space.device().safe_pc());
 	#endif
 
-	return (UINT64)pvrctrl_regs[reg] << shift;
+	return (UINT64)pvrctrl_regs[offset];
 }
 
-WRITE64_MEMBER(powervr2_device::pvr_ctrl_w )
+WRITE32_MEMBER(powervr2_device::pvr_ctrl_w)
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
 	UINT8 old;
 
-	reg = decode_reg_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-
-	switch (reg)
+	switch (offset)
 	{
-		case SB_PDSTAP: m_pvr_dma.pvr_addr = dat; break;
-		case SB_PDSTAR: m_pvr_dma.sys_addr = dat; break;
-		case SB_PDLEN: m_pvr_dma.size = dat; break;
-		case SB_PDDIR: m_pvr_dma.dir = dat & 1; break;
+		case SB_PDSTAP: m_pvr_dma.pvr_addr = data; break;
+		case SB_PDSTAR: m_pvr_dma.sys_addr = data; break;
+		case SB_PDLEN: m_pvr_dma.size = data; break;
+		case SB_PDDIR: m_pvr_dma.dir = data & 1; break;
 		case SB_PDTSEL:
-			m_pvr_dma.sel = dat & 1;
+			m_pvr_dma.sel = data & 1;
 			//if(m_pvr_dma.sel & 1)
 			//  printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
 			break;
-		case SB_PDEN: m_pvr_dma.flag = dat & 1; break;
+		case SB_PDEN: m_pvr_dma.flag = data & 1; break;
 		case SB_PDST:
 			old = m_pvr_dma.start & 1;
-			m_pvr_dma.start = dat & 1;
+			m_pvr_dma.start = data & 1;
 
 			if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0)) // 0 -> 1
 				pvr_dma_execute(space);
@@ -2670,11 +2615,10 @@ WRITE64_MEMBER(powervr2_device::pvr_ctrl_w )
 	}
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x=%x] write %" I64FMT "x to %x (reg %x), mask %" I64FMT "x\n", 0x5f7c00+reg*4, dat, data>>shift, offset, reg, mem_mask);
+	mame_printf_verbose("PVRCTRL: [%08x=%x] write %x to %x (reg %x), mask %x\n", 0x5f7c00+reg*4, data, offset, mem_mask);
 	#endif
 
-//  pvrctrl_regs[reg] |= dat;
-	pvrctrl_regs[reg] = dat;
+	pvrctrl_regs[offset] = data;
 }
 
 void powervr2_device::pvr_dma_execute(address_space &space)

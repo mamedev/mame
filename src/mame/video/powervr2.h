@@ -111,14 +111,14 @@ public:
 
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ64_MEMBER( pvr_ctrl_r );
-	DECLARE_WRITE64_MEMBER( pvr_ctrl_w );
-	DECLARE_READ64_MEMBER( pvr_ta_r );
-	DECLARE_WRITE64_MEMBER( pvr_ta_w );
-	DECLARE_READ64_MEMBER( pvr2_ta_r );
-	DECLARE_WRITE64_MEMBER( pvr2_ta_w );
-	DECLARE_READ64_MEMBER( pvrs_ta_r );
-	DECLARE_WRITE64_MEMBER( pvrs_ta_w );
+	DECLARE_READ32_MEMBER( pvr_ctrl_r );
+	DECLARE_WRITE32_MEMBER( pvr_ctrl_w );
+	DECLARE_READ32_MEMBER( pvr_ta_r );
+	DECLARE_WRITE32_MEMBER( pvr_ta_w );
+	DECLARE_READ32_MEMBER( pvr2_ta_r );
+	DECLARE_WRITE32_MEMBER( pvr2_ta_w );
+	DECLARE_READ32_MEMBER( pvrs_ta_r );
+	DECLARE_WRITE32_MEMBER( pvrs_ta_w );
 	DECLARE_READ32_MEMBER( elan_regs_r );
 	DECLARE_WRITE32_MEMBER( elan_regs_w );
 	DECLARE_WRITE64_MEMBER( ta_fifo_poly_w );
