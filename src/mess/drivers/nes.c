@@ -624,10 +624,10 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT  COMPAT MACHINE   INPUT    INIT    COMPANY       FULLNAME */
-CONS( 1985, nes,       0,      0,     nes,      nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1987, nespal,    nes,    0,     nespal,   nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1983, famicom,   nes,    0,     famicom,  famicom, nes_state, famicom, "Nintendo",  "Famicom (w/ Disk System add-on)", GAME_IMPERFECT_GRAPHICS )
-CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, nes_state, famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS )
-CONS( 198?, m82,       nes,    0,     nes,      nes, driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS )
-CONS( 1992, dendy,     nes,    0,     dendy,    nes, driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS )
+CONS( 1985, nes,       0,      0,     nes,      nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System / Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1987, nespal,    nes,    0,     nespal,   nes, driver_device,     0,       "Nintendo",  "Nintendo Entertainment System (PAL)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1983, famicom,   nes,    0,     famicom,  famicom, nes_state, famicom, "Nintendo",  "Famicom (w/ Disk System add-on)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1986, famitwin,  nes,    0,     famicom,  famicom, nes_state, famicom, "Sharp",     "Famicom Twin", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 198?, m82,       nes,    0,     nes,      nes, driver_device,     0,       "Nintendo",  "M82 Display Unit", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1996, drpcjr,    nes,    0,     famicom,  famicom, nes_state, famicom, "Bung",      "Doctor PC Jr", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+CONS( 1992, dendy,     nes,    0,     dendy,    nes, driver_device,     0,       "Steepler",  "Dendy Classic", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

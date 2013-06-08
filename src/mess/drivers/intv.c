@@ -991,8 +991,8 @@ DRIVER_INIT_MEMBER(intv_state,intvecs)
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-CONS( 1979, intv,       0,      0,      intv,       intv,       intv_state,    intv,       "Mattel", "Intellivision", 0 )
-CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv_state,    intv,       "Sears",  "Super Video Arcade", 0 )
-COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING)
-CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv_state,    intv,       "Mattel", "Intellivision II", 0 )
-COMP( 1983, intvecs,    intv,   0,      intvecs,    intvecs,    intv_state,    intvecs,    "Mattel", "Intellivision Entertainment Computer System", 0)
+CONS( 1979, intv,       0,      0,      intv,       intv,       intv_state,    intv,       "Mattel", "Intellivision", GAME_SUPPORTS_SAVE )
+CONS( 1981, intvsrs,    intv,   0,      intv,       intv,       intv_state,    intv,       "Sears",  "Super Video Arcade", GAME_SUPPORTS_SAVE )
+COMP( 1981, intvkbd,    intv,   0,      intvkbd,    intvkbd,    intv_state,    intvkbd,    "Mattel", "Intellivision Keyboard Component (Unreleased)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+CONS( 1982, intv2,      intv,   0,      intv2,      intv,       intv_state,    intv,       "Mattel", "Intellivision II", GAME_SUPPORTS_SAVE )
+COMP( 1983, intvecs,    intv,   0,      intvecs,    intvecs,    intv_state,    intvecs,    "Mattel", "Intellivision Entertainment Computer System", GAME_SUPPORTS_SAVE )
