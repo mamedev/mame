@@ -76,6 +76,22 @@ static const char *const sysctrl_names[] =
 
 #endif
 
+void dc_state::generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram)
+{
+	sh4_ddt_dma ddt;
+	if(to_mainram)
+		ddt.destination = main_adr;
+	else
+		ddt.source = main_adr;
+	ddt.buffer = dma_ptr;
+	ddt.length = length;
+	ddt.size =size;
+	ddt.direction = to_mainram;
+	ddt.channel = -1;
+	ddt.mode = -1;
+	sh4_dma_ddt(m_maincpu, &ddt);
+}
+
 TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 {
 	m_wave_dma.start = g2bus_regs[SB_ADST] = 0;
@@ -719,6 +735,10 @@ void dc_state::rtc_initial_setup()
 void dc_state::machine_start()
 {
 	rtc_initial_setup();
+
+	// dccons doesn't have a specific g1 device yet
+	if(m_naomig1)
+		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(FUNC(dc_state::generic_dma), this));
 
 	// save states
 	save_pointer(NAME(dc_rtcregister), 4);

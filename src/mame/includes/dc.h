@@ -8,6 +8,7 @@
 #define __DC_H__
 
 #include "video/powervr2.h"
+#include "machine/naomig1.h"
 
 class dc_state : public driver_device
 {
@@ -20,7 +21,8 @@ class dc_state : public driver_device
 		dc_ram(*this, "dc_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_powervr2(*this, "powervr2") { }
+		m_powervr2(*this, "powervr2"),
+		m_naomig1(*this, "rom_board") { }
 
 	required_shared_ptr<UINT64> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
@@ -46,8 +48,6 @@ class dc_state : public driver_device
 		UINT8 start;
 		UINT8 sel;
 	}m_wave_dma;
-
-	/* video related */
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -82,6 +82,9 @@ class dc_state : public driver_device
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<powervr2_device> m_powervr2;
+	optional_device<naomi_g1_device> m_naomig1;
+
+	void generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32 size, bool to_mainram);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

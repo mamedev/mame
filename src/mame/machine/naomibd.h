@@ -4,8 +4,8 @@
 #include "machine/naomig1.h"
 #include "machine/naomicrypt.h"
 
-#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _maincpu_tag, _irq_cb)    \
-	MCFG_NAOMI_G1_ADD(_tag, type, _maincpu_tag, _irq_cb)                        \
+#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _irq_cb)    \
+	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \
 	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag);
 
 class naomi_board : public naomi_g1_device

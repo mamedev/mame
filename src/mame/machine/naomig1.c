@@ -27,17 +27,10 @@ naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, name, tag, owner, clock),
 	  irq_cb(*this)
 {
-	cpu = 0;
-}
-
-void naomi_g1_device::set_maincpu_tag(const char *_maincpu_tag)
-{
-	maincpu_tag = _maincpu_tag;
 }
 
 void naomi_g1_device::device_start()
 {
-	cpu = machine().device<sh4_device>(maincpu_tag);
 	timer = timer_alloc(G1_TIMER_ID);
 	irq_cb.resolve_safe();
 
@@ -234,16 +227,6 @@ READ32_MEMBER(naomi_g1_device::sb_gdlend_r)
 
 void naomi_g1_device::dma(void *dma_ptr, UINT32 main_adr, UINT32 size, bool to_mainram)
 {
-	sh4_ddt_dma ddt;
-	if(to_mainram)
-		ddt.destination = main_adr;
-	else
-		ddt.source = main_adr;
-	ddt.buffer = dma_ptr;
-	ddt.length = size >> 5;
-	ddt.size = 32;
-	ddt.direction = to_mainram;
-	ddt.channel = -1;
-	ddt.mode = -1;
-	sh4_dma_ddt(cpu, &ddt);
+	if(!_dma_cb.isnull())
+		_dma_cb(main_adr, dma_ptr, size >> 5, 32, to_mainram);
 }
