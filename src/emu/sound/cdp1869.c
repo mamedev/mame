@@ -53,11 +53,30 @@ enum
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
 const device_type CDP1869 = &device_creator<cdp1869_device>;
+
+// I/O map
+DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
+	AM_RANGE(0x03, 0x03) AM_WRITE(out3_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(out4_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(out5_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(out6_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(out7_w)
+ADDRESS_MAP_END
+
+// character RAM map
+DEVICE_ADDRESS_MAP_START( char_map, 8, cdp1869_device )
+	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
+ADDRESS_MAP_END
+
+// page RAM map
+DEVICE_ADDRESS_MAP_START( page_map, 8, cdp1869_device )
+	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
+ADDRESS_MAP_END
 
 // default address map
 static ADDRESS_MAP_START( cdp1869, AS_0, 8, cdp1869_device )

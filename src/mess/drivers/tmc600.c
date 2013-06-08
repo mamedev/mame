@@ -93,8 +93,8 @@ WRITE8_MEMBER( tmc600_state::keyboard_latch_w )
 static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_RAM
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
-	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
+	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
@@ -201,7 +201,7 @@ READ_LINE_MEMBER( tmc600_state::clear_r )
 
 READ_LINE_MEMBER( tmc600_state::ef2_r )
 {
-	return (m_cassette)->input() < 0;
+	return m_cassette->input() < 0;
 }
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
@@ -275,19 +275,6 @@ static const cassette_interface tmc600_cassette_interface =
 	NULL
 };
 
-static const floppy_interface tmc600_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	// basic system hardware
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
@@ -301,7 +288,6 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	/* devices */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD("cassette", tmc600_cassette_interface)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tmc600_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

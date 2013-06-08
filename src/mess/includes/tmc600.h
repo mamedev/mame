@@ -6,8 +6,6 @@
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ctronics.h"

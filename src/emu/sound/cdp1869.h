@@ -214,6 +214,10 @@ public:
 	// construction/destruction
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual DECLARE_ADDRESS_MAP(char_map, 8);
+	virtual DECLARE_ADDRESS_MAP(page_map, 8);
+
 	DECLARE_WRITE8_MEMBER( out3_w );
 	DECLARE_WRITE8_MEMBER( out4_w );
 	DECLARE_WRITE8_MEMBER( out5_w );
