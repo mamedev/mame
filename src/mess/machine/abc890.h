@@ -43,19 +43,13 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	// not really public
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( rdy_w );
-	DECLARE_WRITE_LINE_MEMBER( resin_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
-	virtual void abcbus_rst(int state);
 	virtual UINT8 abcbus_inp();
 	virtual void abcbus_utp(UINT8 data);
 	virtual UINT8 abcbus_stat();

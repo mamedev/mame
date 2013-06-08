@@ -34,15 +34,6 @@ device_abcbus_card_interface::device_abcbus_card_interface(const machine_config 
 }
 
 
-//-------------------------------------------------
-//  ~device_abcbus_card_interface - destructor
-//-------------------------------------------------
-
-device_abcbus_card_interface::~device_abcbus_card_interface()
-{
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -53,35 +44,13 @@ device_abcbus_card_interface::~device_abcbus_card_interface()
 //-------------------------------------------------
 
 abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ABCBUS_SLOT, "ABC bus slot", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+	device_t(mconfig, ABCBUS_SLOT, "ABC bus slot", tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_write_int(*this),
+	m_write_nmi(*this),
+	m_write_rdy(*this),
+	m_write_resin(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void abcbus_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const abcbus_interface *intf = reinterpret_cast<const abcbus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<abcbus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_rdy_cb, 0, sizeof(m_out_rdy_cb));
-		memset(&m_out_resin_cb, 0, sizeof(m_out_resin_cb));
-	}
 }
 
 
@@ -94,10 +63,23 @@ void abcbus_slot_device::device_start()
 	m_card = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_rdy_func.resolve(m_out_rdy_cb, *this);
-	m_out_resin_func.resolve(m_out_resin_cb, *this);
+	m_write_int.resolve_safe();
+	m_write_nmi.resolve_safe();
+	m_write_rdy.resolve_safe();
+	m_write_resin.resolve_safe();
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abcbus_slot_device::device_reset()
+{
+	if (m_card != NULL)
+	{
+		get_card_device()->reset();
+	}
 }
 
 
@@ -125,11 +107,7 @@ WRITE8_MEMBER( abcbus_slot_device::cs_w )
 
 UINT8 abcbus_slot_device::rst_r()
 {
-	if (m_card != NULL)
-	{
-		m_card->abcbus_rst(0);
-		m_card->abcbus_rst(1);
-	}
+	device_reset();
 
 	return 0xff;
 }
@@ -311,46 +289,6 @@ void abcbus_slot_device::xmemw_w(offs_t offset, UINT8 data)
 WRITE8_MEMBER( abcbus_slot_device::xmemw_w )
 {
 	xmemw_w(offset, data);
-}
-
-
-//-------------------------------------------------
-//  int_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abcbus_slot_device::int_w )
-{
-	m_out_int_func(state);
-}
-
-
-//-------------------------------------------------
-//  nmi_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abcbus_slot_device::nmi_w )
-{
-	m_out_nmi_func(state);
-}
-
-
-//-------------------------------------------------
-//  rdy_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abcbus_slot_device::rdy_w )
-{
-	m_out_rdy_func(state);
-}
-
-
-//-------------------------------------------------
-//  resin_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abcbus_slot_device::resin_w )
-{
-	m_out_resin_func(state);
 }
 
 

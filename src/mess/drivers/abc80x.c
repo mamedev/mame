@@ -883,19 +883,6 @@ static const cassette_interface cass_intf =
 
 
 //-------------------------------------------------
-//  ABCBUS_INTERFACE( abcbus_intf )
-//-------------------------------------------------
-
-static ABCBUS_INTERFACE( abcbus_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  rs232_port_interface rs232a_intf
 //-------------------------------------------------
 
@@ -1192,7 +1179,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc830_fast)
 
 	// internal ram
@@ -1235,7 +1222,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc830_fast)
 
 	// internal ram
@@ -1278,7 +1265,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc55", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc834_fast)
 
 	// internal ram
@@ -1311,7 +1298,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_ABC_KEYBOARD_PORT_ADD("abc77", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc832_fast)
 
 	// internal ram

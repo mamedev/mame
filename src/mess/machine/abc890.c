@@ -21,50 +21,17 @@ const device_type ABC850 = &device_creator<abc850_device>;
 
 
 //-------------------------------------------------
-//  ABCBUS_INTERFACE( abcbus_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( abc890_device::int_w )
-{
-	m_slot->int_w(state);
-}
-
-WRITE_LINE_MEMBER( abc890_device::nmi_w )
-{
-	m_slot->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER( abc890_device::rdy_w )
-{
-	m_slot->rdy_w(state);
-}
-
-WRITE_LINE_MEMBER( abc890_device::resin_w )
-{
-	m_slot->resin_w(state);
-}
-
-static ABCBUS_INTERFACE( abcbus_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, int_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, rdy_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, resin_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( abc890 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc890 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem1", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem2", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("mem3", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem1", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem2", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem3", abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -84,9 +51,9 @@ machine_config_constructor abc890_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc894 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -106,14 +73,14 @@ machine_config_constructor abc894_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc850 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, "fast")
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "fast")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, "hdc")
-	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io6", abcbus_intf, abcbus_cards, NULL)
-	MCFG_ABCBUS_SLOT_ADD("io7", abcbus_intf, abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "hdc")
+	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io6", abcbus_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("io7", abcbus_cards, NULL)
 MACHINE_CONFIG_END
 
 
@@ -200,6 +167,19 @@ void abc850_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abc890_device::device_reset()
+{
+	for (int i = 0; i < m_slots; i++)
+	{
+		m_expansion_slot[i]->reset();
+	}
+}
+
+
 
 //**************************************************************************
 //  ABC BUS INTERFACE
@@ -210,14 +190,6 @@ void abc890_device::abcbus_cs(UINT8 data)
 	for (int i = 0; i < m_slots; i++)
 	{
 		m_expansion_slot[i]->cs_w(data);
-	}
-}
-
-void abc890_device::abcbus_rst(int state)
-{
-	for (int i = 0; i < m_slots; i++)
-	{
-		m_expansion_slot[i]->rst_r();
 	}
 }
 

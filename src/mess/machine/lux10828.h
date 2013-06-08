@@ -82,7 +82,6 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
-	virtual void abcbus_rst(int state);
 	virtual UINT8 abcbus_inp();
 	virtual void abcbus_utp(UINT8 data);
 	virtual UINT8 abcbus_stat();

@@ -78,13 +78,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define ABCBUS_INTERFACE(_name) \
-	const abcbus_interface (_name) =
-
-
-#define MCFG_ABCBUS_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_ABCBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ABCBUS_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
@@ -93,56 +88,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abcbus_interface
-
-struct abcbus_interface
-{
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_nmi_cb;
-	devcb_write_line    m_out_rdy_cb;
-	devcb_write_line    m_out_resin_cb;
-};
-
-
-// ======================> device_abcbus_card_interface
-
-class abcbus_slot_device;
-
-// class representing interface-specific live abcbus card
-class device_abcbus_card_interface : public device_slot_card_interface
-{
-	friend class abcbus_slot_device;
-
-public:
-	// construction/destruction
-	device_abcbus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_abcbus_card_interface();
-
-	// required operation overrides
-	virtual void abcbus_cs(UINT8 data) = 0;
-
-	// optional operation overrides
-	virtual void abcbus_rst(int state) { };
-	virtual UINT8 abcbus_inp() { return 0xff; };
-	virtual void abcbus_utp(UINT8 data) { };
-	virtual UINT8 abcbus_stat() { return 0xff; };
-	virtual void abcbus_c1(UINT8 data) { };
-	virtual void abcbus_c2(UINT8 data) { };
-	virtual void abcbus_c3(UINT8 data) { };
-	virtual void abcbus_c4(UINT8 data) { };
-	virtual UINT8 abcbus_xmemfl(offs_t offset) { return 0xff; };
-	virtual void abcbus_xmemw(offs_t offset, UINT8 data) { };
-
-public:
-	abcbus_slot_device  *m_slot;
-};
-
-
 // ======================> abcbus_slot_device
 
+class device_abcbus_card_interface;
+
 class abcbus_slot_device : public device_t,
-							public device_slot_interface,
-							public abcbus_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -174,23 +125,53 @@ public:
 	DECLARE_WRITE8_MEMBER( xmemw_w );
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( rdy_w );
-	DECLARE_WRITE_LINE_MEMBER( resin_w );
+	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_write_int(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
+	DECLARE_WRITE_LINE_MEMBER( resin_w ) { m_write_resin(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
+	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_nmi_func;
-	devcb_resolved_write_line   m_out_rdy_func;
-	devcb_resolved_write_line   m_out_resin_func;
+	devcb2_write_line   m_write_int;
+	devcb2_write_line   m_write_nmi;
+	devcb2_write_line   m_write_rdy;
+	devcb2_write_line   m_write_resin;
 
 	device_abcbus_card_interface *m_card;
+};
+
+
+// ======================> device_abcbus_card_interface
+
+// class representing interface-specific live abcbus card
+class device_abcbus_card_interface : public device_slot_card_interface
+{
+	friend class abcbus_slot_device;
+
+public:
+	// construction/destruction
+	device_abcbus_card_interface(const machine_config &mconfig, device_t &device);
+
+	// required operation overrides
+	virtual void abcbus_cs(UINT8 data) = 0;
+
+	// optional operation overrides
+	virtual UINT8 abcbus_inp() { return 0xff; };
+	virtual void abcbus_utp(UINT8 data) { };
+	virtual UINT8 abcbus_stat() { return 0xff; };
+	virtual void abcbus_c1(UINT8 data) { };
+	virtual void abcbus_c2(UINT8 data) { };
+	virtual void abcbus_c3(UINT8 data) { };
+	virtual void abcbus_c4(UINT8 data) { };
+	virtual UINT8 abcbus_xmemfl(offs_t offset) { return 0xff; };
+	virtual void abcbus_xmemw(offs_t offset, UINT8 data) { };
+
+public:
+	abcbus_slot_device  *m_slot;
 };
 
 
