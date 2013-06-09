@@ -3,7 +3,7 @@
  *
  *  Created on: 17/05/2013
  *
- *  Skeleton driver
+ *  Driver by Barry Rodewald
  *
  *
  *  Otrona Attache
@@ -63,6 +63,7 @@
 #include "machine/upd765.h"
 #include "video/tms9927.h"
 #include "machine/ram.h"
+#include "machine/nvram.h"
 
 class attache_state : public driver_device
 {
@@ -100,6 +101,7 @@ public:
 		  m_membank6(*this, "bank6"),
 		  m_membank7(*this, "bank7"),
 		  m_membank8(*this, "bank8"),
+		  m_nvram(*this, "nvram"),
 		  m_rom_active(true),
 		  m_gfx_enabled(false),
 		  m_kb_clock(true),
@@ -197,6 +199,7 @@ private:
 	required_memory_bank m_membank6;
 	required_memory_bank m_membank7;
 	required_memory_bank m_membank8;
+	required_device<nvram_device> m_nvram;
 
 	bool m_rom_active;
 	bool m_gfx_enabled;
@@ -434,6 +437,7 @@ void attache_state::keyboard_clock_w(bool state)
 READ8_MEMBER(attache_state::pio_portA_r)
 {
 	UINT8 ret = 0xff;
+	UINT8 porta = m_pio_porta;
 
 	switch(m_pio_select)
 	{
@@ -442,20 +446,24 @@ READ8_MEMBER(attache_state::pio_portA_r)
 		logerror("PSG: data read %02x\n",ret);
 		break;
 	case PIO_SEL_5832_WRITE:
+		m_rtc->address_w((porta & 0xf0) >> 4);
 		ret = m_rtc->data_r(space,0);
 		logerror("RTC: read %02x (write)\n",ret);
 		break;
 	case PIO_SEL_5832_READ:
+		m_rtc->address_w((porta & 0xf0) >> 4);
 		ret = m_rtc->data_r(space,0);
 		logerror("RTC: read %02x\n",ret);
 		break;
 	case PIO_SEL_5101_WRITE:
+		m_cmos_select = (m_cmos_select & 0xf0) | ((porta & 0xf0) >> 4);
 		ret = m_cmos_ram[m_cmos_select] & 0x0f;
-		logerror("CMOS: read %02x to byte %02x (write)\n",ret, m_cmos_select);
+		logerror("CMOS: read %02x from byte %02x (write)\n",ret, m_cmos_select);
 		break;
 	case PIO_SEL_5101_READ:
+		m_cmos_select = (m_cmos_select & 0xf0) | ((porta & 0xf0) >> 4);
 		ret = m_cmos_ram[m_cmos_select] & 0x0f;
-		logerror("CMOS: read %02x to byte %02x\n",ret, m_cmos_select);
+		logerror("CMOS: read %02x from byte %02x\n",ret, m_cmos_select);
 		break;
 	case PIO_SEL_LATCH:
 		ret = 0x00;  // Write-only?
@@ -555,9 +563,9 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	//B7 = /KEYBOARD CLOCK OUT
 	if((data & 0x20) && !(m_pio_portb & 0x20))
 		operation_strobe(space,m_pio_porta);
-	m_pio_portb = data;
 	m_pio_select = (data & 0x1c) >> 2;
 	m_cmos_select = ((data & 0x03) << 4) | (m_cmos_select & 0x0f);
+	m_pio_portb = data;
 	keyboard_clock_w(data & 0x80);
 }
 
@@ -955,6 +963,8 @@ void attache_state::driver_start()
 
 	memset(RAM,0,65536);
 
+	m_nvram->set_base(m_cmos_ram,64);
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff,read8_delegate(FUNC(attache_state::rom_r),this),write8_delegate(FUNC(attache_state::rom_w),this));
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
@@ -1017,6 +1027,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_TMS9927_ADD("crtc", 12324000, crtc_interface)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
 	
@@ -1064,5 +1076,5 @@ ROM_START( attachef )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    DEVICE            INIT    COMPANY      FULLNAME     FLAGS */
-COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IS_SKELETON)
-COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IS_SKELETON)
+COMP( 1982, attache, 0,      0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev G)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
+COMP( 1982, attachef,attache,0,         attache,    attache, driver_device,    0,      "Otrona",   "Attache (boot rev F)",    GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
