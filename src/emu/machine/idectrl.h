@@ -89,8 +89,10 @@ public:
 
 	DECLARE_READ8_MEMBER(read_via_config);
 	DECLARE_WRITE8_MEMBER(write_via_config);
+	UINT16 read_dma();
 	DECLARE_READ16_MEMBER(read_cs0);
 	DECLARE_READ16_MEMBER(read_cs1);
+	void write_dma(UINT16 data);
 	DECLARE_WRITE16_MEMBER(write_cs0);
 	DECLARE_WRITE16_MEMBER(write_cs1);
 
@@ -136,6 +138,8 @@ private:
 	void write_buffer_to_dma();
 	void read_first_sector();
 	void handle_command(UINT8 _command);
+	void read_buffer_empty();
+	void write_buffer_full();
 
 	UINT8           adapter_control;
 	UINT8           error;

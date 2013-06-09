@@ -301,13 +301,18 @@ void ide_controller_device::continue_read()
 void ide_controller_device::write_buffer_to_dma()
 {
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
-	UINT8 *data = buffer;
+	UINT16 data = 0;
 
 //  LOG(("Writing sector to %08X\n", dma_address));
 
 	/* loop until we've consumed all bytes */
 	while (bytesleft--)
 	{
+		data >>= 8;
+
+		if (bytesleft & 1)
+			data = read_dma();
+
 		/* if we're out of space, grab the next descriptor */
 		if (dma_bytes_left == 0)
 		{
@@ -339,7 +344,7 @@ void ide_controller_device::write_buffer_to_dma()
 		}
 
 		/* write the next byte */
-		dma_space->write_byte(dma_address++, *data++);
+		dma_space->write_byte(dma_address++, data & 0xff);
 		dma_bytes_left--;
 	}
 }
@@ -392,8 +397,8 @@ void ide_controller_device::read_sector_done()
 		if (dma_active)
 			write_buffer_to_dma();
 
-		/* if we're just verifying or if we DMA'ed the data, we can read the next sector */
-		if (verify_only || dma_active)
+		/* if we're just verifying we can read the next sector */
+		if (verify_only)
 			continue_read();
 	}
 
@@ -507,7 +512,7 @@ void ide_controller_device::continue_write()
 void ide_controller_device::read_buffer_from_dma()
 {
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
-	UINT8 *data = buffer;
+	UINT16 data = 0;
 
 //  LOG(("Reading sector from %08X\n", dma_address));
 
@@ -545,8 +550,13 @@ void ide_controller_device::read_buffer_from_dma()
 		}
 
 		/* read the next byte */
-		*data++ = dma_space->read_byte(dma_address++);
-		dma_bytes_left--;
+		data |= dma_space->read_byte(dma_address++) << 8;
+		dma_bytes_left --;
+
+		if((bytesleft & 1) == 0)
+			write_dma(data);
+
+		data >>= 8;
 	}
 }
 
@@ -595,7 +605,6 @@ void ide_controller_device::write_sector_done()
 		if (dma_active && sector_count != 0)
 		{
 			read_buffer_from_dma();
-			continue_write();
 		}
 		else
 			dma_active = 0;
@@ -739,7 +748,6 @@ void ide_controller_device::handle_command(UINT8 _command)
 			if (bus_master_command & 1)
 			{
 				read_buffer_from_dma();
-				continue_write();
 			}
 			break;
 
@@ -961,6 +969,20 @@ READ16_MEMBER( ide_controller_device::read_cs0_pc )
 	}
 }
 
+UINT16 ide_controller_device::read_dma()
+{
+	UINT16 result = buffer[buffer_offset++];
+	result |= buffer[buffer_offset++] << 8;
+
+	if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+	{
+		LOG(("%s:IDE completed DMA read\n", machine().describe_context()));
+		read_buffer_empty();
+	}
+
+	return result;
+}
+
 READ16_MEMBER( ide_controller_device::read_cs0 )
 {
 	UINT16 result = 0;
@@ -1001,8 +1023,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
 					LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
-					continue_read();
-					error = IDE_ERROR_DEFAULT;
+					read_buffer_empty();
 				}
 			}
 			break;
@@ -1061,6 +1082,75 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	return result;
 }
 
+
+void ide_controller_device::write_buffer_full()
+{
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
+	if (command == IDE_COMMAND_SECURITY_UNLOCK)
+	{
+		if (user_password_enable && memcmp(buffer, user_password, 2 + 32) == 0)
+		{
+			LOGPRINT(("IDE Unlocked user password\n"));
+			user_password_enable = 0;
+		}
+		if (master_password_enable && memcmp(buffer, master_password, 2 + 32) == 0)
+		{
+			LOGPRINT(("IDE Unlocked master password\n"));
+			master_password_enable = 0;
+		}
+		if (PRINTF_IDE_PASSWORD)
+		{
+			int i;
+
+			for (i = 0; i < 34; i += 2)
+			{
+				if (i % 8 == 2)
+					mame_printf_debug("\n");
+
+				mame_printf_debug("0x%02x, 0x%02x, ", buffer[i], buffer[i + 1]);
+				//mame_printf_debug("0x%02x%02x, ", buffer[i], buffer[i + 1]);
+			}
+			mame_printf_debug("\n");
+		}
+
+		/* clear the busy and error flags */
+		status &= ~IDE_STATUS_ERROR;
+		status &= ~IDE_STATUS_BUSY;
+		status &= ~IDE_STATUS_BUFFER_READY;
+
+		if (master_password_enable || user_password_enable)
+			security_error();
+		else
+			status |= IDE_STATUS_DRIVE_READY;
+	}
+	else if (command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
+	{
+		UINT8 key[5] = { 0 };
+		int i, bad = 0;
+		dev->read_key(key);
+
+		for (i=0; !bad && i<512; i++)
+			bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
+
+		status &= ~IDE_STATUS_BUSY;
+		status &= ~IDE_STATUS_BUFFER_READY;
+		if (bad)
+			status |= IDE_STATUS_ERROR;
+		else {
+			status &= ~IDE_STATUS_ERROR;
+			gnetreadlock= 0;
+		}
+	}
+	else
+		continue_write();
+}
+
+void ide_controller_device::read_buffer_empty()
+{
+	continue_read();
+	error = IDE_ERROR_DEFAULT;
+}
 
 READ16_MEMBER( ide_controller_device::read_cs1_pc )
 {
@@ -1170,6 +1260,19 @@ WRITE16_MEMBER( ide_controller_device::write_cs0_pc )
 	}
 }
 
+void ide_controller_device::write_dma( UINT16 data )
+{
+	buffer[buffer_offset++] = data;
+	buffer[buffer_offset++] = data >> 8;
+
+	/* if we're at the end of the buffer, handle it */
+	if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+	{
+		LOG(("%s:IDE completed DMA write\n", machine().describe_context()));
+		write_buffer_full();
+	}
+}
+
 WRITE16_MEMBER( ide_controller_device::write_cs0 )
 {
 //	printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
@@ -1204,64 +1307,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
 					LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
-					if (command == IDE_COMMAND_SECURITY_UNLOCK)
-					{
-						if (user_password_enable && memcmp(buffer, user_password, 2 + 32) == 0)
-						{
-							LOGPRINT(("IDE Unlocked user password\n"));
-							user_password_enable = 0;
-						}
-						if (master_password_enable && memcmp(buffer, master_password, 2 + 32) == 0)
-						{
-							LOGPRINT(("IDE Unlocked master password\n"));
-							master_password_enable = 0;
-						}
-						if (PRINTF_IDE_PASSWORD)
-						{
-							int i;
-
-							for (i = 0; i < 34; i += 2)
-							{
-								if (i % 8 == 2)
-									mame_printf_debug("\n");
-
-								mame_printf_debug("0x%02x, 0x%02x, ", buffer[i], buffer[i + 1]);
-								//mame_printf_debug("0x%02x%02x, ", buffer[i], buffer[i + 1]);
-							}
-							mame_printf_debug("\n");
-						}
-
-						/* clear the busy and error flags */
-						status &= ~IDE_STATUS_ERROR;
-						status &= ~IDE_STATUS_BUSY;
-						status &= ~IDE_STATUS_BUFFER_READY;
-
-						if (master_password_enable || user_password_enable)
-							security_error();
-						else
-							status |= IDE_STATUS_DRIVE_READY;
-					}
-					else if (command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
-					{
-						UINT8 key[5] = { 0 };
-						int i, bad = 0;
-						dev->read_key(key);
-
-						for (i=0; !bad && i<512; i++)
-							bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
-
-						status &= ~IDE_STATUS_BUSY;
-						status &= ~IDE_STATUS_BUFFER_READY;
-						if (bad)
-							status |= IDE_STATUS_ERROR;
-						else {
-							status &= ~IDE_STATUS_ERROR;
-							gnetreadlock= 0;
-						}
-					}
-					else
-						continue_write();
-
+					write_buffer_full();
 				}
 			}
 			break;
@@ -1408,7 +1454,6 @@ WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 					else
 					{
 						read_buffer_from_dma();
-						continue_write();
 					}
 				}
 			}

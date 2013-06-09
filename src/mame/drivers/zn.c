@@ -1338,19 +1338,14 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 		return;
 	}
 
-//	printf( "%08x %08x %08x\n", n_address, n_size * 4, n_address + n_size * 4 );
-
 	/* dma size is in 32-bit words, convert to words */
 	n_size <<= 1;
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
 	while( n_size > 0 )
 	{
-		psxwriteword( p_n_psxram, n_address, m_ide->read_cs0( space, 0, 0xffff ) );
+		psxwriteword( p_n_psxram, n_address, m_ide->read_dma() );
 		n_address += 2;
 		n_size--;
 	}
-
-//	printf( "%08x\n", n_address );
 }
 
 void zn_state::atpsx_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
