@@ -4,10 +4,9 @@
 
     Boots, terminal works, memory banking works.
 
-    Error when reading floppy disk (record not found)
+    Error when reading floppy disk (bdos error)
 
     ToDo:
-    - DMA has its own memory banking, activated by BUSACK
     - Get floppy to read the disk (only ones found are .TD0 format)
     - Further work once the floppy is fixed
 
@@ -34,6 +33,7 @@ public:
 		m_pio1(*this, "z80pio_1"),
 		m_dart(*this, "z80dart"),
 		m_sio (*this, "z80sio"),
+		m_dma (*this, "z80dma"),
 		m_ctc (*this, "z80ctc"),
 		m_fdc (*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
@@ -52,20 +52,24 @@ public:
 	DECLARE_DRIVER_INIT(altos5);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	UINT8 m_port08;
 	UINT8 m_port09;
 	UINT8 *m_p_prom;
 	bool m_ipl;
+	offs_t m_curr_bank;
+	floppy_image_device *m_floppy;
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 	UINT8 convert(offs_t offset, bool state);
-	void setup_banks();
+	void setup_banks(UINT8 source);
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80dart_device> m_dart;
 	required_device<z80sio0_device> m_sio;
+	required_device<z80dma_device> m_dma;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -126,53 +130,65 @@ UINT8 altos5_state::convert(offs_t offset, bool state)
 	return data & 0x3f;
 }
 	
-void altos5_state::setup_banks()
+void altos5_state::setup_banks(UINT8 source)
 {
-	// WPRT | template | cpu bank
-	offs_t offs = ((~m_port09 & 0x20) << 3) | ((m_port09 & 0x06) << 5) | ((m_port09 & 0x18) << 1);
-	offs_t temp = offs;
+	offs_t offs,temp;
+	// WPRT | template | dma bank / cpu bank
 
-	membank("bankr0")->set_entry(convert(offs++, 0));
-	membank("bankr1")->set_entry(convert(offs++, 0));
-	membank("bankr2")->set_entry(convert(offs++, 0));
-	membank("bankr3")->set_entry(convert(offs++, 0));
-	membank("bankr4")->set_entry(convert(offs++, 0));
-	membank("bankr5")->set_entry(convert(offs++, 0));
-	membank("bankr6")->set_entry(convert(offs++, 0));
-	membank("bankr7")->set_entry(convert(offs++, 0));
-	membank("bankr8")->set_entry(convert(offs++, 0));
-	membank("bankr9")->set_entry(convert(offs++, 0));
-	membank("bankra")->set_entry(convert(offs++, 0));
-	membank("bankrb")->set_entry(convert(offs++, 0));
-	membank("bankrc")->set_entry(convert(offs++, 0));
-	membank("bankrd")->set_entry(convert(offs++, 0));
-	membank("bankre")->set_entry(convert(offs++, 0));
-	membank("bankrf")->set_entry(convert(offs++, 0));
+	if (source == 1) // use DMA banks only if BUSACK is asserted
+		offs = ((~m_port09 & 0x20) << 3) | ((m_port09 & 0x06) << 5) | ((m_port09 & 0xc0) >> 2);
+	else
+		offs = ((~m_port09 & 0x20) << 3) | ((m_port09 & 0x06) << 5) | ((m_port09 & 0x18) << 1);
 
-	membank("bankw0")->set_entry(convert(temp++, 1));
-	membank("bankw1")->set_entry(convert(temp++, 1));
-	membank("bankw2")->set_entry(convert(temp++, 1));
-	membank("bankw3")->set_entry(convert(temp++, 1));
-	membank("bankw4")->set_entry(convert(temp++, 1));
-	membank("bankw5")->set_entry(convert(temp++, 1));
-	membank("bankw6")->set_entry(convert(temp++, 1));
-	membank("bankw7")->set_entry(convert(temp++, 1));
-	membank("bankw8")->set_entry(convert(temp++, 1));
-	membank("bankw9")->set_entry(convert(temp++, 1));
-	membank("bankwa")->set_entry(convert(temp++, 1));
-	membank("bankwb")->set_entry(convert(temp++, 1));
-	membank("bankwc")->set_entry(convert(temp++, 1));
-	membank("bankwd")->set_entry(convert(temp++, 1));
-	membank("bankwe")->set_entry(convert(temp++, 1));
-	membank("bankwf")->set_entry(convert(temp++, 1));
+	temp = offs;
+	if ((source == 2) || (temp != m_curr_bank))
+	{
+		membank("bankr0")->set_entry(convert(offs++, 0));
+		membank("bankr1")->set_entry(convert(offs++, 0));
+		membank("bankr2")->set_entry(convert(offs++, 0));
+		membank("bankr3")->set_entry(convert(offs++, 0));
+		membank("bankr4")->set_entry(convert(offs++, 0));
+		membank("bankr5")->set_entry(convert(offs++, 0));
+		membank("bankr6")->set_entry(convert(offs++, 0));
+		membank("bankr7")->set_entry(convert(offs++, 0));
+		membank("bankr8")->set_entry(convert(offs++, 0));
+		membank("bankr9")->set_entry(convert(offs++, 0));
+		membank("bankra")->set_entry(convert(offs++, 0));
+		membank("bankrb")->set_entry(convert(offs++, 0));
+		membank("bankrc")->set_entry(convert(offs++, 0));
+		membank("bankrd")->set_entry(convert(offs++, 0));
+		membank("bankre")->set_entry(convert(offs++, 0));
+		membank("bankrf")->set_entry(convert(offs++, 0));
+
+		offs = temp;
+		membank("bankw0")->set_entry(convert(offs++, 1));
+		membank("bankw1")->set_entry(convert(offs++, 1));
+		membank("bankw2")->set_entry(convert(offs++, 1));
+		membank("bankw3")->set_entry(convert(offs++, 1));
+		membank("bankw4")->set_entry(convert(offs++, 1));
+		membank("bankw5")->set_entry(convert(offs++, 1));
+		membank("bankw6")->set_entry(convert(offs++, 1));
+		membank("bankw7")->set_entry(convert(offs++, 1));
+		membank("bankw8")->set_entry(convert(offs++, 1));
+		membank("bankw9")->set_entry(convert(offs++, 1));
+		membank("bankwa")->set_entry(convert(offs++, 1));
+		membank("bankwb")->set_entry(convert(offs++, 1));
+		membank("bankwc")->set_entry(convert(offs++, 1));
+		membank("bankwd")->set_entry(convert(offs++, 1));
+		membank("bankwe")->set_entry(convert(offs++, 1));
+		membank("bankwf")->set_entry(convert(offs++, 1));
+	}
+
+	m_curr_bank = temp;
 }
 
 void altos5_state::machine_reset()
 {
+	m_curr_bank = 0;
 	m_port08 = 0;
 	m_port09 = 0;
 	m_ipl = 1;
-	setup_banks();
+	setup_banks(2);
 	m_maincpu->reset();
 }
 
@@ -192,7 +208,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 WRITE8_MEMBER( altos5_state::port14_w )
 {
 	m_ipl = 0;
-	setup_banks();
+	setup_banks(2);
 }
 
 READ8_MEMBER(altos5_state::memory_read_byte)
@@ -219,11 +235,20 @@ WRITE8_MEMBER(altos5_state::io_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
+WRITE_LINE_MEMBER( altos5_state::busreq_w )
+{
+// since our Z80 has no support for BUSACK, we assume it is granted immediately
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
+	m_dma->bai_w(state); // tell dma that bus has been granted
+	setup_banks(state); // adjust banking for dma or cpu
+}
+
 static Z80DMA_INTERFACE( dma_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT), // actually BUSRQ
+	DEVCB_DRIVER_LINE_MEMBER(altos5_state, busreq_w),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
+	DEVCB_NULL,	// BAO, not used
 	DEVCB_DRIVER_MEMBER(altos5_state, memory_read_byte),
 	DEVCB_DRIVER_MEMBER(altos5_state, memory_write_byte),
 	DEVCB_DRIVER_MEMBER(altos5_state, io_read_byte),
@@ -280,7 +305,10 @@ d7: IRQ from FDC
 */
 READ8_MEMBER( altos5_state::port08_r )
 {
-	return m_port08 | 0x07;
+	UINT8 data = m_port08 | 0x87;
+	if (m_floppy)
+		data |= ((UINT8)m_floppy->twosid_r() << 3); // get number of sides
+	return data;
 }
 
 /*
@@ -298,22 +326,21 @@ d6: SS (H = side 2)
 */
 WRITE8_MEMBER( altos5_state::port08_w )
 {
-	m_port08 = data;
+	m_port08 = data & 0x70;
 
-	floppy_image_device *floppy = NULL;
+	m_floppy = NULL;
 	if (BIT(data, 5))
-		floppy = m_floppy1->get_device();
+		m_floppy = m_floppy1->get_device();
 	else
-		floppy = m_floppy0->get_device();
+		m_floppy = m_floppy0->get_device();
 
-	m_fdc->set_floppy(floppy);
+	m_fdc->set_floppy(m_floppy);
 
-	if (floppy)
+	if (m_floppy)
 	{
-		floppy->mon_w(0);
-		floppy->ss_w(BIT(data, 6));
+		m_floppy->mon_w(0);
+		m_floppy->ss_w(BIT(data, 6));
 		m_fdc->dden_w(!BIT(data, 4));
-		m_port08 |= ((UINT8)floppy->twosid_r() << 3); // get number of sides
 	}
 }
 
@@ -326,7 +353,7 @@ d6, 7: DMA bank select (not emulated)
 WRITE8_MEMBER( altos5_state::port09_w )
 {
 	m_port09 = data;
-	setup_banks();
+	setup_banks(2);
 }
 
 // parallel port
@@ -379,7 +406,7 @@ static Z80SIO_INTERFACE( sio_intf )
 	DEVCB_NULL, // out data
 	DEVCB_NULL, // DTR
 	DEVCB_NULL, // RTS
-	DEVCB_NULL, // WRDY
+	DEVCB_NULL, // WRDY    connects to (altos5_state, fdc_intrq_w),
 	DEVCB_NULL, // SYNC
 
 	// console#1
@@ -412,27 +439,26 @@ SLOT_INTERFACE_END
 
 void altos5_state::fdc_intrq_w(bool state)
 {
-	m_port08 = (m_port08 & 0x7f) | ((UINT8)(state) << 7);
-	m_pio0->port_a_write(m_port08);
+	UINT8 data = m_port08 | ((UINT8)(state) << 7);
+	m_pio0->port_a_write(data);
 }
 
 void altos5_state::fdc_drq_w(bool state)
 {
-	// To DMA pin 25 - SDMA
+	m_dma->rdy_w(state);
 }
 
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
+	m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_drq_w), this));
 
 	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
-	if (floppy)
+	m_floppy = con ? con->get_device() : 0;
+	if (m_floppy)
 	{
-		m_fdc->set_floppy(floppy);
-		m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_intrq_w), this));
-		m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_drq_w), this));
-
-		floppy->ss_w(0);
+		m_fdc->set_floppy(m_floppy);
+		m_floppy->ss_w(0);
 	}
 
 
