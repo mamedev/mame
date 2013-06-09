@@ -81,6 +81,12 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 
 private:
+	// Common read routine
+	void read_all(address_space& space, UINT16 addr, UINT8 *target);
+
+	// Common write routine
+	void write_all(address_space& space, UINT16 addr, UINT8 value);
+
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
 
@@ -101,9 +107,6 @@ private:
 
 	/* Reference to the CPU; avoid lookups. */
 	device_t *m_cpu;
-
-	/* Reference to the address space, maybe unnecessary. */
-	address_space   *m_space;
 };
 
 /******************************************************************************/

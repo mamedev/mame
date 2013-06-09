@@ -48,11 +48,11 @@ READ8Z_MEMBER( ti_std_video_device::readz )
 {
 	if (offset & 2)
 	{       /* read VDP status */
-		*value = m_tms9928a->register_read(*(this->m_space), 0);
+		*value = m_tms9928a->register_read(space, 0);
 	}
 	else
 	{       /* read VDP RAM */
-		*value = m_tms9928a->vram_read(*(this->m_space), 0);
+		*value = m_tms9928a->vram_read(space, 0);
 	}
 }
 
@@ -60,11 +60,11 @@ WRITE8_MEMBER( ti_std_video_device::write )
 {
 	if (offset & 2)
 	{   /* write VDP address */
-		m_tms9928a->register_write(*(this->m_space), 0, data);
+		m_tms9928a->register_write(space, 0, data);
 	}
 	else
 	{   /* write VDP data */
-		m_tms9928a->vram_write(*(this->m_space), 0, data);
+		m_tms9928a->vram_write(space, 0, data);
 	}
 }
 

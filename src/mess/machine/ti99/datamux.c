@@ -84,6 +84,42 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
     DEVICE ACCESSOR FUNCTIONS
 ***************************************************************************/
 
+void ti99_datamux_device::read_all(address_space& space, UINT16 addr, UINT8 *target)
+{
+	attached_device *dev = m_devices.first();
+
+	// Reading the odd address first (addr+1)
+	while (dev != NULL)
+	{
+		if (dev->m_config->write_select != 0xffff) // write-only
+		{
+			if ((addr & dev->m_config->address_mask)==dev->m_config->select)
+			{
+				// Cast to the bus8z_device (see ti99defs.h)
+				bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
+				devz->readz(space, addr, target);
+			}
+			// hope we don't have two devices answering...
+			// consider something like a logical OR and maybe some artificial smoke
+		}
+		dev = dev->m_next;
+	}
+}
+
+void ti99_datamux_device::write_all(address_space& space, UINT16 addr, UINT8 value)
+{
+	attached_device *dev = m_devices.first();
+	while (dev != NULL)
+	{
+		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
+		{
+			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
+			devz->write(space, addr, value);
+		}
+		dev = dev->m_next;
+	}
+}
+
 /*
     Read access. We are using two loops because the delay between both
     accesses must not occur within the loop. So we have one access on the bus,
@@ -96,8 +132,6 @@ READ16_MEMBER( ti99_datamux_device::read )
 {
 	UINT8 hbyte = 0;
 	UINT16 addr = (offset << 1);
-
-	assert (mem_mask == 0xffff);
 
 	// Looks ugly, but this is close to the real thing. If the 16bit
 	// memory expansion is installed in the console, and the access hits its
@@ -113,50 +147,27 @@ READ16_MEMBER( ti99_datamux_device::read )
 		if (base != 0)
 		{
 			UINT16 reply = m_ram16b[offset-base];
-			return reply;
+			return reply & mem_mask;
 		}
 	}
 
-	attached_device *dev = m_devices.first();
-
-	// Reading the odd address first (addr+1)
-	while (dev != NULL)
-	{
-		if (((addr+1) & dev->m_config->address_mask)==dev->m_config->select)
-		{
-			// Cast to the bus8z_device (see ti99defs.h)
-			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-			devz->readz(*m_space, addr+1, &m_latch);
-		}
-		// hope we don't have two devices answering...
-		// consider something like a logical OR and maybe some artificial smoke
-		dev = dev->m_next;
-	}
-
-	dev = m_devices.first();
+	// Read the odd address into the latch
+	read_all(space, addr+1, &m_latch);
 
 	// Reading the even address now (addr)
-	while (dev != NULL)
-	{
-		if (dev->m_config->write_select != 0xffff) // write-only
-		{
-			if ((addr & dev->m_config->address_mask)==dev->m_config->select)
-			{
-				bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-				devz->readz(*m_space, addr, &hbyte);
-			}
-		}
-		dev = dev->m_next;
-	}
+	read_all(space, addr, &hbyte);
 
 	// Insert four wait states and let CPU enter wait state
 	// The counter in the real console is implemented by a shift register
 	// that is triggered on a memory access
+
+	// We cannot split the wait states between the read accesses before we
+	// have a split-phase read access in the core
 	m_waitcount = 6;
 	m_ready(CLEAR_LINE);
 
 	// use the latch and the currently read byte and put it on the 16bit bus
-	return (hbyte<<8) | m_latch;
+	return ((hbyte<<8) | m_latch) & mem_mask;
 }
 
 /*
@@ -173,46 +184,24 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 
 //  printf("write addr=%04x, value=%04x\n", addr, data);
 
-	assert (mem_mask == 0xffff);
-
 	// Handle the internal 32K expansion
 	if (m_use32k)
 	{
-		if (addr>=0x2000 && addr<0x4000)
+		UINT16 base = 0;
+		if ((addr & 0xe000)==0x2000) base = 0x1000;
+		if (((addr & 0xe000)==0xa000) || ((addr & 0xc000)==0xc000)) base = 0x4000;
+
+		if (base != 0)
 		{
-			m_ram16b[offset-0x1000] = data; // index 0000 - 0fff
+			m_ram16b[offset-base] = data;
 			return;
 		}
-		if (addr>=0xa000)
-		{
-			m_ram16b[offset-0x4000] = data; // index 1000 - 4fff
-			return;
-		}
 	}
 
-	attached_device *dev = m_devices.first();
-	while (dev != NULL)
-	{
-		if (((addr+1) & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
-		{
-			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-			devz->write(*m_space, addr+1, data & 0xff);
-		}
-		dev = dev->m_next;
-	}
-
-	dev = m_devices.first();
-
-	while (dev != NULL)
-	{
-		if ((addr & dev->m_config->address_mask)==(dev->m_config->select | dev->m_config->write_select))
-		{
-			// write the byte from the upper 8 lines
-			bus8z_device *devz = static_cast<bus8z_device *>(dev->m_device);
-			devz->write(*m_space, addr, (data>>8) & 0xff);
-		}
-		dev = dev->m_next;
-	}
+	// write odd byte
+	write_all(space, addr+1, data & 0xff);
+	// write even byte
+	write_all(space, addr, (data>>8) & 0xff);
 
 	// Insert four wait states and let CPU enter wait state
 	m_waitcount = 6;
@@ -254,7 +243,7 @@ void ti99_datamux_device::device_reset(void)
 	m_ready.resolve(conf->ready, *this);
 
 	m_cpu = machine().device("maincpu");
-	m_space = &m_cpu->memory().space(AS_PROGRAM);
+	// m_space = &m_cpu->memory().space(AS_PROGRAM);
 
 	m_devices.reset(); // clear the list
 	m_use32k = (ioport("RAM")->read()==1);

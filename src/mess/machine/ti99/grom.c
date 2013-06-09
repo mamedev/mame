@@ -103,6 +103,9 @@ ti99_grom_device::ti99_grom_device(const machine_config &mconfig, const char *ta
 */
 READ8Z_MEMBER( ti99_grom_device::readz )
 {
+	// Prevent debugger access
+	if (space.debugger_access()) return;
+
 	if (offset & 2)
 	{
 		// GROMs generally answer the address read request
@@ -163,6 +166,9 @@ READ8Z_MEMBER( ti99_grom_device::readz )
 */
 WRITE8_MEMBER( ti99_grom_device::write )
 {
+	// Prevent debugger access
+	if (space.debugger_access()) return;
+
 	if (offset & 2)
 	{
 		/* write GROM address */

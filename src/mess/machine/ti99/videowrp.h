@@ -23,7 +23,6 @@ public:
 	virtual void    reset_vdp(int state) =0;
 
 protected:
-	address_space   *m_space;
 	tms9928a_device *m_tms9928a;
 
 	/* Constructor */
