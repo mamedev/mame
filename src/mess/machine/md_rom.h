@@ -440,6 +440,26 @@ private:
 	UINT16 m_latch;
 };
 
+// ======================> md_rom_tekkensp_device
+
+class md_rom_tekkensp_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+	virtual DECLARE_WRITE16_MEMBER(write);
+	
+private:
+	UINT16 m_reg;
+};
+
 // ======================> md_rom_topf_device
 
 class md_rom_topf_device : public md_std_rom_device
@@ -554,6 +574,7 @@ extern const device_type MD_ROM_SMOUSE;
 extern const device_type MD_ROM_SOULB;
 extern const device_type MD_ROM_SSF2;
 extern const device_type MD_ROM_SQUIR;
+extern const device_type MD_ROM_TEKKENSP;
 extern const device_type MD_ROM_TOPF;
 extern const device_type MD_ROM_RADICA;
 extern const device_type MD_ROM_BEGGARP;

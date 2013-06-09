@@ -1148,25 +1148,6 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 
-	{
-		/* only really useful on official games, ea games etc. don't bother
-		  some games specify a single address, (start 200001, end 200001)
-		  this usually means there is serial eeprom instead */
-		int i;
-		UINT16 *rom = (UINT16*)memregion("maincpu")->base();
-
-		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
-		for (i=0;i<12;i++)
-		{
-			if (i==2) mame_printf_debug("\nstart: ");
-			if (i==4) mame_printf_debug("\nend  : ");
-			if (i==6) mame_printf_debug("\n");
-
-			mame_printf_debug("%04x ",rom[(0x1b0/2)+i]);
-		}
-		mame_printf_debug("\n");
-	}
-
 	m_export = 0;
 	m_pal = 0;
 }

@@ -14036,6 +14036,18 @@ but dumps still have to be confirmed.
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_mjlov"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="insane paradise (ch) [a2].bin" size="1048576" crc="2f15bb22" sha1="59e3cf744636e4a27876f271f302d2620bbcbf39" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fengkuan1" cloneof="fengkuan">
+		<description>Feng Kuang Tao Hua Yuan (Chi, Unprotected)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="feng kuang tao hua yuan (chi) (unl).bin" size="1048576" crc="8d40d64f" sha1="0330611a5fcb1f3ca173fcb3387fd35b865f1131" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
@@ -25560,6 +25572,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="tekkensp">
+		<description>Tekken Special</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_tekkensp"/>
+			<dataarea name="rom" size="2097152">
+				<rom name="tekken special (unl).bin" size="2097152" crc="010f6369" sha1="403a33cfbf72cc98c23c45850897e1e6185b7237" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tekkn3sp">
 		<description>Tekken 3 Special</description>
 		<year>199?</year>
@@ -28292,6 +28316,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>Ming</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_yasech"/>
+			<dataarea name="rom" size="2097152">
+				<rom name="wu kong wai zhuan (chi) [a4].bin" size="2097152" crc="0bd70e54" sha1="7e35547d0505e83e3a6b05ad34c1db3a65998532" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wukongc1" cloneof="wukong">
+		<description>Wu Kong Wai Zhuan (Chi, Unprotected)</description>
+		<year>1996</year>
+		<publisher>Ming</publisher>
+		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" size="2097152">
 				<rom name="wu kong wai zhuan (chi) (unl).bin" size="2097152" crc="880a916e" sha1="dd4d7f7433ab82680d7d36124beca0bacebcd6e4" offset="0x000000" loadflag="load16_word_swap"/>
@@ -29324,6 +29362,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<dataarea name="rom" size="4194304">
 				<rom name="super king kong 99 (unl).bin" size="2097152" crc="413dfee2" sha1="6973598d77a755beafff31ce85595f9610f8afa5" offset="00000" loadflag="load16_word_swap"/>
 				<rom size="2097152" offset="0x200000" loadflag="reload"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mjclub">
+		<description>Super Mahjong Club</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_mjlov"/>
+			<dataarea name="rom" size="1048576">
+				<rom name="super majon club (unl).bin" size="1048576" crc="1d81a67c" sha1="03f48da0541dac5a11788460c427d5fdb34bbd1b" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30375,6 +30425,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="plantzom">
+		<description>Plants Vs Zombies (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="plants vs zombies (rus).bin" size="524288" crc="414648d2" sha1="aa4596a19aad478647b480151401cf60c6612458" offset="00000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokecda" cloneof="pokecd">
 		<description>Pokemon Crazy Drummer (Alt)</description>
 		<year>199?</year>
@@ -30634,6 +30695,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="wario land 3 (unl).bin" size="1048576" crc="cd5c93a5" sha1="3ace8ce26aab6fb5d47e690aa74e989c45fbcb75" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wotanks">
+		<description>World of Tanks (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="world of tanks (rus).bin" size="1048576" crc="7ac9e951" sha1="d96484af69fce78dc3e038df72b73b37584db3b7" offset="00000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>

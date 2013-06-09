@@ -69,6 +69,7 @@ enum
 	SMOUSE,                      /* Smart Mouse */
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
+	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
 
 	// when loading from fullpath, we need to treat SRAM in custom way

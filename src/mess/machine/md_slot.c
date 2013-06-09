@@ -280,6 +280,7 @@ static const md_slot slot_list[] =
 	{ SMOUSE, "rom_smouse" },
 	{ SOULBLAD, "rom_soulblad" },
 	{ SQUIRRELK, "rom_squir" },
+	{ TEKKENSP, "rom_tekkesp" },
 	{ TOPFIGHTER, "rom_topf" },
 
 	{ SEGA_SRAM_FULLPATH, "rom_sram" },
