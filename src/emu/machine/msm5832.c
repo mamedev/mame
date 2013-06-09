@@ -180,6 +180,10 @@ READ8_MEMBER( msm5832_device::data_r )
 		{
 			// TODO reference output
 		}
+		else if(m_address == 0x0d || m_address == 0x0e)  // Otrona Attache CP/M BIOS checks these unused registers to detect it
+		{
+			data = 0x0f;
+		}
 		else
 		{
 			data = m_reg[m_address];

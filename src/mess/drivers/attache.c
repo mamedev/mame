@@ -64,6 +64,7 @@
 #include "video/tms9927.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "debugger.h"
 
 class attache_state : public driver_device
 {
@@ -434,6 +435,7 @@ void attache_state::keyboard_clock_w(bool state)
 	m_kb_clock = state;
 }
 
+// TODO: Figure out exactly how the HLD, RD, WR and CS lines are hooked up
 READ8_MEMBER(attache_state::pio_portA_r)
 {
 	UINT8 ret = 0xff;
@@ -446,14 +448,20 @@ READ8_MEMBER(attache_state::pio_portA_r)
 		logerror("PSG: data read %02x\n",ret);
 		break;
 	case PIO_SEL_5832_WRITE:
+		m_rtc->cs_w(1);
+		m_rtc->write_w(0);
+		m_rtc->read_w(1);
 		m_rtc->address_w((porta & 0xf0) >> 4);
 		ret = m_rtc->data_r(space,0);
-		logerror("RTC: read %02x (write)\n",ret);
+		logerror("RTC: read %02x from %02x (write)\n",ret,(porta & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
+		m_rtc->cs_w(1);
+		m_rtc->write_w(0);
+		m_rtc->read_w(1);
 		m_rtc->address_w((porta & 0xf0) >> 4);
 		ret = m_rtc->data_r(space,0);
-		logerror("RTC: read %02x\n",ret);
+		logerror("RTC: read %02x from %02x\n",ret,(porta & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5101_WRITE:
 		m_cmos_select = (m_cmos_select & 0xf0) | ((porta & 0xf0) >> 4);
@@ -491,18 +499,22 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 	{
 	case PIO_SEL_8910_ADDR:
 		m_psg->address_w(space,0,data);
-		logerror("PSG: address write %02x\n",data);
 		break;
 	case PIO_SEL_8910_DATA:
 		m_psg->data_w(space,0,data);
-		logerror("PSG: data write %02x\n",data);
 		break;
 	case PIO_SEL_5832_WRITE:
+		m_rtc->cs_w(1);
+		m_rtc->write_w(0);
+		m_rtc->read_w(1);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		m_rtc->data_w(space,0,data & 0x0f);
 		logerror("RTC: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
+		m_rtc->cs_w(1);
+		m_rtc->write_w(0);
+		m_rtc->read_w(1);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		logerror("RTC: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
@@ -561,10 +573,10 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	//B5 = /'138 OPERATION STROBE
 	//B6 = /KEYBOARD DATA IN
 	//B7 = /KEYBOARD CLOCK OUT
-	if((data & 0x20) && !(m_pio_portb & 0x20))
-		operation_strobe(space,m_pio_porta);
 	m_pio_select = (data & 0x1c) >> 2;
 	m_cmos_select = ((data & 0x03) << 4) | (m_cmos_select & 0x0f);
+	if((data & 0x20) && !(m_pio_portb & 0x20))
+		operation_strobe(space,m_pio_porta);
 	m_pio_portb = data;
 	keyboard_clock_w(data & 0x80);
 }
@@ -1012,7 +1024,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_MSM5832_ADD("rtc",XTAL_8MHz / 4)
+	MCFG_MSM5832_ADD("rtc",XTAL_32_768kHz)
 
 	MCFG_Z80PIO_ADD("pio",XTAL_8MHz / 26, pio_interface)
 	MCFG_Z80SIO0_ADD("sio",XTAL_8MHz / 26, sio_interface)
