@@ -1054,23 +1054,11 @@ static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
-#if 0
-/*
-    After playing the game to the end:
-
-    ff,ff,ff,ff     20,00,f8,02     20,00,f8,04     00,04,d8,09
-    0f,00,00,ff     00,00,18,03     a0,13,fe,05     40,1e,1b,09
-*/
-WRITE8_MEMBER(nmk16_state::okibank_w)
-{
-	m_mask[offset] |= 1 << (data & 0x1f);
-	popmessage("%x %x %x %x - %x %x %x %x",m_mask[0],m_mask[1],m_mask[2],m_mask[3],m_mask[4],m_mask[5],m_mask[6],m_mask[7]);
-}
-#endif
-
 WRITE8_MEMBER(nmk16_state::raphero_sound_rombank_w)
 {
-	membank("bank1")->set_base(memregion("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
+	int bank = data & 7;
+
+	membank("bank1")->set_base(memregion("audiocpu")->base() + 0x10000 + (bank * 0x4000));
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
@@ -1080,7 +1068,6 @@ static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0xc800, 0xc800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0xc808, 0xc808) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 	AM_RANGE(0xc810, 0xc817) AM_DEVWRITE("nmk112", nmk112_device, okibank_w)
-//  AM_RANGE(0xc810, 0xc817) AM_WRITE(okibank_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(raphero_sound_rombank_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)    // main cpu
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -1380,6 +1367,7 @@ static INPUT_PORTS_START( manybloc )
 	PORT_DIPSETTING(      0x8000, "Best" )
 INPUT_PORTS_END
 
+
 /**********************************************************
   Input Ports: Task Force Harrier
 
@@ -1387,7 +1375,6 @@ INPUT_PORTS_END
   protection might be more involved here than it first
   appears, however, this works.
 **********************************************************/
-
 
 static INPUT_PORTS_START( tharrier )
 	PORT_START("IN0")
@@ -4357,13 +4344,16 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(nmk16_state, ym2203_irqhandler))
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ROUTE(0, "mono", 0.70)
+	MCFG_SOUND_ROUTE(1, "mono", 0.70)
+	MCFG_SOUND_ROUTE(2, "mono", 0.70)
+	MCFG_SOUND_ROUTE(3, "mono", 1.00)
 
 	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
@@ -6208,15 +6198,13 @@ ROM_START( raphero )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  /* 16x16 tiles */
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  /* 16x16 tiles */
 
-	ROM_REGION( 0x240000, "oki1", 0 )   /* OKIM6295 samples */
-	// 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "rhp94099.7", 0x040000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
+	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
 
-	ROM_REGION( 0x840000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 samples */
 	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  /* all banked */
 	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
-	ROM_LOAD( "rhp94099.7", 0x440000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
-	ROM_LOAD( "rhp94099.7", 0x640000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) /* unknown */
@@ -7338,7 +7326,7 @@ GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, driver_device, 0,        ROT
 GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, raphero,  0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,  0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
