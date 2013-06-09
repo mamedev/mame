@@ -33,6 +33,20 @@ const device_type S3C44B0 = &device_creator<s3c44b0_device>;
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock)
 {
+	memset(&m_irq, 0, sizeof(s3c44b0_irq_t));
+	memset(m_zdma, 0, sizeof(s3c44b0_dma_t)*2);
+	memset(m_bdma, 0, sizeof(s3c44b0_dma_t)*2);
+	memset(&m_clkpow, 0, sizeof(s3c44b0_clkpow_t));
+	memset(&m_lcd, 0, sizeof(s3c44b0_lcd_t));
+	memset(m_uart, 0, sizeof(s3c44b0_uart_t)*2);
+	memset(&m_sio, 0, sizeof(s3c44b0_sio_t));
+	memset(&m_pwm, 0, sizeof(s3c44b0_pwm_t));
+	memset(&m_wdt, 0, sizeof(s3c44b0_wdt_t));
+	memset(&m_iic, 0, sizeof(s3c44b0_iic_t));
+	memset(&m_iis, 0, sizeof(s3c44b0_iis_t));
+	memset(&m_gpio, 0, sizeof(s3c44b0_gpio_t));
+	memset(&m_adc, 0, sizeof(s3c44b0_adc_t));
+	memset(&m_cpuwrap, 0, sizeof(s3c44b0_cpuwrap_t));
 }
 
 //-------------------------------------------------
