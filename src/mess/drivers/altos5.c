@@ -120,13 +120,9 @@ UINT8 altos5_state::convert(offs_t offset, bool state)
 	// if WPRT point at nothing
 	if (state & BIT(data, 7))
 		data = 0x30;
-	else
-	// normalise bank number and use it
-	if (BIT(data, 6))
-		data-= 0x20;
-	else
-		data-= 0x10;
 
+	// mask off wprt (no longer needed)
+	// normalise bank number (4x becomes 0x; 2x and 1x are already ok)
 	return data & 0x3f;
 }
 	
@@ -494,7 +490,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
-	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 4)
+	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
