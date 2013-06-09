@@ -13,7 +13,8 @@ Debugging options
 
 -[no]oslog
 
-	Outputs the error.log data to the Windows debugger. This can be used at
+	Outputs the error.log data to the stderr TTY channel (usually the 
+	command line window MAME was started in). This can be used at
 	the same time as -log to output the log data to both targets as well.
 	Default is OFF (-nooslog).
 
@@ -33,11 +34,14 @@ Performance options
 
 -[no]multithreading / -[no]mt
 
-	Enables multithreading within MAME. At the moment, this causes the
-	window and code to execute on a second thread, which can improve performance
-        on hyperthreaded and multicore systems.
-        The default is OFF (-nomultithreading).
+	Enables multithreading for the final drawing operation.  This can help 
+	performance on multicore/hyperthreaded systems with slow video cards,
+	but may cause undesired behavior in some games.
+	Note that some drivers in MAME and MESS will use multiple threads even
+	when this is set to OFF, assuming -numprocessors allows it.
+	The default is OFF (-nomultithreading).
 	
+
 -numprocessors <auto|value> / -np <auto|value>
 
 	Specify the number of processors to use for work queues. Specifying
@@ -48,7 +52,9 @@ Performance options
 
 -sdlvideofps
 
-        Enable output of SDL-related video performance.
+        Enable output of benchmark data on the SDL video subsystem, including
+		your system's video driver, X server (if applicable), and OpenGL stack
+		in -video opengl mode.
 
 -bench [n]
 
@@ -62,7 +68,9 @@ Video options
 
 -video <soft|opengl|none>
 
-	Specifies which video subsystem to use for drawing.  Default is 'soft'.
+	Specifies which video subsystem to use for drawing.  The default for 
+	Mac OS X is 'opengl' because OS X is guaranteed to have a compliant 
+	OpenGL stack.  The default on all other systems is 'soft'.
 
 -numscreens <count>
 
@@ -71,8 +79,8 @@ Video options
 	screens. Each screen (up to 4) has its own independent settings for
 	physical monitor, aspect ratio, resolution, and view, which can be
 	set using the options below. The default is 1.  SDL currently has a
-        limit of 1 with the expectation of increasing this when SDL 2.0 is
-        released.
+	limit of 1 with the expectation of increasing this when SDL 2.0 is
+	released.
 
 -[no]window / -[no]w
 
@@ -101,8 +109,8 @@ Video options
 
 -[no]unevenstretch
 
-        Allow non-integer stretch factors allowing for great window sizing
-        flexability.  The default is ON. (-unevenstretch)
+	Allow non-integer stretch factors allowing for great window sizing
+	flexability.  The default is ON. (-unevenstretch)
 
 -[no]centerh
 
@@ -125,7 +133,10 @@ Video options
 	performance hit. You should only need to turn this on in windowed mode.
 	In full screen mode, it is only needed if -triplebuffer does not
 	remove the tearing, in which case you should use -notriplebuffer
-	-waitvsync. Note that this option does not work with -video gdi mode.
+	-waitvsync. Note that support for this option depends entirely on your
+	operating system and video drivers; in general it will not work in
+	windowed mode so -video opengl and fullscreen give the greatest chance
+	of success.
 	The default is OFF (-nowaitvsync).
 
 -[no]syncrefresh
@@ -171,10 +182,16 @@ Video OpenGL-specific options
         and also increases the effective resolution of non-screen elements such
         as artwork and fonts. The default is 1.
 
--gl_forcepow2texture Force power of two textures  (default no)
--gl_notexturerect    Don't use OpenGL GL_ARB_texture_rectangle (default on)
--gl_vbo              Enable OpenGL VBO,  if available (default on)
--gl_pbo              Enable OpenGL PBO,  if available (default on)
+-[no]gl_forcepow2texture Always use only power-of-2 sized textures (default off)
+-[no]gl_notexturerect    Don't use OpenGL GL_ARB_texture_rectangle (default on)
+-[no]gl_vbo              Enable OpenGL VBO,  if available (default on)
+-[no]gl_pbo              Enable OpenGL PBO,  if available (default on)
+
+	These 4 options are for compatibility in -video opengl.  If you report
+	rendering artifacts you may be asked to try messing with them by the 
+	devs, but normally they should be left at their defaults which results
+	in the best possible video performance.
+
 -gl_glsl             Enable OpenGL GLSL, if available (default off)
 -gl_glsl_filter      Enable OpenGL GLSL filtering instead of FF filtering 0-plain,
                      1-bilinear (default)
@@ -301,8 +318,8 @@ Full screen options
 	you are trying to achieve the "exact" pixel resolutions of the original
 	games, which requires significant tweaking. This option is also useful
 	on LCD displays, since they run with a fixed resolution and switching
-	resolutions on them is just silly. This option does not work with
-	-video gdi. The default is OFF (-noswitchres).
+	resolutions on them is just silly.
+	The default is OFF (-noswitchres).
 
 
 
