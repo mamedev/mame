@@ -18,6 +18,8 @@
 
 ***************************************************************************/
 
+#include <tmmintrin.h>
+
 #include "emu.h"
 #include "debugger.h"
 #include "rsp.h"
@@ -753,6 +755,28 @@ static void cfunc_rsp_lbv(void *param)
 
 	ea = (base) ? rsp->r[base] + offset : offset;
 	VREG_B(dest, index) = READ8(rsp, ea);
+
+	// SSE
+#if USE_SIMD
+	// Better solutions for this situation welcome. Need to be able to insert a byte at an arbitrary
+	// byte index in the __m128. Current method amounts to:
+	//     final_vec = (in_vec &~ discard_mask) | insert_value
+	// Naturally, SSE4.1 adds the highly-useful PINSRB opcode. As the name implies, it's an
+	// arbitrary byte-insert-into-m128, but do we want to require SSE4.1? Maybe just have an ifdef
+	// and use the more optimal one if available.
+	const __m128i neg1 = _mm_set_epi16(0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff);
+
+	__m128i insert_vec = _mm_setzero_si128();
+	INT16 insert_value = READ8(rsp, ea) << ((1 - (index & 1)) << 2);
+	_mm_insert_epi16 (insert_vec, insert_value, index >> 1);
+
+	__m128i discard_mask = _mm_setzero_si128();
+	INT16 discard_element = 0x00ff << ((1 - (index & 1)) << 2);
+	_mm_insert_epi16 (discard_mask, discard_element, index >> 1);
+	_mm_xor_si128 (discard_mask, neg1);
+	_mm_and_si128 (rsp->xv[dest], discard_mask);
+	_mm_or_si128 (rsp->xv[dest], insert_vec);
+#endif
 }
 
 static void cfunc_rsp_lsv(void *param)
@@ -762,7 +786,7 @@ static void cfunc_rsp_lsv(void *param)
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	int index = (op >> 7) & 0xe;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -784,6 +808,12 @@ static void cfunc_rsp_lsv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
+
+	// SSE
+#if USE_SIMD
+	INT16 insert_value = READ8(rsp, ea) << 8 | READ8(rsp, ea + 1);
+	_mm_insert_epi16 (rsp->xv[dest], insert_value, index >> 1);
+#endif
 }
 
 static void cfunc_rsp_llv(void *param)
@@ -793,7 +823,7 @@ static void cfunc_rsp_llv(void *param)
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	int index = (op >> 7) & 0xc;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -815,6 +845,14 @@ static void cfunc_rsp_llv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
+
+	// SSE
+#if USE_SIMD
+	INT16 insert_value0 = READ8(rsp, ea) << 8 | READ8(rsp, ea + 1);
+	INT16 insert_value1 = READ8(rsp, ea + 2) << 8 | READ8(rsp, ea + 3);
+	_mm_insert_epi16 (rsp->xv[dest], insert_value0, (index >> 1));
+	_mm_insert_epi16 (rsp->xv[dest], insert_value1, (index >> 1) + 1);
+#endif
 }
 
 static void cfunc_rsp_ldv(void *param)
@@ -824,7 +862,7 @@ static void cfunc_rsp_ldv(void *param)
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	int index = (op >> 7) & 0x8;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -846,6 +884,17 @@ static void cfunc_rsp_ldv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
+
+#if USE_SIMD
+	INT16 insert_value0 = READ8(rsp, ea) << 8 | READ8(rsp, ea + 1);
+	INT16 insert_value1 = READ8(rsp, ea + 2) << 8 | READ8(rsp, ea + 3);
+	INT16 insert_value2 = READ8(rsp, ea + 4) << 8 | READ8(rsp, ea + 5);
+	INT16 insert_value3 = READ8(rsp, ea + 6) << 8 | READ8(rsp, ea + 7);
+	_mm_insert_epi16 (rsp->xv[dest], insert_value0, (index >> 1));
+	_mm_insert_epi16 (rsp->xv[dest], insert_value1, (index >> 1) + 1);
+	_mm_insert_epi16 (rsp->xv[dest], insert_value2, (index >> 1) + 2);
+	_mm_insert_epi16 (rsp->xv[dest], insert_value3, (index >> 1) + 3);
+#endif
 }
 
 static void cfunc_rsp_lqv(void *param)
@@ -857,7 +906,7 @@ static void cfunc_rsp_lqv(void *param)
 	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xf;
+	int index = 0; // Just a test, it goes right back the way it was if something breaks //(op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -880,6 +929,20 @@ static void cfunc_rsp_lqv(void *param)
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
+
+	// SSE
+#if USE_SIMD
+	INT16 val0 = READ8(rsp, ea) << 8 | READ8(rsp, ea + 1);
+	INT16 val1 = READ8(rsp, ea + 2) << 8 | READ8(rsp, ea + 3);
+	INT16 val2 = READ8(rsp, ea + 4) << 8 | READ8(rsp, ea + 5);
+	INT16 val3 = READ8(rsp, ea + 6) << 8 | READ8(rsp, ea + 7);
+	INT16 val4 = READ8(rsp, ea + 8) << 8 | READ8(rsp, ea + 9);
+	INT16 val5 = READ8(rsp, ea + 10) << 8 | READ8(rsp, ea + 11);
+	INT16 val6 = READ8(rsp, ea + 12) << 8 | READ8(rsp, ea + 13);
+	INT16 val7 = READ8(rsp, ea + 14) << 8 | READ8(rsp, ea + 15);
+
+	rsp->xv[dest] = _mm_set_epi16(val0, val1, val2, val3, val4, val5, val6, val7);
+#endif
 }
 
 static void cfunc_rsp_lrv(void *param)

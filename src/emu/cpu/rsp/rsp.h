@@ -16,6 +16,12 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
+#define USE_SIMD		(1)
+
+#if USE_SIMD
+#include <tmmintrin.h>
+#endif
+
 #define USE_RSPDRC
 
 /***************************************************************************
@@ -159,6 +165,11 @@ struct rsp_state
 	UINT32 pc;
 	UINT32 r[35];
 	VECTOR_REG v[32];
+#if USE_SIMD
+	// Mirror of v[] for now, to be used in parallel as
+	// more vector ops are transitioned over
+	__m128i xv[32];
+#endif
 	UINT16 flag[4];
 	UINT32 sr;
 	UINT32 step_count;
