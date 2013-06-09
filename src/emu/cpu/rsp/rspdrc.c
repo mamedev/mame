@@ -973,11 +973,28 @@ static void cfunc_rsp_lrv(void *param)
 	end = 16;
 	ea &= ~0xf;
 
+#if USE_SIMD
+	INT16 mask[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=index; i < end; i++)
 	{
+#if USE_SIMD
+		mask[i >> 1] |= 0x00ff << ((i & 1) * 8);
+		val[i >> 1] |= READ8(rsp, ea) << ((i & 1) * 8);
+#endif
 		VREG_B(dest, i) = READ8(rsp, ea);
 		ea++;
 	}
+
+#if USE_SIMD
+	__m128i neg1 = _mm_set_epi16(0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff);
+	__m128i keep_mask = _mm_set_epi16(mask[0], mask[1], mask[2], mask[3], mask[4], mask[5], mask[6], mask[7]);
+	__m128i load_val = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+	keep_mask = _mm_xor_si128(keep_mask, neg1);
+	rsp->xv[dest] = _mm_and_si128(rsp->xv[dest], keep_mask);
+	rsp->xv[dest] = _mm_or_si128(rsp->xv[dest], load_val);
+#endif
 }
 
 static void cfunc_rsp_lpv(void *param)
@@ -1003,10 +1020,20 @@ static void cfunc_rsp_lpv(void *param)
 
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
+#if USE_SIMD
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=0; i < 8; i++)
 	{
+#if USE_SIMD
+		val[i] = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
+#endif
 		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
 	}
+
+#if USE_SIMD
+	rsp->xv[dest] = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+#endif
 }
 
 static void cfunc_rsp_luv(void *param)
@@ -1032,10 +1059,20 @@ static void cfunc_rsp_luv(void *param)
 
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
+#if USE_SIMD
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=0; i < 8; i++)
 	{
+#if USE_SIMD
+		val[i] = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
+#endif
 		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
 	}
+
+#if USE_SIMD
+	rsp->xv[dest] = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+#endif
 }
 
 static void cfunc_rsp_lhv(void *param)
@@ -1061,10 +1098,20 @@ static void cfunc_rsp_lhv(void *param)
 
 	ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
+#if USE_SIMD
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=0; i < 8; i++)
 	{
+#if USE_SIMD
+		val[i] = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
+#endif
 		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
 	}
+
+#if USE_SIMD
+	rsp->xv[dest] = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+#endif
 }
 
 static void cfunc_rsp_lfv(void *param)
@@ -1096,11 +1143,28 @@ static void cfunc_rsp_lfv(void *param)
 
 	end = (index >> 1) + 4;
 
+#if USE_SIMD
+	INT16 mask[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=index >> 1; i < end; i++)
 	{
+#if USE_SIMD
+		mask[i] = 0xffff;
+		val[i] = READ8(rsp, ea) << 7;
+#endif
 		W_VREG_S(dest, i) = READ8(rsp, ea) << 7;
 		ea += 4;
 	}
+
+#if USE_SIMD
+	__m128i neg1 = _mm_set_epi16(0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff);
+	__m128i keep_mask = _mm_set_epi16(mask[0], mask[1], mask[2], mask[3], mask[4], mask[5], mask[6], mask[7]);
+	__m128i load_val = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+	keep_mask = _mm_xor_si128(keep_mask, neg1);
+	rsp->xv[dest] = _mm_and_si128(rsp->xv[dest], keep_mask);
+	rsp->xv[dest] = _mm_or_si128(rsp->xv[dest], load_val);
+#endif
 }
 
 static void cfunc_rsp_lwv(void *param)
@@ -1130,11 +1194,21 @@ static void cfunc_rsp_lwv(void *param)
 
 	end = (16 - index) + 16;
 
+#if USE_SIMD
+	INT16 val[8] = { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 };
+#endif
 	for (i=(16 - index); i < end; i++)
 	{
+#if USE_SIMD
+		val[i >> 1] |= READ8(rsp, ea) << ((i & 1) * 8);
+#endif
 		VREG_B(dest, i & 0xf) = READ8(rsp, ea);
 		ea += 4;
 	}
+
+#if USE_SIMD
+	rsp->xv[dest] = _mm_set_epi16(val[0], val[1], val[2], val[3], val[4], val[5], val[6], val[7]);
+#endif
 }
 
 static void cfunc_rsp_ltv(void *param)
@@ -1173,6 +1247,10 @@ static void cfunc_rsp_ltv(void *param)
 	for (i = vs; i < ve; i++)
 	{
 		element = ((8 - (index >> 1) + (i - vs)) << 1);
+#if USE_SIMD
+		UINT16 value = (READ8(rsp, ea + 1) << 8) | READ8(rsp, ea);
+		_mm_insert_epi16 (rsp->xv[i], value, element);
+#endif
 		VREG_B(i, (element & 0xf)) = READ8(rsp, ea);
 		VREG_B(i, ((element + 1) & 0xf)) = READ8(rsp, ea + 1);
 
