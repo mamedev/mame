@@ -243,14 +243,15 @@ INPUT_PORTS_END
 void uzebox_state::line_update()
 {
 	UINT32 cycles = (UINT32)(m_maincpu->get_elapsed_cycles() - m_line_start_cycles) / 2;
+	rgb_t color = MAKE_RGB(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
 
 	for (UINT32 x = m_line_pos_cycles; x < cycles; x++)
 	{
 		if (m_bitmap.cliprect().contains(x, m_vpos))
-			m_bitmap.pix32(m_vpos, x) = MAKE_RGB(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
+			m_bitmap.pix32(m_vpos, x) = color;
 		if (!INTERLACED)
 			if (m_bitmap.cliprect().contains(x, m_vpos + 1))
-				m_bitmap.pix32(m_vpos + 1, x) = MAKE_RGB(pal3bit(m_port_c >> 0), pal3bit(m_port_c >> 3), pal2bit(m_port_c >> 6));
+				m_bitmap.pix32(m_vpos + 1, x) = color;
 	}
 
 	m_line_pos_cycles = cycles;
