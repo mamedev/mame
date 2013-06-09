@@ -30,13 +30,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PC1512_KEYBOARD_ADD(_config) \
+#define MCFG_PC1512_KEYBOARD_ADD(_clock, _data) \
 	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define PC1512_KEYBOARD_INTERFACE(_name) \
-	const pc1512_keyboard_interface (_name) =
+	downcast<pc1512_keyboard_device *>(device)->set_clock_callback(DEVCB2_##_clock); \
+	downcast<pc1512_keyboard_device *>(device)->set_data_callback(DEVCB2_##_data);
 
 
 
@@ -44,23 +41,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc1512_keyboard_interface
-
-struct pc1512_keyboard_interface
-{
-	devcb_write_line    m_out_data_cb;
-	devcb_write_line    m_out_clock_cb;
-};
-
-
 // ======================> pc1512_keyboard_device
 
-class pc1512_keyboard_device :  public device_t,
-								public pc1512_keyboard_interface
+class pc1512_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
 	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _clock> void set_clock_callback(_clock clock) { m_write_clock.set_callback(clock); }
+	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -84,11 +74,13 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line   m_out_data_func;
-	devcb_resolved_write_line   m_out_clock_func;
+	enum
+	{
+		LED_CAPS = 0,
+		LED_NUM
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_y1;
@@ -103,6 +95,9 @@ private:
 	required_ioport m_y10;
 	required_ioport m_y11;
 	required_ioport m_com;
+
+	devcb2_write_line   m_write_clock;
+	devcb2_write_line   m_write_data;
 
 	int m_data_in;
 	int m_clock_in;

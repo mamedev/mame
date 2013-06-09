@@ -61,12 +61,12 @@ const device_type CDP1864 = &device_creator<cdp1864_device>;
 
 inline void cdp1864_device::initialize_palette()
 {
-	double res_total = m_res_r + m_res_g + m_res_b + m_res_bkg;
+	double res_total = m_chr_r + m_chr_g + m_chr_b + m_chr_bkg;
 
-	int weight_r = (m_res_r / res_total) * 100;
-	int weight_g = (m_res_g / res_total) * 100;
-	int weight_b = (m_res_b / res_total) * 100;
-	int weight_bkg = (m_res_bkg / res_total) * 100;
+	int weight_r = (m_chr_r / res_total) * 100;
+	int weight_g = (m_chr_g / res_total) * 100;
+	int weight_b = (m_chr_b / res_total) * 100;
+	int weight_bkg = (m_chr_bkg / res_total) * 100;
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -100,6 +100,14 @@ inline void cdp1864_device::initialize_palette()
 cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_read_inlace(*this),
+		m_read_rdata(*this),
+		m_read_bdata(*this),
+		m_read_gdata(*this),
+		m_write_irq(*this),
+		m_write_dma_out(*this),
+		m_write_efx(*this),
+		m_write_hsync(*this),
 		m_disp(0),
 		m_dmaout(0),
 		m_bgcolor(0),
@@ -111,48 +119,20 @@ cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1864_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1864_interface *intf = reinterpret_cast<const cdp1864_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1864_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_inlace_cb, 0, sizeof(m_in_inlace_cb));
-		memset(&m_in_rdata_cb, 0, sizeof(m_in_rdata_cb));
-		memset(&m_in_bdata_cb, 0, sizeof(m_in_bdata_cb));
-		memset(&m_in_gdata_cb, 0, sizeof(m_in_gdata_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_dmao_cb, 0, sizeof(m_out_dmao_cb));
-		memset(&m_out_efx_cb, 0, sizeof(m_out_efx_cb));
-		memset(&m_out_hsync_cb, 0, sizeof(m_out_hsync_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void cdp1864_device::device_start()
 {
 	// resolve callbacks
-	m_in_inlace_func.resolve(m_in_inlace_cb, *this);
-	m_in_rdata_func.resolve(m_in_rdata_cb, *this);
-	m_in_bdata_func.resolve(m_in_bdata_cb, *this);
-	m_in_gdata_func.resolve(m_in_gdata_cb, *this);
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_dmao_func.resolve(m_out_dmao_cb, *this);
-	m_out_efx_func.resolve(m_out_efx_cb, *this);
-	m_out_hsync_func.resolve(m_out_hsync_cb, *this);
+	m_read_inlace.resolve_safe(1);
+	m_read_rdata.resolve_safe(0);
+	m_read_bdata.resolve_safe(0);
+	m_read_gdata.resolve_safe(0);
+	m_write_irq.resolve_safe();
+	m_write_dma_out.resolve_safe();
+	m_write_efx.resolve_safe();
+	m_write_hsync.resolve_safe();
 
 	// initialize palette
 	initialize_palette();
@@ -167,7 +147,6 @@ void cdp1864_device::device_start()
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 
 	// find devices
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -191,14 +170,15 @@ void cdp1864_device::device_reset()
 {
 	m_int_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_INT_START, 0));
 	m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START, 0));
-	m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1864_CYCLES_DMA_START));
+	m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_START));
 
 	m_disp = 0;
 	m_dmaout = 0;
 
-	m_out_int_func(CLEAR_LINE);
-	m_out_dmao_func(CLEAR_LINE);
-	m_out_efx_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
+	m_write_dma_out(CLEAR_LINE);
+	m_write_efx(CLEAR_LINE);
+	m_write_hsync(CLEAR_LINE);
 }
 
 
@@ -217,7 +197,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_out_int_func(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos( CDP1864_SCANLINE_INT_END, 0));
@@ -226,7 +206,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_out_int_func(CLEAR_LINE);
+				m_write_irq(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_INT_START, 0));
@@ -237,22 +217,22 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		switch (scanline)
 		{
 		case CDP1864_SCANLINE_EFX_TOP_START:
-			m_out_efx_func(ASSERT_LINE);
+			m_write_efx(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_END, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_TOP_END:
-			m_out_efx_func(CLEAR_LINE);
+			m_write_efx(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_BOTTOM_START:
-			m_out_efx_func(ASSERT_LINE);
+			m_write_efx(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_BOTTOM_END:
-			m_out_efx_func(CLEAR_LINE);
+			m_write_efx(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
@@ -265,11 +245,11 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 				{
-					m_out_dmao_func(CLEAR_LINE);
+					m_write_dma_out(CLEAR_LINE);
 				}
 			}
 
-			m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1864_CYCLES_DMA_WAIT));
+			m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_WAIT));
 
 			m_dmaout = 0;
 		}
@@ -279,11 +259,11 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 				{
-					m_out_dmao_func(ASSERT_LINE);
+					m_write_dma_out(ASSERT_LINE);
 				}
 			}
 
-			m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
+			m_dma_timer->adjust(clocks_to_attotime(CDP1864_CYCLES_DMA_ACTIVE));
 
 			m_dmaout = 1;
 		}
@@ -309,7 +289,7 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	if (m_aoe)
 	{
-		double frequency = m_cpu->unscaled_clock() / 8 / 4 / (m_latch + 1) / 2;
+		double frequency = unscaled_clock() / 8 / 4 / (m_latch + 1) / 2;
 		int rate = machine().sample_rate() / 2;
 
 		/* get progress through wave */
@@ -362,8 +342,8 @@ READ8_MEMBER( cdp1864_device::dispoff_r )
 {
 	m_disp = 0;
 
-	m_out_int_func(CLEAR_LINE);
-	m_out_dmao_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
+	m_write_dma_out(CLEAR_LINE);
 
 	return 0xff;
 }
@@ -408,9 +388,9 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 
 	if (!m_con)
 	{
-		rdata = m_in_rdata_func();
-		bdata = m_in_bdata_func();
-		gdata = m_in_gdata_func();
+		rdata = m_read_rdata();
+		bdata = m_read_bdata();
+		gdata = m_read_gdata();
 	}
 
 	for (int x = 0; x < 8; x++)

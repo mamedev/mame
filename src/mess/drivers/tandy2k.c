@@ -642,12 +642,6 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	m_kbddat = state;
 }
 
-static TANDY2K_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, kbdclk_w),
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, kbddat_w)
-};
-
 // Machine Initialization
 
 void tandy2k_state::machine_start()
@@ -720,7 +714,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
+	MCFG_TANDY2K_KEYBOARD_ADD(WRITELINE(tandy2k_state, kbdclk_w), WRITELINE(tandy2k_state, kbddat_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")

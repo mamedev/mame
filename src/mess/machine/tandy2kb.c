@@ -17,11 +17,6 @@
 
 #define I8048_TAG       "m1"
 
-enum
-{
-	LED_1 = 0,
-	LED_2
-};
 
 
 //**************************************************************************
@@ -246,32 +241,14 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 		m_y9(*this, "Y9"),
 		m_y10(*this, "Y10"),
 		m_y11(*this, "Y11"),
+		m_write_clock(*this),
+		m_write_data(*this),
 		m_keylatch(0xffff),
 		m_clock(0),
 		m_data(0)
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tandy2k_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tandy2k_keyboard_interface *intf = reinterpret_cast<const tandy2k_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<tandy2k_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -280,8 +257,8 @@ void tandy2k_keyboard_device::device_config_complete()
 void tandy2k_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
-	m_out_data_func.resolve(m_out_data_cb, *this);
+	m_write_clock.resolve_safe();
+	m_write_data.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_keylatch));
@@ -441,7 +418,7 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 	{
 		m_clock = clock;
 
-		m_out_clock_func(m_clock);
+		m_write_clock(m_clock);
 	}
 
 	// keyboard data
@@ -451,6 +428,6 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 	{
 		m_data = kbddat;
 
-		m_out_data_func(m_data);
+		m_write_data(m_data);
 	}
 }

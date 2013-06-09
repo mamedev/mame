@@ -18,13 +18,6 @@
 #define I8021_TAG       "z4"
 
 
-enum
-{
-	LED_0 = 0,
-	LED_1
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -249,31 +242,11 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 		m_y9(*this, "Y9"),
 		m_ya(*this, "YA"),
 		m_yb(*this, "YB"),
+		m_write_clock(*this),
 		m_busy(1),
 		m_data(1),
 		m_clk(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void trs80m2_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const trs80m2_keyboard_interface *intf = reinterpret_cast<const trs80m2_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<trs80m2_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-	}
 }
 
 
@@ -284,7 +257,7 @@ void trs80m2_keyboard_device::device_config_complete()
 void trs80m2_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_write_clock.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_busy));
@@ -386,7 +359,7 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 
 	if (m_clk != clk)
 	{
-		m_out_clock_func(clk);
+		m_write_clock(clk);
 		m_clk = clk;
 	}
 

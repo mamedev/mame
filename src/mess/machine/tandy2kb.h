@@ -12,7 +12,6 @@
 #ifndef __TANDY2K_KEYBOARD__
 #define __TANDY2K_KEYBOARD__
 
-
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
@@ -30,13 +29,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TANDY2K_KEYBOARD_ADD(_config) \
+#define MCFG_TANDY2K_KEYBOARD_ADD(_clock, _data) \
 	MCFG_DEVICE_ADD(TANDY2K_KEYBOARD_TAG, TANDY2K_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define TANDY2K_KEYBOARD_INTERFACE(_name) \
-	const tandy2k_keyboard_interface (_name) =
+	downcast<tandy2k_keyboard_device *>(device)->set_clock_callback(DEVCB2_##_clock); \
+	downcast<tandy2k_keyboard_device *>(device)->set_data_callback(DEVCB2_##_data);
 
 
 
@@ -44,23 +40,16 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> tandy2k_keyboard_interface
-
-struct tandy2k_keyboard_interface
-{
-	devcb_write_line    m_out_clock_cb;
-	devcb_write_line    m_out_data_cb;
-};
-
-
 // ======================> tandy2k_keyboard_device
 
-class tandy2k_keyboard_device :  public device_t,
-									public tandy2k_keyboard_interface
+class tandy2k_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
 	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _clock> void set_clock_callback(_clock clock) { m_write_clock.set_callback(clock); }
+	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -81,11 +70,13 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line   m_out_clock_func;
-	devcb_resolved_write_line   m_out_data_func;
+	enum
+	{
+		LED_1 = 0,
+		LED_2
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_y0;
@@ -100,6 +91,9 @@ private:
 	required_ioport m_y9;
 	required_ioport m_y10;
 	required_ioport m_y11;
+
+	devcb2_write_line   m_write_clock;
+	devcb2_write_line   m_write_data;
 
 	UINT16 m_keylatch;
 

@@ -53,14 +53,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define VIP_EXPANSION_INTERFACE(_name) \
-	const vip_expansion_slot_interface (_name) =
-
-
-#define MCFG_VIP_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot) \
+#define MCFG_VIP_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, VIP_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+#define MCFG_VIP_EXPANSION_SLOT_CALLBACKS(_irq, _dma_out, _dma_in) \
+	downcast<vip_expansion_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
+	downcast<vip_expansion_slot_device *>(device)->set_dma_out_callback(DEVCB2_##_dma_out); \
+	downcast<vip_expansion_slot_device *>(device)->set_dma_in_callback(DEVCB2_##_dma_in);
 
 
 
@@ -68,28 +68,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vip_expansion_slot_interface
-
-struct vip_expansion_slot_interface
-{
-	devcb_write_line    m_out_interrupt_cb;
-	devcb_write_line    m_out_dma_out_cb;
-	devcb_write_line    m_out_dma_in_cb;
-};
-
-
 // ======================> vip_expansion_slot_device
 
 class device_vip_expansion_card_interface;
 
 class vip_expansion_slot_device : public device_t,
-									public vip_expansion_slot_interface,
 									public device_slot_interface
 {
 public:
 	// construction/destruction
 	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~vip_expansion_slot_device();
+
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _dma_out> void set_dma_out_callback(_dma_out dma_out) { m_write_dma_out.set_callback(dma_out); }
+	template<class _dma_in> void set_dma_in_callback(_dma_in dma_in) { m_write_dma_in.set_callback(dma_in); }
 
 	// computer interface
 	UINT8 program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
@@ -107,20 +99,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( run_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( interrupt_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_out_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_in_w );
+	DECLARE_WRITE_LINE_MEMBER( interrupt_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { m_write_dma_out(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { m_write_dma_in(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
-	devcb_resolved_write_line   m_out_interrupt_func;
-	devcb_resolved_write_line   m_out_dma_out_func;
-	devcb_resolved_write_line   m_out_dma_in_func;
+	devcb2_write_line m_write_irq;
+	devcb2_write_line m_write_dma_out;
+	devcb2_write_line m_write_dma_in;
 
-	device_vip_expansion_card_interface *m_cart;
+	device_vip_expansion_card_interface *m_card;
 };
 
 
@@ -133,7 +124,6 @@ class device_vip_expansion_card_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_vip_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_vip_expansion_card_interface();
 
 protected:
 	// runtime

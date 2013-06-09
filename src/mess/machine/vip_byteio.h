@@ -53,14 +53,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define VIP_BYTEIO_PORT_INTERFACE(_name) \
-	const vip_byteio_port_interface (_name) =
-
-
-#define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _slot_intf, _def_slot, _inst) \
 	MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<vip_byteio_port_device *>(device)->set_inst_callback(DEVCB2_##_inst);
 
 
 
@@ -68,26 +64,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vip_byteio_port_interface
-
-struct vip_byteio_port_interface
-{
-	devcb_write_line    m_out_inst_cb;
-};
-
-
 // ======================> vip_byteio_port_device
 
 class device_vip_byteio_port_interface;
 
 class vip_byteio_port_device : public device_t,
-								public vip_byteio_port_interface,
 								public device_slot_interface
 {
 public:
 	// construction/destruction
 	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~vip_byteio_port_device();
+
+	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
 
 	// computer interface
 	UINT8 in_r();
@@ -97,15 +85,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( inst_w );
+	DECLARE_WRITE_LINE_MEMBER( inst_w ) { m_write_inst(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
-	devcb_resolved_write_line   m_out_inst_func;
+	devcb2_write_line m_write_inst;
 
 	device_vip_byteio_port_interface *m_cart;
 };
@@ -119,7 +106,6 @@ class device_vip_byteio_port_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_vip_byteio_port_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_vip_byteio_port_interface();
 
 	virtual UINT8 vip_in_r() { return 0xff; };
 	virtual void vip_out_w(UINT8 data) { };

@@ -546,15 +546,6 @@ WRITE_LINE_MEMBER( vip_state::vdc_ef1_w )
 	m_vdc_ef1 = state;
 }
 
-static CDP1861_INTERFACE( vdc_intf )
-{
-	CDP1802_TAG,
-	SCREEN_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, vdc_int_w),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, vdc_dma_out_w),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, vdc_ef1_w)
-};
-
 UINT32 vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdc->screen_update(screen, bitmap, cliprect);
@@ -609,11 +600,6 @@ WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
 	}
 }
 
-static VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, byteio_inst_w)
-};
-
 
 //-------------------------------------------------
 //  VIP_EXPANSION_INTERFACE( expansion_intf )
@@ -639,13 +625,6 @@ WRITE_LINE_MEMBER( vip_state::exp_dma_in_w )
 
 	update_interrupts();
 }
-
-static VIP_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, exp_int_w),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, exp_dma_out_w),
-	DEVCB_DRIVER_LINE_MEMBER(vip_state, exp_dma_in_w)
-};
 
 
 
@@ -772,8 +751,7 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	// video hardware
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)
 	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
-
-	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_52128MHz/2, vdc_intf)
+	MCFG_CDP1861_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2, WRITELINE(vip_state, vdc_int_w), WRITELINE(vip_state, vdc_dma_out_w), WRITELINE(vip_state, vdc_ef1_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -782,8 +760,9 @@ static MACHINE_CONFIG_START( vip, vip_state )
 	MCFG_SOUND_CONFIG_DISCRETE(vip)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, byteio_intf, vip_byteio_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, expansion_intf, vip_expansion_cards, NULL)
+	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, NULL, WRITELINE(vip_state, byteio_inst_w))
+	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
+    MCFG_VIP_EXPANSION_SLOT_CALLBACKS(WRITELINE(vip_state, exp_int_w), WRITELINE(vip_state, exp_dma_out_w), WRITELINE(vip_state, exp_dma_in_w))
 
 	// devices
 	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)

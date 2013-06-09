@@ -12,7 +12,6 @@
 #ifndef __TRS80M2_KEYBOARD__
 #define __TRS80M2_KEYBOARD__
 
-
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -31,13 +30,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TRS80M2_KEYBOARD_ADD(_config) \
+#define MCFG_TRS80M2_KEYBOARD_ADD(_clock) \
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define TRS80M2_KEYBOARD_INTERFACE(_name) \
-	const trs80m2_keyboard_interface (_name) =
+	downcast<trs80m2_keyboard_device *>(device)->set_clock_callback(DEVCB2_##_clock);
 
 
 
@@ -45,22 +40,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> trs80m2_keyboard_interface
-
-struct trs80m2_keyboard_interface
-{
-	devcb_write_line    m_out_clock_cb;
-};
-
-
 // ======================> trs80m2_keyboard_device
 
-class trs80m2_keyboard_device :  public device_t,
-									public trs80m2_keyboard_interface
+class trs80m2_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _clock> void set_clock_callback(_clock clock) { m_write_clock.set_callback(clock); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -80,10 +68,13 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line   m_out_clock_func;
+	enum
+	{
+		LED_0 = 0,
+		LED_1
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_y0;
@@ -98,6 +89,8 @@ private:
 	required_ioport m_y9;
 	required_ioport m_ya;
 	required_ioport m_yb;
+
+	devcb2_write_line   m_write_clock;
 
 	int m_busy;
 	int m_data;

@@ -7,20 +7,8 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - calculate colors from luminance/chrominance resistors
-
-*/
-
-#include "emu.h"
 #include "cdp1862.h"
 
-
-// device type definition
-const device_type CDP1862 = &device_creator<cdp1862_device>;
 
 
 //**************************************************************************
@@ -28,6 +16,15 @@ const device_type CDP1862 = &device_creator<cdp1862_device>;
 //**************************************************************************
 
 static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+// device type definition
+const device_type CDP1862 = &device_creator<cdp1862_device>;
 
 
 
@@ -80,31 +77,11 @@ inline void cdp1862_device::initialize_palette()
 //-------------------------------------------------
 
 cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock)
+	: device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock),
+	  m_read_rd(*this),
+	  m_read_bd(*this),
+	  m_read_gd(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1862_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1862_interface *intf = reinterpret_cast<const cdp1862_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1862_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_rd_cb, 0, sizeof(m_in_rd_cb));
-		memset(&m_in_bd_cb, 0, sizeof(m_in_bd_cb));
-		memset(&m_in_gd_cb, 0, sizeof(m_in_gd_cb));
-	}
 }
 
 
@@ -115,12 +92,12 @@ void cdp1862_device::device_config_complete()
 void cdp1862_device::device_start()
 {
 	// resolve callbacks
-	m_in_rd_func.resolve(m_in_rd_cb, *this);
-	m_in_bd_func.resolve(m_in_bd_cb, *this);
-	m_in_gd_func.resolve(m_in_gd_cb, *this);
+	m_read_rd.resolve_safe(0);
+	m_read_bd.resolve_safe(0);
+	m_read_gd.resolve_safe(0);
 
 	// find devices
-	m_screen =  machine().device<screen_device>(m_screen_tag);
+	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// init palette
@@ -156,9 +133,9 @@ WRITE8_MEMBER( cdp1862_device::dma_w )
 
 	if (!m_con)
 	{
-		rd = m_in_rd_func();
-		bd = m_in_bd_func();
-		gd = m_in_gd_func();
+		rd = m_read_rd();
+		bd = m_read_bd();
+		gd = m_read_gd();
 	}
 
 	for (x = 0; x < 8; x++)

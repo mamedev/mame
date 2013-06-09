@@ -18,41 +18,12 @@
 #define I8048_TAG       "ic801"
 
 
-enum
-{
-	LED_CAPS = 0,
-	LED_NUM
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 const device_type PC1512_KEYBOARD = &device_creator<pc1512_keyboard_device>;
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc1512_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pc1512_keyboard_interface *intf = reinterpret_cast<const pc1512_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<pc1512_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
-		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
-	}
-}
 
 
 //-------------------------------------------------
@@ -270,6 +241,8 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 		m_y10(*this, "Y10"),
 		m_y11(*this, "Y11"),
 		m_com(*this, "COM"),
+		m_write_clock(*this),
+		m_write_data(*this),
 		m_data_in(1),
 		m_clock_in(1),
 		m_kb_y(0xffff),
@@ -290,8 +263,8 @@ void pc1512_keyboard_device::device_start()
 	m_reset_timer = timer_alloc();
 
 	// resolve callbacks
-	m_out_data_func.resolve(m_out_data_cb, *this);
-	m_out_clock_func.resolve(m_out_clock_cb, *this);
+	m_write_clock.resolve_safe();
+	m_write_data.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_data_in));
@@ -495,10 +468,10 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 	*/
 
 	// keyboard data
-	m_out_data_func(BIT(data, 0));
+	m_write_data(BIT(data, 0));
 
 	// keyboard clock
-	m_out_clock_func(BIT(data, 1));
+	m_write_clock(BIT(data, 1));
 
 	// CAPS LOCK
 	output_set_led_value(LED_CAPS, BIT(data, 2));

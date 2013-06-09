@@ -777,12 +777,6 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 	m_kbclk = state;
 }
 
-static PC1512_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc1512_state, kbdata_w),
-	DEVCB_DRIVER_LINE_MEMBER(pc1512_state, kbclk_w)
-};
-
 
 //-------------------------------------------------
 //  I8237_INTERFACE( dmac_intf )
@@ -1260,7 +1254,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// devices
-	MCFG_PC1512_KEYBOARD_ADD(kb_intf)
+	MCFG_PC1512_KEYBOARD_ADD(WRITELINE(pc1512_state, kbclk_w), WRITELINE(pc1512_state, kbdata_w))
 	MCFG_I8237_ADD(I8237A5_TAG, XTAL_24MHz/6, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
@@ -1306,7 +1300,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// devices
-	MCFG_PC1512_KEYBOARD_ADD(kb_intf)
+	MCFG_PC1512_KEYBOARD_ADD(WRITELINE(pc1512_state, kbclk_w), WRITELINE(pc1512_state, kbdata_w))
 	MCFG_I8237_ADD(I8237A5_TAG, XTAL_24MHz/6, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)

@@ -23,42 +23,28 @@
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
 const device_type CDP1861 = &device_creator<cdp1861_device>;
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 //-------------------------------------------------
 //  cdp1861_device - constructor
 //-------------------------------------------------
 
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock)
+	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock),
+	  m_write_irq(*this),
+	  m_write_dma_out(*this),
+	  m_write_efx(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1861_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1861_interface *intf = reinterpret_cast<const cdp1861_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1861_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_dmao_cb, 0, sizeof(m_out_dmao_cb));
-		memset(&m_out_efx_cb, 0, sizeof(m_out_efx_cb));
-	}
 }
 
 
@@ -69,9 +55,9 @@ void cdp1861_device::device_config_complete()
 void cdp1861_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_dmao_func.resolve(m_out_dmao_cb, *this);
-	m_out_efx_func.resolve(m_out_efx_cb, *this);
+	m_write_irq.resolve_safe();
+	m_write_dma_out.resolve_safe();
+	m_write_efx.resolve_safe();
 
 	// allocate timers
 	m_int_timer = timer_alloc(TIMER_INT);
@@ -79,7 +65,6 @@ void cdp1861_device::device_start()
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// find devices
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_screen =  machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -99,15 +84,15 @@ void cdp1861_device::device_reset()
 {
 	m_int_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
 	m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
-	m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_START));
+	m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_START));
 
 	m_disp = 0;
 	m_dmaout = 0;
 	m_dispon = 0;
 
-	m_out_int_func(CLEAR_LINE);
-	m_out_dmao_func(CLEAR_LINE);
-	m_out_efx_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
+	m_write_dma_out(CLEAR_LINE);
+	m_write_efx(CLEAR_LINE);
 }
 
 
@@ -126,7 +111,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_out_int_func(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0));
@@ -135,7 +120,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_out_int_func(CLEAR_LINE);
+				m_write_irq(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
@@ -146,22 +131,22 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		switch (scanline)
 		{
 		case CDP1861_SCANLINE_EFX_TOP_START:
-			m_out_efx_func(ASSERT_LINE);
+			m_write_efx(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_TOP_END:
-			m_out_efx_func(CLEAR_LINE);
+			m_write_efx(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_BOTTOM_START:
-			m_out_efx_func(ASSERT_LINE);
+			m_write_efx(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_BOTTOM_END:
-			m_out_efx_func(CLEAR_LINE);
+			m_write_efx(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
@@ -174,11 +159,11 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 				{
-					m_out_dmao_func(CLEAR_LINE);
+					m_write_dma_out(CLEAR_LINE);
 				}
 			}
 
-			m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_WAIT));
+			m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_WAIT));
 
 			m_dmaout = 0;
 		}
@@ -188,11 +173,11 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 				{
-					m_out_dmao_func(ASSERT_LINE);
+					m_write_dma_out(ASSERT_LINE);
 				}
 			}
 
-			m_dma_timer->adjust(m_cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_ACTIVE));
+			m_dma_timer->adjust(clocks_to_attotime(CDP1861_CYCLES_DMA_ACTIVE));
 
 			m_dmaout = 1;
 		}
@@ -242,8 +227,8 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 
 	m_dispoff = state;
 
-	m_out_int_func(CLEAR_LINE);
-	m_out_dmao_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
+	m_write_dma_out(CLEAR_LINE);
 }
 
 

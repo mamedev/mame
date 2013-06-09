@@ -27,7 +27,6 @@
 const device_type V1050_KEYBOARD = &device_creator<v1050_keyboard_device>;
 
 
-
 //-------------------------------------------------
 //  ROM( v1050_keyboard )
 //-------------------------------------------------

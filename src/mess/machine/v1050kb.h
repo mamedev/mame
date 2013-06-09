@@ -12,7 +12,6 @@
 #ifndef __V1050_KEYBOARD__
 #define __V1050_KEYBOARD__
 
-
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/discrete.h"
@@ -33,10 +32,6 @@
 
 #define MCFG_V1050_KEYBOARD_ADD() \
 	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
-
-
-#define V1050_KEYBOARD_INTERFACE(_name) \
-	const V1050_keyboard_interface (_name) =
 
 
 

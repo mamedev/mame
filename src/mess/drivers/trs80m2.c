@@ -500,11 +500,6 @@ WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 	m_kbclk = state;
 }
 
-static TRS80M2_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, kb_clock_w)
-};
-
 WRITE8_MEMBER( trs80m2_state::kbd_w )
 {
 	// latch key data
@@ -844,7 +839,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
+	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal RAM
@@ -895,7 +890,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
-	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
+	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)

@@ -34,15 +34,6 @@ device_vip_byteio_port_interface::device_vip_byteio_port_interface(const machine
 }
 
 
-//-------------------------------------------------
-//  ~device_vip_byteio_port_interface - destructor
-//-------------------------------------------------
-
-device_vip_byteio_port_interface::~device_vip_byteio_port_interface()
-{
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -54,42 +45,10 @@ device_vip_byteio_port_interface::~device_vip_byteio_port_interface()
 
 vip_byteio_port_device::vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, VIP_BYTEIO_PORT, "VIP byte I/O port", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_write_inst(*this)
 {
 }
-
-
-//-------------------------------------------------
-//  vip_byteio_port_device - destructor
-//-------------------------------------------------
-
-vip_byteio_port_device::~vip_byteio_port_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vip_byteio_port_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vip_byteio_port_interface *intf = reinterpret_cast<const vip_byteio_port_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<vip_byteio_port_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_inst_cb, 0, sizeof(m_out_inst_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -100,7 +59,7 @@ void vip_byteio_port_device::device_start()
 	m_cart = dynamic_cast<device_vip_byteio_port_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_inst_func.resolve(m_out_inst_cb, *this);
+	m_write_inst.resolve_safe();
 }
 
 
@@ -118,8 +77,6 @@ void vip_byteio_port_device::out_w(UINT8 data) { if (m_cart != NULL) m_cart->vip
 READ_LINE_MEMBER( vip_byteio_port_device::ef3_r ) { int state = CLEAR_LINE; if (m_cart != NULL) state = m_cart->vip_ef3_r(); return state; }
 READ_LINE_MEMBER( vip_byteio_port_device::ef4_r ) { int state = CLEAR_LINE; if (m_cart != NULL) state = m_cart->vip_ef4_r(); return state; }
 WRITE_LINE_MEMBER( vip_byteio_port_device::q_w ) { if (m_cart != NULL) m_cart->vip_q_w(state); }
-
-WRITE_LINE_MEMBER( vip_byteio_port_device::inst_w ) { m_out_inst_func(state); }
 
 
 //-------------------------------------------------

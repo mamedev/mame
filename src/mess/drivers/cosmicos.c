@@ -362,24 +362,6 @@ WRITE_LINE_MEMBER( cosmicos_state::efx_w )
 	m_efx = state;
 }
 
-static CDP1864_INTERFACE( cosmicos_cdp1864_intf )
-{
-	CDP1802_TAG,
-	SCREEN_TAG,
-	CDP1864_INTERLACED,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, dmaout_w),
-	DEVCB_DRIVER_LINE_MEMBER(cosmicos_state, efx_w),
-	DEVCB_NULL,
-	RES_K(2), // R2
-	0, // not connected
-	0, // not connected
-	0  // not connected
-};
-
 /* CDP1802 Configuration */
 
 READ_LINE_MEMBER( cosmicos_state::wait_r )
@@ -582,7 +564,8 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, XTAL_1_75MHz, cosmicos_cdp1864_intf)
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL_1_75MHz, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(cosmicos_state, dmaout_w), WRITELINE(cosmicos_state, efx_w), NULL, VCC, VCC, VCC)
+	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
