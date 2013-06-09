@@ -63,7 +63,7 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 	}
 	else if( offset <= 15)
 	{
-		m_card->write_cs1(space, offset, data & 7, mem_mask);
+		m_card->write_cs1(space, offset & 7, data, mem_mask);
 	}
 }
 
