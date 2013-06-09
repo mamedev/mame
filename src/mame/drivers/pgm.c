@@ -3921,10 +3921,13 @@ GAME( 1997, orlegendca,   orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, o
 GAME( 1997, orlegend111c, orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 no date!          - runs as HongKong, China, China
 GAME( 1997, orlegend105k, orlegend,  pgm_asic3,     orld105k, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )  // V0000 no date!          - runs as Korea
 
-GAME( 1997, drgw2,        pgm,       pgm,     pgm, pgm_state,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1997, dw2v100x,     drgw2,     pgm,     pgm, pgm_state,      dw2v100x,   ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1997, drgw2j,       drgw2,     pgm,     pgm, pgm_state,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1997, drgw2c,       drgw2,     pgm,     pgm, pgm_state,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, drgw2,        pgm,       pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, dw2v100x,     drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      dw2v100x,   ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, drgw2j,       drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, drgw2c,       drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
+GAME( 1998, killbld,      pgm,       pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, killbld104,   killbld,   pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
 // region provided by internal ARM rom
 GAME( 1999, photoy2k,     pgm,       pgm_arm_type1,     photoy2k, pgm_arm_type1_state, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 105)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
@@ -3977,8 +3980,6 @@ GAME( 2001, ddp2101c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,
 GAME( 2001, ddp2100c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (China, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 
-
-
 // japan region only?
 GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001, pgm_arm_type2_state,   dw2001,    ROT0,   "IGS", "Dragon World 2001 (V100?, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/21/01 16:05:16
 
@@ -3991,7 +3992,6 @@ GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state
 GAME( 2002, dmnfrntb,     dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V103, ROM M103XX 07/05/02) (ARM label V103, ROM 07/05/02 S103XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 14:43:13 ARM time: 11:04:24
 GAME( 2002, dmnfrnta,     dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31  (from the strings it looks like V102 only upgraded the 68k ROM)
 GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V106KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
-
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
@@ -4012,16 +4012,12 @@ GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_s
    Partially Working, playable, but some imperfections
    -----------------------------------------------------------------------------------------------------------------------*/
 
-	// it's playable, but the region check is still patched (different IGS025 chips return different sequences so that the game can determine the region)
-GAME( 1998, killbld,      pgm,       pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1998, killbld104,   killbld,   pgm_022_025_kb, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-
 GAME( 1998, olds,         pgm,       pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, olds100,      olds,      pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, olds100a,     olds,      pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // crashes on some bosses, high score table etc.
-GAME( 1998, olds103t,     olds,      pgm,               pgm,  pgm_state,             pgm,        ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 103, China, Tencent) (unprotected)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // why is this version not protected? internal leak? bootleg?
-
-
+// this version was specially made for a Chinese online gaming company. While it may not be entirely suitable for
+// mame, it can give some insight into how protection should work.
+GAME( 1998, olds103t,     olds,      pgm,               pgm,  pgm_state,             pgm,        ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 103, China, Tencent) (unprotected)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
 GAME( 1999, kov115,       kov,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18

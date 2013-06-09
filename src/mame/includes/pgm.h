@@ -122,19 +122,6 @@ public:
 	void screen_eof_pgm(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
 
-	// from pgmprot5.c
-	int protection_address;
-
-	UINT16 dw2_asic_reg[2];
-	UINT8 dw2_asic_z;
-	UINT8 dw2_asic_y;
-	UINT16 dw2_asic_hold;
-
-	DECLARE_READ16_MEMBER( dw2_d80000_r );
-	DECLARE_WRITE16_MEMBER( dw2_d80000_w );
-	DECLARE_WRITE16_MEMBER(dw2_unk_w);
-	void pgm_dw2_decrypt();
-	void drgwld2_common_init();
 	inline void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat);
 	inline void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
 	inline void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
@@ -401,6 +388,41 @@ public:
 	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
 };
 
+/* for machine/pgmprot5.c type games */
+class pgm_012_025_state : public pgm_state
+{
+public:
+	pgm_012_025_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+	}
+
+	UINT32 m_drgw2_protection_region;
+
+	const UINT8 (*m_drgw2_source_data)[0xec];
+
+	UINT16	      m_drgw2_prot_hold;
+	UINT16	      m_drgw2_prot_hilo;
+	UINT16	      m_drgw2_prot_hilo_select;
+	int           m_drgw2_cmd;
+	int           m_drgw2_ptr;
+
+	void pgm_drgw2_decrypt();
+	void drgw2_common_init();
+
+	DECLARE_DRIVER_INIT(drgw2);
+	DECLARE_DRIVER_INIT(dw2v100x);
+	DECLARE_DRIVER_INIT(drgw2c);
+	DECLARE_DRIVER_INIT(drgw2j);
+
+	DECLARE_MACHINE_RESET(drgw2);
+
+	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
+	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
+
+	void drgw2_protection_calculate_hilo();
+	void drgw2_protection_calculate_hold(int y, int z);
+};
+
 /* for machine/pgmprot6.c type games */
 class pgm_028_025_state : public pgm_state
 {
@@ -507,6 +529,10 @@ MACHINE_CONFIG_EXTERN( pgm_022_025_dw );
 
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );
+
+/*----------- defined in machine/pgmprot5.c -----------*/
+
+MACHINE_CONFIG_EXTERN( pgm_012_025_drgw2 );
 
 /*----------- defined in machine/pgmprot6.c -----------*/
 
