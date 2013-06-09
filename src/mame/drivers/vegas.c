@@ -1458,7 +1458,7 @@ static WRITE32_HANDLER( asic_fifo_w )
 
 static READ32_DEVICE_HANDLER( ide_main_r )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 
 	UINT32 data = 0;
 	if (ACCESSING_BITS_0_15)
@@ -1472,7 +1472,7 @@ static READ32_DEVICE_HANDLER( ide_main_r )
 
 static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 
 	if (ACCESSING_BITS_0_15)
 		ide->write_cs0_pc(space, offset * 2, data, mem_mask);
@@ -1483,7 +1483,7 @@ static WRITE32_DEVICE_HANDLER( ide_main_w )
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 
 	UINT32 data = 0;
 	if (ACCESSING_BITS_0_15)
@@ -1497,7 +1497,7 @@ static READ32_DEVICE_HANDLER( ide_alt_r )
 
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 
 	if (ACCESSING_BITS_0_15)
 		ide->write_cs1_pc(space, 6/2 + offset * 2, data, mem_mask);
@@ -1508,14 +1508,14 @@ static WRITE32_DEVICE_HANDLER( ide_alt_w )
 
 static READ32_DEVICE_HANDLER( ide_bus_master32_r )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 	return ide->ide_bus_master32_r(space, offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
 {
-	ide_controller_device *ide = (ide_controller_device *) device;
+	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
 	ide->ide_bus_master32_w(space, offset, data, mem_mask);
 }
 
@@ -2279,9 +2279,9 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	MCFG_M48T37_ADD("timekeeper")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(vegas_state, ide_interrupt))
-	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
 	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
 

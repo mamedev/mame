@@ -518,7 +518,7 @@ public:
 	void update_widget_irq();
 	void init_common(int ioasic, int serialnum, int yearoffs, int config);
 	required_device<cpu_device> m_maincpu;
-	required_device<ide_controller_device> m_ide;
+	required_device<bus_master_ide_controller_device> m_ide;
 };
 
 /*************************************
@@ -1785,10 +1785,10 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase") // wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a0001f0, 0x0a0001f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
-	AM_RANGE(0x0a0003f0, 0x0a0003f7) AM_READ16(seattle_ide_r, 0xffffffff) AM_DEVWRITE16("ide", ide_controller_device, write_cs1_pc, 0xffffffff)
+	AM_RANGE(0x0a0001f0, 0x0a0001f7) AM_DEVREADWRITE16("ide", bus_master_ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+	AM_RANGE(0x0a0003f0, 0x0a0003f7) AM_READ16(seattle_ide_r, 0xffffffff) AM_DEVWRITE16("ide", bus_master_ide_controller_device, write_cs1_pc, 0xffffffff)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP                     // IDE-related, but annoying
-	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", ide_controller_device, ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
@@ -2535,9 +2535,9 @@ static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(seattle_state, ide_interrupt))
-	MCFG_IDE_CONTROLLER_BUS_MASTER("maincpu", AS_PROGRAM)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
 

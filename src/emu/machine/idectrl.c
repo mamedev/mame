@@ -190,44 +190,6 @@ static TIMER_CALLBACK( reset_callback )
 
 /*************************************
  *
- *  Convert offset/mem_mask to offset
- *  and size
- *
- *************************************/
-
-INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
-{
-	int size = 4;
-
-	/* determine which real offset */
-	if (!ACCESSING_BITS_0_7)
-	{
-		(*offset)++, size = 3;
-		if (!ACCESSING_BITS_8_15)
-		{
-			(*offset)++, size = 2;
-			if (!ACCESSING_BITS_16_23)
-				(*offset)++, size = 1;
-		}
-	}
-
-	/* determine the real size */
-	if (ACCESSING_BITS_24_31)
-		return size;
-	size--;
-	if (ACCESSING_BITS_16_23)
-		return size;
-	size--;
-	if (ACCESSING_BITS_8_15)
-		return size;
-	size--;
-	return size;
-}
-
-
-
-/*************************************
- *
  *  Advance to the next sector
  *
  *************************************/
@@ -1387,21 +1349,20 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
  *
  *************************************/
 
-UINT32 ide_controller_device::ide_bus_master_read(offs_t offset, int size)
+READ32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_r )
 {
-	LOG(("%s:ide_bus_master_read(%d, %d)\n", machine().describe_context(), offset, size));
+	LOG(("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask));
 
-	/* command register */
-	if (offset == 0)
+	switch( offset )
+	{
+	case 0:
+		/* command register/status register */
 		return bus_master_command | (bus_master_status << 16);
 
-	/* status register */
-	if (offset == 2)
-		return bus_master_status;
-
-	/* descriptor table register */
-	if (offset == 4)
+	case 1:
+		/* descriptor table register */
 		return bus_master_descriptor;
+	}
 
 	return 0xffffffff;
 }
@@ -1414,82 +1375,67 @@ UINT32 ide_controller_device::ide_bus_master_read(offs_t offset, int size)
  *
  *************************************/
 
-void ide_controller_device::ide_bus_master_write(offs_t offset, int size, UINT32 data)
+WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 {
-	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", machine().describe_context(), offset, size, data));
+	LOG(("%s:ide_bus_master32_w(%d, %08x, %08X)\n", machine().describe_context(), offset, mem_mask, data));
 
-	/* command register */
-	if (offset == 0)
+	switch( offset )
 	{
-		UINT8 old = bus_master_command;
-		UINT8 val = data & 0xff;
-
-		/* save the read/write bit and the start/stop bit */
-		bus_master_command = (old & 0xf6) | (val & 0x09);
-		bus_master_status = (bus_master_status & ~IDE_BUSMASTER_STATUS_ACTIVE) | (val & 0x01);
-
-		/* handle starting a transfer */
-		if (!(old & 1) && (val & 1))
+	case 0:
+		if( ACCESSING_BITS_0_7 )
 		{
-			/* reset all the DMA data */
-			dma_bytes_left = 0;
-			dma_last_buffer = 0;
-			dma_descriptor = bus_master_descriptor;
+			/* command register */
+			UINT8 old = bus_master_command;
+			UINT8 val = data & 0xff;
 
-			/* if we're going live, start the pending read/write */
-			if (dma_active)
+			/* save the read/write bit and the start/stop bit */
+			bus_master_command = (old & 0xf6) | (val & 0x09);
+			bus_master_status = (bus_master_status & ~IDE_BUSMASTER_STATUS_ACTIVE) | (val & 0x01);
+
+			/* handle starting a transfer */
+			if (!(old & 1) && (val & 1))
 			{
-				if (bus_master_command & 8)
-					read_next_sector();
-				else
+				/* reset all the DMA data */
+				dma_bytes_left = 0;
+				dma_last_buffer = 0;
+				dma_descriptor = bus_master_descriptor;
+
+				/* if we're going live, start the pending read/write */
+				if (dma_active)
 				{
-					read_buffer_from_dma();
-					continue_write();
+					if (bus_master_command & 8)
+						read_next_sector();
+					else
+					{
+						read_buffer_from_dma();
+						continue_write();
+					}
 				}
 			}
 		}
-	}
 
-	/* status register */
-	if (offset <= 2 && offset + size > 2)
-	{
-		UINT8 old = bus_master_status;
-		UINT8 val = data >> (8 * (2 - offset));
+		if( ACCESSING_BITS_16_23 )
+		{
+			/* status register */
+			UINT8 old = bus_master_status;
+			UINT8 val = (data >> 16) & 0xff;
 
-		/* save the DMA capable bits */
-		bus_master_status = (old & 0x9f) | (val & 0x60);
+			/* save the DMA capable bits */
+			bus_master_status = (old & 0x9f) | (val & 0x60);
 
-		/* clear interrupt and error bits */
-		if (val & IDE_BUSMASTER_STATUS_IRQ)
-			bus_master_status &= ~IDE_BUSMASTER_STATUS_IRQ;
-		if (val & IDE_BUSMASTER_STATUS_ERROR)
-			bus_master_status &= ~IDE_BUSMASTER_STATUS_ERROR;
-	}
+			/* clear interrupt and error bits */
+			if (val & IDE_BUSMASTER_STATUS_IRQ)
+				bus_master_status &= ~IDE_BUSMASTER_STATUS_IRQ;
+			if (val & IDE_BUSMASTER_STATUS_ERROR)
+				bus_master_status &= ~IDE_BUSMASTER_STATUS_ERROR;
+		}
+		break;
 
-	/* descriptor table register */
-	if (offset == 4)
+	case 1:
+		/* descriptor table register */
 		bus_master_descriptor = data & 0xfffffffc;
-}
-
-READ32_MEMBER( ide_controller_device::ide_bus_master32_r )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-
-	return ide_bus_master_read(offset, size) << ((offset & 3) * 8);
-}
-
-
-WRITE32_MEMBER( ide_controller_device::ide_bus_master32_w )
-{
-	int size;
-
-	offset *= 4;
-	size = convert_to_offset_and_size32(&offset, mem_mask);
-
-	ide_bus_master_write(offset, size, data >> ((offset & 3) * 8));
+		break;
+	}
 }
 
 
@@ -1497,11 +1443,21 @@ SLOT_INTERFACE_START(ide_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 SLOT_INTERFACE_END
 
-const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
-
-ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock),
 	status(0),
+	bmcpu(NULL),
+	bmspace(0),
+	dma_space(NULL),
+	dma_active(0),
+	dma_address_xor(0),
+	dma_last_buffer(0),
+	dma_address(0),
+	dma_descriptor(0),
+	dma_bytes_left(0),
+	bus_master_command(0),
+	bus_master_status(0),
+	bus_master_descriptor(0),
 	adapter_control(0),
 	error(0),
 	command(0),
@@ -1512,16 +1468,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	block_count(0),
 	sectors_until_int(0),
 	verify_only(0),
-	dma_active(0),
-	dma_space(NULL),
-	dma_address_xor(0),
-	dma_last_buffer(0),
-	dma_address(0),
-	dma_descriptor(0),
-	dma_bytes_left(0),
-	bus_master_command(0),
-	bus_master_status(0),
-	bus_master_descriptor(0),
 	config_unknown(0),
 	config_register_num(0),
 	master_password_enable(0),
@@ -1530,9 +1476,53 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	user_password(NULL),
 	gnetreadlock(0),
 	cur_drive(0),
-	m_irq_handler(*this),
+	m_irq_handler(*this)
+{
+}
+
+
+const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
+
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
 	bmcpu(NULL),
-	bmspace(0)
+	bmspace(0),
+	dma_space(NULL),
+	dma_active(0),
+	dma_address_xor(0),
+	dma_last_buffer(0),
+	dma_address(0),
+	dma_descriptor(0),
+	dma_bytes_left(0),
+	bus_master_command(0),
+	bus_master_status(0),
+	bus_master_descriptor(0),
+	adapter_control(0),
+	error(0),
+	command(0),
+	interrupt_pending(0),
+	precomp_offset(0),
+	buffer_offset(0),
+	sector_count(0),
+	block_count(0),
+	sectors_until_int(0),
+	verify_only(0),
+	config_unknown(0),
+	config_register_num(0),
+	master_password_enable(0),
+	user_password_enable(0),
+	master_password(NULL),
+	user_password(NULL),
+	gnetreadlock(0),
+	cur_drive(0),
+	m_irq_handler(*this)
+{
+}
+
+const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
+
+bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	ide_controller_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock)
 {
 }
 
