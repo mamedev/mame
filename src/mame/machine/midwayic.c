@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "midwayic.h"
-#include "machine/idectrl.h"
 #include "audio/cage.h"
 #include "audio/dcs.h"
 
