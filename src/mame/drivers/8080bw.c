@@ -3016,65 +3016,71 @@ static INPUT_PORTS_START( galactic )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
+
+
 /*****************************************************
-  Attack Force
+
+  Attack Force, by E.G.S., Italy
+  Not much information is available for this game.
+  It may have had an amber monitor?
+  
+  XTAL 20MHz
+  
+  TODO: sound
+
 *****************************************************/
 
-
-
 static ADDRESS_MAP_START( attackfc_io_map, AS_IO, 8, _8080bw_state )
-	//AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x02, 0x02) AM_WRITENOP
+	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("mb14241", mb14241_device, shift_result_r, shift_data_w)
+	AM_RANGE(0x04, 0x04) AM_WRITENOP
+	AM_RANGE(0x05, 0x05) AM_WRITENOP
+	AM_RANGE(0x06, 0x06) AM_WRITENOP
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( attackfc_map, AS_PROGRAM, 8, _8080bw_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
 
-//	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+static INPUT_PORTS_START( attackfc )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_DERIVED_CLASS( attackfc, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(attackfc_map)
 	MCFG_CPU_IO_MAP(attackfc_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-//	/* add shifter */
-//	MCFG_MB14241_ADD("mb14241")
+	/* add shifter */
+	MCFG_MB14241_ADD("mb14241")
 
-//	/* sound hardware */
-//	MCFG_FRAGMENT_ADD(invaders_samples_audio)
-//	MCFG_DISCRETE_ADD("discrete", 0, galactic)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+	/* sound hardware */
+	// TODO: custom discrete
 MACHINE_CONFIG_END
 
 
-static INPUT_PORTS_START( attackfc )
-	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
+{
+	UINT8 *rom = memregion("maincpu")->base();
+	UINT32 len = memregion("maincpu")->bytes();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, len);
+	
+	// swap a8/a9
+	for (int i = 0; i < len; i++)
+		buffer[BITSWAP16(i, 15,14,13,12,11,10,8,9, 7,6,5,4,3,2,1,0)] = rom[i];
 
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	/* Dummy controls port, P1 */
-	INVADERS_CONTROL_PORT_P1
-
-	/* Dummy controls port, P2 */
-	INVADERS_CONTROL_PORT_P2
-
-	/* Dummy port for cocktail mode */
-	INVADERS_CAB_TYPE_PORT
-INPUT_PORTS_END
+	memcpy(rom, buffer, len);
+	auto_free(machine(), buffer);
+}
 
 
 
@@ -4551,7 +4557,7 @@ ROM_START( attackfc )
 	ROM_LOAD( "31a.bin",	   0x0800, 0x0400, CRC(787a4658) SHA1(5be3143bdba6a32256603be94400034a8ea1fda6) )
 	ROM_LOAD( "37a.bin",       0x0c00, 0x0400, CRC(ad6bfbbe) SHA1(5f5437b6c8e7dfe9649b25040862f8a51d8c43ed) )
 	ROM_LOAD( "32a.bin",       0x1000, 0x0400, CRC(cbe0a711) SHA1(6e5f4214a4b48b70464005f4263c9b1ec3cbbeb1) )
-	ROM_LOAD( "33a.bin",       0x1800, 0x0400, BAD_DUMP CRC(53147393) SHA1(57e078f1734e382e8a46be09c133daab30c75681) )
+	ROM_LOAD( "33a.bin",       0x1800, 0x0400, CRC(53147393) SHA1(57e078f1734e382e8a46be09c133daab30c75681) )
 	ROM_LOAD( "39a.bin",       0x1c00, 0x0400, CRC(f538cf08) SHA1(4a375a41ab5d9f0d9f9a2ebef4c448038c139204) )
 ROM_END
 
@@ -4654,7 +4660,7 @@ GAMEL(1979, skylove,    0,        shuttlei,  skylove,   driver_device, 0, ROT270
 GAME (1978, claybust,   0,        claybust,  claybust,  driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Claybuster according to flyers
 GAME (1980, gunchamp,   0,        claybust,  gunchamp,  driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Gun Champ according to original cab
 GAME( 19??, astropal,   0,        astropal,  astropal,  driver_device, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1979, attackfc,   0,        attackfc,  attackfc,  driver_device, 0, ROT270, "Electronic Games Systems", "Attack Force", GAME_NOT_WORKING | GAME_NO_SOUND ) // not sure how close this is to invaders hw
+GAME( 1979?,attackfc,   0,        attackfc,  attackfc,  _8080bw_state, attackfc, ROT0, "Electronic Games Systems", "Attack Force", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 
 GAME( 2002, invmulti,   0,        invmulti,  invmulti,  _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a,invmulti, invmulti,  invmulti,  _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
