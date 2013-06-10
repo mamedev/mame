@@ -1,7 +1,3 @@
-/*.exe
-/*.map
-/*.pdb
-/*.sym
 /obj
 src/regtests/chdman/temp
 src/regtests/jedutil/output

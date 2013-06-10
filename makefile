@@ -19,7 +19,7 @@
 #-------------------------------------------------
 # specify core target: mame, mess, etc.
 # specify subtarget: mame, mess, tiny, etc.
-# build rules will be included from 
+# build rules will be included from
 # src/$(TARGET)/$(SUBTARGET).mak
 #-------------------------------------------------
 
@@ -35,7 +35,7 @@ endif
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
-# build rules will be included from 
+# build rules will be included from
 # src/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
@@ -129,7 +129,7 @@ endif
 endif # BIGENDIAN
 
 endif # OS/2
-endif # CROSS_BUILD	
+endif # CROSS_BUILD
 endif # Windows_NT
 
 endif # TARGET_OS
@@ -177,7 +177,7 @@ endif
 
 
 #-------------------------------------------------
-# specify program options; see each option below 
+# specify program options; see each option below
 # for details
 #-------------------------------------------------
 
@@ -642,7 +642,7 @@ DRIVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.o
 
 
 #-------------------------------------------------
-# either build or link against the included 
+# either build or link against the included
 # libraries
 #-------------------------------------------------
 
@@ -709,7 +709,7 @@ LIBS += -lstdc++ -lpthread
 endif
 
 #-------------------------------------------------
-# 'default' target needs to go here, before the 
+# 'default' target needs to go here, before the
 # include files which define additional targets
 #-------------------------------------------------
 
@@ -717,17 +717,12 @@ default: maketree buildtools emulator
 
 all: default tools
 
-# TODO: move to a .mak file in the regtests folder?
 tests: maketree jedutil$(EXE) chdman$(EXE)
-	@echo Running jedutil unittest
-	$(PYTHON) src/regtests/jedutil/jedtest.py
-	@echo Running chdman unittest
-	$(PYTHON) src/regtests/chdman/chdtest.py
 
-7Z_LIB = $(OBJ)/lib7z.a 
+7Z_LIB = $(OBJ)/lib7z.a
 
 #-------------------------------------------------
-# defines needed by multiple make files 
+# defines needed by multiple make files
 #-------------------------------------------------
 
 BUILDSRC = $(SRC)/build
@@ -751,6 +746,7 @@ include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 -include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
 include $(SRC)/tools/tools.mak
+include $(SRC)/regtests/regtests.mak
 
 # combine the various definitions to one
 CCOMFLAGS += $(INCPATH)
@@ -793,10 +789,12 @@ ifdef SYMBOLS
 endif
 
 checkautodetect:
-	@echo TARGETOS=$(TARGETOS) 
-	@echo PTR64=$(PTR64) 
-	@echo BIGENDIAN=$(BIGENDIAN) 
+	@echo TARGETOS=$(TARGETOS)
+	@echo PTR64=$(PTR64)
+	@echo BIGENDIAN=$(BIGENDIAN)
 	@echo UNAME="$(UNAME)"
+
+tests: $(REGTESTS)
 
 
 #-------------------------------------------------

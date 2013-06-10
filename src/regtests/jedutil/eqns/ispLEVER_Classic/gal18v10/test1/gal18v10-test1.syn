@@ -1,0 +1,11 @@
+JDF B
+// Created by Version 1.6 
+PROJECT Untitled
+DESIGN gal18v10 Normal
+DEVKIT GAL18V10-15LJ
+ENTRY ABEL/Schematic
+MODULE gal18v10-test1.abl
+MODSTYLE gal18v10_test1 Normal
+SYNTHESIS_TOOL Synplify
+SIMULATOR_TOOL ActiveHDL
+TOPMODULE gal18v10_test1

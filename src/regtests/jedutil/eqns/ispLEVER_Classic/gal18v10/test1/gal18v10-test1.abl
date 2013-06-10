@@ -1,0 +1,138 @@
+MODULE gal18v10_test1
+
+TITLE 'GAL18V10 Test1'
+
+DECLARATIONS
+
+" Constants
+vcc = 1;
+
+" Inputs
+i1 pin 1;
+i2 pin 2;
+i3 pin 3;
+i4 pin 4;
+i5 pin 5;
+i6 pin 6;
+i7 pin 7;
+i8 pin 8;
+
+" Outputs
+o9  pin 9  istype 'com,pos,retain';
+o11 pin 11 istype 'com,neg,retain';
+o12 pin 12 istype 'com,pos,retain';
+o13 pin 13 istype 'com,neg,retain';
+o14 pin 14 istype 'com,pos,retain';
+o15 pin 15 istype 'com,neg,retain';
+o16 pin 16 istype 'com,pos,retain';
+o17 pin 17 istype 'com,neg,retain';
+o18 pin 18 istype 'com,pos,retain';
+o19 pin 19 istype 'com,neg,retain';
+
+EQUATIONS
+
+o9 = i1 & i2 #
+     !i3 #
+     o19 #
+     !i4 #
+     !i5 #
+     i6 #
+     i7 #
+     !i8 & !o19;
+o9.oe = vcc;
+
+!o11 = !i3 & !o9 #
+       !i1 #
+       i8 #
+       !i2 #
+       i5 #
+       i4 & o9 #
+       !i7 #
+       !i6;
+o11.oe = vcc;
+
+o12 = i4 #
+      i6 #
+      i3 & !o11 #
+      i5 #
+      i1 #
+      i2 #
+      !i8 #
+      i7 & o11;
+o12.oe = vcc;
+
+!o13 = !i5 & !o12 #
+       !i7 & o12 #
+       i8 #
+       !i1 #
+       i2 #
+       !i3 #
+       !i6 #
+       !i4;
+o13.oe = vcc;
+
+o14 = i2 & !i6 #
+      i1 & !o13 #
+      i4 & i5 #
+      i2 & !i7 & o13 #
+      i3 & i7 #
+      i6 & !i7 #
+      i8 #
+      !i1 & !i8 #
+      !i2 & !i3 & !i4 #
+      !i2 & i3 & !i5 & i8;
+o14.oe = vcc;
+
+!o15 = i7 & o14 #
+       !i7 & i8 #
+       i1 & i2 & i3 & i4 & i5 #
+       i6 & i7 & !i8 & !o14 #
+       i6 & i7 & !i8 #
+       !i3 & !i4 #
+       !i4 & o14 #
+       i5 #
+       !i2 & i7 #
+       i3 & i8;
+o15.oe = vcc;
+
+o16 = !i8 #
+      i7 #
+      !i6 #
+      i5 #
+      !i4 #
+      i3 #
+      !i2 & !o15 #
+      i1 & o15;
+o16.oe = vcc;
+
+!o17 = !i3 & i6 #
+       i8 #
+       i4 & !o16 #
+       !i1 #
+       !i5 #
+       i2 #
+       !i6 #
+       !i7 & o16;
+o17.oe = vcc;
+
+o18 = !i1 #
+      !i2 #
+      !i3 #
+      !i4 & o17 #
+      i5 & !o17 #
+      i6 #
+      i7 #
+      i8;
+o18.oe = vcc;
+
+!o19 = !i8 & !o18 #
+       !i7 #
+       !i6 #
+       !i5 #
+       i4 #
+       i3 #
+       i2 #
+       i1 & o18;
+o19.oe = vcc;
+
+END 
