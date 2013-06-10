@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	// bus
 	MCFG_WANGPC_BUS_ADD(bus_intf)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL)
-	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "lvc")
+	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "mvc")
 	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot4", 4, wangpc_cards, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, NULL)
