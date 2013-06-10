@@ -54,7 +54,7 @@ void tiki100_state::bankswitch()
 		else
 		{
 			/* GFXRAM, GFXRAM, RAM */
-			program.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(tiki100_state::gfxram_r), this), write8_delegate(FUNC(tiki100_state::gfxram_w), this));
+			program.install_readwrite_handler(0x0000, 0x7fff, READ8_DELEGATE(tiki100_state, gfxram_r), WRITE8_DELEGATE(tiki100_state, gfxram_w));
 			program.install_readwrite_bank(0x8000, 0xffff, "bank3");
 
 			membank("bank1")->set_entry(BANK_VIDEO_RAM);

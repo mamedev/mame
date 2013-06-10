@@ -49,8 +49,6 @@ public:
 	required_ioport m_pa3;
 	required_ioport m_special;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( pia_r );
 	DECLARE_WRITE8_MEMBER( pia_w );
 	DECLARE_WRITE8_MEMBER( colorram_w );

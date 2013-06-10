@@ -230,7 +230,7 @@ void tdv2324_state::video_start()
 //  SCREEN_UPDATE_IND16( tdv2324 )
 //-------------------------------------------------
 
-UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

@@ -946,14 +946,14 @@ private:
 #define READ64_DELEGATE(_class, _member)					read64_delegate(FUNC(_class::_member), this)
 #define WRITE64_DELEGATE(_class, _member)					write64_delegate(FUNC(_class::_member), this)
 
-#define READ8_DEVICE_DELEGATE(_class, _device, _member)		read8_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE8_DEVICE_DELEGATE(_class, _device, _member)	write8_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ16_DEVICE_DELEGATE(_class, _device, _member)	read16_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE16_DEVICE_DELEGATE(_class, _device, _member)	write16_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ32_DEVICE_DELEGATE(_class, _device, _member)	read32_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE32_DEVICE_DELEGATE(_class, _device, _member)	write32_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ64_DEVICE_DELEGATE(_class, _device, _member)	read64_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE64_DEVICE_DELEGATE(_class, _device, _member)	write64_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ8_DEVICE_DELEGATE(_device, _class, _member)		read8_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE8_DEVICE_DELEGATE(_device, _class, _member)	write8_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ16_DEVICE_DELEGATE(_device, _class, _member)	read16_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE16_DEVICE_DELEGATE(_device, _class, _member)	write16_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ32_DEVICE_DELEGATE(_device, _class, _member)	read32_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE32_DEVICE_DELEGATE(_device, _class, _member)	write32_delegate(FUNC(_class::_member), (_class *)_device)
+#define READ64_DEVICE_DELEGATE(_device, _class, _member)	read64_delegate(FUNC(_class::_member), (_class *)_device)
+#define WRITE64_DEVICE_DELEGATE(_device, _class, _member)	write64_delegate(FUNC(_class::_member), (_class *)_device)
 
 
 // helper macro for merging data with the memory mask

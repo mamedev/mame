@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
 
 	void bankswitch(int bank);
 	void update_nmi();

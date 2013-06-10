@@ -54,8 +54,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( vismac_r );
 	DECLARE_WRITE8_MEMBER( vismac_w );
 	DECLARE_READ8_MEMBER( floppy_r );

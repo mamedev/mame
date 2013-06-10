@@ -865,11 +865,11 @@ void portfolio_state::machine_reset()
 	switch (m_pid)
 	{
 	case PID_SERIAL:
-		io.install_readwrite_handler(0x8070, 0x8077, read8_delegate(FUNC(ins8250_device::ins8250_r), (ins8250_device*)m_uart), write8_delegate(FUNC(ins8250_device::ins8250_w), (ins8250_device*)m_uart));
+		io.install_readwrite_handler(0x8070, 0x8077, READ8_DEVICE_DELEGATE(m_uart, ins8250_device, ins8250_r), WRITE8_DEVICE_DELEGATE(m_uart, ins8250_device, ins8250_w));
 		break;
 
 	case PID_PARALLEL:
-		io.install_readwrite_handler(0x8078, 0x807b, read8_delegate(FUNC(i8255_device::read), (i8255_device*)m_ppi), write8_delegate(FUNC(i8255_device::write), (i8255_device*)m_ppi));
+		io.install_readwrite_handler(0x8078, 0x807b, READ8_DEVICE_DELEGATE(m_ppi, i8255_device, read), WRITE8_DEVICE_DELEGATE(m_ppi, i8255_device, write));
 		break;
 	}
 }

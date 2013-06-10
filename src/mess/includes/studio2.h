@@ -45,8 +45,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( dispon_w );
@@ -91,8 +89,6 @@ public:
 	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_reset();
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ_LINE_MEMBER( rdata_r );
