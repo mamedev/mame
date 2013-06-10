@@ -107,26 +107,50 @@ void ide_controller_device::set_dmarq(int state)
 {
 }
 
-
-
-/***************************************************************************
-    DELAYED INTERRUPT HANDLING
-***************************************************************************/
-
-static TIMER_CALLBACK( delayed_interrupt )
+enum
 {
-	ide_controller_device *ide = (ide_controller_device *)ptr;
-	ide->status &= ~IDE_STATUS_BUSY;
-	ide->set_irq(ASSERT_LINE);
-}
+	TID_NULL,
+	TID_DELAYED_INTERRUPT,
+	TID_DELAYED_INTERRUPT_BUFFER_READY,
+	TID_RESET_CALLBACK,
+	TID_SECURITY_ERROR_DONE,
+	TID_READ_SECTOR_DONE_CALLBACK,
+	TID_WRITE_SECTOR_DONE_CALLBACK
+};
 
-
-static TIMER_CALLBACK( delayed_interrupt_buffer_ready )
+void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	ide_controller_device *ide = (ide_controller_device *)ptr;
-	ide->status &= ~IDE_STATUS_BUSY;
-	ide->status |= IDE_STATUS_BUFFER_READY;
-	ide->set_irq(ASSERT_LINE);
+	switch(id)
+	{
+	case TID_DELAYED_INTERRUPT:
+		status &= ~IDE_STATUS_BUSY;
+		set_irq(ASSERT_LINE);
+		break;
+
+	case TID_DELAYED_INTERRUPT_BUFFER_READY:
+		status &= ~IDE_STATUS_BUSY;
+		status |= IDE_STATUS_BUFFER_READY;
+		set_irq(ASSERT_LINE);
+		break;
+
+	case TID_RESET_CALLBACK:
+		reset();
+		break;
+
+	case TID_SECURITY_ERROR_DONE:
+		/* clear error state */
+		status &= ~IDE_STATUS_ERROR;
+		status |= IDE_STATUS_DRIVE_READY;
+		break;
+
+	case TID_READ_SECTOR_DONE_CALLBACK:
+		read_sector_done();
+		break;
+
+	case TID_WRITE_SECTOR_DONE_CALLBACK:
+		write_sector_done();
+		break;
+	}
 }
 
 
@@ -138,9 +162,9 @@ void ide_controller_device::signal_delayed_interrupt(attotime time, int buffer_r
 
 	/* set a timer */
 	if (buffer_ready)
-		machine().scheduler().timer_set(time, FUNC(delayed_interrupt_buffer_ready), 0, this);
+		timer_set(time, TID_DELAYED_INTERRUPT_BUFFER_READY);
 	else
-		machine().scheduler().timer_set(time, FUNC(delayed_interrupt), 0, this);
+		timer_set(time, TID_DELAYED_INTERRUPT);
 }
 
 
@@ -170,12 +194,6 @@ void ide_controller_device::ide_set_user_password(const UINT8 *password)
 {
 	user_password = password;
 	user_password_enable = (user_password != NULL);
-}
-
-
-static TIMER_CALLBACK( reset_callback )
-{
-	reinterpret_cast<device_t *>(ptr)->reset();
 }
 
 
@@ -230,15 +248,6 @@ void ide_controller_device::next_sector()
  *
  *************************************/
 
-static TIMER_CALLBACK( security_error_done )
-{
-	ide_controller_device *ide = (ide_controller_device *)ptr;
-
-	/* clear error state */
-	ide->status &= ~IDE_STATUS_ERROR;
-	ide->status |= IDE_STATUS_DRIVE_READY;
-}
-
 void ide_controller_device::security_error()
 {
 	/* set error state */
@@ -246,7 +255,7 @@ void ide_controller_device::security_error()
 	status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
-	machine().scheduler().timer_set(TIME_SECURITY_ERROR, FUNC(security_error_done), 0, this);
+	timer_set(TIME_SECURITY_ERROR, TID_SECURITY_ERROR_DONE);
 }
 
 
@@ -350,14 +359,6 @@ void ide_controller_device::read_sector_done()
 }
 
 
-static TIMER_CALLBACK( read_sector_done_callback )
-{
-	ide_controller_device *ide = (ide_controller_device *)ptr;
-
-	ide->read_sector_done();
-}
-
-
 void ide_controller_device::read_first_sector()
 {
 	ide_device_interface *dev = slot[cur_drive]->dev();
@@ -376,10 +377,10 @@ void ide_controller_device::read_first_sector()
 			seek_time = TIME_SEEK_MULTISECTOR;
 
 		dev->cur_lba = new_lba;
-		machine().scheduler().timer_set(seek_time, FUNC(read_sector_done_callback), 0, this);
+		timer_set(seek_time, TID_READ_SECTOR_DONE_CALLBACK);
 	}
 	else
-		machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, this);
+		timer_set(TIME_PER_SECTOR, TID_READ_SECTOR_DONE_CALLBACK);
 }
 
 
@@ -395,11 +396,11 @@ void ide_controller_device::read_next_sector()
 			read_sector_done();
 		else
 			/* just set a timer */
-			machine().scheduler().timer_set(attotime::from_usec(1), FUNC(read_sector_done_callback), 0, this);
+			timer_set(attotime::from_usec(1), TID_READ_SECTOR_DONE_CALLBACK);
 	}
 	else
 		/* just set a timer */
-		machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(read_sector_done_callback), 0, this);
+		timer_set(TIME_PER_SECTOR, TID_READ_SECTOR_DONE_CALLBACK);
 }
 
 
@@ -409,8 +410,6 @@ void ide_controller_device::read_next_sector()
  *  Sector writing
  *
  *************************************/
-
-static TIMER_CALLBACK( write_sector_done_callback );
 
 void ide_controller_device::continue_write()
 {
@@ -431,13 +430,13 @@ void ide_controller_device::continue_write()
 		else
 		{
 			/* set a timer to do the write */
-			machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, this);
+			timer_set(TIME_PER_SECTOR, TID_WRITE_SECTOR_DONE_CALLBACK);
 		}
 	}
 	else
 	{
 		/* set a timer to do the write */
-		machine().scheduler().timer_set(TIME_PER_SECTOR, FUNC(write_sector_done_callback), 0, this);
+		timer_set(TIME_PER_SECTOR, TID_WRITE_SECTOR_DONE_CALLBACK);
 	}
 }
 
@@ -566,13 +565,6 @@ void ide_controller_device::write_sector_done()
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
 	}
-}
-
-
-static TIMER_CALLBACK( write_sector_done_callback )
-{
-	ide_controller_device *ide = (ide_controller_device *)ptr;
-	ide->write_sector_done();
 }
 
 
@@ -1330,8 +1322,8 @@ void ide_controller_device::device_start()
 	slot[1] = owner()->subdevice<ide_slot_device>("drive_1");
 
 	/* create a timer for timing status */
-	last_status_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	reset_timer = machine().scheduler().timer_alloc(FUNC(reset_callback), this);
+	last_status_timer = timer_alloc(TID_NULL);
+	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 
 	/* register ide states */
 	save_item(NAME(adapter_control));
