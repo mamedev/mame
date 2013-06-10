@@ -391,7 +391,7 @@ WRITE8_MEMBER( dave_device::io_w )
 		case 0xa5:
 			{
 				int count = 0;
-				int channel_index = offset>>1;
+				int channel_index = (offset>>1)&3;
 
 				/* Fout = 125,000 / (n+1) Hz */
 
