@@ -36,10 +36,11 @@ DEVICE_ADDRESS_MAP_START( z80_io_map, 8, dave_device )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map, DAVE_AS_PROGRAM, 8, dave_device )
+
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, dave_device )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, DAVE_AS_IO, 8, dave_device )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dave_device )
 ADDRESS_MAP_END
 
 
@@ -53,11 +54,11 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock),
+	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock, "dave", __FILE__),
 	  device_memory_interface(mconfig, *this),
 	  device_sound_interface(mconfig, *this),
 	  m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
-	  m_io_space_config("I/O", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
+	  m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
 	  m_write_irq(*this),
 	  m_write_lh(*this),
 	  m_write_rh(*this)
@@ -164,8 +165,8 @@ const address_space_config *dave_device::memory_space_config(address_spacenum sp
 {
 	switch (spacenum)
 	{
-		case DAVE_AS_PROGRAM: return &m_program_space_config;
-		case DAVE_AS_IO: return &m_io_space_config;
+		case AS_PROGRAM: return &m_program_space_config;
+		case AS_IO: return &m_io_space_config;
 		default: return NULL;
 	}
 }
@@ -302,7 +303,7 @@ READ8_MEMBER( dave_device::program_r )
 	UINT8 segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
 
-	return m_addrspace[0]->read_byte(offset);
+	return this->space(AS_PROGRAM).read_byte(offset);
 }
 
 
@@ -315,7 +316,7 @@ WRITE8_MEMBER( dave_device::program_w )
 	UINT8 segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
 
-	m_addrspace[0]->write_byte(offset, data);
+	this->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 
@@ -365,7 +366,7 @@ READ8_MEMBER( dave_device::io_r )
 		break;
 
 	default:
-		data = m_addrspace[1]->read_byte(offset);
+		data = this->space(AS_IO).read_byte(offset);
 	}
 
 	return data;
@@ -403,13 +404,13 @@ WRITE8_MEMBER( dave_device::io_w )
 				{
 					case 0:
 					{
-						count = (data & 0x0ff) | ((m_regs[offset + 1] & 0x0f)<<8);
+						count = (data & 0x0ff) | ((m_regs[(offset & 0x1f) + 1] & 0x0f)<<8);
 					}
 					break;
 
 					case 1:
 					{
-						count = (m_regs[offset - 1] & 0x0ff) | ((data & 0x0f)<<8);
+						count = (m_regs[(offset & 0x1f) - 1] & 0x0ff) | ((data & 0x0f)<<8);
 
 					}
 					break;
@@ -420,7 +421,7 @@ WRITE8_MEMBER( dave_device::io_w )
 
 				m_period[channel_index] = ((STEP  * machine().sample_rate())/125000) * count;
 
-				m_regs[offset & 0x01f] = data;
+				m_regs[offset & 0x1f] = data;
 			}
 			break;
 
@@ -444,9 +445,9 @@ WRITE8_MEMBER( dave_device::io_w )
 				/* update mame version of volume from data written */
 				/* 0x03f->0x07e00. Max is 0x07fff */
 				/* I believe the volume is linear - to be checked! */
-				m_mame_volumes[offset - 8] = (data & 0x03f) << 9;
+				m_mame_volumes[(offset & 0x1f) - 8] = (data & 0x03f) << 9;
 
-				m_regs[offset & 0x01f] = data;
+				m_regs[offset & 0x1f] = data;
 			}
 			break;
 
@@ -570,14 +571,14 @@ WRITE8_MEMBER( dave_device::io_w )
 				m_level_and[7] = 0xffff;
 			}
 
-			m_regs[offset & 0x01f] = data;
+			m_regs[offset & 0x1f] = data;
 		}
 		break;
 
 	case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		m_segment[offset & 0x03] = data;
 
-		m_regs[offset & 0x01f] = data;
+		m_regs[offset & 0x1f] = data;
 		break;
 
 	case 0xb4:
@@ -585,15 +586,15 @@ WRITE8_MEMBER( dave_device::io_w )
 		m_irq_status &= ~(m_irq_enable & IRQ_LATCH);
 		update_interrupt();
 
-		m_regs[offset & 0x01f] = data;
+		m_regs[offset & 0x1f] = data;
 		break;
 
 	case 0xbf:
-		m_regs[offset & 0x01f] = data;
+		m_regs[offset & 0x1f] = data;
 		break;
 
 	default:
-		m_addrspace[1]->write_byte(offset, data);
+		this->space(AS_IO).write_byte(offset, data);
 	}
 }
 

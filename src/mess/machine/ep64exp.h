@@ -103,8 +103,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( wait_w ) { m_write_wait(state); }
 
-	address_space& program() { return m_dave->space(DAVE_AS_PROGRAM); }
-	address_space& io() { return m_dave->space(DAVE_AS_IO); }
+	address_space& program() { return m_dave->space(AS_PROGRAM); }
+	address_space& io() { return m_dave->space(AS_IO); }
 
 protected:
 	// device-level overrides

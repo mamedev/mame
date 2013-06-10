@@ -20,9 +20,6 @@
 //  MACROS / CONSTANTS
 ///*************************************************************************
 
-#define DAVE_AS_PROGRAM		AS_0
-#define DAVE_AS_IO			AS_1
-
 
 
 ///*************************************************************************
@@ -32,10 +29,10 @@
 #define MCFG_DAVE_ADD(_tag, _clock, _irq, _program_map, _io_map) \
     MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") \
 	MCFG_SOUND_ADD(_tag, DAVE, _clock) \
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0) \
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0) \
- 	MCFG_DEVICE_ADDRESS_MAP(DAVE_AS_PROGRAM, _program_map) \
- 	MCFG_DEVICE_ADDRESS_MAP(DAVE_AS_IO, _io_map) \
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25) \
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25) \
+ 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _program_map) \
+ 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _io_map) \
 	downcast<dave_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 
 

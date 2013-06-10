@@ -67,33 +67,6 @@
 /* "clocks" per line */
 #define NICK_TOTAL_CLOCKS_PER_LINE  64
 
-/* Enterprise has 256 colours, all may be on the screen at once!
- the NICK_GET_RED8, NICK_GET_GREEN8, NICK_GET_BLUE8 macros
- return a 8-bit colour value for the index specified.  */
-
-/* given a colour index in range 0..255 gives the Red component */
-#define NICK_GET_RED8(x) \
-	((      \
-		(BIT(x, 0) << 2) | \
-		(BIT(x, 3) << 1) | \
-		(BIT(x, 6) << 0) \
-	) << 5)
-
-/* given a colour index in range 0..255 gives the Red component */
-#define NICK_GET_GREEN8(x) \
-	((  \
-		(BIT(x, 1) << 2) | \
-		(BIT(x, 4) << 1) | \
-		(BIT(x, 7) << 0) \
-	) << 5)
-
-/* given a colour index in range 0..255 gives the Red component */
-#define NICK_GET_BLUE8(x) \
-	(( \
-		(BIT(x, 2) << 1) | \
-		(BIT(x, 5) << 0) \
-	) << 6)
-
 
 
 //**************************************************************************
@@ -114,6 +87,7 @@ DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
 	AM_RANGE(0x03, 0x03) AM_WRITE(lph_w)
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( nick_map, AS_0, 8, nick_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -129,10 +103,19 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NICK, "NICK", tag, owner, clock),
+	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
 	  device_memory_interface(mconfig, *this),
 	  m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
-	  m_write_virq(*this)
+	  m_write_virq(*this),
+	  horizontal_clock(0),
+	  m_scanline_count(0),
+	  m_FIXBIAS(0),
+	  m_BORDER(0),
+	  m_LPL(0),
+	  m_LPH(0),
+	  m_LD1(0),
+	  m_LD2(0),
+	  m_virq(CLEAR_LINE)
 {
 }
 
@@ -143,21 +126,19 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 
 void nick_device::device_start()
 {
-	screen_device *screen = machine().first_screen();
-
-	screen->register_screen_bitmap(m_bitmap);
+	m_screen = machine().device<screen_device>(m_screen_tag);
+	m_screen->register_screen_bitmap(m_bitmap);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 
 	// initialize palette
-	for (int i = 0; i < 256; i++)
-		palette_set_color_rgb(machine(), i, NICK_GET_RED8(i), NICK_GET_GREEN8(i), NICK_GET_BLUE8(i));
+	initialize_palette();
 
 	// resolve callbacks
 	m_write_virq.resolve_safe();
 
 	// allocate timers
 	m_timer_scanline = timer_alloc();
-	m_timer_scanline->adjust(screen->time_until_pos(0, 0), 0, screen->scan_period());
+	m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
 
 	// state saving
 	save_item(NAME(m_scanline_count));
@@ -193,17 +174,6 @@ void nick_device::device_reset()
 	m_write_virq(CLEAR_LINE);
 	m_virq = 0;
 
-	for (int i = 0; i < 256; i++)
-	{
-		int pen_index;
-		
-		pen_index = (BIT(i, 7) << 0) | (BIT(i, 3) << 1);
-		m_pen_idx_4col[i] = pen_index;
-		
-		pen_index =  (BIT(i, 7) << 0) | (BIT(i, 3) << 1) |  (BIT(i, 5) << 2) | (BIT(i, 1) << 3);
-		m_pen_idx_16col[i] = pen_index;
-	}
-
 	m_scanline_count = 0;
 }
 
@@ -214,12 +184,12 @@ void nick_device::device_reset()
 
 void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline = machine().first_screen()->vpos();
+	int scanline = m_screen->vpos();
 
 	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
 	{
 		/* set write address for line */
-		m_dest = &m_bitmap.pix16(scanline);
+		m_dest = &m_bitmap.pix32(scanline);
 		m_dest_pos = 0;
 		m_dest_max_pos = m_bitmap.width();
 
@@ -244,7 +214,7 @@ const address_space_config *nick_device::memory_space_config(address_spacenum sp
 //  update_screen - update screen
 //-------------------------------------------------
 
-UINT32 nick_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 nick_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
@@ -258,7 +228,7 @@ UINT32 nick_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 READ8_MEMBER( nick_device::vram_r )
 {
-	return m_addrspace[0]->read_byte(offset);
+	return this->space().read_byte(offset);
 }
 
 
@@ -268,7 +238,7 @@ READ8_MEMBER( nick_device::vram_r )
 
 WRITE8_MEMBER( nick_device::vram_w )
 {
-	m_addrspace[0]->write_byte(offset, data);
+	this->space().write_byte(offset, data);
 }
 
 
@@ -316,13 +286,76 @@ WRITE8_MEMBER( nick_device::lph_w )
 }
 
 
+//-------------------------------------------------
+//  initialize_palette - 
+//-------------------------------------------------
+
+void nick_device::initialize_palette()
+{
+	const int resistances_rg[] = { RES_R(470), RES_R(220), RES_R(100) };
+	const int resistances_b[] = { RES_R(220), RES_R(82) };
+
+	double color_weights_rg[3], color_weights_b[2];
+
+	compute_resistor_weights(0, 0xff, -1.0,
+								3, resistances_rg, color_weights_rg, 0, 0,
+								2, resistances_b,  color_weights_b,  0, 0,
+								0, 0, 0, 0, 0);
+
+	for (int i = 0; i < 256; i++)
+	{
+		/*
+		
+		    bit     description
+		
+		    PC0     100R -- RED
+		    PC1     100R -- GREEN
+		    PC2      82R -- BLUE
+		    PC3     220R -- RED
+		    PC4     220R -- GREEN
+		    PC5     220R -- BLUE
+		    PC6     470R -- RED
+		    PC7     470R -- GREEN
+		
+		*/
+
+		int ra = BIT(i, 0);
+		int rb = BIT(i, 3);
+		int rc = BIT(i, 6);
+
+		int ga = BIT(i, 1);
+		int gb = BIT(i, 4);
+		int gc = BIT(i, 7);
+
+		int ba = BIT(i, 2);
+		int bb = BIT(i, 5);
+
+		UINT8 r = combine_3_weights(color_weights_rg, rc, rb, ra);
+		UINT8 g = combine_3_weights(color_weights_rg, gc, gb, ga);
+		UINT8 b = combine_2_weights(color_weights_b, bb, ba);
+
+		m_palette[i] = MAKE_RGB(r, g, b);
+	}
+
+	for (int i = 0; i < 256; i++)
+	{
+		int pen_index;
+		
+		pen_index = (BIT(i, 7) << 0) | (BIT(i, 3) << 1);
+		m_pen_idx_4col[i] = pen_index;
+		
+		pen_index =  (BIT(i, 7) << 0) | (BIT(i, 3) << 1) |  (BIT(i, 5) << 2) | (BIT(i, 1) << 3);
+		m_pen_idx_16col[i] = pen_index;
+	}
+}
+
 // MESS specific
 /* 8-bit pixel write! */
 void nick_device::write_pixel(int ci)
 {
 	if (m_dest_pos < m_dest_max_pos)
 	{
-		m_dest[m_dest_pos++] = ci;
+		m_dest[m_dest_pos++] = m_palette[ci];
 	}
 }
 
@@ -745,10 +778,10 @@ void nick_device::do_pixel(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
 
-		buf2 = m_addrspace[0]->read_byte(m_LD1);
+		buf2 = space().read_byte(m_LD1);
 		m_LD1++;
 
 		write_pixels(buf1, buf1);
@@ -763,7 +796,7 @@ void nick_device::do_lpixel(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
 
 		write_pixels_lpixel(buf1, buf1);
@@ -776,10 +809,10 @@ void nick_device::do_attr(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
 
-		buf2 = m_addrspace[0]->read_byte(m_LD2);
+		buf2 = space().read_byte(m_LD2);
 		m_LD2++;
 
 		{
@@ -797,9 +830,9 @@ void nick_device::do_ch256(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
-		buf2 = m_addrspace[0]->read_byte(ADDR_CH256(m_LD2, buf1));
+		buf2 = space().read_byte(ADDR_CH256(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -811,9 +844,9 @@ void nick_device::do_ch128(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
-		buf2 = m_addrspace[0]->read_byte(ADDR_CH128(m_LD2, buf1));
+		buf2 = space().read_byte(ADDR_CH128(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -825,9 +858,9 @@ void nick_device::do_ch64(int clocks_visible)
 
 	for (int i = 0; i < clocks_visible; i++)
 	{
-		buf1 = m_addrspace[0]->read_byte(m_LD1);
+		buf1 = space().read_byte(m_LD1);
 		m_LD1++;
-		buf2 = m_addrspace[0]->read_byte(ADDR_CH64(m_LD2, buf1));
+		buf2 = space().read_byte(ADDR_CH64(m_LD2, buf1));
 
 		write_pixels_lpixel(buf2, buf1);
 	}
@@ -950,22 +983,22 @@ void nick_device::reload_lpt()
 	UINT32 LPT_Addr = ((m_LPL & 0x0ff) << 4) | ((m_LPH & 0x0f) << (8+4));
 
 	/* update internal LPT state */
-	m_LPT.SC = m_addrspace[0]->read_byte(LPT_Addr);
-	m_LPT.MB = m_addrspace[0]->read_byte(LPT_Addr + 1);
-	m_LPT.LM = m_addrspace[0]->read_byte(LPT_Addr + 2);
-	m_LPT.RM = m_addrspace[0]->read_byte(LPT_Addr + 3);
-	m_LPT.LD1L = m_addrspace[0]->read_byte(LPT_Addr + 4);
-	m_LPT.LD1H = m_addrspace[0]->read_byte(LPT_Addr + 5);
-	m_LPT.LD2L = m_addrspace[0]->read_byte(LPT_Addr + 6);
-	m_LPT.LD2H = m_addrspace[0]->read_byte(LPT_Addr + 7);
-	m_LPT.COL[0] = m_addrspace[0]->read_byte(LPT_Addr + 8);
-	m_LPT.COL[1] = m_addrspace[0]->read_byte(LPT_Addr + 9);
-	m_LPT.COL[2] = m_addrspace[0]->read_byte(LPT_Addr + 10);
-	m_LPT.COL[3] = m_addrspace[0]->read_byte(LPT_Addr + 11);
-	m_LPT.COL[4] = m_addrspace[0]->read_byte(LPT_Addr + 12);
-	m_LPT.COL[5] = m_addrspace[0]->read_byte(LPT_Addr + 13);
-	m_LPT.COL[6] = m_addrspace[0]->read_byte(LPT_Addr + 14);
-	m_LPT.COL[7] = m_addrspace[0]->read_byte(LPT_Addr + 15);
+	m_LPT.SC = space().read_byte(LPT_Addr);
+	m_LPT.MB = space().read_byte(LPT_Addr + 1);
+	m_LPT.LM = space().read_byte(LPT_Addr + 2);
+	m_LPT.RM = space().read_byte(LPT_Addr + 3);
+	m_LPT.LD1L = space().read_byte(LPT_Addr + 4);
+	m_LPT.LD1H = space().read_byte(LPT_Addr + 5);
+	m_LPT.LD2L = space().read_byte(LPT_Addr + 6);
+	m_LPT.LD2H = space().read_byte(LPT_Addr + 7);
+	m_LPT.COL[0] = space().read_byte(LPT_Addr + 8);
+	m_LPT.COL[1] = space().read_byte(LPT_Addr + 9);
+	m_LPT.COL[2] = space().read_byte(LPT_Addr + 10);
+	m_LPT.COL[3] = space().read_byte(LPT_Addr + 11);
+	m_LPT.COL[4] = space().read_byte(LPT_Addr + 12);
+	m_LPT.COL[5] = space().read_byte(LPT_Addr + 13);
+	m_LPT.COL[6] = space().read_byte(LPT_Addr + 14);
+	m_LPT.COL[7] = space().read_byte(LPT_Addr + 15);
 }
 
 /* call here to render a line of graphics */
@@ -977,8 +1010,7 @@ void nick_device::do_line()
 
 	if (m_virq && !(m_LPT.MB & NICK_MB_VIRQ))
 	{
-		screen_device *screen = machine().first_screen();
-		m_timer_scanline->adjust(screen->time_until_pos(0, 0), 0, screen->scan_period());
+		m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
 	}
 
 	m_virq = (m_LPT.MB & NICK_MB_VIRQ) ? 1 : 0;

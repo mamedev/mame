@@ -6574,7 +6574,6 @@ src/mess/includes/dragon.h svneol=native#text/plain
 src/mess/includes/einstein.h svneol=native#text/plain
 src/mess/includes/electron.h svneol=native#text/plain
 src/mess/includes/elf.h svneol=native#text/plain
-src/mess/includes/enterp.h svneol=native#text/plain
 src/mess/includes/ep64.h svneol=native#text/plain
 src/mess/includes/eti660.h svneol=native#text/plain
 src/mess/includes/europc.h svneol=native#text/plain

@@ -13,6 +13,8 @@
 #define __NICK__
 
 #include "emu.h"
+#include "machine/rescap.h"
+#include "video/resnet.h"
 
 
 
@@ -28,8 +30,8 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, nick_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, NICK, _clock) \
-	downcast<nick_device *>(device)->set_virq_callback(DEVCB2_##_virq); \
-	MCFG_PALETTE_LENGTH(256)
+	downcast<nick_device *>(device)->set_screen_tag(_screen_tag); \
+	downcast<nick_device *>(device)->set_virq_callback(DEVCB2_##_virq);
 
 
 /* there are 64us per line, although in reality
@@ -70,12 +72,13 @@ public:
 	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	void set_screen_tag(const char *screen_tag) { m_screen_tag = screen_tag; }
 	template<class _virq> void set_virq_callback(_virq virq) { m_write_virq.set_callback(virq); }
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -98,6 +101,8 @@ protected:
 
 private:
 	devcb2_write_line m_write_virq;
+
+	void initialize_palette();
 
 	void write_pixel(int ci);
 	void calc_visible_clocks(int width);
@@ -138,11 +143,11 @@ private:
 	
 	LPT_ENTRY   m_LPT;
 	
-	UINT16 *m_dest;
+	UINT32 *m_dest;
 	int m_dest_pos;
 	int m_dest_max_pos;
 	
-	UINT8 m_reg[16];
+	UINT8 m_reg[4];
 	
 	/* first clock visible on left hand side */
 	int m_first_visible_clock;
@@ -156,7 +161,10 @@ private:
 
 	int m_virq;
 
-	bitmap_ind16 m_bitmap;
+	const char *m_screen_tag;
+	screen_device *m_screen;
+	bitmap_rgb32 m_bitmap;
+	rgb_t m_palette[256];
 
 	emu_timer *m_timer_scanline;
 };

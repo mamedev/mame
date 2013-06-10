@@ -1928,7 +1928,7 @@
 		</part>
 	</software>
 
-	<software name="dbase242hu">
+	<software name="dbase242hu" cloneof="dbase23">
 		<description>dBase II (v2.42) (Hun)</description>
 		<year>1984</year>
 		<publisher>Ashton-Tate/Babsoft</publisher>
