@@ -1020,6 +1020,14 @@ endif
 # 
 #-------------------------------------------------
 
+ifneq ($(filter SERFLASH,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/serflash.o
+endif
+
+#-------------------------------------------------
+# 
+#-------------------------------------------------
+
 ifneq ($(filter SMC91C9X,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/smc91c9x.o
 endif
