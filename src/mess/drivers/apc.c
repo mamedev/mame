@@ -981,12 +981,6 @@ static I8237_INTERFACE( dmac_intf )
 	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack3_w) }
 };
 
-static UPD1990A_INTERFACE( apc_upd1990a_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_IMD_FORMAT,
@@ -1023,7 +1017,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, apc_upd1990a_intf)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)

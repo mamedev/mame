@@ -565,14 +565,6 @@ static I8255A_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(pc8401a_state, ppi_pc_w)
 };
 
-/* uPD1990A Interface */
-
-static UPD1990A_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* I8251 Interface */
 
 static const i8251_interface uart_intf =
@@ -613,7 +605,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
@@ -647,7 +639,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)

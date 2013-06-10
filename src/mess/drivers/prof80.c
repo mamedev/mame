@@ -489,17 +489,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  UPD1990A_INTERFACE( rtc_intf )
-//-------------------------------------------------
-
-static UPD1990A_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
@@ -616,7 +605,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_CPU_IO_MAP(prof80_io)
 
 	// devices
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)

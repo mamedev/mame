@@ -2141,7 +2141,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot floppy at start-up" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_rtc_device, data_out_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2249,14 +2249,6 @@ static GFXDECODE_START( pc8801 )
 	GFXDECODE_ENTRY( "cgrom", 0, char_layout,  0, 8 )
 	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
-
-/* uPD1990A Interface */
-
-static UPD1990A_INTERFACE( pc8801_upd1990a_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* Floppy Configuration */
 
@@ -2677,7 +2669,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_CASSETTE_ADD("cassette", pc8801_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")

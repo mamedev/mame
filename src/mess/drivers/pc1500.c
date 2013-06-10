@@ -278,13 +278,6 @@ static const lh5810_interface lh5810_pc1500_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", LH5801_LINE_MI)     //IRQ callback
 };
 
-
-static UPD1990A_INTERFACE( pc1500_upd1990a_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
 	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
@@ -302,7 +295,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 
 	MCFG_LH5810_ADD("lh5810", lh5810_pc1500_config)
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc1500_upd1990a_intf)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 MACHINE_CONFIG_END
 
 

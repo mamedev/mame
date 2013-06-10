@@ -2663,7 +2663,7 @@ CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
 
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("DSW1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_rtc_device, data_out_r)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
 	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -3283,12 +3283,6 @@ void pc9801_state::pc9801rs_fdc_drq(bool state)
 		printf("DRQ %02x %d\n",m_fdc_ctrl,state);
 }
 
-static UPD1990A_INTERFACE( pc9801_upd1990a_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const i8251_interface pc9801_uart_interface =
 {
 	DEVCB_NULL,
@@ -3564,7 +3558,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
@@ -3631,7 +3625,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
@@ -3697,7 +3691,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)

@@ -27,22 +27,18 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_UPD1990A_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), UPD1990A, _clock)   \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_UPD1990A_ADD(_tag, _clock, _data, _tp) \
+	MCFG_DEVICE_ADD((_tag), UPD1990A, _clock) \
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB2_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB2_##_tp);
 
-#define UPD1990A_INTERFACE(name) \
-	const upd1990a_interface (name) =
+#define MCFG_UPD4990A_ADD(_tag, _clock, _data, _tp) \
+	MCFG_DEVICE_ADD((_tag), UPD4990A, _clock) \
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB2_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB2_##_tp);
 
 
 
@@ -50,24 +46,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> upd1990a_interface
-
-struct upd1990a_interface
-{
-	devcb_write_line        m_out_data_cb;
-	devcb_write_line        m_out_tp_cb;
-};
-
-
 // ======================> upd1990a_device
 
-class upd1990a_rtc_device : public device_t,
-							public device_rtc_interface,
-							public upd1990a_interface
+class upd1990a_device : public device_t,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd1990a_rtc_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
+	template<class _tp> void set_tp_callback(_tp tp) { m_write_tp.set_callback(tp); }
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
@@ -82,27 +72,42 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	enum {
-			TYPE_UPD1990A = 0,
-			TYPE_UPD4990A
+
+	enum
+	{
+		TYPE_1990A = 0,
+		TYPE_4990A
 	};
-	int m_device_type;
 
 private:
-	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_TP = 1;
-	static const device_timer_id TIMER_DATA_OUT = 2;
-	static const device_timer_id TIMER_TEST_MODE = 3;
+	enum
+	{
+		TIMER_CLOCK,
+		TIMER_TP,
+		TIMER_DATA_OUT,
+		TIMER_TEST_MODE
+	};
 
-	devcb_resolved_write_line   m_out_data_func;
-	devcb_resolved_write_line   m_out_tp_func;
+	enum
+	{
+		MODE_REGISTER_HOLD = 0,
+		MODE_SHIFT,
+		MODE_TIME_SET,
+		MODE_TIME_READ,
+		MODE_TP_64HZ_SET,
+		MODE_TP_256HZ_SET,
+		MODE_TP_2048HZ_SET,
+		MODE_TEST
+	};
+
+	devcb2_write_line   m_write_data;
+	devcb2_write_line   m_write_tp;
 
 	UINT8 m_time_counter[5];    // time counter
 	UINT8 m_shift_reg[5];       // shift register
@@ -117,6 +122,8 @@ private:
 	int m_tp;                   // time pulse
 	int m_c_unlatched;          // command waiting for STB
 
+	int m_variant;
+
 	// timers
 	emu_timer *m_timer_clock;
 	emu_timer *m_timer_tp;
@@ -124,21 +131,20 @@ private:
 	emu_timer *m_timer_test_mode;
 };
 
-class upd1990a_device : public upd1990a_rtc_device
-{
-public:
-	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
 
+// ======================> upd4990a_device
 
-class upd4990a_device : public upd1990a_rtc_device
+class upd4990a_device : public upd1990a_device
 {
 public:
 	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-// device type definition
+
+// device type definitions
 extern const device_type UPD1990A;
 extern const device_type UPD4990A;
+
+
 
 #endif

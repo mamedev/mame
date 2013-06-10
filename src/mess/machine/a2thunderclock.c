@@ -38,14 +38,8 @@ const device_type A2BUS_THUNDERCLOCK = &device_creator<a2bus_thunderclock_device
 #define THUNDERCLOCK_ROM_REGION  "thunclk_rom"
 #define THUNDERCLOCK_UPD1990_TAG "thunclk_upd"
 
-static UPD1990A_INTERFACE( thunderclock_upd1990a_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_thunderclock_device, upd_dataout_w),
-	DEVCB_NULL  // TP out not used? for Thunderclock
-};
-
 MACHINE_CONFIG_FRAGMENT( thunderclock )
-	MCFG_UPD1990A_ADD(THUNDERCLOCK_UPD1990_TAG, 1021800, thunderclock_upd1990a_intf)
+	MCFG_UPD1990A_ADD(THUNDERCLOCK_UPD1990_TAG, 1021800, DEVWRITELINE(DEVICE_SELF_OWNER, a2bus_thunderclock_device, upd_dataout_w), NULL)
 MACHINE_CONFIG_END
 
 ROM_START( thunderclock )
