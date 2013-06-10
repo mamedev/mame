@@ -39,6 +39,7 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
+	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 

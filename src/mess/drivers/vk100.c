@@ -1031,15 +1031,6 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_NULL
 };
 
-static COM8116_INTERFACE( dbrg_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, rxc_w),
-	DEVCB_DEVICE_LINE_MEMBER("i8251", i8251_device, txc_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
 static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
@@ -1056,7 +1047,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, dbrg_intf)
+	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, rxc_w), DEVWRITELINE("i8251", i8251_device, txc_w))
 
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 

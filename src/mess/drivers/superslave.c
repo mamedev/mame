@@ -265,15 +265,6 @@ WRITE_LINE_MEMBER( superslave_state::ft_w )
 	m_dart1->rxtxcb_w(state);
 }
 
-static COM8116_INTERFACE( dbrg_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(superslave_state, fr_w),
-	DEVCB_DRIVER_LINE_MEMBER(superslave_state, ft_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
 
 //-------------------------------------------------
 //  Z80DART_INTERFACE( dart0_intf )
@@ -466,7 +457,7 @@ static MACHINE_CONFIG_START( superslave, superslave_state )
 	MCFG_Z80DART_ADD(Z80DART_0_TAG, XTAL_8MHz/2, dart0_intf)
 	MCFG_Z80DART_ADD(Z80DART_1_TAG, XTAL_8MHz/2, dart1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
-	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, dbrg_intf)
+	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, NULL, WRITELINE(superslave_state, fr_w), WRITELINE(superslave_state, ft_w))
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)

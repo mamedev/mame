@@ -502,20 +502,6 @@ WRITE_LINE_MEMBER( xerox820_state::fr_w )
 	m_sio->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( xerox820_state::ft_w )
-{
-	m_sio->rxtxcb_w(state);
-}
-
-static COM8116_INTERFACE( com8116_intf )
-{
-	DEVCB_NULL,     /* fX/4 output */
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, fr_w),
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, ft_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
 WRITE8_MEMBER( xerox820_state::kbd_w )
 {
 	m_keydata = ~data;
@@ -738,7 +724,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
-	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, NULL, WRITELINE(xerox820_state, fr_w), DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
@@ -786,7 +772,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/8)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
-	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, NULL, WRITELINE(xerox820_state, fr_w), DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

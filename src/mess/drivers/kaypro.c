@@ -170,23 +170,6 @@ static MC6845_INTERFACE( kaypro2x_crtc )
 //  downcast<z80sio_device *>(device)->tx_clock_in();
 //}
 
-static COM8116_INTERFACE( kayproii_brg_intf )
-{
-	DEVCB_NULL,     /* fX/4 output */
-	DEVCB_NULL, //  DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w), z80sio implementation has no clock pin
-	DEVCB_NULL, // DEVCB_DEVICE_LINE("z80sio", rx_tx_b_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
-static COM8116_INTERFACE( kaypro2x_brg_intf )
-{
-	DEVCB_NULL,     /* fX/4 output */
-	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio", rx_tx_a_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE("z80sio_2x", rx_tx_a_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
 
 
 /***********************************************************
@@ -270,7 +253,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kayproii, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kayproii_brg_intf)  // WD1943, SMC8116
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
 	MCFG_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
@@ -316,7 +299,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro2x, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kaypro2x_brg_intf)  // WD1943, SMC8116
+	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, NULL, NULL)  // WD1943, SMC8116
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 

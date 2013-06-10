@@ -248,20 +248,6 @@ static I8255A_INTERFACE( ppi1_intf )
 
 
 //-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
-static COM8116_INTERFACE( dbrg_intf )
-{
-	DEVCB_NULL, // fX/4
-	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, rxc_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8251_TAG, i8251_device, txc_w),
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
-
-//-------------------------------------------------
 //  rs232_port_interface rs232_intf
 //-------------------------------------------------
 
@@ -289,7 +275,7 @@ static MACHINE_CONFIG_FRAGMENT( softbox )
 	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_I8255A_ADD(I8255_0_TAG, ppi0_intf)
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
-	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, dbrg_intf)
+	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE(I8251_TAG, i8251_device, rxc_w), DEVWRITELINE(I8251_TAG, i8251_device, txc_w))
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 MACHINE_CONFIG_END

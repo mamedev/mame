@@ -367,15 +367,6 @@ WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
 	m_uart_b->receive_clock();
 }
 
-static COM8116_INTERFACE( com5016_intf )
-{
-	DEVCB_NULL,                 /* fX/4 output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_fr_w),   /* fR output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_ft_w),   /* fT output */
-	COM8116_DIVISORS_16X_5_0688MHz, // receiver
-	COM8116_DIVISORS_16X_5_0688MHz // transmitter
-};
-
 /* Printer 8251A Interface */
 
 static const i8251_interface printer_8251_intf =
@@ -604,7 +595,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8251_ADD(I8251_B_TAG, /*XTAL_8MHz/2,*/ terminal_8251_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
-	MCFG_COM8116_ADD(COM5016_TAG, XTAL_5_0688MHz, com5016_intf)
+	MCFG_COM8116_ADD(COM5016_TAG, XTAL_5_0688MHz, NULL, WRITELINE(xor100_state, com5016_fr_w), WRITELINE(xor100_state, com5016_ft_w))
 	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats)
