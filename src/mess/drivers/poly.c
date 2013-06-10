@@ -14,13 +14,16 @@
     The keyboard controller is one of those custom XR devices.
     Will use the terminal keyboard instead.
 
+    With bios 1, after entering your userid and password, you get a black
+    screen. This is normal, because it joins to a network which isn't there.
+
     ToDo:
     - Almost Everything!
     - Connect up the device ports & lines
     - Find out about graphics mode and how it is selected
     - There is a beeper or speaker connected to the 6840 - how?
     - Fix Keyboard so that the Enter key tells BASIC to do something
-    - Fix If ^G is pressed, emulation freezes
+    - Fix If ^G is pressed, the system pauses for about 30 seconds.
     - Find out how to make 2nd teletext screen to display
 
 ****************************************************************************/
@@ -30,6 +33,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/6850acia.h"
+#include "machine/mc6854.h"
 #include "video/saa5050.h"
 #include "machine/keyboard.h"
 
@@ -65,10 +70,12 @@ static ADDRESS_MAP_START(poly_mem, AS_PROGRAM, 8, poly_state)
 	AM_RANGE(0xa000,0xcfff) AM_ROM
 	AM_RANGE(0xd000,0xdfff) AM_RAM
 	AM_RANGE(0xe000,0xe003) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //video control PIA 6821
-	// AM_RANGE(0xe004,0xe006) optional RS232C interface
+	AM_RANGE(0xe004,0xe004) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
+	AM_RANGE(0xe005,0xe005) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	//AM_RANGE(0xe006, 0xe006) // baud rate controller (0=9600,2=4800,4=2400,6=1200,8=600,A=300)
 	AM_RANGE(0xe00c,0xe00f) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //keyboard PIA 6821
 	AM_RANGE(0xe020,0xe027) AM_DEVREADWRITE("ptm", ptm6840_device, read, write) //timer 6840
-	// AM_RANGE(0xe030,0xe037) Data Link Controller 6854
+	AM_RANGE(0xe030,0xe037) AM_DEVREADWRITE_LEGACY("adlc", mc6854_r, mc6854_w) //Data Link Controller 6854
 	AM_RANGE(0xe040,0xe040) AM_NOP //Set protect flip-flop after 1 E-cycle
 	AM_RANGE(0xe050,0xe05f) AM_RAM //Dynamic Address Translater (arranges memory banks)
 	// AM_RANGE(0xe060,0xe060) Select Map 1
@@ -137,11 +144,33 @@ static const pia6821_interface poly_pia1_intf=
 
 static const ptm6840_interface poly_ptm_intf =
 {
-	XTAL_10MHz/10, // not correct
+	XTAL_12MHz / 3,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL },
+	DEVCB_NULL
+};
+
+static ACIA6850_INTERFACE( acia_intf )
+{
+	1,
+	1,
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const mc6854_interface adlc_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_r),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
+	NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -160,9 +189,13 @@ static SAA5050_INTERFACE( poly_saa5050_intf )
 WRITE8_MEMBER( poly_state::kbd_put )
 {
 	m_term_data = data;
+
+	//m_pia1->cb1_w(1);
+	//m_pia1->cb1_w(0);
 	//m_term_key = 1;
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	mem.write_byte(0xebec, data); // this has to be 0xecf1 for bios 1
+	mem.write_byte(0xebec, data); // bios 0
+	mem.write_byte(0xebf1, data); // bios 1
 	mem.write_byte(0xebd0, 1); // any non-zero here
 }
 
@@ -173,7 +206,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 static MACHINE_CONFIG_START( poly, poly_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12MHz / 3) // 12.0576MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 
@@ -190,6 +223,8 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_PIA6821_ADD( "pia0", poly_pia0_intf )
 	MCFG_PIA6821_ADD( "pia1", poly_pia1_intf )
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
+	MCFG_ACIA6850_ADD("acia", acia_intf)
+	MCFG_MC6854_ADD("adlc", adlc_intf)
 
 	// temporary hack
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
