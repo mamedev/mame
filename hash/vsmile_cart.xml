@@ -3,7 +3,7 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
-<softwarelist name="vsmile" description="VTech V.Smile cartridges &amp; V.Disc images">
+<softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
 <!--
 
@@ -197,15 +197,12 @@ Language:
 
 -->
 
-<!-- carts -->
-
-
 	<software name="aladdin">
 		<description>Aladdin - Aladdins Welt der Wunder (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092204.bin" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
 			</dataarea>
 		</part>
@@ -216,7 +213,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092124.bin" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
 			</dataarea>
 		</part>
@@ -227,7 +224,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092304.bin" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
 			</dataarea>
 		</part>
@@ -238,7 +235,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
 			</dataarea>
 		</part>
@@ -249,7 +246,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092244-1.bin" size="8388608" crc="83b7e95c" sha1="8c29c4cc585b1c80c7294193a0dff5da76538752" offset="0" />
 			</dataarea>
 		</part>
@@ -260,7 +257,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092824.bin" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
 			</dataarea>
 		</part>
@@ -271,7 +268,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092044.bin" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
 			</dataarea>
 		</part>
@@ -293,7 +290,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="090164.bin" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
 			</dataarea>
 		</part>
@@ -304,7 +301,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="090004.bin" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
 			</dataarea>
 		</part>
@@ -315,7 +312,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092884.bin" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
 			</dataarea>
 		</part>
@@ -326,7 +323,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092604.bin" size="8388608" crc="dc1ceca3" sha1="88349b556de43d78198aeb6289fa836f597f8a77" offset="0" />
 			</dataarea>
 		</part>
@@ -337,7 +334,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092444-1.bin" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
 			</dataarea>
 		</part>
@@ -359,7 +356,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092644.bin" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
 			</dataarea>
 		</part>
@@ -381,7 +378,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092224.bin" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
 			</dataarea>
 		</part>
@@ -392,7 +389,7 @@ Language:
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
-			<dataarea name="flop" size="8388608">
+			<dataarea name="rom" size="8388608">
 				<rom name="092844.bin" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
 			</dataarea>
 		</part>
@@ -402,8 +399,8 @@ Language:
 		<description>Winnie Puhh - Die Honigjagd (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="8388608">
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
 				<rom name="092064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
 			</dataarea>
 		</part>
@@ -413,106 +410,11 @@ Language:
 		<description>Zayzoo's Lernall (Germany)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="8388608">
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
 				<rom name="092364.bin" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
-
-
-
-
-
-<!-- V.Discs -->
-
-	<!-- disk mounted as 93020 -->
-	<software name="incredib">
-		<description>The Incredibles - Mission Incredible (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093020" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093020"  sha1="84ba80f67d136cd742989dceebda1c8881d0f393"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- disk mounted as 93080_001 -->
-	<software name="scoobyaa">
-		<description>Scooby-Doo! Ancient Adventure (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093080" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093080"  sha1="3ec7e1ac4435666c3cc1b1844eac5f271b5357e8"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- disk mounted as 93060_001 -->
-	<software name="spidey93">
-		<description>The Amazing Spider-Man - Countdown to Doom (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093060" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093060"  sha1="89f5072904114211890604dd6693ee70d787996b"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- disk mounted as 93120_003 -->
-	<software name="wacky931">
-		<description>Wacky Race on Jumpin' Bean Island (USA)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093120" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093120"  sha1="dbc128608e64d40aaf3456aac2c0dd07e0f73ef4"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="carsg">
-		<description>Cars - Auf der Überholspur (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093104" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093104" sha1="3b627613a40e22028902e1569099bc67a5ed97be" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="shrekg">
-		<description>Shrek - Der Dritte (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093144" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093144" sha1="4d5b671f26a8ed4ab58444848428210c44b81c45" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="msportg">
-		<description>Multisports (Ger)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-093204" />
-		<part name="cdrom" interface="vsmile_vdisk">
-			<diskarea name="cdrom">
-				<disk name="093204" sha1="ddabd616d8d00bd02c6313a524a2dcef299362b3" />
-			</diskarea>
-		</part>
-	</software>
-
 
 </softwarelist>
