@@ -746,7 +746,7 @@ include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 -include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
 include $(SRC)/tools/tools.mak
-#include $(SRC)/regtests/regtests.mak
+include $(SRC)/regtests/regtests.mak
 
 # combine the various definitions to one
 CCOMFLAGS += $(INCPATH)
