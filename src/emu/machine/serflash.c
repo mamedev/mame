@@ -37,8 +37,6 @@ void serflash_device::device_start()
 	m_length = machine().root_device().memregion( tag() )->bytes();
 	m_region = machine().root_device().memregion( tag() )->base();
 
-	printf("bytes %d\n", m_length);
-
 	m_flashwritemap = auto_alloc_array(machine(), UINT8, m_length / FLASH_PAGE_SIZE);
 	memset(m_flashwritemap, 0, m_length / FLASH_PAGE_SIZE);
 
