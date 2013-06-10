@@ -202,7 +202,6 @@ private:
 	emu_timer *pi_dma_timer;
 	UINT32 pi_dram_addr;
 	UINT32 pi_cart_addr;
-	UINT32 pi_first_dma;
 	UINT32 pi_rd_len;
 	UINT32 pi_wr_len;
 	UINT32 pi_status;
@@ -229,6 +228,7 @@ private:
 	UINT32 si_pif_addr_wr64b;
 	UINT32 si_status;
 	UINT32 cic_status;
+	int cic_type;
 
 	n64_savable_data_t savable_data;
 

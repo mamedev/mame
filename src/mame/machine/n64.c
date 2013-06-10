@@ -34,12 +34,53 @@ TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
 void n64_periphs::reset_tick()
 {
 	reset_timer->adjust(attotime::never);
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-	machine().device("maincpu")->reset();
-	machine().device("rsp")->reset();
-	machine().device("rcp")->reset();
-	machine().device("rsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	maincpu->reset();
+	maincpu->execute().set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+	rspcpu->reset();
+	rspcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	rspcpu->state().set_state_int(RSP_SR, rspcpu->state().state_int(RSP_SR) | RSP_STATUS_HALT);
 	reset_held = false;
+	cic_status = 0;
+	memset(pif_ram, 0, sizeof(pif_ram));
+	switch(cic_type)
+	{
+		case 1:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x06;
+			pif_ram[0x26] = 0x3f;
+			pif_ram[0x27] = 0x3f;
+			break;
+		case 3:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x78;
+			pif_ram[0x27] = 0x3f;
+			break;
+		case 5:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x91;
+			pif_ram[0x27] = 0x3f;
+			break;
+		case 6:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x85;
+			pif_ram[0x27] = 0x3f;
+			break;
+		case 0xd:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x0a;
+			pif_ram[0x26] = 0xdd;
+			pif_ram[0x27] = 0x3f;
+			break;
+		default:
+			pif_ram[0x24] = 0x00;
+			pif_ram[0x25] = 0x02;
+			pif_ram[0x26] = 0x3f;
+			pif_ram[0x27] = 0x3f;
+			break;
+	}
 }
 
 void n64_periphs::poll_reset_button(bool button)
@@ -79,7 +120,7 @@ void n64_periphs::device_reset()
 	mi_version = 0x01010101;
 	mi_interrupt = 0;
 	mi_intr_mask = 0;
-	mi_mode = 0;
+	mi_mode = 0x80; // Skip RDRAM initialization
 
 	sp_mem_addr = 0;
 	sp_dram_addr = 0;
@@ -117,7 +158,6 @@ void n64_periphs::device_reset()
 	ai_status = 0;
 
 	pi_dma_timer->adjust(attotime::never);
-	pi_first_dma = 1;
 	pi_rd_len = 0;
 	pi_wr_len = 0;
 	pi_status = 0;
@@ -146,7 +186,10 @@ void n64_periphs::device_reset()
 
 	memset(ri_regs, 0, sizeof(ri_regs));
 
-	//ri_regs[3] = 1;
+	ri_regs[0] = 0xe; // Skip RDRAM initialization
+	ri_regs[1] = 0x40; //
+	ri_regs[3] = 0x14; //
+	ri_regs[4] = 0x63634; //
 	memset(pif_ram, 0, sizeof(pif_ram));
 	memset(pif_cmd, 0, sizeof(pif_cmd));
 	si_dram_addr = 0;
@@ -171,55 +214,63 @@ void n64_periphs::device_reset()
 
 	// CIC-NUS-6102 (default)
 	pif_ram[0x24] = 0x00;
-	pif_ram[0x25] = 0x02;
+	pif_ram[0x25] = 0x00;
 	pif_ram[0x26] = 0x3f;
 	pif_ram[0x27] = 0x3f;
 	dd_present = false;
+	cic_type=2;
+	mem_map->write_dword(0x00000318, 0x800000);
 
 	if (boot_checksum == U64(0x00000000001ff230))
 	{
 		//printf("64DD detected\n");
 		pif_ram[0x24] = 0x00;
-		pif_ram[0x25] = 0x0a;
+		pif_ram[0x25] = 0x08;
 		pif_ram[0x26] = 0xdd; // How utterly predictable
 		pif_ram[0x27] = 0x3f;
 		dd_present = true;
+		cic_type=0xd;
 	}
 	else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
 	{
 		// CIC-NUS-6101
 		//printf("CIC-NUS-6101 detected\n");
 		pif_ram[0x24] = 0x00;
-		pif_ram[0x25] = 0x06;
+		pif_ram[0x25] = 0x04;
 		pif_ram[0x26] = 0x3f;
 		pif_ram[0x27] = 0x3f;
+		cic_type=1;
 	}
 	else if (boot_checksum == U64(0x000000d6499e376b))
 	{
 		// CIC-NUS-6103
 		//printf("CIC-NUS-6103 detected\n");
 		pif_ram[0x24] = 0x00;
-		pif_ram[0x25] = 0x02;
+		pif_ram[0x25] = 0x00;
 		pif_ram[0x26] = 0x78;
 		pif_ram[0x27] = 0x3f;
+		cic_type=3;
 	}
 	else if (boot_checksum == U64(0x0000011a4a1604b6))
 	{
 		// CIC-NUS-6105
 		//printf("CIC-NUS-6105 detected\n");
 		pif_ram[0x24] = 0x00;
-		pif_ram[0x25] = 0x02;
+		pif_ram[0x25] = 0x00;
 		pif_ram[0x26] = 0x91;
 		pif_ram[0x27] = 0x3f;
+		cic_type=5;
+		mem_map->write_dword(0x000003f0, 0x800000);
 	}
 	else if (boot_checksum == U64(0x000000d6d5de4ba0))
 	{
 		// CIC-NUS-6106
 		//printf("CIC-NUS-6106 detected\n");
 		pif_ram[0x24] = 0x00;
-		pif_ram[0x25] = 0x02;
+		pif_ram[0x25] = 0x00;
 		pif_ram[0x26] = 0x85;
 		pif_ram[0x27] = 0x3f;
+		cic_type=6;
 	}
 	else
 	{
@@ -1579,14 +1630,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			//printf("want write dma in %d\n", (pi_wr_len + 1));
 			pi_dma_timer->adjust(dma_period);
-
-			if (pi_first_dma)
-			{
-				// TODO: CIC-6105 has different address...
-				mem_map->write_dword(0x00000318, 0x800000);
-				mem_map->write_dword(0x000003f0, 0x800000);
-				pi_first_dma = 0;
-			}
 
 			//pi_dma_tick();
 			break;
