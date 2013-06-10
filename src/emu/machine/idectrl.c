@@ -90,29 +90,21 @@
 #define IDE_ERROR_BAD_LOCATION              0x10
 #define IDE_ERROR_BAD_SECTOR                0x80
 
-#define IDE_BUSMASTER_STATUS_ACTIVE         0x01
-#define IDE_BUSMASTER_STATUS_ERROR          0x02
-#define IDE_BUSMASTER_STATUS_IRQ            0x04
 
-
-void ide_controller_device::signal_interrupt()
+void ide_controller_device::set_irq(int state)
 {
-	LOG(("IDE interrupt assert\n"));
-
+	if (state == ASSERT_LINE)
+		LOG(("IDE interrupt assert\n"));
+	else
+		LOG(("IDE interrupt clear\n"));
+	
 	/* signal an interrupt */
-	m_irq_handler(ASSERT_LINE);
-	interrupt_pending = 1;
-	bus_master_status |= IDE_BUSMASTER_STATUS_IRQ;
+	m_irq_handler(state);
+	interrupt_pending = state;
 }
 
-
-void ide_controller_device::clear_interrupt()
+void ide_controller_device::set_dmarq(int state)
 {
-	LOG(("IDE interrupt clear\n"));
-
-	/* clear an interrupt */
-	m_irq_handler(CLEAR_LINE);
-	interrupt_pending = 0;
 }
 
 
@@ -125,7 +117,7 @@ static TIMER_CALLBACK( delayed_interrupt )
 {
 	ide_controller_device *ide = (ide_controller_device *)ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
-	ide->signal_interrupt();
+	ide->set_irq(ASSERT_LINE);
 }
 
 
@@ -134,7 +126,7 @@ static TIMER_CALLBACK( delayed_interrupt_buffer_ready )
 	ide_controller_device *ide = (ide_controller_device *)ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	ide->status |= IDE_STATUS_BUFFER_READY;
-	ide->signal_interrupt();
+	ide->set_irq(ASSERT_LINE);
 }
 
 
@@ -265,7 +257,7 @@ void ide_controller_device::security_error()
  *
  *************************************/
 
-void ide_controller_device::continue_read()
+void ide_controller_device::read_buffer_empty()
 {
 	/* reset the totals */
 	buffer_offset = 0;
@@ -273,14 +265,14 @@ void ide_controller_device::continue_read()
 	/* clear the buffer ready and busy flag */
 	status &= ~IDE_STATUS_BUFFER_READY;
 	status &= ~IDE_STATUS_BUSY;
+	error = IDE_ERROR_DEFAULT;
+	set_dmarq(0);
 
 	if (master_password_enable || user_password_enable)
 	{
 		security_error();
 
 		sector_count = 0;
-		bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
-		dma_active = 0;
 
 		return;
 	}
@@ -290,63 +282,6 @@ void ide_controller_device::continue_read()
 		sector_count--;
 	if (sector_count > 0)
 		read_next_sector();
-	else
-	{
-		bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
-		dma_active = 0;
-	}
-}
-
-
-void ide_controller_device::write_buffer_to_dma()
-{
-	int bytesleft = IDE_DISK_SECTOR_SIZE;
-	UINT16 data = 0;
-
-//  LOG(("Writing sector to %08X\n", dma_address));
-
-	/* loop until we've consumed all bytes */
-	while (bytesleft--)
-	{
-		data >>= 8;
-
-		if (bytesleft & 1)
-			data = read_dma();
-
-		/* if we're out of space, grab the next descriptor */
-		if (dma_bytes_left == 0)
-		{
-			/* if we're out of buffer space, that's bad */
-			if (dma_last_buffer)
-			{
-				LOG(("DMA Out of buffer space!\n"));
-				return;
-			}
-
-			/* fetch the address */
-			dma_address = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
-			dma_address &= 0xfffffffe;
-
-			/* fetch the length */
-			dma_bytes_left = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
-			dma_last_buffer = (dma_bytes_left >> 31) & 1;
-			dma_bytes_left &= 0xfffe;
-			if (dma_bytes_left == 0)
-				dma_bytes_left = 0x10000;
-
-//          LOG(("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", dma_address, dma_bytes_left, dma_last_buffer));
-		}
-
-		/* write the next byte */
-		dma_space->write_byte(dma_address++, data & 0xff);
-		dma_bytes_left--;
-	}
 }
 
 
@@ -390,16 +325,16 @@ void ide_controller_device::read_sector_done()
 		if (sectors_until_int == 0 || sector_count == 1)
 		{
 			sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE_BLOCK) ? block_count : 1);
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 		}
 
 		/* handle DMA */
 		if (dma_active)
-			write_buffer_to_dma();
+			set_dmarq(1);
 
 		/* if we're just verifying we can read the next sector */
 		if (verify_only)
-			continue_read();
+			read_buffer_empty();
 	}
 
 	/* if we got an error, we need to report it */
@@ -408,11 +343,9 @@ void ide_controller_device::read_sector_done()
 		/* set the error flag and the error */
 		status |= IDE_STATUS_ERROR;
 		error = IDE_ERROR_BAD_SECTOR;
-		bus_master_status |= IDE_BUSMASTER_STATUS_ERROR;
-		bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
 
 		/* signal an interrupt */
-		signal_interrupt();
+		set_irq(ASSERT_LINE);
 	}
 }
 
@@ -509,54 +442,69 @@ void ide_controller_device::continue_write()
 }
 
 
-void ide_controller_device::read_buffer_from_dma()
+void ide_controller_device::write_buffer_full()
 {
-	int bytesleft = IDE_DISK_SECTOR_SIZE;
-	UINT16 data = 0;
+	ide_device_interface *dev = slot[cur_drive]->dev();
 
-//  LOG(("Reading sector from %08X\n", dma_address));
-
-	/* loop until we've consumed all bytes */
-	while (bytesleft--)
+	set_dmarq(0);
+	if (command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
-		/* if we're out of space, grab the next descriptor */
-		if (dma_bytes_left == 0)
+		if (user_password_enable && memcmp(buffer, user_password, 2 + 32) == 0)
 		{
-			/* if we're out of buffer space, that's bad */
-			if (dma_last_buffer)
+			LOGPRINT(("IDE Unlocked user password\n"));
+			user_password_enable = 0;
+		}
+		if (master_password_enable && memcmp(buffer, master_password, 2 + 32) == 0)
+		{
+			LOGPRINT(("IDE Unlocked master password\n"));
+			master_password_enable = 0;
+		}
+		if (PRINTF_IDE_PASSWORD)
+		{
+			int i;
+
+			for (i = 0; i < 34; i += 2)
 			{
-				LOG(("DMA Out of buffer space!\n"));
-				return;
+				if (i % 8 == 2)
+					mame_printf_debug("\n");
+
+				mame_printf_debug("0x%02x, 0x%02x, ", buffer[i], buffer[i + 1]);
+				//mame_printf_debug("0x%02x%02x, ", buffer[i], buffer[i + 1]);
 			}
-
-			/* fetch the address */
-			dma_address = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
-			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
-			dma_address &= 0xfffffffe;
-
-			/* fetch the length */
-			dma_bytes_left = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
-			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
-			dma_last_buffer = (dma_bytes_left >> 31) & 1;
-			dma_bytes_left &= 0xfffe;
-			if (dma_bytes_left == 0)
-				dma_bytes_left = 0x10000;
-
-//          LOG(("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", dma_address, dma_bytes_left, dma_last_buffer));
+			mame_printf_debug("\n");
 		}
 
-		/* read the next byte */
-		data |= dma_space->read_byte(dma_address++) << 8;
-		dma_bytes_left --;
+		/* clear the busy and error flags */
+		status &= ~IDE_STATUS_ERROR;
+		status &= ~IDE_STATUS_BUSY;
+		status &= ~IDE_STATUS_BUFFER_READY;
 
-		if((bytesleft & 1) == 0)
-			write_dma(data);
+		if (master_password_enable || user_password_enable)
+			security_error();
+		else
+			status |= IDE_STATUS_DRIVE_READY;
+	}
+	else if (command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
+	{
+		UINT8 key[5] = { 0 };
+		int i, bad = 0;
+		dev->read_key(key);
 
-		data >>= 8;
+		for (i=0; !bad && i<512; i++)
+			bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
+
+		status &= ~IDE_STATUS_BUSY;
+		status &= ~IDE_STATUS_BUFFER_READY;
+		if (bad)
+			status |= IDE_STATUS_ERROR;
+		else {
+			status &= ~IDE_STATUS_ERROR;
+			gnetreadlock= 0;
+		}
+	}
+	else
+	{
+		continue_write();
 	}
 }
 
@@ -592,7 +540,7 @@ void ide_controller_device::write_sector_done()
 		if (--sectors_until_int == 0 || sector_count == 1)
 		{
 			sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE_BLOCK) ? block_count : 1);
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 		}
 
 		/* signal an interrupt if there's more data needed */
@@ -604,10 +552,8 @@ void ide_controller_device::write_sector_done()
 		/* keep going for DMA */
 		if (dma_active && sector_count != 0)
 		{
-			read_buffer_from_dma();
+			set_dmarq(1);
 		}
-		else
-			dma_active = 0;
 	}
 
 	/* if we got an error, we need to report it */
@@ -616,11 +562,9 @@ void ide_controller_device::write_sector_done()
 		/* set the error flag and the error */
 		status |= IDE_STATUS_ERROR;
 		error = IDE_ERROR_BAD_SECTOR;
-		bus_master_status |= IDE_BUSMASTER_STATUS_ERROR;
-		bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
 
 		/* signal an interrupt */
-		signal_interrupt();
+		set_irq(ASSERT_LINE);
 	}
 }
 
@@ -644,8 +588,9 @@ void ide_controller_device::handle_command(UINT8 _command)
 	UINT8 key[5];
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
-	/* implicitly clear interrupts here */
-	clear_interrupt();
+	/* implicitly clear interrupts & dmarq here */
+	set_irq(CLEAR_LINE);
+	set_dmarq(0);
 	command = _command;
 	switch (command)
 	{
@@ -704,8 +649,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			verify_only = 0;
 
 			/* start the read going */
-			if (bus_master_command & 1)
-				read_first_sector();
+			read_first_sector();
 			break;
 
 		case IDE_COMMAND_WRITE_MULTIPLE:
@@ -745,10 +689,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dma_active = 1;
 
 			/* start the read going */
-			if (bus_master_command & 1)
-			{
-				read_buffer_from_dma();
-			}
+			set_dmarq(1);
 			break;
 
 		case IDE_COMMAND_SECURITY_UNLOCK:
@@ -761,7 +702,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_GET_INFO:
@@ -811,7 +752,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* for timeout disabled value is 0 */
 			sector_count = 0;
 			/* signal an interrupt */
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_SET_CONFIG:
@@ -829,7 +770,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE unknown command (F9)\n"));
 
 			/* signal an interrupt */
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_SET_FEATURES:
@@ -847,7 +788,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			status |= IDE_STATUS_DRIVE_READY;
 
 			/* signal an interrupt */
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
@@ -856,7 +797,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			sector_count = 1;
 			status |= IDE_STATUS_DRIVE_READY;
 			status &= ~IDE_STATUS_ERROR;
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
@@ -869,7 +810,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
@@ -885,7 +826,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* update flags */
 			status |= IDE_STATUS_DRIVE_READY;
 			status &= ~IDE_STATUS_ERROR;
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_SEEK:
@@ -900,7 +841,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* for timeout disabled value is 0 */
 			sector_count = 0;
 			/* signal an interrupt */
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			break;
 
 
@@ -908,7 +849,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			status |= IDE_STATUS_ERROR;
 			error = IDE_ERROR_UNKNOWN_COMMAND;
-			signal_interrupt();
+			set_irq(ASSERT_LINE);
 			//debugger_break(device->machine());
 			break;
 	}
@@ -1066,8 +1007,8 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 				result |= IDE_STATUS_HIT_INDEX;
 				last_status_timer->adjust(attotime::never);
 			}
-			if (interrupt_pending)
-				clear_interrupt();
+			if (interrupt_pending == ASSERT_LINE)
+				set_irq(CLEAR_LINE);
 			break;
 
 		/* log anything else */
@@ -1082,75 +1023,6 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	return result;
 }
 
-
-void ide_controller_device::write_buffer_full()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (command == IDE_COMMAND_SECURITY_UNLOCK)
-	{
-		if (user_password_enable && memcmp(buffer, user_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked user password\n"));
-			user_password_enable = 0;
-		}
-		if (master_password_enable && memcmp(buffer, master_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked master password\n"));
-			master_password_enable = 0;
-		}
-		if (PRINTF_IDE_PASSWORD)
-		{
-			int i;
-
-			for (i = 0; i < 34; i += 2)
-			{
-				if (i % 8 == 2)
-					mame_printf_debug("\n");
-
-				mame_printf_debug("0x%02x, 0x%02x, ", buffer[i], buffer[i + 1]);
-				//mame_printf_debug("0x%02x%02x, ", buffer[i], buffer[i + 1]);
-			}
-			mame_printf_debug("\n");
-		}
-
-		/* clear the busy and error flags */
-		status &= ~IDE_STATUS_ERROR;
-		status &= ~IDE_STATUS_BUSY;
-		status &= ~IDE_STATUS_BUFFER_READY;
-
-		if (master_password_enable || user_password_enable)
-			security_error();
-		else
-			status |= IDE_STATUS_DRIVE_READY;
-	}
-	else if (command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
-	{
-		UINT8 key[5] = { 0 };
-		int i, bad = 0;
-		dev->read_key(key);
-
-		for (i=0; !bad && i<512; i++)
-			bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
-
-		status &= ~IDE_STATUS_BUSY;
-		status &= ~IDE_STATUS_BUFFER_READY;
-		if (bad)
-			status |= IDE_STATUS_ERROR;
-		else {
-			status &= ~IDE_STATUS_ERROR;
-			gnetreadlock= 0;
-		}
-	}
-	else
-		continue_write();
-}
-
-void ide_controller_device::read_buffer_empty()
-{
-	continue_read();
-	error = IDE_ERROR_DEFAULT;
-}
 
 READ16_MEMBER( ide_controller_device::read_cs1_pc )
 {
@@ -1389,6 +1261,232 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 }
 
 
+SLOT_INTERFACE_START(ide_devices)
+	SLOT_INTERFACE("hdd", IDE_HARDDISK)
+SLOT_INTERFACE_END
+
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock),
+	status(0),
+	adapter_control(0),
+	error(0),
+	command(0),
+	interrupt_pending(0),
+	precomp_offset(0),
+	buffer_offset(0),
+	sector_count(0),
+	block_count(0),
+	sectors_until_int(0),
+	verify_only(0),
+	config_unknown(0),
+	config_register_num(0),
+	master_password_enable(0),
+	user_password_enable(0),
+	master_password(NULL),
+	user_password(NULL),
+	gnetreadlock(0),
+	cur_drive(0),
+	m_irq_handler(*this)
+{
+}
+
+
+const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
+
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
+	adapter_control(0),
+	error(0),
+	command(0),
+	interrupt_pending(0),
+	precomp_offset(0),
+	buffer_offset(0),
+	sector_count(0),
+	block_count(0),
+	sectors_until_int(0),
+	verify_only(0),
+	config_unknown(0),
+	config_register_num(0),
+	master_password_enable(0),
+	user_password_enable(0),
+	master_password(NULL),
+	user_password(NULL),
+	gnetreadlock(0),
+	cur_drive(0),
+	m_irq_handler(*this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ide_controller_device::device_start()
+{
+	m_irq_handler.resolve_safe();
+
+	/* set MAME harddisk handle */
+	slot[0] = owner()->subdevice<ide_slot_device>("drive_0");
+	slot[1] = owner()->subdevice<ide_slot_device>("drive_1");
+
+	/* create a timer for timing status */
+	last_status_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	reset_timer = machine().scheduler().timer_alloc(FUNC(reset_callback), this);
+
+	/* register ide states */
+	save_item(NAME(adapter_control));
+	save_item(NAME(status));
+	save_item(NAME(error));
+	save_item(NAME(command));
+	save_item(NAME(interrupt_pending));
+	save_item(NAME(precomp_offset));
+
+	save_item(NAME(buffer));
+	save_item(NAME(buffer_offset));
+	save_item(NAME(sector_count));
+
+	save_item(NAME(block_count));
+	save_item(NAME(sectors_until_int));
+
+	save_item(NAME(dma_active));
+
+	save_item(NAME(config_unknown));
+	save_item(NAME(config_register));
+	save_item(NAME(config_register_num));
+
+	save_item(NAME(master_password_enable));
+	save_item(NAME(user_password_enable));
+
+	save_item(NAME(gnetreadlock));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ide_controller_device::device_reset()
+{
+	LOG(("IDE controller reset performed\n"));
+	/* reset the drive state */
+	cur_drive = 0;
+	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
+	error = IDE_ERROR_DEFAULT;
+	buffer_offset = 0;
+	gnetreadlock = 0;
+	master_password_enable = (master_password != NULL);
+	user_password_enable = (user_password != NULL);
+	set_irq(CLEAR_LINE);
+	set_dmarq(0);
+}
+
+
+
+//**************************************************************************
+//  IDE SLOT DEVICE
+//**************************************************************************
+
+// device type definition
+const device_type IDE_SLOT = &device_creator<ide_slot_device>;
+
+//-------------------------------------------------
+//  ide_slot_device - constructor
+//-------------------------------------------------
+
+ide_slot_device::ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IDE_SLOT, "IDE Connector", tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_dev(NULL)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ide_slot_device::device_config_complete()
+{
+	m_dev = dynamic_cast<ide_device_interface *>(get_card_device());
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ide_slot_device::device_start()
+{
+}
+
+
+
+#define IDE_BUSMASTER_STATUS_ACTIVE         0x01
+#define IDE_BUSMASTER_STATUS_ERROR          0x02
+#define IDE_BUSMASTER_STATUS_IRQ            0x04
+
+const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
+
+bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	ide_controller_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock),
+	dma_address(0),
+	dma_bytes_left(0),
+	dma_descriptor(0),
+	dma_last_buffer(0),
+	bus_master_command(0),
+	bus_master_status(0),
+	bus_master_descriptor(0)
+{
+}
+
+void bus_master_ide_controller_device::device_start()
+{
+	ide_controller_device::device_start();
+
+	/* find the bus master space */
+	if (bmcpu != NULL)
+	{
+		device_t *bmtarget = machine().device(bmcpu);
+		if (bmtarget == NULL)
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), bmcpu);
+		device_memory_interface *memory;
+		if (!bmtarget->interface(memory))
+			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag(), bmcpu);
+		dma_space = &memory->space(bmspace);
+		dma_address_xor = (dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
+	}
+
+	save_item(NAME(dma_address));
+	save_item(NAME(dma_bytes_left));
+	save_item(NAME(dma_descriptor));
+	save_item(NAME(dma_last_buffer));
+	save_item(NAME(bus_master_command));
+	save_item(NAME(bus_master_status));
+	save_item(NAME(bus_master_descriptor));
+}
+
+void bus_master_ide_controller_device::set_irq(int state)
+{
+	ide_controller_device::set_irq(state);
+
+	if (m_irq != state)
+	{
+		m_irq = state;
+
+		if( m_irq )
+			bus_master_status |= IDE_BUSMASTER_STATUS_IRQ;
+	}
+}
+
+void bus_master_ide_controller_device::set_dmarq(int state)
+{
+	if (m_dmarq != state)
+	{
+		m_dmarq = state;
+
+		execute_dma();
+	}
+}
+
 /*************************************
  *
  *  Bus master read
@@ -1436,25 +1534,26 @@ WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 
 			/* save the read/write bit and the start/stop bit */
 			bus_master_command = (old & 0xf6) | (val & 0x09);
-			bus_master_status = (bus_master_status & ~IDE_BUSMASTER_STATUS_ACTIVE) | (val & 0x01);
 
-			/* handle starting a transfer */
-			if (!(old & 1) && (val & 1))
+			if ((old ^ bus_master_command) & 1)
 			{
-				/* reset all the DMA data */
-				dma_bytes_left = 0;
-				dma_last_buffer = 0;
-				dma_descriptor = bus_master_descriptor;
-
-				/* if we're going live, start the pending read/write */
-				if (dma_active)
+				if (bus_master_command & 1)
 				{
-					if (bus_master_command & 8)
-						read_next_sector();
-					else
-					{
-						read_buffer_from_dma();
-					}
+					/* handle starting a transfer */
+					bus_master_status |= IDE_BUSMASTER_STATUS_ACTIVE;
+
+					/* reset all the DMA data */
+					dma_bytes_left = 0;
+					dma_descriptor = bus_master_descriptor;
+
+					/* if we're going live, start the pending read/write */
+					execute_dma();
+				}
+				else if (bus_master_status & IDE_BUSMASTER_STATUS_ACTIVE)
+				{
+					bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
+
+					LOG(("DMA Aborted!\n"));
 				}
 			}
 		}
@@ -1463,7 +1562,7 @@ WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 		{
 			/* status register */
 			UINT8 old = bus_master_status;
-			UINT8 val = (data >> 16) & 0xff;
+			UINT8 val = data >> 16;
 
 			/* save the DMA capable bits */
 			bus_master_status = (old & 0x9f) | (val & 0x60);
@@ -1483,211 +1582,62 @@ WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 	}
 }
 
-
-SLOT_INTERFACE_START(ide_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-SLOT_INTERFACE_END
-
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock),
-	status(0),
-	bmcpu(NULL),
-	bmspace(0),
-	dma_space(NULL),
-	dma_active(0),
-	dma_address_xor(0),
-	dma_last_buffer(0),
-	dma_address(0),
-	dma_descriptor(0),
-	dma_bytes_left(0),
-	bus_master_command(0),
-	bus_master_status(0),
-	bus_master_descriptor(0),
-	adapter_control(0),
-	error(0),
-	command(0),
-	interrupt_pending(0),
-	precomp_offset(0),
-	buffer_offset(0),
-	sector_count(0),
-	block_count(0),
-	sectors_until_int(0),
-	verify_only(0),
-	config_unknown(0),
-	config_register_num(0),
-	master_password_enable(0),
-	user_password_enable(0),
-	master_password(NULL),
-	user_password(NULL),
-	gnetreadlock(0),
-	cur_drive(0),
-	m_irq_handler(*this)
+void bus_master_ide_controller_device::execute_dma()
 {
-}
-
-
-const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
-
-ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	bmcpu(NULL),
-	bmspace(0),
-	dma_space(NULL),
-	dma_active(0),
-	dma_address_xor(0),
-	dma_last_buffer(0),
-	dma_address(0),
-	dma_descriptor(0),
-	dma_bytes_left(0),
-	bus_master_command(0),
-	bus_master_status(0),
-	bus_master_descriptor(0),
-	adapter_control(0),
-	error(0),
-	command(0),
-	interrupt_pending(0),
-	precomp_offset(0),
-	buffer_offset(0),
-	sector_count(0),
-	block_count(0),
-	sectors_until_int(0),
-	verify_only(0),
-	config_unknown(0),
-	config_register_num(0),
-	master_password_enable(0),
-	user_password_enable(0),
-	master_password(NULL),
-	user_password(NULL),
-	gnetreadlock(0),
-	cur_drive(0),
-	m_irq_handler(*this)
-{
-}
-
-const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
-
-bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	ide_controller_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_controller_device::device_start()
-{
-	m_irq_handler.resolve_safe();
-
-	/* set MAME harddisk handle */
-	slot[0] = owner()->subdevice<ide_slot_device>("drive_0");
-	slot[1] = owner()->subdevice<ide_slot_device>("drive_1");
-
-	/* find the bus master space */
-	if (bmcpu != NULL)
+	while (m_dmarq && (bus_master_status & IDE_BUSMASTER_STATUS_ACTIVE))
 	{
-		device_t *bmtarget = machine().device(bmcpu);
-		if (bmtarget == NULL)
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), bmcpu);
-		device_memory_interface *memory;
-		if (!bmtarget->interface(memory))
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag(), bmcpu);
-		dma_space = &memory->space(bmspace);
-		dma_address_xor = (dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
+		/* if we're out of space, grab the next descriptor */
+		if (dma_bytes_left == 0)
+		{
+			/* fetch the address */
+			dma_address = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
+			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
+			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
+			dma_address |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
+			dma_address &= 0xfffffffe;
+
+			/* fetch the length */
+			dma_bytes_left = dma_space->read_byte(dma_descriptor++ ^ dma_address_xor);
+			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 8;
+			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 16;
+			dma_bytes_left |= dma_space->read_byte(dma_descriptor++ ^ dma_address_xor) << 24;
+			dma_last_buffer = (dma_bytes_left >> 31) & 1;
+			dma_bytes_left &= 0xfffe;
+			if (dma_bytes_left == 0)
+				dma_bytes_left = 0x10000;
+
+//          LOG(("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", dma_address, dma_bytes_left, dma_last_buffer));
+		}
+
+		if (bus_master_command & 8)
+		{
+			// read from ata bus
+			UINT16 data = read_dma();
+
+			// write to memory
+			dma_space->write_byte(dma_address++, data & 0xff);
+			dma_space->write_byte(dma_address++, data >> 8);
+		}
+		else
+		{
+			// read from memory;
+			UINT16 data = dma_space->read_byte(dma_address++);
+			data |= dma_space->read_byte(dma_address++) << 8;
+
+			// write to ata bus
+			write_dma(data);
+		}
+
+		dma_bytes_left -= 2;
+
+		if (dma_bytes_left == 0 && dma_last_buffer)
+		{
+			bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
+
+			if (m_dmarq)
+			{
+				LOG(("DMA Out of buffer space!\n"));
+			}
+		}
 	}
-
-	/* create a timer for timing status */
-	last_status_timer = machine().scheduler().timer_alloc(FUNC_NULL);
-	reset_timer = machine().scheduler().timer_alloc(FUNC(reset_callback), this);
-
-	/* register ide states */
-	save_item(NAME(adapter_control));
-	save_item(NAME(status));
-	save_item(NAME(error));
-	save_item(NAME(command));
-	save_item(NAME(interrupt_pending));
-	save_item(NAME(precomp_offset));
-
-	save_item(NAME(buffer));
-	save_item(NAME(buffer_offset));
-	save_item(NAME(sector_count));
-
-	save_item(NAME(block_count));
-	save_item(NAME(sectors_until_int));
-
-	save_item(NAME(dma_active));
-	save_item(NAME(dma_last_buffer));
-	save_item(NAME(dma_address));
-	save_item(NAME(dma_descriptor));
-	save_item(NAME(dma_bytes_left));
-
-	save_item(NAME(bus_master_command));
-	save_item(NAME(bus_master_status));
-	save_item(NAME(bus_master_descriptor));
-
-	save_item(NAME(config_unknown));
-	save_item(NAME(config_register));
-	save_item(NAME(config_register_num));
-
-	save_item(NAME(master_password_enable));
-	save_item(NAME(user_password_enable));
-
-	save_item(NAME(gnetreadlock));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ide_controller_device::device_reset()
-{
-	LOG(("IDE controller reset performed\n"));
-	/* reset the drive state */
-	cur_drive = 0;
-	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
-	error = IDE_ERROR_DEFAULT;
-	buffer_offset = 0;
-	gnetreadlock = 0;
-	master_password_enable = (master_password != NULL);
-	user_password_enable = (user_password != NULL);
-	clear_interrupt();
-}
-
-
-
-//**************************************************************************
-//  IDE SLOT DEVICE
-//**************************************************************************
-
-// device type definition
-const device_type IDE_SLOT = &device_creator<ide_slot_device>;
-
-//-------------------------------------------------
-//  ide_slot_device - constructor
-//-------------------------------------------------
-
-ide_slot_device::ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IDE_SLOT, "IDE Connector", tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ide_slot_device::device_config_complete()
-{
-	m_dev = dynamic_cast<ide_device_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_slot_device::device_start()
-{
 }

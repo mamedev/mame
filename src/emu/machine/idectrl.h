@@ -101,8 +101,8 @@ public:
 	DECLARE_WRITE16_MEMBER(write_cs0_pc);
 	DECLARE_WRITE16_MEMBER(write_cs1_pc);
 	
-	void signal_interrupt();
-	void clear_interrupt();
+	virtual void set_irq(int state);
+	virtual void set_dmarq(int state);
 	void read_sector_done();
 	void write_sector_done();
 
@@ -113,21 +113,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	const char *bmcpu;
-	UINT32 bmspace;
-	address_space * dma_space;
-	UINT8           dma_active;
-	UINT8           dma_address_xor;
-	UINT8           dma_last_buffer;
-	offs_t          dma_address;
-	offs_t          dma_descriptor;
-	UINT32          dma_bytes_left;
-	UINT8           bus_master_command;
-	UINT8           bus_master_status;
-	UINT32          bus_master_descriptor;
-
 	void read_next_sector();
-	void read_buffer_from_dma();
 	void continue_write();
 
 private:
@@ -135,12 +121,12 @@ private:
 	void next_sector();
 	void security_error();
 	void continue_read();
-	void write_buffer_to_dma();
 	void read_first_sector();
 	void handle_command(UINT8 _command);
 	void read_buffer_empty();
 	void write_buffer_full();
 
+	UINT8           dma_active;
 	UINT8           adapter_control;
 	UINT8           error;
 	UINT8           command;
@@ -194,6 +180,30 @@ public:
 
 	DECLARE_READ32_MEMBER( ide_bus_master32_r );
 	DECLARE_WRITE32_MEMBER( ide_bus_master32_w );
+
+	virtual void set_irq(int state);
+	virtual void set_dmarq(int state);
+
+protected:
+	virtual void device_start();
+
+private:
+	void execute_dma();
+
+	const char *bmcpu;
+	UINT32 bmspace;
+	address_space * dma_space;
+	UINT8           dma_address_xor;
+
+	offs_t          dma_address;
+	UINT32          dma_bytes_left;
+	offs_t          dma_descriptor;
+	UINT8           dma_last_buffer;
+	UINT8           bus_master_command;
+	UINT8           bus_master_status;
+	UINT32          bus_master_descriptor;
+	int m_irq;
+	int m_dmarq;
 };
 
 extern const device_type BUS_MASTER_IDE_CONTROLLER;
