@@ -65,7 +65,7 @@ def runViewJedTests(tests, jedUtilApp):
         (stdout,stderr) = process.communicate()
         
         if stderr:
-            print "Error: JED test named %s failed during viewing." % test.name
+            print "Error: JED test named " + test.name + " failed during viewing (" + stderr.strip() + ")."
 
         fp = open(test.outputFile, "wb")
         fp.write(stdout)
