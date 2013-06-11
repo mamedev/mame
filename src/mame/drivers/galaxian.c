@@ -2759,7 +2759,6 @@ void galaxian_state::common_init(galaxian_draw_bullet_func draw_bullet,galaxian_
 {
 	m_irq_enabled = 0;
 	m_irq_line = INPUT_LINE_NMI;
-	m_color_resnet_type = GALAXIAN_RESNET_TYPE_MIDWAY;
 	m_numspritegens = 1;
 	m_bullets_base = 0x60;
 	m_sprites_base = 0x40;
@@ -2792,15 +2791,6 @@ void galaxian_state::unmap_galaxian_sound(offs_t base)
 DRIVER_INIT_MEMBER(galaxian_state,galaxian)
 {
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
-}
-
-
-DRIVER_INIT_MEMBER(galaxian_state,galaxiann)
-{
-	DRIVER_INIT_CALL(galaxian);
-
-	/* Namco PCB had a slightly different color prom resnet */
-	m_color_resnet_type = GALAXIAN_RESNET_TYPE_NAMCO;
 }
 
 
@@ -3310,9 +3300,6 @@ DRIVER_INIT_MEMBER(galaxian_state,kingball)
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
-	
-	/* Namco PCB had a slightly different color prom resnet */
-	m_color_resnet_type = GALAXIAN_RESNET_TYPE_NAMCO;
 
 	/* disable the stars */
 	space.unmap_write(0xb004, 0xb004, 0, 0x07f8);

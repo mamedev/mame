@@ -236,9 +236,9 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
 void galaxian_state::palette_init()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int rgb_resistances[3];
+	static const int rgb_resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	int i, minval, midval, maxval, maxres, len;
+	int i, minval, midval, maxval, len;
 	UINT8 starmap[4];
 
 	/*
@@ -267,23 +267,6 @@ void galaxian_state::palette_init()
 	    of the main game would be very low to allow for all the oversaturation
 	    of the stars and shells/missiles.
 	*/
-	
-	// official Namco PCB used 330 ohm resistors instead of the 220 ohm ones
-	switch (m_color_resnet_type)
-	{
-		case GALAXIAN_RESNET_TYPE_NAMCO:
-			rgb_resistances[0] = 1000;
-			rgb_resistances[1] = 470;
-			rgb_resistances[2] = 330;
-			break;
-
-		default:
-			rgb_resistances[0] = 1000;
-			rgb_resistances[1] = 470;
-			rgb_resistances[2] = 220;
-			break;
-	}
-	
 	compute_resistor_weights(0, RGB_MAXIMUM, -1.0,
 			3, &rgb_resistances[0], rweights, 470, 0,
 			3, &rgb_resistances[0], gweights, 470, 0,
@@ -330,10 +313,9 @@ void galaxian_state::palette_init()
 	    Since we can't saturate that high, we instead approximate this
 	    by compressing the values proportionally into the 194->255 range.
 	*/
-	maxres = 1.0 / (1.0/rgb_resistances[0] + 1.0/rgb_resistances[1] + 1.0/rgb_resistances[2]);
-	minval = RGB_MAXIMUM * maxres / 150;
-	midval = RGB_MAXIMUM * maxres / 100;
-	maxval = RGB_MAXIMUM * maxres / 60;
+	minval = RGB_MAXIMUM * 130 / 150;
+	midval = RGB_MAXIMUM * 130 / 100;
+	maxval = RGB_MAXIMUM * 130 / 60;
 
 	/* compute the values for each of 4 possible star values */
 	starmap[0] = 0;

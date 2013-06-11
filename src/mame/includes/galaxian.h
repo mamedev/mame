@@ -28,12 +28,6 @@
 #define GALAXIAN_VBEND          (16)
 #define GALAXIAN_VBSTART        (224+16)
 
-enum
-{
-	GALAXIAN_RESNET_TYPE_MIDWAY,
-	GALAXIAN_RESNET_TYPE_NAMCO
-};
-
 
 class galaxian_state : public driver_device
 {
@@ -59,7 +53,6 @@ public:
 	int m_bullets_base;
 	int m_sprites_base;
 	int m_numspritegens;
-	int m_color_resnet_type;
 	int m_counter_74ls161[2];
 	int m_direction[2];
 	UINT8 m_gmgalax_selected_game;
@@ -189,7 +182,6 @@ public:
 	DECLARE_WRITE8_MEMBER(kingball_dac_w);
 	DECLARE_WRITE8_MEMBER(moonwar_port_select_w);
 	DECLARE_DRIVER_INIT(galaxian);
-	DECLARE_DRIVER_INIT(galaxiann);
 	DECLARE_DRIVER_INIT(nolock);
 	DECLARE_DRIVER_INIT(azurian);
 	DECLARE_DRIVER_INIT(gmgalax);

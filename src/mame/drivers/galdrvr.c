@@ -6904,11 +6904,11 @@ ROM_END
  *************************************/
 
 /* basic galaxian hardware */
-GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian_state, galaxiann, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiana,  galaxian, galaxian, superg,   galaxian_state, galaxiann, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxiant,  galaxian, galaxian, superg,   galaxian_state, galaxiann, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian_state, galaxian,  ROT90,  "Namco (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian_state, galaxian,  ROT90,  "Namco (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxian,   0,        galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiana,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxiant,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
 GAME( 1979, moonaln,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", GAME_SUPPORTS_SAVE ) // or bootleg?
