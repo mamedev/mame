@@ -1117,7 +1117,7 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 GAME( 1981, roundup,  0,        thepit,   roundup, driver_device,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
 GAME( 1981, fitter,   roundup,  thepit,   fitter, driver_device,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
 GAME( 1981, fitterbl, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "bootleg", "Fitter (bootleg of Round-Up)", 0 )
-GAME( 1981, ttfitter, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "bootleg", "T.T. Fitter (bootleg of Round-Up)", 0 )
+GAME( 1981, ttfitter, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "Taito Corporation", "T.T. Fitter", 0 )
 GAME( 1982, thepit,   0,        thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics", "The Pit", 0 ) // AW == Andy Walker
 GAME( 1982, thepitu1, thepit,   thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US set 1)", 0 )
 GAME( 1982, thepitu2, thepit,   thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US set 2)", 0 ) // Bally PCB
