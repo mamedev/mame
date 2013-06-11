@@ -65,8 +65,8 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 	if (parentnode == NULL)
 		return;
 
-    for (int i = 0; i < xmlConfigurations.size(); i++)
-        delete xmlConfigurations[i];
+	for (int i = 0; i < xmlConfigurations.size(); i++)
+		delete xmlConfigurations[i];
 	xmlConfigurations.clear();
 
 	// Configuration load
@@ -79,7 +79,7 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 			case WindowQtConfig::WIN_TYPE_MAIN:         xmlConfigurations.push_back(new MainWindowQtConfig()); break;
 			case WindowQtConfig::WIN_TYPE_MEMORY:       xmlConfigurations.push_back(new MemoryWindowQtConfig()); break;
 			case WindowQtConfig::WIN_TYPE_DASM:         xmlConfigurations.push_back(new DasmWindowQtConfig()); break;
-			case WindowQtConfig::WIN_TYPE_LOG:	        xmlConfigurations.push_back(new LogWindowQtConfig()); break;
+			case WindowQtConfig::WIN_TYPE_LOG:          xmlConfigurations.push_back(new LogWindowQtConfig()); break;
 			case WindowQtConfig::WIN_TYPE_BREAK_POINTS: xmlConfigurations.push_back(new BreakpointsWindowQtConfig()); break;
 			default: continue;
 		}
@@ -94,9 +94,9 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
 
-    for (int i = 0; i < xmlConfigurations.size(); i++)
-    {
-        WindowQtConfig* config = xmlConfigurations[i];
+	for (int i = 0; i < xmlConfigurations.size(); i++)
+	{
+		WindowQtConfig* config = xmlConfigurations[i];
 
 		// Create an xml node
 		xml_data_node *debugger_node;
@@ -112,8 +112,8 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 
 static void gather_save_configurations()
 {
-    for (int i = 0; i < xmlConfigurations.size(); i++)
-        delete xmlConfigurations[i];
+	for (int i = 0; i < xmlConfigurations.size(); i++)
+		delete xmlConfigurations[i];
 	xmlConfigurations.clear();
 
 	// Loop over all the open windows
@@ -163,10 +163,10 @@ static void load_and_clear_main_window_config(std::vector<WindowQtConfig*>& conf
 
 static void setup_additional_startup_windows(running_machine& machine, std::vector<WindowQtConfig*>& configList)
 {
-    for (int i = 0; i < configList.size(); i++)
-    {
-        WindowQtConfig* config = configList[i];
-        
+	for (int i = 0; i < configList.size(); i++)
+	{
+		WindowQtConfig* config = configList[i];
+
 		WindowQt* foo = NULL;
 		switch (config->m_type)
 		{

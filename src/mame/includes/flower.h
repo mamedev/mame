@@ -78,7 +78,7 @@ public:
 	{
 	TIMER_CLOCK_EFFECT
 	};
-	
+
 	DECLARE_WRITE8_MEMBER( sound1_w );
 	DECLARE_WRITE8_MEMBER( sound2_w );
 
@@ -87,7 +87,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// sound stream update overrides
@@ -96,7 +96,7 @@ protected:
 private:
 	void make_mixer_table(int voices, int gain);
 	void show_soundregs();
-	
+
 	// internal state
 	emu_timer *m_effect_timer;
 

@@ -182,11 +182,11 @@ public:
 
 	struct slider_desc
 	{
-		const char *		name;
-		int					minval;
-		int					defval;
-		int					maxval;
-		int					step;
+		const char *        name;
+		int                 minval;
+		int                 defval;
+		int                 maxval;
+		int                 step;
 		INT32 (*adjustor)(running_machine &, void *, astring *, INT32);
 	};
 
@@ -282,7 +282,7 @@ public:
 	render_target *         targethead;
 	cache_target *          cachehead;
 
-	static slider_desc 		s_sliders[];
+	static slider_desc      s_sliders[];
 	static hlsl_options     s_hlsl_presets[4];
 };
 

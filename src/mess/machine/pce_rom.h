@@ -13,11 +13,11 @@ public:
 	// construction/destruction
 	pce_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	pce_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() {}
 	virtual void device_reset() {}
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 };
@@ -57,11 +57,11 @@ class pce_sf2_device : public pce_rom_device
 public:
 	// construction/destruction
 	pce_sf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_cart);
 	virtual DECLARE_WRITE8_MEMBER(write_cart);

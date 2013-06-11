@@ -21,7 +21,7 @@ public:
 		m_discrete(*this, "discrete"),
 		m_redbaronsound(*this, "custom")
 		{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	optional_device<discrete_device> m_discrete;
@@ -45,7 +45,3 @@ public:
 
 /*----------- defined in audio/bzone.c -----------*/
 MACHINE_CONFIG_EXTERN( bzone_audio );
-
-
-
-

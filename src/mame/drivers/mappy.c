@@ -578,7 +578,7 @@ TODO:
 void mappy_state::common_latch_w(UINT32 offset)
 {
 	int bit = offset & 1;
-	
+
 	switch (offset & 0x0e)
 	{
 		case 0x00:  /* INT ON 2 */
@@ -586,27 +586,27 @@ void mappy_state::common_latch_w(UINT32 offset)
 			if (!bit)
 				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
-			
+
 		case 0x02:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
 				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
-			
+
 		case 0x04:  /* n.c. */
 			break;
-			
+
 		case 0x06:  /* SOUND ON */
 			mappy_sound_enable(machine().device("namco"), bit);
 			break;
-			
+
 		case 0x0a:  /* SUB RESET */
 			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
-			
+
 		case 0x0c:  /* n.c. */
 			break;
-			
+
 		case 0x0e:  /* n.c. */
 			break;
 	}
@@ -638,7 +638,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 
 		default:
 			common_latch_w(offset);
-			break;			
+			break;
 	}
 }
 
@@ -662,10 +662,10 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 		case 0x0c:
 			m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
-			
+
 		default:
 			common_latch_w(offset);
-			break;			
+			break;
 	}
 }
 
@@ -697,10 +697,10 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 					break;
 			}
 			break;
-			
+
 		default:
 			common_latch_w(offset);
-			break;			
+			break;
 	}
 }
 
@@ -1714,7 +1714,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-												  /* synchronization of the CPUs */
+													/* synchronization of the CPUs */
 
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-												  /* synchronization of the CPUs */
+													/* synchronization of the CPUs */
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
 
@@ -1832,7 +1832,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-												  /* synchronization of the CPUs */
+													/* synchronization of the CPUs */
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 

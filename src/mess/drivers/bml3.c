@@ -806,49 +806,49 @@ static WRITE_LINE_DEVICE_HANDLER( bml3_fdc_intrq_w )
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
- 	int i,port_i,scancode,trigger = 0;
+	int i,port_i,scancode,trigger = 0;
 
- 	if(!m_keyb_press_flag)
- 	{
- 		m_keyb_scancode = (m_keyb_scancode + 1) & 0x7F;
- 		scancode = m_keyb_scancode;
+	if(!m_keyb_press_flag)
+	{
+		m_keyb_scancode = (m_keyb_scancode + 1) & 0x7F;
+		scancode = m_keyb_scancode;
 
- 		if (scancode == 0x7F)
- 		{
- 			if (m_keyb_empty_scan == 1)
- 			{
- 				// full scan completed with no keypress
- 				m_keyb_press = 0;
- 				if (!m_keyb_counter_operation_disabled)
- 					trigger = !0;
-	  		}
- 			if (m_keyb_empty_scan > 0)
- 				m_keyb_empty_scan--;
-	  	}
- 		else if (scancode < 32*3)
- 		{
- 			port_i = scancode / 32;
- 			i = scancode % 32;
+		if (scancode == 0x7F)
+		{
+			if (m_keyb_empty_scan == 1)
+			{
+				// full scan completed with no keypress
+				m_keyb_press = 0;
+				if (!m_keyb_counter_operation_disabled)
+					trigger = !0;
+			}
+			if (m_keyb_empty_scan > 0)
+				m_keyb_empty_scan--;
+		}
+		else if (scancode < 32*3)
+		{
+			port_i = scancode / 32;
+			i = scancode % 32;
 			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
- 				m_keyb_empty_scan = 2;
- 				trigger = !0;
- 			}
- 		}
- 		if (trigger)
- 		{
- 			m_keyb_press_flag = 1;
- 			m_keyb_press = m_keyb_scancode | 0x80;
- 			if (!m_keyb_interrupt_disabled)
+				m_keyb_empty_scan = 2;
+				trigger = !0;
+			}
+		}
+		if (trigger)
+		{
+			m_keyb_press_flag = 1;
+			m_keyb_press = m_keyb_scancode | 0x80;
+			if (!m_keyb_interrupt_disabled)
 				m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
- 		}
- 		/*
- 		else {
- 			// #$# ? don't need this
-			m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
- 		}
- 		*/
- 	}
+		}
+		/*
+		else {
+		    // #$# ? don't need this
+		    m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+		}
+		*/
+	}
 
 }
 
@@ -1167,10 +1167,10 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
 
- 	/* floppy */
+	/* floppy */
 	// #$# not sure what wd17xx model, this is just a guess
- 	MCFG_WD1773_ADD("fdc", bml3_wd17xx_interface )
- 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bml3_floppy_interface)
+	MCFG_WD1773_ADD("fdc", bml3_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bml3_floppy_interface)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

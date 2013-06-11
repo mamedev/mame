@@ -559,16 +559,16 @@ astring running_machine::get_statename(const char *option)
 		statename_str.cpy("%g");
 	else
 		statename_str.cpy(option);
-	
+
 	// strip any extension in the provided statename
 	int index = statename_str.rchr(0, '.');
 	if (index != -1)
 		statename_str.substr(0, index);
-	
+
 	// handle %d in the template (for image devices)
 	astring statename_dev("%d_");
 	int pos = statename_str.find(0, statename_dev);
-	
+
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
@@ -578,12 +578,12 @@ astring running_machine::get_statename(const char *option)
 		else
 		{
 			int name_found = 0;
-			
+
 			// find length of the device name
 			int end1 = statename_str.find(pos + 3, "/");
 			int end2 = statename_str.find(pos + 3, "%");
 			int end = -1;
-			
+
 			if ((end1 != -1) && (end2 != -1))
 				end = MIN(end1, end2);
 			else if (end1 != -1)
@@ -592,15 +592,15 @@ astring running_machine::get_statename(const char *option)
 				end = end2;
 			else
 				end = statename_str.len();
-			
+
 			if (end - pos < 3)
 				fatalerror("Something very wrong is going on!!!\n");
-			
+
 			// copy the device name to an astring
 			astring devname_str;
 			devname_str.cpysubstr(statename_str, pos + 3, end - pos - 3);
 			//printf("check template: %s\n", devname_str.cstr());
-			
+
 			// verify that there is such a device for this system
 			image_interface_iterator iter(root_device());
 			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
@@ -608,30 +608,30 @@ astring running_machine::get_statename(const char *option)
 				// get the device name
 				astring tempdevname(image->brief_instance_name());
 				//printf("check device: %s\n", tempdevname.cstr());
-				
+
 				if (devname_str.cmp(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
 					if (image->basename_noext() != NULL)
 					{
 						astring filename(image->basename_noext());
-						
+
 						// setup snapname and remove the %d_
 						statename_str.replace(0, devname_str, filename);
 						statename_str.del(pos, 3);
 						//printf("check image: %s\n", filename.cstr());
-						
+
 						name_found = 1;
 					}
 				}
 			}
-			
+
 			// or fallback to default
 			if (name_found == 0)
 				statename_str.cpy("%g");
 		}
 	}
-	
+
 	// substitute path and gamename up front
 	statename_str.replace(0, "/", PATH_SEPARATOR);
 	statename_str.replace(0, "%g", basename());

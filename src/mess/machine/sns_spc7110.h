@@ -36,7 +36,7 @@ public:
 	void mode2(UINT8 init, UINT8 *ROM, UINT32 len);
 
 private:
-	
+
 	UINT8 dataread(UINT8 *ROM, UINT32 len);
 	UINT8 probability(UINT32 n);
 	UINT8 next_lps(UINT32 n);
@@ -44,21 +44,21 @@ private:
 	UINT8 toggle_invert(UINT32 n);
 	UINT32 morton_2x8(UINT32 data);
 	UINT32 morton_4x8(UINT32 data);
-	
+
 	UINT32 m_decomp_mode;
 	UINT32 m_decomp_offset;
-	
+
 	UINT8 *m_decomp_buffer;
 	UINT32 m_decomp_buffer_rdoffset;
 	UINT32 m_decomp_buffer_wroffset;
 	UINT32 m_decomp_buffer_length;
-	
+
 	struct ContextState
 	{
 		UINT8 index;
 		UINT8 invert;
 	} m_context[32];
-	
+
 	UINT32 m_morton16[2][256];
 	UINT32 m_morton32[4][256];
 

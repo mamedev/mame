@@ -2132,7 +2132,7 @@ static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE16(coh1001l_latch_w, 0x0000ffff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1001l_bank_w, 0x00ff0000)
-	
+
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
@@ -2368,7 +2368,7 @@ WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002m_bank_w, 0x00ff0000)
-	
+
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
@@ -2394,7 +2394,7 @@ static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_sound_main_status_r, 0xff000000)
-	
+
 	AM_IMPORT_FROM(coh1002m_map)
 ADDRESS_MAP_END
 
@@ -2426,7 +2426,7 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
 	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
-	
+
 	MCFG_FIFO7200_ADD("cbaj_fifo1", 0x400) // LH540202
 	MCFG_FIFO7200_ADD("cbaj_fifo2", 0x400) // "
 

@@ -66,7 +66,7 @@ struct LPT_ENTRY
 // ======================> nick_device
 
 class nick_device :  public device_t,
-					 public device_memory_interface
+						public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -132,28 +132,28 @@ private:
 	UINT8 horizontal_clock;
 	/* current scanline within LPT */
 	UINT8 m_scanline_count;
-	
+
 	UINT8 m_FIXBIAS;
 	UINT8 m_BORDER;
 	UINT8 m_LPL;
 	UINT8 m_LPH;
-	
+
 	UINT16 m_LD1;
 	UINT16 m_LD2;
-	
+
 	LPT_ENTRY   m_LPT;
-	
+
 	UINT32 *m_dest;
 	int m_dest_pos;
 	int m_dest_max_pos;
-	
+
 	UINT8 m_reg[4];
-	
+
 	/* first clock visible on left hand side */
 	int m_first_visible_clock;
 	/* first clock visible on right hand side */
 	int m_last_visible_clock;
-	
+
 	/* given a bit pattern, this will get the pen index */
 	UINT8 m_pen_idx_4col[256];
 	/* given a bit pattern, this will get the pen index */

@@ -140,7 +140,7 @@ void flower_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 		for (voice = m_channel_list; voice < m_last_channel; voice++)
 			voice->ecount += (voice->ecount < (1<<22));
 		break;
-		
+
 		default:
 			assert_always(FALSE, "Unknown id in flower_sound_device::device_timer");
 	}

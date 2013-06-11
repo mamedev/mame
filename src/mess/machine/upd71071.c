@@ -100,7 +100,7 @@ void upd71071_device::device_config_complete()
 	const upd71071_intf *intf = reinterpret_cast<const upd71071_intf *>(static_config());
 	if (intf != NULL)
 		*static_cast<upd71071_intf *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

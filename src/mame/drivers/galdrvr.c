@@ -46,7 +46,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( galaxianbl )
 	PORT_INCLUDE(galaxian)
-	
+
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, DEF_STR(None) )
@@ -5075,7 +5075,7 @@ ROM_START( mooncrsl ) // similar to above
 	ROM_LOAD( "07.bin",     0x3000, 0x0800, CRC(8e9ac0fc) SHA1(ddc11ad20ecbd954098becf7d7a1bbe6cddeda1b) )
 	ROM_LOAD( "08.bin",     0x3800, 0x0800, CRC(020a8e2f) SHA1(b64438cb043252565d8a4f3f58f4a4f78a276ba2) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )	// not present in this set
+	ROM_REGION( 0x2000, "gfx1", 0 ) // not present in this set
 	ROM_LOAD( "mcs_b",        0x0000, 0x0800, CRC(fb0f1f81) SHA1(38a6679a8b69bc1870a0e67e692131c42f9535c8) )
 	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(13932a15) SHA1(b8885c555c6ad7021be55c6925a0a0872c1b6abd) )
 	ROM_LOAD( "mcs_a",        0x1000, 0x0800, CRC(631ebb5a) SHA1(5bc9493afa76c55858b8c8849524cbc77dc838fc) )

@@ -15,7 +15,7 @@
 
 
 const device_type WARPWARP = &device_creator<warpwarp_sound_device>;
- 
+
 warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WARPWARP, "Warp Warp Custom", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
@@ -43,11 +43,11 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
- 
+
 void warpwarp_sound_device::device_config_complete()
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -77,38 +77,38 @@ void warpwarp_sound_device::device_start()
 	save_item(NAME(m_mcarry));
 	save_item(NAME(m_mcount));
 }
- 
+
 void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-		case TIMER_SOUND_VOLUME_DECAY:			
+		case TIMER_SOUND_VOLUME_DECAY:
 			if (--m_sound_volume < 0)
 				m_sound_volume = 0;
 			break;
-			
+
 		case TIMER_MUSIC_VOLUME_DECAY:
 			if (--m_music_volume < 0)
 				m_music_volume = 0;
 			break;
-			
+
 		default:
 			assert_always(FALSE, "Unknown id in warpwarp_sound_device::device_timer");
 	}
 }
- 
+
 WRITE8_MEMBER( warpwarp_sound_device::sound_w )
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
 	m_sound_volume = 0x7fff; /* set sound_volume */
 	m_noise = 0x0000;  /* reset noise shifter */
- 
- 	/* faster decay enabled? */
+
+	/* faster decay enabled? */
 	if( m_sound_latch & 8 )
- 	{
- 		/*
- 		 * R85(?) is 10k, Rb is 0, C92 is 1uF
+	{
+		/*
+		 * R85(?) is 10k, Rb is 0, C92 is 1uF
 		 * charge time t1 = 0.693 * (R24 + Rb) * C57 -> 0.22176s
 		 * discharge time t2 = 0.693 * (Rb) * C57 -> 0
 		 * C90(?) is only charged via D17 (1N914), no discharge!
@@ -139,17 +139,17 @@ WRITE8_MEMBER( warpwarp_sound_device::music1_w )
 	m_channel->update();
 	m_music1_latch = data & 0x3f;
 }
- 
+
 WRITE8_MEMBER( warpwarp_sound_device::music2_w )
 {
 	m_channel->update();
 	m_music2_latch = data & 0x3f;
 	m_music_volume = 0x7fff;
- 	/* fast decay enabled? */
+	/* fast decay enabled? */
 	if( m_music2_latch & 0x10 )
- 	{
- 		/*
- 		 * Ra (R83?) is 10k, Rb is 0, C92 is 1uF
+	{
+		/*
+		 * Ra (R83?) is 10k, Rb is 0, C92 is 1uF
 		 * charge time t1 = 0.693 * (Ra + Rb) * C -> 0.22176s
 		 * discharge time is (nearly) zero, because Rb is zero
 		 * C95(?) is only charged via D17, not discharged!
@@ -180,11 +180,11 @@ WRITE8_MEMBER( warpwarp_sound_device::music2_w )
 //-------------------------------------------------
 
 void warpwarp_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
- {
- 	stream_sample_t *buffer = outputs[0];
- 
- 	while (samples--)
- 	{
+	{
+	stream_sample_t *buffer = outputs[0];
+
+	while (samples--)
+	{
 		*buffer++ = (m_sound_signal + m_music_signal) / 2;
 
 		/*
@@ -198,65 +198,65 @@ void warpwarp_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		 * ...
 		 * 48 =  64 steps -> 3000 Hz
 		 * ...
- 		 * 63 =   4 steps -> 48 kHz
- 		 */
+		 * 63 =   4 steps -> 48 kHz
+		 */
 
 		m_mcarry -= CLOCK_16H / (4 * (64 - m_music1_latch));
 		while( m_mcarry < 0 )
- 		{
+		{
 			m_mcarry += CLOCK_16H;
 			m_mcount++;
 			m_music_signal = (m_mcount & ~m_music2_latch & 15) ? m_decay[m_music_volume] : 0;
- 			/* override by noise gate? */
+			/* override by noise gate? */
 			if( (m_music2_latch & 32) && (m_noise & 0x8000) )
 				m_music_signal = m_decay[m_music_volume];
- 		}
- 
- 		/* clock 1V = 8kHz */
+		}
+
+		/* clock 1V = 8kHz */
 		m_vcarry -= CLOCK_1V;
 		while (m_vcarry < 0)
- 		{
+		{
 			m_vcarry += CLOCK_16H;
 			m_vcount++;
- 
- 			/* noise is clocked with raising edge of 2V */
+
+			/* noise is clocked with raising edge of 2V */
 			if ((m_vcount & 3) == 2)
- 			{
- 				/* bit0 = bit0 ^ !bit10 */
+			{
+				/* bit0 = bit0 ^ !bit10 */
 				if ((m_noise & 1) == ((m_noise >> 10) & 1))
 					m_noise = (m_noise << 1) | 1;
- 				else
+				else
 					m_noise = m_noise << 1;
- 			}
- 
+			}
+
 			switch (m_sound_latch & 7)
- 			{
- 			case 0: /* 4V */
+			{
+			case 0: /* 4V */
 				m_sound_signal = (m_vcount & 0x04) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 1: /* 8V */
+				break;
+			case 1: /* 8V */
 				m_sound_signal = (m_vcount & 0x08) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 2: /* 16V */
+				break;
+			case 2: /* 16V */
 				m_sound_signal = (m_vcount & 0x10) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 3: /* 32V */
+				break;
+			case 3: /* 32V */
 				m_sound_signal = (m_vcount & 0x20) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 4: /* TONE1 */
+				break;
+			case 4: /* TONE1 */
 				m_sound_signal = !(m_vcount & 0x01) && !(m_vcount & 0x10) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 5: /* TONE2 */
+				break;
+			case 5: /* TONE2 */
 				m_sound_signal = !(m_vcount & 0x02) && !(m_vcount & 0x20) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			case 6: /* TONE3 */
+				break;
+			case 6: /* TONE3 */
 				m_sound_signal = !(m_vcount & 0x04) && !(m_vcount & 0x40) ? m_decay[m_sound_volume] : 0;
- 				break;
- 			default: /* NOISE */
- 				/* QH of 74164 #4V */
+				break;
+			default: /* NOISE */
+				/* QH of 74164 #4V */
 				m_sound_signal = (m_noise & 0x8000) ? m_decay[m_sound_volume] : 0;
- 			}
- 
- 		}
- 	}
+			}
+
+		}
+	}
 }

@@ -85,14 +85,14 @@ tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock)
 {
 }
-	
+
 const device_type M58819 = &device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms6100_device(mconfig, M58819, "M58819", tag, owner, clock)
 {
 }
-	
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -231,5 +231,3 @@ READ_LINE_MEMBER(tms6100_device::tms6100_data_r)
 {
 	return m_data;
 }
-
-

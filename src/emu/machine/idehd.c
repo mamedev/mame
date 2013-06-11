@@ -239,7 +239,7 @@ ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, 
 
 void ide_hdd_device::device_start()
 {
-//	save_item(NAME(features));
+//  save_item(NAME(features));
 
 	save_item(NAME(cur_cylinder));
 	save_item(NAME(cur_sector));

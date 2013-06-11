@@ -88,7 +88,6 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 namespace d3d
 {
-
 hlsl_options shaders::s_hlsl_presets[4] =
 {
 	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation

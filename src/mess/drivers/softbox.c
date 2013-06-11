@@ -5,81 +5,81 @@
     http://mikenaberezny.com/hardware/pet-cbm/sse-softbox-z80-computer/
 
 
-	Using the Corvus hard disk
-	--------------------------
+    Using the Corvus hard disk
+    --------------------------
 
-	The SoftBox distribution disk (softbox-distrib.d80) is configured for 
-	a CBM 8050 as CP/M drives A/B and a 10MB Corvus hard disk as drives C/D.
+    The SoftBox distribution disk (softbox-distrib.d80) is configured for
+    a CBM 8050 as CP/M drives A/B and a 10MB Corvus hard disk as drives C/D.
 
-	Use the CHDMAN utility to create a 10MB hard disk image for the Corvus:
+    Use the CHDMAN utility to create a 10MB hard disk image for the Corvus:
 
-	$ chdman createhd -o /path/to/corvus10mb.chd -chs 358,3,20 -ss 512
+    $ chdman createhd -o /path/to/corvus10mb.chd -chs 358,3,20 -ss 512
 
-	Start the SoftBox emulator with the floppy and hard disk images mounted:
+    Start the SoftBox emulator with the floppy and hard disk images mounted:
 
-	$ mess softbox -flop1 /path/to/softbox-distrib.d80 \
-        	       -hard1 /path/to/corvus10mb.chd
+    $ mess softbox -flop1 /path/to/softbox-distrib.d80 \
+                   -hard1 /path/to/corvus10mb.chd
 
-	Before the Corvus can be used under CP/M, it must be prepared
-	by running DIAG.COM and FORMAT.COM.
+    Before the Corvus can be used under CP/M, it must be prepared
+    by running DIAG.COM and FORMAT.COM.
 
-	DIAG.COM
+    DIAG.COM
 
-	Enter "diag" (no arguments) at the CP/M prompt to run the Corvus diagnostics
-	program.  This program will perform the Corvus low-level format.
+    Enter "diag" (no arguments) at the CP/M prompt to run the Corvus diagnostics
+    program.  This program will perform the Corvus low-level format.
 
-	Select option 6 (Update Controller Code) at the menu.
-	Enter "corvb184.fmt" when prompted for the filename.
-	Enter "y" at the confirmation prompts.
-	Enter "1" for the Corvus drive number (two prompts).
-	After formatting is complete, it will return to the menu.
+    Select option 6 (Update Controller Code) at the menu.
+    Enter "corvb184.fmt" when prompted for the filename.
+    Enter "y" at the confirmation prompts.
+    Enter "1" for the Corvus drive number (two prompts).
+    After formatting is complete, it will return to the menu.
 
-	Select option 3 (Read Controller Code Version #) at the menu.
-	Enter "1" for the Corvus drive number.
-	It should report "V18.4AP" and then return to the menu.
+    Select option 3 (Read Controller Code Version #) at the menu.
+    Enter "1" for the Corvus drive number.
+    It should report "V18.4AP" and then return to the menu.
 
-	Select option 9 to return to CP/M.
+    Select option 9 to return to CP/M.
 
-	FORMAT.COM
+    FORMAT.COM
 
-	Enter "format" (no arguments) at the CP/M prompt to run the SoftBox disk
-	format program.  This program will perform the CP/M filesystem format.
+    Enter "format" (no arguments) at the CP/M prompt to run the SoftBox disk
+    format program.  This program will perform the CP/M filesystem format.
 
-	Enter drive letter "c" at the prompt.
-	Enter "y" to confirm the format.
-	After formatting is complete, it will prompt for a drive letter again.
+    Enter drive letter "c" at the prompt.
+    Enter "y" to confirm the format.
+    After formatting is complete, it will prompt for a drive letter again.
 
-	Enter drive letter "d" at the prompt.
-	Enter "y" to confirm the format.
-	After formatting is complete, it will prompt for a drive letter again.
+    Enter drive letter "d" at the prompt.
+    Enter "y" to confirm the format.
+    After formatting is complete, it will prompt for a drive letter again.
 
-	Press RETURN to return to CP/M.
+    Press RETURN to return to CP/M.
 
-	STAT.COM
+    STAT.COM
 
-	After all steps are completed, drives C and D should be usable from
-	CP/M.  Each drive is one half of the Corvus 10MB disk.  Running the
-	command "stat c: dsk:" should show 4712 kilobyte drive capacity.
-	Drive D should show the same information.
+    After all steps are completed, drives C and D should be usable from
+    CP/M.  Each drive is one half of the Corvus 10MB disk.  Running the
+    command "stat c: dsk:" should show 4712 kilobyte drive capacity.
+    Drive D should show the same information.
 
 
-	Using other Corvus hard disk sizes
-	----------------------------------
+    Using other Corvus hard disk sizes
+    ----------------------------------
 
-	The SoftBox supports 5, 10, and 20 MB hard disks.  The distribution disk
-	is configured for 10 MB as explained above.  To use other sizes, make
-	a new image with CHDMAN.  See the top of src/mess/includes/corvushd.h
-	for the parameters for the other drives.
+    The SoftBox supports 5, 10, and 20 MB hard disks.  The distribution disk
+    is configured for 10 MB as explained above.  To use other sizes, make
+    a new image with CHDMAN.  See the top of src/mess/includes/corvushd.h
+    for the parameters for the other drives.
 
-	After the image has been created and the SoftBox emulator started with
-	it mounted, the SoftBox BIOS needs to be told what size Corvus hard
-	disk is attached.  Use the NEWSYS.COM utility to reconfigure the drive
-	size.  When NEWSYS prompts for a source drive, enter "a" (the drive letter
-	of the CP/M distribution disk).  Use option "d" (Disk drive assignment)
-	to reconfigure the Corvus size.  After the change has been made, use option
-	"s" (Save new system) to write the configuration to the floppy (drive A) and
-	option "e" (Execute new system) to restart CP/M with the configuration.  
-	DIAG.COM and FORMAT.COM can then be used to format the hard disk.
+    After the image has been created and the SoftBox emulator started with
+    it mounted, the SoftBox BIOS needs to be told what size Corvus hard
+    disk is attached.  Use the NEWSYS.COM utility to reconfigure the drive
+    size.  When NEWSYS prompts for a source drive, enter "a" (the drive letter
+    of the CP/M distribution disk).  Use option "d" (Disk drive assignment)
+    to reconfigure the Corvus size.  After the change has been made, use option
+    "s" (Save new system) to write the configuration to the floppy (drive A) and
+    option "e" (Execute new system) to restart CP/M with the configuration.
+    DIAG.COM and FORMAT.COM can then be used to format the hard disk.
 
 */
 

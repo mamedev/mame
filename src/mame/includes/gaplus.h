@@ -16,14 +16,14 @@ public:
 	{
 		TIMER_NAMCOIO_RUN
 	};
-	
+
 	enum
 	{
 		GAME_GAPLUS = 0,
 		GAME_GAPLUSD,
 		GAME_GALAGA3
 	};
-	
+
 	gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -33,7 +33,7 @@ public:
 		m_customio_3(*this,"customio_3"),
 		m_videoram(*this,"videoram"),
 		m_spriteram(*this,"spriteram") { }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
@@ -45,7 +45,7 @@ public:
 	namco56xx_device *m_namco56xx;
 
 	int m_type;
-	
+
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_starfield_control[4];
 	int m_total_stars;
@@ -86,7 +86,7 @@ public:
 	void starfield_init();
 	void starfield_render(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

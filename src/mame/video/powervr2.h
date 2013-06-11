@@ -1,7 +1,7 @@
 #ifndef __POWERVR2_H__
 #define __POWERVR2_H__
 
-#define MCFG_POWERVR2_ADD(_tag, _irq_cb)				                \
+#define MCFG_POWERVR2_ADD(_tag, _irq_cb)                                \
 	MCFG_DEVICE_ADD(_tag, POWERVR2, 0)                                  \
 	downcast<powervr2_device *>(device)->set_irq_cb(DEVCB2_ ## _irq_cb);
 
@@ -107,7 +107,7 @@ public:
 
 	UINT64 *dc_texture_ram;
 	UINT64 *dc_framebuffer_ram;
-	
+
 	UINT64 *pvr2_texture_ram;
 	UINT64 *pvr2_framebuffer_ram;
 	UINT64 *elan_ram;
@@ -277,15 +277,15 @@ private:
 
 	void render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr);
 	void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
-					 float y0, float y1,
-					 float xl, float xr,
-					 float ul, float ur,
-					 float vl, float vr,
-					 float wl, float wr,
-					 float dxldy, float dxrdy,
-					 float duldy, float durdy,
-					 float dvldy, float dvrdy,
-					 float dwldy, float dwrdy);
+						float y0, float y1,
+						float xl, float xr,
+						float ul, float ur,
+						float vl, float vr,
+						float wl, float wr,
+						float dxldy, float dxrdy,
+						float duldy, float durdy,
+						float dvldy, float dvrdy,
+						float dwldy, float dwrdy);
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
 	void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2);
 	void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
@@ -296,7 +296,7 @@ private:
 	static UINT32 dilate1(UINT32 value,int bits);
 	void computedilated();
 	void pvr_build_parameterconfig();
-	void process_ta_fifo();	
+	void process_ta_fifo();
 	void debug_paletteram();
 };
 

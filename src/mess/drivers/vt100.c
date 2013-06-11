@@ -27,8 +27,8 @@
 #include "video/vtvideo.h"
 #include "vt100.lh"
 
-#define RS232_TAG		"rs232"
-#define COM5016T_TAG	"com5016t"
+#define RS232_TAG       "rs232"
+#define COM5016T_TAG    "com5016t"
 
 class vt100_state : public driver_device
 {

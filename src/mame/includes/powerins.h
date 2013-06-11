@@ -14,7 +14,7 @@ public:
 		m_spriteram(*this, "spriteram")
 		{ }
 
-	
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<nmk112_device> m_nmk112;

@@ -93,7 +93,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef_r ) { return m_ef; }
 	DECLARE_READ_LINE_MEMBER( ff_r ) { return m_ff; }
 	DECLARE_READ_LINE_MEMBER( hf_r ) { return m_hf; }
-	
+
 	// normal configuration
 	DECLARE_WRITE16_MEMBER( data_word_w ) { fifo_write(data); }
 	DECLARE_READ16_MEMBER( data_word_r ) { return (UINT16)fifo_read(); }
@@ -113,14 +113,14 @@ private:
 
 	UINT16* m_buffer;
 	int m_ram_size;
-	
+
 	int m_read_ptr;
 	int m_write_ptr;
-	
+
 	int m_ef; // empty flag
 	int m_ff; // full flag
 	int m_hf; // half-full flag
-	
+
 	devcb2_write_line m_ef_handler;
 	devcb2_write_line m_ff_handler;
 	devcb2_write_line m_hf_handler;

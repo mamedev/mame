@@ -35,7 +35,7 @@ private:
 		UINT16  period;
 		UINT8   val;
 	}       m_voice[4];
-	
+
 	sound_stream    *m_sh_channel;
 };
 
@@ -95,38 +95,38 @@ WRITE8_MEMBER(pv1000_sound_device::voice_w)
 
 /*
  plgDavid's audio implementation/analysis notes:
- 
+
  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
  then by the value of the 6bit period registers.
  This creates a surprisingly accurate pitch range.
- 
+
  Note: the register periods are inverted.
  */
 
 void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
-	
+
 	while (samples > 0)
 	{
 		*buffer=0;
-		
+
 		for (int i = 0; i < 3; i++)
 		{
 			UINT32 per = (0x3f - (m_voice[i].period & 0x3f));
-			
-			if (per != 0)	//OFF!
+
+			if (per != 0)   //OFF!
 				*buffer += m_voice[i].val * 8192;
-			
+
 			m_voice[i].count++;
-			
+
 			if (m_voice[i].count >= per)
 			{
 				m_voice[i].count = 0;
 				m_voice[i].val = !m_voice[i].val;
 			}
 		}
-		
+
 		buffer++;
 		samples--;
 	}
@@ -412,7 +412,7 @@ void pv1000_state::machine_start()
 
 	m_gfxram = memregion("gfxram")->base();
 	save_pointer(NAME(m_gfxram), 0x400);
-	
+
 	save_item(NAME(m_io_regs));
 	save_item(NAME(m_fd_data));
 	save_item(NAME(m_pcg_bank));

@@ -20,7 +20,7 @@
 #define P8251A_TAG      "c3"
 #define DISCRETE_TAG    "discrete"
 #define SCREEN_TAG      "screen"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 class vixen_state : public driver_device
 {

@@ -36,7 +36,7 @@
 #define SCN2661_TAG     "scn2661"
 #define UPD765_TAG      "upd765"
 #define CENTRONICS_TAG  "centronics"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 class wangpc_state : public driver_device
 {

@@ -45,7 +45,7 @@
 
 #define MAIN_CLK    15974400
 
-#define RS232_TAG	"rs232"
+#define RS232_TAG   "rs232"
 
 /*
     Driver data
@@ -696,14 +696,14 @@ ADDRESS_MAP_END
 /* TODO: shift break */
 /*INPUT_CHANGED_MEMBER(qx10_state::key_stroke)
 {
-	if(newval && !oldval)
-	{
-		m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
-		m_pic_m->ir4_w(1);
-	}
+    if(newval && !oldval)
+    {
+        m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
+        m_pic_m->ir4_w(1);
+    }
 
-	if(oldval && !newval)
-		m_keyb.rx = 0;
+    if(oldval && !newval)
+        m_keyb.rx = 0;
 }*/
 
 static INPUT_PORTS_START( qx10 )

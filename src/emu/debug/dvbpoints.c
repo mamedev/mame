@@ -2,7 +2,7 @@
 
     dvpoints.c
 
-	Breakpoint debugger view.
+    Breakpoint debugger view.
 
 ****************************************************************************
 
@@ -131,15 +131,15 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 
 void debug_view_breakpoints::pad_astring_to_length(astring& str, int len)
 {
-    int diff = len - str.len();
-    if (diff > 0)
-    {
-        astring buffer;
-        buffer.expand(diff);
-        for (int i = 0; i < diff; i++)
-            buffer.catprintf(" ");
-        str.catprintf("%s", buffer.cstr());
-    }
+	int diff = len - str.len();
+	if (diff > 0)
+	{
+		astring buffer;
+		buffer.expand(diff);
+		for (int i = 0; i < diff; i++)
+			buffer.catprintf(" ");
+		str.catprintf("%s", buffer.cstr());
+	}
 }
 
 //-------------------------------------------------
@@ -162,7 +162,7 @@ void debug_view_breakpoints::view_update()
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
 			numBPs++;
 		bpList = new device_debug::breakpoint*[numBPs];
-		
+
 		// Collect
 		int i = 1;
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
@@ -176,7 +176,7 @@ void debug_view_breakpoints::view_update()
 	for (int row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
-		
+
 		// Header
 		if (effrow == 0)
 		{
@@ -195,8 +195,8 @@ void debug_view_breakpoints::view_update()
 		if (bpi < numBPs && bpi >= 0)
 		{
 			device_debug::breakpoint* bp = bpList[bpi];
-			
- 			astring buffer;
+
+			astring buffer;
 			buffer.printf("%x", bp->index());
 			pad_astring_to_length(buffer, 5);
 			buffer.catprintf("%c", bp->enabled() ? 'X' : 'O');
@@ -213,7 +213,7 @@ void debug_view_breakpoints::view_update()
 				buffer.catprintf("%s", bp->action());
 				pad_astring_to_length(buffer, 60);
 			}
-			
+
 			for (int i = 0; i < m_visible.x; i++)
 			{
 				dest->byte = (i < buffer.len()) ? buffer[i] : ' ';
@@ -222,7 +222,7 @@ void debug_view_breakpoints::view_update()
 			}
 			continue;
 		}
-		
+
 		// Fill the remaining vertical space
 		for (int i = 0; i < m_visible.x; i++)
 		{
@@ -231,6 +231,6 @@ void debug_view_breakpoints::view_update()
 			dest++;
 		}
 	}
-	
+
 	delete bpList;
 }

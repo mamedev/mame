@@ -25,7 +25,7 @@ ADDRESS_MAP_END
 
 naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  irq_cb(*this)
+		irq_cb(*this)
 {
 }
 

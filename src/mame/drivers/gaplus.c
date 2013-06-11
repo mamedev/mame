@@ -272,10 +272,10 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-	
+
 	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
-	
+
 	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
 }
@@ -960,15 +960,15 @@ ROM_END
 DRIVER_INIT_MEMBER(gaplus_state,gaplus)
 {
 	UINT8 *rom;
-	
+
 	rom = memregion("gfx1")->base();
 	for (int i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
-	
+
 	rom = memregion("gfx2")->base() + 0x6000;
 	for (int i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] << 4;
-	
+
 	m_type = GAME_GAPLUS;
 }
 

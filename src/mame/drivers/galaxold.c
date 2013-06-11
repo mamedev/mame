@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6805, 0x6805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)
 	AM_RANGE(0x6806, 0x6807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2") AM_WRITE(galaxold_nmi_enable_w)
-//	AM_RANGE(0x7001, 0x7001) 
+//  AM_RANGE(0x7001, 0x7001)
 	AM_RANGE(0x7002, 0x7002) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x7003, 0x7003) AM_WRITE(scrambold_background_enable_w)
 	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
@@ -645,13 +645,13 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
-//	AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
+//  AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
 	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
 {
-//	printf("rombank %02x\n",data);
+//  printf("rombank %02x\n",data);
 	if (data&1)
 	{
 		UINT8 *rom = memregion("maincpu")->base();
@@ -2104,7 +2104,7 @@ static INPUT_PORTS_START( guttangt )
 	PORT_DIPNAME( 0x40, 0x40, "IN1:7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN1:8" ) 
+	PORT_DIPNAME( 0x80, 0x80, "IN1:8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2130,7 +2130,7 @@ static INPUT_PORTS_START( guttangt )
 	PORT_DIPNAME( 0x40, 0x40, "IN2:7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN2:8" ) 
+	PORT_DIPNAME( 0x80, 0x80, "IN2:8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2368,7 +2368,7 @@ static MACHINE_CONFIG_DERIVED( guttang, galaxian )
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(32+2+64+1)  /* 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background */
 
-//	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
+//  MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
 MACHINE_CONFIG_END
 
@@ -3282,7 +3282,7 @@ ROM_START( guttangt )
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "gg9-2732.rom",           0x0000, 0x1000, CRC(be6bf522) SHA1(23a09409b7de4bfdb970e4ff23d89a2439a0aee5) )
 	ROM_LOAD( "gg10-2732.rom",          0x1000, 0x1000, CRC(b04c34c5) SHA1(a37db70ce67d64daa5f0c41cce1136d1c9d8c175) )
-	
+
 	ROM_REGION( 0x0020, "proms", 0 ) // no PROM was present..
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END

@@ -80,7 +80,7 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 {
 	if (!m_leds_start)
 		return;
-	
+
 	m_leds_start = false;
 
 	// Each hypothetical led block has 3 7seg leds.
@@ -362,11 +362,10 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 
 	for (int i=0;i<0x8000;i++)
 	{
-		
 		// some bits are ^ 0x05
 		/*if ((i&0x30) == 0x00)
 		{
-			if ((( i & 0x0f ) > 0x08)  &&  (( i & 0x0f ) < 0x0f)) MUSICBALL_XOR05
+		    if ((( i & 0x0f ) > 0x08)  &&  (( i & 0x0f ) < 0x0f)) MUSICBALL_XOR05
 		}
 		*/
 

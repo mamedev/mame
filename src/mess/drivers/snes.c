@@ -531,7 +531,7 @@ WRITE8_MEMBER( snes_console_state::snessfx_lo_w )
 READ8_MEMBER( snes_console_state::snessa1_hi_r )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -539,14 +539,14 @@ READ8_MEMBER( snes_console_state::snessa1_hi_r )
 		else if (address < 0x6000)
 		{
 			if (address >= 0x2200 && address < 0x2400)
-				return m_cartslot->chip_read(space, offset);	// SA-1 Regs
+				return m_cartslot->chip_read(space, offset);    // SA-1 Regs
 			else if (address >= 0x3000 && address < 0x3800)
-				return m_cartslot->chip_read(space, offset);	// Internal SA-1 RAM (2K)
+				return m_cartslot->chip_read(space, offset);    // Internal SA-1 RAM (2K)
 			else
 				return snes_r_io(space, address);
 		}
 		else if (address < 0x8000)
-			return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM
+			return m_cartslot->chip_read(space, offset);        // SA-1 BWRAM
 		else
 			return m_cartslot->read_h(space, offset);
 	}
@@ -557,7 +557,7 @@ READ8_MEMBER( snes_console_state::snessa1_hi_r )
 READ8_MEMBER( snes_console_state::snessa1_lo_r )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -565,21 +565,21 @@ READ8_MEMBER( snes_console_state::snessa1_lo_r )
 		else if (address < 0x6000)
 		{
 			if (address >= 0x2200 && address < 0x2400)
-				return m_cartslot->chip_read(space, offset);	// SA-1 Regs
+				return m_cartslot->chip_read(space, offset);    // SA-1 Regs
 			else if (address >= 0x3000 && address < 0x3800)
-				return m_cartslot->chip_read(space, offset);	// Internal SA-1 RAM (2K)
+				return m_cartslot->chip_read(space, offset);    // Internal SA-1 RAM (2K)
 			else
 				return snes_r_io(space, address);
 		}
 		else if (address < 0x8000)
-			return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM
+			return m_cartslot->chip_read(space, offset);        // SA-1 BWRAM
 		else
 			return m_cartslot->read_l(space, offset);
 	}
 	else if (offset < 0x500000)
-		return m_cartslot->chip_read(space, offset);		// SA-1 BWRAM (not mirrored above!)
+		return m_cartslot->chip_read(space, offset);        // SA-1 BWRAM (not mirrored above!)
 	else
-		return snes_r_io(space, address);					// nothing mapped here!
+		return snes_r_io(space, address);                   // nothing mapped here!
 }
 
 WRITE8_MEMBER( snes_console_state::snessa1_hi_w )
@@ -592,21 +592,21 @@ WRITE8_MEMBER( snes_console_state::snessa1_hi_w )
 		else if (address < 0x6000)
 		{
 			if (address >= 0x2200 && address < 0x2400)
-				m_cartslot->chip_write(space, offset, data);	// SA-1 Regs
+				m_cartslot->chip_write(space, offset, data);    // SA-1 Regs
 			else if (address >= 0x3000 && address < 0x3800)
-				m_cartslot->chip_write(space, offset, data);	// Internal SA-1 RAM (2K)
+				m_cartslot->chip_write(space, offset, data);    // Internal SA-1 RAM (2K)
 			else
 				snes_w_io(space, address, data);
 		}
 		else if (address < 0x8000)
-			m_cartslot->chip_write(space, offset, data);		// SA-1 BWRAM
+			m_cartslot->chip_write(space, offset, data);        // SA-1 BWRAM
 	}
 }
 
 WRITE8_MEMBER( snes_console_state::snessa1_lo_w )
 {
 	if (offset >= 0x400000 && offset < 0x500000)
-		m_cartslot->chip_write(space, offset, data);		// SA-1 BWRAM (not mirrored above!)
+		m_cartslot->chip_write(space, offset, data);        // SA-1 BWRAM (not mirrored above!)
 	else
 		snessfx_hi_w(space, offset, data, 0xff);
 }
@@ -886,7 +886,7 @@ WRITE8_MEMBER( snes_console_state::snesbsx_lo_w )
 READ8_MEMBER( snes_console_state::snessgb_hi_r )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)

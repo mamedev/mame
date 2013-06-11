@@ -41,7 +41,7 @@ void fifo7200_device::device_start()
 	m_ef_handler.resolve();
 	m_ff_handler.resolve();
 	m_hf_handler.resolve();
-	
+
 	// state save
 	save_item(NAME(m_read_ptr));
 	save_item(NAME(m_write_ptr));
@@ -60,11 +60,11 @@ void fifo7200_device::device_reset()
 	memset(m_buffer, 0, m_ram_size * sizeof(UINT16));
 	m_read_ptr = 0;
 	m_write_ptr = 0;
-	
+
 	m_ef = 1;
 	m_ff = 0;
 	m_hf = 0;
-	
+
 	if (!m_ef_handler.isnull()) m_ef_handler(m_ef);
 	if (!m_ff_handler.isnull()) m_ff_handler(m_ff);
 	if (!m_hf_handler.isnull()) m_hf_handler(m_hf);
@@ -82,7 +82,7 @@ void fifo7200_device::fifo_write(UINT16 data)
 
 	m_buffer[m_write_ptr] = data & 0x1ff;
 	m_write_ptr = (m_write_ptr + 1) % m_ram_size;
-	
+
 	// update flags
 	if (m_ef)
 	{
@@ -110,7 +110,7 @@ UINT16 fifo7200_device::fifo_read()
 		logerror("IDT7200 %s fifo_read underflow!\n", tag());
 		return 0x1ff;
 	}
-	
+
 	UINT16 ret = m_buffer[m_read_ptr];
 	m_read_ptr = (m_read_ptr + 1) % m_ram_size;
 
@@ -126,12 +126,12 @@ UINT16 fifo7200_device::fifo_read()
 		m_ef = 1;
 		if (!m_ef_handler.isnull()) m_ef_handler(m_ef);
 	}
-	
+
 	else if (((m_read_ptr + m_ram_size / 2) % m_ram_size) == m_write_ptr)
 	{
 		m_hf = 0;
 		if (!m_hf_handler.isnull()) m_hf_handler(m_hf);
 	}
-	
+
 	return ret;
 }

@@ -159,7 +159,7 @@ void vic3_device::device_config_complete()
 	const vic3_interface *intf = reinterpret_cast<const vic3_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<vic3_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -184,33 +184,33 @@ void vic3_device::device_config_complete()
 void vic3_device::device_start()
 {
 	int width, height;
-	
+
 	m_cpu = machine().device(cpu_tag);
 	m_main_screen = machine().device<screen_device>(screen_tag);
 	width = m_main_screen->width();
 	height = m_main_screen->height();
-	
+
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
-	
+
 	m_type = vic_type;
-	
+
 	m_dma_read.resolve(dma_read, *this);
 	m_dma_read_color.resolve(dma_read_color, *this);
 	m_interrupt.resolve(irq, *this);
-	
+
 	m_port_changed.resolve(port_changed, *this);
-	
+
 	m_c64_mem_r.resolve(c64_mem_r, *this);
-	
+
 	m_lightpen_button_cb.resolve(button_cb, *this);
 	m_lightpen_x_cb.resolve(x_cb, *this);
 	m_lightpen_y_cb.resolve(y_cb, *this);
-	
+
 	m_screen[0] = auto_alloc_array(machine(), UINT8, 216 * 656 / 8);
-	
+
 	for (int i = 1; i < 216; i++)
 		m_screen[i] = m_screen[i - 1] + 656 / 8;
-	
+
 	for (int i = 0; i < 256; i++)
 	{
 		m_foreground[i] = 0;
@@ -223,7 +223,7 @@ void vic3_device::device_start()
 		if ((i & 0xc0) > 0x40)
 			m_foreground[i] |= 0xc0;
 	}
-	
+
 	for (int i = 0; i < 256; i++)
 	{
 		m_expandx[i] = 0;
@@ -244,7 +244,7 @@ void vic3_device::device_start()
 		if (i & 0x80)
 			m_expandx[i] |= 0xc000;
 	}
-	
+
 	for (int i = 0; i < 256; i++)
 	{
 		m_expandx_multi[i] = 0;
@@ -265,24 +265,24 @@ void vic3_device::device_start()
 		if (i & 0x80)
 			m_expandx_multi[i] |= 0xa000;
 	}
-	
+
 	save_item(NAME(m_reg));
-	
+
 	save_item(NAME(m_on));
-	
+
 	//save_item(NAME(m_bitmap));
-	
+
 	save_item(NAME(m_lines));
-	
+
 	save_item(NAME(m_chargenaddr));
 	save_item(NAME(m_videoaddr));
 	save_item(NAME(m_bitmapaddr));
-	
+
 	save_item(NAME(m_x_begin));
 	save_item(NAME(m_x_end));
 	save_item(NAME(m_y_begin));
 	save_item(NAME(m_y_end));
-	
+
 	save_item(NAME(m_c64_bitmap));
 	save_item(NAME(m_bitmapmulti));
 	save_item(NAME(m_mono));
@@ -290,23 +290,23 @@ void vic3_device::device_start()
 	save_item(NAME(m_ecmcolor));
 	save_item(NAME(m_colors));
 	save_item(NAME(m_spritemulti));
-	
+
 	save_item(NAME(m_lastline));
 	save_item(NAME(m_rasterline));
 	save_item(NAME(m_interlace));
-	
+
 	save_item(NAME(m_columns));
 	save_item(NAME(m_rows));
-	
+
 	save_item(NAME(m_shift));
 	save_item(NAME(m_foreground));
 	save_item(NAME(m_multi_collision));
-	
+
 	save_item(NAME(m_palette_red));
 	save_item(NAME(m_palette_green));
 	save_item(NAME(m_palette_blue));
 	save_item(NAME(m_palette_dirty));
-	
+
 	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_sprites[i].x), i);
@@ -332,32 +332,32 @@ void vic3_device::device_start()
 void vic3_device::device_reset()
 {
 	memset(m_reg, 0, ARRAY_LENGTH(m_reg));
-	
+
 	m_on = 1;
-	
+
 	m_interlace = 0;
 	m_columns = 640;
 	m_rows = 200;
 	m_lines = VIC2_LINES;
-	
+
 	memset(&m_sprites, 0, sizeof(m_sprites));
-	
+
 	m_chargenaddr = 0;
 	m_videoaddr = 0;
 	m_bitmapaddr = 0;
-	
+
 	m_x_begin = 0;
 	m_x_end = 0;
 	m_y_begin = 0;
 	m_y_end = 0;
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		m_c64_bitmap[i] = 0;
 		m_mono[i] = 0;
 		m_ecmcolor[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		m_bitmapmulti[i] = 0;
@@ -365,16 +365,16 @@ void vic3_device::device_reset()
 		m_colors[i] = 0;
 		m_spritemulti[i] = 0;
 	}
-	
+
 	m_lastline = 0;
 	m_rasterline = 0;
-	
+
 	memset(m_shift, 0, ARRAY_LENGTH(m_shift));
 	memset(m_multi_collision, 0, ARRAY_LENGTH(m_multi_collision));
 	memset(m_palette_red, 0, ARRAY_LENGTH(m_palette_red));
 	memset(m_palette_green, 0, ARRAY_LENGTH(m_palette_green));
 	memset(m_palette_blue, 0, ARRAY_LENGTH(m_palette_blue));
-	
+
 	m_palette_dirty = 0;
 }
 
@@ -535,7 +535,7 @@ void vic3_device::draw_sprite_code_multi( int y, int xbegin, int code, int prior
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
 		return;
-	
+
 	for (x = 0, mask = 0xc0, shift = 6; x < 8; x += 2, mask >>= 2, shift -= 2)
 	{
 		if (code & mask)
@@ -1499,7 +1499,7 @@ WRITE8_MEMBER( vic3_device::port_w )
 		break;
 	case 0x30:
 		m_reg[offset] = data;
-		if (!m_port_changed.isnull()) 
+		if (!m_port_changed.isnull())
 		{
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 			m_reg[offset] = data;
@@ -2058,5 +2058,3 @@ UINT32 vic3_device::video_update( bitmap_ind16 &bitmap, const rectangle &cliprec
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
-
-

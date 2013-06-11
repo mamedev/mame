@@ -278,7 +278,7 @@ WRITE8_MEMBER( im6402_device::write )
 	}
 	else
 	{
-		set_tbre(CLEAR_LINE);		
+		set_tbre(CLEAR_LINE);
 	}
 }
 

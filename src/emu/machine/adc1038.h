@@ -47,7 +47,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	adc1038_input_read_func           m_input_callback_r_func;
 
 	private:

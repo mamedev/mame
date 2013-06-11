@@ -301,7 +301,7 @@ static astring &nvram_filename(astring &result, device_t &device)
 	running_machine &machine = device.machine();
 
 	// start with either basename or basename_biosnum
-	result.cpy(machine.basename());	
+	result.cpy(machine.basename());
 	if (device.machine().root_device().system_bios() != 0 && device.machine().root_device().default_bios() != device.machine().root_device().system_bios())
 		result.catprintf("_%d", device.machine().root_device().system_bios() - 1);
 

@@ -1,7 +1,7 @@
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)
-	
+
     Emulation by Bryan McPhail, mish@tendril.co.uk/mish@mame.net
     Thanks to Ian Schmidt and Stiletto for sound information!
     Major thanks to Aaron Giles for sound info, figuring out the 68K/ES5505

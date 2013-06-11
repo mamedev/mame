@@ -14,7 +14,7 @@ class sns_rom_sgb_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_sgb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -25,7 +25,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
-	
+
 	virtual DECLARE_READ8_MEMBER(gb_cart_r);
 	virtual DECLARE_WRITE8_MEMBER(gb_bank_w);
 	virtual DECLARE_READ8_MEMBER(gb_ram_r);

@@ -1947,4 +1947,3 @@ bool winwindow_qt_filter(void *message)
 	return false;
 }
 #endif
-

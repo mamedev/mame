@@ -71,7 +71,7 @@ void tc0220ioc_device::device_config_complete()
 	const tc0220ioc_interface *intf = reinterpret_cast<const tc0220ioc_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0220ioc_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -216,7 +216,7 @@ void tc0510nio_device::device_config_complete()
 	const tc0510nio_interface *intf = reinterpret_cast<const tc0510nio_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0510nio_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -362,7 +362,7 @@ void tc0640fio_device::device_config_complete()
 	const tc0640fio_interface *intf = reinterpret_cast<const tc0640fio_interface *>(static_config());
 	if (intf != NULL)
 	*static_cast<tc0640fio_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

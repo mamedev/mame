@@ -1,8 +1,8 @@
 /***********************************************************************************************************
 
- 
+
  PC-Engine & Turbografx-16 cart emulation
- 
+
 
  ***********************************************************************************************************/
 
@@ -98,7 +98,7 @@ READ8_MEMBER(pce_populous_device::read_cart)
 	int bank = offset / 0x20000;
 	if (m_ram && offset >= 0x80000 && offset < 0x88000)
 		return m_ram[offset];
-	
+
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
 }
 
@@ -122,4 +122,3 @@ WRITE8_MEMBER(pce_sf2_device::write_cart)
 	if (offset >= 0x1ff0 && offset < 0x1ff4)
 		m_bank_base = offset & 3;
 }
-

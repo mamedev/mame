@@ -152,7 +152,7 @@ class mac_sound_device : public device_t,
 public:
 	mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mac_sound_device() {}
-	
+
 	void enable_sound(int on);
 	void set_sound_buffer(int buffer);
 	void set_volume(int volume);
@@ -167,7 +167,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	
+
 	ram_device *m_ram;
 	model_t m_mac_model;
 

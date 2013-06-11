@@ -47,7 +47,7 @@ void mc68328_device::device_config_complete()
 	const mc68328_interface *intf = reinterpret_cast<const mc68328_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<mc68328_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -84,7 +84,7 @@ void mc68328_device::device_config_complete()
 //-------------------------------------------------
 
 void mc68328_device::device_start()
-{	
+{
 	m_out_port_a.resolve(m_out_port_a_func, *this);
 	m_out_port_b.resolve(m_out_port_b_func, *this);
 	m_out_port_c.resolve(m_out_port_c_func, *this);
@@ -95,7 +95,7 @@ void mc68328_device::device_start()
 	m_out_port_j.resolve(m_out_port_j_func, *this);
 	m_out_port_k.resolve(m_out_port_k_func, *this);
 	m_out_port_m.resolve(m_out_port_m_func, *this);
-	
+
 	m_in_port_a.resolve(m_in_port_a_func, *this);
 	m_in_port_b.resolve(m_in_port_b_func, *this);
 	m_in_port_c.resolve(m_in_port_c_func, *this);
@@ -108,7 +108,7 @@ void mc68328_device::device_start()
 	m_in_port_m.resolve(m_in_port_m_func, *this);
 
 	m_out_pwm.resolve(m_out_pwm_func, *this);
-	
+
 	m_out_spim.resolve(m_out_spim_func, *this);
 	m_in_spim.resolve(m_in_spim_func, *this);
 
@@ -155,18 +155,18 @@ void mc68328_device::device_reset()
 	m_regs.csd1 = 0x00010006;
 	m_regs.csd2 = 0x00010006;
 	m_regs.csd3 = 0x00010006;
-	
+
 	m_regs.pllcr = 0x2400;
 	m_regs.pllfsr = 0x0123;
 	m_regs.pctlr = 0x1f;
-	
+
 	m_regs.ivr = 0x00;
 	m_regs.icr = 0x0000;
 	m_regs.imr = 0x00ffffff;
 	m_regs.iwr = 0x00ffffff;
 	m_regs.isr = 0x00000000;
 	m_regs.ipr = 0x00000000;
-	
+
 	m_regs.padir = 0x00;
 	m_regs.padata = 0x00;
 	m_regs.pasel = 0x00;
@@ -206,12 +206,12 @@ void mc68328_device::device_reset()
 	m_regs.pmdata = 0x00;
 	m_regs.pmpuen = 0xff;
 	m_regs.pmsel = 0xff;
-	
+
 	m_regs.pwmc = 0x0000;
 	m_regs.pwmp = 0x0000;
 	m_regs.pwmw = 0x0000;
 	m_regs.pwmcnt = 0x0000;
-	
+
 	m_regs.tctl[0] = m_regs.tctl[1] = 0x0000;
 	m_regs.tprer[0] = m_regs.tprer[1] = 0x0000;
 	m_regs.tcmp[0] = m_regs.tcmp[1] = 0xffff;
@@ -221,18 +221,18 @@ void mc68328_device::device_reset()
 	m_regs.wctlr = 0x0000;
 	m_regs.wcmpr = 0xffff;
 	m_regs.wcn = 0x0000;
-	
+
 	m_regs.spisr = 0x0000;
-	
+
 	m_regs.spimdata = 0x0000;
 	m_regs.spimcont = 0x0000;
-	
+
 	m_regs.ustcnt = 0x0000;
 	m_regs.ubaud = 0x003f;
 	m_regs.urx = 0x0000;
 	m_regs.utx = 0x0000;
 	m_regs.umisc = 0x0000;
-	
+
 	m_regs.lssa = 0x00000000;
 	m_regs.lvpw = 0xff;
 	m_regs.lxmax = 0x03ff;
@@ -251,14 +251,14 @@ void mc68328_device::device_reset()
 	m_regs.lposr = 0x00;
 	m_regs.lfrcm = 0xb9;
 	m_regs.lgpmr = 0x1073;
-	
+
 	m_regs.hmsr = 0x00000000;
 	m_regs.alarm = 0x00000000;
 	m_regs.rtcctl = 0x00;
 	m_regs.rtcisr = 0x00;
 	m_regs.rtcienr = 0x00;
 	m_regs.stpwtch = 0x00;
-	
+
 	m_rtc->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
@@ -2735,13 +2735,13 @@ UINT32 mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	UINT16 word;
 	UINT16 *line;
 	int y, x, b;
-	
+
 	if (m_regs.lckcon & LCKCON_LCDC_EN)
 	{
 		for (y = 0; y < 160; y++)
 		{
 			line = &bitmap.pix16(y);
-			
+
 			for (x = 0; x < 160; x += 16)
 			{
 				word = *(video_ram++);
@@ -2757,7 +2757,7 @@ UINT32 mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		for (y = 0; y < 160; y++)
 		{
 			line = &bitmap.pix16(y);
-			
+
 			for (x = 0; x < 160; x++)
 			{
 				line[x] = 0;
@@ -2905,4 +2905,3 @@ void mc68328_device::register_state_save()
 	save_item(NAME(m_regs.rtcienr));
 	save_item(NAME(m_regs.stpwtch));
 }
-

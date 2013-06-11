@@ -32,13 +32,13 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	void do_bankswitch( int offset, int data );
 	void postload_bankswitch();
-	
+
 	// internal state
-	
+
 	/* which chips have their sample address table divided into pages */
 	UINT8 m_page_mask;
 

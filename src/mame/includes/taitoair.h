@@ -44,7 +44,7 @@ public:
 	required_shared_ptr<UINT16> m_paletteram;
 	required_shared_ptr<UINT16> m_gradram;
 	required_shared_ptr<UINT16> m_backregs;
-	
+
 	/* video-related */
 	taitoair_poly  m_q;
 

@@ -17,7 +17,7 @@
    8-bit PCM, 16-bit PCM ...... 0.172 to 88.2kHz in 512 steps
   256 steps total level and 16 steps panpot can be set
   Voice signal is output in stereo 16-bit 2's complement MSB-first format
-  
+
   TODO:
   - Is memory handling 100% correct? At the moment, Konami firebeat.c is the only
     hardware currently emulated that uses external handlers.

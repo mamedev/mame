@@ -40,17 +40,17 @@ public:
 	DECLARE_WRITE8_MEMBER( conv_w );
 	DECLARE_READ8_MEMBER( do_r );
 	DECLARE_READ8_MEMBER( eoc_r );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	void convert(int channel, int bits16, int lsbfirst);
 
 	adc1213x_input_convert_func m_input_callback_r_func;
-	
+
 	private:
 	// internal state
 	int m_cycle;

@@ -99,7 +99,7 @@ void speaker_sound_device::device_config_complete()
 	const speaker_interface *intf = reinterpret_cast<const speaker_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<speaker_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -116,7 +116,7 @@ void speaker_sound_device::device_start()
 {
 	int i;
 	double x;
-	
+
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
 
 	m_level = 0;
@@ -137,7 +137,7 @@ void speaker_sound_device::device_start()
 	/* Note: To avoid time drift due to floating point inaccuracies,
 	 * it is good if the speaker time synchronizes itself with the stream timing regularly.
 	 */
-	
+
 	/* Compute filter kernel; */
 	/* (Done for each device though the data is shared...
 	 *  No problem really, but should be done as part of system init if I knew how)
@@ -157,8 +157,8 @@ void speaker_sound_device::device_start()
 #define FILTER_STEP  (M_PI / 2 / RATE_MULTIPLIER)
 	/* Distribute symmetrically on x axis; center has x=0 if length is odd */
 	for (i = 0,             x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
-		 i < FILTER_LENGTH;
-		 i++,                x += FILTER_STEP)
+			i < FILTER_LENGTH;
+			i++,                x += FILTER_STEP)
 	{
 		if (x == 0)
 			m_ampl[i] = 1;
@@ -180,7 +180,7 @@ void speaker_sound_device::device_start()
 	save_item(NAME(m_channel_last_sample_time));
 	save_item(NAME(m_interm_sample_index));
 	save_item(NAME(m_last_update_time));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(speaker_sound_device::speaker_postload), this));
 }
 
@@ -201,35 +201,35 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	int volume = m_levels[m_level];
 	double filtered_volume;
 	attotime sampled_time = attotime::zero;
-	
+
 	if (samples > 0)
 	{
 		/* Prepare to update time state */
 		sampled_time = attotime(0, m_channel_sample_period);
 		if (samples > 1)
 			sampled_time *= samples;
-		
+
 		/* Note: since the stream is in the process of being updated,
 		 * stream->sample_time() will return the time before the update! (MAME 0.130)
 		 * Avoid using it here in order to avoid a subtle dependence on the stream implementation.
 		 */
 	}
-	
+
 	if (samples-- > 0)
 	{
 		/* Note that first interm. sample may be composed... */
 		filtered_volume = update_interm_samples_get_filtered_volume(volume);
-		
+
 		/* Composite volume is now quantized to the stream resolution */
 		*buffer++ = (stream_sample_t)filtered_volume;
-		
+
 		/* Any additional samples will be homogeneous, however may need filtering across samples: */
 		while (samples-- > 0)
 		{
 			filtered_volume = update_interm_samples_get_filtered_volume(volume);
 			*buffer++ = (stream_sample_t)filtered_volume;
 		}
-		
+
 		/* Update the time state */
 		m_channel_last_sample_time += sampled_time;
 		m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
@@ -289,7 +289,7 @@ void speaker_sound_device::level_w(int new_level)
 
 	/* Finally update speaker state before returning */
 	m_level = new_level;
-	
+
 }
 
 
@@ -394,5 +394,3 @@ double speaker_sound_device::get_filtered_volume()
 
 	return filtered_volume;
 }
-
-

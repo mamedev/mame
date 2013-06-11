@@ -1212,7 +1212,7 @@ WRITE16_MEMBER(md_rom_tekkensp_device::write)
 			// data output mode bit 1 ? (never written by game)
 			break;
 		default:
-			if (data & 0x100)	// data input (only connected to D0 ?)
+			if (data & 0x100)   // data input (only connected to D0 ?)
 			{
 				// 4-bit hardware register ($400004 corresponds to bit0, $400006 to bit1, etc)
 				int shift = (offset - 2) & 3;

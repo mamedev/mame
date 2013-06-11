@@ -1567,7 +1567,7 @@ static MACHINE_CONFIG_DERIVED( asst128, iskr1031 )
 	MCFG_DEVICE_REMOVE("pit8253")
 
 	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
-	
+
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 
@@ -2038,8 +2038,8 @@ ROM_END
 ROM_START( t1000sl )
 	ROM_REGION(0x100000,"maincpu", 0)
 
-    // 8076312.hu1 - most likely v01.04.00
-    // 8075312.hu2
+	// 8076312.hu1 - most likely v01.04.00
+	// 8075312.hu2
 
 
 	// partlist says it has 1 128kbyte rom

@@ -75,24 +75,24 @@ void pit8253_device::device_config_complete()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pit8253_device::common_start( int device_type ) 
+void pit8253_device::common_start( int device_type )
 {
 	m_device_type = device_type;
-	
+
 	/* register for state saving */
 	for (int timerno = 0; timerno < PIT8253_MAX_TIMER; timerno++)
 	{
 		pit8253_timer *timer = get_timer(timerno);
-		
+
 		/* initialize timer */
 		timer->clockin = m_intf_timer[timerno].clockin;
 		timer->updatetimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pit8253_device::update_timer_cb),this));
 		timer->updatetimer->adjust(attotime::never, timerno);
-		
+
 		/* resolve callbacks */
 		timer->in_gate_func.resolve(m_intf_timer[timerno].in_gate_func, *this);
 		timer->out_out_func.resolve(m_intf_timer[timerno].out_out_func, *this);
-		
+
 		/* set up state save values */
 		save_item(NAME(timer->clockin), timerno);
 		save_item(NAME(timer->control), timerno);
@@ -144,20 +144,20 @@ void pit8253_device::device_reset()
 		timer->rmsb = timer->wmsb = 0;
 		timer->count = timer->value = timer->latch = 0;
 		timer->lowcount = 0;
-		
+
 		if (!timer->in_gate_func.isnull())
 			timer->gate = timer->in_gate_func();
 		else
 			timer->gate = 1;
-		
+
 		timer->output = 2;  /* output is undetermined */
 		timer->latched_count = 0;
 		timer->latched_status = 0;
 		timer->null_count = 1;
 		timer->cycles_to_output = CYCLES_NEVER;
-		
+
 		timer->last_updated = machine().time();
-		
+
 		update(timer);
 	}
 }
@@ -311,7 +311,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 	LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
 			(int)elapsed_cycles, timer->index, mode, bcd, timer->phase, pit8253_gate(timer), timer->output, timer->value));
 
-	switch (mode) 
+	switch (mode)
 	{
 	case 0:
 		/* Mode 0: (Interrupt on Terminal Count)
@@ -342,7 +342,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
 				/* Counter load cycle */
-				if (elapsed_cycles > 0) 
+				if (elapsed_cycles > 0)
 				{
 					--elapsed_cycles;
 					timer->phase = 2;
@@ -406,7 +406,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 		if (elapsed_cycles >= 0 && timer->phase == 1)
 		{
 			/* Counter load cycle, output goes low */
-			if (elapsed_cycles > 0) 
+			if (elapsed_cycles > 0)
 			{
 				--elapsed_cycles;
 				timer->phase = 2;
@@ -472,7 +472,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 		{
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
-				if (elapsed_cycles > 0) 
+				if (elapsed_cycles > 0)
 				{
 					--elapsed_cycles;
 					timer->phase = 2;
@@ -552,7 +552,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 		{
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
-				if (elapsed_cycles > 0) 
+				if (elapsed_cycles > 0)
 				{
 					--elapsed_cycles;
 					timer->phase = 2;
@@ -560,7 +560,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 				load_counter_value(timer);
 			}
 
-			if (elapsed_cycles > 0) 
+			if (elapsed_cycles > 0)
 			{
 				adjusted_value = adjusted_count(bcd, timer->value);
 
@@ -635,7 +635,7 @@ void pit8253_device::simulate2(pit8253_timer *timer, INT64 elapsed_cycles)
 		{
 			if (elapsed_cycles >= 0 && timer->phase == 1)
 			{
-				if (elapsed_cycles > 0) 
+				if (elapsed_cycles > 0)
 				{
 					--elapsed_cycles;
 					timer->phase = 2;
@@ -799,12 +799,12 @@ READ8_MEMBER( pit8253_device::read )
 				timer->rmsb = 1 - timer->rmsb;
 				--timer->latched_count;
 			}
-			else 
+			else
 			{
 				value = masked_value(timer);
 
 				/* Read back current count */
-				switch(CTRL_ACCESS(timer->control)) 
+				switch(CTRL_ACCESS(timer->control))
 				{
 				case 0:
 				default:
@@ -892,7 +892,7 @@ void pit8253_device::readback(pit8253_timer *timer, int command)
 		if (timer->latched_count == 0)
 		{
 			value = masked_value(timer);
-			switch(CTRL_ACCESS(timer->control)) 
+			switch(CTRL_ACCESS(timer->control))
 			{
 			case 0:
 				/* This should never happen */
@@ -928,7 +928,7 @@ WRITE8_MEMBER( pit8253_device::write )
 
 	LOG2(("pit8253: write(): offset=%d data=0x%02x\n", offset, data));
 
-	if (timer == NULL) 
+	if (timer == NULL)
 	{
 		/* Write to mode control register */
 		timer = get_timer((data >> 6) & 3);
@@ -982,7 +982,7 @@ WRITE8_MEMBER( pit8253_device::write )
 		if (machine().time() > timer->last_updated && timer->clockin != 0)
 			middle_of_a_cycle = 1;
 
-		switch(CTRL_ACCESS(timer->control)) 
+		switch(CTRL_ACCESS(timer->control))
 		{
 		case 0:
 			/* This should never happen */
@@ -1124,4 +1124,3 @@ void pit8253_device::set_clock_signal(int timerno, int state)
 WRITE_LINE_MEMBER( pit8253_device::clk0_w ) { set_clock_signal(0, state); }
 WRITE_LINE_MEMBER( pit8253_device::clk1_w ) { set_clock_signal(1, state); }
 WRITE_LINE_MEMBER( pit8253_device::clk2_w ) { set_clock_signal(2, state); }
-

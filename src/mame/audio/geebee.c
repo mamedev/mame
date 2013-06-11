@@ -12,7 +12,7 @@
 
 
 const device_type GEEBEE = &device_creator<geebee_sound_device>;
- 
+
 geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GEEBEE, "Gee Bee Custom", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
@@ -26,17 +26,17 @@ geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const ch
 		m_vcount(0)
 {
 }
- 
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
- 
+
 void geebee_sound_device::device_config_complete()
 {
 }
- 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -60,7 +60,7 @@ void geebee_sound_device::device_start()
 	save_item(NAME(m_noise));
 	save_item(NAME(m_vcount));
 }
- 
+
 void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -69,7 +69,7 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 			if (--m_volume < 0)
 				m_volume = 0;
 			break;
-			
+
 		default:
 			assert_always(FALSE, "Unknown id in geebee_device::device_timer");
 	}
@@ -81,11 +81,11 @@ WRITE8_MEMBER( geebee_sound_device::sound_w )
 	m_sound_latch = data;
 	m_volume = 0x7fff; /* set volume */
 	m_noise = 0x0000;  /* reset noise shifter */
- 	/* faster decay enabled? */
+	/* faster decay enabled? */
 	if( m_sound_latch & 8 )
- 	{
- 		/*
- 		 * R24 is 10k, Rb is 0, C57 is 1uF
+	{
+		/*
+		 * R24 is 10k, Rb is 0, C57 is 1uF
 		 * charge time t1 = 0.693 * (R24 + Rb) * C57 -> 0.22176s
 		 * discharge time t2 = 0.693 * (Rb) * C57 -> 0
 		 * Then C33 is only charged via D6 (1N914), not discharged!
@@ -114,52 +114,52 @@ WRITE8_MEMBER( geebee_sound_device::sound_w )
 //-------------------------------------------------
 
 void geebee_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
- {
- 	stream_sample_t *buffer = outputs[0];
- 
- 	while (samples--)
- 	{
+	{
+	stream_sample_t *buffer = outputs[0];
+
+	while (samples--)
+	{
 		*buffer++ = m_sound_signal;
- 		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
- 		{
+		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
+		{
 			m_vcount++;
- 			/* noise clocked with raising edge of 2V */
+			/* noise clocked with raising edge of 2V */
 			if ((m_vcount & 3) == 2)
- 			{
- 				/* bit0 = bit0 ^ !bit10 */
+			{
+				/* bit0 = bit0 ^ !bit10 */
 				if ((m_noise & 1) == ((m_noise >> 10) & 1))
 					m_noise = ((m_noise << 1) & 0xfffe) | 1;
- 				else
+				else
 					m_noise = (m_noise << 1) & 0xfffe;
- 			}
+			}
 			switch (m_sound_latch & 7)
- 			{
- 			case 0: /* 4V */
+			{
+			case 0: /* 4V */
 				m_sound_signal = (m_vcount & 0x04) ? m_decay[m_volume] : 0;
- 				break;
- 			case 1: /* 8V */
+				break;
+			case 1: /* 8V */
 				m_sound_signal = (m_vcount & 0x08) ? m_decay[m_volume] : 0;
- 				break;
- 			case 2: /* 16V */
+				break;
+			case 2: /* 16V */
 				m_sound_signal = (m_vcount & 0x10) ? m_decay[m_volume] : 0;
- 				break;
- 			case 3: /* 32V */
+				break;
+			case 3: /* 32V */
 				m_sound_signal = (m_vcount & 0x20) ? m_decay[m_volume] : 0;
- 				break;
- 			case 4: /* TONE1 */
+				break;
+			case 4: /* TONE1 */
 				m_sound_signal = !(m_vcount & 0x01) && !(m_vcount & 0x10) ? m_decay[m_volume] : 0;
- 				break;
- 			case 5: /* TONE2 */
+				break;
+			case 5: /* TONE2 */
 				m_sound_signal = !(m_vcount & 0x02) && !(m_vcount & 0x20) ? m_decay[m_volume] : 0;
- 				break;
- 			case 6: /* TONE3 */
+				break;
+			case 6: /* TONE3 */
 				m_sound_signal = !(m_vcount & 0x04) && !(m_vcount & 0x40) ? m_decay[m_volume] : 0;
- 				break;
- 			default: /* NOISE */
- 				/* QH of 74164 #4V */
+				break;
+			default: /* NOISE */
+				/* QH of 74164 #4V */
 				m_sound_signal = (m_noise & 0x8000) ? m_decay[m_volume] : 0;
- 			}
-			
- 		}
- 	}
+			}
+
+		}
+	}
 }

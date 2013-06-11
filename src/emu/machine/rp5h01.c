@@ -3,8 +3,8 @@
     RP5H01
 
     TODO:
-    - follow the datasheet better (all dumps presumably needs to be redone 
-	  from scratch?)
+    - follow the datasheet better (all dumps presumably needs to be redone
+      from scratch?)
 
 ***************************************************************************/
 
@@ -187,5 +187,3 @@ READ8_MEMBER( rp5h01_device::data_r )
 	/* return the data */
 	return (m_data[byte] >> bit) & 1;
 }
-
-

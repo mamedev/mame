@@ -258,7 +258,7 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 	else
 	if (m_kbd_row == 3)
 		i = m_io_line3->read();
-	
+
 	/* if previous key is still held, bail out */
 	if (i)
 		if (tec1_convert_col_to_bin(i, m_kbd_row) == m_kbd)

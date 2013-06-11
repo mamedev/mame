@@ -3023,9 +3023,9 @@ INPUT_PORTS_END
   Attack Force, by E.G.S., Italy
   Not much information is available for this game.
   It may have had an amber monitor?
-  
+
   XTAL 20MHz
-  
+
   TODO: sound
 
 *****************************************************/
@@ -3073,7 +3073,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT32 len = memregion("maincpu")->bytes();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, len);
-	
+
 	// swap a8/a9
 	for (int i = 0; i < len; i++)
 		buffer[BITSWAP16(i, 15,14,13,12,11,10,8,9, 7,6,5,4,3,2,1,0)] = rom[i];
@@ -4554,7 +4554,7 @@ ROM_START( attackfc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "30a.bin",       0x0000, 0x0400, CRC(c12e3386) SHA1(72b1d3d67a83edf0be0b0c37ef6dcffba450f16f) )
 	ROM_LOAD( "36a.bin",       0x0400, 0x0400, CRC(6738dcb9) SHA1(e4c68553fc3f2d3db3d251b9cb325e2409d9c02a) )
-	ROM_LOAD( "31a.bin",	   0x0800, 0x0400, CRC(787a4658) SHA1(5be3143bdba6a32256603be94400034a8ea1fda6) )
+	ROM_LOAD( "31a.bin",       0x0800, 0x0400, CRC(787a4658) SHA1(5be3143bdba6a32256603be94400034a8ea1fda6) )
 	ROM_LOAD( "37a.bin",       0x0c00, 0x0400, CRC(ad6bfbbe) SHA1(5f5437b6c8e7dfe9649b25040862f8a51d8c43ed) )
 	ROM_LOAD( "32a.bin",       0x1000, 0x0400, CRC(cbe0a711) SHA1(6e5f4214a4b48b70464005f4263c9b1ec3cbbeb1) )
 	ROM_LOAD( "33a.bin",       0x1800, 0x0400, CRC(53147393) SHA1(57e078f1734e382e8a46be09c133daab30c75681) )

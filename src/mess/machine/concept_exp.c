@@ -1,14 +1,14 @@
 /**********************************************************************
- 
+
  Corvus Concept expansion port emulation
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
- 
+
+
  FIXME: Concept expansion ports should just use the Apple II Bus device!
- The code below is outdated and inaccurate! 
- 
+ The code below is outdated and inaccurate!
+
  **********************************************************************/
 
 #include "machine/concept_exp.h"
@@ -82,7 +82,7 @@ READ8_MEMBER( concept_exp_port_device::rom_r )
 {
 	if (m_card)
 		return m_card->reg_r(space, offset);
-	
+
 	return 0;
 }
 
@@ -139,7 +139,7 @@ enum
 	LS_8IN_bit      = 5,    // 1 if 8" floppy drive?
 	LS_DSKCHG_bit   = 6,    // 0 if disk changed, 1 if not
 	LS_SD_bit       = 7,    // 1 if single density
-	
+
 	LS_DRQ_mask     = (1 << LS_DRQ_bit),
 	LS_INT_mask     = (1 << LS_INT_bit),
 	LS_SS_mask      = (1 << LS_SS_bit),
@@ -156,7 +156,7 @@ enum
 	LC_MOTOROF_bit  = 5,    // 1 if motor to be turned off
 	LC_FLP8IN_bit   = 6,    // 1 to select 8", 0 for 5"1/4 (which I knew what it means)
 	LC_FMMFM_bit    = 7,    // 1 to select single density, 0 for double
-	
+
 	LC_FLPSD1_mask  = (1 << LC_FLPSD1_bit),
 	LC_DE0_mask     = (1 << LC_DE0_bit),
 	LC_DE1_mask     = (1 << LC_DE1_bit),
@@ -209,22 +209,22 @@ READ8_MEMBER(concept_fdc_device::reg_r)
 {
 	switch (offset)
 	{
-		case  0:	// LOCAL STATUS REG
+		case  0:    // LOCAL STATUS REG
 			return m_fdc_local_status;
-			
-		case  8:	// FDC STATUS REG
+
+		case  8:    // FDC STATUS REG
 			return wd17xx_status_r(m_wd179x, space, offset);
-			
-		case  9:	// FDC TRACK REG
+
+		case  9:    // FDC TRACK REG
 			return wd17xx_track_r(m_wd179x, space, offset);
-			
-		case 10:	// FDC SECTOR REG
+
+		case 10:    // FDC SECTOR REG
 			return wd17xx_sector_r(m_wd179x, space, offset);
-			
-		case 11:	// FDC DATA REG
+
+		case 11:    // FDC DATA REG
 			return wd17xx_data_r(m_wd179x, space, offset);
 	}
-	
+
 	return 0;
 }
 
@@ -234,9 +234,9 @@ WRITE8_MEMBER(concept_fdc_device::reg_w)
 
 	switch (offset)
 	{
-		case 0:		// LOCAL COMMAND REG
+		case 0:     // LOCAL COMMAND REG
 			m_fdc_local_command = data;
-			
+
 			wd17xx_set_side(m_wd179x, (data & LC_FLPSD1_mask) != 0);
 			current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
 			wd17xx_set_drive(m_wd179x, current_drive);
@@ -246,20 +246,20 @@ WRITE8_MEMBER(concept_fdc_device::reg_w)
 			wd17xx_dden_w(m_wd179x, BIT(data, 7));
 			floppy_drive_set_ready_state(floppy_get_device(machine(), current_drive), 1, 0);
 			break;
-			
-		case  8:	// FDC COMMAMD REG
+
+		case  8:    // FDC COMMAMD REG
 			wd17xx_command_w(m_wd179x, space, offset, data);
 			break;
-			
-		case  9:	// FDC TRACK REG
+
+		case  9:    // FDC TRACK REG
 			wd17xx_track_w(m_wd179x, space, offset, data);
 			break;
-			
-		case 10:	// FDC SECTOR REG
+
+		case 10:    // FDC SECTOR REG
 			wd17xx_sector_w(m_wd179x, space, offset, data);
 			break;
-			
-		case 11:	// FDC DATA REG
+
+		case 11:    // FDC DATA REG
 			wd17xx_data_w(m_wd179x, space, offset, data);
 			break;
 	}
@@ -276,42 +276,42 @@ static LEGACY_FLOPPY_OPTIONS_START(concept)
 #if 1
 /* SSSD 8" */
 LEGACY_FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([1])
-					 TRACKS([77])
-					 SECTORS([26])
-					 SECTOR_LENGTH([128])
-					 FIRST_SECTOR_ID([1]))
+						HEADS([1])
+						TRACKS([77])
+						SECTORS([26])
+						SECTOR_LENGTH([128])
+						FIRST_SECTOR_ID([1]))
 #elif 0
 /* SSDD 8" (according to ROMs) */
 LEGACY_FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([1])
-					 TRACKS([77])
-					 SECTORS([26])
-					 SECTOR_LENGTH([256])
-					 FIRST_SECTOR_ID([1]))
+						HEADS([1])
+						TRACKS([77])
+						SECTORS([26])
+						SECTOR_LENGTH([256])
+						FIRST_SECTOR_ID([1]))
 #elif 0
 /* Apple II DSDD 5"1/4 (according to ROMs) */
 LEGACY_FLOPPY_OPTION(concept, "img", "Corvus Concept Apple II 5\"1/4 DSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([2])
-					 TRACKS([35])
-					 SECTORS([16])
-					 SECTOR_LENGTH([256])
-					 FIRST_SECTOR_ID([1]))
+						HEADS([2])
+						TRACKS([35])
+						SECTORS([16])
+						SECTOR_LENGTH([256])
+						FIRST_SECTOR_ID([1]))
 #elif 0
 /* actual formats found */
 LEGACY_FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (256-byte sectors)", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([2])
-					 TRACKS([80])
-					 SECTORS([16])
-					 SECTOR_LENGTH([256])
-					 FIRST_SECTOR_ID([1]))
+						HEADS([2])
+						TRACKS([80])
+						SECTORS([16])
+						SECTOR_LENGTH([256])
+						FIRST_SECTOR_ID([1]))
 #else
 LEGACY_FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (512-byte sectors)", basicdsk_identify_default, basicdsk_construct_default, NULL,
-					 HEADS([2])
-					 TRACKS([80])
-					 SECTORS([9])
-					 SECTOR_LENGTH([512])
-					 FIRST_SECTOR_ID([1]))
+						HEADS([2])
+						TRACKS([80])
+						SECTORS([9])
+						SECTOR_LENGTH([512])
+						FIRST_SECTOR_ID([1]))
 #endif
 LEGACY_FLOPPY_OPTIONS_END
 
@@ -358,13 +358,13 @@ READ8_MEMBER(concept_hdc_device::reg_r)
 {
 	switch (offset)
 	{
-		case 0:		// HDC Data Register
+		case 0:     // HDC Data Register
 			return corvus_hdc_data_r(space, offset);
-			
-		case 1:		// HDC Status Register
+
+		case 1:     // HDC Status Register
 			return corvus_hdc_status_r(space, offset);
 	}
-	
+
 	return 0;
 }
 
@@ -373,7 +373,7 @@ WRITE8_MEMBER(concept_hdc_device::reg_w)
 {
 	switch (offset)
 	{
-		case 0:		// HDC Data Register
+		case 0:     // HDC Data Register
 			corvus_hdc_data_w(space, offset, data);
 			break;
 	}
@@ -396,4 +396,3 @@ machine_config_constructor concept_hdc_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME(hdc);
 }
-

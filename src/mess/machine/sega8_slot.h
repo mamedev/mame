@@ -48,12 +48,12 @@ public:
 	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	
+
 	void rom_alloc(running_machine &machine, UINT32 size);
 	void ram_alloc(running_machine &machine, UINT32 size);
-	
+
 	virtual void late_bank_setup() {}
-	
+
 	void set_has_battery(bool val) { has_battery = val; }
 	bool get_has_battery() { return has_battery; }
 	void set_late_battery(bool val) { m_late_battery_enable = val; }
@@ -62,7 +62,7 @@ public:
 	int get_lphaser_xoffs() { return m_lphaser_xoffs; }
 	void set_sms_mode(int val) { m_sms_mode = val; }
 	int get_sms_mode() { return m_sms_mode; }
-	
+
 //protected:
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
@@ -81,10 +81,10 @@ public:
 	int m_rom_page_count;
 
 	bool has_battery;
-	
-	// we use this variable for fullpath loading only: in this case, RAM is always allocated, 
+
+	// we use this variable for fullpath loading only: in this case, RAM is always allocated,
 	// but we set has_battery only if RAM is actually enabled during game...
-	bool m_late_battery_enable;	
+	bool m_late_battery_enable;
 
 	int m_lphaser_xoffs;
 	int m_sms_mode;
@@ -218,14 +218,12 @@ public:
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<sega8_card_slot_device *>(device)->set_mandatory(FALSE); \
 	static_cast<sega8_card_slot_device *>(device)->set_intf("sms_card"); \
-	static_cast<sega8_card_slot_device *>(device)->set_ext("bin"); \
-
+	static_cast<sega8_card_slot_device *>(device)->set_ext("bin");
 #define MCFG_SG1000_CARD_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, SEGA8_CARD_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	static_cast<sega8_card_slot_device *>(device)->set_intf("sg1000_cart"); \
-	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sg"); \
-
+	static_cast<sega8_card_slot_device *>(device)->set_ext("bin,sg");
 
 
 #endif

@@ -53,16 +53,16 @@ inline void gba_state::update_mask(UINT8* mask, int mode, int submode, UINT32* o
 		for (int x = 0; x < 240; x++)
 		{
 			mask[x] = out_mask;
-			
+
 			if ((obj_win[x] & 0x80000000) == 0)
 				mask[x] = m_WINOUT >> 8;
-			
+
 			if (inwin1)
 			{
 				if (is_in_window(x, 1))
 					mask[x] = in1_mask;
 			}
-			
+
 			if (inwin0)
 			{
 				if (is_in_window(x, 0))
@@ -87,7 +87,7 @@ inline void gba_state::update_mask(UINT8* mask, int mode, int submode, UINT32* o
 		mode_mask = ~0x0b;
 	}
 
-	
+
 	if (mode_mask)
 	{
 		for (int x = 0; x < 240; x++)
@@ -103,8 +103,8 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 	UINT8 inWin0Mask = m_WININ & 0x00ff;
 	UINT8 inWin1Mask = m_WININ >> 8;
 	UINT8 outMask = m_WINOUT & 0x00ff;
-	UINT8 masks[240];	// this puts together WinMasks with the fact that some modes/submodes skip specific layers!
-	
+	UINT8 masks[240];   // this puts together WinMasks with the fact that some modes/submodes skip specific layers!
+
 	if (submode == GBA_SUBMODE2)
 	{
 		if (m_DISPCNT & DISPCNT_WIN0_EN)
@@ -117,7 +117,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 			else
 				inWindow0 |= (y >= v0 || y < v1) ? 1 : 0;
 		}
-		
+
 		if (m_DISPCNT & DISPCNT_WIN1_EN)
 		{
 			UINT8 v0 = m_WIN1V >> 8;
@@ -129,7 +129,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 				inWindow1 |= (y >= v0 || y < v1) ? 1 : 0;
 		}
 	}
-	
+
 	// Draw BG
 	switch (mode)
 	{
@@ -154,7 +154,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 			draw_roz_bitmap_scanline(line2, y, DISPCNT_BG2_EN, m_BG2CNT, m_BG2X, m_BG2Y, m_BG2PA, m_BG2PB, m_BG2PC, m_BG2PD, &m_gfxBG2X, &m_gfxBG2Y, m_gfxBG2Changed, bpp);
 			break;
 	}
-	
+
 	// Draw OAM
 	draw_gba_oam(lineOBJ, y);
 	if (submode == GBA_SUBMODE2)
@@ -162,73 +162,73 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 
 	memset(masks, 0xff, sizeof(masks));
 	update_mask(&masks[0], mode, submode, lineOBJWin, inWindow0, inWindow1, inWin0Mask, inWin1Mask, outMask);
-	
+
 	for (int x = 0; x < 240; x++)
 	{
 		UINT32 color = backdrop;
 		UINT8 top = 0x20;
-		
+
 		if ((UINT8)(line0[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x01)
 		{
 			color = line0[x];
 			top = 0x01;
 		}
-		
+
 		if ((UINT8)(line1[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x02)
 		{
 			color = line1[x];
 			top = 0x02;
 		}
-		
+
 		if ((UINT8)(line2[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x04)
 		{
 			color = line2[x];
 			top = 0x04;
 		}
-		
+
 		if ((UINT8)(line3[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x08)
 		{
 			color = line3[x];
 			top = 0x08;
 		}
-		
+
 		if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(color >> 24) && masks[x] & 0x10)
 		{
 			color = lineOBJ[x];
 			top = 0x10;
 		}
-		
+
 		if (color & 0x00010000)
 		{
 			if (submode != GBA_SUBMODE0 || top == 0x10)
 			{
 				UINT32 back = backdrop;
 				UINT8 top2 = 0x20;
-				
+
 				if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
 				{
 					back = line0[x];
 					top2 = 0x01;
 				}
-				
+
 				if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
 				{
 					back = line1[x];
 					top2 = 0x02;
 				}
-				
+
 				if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
 				{
 					back = line2[x];
 					top2 = 0x04;
 				}
-				
+
 				if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
 				{
 					back = line3[x];
 					top2 = 0x08;
 				}
-				
+
 				if (top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 					color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 				else
@@ -260,7 +260,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 					{
 						UINT32 back = backdrop;
 						UINT8 top2 = 0x20;
-						
+
 						if ((UINT8)(line0[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x01)
 						{
 							if (top != 0x01)
@@ -269,7 +269,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 								top2 = 0x01;
 							}
 						}
-						
+
 						if ((UINT8)(line1[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x02)
 						{
 							if (top != 0x02)
@@ -278,7 +278,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 								top2 = 0x02;
 							}
 						}
-						
+
 						if ((UINT8)(line2[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x04)
 						{
 							if (top != 0x04)
@@ -287,7 +287,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 								top2 = 0x04;
 							}
 						}
-						
+
 						if ((UINT8)(line3[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x08)
 						{
 							if (top != 0x08)
@@ -296,7 +296,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 								top2 = 0x08;
 							}
 						}
-						
+
 						if ((UINT8)(lineOBJ[x] >> 24) < (UINT8)(back >> 24) && masks[x] & 0x10)
 						{
 							if (top != 0x10)
@@ -305,7 +305,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 								top2 = 0x10;
 							}
 						}
-						
+
 						if (top2 & (m_BLDCNT >> BLDCNT_TP2_SHIFT))
 							color = alpha_blend_pixel(color, back, coeff[m_BLDALPHA & 0x1f], coeff[(m_BLDALPHA >> 8) & 0x1f]);
 					}
@@ -320,7 +320,7 @@ void gba_state::draw_modes(int mode, int submode, int y, UINT32* line0, UINT32* 
 			}
 		}
 		lineMix[x] = color;
-	}	
+	}
 	if (mode == GBA_MODE1 || mode == GBA_MODE2 || mode == GBA_MODE345)
 		m_gfxBG2Changed = 0;
 	if (mode == GBA_MODE2)
@@ -336,13 +336,13 @@ void gba_state::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enab
 	INT32 sy = (depth == 4) ? 128 : 160;
 	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
 	INT32 cx, cy, pixx, pixy, x;
-	
+
 	if ((depth == 8) && (m_DISPCNT & DISPCNT_FRAMESEL))
 		src8 += 0xa000;
-	
+
 	if ((depth == 4) && (m_DISPCNT & DISPCNT_FRAMESEL))
 		src16 += 0xa000/2;
-	
+
 	// sign extend roz parameters
 	if (X & 0x08000000) X |= 0xf0000000;
 	if (Y & 0x08000000) Y |= 0xf0000000;
@@ -350,23 +350,23 @@ void gba_state::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enab
 	if (PB & 0x8000) PB |= 0xffff0000;
 	if (PC & 0x8000) PC |= 0xffff0000;
 	if (PD & 0x8000) PD |= 0xffff0000;
-	
+
 	if(ypos == 0)
 		changed = 3;
-	
+
 	if(changed & 1)
 		*currentx = X;
 	else
 		*currentx += PB;
-	
+
 	if(changed & 2)
 		*currenty = Y;
 	else
 		*currenty += PD;
-	
+
 	cx = *currentx;
 	cy = *currenty;
-	
+
 	if(ctrl & BGCNT_MOSAIC)
 	{
 		INT32 mosaic_line = ((m_MOSAIC & 0xf0) >> 4) + 1;
@@ -374,10 +374,10 @@ void gba_state::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enab
 		cx = X + tempy*PB;
 		cy = Y + tempy*PD;
 	}
-	
+
 	pixx = cx >> 8;
 	pixy = cy >> 8;
-	
+
 	for(x = 0; x < 240; x++)
 	{
 		if(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy)
@@ -396,14 +396,14 @@ void gba_state::draw_roz_bitmap_scanline(UINT32 *scanline, int ypos, UINT32 enab
 				scanline[x] = src16[pixy*sx + pixx] | prio;
 			}
 		}
-		
+
 		cx += PA;
 		cy += PC;
-		
+
 		pixx = cx >> 8;
 		pixy = cy >> 8;
 	}
-	
+
 	if(ctrl & BGCNT_MOSAIC)
 	{
 		INT32 mosaicx = (m_MOSAIC & 0x0f) + 1;
@@ -508,17 +508,17 @@ void gba_state::draw_roz_scanline(UINT32 *scanline, int ypos, UINT32 enablemask,
 				// shall we shift for (ctrl & BGCNT_PALETTE256)?? or is not effective for ROZ?
 				tile = mgba_vram[mapbase + (pixx >> 3) + (pixy >> 3) * (sizes[size] >> 3)];
 				pixel = mgba_vram[base + (tile << 6) + (tiley << 3) + tilex];
-				
+
 				// plot it
 				scanline[x] = pixel ? (pgba_pram[pixel] | prio) : 0x80000000;
 			}
-			
+
 			cx += PA;
 			cy += PC;
-			
+
 			pixx = cx >> 8;
 			pixy = cy >> 8;
-			
+
 			if(ctrl & BGCNT_PALETTESET_WRAP)
 			{
 				pixx %= sizes[size];
@@ -573,10 +573,9 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 
 	for (x = 0; x < 240; x++)
 		scanline[x] = 0x80000000;
-		
+
 	if(m_DISPCNT & enablemask)
 	{
-		
 		switch((ctrl & BGCNT_SCREENSIZE) >> BGCNT_SCREENSIZE_SHIFT)
 		{
 			case 1:
@@ -590,13 +589,13 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 				height = 512;
 				break;
 		}
-		
+
 		maskx = width - 1;
 		masky = height - 1;
-		
+
 		pixx = hofs & maskx;
 		pixy = (vofs + ypos) & masky;
-		
+
 		if(use_mosaic)
 		{
 			if((ypos % mosaicy) != 0)
@@ -605,7 +604,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 				pixy = (vofs + mosaicy) & masky;
 			}
 		}
-		
+
 		if(pixy > 255 && height > 256)
 		{
 			pixy &= 0x000000ff;
@@ -615,9 +614,9 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 				screendata += 0x400;
 			}
 		}
-		
+
 		stride = (pixy >> 3) << 5;
-		
+
 		UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
 		for(x = 0; x < 240; x++)
 		{
@@ -627,7 +626,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 			INT32 tiley = pixy & 7;
 			UINT8 color;
 			UINT8 palindex;
-			
+
 			if(data & TILEOBJ_HFLIP)
 			{
 				tilex = 7 - tilex;
@@ -636,7 +635,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 			{
 				tiley = 7 - tiley;
 			}
-			
+
 			if (ctrl & BGCNT_PALETTE256)
 			{
 				color = chardata[(tile << 6) + (tiley << 3) + tilex];
@@ -645,19 +644,19 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 			else
 			{
 				color = chardata[(tile << 5) + (tiley << 2) + (tilex >> 1)];
-				
+
 				if (tilex & 1)
 					color >>= 4;
 				else
 					color &= 0x0f;
 				palindex = (data >> 8) & 0x00f0;
-			}				
+			}
 
 			if (color)
 				scanline[x] = palette[palindex + color] | priority;
 			else
 				scanline[x] = 0x80000000;
-			
+
 			if (data & TILEOBJ_HFLIP)
 			{
 				if (tilex == 0)
@@ -669,7 +668,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 			{
 				src++;
 			}
-			
+
 			pixx++;
 			if(pixx == 256)
 			{
@@ -689,7 +688,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 				src = screendata + stride;
 			}
 		}
-		
+
 		if(use_mosaic)
 		{
 			if(mosaicx > 1)
@@ -707,7 +706,7 @@ void gba_state::draw_bg_scanline(UINT32 *scanline, int ypos, UINT32 enablemask, 
 				}
 			}
 		}
-		
+
 	}
 }
 
@@ -722,7 +721,7 @@ void gba_state::draw_gba_oam_window(UINT32 *scanline, int y)
 
 	for (x = 0; x < 240; x++)
 		scanline[x] = 0x80000000;
-	
+
 	if (m_DISPCNT & DISPCNT_OBJWIN_EN)
 	{
 		for( gba_oamindex = 127; gba_oamindex >= 0; gba_oamindex-- )
@@ -1170,7 +1169,7 @@ void gba_state::draw_gba_oam(UINT32 *scanline, int y)
 
 	for (x = 0; x < 240; x++)
 		scanline[x] = 0x80000000;
-	
+
 	if( m_DISPCNT & DISPCNT_OBJ_EN )
 	{
 		for( gba_oamindex = 0; gba_oamindex < 128; gba_oamindex++ )
@@ -1861,7 +1860,7 @@ void gba_state::draw_scanline(int y)
 		depth = 8;
 	else if ((m_DISPCNT & 7) == 5)
 		depth = 4;
-	
+
 	//printf("mode = %d, %d\n", m_DISPCNT & 7, submode);
 
 	switch(m_DISPCNT & 7)
@@ -1880,7 +1879,7 @@ void gba_state::draw_scanline(int y)
 			fatalerror("Invalid screen mode (6 or 7)!\n");
 			break;
 	}
-	
+
 	for (int x = 0; x < 240; x++)
 	{
 		scanline[x] = m_xferscan[6][1024 + x] & 0x7fff;

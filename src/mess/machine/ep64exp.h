@@ -57,7 +57,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define EP64_EXPANSION_BUS_TAG	"exp"
+#define EP64_EXPANSION_BUS_TAG  "exp"
 
 
 
@@ -86,7 +86,7 @@
 class device_ep64_expansion_bus_card_interface;
 
 class ep64_expansion_bus_slot_device : public device_t,
-									   public device_slot_interface
+										public device_slot_interface
 {
 	friend class device_ep64_expansion_bus_card_interface;
 

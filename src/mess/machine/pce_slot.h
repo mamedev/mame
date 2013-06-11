@@ -44,7 +44,7 @@ public:
 	UINT32 m_ram_size;
 
 	void rom_map_setup(UINT32 size);
-	
+
 	UINT8 rom_bank_map[8];    // 128K chunks of rom
 };
 

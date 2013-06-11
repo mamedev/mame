@@ -100,7 +100,7 @@ public:
 	DECLARE_READ16_MEMBER(read_cs1_pc);
 	DECLARE_WRITE16_MEMBER(write_cs0_pc);
 	DECLARE_WRITE16_MEMBER(write_cs1_pc);
-	
+
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);
 	void read_sector_done();

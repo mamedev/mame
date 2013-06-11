@@ -155,7 +155,7 @@ class md_rom_16mj2_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -447,15 +447,15 @@ class md_rom_tekkensp_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_tekkensp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
-	
+
 private:
 	UINT16 m_reg;
 };

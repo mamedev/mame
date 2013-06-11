@@ -46,7 +46,7 @@ void serflash_device::device_reset()
 {
 	m_flash_enab = 0;
 	flash_hard_reset(machine());
-	
+
 	m_last_flash_cmd = 0x00;
 	m_flash_addr_seq = 0;
 	m_flash_addr = 0;
@@ -61,7 +61,6 @@ void serflash_device::device_reset()
 
 void serflash_device::nvram_default()
 {
-
 }
 
 
@@ -98,7 +97,6 @@ void serflash_device::nvram_read(emu_file &file)
 
 void serflash_device::nvram_write(emu_file &file)
 {
-
 	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
 	int size = m_length /= FLASH_PAGE_SIZE;
 
@@ -167,7 +165,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 
 		switch (data)
 		{
-			case 0x00:	// READ
+			case 0x00:  // READ
 				m_flash_addr_seq = 0;
 				break;
 
@@ -175,21 +173,21 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				m_flash_addr_seq = 0;
 				break;
 
-			case 0x70:	// READ STATUS
+			case 0x70:  // READ STATUS
 				flash_change_state( space.machine(), STATE_READ_STATUS );
 				break;
 
-			case 0x80:	// PAGE / CACHE PROGRAM
+			case 0x80:  // PAGE / CACHE PROGRAM
 				m_flash_addr_seq = 0;
 				// this actually seems to be set with the next 2 writes?
 				m_flash_page_addr = 0;
 				break;
 
-			case 0x90:	// READ ID
+			case 0x90:  // READ ID
 				flash_change_state( space.machine(), STATE_READ_ID );
 				break;
 
-			case 0xff:	// RESET
+			case 0xff:  // RESET
 				flash_change_state( space.machine(), STATE_IDLE );
 				break;
 
@@ -203,11 +201,9 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 	{
 		switch (m_flash_cmd_prev)
 		{
-			case 0x00:	// READ
+			case 0x00:  // READ
 				if (data == 0x30)
 				{
-
-
 					memcpy(m_flash_page_data, m_region + m_flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 					m_flash_page_addr = m_flash_col;
 					m_flash_page_index = m_flash_row;
@@ -306,16 +302,16 @@ READ8_MEMBER( serflash_device::flash_io_r )
 			switch( m_flash_read_seq++ )
 			{
 				case 0:
-					data = 0xEC;	// Manufacturer
+					data = 0xEC;    // Manufacturer
 					break;
 				case 1:
-					data = 0xF1;	// Device
+					data = 0xF1;    // Device
 					break;
 				case 2:
-					data = 0x00;	// XX
+					data = 0x00;    // XX
 					break;
 				case 3:
-					data = 0x15;	// Flags
+					data = 0x15;    // Flags
 					m_flash_read_seq = 0;
 					break;
 			}
@@ -342,7 +338,7 @@ READ8_MEMBER( serflash_device::flash_io_r )
 
 		default:
 		{
-		//	logerror("%08x FLASH: unknown read in state %s\n",0x00/*m_maincpu->pc()*/, m_flash_state_name[m_flash_state]);
+		//  logerror("%08x FLASH: unknown read in state %s\n",0x00/*m_maincpu->pc()*/, m_flash_state_name[m_flash_state]);
 		}
 	}
 
@@ -412,4 +408,3 @@ WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
 		logerror("set flash block to %08x\n", m_flash_addr);
 	}
 }
-

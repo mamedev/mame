@@ -360,18 +360,18 @@ protected:
 
 	enum
 	{
-		WR2_DATA_XFER_INT		  = 0x00, // not supported
-		WR2_DATA_XFER_DMA_INT	  = 0x01, // not supported
-		WR2_DATA_XFER_DMA 		  = 0x02, // not supported
-		WR2_DATA_XFER_ILLEGAL	  = 0x03, // not supported
-		WR2_DATA_XFER_MASK		  = 0x03, // not supported
-		WR2_PRIORITY			  = 0x04, // not supported
-		WR2_MODE_8085_1			  = 0x00, // not supported
-		WR2_MODE_8085_2			  = 0x08, // not supported
-		WR2_MODE_8086_8088	      = 0x10, // not supported
-		WR2_MODE_ILLEGAL		  = 0x18, // not supported
-		WR2_MODE_MASK			  = 0x18, // not supported
-		WR2_VECTORED_INT		  = 0x20, // not supported
+		WR2_DATA_XFER_INT         = 0x00, // not supported
+		WR2_DATA_XFER_DMA_INT     = 0x01, // not supported
+		WR2_DATA_XFER_DMA         = 0x02, // not supported
+		WR2_DATA_XFER_ILLEGAL     = 0x03, // not supported
+		WR2_DATA_XFER_MASK        = 0x03, // not supported
+		WR2_PRIORITY              = 0x04, // not supported
+		WR2_MODE_8085_1           = 0x00, // not supported
+		WR2_MODE_8085_2           = 0x08, // not supported
+		WR2_MODE_8086_8088        = 0x10, // not supported
+		WR2_MODE_ILLEGAL          = 0x18, // not supported
+		WR2_MODE_MASK             = 0x18, // not supported
+		WR2_VECTORED_INT          = 0x20, // not supported
 		WR2_PIN10_SYNDETB_RTSB    = 0x80  // not supported
 	};
 

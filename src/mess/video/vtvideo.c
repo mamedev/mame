@@ -56,7 +56,7 @@ void vt100_video_device::device_config_complete()
 	const vt_video_interface *intf = reinterpret_cast<const vt_video_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<vt_video_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -76,18 +76,18 @@ void vt100_video_device::device_start()
 	/* resolve callbacks */
 	m_in_ram_func.resolve(m_in_ram_cb, *this);
 	m_clear_video_interrupt.resolve(m_clear_video_cb, *this);
-	
+
 	/* get the screen device */
 	m_screen = machine().device<screen_device>(m_screen_tag);
 	assert(m_screen != NULL);
-	
+
 	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
 	assert(m_gfx != NULL);
-	
+
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change),this));
 
-	
+
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
 	save_item(NAME(m_blink_flip_flop));
@@ -108,15 +108,15 @@ void vt100_video_device::device_reset()
 {
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
 	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff); // white
-	
+
 	m_height = 25;
 	m_lba7 = 0;
-	
+
 	m_scroll_latch = 0;
 	m_blink_flip_flop = 0;
 	m_reverse_field = 0;
 	m_basic_attribute = 0;
-	
+
 	m_columns = 80;
 	m_frequency = 60;
 	m_interlaced = 1;
@@ -151,22 +151,22 @@ READ8_MEMBER( vt100_video_device::lba7_r )
 
 WRITE8_MEMBER( vt100_video_device::dc012_w )
 {
-	if (!(data & 0x08)) 
+	if (!(data & 0x08))
 	{
-		if (!(data & 0x04)) 
+		if (!(data & 0x04))
 		{
 			// set lower part scroll
 			m_scroll_latch = (m_scroll_latch & 0x0c) | (data & 0x03);
-		} 
-		else 
+		}
+		else
 		{
 			// set higher part scroll
 			m_scroll_latch = (m_scroll_latch & 0x03) | ((data & 0x03) << 2);
 		}
-	} 
-	else 
+	}
+	else
 	{
-		switch (data & 0x0f) 
+		switch (data & 0x0f)
 		{
 			case 0x08:
 				// toggle blink flip flop
@@ -206,31 +206,31 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 
 WRITE8_MEMBER( vt100_video_device::dc011_w )
 {
-	if (!BIT(data, 5)) 
+	if (!BIT(data, 5))
 	{
 		UINT8 col = m_columns;
-		if (!BIT(data, 4)) 
+		if (!BIT(data, 4))
 		{
 			m_columns = 80;
-		} 
-		else 
+		}
+		else
 		{
 			m_columns = 132;
 		}
-		if (col != m_columns) 
+		if (col != m_columns)
 		{
 			recompute_parameters();
 		}
 		m_interlaced = 1;
-	} 
-	else 
+	}
+	else
 	{
-		if (!BIT(data, 4)) 
+		if (!BIT(data, 4))
 		{
 			m_frequency = 60;
 			m_skip_lines = 2;
-		} 
-		else 
+		}
+		else
 		{
 			m_frequency = 50;
 			m_skip_lines = 5;
@@ -252,7 +252,7 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 
 	for (int i = 0; i < 10; i++)
 	{
-		switch (display_type) 
+		switch (display_type)
 		{
 			case 0 : // bottom half, double height
 						j = (i >> 1) + 5; break;
@@ -268,7 +268,7 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 
 		line = m_gfx[(code & 0x7f) * 16 + j];
 
-		if (m_basic_attribute == 1) 
+		if (m_basic_attribute == 1)
 		{
 			if ((code & 0x80) == 0x80)
 				invert = 1;
@@ -280,26 +280,26 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, i
 		{
 			prevbit = bit;
 			bit = BIT((line << b), 7);
-			if (double_width) 
+			if (double_width)
 			{
 				bitmap.pix16(y * 10 + i, x * 20 + b * 2)     =  (bit | prevbit) ^ invert;
 				bitmap.pix16(y * 10 + i, x * 20 + b * 2 + 1) =  bit ^ invert;
-			} 
-			else 
+			}
+			else
 			{
 				bitmap.pix16(y * 10 + i, x * 10 + b) =  (bit | prevbit) ^ invert;
 			}
 		}
 		prevbit = bit;
 		// char interleave is filled with last bit
-		if (double_width) 
+		if (double_width)
 		{
 			bitmap.pix16(y * 10 + i, x * 20 + 16) =  (bit | prevbit) ^ invert;
 			bitmap.pix16(y * 10 + i, x * 20 + 17) =  bit ^ invert;
 			bitmap.pix16(y * 10 + i, x * 20 + 18) =  bit ^ invert;
 			bitmap.pix16(y * 10 + i, x * 20 + 19) =  bit ^ invert;
-		} 
-		else 
+		}
+		else
 		{
 			bitmap.pix16(y * 10 + i, x * 10 + 8) =  (bit | prevbit) ^ invert;
 			bitmap.pix16(y * 10 + i, x * 10 + 9) =  bit ^ invert;
@@ -319,16 +319,16 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	UINT8 display_type = 3;  // binary 11
 	UINT16 temp = 0;
 
-	if (m_in_ram_func(0) != 0x7f) 
+	if (m_in_ram_func(0) != 0x7f)
 		return;
 
-	while (line < (m_height + m_skip_lines)) 
+	while (line < (m_height + m_skip_lines))
 	{
 		code = m_in_ram_func(addr + xpos);
-		if (code == 0x7f) 
+		if (code == 0x7f)
 		{
 			// end of line, fill empty till end of line
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				for (x = xpos; x < ((display_type == 2) ? (m_columns / 2) : m_columns); x++)
 				{
@@ -342,22 +342,22 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
 			scroll_region = (temp >> 15) & 1;
 			display_type  = (temp >> 13) & 3;
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				ypos++;
 			}
 			xpos = 0;
 			line++;
-		} 
-		else 
+		}
+		else
 		{
 			// display regular char
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				display_char(bitmap, code, xpos, ypos, scroll_region, display_type);
 			}
 			xpos++;
-			if (xpos > m_columns) 
+			if (xpos > m_columns)
 			{
 				line++;
 				xpos = 0;
@@ -375,7 +375,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 
 	for (int i = 0; i < 10; i++)
 	{
-		switch (display_type) 
+		switch (display_type)
 		{
 			case 0 : // bottom half, double height
 						j = (i >> 1) + 5; break;
@@ -390,9 +390,9 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		if (j == 0) j = 15; else j = j - 1;
 
 		line = m_gfx[code * 16 + j];
-		if (m_basic_attribute == 1) 
+		if (m_basic_attribute == 1)
 		{
-			if ((code & 0x80) == 0x80) 
+			if ((code & 0x80) == 0x80)
 			{
 				line = line ^ 0xff;
 			}
@@ -401,25 +401,25 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		for (int b = 0; b < 8; b++)
 		{
 			bit = BIT((line << b), 7);
-			if (double_width) 
+			if (double_width)
 			{
 				bitmap.pix16(y * 10 + i, x * 20 + b * 2)     = bit;
 				bitmap.pix16(y * 10 + i, x * 20 + b * 2 + 1) = bit;
-			} 
-			else 
+			}
+			else
 			{
 				bitmap.pix16(y * 10 + i, x * 10 + b) = bit;
 			}
 		}
 		// char interleave is filled with last bit
-		if (double_width) 
+		if (double_width)
 		{
 			bitmap.pix16(y * 10 + i, x * 20 + 16) = bit;
 			bitmap.pix16(y * 10 + i, x * 20 + 17) = bit;
 			bitmap.pix16(y * 10 + i, x * 20 + 18) = bit;
 			bitmap.pix16(y * 10 + i, x * 20 + 19) = bit;
-		} 
-		else 
+		}
+		else
 		{
 			bitmap.pix16(y * 10 + i, x * 10 + 8) = bit;
 			bitmap.pix16(y * 10 + i, x * 10 + 9) = bit;
@@ -440,13 +440,13 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 	UINT8 display_type = 3;  // binary 11
 	UINT16 temp = 0;
 
-	while (line < (m_height + m_skip_lines)) 
+	while (line < (m_height + m_skip_lines))
 	{
 		code = m_in_ram_func(addr + xpos);
-		if (code == 0xff) 
+		if (code == 0xff)
 		{
 			// end of line, fill empty till end of line
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				for (x = xpos; x < ((display_type == 2) ? (m_columns / 2) : m_columns); x++)
 				{
@@ -462,22 +462,22 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			temp = m_in_ram_func(attr_addr);
 			scroll_region = (temp) & 1;
 			display_type = (temp>> 1) & 3;
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				ypos++;
 			}
 			xpos = 0;
 			line++;
-		} 
-		else 
+		}
+		else
 		{
 			// display regular char
-			if (line >= m_skip_lines) 
+			if (line >= m_skip_lines)
 			{
 				display_char(bitmap, code, xpos, ypos, scroll_region, display_type);
 			}
 			xpos++;
-			if (xpos > m_columns) 
+			if (xpos > m_columns)
 			{
 				line++;
 				xpos = 0;

@@ -104,11 +104,11 @@ public:
 	device_t *m_dev_vp2;        /* virtual port 2 */
 	device_t *m_dev_6h;
 	optional_device<discrete_device> m_discrete;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
-	
+
 	/* machine states */
 	UINT8               m_hardware_type;
 	UINT8               m_nmi_mask;

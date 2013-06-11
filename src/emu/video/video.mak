@@ -15,15 +15,15 @@ VIDEOOBJ = $(EMUOBJ)/video
 
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter SEGA315_5124,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/315_5124.o 
+VIDEOOBJS+= $(VIDEOOBJ)/315_5124.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter BUFSPRITE,$(VIDEOS)),)
@@ -31,47 +31,47 @@ VIDEOOBJS+= $(VIDEOOBJ)/bufsprite.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter CDP1861,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/cdp1861.o  
+VIDEOOBJS+= $(VIDEOOBJ)/cdp1861.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter CDP1862,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/cdp1862.o  
+VIDEOOBJS+= $(VIDEOOBJ)/cdp1862.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter CRT9007,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/crt9007.o  
+VIDEOOBJS+= $(VIDEOOBJ)/crt9007.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter CRT9021,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/crt9021.o  
+VIDEOOBJS+= $(VIDEOOBJ)/crt9021.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter CRT9212,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/crt9212.o  
+VIDEOOBJS+= $(VIDEOOBJ)/crt9212.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter DL1416,$(VIDEOS)),)
@@ -79,7 +79,7 @@ VIDEOOBJS+= $(VIDEOOBJ)/dl1416.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter DM9368,$(VIDEOS)),)
@@ -87,225 +87,225 @@ VIDEOOBJS+= $(VIDEOOBJ)/dm9368.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter EF9340_1,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/ef9340_1.o 
+VIDEOOBJS+= $(VIDEOOBJ)/ef9340_1.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter H63484,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/h63484.o   
+VIDEOOBJS+= $(VIDEOOBJ)/h63484.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD44102,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd44102.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd44102.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD44352,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd44352.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd44352.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD44780,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd44780.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd44780.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD61830,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd61830.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd61830.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD63484,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd63484.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd63484.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HD66421,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/hd66421.o  
+VIDEOOBJS+= $(VIDEOOBJ)/hd66421.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HUC6202,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/huc6202.o  
+VIDEOOBJS+= $(VIDEOOBJ)/huc6202.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HUC6260,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/huc6260.o  
+VIDEOOBJS+= $(VIDEOOBJ)/huc6260.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HUC6261,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/huc6261.o  
+VIDEOOBJS+= $(VIDEOOBJ)/huc6261.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HUC6270,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/huc6270.o  
+VIDEOOBJS+= $(VIDEOOBJ)/huc6270.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter HUC6272,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/huc6272.o  
+VIDEOOBJS+= $(VIDEOOBJ)/huc6272.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter I8244,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/i8244.o    
+VIDEOOBJS+= $(VIDEOOBJ)/i8244.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter I8275,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/i8275.o         \
-			$(VIDEOOBJ)/i8275x.o 
+			$(VIDEOOBJ)/i8275x.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
-ifneq ($(filter K053250,$(VIDEOS)),)			
+ifneq ($(filter K053250,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/k053250.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter M50458,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/m50458.o   
+VIDEOOBJS+= $(VIDEOOBJ)/m50458.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter MB90082,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/mb90082.o  
+VIDEOOBJS+= $(VIDEOOBJ)/mb90082.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter MC6845,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/mc6845.o   
+VIDEOOBJS+= $(VIDEOOBJ)/mc6845.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter MC6847,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/mc6847.o   
+VIDEOOBJS+= $(VIDEOOBJ)/mc6847.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter MSM6255,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/msm6255.o  
+VIDEOOBJS+= $(VIDEOOBJ)/msm6255.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter PC_CGA,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/pc_cga.o        \
-			$(VIDEOOBJ)/cgapal.o 
+			$(VIDEOOBJ)/cgapal.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
-ifneq ($(filter PC_VGA,$(VIDEOS)),)			
-VIDEOOBJS+= $(VIDEOOBJ)/pc_vga.o   
+ifneq ($(filter PC_VGA,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/pc_vga.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter POLY,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/poly.o 
+VIDEOOBJS+= $(VIDEOOBJ)/poly.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter PSX,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/psx.o 
+VIDEOOBJS+= $(VIDEOOBJ)/psx.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter RAMDAC,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/ramdac.o 
+VIDEOOBJS+= $(VIDEOOBJ)/ramdac.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter S2636,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/s2636.o 
+VIDEOOBJS+= $(VIDEOOBJ)/s2636.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter SAA5050,$(VIDEOS)),)
@@ -313,14 +313,14 @@ VIDEOOBJS+= $(VIDEOOBJ)/saa5050.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 ifneq ($(filter SED1330,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/sed1330.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter STVVDP,$(VIDEOS)),)
@@ -329,39 +329,39 @@ VIDEOOBJS+= $(VIDEOOBJ)/stvvdp1.o       \
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter TLC34076,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/tlc34076.o 
+VIDEOOBJS+= $(VIDEOOBJ)/tlc34076.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter TMS34061,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/tms34061.o 
+VIDEOOBJS+= $(VIDEOOBJ)/tms34061.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter TMS3556,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/tms3556.o 
+VIDEOOBJS+= $(VIDEOOBJ)/tms3556.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter TMS9927,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/tms9927.o 
+VIDEOOBJS+= $(VIDEOOBJ)/tms9927.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter TMS9928A,$(VIDEOS)),)
@@ -369,7 +369,7 @@ VIDEOOBJS+= $(VIDEOOBJ)/tms9928a.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter UPD3301,$(VIDEOS)),)
@@ -377,15 +377,15 @@ VIDEOOBJS+= $(VIDEOOBJ)/upd3301.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter UPD7220,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/upd7220.o 
+VIDEOOBJS+= $(VIDEOOBJ)/upd7220.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter UPD7227,$(VIDEOS)),)
@@ -393,15 +393,15 @@ VIDEOOBJS+= $(VIDEOOBJ)/upd7227.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter V9938,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/v9938.o 
+VIDEOOBJS+= $(VIDEOOBJ)/v9938.o
 endif
 
 #-------------------------------------------------
-# 
+#
 #-------------------------------------------------
 
 ifneq ($(filter VOODOO,$(VIDEOS)),)

@@ -17,7 +17,7 @@ class namcoio_device : public device_t,
 public:
 	namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -29,15 +29,15 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	int m_device_type;
-	
+
 	enum {
 			TYPE_NAMCO56XX,
 			TYPE_NAMCO58XX,
 			TYPE_NAMCO59XX,
 		};
-	
+
 	// internal state
 	UINT8          m_ram[16];
 
@@ -51,11 +51,11 @@ protected:
 	INT32          m_coins_per_cred[2];
 	INT32          m_creds_per_coin[2];
 	INT32          m_in_count;
-	
+
 	void handle_coins( int swap );
 
 	virtual void customio_run() {}
-	
+
 private:
 
 };

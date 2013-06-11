@@ -250,7 +250,7 @@ READ16_MEMBER( intv_state::intv_stic_r )
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		return m_stic->read(space, offset, mem_mask);
-	else 
+	else
 		return offset;
 }
 
@@ -266,8 +266,8 @@ READ16_MEMBER( intv_state::intv_gram_r )
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		return m_stic->gram_read(space, offset, mem_mask);
-	else 
-		return offset;	
+	else
+		return offset;
 }
 
 WRITE16_MEMBER( intv_state::intv_gram_w )
@@ -345,7 +345,7 @@ WRITE16_MEMBER( intv_state::ecs_bank2_page_select )
 		if (data == 0x7a50)
 		{
 			m_ecs_bank_src[1] = 1;
-			m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));		// ECS ROM at 0x7000 is on page 1
+			m_bank2->set_base(m_bank_base[m_ecs_bank_src[1]] + (0x7000 << 1));      // ECS ROM at 0x7000 is on page 1
 		}
 		else if (data == 0x7a51 )
 		{
@@ -619,10 +619,10 @@ void intv_state::machine_reset()
 	if (m_is_ecs)
 	{
 		// ECS can switch between the maincpu and the ecs roms
-		m_ecs_bank_src[0] = 0;	// CPU
-		m_ecs_bank_src[1] = 1;	// ECS
-		m_ecs_bank_src[2] = 0;	// CPU
-		m_ecs_bank_src[3] = 0;	// CPU
+		m_ecs_bank_src[0] = 0;  // CPU
+		m_ecs_bank_src[1] = 1;  // ECS
+		m_ecs_bank_src[2] = 0;  // CPU
+		m_ecs_bank_src[3] = 0;  // CPU
 		m_bank_base[0] = m_region_maincpu->base();
 		m_bank_base[1] = m_region_ecs_rom->base();
 		m_bank1->set_base(m_bank_base[m_ecs_bank_src[0]] + (0x2000 << 1));
@@ -684,7 +684,7 @@ void intv_state::machine_start()
 		save_item(NAME(m_ecs_bank_src));
 		machine().save().register_postload(save_prepost_delegate(FUNC(intv_state::ecs_banks_restore), this));
 	}
-	
+
 	// intvkbd
 	if (m_is_keybd)
 	{

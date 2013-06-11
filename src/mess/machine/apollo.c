@@ -691,9 +691,9 @@ IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 
 READ8_MEMBER( apollo_state::apollo_pic8259_get_slave_ack )
 {
-       MLOG1(("apollo_pic8259_get_slave_ack: offset=%x", offset));
+		MLOG1(("apollo_pic8259_get_slave_ack: offset=%x", offset));
 
-       return offset == 3 ? m_pic8259_slave->inta_r() : 0;
+		return offset == 3 ? m_pic8259_slave->inta_r() : 0;
 }
 
 WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_master_set_int_line ) {

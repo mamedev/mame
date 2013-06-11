@@ -1885,27 +1885,27 @@ ROM_END
 /*
 Coinworld data
 
-Error Number	Cause of alarm	      Comments
-11              1 GBP coin in         These alarms go off when a coin is jammed in the mech, or if the Mars anti-strimming alarm is activated.  
+Error Number    Cause of alarm        Comments
+11              1 GBP coin in         These alarms go off when a coin is jammed in the mech, or if the Mars anti-strimming alarm is activated.
 12              50p coin in           The machine will lock up for a short amount of time, whilst sounding as alarm tone.
 13              20p coin in           Error 15 can be caused by having DIL switch 6 in the wrong position for your coin mech loom.
 14              10p coin in
 15               5p coin in
-16	            2 GBP coin in
+16              2 GBP coin in
 21              Reel 1 alarm          The faulty reel will flash. Nothing more will happen until the machine is reset
 22              Reel 2 alarm
-23	            Reel 3 alarm
-42	            Ram Cleared	          The RAM is cleared when the machine is turned on for the first time, or when the price of play is changed. The alarm 
+23              Reel 3 alarm
+42              Ram Cleared           The RAM is cleared when the machine is turned on for the first time, or when the price of play is changed. The alarm
                                       clears after a short time
-51	           Checksum error         The machine will lock up completely if the eprom has failed, or if the security chip is missing or has failed
+51             Checksum error         The machine will lock up completely if the eprom has failed, or if the security chip is missing or has failed
 54             Security chip fail
 61             Cash in meter failure  The machine will not run if the cash in, or cash out meters are not connected properly.
-62	           Cash out meter failure
-71             Datapack error	      If the machine is in protocol mode, and a datapack is not connected, then the machine alarms. It will reset after a  
+62             Cash out meter failure
+71             Datapack error         If the machine is in protocol mode, and a datapack is not connected, then the machine alarms. It will reset after a
                                       time, and have another go at transmitting the data
-72	           Sound card fail	      If the sound card is missing, or the wrong sound eprom is fitted, the machine alarms on power on. The machine will then 
+72             Sound card fail        If the sound card is missing, or the wrong sound eprom is fitted, the machine alarms on power on. The machine will then
                                       operate in silence.
-99	           Payout tubes empty	  If one of the tubes runs dry, the machine will attempt to compensate by paying from the other tube. If this runs dry
+99             Payout tubes empty     If one of the tubes runs dry, the machine will attempt to compensate by paying from the other tube. If this runs dry
                                       as well, the machine will lock up, requiring a refill before games can continue. The alarm tone is a softer, more friendly one.
 */
 

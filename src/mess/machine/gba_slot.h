@@ -42,9 +42,9 @@ public:
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
 	// internal state
-	UINT32 *m_rom;	// this points to the cart rom region
+	UINT32 *m_rom;  // this points to the cart rom region
 	UINT32 *m_nvram;
-	UINT32 m_rom_size;	// this is the actual game size, not the rom region size!
+	UINT32 m_rom_size;  // this is the actual game size, not the rom region size!
 	UINT32 m_nvram_size;
 };
 
@@ -119,9 +119,9 @@ extern const device_type GBA_CART_SLOT;
 
 
 //------------------------------------------------------------------------
-// 
+//
 // Misc structs to attempt NVRAM identification when loading from fullpath
-// 
+//
 //------------------------------------------------------------------------
 
 

@@ -12,7 +12,7 @@
 #define __SOUND_SPEAKER_H__
 
 // Length of anti-aliasing filter kernel, measured in number of intermediate samples
-enum 
+enum
 {
 	FILTER_LENGTH = 64
 };
@@ -48,21 +48,21 @@ private:
 
 	// Updates the composed volume array according to time
 	void update_interm_samples(attotime time, int volume);
-	
+
 	// Updates the composed volume array and returns final filtered volume of next stream sample
 	double update_interm_samples_get_filtered_volume(int volume);
-	
+
 	void finalize_interm_sample(int volume);
 	void init_next_interm_sample();
 	inline double make_fraction(attotime a, attotime b, double timediv);
 	double get_filtered_volume();
-	
+
 	// Kernel (pulse response) for filtering across samples (while we avoid fancy filtering within samples)
 	double m_ampl[FILTER_LENGTH];
-	
+
 	sound_stream *m_channel;
 	int m_level;
-	
+
 	/* The volume of a composed sample grows incrementally each time the speaker is over-sampled.
 	 * That is in effect a basic average filter.
 	 * Another filter can and will be applied to the array of composed samples.

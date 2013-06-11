@@ -635,7 +635,7 @@ class s3c44b0_device : public device_t,
 public:
 	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~s3c44b0_device() {}
-	
+
 	DECLARE_READ32_MEMBER(lcd_r);
 	DECLARE_READ32_MEMBER(clkpow_r);
 	DECLARE_READ32_MEMBER(irq_r);
@@ -680,7 +680,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	// LCD Controller
@@ -754,7 +754,7 @@ private:
 	void adc_stop();
 	void adc_recalc();
 	TIMER_CALLBACK_MEMBER(adc_timer_exp);
-	
+
 	// SIO
 	void sio_start();
 	void sio_stop();

@@ -43,8 +43,8 @@
 #define M6522_4_TAG     "1f"
 #define M6522_5_TAG     "1k"
 #define M6522_6_TAG     "1h"
-#define DAC0808_0_TAG	"5b"
-#define DAC0808_1_TAG	"5c"
+#define DAC0808_0_TAG   "5b"
+#define DAC0808_1_TAG   "5c"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
@@ -203,7 +203,7 @@ public:
 	int m_rdy1;
 	int m_ds0;
 	int m_ds1;
-	UINT8 m_lms;          	             /* motor speed */
+	UINT8 m_lms;                         /* motor speed */
 	int m_st[2];                        /* stepper phase */
 	int m_stp[2];                        /* stepper enable */
 	int m_drive;                        /* selected drive */

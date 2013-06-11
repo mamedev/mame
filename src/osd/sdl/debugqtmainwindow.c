@@ -297,8 +297,8 @@ void MainWindow::executeCommand(bool withClear)
 
 	// Send along the command
 	debug_console_execute_command(*m_machine,
-								  command.toLocal8Bit().data(),
-								  true);
+									command.toLocal8Bit().data(),
+									true);
 
 	// Add history & set the index to be the top of the stack
 	addToHistory(command);
@@ -328,24 +328,24 @@ void MainWindow::mountImage(bool changedTo)
 		refreshAll();
 		return;
 	}
-	
+
 	// File dialog
 	QString filename = QFileDialog::getOpenFileName(this,
 													"Select an image file",
 													QDir::currentPath(),
 													tr("All files (*.*)"));
-	
+
 	if (img->load(filename.toUtf8().data()) != IMAGE_INIT_PASS)
 	{
 		debug_console_printf(*m_machine, "Image could not be mounted.\n");
 		refreshAll();
 		return;
 	}
-	
+
 	// Activate the unmount menu option
 	QAction* unmountAct = sender()->parent()->findChild<QAction*>("unmount");
 	unmountAct->setEnabled(true);
-	
+
 	// Set the mount name
 	QMenu* parentMenuItem = dynamic_cast<QMenu*>(sender()->parent());
 	QString baseString = parentMenuItem->title();
@@ -364,12 +364,12 @@ void MainWindow::unmountImage(bool changedTo)
 	const int imageIndex = dynamic_cast<QAction*>(sender())->data().toInt();
 	image_interface_iterator iter(m_machine->root_device());
 	device_image_interface *img = iter.byindex(imageIndex);
-	
+
 	img->unload();
-	
+
 	// Deactivate the unmount menu option
 	dynamic_cast<QAction*>(sender())->setEnabled(false);
-	
+
 	// Set the mount name
 	QMenu* parentMenuItem = dynamic_cast<QMenu*>(sender()->parent());
 	QString baseString = parentMenuItem->title();
@@ -411,17 +411,17 @@ void MainWindow::addToHistory(const QString& command)
 void MainWindow::createImagesMenu()
 {
 	QMenu* imagesMenu = menuBar()->addMenu("&Images");
-	
+
 	int interfaceIndex = 0;
 	image_interface_iterator iter(m_machine->root_device());
 	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
 		astring menuName;
 		menuName.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
-		
+
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.cstr());
 		interfaceMenu->setObjectName(img->device().name());
-		
+
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);
 		QAction* unmountAct = new QAction("Unmount", interfaceMenu);
 		mountAct->setObjectName("mount");
@@ -430,15 +430,15 @@ void MainWindow::createImagesMenu()
 		unmountAct->setData(QVariant(interfaceIndex));
 		connect(mountAct, SIGNAL(triggered(bool)), this, SLOT(mountImage(bool)));
 		connect(unmountAct, SIGNAL(triggered(bool)), this, SLOT(unmountImage(bool)));
-		
+
 		if (!img->exists())
 			unmountAct->setEnabled(false);
-		
+
 		interfaceMenu->addAction(mountAct);
 		interfaceMenu->addAction(unmountAct);
-		
+
 		// TODO: Cassette operations
-		
+
 		interfaceIndex++;
 	}
 }

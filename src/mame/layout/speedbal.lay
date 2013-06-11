@@ -75,10 +75,10 @@
 		<bezel name="digit10" element="digit">
 			<bounds left="10" top="-20" right="20" bottom="-8" />
 		</bezel>
- 		<bezel name="digit20" element="digit">
+		<bezel name="digit20" element="digit">
 			<bounds left="20" top="-20" right="30" bottom="-8" />
 		</bezel>
-	   	<bezel name="digit30" element="digit">
+		<bezel name="digit30" element="digit">
 			<bounds left="30" top="-20" right="40" bottom="-8" />
 		</bezel>
 		<bezel name="digit40" element="digit">
@@ -193,5 +193,5 @@
 
 
 	</view>
-    
+
 </mamelayout>

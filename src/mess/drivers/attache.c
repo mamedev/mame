@@ -68,42 +68,42 @@ class attache_state : public driver_device
 public:
 	attache_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this,"maincpu"),
-		  m_rom(*this,"boot"),
-		  m_ram(*this,RAM_TAG),
-		  m_char_rom(*this,"video"),
-		  m_rtc(*this,"rtc"),
-		  m_psg(*this,"psg"),
-		  m_fdc(*this,"fdc"),
-		  m_sio(*this,"sio"),
-		  m_pio(*this,"pio"),
-		  m_ctc(*this,"ctc"),
-		  m_crtc(*this,"crtc"),
-		  m_dma(*this, "dma"),
-		  m_floppy0(*this, "fdc:0:525dd"),
-		  m_floppy1(*this, "fdc:1:525dd"),
-		  m_kb_row0(*this, "row0"),
-		  m_kb_row1(*this, "row1"),
-		  m_kb_row2(*this, "row2"),
-		  m_kb_row3(*this, "row3"),
-		  m_kb_row4(*this, "row4"),
-		  m_kb_row5(*this, "row5"),
-		  m_kb_row6(*this, "row6"),
-		  m_kb_row7(*this, "row7"),
-		  m_kb_mod(*this, "modifiers"),
-		  m_membank1(*this, "bank1"),
-		  m_membank2(*this, "bank2"),
-		  m_membank3(*this, "bank3"),
-		  m_membank4(*this, "bank4"),
-		  m_membank5(*this, "bank5"),
-		  m_membank6(*this, "bank6"),
-		  m_membank7(*this, "bank7"),
-		  m_membank8(*this, "bank8"),
-		  m_nvram(*this, "nvram"),
-		  m_rom_active(true),
-		  m_gfx_enabled(false),
-		  m_kb_clock(true),
-		  m_kb_empty(true)
+			m_maincpu(*this,"maincpu"),
+			m_rom(*this,"boot"),
+			m_ram(*this,RAM_TAG),
+			m_char_rom(*this,"video"),
+			m_rtc(*this,"rtc"),
+			m_psg(*this,"psg"),
+			m_fdc(*this,"fdc"),
+			m_sio(*this,"sio"),
+			m_pio(*this,"pio"),
+			m_ctc(*this,"ctc"),
+			m_crtc(*this,"crtc"),
+			m_dma(*this, "dma"),
+			m_floppy0(*this, "fdc:0:525dd"),
+			m_floppy1(*this, "fdc:1:525dd"),
+			m_kb_row0(*this, "row0"),
+			m_kb_row1(*this, "row1"),
+			m_kb_row2(*this, "row2"),
+			m_kb_row3(*this, "row3"),
+			m_kb_row4(*this, "row4"),
+			m_kb_row5(*this, "row5"),
+			m_kb_row6(*this, "row6"),
+			m_kb_row7(*this, "row7"),
+			m_kb_mod(*this, "modifiers"),
+			m_membank1(*this, "bank1"),
+			m_membank2(*this, "bank2"),
+			m_membank3(*this, "bank3"),
+			m_membank4(*this, "bank4"),
+			m_membank5(*this, "bank5"),
+			m_membank6(*this, "bank6"),
+			m_membank7(*this, "bank7"),
+			m_membank8(*this, "bank8"),
+			m_nvram(*this, "nvram"),
+			m_rom_active(true),
+			m_gfx_enabled(false),
+			m_kb_clock(true),
+			m_kb_empty(true)
 	{ }
 
 	// PIO port B operation select
@@ -235,7 +235,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	UINT8 x,y,bit,scan,data;
 	UINT8 dbl_mode = 0;  // detemines which half of character to display when using double size attribute,
-	                     // as it can start on either odd or even character cells.
+							// as it can start on either odd or even character cells.
 
 	// Graphics output (if enabled)
 	if(m_gfx_enabled)
@@ -542,31 +542,31 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 
 WRITE8_MEMBER(attache_state::pio_portA_w)
 {
-	//	AO-7 = LATCH DATA OUT:
-	//	LO = MOTOR ON
-	//	L1 = GRAPHICS ENABLE
-	//	L2 = /EPROM ENABLE
-	//	L3-7 = DISPLAY BRIGHTNESS
-	//	AO-7 = 8910 DATA I/O:
-	//	AO-3 = 5832 DO-3 I/O
-	//	A4-7 = 5832 AO-3 OUT
-	//	AO-3 = 5101 DO-3 I/O
-	//	A4-7 = 5101 AO-3 OUT
+	//  AO-7 = LATCH DATA OUT:
+	//  LO = MOTOR ON
+	//  L1 = GRAPHICS ENABLE
+	//  L2 = /EPROM ENABLE
+	//  L3-7 = DISPLAY BRIGHTNESS
+	//  AO-7 = 8910 DATA I/O:
+	//  AO-3 = 5832 DO-3 I/O
+	//  A4-7 = 5832 AO-3 OUT
+	//  AO-3 = 5101 DO-3 I/O
+	//  A4-7 = 5101 AO-3 OUT
 	m_pio_porta = data;
 }
 
 WRITE8_MEMBER(attache_state::pio_portB_w)
 {
-	//	BO-1 = 5101 A4-5
-	//	B2-4 = OPERATION SELECT
-	//	0 = 8910 ADDR LOAD
-	//	1 = 8910 DATA LOAD
-	//	2 = 5832 WRITE
-	//	3 = 5832 READ
-	//	4 = 5101 WRITE
-	//	5 = 5101 READ
-	//	6 = LATCH LOAD
-	//	7 = NO-OP
+	//  BO-1 = 5101 A4-5
+	//  B2-4 = OPERATION SELECT
+	//  0 = 8910 ADDR LOAD
+	//  1 = 8910 DATA LOAD
+	//  2 = 5832 WRITE
+	//  3 = 5832 READ
+	//  4 = 5101 WRITE
+	//  5 = 5101 READ
+	//  6 = LATCH LOAD
+	//  7 = NO-OP
 	//B5 = /'138 OPERATION STROBE
 	//B6 = /KEYBOARD DATA IN
 	//B7 = /KEYBOARD CLOCK OUT
@@ -646,8 +646,8 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	case DISP_CHAR:
 		m_char_ram[(m_char_line*128)+(param & 0x7f)] = data;
 		break;
-//	default:
-//		logerror("Unimplemented display operation %02x data %02x param %02x\n",m_current_cmd,data,param);
+//  default:
+//      logerror("Unimplemented display operation %02x data %02x param %02x\n",m_current_cmd,data,param);
 	}
 }
 
@@ -756,7 +756,6 @@ WRITE_LINE_MEMBER(attache_state::eop_w)
 
 WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
 {
-
 }
 
 static ADDRESS_MAP_START( attache_map , AS_PROGRAM, 8, attache_state)
@@ -1040,7 +1039,7 @@ static MACHINE_CONFIG_START( attache, attache_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64k")
-	
+
 	MCFG_SOFTWARE_LIST_ADD("disk_list","attache")
 MACHINE_CONFIG_END
 

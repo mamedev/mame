@@ -44,13 +44,13 @@ ADDRESS_MAP_END
 
 upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD7227, "uPD7227", tag, owner, clock),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map)),
-	  m_cs(1),
-	  m_cd(1),
-	  m_sck(1),
-	  m_si(1),
-	  m_so(1)
+		device_memory_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map)),
+		m_cs(1),
+		m_cd(1),
+		m_sck(1),
+		m_si(1),
+		m_so(1)
 {
 }
 

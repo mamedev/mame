@@ -21,7 +21,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<rp5h01_device> m_rp5h01;
-	
+
 	required_shared_ptr<UINT8> m_ram_8w;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_timedata;

@@ -498,40 +498,40 @@ static pin_fuse_rows pal20r8pinfuserows[] = {
 	{22, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};    /* Registered Output */
 
 static pin_fuse_rows _82s153pinfuserows[] = {
-    {9,  NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {11, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {12, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
-    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0}};
+	{9,  NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{11, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0}};
 
 static pin_fuse_rows pls153pinfuserows[] = {
-    {9,  1472, 0, 0},
-    {11, 1508, 0, 0},
-    {12, 1544, 0, 0},
-    {13, 1580, 0, 0},
-    {14, 1616, 0, 0},
-    {15, 1652, 0, 0},
-    {16, 1688, 0, 0},
-    {17, 1724, 0, 0},
-    {18, 1760, 0, 0},
-    {19, 1796, 0, 0}};
+	{9,  1472, 0, 0},
+	{11, 1508, 0, 0},
+	{12, 1544, 0, 0},
+	{13, 1580, 0, 0},
+	{14, 1616, 0, 0},
+	{15, 1652, 0, 0},
+	{16, 1688, 0, 0},
+	{17, 1724, 0, 0},
+	{18, 1760, 0, 0},
+	{19, 1796, 0, 0}};
 
 static pin_fuse_rows ck2605pinfuserows[] = {
-    {9,  736,  0, 0},
-    {11, 772,  0, 0},
-    {12, 808,  0, 0},
-    {13, 844,  0, 0},
-    {14, 880,  0, 0},
-    {15, 916,  0, 0},
-    {16, 952,  0, 0},
-    {17, 988,  0, 0},
-    {18, 1024, 0, 0},
-    {19, 1060, 0, 0}};
+	{9,  736,  0, 0},
+	{11, 772,  0, 0},
+	{12, 808,  0, 0},
+	{13, 844,  0, 0},
+	{14, 880,  0, 0},
+	{15, 916,  0, 0},
+	{16, 952,  0, 0},
+	{17, 988,  0, 0},
+	{18, 1024, 0, 0},
+	{19, 1060, 0, 0}};
 
 static pin_fuse_columns pal10l8pinfusecolumns[] = {
 	{1, 3, 2},
@@ -912,64 +912,64 @@ static pin_fuse_columns pal20r8pinfusecolumns[] = {
 	{23, 3, 2}};
 
 static pin_fuse_columns _82s153pinfusecolumns[] = {
-    {1,  0, 0},
-    {2,  0, 0},
-    {3,  0, 0},
-    {4,  0, 0},
-    {5,  0, 0},
-    {6,  0, 0},
-    {7,  0, 0},
-    {8,  0, 0},
-    {9,  0, 0},
-    {11, 0, 0},
-    {12, 0, 0},
-    {13, 0, 0},
-    {14, 0, 0},
-    {15, 0, 0},
-    {16, 0, 0},
-    {17, 0, 0},
-    {18, 0, 0},
-    {19, 0, 0}};
+	{1,  0, 0},
+	{2,  0, 0},
+	{3,  0, 0},
+	{4,  0, 0},
+	{5,  0, 0},
+	{6,  0, 0},
+	{7,  0, 0},
+	{8,  0, 0},
+	{9,  0, 0},
+	{11, 0, 0},
+	{12, 0, 0},
+	{13, 0, 0},
+	{14, 0, 0},
+	{15, 0, 0},
+	{16, 0, 0},
+	{17, 0, 0},
+	{18, 0, 0},
+	{19, 0, 0}};
 
 static pin_fuse_columns pls153pinfusecolumns[] = {
-    {1,  1,  0},
-    {2,  3,  2},
-    {3,  5,  4},
-    {4,  7,  6},
-    {5,  9,  8},
-    {6,  11, 10},
-    {7,  13, 12},
-    {8,  15, 14},
-    {9,  17, 16},
-    {11, 19, 18},
-    {12, 21, 20},
-    {13, 23, 22},
-    {14, 25, 24},
-    {15, 27, 26},
-    {16, 29, 28},
-    {17, 31, 30},
-    {18, 33, 32},
-    {19, 35, 34}};
+	{1,  1,  0},
+	{2,  3,  2},
+	{3,  5,  4},
+	{4,  7,  6},
+	{5,  9,  8},
+	{6,  11, 10},
+	{7,  13, 12},
+	{8,  15, 14},
+	{9,  17, 16},
+	{11, 19, 18},
+	{12, 21, 20},
+	{13, 23, 22},
+	{14, 25, 24},
+	{15, 27, 26},
+	{16, 29, 28},
+	{17, 31, 30},
+	{18, 33, 32},
+	{19, 35, 34}};
 
 static pin_fuse_columns ck2605pinfusecolumns[] = {
-    {1,  1,  0},
-    {2,  3,  2},
-    {3,  5,  4},
-    {4,  7,  6},
-    {5,  9,  8},
-    {6,  11, 10},
-    {7,  13, 12},
-    {8,  15, 14},
-    {9,  17, 16},
-    {11, 19, 18},
-    {12, 21, 20},
-    {13, 23, 22},
-    {14, 25, 24},
-    {15, 27, 26},
-    {16, 29, 28},
-    {17, 31, 30},
-    {18, 33, 32},
-    {19, 35, 34}};
+	{1,  1,  0},
+	{2,  3,  2},
+	{3,  5,  4},
+	{4,  7,  6},
+	{5,  9,  8},
+	{6,  11, 10},
+	{7,  13, 12},
+	{8,  15, 14},
+	{9,  17, 16},
+	{11, 19, 18},
+	{12, 21, 20},
+	{13, 23, 22},
+	{14, 25, 24},
+	{15, 27, 26},
+	{16, 29, 28},
+	{17, 31, 30},
+	{18, 33, 32},
+	{19, 35, 34}};
 
 static pal_data paldata[] = {
 	{"PAL10L8",
@@ -1081,7 +1081,7 @@ static pal_data paldata[] = {
 		config_peel18cv8_pins,
 		NULL,
 		get_peel18cv8_pin_fuse_state},
-    {"GAL18V10",
+	{"GAL18V10",
 		gal18v10pinfuserows, ARRAY_LEN(gal18v10pinfuserows),
 		gal18v10pinfusecolumns, ARRAY_LEN(gal18v10pinfusecolumns),
 		print_gal18v10_product_terms,
@@ -1123,13 +1123,13 @@ static pal_data paldata[] = {
 		config_pal20r8_pins,
 		NULL,
 		NULL},/*
-	{"PAL20X4", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PAL20X8", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PAL20X10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL20V8A", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PLS100", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+    {"PAL20X4", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"PAL20X8", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"PAL20X10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"PAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"GAL20V8A", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"GAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+    {"PLS100", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"82S153",
 		_82s153pinfuserows, ARRAY_LEN(_82s153pinfuserows),
 		_82s153pinfusecolumns, ARRAY_LEN(_82s153pinfusecolumns),
@@ -1144,7 +1144,7 @@ static pal_data paldata[] = {
 		config_pls153_pins,
 		NULL,
 		NULL},
- 	{"CK2605",
+	{"CK2605",
 		ck2605pinfuserows, ARRAY_LEN(ck2605pinfuserows),
 		ck2605pinfusecolumns, ARRAY_LEN(ck2605pinfusecolumns),
 		print_ck2605_product_terms,
@@ -2155,7 +2155,7 @@ static void print_pal20r8_product_terms(const pal_data* pal, const jed_data* jed
 
 static void print_82s153_product_terms(const pal_data* pal, const jed_data* jed)
 {
-    fprintf(stderr, "Print of product terms not supported for this device\n");
+	fprintf(stderr, "Print of product terms not supported for this device\n");
 }
 
 
@@ -2180,7 +2180,7 @@ static void print_pls153_product_terms(const pal_data* pal, const jed_data* jed)
 	printf("Equations:\n\n");
 
 	for (index = 0; index < outputpinscount; ++index)
-    {
+	{
 		flags = outputpins[index].flags;
 
 		indent = 0;
@@ -2196,51 +2196,51 @@ static void print_pls153_product_terms(const pal_data* pal, const jed_data* jed)
 
 		printf("%s", buffer);
 
-        haveterms = 0;
+		haveterms = 0;
 		indent += strlen(buffer);
 
 		fuse_rows = find_fuse_rows(pal, outputpins[index].pin);
-        fuserow = 0;
+		fuserow = 0;
 
-        if (outputpins[index].pin != 9)
-        {
-            or_column = 19 - outputpins[index].pin;
-        }
-        else
-        {
-            or_column = 9;
-        }
+		if (outputpins[index].pin != 9)
+		{
+			or_column = 19 - outputpins[index].pin;
+		}
+		else
+		{
+			or_column = 9;
+		}
 
-        for (row = 0; row < 32; ++row)
-        {
-       		if (!jed_get_fuse(jed, fuserow + columncount + or_column))
-            {
-                generate_product_terms(pal, jed, fuserow, buffer);
+		for (row = 0; row < 32; ++row)
+		{
+			if (!jed_get_fuse(jed, fuserow + columncount + or_column))
+			{
+				generate_product_terms(pal, jed, fuserow, buffer);
 
-			    if (strlen(buffer) > 0)
-			    {
-				    if (haveterms)
-				    {
-					    printf(" +\n");
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+						printf(" +\n");
 
-					    for (indentindex = 0; indentindex < indent; ++indentindex)
-					    {
-						    printf(" ");
-					    }
-				    }
-				    else
-				    {
-					    haveterms = 1;
-				    }
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
 
-				    printf("%s", buffer);
-			    }
-            }
+					printf("%s", buffer);
+				}
+			}
 
-            fuserow += (columncount + 10);
-        }
-        
-        printf("\n");
+			fuserow += (columncount + 10);
+		}
+
+		printf("\n");
 
 		/* output enable equations */
 
@@ -2258,7 +2258,7 @@ static void print_pls153_product_terms(const pal_data* pal, const jed_data* jed)
 		}
 
 		printf("\n");
-    }
+	}
 }
 
 
@@ -2283,7 +2283,7 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 	printf("Equations:\n\n");
 
 	for (index = 0; index < outputpinscount; ++index)
-    {
+	{
 		flags = outputpins[index].flags;
 
 		indent = 0;
@@ -2299,51 +2299,51 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 
 		printf("%s", buffer);
 
-        haveterms = 0;
+		haveterms = 0;
 		indent += strlen(buffer);
 
 		fuse_rows = find_fuse_rows(pal, outputpins[index].pin);
-        fuserow = 0;
+		fuserow = 0;
 
-        if (outputpins[index].pin != 9)
-        {
-            or_column = 19 - outputpins[index].pin;
-        }
-        else
-        {
-            or_column = 9;
-        }
+		if (outputpins[index].pin != 9)
+		{
+			or_column = 19 - outputpins[index].pin;
+		}
+		else
+		{
+			or_column = 9;
+		}
 
-        for (row = 0; row < 16; ++row)
-        {
-       		if (!jed_get_fuse(jed, fuserow + columncount + or_column))
-            {
-                generate_product_terms(pal, jed, fuserow, buffer);
+		for (row = 0; row < 16; ++row)
+		{
+			if (!jed_get_fuse(jed, fuserow + columncount + or_column))
+			{
+				generate_product_terms(pal, jed, fuserow, buffer);
 
-			    if (strlen(buffer) > 0)
-			    {
-				    if (haveterms)
-				    {
-					    printf(" +\n");
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+						printf(" +\n");
 
-					    for (indentindex = 0; indentindex < indent; ++indentindex)
-					    {
-						    printf(" ");
-					    }
-				    }
-				    else
-				    {
-					    haveterms = 1;
-				    }
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
 
-				    printf("%s", buffer);
-			    }
-            }
+					printf("%s", buffer);
+				}
+			}
 
-            fuserow += (columncount + 10);
-        }
-        
-        printf("\n");
+			fuserow += (columncount + 10);
+		}
+
+		printf("\n");
 
 		/* output enable equations */
 
@@ -2361,7 +2361,7 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 		}
 
 		printf("\n");
-    }
+	}
 }
 
 
@@ -3426,12 +3426,12 @@ static void config_pls153_pins(const pal_data* pal, const jed_data* jed)
 
 	output_pin_count = 0;
 
-    for (index = 0; index < pal->pinfuserowscount; ++index)
-    {
-    	if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
-        {
-		    output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
-		    output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+	for (index = 0; index < pal->pinfuserowscount; ++index)
+	{
+		if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+		{
+			output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
+			output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
 
 			if (jed_get_fuse(jed, 1832 + (9 - index)))
 			{
@@ -3442,9 +3442,9 @@ static void config_pls153_pins(const pal_data* pal, const jed_data* jed)
 				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
 			}
 
-		    ++output_pin_count;
-        }
-    }
+			++output_pin_count;
+		}
+	}
 
 	set_input_pins(input_pins, ARRAY_LEN(input_pins));
 	set_output_pins(output_pins, output_pin_count);
@@ -3465,12 +3465,12 @@ static void config_ck2605_pins(const pal_data* pal, const jed_data* jed)
 
 	output_pin_count = 0;
 
-    for (index = 0; index < pal->pinfuserowscount; ++index)
-    {
-    	if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
-        {
-		    output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
-		    output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+	for (index = 0; index < pal->pinfuserowscount; ++index)
+	{
+		if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+		{
+			output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
+			output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
 
 			if (jed_get_fuse(jed, 1096 + (9 - index)))
 			{
@@ -3481,9 +3481,9 @@ static void config_ck2605_pins(const pal_data* pal, const jed_data* jed)
 				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
 			}
 
-		    ++output_pin_count;
-        }
-    }
+			++output_pin_count;
+		}
+	}
 
 	set_input_pins(input_pins, ARRAY_LEN(input_pins));
 	set_output_pins(output_pins, output_pin_count);

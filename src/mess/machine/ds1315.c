@@ -216,5 +216,3 @@ void ds1315_device::input_raw_data()
 	   We always return the host's time when asked.
 	*/
 }
-
-

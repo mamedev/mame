@@ -129,7 +129,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rockclim_scroll_w);
 	DECLARE_WRITE8_MEMBER(guttang_rombank_w);
 
-	
+
 
 	DECLARE_READ8_MEMBER(rockclim_videoram_r);
 	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);

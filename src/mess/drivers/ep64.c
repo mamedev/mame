@@ -13,12 +13,12 @@ Enterprise Sixty Four / Enterprise One Two Eight
 Enterprise Computers Ltd. 1985
 
 MAIN PCB Layout
----------------  
+---------------
                                         DUAL
 |-----------| 9V                        TAPE_IN/OUT                             RES
-|HEATSINK   | DC_IN             MON1    AND REMOTE     SR1    PR1   CN2A CN1A   |-|                      
+|HEATSINK   | DC_IN             MON1    AND REMOTE     SR1    PR1   CN2A CN1A   |-|
 |           |--||---|--||--|--| |--| |-||-||-||-||-| |----| |-----| |--| |--| |-|-|------|
-|-----------|7805   | MOD  |  |-|  |-|             |-|    |-|     |-|  |-|  |-|   EXP2 --|EXTERNAL            
+|-----------|7805   | MOD  |  |-|  |-|             |-|    |-|     |-|  |-|  |-|   EXP2 --|EXTERNAL
         |---+7805   |      |                         74LS06 74LS273 74LS86 74LS32      --|EXPANSION
         |   |       |------|             74LS244                                       --|CONNECTOR
         |   |78L12 POT1  LM386                               |-----|   |-----|   EXP1  --|
@@ -27,7 +27,7 @@ MAIN PCB Layout
         |   |            4.433619MHz     74LS145 POT3 LED    |-----|   |-----|         --|
         |---+                                                                          --|
             |                            74LS74      74LS244  74LS244  74LS245 |---------|
-            |                                                                  |            
+            |                                                                  |
             | 74LS373                    4164  4164  74F157                    |
             |                                                                  |
             | 16-2-103   LM339    LM324  4164  4164  74F157           EXOS.IC2 |
@@ -38,8 +38,8 @@ MAIN PCB Layout
             |------------------------------------------------------------------|
 Notes: (all IC's shown)
            Z80A - Z80A CPU, clock input 4MHz [8/2]
-       EXOS.IC2 - 32k x8-bit mask ROM usually 23256 manufactured by GI (DIP24). Contains EXOS operating 
-                  system and built-in word processor software. A few official revisions were made and 
+       EXOS.IC2 - 32k x8-bit mask ROM usually 23256 manufactured by GI (DIP24). Contains EXOS operating
+                  system and built-in word processor software. A few official revisions were made and
                   there were a few unofficial revision made with additional capabilities and bug-fixes
                   ROM labelling of some official versions found....
                   9256DS-0019 (C)1984 INTELLIGENT SOFTWARE LTD ENTER 08-45-A GI
@@ -77,7 +77,7 @@ Notes: (all IC's shown)
             MOD - Astec UM1233 TV modulator
             RES - Reset push button switch
            MON1 - Monitor output connector. Pinout is....
-           
+
                             Green  A1 B1 NC
                             Ground A2 B2 Ground
                   Mono Comp. Video A3 B3 Blue
@@ -85,16 +85,16 @@ Notes: (all IC's shown)
                              VSync A5 B5 Composite Sync
                                 NC A6 B6 Mode Switch
                         Left Audio A7 B7 Right Audio
-           
+
             SR1 - Serial/Network connector. Pinout is....
-            
+
                          Reference A1 B1 Ground
                                  - A2 B2 -
                                RTS A3 B3 Data Out
                                CTS A4 B4 Data In
 
             PR1 - Printer connector. Pinout is....
-                  
+
                             Ground A1 B1 Ground
                             Strobe A2 B2 Ready
                             Data 3 A3 B3 Data 4
@@ -104,9 +104,9 @@ Notes: (all IC's shown)
                             Data 0 A7 B7 Data 7
 
            CN2A - Joystick 2 connector
-           CN1A - Joystick 1 connector 
+           CN1A - Joystick 1 connector
                   Pinout is....
-                  
+
                           Keyboard J A1 B1 Ground
                           Keyboard L A2 B2 Keyboard K
                                    - A3 B3 -
@@ -116,7 +116,7 @@ Notes: (all IC's shown)
 
 
 Internal Memory Expansion PCB Layout
-------------------------------------     
+------------------------------------
 
 |---------------------|
 |  4164 74LS00 PL3 PL2|
@@ -138,15 +138,15 @@ Notes: (All IC's shown)
 
 /*
 
-	TODO:
+    TODO:
 
-	- POST RAM errors
-	- rewrite DAVE to output to discrete DAC
-	- rewrite NICK
-	- cassette
-	- external joysticks
+    - POST RAM errors
+    - rewrite DAVE to output to discrete DAC
+    - rewrite NICK
+    - cassette
+    - external joysticks
 
-	http://ep.homeserver.hu/Dokumentacio/Konyvek/
+    http://ep.homeserver.hu/Dokumentacio/Konyvek/
 
 */
 
@@ -191,9 +191,9 @@ READ8_MEMBER( ep64_state::rd0_r )
 WRITE8_MEMBER( ep64_state::wr0_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       KEY A
 	    1       KEY B
 	    2       KEY C
@@ -202,7 +202,7 @@ WRITE8_MEMBER( ep64_state::wr0_w )
 	    5       CASSETTE OUT
 	    6       REMOTE 1
 	    7       REMOTE 2
-	
+
 	*/
 
 	// keyboard
@@ -228,9 +228,9 @@ WRITE8_MEMBER( ep64_state::wr0_w )
 READ8_MEMBER( ep64_state::rd1_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       KBJ
 	    1       KBK
 	    2       KBL
@@ -239,7 +239,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 	    5       SERIAL/NET STATUS IN
 	    6       CASSETTE IN
 	    7       ?
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -265,18 +265,18 @@ READ8_MEMBER( ep64_state::rd1_r )
 WRITE8_MEMBER( ep64_state::wr2_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SERIAL/NET DATA OUT
 	    1       SERIAL/NET STATUS OUT
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 
 	// serial
@@ -596,7 +596,7 @@ ROM_START( ep64 )
 	ROM_CART_LOAD( "cart", 0x00000, 0x10000, ROM_MIRROR )
 ROM_END
 
-#define rom_phc64	rom_ep64
+#define rom_phc64   rom_ep64
 
 
 //-------------------------------------------------

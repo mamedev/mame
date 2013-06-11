@@ -48,14 +48,14 @@ class tc0220ioc_device : public device_t,
 public:
 	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0220ioc_device() {}
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 	DECLARE_READ8_MEMBER( portreg_r );
 	DECLARE_WRITE8_MEMBER( portreg_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -115,7 +115,7 @@ class tc0640fio_device : public device_t,
 public:
 	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0640fio_device() {}
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ16_MEMBER( halfword_r );
@@ -159,5 +159,5 @@ extern const device_type TC0640FIO;
 	MCFG_DEVICE_ADD(_tag, TC0640FIO, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
-	
+
 #endif  /* __TAITOIO_H__ */

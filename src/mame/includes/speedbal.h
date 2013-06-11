@@ -16,7 +16,7 @@ public:
 
 	bool m_leds_start;
 	UINT32 m_leds_shiftreg;
-	
+
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 

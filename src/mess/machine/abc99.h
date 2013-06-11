@@ -64,7 +64,7 @@ private:
 		TIMER_SERIAL,
 		TIMER_MOUSE
 	};
-	
+
 	enum
 	{
 		LED_1 = 0,

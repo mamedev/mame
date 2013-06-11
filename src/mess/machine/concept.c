@@ -58,7 +58,7 @@ void concept_state::machine_start()
 	/* clear keyboard interface state */
 	m_KeyQueueHead = m_KeyQueueLen = 0;
 	memset(m_KeyStateSave, 0, sizeof(m_KeyStateSave));
-	
+
 	m_exp[0] = machine().device<concept_exp_port_device>("exp1");
 	m_exp[1] = machine().device<concept_exp_port_device>("exp2");
 	m_exp[2] = machine().device<concept_exp_port_device>("exp3");
@@ -248,10 +248,10 @@ READ16_MEMBER(concept_state::concept_io_r)
 		/* I/O slot regs */
 		switch ((offset >> 4) & 7)
 		{
-			case 1:	// IO1 registers
-			case 2:	// IO2 registers
-			case 3:	// IO3 registers
-			case 4:	// IO4 registers
+			case 1: // IO1 registers
+			case 2: // IO2 registers
+			case 3: // IO3 registers
+			case 4: // IO4 registers
 				return m_exp[((offset >> 4) & 7) - 1]->reg_r(space, offset & 0x0f);
 			break;
 
@@ -261,10 +261,10 @@ READ16_MEMBER(concept_state::concept_io_r)
 		}
 		break;
 
-	case 1:	// IO1 ROM
-	case 2:	// IO2 ROM
-	case 3:	// IO3 ROM
-	case 4:	// IO4 ROM
+	case 1: // IO1 ROM
+	case 2: // IO2 ROM
+	case 3: // IO3 ROM
+	case 4: // IO4 ROM
 		LOG(("concept_io_r: Slot ROM memory accessed for slot %d at address 0x03%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1));
 		return m_exp[((offset >> 8) & 7) - 1]->rom_r(space, offset & 0xff);
 		break;
@@ -373,23 +373,23 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		/* I/O slot regs */
 		switch ((offset >> 4) & 7)
 		{
-			case 1:	// IO1 registers
-			case 2:	// IO2 registers
-			case 3:	// IO3 registers
-			case 4:	// IO4 registers
+			case 1: // IO1 registers
+			case 2: // IO2 registers
+			case 3: // IO3 registers
+			case 4: // IO4 registers
 				return m_exp[((offset >> 4) & 7) - 1]->reg_w(space, offset & 0x0f, data);
 				break;
 
-			default:	// ???
+			default:    // ???
 				logerror("concept_io_w: Slot I/O memory written for unknown purpose at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data);
 				break;
 		}
 		break;
 
-	case 1:	// IO1 ROM
-	case 2:	// IO2 ROM
-	case 3:	// IO3 ROM
-	case 4:	// IO4 ROM
+	case 1: // IO1 ROM
+	case 2: // IO2 ROM
+	case 3: // IO3 ROM
+	case 4: // IO4 ROM
 		LOG(("concept_io_w: Slot ROM memory written to for slot %d at address 0x03%4.4x, data: 0x%4.4x\n", ((offset >> 8) & 7) - 1, offset << 1, data));
 		return m_exp[((offset >> 8) & 7) - 1]->rom_w(space, offset & 0xff, data);
 		break;
@@ -463,4 +463,3 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		break;
 	}
 }
-

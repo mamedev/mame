@@ -43,7 +43,7 @@ device_card_options *device_slot_interface::static_alloc_card_options(device_t &
 
 	return options;
 }
-	
+
 void device_slot_interface::static_set_card_machine_config(device_t &device, const char *card, const machine_config_constructor machine_config)
 {
 	static_alloc_card_options(device, card)->m_machine_config = machine_config;

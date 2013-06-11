@@ -102,7 +102,7 @@ void newport_video_device::device_config_complete()
 void newport_video_device::device_start()
 {
 	m_base = auto_alloc_array_clear(machine(), UINT32, (1280+64) * (1024+64));
-	
+
 	save_pointer(NAME(m_base), (1280+64) * (1024+64));
 	save_item(NAME(m_VC2.nRegister));
 	save_item(NAME(m_VC2.nRAM));
@@ -203,8 +203,8 @@ void newport_video_device::device_reset()
 	m_REX3.nDrawMode0 = 0x00000000;
 	m_REX3.nDrawMode1 = 0x3002f001;
 	m_REX3.nDCBMode = 0x00000780;
-	m_REX3.nKludge_SkipLine = 0;	
-}	
+	m_REX3.nKludge_SkipLine = 0;
+}
 
 
 UINT32 newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -214,7 +214,7 @@ UINT32 newport_video_device::screen_update(screen_device &device, bitmap_rgb32 &
 	{
 		UINT32 *src = &m_base[1344 * y];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
-		
+
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
 		{

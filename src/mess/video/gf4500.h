@@ -15,8 +15,8 @@ class gf4500_device : public device_t
 public:
 	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~gf4500_device() {}
-	
-	
+
+
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
 
@@ -27,12 +27,12 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
-private:	
+
+private:
 	// internal state
 
 	void vram_write16(UINT16 data);
-	
+
 	UINT32 *m_data;
 	int m_screen_x;
 	int m_screen_y;

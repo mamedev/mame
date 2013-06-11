@@ -2,7 +2,7 @@
 
     dvpoints.h
 
-	Breakpoint debugger view.
+    Breakpoint debugger view.
 
 ****************************************************************************
 
@@ -77,7 +77,7 @@ private:
 	// internal helpers
 	void enumerate_sources();
 	bool recompute(offs_t pc, int startline, int lines);
-    void pad_astring_to_length(astring& str, int len);
+	void pad_astring_to_length(astring& str, int len);
 
 	// internal state
 };

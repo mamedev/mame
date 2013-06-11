@@ -149,7 +149,7 @@ PALETTE_INIT( stuntair )
 		int b = (data&0xc0)>>6;
 		int g = (data&0x38)>>3;
 		int r = (data&0x07)>>0;
-		
+
 		palette_set_color(machine,i,MAKE_RGB(r<<5,g<<5,b<<6));
 	}
 

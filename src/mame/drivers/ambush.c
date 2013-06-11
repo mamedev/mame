@@ -286,14 +286,14 @@ ROM_END
 
 ROM_START( ambushh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	/* displays an M ("Mal" is Bad in Spanish) next to ROM 1 during the test, why is internal checksum wrong (0x02 instead of 0x00) ? 
+	/* displays an M ("Mal" is Bad in Spanish) next to ROM 1 during the test, why is internal checksum wrong (0x02 instead of 0x00) ?
 	   I think the ROM has been hacked(?)
 	*/
 	ROM_LOAD( "a1_hack.i7",    0x0000, 0x2000, CRC(a7cd149d) SHA1(470ebe60bc23a7908fb96caef8074d65f8c57625) )
-	// 1A6D:	0C -> 00
-	// 1A75:	18 -> 0D
-	// 1A76:	D5 -> 18
-	// 1A77:	00 -> D6
+	// 1A6D:    0C -> 00
+	// 1A75:    18 -> 0D
+	// 1A76:    D5 -> 18
+	// 1A77:    00 -> D6
 
 	ROM_LOAD( "a2.g7",    0x2000, 0x2000, CRC(8328d88a) SHA1(690f0af10a0550566b67ee570f849b2764448d15) )
 	ROM_LOAD( "a3.f7",    0x4000, 0x2000, CRC(8db57ab5) SHA1(5cc7d7ebdfc91fb8d9ed52836d70c1de68001402) )

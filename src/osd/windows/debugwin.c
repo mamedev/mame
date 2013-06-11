@@ -469,7 +469,7 @@ void windows_osd_interface::init_debugger()
 	// get other metrics
 	hscroll_height = GetSystemMetrics(SM_CYHSCROLL);
 	vscroll_width = GetSystemMetrics(SM_CXVSCROLL);
-	
+
 	// ensure we get called on the way out
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugwin_destroy_windows), &machine()));
 }

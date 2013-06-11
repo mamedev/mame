@@ -78,9 +78,9 @@ inline void cdp1862_device::initialize_palette()
 
 cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock),
-	  m_read_rd(*this),
-	  m_read_bd(*this),
-	  m_read_gd(*this)
+		m_read_rd(*this),
+		m_read_bd(*this),
+		m_read_gd(*this)
 {
 }
 

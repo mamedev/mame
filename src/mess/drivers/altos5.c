@@ -129,7 +129,7 @@ UINT8 altos5_state::convert(offs_t offset, bool state)
 	// normalise bank number (4x becomes 0x; 2x and 1x are already ok)
 	return data & 0x3f;
 }
-	
+
 void altos5_state::setup_banks(UINT8 source)
 {
 	offs_t offs,temp;
@@ -248,7 +248,7 @@ static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(altos5_state, busreq_w),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,	// BAO, not used
+	DEVCB_NULL, // BAO, not used
 	DEVCB_DRIVER_MEMBER(altos5_state, memory_read_byte),
 	DEVCB_DRIVER_MEMBER(altos5_state, memory_write_byte),
 	DEVCB_DRIVER_MEMBER(altos5_state, io_read_byte),
@@ -300,7 +300,7 @@ static Z80PIO_INTERFACE( pio0_intf )
 d0: L = a HD is present
 d1: L = a 2nd hard drive is present
 d2: unused configuration input (must be H to skip HD boot)
-d3: selected floppy is single(L) or double sided(H) 
+d3: selected floppy is single(L) or double sided(H)
 d7: IRQ from FDC
 */
 READ8_MEMBER( altos5_state::port08_r )

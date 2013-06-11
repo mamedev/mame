@@ -28,7 +28,7 @@ public:
 		m_tc0180vcu(*this, "tc0180vcu"),
 		m_tc0640fio(*this, "tc0640fio"),
 		m_tc0220ioc(*this, "tc0220ioc"),
-		m_tc0510nio(*this, "tc0510nio")	{ }
+		m_tc0510nio(*this, "tc0510nio") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;

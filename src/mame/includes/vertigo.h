@@ -89,7 +89,7 @@ public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),  
+			m_audiocpu(*this, "audiocpu"),
 			m_pit(*this, "pit8254"),
 			m_vectorram(*this, "vectorram")
 	{ }

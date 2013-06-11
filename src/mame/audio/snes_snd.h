@@ -73,8 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER( spc_io_w );
 	DECLARE_WRITE8_MEMBER( spc_ram_w );
 	DECLARE_WRITE8_MEMBER( spc_port_in );
-	
-//	UINT8 *spc_get_ram() { return m_ram; }
+
+//  UINT8 *spc_get_ram() { return m_ram; }
 
 protected:
 	// device-level overrides
@@ -86,7 +86,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-	
+
 	DECLARE_READ8_MEMBER(dsp_io_r);
 	DECLARE_WRITE8_MEMBER(dsp_io_w);
 	TIMER_CALLBACK_MEMBER(spc_timer);
@@ -94,21 +94,21 @@ private:
 	void dsp_update(short *sound_ptr);
 	int advance_envelope(int v);
 	void state_register();
-	
+
 	// internal state
 	UINT8                   *m_ram;
 	sound_stream            *m_channel;
 	UINT8                   m_dsp_regs[256];      /* DSP registers */
 	UINT8                   m_ipl_region[64];     /* SPC top 64 bytes */
-	
+
 	int                     m_keyed_on;
 	int                     m_keys;               /* 8-bits for 8 voices */
 	voice_state_type        m_voice_state[8];
-	
+
 	/* Noise stuff */
 	int                     m_noise_cnt;
 	int                     m_noise_lev;
-	
+
 	/* These are for the FIR echo filter */
 #ifndef NO_ECHO
 	short                   m_fir_lbuf[8];
@@ -116,12 +116,12 @@ private:
 	int                     m_fir_ptr;
 	int                     m_echo_ptr;
 #endif
-	
+
 	/* timers */
 	emu_timer               *m_timer[3];
 	UINT8                   m_enabled[3];
 	UINT16                  m_counter[3];
-	
+
 	/* IO ports */
 	UINT8                   m_port_in[4];         /* SPC input ports */
 	UINT8                   m_port_out[4];        /* SPC output ports */

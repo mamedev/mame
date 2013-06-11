@@ -30,7 +30,7 @@
 
       This code is also in the main PRG ROM at offset 0x1ffffc, even on single
       board games. Known regions are:
-	
+
           0x01 Japan
           0x10 US
           0x20 Taiwan
@@ -951,8 +951,8 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
-//	AM_RANGE(0x00000104, 0x00000107) AM_WRITENOP // ?
-//	AM_RANGE(0x00000108, 0x0000010b) AM_WRITENOP // ?
+//  AM_RANGE(0x00000104, 0x00000107) AM_WRITENOP // ?
+//  AM_RANGE(0x00000108, 0x0000010b) AM_WRITENOP // ?
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM
 	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
@@ -1059,7 +1059,7 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 		m_z80_lastbank = bank;
 		membank("bank1")->set_entry(bank);
 	}
-	
+
 	// d3: watchdog?
 }
 
@@ -1067,7 +1067,7 @@ WRITE8_MEMBER(seibuspi_state::spi_coin_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
 	coin_counter_w(machine(), 1, data & 2);
-	
+
 	// coin latch used by single boards
 	if (data)
 		m_sb_coin_latch = 0xa0 | data;
@@ -1903,7 +1903,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 	MCFG_DEVICE_REMOVE("ds2404")
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
-	
+
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END

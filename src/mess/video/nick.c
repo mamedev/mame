@@ -104,18 +104,18 @@ ADDRESS_MAP_END
 
 nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NICK, "NICK", tag, owner, clock, "nick", __FILE__),
-	  device_memory_interface(mconfig, *this),
-	  m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
-	  m_write_virq(*this),
-	  horizontal_clock(0),
-	  m_scanline_count(0),
-	  m_FIXBIAS(0),
-	  m_BORDER(0),
-	  m_LPL(0),
-	  m_LPH(0),
-	  m_LD1(0),
-	  m_LD2(0),
-	  m_virq(CLEAR_LINE)
+		device_memory_interface(mconfig, *this),
+		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
+		m_write_virq(*this),
+		horizontal_clock(0),
+		m_scanline_count(0),
+		m_FIXBIAS(0),
+		m_BORDER(0),
+		m_LPL(0),
+		m_LPH(0),
+		m_LD1(0),
+		m_LD2(0),
+		m_virq(CLEAR_LINE)
 {
 }
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( nick_device::vram_w )
 
 
 //-------------------------------------------------
-//  fixbias_w - 
+//  fixbias_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( nick_device::fixbias_w )
@@ -253,7 +253,7 @@ WRITE8_MEMBER( nick_device::fixbias_w )
 
 
 //-------------------------------------------------
-//  border_w - 
+//  border_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( nick_device::border_w )
@@ -263,7 +263,7 @@ WRITE8_MEMBER( nick_device::border_w )
 
 
 //-------------------------------------------------
-//  lpl_w - 
+//  lpl_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( nick_device::lpl_w )
@@ -275,7 +275,7 @@ WRITE8_MEMBER( nick_device::lpl_w )
 
 
 //-------------------------------------------------
-//  lph_w - 
+//  lph_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( nick_device::lph_w )
@@ -287,7 +287,7 @@ WRITE8_MEMBER( nick_device::lph_w )
 
 
 //-------------------------------------------------
-//  initialize_palette - 
+//  initialize_palette -
 //-------------------------------------------------
 
 void nick_device::initialize_palette()
@@ -305,9 +305,9 @@ void nick_device::initialize_palette()
 	for (int i = 0; i < 256; i++)
 	{
 		/*
-		
+
 		    bit     description
-		
+
 		    PC0     100R -- RED
 		    PC1     100R -- GREEN
 		    PC2      82R -- BLUE
@@ -316,7 +316,7 @@ void nick_device::initialize_palette()
 		    PC5     220R -- BLUE
 		    PC6     470R -- RED
 		    PC7     470R -- GREEN
-		
+
 		*/
 
 		int ra = BIT(i, 0);
@@ -340,10 +340,10 @@ void nick_device::initialize_palette()
 	for (int i = 0; i < 256; i++)
 	{
 		int pen_index;
-		
+
 		pen_index = (BIT(i, 7) << 0) | (BIT(i, 3) << 1);
 		m_pen_idx_4col[i] = pen_index;
-		
+
 		pen_index =  (BIT(i, 7) << 0) | (BIT(i, 3) << 1) |  (BIT(i, 5) << 2) | (BIT(i, 1) << 3);
 		m_pen_idx_16col[i] = pen_index;
 	}
@@ -437,10 +437,10 @@ void nick_device::write_pixels2color_lpixel(UINT8 pen0, UINT8 pen1, UINT8 data_b
 	int col_index[2];
 	int pen_index;
 	UINT8 data = data_byte;
-	
+
 	col_index[0] = get_color_index(pen0);
 	col_index[1] = get_color_index(pen1);
-	
+
 	for (int i = 0; i < 8; i++)
 	{
 		pen_index = col_index[BIT(data, 7)];

@@ -8,19 +8,19 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- m6800.c rewrite
-	- keyboard interrupt
-	- LCD controller
-	- serial
-	- SW6 read
-	- RS-232
-	- microcassette
-	- printer
-	- ROM cartridge
-	- floppy TF-20
-	- barcode reader
+    - m6800.c rewrite
+    - keyboard interrupt
+    - LCD controller
+    - serial
+    - SW6 read
+    - RS-232
+    - microcassette
+    - printer
+    - ROM cartridge
+    - floppy TF-20
+    - barcode reader
 
 */
 
@@ -84,18 +84,18 @@ READ8_MEMBER( hx20_state::krtn07_r )
 READ8_MEMBER( hx20_state::krtn89_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       KRTN8
 	    1       KRTN9
-	    2       
-	    3       
-	    4       
-	    5       
+	    2
+	    3
+	    4
+	    5
 	    6       _PWSW
 	    7       _BUSY
-	
+
 	*/
 
 	UINT8 data = 0xff;
@@ -120,9 +120,9 @@ READ8_MEMBER( hx20_state::krtn89_r )
 WRITE8_MEMBER( hx20_state::lcd_cs_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       LCD CS bit 0
 	    1       LCD CS bit 1
 	    2       LCD CS bit 2
@@ -131,7 +131,7 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 	    5       SERIAL POUT
 	    6       MO1
 	    7       MO2
-	
+
 	*/
 
 	logerror("LCD CS %02x\n", data);
@@ -153,7 +153,7 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 	case 5: m_lcdc4->cs_w(0); break;
 	case 6: m_lcdc5->cs_w(0); break;
 	}
-	
+
 	int cd = BIT(data, 3);
 
 	m_lcdc0->cd_w(cd);
@@ -187,18 +187,18 @@ WRITE8_MEMBER( hx20_state::lcd_data_w )
 READ8_MEMBER( hx20_state::main_p1_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       RS-232 DSR
 	    1       RS-232 CTS
-	    2       
+	    2
 	    3       _INT EX
 	    4       _PWA
 	    5       _K.B REQUEST
 	    6       SERIAL PIN
 	    7       CARTRIDGE MI1 (0=ROM, 1=microcassette)
-	
+
 	*/
 
 	UINT8 data = 0x98;
@@ -224,18 +224,18 @@ READ8_MEMBER( hx20_state::main_p1_r )
 WRITE8_MEMBER( hx20_state::main_p1_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 }
 
@@ -247,25 +247,25 @@ WRITE8_MEMBER( hx20_state::main_p1_w )
 READ8_MEMBER( hx20_state::main_p2_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       bar code reader data
-	    1       
+	    1
 	    2       SLAVE P34
 	    3       RX
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    4
+	    5
+	    6
+	    7
+
 	*/
-	
+
 	UINT8 data = M6801_MODE_4;
 
 	// serial
 	data &= ~(!m_slave_flag << 2);
-	
+
 	if (m_slave_sio)
 		data |= m_slave_rx << 3;
 	else
@@ -282,18 +282,18 @@ READ8_MEMBER( hx20_state::main_p2_r )
 WRITE8_MEMBER( hx20_state::main_p2_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       RS-232 TXD
 	    2       serial select (0=peripheral, 1=slave 6301)
-	    3       
+	    3
 	    4       TX
-	    5       
-	    6       
-	    7       
-	
+	    5
+	    6
+	    7
+
 	*/
 
 	// RS-232
@@ -316,18 +316,18 @@ WRITE8_MEMBER( hx20_state::main_p2_w )
 READ8_MEMBER( hx20_state::slave_p1_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
 	    6       printer reset pulse
 	    7       printer timing pulse
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -343,18 +343,18 @@ READ8_MEMBER( hx20_state::slave_p1_r )
 WRITE8_MEMBER( hx20_state::slave_p1_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       printer head 1 (1=on)
 	    1       printer head 2
 	    2       printer head 3
 	    3       printer head 4
 	    4       printer motor (0=on)
 	    5       speaker (1=on)
-	    6       
-	    7       
-	
+	    6
+	    7
+
 	*/
 
 	// speaker
@@ -369,20 +369,20 @@ WRITE8_MEMBER( hx20_state::slave_p1_w )
 READ8_MEMBER( hx20_state::slave_p2_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       RS-232 RXD / microcassette (0=read, 1=write)
-	    1       
-	    2       
+	    1
+	    2
 	    3       TX
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    4
+	    5
+	    6
+	    7
+
 	*/
-	
+
 	UINT8 data = M6801_MODE_7;
 
 	// serial
@@ -399,18 +399,18 @@ READ8_MEMBER( hx20_state::slave_p2_r )
 WRITE8_MEMBER( hx20_state::slave_p2_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       microcassette internal clock, write data
 	    2       serial select (0=brake, 1=normal)
-	    3       
+	    3
 	    4       RX
-	    5       
-	    6       
-	    7       
-	
+	    5
+	    6
+	    7
+
 	*/
 
 	// serial
@@ -425,18 +425,18 @@ WRITE8_MEMBER( hx20_state::slave_p2_w )
 READ8_MEMBER( hx20_state::slave_p3_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
+
+	    0
+	    1
 	    2       external cassette read data
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
+	    3
+	    4
+	    5
+	    6
+	    7
+
 	*/
 
 	UINT8 data = 0;
@@ -452,18 +452,18 @@ READ8_MEMBER( hx20_state::slave_p3_r )
 WRITE8_MEMBER( hx20_state::slave_p3_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       external cassette remote (0=on)
 	    1       RS-232 RTS
-	    2       
+	    2
 	    3       external cassette write data
 	    4       slave status flag
 	    5       bar code power (1=on)
 	    6       RS-232 power (1=on)
 	    7       program power (1=on)
-	
+
 	*/
 
 	// RS-232
@@ -481,20 +481,20 @@ WRITE8_MEMBER( hx20_state::slave_p3_w )
 READ8_MEMBER( hx20_state::slave_p4_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       PLUG 2
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
 	    7       RS-232 CD
-	
+
 	*/
-	
+
 	UINT8 data = 0;
 
 	// RS-232
@@ -511,18 +511,18 @@ READ8_MEMBER( hx20_state::slave_p4_r )
 WRITE8_MEMBER( hx20_state::slave_p4_w )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       port enable always on / printer motor control (0=open, 1=brake)
 	    2       clear shift register / microcassette power switch (1=on)
 	    3       ROM cartridge power switch (1=on) / microcassette command
 	    4       ROM address counter clear / clock
 	    5       cassette/RS-232 select (0=RS-232, 1=microcassette)
 	    6       ROM cartridge select / microcassette clock (0=counter, 1=head switch)
-	    7       
-	
+	    7
+
 	*/
 }
 
@@ -598,7 +598,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( hx20 )
 	PORT_START("KSC0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('_')
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!') 
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
@@ -871,7 +871,7 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")

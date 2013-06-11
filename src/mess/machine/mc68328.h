@@ -1,14 +1,14 @@
 /**********************************************************************
- 
+
  Motorola 68328 ("DragonBall") System-on-a-Chip implementation
- 
+
  By MooglyGuy
  contact mooglyguy@gmail.com with licensing and usage questions.
- 
+
  **********************************************************************/
 
 /*****************************************************************************************************************
- 
+
                                                              P P P P P P P   P P P P P P P
                                                              E E E E E E E   J J J J J J J
                                                              1 2 3 4 5 6 7   0 1 2 3 4 5 6
@@ -80,11 +80,11 @@
                                                          1   2                   P
                                                                                  I
                                                                                  O
- 
+
                    Figure 12-1. MC68328 144-Lead Plastic Thin-Quad Flat Pack Pin Assignment
- 
+
                       Source: MC68328 (DragonBall)(tm) Integrated Processor User's Manual
- 
+
  *****************************************************************************************************************/
 
 #ifndef __MC68328_H__
@@ -412,7 +412,7 @@
 struct mc68328_interface
 {
 	const char *m68k_cpu_tag;
-	
+
 	devcb_write8  m_out_port_a_func;    /* 8-bit output */
 	devcb_write8  m_out_port_b_func;    /* 8-bit output */
 	devcb_write8  m_out_port_c_func;    /* 8-bit output */
@@ -423,7 +423,7 @@ struct mc68328_interface
 	devcb_write8  m_out_port_j_func;    /* 8-bit output */
 	devcb_write8  m_out_port_k_func;    /* 8-bit output */
 	devcb_write8  m_out_port_m_func;    /* 8-bit output */
-	
+
 	devcb_read8   m_in_port_a_func;     /* 8-bit input */
 	devcb_read8   m_in_port_b_func;     /* 8-bit input */
 	devcb_read8   m_in_port_c_func;     /* 8-bit input */
@@ -434,9 +434,9 @@ struct mc68328_interface
 	devcb_read8   m_in_port_j_func;     /* 8-bit input */
 	devcb_read8   m_in_port_k_func;     /* 8-bit input */
 	devcb_read8   m_in_port_m_func;     /* 8-bit input */
-	
+
 	devcb_write8  m_out_pwm_func;       /* 1-bit output */
-	
+
 	devcb_write16 m_out_spim_func;      /* 16-bit output */
 	devcb_read16  m_in_spim_func;       /* 16-bit input */
 
@@ -449,7 +449,7 @@ struct mc68328_regs_t
 	// $(FF)FFF000
 	UINT8   scr;        // System Control Register
 	UINT8   unused0[255];
-	
+
 	// $(FF)FFF100
 	UINT16  grpbasea;   // Chip Select Group A Base Register
 	UINT16  grpbaseb;   // Chip Select Group B Base Register
@@ -476,14 +476,14 @@ struct mc68328_regs_t
 	UINT32  csd2;       // Group D Chip Select 2 Register
 	UINT32  csd3;       // Group D Chip Select 3 Register
 	UINT8   unused1[176];
-	
+
 	// $(FF)FFF200
 	UINT16  pllcr;      // PLL Control Register
 	UINT16  pllfsr;     // PLL Frequency Select Register
 	UINT8   pad2[3];
 	UINT8   pctlr;      // Power Control Register
 	UINT8   unused3[248];
-	
+
 	// $(FF)FFF300
 	UINT8   ivr;        // Interrupt Vector Register
 	UINT8   unused4[1];
@@ -493,26 +493,26 @@ struct mc68328_regs_t
 	UINT32  isr;        // Interrupt Status Register
 	UINT32  ipr;        // Interrupt Pending Register
 	UINT8   unused5[236];
-	
+
 	// $(FF)FFF400
 	UINT8   padir;      // Port A Direction Register
 	UINT8   padata;     // Port A Data Register
 	UINT8   unused6[1];
 	UINT8   pasel;      // Port A Select Register
 	UINT8   unused7[4];
-	
+
 	UINT8   pbdir;      // Port B Direction Register
 	UINT8   pbdata;     // Port B Data Register
 	UINT8   unused8[1];
 	UINT8   pbsel;      // Port B Select Register
 	UINT8   unused9[4];
-	
+
 	UINT8   pcdir;      // Port C Direction Register
 	UINT8   pcdata;     // Port C Data Register
 	UINT8   unused10[1];
 	UINT8   pcsel;      // Port C Select Register
 	UINT8   unused11[4];
-	
+
 	UINT8   pddir;      // Port D Direction Register
 	UINT8   pddata;     // Port D Data Register
 	UINT8   pdpuen;     // Port D Pullup Enable Register
@@ -521,25 +521,25 @@ struct mc68328_regs_t
 	UINT8   pdirqen;    // Port D IRQ Enable Register
 	UINT8   pddataedge; // Port D Data Edge Level
 	UINT8   pdirqedge;  // Port D IRQ Edge Register
-	
+
 	UINT8   pedir;      // Port E Direction Register
 	UINT8   pedata;     // Port E Data Register
 	UINT8   pepuen;     // Port E Pullup Enable Register
 	UINT8   pesel;      // Port E Select Register
 	UINT8   unused14[4];
-	
+
 	UINT8   pfdir;      // Port F Direction Register
 	UINT8   pfdata;     // Port F Data Register
 	UINT8   pfpuen;     // Port F Pullup Enable Register
 	UINT8   pfsel;      // Port F Select Register
 	UINT8   unused15[4];
-	
+
 	UINT8   pgdir;      // Port G Direction Register
 	UINT8   pgdata;     // Port G Data Register
 	UINT8   pgpuen;     // Port G Pullup Enable Register
 	UINT8   pgsel;      // Port G Select Register
 	UINT8   unused16[4];
-	
+
 	UINT8   pjdir;      // Port J Direction Register
 	UINT8   pjdata;     // Port J Data Register
 	UINT8   unused17[1];
@@ -550,20 +550,20 @@ struct mc68328_regs_t
 	UINT8   pkpuen;     // Port K Pullup Enable Register
 	UINT8   pksel;      // Port K Select Register
 	UINT8   unused19[4];
-	
+
 	UINT8   pmdir;      // Port M Direction Register
 	UINT8   pmdata;     // Port M Data Register
 	UINT8   pmpuen;     // Port M Pullup Enable Register
 	UINT8   pmsel;      // Port M Select Register
 	UINT8   unused20[180];
-	
+
 	// $(FF)FFF500
 	UINT16  pwmc;       // PWM Control Register
 	UINT16  pwmp;       // PWM Period Register
 	UINT16  pwmw;       // PWM Width Register
 	UINT16  pwmcnt;     // PWN Counter
 	UINT8   unused21[248];
-	
+
 	// $(FF)FFF600
 	UINT16  tctl[2];    // Timer Control Register
 	UINT16  tprer[2];   // Timer Prescaler Register
@@ -576,16 +576,16 @@ struct mc68328_regs_t
 	UINT16  wcn;        // Watchdog Counter
 	UINT8   tclear[2];  // Timer Clearable Status
 	UINT8   unused22[224];
-	
+
 	// $(FF)FFF700
 	UINT16  spisr;      // SPIS Register
 	UINT8   unused23[254];
-	
+
 	// $(FF)FFF800
 	UINT16  spimdata;   // SPIM Data Register
 	UINT16  spimcont;   // SPIM Control/Status Register
 	UINT8   unused24[252];
-	
+
 	// $(FF)FFF900
 	UINT16  ustcnt;     // UART Status/Control Register
 	UINT16  ubaud;      // UART Baud Control Register
@@ -593,7 +593,7 @@ struct mc68328_regs_t
 	UINT16  utx;        // UART TX Register
 	UINT16  umisc;      // UART Misc Register
 	UINT8   unused25[246];
-	
+
 	// $(FF)FFFA00
 	UINT32  lssa;       // Screen Starting Address Register
 	UINT8   unused26[1];
@@ -625,7 +625,7 @@ struct mc68328_regs_t
 	UINT8   lfrcm;      // Frame Rate Control Modulation Register
 	UINT16  lgpmr;      // Gray Palette Mapping Register
 	UINT8   unused37[204];
-	
+
 	// $(FF)FFFB00
 	UINT32  hmsr;       // RTC Hours Minutes Seconds Register
 	UINT32  alarm;      // RTC Alarm Register
@@ -657,15 +657,15 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
-private:	
+
+private:
 	// internal state
 	void set_interrupt_line(UINT32 line, UINT32 active);
 	void poll_port_d_interrupts();
 	UINT32 get_timer_frequency(UINT32 index);
 	void maybe_start_timer(UINT32 index, UINT32 new_enable);
 	void timer_compare_event(UINT32 index);
-	
+
 	void register_state_save();
 
 	TIMER_CALLBACK_MEMBER(timer1_hit);
@@ -674,11 +674,11 @@ private:
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 
 	mc68328_regs_t m_regs;
-	
+
 	emu_timer *m_gptimer[2];
 	emu_timer *m_rtc;
 	emu_timer *m_pwm;
-	
+
 	devcb_resolved_write8  m_out_port_a;    /* 8-bit output */
 	devcb_resolved_write8  m_out_port_b;    /* 8-bit output */
 	devcb_resolved_write8  m_out_port_c;    /* 8-bit output */
@@ -689,7 +689,7 @@ private:
 	devcb_resolved_write8  m_out_port_j;    /* 8-bit output */
 	devcb_resolved_write8  m_out_port_k;    /* 8-bit output */
 	devcb_resolved_write8  m_out_port_m;    /* 8-bit output */
-	
+
 	devcb_resolved_read8   m_in_port_a;     /* 8-bit input */
 	devcb_resolved_read8   m_in_port_b;     /* 8-bit input */
 	devcb_resolved_read8   m_in_port_c;     /* 8-bit input */
@@ -700,13 +700,13 @@ private:
 	devcb_resolved_read8   m_in_port_j;     /* 8-bit input */
 	devcb_resolved_read8   m_in_port_k;     /* 8-bit input */
 	devcb_resolved_read8   m_in_port_m;     /* 8-bit input */
-	
+
 	devcb_resolved_write8  m_out_pwm;       /* 1-bit output */
-	
+
 	devcb_resolved_write16 m_out_spim;      /* 16-bit output */
 	devcb_resolved_read16  m_in_spim;       /* 16-bit input */
 
-	devcb_resolved_write_line m_spim_xch_trigger;	// not really a write_line, fix when converting to devcb2!
+	devcb_resolved_write_line m_spim_xch_trigger;   // not really a write_line, fix when converting to devcb2!
 
 	cpu_device *m_cpu;
 };

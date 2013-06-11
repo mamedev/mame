@@ -240,7 +240,7 @@ void upd1771c_device::device_config_complete()
 	const upd1771_interface *intf = reinterpret_cast<const upd1771_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<upd1771_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -256,11 +256,11 @@ void upd1771c_device::device_start()
 {
 	/* resolve callbacks */
 	m_ack_out_func.resolve(m_ack_callback, *this);
-	
+
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
-	
+
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 4, this);
-	
+
 	save_item(NAME(m_packet));
 	save_item(NAME(m_index));
 	save_item(NAME(m_expected_bytes));
@@ -385,32 +385,32 @@ WRITE8_MEMBER( upd1771c_device::write )
 			m_index = 0;
 			//logerror( "upd1771_w: ----------------silence  state reset\n");
 			break;
-			
+
 		case 1:
 			if (m_index == 10)
 			{
 				m_state = STATE_NOISE;
 				m_index = 0;
-				
+
 				m_nw_timbre = (m_packet[1] & 0xe0) >> 5;
 				m_nw_period = ((UINT32)m_packet[2] + 1) << 7;
 				m_nw_volume = m_packet[3] & 0x1f;
-				
+
 				//very long clocked periods.. used for engine drones
 				m_n_period[0] = (((UINT32)m_packet[4]) + 1) << 7;
 				m_n_period[1] = (((UINT32)m_packet[5]) + 1) << 7;
 				m_n_period[2] = (((UINT32)m_packet[6]) + 1) << 7;
-				
+
 				m_n_volume[0] = m_packet[7] & 0x1f;
 				m_n_volume[1] = m_packet[8] & 0x1f;
 				m_n_volume[2] = m_packet[9] & 0x1f;
-				
+
 				//logerror( "upd1771_w: ----------------noise state reset\n");
 			}
 			else
 				m_timer->adjust(attotime::from_ticks(512, clock()));
 			break;
-	
+
 		case 2:
 			if (m_index == 4)
 			{
@@ -421,18 +421,18 @@ WRITE8_MEMBER( upd1771c_device::write )
 				//smaller periods dont all equal to 0x20
 				if (m_t_period < 0x20)
 					m_t_period = 0x20;
-				
+
 				m_t_volume =  m_packet[3] & 0x1f;
 				m_state = STATE_TONE;
 				m_index = 0;
 			}
 			else
-				m_timer->adjust(attotime::from_ticks(512, clock()));			
+				m_timer->adjust(attotime::from_ticks(512, clock()));
 			break;
 
 		case 0x1f:
 			//6Khz(ish) DIGI playback
-			
+
 			//end capture
 			if (m_index >= 2 && m_packet[m_index - 2] == 0xfe && m_packet[m_index - 1] == 0x00)
 			{
@@ -481,37 +481,37 @@ TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
 void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
-	
+
 	switch (m_state)
 	{
 		case STATE_TONE:
 			//logerror( "upd1771_STATE_TONE samps:%d %d %d %d %d %d\n",(int)samples,
 			//    (int)m_t_timbre,(int)m_t_offset,(int)m_t_volume,(int)m_t_period,(int)m_t_tpos);
-			
+
 			while (--samples >= 0)
 			{
 				*buffer++ = (WAVEFORMS[m_t_timbre][m_t_tpos]) * m_t_volume * 2;
-				
+
 				m_t_ppos++;
 				if (m_t_ppos >= m_t_period)
 				{
 					m_t_tpos++;
 					if (m_t_tpos == 32)
 						m_t_tpos = m_t_offset;
-					
+
 					m_t_ppos = 0;
 				}
 			}
 			break;
-			
+
 		case STATE_NOISE:
 			while (--samples >= 0)
 			{
 				*buffer = 0;
-				
+
 				//"wavetable-LFSR" component
 				int wlfsr_val = ((int)noise_tbl[m_nw_tpos]) - 127;//data too wide
-				
+
 				m_nw_ppos++;
 				if (m_nw_ppos >= m_nw_period)
 				{
@@ -520,7 +520,7 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 						m_nw_tpos = 0;
 					m_nw_ppos = 0;
 				}
-				
+
 				//mix in each of the noise's 3 pulse components
 				char res[3];
 				for (int i = 0; i < 3; ++i)
@@ -535,16 +535,16 @@ void upd1771c_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 				}
 				//not quite, but close.
 				*buffer+= (
-						   (wlfsr_val * m_nw_volume) |
-						   (res[0] * m_n_volume[0]) |
-						   (res[1] * m_n_volume[1]) |
-						   (res[2] * m_n_volume[2])
-						   ) ;
-				
+							(wlfsr_val * m_nw_volume) |
+							(res[0] * m_n_volume[0]) |
+							(res[1] * m_n_volume[1]) |
+							(res[2] * m_n_volume[2])
+							) ;
+
 				buffer++;
 			}
 			break;
-			
+
 		default:
 			//fill buffer with silence
 			while (--samples >= 0)

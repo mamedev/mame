@@ -1,7 +1,7 @@
 /***********************************************************************************************************
 
  Sega 8-bit cart emulation (for Master System, GameGear and SG-1000)
- 
+
  TODO: implement proper ROM & RAM mirroring when the cart size is not a power of 2K (e.g. 24K or 48K)
 
  ***********************************************************************************************************/
@@ -318,20 +318,20 @@ void sega8_korean_device::late_bank_setup()
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  Base Sega 8bit carts, possibly with bankswitch
  (only used by Mark III, SMS and GG games)
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_rom_device::read_cart)
 {
 	int bank = offset / 0x4000;
-	
+
 	if (bank == 2 && m_ram && m_ram_enabled)
 		return m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size];
 
-	if (offset < 0x400)	// first 1k is hardcoded
+	if (offset < 0x400) // first 1k is hardcoded
 		return m_rom[offset];
 
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
@@ -340,7 +340,7 @@ READ8_MEMBER(sega8_rom_device::read_cart)
 WRITE8_MEMBER(sega8_rom_device::write_cart)
 {
 	int bank = offset / 0x4000;
-	
+
 	if (bank == 2 && m_ram && m_ram_enabled)
 		m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size] = data;
 }
@@ -362,29 +362,29 @@ WRITE8_MEMBER(sega8_rom_device::write_mapper)
 			else
 				m_ram_enabled = 0;
 			break;
-			
+
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
 			m_rom_bank_base[offset - 1] = data  % m_rom_page_count;
 			break;
-	}	 
+	}
 }
 
 
 /*-------------------------------------------------
- 
- Sega Card Catcher is a passthrough adapter for 
- SG-1000 to load games in MyCard format into the 
+
+ Sega Card Catcher is a passthrough adapter for
+ SG-1000 to load games in MyCard format into the
  main cartslot
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_cardcatch_device::read_cart)
 {
 	if (offset < 0x8000)
 		return m_card->read_cart(space, offset);
-	
+
 	return 0xff;
 }
 
@@ -409,11 +409,11 @@ machine_config_constructor sega8_cardcatch_device::device_mconfig_additions() co
 }
 
 /*-------------------------------------------------
- 
- Othello is a SG-1000 game featuring 2K of 
+
+ Othello is a SG-1000 game featuring 2K of
  oncart RAM, mapped at 0x8000-0x9fff.
  Is RAM mirrored? For now we assume so...
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_othello_device::read_cart)
@@ -421,7 +421,7 @@ READ8_MEMBER(sega8_othello_device::read_cart)
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x7ff];
-	
+
 	return m_rom[offset % m_rom_size];
 }
 
@@ -434,10 +434,10 @@ WRITE8_MEMBER(sega8_othello_device::write_cart)
 
 
 /*-------------------------------------------------
- 
- The Castle is a SG-1000 game featuring 8K of 
+
+ The Castle is a SG-1000 game featuring 8K of
  oncart RAM, mapped at 0x8000-0x9fff
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_castle_device::read_cart)
@@ -445,7 +445,7 @@ READ8_MEMBER(sega8_castle_device::read_cart)
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
-	
+
 	return m_rom[offset % m_rom_size];
 }
 
@@ -458,10 +458,10 @@ WRITE8_MEMBER(sega8_castle_device::write_cart)
 
 
 /*-------------------------------------------------
- 
- BASIC Level III cart featured 32K of 
+
+ BASIC Level III cart featured 32K of
  oncart RAM, mapped at 0x8000-0xffff?
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_basic_l3_device::read_cart)
@@ -469,7 +469,7 @@ READ8_MEMBER(sega8_basic_l3_device::read_cart)
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000)
 		return m_ram[offset & 0x3fff];
-	
+
 	return m_rom[offset % m_rom_size];
 }
 
@@ -492,10 +492,10 @@ WRITE8_MEMBER(sega8_basic_l3_device::write_ram)
 
 
 /*-------------------------------------------------
- 
- Music Editor cart featured 10K of oncart RAM, mapped 
+
+ Music Editor cart featured 10K of oncart RAM, mapped
  in 0x8000-0x9fff and 0xc000-0xffff
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_music_editor_device::read_cart)
@@ -503,7 +503,7 @@ READ8_MEMBER(sega8_music_editor_device::read_cart)
 	// 8K of RAM sits in 0x8000-0x9fff
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
-	
+
 	return m_rom[offset % m_rom_size];
 }
 
@@ -530,38 +530,38 @@ WRITE8_MEMBER(sega8_music_editor_device::write_ram)
 
 
 /*-------------------------------------------------
- 
+
  SG-1000 Terebi Oekaki using a Tablet input device
- 
+
  -------------------------------------------------*/
 
 /*
- 
+
  Terebi Oekaki (TV Draw)
- 
+
  Address Access  Bits
  7       6   5   4   3   2   1   0
  $6000   W       -       -   -   -   -   -   -   AXIS
  $8000   R       BUSY    -   -   -   -   -   -   PRESS
  $A000   R/W     DATA
- 
+
  AXIS: write 0 to select X axis, 1 to select Y axis.
  BUSY: reads 1 when graphic board is busy sampling position, else 0.
  PRESS: reads 0 when pen is touching graphic board, else 1.
  DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
- 
+
  */
 
 
 READ8_MEMBER(sega8_terebi_device::read_cart)
 {
 	int bank = offset / 0x4000;
-	
+
 	if (offset == 0x8000)
 		return m_tvdraw_pen->read();
 	if (offset == 0xa000)
 		return m_tvdraw_data;
-	
+
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
 }
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER(sega8_terebi_device::write_cart)
 			if (data & 0x01)
 			{
 				m_tvdraw_data = m_tvdraw_x->read();
-				
+
 				if (m_tvdraw_data < 4) m_tvdraw_data = 4;
 				if (m_tvdraw_data > 251) m_tvdraw_data = 251;
 			}
@@ -604,16 +604,16 @@ ioport_constructor sega8_terebi_device::device_input_ports() const
 
 
 /*-------------------------------------------------
- 
+
  Dahjee carts were sold with a RAM expansion pass-through
- cart (which we don't emulate separately for the 
- moment) which allowed to play on old SG1000 machines 
+ cart (which we don't emulate separately for the
+ moment) which allowed to play on old SG1000 machines
  some MSX conversions requiring more RAM than available
- 
+
  Two kind of expansion existed (for different games),
- one with 9K of RAM (Type A) and one with 8K of 
+ one with 9K of RAM (Type A) and one with 8K of
  RAM (Type B).
- 
+
  -------------------------------------------------*/
 
 // TYPE A
@@ -622,7 +622,7 @@ READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
 	// 8K of RAM sits in 0x2000-0x3fff
 	if (offset >= 0x2000 && offset < 0x4000)
 		return m_ram[offset & 0x1fff];
-	
+
 	return m_rom[offset % m_rom_size];
 }
 
@@ -670,27 +670,27 @@ WRITE8_MEMBER(sega8_dahjee_typeb_device::write_ram)
 
 
 /*-------------------------------------------------
- 
+
  Sega carts + EEPROM, used for some GameGear baseball
  games
- 
+
  -------------------------------------------------*/
 
 
 READ8_MEMBER(sega8_eeprom_device::read_cart)
 {
 	int bank = offset / 0x4000;
-	
+
 	if (offset == 0x8000 && m_93c46_enabled)
 	{
 		UINT8 value = (m_93c46_lines & 0xfc) | 0x02;
 		value |= m_eeprom->read_bit() ? 1 : 0;
 		return value;
 	}
-	
-	if (offset < 0x400)	// first 1k is hardcoded
+
+	if (offset < 0x400) // first 1k is hardcoded
 		return m_rom[offset];
-	
+
 	return m_rom[m_rom_bank_base[bank] * 0x4000 + (offset & 0x3fff)];
 }
 
@@ -719,13 +719,13 @@ WRITE8_MEMBER(sega8_eeprom_device::write_mapper)
 			m_93c46_enabled = BIT(data, 3);
 			logerror("eeprom %s\n", m_93c46_enabled ? "enabled" : "disabled");
 			break;
-			
+
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
 			m_rom_bank_base[offset - 1] = data % m_rom_page_count;
 			break;
-	}	 
+	}
 }
 
 MACHINE_CONFIG_FRAGMENT( gg_eeprom )
@@ -739,19 +739,19 @@ machine_config_constructor sega8_eeprom_device::device_mconfig_additions() const
 
 
 /*-------------------------------------------------
- 
+
  Codemasters carts, possibly having on cart RAM
  (Ernie Els Golf)
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_codemasters_device::read_cart)
 {
 	int bank = offset / 0x2000;
-	
+
 	if (bank == 5 && m_ram && m_ram_enabled)
 		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
-	
+
 	return m_rom[m_rom_bank_base[bank/2] * 0x4000 + (offset & 0x3fff)];
 }
 
@@ -786,9 +786,9 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
 }
 
 /*-------------------------------------------------
- 
+
  HES 4 PAK All Action cart
- 
+
  -------------------------------------------------*/
 
 
@@ -814,25 +814,25 @@ WRITE8_MEMBER(sega8_4pak_device::write_cart)
 
 
 /*-------------------------------------------------
- 
+
  base Zemina carts, allowing for 8K bankswitch
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_zemina_device::read_cart)
 {
 	int bank = offset / 0x2000;
-	
+
 	if (bank >= 4 && m_ram && m_ram_enabled)
 		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
-	
+
 	return m_rom[m_rom_bank_base[bank] * 0x2000 + (offset & 0x1fff)];
 }
 
 WRITE8_MEMBER(sega8_zemina_device::write_cart)
 {
 	int bank = offset / 0x2000;
-	
+
 	if (bank >= 4 && m_ram && m_ram_enabled)
 		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size] = data;
 
@@ -857,28 +857,28 @@ WRITE8_MEMBER(sega8_zemina_device::write_cart)
 }
 
 /*-------------------------------------------------
- 
+
  Zemina cart used for Nemesis: same as above, but
  different bank layout at start (see late_bank_setup)
- 
+
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  Daiou cart used for SMS Janggun-ui Adeul
- 
+
  the game expects to access 256 x 8K banks:
  first 64 are just the game, second 64 are a mirror of the first ones
  upper 128 are the same as the previous but with bytes in reverse order
  probably as a shortcut to get sprite flipping for free from hw
  so if bit7 of current bank page is set, we swap the result
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(sega8_janggun_device::read_cart)
 {
 	int bank = offset / 0x2000;
-	
+
 	if (m_rom_bank_base[bank] < 0x80)
 		return m_rom[(m_rom_bank_base[bank] & 0x3f) * 0x2000 + (offset & 0x1fff)];
 	else
@@ -911,32 +911,31 @@ WRITE8_MEMBER(sega8_janggun_device::write_mapper)
 	{
 		case 0:
 			break;
-			
+
 		case 1: // Select 16k ROM bank for 0000-3fff
 		case 2: // Select 16k ROM bank for 4000-7fff
 		case 3: // Select 16k ROM bank for 8000-bfff
 			m_rom_bank_base[(offset - 1) * 2] = (data  % m_rom_page_count) * 2;
 			m_rom_bank_base[(offset - 1) * 2 + 1] = (data  % m_rom_page_count) * 2 + 1;
 			break;
-	}	 
+	}
 }
 
 
 /*-------------------------------------------------
- 
- Korean cart, used e.g. in Dodgeball King, 
+
+ Korean cart, used e.g. in Dodgeball King,
  uses writes to 0xa000 for bankswitch
- 
+
  -------------------------------------------------*/
 
 WRITE8_MEMBER(sega8_korean_device::write_cart)
 {
 	int bank = offset / 0x4000;
-	
+
 	if (bank == 2 && m_ram && m_ram_enabled)
 		m_ram[m_ram_base * 0x4000 + (offset & 0x3fff)] = data;
 
 	if (offset == 0xa000)
 		m_rom_bank_base[2] = data % m_rom_page_count;
 }
-

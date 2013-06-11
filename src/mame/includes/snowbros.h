@@ -25,7 +25,7 @@ public:
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;
 	UINT8 *m_spriteram;
-	
+
 	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);

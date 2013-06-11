@@ -30,7 +30,6 @@ nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, dev
 
 void nmk112_device::device_config_complete()
 {
-
 }
 
 //-------------------------------------------------
@@ -40,7 +39,7 @@ void nmk112_device::device_config_complete()
 void nmk112_device::device_start()
 {
 	const nmk112_interface *intf = (const nmk112_interface *)static_config();
-	
+
 	if (intf->rgn0 == NULL)
 	{
 		m_rom0 = NULL;

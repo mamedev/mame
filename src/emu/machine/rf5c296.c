@@ -89,7 +89,7 @@ READ16_MEMBER(rf5c296_device::io_r)
 	case 0x3e1:
 		data = reg_r(m_rf5c296_reg);
 		break;
-		
+
 	default:
 		data = m_pccard->read_memory(space, offset, mem_mask);
 		break;

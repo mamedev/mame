@@ -26,7 +26,7 @@
 // ======================> ep64_exdos_device
 
 class ep64_exdos_device : public device_t,
-						  public device_ep64_expansion_bus_card_interface
+							public device_ep64_expansion_bus_card_interface
 {
 public:
 	// construction/destruction

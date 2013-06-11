@@ -31,7 +31,7 @@
           The kram3 set used to be playable with the implementation in the MAME M6809
           CPU core, encrypting only the first byte in 10 xx and 11 xx opcodes.
           This should get a cleaner implementation. Until then, kram3 is broken on purpose.
-          
+
           According to the QIX and Kram schematics, these games should be using 68A90Es.
           The 6809E has a 'Last Instruction Cycle' pin that is likely tied in with the encryption:
           "LIC is HIGH during the last cycle of every instruction and its transition from

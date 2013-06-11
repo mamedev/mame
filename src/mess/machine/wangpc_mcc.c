@@ -272,7 +272,7 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, U
 		case 0x06/2:
 			m_sio->cd_ba_w(space, offset >> 1, data & 0xff);
 			break;
-		
+
 		case 0x08/2:
 		case 0x0a/2:
 		case 0x0c/2:

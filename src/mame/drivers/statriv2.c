@@ -85,7 +85,7 @@ public:
 		m_tms(*this, "tms"),
 		m_videoram(*this, "videoram"),
 		m_question_offset(*this, "question_offset")
-		 { }
+			{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;

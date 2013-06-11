@@ -33,7 +33,7 @@ public:
 	int screen_reset();
 	int upscroll_offset();
 	int cursor_bounds(rectangle &bounds);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -46,17 +46,17 @@ private:
 	void state_postload();
 	void recompute_parameters(int postload);
 	void generic_access(address_space &space, offs_t offset);
-	
+
 	// internal state
 	screen_device *m_screen;
 	const UINT8 *m_selfload;
-	
+
 	/* live state */
 	UINT32  m_clock;
 	UINT8   m_reg[9];
 	UINT8   m_start_datarow;
 	UINT8   m_reset;
-	
+
 	/* derived state; no need to save */
 	UINT8   m_valid_config;
 	UINT16  m_total_hpix, m_total_vpix;

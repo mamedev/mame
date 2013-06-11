@@ -423,24 +423,24 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 				*/
 
 				if ((data8 == 0x94)
-				 || (data8 == 0x9e)
-				 || (data8 == 0xa4)
-				 || (data8 == 0xb2)
-				 || (data8 == 0xbe)
-				 || (data8 == 0xd0)
-				   )
+					|| (data8 == 0x9e)
+					|| (data8 == 0xa4)
+					|| (data8 == 0xb2)
+					|| (data8 == 0xbe)
+					|| (data8 == 0xd0)
+					)
 				{
 					return;
 				}
 
 				if ((data8 == 0x8a)
-				 || (data8 == 0x8e)
-				 || (data8 == 0xca)
-				 || (data8 == 0xd2)
-				 || (data8 == 0xe2)
-				 || (data8 == 0xf0)
-				 || (data8 == 0xfc)
-				   )
+					|| (data8 == 0x8e)
+					|| (data8 == 0xca)
+					|| (data8 == 0xd2)
+					|| (data8 == 0xe2)
+					|| (data8 == 0xf0)
+					|| (data8 == 0xfc)
+					)
 				{
 					/* someone with access to the actual dongle could dump the true values
 					   I've never seen it so I just determined the relevant bits instead
@@ -509,8 +509,8 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 		}
 
 		if ((m_haspstate == HASPSTATE_PASSBEG)
-		 && (data8 & 1)
-		   )
+			&& (data8 & 1)
+			)
 		{
 			m_hasp_tmppass[m_hasp_passind] = data8;
 

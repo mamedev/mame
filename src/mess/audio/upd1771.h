@@ -36,7 +36,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER( pcm_write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -57,10 +57,10 @@ private:
 	UINT8   m_packet[MAX_PACKET_SIZE];
 	UINT32  m_index;
 	UINT8   m_expected_bytes;
-	
+
 	UINT8   m_state;//0:silence, 1 noise, 2 tone
 	UINT8   m_pc3;
-	
+
 	//tone
 	UINT8    m_t_timbre; //[0;  7]
 	UINT8    m_t_offset; //[0; 32]
@@ -68,14 +68,14 @@ private:
 	UINT8    m_t_volume; //[0; 31]
 	UINT8    m_t_tpos;//timbre pos
 	UINT16   m_t_ppos;//period pos
-	
+
 	//noise wavetable LFSR
 	UINT8    m_nw_timbre; //[0;  7]
 	UINT8    m_nw_volume; //[0; 31]
 	UINT32   m_nw_period;
 	UINT32   m_nw_tpos;   //timbre pos
 	UINT32   m_nw_ppos;   //period pos
-	
+
 	//noise pulse components
 	UINT8    m_n_value[3];  //[0;1]
 	UINT16   m_n_volume[3]; //[0; 31]

@@ -193,7 +193,7 @@ public:
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
-//	emu_timer *m_keyboard_timer;
+//  emu_timer *m_keyboard_timer;
 	GCU_REGS m_gcu[2];
 	int m_tick;
 	int m_layer;
@@ -209,7 +209,7 @@ public:
 	UINT8 m_temp_data[64*1024];
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
-//	int m_keyboard_state[2];
+//  int m_keyboard_state[2];
 	UINT8 m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
@@ -239,8 +239,8 @@ public:
 	DECLARE_WRITE32_MEMBER(atapi_command_w);
 	DECLARE_READ32_MEMBER(atapi_control_r);
 	DECLARE_WRITE32_MEMBER(atapi_control_w);
-//	DECLARE_READ32_MEMBER(comm_uart_r);
-//	DECLARE_WRITE32_MEMBER(comm_uart_w);
+//  DECLARE_READ32_MEMBER(comm_uart_r);
+//  DECLARE_WRITE32_MEMBER(comm_uart_w);
 	DECLARE_READ32_MEMBER(cabinet_r);
 	DECLARE_READ32_MEMBER(keyboard_wheel_r);
 	DECLARE_READ8_MEMBER(midi_uart_r);
@@ -257,7 +257,7 @@ public:
 	DECLARE_READ32_MEMBER(ppc_spu_share_r);
 	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
-//	TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
+//  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	void gcu_draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
 	void gcu_fill_rect(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *cmd);
 	void gcu_draw_character(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, UINT32 *cmd);
@@ -1404,52 +1404,52 @@ WRITE32_MEMBER(firebeat_state::atapi_control_w )
 /*
 READ32_MEMBER(firebeat_state::comm_uart_r )
 {
-	UINT32 r = 0;
+    UINT32 r = 0;
 
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= pc16552d_0_r(space, (offset*4)+0) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= pc16552d_0_r(space, (offset*4)+1) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= pc16552d_0_r(space, (offset*4)+2) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= pc16552d_0_r(space, (offset*4)+3) << 0;
-	}
+    if (ACCESSING_BITS_24_31)
+    {
+        r |= pc16552d_0_r(space, (offset*4)+0) << 24;
+    }
+    if (ACCESSING_BITS_16_23)
+    {
+        r |= pc16552d_0_r(space, (offset*4)+1) << 16;
+    }
+    if (ACCESSING_BITS_8_15)
+    {
+        r |= pc16552d_0_r(space, (offset*4)+2) << 8;
+    }
+    if (ACCESSING_BITS_0_7)
+    {
+        r |= pc16552d_0_r(space, (offset*4)+3) << 0;
+    }
 
-	return r;
+    return r;
 }
 
 WRITE32_MEMBER(firebeat_state::comm_uart_w )
 {
-	if (ACCESSING_BITS_24_31)
-	{
-		pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
-	}
+    if (ACCESSING_BITS_24_31)
+    {
+        pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
+    }
+    if (ACCESSING_BITS_16_23)
+    {
+        pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
+    }
+    if (ACCESSING_BITS_8_15)
+    {
+        pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
+    }
+    if (ACCESSING_BITS_0_7)
+    {
+        pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
+    }
 }
 
 static void comm_uart_irq_callback(running_machine &machine, int channel, int value)
 {
-	// TODO
-	//m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+    // TODO
+    //m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 */
 static const ins8250_interface firebeat_com0_interface =
@@ -1569,74 +1569,74 @@ static const ins8250_interface firebeat_midi1_interface =
 /*
 static const int keyboard_notes[24] =
 {
-	0x3c,   // C1
-	0x3d,   // C1#
-	0x3e,   // D1
-	0x3f,   // D1#
-	0x40,   // E1
-	0x41,   // F1
-	0x42,   // F1#
-	0x43,   // G1
-	0x44,   // G1#
-	0x45,   // A1
-	0x46,   // A1#
-	0x47,   // B1
-	0x48,   // C2
-	0x49,   // C2#
-	0x4a,   // D2
-	0x4b,   // D2#
-	0x4c,   // E2
-	0x4d,   // F2
-	0x4e,   // F2#
-	0x4f,   // G2
-	0x50,   // G2#
-	0x51,   // A2
-	0x52,   // A2#
-	0x53,   // B2
+    0x3c,   // C1
+    0x3d,   // C1#
+    0x3e,   // D1
+    0x3f,   // D1#
+    0x40,   // E1
+    0x41,   // F1
+    0x42,   // F1#
+    0x43,   // G1
+    0x44,   // G1#
+    0x45,   // A1
+    0x46,   // A1#
+    0x47,   // B1
+    0x48,   // C2
+    0x49,   // C2#
+    0x4a,   // D2
+    0x4b,   // D2#
+    0x4c,   // E2
+    0x4d,   // F2
+    0x4e,   // F2#
+    0x4f,   // G2
+    0x50,   // G2#
+    0x51,   // A2
+    0x52,   // A2#
+    0x53,   // B2
 };
 
 TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 {
-	static const int kb_uart_channel[2] = { 1, 0 };
-	static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
-	int keyboard;
-	int i;
+    static const int kb_uart_channel[2] = { 1, 0 };
+    static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
+    int keyboard;
+    int i;
 
-	for (keyboard=0; keyboard < 2; keyboard++)
-	{
-		UINT32 kbstate = ioport(keynames[keyboard])->read();
-		int uart_channel = kb_uart_channel[keyboard];
+    for (keyboard=0; keyboard < 2; keyboard++)
+    {
+        UINT32 kbstate = ioport(keynames[keyboard])->read();
+        int uart_channel = kb_uart_channel[keyboard];
 
-		if (kbstate != m_keyboard_state[keyboard])
-		{
-			for (i=0; i < 24; i++)
-			{
-				int kbnote = keyboard_notes[i];
+        if (kbstate != m_keyboard_state[keyboard])
+        {
+            for (i=0; i < 24; i++)
+            {
+                int kbnote = keyboard_notes[i];
 
-				if ((m_keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
-				{
-					// key was on, now off -> send Note Off message
-					pc16552d_rx_data(machine(), 1, uart_channel, 0x80);
-					pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
-					pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
-				}
-				else if ((m_keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
-				{
-					// key was off, now on -> send Note On message
-					pc16552d_rx_data(machine(), 1, uart_channel, 0x90);
-					pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
-					pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
-				}
-			}
-		}
-		else
-		{
-			// no messages, send Active Sense message instead
-			pc16552d_rx_data(machine(), 1, uart_channel, 0xfe);
-		}
+                if ((m_keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
+                {
+                    // key was on, now off -> send Note Off message
+                    pc16552d_rx_data(machine(), 1, uart_channel, 0x80);
+                    pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
+                    pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
+                }
+                else if ((m_keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
+                {
+                    // key was off, now on -> send Note On message
+                    pc16552d_rx_data(machine(), 1, uart_channel, 0x90);
+                    pc16552d_rx_data(machine(), 1, uart_channel, kbnote);
+                    pc16552d_rx_data(machine(), 1, uart_channel, 0x7f);
+                }
+            }
+        }
+        else
+        {
+            // no messages, send Active Sense message instead
+            pc16552d_rx_data(machine(), 1, uart_channel, 0xfe);
+        }
 
-		m_keyboard_state[keyboard] = kbstate;
-	}
+        m_keyboard_state[keyboard] = kbstate;
+    }
 }
 */
 // Extend board IRQs
@@ -1984,57 +1984,57 @@ static INPUT_PORTS_START(kbm)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE_V ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
 /*
-	PORT_START("KEYBOARD_P1")
-	PORT_BIT( 0x000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1#") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x000004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D1") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D1#") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 E1") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F1") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F1#") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x000080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G1") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G1#") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x000400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A1#") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 B1") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C2") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C2#") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x004000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D2") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D2#") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x010000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 E2") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x020000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F2") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x040000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F2#") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x080000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x100000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G2#") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A2") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A2#") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 B2") PORT_CODE(KEYCODE_N)
+    PORT_START("KEYBOARD_P1")
+    PORT_BIT( 0x000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1") PORT_CODE(KEYCODE_Q)
+    PORT_BIT( 0x000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C1#") PORT_CODE(KEYCODE_W)
+    PORT_BIT( 0x000004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D1") PORT_CODE(KEYCODE_E)
+    PORT_BIT( 0x000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D1#") PORT_CODE(KEYCODE_R)
+    PORT_BIT( 0x000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 E1") PORT_CODE(KEYCODE_T)
+    PORT_BIT( 0x000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F1") PORT_CODE(KEYCODE_Y)
+    PORT_BIT( 0x000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F1#") PORT_CODE(KEYCODE_U)
+    PORT_BIT( 0x000080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G1") PORT_CODE(KEYCODE_I)
+    PORT_BIT( 0x000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G1#") PORT_CODE(KEYCODE_O)
+    PORT_BIT( 0x000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A1") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x000400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A1#") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 B1") PORT_CODE(KEYCODE_D)
+    PORT_BIT( 0x001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C2") PORT_CODE(KEYCODE_F)
+    PORT_BIT( 0x002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 C2#") PORT_CODE(KEYCODE_G)
+    PORT_BIT( 0x004000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D2") PORT_CODE(KEYCODE_H)
+    PORT_BIT( 0x008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 D2#") PORT_CODE(KEYCODE_J)
+    PORT_BIT( 0x010000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 E2") PORT_CODE(KEYCODE_K)
+    PORT_BIT( 0x020000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F2") PORT_CODE(KEYCODE_L)
+    PORT_BIT( 0x040000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 F2#") PORT_CODE(KEYCODE_Z)
+    PORT_BIT( 0x080000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G2") PORT_CODE(KEYCODE_X)
+    PORT_BIT( 0x100000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 G2#") PORT_CODE(KEYCODE_C)
+    PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A2") PORT_CODE(KEYCODE_V)
+    PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 A2#") PORT_CODE(KEYCODE_B)
+    PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 B2") PORT_CODE(KEYCODE_N)
 
-	PORT_START("KEYBOARD_P2")
-	PORT_BIT( 0x000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C1#") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x000004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D1") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D1#") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 E1") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F1") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F1#") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x000080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G1") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G1#") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x000400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A1#") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B1") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C2") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C2#") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x004000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D2") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D2#") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x010000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 E2") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x020000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F2") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x040000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F2#") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x080000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x100000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G2#") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2#") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B2") PORT_CODE(KEYCODE_N)
+    PORT_START("KEYBOARD_P2")
+    PORT_BIT( 0x000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C1") PORT_CODE(KEYCODE_Q)
+    PORT_BIT( 0x000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C1#") PORT_CODE(KEYCODE_W)
+    PORT_BIT( 0x000004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D1") PORT_CODE(KEYCODE_E)
+    PORT_BIT( 0x000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D1#") PORT_CODE(KEYCODE_R)
+    PORT_BIT( 0x000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 E1") PORT_CODE(KEYCODE_T)
+    PORT_BIT( 0x000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F1") PORT_CODE(KEYCODE_Y)
+    PORT_BIT( 0x000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F1#") PORT_CODE(KEYCODE_U)
+    PORT_BIT( 0x000080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G1") PORT_CODE(KEYCODE_I)
+    PORT_BIT( 0x000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G1#") PORT_CODE(KEYCODE_O)
+    PORT_BIT( 0x000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A1") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x000400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A1#") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B1") PORT_CODE(KEYCODE_D)
+    PORT_BIT( 0x001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C2") PORT_CODE(KEYCODE_F)
+    PORT_BIT( 0x002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 C2#") PORT_CODE(KEYCODE_G)
+    PORT_BIT( 0x004000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D2") PORT_CODE(KEYCODE_H)
+    PORT_BIT( 0x008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 D2#") PORT_CODE(KEYCODE_J)
+    PORT_BIT( 0x010000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 E2") PORT_CODE(KEYCODE_K)
+    PORT_BIT( 0x020000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F2") PORT_CODE(KEYCODE_L)
+    PORT_BIT( 0x040000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 F2#") PORT_CODE(KEYCODE_Z)
+    PORT_BIT( 0x080000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G2") PORT_CODE(KEYCODE_X)
+    PORT_BIT( 0x100000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 G2#") PORT_CODE(KEYCODE_C)
+    PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2") PORT_CODE(KEYCODE_V)
+    PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2#") PORT_CODE(KEYCODE_B)
+    PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B2") PORT_CODE(KEYCODE_N)
 */
 INPUT_PORTS_END
 
@@ -2355,8 +2355,8 @@ void firebeat_state::init_firebeat()
 
 	atapi_init();
 
-//	pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
-//	pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
+//  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
+//  pc16552d_init(machine(), 1, 24000000, midi_uart_irq_callback, 0);     // MIDI UART
 
 	m_extend_board_irq_enable = 0x3f;
 	m_extend_board_irq_active = 0x00;
@@ -2387,8 +2387,8 @@ DRIVER_INIT_MEMBER(firebeat_state,ppd)
 void firebeat_state::init_keyboard()
 {
 	// set keyboard timer
-//	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
-//	m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+//  m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_state::keyboard_timer_callback),this));
+//  m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 DRIVER_INIT_MEMBER(firebeat_state,kbm)

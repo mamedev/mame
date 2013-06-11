@@ -52,7 +52,7 @@ struct mea8000_interface
 {
 	/* output channel */
 	const char *   m_channel;
-	
+
 	/* 1-bit 'ready' output, not negated */
 	devcb_write8   m_req_out_cb;
 };
@@ -105,37 +105,37 @@ private:
 
 	/* state */
 	mea8000_state m_state; /* current state */
-	
+
 	UINT8 m_buf[4]; /* store 4 consecutive data to form a frame info */
 	UINT8 m_bufpos; /* new byte to write in frame info buffer */
-	
+
 	UINT8 m_cont; /* if no data 0=stop 1=repeat last frame */
 	UINT8 m_roe;  /* enable req output, now unimplemented */
-	
+
 	UINT16 m_framelength;  /* in samples */
 	UINT16 m_framepos;     /* in samples */
 	UINT16 m_framelog;     /* log2 of framelength */
-	
+
 	INT16 m_lastsample, m_sample; /* output samples are interpolated */
-	
+
 	UINT32 m_phi; /* absolute phase for frequency / noise generator */
-	
+
 	filter_t m_f[4]; /* filters */
-	
+
 	UINT16 m_last_ampl, m_ampl;    /* amplitude * 1000 */
 	UINT16 m_last_pitch, m_pitch;  /* pitch of sawtooth signal, in Hz */
 	UINT8  m_noise;
-	
+
 	emu_timer *m_timer;
-	
+
 	devcb_resolved_write8 m_req_out;
 
-	
+
 	int m_cos_table[TABLE_LEN];  /* fm => cos coefficient */
 	int m_exp_table[TABLE_LEN];  /* bw => exp coefficient */
 	int m_exp2_table[TABLE_LEN]; /* bw => 2*exp coefficient */
 	int m_noise_table[NOISE_LEN];
-	
+
 };
 
 extern const device_type MEA8000;

@@ -96,7 +96,7 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 		// setup the rom_bank_map array to faster ROM read
 		for (i = 0; i < size / 0x20000 && i < 8; i++)
 			rom_bank_map[i] = i;
-		
+
 		// fill up remaining blocks with mirrors
 		while (i % 8)
 		{
@@ -110,10 +110,10 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 		}
 	}
 	// check bank map!
-//	for (i = 0; i < 8; i++)
-//	{
-//		printf("bank %3d = %3d\t", i, rom_bank_map[i]);
-//	}
+//  for (i = 0; i < 8; i++)
+//  {
+//      printf("bank %3d = %3d\t", i, rom_bank_map[i]);
+//  }
 }
 
 
@@ -218,7 +218,7 @@ bool pce_cart_slot_device::call_load()
 		UINT32 offset = 0;
 		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
-		
+
 		// From fullpath, check for presence of a header and skip it
 		if (software_entry() == NULL && (len % 0x4000) == 512)
 		{
@@ -227,7 +227,7 @@ bool pce_cart_slot_device::call_load()
 			len -= offset;
 			fseek(offset, SEEK_SET);
 		}
-		
+
 		m_cart->rom_alloc(machine(), len);
 		ROM = m_cart->get_rom_base();
 
@@ -240,11 +240,11 @@ bool pce_cart_slot_device::call_load()
 		if (ROM[0x1fff] < 0xe0)
 		{
 			UINT8 decrypted[256];
-			
+
 			/* Initialize decryption table */
 			for (int i = 0; i < 256; i++)
 				decrypted[i] = ((i & 0x01) << 7) | ((i & 0x02) << 5) | ((i & 0x04) << 3) | ((i & 0x08) << 1) | ((i & 0x10) >> 1) | ((i & 0x20 ) >> 3) | ((i & 0x40) >> 5) | ((i & 0x80) >> 7);
-			
+
 			/* Decrypt ROM image */
 			for (int i = 0; i < len; i++)
 				ROM[i] = decrypted[ROM[i]];
@@ -253,13 +253,13 @@ bool pce_cart_slot_device::call_load()
 		m_cart->rom_map_setup(len);
 
 		if (software_entry() == NULL)
-			m_type = get_cart_type(ROM, len);			
+			m_type = get_cart_type(ROM, len);
 		else
 		{
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = pce_get_pcb_id(pcb_name);
-		}	
+		}
 		//printf("Type: %s\n", pce_get_slot(m_type));
 
 		if (m_type == PCE_POPULOUS)
@@ -296,7 +296,7 @@ bool pce_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 
 
 /*-------------------------------------------------
- get_cart_type - code to detect NVRAM type from 
+ get_cart_type - code to detect NVRAM type from
  fullpath
  -------------------------------------------------*/
 
@@ -307,11 +307,11 @@ int pce_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	/* Check for Street fighter 2 */
 	if (len == 0x280000)
 		type = PCE_SF2;
-	
+
 	/* Check for Populous */
 	if (len >= 0x1f26 + 8 && !memcmp(ROM + 0x1f26, "POPULOUS", 8))
 		type = PCE_POPULOUS;
-	
+
 	// Check for CD system card v3 which adds on-cart RAM to the system
 	if (!memcmp(ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23))
 	{
@@ -382,4 +382,3 @@ WRITE8_MEMBER(pce_cart_slot_device::write_cart)
 void pce_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 {
 }
-

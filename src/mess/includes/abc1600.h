@@ -42,8 +42,8 @@
 #define BUS0X_TAG           "bus0x"
 #define BUS1_TAG            "bus1"
 #define BUS2_TAG            "bus2"
-#define RS232_A_TAG     	"rs232a"
-#define RS232_B_TAG     	"rs232b"
+#define RS232_A_TAG         "rs232a"
+#define RS232_B_TAG         "rs232b"
 
 
 

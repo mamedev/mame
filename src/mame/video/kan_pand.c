@@ -69,7 +69,7 @@ void kaneko_pandora_device::device_config_complete()
 	const kaneko_pandora_interface *intf = reinterpret_cast<const kaneko_pandora_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<kaneko_pandora_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

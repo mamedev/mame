@@ -30,13 +30,13 @@ PT-GMAIN01D
 |----------------------------|
 Notes: (all ICs shown)
 
-       VG230    - Vadem VG230 single-chip PC platform. Contains 16 MHz NEC uPD70116H V30HL CPU 
-                  (which is a high-speed low-power 8086 variation), IBM PC/XT-compatible core 
+       VG230    - Vadem VG230 single-chip PC platform. Contains 16 MHz NEC uPD70116H V30HL CPU
+                  (which is a high-speed low-power 8086 variation), IBM PC/XT-compatible core
                   logic, LCD controller (CGA/AT&T640x400), keyboard matrix scanner, dual PCMCIA
                   2.1 card controller, EMS 4.0 hardware support for up to 64MB, built-in timer
                   PIC/DMA/UART/RTC controllers. The clock input is 32.2200MHz. An internal divider
                   creates a 16.11MHz clock for the V30HL CPU.
-       HM514800 - Hitachi HM514800 512k x8-bit DRAM         
+       HM514800 - Hitachi HM514800 512k x8-bit DRAM
        MC14071  - Motorola MC14071 Quad 2-input OR gate
        74HC04   - 74HC04 Hex inverter
        LM2937   - Texas Instruments LM2937ES-5 voltage regulator (Max 26V input, 5V output at 500mA)
@@ -45,27 +45,27 @@ Notes: (all ICs shown)
        VOL      - Volume pot
        CN5      - 5 pin connector for 4-way control pad (up/down/left/right/ground)
        CN4      - 5 pin connector for on/off switch and 2 buttons
-       CN3      - 2 pin power input from 6x AA-battery compartment (input voltage is 9V DC)       
-       CN2      - Flat cable connector for video out to LCD panel. When the LCD is powered on the pixels 
-                  are blue. The LCD panel PCB has part number 97-44264-8 LMG6912RPFC LMG6910RPGR 
+       CN3      - 2 pin power input from 6x AA-battery compartment (input voltage is 9V DC)
+       CN2      - Flat cable connector for video out to LCD panel. When the LCD is powered on the pixels
+                  are blue. The LCD panel PCB has part number 97-44264-8 LMG6912RPFC LMG6910RPGR
                   and contains the following parts.....
                   Matsushita 53008HEB-8
                   Sanyo LA6324N quad operational amplifier
                   Hitachi BD66285BFC LCD controller IC (x3)
                   Hitachi BD66284BFC LCD controller IC (x4)
-                  The LCD flat cable has several wires but 2 of them have frequencies which measure 
+                  The LCD flat cable has several wires but 2 of them have frequencies which measure
                   69.9161Hz and 16.7798kHz. These are assumed to be VSync and HSync
        CN1      - Cart slot
        X1       - Marked 322. Measures 32.21732MHz so this is a common 32.22MHz OSC.
        X2       - No markings. Measures 32.768kHz and used for the RTC
        *        - These parts are on the other side of the PCB
-       
+
 
 Carts
 -----
-All of the carts are identical. Most have only one surface mounted mask ROM. Either a 
-MX23C8100 (8M) or YRM0442 (4M). Some are populated with additional parts including a 62256 
-32kx8 SRAM, a 3v coin battery and a MM1081N reset chip plus a few resistors/capacitors and 
+All of the carts are identical. Most have only one surface mounted mask ROM. Either a
+MX23C8100 (8M) or YRM0442 (4M). Some are populated with additional parts including a 62256
+32kx8 SRAM, a 3v coin battery and a MM1081N reset chip plus a few resistors/capacitors and
 a transistor. All parts are surface mounted.
 
 PT-GMEM01B
@@ -214,15 +214,15 @@ protected:
 	UINT8 m_pc_spkrdata;
 	UINT8 m_pc_input;
 
-    int m_ppi_portc_switch_high;
-    int m_ppi_speaker;
-    int m_ppi_keyboard_clear;
-    UINT8 m_ppi_keyb_clock;
-    UINT8 m_ppi_portb;
-    UINT8 m_ppi_clock_signal;
-    UINT8 m_ppi_data_signal;
-    UINT8 m_ppi_shift_register;
-    UINT8 m_ppi_shift_enable;
+	int m_ppi_portc_switch_high;
+	int m_ppi_speaker;
+	int m_ppi_keyboard_clear;
+	UINT8 m_ppi_keyb_clock;
+	UINT8 m_ppi_portb;
+	UINT8 m_ppi_clock_signal;
+	UINT8 m_ppi_data_signal;
+	UINT8 m_ppi_shift_register;
+	UINT8 m_ppi_shift_enable;
 
 };
 

@@ -85,14 +85,14 @@ void msm5205_device::device_config_complete()
 	const msm5205_interface *intf = reinterpret_cast<const msm5205_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<msm5205_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
 		memset(&m_vclk_cb, 0, sizeof(m_vclk_cb));
 		m_select = 0;
 	}
-	
+
 }
 
 //-------------------------------------------------
@@ -103,14 +103,14 @@ void msm5205_device::device_start()
 {
 	m_mod_clock = clock();
 	m_vclk_callback.resolve(m_vclk_cb, *this);
-	
+
 	/* compute the difference tables */
 	compute_tables();
-	
+
 	/* stream system initialize */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock(), this);
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(msm5205_device::vclk_callback), this));
-	
+
 	/* register for save states */
 	save_item(NAME(m_mod_clock));
 	save_item(NAME(m_data));
@@ -127,14 +127,14 @@ void msm5205_device::device_start()
 //-------------------------------------------------
 
 void msm5205_device::device_reset()
-{	
+{
 	/* initialize work */
 	m_data    = 0;
 	m_vclk    = 0;
 	m_reset   = 0;
 	m_signal  = 0;
 	m_step    = 0;
-	
+
 	/* timer and bitwidth set */
 	playmode_w(m_select);
 }
@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
 	int new_signal;
 
 	/* callback user handler and latch next data */
-	if (!m_vclk_callback.isnull()) 
+	if (!m_vclk_callback.isnull())
 		m_vclk_callback(1);
 
 	/* reset check at last hiedge of VCLK */
@@ -237,7 +237,7 @@ void msm5205_device::vclk_w(int vclk)
 		if (m_vclk != vclk)
 		{
 			m_vclk = vclk;
-			if (!vclk) 
+			if (!vclk)
 				vclk_callback(this, 0);
 		}
 	}
@@ -325,7 +325,7 @@ void msm5205_device::change_clock_w(INT32 clock)
 void msm5205_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *buffer = outputs[0];
-	
+
 	/* if this voice is active */
 	if(m_signal)
 	{

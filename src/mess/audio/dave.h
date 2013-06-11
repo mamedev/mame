@@ -27,12 +27,12 @@
 ///*************************************************************************
 
 #define MCFG_DAVE_ADD(_tag, _clock, _irq, _program_map, _io_map) \
-    MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") \
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") \
 	MCFG_SOUND_ADD(_tag, DAVE, _clock) \
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25) \
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25) \
- 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _program_map) \
- 	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _io_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _program_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _io_map) \
 	downcast<dave_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 
 
@@ -89,14 +89,14 @@ private:
 
 	enum
 	{
-		IRQ_50HZ_DIVIDER	= 0x01,
-		IRQ_50HZ_LATCH		= 0x02,
-		IRQ_1HZ_DIVIDER		= 0x04,
-		IRQ_1HZ_LATCH		= 0x08,
-		IRQ_INT1			= 0x10,
-		IRQ_INT1_LATCH		= 0x20,
-		IRQ_INT2			= 0x40,
-		IRQ_INT2_LATCH		= 0x80,
+		IRQ_50HZ_DIVIDER    = 0x01,
+		IRQ_50HZ_LATCH      = 0x02,
+		IRQ_1HZ_DIVIDER     = 0x04,
+		IRQ_1HZ_LATCH       = 0x08,
+		IRQ_INT1            = 0x10,
+		IRQ_INT1_LATCH      = 0x20,
+		IRQ_INT2            = 0x40,
+		IRQ_INT2_LATCH      = 0x80,
 		IRQ_LATCH           = IRQ_INT2_LATCH | IRQ_INT1_LATCH | IRQ_1HZ_LATCH | IRQ_50HZ_LATCH
 	};
 
@@ -122,7 +122,7 @@ private:
 	int m_period[4];
 	int m_count[4];
 	int m_level[4];
-	
+
 	/* these are used to force channels on/off */
 	/* if one of the or values is 0x0ff, this means
 	 the volume will be forced on,else it is dependant on
@@ -131,13 +131,13 @@ private:
 	/* if one of the values is 0x00, this means the
 	 volume is forced off, else it is dependant on the wave */
 	int m_level_and[8];
-	
+
 	/* these are the current channel volumes in MAME form */
 	int m_mame_volumes[8];
-	
+
 	/* update step */
 	//int m_update_step;
-	
+
 	sound_stream *m_sound_stream_var;
 };
 

@@ -173,7 +173,7 @@ swarm           // hack
 zerotime        // hack
 starfght        // hack
 galaxbsf        // hack
-galaxianbl		// bootleg
+galaxianbl      // bootleg
 kamakazi3       // Video Games (UK) Ltd., hack or bootleg?
 tst_galx        // Galaxian Test ROM
 gmgalax         // bootleg
@@ -186,7 +186,7 @@ gteikokb        // bootleg
 gteikob2        // bootleg
 galemp          // (c) Taito do Brasil
 asideral        // bootleg
-pajaroes		// bootleg
+pajaroes        // bootleg
 spacbatt        // bootleg
 spacbat2        // bootleg
 spacempr        // bootleg
@@ -246,7 +246,7 @@ eagle2          // [1980] Centuri
 eagle3          // [1980] Centuri
 spctbird        // (c) Fortrek
 mooncptc        // bootleg (Petaco S.A.)
-mooncrsl		// bootleg (Laguna S.A.)
+mooncrsl        // bootleg (Laguna S.A.)
 fantastc        // (c) Taito (Brazil) - rewrite of Galaga
 timefgtr        // (c) Taito (Brazil) - rewrite of Time Pilot
 kong            // (c) Taito (Brazil) - rewrite of Donkey Kong
@@ -300,11 +300,11 @@ scramblebf      // bootleg
 scramblebb      // bootleg?
 scramblb        // bootleg
 scramb2         // bootleg
-scrambler		// bootleg
+scrambler       // bootleg
 explorer        // bootleg
 strfbomb        // bootleg
-scrambp			// bootleg (Billport S.A.)
-scrampt			// bootleg (Petaco S.A.)
+scrambp         // bootleg (Billport S.A.)
+scrampt         // bootleg (Petaco S.A.)
 atlantis        // (c) 1981 Comsoft
 atlantis2       // (c) 1981 Comsoft
 theend          // (c) 1980 Konami
@@ -412,7 +412,7 @@ cclimberj       // (c) 1980 Nichibutsu
 ccboot          // bootleg
 ccboot2         // bootleg
 ccbootmr        // Model Racing bootleg
-cclimbroper		// Operamatic bootleg
+cclimbroper     // Operamatic bootleg
 ckong           // (c) 1981 (Kyoei)
 ckongo          // bootleg (Orca)
 ckongalc        // bootleg (Alca)
@@ -680,7 +680,7 @@ vautourz        // bootleg
 griffon         // bootleg (Videotron)
 nextfase        // bootleg
 phoenixs        // bootleg (Sonic)
-avefenix		//
+avefenix        //
 pleiads         // (c) 1981 Tehkan
 pleiadsb2       // bootleg
 pleiadbl        // bootleg
@@ -1493,7 +1493,7 @@ yosakdona       // (c) 1979 Yosaku To Donbei
 spceking        // (c) 1978 Leijac Corporation (Konami)
 spcewars        // (c) 1978 Sanritsu
 astropal        // (c) 19?? Sidam
-attackfc		// (c) 1979? E.G.S.
+attackfc        // (c) 1979? E.G.S.
 cosmo           // TDS & Mints
 darthvdr        // bootleg
 ultrainv
@@ -2751,7 +2751,7 @@ startrkd        // bootleg
 mayday          // bootleg
 maydaya         // bootleg
 maydayb         // bootleg
-batlzone		// bootleg?
+batlzone        // bootleg?
 colony7         // (c) 1981 Taito
 colony7a        // (c) 1981 Taito
 jin             // Falcon bootleg/hack
@@ -4086,7 +4086,7 @@ brdrline        // (c) 1980 Sega
 starrkr         // (c) 1981 Sega
 brdrlins        // Sidam bootleg
 brdrlinb        // Karateco bootleg
-brdrlinet		// (c) 1981 Sega
+brdrlinet       // (c) 1981 Sega
 digger          // 684-691 no copyright notice
 pulsar          // 790-805 (c) 1981 Sega
 heiankyo        // (c) [1979?] Denki Onkyo
@@ -5463,7 +5463,7 @@ csweetht        // 19         Sweet Heart
 ctornado        // 20 1982.05 Tornado
 cmissnx         // 21 1982.04 Mission-X/Zoar
 cptennis        // 22 1982.06 Pro Tennis
-cprogolf18		// 23 1982.?? 18 Hole Pro Golf
+cprogolf18      // 23 1982.?? 18 Hole Pro Golf
 				// 24 1982.07 Tsumego Kaisyou
 cadanglr        // 25 1982.10 Angler Dangler
 cfishing        // 25 1982.10 Fishing
@@ -6575,7 +6575,7 @@ asteroid        // 035127-035145    (c) 1979
 asteroid2       // 035127-035145    (c) 1979
 asteroid1       // 035127-035145    no copyright notice
 asteroidb       // (bootleg)
-aerolitos		// Rodmar Elec. bootleg
+aerolitos       // Rodmar Elec. bootleg
 asterock        // Sidam bootleg    (c) 1979
 asterockv       // Videotron bootleg(c) 1979
 hyperspc        // Rumiano bootleg  (c) 1979
@@ -6994,7 +6994,7 @@ sasuke          // [1980] Shin Nihon Kikaku (SNK)
 satansat        // (c) 1981 SNK
 satansata       // (c) 1981 SNK
 zarzon          // (c) 1981 Taito, gameplay says SNK
-satansatind		// bootleg
+satansatind     // bootleg
 vanguard        // (c) 1981 SNK
 vanguardc       // (c) 1981 SNK + Centuri
 vanguardj       // (c) 1981 SNK
@@ -7430,7 +7430,7 @@ timesold1       // Alpha-68K96II 'BT' (c) 1987
 btlfield        // Alpha-68K96II 'BT' (c) 1987
 btlfieldb       // bootleg
 skysoldr        // Alpha-68K96II 'SS' (c) 1988 SNK (Romstar with dip switch)
-skysoldrbl		// bootleg
+skysoldrbl      // bootleg
 goldmedl        // Alpha-68K96II 'GM' (c) 1988 SNK
 goldmedla       // Alpha-68K96II 'GM' (c) 1988 SNK
 goldmedlb       // Alpha-68K96II bootleg
@@ -7455,7 +7455,7 @@ tagteam         // TA-0007 (c) 1983 + Data East license
 ssozumo         // TA-0008 (c) 1984
 mystston        // TA-0010 (c) 1984
 myststono       // TA-0010 (c) 1984
-myststonoi		// PCB manufactured by Itisa
+myststonoi      // PCB manufactured by Itisa
 dogfgt          // TA-0011 (c) 1984
 dogfgtu         // TA-0011 (c) 1985 Data East USA, Inc.
 dogfgtj         // TA-0011 (c) 1984
@@ -8899,7 +8899,7 @@ mrflea          // (c) 1982
 
 // Tecfri games
 ambush          // (c) 1983
-ambushh			// (c) 1983
+ambushh         // (c) 1983
 ambushj         // (c) 1983 Nippon Amuse license
 ambushv         // (c) 1983 Volt Electronics license
 holeland        // (c) 1984
@@ -8907,7 +8907,7 @@ crzrally        // (c) 1985
 crzrallya       // (c) 1985
 crzrallyg       // (c) 1985
 speedbal        // (c) 1987
-musicbal		// (c) 1987
+musicbal        // (c) 1987
 sauro           // (c) 1987
 saurop          // (c) 1987
 trckydoc        // (c) 1987
@@ -30632,5 +30632,3 @@ bingomana
 
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
-
-

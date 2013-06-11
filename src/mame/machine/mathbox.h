@@ -11,14 +11,14 @@
 
 #define MCFG_MATHBOX_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MATHBOX, 0)
-	
+
 
 /* ----- device interface ----- */
 class mathbox_device : public device_t
 {
 public:
 	mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE8_MEMBER( go_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( lo_r );

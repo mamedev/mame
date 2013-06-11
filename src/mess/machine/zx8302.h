@@ -172,7 +172,7 @@ private:
 
 	enum
 	{
-		INT_GAP             	= 0x01,
+		INT_GAP                 = 0x01,
 		INT_INTERFACE           = 0x02,
 		INT_TRANSMIT            = 0x04,
 		INT_FRAME               = 0x08,
@@ -181,7 +181,7 @@ private:
 
 	enum
 	{
-		STATUS_NETWORK_PORT 	= 0x01,
+		STATUS_NETWORK_PORT     = 0x01,
 		STATUS_TX_BUFFER_FULL   = 0x02,
 		STATUS_RX_BUFFER_FULL   = 0x04,
 		STATUS_MICRODRIVE_GAP   = 0x08,

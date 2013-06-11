@@ -35,7 +35,7 @@
 #define WD1010_TAG      "u18"
 #define WD1100_11_TAG   "u12"
 #define CENTRONICS_TAG  "centronics"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 class tandy2k_state : public driver_device
 {

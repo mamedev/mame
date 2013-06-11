@@ -141,7 +141,7 @@ namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *ta
 		: namcoio_device(mconfig, NAMCO59XX, "Namco 59xx", tag, owner, clock, "59xx")
 {
 	m_device_type = TYPE_NAMCO59XX;
-}	
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -155,7 +155,7 @@ void namcoio_device::device_config_complete()
 	const namcoio_interface *intf = reinterpret_cast<const namcoio_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<namcoio_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{

@@ -13,12 +13,12 @@
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
 
-#define Z80_TAG     	"u45"
-#define Z80DART_0_TAG	"u14"
-#define Z80DART_1_TAG	"u30"
-#define Z80PIO_TAG		"u43"
-#define AM9519_TAG		"u13"
-#define BR1941_TAG		"u12"
+#define Z80_TAG         "u45"
+#define Z80DART_0_TAG   "u14"
+#define Z80DART_1_TAG   "u30"
+#define Z80PIO_TAG      "u43"
+#define AM9519_TAG      "u13"
+#define BR1941_TAG      "u12"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define RS232_C_TAG     "rs232c"
@@ -29,18 +29,18 @@ class superslave_state : public driver_device
 public:
 	superslave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG),
-		  m_dart0(*this, Z80DART_0_TAG),
-		  m_dart1(*this, Z80DART_1_TAG),
-		  m_dbrg(*this, BR1941_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_rs232a(*this, RS232_A_TAG),
-		  m_rs232b(*this, RS232_B_TAG),
-		  m_rs232c(*this, RS232_C_TAG),
-		  m_rs232d(*this, RS232_D_TAG),
-		  m_rom(*this, Z80_TAG),
-		  m_memctrl(0x01),
-		  m_cmd(0x01)
+			m_maincpu(*this, Z80_TAG),
+			m_dart0(*this, Z80DART_0_TAG),
+			m_dart1(*this, Z80DART_1_TAG),
+			m_dbrg(*this, BR1941_TAG),
+			m_ram(*this, RAM_TAG),
+			m_rs232a(*this, RS232_A_TAG),
+			m_rs232b(*this, RS232_B_TAG),
+			m_rs232c(*this, RS232_C_TAG),
+			m_rs232d(*this, RS232_D_TAG),
+			m_rom(*this, Z80_TAG),
+			m_memctrl(0x01),
+			m_cmd(0x01)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

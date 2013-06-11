@@ -122,7 +122,7 @@ void ay31015_device::device_config_complete()
 	const ay31015_config *intf = reinterpret_cast<const ay31015_config *>(static_config());
 	if (intf != NULL)
 		*static_cast<ay31015_config *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -143,13 +143,13 @@ void ay31015_device::device_start()
 	m_read_si.resolve(read_si_cb, *this);
 	m_write_so.resolve(write_so_cb, *this);
 	m_status_changed.resolve(status_changed_cb, *this);
-	
+
 	m_tx_clock = transmitter_clock;
 	m_rx_clock = receiver_clock;
-	
+
 	m_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::rx_process),this));
 	m_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::tx_process),this));
-	
+
 	update_rx_timer();
 	update_tx_timer();
 
@@ -184,7 +184,7 @@ void ay31015_device::device_reset()
 {
 	m_control_reg = 0;
 	m_rx_data = 0;
-	
+
 	internal_reset();
 }
 
@@ -566,12 +566,12 @@ void ay51013_device::internal_reset()
 {
 	/* total pulses = 16 * data-bits */
 	UINT8 t1;
-	
+
 	if (m_control_reg & CONTROL_NB2)
 		t1 = (m_control_reg & CONTROL_NB1) ? 8 : 7;
 	else
 		t1 = (m_control_reg & CONTROL_NB1) ? 6 : 5;
-	
+
 	m_total_pulses = t1 << 4;                    /* total clock pulses to load a byte */
 	m_second_stop_bit = ((m_control_reg & CONTROL_TSB) ? 16 : 0);     /* 2nd stop bit */
 	if ((t1 == 5) && (m_second_stop_bit == 16))
@@ -730,4 +730,3 @@ void ay31015_device::set_transmit_data( UINT8 data )
 		update_status_pins();
 	}
 }
-

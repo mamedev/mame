@@ -318,7 +318,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 		+ map(3, 24) + map(2, 16) + map(1,  8) + map(0,  0);
 #undef map
 	}
-	
+
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_mode);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_offset);
 	state_save_register_item_pointer(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE);
@@ -331,7 +331,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].index);
 		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].invert);
 	}
-	
+
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_val);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_in);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_span);
@@ -349,7 +349,7 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_inverts);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_lps);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_in_count);
-	
+
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_pixelorder);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_realorder);
 	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_bitplanebuffer);
@@ -455,7 +455,7 @@ UINT8 SPC7110_Decomp::dataread(UINT8 *ROM, UINT32 len)
 }
 
 void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
-{	
+{
 	if (init == 1)
 	{
 		m_m0_out = m_m0_inverts = m_m0_lps = 0;

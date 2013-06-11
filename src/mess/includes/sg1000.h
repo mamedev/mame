@@ -29,8 +29,8 @@
 #define UPD9255_1_TAG   "upd9255_1"
 #define CENTRONICS_TAG  "centronics"
 #define TMS9918A_TAG    "tms9918a"
-#define RS232_TAG		"rs232"
-#define CARTSLOT_TAG	"slot"
+#define RS232_TAG       "rs232"
+#define CARTSLOT_TAG    "slot"
 
 
 INPUT_PORTS_EXTERN( sk1100 );

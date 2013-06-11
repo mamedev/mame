@@ -109,11 +109,11 @@ data:  0 0000 0000  all fields occupied
 		else
 		{
 			/* looking for a piece in this line and clear bit in data if found */
-			
+
 			for (i_AH = 0; i_AH < 8; i_AH = i_AH + 1)
 				if (IsPiece(64 - (i_18 * 8 + 8 - i_AH)))
 					data &= ~(1 << i_AH);           // clear bit
-			
+
 			read_board_flag = TRUE;
 		}
 	}

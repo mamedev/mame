@@ -31,8 +31,8 @@ ToDo:
 #include "machine/serial.h"
 #include "sdk86.lh"
 
-#define I8251_TAG		"i8251"
-#define RS232_TAG     	"rs232"
+#define I8251_TAG       "i8251"
+#define RS232_TAG       "rs232"
 
 
 class sdk86_state : public driver_device
@@ -40,8 +40,8 @@ class sdk86_state : public driver_device
 public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		  m_maincpu(*this, "maincpu"),
-		  m_usart(*this, I8251_TAG)
+			m_maincpu(*this, "maincpu"),
+			m_usart(*this, I8251_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

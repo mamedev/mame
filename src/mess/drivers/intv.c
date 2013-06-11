@@ -94,8 +94,8 @@ void intv_state::palette_init()
 
 	for (int i = 0; i < 16; i++)
 	{
-		r = intv_colors[i * 3 + 0]; 
-		g = intv_colors[i * 3 + 1]; 
+		r = intv_colors[i * 3 + 0];
+		g = intv_colors[i * 3 + 1];
 		b = intv_colors[i * 3 + 2];
 		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 		colortable_palette_set_color(machine().colortable, i + 16, MAKE_RGB(r, g, b));

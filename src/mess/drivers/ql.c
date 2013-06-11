@@ -144,12 +144,12 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 	    bit     description
 
 	    0       Serial data input (SER2 RxD, SER1 TxD)
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
+	    1
+	    2
+	    3
+	    4
+	    5
+	    6
 	    7       ZX8302 serial link input/output (COMDATA)
 
 	*/
@@ -176,13 +176,13 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 
 	    bit     description
 
-	    0       
+	    0
 	    1       Speaker output
 	    2       Interrupt output (IPL0-2)
 	    3       Interrupt output (IPL1)
 	    4       Serial Clear-to-Send output (SER1 CTS)
 	    5       Serial Data Terminal Ready output (SER2 DTR)
-	    6       
+	    6
 	    7       ZX8302 serial link input/output (COMDATA)
 
 	*/
@@ -1074,10 +1074,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( opd, ql )
-    // internal ram
-    MCFG_RAM_MODIFY(RAM_TAG)
-    MCFG_RAM_DEFAULT_SIZE("128K")
-    MCFG_RAM_EXTRA_OPTIONS("256K")
+	// internal ram
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("256K")
 MACHINE_CONFIG_END
 
 

@@ -900,9 +900,9 @@ static INPUT_PORTS_START( bnj )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( caractn2 ) /* 2/3 Lives Dip changes in this set */
-        PORT_INCLUDE( bnj )
+		PORT_INCLUDE( bnj )
 
-        PORT_MODIFY("DSW2")
+		PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("7D:1")
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x00, "3" )

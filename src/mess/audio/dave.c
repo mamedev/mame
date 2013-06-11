@@ -55,13 +55,13 @@ ADDRESS_MAP_END
 
 dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock, "dave", __FILE__),
-	  device_memory_interface(mconfig, *this),
-	  device_sound_interface(mconfig, *this),
-	  m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
-	  m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
-	  m_write_irq(*this),
-	  m_write_lh(*this),
-	  m_write_rh(*this)
+		device_memory_interface(mconfig, *this),
+		device_sound_interface(mconfig, *this),
+		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, *ADDRESS_MAP_NAME(program_map)),
+		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(io_map)),
+		m_write_irq(*this),
+		m_write_lh(*this),
+		m_write_rh(*this)
 {
 }
 
@@ -80,7 +80,7 @@ void dave_device::device_start()
 	// allocate timers
 	m_timer_1hz = timer_alloc(TIMER_1HZ);
 	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
-	
+
 	m_timer_50hz = timer_alloc(TIMER_50HZ);
 	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
 
@@ -101,10 +101,10 @@ void dave_device::device_start()
 		m_count[i] = (STEP * machine().sample_rate()) / 125000;
 		m_level[i] = 0;
 	}
-	
+
 	/* dave has 3 tone channels and 1 noise channel.
 	 the volumes are mixed internally and output as left and right volume */
-	
+
 	/* 3 tone channels + 1 noise channel */
 	m_sound_stream_var = machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
 }
@@ -186,20 +186,20 @@ void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	int output_volumes[8];
 	int left_volume;
 	int right_volume;
-	
+
 	//logerror("sound update!\n");
-	
+
 	buffer1 = outputs[0];
 	buffer2 = outputs[1];
-	
+
 	while (samples)
 	{
 		int vol[4];
-		
+
 		/* vol[] keeps track of how long each square wave stays */
 		/* in the 1 position during the sample period. */
 		vol[0] = vol[1] = vol[2] = vol[3] = 0;
-		
+
 		for (int i = 0; i < 3; i++)
 		{
 			if ((m_regs[7] & (1 << i))==0)
@@ -230,9 +230,9 @@ void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					vol[i] -= m_count[i];
 			}
 		}
-		
+
 		/* update volume outputs */
-		
+
 		/* setup output volumes for each channel */
 		/* channel 0 */
 		output_volumes[0] = ((m_level[0] & m_level_and[0]) | m_level_or[0]) & m_mame_volumes[0];
@@ -246,13 +246,13 @@ void dave_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		/* channel 3 */
 		output_volumes[6] = ((m_level[3] & m_level_and[6]) | m_level_or[6]) & m_mame_volumes[3];
 		output_volumes[7] = ((m_level[3] & m_level_and[7]) | m_level_or[7]) & m_mame_volumes[7];
-		
+
 		left_volume = (output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6])>>2;
 		right_volume = (output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7])>>2;
-		
+
 		*(buffer1++) = left_volume;
 		*(buffer2++) = right_volume;
-		
+
 		samples--;
 	}
 }
@@ -600,7 +600,7 @@ WRITE8_MEMBER( dave_device::io_w )
 
 
 //-------------------------------------------------
-//  update_interrupt - 
+//  update_interrupt -
 //-------------------------------------------------
 
 void dave_device::update_interrupt()

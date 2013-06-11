@@ -10,7 +10,7 @@ class tms6100_device : public device_t
 public:
 	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE_LINE_MEMBER( tms6100_m0_w );
 	DECLARE_WRITE_LINE_MEMBER( tms6100_m1_w );
 	DECLARE_WRITE_LINE_MEMBER( tms6100_romclock_w );
@@ -34,8 +34,8 @@ private:
 	UINT8  m_tms_clock;
 	UINT8  m_data;
 	UINT8  m_state;
-	
-	const UINT8 *m_rom;	
+
+	const UINT8 *m_rom;
 
 };
 

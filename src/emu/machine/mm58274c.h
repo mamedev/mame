@@ -26,7 +26,7 @@ class mm58274c_device : public device_t,
 public:
 	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mm58274c_device() {}
-	
+
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -42,14 +42,14 @@ protected:
 private:
 	// internal state
 	attotime interrupt_period_table(int val);
-	
+
 	int m_status;     /* status register (*read* from address 0 = control register) */
 	int m_control;    /* control register (*write* to address 0) */
-	
+
 	int m_clk_set;    /* clock setting register */
 	int m_int_ctl;    /* interrupt control register */
-	
-	
+
+
 	int m_wday;       /* day of the week (1-7 (1=day1 as set in init)) */
 	int m_years1;     /* years (BCD: 0-99) */
 	int m_years2;
@@ -64,7 +64,7 @@ private:
 	int m_seconds1;   /* seconds (BCD : 0-59) */
 	int m_seconds2;
 	int m_tenths;     /* tenths of second (BCD : 0-9) */
-	
+
 	emu_timer *m_increment_rtc;
 	emu_timer *m_interrupt_timer;
 };

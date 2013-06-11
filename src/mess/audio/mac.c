@@ -82,20 +82,20 @@ void mac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 {
 	INT16 last_val = 0;
 	stream_sample_t *buffer = outputs[0];
-	
+
 	if ((m_mac_model == MODEL_MAC_PORTABLE) || (m_mac_model == MODEL_MAC_PB100))
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
-	
+
 	/* if we're not enabled, just fill with 0 */
 	if (machine().sample_rate() == 0)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
-	
+
 	/* fill in the sample */
 	while (samples && m_snd_cache_len)
 	{
@@ -105,7 +105,7 @@ void mac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 		m_snd_cache_len--;
 		samples--;
 	}
-	
+
 	while (samples--)
 	{
 		/* should never happen */

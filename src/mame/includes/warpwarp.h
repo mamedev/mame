@@ -8,10 +8,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_warpwarp_sound(*this, "warpwarp_custom"),
 		m_geebee_sound(*this, "geebee_custom"),
- 		m_geebee_videoram(*this, "geebee_videoram"),
+		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram")
 		{ }
- 
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<warpwarp_sound_device> m_warpwarp_sound;
 	optional_device<geebee_sound_device> m_geebee_sound;

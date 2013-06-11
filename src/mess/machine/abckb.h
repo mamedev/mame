@@ -20,7 +20,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC_KEYBOARD_PORT_TAG	"kb"
+#define ABC_KEYBOARD_PORT_TAG   "kb"
 
 
 

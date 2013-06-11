@@ -159,7 +159,7 @@ bool gba_cart_slot_device::call_load()
 	{
 		UINT8 *ROM = (UINT8 *)m_cart->get_rom_base();
 		UINT32 cart_size;
-		
+
 		if (software_entry() == NULL)
 		{
 			cart_size = length();
@@ -169,9 +169,9 @@ bool gba_cart_slot_device::call_load()
 				return IMAGE_INIT_FAIL;
 			}
 			fread(ROM, cart_size);
-			m_cart->set_rom_size(cart_size);	// we store the actual game size...
+			m_cart->set_rom_size(cart_size);    // we store the actual game size...
 
-			m_type = get_cart_type(ROM, cart_size);			
+			m_type = get_cart_type(ROM, cart_size);
 		}
 		else
 		{
@@ -184,8 +184,8 @@ bool gba_cart_slot_device::call_load()
 				return IMAGE_INIT_FAIL;
 			}
 			memcpy(ROM, get_software_region("rom"), cart_size);
-			m_cart->set_rom_size(cart_size);	// we store the actual game size...
-			
+			m_cart->set_rom_size(cart_size);    // we store the actual game size...
+
 			if (pcb_name)
 				m_type = gba_get_pcb_id(pcb_name);
 
@@ -249,7 +249,7 @@ bool gba_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 
 
 /*-------------------------------------------------
- get_cart_type - code to detect NVRAM type from 
+ get_cart_type - code to detect NVRAM type from
  fullpath
  -------------------------------------------------*/
 
@@ -305,16 +305,16 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			chip |= GBA_CHIP_RTC;
 	}
 	mame_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).cstr());
-	
+
 	// fix for games which return more than one kind of chip: either it is one of the known titles, or we default to no battery
 	if (gba_chip_has_conflict(chip))
 	{
 		char game_code[5] = { 0 };
 		bool resolved = FALSE;
-		
+
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
-		
+
 		mame_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
 		chip &= ~(GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_4K | GBA_CHIP_EEPROM_64K | GBA_CHIP_FLASH | GBA_CHIP_FLASH_1M | GBA_CHIP_FLASH_512 | GBA_CHIP_SRAM);
@@ -333,7 +333,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		if (!resolved)
 			mame_printf_warning("GBA: NVRAM is disabled because multiple NVRAM chips were detected!\n");
 	}
-	
+
 	// fix for games which are known to require an eeprom with 14-bit addressing (64 kbit)
 	if (chip & GBA_CHIP_EEPROM)
 	{
@@ -341,7 +341,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
-		
+
 		mame_printf_info("GBA: Game Code \"%s\"\n", game_code);
 
 		for (int i = 0; i < sizeof(gba_chip_fix_eeprom_list) / sizeof(gba_chip_fix_eeprom_item); i++)
@@ -462,7 +462,7 @@ void gba_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 
 
 /*-------------------------------------------------
- Install ROM - directly point system address map 
+ Install ROM - directly point system address map
  to the cart ROM region so to avoid the memory
  system additional load
  -------------------------------------------------*/
@@ -481,4 +481,3 @@ void gba_cart_slot_device::install_rom()
 		machine().root_device().membank("rom3")->set_base(machine().root_device().memregion(m_cart->device().subtag(tempstring, "cartridge"))->base());
 	}
 }
-

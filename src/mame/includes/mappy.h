@@ -26,7 +26,7 @@ public:
 		GAME_DIGDUG2,
 		GAME_MOTOS
 	};
-	
+
 	mappy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
@@ -38,7 +38,7 @@ public:
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_subcpu2;
@@ -49,7 +49,7 @@ public:
 	namco58xx_device *m_namco58xx_1;
 	namco58xx_device *m_namco58xx_2;
 	namco59xx_device *m_namco59xx;
-	
+
 	// per-game variable to distinguish between the various IO chip config
 	int m_type;
 

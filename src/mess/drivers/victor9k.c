@@ -9,31 +9,31 @@
 
 /*
 
-	Sector format
-	-------------
+    Sector format
+    -------------
 
-	Header sync
-	Sector header (header ID, track ID, sector ID, and checksum)
-	Gap 1
-	Data Sync
-	Data field (data sync, data ID, data bytes, and checksum)
-	Gap 2
+    Header sync
+    Sector header (header ID, track ID, sector ID, and checksum)
+    Gap 1
+    Data Sync
+    Data field (data sync, data ID, data bytes, and checksum)
+    Gap 2
 
-	Track format
-	------------
-	
-	ZONE		LOWER HEAD	UPPER HEAD 	SECTORS		ROTATIONAL
-	NUMBER		TRACKS		TRACKS		PER TRACK 	PERIOD (MS)
+    Track format
+    ------------
 
-	0 			0-3			unused		19 			237.9
-	1 			4-15		0-7			18 			224.5
-	2 			16-26		8-18		17 			212.2
-	3 			27-37		19-29		16 			199.9
-	4 			38-48		30-40		15 			187.6
-	5 			49-59		41-51		14 			175.3
-	6 			60-70		52-62		13 			163.0
-	7 			71-79		63-74		12			149.6
-	8 			unused		75-79		11 			144.0
+    ZONE        LOWER HEAD  UPPER HEAD  SECTORS     ROTATIONAL
+    NUMBER      TRACKS      TRACKS      PER TRACK   PERIOD (MS)
+
+    0           0-3         unused      19          237.9
+    1           4-15        0-7         18          224.5
+    2           16-26       8-18        17          212.2
+    3           27-37       19-29       16          199.9
+    4           38-48       30-40       15          187.6
+    5           49-59       41-51       14          175.3
+    6           60-70       52-62       13          163.0
+    7           71-79       63-74       12          149.6
+    8           unused      75-79       11          144.0
 
 */
 
@@ -67,9 +67,9 @@
 READ8_MEMBER( victor9k_state::floppy_p1_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       L0MS0
 	    1       L0MS1
 	    2       L0MS2
@@ -78,7 +78,7 @@ READ8_MEMBER( victor9k_state::floppy_p1_r )
 	    5       L1MS1
 	    6       L1MS2
 	    7       L1MS3
-	
+
 	*/
 
 	return m_lms;
@@ -92,18 +92,18 @@ READ8_MEMBER( victor9k_state::floppy_p1_r )
 READ8_MEMBER( victor9k_state::floppy_p2_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
+
+	    0
+	    1
+	    2
+	    3
+	    4
+	    5
 	    6       RDY0
 	    7       RDY1
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -122,18 +122,18 @@ READ8_MEMBER( victor9k_state::floppy_p2_r )
 WRITE8_MEMBER( victor9k_state::floppy_p2_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       START0
 	    1       STOP0
 	    2       START1
 	    3       STOP1
 	    4       SEL1
 	    5       SEL0
-	    6       
-	    7       
-	
+	    6
+	    7
+
 	*/
 
 	if (BIT(data, 0)) m_floppy0->mon_w(0);
@@ -142,7 +142,7 @@ WRITE8_MEMBER( victor9k_state::floppy_p2_w )
 	if (BIT(data, 3)) m_floppy1->mon_w(1);
 
 	int sel0 = BIT(data, 5);
-	
+
 	if (m_sel0 && !sel0)
 	{
 		m_da0 = m_da;
@@ -152,7 +152,7 @@ WRITE8_MEMBER( victor9k_state::floppy_p2_w )
 	m_sel0 = sel0;
 
 	int sel1 = BIT(data, 4);
-	
+
 	if (m_sel1 && !sel1)
 	{
 		m_da1 = m_da;
@@ -1034,7 +1034,7 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 
 	// single/double sided
 	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
-	
+
 	return data;
 }
 
@@ -1148,7 +1148,7 @@ void victor9k_state::unload0_cb(floppy_image_device *device)
 void victor9k_state::ready1_cb(floppy_image_device *device, int state)
 {
 	m_rdy1 = state;
-	
+
 	m_via5->write_cb2(m_rdy1);
 }
 

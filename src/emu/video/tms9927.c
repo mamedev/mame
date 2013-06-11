@@ -85,14 +85,14 @@ void tms9927_device::device_start()
 {
 	assert(clock() > 0);
 	assert(m_hpixels_per_column > 0);
-		
+
 	/* copy the initial parameters */
 	m_clock = clock();
-		
+
 	/* get the screen device */
 	m_screen = downcast<screen_device *>(machine().device(m_screen_tag));
 	assert(m_screen != NULL);
-		
+
 	/* get the self-load PROM */
 	if (m_selfload_region != NULL)
 	{
@@ -102,7 +102,7 @@ void tms9927_device::device_start()
 
 	/* register for state saving */
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms9927_device::state_postload), this));
-	
+
 	save_item(NAME(m_reg));
 	save_item(NAME(m_start_datarow));
 	save_item(NAME(m_reset));
@@ -123,11 +123,11 @@ void tms9927_device::device_reset()
 void tms9927_device::device_stop()
 {
 	mame_printf_debug("TMS9937: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
-					  m_clock,
-					  m_total_hpix,
-					  0, m_visible_hpix,
-					  m_total_vpix,
-					  0, m_visible_vpix);
+						m_clock,
+						m_total_hpix,
+						0, m_visible_hpix,
+						m_total_vpix,
+						0, m_visible_vpix);
 }
 
 
@@ -300,4 +300,3 @@ void tms9927_device::recompute_parameters(int postload)
 
 	m_screen->configure(m_total_hpix, m_total_vpix, visarea, refresh);
 }
-

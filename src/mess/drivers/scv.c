@@ -71,7 +71,7 @@ protected:
 
 	ioport_port *m_key[8];
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	void scv_set_banks();
 	inline void plot_sprite_part( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 pat, UINT8 col, UINT8 screen_sprite_start_line );
 	inline void draw_sprite( bitmap_ind16 &bitmap, UINT8 x, UINT8 y, UINT8 tile_idx, UINT8 col, UINT8 left, UINT8 right, UINT8 top, UINT8 bottom, UINT8 clip_y, UINT8 screen_sprite_start_line );
@@ -421,7 +421,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		case TIMER_VB:
 			{
 				int vpos = machine().primary_screen->vpos();
-			
+
 				switch( vpos )
 				{
 				case 240:
@@ -784,7 +784,7 @@ void scv_state::machine_start()
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portc));
 	save_item(NAME(m_cart_ram_enabled));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(scv_state::scv_postload), this));
 }
 

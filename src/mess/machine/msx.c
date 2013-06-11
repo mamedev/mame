@@ -858,7 +858,7 @@ void msx_state::msx_memory_init()
 
 			size = layout->size;
 			option = layout->option;
-			
+
 			if (layout->type != SLOT_CARTRIDGE1 && layout->type != SLOT_CARTRIDGE2)
 			{
 				int size_tmp = 0;

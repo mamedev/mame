@@ -120,7 +120,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 		m_sys3_card = 1;
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
 	}
-	
+
 	if (m_cartslot->get_type() == PCE_CDSYS3U)
 	{
 		m_sys3_card = 3;
@@ -213,7 +213,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 
 	if (offset & 0x200 && m_sys3_card && m_acard) // route Arcade Card handling ports
 		return m_cd->acard_w(space, offset, data);
-	
+
 	m_cd->intf_w(space, offset, data);
 
 	m_cd->update();
@@ -238,7 +238,7 @@ READ8_MEMBER(pce_state::pce_cd_intf_r)
 			case 0xc7: return 0x03;
 		}
 	}
-	
+
 	return m_cd->intf_r(space, offset);
 }
 

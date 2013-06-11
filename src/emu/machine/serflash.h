@@ -6,7 +6,7 @@
 #define __SERFLASH_H__
 
 
-#define FLASH_PAGE_SIZE	(2048+64)
+#define FLASH_PAGE_SIZE (2048+64)
 
 
 
@@ -18,16 +18,15 @@
 //**************************************************************************
 
 #define MCFG_SERFLASH_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SERFLASH, 0) \
-
+	MCFG_DEVICE_ADD(_tag, SERFLASH, 0)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 class serflash_device;
 
-typedef enum							{ STATE_IDLE = 0,	STATE_READ,		STATE_READ_ID,	STATE_READ_STATUS, STATE_BLOCK_ERASE, STATE_PAGE_PROGRAM	} flash_state_t;
-//const char *m_flash_state_name[] =	{ "IDLE",			"READ",			"READ_ID",		"READ_STATUS",     "BLOCK ERASE",     "PAGE PROGRAM"		};
+typedef enum                            { STATE_IDLE = 0,   STATE_READ,     STATE_READ_ID,  STATE_READ_STATUS, STATE_BLOCK_ERASE, STATE_PAGE_PROGRAM    } flash_state_t;
+//const char *m_flash_state_name[] =    { "IDLE",           "READ",         "READ_ID",      "READ_STATUS",     "BLOCK ERASE",     "PAGE PROGRAM"        };
 
 // custom initialization for default state
 typedef device_delegate<void (serflash_device &, void *, size_t)> serflash_init_delegate;
@@ -105,4 +104,3 @@ extern const device_type SERFLASH;
 
 
 #endif
-

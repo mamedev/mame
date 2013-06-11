@@ -116,22 +116,22 @@ class newport_video_device : public device_t
 public:
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~newport_video_device() {}
-	
-	
+
+
 	DECLARE_READ32_MEMBER( rex3_r );
 	DECLARE_WRITE32_MEMBER( rex3_w );
-	
+
 	UINT32 screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
-private:	
+
+private:
 	// internal state
-	
+
 	DECLARE_READ32_MEMBER( cmap0_r );
 	DECLARE_WRITE32_MEMBER( cmap0_w );
 	DECLARE_READ32_MEMBER( cmap1_r );
@@ -142,14 +142,14 @@ private:
 	DECLARE_READ32_MEMBER( vc2_r );
 	DECLARE_WRITE32_MEMBER( vc2_w );
 	void DoREX3Command();
-	
+
 	VC2_t  m_VC2;
 	XMAP_t m_XMAP0;
 	XMAP_t m_XMAP1;
 	REX3_t m_REX3;
 	UINT32 *m_base;
 	UINT8  m_nDrawGreen;
-	CMAP_t m_CMAP0;	
+	CMAP_t m_CMAP0;
 };
 
 

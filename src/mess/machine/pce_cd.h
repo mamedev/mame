@@ -105,7 +105,7 @@ private:
 	UINT8   m_msm_nibble;
 	UINT8   m_msm_idle;
 	UINT8   m_msm_repeat;
-	
+
 	/* SCSI signals */
 	int     m_scsi_BSY;   /* Busy. Bus in use */
 	int     m_scsi_SEL;   /* Select. Initiator has won arbitration and has selected a target */
@@ -128,7 +128,7 @@ private:
 	int     m_data_buffer_size;
 	int     m_data_buffer_index;
 	int     m_data_transferred;
-	
+
 	/* Arcade Card specific */
 	UINT8   *m_acard_ram;
 	UINT8   m_acard_latch;
@@ -138,7 +138,7 @@ private:
 	UINT16  m_acard_addr_inc[4];
 	UINT32  m_acard_shift;
 	UINT8   m_acard_shift_reg;
-	
+
 	UINT32  m_current_frame;
 	UINT32  m_end_frame;
 	UINT32  m_last_frame;
@@ -151,12 +151,12 @@ private:
 	required_device<cdda_device> m_cdda;
 	required_device<nvram_device> m_nvram;
 	required_device<cdrom_image_device> m_cdrom;
-	
+
 	cdrom_file  *m_cd_file;
 	const cdrom_toc*    m_toc;
 	emu_timer   *m_data_timer;
 	emu_timer   *m_adpcm_dma_timer;
-	
+
 	emu_timer   *m_cdda_fadeout_timer;
 	emu_timer   *m_cdda_fadein_timer;
 	double  m_cdda_volume;

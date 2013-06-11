@@ -5,8 +5,8 @@
     very preliminary driver by Angelo Salese,
     based on work by Tomasz Slanina and Tom Walker
 
-	TODO:
-	- probably needs a full rewrite & merge with ssfindo.c
+    TODO:
+    - probably needs a full rewrite & merge with ssfindo.c
 
     ???
     bp (0382827C) (second trigger)

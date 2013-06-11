@@ -130,7 +130,7 @@ void mea8000_device::device_config_complete()
 	const mea8000_interface *intf = reinterpret_cast<const mea8000_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<mea8000_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -146,9 +146,9 @@ void mea8000_device::device_start()
 	m_req_out.resolve(m_req_out_cb, *this);
 
 	m_dac = machine().device<dac_device>(m_channel);
-	
+
 	init_tables();
-	
+
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mea8000_device::timer_expire),this));
 
 	save_item(NAME(m_state));
@@ -176,7 +176,7 @@ void mea8000_device::device_start()
 	save_item(NAME(m_last_pitch));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_noise));
-}	
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -210,7 +210,6 @@ int mea8000_device::accept_byte()
 
 void mea8000_device::update_req()
 {
-
 	// actually, req pulses less than 3us for each new byte,
 	// it goes back up if there space left in the buffer, or stays low if the
 	// buffer contains a complete frame and the CPU nees to wait for the next
@@ -557,7 +556,7 @@ WRITE8_MEMBER( mea8000_device::write )
 		else
 		{
 			/* enqueue frame byte */
-			LOG(("$%04x %f: mea8000_w data %02X in frame pos %i\n", machine().firstcpu->pcbase(), machine().time().as_double(), 
+			LOG(("$%04x %f: mea8000_w data %02X in frame pos %i\n", machine().firstcpu->pcbase(), machine().time().as_double(),
 					data, m_bufpos));
 			m_buf[m_bufpos] = data;
 			m_bufpos++;

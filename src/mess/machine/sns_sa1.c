@@ -53,7 +53,6 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 
 void sns_sa1_device::device_start()
 {
-	
 }
 
 void sns_sa1_device::device_reset()
@@ -78,7 +77,7 @@ void sns_sa1_device::device_reset()
 	m_bwram_sa1 = 0;
 	m_bwram_sa1_source = 0;
 	m_bwram_sa1_format = 0;
-	m_bwram_write_snes = 1; 
+	m_bwram_write_snes = 1;
 	m_bwram_write_sa1 = 1;
 	m_bwpa_sa1 = 0x0f;
 	m_iram_write_snes = 1;
@@ -220,15 +219,15 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 				UINT32 data = (var_length_read(space, m_vda + 0) <<  0) | (var_length_read(space, m_vda + 1) <<  8)
 															| (var_length_read(space, m_vda + 2) << 16);
 				data >>= m_vbit;
-				
-				if (m_drm == 1) 
+
+				if (m_drm == 1)
 				{
 					//auto-increment mode
 					m_vbit += m_vlen;
 					m_vda += (m_vbit >> 3);
 					m_vbit &= 7;
 				}
-				
+
 				value = (data >> 8) & 0xff;
 			}
 			break;
@@ -255,7 +254,7 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 				// reset sa-1?
 			}
 			m_sa1_ctrl = data;
-		
+
 			if (BIT(m_sa1_ctrl, 7))
 			{
 				// IRQ

@@ -102,7 +102,7 @@ public:
 	device_t *m_left_lcd;
 	device_t *m_right_lcd;
 	address_space *m_space;
-	
+
 	UINT8 m_bios_page_count;
 	UINT8 m_fm_detect;
 	UINT8 m_ctrl_reg;
@@ -113,11 +113,11 @@ public:
 	UINT8 m_input_port0;
 	UINT8 m_input_port1;
 	UINT8 m_gg_sio[5];
-	
+
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
 	int m_bank_enabled[4];
 	UINT8 m_bios_page[4];
-	
+
 	// for gamegear LCD persistence hack
 	bitmap_rgb32 m_prev_bitmap;
 
@@ -168,7 +168,7 @@ public:
 	UINT8 m_frame_sscope_state;
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
-	UINT8 m_store_control;	
+	UINT8 m_store_control;
 	int m_current_cartridge;
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
@@ -241,7 +241,7 @@ public:
 	: sms_state(mconfig, type, tag),
 	m_control_cpu(*this, "control")
 	{ }
-	
+
 	required_device<cpu_device> m_control_cpu;
 
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
@@ -251,13 +251,13 @@ public:
 	DECLARE_READ8_MEMBER(sms_store_control_r);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 	DECLARE_DRIVER_INIT(smssdisp);
-	
+
 	DECLARE_READ8_MEMBER(store_read_0000);
 	DECLARE_READ8_MEMBER(store_read_4000);
 	DECLARE_READ8_MEMBER(store_read_8000);
 	DECLARE_READ8_MEMBER(store_cart_peek);
 	DECLARE_WRITE8_MEMBER(store_write_cart);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };
 

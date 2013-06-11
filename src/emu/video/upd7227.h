@@ -63,18 +63,18 @@ protected:
 private:
 	enum
 	{
-		CMD_SMM 		= 0x18,
-		CMD_SFF 		= 0x10,
-		CMD_LDPI 		= 0x80,
-		CMD_SWM 		= 0x64,
-		CMD_SRM 		= 0x60,
-		CMD_SANDM 		= 0x6c,
-		CMD_SORM 		= 0x68,
-		CMD_SCM 		= 0x72,
-		CMD_BSET 		= 0x40,
-		CMD_BRESET 		= 0x20,
-		CMD_DISP_ON 	= 0x09,
-		CMD_DISP_OFF 	= 0x08
+		CMD_SMM         = 0x18,
+		CMD_SFF         = 0x10,
+		CMD_LDPI        = 0x80,
+		CMD_SWM         = 0x64,
+		CMD_SRM         = 0x60,
+		CMD_SANDM       = 0x6c,
+		CMD_SORM        = 0x68,
+		CMD_SCM         = 0x72,
+		CMD_BSET        = 0x40,
+		CMD_BRESET      = 0x20,
+		CMD_DISP_ON     = 0x09,
+		CMD_DISP_OFF    = 0x08
 	};
 
 	int m_sx;

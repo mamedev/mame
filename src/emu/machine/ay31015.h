@@ -74,32 +74,32 @@ public:
 	ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	~ay31015_device() {}
 
-	
+
 	/* Set an input pin */
 	void set_input_pin( ay31015_input_pin_t pin, int data );
-	
-	
+
+
 	/* Get an output pin */
 	int get_output_pin( ay31015_output_pin_t pin );
-	
-	
+
+
 	/* Set a new transmitter clock (new_clock is in Hz) */
 	void set_transmitter_clock( double new_clock );
-	
-	
+
+
 	/* Set a new receiver clock (new_clock is in Hz) */
 	void set_receiver_clock( double new_clock );
-	
-	
+
+
 	/* Reead the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
 	UINT8 get_received_data();
-	
-	
+
+
 	/* Set the transmitter buffer */
 	/* The data to transmit is set on DB1-DB8 (pins 26-33) */
 	void set_transmit_data( UINT8 data );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -120,13 +120,13 @@ protected:
 	TIMER_CALLBACK_MEMBER(tx_process);
 
 	int m_pins[41];
-	
+
 	UINT8 m_control_reg;
 	UINT8 m_status_reg;
 	UINT16 m_second_stop_bit; // 0, 8, 16
 	UINT16 m_total_pulses;    // bits * 16
 	UINT8 m_internal_sample;
-	
+
 	state_t m_rx_state;
 	UINT8 m_rx_data;      // byte being received
 	UINT8 m_rx_buffer;    // received byte waiting to be accepted by computer
@@ -135,7 +135,7 @@ protected:
 	UINT16 m_rx_pulses;   // total pulses left
 	double m_rx_clock;
 	emu_timer *m_rx_timer;
-	
+
 	state_t m_tx_state;
 	UINT8 m_tx_data;      // byte being sent
 	UINT8 m_tx_buffer;    // next byte to send
@@ -143,7 +143,7 @@ protected:
 	UINT16 m_tx_pulses;   // total pulses left
 	double m_tx_clock;
 	emu_timer *m_tx_timer;
-	
+
 	devcb_resolved_read8    m_read_si;                /* SI - pin 20 - This will be called whenever the SI pin is sampled. Optional */
 	devcb_resolved_write8   m_write_so;               /* SO - pin 25 - This will be called whenever data is put on the SO pin. Optional */
 	devcb_resolved_write8   m_status_changed;         /* This will be called whenever one of the status pins may have changed. Optional */
@@ -153,14 +153,14 @@ class ay51013_device : public ay31015_device
 {
 public:
 	ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 protected:
 	virtual void internal_reset();
 
 };
 
-extern const device_type AY31015;	// For AY-3-1014A, AY-3-1015(D) and HD6402 variants
-extern const device_type AY51013;	// For AY-3-1014, AY-5-1013 and AY-6-1013 variants
+extern const device_type AY31015;   // For AY-3-1014A, AY-3-1015(D) and HD6402 variants
+extern const device_type AY51013;   // For AY-3-1014, AY-5-1013 and AY-6-1013 variants
 
 
 

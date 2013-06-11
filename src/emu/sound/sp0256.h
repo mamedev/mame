@@ -81,11 +81,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(sby_r);
 	DECLARE_READ16_MEMBER(spb640_r);
 	DECLARE_WRITE16_MEMBER(spb640_w);
-	
+
 	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);
 	void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -97,20 +97,20 @@ protected:
 private:
 	UINT32 getb(int len);
 	void micro();
-	
+
 	sound_stream  *m_stream;          /* MAME core sound stream                       */
 	devcb_resolved_write_line m_drq;  /* Data request callback                        */
 	devcb_resolved_write_line m_sby;  /* Standby callback                             */
 
 	int            m_sby_line;        /* Standby line state                           */
 	int            m_cur_len;         /* Fullness of current sound buffer.            */
-	
+
 	int            m_silent;          /* Flag: SP0256 is silent.                      */
-	
+
 	INT16         *m_scratch;         /* Scratch buffer for audio.                    */
 	UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
 	UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
-	
+
 	struct lpc12_t m_filt;            /* 12-pole filter                               */
 	int            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
 	int            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
@@ -120,12 +120,12 @@ private:
 	int            m_halted;          /* True when CPU is halted.                     */
 	UINT32         m_mode;            /* Mode register.                               */
 	UINT32         m_page;            /* Page set by SETPAGE                          */
-	
+
 	UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
 	UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
 	UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
 	UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
-	
+
 	UINT8          *m_rom;            /* 64K ROM.                                     */
 
 	emu_timer *m_lrq_timer;

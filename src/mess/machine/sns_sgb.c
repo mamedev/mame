@@ -1,12 +1,12 @@
 /***********************************************************************************************************
- 
+
  Super Game Boy emulation (for SNES/SFC)
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
 
  TODO: almost everything
- 
+
  ***********************************************************************************************************/
 
 
@@ -123,60 +123,60 @@ READ8_MEMBER( sns_rom_sgb_device::chip_read )
 	UINT16 address = offset & 0xffff;
 
 	//LY counter
-	if (address == 0x6000) 
+	if (address == 0x6000)
 	{
 		m_sgb_ly = 0;// GameBoy PPU LY here
 		m_sgb_row = m_lcd_row;
 		return m_sgb_ly;
 	}
-	
+
 	//command ready port
-	if (address == 0x6002) 
+	if (address == 0x6002)
 	{
 		bool data = (m_packetsize > 0);
-		if (data) 
+		if (data)
 		{
-			for (int i = 0; i < 16; i++) 
+			for (int i = 0; i < 16; i++)
 				m_joy_pckt[i] = m_packet_data[0][i];
-			m_packetsize--;	
+			m_packetsize--;
 
 			//hack because we still don't emulate input packets!
 			if (!m_packetsize) m_packetsize = 64;
 
 			// shift packet
-			for (int i = 0; i < m_packetsize; i++) 
+			for (int i = 0; i < m_packetsize; i++)
 				for (int j = 0; j < 16; j++)
 					m_packet_data[i][j] = m_packet_data[i + 1][j];
 		}
 		return data;
 	}
-	
+
 	//ICD2 revision
-	if (address == 0x600f) 
+	if (address == 0x600f)
 		return 0x21;
-	
+
 	//command port
-	if ((address & 0xfff0) == 0x7000) 
+	if ((address & 0xfff0) == 0x7000)
 		return m_joy_pckt[address & 0x0f];
-	
+
 	//VRAM port
-	if (address == 0x7800) 
+	if (address == 0x7800)
 	{
 		UINT8 data = m_lcd_output[m_vram_offs];
 		m_vram_offs = (m_vram_offs + 1) % 320;
 		return data;
 	}
 
-	return 0x00;	// this should never happen?
+	return 0x00;    // this should never happen?
 }
 
-void sns_rom_sgb_device::lcd_render(UINT32 *source) 
+void sns_rom_sgb_device::lcd_render(UINT32 *source)
 {
 	memset(m_lcd_output, 0x00, 320 * sizeof(UINT16));
-	
+
 	for (int y = 0; y < 8; y++)
 	{
-		for (int x = 0; x < 160; x++) 
+		for (int x = 0; x < 160; x++)
 		{
 			UINT32 pixel = *source++;
 			UINT16 addr = y * 2 + (x / 8 * 16);
@@ -189,59 +189,58 @@ void sns_rom_sgb_device::lcd_render(UINT32 *source)
 WRITE8_MEMBER( sns_rom_sgb_device::chip_write )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	//VRAM port
-	if (address == 0x6001) 
+	if (address == 0x6001)
 	{
 		m_vram = data;
 		m_vram_offs = 0;
-		
+
 		UINT8 offset = (m_sgb_row - (4 - (m_vram - (m_sgb_ly & 3)))) & 3;
 		lcd_render(m_lcd_buffer + offset * 160 * 8);
-		
+
 		return;
 	}
-	
+
 	//control port
-	if (address == 0x6003) 
+	if (address == 0x6003)
 	{
-		if ((m_port & 0x80) == 0x00 && (data & 0x80) == 0x80) 
+		if ((m_port & 0x80) == 0x00 && (data & 0x80) == 0x80)
 		{
 			//reset
 		}
 
-		switch (data & 3) 
+		switch (data & 3)
 		{
 			//change CPU frequency
 		}
 		m_port = data;
 		return;
 	}
-	
-	if (address == 0x6004) 
+
+	if (address == 0x6004)
 	{
 		//joypad 1
-		m_joy1 = data; 
-		return; 
+		m_joy1 = data;
+		return;
 	}
-	if (address == 0x6005) 
+	if (address == 0x6005)
 	{
 		//joypad 2
-		m_joy2 = data; 
-		return; 
+		m_joy2 = data;
+		return;
 	}
-	if (address == 0x6006) 
+	if (address == 0x6006)
 	{
 		//joypad 3
-		m_joy3 = data; 
-		return; 
+		m_joy3 = data;
+		return;
 	}
-	if (address == 0x6007) 
+	if (address == 0x6007)
 	{
 		//joypad 4
-		m_joy4 = data; 
-		return; 
+		m_joy4 = data;
+		return;
 	}
-	
-}
 
+}

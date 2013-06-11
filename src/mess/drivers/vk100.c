@@ -153,8 +153,8 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 #include "machine/serial.h"
 #include "vk100.lh"
 
-#define RS232_TAG		"rs232"
-#define COM5016T_TAG	"com5016t"
+#define RS232_TAG       "rs232"
+#define COM5016T_TAG    "com5016t"
 
 class vk100_state : public driver_device
 {

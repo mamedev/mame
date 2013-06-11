@@ -97,7 +97,7 @@ void ide_controller_device::set_irq(int state)
 		LOG(("IDE interrupt assert\n"));
 	else
 		LOG(("IDE interrupt clear\n"));
-	
+
 	/* signal an interrupt */
 	m_irq_handler(state);
 	interrupt_pending = state;
@@ -885,7 +885,7 @@ READ8_MEMBER( ide_controller_device::read_via_config )
 			break;
 	}
 
-//	printf( "read via config %04x %04x %04x\n", offset, result, mem_mask );
+//  printf( "read via config %04x %04x %04x\n", offset, result, mem_mask );
 	return result;
 }
 
@@ -1009,7 +1009,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 			break;
 	}
 
-//	printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
+//  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
 
 	/* return the result */
 	return result;
@@ -1071,7 +1071,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 			break;
 	}
 
-//	printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
+//  printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
 
 	/* return the result */
 	return result;
@@ -1086,7 +1086,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 
 WRITE8_MEMBER( ide_controller_device::write_via_config )
 {
-//	printf( "write via config %04x %04x %04x\n", offset, data, mem_mask );
+//  printf( "write via config %04x %04x %04x\n", offset, data, mem_mask );
 
 	/* logit */
 	LOG(("%s:IDE via config write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
@@ -1139,7 +1139,7 @@ void ide_controller_device::write_dma( UINT16 data )
 
 WRITE16_MEMBER( ide_controller_device::write_cs0 )
 {
-//	printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
+//  printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
 
 	switch (offset)
 	{
@@ -1229,7 +1229,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
 
 WRITE16_MEMBER( ide_controller_device::write_cs1 )
 {
-//	printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
+//  printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
 
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));

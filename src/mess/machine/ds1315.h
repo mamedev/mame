@@ -48,7 +48,7 @@ private:
 
 	void fill_raw_data();
 	void input_raw_data();
-	
+
 	int m_count;
 	ds1315_mode_t m_mode;
 	UINT8 m_raw_data[8*8];

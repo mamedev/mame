@@ -1665,15 +1665,15 @@ void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, flo
 }
 
 void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
-								  float y0, float y1,
-								  float xl, float xr,
-								  float ul, float ur,
-								  float vl, float vr,
-								  float wl, float wr,
-								  float dxldy, float dxrdy,
-								  float duldy, float durdy,
-								  float dvldy, float dvrdy,
-								  float dwldy, float dwrdy)
+									float y0, float y1,
+									float xl, float xr,
+									float ul, float ur,
+									float vl, float vr,
+									float wl, float wr,
+									float dxldy, float dxrdy,
+									float duldy, float durdy,
+									float dvldy, float dvrdy,
+									float dwldy, float dwrdy)
 {
 	float dy;
 	int yy0, yy1;
@@ -2404,7 +2404,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
-{	
+{
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
 
 	endofrender_timer_tsp->adjust(attotime::never);
@@ -2624,7 +2624,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POWERVR2, "PowerVR 2", tag, owner, clock),
-	  irq_cb(*this)
+		irq_cb(*this)
 {
 }
 

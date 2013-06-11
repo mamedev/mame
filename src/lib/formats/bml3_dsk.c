@@ -36,7 +36,7 @@ static FLOPPY_CONSTRUCT(bml3_dsk_construct)
 
 
 LEGACY_FLOPPY_OPTIONS_START( bml3 )
-	LEGACY_FLOPPY_OPTION( bml3_dsk, "bm3",		"BML3 floppy disk image",	bml3_dsk_identify, bml3_dsk_construct, NULL,
+	LEGACY_FLOPPY_OPTION( bml3_dsk, "bm3",      "BML3 floppy disk image",   bml3_dsk_identify, bml3_dsk_construct, NULL,
 			HEADS([2])
 			TRACKS([40])
 			SECTORS([16])

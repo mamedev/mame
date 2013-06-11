@@ -20,8 +20,8 @@
 
     TODO:
 
-	- devcb2
-	- i8274 DMA scheme
+    - devcb2
+    - i8274 DMA scheme
     - break detection
     - wr0 reset tx interrupt pending
     - wait/ready
@@ -494,7 +494,7 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 	{
 		m_rx_data_fifo[i] = 0;
 		m_rx_error_fifo[i] = 0;
-	}	
+	}
 }
 
 
@@ -929,7 +929,7 @@ void z80dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
 		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", m_owner->tag(), 'A' + m_index, get_stop_bits()));
 		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", m_owner->tag(), 'A' + m_index, get_clock_mode()));
-		
+
 		update_serial();
 		break;
 
@@ -1279,7 +1279,7 @@ void z80dart_channel::update_serial()
 	{
 		if (m_wr[1] & WR4_PARITY_EVEN)
 			parity_code = SERIAL_PARITY_EVEN;
-		else 
+		else
 			parity_code = SERIAL_PARITY_ODD;
 	}
 

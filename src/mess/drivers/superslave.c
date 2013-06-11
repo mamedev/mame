@@ -104,18 +104,18 @@ WRITE8_MEMBER( superslave_state::baud_w )
 WRITE8_MEMBER( superslave_state::memctrl_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       Memory bank 0 on
 	    1       Memory bank 1 on
-	    2       
-	    3       
+	    2
+	    3
 	    4       Unswitched memory boundary bit 0
 	    5       Unswitched memory boundary bit 1
 	    6       Unswitched memory boundary bit 2
 	    7       Unswitched memory boundary bit 3
-	
+
 	*/
 
 	m_memctrl = data;
@@ -129,9 +129,9 @@ WRITE8_MEMBER( superslave_state::memctrl_w )
 READ8_MEMBER( superslave_state::status_r)
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       Sense Switch (0=closed)
 	    1       Parity error (1=error)
 	    2       Syncerr (1=error)
@@ -140,7 +140,7 @@ READ8_MEMBER( superslave_state::status_r)
 	    5       Data Set Ready 2
 	    6       Data Set Ready 1
 	    7       Data Set Ready 0
-	
+
 	*/
 
 	UINT8 data = 1;
@@ -162,9 +162,9 @@ READ8_MEMBER( superslave_state::status_r)
 WRITE8_MEMBER( superslave_state::cmd_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       Prom enable (1=enabled)
 	    1       Clear Parity (1=cleared)
 	    2       Clear Syncerr (1=cleared)
@@ -173,7 +173,7 @@ WRITE8_MEMBER( superslave_state::cmd_w )
 	    5       Command bit 5
 	    6       Command bit 6
 	    7       Command bit 7
-	
+
 	*/
 
 	m_cmd = data;

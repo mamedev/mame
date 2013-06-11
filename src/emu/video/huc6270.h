@@ -67,7 +67,7 @@ private:
 		HUC6270_VDW,
 		HUC6270_VCR
 	};
-	
+
 	enum huc6270_h_state {
 		HUC6270_HDS,
 		HUC6270_HDW,

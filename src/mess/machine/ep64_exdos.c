@@ -12,7 +12,7 @@
 Floppy Drive Controller PCB Layout
 ----------------------------------
 
-INTELLIGENT SOFTWARE LTD DISK CONTROLLER 
+INTELLIGENT SOFTWARE LTD DISK CONTROLLER
 ISS1
  |--------------------------------------------|
  |                                            |
@@ -54,7 +54,7 @@ This PCB plugs into the external expansion connector on the right side of the ma
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define WD1770_TAG	"u1"
+#define WD1770_TAG  "u1"
 
 
 
@@ -180,18 +180,18 @@ void ep64_exdos_device::device_reset()
 READ8_MEMBER( ep64_exdos_device::read )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       INTRQ
-	    2       
-	    3       
-	    4       
-	    5       
+	    2
+	    3
+	    4
+	    5
 	    6       DCHG
 	    7       DRQ
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -212,9 +212,9 @@ READ8_MEMBER( ep64_exdos_device::read )
 WRITE8_MEMBER( ep64_exdos_device::write )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       SELECT 0
 	    1       SELECT 1
 	    2       SELECT 2
@@ -223,7 +223,7 @@ WRITE8_MEMBER( ep64_exdos_device::write )
 	    5       _DDEN
 	    6       DISK CHANGE RESET
 	    7       IN USE
-	
+
 	*/
 
 	m_floppy = NULL;

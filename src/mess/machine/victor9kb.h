@@ -32,8 +32,7 @@
 
 #define MCFG_VICTOR9K_KEYBOARD_ADD(_kbrdy) \
 	MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0) \
-	downcast<victor9k_keyboard_device *>(device)->set_kbrdy_callback(DEVCB2_##_kbrdy); \
-
+	downcast<victor9k_keyboard_device *>(device)->set_kbrdy_callback(DEVCB2_##_kbrdy);
 
 
 //**************************************************************************

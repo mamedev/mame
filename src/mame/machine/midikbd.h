@@ -8,7 +8,7 @@
 	devcb = &midi_keyboard_device::static_set_tx_callback(*device, DEVCB2_##_devcb);
 
 class midi_keyboard_device : public device_t,
-							 public device_serial_interface
+								public device_serial_interface
 {
 public:
 	midi_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

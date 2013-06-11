@@ -29,7 +29,7 @@
 
 
 /* device types */
-enum 
+enum
 {
 	TYPE_PIT8253 = 0,
 	TYPE_PIT8254
@@ -52,14 +52,14 @@ struct pit8253_timer
 	int index;                      /* index number of the timer */
 	double clockin;                 /* input clock frequency in Hz */
 	int clock;                      /* clock signal when clockin is 0 */
-	
+
 	devcb_resolved_read_line    in_gate_func;   /* callback for gate input */
 	devcb_resolved_write_line   out_out_func;   /* callback function for when output changes */
-	
+
 	attotime last_updated;          /* time when last updated */
-	
+
 	emu_timer *updatetimer;         /* MAME timer to process updates */
-	
+
 	UINT16 value;                   /* current counter value ("CE" in Intel docs) */
 	UINT16 latch;                   /* latched counter value ("OL" in Intel docs) */
 	UINT16 count;                   /* new counter value ("CR" in Intel docs) */
@@ -69,13 +69,13 @@ struct pit8253_timer
 	INT32 rmsb;                     /* 1 = Next read is MSB of 16-bit value */
 	INT32 wmsb;                     /* 1 = Next write is MSB of 16-bit value */
 	INT32 output;                       /* 0 = low, 1 = high */
-	
+
 	INT32 gate;                     /* gate input (0 = low, 1 = high) */
 	INT32 latched_count;                /* number of bytes of count latched */
 	INT32 latched_status;               /* 1 = status latched (8254 only) */
 	INT32 null_count;                   /* 1 = mode control or count written, 0 = count loaded */
 	INT32 phase;                        /* see phase definition tables in simulate2(), below */
-	
+
 	UINT32 cycles_to_output;        /* cycles until output callback called */
 };
 
@@ -90,20 +90,20 @@ public:
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
-	
+
 	WRITE_LINE_MEMBER(clk0_w);
 	WRITE_LINE_MEMBER(clk1_w);
 	WRITE_LINE_MEMBER(clk2_w);
-	
+
 	WRITE_LINE_MEMBER(gate0_w);
 	WRITE_LINE_MEMBER(gate1_w);
 	WRITE_LINE_MEMBER(gate2_w);
-	
-	
+
+
 	/* In the 8253/8254 the CLKx input lines can be attached to a regular clock
 	 signal. Another option is to use the output from one timer as the input
 	 clock to another timer.
-	 
+
 	 The functions below should supply both functionalities. If the signal is
 	 a regular clock signal, use the pit8253_set_clockin function. If the
 	 CLKx input signal is the output of the different source, set the new_clockin
@@ -113,14 +113,14 @@ public:
 	int get_output(int timer);
 	void set_clockin(int timer, double new_clockin);
 
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
-	
+
 	// internal state
 	void common_start(int device_type);
 	pit8253_timer *get_timer(int which);
@@ -138,7 +138,7 @@ protected:
 	void set_clock_signal(int timerno, int state);
 
 	TIMER_CALLBACK_MEMBER(update_timer_cb);
-	
+
 	int m_device_type;
 
 	pit8253_timer m_timers[PIT8253_MAX_TIMER];

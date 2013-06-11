@@ -42,10 +42,10 @@ static MACHINE_CONFIG_FRAGMENT( mpeg573 )
 MACHINE_CONFIG_END
 
 mpeg573_device::mpeg573_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-  : device_t(mconfig, MPEG573, "Konami 573 digital audio board", tag, owner, clock, "mpeg573", __FILE__),
+	: device_t(mconfig, MPEG573, "Konami 573 digital audio board", tag, owner, clock, "mpeg573", __FILE__),
 	mas3507d(*this, "mpeg"),
 	digital_id(*this, "digital_id"),
-    output_cb(*this)
+	output_cb(*this)
 {
 }
 
@@ -156,9 +156,9 @@ WRITE16_MEMBER(mpeg573_device::mas_i2c_w)
 WRITE16_MEMBER(mpeg573_device::mpeg_ctrl_w)
 {
 	logerror("FPGA MPEG control %c%c%c\n",
-			 data & 0x8000 ? '#' : '.',
-			 data & 0x4000 ? '#' : '.',
-			 data & 0x2000 ? '#' : '.');
+				data & 0x8000 ? '#' : '.',
+				data & 0x4000 ? '#' : '.',
+				data & 0x2000 ? '#' : '.');
 }
 
 WRITE16_MEMBER(mpeg573_device::ram_write_adr_high_w)

@@ -74,7 +74,7 @@ void gf4500_device::device_reset()
 {
 	m_screen_x = m_screen_y = 0;
 	m_screen_x_max = m_screen_y_max = m_screen_x_min = m_screen_y_min = 0;
-}	
+}
 
 
 void gf4500_device::vram_write16( UINT16 data )
@@ -180,4 +180,3 @@ WRITE32_MEMBER( gf4500_device::write )
 		}
 	}
 }
-

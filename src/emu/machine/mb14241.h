@@ -12,7 +12,7 @@ class mb14241_device : public device_t
 {
 public:
 	mb14241_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE8_MEMBER ( shift_count_w );
 	DECLARE_WRITE8_MEMBER ( shift_data_w );
 	DECLARE_READ8_MEMBER( shift_result_r );
@@ -25,7 +25,7 @@ protected:
 
 private:
 	// internal state
-	
+
 	UINT16 m_shift_data;  /* 15 bits only */
 	UINT8 m_shift_count;  /* 3 bits */
 };

@@ -99,7 +99,7 @@ void mm58274c_device::device_start()
 	save_item(NAME(m_minutes2));
 	save_item(NAME(m_seconds1));
 	save_item(NAME(m_seconds2));
-	save_item(NAME(m_tenths));	
+	save_item(NAME(m_tenths));
 }
 
 //-------------------------------------------------
@@ -109,14 +109,14 @@ void mm58274c_device::device_start()
 void mm58274c_device::device_reset()
 {
 	system_time systime;
-	
+
 	/* get the current date/time from the core */
 	machine().current_datetime(systime);
-	
+
 	m_clk_set = systime.local_time.year & 3 << 2;
 	if (m_mode24)
 		m_clk_set |= clk_set_24;
-	
+
 	/* The clock count starts on 1st January 1900 */
 	m_wday = 1 + ((systime.local_time.weekday - m_day1) % 7);
 	m_years1 = (systime.local_time.year / 10) % 10;
@@ -175,75 +175,75 @@ READ8_MEMBER( mm58274c_device::read )
 			reply = m_status;
 			m_status = 0;
 			break;
-			
+
 		case 0x01:   /* Tenths of Seconds */
 			reply = m_tenths;
 			break;
-			
+
 		case 0x02:   /* Units Seconds */
 			reply = m_seconds2;
 			break;
-			
+
 		case 0x03:   /* Tens Seconds */
 			reply = m_seconds1;
 			break;
-			
+
 		case 0x04:  /* Units Minutes */
 			reply = m_minutes2;
 			break;
-			
+
 		case 0x05:   /* Tens Minutes */
 			reply = m_minutes1;
 			break;
-			
+
 		case 0x06:   /* Units Hours */
 			reply = m_hours2;
 			break;
-			
+
 		case 0x07:   /* Tens Hours */
 			reply = m_hours1;
 			break;
-			
+
 		case 0x08:   /* Units Days */
 			reply = m_days2;
 			break;
-			
+
 		case 0x09:   /* Tens Days */
 			reply = m_days1;
 			break;
-			
+
 		case 0x0a:   /* Units Months */
 			reply = m_months2;
 			break;
-			
+
 		case 0x0b:   /* Tens Months */
 			reply = m_months1;
 			break;
-			
+
 		case 0x0c:   /* Units Years */
 			reply = m_years2;
 			break;
-			
+
 		case 0x0d:   /* Tens Years */
 			reply = m_years1;
 			break;
-			
+
 		case 0x0e:   /* Day of Week */
 			reply = m_wday;
 			break;
-			
+
 		case 0x0f:   /* Clock Setting & Interrupt Registers */
-			if (m_control & ctl_intsel)	/* interrupt register */
+			if (m_control & ctl_intsel) /* interrupt register */
 				reply = m_int_ctl;
-			else	/* clock setting register */
+			else    /* clock setting register */
 			{
-				if (m_clk_set & clk_set_24)	/* 24-hour mode */
+				if (m_clk_set & clk_set_24) /* 24-hour mode */
 					reply = m_clk_set & ~clk_set_pm;
-				else	/* 12-hour mode */
+				else    /* 12-hour mode */
 					reply = m_clk_set;
 			}
 			break;
-			
+
 		default:
 			reply = 0;
 			break;
@@ -261,90 +261,90 @@ WRITE8_MEMBER( mm58274c_device::write )
 	switch (offset)
 	{
 		case 0x00:   /* Control Register (test mode and interrupt not emulated) */
-			if ((!(m_control & ctl_intstop)) && (data & ctl_intstop))	/* interrupt stop */
+			if ((!(m_control & ctl_intstop)) && (data & ctl_intstop))   /* interrupt stop */
 				m_interrupt_timer->enable(0);
-			else if ((m_control & ctl_intstop) && (!(data & ctl_intstop)))	/* interrupt run */
+			else if ((m_control & ctl_intstop) && (!(data & ctl_intstop)))  /* interrupt run */
 			{
 				attotime period = interrupt_period_table(m_int_ctl & int_ctl_dly);
-				
+
 				m_interrupt_timer->adjust(period, 0, m_int_ctl & int_ctl_rpt ? period : attotime::zero);
 			}
-			if (data & ctl_clkstop)	/* stopping the clock clears the tenth counter */
+			if (data & ctl_clkstop) /* stopping the clock clears the tenth counter */
 				m_tenths = 0;
 			m_control = data;
 			break;
-			
+
 		case 0x01:   /* Tenths of Seconds: cannot be written */
 			break;
-			
+
 		case 0x02:   /* Units Seconds */
 			m_seconds2 = data;
 			break;
-			
+
 		case 0x03:   /* Tens Seconds */
 			m_seconds1 = data;
 			break;
-			
+
 		case 0x04:   /* Units Minutes */
 			m_minutes2 = data;
 			break;
-			
+
 		case 0x05:   /* Tens Minutes */
 			m_minutes1 = data;
 			break;
-			
+
 		case 0x06:   /* Units Hours */
 			m_hours2 = data;
 			break;
-			
+
 		case 0x07:   /* Tens Hours */
 			m_hours1 = data;
 			break;
-			
+
 		case 0x08:   /* Units Days */
 			m_days2 = data;
 			break;
-			
+
 		case 0x09:   /* Tens Days */
 			m_days1 = data;
 			break;
-			
+
 		case 0x0a:   /* Units Months */
 			m_months2 = data;
 			break;
-			
+
 		case 0x0b:   /* Tens Months */
 			m_months1 = data;
 			break;
-			
+
 		case 0x0c:   /* Units Years */
 			m_years2 = data;
 			break;
-			
+
 		case 0x0d:   /* Tens Years */
 			m_years1 = data;
 			break;
-			
+
 		case 0x0e:   /* Day of Week */
 			m_wday = data;
 			break;
-			
+
 		case 0x0f:   /* Clock Setting & Interrupt Registers */
-			if (m_control & ctl_intsel)	/* interrupt register (not emulated) */
+			if (m_control & ctl_intsel) /* interrupt register (not emulated) */
 			{
 				m_int_ctl = data;
-				if (!(m_control & ctl_intstop))	/* interrupt run */
+				if (!(m_control & ctl_intstop)) /* interrupt run */
 				{
 					attotime period = interrupt_period_table(m_int_ctl & int_ctl_dly);
-					
+
 					m_interrupt_timer->adjust(period, 0, m_int_ctl & int_ctl_rpt ? period : attotime::zero);
 				}
 			}
-			else	/* clock setting register */
+			else    /* clock setting register */
 			{
 				m_clk_set = data;
 #if 0
-				if (m_clk_set & clk_set_24)	/* 24-hour mode */
+				if (m_clk_set & clk_set_24) /* 24-hour mode */
 					m_clk_set &= ~clk_set_pm;
 #endif
 			}
@@ -482,4 +482,3 @@ TIMER_CALLBACK_MEMBER(mm58274c_device::rtc_increment_cb)
 		}
 	}
 }
-

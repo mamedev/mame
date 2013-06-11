@@ -36,7 +36,7 @@
 #define SPEAKER_TAG     "speaker"
 #define ISA_BUS_TAG     "isa"
 #define SCREEN_TAG      "screen"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 class pc1512_state : public driver_device
 {

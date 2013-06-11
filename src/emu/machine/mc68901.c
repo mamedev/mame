@@ -1232,7 +1232,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			if (data & UCR_PARITY_EVEN)
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Even\n", tag());
-				
+
 				parity_code = SERIAL_PARITY_EVEN;
 			}
 			else

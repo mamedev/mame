@@ -1417,8 +1417,8 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 
 
 READ_LINE_MEMBER( bbc_state::bbc_rxd_r )
-{ 
-	return ( m_serproc_data & 0x40 ) ? m_rs232->rx() : m_rxd_cass; 
+{
+	return ( m_serproc_data & 0x40 ) ? m_rs232->rx() : m_rxd_cass;
 }
 
 
@@ -1429,7 +1429,7 @@ READ_LINE_MEMBER( bbc_state::bbc_dcd_r )
 
 
 READ_LINE_MEMBER( bbc_state::bbc_cts_r )
-{ 
+{
 	return ( m_serproc_data & 0x40 ) ? m_rs232->cts_r() : 0;
 }
 

@@ -1,12 +1,12 @@
 /***********************************************************************************************************
 
- 
+
  Game Boy Advance cart emulation
 
 
  We support carts with several kind of Save RAM (actual SRAM, Flash RAM or EEPROM)
- 
- 
+
+
 
  ***********************************************************************************************************/
 
@@ -120,7 +120,7 @@ void gba_rom_eeprom64_device::device_start()
 {
 	astring tempstring;
 	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
-	
+
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(machine(), 0x2000);
 	m_eeprom = auto_alloc(machine(), gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14));
@@ -140,7 +140,7 @@ READ32_MEMBER(gba_rom_sram_device::read_ram)
 {
 	if (m_nvram && offset < m_nvram_size/4)
 		return m_nvram[offset];
-	else	// this cannot actually happen...
+	else    // this cannot actually happen...
 		return 0xffffffff;
 }
 
@@ -168,25 +168,25 @@ machine_config_constructor gba_rom_flash_device::device_mconfig_additions() cons
 READ32_MEMBER(gba_rom_flash_device::read_ram)
 {
 	UINT32 rv = 0;
-	
+
 	offset &= m_flash_mask;
-	
-	if (mem_mask & 0xff) 
+
+	if (mem_mask & 0xff)
 		rv |= m_flash->read(offset * 4);
-	if (mem_mask & 0xff00) 
+	if (mem_mask & 0xff00)
 		rv |= m_flash->read((offset * 4) + 1) << 8;
-	if (mem_mask & 0xff0000) 
+	if (mem_mask & 0xff0000)
 		rv |= m_flash->read((offset * 4) + 2) << 16;
-	if (mem_mask & 0xff000000) 
+	if (mem_mask & 0xff000000)
 		rv |= m_flash->read((offset * 4) + 3) << 24;
-	
+
 	return rv;
 }
 
 WRITE32_MEMBER(gba_rom_flash_device::write_ram)
 {
 	offset &= m_flash_mask;
-	
+
 	switch (mem_mask)
 	{
 		case 0xff:
@@ -220,18 +220,18 @@ machine_config_constructor gba_rom_flash1m_device::device_mconfig_additions() co
 READ32_MEMBER(gba_rom_flash1m_device::read_ram)
 {
 	UINT32 rv = 0;
-	
+
 	offset &= m_flash_mask;
 
-	if (mem_mask & 0xff) 
+	if (mem_mask & 0xff)
 		rv |= m_flash->read(offset * 4);
-	if (mem_mask & 0xff00) 
+	if (mem_mask & 0xff00)
 		rv |= m_flash->read((offset * 4) + 1) << 8;
-	if (mem_mask & 0xff0000) 
+	if (mem_mask & 0xff0000)
 		rv |= m_flash->read((offset * 4) + 2) << 16;
-	if (mem_mask & 0xff000000) 
+	if (mem_mask & 0xff000000)
 		rv |= m_flash->read((offset * 4) + 3) << 24;
-	
+
 	return rv;
 }
 
@@ -262,8 +262,8 @@ WRITE32_MEMBER(gba_rom_flash1m_device::write_ram)
 
 /*-------------------------------------------------
  Carts with EEPROM
- 
- TODO: can this sketchy EEPROM device be merged 
+
+ TODO: can this sketchy EEPROM device be merged
  with the core implementation?
  -------------------------------------------------*/
 
@@ -288,16 +288,16 @@ gba_eeprom_device::gba_eeprom_device(running_machine &machine, UINT8 *eeprom, UI
 UINT32 gba_eeprom_device::read()
 {
 	UINT32 out;
-	
+
 	switch (m_state)
 	{
 		case EEP_IDLE:
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, m_state, activecpu_get_pc(), 1);
 			return 0x00010001;  // "ready"
-			
+
 		case EEP_READFIRST:
 			m_count--;
-			
+
 			if (!m_count)
 			{
 				m_count = 64;
@@ -318,19 +318,19 @@ UINT32 gba_eeprom_device::read()
 				m_addr++;
 				m_bits = 8;
 			}
-			
+
 			out = (m_eep_data & 0x80) ? 1 : 0;
 			out |= (out<<16);
 			m_eep_data <<= 1;
-			
+
 			m_bits--;
 			m_count--;
-			
+
 			if (!m_count)
 			{
 				m_state = EEP_IDLE;
 			}
-			
+
 //          printf("out = %08x\n", out);
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, m_state, activecpu_get_pc(), out);
 			return out;
@@ -348,7 +348,7 @@ void gba_eeprom_device::write(UINT32 data)
 			if (data == 1)
 				m_state++;
 			break;
-			
+
 		case EEP_COMMAND:
 			if (data == 1)
 				m_command = EEP_READFIRST;
@@ -358,7 +358,7 @@ void gba_eeprom_device::write(UINT32 data)
 			m_count = m_addr_bits;
 			m_addr = 0;
 			break;
-			
+
 		case EEP_ADDR:
 			m_addr <<= 1;
 			m_addr |= (data & 1);
@@ -377,7 +377,7 @@ void gba_eeprom_device::write(UINT32 data)
 				}
 			}
 			break;
-			
+
 		case EEP_AFTERADDR:
 			m_state = m_command;
 			m_count = 64;
@@ -386,13 +386,13 @@ void gba_eeprom_device::write(UINT32 data)
 			if (m_state == EEP_READFIRST)
 				m_count = 4;
 			break;
-			
+
 		case EEP_WRITE:
 			m_eep_data <<= 1;
 			m_eep_data |= (data & 1);
 			m_bits--;
 			m_count--;
-			
+
 			if (m_bits == 0)
 			{
 				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_addr);
@@ -404,11 +404,11 @@ void gba_eeprom_device::write(UINT32 data)
 				m_eep_data = 0;
 				m_bits = 8;
 			}
-			
+
 			if (!m_count)
 				m_state = EEP_AFTERWRITE;
 			break;
-			
+
 		case EEP_AFTERWRITE:
 			m_state = EEP_IDLE;
 			break;
@@ -434,7 +434,7 @@ WRITE32_MEMBER(gba_rom_eeprom_device::write_ram)
 
 	if (~mem_mask == 0x0000ffff)
 		data >>= 16;
-	
+
 	m_eeprom->write(data);
 }
 
@@ -443,7 +443,7 @@ READ32_MEMBER(gba_rom_eeprom64_device::read_ram)
 	// Larger games have smaller access to EERPOM content
 	if (m_rom_size > (16 * 1024 * 1024) && offset < 0xffff00/4)
 		return 0xffffffff;
-	
+
 	return m_eeprom->read();
 }
 
@@ -452,10 +452,9 @@ WRITE32_MEMBER(gba_rom_eeprom64_device::write_ram)
 	// Larger games have smaller access to EEPROM content
 	if (m_rom_size > (16 * 1024 * 1024) && offset < 0xffff00/4)
 		return;
-	
+
 	if (~mem_mask == 0x0000ffff)
 		data >>= 16;
-	
+
 	m_eeprom->write(data);
 }
-

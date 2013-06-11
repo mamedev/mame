@@ -502,7 +502,7 @@ ROM_END
 
   Sound: 1x U6295 (U53)
 
-  RAM:  2x 6116. 
+  RAM:  2x 6116.
         2x 6264 (prg RAM)
         2x 62256 (near battery)
 
@@ -518,27 +518,27 @@ ROM_END
 
 */
 ROM_START( top21 )
-	ROM_REGION( 0x100000, "maincpu", 0 )	// 68000 code
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "odd_1-2.u75",  0x000001, 0x80000, CRC(ce4f2a74) SHA1(f9a9043da924ddba16f49d6856dbcfd8f066c824) )
 	ROM_LOAD16_BYTE( "even_1-2.u76", 0x000000, 0x80000, CRC(8d645456) SHA1(06c59816f259168f15503b276fc28c947e17cc60) )
-	ROM_COPY( "maincpu",            0x080000, 0x00000, 0x80000 )	// copying the second halves to the right offset
+	ROM_COPY( "maincpu",            0x080000, 0x00000, 0x80000 )    // copying the second halves to the right offset
 
 	ROM_REGION( 0xa0000, "gfx1", 0 )
 	ROM_LOAD( "36.u36",     0x000000, 0x20000, CRC(071883f7) SHA1(16b5c251975394bb94c0d32277912ea99280c21c) )
-	ROM_LOAD( "35.u35",     0x020000, 0x20000, CRC(cdc8cc44) SHA1(ce703e7f050465b1bc07800eb84eb7f127ebbddb) )	// double size. 2nd half empty
+	ROM_LOAD( "35.u35",     0x020000, 0x20000, CRC(cdc8cc44) SHA1(ce703e7f050465b1bc07800eb84eb7f127ebbddb) )   // double size. 2nd half empty
 	ROM_IGNORE(                       0x20000)
 	ROM_LOAD( "34.u34",     0x040000, 0x20000, CRC(bdbe7360) SHA1(3038f66d57a43afea9d6c05908bfb50167a881c2) )
 	ROM_LOAD( "33.u33",     0x060000, 0x20000, CRC(670584b0) SHA1(23772404b5e5066828c59d9baa03b732a80db676) )
 	ROM_LOAD( "32.u32",     0x080000, 0x20000, CRC(c5bc3950) SHA1(aebaae91ade0c221ba14186fde78206996cdec30) )
 
-	ROM_REGION( 0x80000, "oki", 0 )	// 6295 samples (first half empty)
+	ROM_REGION( 0x80000, "oki", 0 ) // 6295 samples (first half empty)
 	ROM_LOAD( "audio.u64",  0x00000, 0x80000, CRC(4f70a9bc) SHA1(83f0664eadf923ed45e3e18bfcefafb85163c4a0) )
-	ROM_COPY( "oki",        0x40000, 0x00000, 0x40000 )	// copying the second half to the right offset
+	ROM_COPY( "oki",        0x40000, 0x00000, 0x40000 ) // copying the second half to the right offset
 
-	ROM_REGION( 0x4000, "mcu", 0 )	// MCU code
+	ROM_REGION( 0x4000, "mcu", 0 )  // MCU code
 	ROM_LOAD( "pic16c65b_top21.u60", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "nvram", 0 )	// default NVRAM (2x 62256)
+	ROM_REGION( 0x10000, "nvram", 0 )   // default NVRAM (2x 62256)
 	ROM_LOAD( "top21_nvram.bin", 0x00000, 0x10000, CRC(638726ce) SHA1(c55c77df5fbddfb19acf50f1b4467c63c818d5e7) )
 ROM_END
 

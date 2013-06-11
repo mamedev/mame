@@ -14,52 +14,52 @@
 #include "sound/speaker.h"
 #include "rendlay.h"
 
-#define HD6301V1_MAIN_TAG	"8g"
-#define HD6301V1_SLAVE_TAG	"6d"
-#define MC146818_TAG		"6g"
-#define UPD7227_0_TAG		"lcdc0"
-#define UPD7227_1_TAG		"lcdc1"
-#define UPD7227_2_TAG		"lcdc2"
-#define UPD7227_3_TAG		"lcdc3"
-#define UPD7227_4_TAG		"lcdc4"
-#define UPD7227_5_TAG		"lcdc5"
-#define SPEAKER_TAG			"speaker"
-#define CASSETTE_TAG		"cassette"
-#define RS232_TAG 	    	"rs232"
-#define SCREEN_TAG			"screen"
+#define HD6301V1_MAIN_TAG   "8g"
+#define HD6301V1_SLAVE_TAG  "6d"
+#define MC146818_TAG        "6g"
+#define UPD7227_0_TAG       "lcdc0"
+#define UPD7227_1_TAG       "lcdc1"
+#define UPD7227_2_TAG       "lcdc2"
+#define UPD7227_3_TAG       "lcdc3"
+#define UPD7227_4_TAG       "lcdc4"
+#define UPD7227_5_TAG       "lcdc5"
+#define SPEAKER_TAG         "speaker"
+#define CASSETTE_TAG        "cassette"
+#define RS232_TAG           "rs232"
+#define SCREEN_TAG          "screen"
 
 class hx20_state : public driver_device
 {
 public:
 	hx20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, HD6301V1_MAIN_TAG),
-		  m_subcpu(*this, HD6301V1_SLAVE_TAG),
-		  m_rtc(*this, MC146818_TAG),
-		  m_lcdc0(*this, UPD7227_0_TAG),
-		  m_lcdc1(*this, UPD7227_1_TAG),
-		  m_lcdc2(*this, UPD7227_2_TAG),
-		  m_lcdc3(*this, UPD7227_3_TAG),
-		  m_lcdc4(*this, UPD7227_4_TAG),
-		  m_lcdc5(*this, UPD7227_5_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_rs232(*this, RS232_TAG),
-		  m_sio(*this, "sio"),
-		  m_ksc0(*this, "KSC0"),
-		  m_ksc1(*this, "KSC1"),
-		  m_ksc2(*this, "KSC2"),
-		  m_ksc3(*this, "KSC3"),
-		  m_ksc4(*this, "KSC4"),
-		  m_ksc5(*this, "KSC5"),
-		  m_ksc6(*this, "KSC6"),
-		  m_ksc7(*this, "KSC7"),
-		  m_sw6(*this, "SW6"),
-		  m_slave_rx(1),
-		  m_slave_tx(1),
-		  m_slave_flag(1),
-		  m_rtc_irq(CLEAR_LINE),
-		  m_kbrequest(1)
+			m_maincpu(*this, HD6301V1_MAIN_TAG),
+			m_subcpu(*this, HD6301V1_SLAVE_TAG),
+			m_rtc(*this, MC146818_TAG),
+			m_lcdc0(*this, UPD7227_0_TAG),
+			m_lcdc1(*this, UPD7227_1_TAG),
+			m_lcdc2(*this, UPD7227_2_TAG),
+			m_lcdc3(*this, UPD7227_3_TAG),
+			m_lcdc4(*this, UPD7227_4_TAG),
+			m_lcdc5(*this, UPD7227_5_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_cassette(*this, CASSETTE_TAG),
+			m_rs232(*this, RS232_TAG),
+			m_sio(*this, "sio"),
+			m_ksc0(*this, "KSC0"),
+			m_ksc1(*this, "KSC1"),
+			m_ksc2(*this, "KSC2"),
+			m_ksc3(*this, "KSC3"),
+			m_ksc4(*this, "KSC4"),
+			m_ksc5(*this, "KSC5"),
+			m_ksc6(*this, "KSC6"),
+			m_ksc7(*this, "KSC7"),
+			m_sw6(*this, "SW6"),
+			m_slave_rx(1),
+			m_slave_tx(1),
+			m_slave_flag(1),
+			m_rtc_irq(CLEAR_LINE),
+			m_kbrequest(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;

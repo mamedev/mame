@@ -176,12 +176,12 @@ void snes_sound_device::device_config_complete()
 void snes_sound_device::device_start()
 {
 	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000, this);
-	
+
 	m_ram = auto_alloc_array_clear(machine(), UINT8, SNES_SPCRAM_SIZE);
-	
+
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
-	
+
 	/* Initialize the timers */
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
 	m_timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
@@ -192,7 +192,7 @@ void snes_sound_device::device_start()
 	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
 	m_timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
 	m_timer[2]->enable(false);
-	
+
 	state_register();
 	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
 }
@@ -205,14 +205,14 @@ void snes_sound_device::device_reset()
 {
 	/* default to ROM visible */
 	m_ram[0xf1] = 0x80;
-	
+
 	/* Sort out the ports */
 	for (int i = 0; i < 4; i++)
 	{
 		m_port_in[i] = 0;
 		m_port_out[i] = 0;
 	}
-	
+
 	dsp_reset();
 }
 
@@ -1242,12 +1242,12 @@ void snes_sound_device::state_register()
 void snes_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	short mix[2];
-	
+
 	for (int i = 0; i < samples; i++)
 	{
 		mix[0] = mix[1] = 0;
 		dsp_update(mix);
-		
+
 		/* Update the buffers */
 		outputs[0][i] = (stream_sample_t)mix[0];
 		outputs[1][i] = (stream_sample_t)mix[1];

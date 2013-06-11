@@ -400,9 +400,9 @@ public:
 
 	const UINT8 (*m_drgw2_source_data)[0xec];
 
-	UINT16	      m_drgw2_prot_hold;
-	UINT16	      m_drgw2_prot_hilo;
-	UINT16	      m_drgw2_prot_hilo_select;
+	UINT16        m_drgw2_prot_hold;
+	UINT16        m_drgw2_prot_hilo;
+	UINT16        m_drgw2_prot_hilo_select;
 	int           m_drgw2_cmd;
 	int           m_drgw2_ptr;
 

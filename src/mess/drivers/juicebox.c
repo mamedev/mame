@@ -258,7 +258,7 @@ void juicebox_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	smc_init();
-	
+
 	space.install_readwrite_handler(0x01c00000, 0x01c0000b, 0, 0, read32_delegate(FUNC(s3c44b0_device::cpuwrap_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::cpuwrap_w), &(*m_s3c44b0)));
 	space.install_readwrite_handler(0x01d00000, 0x01d0002b, 0, 0, read32_delegate(FUNC(s3c44b0_device::uart_0_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_0_w), &(*m_s3c44b0)));
 	space.install_readwrite_handler(0x01d04000, 0x01d0402b, 0, 0, read32_delegate(FUNC(s3c44b0_device::uart_1_r), &(*m_s3c44b0)),  write32_delegate(FUNC(s3c44b0_device::uart_1_w), &(*m_s3c44b0)));

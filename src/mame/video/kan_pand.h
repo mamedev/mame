@@ -29,29 +29,29 @@ public:
 	~kaneko_pandora_device() {}
 
 	DECLARE_WRITE8_MEMBER ( spriteram_w );
-	DECLARE_READ8_MEMBER( spriteram_r );	
+	DECLARE_READ8_MEMBER( spriteram_r );
 	DECLARE_WRITE16_MEMBER( spriteram_LSB_w );
 	DECLARE_READ16_MEMBER( spriteram_LSB_r );
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_clear_bitmap( int clear );
 	void eof();
 	void set_bg_pen( int pen );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	void draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 private:
 	// internal state
-	screen_device	*m_screen;
-	UINT8 *      	m_spriteram;
-	bitmap_ind16 	*m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
-	int          	m_clear_bitmap;
-	int         	m_bg_pen; // might work some other way..
+	screen_device   *m_screen;
+	UINT8 *         m_spriteram;
+	bitmap_ind16    *m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
+	int             m_clear_bitmap;
+	int             m_bg_pen; // might work some other way..
 };
 
 extern const device_type KANEKO_PANDORA;

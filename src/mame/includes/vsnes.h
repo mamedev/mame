@@ -11,7 +11,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-		
+
 	required_shared_ptr<UINT8> m_work_ram;
 	optional_shared_ptr<UINT8> m_work_ram_1;
 	int m_coin;

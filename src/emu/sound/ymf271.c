@@ -1136,7 +1136,7 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 			slot->ch3_level = data & 0xf;
 			break;
 		}
-		
+
 		default:
 			break;
 	}
@@ -1318,7 +1318,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if (!m_irq_handler.isnull())
 				m_irq_handler(1);
 		}
-		
+
 		// reload timer
 		m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA)), 0);
 		break;
@@ -1334,7 +1334,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			if (!m_irq_handler.isnull())
 				m_irq_handler(1);
 		}
-		
+
 		// reload timer
 		m_timB->adjust(attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB)), 0);
 		break;
@@ -1447,7 +1447,7 @@ void ymf271_device::ymf271_write_timer(int data)
 				if (!m_ext_rw && !m_ext_write_handler.isnull())
 					m_ext_write_handler(m_ext_address, data);
 				break;
-			
+
 			default:
 				break;
 		}
@@ -1737,11 +1737,11 @@ void ymf271_device::device_reset()
 		m_slots[i].active = 0;
 		m_slots[i].volume = 0;
 	}
-	
+
 	// reset timers and IRQ
 	m_timA->reset();
 	m_timB->reset();
-	
+
 	m_irqstate = 0;
 	m_status = 0;
 	m_enable = 0;

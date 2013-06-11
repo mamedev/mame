@@ -20,7 +20,7 @@ ZPU-2000 - main cpu board
  - four 'test button' style switches
  - one 4Mhz xtal @A1
  - this same board is shared with cliff hanger (clifhgr.c)
- 
+
 CFB-1000 - video/subcpu board
  - this board has a sub-cpu on it and four roms (six sockets for roms, two empty)
    - the roms go in sockets "ROM0"@G8, "ROM2"@K8, "ROM3"@K10, "ROM4"@K11

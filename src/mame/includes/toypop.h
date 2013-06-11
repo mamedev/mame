@@ -25,14 +25,14 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_m68000_sharedram;
 	required_shared_ptr<UINT16> m_bg_image;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<namco58xx_device> m_namco58xx;
 	required_device<namco56xx_device> m_namco56xx_1;
 	required_device<namco56xx_device> m_namco56xx_2;
-	
+
 	tilemap_t *m_bg_tilemap;
 
 	int m_bitmapflip;

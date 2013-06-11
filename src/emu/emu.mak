@@ -135,20 +135,20 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/flt_vol.o \
 	$(EMUOBJ)/sound/flt_rc.o \
 	$(EMUOBJ)/sound/wavwrite.o \
-	$(EMUOBJ)/sound/samples.o	\
+	$(EMUOBJ)/sound/samples.o   \
 
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \
 	$(EMUDRIVERS)/testcpu.o \
-	
+
 EMUMACHINEOBJS = \
-    $(EMUMACHINE)/generic.o     \
-	$(EMUMACHINE)/ram.o     	\
-	$(EMUMACHINE)/nvram.o     	\
+	$(EMUMACHINE)/generic.o     \
+	$(EMUMACHINE)/ram.o         \
+	$(EMUMACHINE)/nvram.o       \
 	$(EMUMACHINE)/laserdsc.o    \
 	$(EMUMACHINE)/net_lib.o     \
 	$(EMUMACHINE)/netlist.o     \
-	
+
 EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o    \
 	$(EMUIMAGEDEV)/cartslot.o   \
@@ -165,10 +165,10 @@ EMUIMAGEDEVOBJS = \
 
 
 EMUVIDEOOBJS = \
-	$(EMUVIDEO)/generic.o   	\
-	$(EMUVIDEO)/resnet.o    	\
-	$(EMUVIDEO)/rgbutil.o   	\
-	$(EMUVIDEO)/vector.o		\
+	$(EMUVIDEO)/generic.o       \
+	$(EMUVIDEO)/resnet.o        \
+	$(EMUVIDEO)/rgbutil.o       \
+	$(EMUVIDEO)/vector.o        \
 
 
 LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS) $(EMUVIDEOOBJS)

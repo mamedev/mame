@@ -19,7 +19,7 @@ public:
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom) { return m_rom[offset]; }
 };
@@ -31,7 +31,7 @@ class gba_rom_sram_device : public gba_rom_device
 public:
 	// construction/destruction
 	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
@@ -44,11 +44,11 @@ class gba_rom_flash_device : public gba_rom_device
 public:
 	// construction/destruction
 	gba_rom_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
@@ -66,15 +66,15 @@ class gba_rom_flash1m_device : public gba_rom_device
 public:
 	// construction/destruction
 	gba_rom_flash1m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
-	
+
 private:
 	//UINT32 m_flash_size;
 	UINT32 m_flash_mask;
@@ -115,7 +115,7 @@ protected:
 	int m_bits;
 	int m_addr_bits;
 	UINT8 m_eep_data;
-	
+
 	running_machine& m_machine;
 };
 
@@ -127,10 +127,10 @@ class gba_rom_eeprom_device : public gba_rom_device
 public:
 	// construction/destruction
 	gba_rom_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
@@ -147,14 +147,14 @@ class gba_rom_eeprom64_device : public gba_rom_device
 public:
 	// construction/destruction
 	gba_rom_eeprom64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ram);
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
-	
+
 private:
 	gba_eeprom_device *m_eeprom;
 };

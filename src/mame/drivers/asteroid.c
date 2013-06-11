@@ -392,7 +392,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aerolitos )
 	PORT_INCLUDE( asteroid )
-	
+
 	PORT_MODIFY("DSW1") // this bootleg was for the Spanish market, so set it to Spanish by default
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING (   0x00, DEF_STR( English ) )

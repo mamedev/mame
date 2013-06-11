@@ -4,11 +4,11 @@
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
 
-#define MCFG_MPEG573_ADD(_tag, _clock, _output_cb )	\
+#define MCFG_MPEG573_ADD(_tag, _clock, _output_cb ) \
 	MCFG_DEVICE_ADD(_tag, MPEG573, _clock) \
 	downcast<mpeg573_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
 
-#define MCFG_MPEG573_OUTPUT_CALLBACK( _output_cb )	\
+#define MCFG_MPEG573_OUTPUT_CALLBACK( _output_cb )  \
 	downcast<mpeg573_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
 
 class mpeg573_device : public device_t

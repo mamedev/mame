@@ -61,7 +61,7 @@ void s3c44b0_device::device_config_complete()
 	const s3c44b0_interface *intf = reinterpret_cast<const s3c44b0_interface *>(static_config());
 	if (intf != NULL)
 		*static_cast<s3c44b0_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -83,8 +83,8 @@ void s3c44b0_device::device_start()
 	m_sda_w.resolve(i2c_itf.sda_w, *this);
 	m_adc_data_r.resolve(adc_itf.data_r, *this);
 	m_i2s_data_w.resolve(i2s_itf.data_w, *this);
-	
-	
+
+
 	for (int i = 0; i < 6; i++) m_pwm.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::pwm_timer_exp),this));
 	for (int i = 0; i < 2; i++) m_uart[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::uart_timer_exp),this));
 	for (int i = 0; i < 2; i++) m_zdma[i].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(s3c44b0_device::zdma_timer_exp),this));
@@ -114,12 +114,12 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_irq.regs.f_ispc));
 	save_item(NAME(m_irq.line_irq));
 	save_item(NAME(m_irq.line_fiq));
-	
+
 	save_item(NAME(m_clkpow.regs.pllcon));
 	save_item(NAME(m_clkpow.regs.clkcon));
 	save_item(NAME(m_clkpow.regs.clkslow));
 	save_item(NAME(m_clkpow.regs.locktime));
-	
+
 	// FIXME: how to save m_lcd.bitmap which gets allocated/freed during emulation?
 	save_item(NAME(m_lcd.regs.lcdcon1));
 	save_item(NAME(m_lcd.regs.lcdcon2));
@@ -149,9 +149,9 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_lcd.vpos_max));
 	save_item(NAME(m_lcd.vpos_end));
 	save_item(NAME(m_lcd.frame_time));
-	
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(s3c44b0_device::s3c44b0_postload), this));
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_zdma[i].regs.dcon), i);
@@ -161,7 +161,7 @@ void s3c44b0_device::device_start()
 		save_item(NAME(m_zdma[i].regs.dcsrc), i);
 		save_item(NAME(m_zdma[i].regs.dcdst), i);
 		save_item(NAME(m_zdma[i].regs.dccnt), i);
-		
+
 		save_item(NAME(m_bdma[i].regs.dcon), i);
 		save_item(NAME(m_bdma[i].regs.disrc), i);
 		save_item(NAME(m_bdma[i].regs.didst), i);
@@ -169,7 +169,7 @@ void s3c44b0_device::device_start()
 		save_item(NAME(m_bdma[i].regs.dcsrc), i);
 		save_item(NAME(m_bdma[i].regs.dcdst), i);
 		save_item(NAME(m_bdma[i].regs.dccnt), i);
-		
+
 		save_item(NAME(m_uart[i].regs.ulcon), i);
 		save_item(NAME(m_uart[i].regs.ucon), i);
 		save_item(NAME(m_uart[i].regs.ufcon), i);
@@ -182,13 +182,13 @@ void s3c44b0_device::device_start()
 		save_item(NAME(m_uart[i].regs.urxh), i);
 		save_item(NAME(m_uart[i].regs.ubrdiv), i);
 	}
-	
+
 	save_item(NAME(m_sio.regs.siocon));
 	save_item(NAME(m_sio.regs.siodat));
 	save_item(NAME(m_sio.regs.sbrdr));
 	save_item(NAME(m_sio.regs.itvcnt));
 	save_item(NAME(m_sio.regs.dcntz));
-	
+
 	save_item(NAME(m_pwm.regs.tcfg0));
 	save_item(NAME(m_pwm.regs.tcfg1));
 	save_item(NAME(m_pwm.regs.tcon));
@@ -212,17 +212,17 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_pwm.cnt));
 	save_item(NAME(m_pwm.cmp));
 	save_item(NAME(m_pwm.freq));
-	
+
 	save_item(NAME(m_wdt.regs.wtcon));
 	save_item(NAME(m_wdt.regs.wtdat));
 	save_item(NAME(m_wdt.regs.wtcnt));
-	
+
 	save_item(NAME(m_iic.regs.iiccon));
 	save_item(NAME(m_iic.regs.iicstat));
 	save_item(NAME(m_iic.regs.iicadd));
 	save_item(NAME(m_iic.regs.iicds));
 	save_item(NAME(m_iic.count));
-	
+
 	save_item(NAME(m_iis.regs.iiscon));
 	save_item(NAME(m_iis.regs.iismod));
 	save_item(NAME(m_iis.regs.iispsr));
@@ -230,7 +230,7 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_iis.regs.iisfifo));
 	save_item(NAME(m_iis.fifo));
 	save_item(NAME(m_iis.fifo_index));
-	
+
 	save_item(NAME(m_gpio.regs.gpacon));
 	save_item(NAME(m_gpio.regs.gpadat));
 	save_item(NAME(m_gpio.regs.gpbcon));
@@ -253,11 +253,11 @@ void s3c44b0_device::device_start()
 	save_item(NAME(m_gpio.regs.spucr));
 	save_item(NAME(m_gpio.regs.extint));
 	save_item(NAME(m_gpio.regs.extintpnd));
-	
+
 	save_item(NAME(m_adc.regs.adccon));
 	save_item(NAME(m_adc.regs.adcpsr));
 	save_item(NAME(m_adc.regs.adcdat));
-	
+
 	save_item(NAME(m_cpuwrap.regs.syscfg));
 	save_item(NAME(m_cpuwrap.regs.ncachbe0));
 	save_item(NAME(m_cpuwrap.regs.ncachbe1));
