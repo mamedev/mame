@@ -268,8 +268,10 @@ void ide_controller_device::security_error()
 
 void ide_controller_device::read_buffer_empty()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* reset the totals */
-	buffer_offset = 0;
+	dev->buffer_offset = 0;
 
 	/* clear the buffer ready and busy flag */
 	status &= ~IDE_STATUS_BUFFER_READY;
@@ -305,8 +307,9 @@ void ide_controller_device::read_sector_done()
 		status &= ~IDE_STATUS_BUSY;
 		return;
 	}
+
 	/* now do the read */
-	count = dev->read_sector(lba, buffer);
+	count = dev->read_sector(lba, dev->buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
 	if (!verify_only)
@@ -413,8 +416,10 @@ void ide_controller_device::read_next_sector()
 
 void ide_controller_device::continue_write()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* reset the totals */
-	buffer_offset = 0;
+	dev->buffer_offset = 0;
 
 	/* clear the buffer ready flag */
 	status &= ~IDE_STATUS_BUFFER_READY;
@@ -448,12 +453,12 @@ void ide_controller_device::write_buffer_full()
 	set_dmarq(0);
 	if (command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
-		if (user_password_enable && memcmp(buffer, user_password, 2 + 32) == 0)
+		if (user_password_enable && memcmp(dev->buffer, user_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked user password\n"));
 			user_password_enable = 0;
 		}
-		if (master_password_enable && memcmp(buffer, master_password, 2 + 32) == 0)
+		if (master_password_enable && memcmp(dev->buffer, master_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked master password\n"));
 			master_password_enable = 0;
@@ -467,8 +472,8 @@ void ide_controller_device::write_buffer_full()
 				if (i % 8 == 2)
 					mame_printf_debug("\n");
 
-				mame_printf_debug("0x%02x, 0x%02x, ", buffer[i], buffer[i + 1]);
-				//mame_printf_debug("0x%02x%02x, ", buffer[i], buffer[i + 1]);
+				mame_printf_debug("0x%02x, 0x%02x, ", dev->buffer[i], dev->buffer[i + 1]);
+				//mame_printf_debug("0x%02x%02x, ", dev->buffer[i], dev->buffer[i + 1]);
 			}
 			mame_printf_debug("\n");
 		}
@@ -490,7 +495,7 @@ void ide_controller_device::write_buffer_full()
 		dev->read_key(key);
 
 		for (i=0; !bad && i<512; i++)
-			bad = ((i < 2 || i >= 7) && buffer[i]) || ((i >= 2 && i < 7) && buffer[i] != key[i-2]);
+			bad = ((i < 2 || i >= 7) && dev->buffer[i]) || ((i >= 2 && i < 7) && dev->buffer[i] != key[i-2]);
 
 		status &= ~IDE_STATUS_BUSY;
 		status &= ~IDE_STATUS_BUFFER_READY;
@@ -514,7 +519,7 @@ void ide_controller_device::write_sector_done()
 	int lba = dev->lba_address(), count = 0;
 
 	/* now do the write */
-	count = dev->write_sector(lba, buffer);
+	count = dev->write_sector(lba, dev->buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
 	status |= IDE_STATUS_BUFFER_READY;
@@ -592,7 +597,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 1;
 			dma_active = 0;
 			verify_only = 0;
@@ -606,7 +611,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 1;
 			dma_active = 0;
 			verify_only = 0;
@@ -621,7 +626,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 1;
 			dma_active = 0;
 			verify_only = 1;
@@ -635,7 +640,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = sector_count;
 			dma_active = 1;
 			verify_only = 0;
@@ -650,7 +655,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 1;
 			dma_active = 0;
 
@@ -663,7 +668,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 1;
 			dma_active = 0;
 
@@ -676,7 +681,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = sector_count;
 			dma_active = 1;
 
@@ -688,7 +693,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE Security Unlock\n"));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 0;
 			dma_active = 0;
 
@@ -701,11 +706,11 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE Read features\n"));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sector_count = 1;
 
 			/* build the features page */
-			memcpy(buffer, slot[cur_drive]->dev()->get_features(), sizeof(buffer));
+			memcpy(dev->buffer, slot[cur_drive]->dev()->get_features(), sizeof(dev->buffer));
 
 			/* indicate everything is ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -796,7 +801,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE GNET Unlock 2\n"));
 
 			/* reset the buffer */
-			buffer_offset = 0;
+			dev->buffer_offset = 0;
 			sectors_until_int = 0;
 			dma_active = 0;
 
@@ -909,10 +914,10 @@ UINT16 ide_controller_device::read_dma()
 	if (dev == NULL)
 		return 0;
 
-	UINT16 result = buffer[buffer_offset++];
-	result |= buffer[buffer_offset++] << 8;
+	UINT16 result = dev->buffer[dev->buffer_offset++];
+	result |= dev->buffer[dev->buffer_offset++] << 8;
 
-	if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+	if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 	{
 		LOG(("%s:IDE completed DMA read\n", machine().describe_context()));
 		read_buffer_empty();
@@ -950,12 +955,12 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 			if (status & IDE_STATUS_BUFFER_READY)
 			{
 				/* fetch the correct amount of data */
-				result = buffer[buffer_offset++];
+				result = dev->buffer[dev->buffer_offset++];
 				if (mem_mask == 0xffff)
-					result |= buffer[buffer_offset++] << 8;
+					result |= dev->buffer[dev->buffer_offset++] << 8;
 
 				/* if we're at the end of the buffer, handle it */
-				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+				if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
 					LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
 					read_buffer_empty();
@@ -1125,11 +1130,13 @@ WRITE16_MEMBER( ide_controller_device::write_cs0_pc )
 
 void ide_controller_device::write_dma( UINT16 data )
 {
-	buffer[buffer_offset++] = data;
-	buffer[buffer_offset++] = data >> 8;
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
+	dev->buffer[dev->buffer_offset++] = data;
+	dev->buffer[dev->buffer_offset++] = data >> 8;
 
 	/* if we're at the end of the buffer, handle it */
-	if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+	if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 	{
 		LOG(("%s:IDE completed DMA write\n", machine().describe_context()));
 		write_buffer_full();
@@ -1162,12 +1169,12 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 			if (status & IDE_STATUS_BUFFER_READY)
 			{
 				/* store the correct amount of data */
-				buffer[buffer_offset++] = data;
+				dev->buffer[dev->buffer_offset++] = data;
 				if (mem_mask == 0xffff)
-					buffer[buffer_offset++] = data >> 8;
+					dev->buffer[dev->buffer_offset++] = data >> 8;
 
 				/* if we're at the end of the buffer, handle it */
-				if (buffer_offset >= IDE_DISK_SECTOR_SIZE)
+				if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
 					LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
 					write_buffer_full();
@@ -1264,7 +1271,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 	command(0),
 	interrupt_pending(0),
 	precomp_offset(0),
-	buffer_offset(0),
 	sector_count(0),
 	block_count(0),
 	sectors_until_int(0),
@@ -1291,7 +1297,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	command(0),
 	interrupt_pending(0),
 	precomp_offset(0),
-	buffer_offset(0),
 	sector_count(0),
 	block_count(0),
 	sectors_until_int(0),
@@ -1332,8 +1337,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(interrupt_pending));
 	save_item(NAME(precomp_offset));
 
-	save_item(NAME(buffer));
-	save_item(NAME(buffer_offset));
 	save_item(NAME(sector_count));
 
 	save_item(NAME(block_count));
@@ -1357,12 +1360,14 @@ void ide_controller_device::device_start()
 
 void ide_controller_device::device_reset()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	LOG(("IDE controller reset performed\n"));
 	/* reset the drive state */
 	cur_drive = 0;
 	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 	error = IDE_ERROR_DEFAULT;
-	buffer_offset = 0;
+	dev->buffer_offset = 0;
 	gnetreadlock = 0;
 	master_password_enable = (master_password != NULL);
 	user_password_enable = (user_password != NULL);

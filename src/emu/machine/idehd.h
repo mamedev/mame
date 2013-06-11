@@ -28,6 +28,9 @@ public:
 	UINT8           cur_head_reg;
 	UINT32          cur_lba;
 
+	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
+	UINT16          buffer_offset;
+
 protected:
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;

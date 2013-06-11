@@ -134,8 +134,6 @@ private:
 	UINT8           interrupt_pending;
 	UINT8           precomp_offset;
 
-	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
-	UINT16          buffer_offset;
 	UINT16          sector_count;
 
 	UINT16          block_count;

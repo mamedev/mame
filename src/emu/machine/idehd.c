@@ -247,6 +247,9 @@ void ide_hdd_device::device_start()
 	save_item(NAME(cur_head_reg));
 
 	save_item(NAME(cur_lba));
+
+	save_item(NAME(buffer));
+	save_item(NAME(buffer_offset));
 }
 
 //-------------------------------------------------
