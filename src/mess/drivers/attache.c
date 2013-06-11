@@ -44,9 +44,7 @@
  *
  *  TODO:
  *    - Keyboard repeat
- *    - Get FDC/DMA transfers working
  *    - Get at least some of the system tests to pass
- *    - Add graphics support
  *    - and probably lots more I've forgotten, too.
  *
  */
@@ -64,7 +62,6 @@
 #include "video/tms9927.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "debugger.h"
 
 class attache_state : public driver_device
 {
@@ -435,7 +432,7 @@ void attache_state::keyboard_clock_w(bool state)
 	m_kb_clock = state;
 }
 
-// TODO: Figure out exactly how the HLD, RD, WR and CS lines are hooked up
+// TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
 READ8_MEMBER(attache_state::pio_portA_r)
 {
 	UINT8 ret = 0xff;
@@ -505,16 +502,16 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		break;
 	case PIO_SEL_5832_WRITE:
 		m_rtc->cs_w(1);
-		m_rtc->write_w(0);
-		m_rtc->read_w(1);
+		m_rtc->write_w(1);
+		m_rtc->read_w(0);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		m_rtc->data_w(space,0,data & 0x0f);
 		logerror("RTC: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
 		m_rtc->cs_w(1);
-		m_rtc->write_w(0);
-		m_rtc->read_w(1);
+		m_rtc->write_w(1);
+		m_rtc->read_w(0);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		logerror("RTC: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;
