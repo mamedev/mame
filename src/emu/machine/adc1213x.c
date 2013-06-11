@@ -59,6 +59,7 @@ adc12138_device::adc12138_device(const machine_config &mconfig, device_type type
 {
 }
 
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -85,6 +86,15 @@ void adc12138_device::device_config_complete()
 
 void adc12138_device::device_start()
 {
+	m_cycle = 0;
+	m_data_out = 0;
+	m_data_in = 0;
+	m_auto_cal = 0;
+	m_auto_zero = 0;
+	m_input_shift_reg = 0;
+	m_output_shift_reg = 0;
+	m_end_conv = 0;
+
 	/* resolve callbacks */
 	m_input_callback_r_func = input_callback_r;
 
@@ -97,7 +107,6 @@ void adc12138_device::device_start()
 	save_item(NAME(m_auto_zero));
 	save_item(NAME(m_acq_time));
 	save_item(NAME(m_data_out_sign));
-	save_item(NAME(m_mode));
 	save_item(NAME(m_input_shift_reg));
 	save_item(NAME(m_output_shift_reg));
 	save_item(NAME(m_end_conv));

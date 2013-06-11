@@ -61,7 +61,6 @@ protected:
 	int m_auto_zero;
 	int m_acq_time;
 	int m_data_out_sign;
-	int m_mode;
 	int m_input_shift_reg;
 	int m_output_shift_reg;
 	int m_end_conv;
