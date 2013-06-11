@@ -3895,10 +3895,31 @@ ROM_START( asideral )
 	ROM_LOAD( "u9.l2",     0x1000, 0x0800, CRC(fc8b58fd) SHA1(72553e2735b0dcc2dcfce9698d49566732492588) )
 	ROM_LOAD( "u11.l2",    0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // which PROM should we be using, the one from the bootlegs or the original UniWarS one, the gfx roms are the same as the original.
-//  ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "uniwars.clr",  0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
 ROM_END
+
+ROM_START( pajaroes ) // VERY similar to the asideral set
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "pea.rom",  0x0000, 0x0800, CRC(82a9da91) SHA1(864127f73b4a78435766ff70010663c4d789c472) )
+	ROM_LOAD( "peb.rom",  0x0800, 0x0800, CRC(cc59b49c) SHA1(13f6cb3a979f1b9baa4fd07c3e36c17ad8e69b5f) )
+	ROM_LOAD( "pec.rom",  0x1000, 0x0800, CRC(3bc5a165) SHA1(0ad0247f6499170a828bf343f7710c1036b241a7) )
+	ROM_LOAD( "ped.rom",  0x1800, 0x0800, CRC(c50149d0) SHA1(4007d7c07fe2742d67d2041b4b3c2f3fcaedbc8b) )
+	ROM_LOAD( "pe05.rom", 0x2000, 0x0800, CRC(cb461871) SHA1(3865f3b7f47f314a097dddfcc49929bb63afd4fc) )
+	ROM_LOAD( "pe04.rom", 0x2800, 0x0800, CRC(f157a8db) SHA1(75fa76d5dad149502c25d191053041a52dd1562e) )
+	ROM_LOAD( "pe03.rom", 0x3000, 0x0800, CRC(75085cb6) SHA1(92c4f375352685ec670b0aa96becce064c5d9bce) )
+	ROM_LOAD( "pe02.rom", 0x3800, 0x0800, BAD_DUMP CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) ) // was missing, assuming it's the same as asideral for now
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pe07.rom",    0x0000, 0x0800, CRC(012941e0) SHA1(4f7ec4d95939cb7c4086bb7df43759ac504ae47c) )
+	ROM_LOAD( "pe09.rom",    0x0800, 0x0800, CRC(c26132af) SHA1(7ae125a911dfd47aeca4f129f580762ce4d8d91a) )
+	ROM_LOAD( "pe06.rom",    0x1000, 0x0800, CRC(fc8b58fd) SHA1(72553e2735b0dcc2dcfce9698d49566732492588) )
+	ROM_LOAD( "pe08.rom",    0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // wasn't in the set
+	ROM_LOAD( "uniwars.clr",  0x0000, 0x0020, CRC(25c79518) SHA1(e8f7e8b3d0cf1ed9d723948548f58abf0e2c6d1f) )
+ROM_END
+
 
 
 ROM_START( spacbatt )
@@ -6941,7 +6962,7 @@ GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, galaxian_state, pisces,   RO
 GAME( 1980, skyraidr, uniwars,  galaxian, superg, galaxian_state,   pisces,   ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, galemp,   uniwars,  galaxian, superg, galaxian_state,   pisces,   ROT90,  "bootleg (Taito do Brasil)", "Galaxy Empire (bootleg?)", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
 GAME( 1980, asideral, uniwars,  galaxian, asideral, galaxian_state, pisces,   ROT90,  "bootleg (Electrogame S.A.)", "Ataque Sideral (Spanish bootleg of UniWar S)", GAME_SUPPORTS_SAVE )
-
+GAME( 1980, pajaroes, uniwars,  galaxian, asideral, galaxian_state, pisces,   ROT90,  "bootleg (PSV S.A.)", "Pajaro del Espacio (Spanish bootleg of UniWar S)", GAME_SUPPORTS_SAVE ) // very similar to above
 
 
 /* Artic Multi-System games - separate tile/sprite ROMs */
