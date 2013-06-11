@@ -440,6 +440,12 @@ ifneq ($(BUILD_JPEGLIB),1)
 DEFS += -DUSE_SYSTEM_JPEGLIB
 endif
 
+# disable initialization of memory in malloc overload
+ifdef SANITIZE
+ifneq (,$(findstring memory,$(SANITIZE)))
+DEFS += -DNO_MEMORY_INITIALIZATION
+endif
+endif
 
 
 #-------------------------------------------------
@@ -535,6 +541,11 @@ ifdef SANITIZE
 CCOMFLAGS += -fsanitize=$(SANITIZE)
 ifneq (,$(findstring thread,$(SANITIZE)))
 CCOMFLAGS += -fPIE
+endif
+ifneq (,$(findstring memory,$(SANITIZE)))
+ifneq (,$(findstring clang,$(CC)))
+CCOMFLAGS += -fsanitize-memory-track-origins
+endif
 endif
 endif
 
