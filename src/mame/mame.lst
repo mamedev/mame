@@ -5462,7 +5462,7 @@ csweetht        // 19         Sweet Heart
 ctornado        // 20 1982.05 Tornado
 cmissnx         // 21 1982.04 Mission-X/Zoar
 cptennis        // 22 1982.06 Pro Tennis
-				// 23 1982.?? 18 Hole Pro Golf
+cprogolf18		// 23 1982.?? 18 Hole Pro Golf
 				// 24 1982.07 Tsumego Kaisyou
 cadanglr        // 25 1982.10 Angler Dangler
 cfishing        // 25 1982.10 Fishing
@@ -30631,3 +30631,5 @@ bingomana
 
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
+
+
