@@ -2145,6 +2145,7 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_DRIVERS)/ti99_2.o    \
 	$(MESS_VIDEO)/avigo.o       \
 	$(MESS_DRIVERS)/avigo.o     \
+	$(MESS_DRIVERS)/evmbug.o    \
 
 $(MESSOBJ)/tiger.a:             \
 	$(MESS_DRIVERS)/gamecom.o   \
