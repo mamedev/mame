@@ -253,6 +253,10 @@ void galaxian_state::palette_init()
 	            -- 470 ohm resistor  -- RED
 	      bit 0 -- 1  kohm resistor  -- RED
 
+	    Note that not all boards have this configuration. Namco PCBs may
+	    have 330 ohm resistors instead of 220, but the default setup has
+	    also been used by Namco.
+	    
 	    In parallel with these resistors are a pair of 150 ohm and 100 ohm
 	    resistors on each R,G,B component that are connected to the star
 	    generator.
