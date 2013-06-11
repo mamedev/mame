@@ -106,7 +106,7 @@ To Do:
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 #include "machine/microtch.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/nvram.h"
 
 /***************************************************************************
@@ -125,13 +125,15 @@ public:
 		m_microtouch(*this,"microtouch"),
 		m_regs(*this, "regs"),
 		m_galgames_ram(*this, "galgames_ram"),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_duart(*this, "duart68681"){ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_device> m_microtouch;
+	optional_device<microtouch_serial_device> m_microtouch;
 	required_shared_ptr<UINT16> m_regs;
 	optional_shared_ptr<UINT16> m_galgames_ram;
 	required_device<okim6295_device> m_oki;
+	optional_device<duartn68681_device> m_duart;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
@@ -145,9 +147,8 @@ public:
 	UINT32 m_palette_offset;
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];
-	device_t *m_duart68681;
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_READ16_MEMBER(rtc_r);
 	DECLARE_WRITE16_MEMBER(rtc_w);
 	DECLARE_WRITE16_MEMBER(tmaster_color_w);
@@ -222,25 +223,10 @@ WRITE16_MEMBER(tmaster_state::tmaster_oki_bank_w)
 
 ***************************************************************************/
 
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
 {
-	tmaster_state *drvstate = device->machine().driver_data<tmaster_state>();
-	drvstate->m_maincpu->set_input_line_and_vector(4, state, vector);
+	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
 };
-
-static void duart_tx(device_t *device, int channel, UINT8 data)
-{
-	tmaster_state *state = device->machine().driver_data<tmaster_state>();
-	if ( channel == 0 )
-	{
-		state->m_microtouch->rx(device->machine().driver_data()->generic_space(), 0, data);
-	}
-};
-
-WRITE8_MEMBER( tmaster_state::microtouch_tx )
-{
-	duart68681_rx_data(m_duart68681, 0, data);
-}
 
 /***************************************************************************
 
@@ -545,7 +531,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ(tmaster_coins_r )
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
 
 	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE(tmaster_oki_bank_w )
 
@@ -899,7 +885,6 @@ MACHINE_RESET_MEMBER(tmaster_state,tmaster)
 	m_gfx_offs = 0;
 	m_gfx_size = memregion("blitter")->bytes();
 
-	m_duart68681 = machine().device( "duart68681" );
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
@@ -914,12 +899,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
 	// lev 2 triggered at the end of the blit
 }
 
-static const duart68681_config tmaster_duart68681_config =
+static const duartn68681_config tmaster_duart68681_config =
 {
-	duart_irq_handler,
-	duart_tx,
-	NULL,
-	NULL
+	DEVCB_DRIVER_LINE_MEMBER(tmaster_state, duart_irq_handler),
+	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( tm3k, tmaster_state )
@@ -929,8 +915,8 @@ static MACHINE_CONFIG_START( tm3k, tmaster_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
-	MCFG_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
-	MCFG_MICROTOUCH_ADD( "microtouch", WRITE8(tmaster_state, microtouch_tx) )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
