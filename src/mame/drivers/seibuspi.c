@@ -52,6 +52,7 @@ TODO:
 - Improve alpha blending. In Viper Phase 1, see the blue "Viper" logo when on the
   "push 1 or 2 players button" screen. Note that the alpha blended red logo on the
   title screen is tiles(that effect is emulated), this blue logo is sprites.
+  The current implementation is a crude hack.
 
 */
 

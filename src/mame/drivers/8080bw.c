@@ -3024,7 +3024,8 @@ INPUT_PORTS_END
   Not much information is available for this game.
   It may have had an amber monitor?
 
-  XTAL 20MHz
+  20MHz XTAL, 2MHz CPU
+  video: 15625Hz
 
   TODO: sound
 
@@ -3032,11 +3033,11 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( attackfc_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_WRITENOP
+	AM_RANGE(0x02, 0x02) AM_WRITENOP // lamp?
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("mb14241", mb14241_device, shift_result_r, shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_WRITENOP
-	AM_RANGE(0x05, 0x05) AM_WRITENOP
-	AM_RANGE(0x06, 0x06) AM_WRITENOP
+	AM_RANGE(0x04, 0x04) AM_WRITENOP // coinlock?
+	AM_RANGE(0x05, 0x05) AM_WRITENOP // sound?
+	AM_RANGE(0x06, 0x06) AM_WRITENOP // sound?
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
 ADDRESS_MAP_END
 

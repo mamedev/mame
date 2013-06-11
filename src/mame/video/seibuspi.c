@@ -492,9 +492,9 @@ VIDEO_START_MEMBER(seibuspi_state,spi)
 	int i;
 	int region_length;
 
-	m_text_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8,64,32 );
+	m_text_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
 	m_back_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_back_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
-	m_mid_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
+	m_mid_layer     = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_mid_tile_info), this), TILEMAP_SCAN_COLS,  16,16,32,32 );
 	m_fore_layer    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seibuspi_state::get_fore_tile_info),this), TILEMAP_SCAN_COLS,  16,16,32,32 );
 
 	m_text_layer->set_transparent_pen(31);
@@ -549,29 +549,6 @@ VIDEO_START_MEMBER(seibuspi_state,spi)
 		m_bg_fore_layer_position = 0x8000;
 	}
 }
-
-#ifdef UNUSED_FUNCTION
-void seibuspi_state::set_rowscroll(tilemap_t *layer, int scroll, INT16* rows)
-{
-	int i;
-	int x = m_scrollram[scroll] & 0xffff;
-	int y = (m_scrollram[scroll] >> 16) & 0xffff;
-	layer->set_scroll_rows(512);
-	for( i=0; i < 512; i++ )
-	{
-		layer->set_scrollx(i, x + rows[i]);
-	}
-	layer->set_scrolly(0, y);
-}
-
-void seibuspi_state::set_scroll(tilemap_t *layer, int scroll)
-{
-	int x = m_scrollram[scroll] & 0xffff;
-	int y = (m_scrollram[scroll] >> 16) & 0xffff;
-	layer->set_scrollx(0, x);
-	layer->set_scrolly(0, y);
-}
-#endif
 
 
 void seibuspi_state::combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll)
