@@ -119,7 +119,9 @@ static const pia6821_interface poly_pia0_intf=
 READ8_MEMBER( poly_state::pia1_b_in )
 {
 // return ascii key value, bit 7 is the strobe value
-	return m_term_data;
+	UINT8 data = m_term_data;
+	m_term_data &= 0x7f;
+	return data;
 }
 
 READ_LINE_MEMBER( poly_state::pia1_cb1_in )
@@ -193,18 +195,12 @@ static SAA5050_INTERFACE( poly_saa5050_intf )
 	40, 24, 40  /* x, y, size */
 };
 
-// temporary hack
 WRITE8_MEMBER( poly_state::kbd_put )
 {
-	m_term_data = data;
+	m_term_data = data | 0x80;
 
-	//m_pia1->cb1_w(1);
-	//m_pia1->cb1_w(0);
-	//m_term_key = 1;
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	mem.write_byte(0xebec, data); // bios 0
-	mem.write_byte(0xebf1, data); // bios 1
-	mem.write_byte(0xebd0, 1); // any non-zero here
+	m_pia1->cb1_w(1);
+	m_pia1->cb1_w(0);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
@@ -238,7 +234,6 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_ACIA6850_ADD("acia", acia_intf)
 	MCFG_MC6854_ADD("adlc", adlc_intf)
 
-	// temporary hack
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
