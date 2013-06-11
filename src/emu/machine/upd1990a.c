@@ -46,15 +46,14 @@ const device_type UPD4990A = &device_creator<upd4990a_device>;
 //  upd1990a_device - constructor
 //-------------------------------------------------
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		m_write_data(*this),
 		m_write_tp(*this),
 		m_data_out(0),
 		m_c(0),
-		m_clk(0),
-		m_variant(variant)
+		m_clk(0)
 {
 }
 
@@ -65,13 +64,12 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag,
 		m_write_tp(*this),
 		m_data_out(0),
 		m_c(0),
-		m_clk(0),
-		m_variant(TYPE_1990A)
+		m_clk(0)
 {
 }
 
 upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd1990a_device(mconfig, UPD4990A, "uPD4990A", tag, owner, clock, TYPE_4990A) { }
+	: upd1990a_device(mconfig, UPD4990A, "uPD4990A", tag, owner, clock) { }
 
 
 //-------------------------------------------------
