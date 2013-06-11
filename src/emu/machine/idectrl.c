@@ -904,6 +904,11 @@ READ16_MEMBER( ide_controller_device::read_cs0_pc )
 
 UINT16 ide_controller_device::read_dma()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
+	if (dev == NULL)
+		return 0;
+
 	UINT16 result = buffer[buffer_offset++];
 	result |= buffer[buffer_offset++] << 8;
 
@@ -935,10 +940,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	}
 	else
 	{
-		/* even a do-nothing operation should take a little time */
-
-		status ^= IDE_STATUS_BUSY;
-		return status;
+		return 0;
 	}
 
 	switch (offset)
@@ -1043,10 +1045,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	}
 	else
 	{
-		/* even a do-nothing operation should take a little time */
-
-		status ^= IDE_STATUS_BUSY;
-		return status;
+		return 0;
 	}
 
 	/* logit */
