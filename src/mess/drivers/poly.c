@@ -21,9 +21,7 @@
     - Almost Everything!
     - Connect up the device ports & lines
     - Find out about graphics mode and how it is selected
-    - There is a beeper or speaker connected to the 6840 - how?
     - Fix Keyboard so that the Enter key tells BASIC to do something
-    - Fix If ^G is pressed, the system pauses for about 30 seconds.
     - Find out how to make 2nd teletext screen to display
 
 ****************************************************************************/
@@ -37,6 +35,8 @@
 #include "machine/mc6854.h"
 #include "video/saa5050.h"
 #include "machine/keyboard.h"
+#include "sound/speaker.h"
+
 
 
 class poly_state : public driver_device
@@ -47,13 +47,16 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_pia0(*this, "pia0"),
 			m_pia1(*this, "pia1"),
+			m_speaker(*this, "speaker"),
 			m_videoram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
+	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<UINT8> m_videoram;
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(pia1_b_in);
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
@@ -142,14 +145,19 @@ static const pia6821_interface poly_pia1_intf=
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
+WRITE_LINE_MEMBER( poly_state::speaker_w )
+{
+	m_speaker->level_w(state);
+}
+
 static const ptm6840_interface poly_ptm_intf =
 {
 	XTAL_12MHz / 3,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL },
-	DEVCB_NULL
+		DEVCB_DEVICE_LINE_MEMBER("ptm", ptm6840_device, set_c1),
+		DEVCB_DRIVER_LINE_MEMBER(poly_state, speaker_w) },
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
 static ACIA6850_INTERFACE( acia_intf )
@@ -209,7 +217,6 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12MHz / 3) // 12.0576MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -217,6 +224,11 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_SAA5050_ADD("saa5050", 6000000, poly_saa5050_intf)
@@ -253,5 +265,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981,  poly1,  0,      0,       poly,      poly, driver_device,    0,      "Polycorp",  "Poly-1 Educational Computer", GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY     FULLNAME       FLAGS */
+COMP( 1981,  poly1,  0,      0,       poly,      poly, driver_device,    0,   "Polycorp", "Poly-1 Educational Computer", GAME_NOT_WORKING )
