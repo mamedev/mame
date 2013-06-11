@@ -717,8 +717,6 @@ default: maketree buildtools emulator
 
 all: default tools
 
-tests: maketree jedutil$(EXE) chdman$(EXE)
-
 7Z_LIB = $(OBJ)/lib7z.a
 
 #-------------------------------------------------
