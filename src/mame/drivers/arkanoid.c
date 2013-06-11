@@ -2,11 +2,7 @@
 
     Arkanoid driver
 
-    - I think the MCU dump we're using with the original sets is actually
-      from a bootleg?  It's similar to the ones dumped from other bootlegs
-      and the 2/3 of the decapped MCUs appear to be very different.  Another
-      bootleg had a dump very similar to the fresh decaps instead.  This
-      needs sorting out properly.  The hookups for the different types of MCU
+    - MCU hookup needs sorting out properly.  The hookups for the different types
       is not identical.
 
     Japanese version support cocktail mode (DSW #7), the others don't.
@@ -44,6 +40,221 @@ Measured Clocks:
 M68705 - 2998533Hz (3Mhz)
 YM2149 - 2998531Hz (3Mhz)
 
+
+****************************************************************************
+
+Guru's readme
+
+Arkanoid
+Taito 1986
+
+PCB Layout
+----------
+
+Note an original Taito Arkanoid PCB is approximately 10" square and is
+painted white. The copper traces are not visible. The part type and
+location of each component is printed in green on the PCB on top of the 
+white paint.
+
+The following MCU images were tested on an original Arkanoid PCB using sets
+'arkanoid', 'arkanoidu' and 'arkanoiduo' and work as expected.
+(1) MCU image with CRC 0x389a8cfb
+(2) MCU image with CRC 0x515d77b6
+
+An MCU found on a Tournament Arkanoid PCB was an unprotected type MC68705P3 
+and when read the CRC matched (1). So we can assume the MCUs for Arkanoid and 
+Tournament Arkanoid are the same.... or are at least interchangeable and work.
+
+"Tetris (D.R. Korea)" in MAME is a hack on an original Arkanoid PCB. 
+The hack can be undone and returned to Arkanoid simply by removing the mod 
+wires on the YM2149, replacing the ROMs with Arkanoid ROMs and replacing 
+the PC030CM which was removed. A working Arkanoid 68705 MCU is also required.
+The above 'tested' images can be used.
+
+
+J1100075A
+K1100180A
+K1100181A (ROMSTAR version added sticker)
+  |---------------------------------------------|
+  |                VOLUME  TL7700   TMM2018     |
+|-|         MB3731                              |
+|                                               |
+|P                                              |
+|O                                              |
+|W          DSWA(8)  A75-09.IC22                |
+|E                                              |
+|R         YM2149F   A75-08.IC23                |
+|                                               |
+|-|                  A75-07.IC24                |
+  |                                             |
+  |                                             |
+|-|                                 TMM2016     |
+|                                               |
+|          PC030CM                  TMM2016     |
+|                                               |
+|               JP4 JP3                         |
+|2                                              |
+|2         A75_06.IC14                          |
+|W 48CR-1                                       |
+|A                                              |
+|Y                                              |
+|          TMM2016                         12MHz|
+|  48CR-1                                       |
+|  48CR-1  A75_10.IC16    A75_05.IC62  MB112S146|
+|                                               |
+|-|        A75_01-1.IC17  A75_04.IC63  MB112S146|
+  |48CR-1                                       |
+  |                       A75_03.IC64           |
+  |        Z80                                  |
+  |---------------------------------------------|
+Notes:
+      Z80         - Zilog Z0840006 CPU. Clock input 6.000MHz (12/2)
+      YM2149F     - Yamaha YM2149F software-controlled sound generator (SSG). Clock input 1.5MHz (12/8)
+      A75_06.IC14 - Motorola MC68705P5 micro-controller. Clock input 3.000MHz (12/4). Labelled 'A75 06' for 
+                    ROMSTAR version. Note original Taito version 68705 and Tournament Arkanoid MCUs work fine.
+      A75_*       - 27C256 EPROMs labelled 'A75 xx'. xx = 01, 03, 04, 05 etc. See ROM loading in the src for exact ROM usage.
+      A75-0*      - MMI 63S241 bipolar PROMs. Compatible with MB7116, 7621, DM74S571N etc
+      TMM2018     - Toshiba TMM2018 2k x8 SRAM (DIP24)
+      TMM2016     - Toshiba TMM2016 2k x8 SRAM (DIP24)
+      MB112S146   - Fujitsu MB112S146. Some kind of custom graphic decoder/shifter (DIP28)
+      MB3731      - Fujitsu MB3731 18W BTL audio power amplifier (SIP12)
+      PC030CM     - Taito custom ceramic package (SIP20)
+      48CR-1      - Taito custom resistor array (SIP10)
+      TL7700      - Texas Instruments TL7700CP supply voltage supervisor i.e. reset chip (DIP8)
+      JP3         - 2-pin jumper. This is open but the game works even if it is closed.
+      JP4         - 2-pin jumper. Must be closed to allow coin-up through PC030CM otherwise coin-up does not work.
+                    Note the G connector is the 22-way edge connector.
+                    The Japanese manual states (translated to English).....
+                    ********
+                    The coin-SW of this Main PC Board does not work without wiring coin meter to 
+                    coin meter pins of the G-connector. 
+                    You need to modify as follows in case coin meter is not connected to Main PC Board.
+                    Coin System A ..... Wire jumper JP4 on Main PC Board. Coin meter not used.
+                    Coin System B ..... Wire jumper JP3 on Main PC Board. Coin meter used.
+                    ********
+
+      Measured Syncs
+      --------------
+      HSync       - 15.625kHz
+      VSync       - 59.185Hz
+      
+      
+      POWER connector H
+      -----------------
+      1    Ground
+      2    Ground
+      3    Ground
+      4    Ground
+      5    +5V
+      6    +5V
+      7    +5V
+      8    NC
+      9    +12V
+      10   Post
+      11   NC
+      12   NC
+      
+      
+      22-way edge connector G
+      -----------------------
+
+           PARTS         SOLDER
+           --------------------
+                 |-----|
+          GROUND | 1 A | GROUND
+       VIDEO RED | 2 B | VIDEO GROUND
+     VIDEO GREEN | 3 C | VIDEO BLUE
+     VIDEO SYNC  | 4 D |
+     SOUND OUT + | 5 E | SOUND OUT -
+            POST | 6 F | POST
+                 | 7 H |
+     COIN SW (A) | 8 J | COIN SW (B)
+  COIN METER (A) | 9 K | COIN METER (B)
+COIN LOCKOUT (A) |10 L | COIN LOCKOUT (B)
+      SERVICE SW |11 M | TILT SW
+         START 1 |12 N | START 2
+                 |13 P |
+                 |14 R |
+        1P RIGHT |15 S | 2P RIGHT \
+         lP LEFT |16 T | 2P LEFT  / Connect 15/16/S/T to the spinner left/right connections
+                 |17 U |
+                 |18 V |
+                 |19 W |
+                 |20 X |
+   lP SERVE/FIRE |21 Y | 2P SERVE/FIRE
+                 |22 Z |
+                 |-----|
+
+Note about spinner controller
+-----------------------------
+
+This game requires a geared spinner to operate correctly. A trackball or other optical 
+controller or home-made spinner built from a PC mouse will work but the player moves too
+slowly and the game is unplayable. The Taito geared spinner moves the optical wheel *very* 
+fast to ensure the player moves fast enough to follow and return the ball easily. The ratio of
+the control knob rotation to the optical wheel rotation is 1:20 so for one rotation of the
+control knob the optical wheel rotates 20 times.
+Generally a half-turn of the control knob is enough to move the player across the full screen.
+
+The spinner connections are....
+Pin 1 - Left
+Pin 2 - +5V
+Pin 3 - Ground
+Pin 4 - Right
+
+These pins are listed from the Japanese Taito manual and have been tested to be correct with 
+the real Taito Arkanoid spinner.
+The US ROMSTAR manual lists pin 4 as left and pin 1 as right. This information is probably
+incorrect. Pins 2 and 3 are the same.
+
+Spinner PCB Layout
+------------------
+J9000024A 
+K9000060A
+|-----------|
+|   OPTO    |
+|          S|
+|           |
+|          S|
+|           |
+|  POWER    |
+|-4-3-2-1---|
+Notes:
+      OPTO  - Optical transmitter/receiver on other side of PCB
+      POWER - Power input connector. Pin 1 is on the right.
+      S     - Screw positions to show orientation of the PCB with reference to the power connector pin 1
+
+      
+DIP Switches
++-----------------------------+--------------------------------+
+|FACTORY DEFAULT = *          |  1   2   3   4   5   6   7   8 |
++----------+------------------+----+---+-----------------------+
+|          |*1 COIN  1 CREDIT | OFF|OFF|                       |
+|COINS     | 1 COIN  2 CREDITS| ON |OFF|                       |
+|          | 2 COINS 1 CREDIT | OFF|ON |                       |
+|          | 1 COIN  6 CREDITS| ON |ON |                       |
++----------+------------------+----+---+---+                   |
+|LIVES     |*3                |        |OFF|                   |
+|          | 5                |        |ON |                   |
++----------+------------------+--------+---+---+               |
+|BONUS     |*20000 / 60000    |            |OFF|               |
+|1ST/EVERY | 20000 ONLY       |            |ON |               |
++----------+------------------+------------+---+---+           |
+|DIFFICULTY|*EASY             |                |OFF|           |
+|          | HARD             |                |ON |           |
++----------+------------------+----------------+---+---+       |
+|GAME MODE |*GAME             |                    |OFF|       |
+|          | TEST             |                    |ON |       |
++----------+------------------+--------------------+---+---+   |
+|SCREEN    |*NORMAL           |                        |OFF|   |
+|          | INVERT           |                        |ON |   |
++----------+------------------+------------------------+---+---+
+|CONTINUE  | WITHOUT          |                            |OFF|
+|          |*WITH             |                            |ON |
++----------+------------------+----------------------------+---+
+
+
+***************************************************************************
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -1111,7 +1322,7 @@ ROM_START( arkanoid )
 	ROM_LOAD( "a75-11.ic16",   0x8000, 0x8000, CRC(eafd7191) SHA1(d2f8843b716718b1de209e97a874e8ce600f3f87) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
+	ROM_LOAD( "a75-06.ic14",   0x0000, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) // ok for this set
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1137,7 +1348,7 @@ ROM_START( arkanoidu )
 	ROM_LOAD( "a75-18.ic16",   0x8000, 0x8000, CRC(cdc08301) SHA1(05f54353cc8333af14fa985a2764960e20e8161a) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-20.ic14",  0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503)  ) /* Hand crafted, need the decapped data here */
+	ROM_LOAD( "a75-20.ic14",   0x0000, 0x0800, BAD_DUMP CRC(de518e47) SHA1(b8eddd1c566505fb69e3d1207c7a9720dfb9f503) ) /* Hand crafted, need the decapped data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -1156,7 +1367,7 @@ ROM_START( arkanoiduo )
 	ROM_LOAD( "a75-10.ic16",   0x8000, 0x8000, CRC(a1769e15) SHA1(fbb45731246a098b29eb08de5d63074b496aaaba) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-06.ic14",  0x0000, 0x0800, BAD_DUMP CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) /* Possible bootleg code??, need the decapped data here */
+	ROM_LOAD( "a75-06.ic14",   0x0000, 0x0800, CRC(515d77b6) SHA1(a302937683d11f663abd56a2fd7c174374e4d7fb) ) // ok for this set
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
