@@ -591,18 +591,13 @@ static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 ADDRESS_MAP_END
 
 
-static const tms0980_config microvision_tms0980_config =
+static const UINT16 microvision_output_pla[0x20] =
 {
-	{
-		/* O output PLA configuration currently unknown */
-		0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
-		0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F,
-		0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
-		0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00
-	},
-	DEVCB_DRIVER_MEMBER(microvision_state, tms1100_read_k),
-	DEVCB_DRIVER_MEMBER16(microvision_state, tms1100_write_o),
-	DEVCB_DRIVER_MEMBER16(microvision_state, tms1100_write_r)
+	/* O output PLA configuration currently unknown */
+	0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
+	0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F,
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00
 };
 
 
@@ -610,7 +605,10 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
 	MCFG_CPU_IO_MAP( microvision_8021_io )
 	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
-	MCFG_CPU_CONFIG( microvision_tms0980_config )
+	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla )
+	MCFG_TMS1XXX_READ_K( READ8( microvision_state, tms1100_read_k ) )
+	MCFG_TMS1XXX_WRITE_O( WRITE16( microvision_state, tms1100_write_o ) )
+	MCFG_TMS1XXX_WRITE_R( WRITE16( microvision_state, tms1100_write_r ) )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

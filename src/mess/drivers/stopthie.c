@@ -51,24 +51,22 @@ WRITE16_MEMBER(stopthie_state::stopthie_write_r)
 }
 
 
-static const tms0980_config stopthie_tms0980_config =
+static const UINT16 stopthie_output_pla[0x20] =
 {
-	{
-		/* O output PLA configuration currently unknown */
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	},
-	DEVCB_DRIVER_MEMBER(stopthie_state, stopthie_read_k),
-	DEVCB_DRIVER_MEMBER16(stopthie_state, stopthie_write_o),
-	DEVCB_DRIVER_MEMBER16(stopthie_state, stopthie_write_r)
+	/* O output PLA configuration currently unknown */
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+	0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
 };
 
 
 static MACHINE_CONFIG_START( stopthie, stopthie_state )
 	MCFG_CPU_ADD( "maincpu", TMS0980, 5000000 ) /* Clock is wrong */
-	MCFG_CPU_CONFIG( stopthie_tms0980_config )
+	MCFG_TMS1XXX_OUTPUT_PLA( stopthie_output_pla )
+	MCFG_TMS1XXX_READ_K( READ8( stopthie_state, stopthie_read_k ) )
+	MCFG_TMS1XXX_WRITE_O( WRITE16( stopthie_state, stopthie_write_o ) )
+	MCFG_TMS1XXX_WRITE_R( WRITE16( stopthie_state, stopthie_write_r ) )
 
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
 MACHINE_CONFIG_END
