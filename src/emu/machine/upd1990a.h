@@ -53,7 +53,7 @@ class upd1990a_device : public device_t,
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
@@ -78,6 +78,12 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+
+	enum
+	{
+		TYPE_1990A = 0,
+		TYPE_4990A
+	};
 
 private:
 	enum
@@ -115,6 +121,8 @@ private:
 	int m_clk;                  // shift clock
 	int m_tp;                   // time pulse
 	int m_c_unlatched;          // command waiting for STB
+
+	int m_variant;
 
 	// timers
 	emu_timer *m_timer_clock;
