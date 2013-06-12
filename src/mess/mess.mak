@@ -734,6 +734,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/hd63450.o   \
 	$(MESS_MACHINE)/i8271.o     \
 	$(MESS_MACHINE)/ieee488.o   \
+	$(MESS_MACHINE)/imi5000h.o  \
 	$(MESS_MACHINE)/isa.o       \
 	$(MESS_MACHINE)/kb3600.o    \
 	$(MESS_MACHINE)/keyboard.o  \
