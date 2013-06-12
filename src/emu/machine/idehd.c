@@ -262,6 +262,7 @@ void ide_hdd_device::device_start()
 	save_item(NAME(user_password_enable));
 
 	save_item(NAME(gnetreadlock));
+	save_item(NAME(block_count));
 }
 
 //-------------------------------------------------

@@ -34,6 +34,7 @@ public:
 	UINT8           adapter_control;
 	UINT8           precomp_offset;
 	UINT16          sector_count;
+	UINT16          block_count;
 
 	UINT8           master_password_enable;
 	UINT8           user_password_enable;

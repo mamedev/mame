@@ -57,14 +57,14 @@
 #define IDE_BANK2_CONFIG_REGISTER           8
 #define IDE_BANK2_CONFIG_DATA               0xc
 
-#define IDE_COMMAND_READ_MULTIPLE           0x20
-#define IDE_COMMAND_READ_MULTIPLE_NORETRY   0x21
-#define IDE_COMMAND_WRITE_MULTIPLE          0x30
-#define IDE_COMMAND_WRITE_MULTIPLE_NORETRY  0x31
+#define IDE_COMMAND_READ_SECTORS            0x20
+#define IDE_COMMAND_READ_SECTORS_NORETRY    0x21
+#define IDE_COMMAND_WRITE_SECTORS           0x30
+#define IDE_COMMAND_WRITE_SECTORS_NORETRY   0x31
 #define IDE_COMMAND_DIAGNOSTIC              0x90
 #define IDE_COMMAND_SET_CONFIG              0x91
-#define IDE_COMMAND_READ_MULTIPLE_BLOCK     0xc4
-#define IDE_COMMAND_WRITE_MULTIPLE_BLOCK    0xc5
+#define IDE_COMMAND_READ_MULTIPLE           0xc4
+#define IDE_COMMAND_WRITE_MULTIPLE          0xc5
 #define IDE_COMMAND_SET_BLOCK_COUNT         0xc6
 #define IDE_COMMAND_READ_DMA                0xc8
 #define IDE_COMMAND_WRITE_DMA               0xca
@@ -72,8 +72,8 @@
 #define IDE_COMMAND_SET_FEATURES            0xef
 #define IDE_COMMAND_SECURITY_UNLOCK         0xf2
 #define IDE_COMMAND_UNKNOWN_F9              0xf9
-#define IDE_COMMAND_VERIFY_MULTIPLE         0x40
-#define IDE_COMMAND_VERIFY_NORETRY          0x41
+#define IDE_COMMAND_VERIFY_SECTORS          0x40
+#define IDE_COMMAND_VERIFY_SECTORS_NORETRY  0x41
 #define IDE_COMMAND_ATAPI_IDENTIFY          0xa1
 #define IDE_COMMAND_RECALIBRATE             0x10
 #define IDE_COMMAND_SEEK                    0x70
@@ -336,7 +336,7 @@ void ide_controller_device::read_sector_done()
 			sectors_until_int--;
 		if (sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE_BLOCK) ? block_count : 1);
+			sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -369,7 +369,7 @@ void ide_controller_device::read_first_sector()
 	status |= IDE_STATUS_BUSY;
 
 	/* just set a timer */
-	if (command == IDE_COMMAND_READ_MULTIPLE_BLOCK)
+	if (command == IDE_COMMAND_READ_MULTIPLE)
 	{
 		int new_lba = dev->lba_address();
 		attotime seek_time;
@@ -392,7 +392,7 @@ void ide_controller_device::read_next_sector()
 	/* mark ourselves busy */
 	status |= IDE_STATUS_BUSY;
 
-	if (command == IDE_COMMAND_READ_MULTIPLE_BLOCK)
+	if (command == IDE_COMMAND_READ_MULTIPLE)
 	{
 		if (sectors_until_int != 1)
 			/* make ready now */
@@ -425,7 +425,7 @@ void ide_controller_device::continue_write()
 	status &= ~IDE_STATUS_BUFFER_READY;
 	status |= IDE_STATUS_BUSY;
 
-	if (command == IDE_COMMAND_WRITE_MULTIPLE_BLOCK)
+	if (command == IDE_COMMAND_WRITE_MULTIPLE)
 	{
 		if (sectors_until_int != 1)
 		{
@@ -543,7 +543,7 @@ void ide_controller_device::write_sector_done()
 		/* signal an interrupt */
 		if (--sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE_BLOCK) ? block_count : 1);
+			sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -591,8 +591,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 	command = _command;
 	switch (command)
 	{
-		case IDE_COMMAND_READ_MULTIPLE:
-		case IDE_COMMAND_READ_MULTIPLE_NORETRY:
+		case IDE_COMMAND_READ_SECTORS:
+		case IDE_COMMAND_READ_SECTORS_NORETRY:
 			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
@@ -606,13 +606,13 @@ void ide_controller_device::handle_command(UINT8 _command)
 			read_first_sector();
 			break;
 
-		case IDE_COMMAND_READ_MULTIPLE_BLOCK:
+		case IDE_COMMAND_READ_MULTIPLE:
 			LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			sectors_until_int = dev->block_count;
 			dma_active = 0;
 			verify_only = 0;
 
@@ -620,8 +620,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			read_first_sector();
 			break;
 
-		case IDE_COMMAND_VERIFY_MULTIPLE:
-		case IDE_COMMAND_VERIFY_NORETRY:
+		case IDE_COMMAND_VERIFY_SECTORS:
+		case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
 			LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
@@ -649,8 +649,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			read_first_sector();
 			break;
 
-		case IDE_COMMAND_WRITE_MULTIPLE:
-		case IDE_COMMAND_WRITE_MULTIPLE_NORETRY:
+		case IDE_COMMAND_WRITE_SECTORS:
+		case IDE_COMMAND_WRITE_SECTORS_NORETRY:
 			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
@@ -663,13 +663,13 @@ void ide_controller_device::handle_command(UINT8 _command)
 			status |= IDE_STATUS_BUFFER_READY;
 			break;
 
-		case IDE_COMMAND_WRITE_MULTIPLE_BLOCK:
+		case IDE_COMMAND_WRITE_MULTIPLE:
 			LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
 				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			sectors_until_int = dev->block_count;
 			dma_active = 0;
 
 			/* mark the buffer ready */
@@ -780,7 +780,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_SET_BLOCK_COUNT:
 			LOGPRINT(("IDE Set block count (%02X)\n", dev->sector_count));
 
-			block_count = dev->sector_count;
+			dev->block_count = dev->sector_count;
 			// judge dredd wants 'drive ready' on this command
 			status |= IDE_STATUS_DRIVE_READY;
 
@@ -1274,7 +1274,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 	error(0),
 	command(0),
 	interrupt_pending(0),
-	block_count(0),
 	sectors_until_int(0),
 	verify_only(0),
 	config_unknown(0),
@@ -1292,7 +1291,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	error(0),
 	command(0),
 	interrupt_pending(0),
-	block_count(0),
 	sectors_until_int(0),
 	verify_only(0),
 	config_unknown(0),
@@ -1324,7 +1322,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(command));
 	save_item(NAME(interrupt_pending));
 
-	save_item(NAME(block_count));
 	save_item(NAME(sectors_until_int));
 
 	save_item(NAME(dma_active));

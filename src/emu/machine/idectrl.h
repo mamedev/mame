@@ -132,7 +132,6 @@ private:
 	UINT8           dma_active;
 	UINT8           interrupt_pending;
 
-	UINT16          block_count;
 	UINT16          sectors_until_int;
 	UINT8           verify_only;
 
