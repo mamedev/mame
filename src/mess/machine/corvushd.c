@@ -97,6 +97,7 @@ struct dadr_t {
 
 // Controller structure
 struct corvus_hdc_t {
+	device_t *root_device;
 	UINT8   status;             // Controller status byte (DIRECTION + BUSY/READY)
 	char    prep_mode;          // Whether the controller is in Prep Mode or not
 	// Physical drive info
@@ -1159,15 +1160,17 @@ static UINT8 corvus_format_drive(running_machine &machine, UINT8 *pattern, UINT1
 //      hard_disk_file object
 //
 static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
+	corvus_hdc_t
+			*c = &corvus_hdc;
 	static const char *const tags[] = {
-		"harddisk1"
+		"harddisk1", "harddisk2", "harddisk3", "harddisk4"
 	};
 	harddisk_image_device *img;
 
-	/* Only one harddisk supported right now */
-	assert ( id == 0 );
-
-	img = dynamic_cast<harddisk_image_device *>(machine.device(tags[id]));
+	if (c->root_device)
+		img = dynamic_cast<harddisk_image_device *>(c->root_device->subdevice(tags[id]));
+	else
+		img = dynamic_cast<harddisk_image_device *>(machine.device(tags[id]));
 
 	if ( !img )
 		return NULL;
@@ -1175,7 +1178,16 @@ static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 	if (!img->exists())
 		return NULL;
 
-	return img->get_hard_disk_file();
+    // Pick up the Head/Cylinder/Sector info
+    hard_disk_file *file = img->get_hard_disk_file();
+   	hard_disk_info *info = hard_disk_get_info(file);
+	c->sectors_per_track = info->sectors;
+	c->tracks_per_cylinder = info->heads;
+	c->cylinders_per_drive = info->cylinders;
+
+	LOG(("corvus_hdc_init: Attached to drive %u image: H:%d, C:%d, S:%d\n", id, info->heads, info->cylinders, info->sectors));
+
+	return file;
 }
 
 
@@ -1420,19 +1432,9 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 //
 UINT8 corvus_hdc_init(running_machine &machine) {
 	corvus_hdc_t            *c = &corvus_hdc;   // Pick up global controller structure
-	hard_disk_file  *disk;              // Structures for interface to CHD routines
-	hard_disk_info  *info;
-
-	if((disk = corvus_hdc_file(machine, 0)))                // Attach to the CHD file
-		info = hard_disk_get_info(disk);        // Pick up the Head/Cylinder/Sector info
-	else
-		return 0;
 
 	c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY); // Host-to-controller mode, Idle (awaiting command from Host mode)
 	c->prep_mode = FALSE;                       // We're not in Prep Mode
-	c->sectors_per_track = info->sectors;
-	c->tracks_per_cylinder = info->heads;
-	c->cylinders_per_drive = info->cylinders;
 	c->offset = 0;                              // Buffer is empty
 	c->awaiting_modifier = FALSE;               // We're not in the middle of a two-byte command
 	c->xmit_bytes = 0;                          // We don't have anything to say to the host
@@ -1441,8 +1443,6 @@ UINT8 corvus_hdc_init(running_machine &machine) {
 	c->timeout_timer = machine.scheduler().timer_alloc(FUNC(corvus_hdc_callback));  // Set up a timer to handle the four-second host-to-controller timeout
 	c->timeout_timer->adjust(attotime::from_seconds(4), CALLBACK_TIMEOUT);
 	c->timeout_timer->enable(0);        // Start this timer out disabled
-
-	LOG(("corvus_hdc_init: Attached to drive image: H:%d, C:%d, S:%d\n", info->heads, info->cylinders, info->sectors));
 
 	//
 	// Define all of the packet sizes for the commands
@@ -1547,6 +1547,15 @@ UINT8 corvus_hdc_init(running_machine &machine) {
 	return TRUE;
 }
 
+
+UINT8 corvus_hdc_init( device_t *device )
+{
+	corvus_hdc_t            *c = &corvus_hdc;   // Pick up global controller structure
+
+	c->root_device = device;
+
+	return corvus_hdc_init(device->machine());	
+}
 
 
 //

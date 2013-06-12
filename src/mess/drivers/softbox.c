@@ -357,6 +357,28 @@ void softbox_state::machine_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset_after_children - device-specific
+//    reset that must happen after child devices
+//    have performed their resets
+//-------------------------------------------------
+ 
+void softbox_state::device_reset_after_children()
+{
+	/* The Z80 starts at address 0x0000 but the SoftBox has RAM there and
+	   needs to start from the BIOS at 0xf000.  The PCB has logic and a
+	   74S287 PROM that temporarily changes the memory map so that the
+	   IC3 EPROM at 0xf000 is mapped to 0x0000 for the first instruction
+	   fetch only.  The instruction normally at 0xf000 is an absolute jump
+	   into the BIOS.  On reset, the Z80 will fetch it from 0x0000 and set 
+	   its PC, then the normal map will be restored before the next
+	   instruction fetch.  Here we just set the PC to 0xf000 after the Z80 
+	   resets, which has the same effect. */
+	
+	m_maincpu->set_state_int(Z80_PC, 0xf000);
+}
+
+
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -379,6 +401,9 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE(I8251_TAG, i8251_device, rxc_w), DEVWRITELINE(I8251_TAG, i8251_device, txc_w))
 	MCFG_CBM_IEEE488_ADD("c8050")
 	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 

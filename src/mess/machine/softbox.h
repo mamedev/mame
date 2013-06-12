@@ -56,6 +56,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset_after_children();
 
 private:
 	enum
@@ -65,6 +66,7 @@ private:
 		LED_READY
 	};
 
+	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 };
 

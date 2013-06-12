@@ -26,14 +26,17 @@ class softbox_state : public driver_device
 public:
 	softbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, Z80_TAG),
 			m_dbrg(*this, COM8116_TAG),
 			m_ieee(*this, IEEE488_TAG)
 	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
 
 	virtual void machine_start();
+	virtual void device_reset_after_children();
 
 	DECLARE_WRITE8_MEMBER( dbrg_w );
 
