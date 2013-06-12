@@ -93,6 +93,8 @@
 
 void ide_controller_device::set_irq(int state)
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	if (state == ASSERT_LINE)
 		LOG(("IDE interrupt assert\n"));
 	else
@@ -100,7 +102,7 @@ void ide_controller_device::set_irq(int state)
 
 	/* signal an interrupt */
 	m_irq_handler(state);
-	interrupt_pending = state;
+	dev->interrupt_pending = state;
 }
 
 void ide_controller_device::set_dmarq(int state)
@@ -333,10 +335,10 @@ void ide_controller_device::read_sector_done()
 
 		/* signal an interrupt */
 		if (!dev->verify_only)
-			sectors_until_int--;
-		if (sectors_until_int == 0 || dev->sector_count == 1)
+			dev->sectors_until_int--;
+		if (dev->sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
+			dev->sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -389,12 +391,14 @@ void ide_controller_device::read_first_sector()
 
 void ide_controller_device::read_next_sector()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* mark ourselves busy */
 	status |= IDE_STATUS_BUSY;
 
 	if (command == IDE_COMMAND_READ_MULTIPLE)
 	{
-		if (sectors_until_int != 1)
+		if (dev->sectors_until_int != 1)
 			/* make ready now */
 			read_sector_done();
 		else
@@ -427,7 +431,7 @@ void ide_controller_device::continue_write()
 
 	if (command == IDE_COMMAND_WRITE_MULTIPLE)
 	{
-		if (sectors_until_int != 1)
+		if (dev->sectors_until_int != 1)
 		{
 			/* ready to write now */
 			write_sector_done();
@@ -541,9 +545,9 @@ void ide_controller_device::write_sector_done()
 		error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
-		if (--sectors_until_int == 0 || dev->sector_count == 1)
+		if (--dev->sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
+			dev->sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -598,7 +602,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			dev->sectors_until_int = 1;
 			dev->dma_active = 0;
 			dev->verify_only = 0;
 
@@ -612,7 +616,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			dev->sectors_until_int = 1;
 			dev->dma_active = 0;
 			dev->verify_only = 0;
 
@@ -627,7 +631,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			dev->sectors_until_int = 1;
 			dev->dma_active = 0;
 			dev->verify_only = 1;
 
@@ -641,7 +645,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = dev->sector_count;
+			dev->sectors_until_int = dev->sector_count;
 			dev->dma_active = 1;
 			dev->verify_only = 0;
 
@@ -656,7 +660,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			dev->sectors_until_int = 1;
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
@@ -669,7 +673,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 1;
+			dev->sectors_until_int = 1;
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
@@ -682,7 +686,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = dev->sector_count;
+			dev->sectors_until_int = dev->sector_count;
 			dev->dma_active = 1;
 
 			/* start the read going */
@@ -694,7 +698,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 0;
+			dev->sectors_until_int = 0;
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
@@ -802,7 +806,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = 0;
+			dev->sectors_until_int = 0;
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
@@ -1006,7 +1010,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 				result |= IDE_STATUS_HIT_INDEX;
 				last_status_timer->adjust(attotime::never);
 			}
-			if (interrupt_pending == ASSERT_LINE)
+			if (dev->interrupt_pending == ASSERT_LINE)
 				set_irq(CLEAR_LINE);
 			break;
 
@@ -1273,8 +1277,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 	status(0),
 	error(0),
 	command(0),
-	interrupt_pending(0),
-	sectors_until_int(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1289,8 +1291,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
 	error(0),
 	command(0),
-	interrupt_pending(0),
-	sectors_until_int(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1318,9 +1318,7 @@ void ide_controller_device::device_start()
 	save_item(NAME(status));
 	save_item(NAME(error));
 	save_item(NAME(command));
-	save_item(NAME(interrupt_pending));
 
-	save_item(NAME(sectors_until_int));
 	save_item(NAME(config_unknown));
 	save_item(NAME(config_register));
 	save_item(NAME(config_register_num));

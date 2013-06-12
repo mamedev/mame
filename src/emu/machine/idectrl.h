@@ -129,9 +129,6 @@ private:
 	UINT8           error;
 	UINT8           command;
 
-	UINT8           interrupt_pending;
-	UINT16          sectors_until_int;
-
 	UINT8           config_unknown;
 	UINT8           config_register[IDE_CONFIG_REGISTERS];
 	UINT8           config_register_num;

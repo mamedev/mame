@@ -36,6 +36,9 @@ public:
 	UINT16          sector_count;
 	UINT16          block_count;
 
+	UINT8           interrupt_pending;
+	UINT16          sectors_until_int;
+
 	UINT8           dma_active;
 	UINT8           verify_only;
 
