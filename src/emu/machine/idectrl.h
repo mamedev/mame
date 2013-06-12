@@ -129,11 +129,8 @@ private:
 	UINT8           error;
 	UINT8           command;
 
-	UINT8           dma_active;
 	UINT8           interrupt_pending;
-
 	UINT16          sectors_until_int;
-	UINT8           verify_only;
 
 	UINT8           config_unknown;
 	UINT8           config_register[IDE_CONFIG_REGISTERS];

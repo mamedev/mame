@@ -312,7 +312,7 @@ void ide_controller_device::read_sector_done()
 	count = dev->read_sector(lba, dev->buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
-	if (!verify_only)
+	if (!dev->verify_only)
 		status |= IDE_STATUS_BUFFER_READY;
 	status |= IDE_STATUS_SEEK_COMPLETE;
 
@@ -332,7 +332,7 @@ void ide_controller_device::read_sector_done()
 		error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
-		if (!verify_only)
+		if (!dev->verify_only)
 			sectors_until_int--;
 		if (sectors_until_int == 0 || dev->sector_count == 1)
 		{
@@ -341,11 +341,11 @@ void ide_controller_device::read_sector_done()
 		}
 
 		/* handle DMA */
-		if (dma_active)
+		if (dev->dma_active)
 			set_dmarq(1);
 
 		/* if we're just verifying we can read the next sector */
-		if (verify_only)
+		if (dev->verify_only)
 			read_buffer_empty();
 	}
 
@@ -554,7 +554,7 @@ void ide_controller_device::write_sector_done()
 			status &= ~IDE_STATUS_BUFFER_READY;
 
 		/* keep going for DMA */
-		if (dma_active && dev->sector_count != 0)
+		if (dev->dma_active && dev->sector_count != 0)
 		{
 			set_dmarq(1);
 		}
@@ -599,8 +599,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 1;
-			dma_active = 0;
-			verify_only = 0;
+			dev->dma_active = 0;
+			dev->verify_only = 0;
 
 			/* start the read going */
 			read_first_sector();
@@ -613,8 +613,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 1;
-			dma_active = 0;
-			verify_only = 0;
+			dev->dma_active = 0;
+			dev->verify_only = 0;
 
 			/* start the read going */
 			read_first_sector();
@@ -628,8 +628,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 1;
-			dma_active = 0;
-			verify_only = 1;
+			dev->dma_active = 0;
+			dev->verify_only = 1;
 
 			/* start the read going */
 			read_first_sector();
@@ -642,8 +642,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = dev->sector_count;
-			dma_active = 1;
-			verify_only = 0;
+			dev->dma_active = 1;
+			dev->verify_only = 0;
 
 			/* start the read going */
 			read_first_sector();
@@ -657,7 +657,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 1;
-			dma_active = 0;
+			dev->dma_active = 0;
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -670,7 +670,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 1;
-			dma_active = 0;
+			dev->dma_active = 0;
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -683,7 +683,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = dev->sector_count;
-			dma_active = 1;
+			dev->dma_active = 1;
 
 			/* start the read going */
 			set_dmarq(1);
@@ -695,7 +695,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 0;
-			dma_active = 0;
+			dev->dma_active = 0;
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -803,7 +803,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			/* reset the buffer */
 			dev->buffer_offset = 0;
 			sectors_until_int = 0;
-			dma_active = 0;
+			dev->dma_active = 0;
 
 			/* mark the buffer ready */
 			status |= IDE_STATUS_BUFFER_READY;
@@ -1275,7 +1275,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 	command(0),
 	interrupt_pending(0),
 	sectors_until_int(0),
-	verify_only(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1292,7 +1291,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	command(0),
 	interrupt_pending(0),
 	sectors_until_int(0),
-	verify_only(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1323,9 +1321,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(interrupt_pending));
 
 	save_item(NAME(sectors_until_int));
-
-	save_item(NAME(dma_active));
-
 	save_item(NAME(config_unknown));
 	save_item(NAME(config_register));
 	save_item(NAME(config_register_num));

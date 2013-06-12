@@ -36,6 +36,9 @@ public:
 	UINT16          sector_count;
 	UINT16          block_count;
 
+	UINT8           dma_active;
+	UINT8           verify_only;
+
 	UINT8           master_password_enable;
 	UINT8           user_password_enable;
 	const UINT8 *   master_password;

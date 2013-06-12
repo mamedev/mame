@@ -263,6 +263,9 @@ void ide_hdd_device::device_start()
 
 	save_item(NAME(gnetreadlock));
 	save_item(NAME(block_count));
+
+	save_item(NAME(dma_active));
+	save_item(NAME(verify_only));
 }
 
 //-------------------------------------------------
