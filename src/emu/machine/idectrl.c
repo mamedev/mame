@@ -612,7 +612,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = dev->block_count;
+			sectors_until_int = 1;
 			dma_active = 0;
 			verify_only = 0;
 
@@ -669,7 +669,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = dev->block_count;
+			sectors_until_int = 1;
 			dma_active = 0;
 
 			/* mark the buffer ready */
