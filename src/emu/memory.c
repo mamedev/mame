@@ -304,7 +304,7 @@ protected:
 	struct subunit_info
 	{
 		UINT32              m_mask;                 // mask (ff, ffff or ffffffff)
-		UINT32              m_offset;               // offset to add to the address
+		INT32               m_offset;               // offset to add to the address
 		UINT32              m_multiplier;           // multiplier to the pre-split address
 		UINT8               m_size;                 // size (8, 16 or 32)
 		UINT8               m_shift;                // shift of the subunit
@@ -4341,9 +4341,9 @@ void handler_entry::copy(handler_entry *entry)
 //-------------------------------------------------
 void handler_entry::reconfigure_subunits(offs_t bytestart)
 {
-	offs_t delta = bytestart - m_bytestart;
+	INT32 delta = bytestart - m_bytestart;
 	for (int i=0; i != m_subunits; i++)
-		m_subunit_infos[i].m_offset -= delta;
+		m_subunit_infos[i].m_offset += delta / (m_subunit_infos[i].m_size / 8);
 }
 
 
