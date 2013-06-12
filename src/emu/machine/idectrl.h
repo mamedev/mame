@@ -57,9 +57,10 @@ SLOT_INTERFACE_EXTERN(ide_devices);
 ***************************************************************************/
 
 #define MCFG_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
-	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, _fixed) \
-	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0)
+	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
+	MCFG_IDE_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
+	MCFG_IDE_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_IDE_SLOT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_SLOT, 0) \
@@ -146,9 +147,10 @@ extern const device_type IDE_CONTROLLER;
 
 
 #define MCFG_BUS_MASTER_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
-	MCFG_IDE_SLOT_ADD("drive_0", _slotintf, _master, _fixed) \
-	MCFG_IDE_SLOT_ADD("drive_1", _slotintf, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0)
+	MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0) \
+	MCFG_IDE_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
+	MCFG_IDE_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(bmcpu, bmspace) \
 	bus_master_ide_controller_device::set_bus_master_space(*device, bmcpu, bmspace);

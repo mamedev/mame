@@ -24,7 +24,7 @@ void ata_flash_pccard_device::device_start()
 	memset(m_cis, 0xff, 512);
 
 	astring drive_tag;
-	subtag(drive_tag, "drive_0");
+	subtag(drive_tag, "card:0:hdd");
 
 	m_chd_file = get_disk_handle(machine(), drive_tag);
 	if(m_chd_file != NULL)

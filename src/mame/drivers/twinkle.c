@@ -939,7 +939,7 @@ ROM_START( bmiidx )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY("863jaa04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) ) // was part of a 1st mix machine, but "c44" indicates 8th mix?
 ROM_END
 
@@ -955,7 +955,7 @@ ROM_START( bmiidx2 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "985jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "985jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -971,7 +971,7 @@ ROM_START( bmiidx3 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "992jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "992jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -987,7 +987,7 @@ ROM_START( bmiidx4 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a03jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "a03jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1003,7 +1003,7 @@ ROM_START( bmiidx6 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "b4ujaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1019,7 +1019,7 @@ ROM_START( bmiidx7 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "b44jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1035,7 +1035,7 @@ ROM_START( bmiidx8 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "c44jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "c44jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1051,7 +1051,7 @@ ROM_START( bmiidxc )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1067,7 +1067,7 @@ ROM_START( bmiidxc2 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1083,7 +1083,7 @@ ROM_START( bmiidxca )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 

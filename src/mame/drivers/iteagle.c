@@ -258,20 +258,20 @@ MACHINE_CONFIG_END
 ROM_START( iteagle )
 	EAGLE_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 ROM_END
 
 ROM_START( gtfore04 )
 	EAGLE_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "gt2004", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) )
 ROM_END
 
 ROM_START( gtfore05 )
 	EAGLE_BIOS
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
 ROM_END
 

@@ -511,7 +511,7 @@ ROM_START( voyager )
 
 	ROM_REGION( 0x800, "nvram", ROMREGION_ERASE00 )
 
-	DISK_REGION( "drive_0" )
+	DISK_REGION( "ide:0:hdd" )
 	DISK_IMAGE_READONLY( "voyager", 0, SHA1(8b94f2420f6abb40148e4ba6eed8819d8e85dbde))
 ROM_END
 

@@ -284,7 +284,7 @@ void ide_hdd_device::device_reset()
 	}
 	else
 	{
-		m_handle = get_disk_handle(machine(), owner()->tag());
+		m_handle = get_disk_handle(machine(), tag());
 		m_disk = hard_disk_open(m_handle);
 	}
 

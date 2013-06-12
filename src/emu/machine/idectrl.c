@@ -95,6 +95,9 @@ void ide_controller_device::set_irq(int state)
 {
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
+	if (dev == NULL)
+		return;
+
 	if (state == ASSERT_LINE)
 		LOG(("IDE interrupt assert\n"));
 	else
@@ -1309,8 +1312,8 @@ void ide_controller_device::device_start()
 	m_irq_handler.resolve_safe();
 
 	/* set MAME harddisk handle */
-	slot[0] = owner()->subdevice<ide_slot_device>("drive_0");
-	slot[1] = owner()->subdevice<ide_slot_device>("drive_1");
+	slot[0] = subdevice<ide_slot_device>("0");
+	slot[1] = subdevice<ide_slot_device>("1");
 
 	/* create a timer for timing status */
 	last_status_timer = timer_alloc(TID_NULL);
