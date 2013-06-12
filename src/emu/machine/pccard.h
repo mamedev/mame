@@ -12,6 +12,8 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_reg);
 	virtual DECLARE_WRITE16_MEMBER(write_memory);
 	virtual DECLARE_WRITE16_MEMBER(write_reg);
+
+	virtual ~pccard_interface() {}
 };
 
 extern const device_type PCCARD_SLOT;

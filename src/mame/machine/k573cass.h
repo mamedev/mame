@@ -32,6 +32,8 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_dsr);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_do);
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
+
+	virtual ~konami573_cassette_interface() {}
 };
 
 
