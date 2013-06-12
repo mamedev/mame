@@ -304,6 +304,11 @@ void ide_hdd_device::device_reset()
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 			ide_build_features();
 	}
+
+	buffer_offset = 0;
+	gnetreadlock = 0;
+	master_password_enable = (master_password != NULL);
+	user_password_enable = (user_password != NULL);
 }
 
 //-------------------------------------------------

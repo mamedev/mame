@@ -102,7 +102,9 @@ void ide_controller_device::set_irq(int state)
 
 	/* signal an interrupt */
 	m_irq_handler(state);
-	dev->interrupt_pending = state;
+
+	if (dev != NULL)
+		dev->interrupt_pending = state;
 }
 
 void ide_controller_device::set_dmarq(int state)
@@ -1330,17 +1332,11 @@ void ide_controller_device::device_start()
 
 void ide_controller_device::device_reset()
 {
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
 	LOG(("IDE controller reset performed\n"));
 	/* reset the drive state */
 	cur_drive = 0;
 	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 	error = IDE_ERROR_DEFAULT;
-	dev->buffer_offset = 0;
-	dev->gnetreadlock = 0;
-	dev->master_password_enable = (dev->master_password != NULL);
-	dev->user_password_enable = (dev->user_password != NULL);
 	set_irq(CLEAR_LINE);
 	set_dmarq(0);
 }
