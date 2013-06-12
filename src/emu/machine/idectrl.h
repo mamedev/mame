@@ -83,9 +83,9 @@ public:
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_irq_handler.set_callback(object); }
 
 	UINT8 *ide_get_features(int drive);
-	void ide_set_gnet_readlock(const UINT8 onoff);
-	void ide_set_master_password(const UINT8 *password);
-	void ide_set_user_password(const UINT8 *password);
+	void ide_set_gnet_readlock(int drive, const UINT8 onoff);
+	void ide_set_master_password(int drive, const UINT8 *password);
+	void ide_set_user_password(int drive, const UINT8 *password);
 
 	DECLARE_READ8_MEMBER(read_via_config);
 	DECLARE_WRITE8_MEMBER(write_via_config);
@@ -142,13 +142,6 @@ private:
 
 	emu_timer *     last_status_timer;
 	emu_timer *     reset_timer;
-
-	UINT8           master_password_enable;
-	UINT8           user_password_enable;
-	const UINT8 *   master_password;
-	const UINT8 *   user_password;
-
-	UINT8           gnetreadlock;
 
 	UINT8           cur_drive;
 	ide_slot_device *slot[2];

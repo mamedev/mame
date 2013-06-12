@@ -178,22 +178,22 @@ UINT8 *ide_controller_device::ide_get_features(int _drive)
 	return slot[_drive]->dev()->get_features();
 }
 
-void ide_controller_device::ide_set_gnet_readlock(const UINT8 onoff)
+void ide_controller_device::ide_set_gnet_readlock(int _drive, const UINT8 onoff)
 {
-	gnetreadlock = onoff;
+	slot[_drive]->dev()->gnetreadlock = onoff;
 }
 
-void ide_controller_device::ide_set_master_password(const UINT8 *password)
+void ide_controller_device::ide_set_master_password(int _drive, const UINT8 *password)
 {
-	master_password = password;
-	master_password_enable = (master_password != NULL);
+	slot[_drive]->dev()->master_password = password;
+	slot[_drive]->dev()->master_password_enable = (password != NULL);
 }
 
 
-void ide_controller_device::ide_set_user_password(const UINT8 *password)
+void ide_controller_device::ide_set_user_password(int _drive, const UINT8 *password)
 {
-	user_password = password;
-	user_password_enable = (user_password != NULL);
+	slot[_drive]->dev()->user_password = password;
+	slot[_drive]->dev()->user_password_enable = (password != NULL);
 }
 
 
@@ -279,7 +279,7 @@ void ide_controller_device::read_buffer_empty()
 	error = IDE_ERROR_DEFAULT;
 	set_dmarq(0);
 
-	if (master_password_enable || user_password_enable)
+	if (dev->master_password_enable || dev->user_password_enable)
 	{
 		security_error();
 
@@ -302,7 +302,7 @@ void ide_controller_device::read_sector_done()
 	int lba = dev->lba_address(), count = 0;
 
 	/* GNET readlock check */
-	if (gnetreadlock) {
+	if (dev->gnetreadlock) {
 		status &= ~IDE_STATUS_ERROR;
 		status &= ~IDE_STATUS_BUSY;
 		return;
@@ -453,15 +453,15 @@ void ide_controller_device::write_buffer_full()
 	set_dmarq(0);
 	if (command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
-		if (user_password_enable && memcmp(dev->buffer, user_password, 2 + 32) == 0)
+		if (dev->user_password_enable && memcmp(dev->buffer, dev->user_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked user password\n"));
-			user_password_enable = 0;
+			dev->user_password_enable = 0;
 		}
-		if (master_password_enable && memcmp(dev->buffer, master_password, 2 + 32) == 0)
+		if (dev->master_password_enable && memcmp(dev->buffer, dev->master_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked master password\n"));
-			master_password_enable = 0;
+			dev->master_password_enable = 0;
 		}
 		if (PRINTF_IDE_PASSWORD)
 		{
@@ -483,7 +483,7 @@ void ide_controller_device::write_buffer_full()
 		status &= ~IDE_STATUS_BUSY;
 		status &= ~IDE_STATUS_BUFFER_READY;
 
-		if (master_password_enable || user_password_enable)
+		if (dev->master_password_enable || dev->user_password_enable)
 			security_error();
 		else
 			status |= IDE_STATUS_DRIVE_READY;
@@ -503,7 +503,7 @@ void ide_controller_device::write_buffer_full()
 			status |= IDE_STATUS_ERROR;
 		else {
 			status &= ~IDE_STATUS_ERROR;
-			gnetreadlock= 0;
+			dev->gnetreadlock= 0;
 		}
 	}
 	else
@@ -817,7 +817,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dev->read_key(key);
 			if ((dev->precomp_offset == key[0]) && (dev->sector_count == key[1]) && (dev->cur_sector == key[2]) && (dev->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
 			{
-				gnetreadlock= 0;
+				dev->gnetreadlock= 0;
 			}
 
 			/* update flags */
@@ -1279,11 +1279,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 	verify_only(0),
 	config_unknown(0),
 	config_register_num(0),
-	master_password_enable(0),
-	user_password_enable(0),
-	master_password(NULL),
-	user_password(NULL),
-	gnetreadlock(0),
 	cur_drive(0),
 	m_irq_handler(*this)
 {
@@ -1302,11 +1297,6 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 	verify_only(0),
 	config_unknown(0),
 	config_register_num(0),
-	master_password_enable(0),
-	user_password_enable(0),
-	master_password(NULL),
-	user_password(NULL),
-	gnetreadlock(0),
 	cur_drive(0),
 	m_irq_handler(*this)
 {
@@ -1342,11 +1332,6 @@ void ide_controller_device::device_start()
 	save_item(NAME(config_unknown));
 	save_item(NAME(config_register));
 	save_item(NAME(config_register_num));
-
-	save_item(NAME(master_password_enable));
-	save_item(NAME(user_password_enable));
-
-	save_item(NAME(gnetreadlock));
 }
 
 //-------------------------------------------------
@@ -1363,9 +1348,9 @@ void ide_controller_device::device_reset()
 	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 	error = IDE_ERROR_DEFAULT;
 	dev->buffer_offset = 0;
-	gnetreadlock = 0;
-	master_password_enable = (master_password != NULL);
-	user_password_enable = (user_password != NULL);
+	dev->gnetreadlock = 0;
+	dev->master_password_enable = (dev->master_password != NULL);
+	dev->user_password_enable = (dev->user_password != NULL);
 	set_irq(CLEAR_LINE);
 	set_dmarq(0);
 }

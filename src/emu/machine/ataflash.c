@@ -36,7 +36,7 @@ void ata_flash_pccard_device::device_start()
 void ata_flash_pccard_device::device_reset_after_children()
 {
 	m_locked = 0x1ff;
-	m_card->ide_set_gnet_readlock(1);
+	m_card->ide_set_gnet_readlock(0, 1);
 }
 
 READ16_MEMBER( ata_flash_pccard_device::read_memory )
@@ -113,7 +113,7 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 
 		if (!m_locked)
 		{
-			m_card->ide_set_gnet_readlock(0);
+			m_card->ide_set_gnet_readlock(0, 0);
 		}
 	}
 }

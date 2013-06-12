@@ -35,6 +35,13 @@ public:
 	UINT8           precomp_offset;
 	UINT16          sector_count;
 
+	UINT8           master_password_enable;
+	UINT8           user_password_enable;
+	const UINT8 *   master_password;
+	const UINT8 *   user_password;
+
+	UINT8           gnetreadlock;
+
 protected:
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;

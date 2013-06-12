@@ -1355,9 +1355,9 @@ static const k054539_interface k054539_config =
 void djmain_state::machine_start()
 {
 	if (m_ide_master_password != NULL)
-		m_ide->ide_set_master_password(m_ide_master_password);
+		m_ide->ide_set_master_password(0, m_ide_master_password);
 	if (m_ide_user_password != NULL)
-		m_ide->ide_set_user_password(m_ide_user_password);
+		m_ide->ide_set_user_password(0, m_ide_user_password);
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));

@@ -11,7 +11,9 @@
 //-------------------------------------------------
 
 ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+	master_password(NULL),
+	user_password(NULL)
 {
 }
 
@@ -255,6 +257,11 @@ void ide_hdd_device::device_start()
 	save_item(NAME(precomp_offset));
 
 	save_item(NAME(sector_count));
+
+	save_item(NAME(master_password_enable));
+	save_item(NAME(user_password_enable));
+
+	save_item(NAME(gnetreadlock));
 }
 
 //-------------------------------------------------
