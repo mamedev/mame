@@ -10,7 +10,7 @@
 BreakpointsWindow::BreakpointsWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, NULL)
 {
-	setWindowTitle("Debug: Machine Breakpoints");
+	setWindowTitle("Debug: All Breakpoints");
 
 	if (parent != NULL)
 	{
