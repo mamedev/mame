@@ -918,7 +918,7 @@ UINT16 ide_controller_device::read_dma()
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	if (dev == NULL)
-		return 0;
+		return 0xff;
 
 	UINT16 result = dev->buffer[dev->buffer_offset++];
 	result |= dev->buffer[dev->buffer_offset++] << 8;
@@ -951,7 +951,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	}
 	else
 	{
-		return 0;
+		return 0xff;
 	}
 
 	switch (offset)
@@ -1056,7 +1056,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	}
 	else
 	{
-		return 0;
+		return 0xff;
 	}
 
 	/* logit */
