@@ -1755,6 +1755,8 @@ float nv2a_renderer::combiner_map_input_select(int code,int index)
 			return combiner.variable_EF[index];
 		break;
 	}
+
+	return 0;
 }
 
 float *nv2a_renderer::combiner_map_input_select3(int code)
@@ -1804,6 +1806,8 @@ float *nv2a_renderer::combiner_map_input_select3(int code)
 			return combiner.variable_EF;
 		break;
 	}
+
+	return 0;
 }
 
 float *nv2a_renderer::combiner_map_output_select3(int code)
@@ -1853,6 +1857,8 @@ float *nv2a_renderer::combiner_map_output_select3(int code)
 			return 0;
 		break;
 	}
+
+	return 0;
 }
 
 float nv2a_renderer::combiner_map_input_function(int code,float value)
@@ -1887,6 +1893,8 @@ float nv2a_renderer::combiner_map_input_function(int code,float value)
 			return -value;
 		break;
 	}
+
+	return 0;
 }
 
 void nv2a_renderer::combiner_map_input_function3(int code,float *data)
