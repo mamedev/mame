@@ -31,6 +31,10 @@ public:
 	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          buffer_offset;
 
+	UINT8           adapter_control;
+	UINT8           precomp_offset;
+	UINT16          sector_count;
+
 protected:
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;

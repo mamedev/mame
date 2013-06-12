@@ -283,15 +283,15 @@ void ide_controller_device::read_buffer_empty()
 	{
 		security_error();
 
-		sector_count = 0;
+		dev->sector_count = 0;
 
 		return;
 	}
 
 	/* if there is more data to read, keep going */
-	if (sector_count > 0)
-		sector_count--;
-	if (sector_count > 0)
+	if (dev->sector_count > 0)
+		dev->sector_count--;
+	if (dev->sector_count > 0)
 		read_next_sector();
 }
 
@@ -325,7 +325,7 @@ void ide_controller_device::read_sector_done()
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (sector_count != 1)
+		if (dev->sector_count != 1)
 			next_sector();
 
 		/* clear the error value */
@@ -334,7 +334,7 @@ void ide_controller_device::read_sector_done()
 		/* signal an interrupt */
 		if (!verify_only)
 			sectors_until_int--;
-		if (sectors_until_int == 0 || sector_count == 1)
+		if (sectors_until_int == 0 || dev->sector_count == 1)
 		{
 			sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE_BLOCK) ? block_count : 1);
 			set_irq(ASSERT_LINE);
@@ -534,27 +534,27 @@ void ide_controller_device::write_sector_done()
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (sector_count != 1)
+		if (dev->sector_count != 1)
 			next_sector();
 
 		/* clear the error value */
 		error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
-		if (--sectors_until_int == 0 || sector_count == 1)
+		if (--sectors_until_int == 0 || dev->sector_count == 1)
 		{
 			sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE_BLOCK) ? block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
 		/* signal an interrupt if there's more data needed */
-		if (sector_count > 0)
-			sector_count--;
-		if (sector_count == 0)
+		if (dev->sector_count > 0)
+			dev->sector_count--;
+		if (dev->sector_count == 0)
 			status &= ~IDE_STATUS_BUFFER_READY;
 
 		/* keep going for DMA */
-		if (dma_active && sector_count != 0)
+		if (dma_active && dev->sector_count != 0)
 		{
 			set_dmarq(1);
 		}
@@ -594,7 +594,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_READ_MULTIPLE:
 		case IDE_COMMAND_READ_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
@@ -608,7 +608,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_READ_MULTIPLE_BLOCK:
 			LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
@@ -623,7 +623,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_VERIFY_MULTIPLE:
 		case IDE_COMMAND_VERIFY_NORETRY:
 			LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
@@ -637,11 +637,11 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_READ_DMA:
 			LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = sector_count;
+			sectors_until_int = dev->sector_count;
 			dma_active = 1;
 			verify_only = 0;
 
@@ -652,7 +652,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_WRITE_MULTIPLE:
 		case IDE_COMMAND_WRITE_MULTIPLE_NORETRY:
 			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
@@ -665,7 +665,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_WRITE_MULTIPLE_BLOCK:
 			LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
@@ -678,11 +678,11 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_WRITE_DMA:
 			LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), sector_count));
+				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sectors_until_int = sector_count;
+			sectors_until_int = dev->sector_count;
 			dma_active = 1;
 
 			/* start the read going */
@@ -707,7 +707,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* reset the buffer */
 			dev->buffer_offset = 0;
-			sector_count = 1;
+			dev->sector_count = 1;
 
 			/* build the features page */
 			memcpy(dev->buffer, slot[cur_drive]->dev()->get_features(), sizeof(dev->buffer));
@@ -747,16 +747,16 @@ void ide_controller_device::handle_command(UINT8 _command)
 			error = IDE_ERROR_NONE;
 
 			/* for timeout disabled value is 0 */
-			sector_count = 0;
+			dev->sector_count = 0;
 			/* signal an interrupt */
 			set_irq(ASSERT_LINE);
 			break;
 
 		case IDE_COMMAND_SET_CONFIG:
-			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, sector_count));
+			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, dev->sector_count));
 			status &= ~IDE_STATUS_ERROR;
 			error = IDE_ERROR_NONE;
-			dev->set_geometry(sector_count,dev->cur_head + 1);
+			dev->set_geometry(dev->sector_count,dev->cur_head + 1);
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
@@ -771,16 +771,16 @@ void ide_controller_device::handle_command(UINT8 _command)
 			break;
 
 		case IDE_COMMAND_SET_FEATURES:
-			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", precomp_offset, sector_count & 0xff, dev->cur_sector, dev->cur_cylinder & 0xff, dev->cur_cylinder >> 8));
+			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", dev->precomp_offset, dev->sector_count & 0xff, dev->cur_sector, dev->cur_cylinder & 0xff, dev->cur_cylinder >> 8));
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_SET_BLOCK_COUNT:
-			LOGPRINT(("IDE Set block count (%02X)\n", sector_count));
+			LOGPRINT(("IDE Set block count (%02X)\n", dev->sector_count));
 
-			block_count = sector_count;
+			block_count = dev->sector_count;
 			// judge dredd wants 'drive ready' on this command
 			status |= IDE_STATUS_DRIVE_READY;
 
@@ -791,7 +791,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
 			LOGPRINT(("IDE GNET Unlock 1\n"));
 
-			sector_count = 1;
+			dev->sector_count = 1;
 			status |= IDE_STATUS_DRIVE_READY;
 			status &= ~IDE_STATUS_ERROR;
 			set_irq(ASSERT_LINE);
@@ -815,7 +815,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			/* key check */
 			dev->read_key(key);
-			if ((precomp_offset == key[0]) && (sector_count == key[1]) && (dev->cur_sector == key[2]) && (dev->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
+			if ((dev->precomp_offset == key[0]) && (dev->sector_count == key[1]) && (dev->cur_sector == key[2]) && (dev->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
 			{
 				gnetreadlock= 0;
 			}
@@ -836,7 +836,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			error = IDE_ERROR_NONE;
 
 			/* for timeout disabled value is 0 */
-			sector_count = 0;
+			dev->sector_count = 0;
 			/* signal an interrupt */
 			set_irq(ASSERT_LINE);
 			break;
@@ -975,7 +975,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 
 		/* return the current sector count */
 		case IDE_BANK0_SECTOR_COUNT:
-			result = sector_count;
+			result = dev->sector_count;
 			break;
 
 		/* return the current sector */
@@ -1184,12 +1184,12 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 
 		/* precompensation offset?? */
 		case IDE_BANK0_ERROR:
-			precomp_offset = data;
+			dev->precomp_offset = data;
 			break;
 
 		/* sector count */
 		case IDE_BANK0_SECTOR_COUNT:
-			sector_count = data ? data : 256;
+			dev->sector_count = data ? data : 256;
 			break;
 
 		/* current sector */
@@ -1235,6 +1235,11 @@ WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
 
 WRITE16_MEMBER( ide_controller_device::write_cs1 )
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
+	if (dev == NULL)
+		return;
+
 //  printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
 
 	/* logit */
@@ -1244,7 +1249,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 	{
 		/* adapter control */
 		case IDE_BANK1_STATUS_CONTROL:
-			adapter_control = data;
+			dev->adapter_control = data;
 
 			/* handle controller reset */
 			//if (data == 0x04)
@@ -1266,12 +1271,9 @@ SLOT_INTERFACE_END
 ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
 	status(0),
-	adapter_control(0),
 	error(0),
 	command(0),
 	interrupt_pending(0),
-	precomp_offset(0),
-	sector_count(0),
 	block_count(0),
 	sectors_until_int(0),
 	verify_only(0),
@@ -1292,12 +1294,9 @@ const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	adapter_control(0),
 	error(0),
 	command(0),
 	interrupt_pending(0),
-	precomp_offset(0),
-	sector_count(0),
 	block_count(0),
 	sectors_until_int(0),
 	verify_only(0),
@@ -1330,14 +1329,10 @@ void ide_controller_device::device_start()
 	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 
 	/* register ide states */
-	save_item(NAME(adapter_control));
 	save_item(NAME(status));
 	save_item(NAME(error));
 	save_item(NAME(command));
 	save_item(NAME(interrupt_pending));
-	save_item(NAME(precomp_offset));
-
-	save_item(NAME(sector_count));
 
 	save_item(NAME(block_count));
 	save_item(NAME(sectors_until_int));

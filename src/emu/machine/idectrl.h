@@ -106,8 +106,6 @@ public:
 	void read_sector_done();
 	void write_sector_done();
 
-	UINT8           status;
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -127,14 +125,12 @@ private:
 	void read_buffer_empty();
 	void write_buffer_full();
 
-	UINT8           dma_active;
-	UINT8           adapter_control;
+	UINT8           status;
 	UINT8           error;
 	UINT8           command;
-	UINT8           interrupt_pending;
-	UINT8           precomp_offset;
 
-	UINT16          sector_count;
+	UINT8           dma_active;
+	UINT8           interrupt_pending;
 
 	UINT16          block_count;
 	UINT16          sectors_until_int;
