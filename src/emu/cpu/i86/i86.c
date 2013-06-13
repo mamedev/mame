@@ -231,10 +231,13 @@ static CPU_RESET( i8086 )
 {
 	i8086_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	offs_t save_xor;
 
 	save_irqcallback = cpustate->irq_callback;
+	save_xor = cpustate->fetch_xor;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
+	cpustate->fetch_xor = save_xor;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
