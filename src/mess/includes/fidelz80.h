@@ -47,8 +47,8 @@ public:
 	DECLARE_READ8_MEMBER( vcc_portb_r );
 	DECLARE_WRITE8_MEMBER( vcc_porta_w );
 
-	//model ABC/VBC
-	DECLARE_WRITE8_MEMBER( abc_speech_w );
+	//model 7014 and VBC
+	DECLARE_WRITE8_MEMBER(bridgec_speech_w );
 	DECLARE_WRITE8_MEMBER(kp_matrix_w);
 	DECLARE_READ8_MEMBER(unknown_r);
 	DECLARE_READ8_MEMBER(exp_i8243_p2_r);
@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_command_w);
 	DECLARE_READ8_MEMBER(mcu_data_r);
 	DECLARE_READ8_MEMBER(mcu_status_r);
+	DECLARE_INPUT_CHANGED_MEMBER(bridgec_trigger_reset);
 
 	//model VSC
 	DECLARE_WRITE8_MEMBER(vsc_porta_w);
@@ -67,7 +68,6 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 	DECLARE_INPUT_CHANGED_MEMBER(fidelz80_trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(abc_trigger_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	DECLARE_WRITE8_MEMBER(digit_w);
