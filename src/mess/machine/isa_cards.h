@@ -29,6 +29,7 @@
 #include "machine/isa_hdc.h"
 #include "machine/isa_wdxt_gen.h"
 #include "machine/isa_ide.h"
+#include "machine/isa_ide8.h"
 #include "machine/isa_ide_cd.h"
 #include "machine/isa_aha1542.h"
 
