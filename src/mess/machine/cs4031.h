@@ -235,7 +235,6 @@ private:
 	int m_dma_channel;
 
 	UINT8 m_portb;
-	int m_speaker_data;
 	int m_refresh_toggle;
 	int m_iochck;
 	int m_nmi_mask;
