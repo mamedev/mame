@@ -19,7 +19,7 @@
 
 // ======================> ide_device_interface
 
-class ide_device_interface : public device_slot_card_interface
+class ide_device_interface
 {
 public:
 	ide_device_interface(const machine_config &mconfig, device_t &device);
@@ -63,7 +63,8 @@ protected:
 };
 
 class ide_mass_storage_device : public device_t,
-	public ide_device_interface
+	public ide_device_interface,
+	public device_slot_card_interface
 {
 public:
 	ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);

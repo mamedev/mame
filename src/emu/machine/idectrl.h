@@ -88,7 +88,6 @@ public:
 	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_dmarq_handler.set_callback(object); }
 
 	UINT8 *ide_get_features(int drive);
-	void ide_set_gnet_readlock(int drive, const UINT8 onoff);
 	void ide_set_master_password(int drive, const UINT8 *password);
 	void ide_set_user_password(int drive, const UINT8 *password);
 

@@ -85,11 +85,6 @@ UINT8 *ide_controller_device::ide_get_features(int _drive)
 	return m_slot[_drive]->dev()->get_features();
 }
 
-void ide_controller_device::ide_set_gnet_readlock(int _drive, const UINT8 onoff)
-{
-	m_slot[_drive]->dev()->m_gnetreadlock = onoff;
-}
-
 void ide_controller_device::ide_set_master_password(int _drive, const UINT8 *password)
 {
 	m_slot[_drive]->dev()->m_master_password = password;

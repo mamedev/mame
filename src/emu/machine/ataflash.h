@@ -8,9 +8,8 @@
 
 extern const device_type ATA_FLASH_PCCARD;
 
-class ata_flash_pccard_device : public device_t,
-	public pccard_interface,
-	public device_slot_card_interface
+class ata_flash_pccard_device : public ide_hdd_device,
+	public pccard_interface
 {
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -22,15 +21,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset_after_children();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_reset();
 
 private:
-	chd_file *m_chd_file;
 	unsigned char m_cis[512];
 	int m_locked;
-	required_device<ide_controller_device> m_card;
 };
 
 #endif

@@ -77,12 +77,13 @@ enum
 //  ide_device_interface - constructor
 //-------------------------------------------------
 
-ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device) :
 	m_master_password(NULL),
 	m_user_password(NULL),
-	m_irq_handler(*this),
-	m_dmarq_handler(*this)
+	m_csel(0),
+	m_dasp(0),
+	m_irq_handler(device),
+	m_dmarq_handler(device)
 {
 }
 
@@ -104,7 +105,8 @@ void ide_device_interface::set_dmarq(int state)
 
 ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	ide_device_interface(mconfig, *this)
+	ide_device_interface(mconfig, *this),
+	device_slot_card_interface(mconfig, *this)
 {
 }
 
@@ -1318,8 +1320,8 @@ ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-		ide_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source)
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: ide_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
