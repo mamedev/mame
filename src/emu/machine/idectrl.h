@@ -49,6 +49,9 @@ extern const device_type IDE_SLOT;
 #define MCFG_IDE_CONTROLLER_IRQ_HANDLER(_devcb) \
 	devcb = &ide_controller_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_IDE_CONTROLLER_DMARQ_HANDLER(_devcb) \
+	devcb = &ide_controller_device::set_dmarq_handler(*device, DEVCB2_##_devcb);
+
 SLOT_INTERFACE_EXTERN(ide_devices);
 SLOT_INTERFACE_EXTERN(ide_devices);
 
@@ -82,14 +85,13 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_dmarq_handler.set_callback(object); }
 
 	UINT8 *ide_get_features(int drive);
 	void ide_set_gnet_readlock(int drive, const UINT8 onoff);
 	void ide_set_master_password(int drive, const UINT8 *password);
 	void ide_set_user_password(int drive, const UINT8 *password);
 
-	DECLARE_READ8_MEMBER(read_via_config);
-	DECLARE_WRITE8_MEMBER(write_via_config);
 	UINT16 read_dma();
 	DECLARE_READ16_MEMBER(read_cs0);
 	DECLARE_READ16_MEMBER(read_cs1);
@@ -97,43 +99,38 @@ public:
 	DECLARE_WRITE16_MEMBER(write_cs0);
 	DECLARE_WRITE16_MEMBER(write_cs1);
 
+	DECLARE_READ8_MEMBER(read_via_config);
+	DECLARE_WRITE8_MEMBER(write_via_config);
 	DECLARE_READ16_MEMBER(read_cs0_pc);
 	DECLARE_READ16_MEMBER(read_cs1_pc);
 	DECLARE_WRITE16_MEMBER(write_cs0_pc);
 	DECLARE_WRITE16_MEMBER(write_cs1_pc);
 
-	virtual void set_irq(int state);
-	virtual void set_dmarq(int state);
-	void read_sector_done();
-	void write_sector_done();
-
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	void read_next_sector();
-	void continue_write();
+	virtual void set_irq(int state);
+	virtual void set_dmarq(int state);
 
 private:
-	void signal_delayed_interrupt(attotime time, int buffer_ready);
-	void next_sector();
-	void security_error();
-	void continue_read();
-	void read_first_sector();
-	void handle_command(UINT8 _command);
-	void read_buffer_empty();
-	void write_buffer_full();
+	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
+	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
 
-	UINT8           config_unknown;
-	UINT8           config_register[IDE_CONFIG_REGISTERS];
-	UINT8           config_register_num;
+	DECLARE_WRITE_LINE_MEMBER(irq1_write_line);
+	DECLARE_WRITE_LINE_MEMBER(dmarq1_write_line);
 
-	UINT8           cur_drive;
-	ide_slot_device *slot[2];
+	UINT8           m_config_unknown;
+	UINT8           m_config_register[IDE_CONFIG_REGISTERS];
+	UINT8           m_config_register_num;
+
+	ide_slot_device *m_slot[2];
+	int m_irq[2];
+	int m_dmarq[2];
 
 	devcb2_write_line m_irq_handler;
+	devcb2_write_line m_dmarq_handler;
 };
 
 extern const device_type IDE_CONTROLLER;
@@ -157,11 +154,11 @@ public:
 	DECLARE_READ32_MEMBER( ide_bus_master32_r );
 	DECLARE_WRITE32_MEMBER( ide_bus_master32_w );
 
-	virtual void set_irq(int state);
-	virtual void set_dmarq(int state);
-
 protected:
 	virtual void device_start();
+
+	virtual void set_irq(int state);
+	virtual void set_dmarq(int state);
 
 private:
 	void execute_dma();

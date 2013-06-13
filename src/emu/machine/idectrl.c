@@ -26,64 +26,13 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MINIMUM_COMMAND_TIME                (attotime::from_usec(10))
-
-#define TIME_PER_SECTOR                     (attotime::from_usec(100))
-#define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
-#define TIME_SECURITY_ERROR                 (attotime::from_msec(1000))
-
-#define TIME_SEEK_MULTISECTOR               (attotime::from_msec(13))
-#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_nsec(16300))
-
-#define IDE_BANK0_DATA                      0
-#define IDE_BANK0_ERROR                     1
-#define IDE_BANK0_SECTOR_COUNT              2
-#define IDE_BANK0_SECTOR_NUMBER             3
-#define IDE_BANK0_CYLINDER_LSB              4
-#define IDE_BANK0_CYLINDER_MSB              5
-#define IDE_BANK0_HEAD_NUMBER               6
-#define IDE_BANK0_STATUS_COMMAND            7
-
-#define IDE_BANK1_STATUS_CONTROL            6
-
 #define IDE_BANK2_CONFIG_UNK                4
 #define IDE_BANK2_CONFIG_REGISTER           8
 #define IDE_BANK2_CONFIG_DATA               0xc
 
-#define IDE_COMMAND_READ_SECTORS            0x20
-#define IDE_COMMAND_READ_SECTORS_NORETRY    0x21
-#define IDE_COMMAND_WRITE_SECTORS           0x30
-#define IDE_COMMAND_WRITE_SECTORS_NORETRY   0x31
-#define IDE_COMMAND_DIAGNOSTIC              0x90
-#define IDE_COMMAND_SET_CONFIG              0x91
-#define IDE_COMMAND_READ_MULTIPLE           0xc4
-#define IDE_COMMAND_WRITE_MULTIPLE          0xc5
-#define IDE_COMMAND_SET_BLOCK_COUNT         0xc6
-#define IDE_COMMAND_READ_DMA                0xc8
-#define IDE_COMMAND_WRITE_DMA               0xca
-#define IDE_COMMAND_GET_INFO                0xec
-#define IDE_COMMAND_SET_FEATURES            0xef
-#define IDE_COMMAND_SECURITY_UNLOCK         0xf2
-#define IDE_COMMAND_UNKNOWN_F9              0xf9
-#define IDE_COMMAND_VERIFY_SECTORS          0x40
-#define IDE_COMMAND_VERIFY_SECTORS_NORETRY  0x41
-#define IDE_COMMAND_ATAPI_IDENTIFY          0xa1
-#define IDE_COMMAND_RECALIBRATE             0x10
-#define IDE_COMMAND_SEEK                    0x70
-#define IDE_COMMAND_IDLE_IMMEDIATE          0xe1
-#define IDE_COMMAND_IDLE                    0xe3
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_1     0xfe
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_2     0xfc
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_3     0x0f
-
 
 void ide_controller_device::set_irq(int state)
 {
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-		return;
-
 	if (state == ASSERT_LINE)
 		LOG(("IDE interrupt assert\n"));
 	else
@@ -91,75 +40,40 @@ void ide_controller_device::set_irq(int state)
 
 	/* signal an interrupt */
 	m_irq_handler(state);
-
-	if (dev != NULL)
-		dev->interrupt_pending = state;
 }
 
 void ide_controller_device::set_dmarq(int state)
 {
+	m_dmarq_handler(state);
 }
 
-enum
+WRITE_LINE_MEMBER( ide_controller_device::irq0_write_line )
 {
-	TID_NULL,
-	TID_DELAYED_INTERRUPT,
-	TID_DELAYED_INTERRUPT_BUFFER_READY,
-	TID_RESET_CALLBACK,
-	TID_SECURITY_ERROR_DONE,
-	TID_READ_SECTOR_DONE_CALLBACK,
-	TID_WRITE_SECTOR_DONE_CALLBACK
-};
+	m_irq[0] = state;
 
-void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	switch(id)
-	{
-	case TID_DELAYED_INTERRUPT:
-		dev->status &= ~IDE_STATUS_BUSY;
-		set_irq(ASSERT_LINE);
-		break;
-
-	case TID_DELAYED_INTERRUPT_BUFFER_READY:
-		dev->status &= ~IDE_STATUS_BUSY;
-		dev->status |= IDE_STATUS_BUFFER_READY;
-		set_irq(ASSERT_LINE);
-		break;
-
-	case TID_SECURITY_ERROR_DONE:
-		/* clear error state */
-		dev->status &= ~IDE_STATUS_ERROR;
-		dev->status |= IDE_STATUS_DRIVE_READY;
-		break;
-
-	case TID_READ_SECTOR_DONE_CALLBACK:
-		read_sector_done();
-		break;
-
-	case TID_WRITE_SECTOR_DONE_CALLBACK:
-		write_sector_done();
-		break;
-	}
+	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
 }
 
-
-void ide_controller_device::signal_delayed_interrupt(attotime time, int buffer_ready)
+WRITE_LINE_MEMBER( ide_controller_device::irq1_write_line )
 {
-	ide_device_interface *dev = slot[cur_drive]->dev();
+	m_irq[1] = state;
 
-	/* clear buffer ready and set the busy flag */
-	dev->status &= ~IDE_STATUS_BUFFER_READY;
-	dev->status |= IDE_STATUS_BUSY;
-
-	/* set a timer */
-	if (buffer_ready)
-		timer_set(time, TID_DELAYED_INTERRUPT_BUFFER_READY);
-	else
-		timer_set(time, TID_DELAYED_INTERRUPT);
+	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
 }
 
+WRITE_LINE_MEMBER( ide_controller_device::dmarq0_write_line )
+{
+	m_dmarq[0] = state;
+
+	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+}
+
+WRITE_LINE_MEMBER( ide_controller_device::dmarq1_write_line )
+{
+	m_dmarq[1] = state;
+
+	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+}
 
 
 /***************************************************************************
@@ -168,694 +82,67 @@ void ide_controller_device::signal_delayed_interrupt(attotime time, int buffer_r
 
 UINT8 *ide_controller_device::ide_get_features(int _drive)
 {
-	return slot[_drive]->dev()->get_features();
+	return m_slot[_drive]->dev()->get_features();
 }
 
 void ide_controller_device::ide_set_gnet_readlock(int _drive, const UINT8 onoff)
 {
-	slot[_drive]->dev()->gnetreadlock = onoff;
+	m_slot[_drive]->dev()->m_gnetreadlock = onoff;
 }
 
 void ide_controller_device::ide_set_master_password(int _drive, const UINT8 *password)
 {
-	slot[_drive]->dev()->master_password = password;
-	slot[_drive]->dev()->master_password_enable = (password != NULL);
+	m_slot[_drive]->dev()->m_master_password = password;
+	m_slot[_drive]->dev()->m_master_password_enable = (password != NULL);
 }
 
 
 void ide_controller_device::ide_set_user_password(int _drive, const UINT8 *password)
 {
-	slot[_drive]->dev()->user_password = password;
-	slot[_drive]->dev()->user_password_enable = (password != NULL);
+	m_slot[_drive]->dev()->m_user_password = password;
+	m_slot[_drive]->dev()->m_user_password_enable = (password != NULL);
 }
-
-
-
-/*************************************
- *
- *  Advance to the next sector
- *
- *************************************/
-
-void ide_controller_device::next_sector()
-{
-	/* LBA direct? */
-	ide_device_interface *dev = slot[cur_drive]->dev();
-	if (dev->cur_head_reg & 0x40)
-	{
-		dev->cur_sector++;
-		if (dev->cur_sector == 0)
-		{
-			dev->cur_cylinder++;
-			if (dev->cur_cylinder == 0)
-				dev->cur_head++;
-		}
-	}
-
-	/* standard CHS */
-	else
-	{
-		/* sectors are 1-based */
-		dev->cur_sector++;
-		if (dev->cur_sector > dev->get_sectors())
-		{
-			/* heads are 0 based */
-			dev->cur_sector = 1;
-			dev->cur_head++;
-			if (dev->cur_head >= dev->get_heads())
-			{
-				dev->cur_head = 0;
-				dev->cur_cylinder++;
-			}
-		}
-	}
-
-	dev->cur_lba = dev->lba_address();
-}
-
-
-
-/*************************************
- *
- *  security error handling
- *
- *************************************/
-
-void ide_controller_device::security_error()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* set error state */
-	dev->status |= IDE_STATUS_ERROR;
-	dev->status &= ~IDE_STATUS_DRIVE_READY;
-
-	/* just set a timer and mark ourselves error */
-	timer_set(TIME_SECURITY_ERROR, TID_SECURITY_ERROR_DONE);
-}
-
-
-
-/*************************************
- *
- *  Sector reading
- *
- *************************************/
-
-void ide_controller_device::read_buffer_empty()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* reset the totals */
-	dev->buffer_offset = 0;
-
-	/* clear the buffer ready and busy flag */
-	dev->status &= ~IDE_STATUS_BUFFER_READY;
-	dev->status &= ~IDE_STATUS_BUSY;
-	dev->error = IDE_ERROR_DEFAULT;
-	set_dmarq(0);
-
-	if (dev->master_password_enable || dev->user_password_enable)
-	{
-		security_error();
-
-		dev->sector_count = 0;
-
-		return;
-	}
-
-	/* if there is more data to read, keep going */
-	if (dev->sector_count > 0)
-		dev->sector_count--;
-	if (dev->sector_count > 0)
-		read_next_sector();
-}
-
-
-void ide_controller_device::read_sector_done()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-	int lba = dev->lba_address(), count = 0;
-
-	/* GNET readlock check */
-	if (dev->gnetreadlock) {
-		dev->status &= ~IDE_STATUS_ERROR;
-		dev->status &= ~IDE_STATUS_BUSY;
-		return;
-	}
-
-	/* now do the read */
-	count = dev->read_sector(lba, dev->buffer);
-
-	/* by default, mark the buffer ready and the seek complete */
-	if (!dev->verify_only)
-		dev->status |= IDE_STATUS_BUFFER_READY;
-	dev->status |= IDE_STATUS_SEEK_COMPLETE;
-
-	/* and clear the busy and error flags */
-	dev->status &= ~IDE_STATUS_ERROR;
-	dev->status &= ~IDE_STATUS_BUSY;
-
-	/* if we succeeded, advance to the next sector and set the nice bits */
-	if (count == 1)
-	{
-		/* advance the pointers, unless this is the last sector */
-		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (dev->sector_count != 1)
-			next_sector();
-
-		/* clear the error value */
-		dev->error = IDE_ERROR_NONE;
-
-		/* signal an interrupt */
-		if (!dev->verify_only)
-			dev->sectors_until_int--;
-		if (dev->sectors_until_int == 0 || dev->sector_count == 1)
-		{
-			dev->sectors_until_int = ((dev->command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
-			set_irq(ASSERT_LINE);
-		}
-
-		/* handle DMA */
-		if (dev->dma_active)
-			set_dmarq(1);
-
-		/* if we're just verifying we can read the next sector */
-		if (dev->verify_only)
-			read_buffer_empty();
-	}
-
-	/* if we got an error, we need to report it */
-	else
-	{
-		/* set the error flag and the error */
-		dev->status |= IDE_STATUS_ERROR;
-		dev->error = IDE_ERROR_BAD_SECTOR;
-
-		/* signal an interrupt */
-		set_irq(ASSERT_LINE);
-	}
-}
-
-
-void ide_controller_device::read_first_sector()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-	/* mark ourselves busy */
-	dev->status |= IDE_STATUS_BUSY;
-
-	/* just set a timer */
-	if (dev->command == IDE_COMMAND_READ_MULTIPLE)
-	{
-		int new_lba = dev->lba_address();
-		attotime seek_time;
-
-		if (new_lba == dev->cur_lba || new_lba == dev->cur_lba + 1)
-			seek_time = TIME_NO_SEEK_MULTISECTOR;
-		else
-			seek_time = TIME_SEEK_MULTISECTOR;
-
-		dev->cur_lba = new_lba;
-		timer_set(seek_time, TID_READ_SECTOR_DONE_CALLBACK);
-	}
-	else
-		timer_set(TIME_PER_SECTOR, TID_READ_SECTOR_DONE_CALLBACK);
-}
-
-
-void ide_controller_device::read_next_sector()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* mark ourselves busy */
-	dev->status |= IDE_STATUS_BUSY;
-
-	if (dev->command == IDE_COMMAND_READ_MULTIPLE)
-	{
-		if (dev->sectors_until_int != 1)
-			/* make ready now */
-			read_sector_done();
-		else
-			/* just set a timer */
-			timer_set(attotime::from_usec(1), TID_READ_SECTOR_DONE_CALLBACK);
-	}
-	else
-		/* just set a timer */
-		timer_set(TIME_PER_SECTOR, TID_READ_SECTOR_DONE_CALLBACK);
-}
-
-
-
-/*************************************
- *
- *  Sector writing
- *
- *************************************/
-
-void ide_controller_device::continue_write()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* reset the totals */
-	dev->buffer_offset = 0;
-
-	/* clear the buffer ready flag */
-	dev->status &= ~IDE_STATUS_BUFFER_READY;
-	dev->status |= IDE_STATUS_BUSY;
-
-	if (dev->command == IDE_COMMAND_WRITE_MULTIPLE)
-	{
-		if (dev->sectors_until_int != 1)
-		{
-			/* ready to write now */
-			write_sector_done();
-		}
-		else
-		{
-			/* set a timer to do the write */
-			timer_set(TIME_PER_SECTOR, TID_WRITE_SECTOR_DONE_CALLBACK);
-		}
-	}
-	else
-	{
-		/* set a timer to do the write */
-		timer_set(TIME_PER_SECTOR, TID_WRITE_SECTOR_DONE_CALLBACK);
-	}
-}
-
-
-void ide_controller_device::write_buffer_full()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	set_dmarq(0);
-	if (dev->command == IDE_COMMAND_SECURITY_UNLOCK)
-	{
-		if (dev->user_password_enable && memcmp(dev->buffer, dev->user_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked user password\n"));
-			dev->user_password_enable = 0;
-		}
-		if (dev->master_password_enable && memcmp(dev->buffer, dev->master_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked master password\n"));
-			dev->master_password_enable = 0;
-		}
-		if (PRINTF_IDE_PASSWORD)
-		{
-			int i;
-
-			for (i = 0; i < 34; i += 2)
-			{
-				if (i % 8 == 2)
-					mame_printf_debug("\n");
-
-				mame_printf_debug("0x%02x, 0x%02x, ", dev->buffer[i], dev->buffer[i + 1]);
-				//mame_printf_debug("0x%02x%02x, ", dev->buffer[i], dev->buffer[i + 1]);
-			}
-			mame_printf_debug("\n");
-		}
-
-		/* clear the busy and error flags */
-		dev->status &= ~IDE_STATUS_ERROR;
-		dev->status &= ~IDE_STATUS_BUSY;
-		dev->status &= ~IDE_STATUS_BUFFER_READY;
-
-		if (dev->master_password_enable || dev->user_password_enable)
-			security_error();
-		else
-			dev->status |= IDE_STATUS_DRIVE_READY;
-	}
-	else if (dev->command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
-	{
-		UINT8 key[5] = { 0 };
-		int i, bad = 0;
-		dev->read_key(key);
-
-		for (i=0; !bad && i<512; i++)
-			bad = ((i < 2 || i >= 7) && dev->buffer[i]) || ((i >= 2 && i < 7) && dev->buffer[i] != key[i-2]);
-
-		dev->status &= ~IDE_STATUS_BUSY;
-		dev->status &= ~IDE_STATUS_BUFFER_READY;
-		if (bad)
-			dev->status |= IDE_STATUS_ERROR;
-		else {
-			dev->status &= ~IDE_STATUS_ERROR;
-			dev->gnetreadlock= 0;
-		}
-	}
-	else
-	{
-		continue_write();
-	}
-}
-
-
-void ide_controller_device::write_sector_done()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-	int lba = dev->lba_address(), count = 0;
-
-	/* now do the write */
-	count = dev->write_sector(lba, dev->buffer);
-
-	/* by default, mark the buffer ready and the seek complete */
-	dev->status |= IDE_STATUS_BUFFER_READY;
-	dev->status |= IDE_STATUS_SEEK_COMPLETE;
-
-	/* and clear the busy adn error flags */
-	dev->status &= ~IDE_STATUS_ERROR;
-	dev->status &= ~IDE_STATUS_BUSY;
-
-	/* if we succeeded, advance to the next sector and set the nice bits */
-	if (count == 1)
-	{
-		/* advance the pointers, unless this is the last sector */
-		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (dev->sector_count != 1)
-			next_sector();
-
-		/* clear the error value */
-		dev->error = IDE_ERROR_NONE;
-
-		/* signal an interrupt */
-		if (--dev->sectors_until_int == 0 || dev->sector_count == 1)
-		{
-			dev->sectors_until_int = ((dev->command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
-			set_irq(ASSERT_LINE);
-		}
-
-		/* signal an interrupt if there's more data needed */
-		if (dev->sector_count > 0)
-			dev->sector_count--;
-		if (dev->sector_count == 0)
-			dev->status &= ~IDE_STATUS_BUFFER_READY;
-
-		/* keep going for DMA */
-		if (dev->dma_active && dev->sector_count != 0)
-		{
-			set_dmarq(1);
-		}
-	}
-
-	/* if we got an error, we need to report it */
-	else
-	{
-		/* set the error flag and the error */
-		dev->status |= IDE_STATUS_ERROR;
-		dev->error = IDE_ERROR_BAD_SECTOR;
-
-		/* signal an interrupt */
-		set_irq(ASSERT_LINE);
-	}
-}
-
-
-
-/*************************************
- *
- *  Handle IDE commands
- *
- *************************************/
-
-void ide_controller_device::handle_command(UINT8 _command)
-{
-	UINT8 key[5];
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* implicitly clear interrupts & dmarq here */
-	set_irq(CLEAR_LINE);
-	set_dmarq(0);
-	dev->command = _command;
-	switch (dev->command)
-	{
-		case IDE_COMMAND_READ_SECTORS:
-		case IDE_COMMAND_READ_SECTORS_NORETRY:
-			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 1;
-			dev->dma_active = 0;
-			dev->verify_only = 0;
-
-			/* start the read going */
-			read_first_sector();
-			break;
-
-		case IDE_COMMAND_READ_MULTIPLE:
-			LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 1;
-			dev->dma_active = 0;
-			dev->verify_only = 0;
-
-			/* start the read going */
-			read_first_sector();
-			break;
-
-		case IDE_COMMAND_VERIFY_SECTORS:
-		case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
-			LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 1;
-			dev->dma_active = 0;
-			dev->verify_only = 1;
-
-			/* start the read going */
-			read_first_sector();
-			break;
-
-		case IDE_COMMAND_READ_DMA:
-			LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = dev->sector_count;
-			dev->dma_active = 1;
-			dev->verify_only = 0;
-
-			/* start the read going */
-			read_first_sector();
-			break;
-
-		case IDE_COMMAND_WRITE_SECTORS:
-		case IDE_COMMAND_WRITE_SECTORS_NORETRY:
-			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 1;
-			dev->dma_active = 0;
-
-			/* mark the buffer ready */
-			dev->status |= IDE_STATUS_BUFFER_READY;
-			break;
-
-		case IDE_COMMAND_WRITE_MULTIPLE:
-			LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 1;
-			dev->dma_active = 0;
-
-			/* mark the buffer ready */
-			dev->status |= IDE_STATUS_BUFFER_READY;
-			break;
-
-		case IDE_COMMAND_WRITE_DMA:
-			LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				dev->cur_cylinder, dev->cur_head, dev->cur_sector, dev->lba_address(), dev->sector_count));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = dev->sector_count;
-			dev->dma_active = 1;
-
-			/* start the read going */
-			set_dmarq(1);
-			break;
-
-		case IDE_COMMAND_SECURITY_UNLOCK:
-			LOGPRINT(("IDE Security Unlock\n"));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 0;
-			dev->dma_active = 0;
-
-			/* mark the buffer ready */
-			dev->status |= IDE_STATUS_BUFFER_READY;
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_GET_INFO:
-			LOGPRINT(("IDE Read features\n"));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sector_count = 1;
-
-			/* build the features page */
-			memcpy(dev->buffer, slot[cur_drive]->dev()->get_features(), sizeof(dev->buffer));
-
-			/* indicate everything is ready */
-			dev->status |= IDE_STATUS_BUFFER_READY;
-			dev->status |= IDE_STATUS_SEEK_COMPLETE;
-			dev->status |= IDE_STATUS_DRIVE_READY;
-
-			/* and clear the busy adn error flags */
-			dev->status &= ~IDE_STATUS_ERROR;
-			dev->status &= ~IDE_STATUS_BUSY;
-
-			/* clear the error too */
-			dev->error = IDE_ERROR_NONE;
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 1);
-			break;
-
-		case IDE_COMMAND_DIAGNOSTIC:
-			dev->error = IDE_ERROR_DEFAULT;
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_RECALIBRATE:
-			/* clear the error too */
-			dev->error = IDE_ERROR_NONE;
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_IDLE:
-			/* clear the error too */
-			dev->error = IDE_ERROR_NONE;
-
-			/* for timeout disabled value is 0 */
-			dev->sector_count = 0;
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SET_CONFIG:
-			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, dev->sector_count));
-			dev->status &= ~IDE_STATUS_ERROR;
-			dev->error = IDE_ERROR_NONE;
-			dev->set_geometry(dev->sector_count,dev->cur_head + 1);
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_UNKNOWN_F9:
-			/* only used by Killer Instinct AFAICT */
-			LOGPRINT(("IDE unknown command (F9)\n"));
-
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SET_FEATURES:
-			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", dev->precomp_offset, dev->sector_count & 0xff, dev->cur_sector, dev->cur_cylinder & 0xff, dev->cur_cylinder >> 8));
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_SET_BLOCK_COUNT:
-			LOGPRINT(("IDE Set block count (%02X)\n", dev->sector_count));
-
-			dev->block_count = dev->sector_count;
-			// judge dredd wants 'drive ready' on this command
-			dev->status |= IDE_STATUS_DRIVE_READY;
-
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
-			LOGPRINT(("IDE GNET Unlock 1\n"));
-
-			dev->sector_count = 1;
-			dev->status |= IDE_STATUS_DRIVE_READY;
-			dev->status &= ~IDE_STATUS_ERROR;
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
-			LOGPRINT(("IDE GNET Unlock 2\n"));
-
-			/* reset the buffer */
-			dev->buffer_offset = 0;
-			dev->sectors_until_int = 0;
-			dev->dma_active = 0;
-
-			/* mark the buffer ready */
-			dev->status |= IDE_STATUS_BUFFER_READY;
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
-			LOGPRINT(("IDE GNET Unlock 3\n"));
-
-			/* key check */
-			dev->read_key(key);
-			if ((dev->precomp_offset == key[0]) && (dev->sector_count == key[1]) && (dev->cur_sector == key[2]) && (dev->cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
-			{
-				dev->gnetreadlock= 0;
-			}
-
-			/* update flags */
-			dev->status |= IDE_STATUS_DRIVE_READY;
-			dev->status &= ~IDE_STATUS_ERROR;
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SEEK:
-			/*
-			    cur_cylinder, cur_sector and cur_head
-			    are all already set in this case so no need
-			    so that implements actual seek
-			*/
-			/* clear the error too */
-			dev->error = IDE_ERROR_NONE;
-
-			/* for timeout disabled value is 0 */
-			dev->sector_count = 0;
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-
-		default:
-			LOGPRINT(("IDE unknown command (%02X)\n", dev->command));
-			dev->status |= IDE_STATUS_ERROR;
-			dev->error = IDE_ERROR_UNKNOWN_COMMAND;
-			set_irq(ASSERT_LINE);
-			//debugger_break(device->machine());
-			break;
-	}
-}
-
-
 
 /*************************************
  *
  *  IDE controller read
  *
  *************************************/
+
+UINT16 ide_controller_device::read_dma()
+{
+	UINT16 result = 0xffff;
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			result &= m_slot[i]->dev()->read_dma();
+
+//  printf( "read_dma %04x\n", result );
+	return result;
+}
+
+READ16_MEMBER( ide_controller_device::read_cs0 )
+{
+	UINT16 result = mem_mask;
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			result &= m_slot[i]->dev()->read_cs0(space, offset, mem_mask);
+
+//  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
+
+	return result;
+}
+
+READ16_MEMBER( ide_controller_device::read_cs1 )
+{
+	UINT16 result = mem_mask;
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			result &= m_slot[i]->dev()->read_cs1(space, offset, mem_mask);
+
+//  printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
+
+	return result;
+}
 
 READ8_MEMBER( ide_controller_device::read_via_config )
 {
@@ -868,18 +155,18 @@ READ8_MEMBER( ide_controller_device::read_via_config )
 	{
 		/* unknown config register */
 		case IDE_BANK2_CONFIG_UNK:
-			result = config_unknown;
+			result = m_config_unknown;
 			break;
 
 		/* active config register */
 		case IDE_BANK2_CONFIG_REGISTER:
-			result = config_register_num;
+			result = m_config_register_num;
 			break;
 
 		/* data from active config register */
 		case IDE_BANK2_CONFIG_DATA:
-			if (config_register_num < IDE_CONFIG_REGISTERS)
-				result = config_register[config_register_num];
+			if (m_config_register_num < IDE_CONFIG_REGISTERS)
+				result = m_config_register[m_config_register_num];
 			break;
 
 		default:
@@ -904,126 +191,6 @@ READ16_MEMBER( ide_controller_device::read_cs0_pc )
 	}
 }
 
-UINT16 ide_controller_device::read_dma()
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-	{
-		if (slot[cur_drive^1]->dev() == NULL)
-			return 0xff;
-		return 0;
-	}
-
-	UINT16 result = dev->buffer[dev->buffer_offset++];
-	result |= dev->buffer[dev->buffer_offset++] << 8;
-
-	if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
-	{
-		LOG(("%s:IDE completed DMA read\n", machine().describe_context()));
-		read_buffer_empty();
-	}
-
-	return result;
-}
-
-READ16_MEMBER( ide_controller_device::read_cs0 )
-{
-	UINT16 result = 0;
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	/* logit */
-//  if (offset != IDE_BANK0_DATA && offset != IDE_BANK0_STATUS_COMMAND)
-		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
-
-	if (dev == NULL)
-	{
-		if (slot[cur_drive^1]->dev() == NULL)
-			return 0xff;
-		return 0;
-	}
-
-	if (dev->is_ready()) {
-		dev->status |= IDE_STATUS_DRIVE_READY;
-	} else {
-		dev->status &= ~IDE_STATUS_DRIVE_READY;
-	}
-
-	switch (offset)
-	{
-		/* read data if there's data to be read */
-		case IDE_BANK0_DATA:
-			if (dev->status & IDE_STATUS_BUFFER_READY)
-			{
-				/* fetch the correct amount of data */
-				result = dev->buffer[dev->buffer_offset++];
-				if (mem_mask == 0xffff)
-					result |= dev->buffer[dev->buffer_offset++] << 8;
-
-				/* if we're at the end of the buffer, handle it */
-				if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
-				{
-					LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
-					read_buffer_empty();
-				}
-			}
-			break;
-
-		/* return the current error */
-		case IDE_BANK0_ERROR:
-			result = dev->error;
-			break;
-
-		/* return the current sector count */
-		case IDE_BANK0_SECTOR_COUNT:
-			result = dev->sector_count;
-			break;
-
-		/* return the current sector */
-		case IDE_BANK0_SECTOR_NUMBER:
-			result = dev->cur_sector;
-			break;
-
-		/* return the current cylinder LSB */
-		case IDE_BANK0_CYLINDER_LSB:
-			result = dev->cur_cylinder & 0xff;
-			break;
-
-		/* return the current cylinder MSB */
-		case IDE_BANK0_CYLINDER_MSB:
-			result = dev->cur_cylinder >> 8;
-			break;
-
-		/* return the current head */
-		case IDE_BANK0_HEAD_NUMBER:
-			result = dev->cur_head_reg;
-			break;
-
-		/* return the current status and clear any pending interrupts */
-		case IDE_BANK0_STATUS_COMMAND:
-			result = dev->status;
-			if (dev->last_status_timer->elapsed() > TIME_PER_ROTATION)
-			{
-				result |= IDE_STATUS_HIT_INDEX;
-				dev->last_status_timer->adjust(attotime::never);
-			}
-			if (dev->interrupt_pending == ASSERT_LINE)
-				set_irq(CLEAR_LINE);
-			break;
-
-		/* log anything else */
-		default:
-			logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
-			break;
-	}
-
-//  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
-
-	/* return the result */
-	return result;
-}
-
-
 READ16_MEMBER( ide_controller_device::read_cs1_pc )
 {
 	if (mem_mask == 0xff00)
@@ -1036,58 +203,39 @@ READ16_MEMBER( ide_controller_device::read_cs1_pc )
 	}
 }
 
-READ16_MEMBER( ide_controller_device::read_cs1 )
-{
-	UINT16 result = 0;
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-	{
-		if (slot[cur_drive^1]->dev() == NULL)
-			return 0xff;
-		return 0;
-	}
-
-	if (dev->is_ready()) {
-		dev->status |= IDE_STATUS_DRIVE_READY;
-	} else {
-		dev->status &= ~IDE_STATUS_DRIVE_READY;
-	}
-
-	/* logit */
-//  if (offset != IDE_BANK1_STATUS_CONTROL)
-		LOG(("%s:IDE cs1 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
-		/* return the current status but don't clear interrupts */
-
-	switch (offset)
-	{
-		case IDE_BANK1_STATUS_CONTROL:
-			result = dev->status;
-			if (dev->last_status_timer->elapsed() > TIME_PER_ROTATION)
-			{
-				result |= IDE_STATUS_HIT_INDEX;
-				dev->last_status_timer->adjust(attotime::never);
-			}
-			break;
-
-		/* log anything else */
-		default:
-			logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
-			break;
-	}
-
-//  printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
-
-	/* return the result */
-	return result;
-}
-
 
 /*************************************
  *
  *  IDE controller write
  *
  *************************************/
+
+void ide_controller_device::write_dma( UINT16 data )
+{
+//  printf( "write_dma %04x\n", data );
+
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			m_slot[i]->dev()->write_dma(data);
+}
+
+WRITE16_MEMBER( ide_controller_device::write_cs0 )
+{
+//  printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
+
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			m_slot[i]->dev()->write_cs0(space, offset, data, mem_mask);
+}
+
+WRITE16_MEMBER( ide_controller_device::write_cs1 )
+{
+//  printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
+
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			m_slot[i]->dev()->write_cs1(space, offset, data, mem_mask);
+}
 
 WRITE8_MEMBER( ide_controller_device::write_via_config )
 {
@@ -1100,18 +248,18 @@ WRITE8_MEMBER( ide_controller_device::write_via_config )
 	{
 		/* unknown config register */
 		case IDE_BANK2_CONFIG_UNK:
-			config_unknown = data;
+			m_config_unknown = data;
 			break;
 
 		/* active config register */
 		case IDE_BANK2_CONFIG_REGISTER:
-			config_register_num = data;
+			m_config_register_num = data;
 			break;
 
 		/* data from active config register */
 		case IDE_BANK2_CONFIG_DATA:
-			if (config_register_num < IDE_CONFIG_REGISTERS)
-				config_register[config_register_num] = data;
+			if (m_config_register_num < IDE_CONFIG_REGISTERS)
+				m_config_register[m_config_register_num] = data;
 			break;
 	}
 }
@@ -1129,103 +277,6 @@ WRITE16_MEMBER( ide_controller_device::write_cs0_pc )
 	}
 }
 
-void ide_controller_device::write_dma( UINT16 data )
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-		return;
-
-	dev->buffer[dev->buffer_offset++] = data;
-	dev->buffer[dev->buffer_offset++] = data >> 8;
-
-	/* if we're at the end of the buffer, handle it */
-	if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
-	{
-		LOG(("%s:IDE completed DMA write\n", machine().describe_context()));
-		write_buffer_full();
-	}
-}
-
-WRITE16_MEMBER( ide_controller_device::write_cs0 )
-{
-//  printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
-
-	switch (offset)
-	{
-		case IDE_BANK0_HEAD_NUMBER:
-			cur_drive = (data & 0x10) >> 4;
-			break;
-	}
-
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-		return;
-
-	/* logit */
-	if (offset != IDE_BANK0_DATA)
-		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
-	//  fprintf(stderr, "ide write %03x %02x mem_mask=%d\n", offset, data, size);
-	switch (offset)
-	{
-		/* write data */
-		case IDE_BANK0_DATA:
-			if (dev->status & IDE_STATUS_BUFFER_READY)
-			{
-				/* store the correct amount of data */
-				dev->buffer[dev->buffer_offset++] = data;
-				if (mem_mask == 0xffff)
-					dev->buffer[dev->buffer_offset++] = data >> 8;
-
-				/* if we're at the end of the buffer, handle it */
-				if (dev->buffer_offset >= IDE_DISK_SECTOR_SIZE)
-				{
-					LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
-					write_buffer_full();
-				}
-			}
-			break;
-
-		/* precompensation offset?? */
-		case IDE_BANK0_ERROR:
-			dev->precomp_offset = data;
-			break;
-
-		/* sector count */
-		case IDE_BANK0_SECTOR_COUNT:
-			dev->sector_count = data ? data : 256;
-			break;
-
-		/* current sector */
-		case IDE_BANK0_SECTOR_NUMBER:
-			dev->cur_sector = data;
-			break;
-
-		/* current cylinder LSB */
-		case IDE_BANK0_CYLINDER_LSB:
-			dev->cur_cylinder = (dev->cur_cylinder & 0xff00) | (data & 0xff);
-			break;
-
-		/* current cylinder MSB */
-		case IDE_BANK0_CYLINDER_MSB:
-			dev->cur_cylinder = (dev->cur_cylinder & 0x00ff) | ((data & 0xff) << 8);
-			break;
-
-		/* current head */
-		case IDE_BANK0_HEAD_NUMBER:
-			dev->cur_head = data & 0x0f;
-			dev->cur_head_reg = data;
-			// LBA mode = data & 0x40
-			break;
-
-		/* command */
-		case IDE_BANK0_STATUS_COMMAND:
-			handle_command(data);
-			break;
-	}
-}
-
 WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
 {
 	if (mem_mask == 0xff00)
@@ -1238,47 +289,16 @@ WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs1 )
-{
-	ide_device_interface *dev = slot[cur_drive]->dev();
-
-	if (dev == NULL)
-		return;
-
-//  printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
-
-	/* logit */
-	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
-
-	switch (offset)
-	{
-		/* adapter control */
-		case IDE_BANK1_STATUS_CONTROL:
-			dev->adapter_control = data;
-
-			/* handle controller reset */
-			//if (data == 0x04)
-			if (data & 0x04)
-			{
-				dev->status |= IDE_STATUS_BUSY;
-				dev->status &= ~IDE_STATUS_DRIVE_READY;
-				dev->reset_timer->adjust(attotime::from_msec(5));
-			}
-			break;
-	}
-}
-
-
 SLOT_INTERFACE_START(ide_devices)
 	SLOT_INTERFACE("hdd", IDE_HARDDISK)
 SLOT_INTERFACE_END
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
-	config_unknown(0),
-	config_register_num(0),
-	cur_drive(0),
-	m_irq_handler(*this)
+	m_config_unknown(0),
+	m_config_register_num(0),
+	m_irq_handler(*this),
+	m_dmarq_handler(*this)
 {
 }
 
@@ -1287,10 +307,10 @@ const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	config_unknown(0),
-	config_register_num(0),
-	cur_drive(0),
-	m_irq_handler(*this)
+	m_config_unknown(0),
+	m_config_register_num(0),
+	m_irq_handler(*this),
+	m_dmarq_handler(*this)
 {
 }
 
@@ -1301,15 +321,40 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, cons
 void ide_controller_device::device_start()
 {
 	m_irq_handler.resolve_safe();
+	m_dmarq_handler.resolve_safe();
 
 	/* set MAME harddisk handle */
-	slot[0] = subdevice<ide_slot_device>("0");
-	slot[1] = subdevice<ide_slot_device>("1");
+	m_slot[0] = subdevice<ide_slot_device>("0");
+	m_slot[1] = subdevice<ide_slot_device>("1");
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_irq[i] = 0;
+		m_dmarq[i] = 0;
+
+		ide_device_interface *dev = m_slot[i]->dev();
+		if (dev != NULL)
+		{
+			if (i == 0)
+			{
+				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, irq0_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, dmarq0_write_line));
+			}
+			else
+			{
+				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, irq1_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, dmarq1_write_line));
+			}
+
+			dev->m_csel = i;
+			dev->m_dasp = m_slot[1]->dev() != NULL;
+		}
+	}
 
 	/* register ide states */
-	save_item(NAME(config_unknown));
-	save_item(NAME(config_register));
-	save_item(NAME(config_register_num));
+	save_item(NAME(m_config_unknown));
+	save_item(NAME(m_config_register));
+	save_item(NAME(m_config_register_num));
 }
 
 //-------------------------------------------------
@@ -1319,10 +364,6 @@ void ide_controller_device::device_start()
 void ide_controller_device::device_reset()
 {
 	LOG(("IDE controller reset performed\n"));
-	/* reset the drive state */
-	cur_drive = 0;
-	set_irq(CLEAR_LINE);
-	set_dmarq(0);
 }
 
 
@@ -1425,6 +466,8 @@ void bus_master_ide_controller_device::set_irq(int state)
 
 void bus_master_ide_controller_device::set_dmarq(int state)
 {
+	ide_controller_device::set_dmarq(state);
+
 	if (m_dmarq != state)
 	{
 		m_dmarq = state;
