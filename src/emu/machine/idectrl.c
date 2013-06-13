@@ -921,7 +921,11 @@ UINT16 ide_controller_device::read_dma()
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	if (dev == NULL)
-		return 0xff;
+	{
+		if (slot[cur_drive^1]->dev() == NULL)
+			return 0xff;
+		return 0;
+	}
 
 	UINT16 result = dev->buffer[dev->buffer_offset++];
 	result |= dev->buffer[dev->buffer_offset++] << 8;
@@ -944,17 +948,17 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 //  if (offset != IDE_BANK0_DATA && offset != IDE_BANK0_STATUS_COMMAND)
 		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 
-	if (dev != NULL)
+	if (dev == NULL)
 	{
-		if (dev->is_ready()) {
-			status |= IDE_STATUS_DRIVE_READY;
-		} else {
-			status &= ~IDE_STATUS_DRIVE_READY;
-		}
+		if (slot[cur_drive^1]->dev() == NULL)
+			return 0xff;
+		return 0;
 	}
-	else
-	{
-		return 0xff;
+
+	if (dev->is_ready()) {
+		status |= IDE_STATUS_DRIVE_READY;
+	} else {
+		status &= ~IDE_STATUS_DRIVE_READY;
 	}
 
 	switch (offset)
@@ -1049,17 +1053,17 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	UINT16 result = 0;
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
-	if (dev != NULL)
+	if (dev == NULL)
 	{
-		if (dev->is_ready()) {
-			status |= IDE_STATUS_DRIVE_READY;
-		} else {
-			status &= ~IDE_STATUS_DRIVE_READY;
-		}
+		if (slot[cur_drive^1]->dev() == NULL)
+			return 0xff;
+		return 0;
 	}
-	else
-	{
-		return 0xff;
+
+	if (dev->is_ready()) {
+		status |= IDE_STATUS_DRIVE_READY;
+	} else {
+		status &= ~IDE_STATUS_DRIVE_READY;
 	}
 
 	/* logit */
