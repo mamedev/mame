@@ -16,8 +16,8 @@
 
 #pragma once
 
-#ifndef __WDXT_GEN__
-#define __WDXT_GEN__
+#ifndef __ISA8_WDXT_GEN__
+#define __ISA8_WDXT_GEN__
 
 
 #include "emu.h"
@@ -81,6 +81,6 @@ private:
 
 
 // device type definition
-extern const device_type WDXT_GEN;
+extern const device_type ISA8_WDXT_GEN;
 
 #endif
