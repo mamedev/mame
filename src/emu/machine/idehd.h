@@ -34,32 +34,18 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cs0) = 0;
 	virtual DECLARE_WRITE16_MEMBER(write_cs1) = 0;
 
-	UINT8 *get_features() { return m_features;}
-
-	UINT16 get_cylinders() { return m_num_cylinders; }
-	UINT16 get_sectors() { return m_num_sectors; }
-	UINT16 get_heads() { return m_num_heads; }
-	virtual bool is_ready() { return true; }
-	virtual void read_key(UINT8 key[]) { }
+	virtual UINT8 *get_features() = 0;
 
 	UINT8           m_master_password_enable;
 	UINT8           m_user_password_enable;
 	const UINT8 *   m_master_password;
 	const UINT8 *   m_user_password;
 
-	UINT8           m_gnetreadlock;
-
 	int m_csel;
 	int m_dasp;
 
 	devcb2_write_line m_irq_handler;
 	devcb2_write_line m_dmarq_handler;
-
-protected:
-	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
-	UINT16          m_num_cylinders;
-	UINT8           m_num_sectors;
-	UINT8           m_num_heads;
 };
 
 class ide_mass_storage_device : public device_t,
@@ -80,14 +66,26 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cs0);
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
 
+	virtual UINT8 *get_features() { return m_features; }
+	
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	virtual bool is_ready() = 0;
+	virtual void read_key(UINT8 key[]) = 0;
+
+	UINT8           m_gnetreadlock;
+
+	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
+	UINT16          m_num_cylinders;
+	UINT8           m_num_sectors;
+	UINT8           m_num_heads;
+
 private:
 	UINT32 lba_address();
-	void set_geometry(UINT8 sectors, UINT8 heads) { m_num_sectors= sectors; m_num_heads=heads; }
+	void set_geometry(UINT8 sectors, UINT8 heads) { m_num_sectors = sectors; m_num_heads = heads; }
 	void read_sector_done();
 	void write_sector_done();
 	void read_next_sector();
@@ -141,7 +139,7 @@ public:
 
 	virtual int  read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
 	virtual int  write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
-	virtual void read_key(UINT8 key[]);
+
 protected:
 	// device-level overrides
 	virtual void device_reset();
@@ -149,9 +147,11 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	void ide_build_features();
 	virtual bool is_ready() { return (m_disk != NULL); }
-protected:
+	virtual void read_key(UINT8 key[]);
+
+	void ide_build_features();
+
 	chd_file       *m_handle;
 	hard_disk_file *m_disk;
 };

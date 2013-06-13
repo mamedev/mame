@@ -124,7 +124,7 @@ UINT32 ide_mass_storage_device::lba_address()
 
 	/* standard CHS */
 	else
-		return (m_cur_cylinder * get_heads() + m_cur_head) * get_sectors() + m_cur_sector - 1;
+		return (m_cur_cylinder * m_num_heads + m_cur_head) * m_num_sectors + m_cur_sector - 1;
 }
 
 
@@ -409,12 +409,12 @@ void ide_mass_storage_device::next_sector()
 	{
 		/* sectors are 1-based */
 		m_cur_sector++;
-		if (m_cur_sector > get_sectors())
+		if (m_cur_sector > m_num_sectors)
 		{
 			/* heads are 0 based */
 			m_cur_sector = 1;
 			m_cur_head++;
-			if (m_cur_head >= get_heads())
+			if (m_cur_head >= m_num_heads)
 			{
 				m_cur_head = 0;
 				m_cur_cylinder++;
