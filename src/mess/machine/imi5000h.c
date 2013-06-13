@@ -106,12 +106,29 @@ static const z80_daisy_config z80_daisy_chain[] =
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( imi5000h_device::ctc_z0_w )
+{
+	m_ctc->trg1(state);
+}
+
+WRITE_LINE_MEMBER( imi5000h_device::ctc_z1_w )
+{
+	m_ctc->trg2(state);
+	m_ctc->trg3(state);
+}
+
+WRITE_LINE_MEMBER( imi5000h_device::ctc_z2_w )
+{
+	//m_memory_enable = state;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+}
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, ctc_z0_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, ctc_z1_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, ctc_z2_w)
 };
 
 
@@ -119,15 +136,91 @@ static Z80CTC_INTERFACE( ctc_intf )
 //  Z80PIO_INTERFACE( pio0_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( imi5000h_device::pio0_pa_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       -SEEK COMPLETE
+	    1       -SECTOR SIZE 2 (UB4:4)
+	    2       -SECTOR SIZE 1 (UB4:1)
+	    3       -SECTOR SEL
+	    4       CRC ERROR
+	    5       WRITE FAULT
+	    6       -INDEX SEL
+	    7       
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio0_pa_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       ACTIVITY LED
+	
+	*/
+}
+
+READ8_MEMBER( imi5000h_device::pio0_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       -READY
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio0_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       DIRECTION IN
+	    2       -HSXSTB
+	    3       STEP
+	    4       HEAD SEL 2^0
+	    5       HEAD SEL 2^1
+	    6       HEAD SEL 2^2
+	    7       REDUCE WR CURRENT
+	
+	*/
+}
+
 static Z80PIO_INTERFACE( pio0_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pa_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_0_TAG, z80pio_device, strobe_a),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio0_pb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_0_TAG, z80pio_device, strobe_b)
 };
 
 
@@ -135,14 +228,63 @@ static Z80PIO_INTERFACE( pio0_intf )
 //  Z80PIO_INTERFACE( pio2_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( imi5000h_device::pio2_pa_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       -SYNC
+	    7       -DRV.ACK
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio2_pa_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       BUS DIR
+	    1       -DRV.ACK
+	    2       -ALT SEL
+	    3       -HSXFER
+	    4       PIO RDY
+	    5       -COMPL
+	    6       
+	    7       
+	
+	*/
+}
+
+READ8_MEMBER( imi5000h_device::pio2_pb_r )
+{
+	// command bus
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio2_pb_w )
+{
+	// command bus
+}
+
 static Z80PIO_INTERFACE( pio2_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pa_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_2_TAG, z80pio_device, strobe_a),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio2_pb_w),
 	DEVCB_NULL
 };
 
@@ -151,15 +293,91 @@ static Z80PIO_INTERFACE( pio2_intf )
 //  Z80PIO_INTERFACE( pio3_intf )
 //-------------------------------------------------
 
+READ8_MEMBER( imi5000h_device::pio3_pa_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       -TIMEOUT DISABLE (UB4:8)
+	    1       -UNIT SELECT 1 (UB4:7)
+	    2       -UNIT SELECT 2 (UB4:6)
+	    3       SYSTEM/-DIAG (UB4:5)
+	    4       -RXD
+	    5       
+	    6       -TRACK 00
+	    7       
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio3_pa_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       TXD
+	    6       
+	    7       -WRITE DISABLE
+	
+	*/
+}
+
+READ8_MEMBER( imi5000h_device::pio3_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       6MB1
+	    3       -WRITE PROTECT (W2)
+	    4       -FORMAT ENABLE
+	    5       6MB2
+	    6       12MB1
+	    7       12MB2
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       -DRV 1 SEL
+	    1       -DRV 2 SEL
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       
+	
+	*/
+}
+
 static Z80PIO_INTERFACE( pio3_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pa_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_3_TAG, z80pio_device, strobe_a),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, imi5000h_device, pio3_pb_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_3_TAG, z80pio_device, strobe_b)
 };
 
 
@@ -168,15 +386,15 @@ static Z80PIO_INTERFACE( pio3_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( imi5000h )
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(imi5000h_mem)
 	MCFG_CPU_IO_MAP(imi5000h_io)
 
-	MCFG_Z80CTC_ADD(Z80CTC_TAG, 4000000, ctc_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_0_TAG, 4000000, pio0_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_2_TAG, 4000000, pio2_intf)
-	MCFG_Z80PIO_ADD(Z80PIO_3_TAG, 4000000, pio3_intf)
+	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_0_TAG, XTAL_8MHz/2, pio0_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_2_TAG, XTAL_8MHz/2, pio2_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_3_TAG, XTAL_8MHz/2, pio3_intf)
 MACHINE_CONFIG_END
 
 
@@ -196,6 +414,24 @@ machine_config_constructor imi5000h_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( imi5000h )
+	PORT_START("LSI-11")
+	PORT_DIPNAME( 0x01, 0x00, "LSI-11" )
+	PORT_DIPSETTING(    0x01, "Normal" )
+	PORT_DIPSETTING(    0x00, "LSI-11" ) // emulate DEC RL01 and RL02
+
+	PORT_START("MUX")
+	PORT_DIPNAME( 0x01, 0x00, "MUX" )
+	PORT_DIPSETTING(    0x01, "Single" )
+	PORT_DIPSETTING(    0x00, "Multiplexer" ) // Corvus Multiplexer Network
+
+	PORT_START("FORMAT")
+	PORT_DIPNAME( 0x01, 0x00, "FORMAT" )
+	PORT_DIPSETTING(    0x01, "Normal" ) // read controller firmware from cylinders 0 and 1
+	PORT_DIPSETTING(    0x00, "Format" ) // drive ready after self-test, allow format
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("RESET")
+
 	PORT_START("UB4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "UB4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "UB4:2" )
@@ -230,6 +466,10 @@ ioport_constructor imi5000h_device::device_input_ports() const
 imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
 		m_maincpu(*this, Z80_TAG),
+		m_ctc(*this, Z80CTC_TAG),
+		m_lsi11(*this, "LSI-11"),
+		m_mux(*this, "MUX"),
+		m_format(*this, "FORMAT"),
 		m_ub4(*this, "UB4")
 {
 }
@@ -241,4 +481,15 @@ imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag,
 
 void imi5000h_device::device_start()
 {
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void imi5000h_device::device_reset()
+{
+	m_maincpu->reset();
+	m_ctc->reset();
 }

@@ -48,12 +48,43 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+
+	DECLARE_READ8_MEMBER( pio0_pa_r );
+	DECLARE_WRITE8_MEMBER( pio0_pa_w );
+	DECLARE_READ8_MEMBER( pio0_pb_r );
+	DECLARE_WRITE8_MEMBER( pio0_pb_w );
+
+	DECLARE_READ8_MEMBER( pio2_pa_r );
+	DECLARE_WRITE8_MEMBER( pio2_pa_w );
+	DECLARE_READ8_MEMBER( pio2_pb_r );
+	DECLARE_WRITE8_MEMBER( pio2_pb_w );
+
+	DECLARE_READ8_MEMBER( pio3_pa_r );
+	DECLARE_WRITE8_MEMBER( pio3_pa_w );
+	DECLARE_READ8_MEMBER( pio3_pb_r );
+	DECLARE_WRITE8_MEMBER( pio3_pb_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
+	enum
+	{
+		LED_FAULT,
+		LED_BUSY,
+		LED_READY
+	};
+
 	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_ioport m_lsi11;
+	required_ioport m_mux;
+	required_ioport m_format;
 	required_ioport m_ub4;
 };
 
