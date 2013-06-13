@@ -253,6 +253,8 @@ void ide_hdd_device::device_start()
 	save_item(NAME(buffer));
 	save_item(NAME(buffer_offset));
 
+	save_item(NAME(status));
+	save_item(NAME(command));
 	save_item(NAME(error));
 
 	save_item(NAME(adapter_control));
@@ -312,6 +314,7 @@ void ide_hdd_device::device_reset()
 	master_password_enable = (master_password != NULL);
 	user_password_enable = (user_password != NULL);
 	error = IDE_ERROR_DEFAULT;
+	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 }
 
 //-------------------------------------------------

@@ -35,13 +35,6 @@
 #define TIME_SEEK_MULTISECTOR               (attotime::from_msec(13))
 #define TIME_NO_SEEK_MULTISECTOR            (attotime::from_nsec(16300))
 
-#define IDE_STATUS_ERROR                    0x01
-#define IDE_STATUS_HIT_INDEX                0x02
-#define IDE_STATUS_BUFFER_READY             0x08
-#define IDE_STATUS_SEEK_COMPLETE            0x10
-#define IDE_STATUS_DRIVE_READY              0x40
-#define IDE_STATUS_BUSY                     0x80
-
 #define IDE_BANK0_DATA                      0
 #define IDE_BANK0_ERROR                     1
 #define IDE_BANK0_SECTOR_COUNT              2
@@ -120,16 +113,18 @@ enum
 
 void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	switch(id)
 	{
 	case TID_DELAYED_INTERRUPT:
-		status &= ~IDE_STATUS_BUSY;
+		dev->status &= ~IDE_STATUS_BUSY;
 		set_irq(ASSERT_LINE);
 		break;
 
 	case TID_DELAYED_INTERRUPT_BUFFER_READY:
-		status &= ~IDE_STATUS_BUSY;
-		status |= IDE_STATUS_BUFFER_READY;
+		dev->status &= ~IDE_STATUS_BUSY;
+		dev->status |= IDE_STATUS_BUFFER_READY;
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -139,8 +134,8 @@ void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 	case TID_SECURITY_ERROR_DONE:
 		/* clear error state */
-		status &= ~IDE_STATUS_ERROR;
-		status |= IDE_STATUS_DRIVE_READY;
+		dev->status &= ~IDE_STATUS_ERROR;
+		dev->status |= IDE_STATUS_DRIVE_READY;
 		break;
 
 	case TID_READ_SECTOR_DONE_CALLBACK:
@@ -156,9 +151,11 @@ void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 void ide_controller_device::signal_delayed_interrupt(attotime time, int buffer_ready)
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* clear buffer ready and set the busy flag */
-	status &= ~IDE_STATUS_BUFFER_READY;
-	status |= IDE_STATUS_BUSY;
+	dev->status &= ~IDE_STATUS_BUFFER_READY;
+	dev->status |= IDE_STATUS_BUSY;
 
 	/* set a timer */
 	if (buffer_ready)
@@ -250,9 +247,11 @@ void ide_controller_device::next_sector()
 
 void ide_controller_device::security_error()
 {
+	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	/* set error state */
-	status |= IDE_STATUS_ERROR;
-	status &= ~IDE_STATUS_DRIVE_READY;
+	dev->status |= IDE_STATUS_ERROR;
+	dev->status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
 	timer_set(TIME_SECURITY_ERROR, TID_SECURITY_ERROR_DONE);
@@ -274,8 +273,8 @@ void ide_controller_device::read_buffer_empty()
 	dev->buffer_offset = 0;
 
 	/* clear the buffer ready and busy flag */
-	status &= ~IDE_STATUS_BUFFER_READY;
-	status &= ~IDE_STATUS_BUSY;
+	dev->status &= ~IDE_STATUS_BUFFER_READY;
+	dev->status &= ~IDE_STATUS_BUSY;
 	dev->error = IDE_ERROR_DEFAULT;
 	set_dmarq(0);
 
@@ -303,8 +302,8 @@ void ide_controller_device::read_sector_done()
 
 	/* GNET readlock check */
 	if (dev->gnetreadlock) {
-		status &= ~IDE_STATUS_ERROR;
-		status &= ~IDE_STATUS_BUSY;
+		dev->status &= ~IDE_STATUS_ERROR;
+		dev->status &= ~IDE_STATUS_BUSY;
 		return;
 	}
 
@@ -313,12 +312,12 @@ void ide_controller_device::read_sector_done()
 
 	/* by default, mark the buffer ready and the seek complete */
 	if (!dev->verify_only)
-		status |= IDE_STATUS_BUFFER_READY;
-	status |= IDE_STATUS_SEEK_COMPLETE;
+		dev->status |= IDE_STATUS_BUFFER_READY;
+	dev->status |= IDE_STATUS_SEEK_COMPLETE;
 
 	/* and clear the busy and error flags */
-	status &= ~IDE_STATUS_ERROR;
-	status &= ~IDE_STATUS_BUSY;
+	dev->status &= ~IDE_STATUS_ERROR;
+	dev->status &= ~IDE_STATUS_BUSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -336,7 +335,7 @@ void ide_controller_device::read_sector_done()
 			dev->sectors_until_int--;
 		if (dev->sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			dev->sectors_until_int = ((command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
+			dev->sectors_until_int = ((dev->command == IDE_COMMAND_READ_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -353,7 +352,7 @@ void ide_controller_device::read_sector_done()
 	else
 	{
 		/* set the error flag and the error */
-		status |= IDE_STATUS_ERROR;
+		dev->status |= IDE_STATUS_ERROR;
 		dev->error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
@@ -366,10 +365,10 @@ void ide_controller_device::read_first_sector()
 {
 	ide_device_interface *dev = slot[cur_drive]->dev();
 	/* mark ourselves busy */
-	status |= IDE_STATUS_BUSY;
+	dev->status |= IDE_STATUS_BUSY;
 
 	/* just set a timer */
-	if (command == IDE_COMMAND_READ_MULTIPLE)
+	if (dev->command == IDE_COMMAND_READ_MULTIPLE)
 	{
 		int new_lba = dev->lba_address();
 		attotime seek_time;
@@ -392,9 +391,9 @@ void ide_controller_device::read_next_sector()
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	/* mark ourselves busy */
-	status |= IDE_STATUS_BUSY;
+	dev->status |= IDE_STATUS_BUSY;
 
-	if (command == IDE_COMMAND_READ_MULTIPLE)
+	if (dev->command == IDE_COMMAND_READ_MULTIPLE)
 	{
 		if (dev->sectors_until_int != 1)
 			/* make ready now */
@@ -424,10 +423,10 @@ void ide_controller_device::continue_write()
 	dev->buffer_offset = 0;
 
 	/* clear the buffer ready flag */
-	status &= ~IDE_STATUS_BUFFER_READY;
-	status |= IDE_STATUS_BUSY;
+	dev->status &= ~IDE_STATUS_BUFFER_READY;
+	dev->status |= IDE_STATUS_BUSY;
 
-	if (command == IDE_COMMAND_WRITE_MULTIPLE)
+	if (dev->command == IDE_COMMAND_WRITE_MULTIPLE)
 	{
 		if (dev->sectors_until_int != 1)
 		{
@@ -453,7 +452,7 @@ void ide_controller_device::write_buffer_full()
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
 	set_dmarq(0);
-	if (command == IDE_COMMAND_SECURITY_UNLOCK)
+	if (dev->command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
 		if (dev->user_password_enable && memcmp(dev->buffer, dev->user_password, 2 + 32) == 0)
 		{
@@ -481,16 +480,16 @@ void ide_controller_device::write_buffer_full()
 		}
 
 		/* clear the busy and error flags */
-		status &= ~IDE_STATUS_ERROR;
-		status &= ~IDE_STATUS_BUSY;
-		status &= ~IDE_STATUS_BUFFER_READY;
+		dev->status &= ~IDE_STATUS_ERROR;
+		dev->status &= ~IDE_STATUS_BUSY;
+		dev->status &= ~IDE_STATUS_BUFFER_READY;
 
 		if (dev->master_password_enable || dev->user_password_enable)
 			security_error();
 		else
-			status |= IDE_STATUS_DRIVE_READY;
+			dev->status |= IDE_STATUS_DRIVE_READY;
 	}
-	else if (command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
+	else if (dev->command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
 	{
 		UINT8 key[5] = { 0 };
 		int i, bad = 0;
@@ -499,12 +498,12 @@ void ide_controller_device::write_buffer_full()
 		for (i=0; !bad && i<512; i++)
 			bad = ((i < 2 || i >= 7) && dev->buffer[i]) || ((i >= 2 && i < 7) && dev->buffer[i] != key[i-2]);
 
-		status &= ~IDE_STATUS_BUSY;
-		status &= ~IDE_STATUS_BUFFER_READY;
+		dev->status &= ~IDE_STATUS_BUSY;
+		dev->status &= ~IDE_STATUS_BUFFER_READY;
 		if (bad)
-			status |= IDE_STATUS_ERROR;
+			dev->status |= IDE_STATUS_ERROR;
 		else {
-			status &= ~IDE_STATUS_ERROR;
+			dev->status &= ~IDE_STATUS_ERROR;
 			dev->gnetreadlock= 0;
 		}
 	}
@@ -524,12 +523,12 @@ void ide_controller_device::write_sector_done()
 	count = dev->write_sector(lba, dev->buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
-	status |= IDE_STATUS_BUFFER_READY;
-	status |= IDE_STATUS_SEEK_COMPLETE;
+	dev->status |= IDE_STATUS_BUFFER_READY;
+	dev->status |= IDE_STATUS_SEEK_COMPLETE;
 
 	/* and clear the busy adn error flags */
-	status &= ~IDE_STATUS_ERROR;
-	status &= ~IDE_STATUS_BUSY;
+	dev->status &= ~IDE_STATUS_ERROR;
+	dev->status &= ~IDE_STATUS_BUSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -545,7 +544,7 @@ void ide_controller_device::write_sector_done()
 		/* signal an interrupt */
 		if (--dev->sectors_until_int == 0 || dev->sector_count == 1)
 		{
-			dev->sectors_until_int = ((command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
+			dev->sectors_until_int = ((dev->command == IDE_COMMAND_WRITE_MULTIPLE) ? dev->block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
@@ -553,7 +552,7 @@ void ide_controller_device::write_sector_done()
 		if (dev->sector_count > 0)
 			dev->sector_count--;
 		if (dev->sector_count == 0)
-			status &= ~IDE_STATUS_BUFFER_READY;
+			dev->status &= ~IDE_STATUS_BUFFER_READY;
 
 		/* keep going for DMA */
 		if (dev->dma_active && dev->sector_count != 0)
@@ -566,7 +565,7 @@ void ide_controller_device::write_sector_done()
 	else
 	{
 		/* set the error flag and the error */
-		status |= IDE_STATUS_ERROR;
+		dev->status |= IDE_STATUS_ERROR;
 		dev->error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
@@ -590,8 +589,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 	/* implicitly clear interrupts & dmarq here */
 	set_irq(CLEAR_LINE);
 	set_dmarq(0);
-	command = _command;
-	switch (command)
+	dev->command = _command;
+	switch (dev->command)
 	{
 		case IDE_COMMAND_READ_SECTORS:
 		case IDE_COMMAND_READ_SECTORS_NORETRY:
@@ -662,7 +661,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
-			status |= IDE_STATUS_BUFFER_READY;
+			dev->status |= IDE_STATUS_BUFFER_READY;
 			break;
 
 		case IDE_COMMAND_WRITE_MULTIPLE:
@@ -675,7 +674,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
-			status |= IDE_STATUS_BUFFER_READY;
+			dev->status |= IDE_STATUS_BUFFER_READY;
 			break;
 
 		case IDE_COMMAND_WRITE_DMA:
@@ -700,7 +699,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
-			status |= IDE_STATUS_BUFFER_READY;
+			dev->status |= IDE_STATUS_BUFFER_READY;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -715,13 +714,13 @@ void ide_controller_device::handle_command(UINT8 _command)
 			memcpy(dev->buffer, slot[cur_drive]->dev()->get_features(), sizeof(dev->buffer));
 
 			/* indicate everything is ready */
-			status |= IDE_STATUS_BUFFER_READY;
-			status |= IDE_STATUS_SEEK_COMPLETE;
-			status |= IDE_STATUS_DRIVE_READY;
+			dev->status |= IDE_STATUS_BUFFER_READY;
+			dev->status |= IDE_STATUS_SEEK_COMPLETE;
+			dev->status |= IDE_STATUS_DRIVE_READY;
 
 			/* and clear the busy adn error flags */
-			status &= ~IDE_STATUS_ERROR;
-			status &= ~IDE_STATUS_BUSY;
+			dev->status &= ~IDE_STATUS_ERROR;
+			dev->status &= ~IDE_STATUS_BUSY;
 
 			/* clear the error too */
 			dev->error = IDE_ERROR_NONE;
@@ -756,7 +755,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, dev->sector_count));
-			status &= ~IDE_STATUS_ERROR;
+			dev->status &= ~IDE_STATUS_ERROR;
 			dev->error = IDE_ERROR_NONE;
 			dev->set_geometry(dev->sector_count,dev->cur_head + 1);
 
@@ -784,7 +783,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 			dev->block_count = dev->sector_count;
 			// judge dredd wants 'drive ready' on this command
-			status |= IDE_STATUS_DRIVE_READY;
+			dev->status |= IDE_STATUS_DRIVE_READY;
 
 			/* signal an interrupt */
 			set_irq(ASSERT_LINE);
@@ -794,8 +793,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE GNET Unlock 1\n"));
 
 			dev->sector_count = 1;
-			status |= IDE_STATUS_DRIVE_READY;
-			status &= ~IDE_STATUS_ERROR;
+			dev->status |= IDE_STATUS_DRIVE_READY;
+			dev->status &= ~IDE_STATUS_ERROR;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -808,7 +807,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			dev->dma_active = 0;
 
 			/* mark the buffer ready */
-			status |= IDE_STATUS_BUFFER_READY;
+			dev->status |= IDE_STATUS_BUFFER_READY;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -823,8 +822,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 			}
 
 			/* update flags */
-			status |= IDE_STATUS_DRIVE_READY;
-			status &= ~IDE_STATUS_ERROR;
+			dev->status |= IDE_STATUS_DRIVE_READY;
+			dev->status &= ~IDE_STATUS_ERROR;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -845,8 +844,8 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 
 		default:
-			LOGPRINT(("IDE unknown command (%02X)\n", command));
-			status |= IDE_STATUS_ERROR;
+			LOGPRINT(("IDE unknown command (%02X)\n", dev->command));
+			dev->status |= IDE_STATUS_ERROR;
 			dev->error = IDE_ERROR_UNKNOWN_COMMAND;
 			set_irq(ASSERT_LINE);
 			//debugger_break(device->machine());
@@ -949,16 +948,16 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	}
 
 	if (dev->is_ready()) {
-		status |= IDE_STATUS_DRIVE_READY;
+		dev->status |= IDE_STATUS_DRIVE_READY;
 	} else {
-		status &= ~IDE_STATUS_DRIVE_READY;
+		dev->status &= ~IDE_STATUS_DRIVE_READY;
 	}
 
 	switch (offset)
 	{
 		/* read data if there's data to be read */
 		case IDE_BANK0_DATA:
-			if (status & IDE_STATUS_BUFFER_READY)
+			if (dev->status & IDE_STATUS_BUFFER_READY)
 			{
 				/* fetch the correct amount of data */
 				result = dev->buffer[dev->buffer_offset++];
@@ -1006,7 +1005,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 
 		/* return the current status and clear any pending interrupts */
 		case IDE_BANK0_STATUS_COMMAND:
-			result = status;
+			result = dev->status;
 			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
@@ -1054,9 +1053,9 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	}
 
 	if (dev->is_ready()) {
-		status |= IDE_STATUS_DRIVE_READY;
+		dev->status |= IDE_STATUS_DRIVE_READY;
 	} else {
-		status &= ~IDE_STATUS_DRIVE_READY;
+		dev->status &= ~IDE_STATUS_DRIVE_READY;
 	}
 
 	/* logit */
@@ -1067,7 +1066,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	switch (offset)
 	{
 		case IDE_BANK1_STATUS_CONTROL:
-			result = status;
+			result = dev->status;
 			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
@@ -1176,7 +1175,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 	{
 		/* write data */
 		case IDE_BANK0_DATA:
-			if (status & IDE_STATUS_BUFFER_READY)
+			if (dev->status & IDE_STATUS_BUFFER_READY)
 			{
 				/* store the correct amount of data */
 				dev->buffer[dev->buffer_offset++] = data;
@@ -1265,8 +1264,8 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 			//if (data == 0x04)
 			if (data & 0x04)
 			{
-				status |= IDE_STATUS_BUSY;
-				status &= ~IDE_STATUS_DRIVE_READY;
+				dev->status |= IDE_STATUS_BUSY;
+				dev->status &= ~IDE_STATUS_DRIVE_READY;
 				reset_timer->adjust(attotime::from_msec(5));
 			}
 			break;
@@ -1280,8 +1279,6 @@ SLOT_INTERFACE_END
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
-	status(0),
-	command(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1294,7 +1291,6 @@ const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	command(0),
 	config_unknown(0),
 	config_register_num(0),
 	cur_drive(0),
@@ -1319,9 +1315,6 @@ void ide_controller_device::device_start()
 	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 
 	/* register ide states */
-	save_item(NAME(status));
-	save_item(NAME(command));
-
 	save_item(NAME(config_unknown));
 	save_item(NAME(config_register));
 	save_item(NAME(config_register_num));
@@ -1336,7 +1329,6 @@ void ide_controller_device::device_reset()
 	LOG(("IDE controller reset performed\n"));
 	/* reset the drive state */
 	cur_drive = 0;
-	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
 	set_irq(CLEAR_LINE);
 	set_dmarq(0);
 }

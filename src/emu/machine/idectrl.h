@@ -126,9 +126,6 @@ private:
 	void read_buffer_empty();
 	void write_buffer_full();
 
-	UINT8           status;
-	UINT8           command;
-
 	UINT8           config_unknown;
 	UINT8           config_register[IDE_CONFIG_REGISTERS];
 	UINT8           config_register_num;

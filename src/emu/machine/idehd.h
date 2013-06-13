@@ -3,6 +3,13 @@
 
 #define IDE_DISK_SECTOR_SIZE            512
 
+#define IDE_STATUS_ERROR                    0x01
+#define IDE_STATUS_HIT_INDEX                0x02
+#define IDE_STATUS_BUFFER_READY             0x08
+#define IDE_STATUS_SEEK_COMPLETE            0x10
+#define IDE_STATUS_DRIVE_READY              0x40
+#define IDE_STATUS_BUSY                     0x80
+
 #define IDE_ERROR_NONE                      0x00
 #define IDE_ERROR_DEFAULT                   0x01
 #define IDE_ERROR_TRACK0_NOT_FOUND          0x02
@@ -35,7 +42,9 @@ public:
 	UINT8           cur_head_reg;
 	UINT32          cur_lba;
 
+	UINT8           status;
 	UINT8           error;
+	UINT8           command;
 
 	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          buffer_offset;
