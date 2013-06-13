@@ -1058,6 +1058,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/pet_64k.o   \
 	$(MESS_MACHINE)/superpet.o  \
 	$(MESS_MACHINE)/mos6702.o   \
+	$(MESS_MACHINE)/shark.o     \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
 	$(MESS_MACHINE)/c64exp.o    \
