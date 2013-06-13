@@ -247,16 +247,12 @@ READ8_MEMBER(funkball_state::io20_r)
 	UINT8 r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
-	if (offset == 0x02)
+	if (offset == 0x00)
 	{
 	}
-	else if (offset == 0x03)
+	else if (offset == 0x01)
 	{
 		r = funkball_config_reg_r();
-	}
-	else
-	{
-		r = m_pic8259_1->read(space, offset);
 	}
 	return r;
 }
@@ -264,17 +260,13 @@ READ8_MEMBER(funkball_state::io20_r)
 WRITE8_MEMBER(funkball_state::io20_w)
 {
 	// 0x22, 0x23, Cyrix configuration registers
-	if (offset == 0x02)
+	if (offset == 0x00)
 	{
 		m_funkball_config_reg_sel = data;
 	}
-	else if (offset == 0x03)
+	else if (offset == 0x01)
 	{
 		funkball_config_reg_w(data);
-	}
-	else
-	{
-		m_pic8259_1->write(space, offset, data);
 	}
 }
 
@@ -405,8 +397,8 @@ static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
