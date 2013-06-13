@@ -16,7 +16,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "video/konicdev.h"
-#include "sound/k007232.h"
 #include "includes/konamipt.h"
 #include "includes/bottom9.h"
 
@@ -146,11 +145,11 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(m_k007232_1, bank_A, bank_B);
+	m_k007232_1->set_bank(bank_A, bank_B);
 
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank(m_k007232_2, bank_A, bank_B);
+	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
 
@@ -178,8 +177,8 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
@@ -263,14 +262,14 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(bottom9_state::volume_callback0)
 {
-	k007232_set_volume(m_k007232_1, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232_1, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(bottom9_state::volume_callback1)
 {
-	k007232_set_volume(m_k007232_2, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232_2, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =

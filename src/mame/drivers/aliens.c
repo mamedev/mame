@@ -10,7 +10,6 @@ Preliminary driver by:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-#include "sound/k007232.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
@@ -77,7 +76,7 @@ WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
-	k007232_set_bank(m_k007232, bank_A, bank_B);
+	m_k007232->set_bank(bank_A, bank_B);
 }
 
 
@@ -126,7 +125,7 @@ static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)                         /* soundlatch_byte_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -187,8 +186,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(aliens_state::volume_callback)
 {
-	k007232_set_volume(m_k007232, 0, (data & 0x0f) * 0x11, 0);
-	k007232_set_volume(m_k007232, 1, 0, (data >> 4) * 0x11);
+	m_k007232->set_volume(0, (data & 0x0f) * 0x11, 0);
+	m_k007232->set_volume(1, 0, (data >> 4) * 0x11);
 }
 
 static const k007232_interface k007232_config =

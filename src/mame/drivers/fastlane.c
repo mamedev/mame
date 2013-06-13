@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
-#include "sound/k007232.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/fastlane.h"
@@ -46,7 +45,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 	membank("bank1")->set_entry((data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(m_k007232_2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
+	m_k007232_2->set_bank(0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -56,22 +55,22 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 
 READ8_MEMBER(fastlane_state::fastlane_k1_k007232_r)
 {
-	return k007232_r(m_k007232_1, space, offset ^ 1);
+	return m_k007232_1->read(space, offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k1_k007232_w)
 {
-	k007232_w(m_k007232_1, space, offset ^ 1, data);
+	m_k007232_1->write(space, offset ^ 1, data);
 }
 
 READ8_MEMBER(fastlane_state::fastlane_k2_k007232_r)
 {
-	return k007232_r(m_k007232_2, space, offset ^ 1);
+	return m_k007232_2->read(space, offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 {
-	k007232_w(m_k007232_2, space, offset ^ 1, data);
+	m_k007232_2->write(space, offset ^ 1, data);
 }
 static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_SHARE("k007121_regs") /* 007121 registers */
@@ -177,14 +176,14 @@ GFXDECODE_END
 
 WRITE8_MEMBER(fastlane_state::volume_callback0)
 {
-	k007232_set_volume(m_k007232_1, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232_1, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(fastlane_state::volume_callback1)
 {
-	k007232_set_volume(m_k007232_2, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232_2, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =

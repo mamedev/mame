@@ -12,7 +12,6 @@
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
-#include "sound/k007232.h"
 #include "includes/konamipt.h"
 #include "includes/gbusters.h"
 
@@ -102,7 +101,7 @@ WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
 {
 	int bank_B = BIT(data, 2);  /* ?? */
 	int bank_A = BIT(data, 0);      /* ?? */
-	k007232_set_bank(m_k007232, bank_A, bank_B );
+	m_k007232->set_bank(bank_A, bank_B );
 
 #if 0
 	{
@@ -164,7 +163,7 @@ static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                                 /* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                                 /* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)                                 /* soundlatch_byte_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)        /* 007232 registers */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)        /* 007232 registers */
 	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_device, status_r)                   /* YM 2151 */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)               /* YM 2151 */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)        /* 007232 bankswitch? */
@@ -232,8 +231,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(gbusters_state::volume_callback)
 {
-	k007232_set_volume(m_k007232, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

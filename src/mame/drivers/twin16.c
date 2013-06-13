@@ -47,7 +47,6 @@ Known Issues:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-#include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "includes/twin16.h"
@@ -224,7 +223,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(twin16_upd_reset_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(twin16_upd_start_w)
@@ -670,8 +669,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(twin16_state::volume_callback)
 {
-	k007232_set_volume(m_k007232,0,(data >> 4) * 0x11,0);
-	k007232_set_volume(m_k007232,1,0,(data & 0x0f) * 0x11);
+	m_k007232->set_volume(0,(data >> 4) * 0x11,0);
+	m_k007232->set_volume(1,0,(data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

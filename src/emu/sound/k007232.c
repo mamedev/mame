@@ -26,41 +26,7 @@ added external port callback, and functions to set the volume of the channels
 #include "emu.h"
 #include "k007232.h"
 
-
-#define  KDAC_A_PCM_MAX    (2)      /* Channels per chip */
-
-
-struct KDAC_A_PCM
-{
-	UINT8           vol[KDAC_A_PCM_MAX][2]; /* volume for the left and right channel */
-	UINT32          addr[KDAC_A_PCM_MAX];
-	UINT32          start[KDAC_A_PCM_MAX];
-	UINT32          step[KDAC_A_PCM_MAX];
-	UINT32          bank[KDAC_A_PCM_MAX];
-	int             play[KDAC_A_PCM_MAX];
-
-	UINT8           wreg[0x10]; /* write data */
-	UINT8 *         pcmbuf[2];  /* Channel A & B pointers */
-
-	UINT32          clock;          /* chip clock */
-	UINT32          pcmlimit;
-
-	sound_stream *  stream;
-	const k007232_interface *intf;
-	UINT32          fncode[0x200];
-	devcb_resolved_write8 portwritehandler;
-};
-
-
 #define   BASE_SHIFT    (12)
-
-
-INLINE KDAC_A_PCM *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == K007232);
-	return (KDAC_A_PCM *)downcast<k007232_device *>(device)->token();
-}
 
 
 #if 0
@@ -175,8 +141,81 @@ static const float kdaca_fn[][2] = {
 #endif
 
 /*************************************************************/
-static void KDAC_A_make_fncode( KDAC_A_PCM *info ){
-	int i;
+
+
+const device_type K007232 = &device_creator<k007232_device>;
+
+k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K007232, "K007232", tag, owner, clock),
+		device_sound_interface(mconfig, *this)
+{
+	
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k007232_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const k007232_interface *intf = reinterpret_cast<const k007232_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k007232_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+	memset(&m_portwritehandler, 0, sizeof(m_portwritehandler));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k007232_device::device_start()
+{
+	/* Set up the chips */
+	m_pcmbuf[0] = *region();
+	m_pcmbuf[1] = *region();
+	m_pcmlimit  = region()->bytes();
+
+	m_portwritehandler_func.resolve(m_portwritehandler,*this);
+
+	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
+	{
+		m_addr[i] = 0;
+		m_start[i] = 0;
+		m_step[i] = 0;
+		m_play[i] = 0;
+		m_bank[i] = 0;
+	}
+	m_vol[0][0] = 255;  /* channel A output to output A */
+	m_vol[0][1] = 0;
+	m_vol[1][0] = 0;
+	m_vol[1][1] = 255;  /* channel B output to output B */
+
+	for (int i = 0; i < 0x10; i++)  
+		m_wreg[i] = 0;
+
+	m_stream = machine().sound().stream_alloc(*this, 0 , 2, clock()/128, this);
+
+	KDAC_A_make_fncode();
+
+	save_item(NAME(m_vol));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_start));
+	save_item(NAME(m_step));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_play));
+	save_item(NAME(m_wreg));
+}
+
+void k007232_device::KDAC_A_make_fncode()
+{
 #if 0
 	int i, j, k;
 	float fn;
@@ -206,10 +245,12 @@ static void KDAC_A_make_fncode( KDAC_A_PCM *info ){
 #endif
 
 #else
-	for( i = 0; i < 0x200; i++ ){
+	int i;
+	for( i = 0; i < 0x200; i++ )
+	{
 	//fncode[i] = (0x200 * 55) / (0x200 - i);
-	info->fncode[i] = (32 << BASE_SHIFT) / (0x200 - i);
-//  info->fncode[i] = ((0x200 * 55.2 / 880) / (0x200 - i));
+	m_fncode[i] = (32 << BASE_SHIFT) / (0x200 - i);
+//  m_fncode[i] = ((0x200 * 55.2 / 880) / (0x200 - i));
 	// = 512 * 55.2 / 220 / (512 - i) = 128 / (512 - i)
 	//    logerror("2 : fncode[%04x] = %.2f\n", i, fncode[i] );
 	}
@@ -219,139 +260,20 @@ static void KDAC_A_make_fncode( KDAC_A_PCM *info ){
 
 
 /************************************************/
-/*    Konami PCM update                         */
-/************************************************/
-
-static STREAM_UPDATE( KDAC_A_update )
-{
-	KDAC_A_PCM *info = (KDAC_A_PCM *)param;
-	int i;
-
-	memset(outputs[0],0,samples * sizeof(*outputs[0]));
-	memset(outputs[1],0,samples * sizeof(*outputs[1]));
-
-	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
-	{
-		if (info->play[i])
-	{
-		int volA,volB,j,out;
-		unsigned int addr, old_addr;
-		//int cen;
-
-		/**** PCM setup ****/
-		addr = info->start[i] + ((info->addr[i]>>BASE_SHIFT)&0x000fffff);
-		volA = info->vol[i][0] * 2;
-		volB = info->vol[i][1] * 2;
-#if 0
-		cen = (volA + volB) / 2;
-		volA = (volA + cen) < 0x1fe ? (volA + cen) : 0x1fe;
-		volB = (volB + cen) < 0x1fe ? (volB + cen) : 0x1fe;
-#endif
-
-		for( j = 0; j < samples; j++ )
-		{
-			old_addr = addr;
-			addr = info->start[i] + ((info->addr[i]>>BASE_SHIFT)&0x000fffff);
-			while (old_addr <= addr)
-		{
-			if( (info->pcmbuf[i][old_addr] & 0x80) || old_addr >= info->pcmlimit )
-			{
-				/* end of sample */
-
-				if( info->wreg[0x0d]&(1<<i) )
-			{
-				/* loop to the beginning */
-				info->start[i] =
-				((((unsigned int)info->wreg[i*0x06 + 0x04]<<16)&0x00010000) |
-					(((unsigned int)info->wreg[i*0x06 + 0x03]<< 8)&0x0000ff00) |
-					(((unsigned int)info->wreg[i*0x06 + 0x02]    )&0x000000ff) |
-					info->bank[i]);
-				addr = info->start[i];
-				info->addr[i] = 0;
-				old_addr = addr; /* skip loop */
-			}
-				else
-			{
-				/* stop sample */
-				info->play[i] = 0;
-			}
-				break;
-			}
-
-			old_addr++;
-		}
-
-			if (info->play[i] == 0)
-		break;
-
-			info->addr[i] += info->step[i];
-
-			out = (info->pcmbuf[i][addr] & 0x7f) - 0x40;
-
-			outputs[0][j] += out * volA;
-			outputs[1][j] += out * volB;
-		}
-	}
-	}
-}
-
-
-/************************************************/
-/*    Konami PCM start                          */
-/************************************************/
-static DEVICE_START( k007232 )
-{
-	static const k007232_interface defintrf = { DEVCB_NULL };
-	int i;
-	KDAC_A_PCM *info = get_safe_token(device);
-
-	info->intf = (device->static_config() != NULL) ? (const k007232_interface *)device->static_config() : &defintrf;
-
-	/* Set up the chips */
-
-	info->pcmbuf[0] = *device->region();
-	info->pcmbuf[1] = *device->region();
-	info->pcmlimit  = device->region()->bytes();
-
-	info->clock = device->clock();
-
-	info->portwritehandler.resolve(info->intf->portwritehandler,*device);
-
-	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
-	{
-		info->start[i] = 0;
-		info->step[i] = 0;
-		info->play[i] = 0;
-		info->bank[i] = 0;
-	}
-	info->vol[0][0] = 255;  /* channel A output to output A */
-	info->vol[0][1] = 0;
-	info->vol[1][0] = 0;
-	info->vol[1][1] = 255;  /* channel B output to output B */
-
-	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
-
-	info->stream = device->machine().sound().stream_alloc(*device,0,2,device->clock()/128,info,KDAC_A_update);
-
-	KDAC_A_make_fncode(info);
-}
-
-/************************************************/
 /*    Konami PCM write register                 */
 /************************************************/
-WRITE8_DEVICE_HANDLER( k007232_w )
+WRITE8_MEMBER( k007232_device::write )
 {
-	KDAC_A_PCM *info = get_safe_token(device);
 	int r = offset;
 	int v = data;
 
-	info->stream->update();
+	m_stream->update();
 
-	info->wreg[r] = v;          /* stock write data */
+	m_wreg[r] = v;          /* stock write data */
 
 	if (r == 0x0c){
 	/* external port, usually volume control */
-	if (!info->portwritehandler.isnull()) info->portwritehandler(0,v);
+	if (!m_portwritehandler_func.isnull()) m_portwritehandler_func(0,v);
 	return;
 	}
 	else if( r == 0x0d ){
@@ -372,13 +294,13 @@ WRITE8_DEVICE_HANDLER( k007232_w )
 	case 0x01:
 	{
 				/**** address step ****/
-		int idx = (((((unsigned int)info->wreg[reg_port*0x06 + 0x01])<<8)&0x0100) | (((unsigned int)info->wreg[reg_port*0x06 + 0x00])&0x00ff));
+		int idx = (((((unsigned int)m_wreg[reg_port*0x06 + 0x01])<<8)&0x0100) | (((unsigned int)m_wreg[reg_port*0x06 + 0x00])&0x00ff));
 #if 0
 		if( !reg_port && r == 1 )
 	logerror("%04x\n" ,idx );
 #endif
 
-		info->step[reg_port] = info->fncode[idx];
+		m_step[reg_port] = m_fncode[idx];
 		break;
 	}
 	case 0x02:
@@ -387,14 +309,14 @@ WRITE8_DEVICE_HANDLER( k007232_w )
 		break;
 	case 0x05:
 				/**** start address ****/
-		info->start[reg_port] =
-	((((unsigned int)info->wreg[reg_port*0x06 + 0x04]<<16)&0x00010000) |
-		(((unsigned int)info->wreg[reg_port*0x06 + 0x03]<< 8)&0x0000ff00) |
-		(((unsigned int)info->wreg[reg_port*0x06 + 0x02]    )&0x000000ff) |
-		info->bank[reg_port]);
-		if (info->start[reg_port] < info->pcmlimit ){
-	info->play[reg_port] = 1;
-	info->addr[reg_port] = 0;
+		m_start[reg_port] =
+	((((unsigned int)m_wreg[reg_port*0x06 + 0x04]<<16)&0x00010000) |
+		(((unsigned int)m_wreg[reg_port*0x06 + 0x03]<< 8)&0x0000ff00) |
+		(((unsigned int)m_wreg[reg_port*0x06 + 0x02]    )&0x000000ff) |
+		m_bank[reg_port]);
+		if (m_start[reg_port] < m_pcmlimit ){
+	m_play[reg_port] = 1;
+	m_addr[reg_port] = 0;
 		}
 		break;
 	}
@@ -404,9 +326,8 @@ WRITE8_DEVICE_HANDLER( k007232_w )
 /************************************************/
 /*    Konami PCM read register                  */
 /************************************************/
-READ8_DEVICE_HANDLER( k007232_r )
+READ8_MEMBER( k007232_device::read )
 {
-	KDAC_A_PCM *info = get_safe_token(device);
 	int r = offset;
 	int  ch = 0;
 
@@ -414,15 +335,15 @@ READ8_DEVICE_HANDLER( k007232_r )
 	ch = r/0x0006;
 	r  = ch * 0x0006;
 
-	info->start[ch] =
-		((((unsigned int)info->wreg[r + 0x04]<<16)&0x00010000) |
-		(((unsigned int)info->wreg[r + 0x03]<< 8)&0x0000ff00) |
-		(((unsigned int)info->wreg[r + 0x02]    )&0x000000ff) |
-		info->bank[ch]);
+	m_start[ch] =
+		((((unsigned int)m_wreg[r + 0x04]<<16)&0x00010000) |
+		(((unsigned int)m_wreg[r + 0x03]<< 8)&0x0000ff00) |
+		(((unsigned int)m_wreg[r + 0x02]    )&0x000000ff) |
+		m_bank[ch]);
 
-	if (info->start[ch] <  info->pcmlimit ){
-		info->play[ch] = 1;
-		info->addr[ch] = 0;
+	if (m_start[ch] <  m_pcmlimit ){
+		m_play[ch] = 1;
+		m_addr[ch] = 0;
 	}
 	}
 	return 0;
@@ -430,49 +351,20 @@ READ8_DEVICE_HANDLER( k007232_r )
 
 /*****************************************************************************/
 
-void k007232_set_volume(device_t *device,int channel,int volumeA,int volumeB)
+void k007232_device::set_volume(int channel,int volumeA,int volumeB)
 {
-	KDAC_A_PCM *info = get_safe_token(device);
-	info->vol[channel][0] = volumeA;
-	info->vol[channel][1] = volumeB;
+	m_vol[channel][0] = volumeA;
+	m_vol[channel][1] = volumeB;
 }
 
-void k007232_set_bank( device_t *device, int chABank, int chBBank )
+void k007232_device::set_bank(int chABank, int chBBank )
 {
-	KDAC_A_PCM *info = get_safe_token(device);
-	info->bank[0] = chABank<<17;
-	info->bank[1] = chBBank<<17;
+	m_bank[0] = chABank<<17;
+	m_bank[1] = chBBank<<17;
 }
 
 /*****************************************************************************/
 
-const device_type K007232 = &device_creator<k007232_device>;
-
-k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007232, "K007232", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(KDAC_A_PCM);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k007232_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k007232_device::device_start()
-{
-	DEVICE_START_NAME( k007232 )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -480,6 +372,72 @@ void k007232_device::device_start()
 
 void k007232_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	int i;
+
+	memset(outputs[0],0,samples * sizeof(*outputs[0]));
+	memset(outputs[1],0,samples * sizeof(*outputs[1]));
+
+	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
+	{
+		if (m_play[i])
+	{
+		int volA,volB,j,out;
+		unsigned int addr, old_addr;
+		//int cen;
+
+		/**** PCM setup ****/
+		addr = m_start[i] + ((m_addr[i]>>BASE_SHIFT)&0x000fffff);
+		volA = m_vol[i][0] * 2;
+		volB = m_vol[i][1] * 2;
+#if 0
+		cen = (volA + volB) / 2;
+		volA = (volA + cen) < 0x1fe ? (volA + cen) : 0x1fe;
+		volB = (volB + cen) < 0x1fe ? (volB + cen) : 0x1fe;
+#endif
+
+		for( j = 0; j < samples; j++ )
+		{
+			old_addr = addr;
+			addr = m_start[i] + ((m_addr[i]>>BASE_SHIFT)&0x000fffff);
+			while (old_addr <= addr)
+		{
+			if( (m_pcmbuf[i][old_addr] & 0x80) || old_addr >= m_pcmlimit )
+			{
+				/* end of sample */
+
+				if( m_wreg[0x0d]&(1<<i) )
+			{
+				/* loop to the beginning */
+				m_start[i] =
+				((((unsigned int)m_wreg[i*0x06 + 0x04]<<16)&0x00010000) |
+					(((unsigned int)m_wreg[i*0x06 + 0x03]<< 8)&0x0000ff00) |
+					(((unsigned int)m_wreg[i*0x06 + 0x02]    )&0x000000ff) |
+					m_bank[i]);
+				addr = m_start[i];
+				m_addr[i] = 0;
+				old_addr = addr; /* skip loop */
+			}
+				else
+			{
+				/* stop sample */
+				m_play[i] = 0;
+			}
+				break;
+			}
+
+			old_addr++;
+		}
+
+			if (m_play[i] == 0)
+		break;
+
+			m_addr[i] += m_step[i];
+
+			out = (m_pcmbuf[i][addr] & 0x7f) - 0x40;
+
+			outputs[0][j] += out * volA;
+			outputs[1][j] += out * volB;
+		}
+	}
+	}
 }

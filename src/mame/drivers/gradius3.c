@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-#include "sound/k007232.h"
 #include "includes/konamipt.h"
 #include "includes/gradius3.h"
 
@@ -142,7 +141,7 @@ WRITE8_MEMBER(gradius3_state::sound_bank_w)
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(m_k007232, bank_A, bank_B);
+	m_k007232->set_bank(bank_A, bank_B);
 }
 
 
@@ -185,7 +184,7 @@ static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)             /* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
+	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -251,8 +250,8 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(gradius3_state::volume_callback)
 {
-	k007232_set_volume(m_k007232, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

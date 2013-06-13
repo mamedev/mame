@@ -3,7 +3,6 @@
     Bishi Bashi Champ Mini Game Senshuken
 
 *************************************************************************/
-#include "sound/k007232.h"
 
 #define CPU_CLOCK       (XTAL_24MHz / 2)        /* 68000 clock */
 #define SOUND_CLOCK     XTAL_16_9344MHz     /* YMZ280 clock */
@@ -15,7 +14,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k007232(*this, "k007232"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
 		m_k055555(*this, "k055555") { }
@@ -34,7 +32,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<k007232_device> m_k007232;
 	required_device<k056832_device> m_k056832;
 	required_device<k054338_device> m_k054338;
 	required_device<k055555_device> m_k055555;

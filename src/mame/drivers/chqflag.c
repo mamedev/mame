@@ -17,7 +17,6 @@
 #include "cpu/m6809/konami.h"
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
-#include "sound/k007232.h"
 #include "includes/chqflag.h"
 #include "includes/konamipt.h"
 
@@ -169,21 +168,21 @@ WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank(m_k007232_1, bank_A, bank_B);
+	m_k007232_1->set_bank(bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(m_k007232_2, bank_A, bank_B);
+	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
 static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w) /* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)  /* 007232 (chip 1) */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)  /* 007232 (chip 1) */
 	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)  /* extra volume, goes to the 007232 w/ A11 */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)  /* 007232 (chip 2) */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)  /* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_byte_r)         /* engine sound volume */
@@ -257,18 +256,18 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER(chqflag_state::volume_callback0)
 {
-	k007232_set_volume(m_k007232_1, 0, (data & 0x0f) * 0x11, 0);
-	k007232_set_volume(m_k007232_1, 1, 0, (data >> 4) * 0x11);
+	m_k007232_1->set_volume(0, (data & 0x0f) * 0x11, 0);
+	m_k007232_1->set_volume(1, 0, (data >> 4) * 0x11);
 }
 
 WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 {
-	k007232_set_volume(m_k007232_2, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232_2->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 WRITE8_MEMBER(chqflag_state::volume_callback1)
 {
-	k007232_set_volume(m_k007232_2, 0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =

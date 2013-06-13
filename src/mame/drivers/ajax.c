@@ -16,7 +16,6 @@
 #include "cpu/m6809/konami.h"
 #include "video/konicdev.h"
 #include "sound/2151intf.h"
-#include "sound/k007232.h"
 #include "includes/ajax.h"
 #include "includes/konamipt.h"
 
@@ -51,8 +50,8 @@ static ADDRESS_MAP_START( ajax_sound_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                             /* ROM F6 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                             /* RAM 2128SL at D16 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)             /* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)      /* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)      /* 007232 registers (chip 2) */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_device, read, write)      /* 007232 registers (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_device, read, write)      /* 007232 registers (chip 2) */
 	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)         /* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)       /* YM2151 */
@@ -142,30 +141,30 @@ WRITE8_MEMBER(ajax_state::sound_bank_w)
 	/* banks # for the 007232 (chip 1) */
 	bank_A = BIT(data, 1);
 	bank_B = BIT(data, 0);
-	k007232_set_bank(m_k007232_1, bank_A, bank_B);
+	m_k007232_1->set_bank(bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(m_k007232_2, bank_A, bank_B);
+	m_k007232_2->set_bank(bank_A, bank_B);
 }
 
 WRITE8_MEMBER(ajax_state::volume_callback0)
 {
-	k007232_set_volume(m_k007232_1, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_k007232_1, 1, 0, (data & 0x0f) * 0x11);
+	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
+	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(ajax_state::k007232_extvol_w)
 {
 	/* channel A volume (mono) */
-	k007232_set_volume(m_k007232_2, 0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
+	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
 WRITE8_MEMBER(ajax_state::volume_callback1)
 {
 	/* channel B volume/pan */
-	k007232_set_volume(m_k007232_2, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	m_k007232_2->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =
