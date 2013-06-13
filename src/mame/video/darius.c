@@ -88,16 +88,16 @@ void darius_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 UINT32 darius_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs)
 {
-	pc080sn_tilemap_update(m_pc080sn);
+	m_pc080sn->tilemap_update();
 
 	// draw bottom layer(always active)
-	pc080sn_tilemap_draw_offset(m_pc080sn, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
+	m_pc080sn->tilemap_draw_offset(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
-	pc080sn_tilemap_draw_offset(m_pc080sn, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
+	m_pc080sn->tilemap_draw_offset(bitmap, cliprect, 1, 0, 0, -xoffs, 0);
 
 	draw_sprites(bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
 

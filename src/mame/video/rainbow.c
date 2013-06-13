@@ -42,15 +42,15 @@ UINT32 rbisland_state::screen_update_rainbow(screen_device &screen, bitmap_ind16
 {
 	int layer[2];
 
-	pc080sn_tilemap_update(m_pc080sn);
+	m_pc080sn->tilemap_update();
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[1], 0, 2);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
 
 	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 1);
 	return 0;
@@ -69,7 +69,7 @@ the Y settings are active low.
 
 VIDEO_START_MEMBER(rbisland_state,jumping)
 {
-	pc080sn_set_trans_pen(m_pc080sn, 1, 15);
+	m_pc080sn->set_trans_pen(1, 15);
 
 	m_sprite_ctrl = 0;
 	m_sprites_flipscreen = 0;
@@ -86,17 +86,17 @@ UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16
 	int offs, layer[2];
 	int sprite_colbank = (m_sprite_ctrl & 0xe0) >> 1;
 
-	pc080sn_tilemap_update(m_pc080sn);
+	m_pc080sn->tilemap_update();
 
 	/* Override values, or foreground layer is in wrong position */
-	pc080sn_set_scroll(m_pc080sn, 1, 16, 0);
+	m_pc080sn->set_scroll(1, 16, 0);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Draw the sprites. 128 sprites in total */
 	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
@@ -122,7 +122,7 @@ UINT32 rbisland_state::screen_update_jumping(screen_device &screen, bitmap_ind16
 		}
 	}
 
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[1], 0, 0);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 0);
 
 #if 0
 	{

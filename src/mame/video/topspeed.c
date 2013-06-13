@@ -144,8 +144,8 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	pc080sn_tilemap_update(m_pc080sn_1);
-	pc080sn_tilemap_update(m_pc080sn_2);
+	m_pc080sn_1->tilemap_update();
+	m_pc080sn_2->tilemap_update();
 
 	/* Tilemap layer priority seems hardwired (the order is odd, too) */
 	layer[0] = 1;
@@ -159,22 +159,22 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[3] == 0)
 #endif
-	pc080sn_tilemap_draw(m_pc080sn_2, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn_2->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[2] == 0)
 #endif
-	pc080sn_tilemap_draw_special(m_pc080sn_2, bitmap, cliprect, layer[1], 0, 2, m_raster_ctrl);
+	m_pc080sn_2->tilemap_draw_special(bitmap, cliprect, layer[1], 0, 2, m_raster_ctrl);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[1] == 0)
 #endif
-	pc080sn_tilemap_draw_special(m_pc080sn_1, bitmap, cliprect, layer[2], 0, 4, m_raster_ctrl + 0x100);
+	m_pc080sn_1->tilemap_draw_special(bitmap, cliprect, layer[2], 0, 4, m_raster_ctrl + 0x100);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[0] == 0)
 #endif
-	pc080sn_tilemap_draw(m_pc080sn_1, bitmap, cliprect, layer[3], 0, 8);
+	m_pc080sn_1->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[4] == 0)

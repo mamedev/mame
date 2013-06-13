@@ -17,11 +17,11 @@
 
 struct pc080sn_interface
 {
-	int                gfxnum;
+	int                m_gfxnum;
 
-	int                x_offset, y_offset;
-	int                y_invert;
-	int                dblwidth;
+	int                m_x_offset, m_y_offset;
+	int                m_y_invert;
+	int                m_dblwidth;
 };
 
 
@@ -100,25 +100,54 @@ struct tc0180vcu_interface
 	int            tx_color_base;
 };
 
-class pc080sn_device : public device_t
+class pc080sn_device : public device_t,
+										pc080sn_interface
 {
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~pc080sn_device() { global_free(m_token); }
+	~pc080sn_device() {}
+	
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+	DECLARE_WRITE16_MEMBER( xscroll_word_w );
+	DECLARE_WRITE16_MEMBER( yscroll_word_w );
+	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+	
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	
+	void common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
+	void common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	void pc080sn_restore_scroll();
-protected:
+	void set_scroll(int tilemap_num, int scrollx, int scrolly);
+	void set_trans_pen(int tilemap_num, int pen);
+	void tilemap_update();
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	void tilemap_draw_offset(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
+	void topspeed_custom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *color_ctrl_ram);
+
+	/* For Topspeed */
+	void tilemap_draw_special(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
+	
+	void restore_scroll();
+
+	protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-private:
+	
+	private:
 	// internal state
-	void *m_token;
+	UINT16         m_ctrl[8];
 
-	TILE_GET_INFO_MEMBER(pc080sn_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(pc080sn_get_fg_tile_info);
+	UINT16 		   *m_ram;
+	UINT16 		   *m_bg_ram[2];
+	UINT16		   *m_bgscroll_ram[2];
+
+	int            m_bgscrollx[2], m_bgscrolly[2];
+		
+	tilemap_t      *m_tilemap[2];
+			
 };
 
 extern const device_type PC080SN;
@@ -378,23 +407,6 @@ extern const device_type TC0180VCU;
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
-
-/**  PC080SN  **/
-DECLARE_READ16_DEVICE_HANDLER( pc080sn_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( pc080sn_word_w );
-DECLARE_WRITE16_DEVICE_HANDLER( pc080sn_xscroll_word_w );
-DECLARE_WRITE16_DEVICE_HANDLER( pc080sn_yscroll_word_w );
-DECLARE_WRITE16_DEVICE_HANDLER( pc080sn_ctrl_word_w );
-
-void pc080sn_set_scroll(device_t *device, int tilemap_num, int scrollx, int scrolly);
-void pc080sn_set_trans_pen(device_t *device, int tilemap_num, int pen);
-void pc080sn_tilemap_update(device_t *device);
-void pc080sn_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
-void pc080sn_tilemap_draw_offset(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, int xoffs, int yoffs);
-
-/* For Topspeed */
-void pc080sn_tilemap_draw_special(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority, UINT16 *ram);
-
 
 /**  PC090OJ  **/
 DECLARE_READ16_DEVICE_HANDLER( pc090oj_word_r );

@@ -38,15 +38,15 @@ UINT32 opwolf_state::screen_update_opwolf(screen_device &screen, bitmap_ind16 &b
 {
 	int layer[2];
 
-	pc080sn_tilemap_update(m_pc080sn);
+	m_pc080sn->tilemap_update();
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	pc080sn_tilemap_draw(m_pc080sn, bitmap, cliprect, layer[1], 0, 2);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
 
 	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 1);
 
