@@ -83,13 +83,6 @@
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_2     0xfc
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_3     0x0f
 
-#define IDE_ERROR_NONE                      0x00
-#define IDE_ERROR_DEFAULT                   0x01
-#define IDE_ERROR_TRACK0_NOT_FOUND          0x02
-#define IDE_ERROR_UNKNOWN_COMMAND           0x04
-#define IDE_ERROR_BAD_LOCATION              0x10
-#define IDE_ERROR_BAD_SECTOR                0x80
-
 
 void ide_controller_device::set_irq(int state)
 {
@@ -283,7 +276,7 @@ void ide_controller_device::read_buffer_empty()
 	/* clear the buffer ready and busy flag */
 	status &= ~IDE_STATUS_BUFFER_READY;
 	status &= ~IDE_STATUS_BUSY;
-	error = IDE_ERROR_DEFAULT;
+	dev->error = IDE_ERROR_DEFAULT;
 	set_dmarq(0);
 
 	if (dev->master_password_enable || dev->user_password_enable)
@@ -336,7 +329,7 @@ void ide_controller_device::read_sector_done()
 			next_sector();
 
 		/* clear the error value */
-		error = IDE_ERROR_NONE;
+		dev->error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
 		if (!dev->verify_only)
@@ -361,7 +354,7 @@ void ide_controller_device::read_sector_done()
 	{
 		/* set the error flag and the error */
 		status |= IDE_STATUS_ERROR;
-		error = IDE_ERROR_BAD_SECTOR;
+		dev->error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
@@ -547,7 +540,7 @@ void ide_controller_device::write_sector_done()
 			next_sector();
 
 		/* clear the error value */
-		error = IDE_ERROR_NONE;
+		dev->error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
 		if (--dev->sectors_until_int == 0 || dev->sector_count == 1)
@@ -574,7 +567,7 @@ void ide_controller_device::write_sector_done()
 	{
 		/* set the error flag and the error */
 		status |= IDE_STATUS_ERROR;
-		error = IDE_ERROR_BAD_SECTOR;
+		dev->error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
@@ -731,14 +724,14 @@ void ide_controller_device::handle_command(UINT8 _command)
 			status &= ~IDE_STATUS_BUSY;
 
 			/* clear the error too */
-			error = IDE_ERROR_NONE;
+			dev->error = IDE_ERROR_NONE;
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 1);
 			break;
 
 		case IDE_COMMAND_DIAGNOSTIC:
-			error = IDE_ERROR_DEFAULT;
+			dev->error = IDE_ERROR_DEFAULT;
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
@@ -746,14 +739,14 @@ void ide_controller_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_RECALIBRATE:
 			/* clear the error too */
-			error = IDE_ERROR_NONE;
+			dev->error = IDE_ERROR_NONE;
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_IDLE:
 			/* clear the error too */
-			error = IDE_ERROR_NONE;
+			dev->error = IDE_ERROR_NONE;
 
 			/* for timeout disabled value is 0 */
 			dev->sector_count = 0;
@@ -764,7 +757,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", dev->cur_head + 1, dev->sector_count));
 			status &= ~IDE_STATUS_ERROR;
-			error = IDE_ERROR_NONE;
+			dev->error = IDE_ERROR_NONE;
 			dev->set_geometry(dev->sector_count,dev->cur_head + 1);
 
 			/* signal an interrupt */
@@ -842,7 +835,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 			    so that implements actual seek
 			*/
 			/* clear the error too */
-			error = IDE_ERROR_NONE;
+			dev->error = IDE_ERROR_NONE;
 
 			/* for timeout disabled value is 0 */
 			dev->sector_count = 0;
@@ -854,7 +847,7 @@ void ide_controller_device::handle_command(UINT8 _command)
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			status |= IDE_STATUS_ERROR;
-			error = IDE_ERROR_UNKNOWN_COMMAND;
+			dev->error = IDE_ERROR_UNKNOWN_COMMAND;
 			set_irq(ASSERT_LINE);
 			//debugger_break(device->machine());
 			break;
@@ -983,7 +976,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 
 		/* return the current error */
 		case IDE_BANK0_ERROR:
-			result = error;
+			result = dev->error;
 			break;
 
 		/* return the current sector count */
@@ -1145,6 +1138,9 @@ void ide_controller_device::write_dma( UINT16 data )
 {
 	ide_device_interface *dev = slot[cur_drive]->dev();
 
+	if (dev == NULL)
+		return;
+
 	dev->buffer[dev->buffer_offset++] = data;
 	dev->buffer[dev->buffer_offset++] = data >> 8;
 
@@ -1168,6 +1164,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 	}
 
 	ide_device_interface *dev = slot[cur_drive]->dev();
+
 	if (dev == NULL)
 		return;
 
@@ -1284,7 +1281,6 @@ SLOT_INTERFACE_END
 ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
 	status(0),
-	error(0),
 	command(0),
 	config_unknown(0),
 	config_register_num(0),
@@ -1298,7 +1294,6 @@ const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	error(0),
 	command(0),
 	config_unknown(0),
 	config_register_num(0),
@@ -1325,7 +1320,6 @@ void ide_controller_device::device_start()
 
 	/* register ide states */
 	save_item(NAME(status));
-	save_item(NAME(error));
 	save_item(NAME(command));
 
 	save_item(NAME(config_unknown));
@@ -1343,7 +1337,6 @@ void ide_controller_device::device_reset()
 	/* reset the drive state */
 	cur_drive = 0;
 	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
-	error = IDE_ERROR_DEFAULT;
 	set_irq(CLEAR_LINE);
 	set_dmarq(0);
 }

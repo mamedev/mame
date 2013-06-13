@@ -127,7 +127,6 @@ private:
 	void write_buffer_full();
 
 	UINT8           status;
-	UINT8           error;
 	UINT8           command;
 
 	UINT8           config_unknown;

@@ -253,6 +253,8 @@ void ide_hdd_device::device_start()
 	save_item(NAME(buffer));
 	save_item(NAME(buffer_offset));
 
+	save_item(NAME(error));
+
 	save_item(NAME(adapter_control));
 	save_item(NAME(precomp_offset));
 	save_item(NAME(sector_count));
@@ -309,6 +311,7 @@ void ide_hdd_device::device_reset()
 	gnetreadlock = 0;
 	master_password_enable = (master_password != NULL);
 	user_password_enable = (user_password != NULL);
+	error = IDE_ERROR_DEFAULT;
 }
 
 //-------------------------------------------------

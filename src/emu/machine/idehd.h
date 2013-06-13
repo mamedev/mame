@@ -3,6 +3,13 @@
 
 #define IDE_DISK_SECTOR_SIZE            512
 
+#define IDE_ERROR_NONE                      0x00
+#define IDE_ERROR_DEFAULT                   0x01
+#define IDE_ERROR_TRACK0_NOT_FOUND          0x02
+#define IDE_ERROR_UNKNOWN_COMMAND           0x04
+#define IDE_ERROR_BAD_LOCATION              0x10
+#define IDE_ERROR_BAD_SECTOR                0x80
+
 // ======================> ide_device_interface
 
 class ide_device_interface : public device_slot_card_interface
@@ -27,6 +34,8 @@ public:
 	UINT8           cur_head;
 	UINT8           cur_head_reg;
 	UINT32          cur_lba;
+
+	UINT8           error;
 
 	UINT8           buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          buffer_offset;
