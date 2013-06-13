@@ -628,4 +628,30 @@
 		</part>
 	</software>
 
+	<software name="zram">
+		<description>Z-RAM CP/M Version 2.2</description>
+		<year>1982</year>
+		<publisher>Madison Computer</publisher>
+		<info name="serial" value="CP2-620-580" />
+
+		<!--
+		          C P / M   ( R )       V e r s i o n   2 . 2
+		( C )   1 9 7 6 - 1 9 8 0   D i g i t a l   R e s e a r c h
+		s e r i a l  #  C P 2 - 6 2 0 -   5 8 0   # #
+		8050 format / 4040 on back   (C) 1982 Madison Computer
+		See Digital Research software license for restrictions.
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="madison8050_t43_s16_bad.d80" size="533248" crc="91718447" sha1="4ab1983c275c217a0f66facf4db639de04720419" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="madison4040.d64" size="174848" crc="e4638b5a" sha1="19aa578a8eadfc95a5e30e73abcc5d80ee6b1aca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
