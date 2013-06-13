@@ -80,34 +80,46 @@ enum
 ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device) :
 	m_master_password(NULL),
 	m_user_password(NULL),
-	m_csel(0),
-	m_dasp(0),
 	m_irq_handler(device),
 	m_dmarq_handler(device)
 {
 }
 
-void ide_device_interface::set_irq(int state)
+ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	ide_device_interface(mconfig, *this),
+	device_slot_card_interface(mconfig, *this),
+	m_csel(0),
+	m_dasp(0)
+{
+}
+
+void ide_mass_storage_device::set_irq(int state)
 {
 	if (state == ASSERT_LINE)
 		LOG(("IDE interrupt assert\n"));
 	else
 		LOG(("IDE interrupt clear\n"));
 
+	m_interrupt_pending = state;
+
 	/* signal an interrupt */
 	m_irq_handler(state);
 }
 
-void ide_device_interface::set_dmarq(int state)
+void ide_mass_storage_device::set_dmarq(int state)
 {
 	m_dmarq_handler(state);
 }
 
-ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	ide_device_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+WRITE_LINE_MEMBER( ide_mass_storage_device::write_csel )
 {
+	m_csel = state;
+}
+
+WRITE_LINE_MEMBER( ide_mass_storage_device::write_dasp )
+{
+	m_dasp = state;
 }
 
 /*************************************
@@ -362,13 +374,6 @@ void ide_mass_storage_device::device_reset()
 	/* reset the drive state */
 	set_irq(CLEAR_LINE);
 	set_dmarq(CLEAR_LINE);
-}
-
-void ide_mass_storage_device::set_irq(int state)
-{
-	ide_device_interface::set_irq(state);
-
-	m_interrupt_pending = state;
 }
 
 void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer_ready)

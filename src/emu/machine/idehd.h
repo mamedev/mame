@@ -24,15 +24,15 @@ class ide_device_interface
 public:
 	ide_device_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void set_irq(int state);
-	virtual void set_dmarq(int state);
-
 	virtual UINT16 read_dma() = 0;
 	virtual DECLARE_READ16_MEMBER(read_cs0) = 0;
 	virtual DECLARE_READ16_MEMBER(read_cs1) = 0;
+
 	virtual void write_dma(UINT16 data) = 0;
 	virtual DECLARE_WRITE16_MEMBER(write_cs0) = 0;
 	virtual DECLARE_WRITE16_MEMBER(write_cs1) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
 	virtual UINT8 *get_features() = 0;
 
@@ -40,9 +40,6 @@ public:
 	UINT8           m_user_password_enable;
 	const UINT8 *   m_master_password;
 	const UINT8 *   m_user_password;
-
-	int m_csel;
-	int m_dasp;
 
 	devcb2_write_line m_irq_handler;
 	devcb2_write_line m_dmarq_handler;
@@ -55,16 +52,15 @@ class ide_mass_storage_device : public device_t,
 public:
 	ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
 
-	virtual int  read_sector(UINT32 lba, void *buffer) = 0;
-	virtual int  write_sector(UINT32 lba, const void *buffer) = 0;
-
-	virtual void set_irq(int state);
 	virtual UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
+
 	virtual void write_dma(UINT16 data);
 	virtual DECLARE_WRITE16_MEMBER(write_cs0);
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_csel);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
 
 	virtual UINT8 *get_features() { return m_features; }
 	
@@ -73,8 +69,13 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	virtual int read_sector(UINT32 lba, void *buffer) = 0;
+	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 	virtual bool is_ready() = 0;
 	virtual void read_key(UINT8 key[]) = 0;
+
+	void set_irq(int state);
+	void set_dmarq(int state);
 
 	UINT8           m_gnetreadlock;
 
@@ -98,6 +99,9 @@ private:
 	void handle_command(UINT8 _command);
 	void read_buffer_empty();
 	void write_buffer_full();
+
+	int m_csel;
+	int m_dasp;
 
 	int             m_cur_drive;
 	UINT16          m_cur_cylinder;

@@ -341,8 +341,8 @@ void ide_controller_device::device_start()
 				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, dmarq1_write_line));
 			}
 
-			dev->m_csel = i;
-			dev->m_dasp = m_slot[1]->dev() != NULL;
+			dev->write_csel(i);
+			dev->write_dasp(m_slot[1]->dev() != NULL);
 		}
 	}
 
