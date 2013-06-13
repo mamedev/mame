@@ -211,11 +211,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(pcat_base_state,get_out2)
 };
 
-static const struct mc146818_interface at_mc146818_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_2", pic8259_device, ir0_w)
-};
-
 ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
@@ -233,7 +228,7 @@ MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
-	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config)
+	MCFG_MC146818_IRQ_ADD("rtc", MC146818_STANDARD, DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
 
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
