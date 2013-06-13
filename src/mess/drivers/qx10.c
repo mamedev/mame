@@ -445,11 +445,6 @@ static I8255_INTERFACE(qx10_i8255_interface)
     MC146818
 */
 
-const struct mc146818_interface qx10_mc146818_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir2_w)
-};
-
 WRITE8_MEMBER(qx10_state::mc146818_w)
 {
 	m_rtc->write(space, !offset, data);
@@ -888,7 +883,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
-	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, qx10_mc146818_config )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)

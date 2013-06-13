@@ -140,11 +140,6 @@ WRITE_LINE_MEMBER( e01_device::rtc_irq_w )
 	update_interrupts();
 }
 
-static mc146818_interface rtc_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, rtc_irq_w)
-};
-
 
 //-------------------------------------------------
 //  mc6854_interface adlc_intf
@@ -299,7 +294,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_CPU_ADD(R65C102_TAG, M65C02, XTAL_8MHz/4) // Rockwell R65C102P3
 	MCFG_CPU_PROGRAM_MAP(e01_mem)
 
-	MCFG_MC146818_IRQ_ADD(HD146818_TAG, MC146818_STANDARD, rtc_intf)
+	MCFG_MC146818_IRQ_ADD(HD146818_TAG, MC146818_STANDARD, WRITELINE(e01_device, rtc_irq_w))
 
 	// devices
 	MCFG_VIA6522_ADD(R6522_TAG, XTAL_8MHz/4, via_intf)

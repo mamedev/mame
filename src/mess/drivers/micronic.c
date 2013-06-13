@@ -358,10 +358,6 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 	m_maincpu->set_input_line(0, !state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct mc146818_interface micronic_mc146818_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(micronic_state, mc146818_irq)
-};
 
 static MACHINE_CONFIG_START( micronic, micronic_state )
 	/* basic machine hardware */
@@ -393,7 +389,7 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 
 	MCFG_NVRAM_HANDLER(micronic)
 
-	MCFG_MC146818_IRQ_ADD( MC146818_TAG, MC146818_IGNORE_CENTURY, micronic_mc146818_config )
+	MCFG_MC146818_IRQ_ADD( MC146818_TAG, MC146818_IGNORE_CENTURY, WRITELINE(micronic_state, mc146818_irq))
 MACHINE_CONFIG_END
 
 /* ROM definition */

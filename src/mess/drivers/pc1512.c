@@ -962,16 +962,6 @@ static const struct pit8253_interface pit_intf =
 
 
 //-------------------------------------------------
-//  mc146818_interface rtc_intf
-//-------------------------------------------------
-
-static const struct mc146818_interface rtc_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir2_w)
-};
-
-
-//-------------------------------------------------
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
@@ -1048,11 +1038,6 @@ static const centronics_interface centronics_intf =
 //-------------------------------------------------
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
-
-static SLOT_INTERFACE_START( pc1512_isa8_cards )
-	SLOT_INTERFACE("wdxt_gen", WDXT_GEN)
-	SLOT_INTERFACE("ega", ISA8_EGA)
-SLOT_INTERFACE_END
 
 static const isa8bus_interface isabus_intf =
 {
@@ -1258,7 +1243,7 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_I8237_ADD(I8237A5_TAG, XTAL_24MHz/6, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
+	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
@@ -1268,9 +1253,9 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc_isa8_cards, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1304,7 +1289,7 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_I8237_ADD(I8237A5_TAG, XTAL_24MHz/6, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
+	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
@@ -1314,9 +1299,9 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc1512_isa8_cards, "wdxt_gen", false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc1512_isa8_cards, NULL, false)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc1512_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc_isa8_cards, "wdxt_gen", false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc_isa8_cards, NULL, false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

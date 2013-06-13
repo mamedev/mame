@@ -538,6 +538,7 @@ DRVLIBS += \
 	$(MESSOBJ)/intelgnt.a \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
+	$(MESSOBJ)/isa.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
@@ -735,7 +736,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/i8271.o     \
 	$(MESS_MACHINE)/ieee488.o   \
 	$(MESS_MACHINE)/imi5000h.o  \
-	$(MESS_MACHINE)/isa.o       \
 	$(MESS_MACHINE)/kb3600.o    \
 	$(MESS_MACHINE)/keyboard.o  \
 	$(MESS_MACHINE)/kr2376.o    \
@@ -771,6 +771,35 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/vcsctrl.o   \
 	$(MESS_MACHINE)/z80bin.o    \
 
+$(MESSOBJ)/isa.a: \
+	$(MESS_MACHINE)/isa.o       \
+	$(MESS_MACHINE)/isa_cards.o \
+	$(MESS_VIDEO)/isa_mda.o     \
+	$(MESS_MACHINE)/isa_wdxt_gen.o  \
+	$(MESS_MACHINE)/isa_adlib.o \
+	$(MESS_MACHINE)/isa_com.o   \
+	$(MESS_MACHINE)/isa_fdc.o   \
+	$(MESS_MACHINE)/isa_finalchs.o  \
+	$(MESS_MACHINE)/isa_gblaster.o  \
+	$(MESS_MACHINE)/isa_gus.o   \
+	$(MESS_MACHINE)/isa_hdc.o   \
+	$(MESS_MACHINE)/isa_ibm_mfc.o   \
+	$(MESS_MACHINE)/isa_mpu401.o\
+	$(MESS_MACHINE)/isa_sblaster.o  \
+	$(MESS_MACHINE)/isa_stereo_fx.o \
+	$(MESS_MACHINE)/isa_ssi2001.o   \
+	$(MESS_MACHINE)/isa_ide.o   \
+	$(MESS_MACHINE)/isa_ide8.o   \
+	$(MESS_MACHINE)/isa_ide_cd.o\
+	$(MESS_MACHINE)/isa_aha1542.o   \
+	$(MESS_VIDEO)/isa_cga.o     \
+	$(MESS_VIDEO)/isa_svga_cirrus.o \
+	$(MESS_VIDEO)/isa_ega.o     \
+	$(MESS_VIDEO)/isa_vga.o     \
+	$(MESS_VIDEO)/isa_vga_ati.o \
+	$(MESS_VIDEO)/isa_svga_tseng.o      \
+	$(MESS_VIDEO)/isa_svga_s3.o \
+	$(MESS_VIDEO)/s3virge.o \
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers
@@ -835,7 +864,6 @@ $(MESSOBJ)/amstrad.a:           \
 	$(MESS_MACHINE)/pc1512kb.o  \
 	$(MESS_VIDEO)/pc1512.o      \
 	$(MESS_VIDEO)/pc1640.o      \
-	$(MESS_MACHINE)/isa_wdxt_gen.o  \
 	$(MESS_VIDEO)/nc.o          \
 	$(MESS_DRIVERS)/nc.o        \
 	$(MESS_MACHINE)/nc.o        \
@@ -949,10 +977,11 @@ $(MESSOBJ)/ascii.a:             \
 
 $(MESSOBJ)/at.a:                \
 	$(MESS_MACHINE)/at_keybc.o  \
-	$(MESS_MACHINE)/cs4031.o    \
 	$(MESS_MACHINE)/cs8221.o    \
 	$(MESS_MACHINE)/at.o        \
 	$(MESS_DRIVERS)/at.o        \
+	$(MESS_MACHINE)/cs4031.o    \
+	$(MESS_DRIVERS)/ct486.o     \
 
 $(MESSOBJ)/atari.a:             \
 	$(MESS_MACHINE)/ataricrt.o  \
@@ -1776,33 +1805,8 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_MACHINE)/pc_keyboards.o \
 	$(MESS_MACHINE)/kb_keytro.o \
 	$(MESS_MACHINE)/kb_msnat.o  \
-	$(MESS_MACHINE)/isa_adlib.o \
 	$(MESS_MACHINE)/ser_mouse.o \
-	$(MESS_MACHINE)/isa_com.o   \
-	$(MESS_MACHINE)/isa_fdc.o   \
-	$(MESS_MACHINE)/isa_finalchs.o  \
-	$(MESS_MACHINE)/isa_gblaster.o  \
-	$(MESS_MACHINE)/isa_gus.o   \
-	$(MESS_MACHINE)/isa_hdc.o   \
-	$(MESS_MACHINE)/isa_ibm_mfc.o   \
-	$(MESS_MACHINE)/isa_mpu401.o\
-	$(MESS_MACHINE)/isa_sblaster.o  \
-	$(MESS_MACHINE)/isa_stereo_fx.o \
-	$(MESS_MACHINE)/isa_ssi2001.o   \
-	$(MESS_MACHINE)/isa_ide.o   \
-	$(MESS_MACHINE)/isa_ide8.o   \
-	$(MESS_MACHINE)/isa_ide_cd.o\
-	$(MESS_MACHINE)/isa_aha1542.o   \
-	$(MESS_VIDEO)/isa_cga.o     \
-	$(MESS_VIDEO)/isa_mda.o     \
 	$(MESS_VIDEO)/crtc_ega.o    \
-	$(MESS_VIDEO)/isa_ega.o     \
-	$(MESS_VIDEO)/isa_vga.o     \
-	$(MESS_VIDEO)/isa_vga_ati.o \
-	$(MESS_VIDEO)/isa_svga_tseng.o      \
-	$(MESS_VIDEO)/isa_svga_s3.o \
-	$(MESS_VIDEO)/s3virge.o \
-	$(MESS_VIDEO)/isa_svga_cirrus.o \
 	$(MESS_MACHINE)/i82371ab.o  \
 	$(MESS_MACHINE)/i82371sb.o  \
 	$(MESS_MACHINE)/i82439tx.o  \

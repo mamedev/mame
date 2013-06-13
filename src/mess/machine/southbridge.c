@@ -52,11 +52,6 @@ I8237_INTERFACE( at_dma8237_2_config )
 	{ DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack4_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack5_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack6_w), DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dack7_w) }
 };
 
-const struct mc146818_interface at_mc146818_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_mc146818_irq)
-};
-
 static const at_keyboard_controller_interface keyboard_controller_intf =
 {
 	DEVCB_CPU_INPUT_LINE(":maincpu", INPUT_LINE_RESET),
@@ -121,7 +116,7 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
+	MCFG_MC146818_IRQ_ADD("rtc", MC146818_STANDARD, WRITELINE(southbridge_device, at_mc146818_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -34,12 +34,6 @@ static ADDRESS_MAP_START( at386_map, AS_PROGRAM, 32, at_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-// memory is mostly handled by the chipset
-static ADDRESS_MAP_START( ct486_map, AS_PROGRAM, 32, at_state )
-	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START( at586_map, AS_PROGRAM, 32, at586_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
@@ -150,50 +144,6 @@ static ADDRESS_MAP_START( at386_io, AS_IO, 32, at_state )
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 
-
-READ32_MEMBER( at_state::ct486_chipset_r )
-{
-	if (ACCESSING_BITS_0_7)
-		return m_pic8259_master->read(space, 0);
-
-	if (ACCESSING_BITS_8_15)
-		return m_pic8259_master->read(space, 1) << 8;
-
-	if (ACCESSING_BITS_24_31)
-		return m_cs4031->data_r(space, 0, 0) << 24;
-
-	return 0xffffffff;
-}
-
-WRITE32_MEMBER( at_state::ct486_chipset_w )
-{
-	if (ACCESSING_BITS_0_7)
-		m_pic8259_master->write(space, 0, data);
-
-	if (ACCESSING_BITS_8_15)
-		m_pic8259_master->write(space, 1, data >> 8);
-
-	if (ACCESSING_BITS_16_23)
-		m_cs4031->address_w(space, 0, data >> 16, 0);
-
-	if (ACCESSING_BITS_24_31)
-		m_cs4031->data_w(space, 0, data >> 24, 0);
-}
-
-static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE(ct486_chipset_r, ct486_chipset_w)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
-ADDRESS_MAP_END
-
-
 static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
@@ -300,11 +250,6 @@ WRITE_LINE_MEMBER( at_state::at_mc146818_irq )
 	m_pic8259_slave->ir0_w((state) ? 0 : 1);
 }
 
-const struct mc146818_interface at_mc146818_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(at_state, at_mc146818_irq)
-};
-
 static const isa16bus_interface isabus_intf =
 {
 	// interrupts
@@ -332,45 +277,6 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq3_w),
 };
 
-static SLOT_INTERFACE_START(pc_isa16_cards)
-	// ISA 8 bit
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("wyse700", ISA8_WYSE700)
-	SLOT_INTERFACE("ega", ISA8_EGA)
-	SLOT_INTERFACE("vga", ISA8_VGA)
-	SLOT_INTERFACE("svga_et4k", ISA8_SVGA_ET4K)
-	SLOT_INTERFACE("svga_dm",ISA8_SVGA_CIRRUS)
-	SLOT_INTERFACE("com", ISA8_COM)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("fdc", ISA8_FDC_AT)
-	SLOT_INTERFACE("hdc", ISA8_HDC)
-	SLOT_INTERFACE("adlib", ISA8_ADLIB)
-	SLOT_INTERFACE("hercules", ISA8_HERCULES)
-	SLOT_INTERFACE("gblaster", ISA8_GAME_BLASTER)
-	SLOT_INTERFACE("sblaster1_0", ISA8_SOUND_BLASTER_1_0)
-	SLOT_INTERFACE("sblaster1_5", ISA8_SOUND_BLASTER_1_5)
-	SLOT_INTERFACE("stereo_fx", ISA8_STEREO_FX)
-	SLOT_INTERFACE("ssi2001", ISA8_SSI2001)
-	SLOT_INTERFACE("ne1000", NE1000)
-	SLOT_INTERFACE("3c503", EL2_3C503)
-	SLOT_INTERFACE("mpu401", ISA8_MPU401)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("ibm_mfc", ISA8_IBM_MFC)
-	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-	// ISA 16 bit
-	SLOT_INTERFACE("ide", ISA16_IDE)
-	SLOT_INTERFACE("ide_cd", ISA16_IDE_CD)
-	SLOT_INTERFACE("ne2000", NE2000)
-	SLOT_INTERFACE("aha1542", AHA1542)
-	SLOT_INTERFACE("gus",ISA16_GUS)
-	SLOT_INTERFACE("sblaster_16", ISA16_SOUND_BLASTER_16)
-	SLOT_INTERFACE("svga_s3",ISA16_SVGA_S3)
-	SLOT_INTERFACE("s3virge",ISA16_S3VIRGE)
-	SLOT_INTERFACE("s3virgedx",ISA16_S3VIRGEDX)
-	SLOT_INTERFACE("gfxultra",ISA16_VGA_GFXULTRA)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_MACHINE_START_OVERRIDE(at_state, at )
 	MCFG_MACHINE_RESET_OVERRIDE(at_state, at )
@@ -387,7 +293,7 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, at_mc146818_config )
+	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, WRITELINE(at_state, at_mc146818_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -588,20 +494,6 @@ static MACHINE_CONFIG_DERIVED( at486, at386 )
 	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
 	MCFG_CPU_IO_MAP(at386_io)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( ct486, at386 )
-	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
-	MCFG_CPU_PROGRAM_MAP(ct486_map)
-	MCFG_CPU_IO_MAP(ct486_io)
-
-	MCFG_CS4031_ADD("cs4031", "maincpu", "isa", "bios")
-
-	MCFG_DEVICE_REMOVE(RAM_TAG)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
 MACHINE_CONFIG_END
 
 
@@ -1192,14 +1084,6 @@ ROM_START( at486 )
 ROM_END
 
 
-// Unknown 486 board with Chips & Technologies CS4031 chipset
-ROM_START( ct486 )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
-	ROM_REGION(0x100000, "bios", 0)
-	ROM_LOAD("chips_1.ami", 0xf0000, 0x10000, CRC(a14a7511) SHA1(b88d09be66905ed2deddc26a6f8522e7d2d6f9a8))
-ROM_END
-
-
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 + VT82C496G + VT82C406MV, NS311/312 or NS332 I/O
 ROM_START( ficpio2 )
@@ -1438,7 +1322,6 @@ COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga, at_state,      atvga,
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, driver_device,      0,   "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, driver_device,      0,       "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
 COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga, at_state,      atvga,  "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga, at_state,      atvga,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
 COMP ( 199?, megapcpl, ibm5170, 0,       megapcpl,  atvga, at_state,      atvga,  "Amstrad plc", "MegaPC Plus", GAME_NOT_WORKING )

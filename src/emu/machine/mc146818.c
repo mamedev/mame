@@ -115,6 +115,7 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, MC146818, "NVRAM", tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_write_irq(*this),
 		m_type(MC146818_STANDARD),
 		m_index(0),
 		m_eindex(0),
@@ -154,28 +155,9 @@ void mc146818_device::device_start()
 
 	set_base_datetime();
 
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_write_irq.resolve_safe();
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc146818_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc146818_interface *intf = reinterpret_cast<const mc146818_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc146818_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -187,7 +169,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	if (id == TIMER_PERIODIC) {
 		m_data[0x0c] |= 0xc0;
-		if (!m_out_irq_func.isnull()) m_out_irq_func(CLEAR_LINE);
+		m_write_irq(CLEAR_LINE);
 		return;
 	}
 
@@ -292,7 +274,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	// IRQ line is active low
-	if (!m_out_irq_func.isnull()) m_out_irq_func((m_data[0x0c] & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_write_irq((m_data[0x0c] & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_updated = true;  /* clock has been updated */
 	m_last_refresh = machine().time();
@@ -434,7 +416,7 @@ READ8_MEMBER( mc146818_device::read )
 			data = m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
 			// read 0x0c will clear all IRQ flags in register 0x0c
 			m_data[m_index % MC146818_DATA_SIZE] &= 0x0f;
-			if (!m_out_irq_func.isnull()) m_out_irq_func(ASSERT_LINE);
+			m_write_irq(ASSERT_LINE);
 			break;
 		case 0xd:
 			/* battery ok */

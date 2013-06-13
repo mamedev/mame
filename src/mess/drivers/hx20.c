@@ -752,11 +752,6 @@ WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
 	update_interrupt();
 }
 
-static const struct mc146818_interface rtc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(hx20_state, rtc_irq_w)
-};
-
 
 //-------------------------------------------------
 //  rs232_port_interface rs232_intf
@@ -867,7 +862,7 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, rtc_intf)
+	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, WRITELINE(hx20_state, rtc_irq_w))
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")

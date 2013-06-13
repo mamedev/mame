@@ -9,14 +9,8 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "video/isa_cga.h"
-#include "video/isa_ega.h"
-#include "video/isa_svga_cirrus.h"
-#include "video/isa_svga_s3.h"
-#include "video/isa_svga_tseng.h"
 
 #include "machine/idectrl.h"
-#include "machine/isa_aha1542.h"
 #include "machine/at_keybc.h"
 
 #include "imagedev/harddriv.h"
@@ -28,28 +22,13 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/isa.h"
-
-#include "machine/isa_adlib.h"
-#include "machine/isa_com.h"
-#include "machine/isa_fdc.h"
-#include "machine/isa_gblaster.h"
-#include "machine/isa_hdc.h"
-#include "machine/isa_sblaster.h"
-#include "machine/isa_gus.h"
-#include "machine/3c503.h"
-#include "machine/ne1000.h"
-#include "machine/ne2000.h"
-#include "video/isa_mda.h"
-#include "machine/isa_mpu401.h"
-#include "machine/isa_ibm_mfc.h"
-
-#include "machine/isa_ide.h"
-#include "machine/isa_ide_cd.h"
+#include "machine/isa_cards.h"
 
 #include "machine/pc_lpt.h"
 #include "machine/pc_kbdc.h"
 
 #include "machine/am9517a.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

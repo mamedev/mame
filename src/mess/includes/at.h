@@ -20,20 +20,11 @@
 #include "machine/i82371ab.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439tx.h"
-#include "machine/cs4031.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
 #include "video/pc_cga.h"
-#include "video/isa_cga.h"
-#include "video/isa_ega.h"
-#include "video/isa_vga.h"
-#include "video/isa_vga_ati.h"
-#include "video/isa_svga_cirrus.h"
-#include "video/isa_svga_s3.h"
-#include "video/isa_svga_tseng.h"
 
 #include "machine/idectrl.h"
-#include "machine/isa_aha1542.h"
 #include "machine/at_keybc.h"
 
 #include "imagedev/harddriv.h"
@@ -46,25 +37,7 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/isa.h"
-
-#include "machine/isa_adlib.h"
-#include "machine/isa_com.h"
-#include "machine/isa_fdc.h"
-#include "machine/isa_gblaster.h"
-#include "machine/isa_hdc.h"
-#include "machine/isa_sblaster.h"
-#include "machine/isa_stereo_fx.h"
-#include "machine/isa_gus.h"
-#include "machine/isa_ssi2001.h"
-#include "machine/3c503.h"
-#include "machine/ne1000.h"
-#include "machine/ne2000.h"
-#include "video/isa_mda.h"
-#include "machine/isa_mpu401.h"
-#include "machine/isa_ibm_mfc.h"
-
-#include "machine/isa_ide.h"
-#include "machine/isa_ide_cd.h"
+#include "machine/isa_cards.h"
 
 #include "machine/pc_lpt.h"
 #include "machine/pc_kbdc.h"
@@ -91,7 +64,6 @@ public:
 	m_dma8237_2(*this, "dma8237_2"),
 	m_pit8254(*this, "pit8254"),
 	m_cs8221(*this, "cs8221"),
-	m_cs4031(*this, "cs4031"),
 	m_ide(*this, "ide"),
 	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
@@ -108,7 +80,6 @@ public:
 	optional_device<am9517a_device> m_dma8237_2;
 	optional_device<pit8254_device> m_pit8254;
 	optional_device<cs8221_device> m_cs8221;
-	optional_device<cs4031_device> m_cs4031;
 	optional_device<ide_controller_device> m_ide;
 	optional_device<at_keyboard_controller_device> m_keybc;
 	optional_device<isa16_device> m_isabus;
@@ -155,8 +126,6 @@ public:
 	DECLARE_WRITE8_MEMBER(at_keybc_w);
 	DECLARE_READ16_MEMBER(neat_chipset_r);
 	DECLARE_WRITE16_MEMBER(neat_chipset_w);
-	DECLARE_READ32_MEMBER(ct486_chipset_r);
-	DECLARE_WRITE32_MEMBER(ct486_chipset_w);
 	DECLARE_WRITE_LINE_MEMBER(at_mc146818_irq);
 	DECLARE_WRITE8_MEMBER(write_rtc);
 	int m_poll_delay;

@@ -19,10 +19,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MC146818_IRQ_ADD(_tag, _type, _intrf) \
+#define MCFG_MC146818_IRQ_ADD(_tag, _type, _irq) \
 	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
 	mc146818_device::static_set_type(*device, mc146818_device::_type); \
-	MCFG_DEVICE_CONFIG(_intrf)
+	downcast<mc146818_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 
 #define MCFG_MC146818_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
@@ -32,19 +32,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mc146818_interface
-
-struct mc146818_interface
-{
-	devcb_write_line    m_out_irq_cb;
-};
-
 // ======================> mc146818_device
 
 class mc146818_device : public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface,
-						public mc146818_interface
+						public device_nvram_interface
 {
 public:
 	// values
@@ -62,14 +54,20 @@ public:
 	// inline configuration helpers
 	static void static_set_type(device_t &device, mc146818_type type);
 
+	// callbacks
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE8_MEMBER( address_w ) { write(space, 0, data); }
+	DECLARE_READ8_MEMBER( data_r ) { return read(space, 1); }
+	DECLARE_WRITE8_MEMBER( data_w ) { write(space, 1, data); }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
@@ -83,6 +81,8 @@ protected:
 	// internal helpers
 	int dec_2_local(int a);
 	void set_base_datetime();
+
+	devcb2_write_line m_write_irq;
 
 	// internal state
 	static const int MC146818_DATA_SIZE = 0x80;
@@ -105,8 +105,6 @@ protected:
 
 	emu_timer *m_clock_timer;
 	emu_timer *m_periodic_timer;
-
-	devcb_resolved_write_line m_out_irq_func;
 };
 
 
