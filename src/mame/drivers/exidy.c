@@ -3,7 +3,7 @@
     Exidy 6502 hardware
 
     Games supported:
-        * Side Track
+        * Side Trak
         * Targ
         * Spectar
         * Mouse Trap
@@ -21,7 +21,7 @@
 
 Name                 Year  CPU    board/rom numbers
 
-Side Track           1979  6502   STL, STA
+Side Trak            1979  6502   STL, STA
 Targ                 1980  6502   HRL, HRA
 Spectar              1980  6502   SPL, SPA
 Mouse Trap           1981  6502   MTL, MTA
@@ -1529,13 +1529,13 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, exidy_state, sidetrac, ROT0, "Exidy",   "Side Track", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, exidy_state, sidetrac, ROT0, "Exidy",   "Side Trak", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
 GAME( 1980, targ,     0,       targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, targc,    targ,    targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ (cocktail?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spectar,  0,       spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spectar1, spectar, spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, rallys,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, rallysa,  spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (alternate bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, rallys,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, rallysa,  spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, panzer,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, phantoma, spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
