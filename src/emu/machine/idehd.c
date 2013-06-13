@@ -2,6 +2,17 @@
 
 #define PRINTF_IDE_COMMANDS         0
 
+enum
+{
+	TID_NULL,
+	TID_DELAYED_INTERRUPT,
+	TID_DELAYED_INTERRUPT_BUFFER_READY,
+	TID_RESET_CALLBACK,
+	TID_SECURITY_ERROR_DONE,
+	TID_READ_SECTOR_DONE_CALLBACK,
+	TID_WRITE_SECTOR_DONE_CALLBACK
+};
+
 //**************************************************************************
 //  IDE DEVICE INTERFACE
 //**************************************************************************
@@ -272,6 +283,8 @@ void ide_hdd_device::device_start()
 
 	save_item(NAME(dma_active));
 	save_item(NAME(verify_only));
+
+	last_status_timer = timer_alloc(TID_NULL);
 }
 
 //-------------------------------------------------

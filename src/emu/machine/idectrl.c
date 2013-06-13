@@ -1006,10 +1006,10 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 		/* return the current status and clear any pending interrupts */
 		case IDE_BANK0_STATUS_COMMAND:
 			result = dev->status;
-			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
+			if (dev->last_status_timer->elapsed() > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				last_status_timer->adjust(attotime::never);
+				dev->last_status_timer->adjust(attotime::never);
 			}
 			if (dev->interrupt_pending == ASSERT_LINE)
 				set_irq(CLEAR_LINE);
@@ -1067,10 +1067,10 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	{
 		case IDE_BANK1_STATUS_CONTROL:
 			result = dev->status;
-			if (last_status_timer->elapsed() > TIME_PER_ROTATION)
+			if (dev->last_status_timer->elapsed() > TIME_PER_ROTATION)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				last_status_timer->adjust(attotime::never);
+				dev->last_status_timer->adjust(attotime::never);
 			}
 			break;
 
@@ -1311,7 +1311,6 @@ void ide_controller_device::device_start()
 	slot[1] = subdevice<ide_slot_device>("1");
 
 	/* create a timer for timing status */
-	last_status_timer = timer_alloc(TID_NULL);
 	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 
 	/* register ide states */

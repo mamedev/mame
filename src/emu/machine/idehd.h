@@ -67,6 +67,8 @@ public:
 
 	UINT8           gnetreadlock;
 
+	emu_timer *     last_status_timer;
+
 protected:
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;

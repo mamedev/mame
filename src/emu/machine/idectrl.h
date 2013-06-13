@@ -130,7 +130,6 @@ private:
 	UINT8           config_register[IDE_CONFIG_REGISTERS];
 	UINT8           config_register_num;
 
-	emu_timer *     last_status_timer;
 	emu_timer *     reset_timer;
 
 	UINT8           cur_drive;
