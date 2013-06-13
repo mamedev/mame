@@ -31,9 +31,68 @@ enum
 };
 
 
-DECLARE_LEGACY_CPU_DEVICE(HCD62121, hcd62121);
+class hcd62121_cpu_device :  public cpu_device
+{
+public:
+	// construction/destruction
+	hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 4; }
+	virtual UINT32 execute_max_cycles() const { return 48; }
+	virtual UINT32 execute_input_lines() const { return 2; }
+	virtual void execute_run();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 18; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	UINT8 read_op();
+	UINT8 datasize( UINT8 op );
+	void read_reg( int size, UINT8 op1 );
+	void write_reg( int size, UINT8 op1 );
+	void read_regreg( int size, UINT8 op1, UINT8 op2, bool op_is_logical );
+	void write_regreg( int size, UINT8 op1, UINT8 op2 );
+	void read_iregreg( int size, UINT8 op1, UINT8 op2 );
+	void write_iregreg( int size, UINT8 op1, UINT8 op2 );
+	void write_iregreg2( int size, UINT8 op1, UINT8 op2 );
+	int check_cond( UINT8 op );
+
+	address_space_config m_program_config;
+	address_space_config m_io_config;
+
+	UINT32 m_prev_pc;
+	UINT16 m_sp;
+	UINT16 m_ip;
+	UINT8 m_dsize;
+	UINT8 m_cseg;
+	UINT8 m_dseg;
+	UINT8 m_sseg;
+	UINT8 m_f;
+	UINT16 m_lar;
+	UINT8 m_reg[0x80];
+	UINT8 m_temp1[0x10];
+	UINT8 m_temp2[0x10];
+
+	address_space *m_program;
+	address_space *m_io;
+	int m_icount;
+};
 
 
-extern CPU_DISASSEMBLE( hcd62121 );
+extern const device_type HCD62121;
+
 
 #endif /* __HCD62121_H__ */
