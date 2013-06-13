@@ -68,6 +68,7 @@ public:
 	UINT8           gnetreadlock;
 
 	emu_timer *     last_status_timer;
+	emu_timer *     reset_timer;
 
 protected:
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
@@ -93,6 +94,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;

@@ -128,10 +128,6 @@ void ide_controller_device::device_timer(emu_timer &timer, device_timer_id id, i
 		set_irq(ASSERT_LINE);
 		break;
 
-	case TID_RESET_CALLBACK:
-		reset();
-		break;
-
 	case TID_SECURITY_ERROR_DONE:
 		/* clear error state */
 		dev->status &= ~IDE_STATUS_ERROR;
@@ -1266,7 +1262,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 			{
 				dev->status |= IDE_STATUS_BUSY;
 				dev->status &= ~IDE_STATUS_DRIVE_READY;
-				reset_timer->adjust(attotime::from_msec(5));
+				dev->reset_timer->adjust(attotime::from_msec(5));
 			}
 			break;
 	}
@@ -1309,9 +1305,6 @@ void ide_controller_device::device_start()
 	/* set MAME harddisk handle */
 	slot[0] = subdevice<ide_slot_device>("0");
 	slot[1] = subdevice<ide_slot_device>("1");
-
-	/* create a timer for timing status */
-	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 
 	/* register ide states */
 	save_item(NAME(config_unknown));

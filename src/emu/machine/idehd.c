@@ -284,7 +284,9 @@ void ide_hdd_device::device_start()
 	save_item(NAME(dma_active));
 	save_item(NAME(verify_only));
 
+	/* create a timer for timing status */
 	last_status_timer = timer_alloc(TID_NULL);
+	reset_timer = timer_alloc(TID_RESET_CALLBACK);
 }
 
 //-------------------------------------------------
@@ -328,6 +330,16 @@ void ide_hdd_device::device_reset()
 	user_password_enable = (user_password != NULL);
 	error = IDE_ERROR_DEFAULT;
 	status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
+}
+
+void ide_hdd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TID_RESET_CALLBACK:
+		reset();
+		break;
+	}
 }
 
 //-------------------------------------------------

@@ -130,8 +130,6 @@ private:
 	UINT8           config_register[IDE_CONFIG_REGISTERS];
 	UINT8           config_register_num;
 
-	emu_timer *     reset_timer;
-
 	UINT8           cur_drive;
 	ide_slot_device *slot[2];
 
