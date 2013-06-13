@@ -282,7 +282,7 @@ void pit8253_device::decrease_counter_value(pit8253_timer *timer, UINT64 cycles)
 void pit8253_device::load_counter_value(pit8253_timer *timer)
 {
 	timer->value = timer->count;
-	timer->null_count = 1;
+	timer->null_count = 0;
 
 	if (CTRL_MODE(timer->control) == 3 && timer->output == 0)
 		timer->value &= 0xfffe;
@@ -878,7 +878,7 @@ void pit8253_device::readback(pit8253_timer *timer, int command)
 		/* readback status command */
 		if (timer->latched_status == 0)
 		{
-			timer->status = timer->control | (timer->output != 0 ? 0x80 : 0) | (timer->null_count != 0 ? 0x40 : 0);
+			timer->status = (timer->control & 0x3f) | (timer->output != 0 ? 0x80 : 0) | (timer->null_count != 0 ? 0x40 : 0);
 		}
 
 		timer->latched_status = 1;
