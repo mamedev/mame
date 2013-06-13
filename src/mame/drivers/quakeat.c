@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 //  AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-//  AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
+//  AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
 //  AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 //  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END

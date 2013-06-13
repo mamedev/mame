@@ -105,8 +105,8 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_data_w );
 //  DECLARE_WRITE8_MEMBER( bios_ram_w );
 	DECLARE_READ8_MEMBER( test_r );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
+	DECLARE_READ8_MEMBER( serial_r );
+	DECLARE_WRITE8_MEMBER( serial_w );
 
 	UINT8 funkball_config_reg_r();
 	void funkball_config_reg_w(UINT8 data);
@@ -125,8 +125,8 @@ public:
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bios_ram_w);
-	DECLARE_READ32_MEMBER(fdc_r);
-	DECLARE_WRITE32_MEMBER(fdc_w);
+	DECLARE_READ32_MEMBER(serial_r);
+	DECLARE_WRITE32_MEMBER(serial_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start();
@@ -210,18 +210,18 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
 
-READ8_MEMBER( funkball_state::fdc_r )
+READ8_MEMBER( funkball_state::serial_r )
 {
 	//printf("%02x\n",offset);
-	if(offset == 0xd)
+	if(offset == 5)
 		return 0x20;
 
 	return 0;
 }
 
-WRITE8_MEMBER( funkball_state::fdc_w )
+WRITE8_MEMBER( funkball_state::serial_w )
 {
-	if(offset == 8)
+	if(offset == 0)
 	{
 		if(data == 0x0d)
 			printf("\n");
@@ -401,9 +401,9 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
-//  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
-//  AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
-	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE8(fdc_r,fdc_w,0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE8(serial_r,serial_w,0xffffffff)
 
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 
