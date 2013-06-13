@@ -386,9 +386,9 @@ READ8_MEMBER( cs4031_device::dma_read_word )
 		return 0xff;
 
 	UINT16 result = m_space->read_word(page_offset() + (offset << 1));
-	m_dma_high_byte = result & 0xff00;
+	m_dma_high_byte = result >> 8;
 
-	return result & 0xff;
+	return result;
 }
 
 WRITE8_MEMBER( cs4031_device::dma_write_word )
@@ -396,7 +396,7 @@ WRITE8_MEMBER( cs4031_device::dma_write_word )
 	if (m_dma_channel == -1)
 		return;
 
-	m_space->write_word(page_offset() + (offset << 1), m_dma_high_byte | data);
+	m_space->write_word(page_offset() + (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
 WRITE_LINE_MEMBER( cs4031_device::dma2_dack0_w )

@@ -106,16 +106,16 @@ public:
 	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
 	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
 	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { UINT16 result = m_read_ior(5); m_dma_high_byte = result & 0xff00; return result & 0xff; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { UINT16 result = m_read_ior(6); m_dma_high_byte = result & 0xff00; return result & 0xff; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { UINT16 result = m_read_ior(7); m_dma_high_byte = result & 0xff00; return result & 0xff; }
+	DECLARE_READ8_MEMBER( dma2_ior1_r ) { UINT16 result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior2_r ) { UINT16 result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	DECLARE_READ8_MEMBER( dma2_ior3_r ) { UINT16 result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
 	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
 	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, m_dma_high_byte | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, m_dma_high_byte | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, m_dma_high_byte | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }
