@@ -111,8 +111,8 @@ public:
 	{
 		PIO_SEL_8910_ADDR = 0,
 		PIO_SEL_8910_DATA,
-		PIO_SEL_5832_WRITE,
 		PIO_SEL_5832_READ,
+		PIO_SEL_5832_WRITE,
 		PIO_SEL_5101_WRITE,
 		PIO_SEL_5101_READ,
 		PIO_SEL_LATCH,
@@ -510,7 +510,7 @@ void attache_state::operation_strobe(address_space& space, UINT8 data)
 		break;
 	case PIO_SEL_5832_READ:
 		m_rtc->cs_w(1);
-		m_rtc->write_w(1);
+		m_rtc->write_w(0);
 		m_rtc->read_w(0);
 		m_rtc->address_w((data & 0xf0) >> 4);
 		logerror("RTC: write %01x to %01x (read)\n",data & 0x0f,(data & 0xf0) >> 4);
@@ -561,8 +561,8 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	//  B2-4 = OPERATION SELECT
 	//  0 = 8910 ADDR LOAD
 	//  1 = 8910 DATA LOAD
-	//  2 = 5832 WRITE
-	//  3 = 5832 READ
+	//  2 = 5832 WRITE  -- the CP/M BIOS dumped from an actual disc seems to switch the RTC operations around
+	//  3 = 5832 READ      this differs from the BIOS source listings available for both CP/M 2.2.3 and 2.2.5
 	//  4 = 5101 WRITE
 	//  5 = 5101 READ
 	//  6 = LATCH LOAD
@@ -570,10 +570,12 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 	//B5 = /'138 OPERATION STROBE
 	//B6 = /KEYBOARD DATA IN
 	//B7 = /KEYBOARD CLOCK OUT
-	m_pio_select = (data & 0x1c) >> 2;
 	m_cmos_select = ((data & 0x03) << 4) | (m_cmos_select & 0x0f);
-	if((data & 0x20) && !(m_pio_portb & 0x20))
+	if(!(data & 0x20) && (m_pio_portb & 0x20))
+	{
+		m_pio_select = (data & 0x1c) >> 2;
 		operation_strobe(space,m_pio_porta);
+	}
 	m_pio_portb = data;
 	keyboard_clock_w(data & 0x80);
 }
