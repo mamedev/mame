@@ -102,6 +102,7 @@ void nes_state::machine_start()
 	}
 
 	m_io_ctrlsel        = ioport("CTRLSEL");
+	m_io_exp            = ioport("EXP");
 	m_io_paddle         = ioport("PADDLE");
 	m_io_cc_left        = ioport("CC_LEFT");
 	m_io_cc_right       = ioport("CC_RIGHT");
@@ -196,19 +197,12 @@ void nes_state::machine_start()
 //  INPUTS
 //-------------------------------------------------
 
-READ8_MEMBER(nes_state::nes_IN0_r)
+READ8_MEMBER(nes_state::nes_in0_r)
 {
 	int cfg = m_io_ctrlsel->read();
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
 	UINT8 ret = 0x40;
-	
-	if ((cfg & 0x000f) >= 0x08)
-	{
-		// here we should have the tape input
-		ret |= 0;
-	}
-
 	ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
 
 	/* zapper */
@@ -245,35 +239,13 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_state::nes_IN1_r)
+READ8_MEMBER(nes_state::nes_in1_r)
 {
 	int cfg = m_io_ctrlsel->read();
 	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
 	UINT8 ret = 0x40;
-	
-	// row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
-	if ((cfg & 0x000f) == 0x08) // for now we treat the FC keyboard separately from other inputs!
-	{
-		if (m_fck_scan < 9)
-			ret |= ~(((m_io_fckey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
-		else
-			ret |= 0x1e;
-	}
-	
-	if ((cfg & 0x000f) == 0x09)    // for now we treat the Subor keyboard separately from other inputs!
-	{
-		if (m_fck_scan < 12)
-			ret |= ~(((m_io_subkey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
-		else
-			ret |= 0x1e;
-	}
-
-	/* Handle data line 0's serial output */
-	if ((cfg & 0x00f0) == 0x0070)
-		ret |= (((m_in_1.i0 >> m_in_1.shift) & 0x01) << 1);
-	else
-		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
+	ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
 
 	/* zapper */
 	if ((cfg & 0x00f0) == 0x0020)
@@ -321,70 +293,12 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 	return ret;
 }
 
-
-void nes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_LIGHTGUN_TICK:
-		lightgun_tick(ptr, param);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in nes_state::device_timer");
-	}
-}
-
-
-TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
-{
-	if ((m_io_ctrlsel->read() & 0x000f) == 0x0002)
-	{
-		/* enable lightpen crosshair */
-		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
-	}
-	else
-	{
-		/* disable lightpen crosshair */
-		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
-	}
-
-	if ((m_io_ctrlsel->read() & 0x00f0) == 0x0020)
-	{
-		/* enable lightpen crosshair */
-		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
-	}
-	else
-	{
-		/* disable lightpen crosshair */
-		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_NONE);
-	}
-}
-
-WRITE8_MEMBER(nes_state::nes_IN0_w)
+WRITE8_MEMBER(nes_state::nes_in0_w)
 {
 	int cfg = m_io_ctrlsel->read();
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
-
-	if ((cfg & 0x000f) >= 0x08)
-	{
-		// here we should also have the tape output
-
-		if (BIT(data, 2))   // keyboard active
-		{
-			int lines = ((cfg & 0x000f) == 0x08) ? 9 : 12;
-			UINT8 out = BIT(data, 1);   // scan
-
-			if (m_fck_mode && !out && ++m_fck_scan > lines)
-				m_fck_scan = 0;
-
-			m_fck_mode = out;   // access lower or upper 4 bits
-
-			if (BIT(data, 0))   // reset
-				m_fck_scan = 0;
-		}
-	}
+	timer_set(attotime::zero, TIMER_ZAPPER_TICK);
 
 	// check 'standard' inputs
 	if (data & 0x01)
@@ -421,10 +335,6 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 			m_in_0.i1 = m_io_zapper1_x->read();
 			m_in_0.i2 = m_io_zapper1_y->read();
 			break;
-			
-		case 0x06:  /* crazy climber controller (left stick) */
-			m_in_0.i0 = m_io_cc_left->read();
-			break;
 	}
 	
 	// P2 inputs
@@ -442,17 +352,6 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 			
 		case 0x04:  /* arkanoid paddle */
 			m_in_1.i0 = (UINT8) ((UINT8) m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
-			break;
-			
-		case 0x06:  /* crazy climber controller (right stick) */
-			m_in_1.i0 = m_io_cc_right->read();
-			break;
-
-		case 0x07: /* Mahjong Panel */
-			if (data & 0xf8)
-				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
-			else
-				m_in_1.i0 = m_io_mahjong[(data & 0xfe) >> 1]->read();
 			break;
 	}
 	
@@ -473,8 +372,284 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 }
 
 
-WRITE8_MEMBER(nes_state::nes_IN1_w)
+WRITE8_MEMBER(nes_state::nes_in1_w)
 {
+}
+
+
+READ8_MEMBER(nes_state::fc_in0_r)
+{
+	int exp = m_io_exp->read();
+	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
+	UINT8 ret = 0x40;
+	
+	if ((exp & 0x0f) == 0x02)
+	{
+		// here we should have the tape input
+		ret |= 0;
+	}
+	
+	ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
+	
+	if (LOG_JOY)
+		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_0.shift, m_in_0.i0);
+	
+	m_in_0.shift++;
+	
+	return ret;
+}
+
+READ8_MEMBER(nes_state::fc_in1_r)
+{
+	int exp = m_io_exp->read();
+	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
+	UINT8 ret = 0x40;
+	
+	// row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
+	if ((exp & 0x0f) == 0x02)
+	{
+		if (m_fck_scan < 9)
+			ret |= ~(((m_io_fckey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
+		else
+			ret |= 0x1e;
+	}
+	
+	if ((exp & 0x0f) == 0x03)
+	{
+		if (m_fck_scan < 12)
+			ret |= ~(((m_io_subkey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
+		else
+			ret |= 0x1e;
+	}
+	
+	/* Handle data line 0's serial output */
+	if ((exp & 0x0f) == 0x06)
+		ret |= (((m_in_1.i0 >> m_in_1.shift) & 0x01) << 1);
+	else 
+		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
+	
+	/* zapper */
+	if ((exp & 0x0f) == 0x01)
+	{
+		int x = m_in_1.i1;  /* read Zapper x-position */
+		int y = m_in_1.i2;  /* read Zapper y-position */
+		UINT32 pix, color_base;
+		
+		/* get the pixel at the gun position */
+		pix = m_ppu->get_pixel(x, y);
+		
+		/* get the color base from the ppu */
+		color_base = m_ppu->get_colorbase();
+		
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33) || (pix == color_base + 0x34))
+		{
+			ret &= ~0x08; /* sprite hit */
+		}
+		else
+			ret |= 0x08;  /* no sprite hit */
+		
+		/* If button 1 is pressed, indicate the light gun trigger is pressed */
+		ret |= ((m_in_1.i0 & 0x01) << 4);
+	}
+	
+	/* arkanoid dial */
+	if ((exp & 0x0f) == 0x04)
+	{
+		/* Handle data line 2's serial output */
+		ret |= ((m_in_1.i2 >> m_in_1.shift) & 0x01) << 3;
+		
+		/* Handle data line 3's serial output - bits are reversed */
+		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
+		/* ret |= ((m_in_1[3] >> m_in_1.shift) & 0x01) << 4; */
+		/* ret |= ((m_in_1[3] << m_in_1.shift) & 0x80) >> 3; */
+	}
+	
+	if (LOG_JOY)
+		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_1.shift, m_in_1.i0);
+	
+	m_in_1.shift++;
+	
+	return ret;
+}
+
+WRITE8_MEMBER(nes_state::fc_in0_w)
+{
+	int cfg = m_io_ctrlsel->read();
+	int exp = m_io_exp->read();
+
+	/* Check if lightgun has been chosen as input: if so, enable crosshair */
+	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
+
+	if ((exp & 0x0f) == 0x02 || (exp & 0x0f) == 0x03)
+	{
+		// here we should also have the tape output
+		
+		if (BIT(data, 2))   // keyboard active
+		{
+			int lines = ((exp & 0x0f) == 0x02) ? 9 : 12;
+			UINT8 out = BIT(data, 1);   // scan
+			
+			if (m_fck_mode && !out && ++m_fck_scan > lines)
+				m_fck_scan = 0;
+			
+			m_fck_mode = out;   // access lower or upper 4 bits
+			
+			if (BIT(data, 0))   // reset
+				m_fck_scan = 0;
+		}
+	}
+	
+	// check 'standard' inputs
+	if (data & 0x01)
+		return;
+	
+	if (LOG_JOY)
+		logerror("joy 0 bits read: %d\n", m_in_0.shift);
+	
+	/* Toggling bit 0 high then low resets both controllers */
+	m_in_0.shift = 0;
+	m_in_1.shift = 0;
+	m_in_0.i0 = 0;
+	m_in_0.i1 = 0;
+	m_in_0.i2 = 0;
+	m_in_1.i0 = 0;
+	m_in_1.i1 = 0;
+	m_in_1.i2 = 0;
+	m_in_2.i0 = 0;
+	m_in_2.i1 = 0;
+	m_in_2.i2 = 0;
+	m_in_3.i0 = 0;
+	m_in_3.i1 = 0;
+	m_in_3.i2 = 0;
+	
+	// P1 inputs
+	if ((cfg & 0x000f) == 0x0001)	  /* gamepad 1 */
+		m_in_0.i0 = m_io_pad[0]->read();
+	else if ((cfg & 0x000f) == 0x0002)  /* crazy climber controller (left stick) */
+		m_in_0.i0 = m_io_cc_left->read();
+	
+	// P2 inputs
+	if ((cfg & 0x00f0) == 0x0010)	  /* gamepad 2 */
+		m_in_1.i0 = m_io_pad[1]->read();
+	else if ((cfg & 0x00f0) == 0x0020)  /* crazy climber controller (right stick) */
+		m_in_1.i0 = m_io_cc_right->read();
+	
+	// P3 inputs
+	if ((exp & 0x0f) == 7 && (cfg & 0x0f00) == 0x0100)
+	{
+		m_in_2.i0 = m_io_pad[2]->read();
+		m_in_0.i0 |= (m_in_2.i0 << 8) | (0x08 << 16);
+	}
+	
+	// P4 inputs
+	if ((exp & 0x0f) == 7 && (cfg & 0xf000) == 0x1000)
+	{
+		m_in_3.i0 = m_io_pad[3]->read();
+		m_in_1.i0 |= (m_in_3.i0 << 8) | (0x04 << 16);
+	}
+
+	
+	// EXP input
+	switch (exp & 0x0f)
+	{
+		case 0x01:	// Lightgun
+			m_in_0.i0 = m_io_zapper2_t->read();
+			m_in_0.i1 = m_io_zapper2_x->read();
+			m_in_0.i2 = m_io_zapper2_y->read();
+			break;
+#if 0			
+		case 0x02:	// FC Keyboard
+			// here we should also have the tape output
+			if (BIT(data, 2))   // keyboard active
+			{
+				UINT8 out = BIT(data, 1);   // scan
+				
+				if (m_fck_mode && !out && ++m_fck_scan > 9)
+					m_fck_scan = 0;
+				
+				m_fck_mode = out;   // access lower or upper 4 bits
+				
+				if (BIT(data, 0))   // reset
+					m_fck_scan = 0;
+			}
+			break;
+			
+		case 0x03:	// Subor Keyboard
+			if (BIT(data, 2))   // keyboard active
+			{
+				UINT8 out = BIT(data, 1);   // scan
+				
+				if (m_fck_mode && !out && ++m_fck_scan > 12)
+					m_fck_scan = 0;
+				
+				m_fck_mode = out;   // access lower or upper 4 bits
+				
+				if (BIT(data, 0))   // reset
+					m_fck_scan = 0;
+			}
+			break;
+#endif			
+		case 0x04:  // Arkanoid paddle
+			m_in_1.i0 |= (UINT8) ((UINT8) m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
+			break;
+			
+		case 0x06:  // Mahjong Panel
+			if (data & 0xf8)
+				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
+			else
+				m_in_1.i0 = m_io_mahjong[(data & 0xfe) >> 1]->read();
+			break;
+	}
+	
+}
+
+
+void nes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_ZAPPER_TICK:
+			if ((m_io_ctrlsel->read() & 0x000f) == 0x0002)
+			{
+				/* enable lightpen crosshair */
+				crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
+			}
+			else
+			{
+				/* disable lightpen crosshair */
+				crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
+			}
+			
+			if ((m_io_ctrlsel->read() & 0x00f0) == 0x0020)
+			{
+				/* enable lightpen crosshair */
+				crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
+			}
+			else
+			{
+				/* disable lightpen crosshair */
+				crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_NONE);
+			}
+			break;
+		case TIMER_LIGHTGUN_TICK:
+			if ((m_io_exp->read() & 0x0f) == 0x01)
+			{
+				/* enable lightpen crosshair */
+				crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
+			}
+			else
+			{
+				/* disable lightpen crosshair */
+				crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
+			}
+			break;
+		default:
+			assert_always(FALSE, "Unknown id in nes_state::device_timer");
+	}
 }
 
 
@@ -713,4 +888,10 @@ DRIVER_INIT_MEMBER(nes_state,famicom)
 
 	floppy_install_load_proc(floppy_get_device(machine(), 0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine(), 0), nes_unload_proc);
+
+	// setup alt input handlers for additional FC input devices
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	space.install_read_handler(0x4016, 0x4016, read8_delegate(FUNC(nes_state::fc_in0_r), this));
+	space.install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(nes_state::fc_in0_w), this));
+	space.install_read_handler(0x4017, 0x4017, read8_delegate(FUNC(nes_state::fc_in1_r), this));
 }

@@ -447,6 +447,7 @@ class nes_state : public driver_device
 public:
 	enum
 	{
+		TIMER_ZAPPER_TICK,
 		TIMER_LIGHTGUN_TICK
 	};
 
@@ -481,6 +482,7 @@ public:
 	ioport_port       *m_io_zapper2_x;
 	ioport_port       *m_io_zapper2_y;
 	ioport_port       *m_io_paddle;
+	ioport_port       *m_io_exp;
 
 	UINT8      *m_vram;
 	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
@@ -493,10 +495,13 @@ public:
 	int nes_ppu_vidaccess(int address, int data);
 	void ppu_nmi(int *ppu_regs);
 
-	DECLARE_READ8_MEMBER(nes_IN0_r);
-	DECLARE_READ8_MEMBER(nes_IN1_r);
-	DECLARE_WRITE8_MEMBER(nes_IN0_w);
-	DECLARE_WRITE8_MEMBER(nes_IN1_w);
+	DECLARE_READ8_MEMBER(nes_in0_r);
+	DECLARE_READ8_MEMBER(nes_in1_r);
+	DECLARE_WRITE8_MEMBER(nes_in0_w);
+	DECLARE_WRITE8_MEMBER(nes_in1_w);
+	DECLARE_READ8_MEMBER(fc_in0_r);
+	DECLARE_READ8_MEMBER(fc_in1_r);
+	DECLARE_WRITE8_MEMBER(fc_in0_w);
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -504,7 +509,6 @@ public:
 	virtual void video_reset();
 	virtual void palette_init();
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(lightgun_tick);
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
