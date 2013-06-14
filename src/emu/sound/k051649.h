@@ -3,8 +3,6 @@
 #ifndef __K051649_H__
 #define __K051649_H__
 
-#include "devlegcy.h"
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
