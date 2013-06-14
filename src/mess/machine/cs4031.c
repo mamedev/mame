@@ -82,6 +82,11 @@ const char* cs4031_device::m_register_names[] =
 	/* 1f */ "RESERVED"
 };
 
+const float cs4031_device::m_dma_clock_divider[] =
+{
+	10, 8, 6, 0, 0, 0, 0, 0, 5, 4, 3, 2.5, 2, 1.5, 0, 0
+};
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -159,8 +164,8 @@ const struct pit8253_interface cs4031_pit_config =
 };
 
 static MACHINE_CONFIG_FRAGMENT( cs4031 )
-	MCFG_I8237_ADD("dma1", XTAL_14_31818MHz/3 /* todo: set to 0, instead set via config register */, dma1_config)
-	MCFG_I8237_ADD("dma2", XTAL_14_31818MHz/3 /* todo: set to 0, instead set via config register */, dma2_config)
+	MCFG_I8237_ADD("dma1", 0, dma1_config)
+	MCFG_I8237_ADD("dma2", 0, dma2_config)
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
 	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
 	MCFG_PIT8254_ADD("ctc", cs4031_pit_config)
@@ -330,6 +335,8 @@ void cs4031_device::device_reset()
 	update_read_regions();
 	update_write_regions();
 
+	// initialize dma controller clocks
+	update_dma_clock();
 }
 
 //-------------------------------------------------
@@ -427,6 +434,22 @@ void cs4031_device::set_dma_channel(int channel, bool state)
 			if (m_dma_eop)
 				m_write_tc(channel, 0, 0xff);
 		}
+	}
+}
+
+void cs4031_device::update_dma_clock()
+{
+	if (m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f] != 0)
+	{
+		UINT32 dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
+
+		if (!BIT(m_registers[DMA_WAIT_STATE], 0))
+			dma_clock /= 2;
+
+		logerror("cs4031_device::update_dma_clock: dma clock is now %u\n", dma_clock);
+
+		m_dma1->set_unscaled_clock(dma_clock);
+		m_dma2->set_unscaled_clock(dma_clock);
 	}
 }
 
@@ -539,13 +562,20 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 		// execute command
 		switch (m_address)
 		{
-		case 0x01: break;
+		case DMA_WAIT_STATE:
+			update_dma_clock();
+			break;
+
 		case 0x05: break;
 		case 0x06: break;
 		case 0x07: break;
 		case 0x08: break;
 		case 0x09: break;
-		case 0x0a: break;
+
+		case DMA_CLOCK:
+			update_dma_clock();
+			break;
+
 		case 0x10: break;
 		case 0x11: break;
 		case 0x12: break;
@@ -556,20 +586,21 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 		case 0x17: break;
 		case 0x18: break;
 
-		case 0x19:
+		case SHADOW_READ:
 			update_read_regions();
 			break;
 
-		case 0x1a:
+		case SHADOW_WRITE:
 			update_write_regions();
 			break;
 
-		case 0x1b:
+		case ROMCS:
 			update_read_regions();
 			update_write_regions();
 			break;
 
-		case 0x1c: break;
+		case SOFT_RESET_AND_GATEA20:
+			break;
 		}
 	}
 

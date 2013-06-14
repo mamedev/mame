@@ -201,6 +201,7 @@ private:
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
+	void update_dma_clock();
 	void nmi();
 	void a20m();
 
@@ -248,6 +249,7 @@ private:
 
 	// chipset configuration
 	static const char* m_register_names[];
+	static const float m_dma_clock_divider[];
 
 	enum
 	{
