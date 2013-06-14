@@ -41,6 +41,7 @@ enum
 	PARAM_REL,          /* 16 or 32-bit PC-relative displacement */
 	PARAM_REL8,         /* 8-bit PC-relative displacement */
 	PARAM_MEM_OFFS,     /* 16 or 32-bit mem offset */
+	PARAM_PREIMP,       /* prefix with implicit register */
 	PARAM_SREG,         /* segment register */
 	PARAM_CREG,         /* control register */
 	PARAM_DREG,         /* debug register */
@@ -229,10 +230,10 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"imul",            MODRM,          PARAM_REG,          PARAM_RM,           PARAM_IMM       },
 	{"push",            0,              PARAM_I8,           0,                  0               },
 	{"imul",            MODRM,          PARAM_REG,          PARAM_RM,           PARAM_I8        },
-	{"insb",            0,              0,                  0,                  0               },
-	{"insw\0insd\0insd",VAR_NAME,       0,                  0,                  0               },
-	{"outsb",           0,              0,                  0,                  0               },
-	{"outsw\0outsd\0outsd",VAR_NAME,    0,                  0,                  0               },
+	{"insb",            0,              PARAM_PREIMP,       0,                  0               },
+	{"insw\0insd\0insd",VAR_NAME,       PARAM_PREIMP,       0,                  0               },
+	{"outsb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"outsw\0outsd\0outsd",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
 	// 0x70
 	{"jo",              0,              PARAM_REL8,         0,                  0               },
 	{"jno",             0,              PARAM_REL8,         0,                  0               },
@@ -289,18 +290,18 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"mov",             0,              PARAM_EAX,          PARAM_MEM_OFFS,     0               },
 	{"mov",             0,              PARAM_MEM_OFFS,     PARAM_AL,           0               },
 	{"mov",             0,              PARAM_MEM_OFFS,     PARAM_EAX,          0               },
-	{"movsb",           0,              0,                  0,                  0               },
-	{"movsw\0movsd\0movsq",VAR_NAME,    0,                  0,                  0               },
-	{"cmpsb",           0,              0,                  0,                  0               },
-	{"cmpsw\0cmpsd\0cmpsq",VAR_NAME,    0,                  0,                  0               },
+	{"movsb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"movsw\0movsd\0movsq",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
+	{"cmpsb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"cmpsw\0cmpsd\0cmpsq",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
 	{"test",            0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"test",            0,              PARAM_EAX,          PARAM_IMM,          0               },
-	{"stosb",           0,              0,                  0,                  0               },
-	{"stosw\0stosd\0stosq",VAR_NAME,    0,                  0,                  0               },
-	{"lodsb",           0,              0,                  0,                  0               },
-	{"lodsw\0lodsd\0lodsq",VAR_NAME,    0,                  0,                  0               },
-	{"scasb",           0,              0,                  0,                  0               },
-	{"scasw\0scasd\0scasq",VAR_NAME,    0,                  0,                  0               },
+	{"stosb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"stosw\0stosd\0stosq",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
+	{"lodsb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"lodsw\0lodsd\0lodsq",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
+	{"scasb",           0,              PARAM_PREIMP,       0,                  0               },
+	{"scasw\0scasd\0scasq",VAR_NAME,    PARAM_PREIMP,       0,                  0               },
 	// 0xb0
 	{"mov",             0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"mov",             0,              PARAM_CL,           PARAM_UI8,          0               },
@@ -2416,6 +2417,18 @@ static char* handle_param(char* s, UINT32 param)
 			} else {
 				i16 = FETCHD16();
 				s += sprintf( s, "[%s]", hexstring(i16, 0) );
+			}
+			break;
+
+		case PARAM_PREIMP:
+			switch(segment)
+			{
+				case SEG_CS: s += sprintf( s, "cs:" ); break;
+				case SEG_DS: s += sprintf( s, "ds:" ); break;
+				case SEG_ES: s += sprintf( s, "es:" ); break;
+				case SEG_FS: s += sprintf( s, "fs:" ); break;
+				case SEG_GS: s += sprintf( s, "gs:" ); break;
+				case SEG_SS: s += sprintf( s, "ss:" ); break;
 			}
 			break;
 
