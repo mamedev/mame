@@ -288,7 +288,7 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
 
 	/* zapper */
-	if ((cfg & 0x00f0) == 0x0030)
+	if ((cfg & 0x00f0) == 0x0020)
 	{
 		int x = m_in_1.i1;  /* read Zapper x-position */
 		int y = m_in_1.i2;  /* read Zapper y-position */
@@ -360,7 +360,7 @@ TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
 	}
 
-	if ((m_io_ctrlsel->read() & 0x00f0) == 0x0030)
+	if ((m_io_ctrlsel->read() & 0x00f0) == 0x0020)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
@@ -434,9 +434,8 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 			m_in_0.i2 = m_io_zapper1_y->read();
 			break;
 			
-		case 0x06:  /* crazy climber controller */
+		case 0x06:  /* crazy climber controller (left stick) */
 			m_in_0.i0 = m_io_cc_left->read();
-			m_in_1.i0 = m_io_cc_right->read();
 			break;
 	}
 	
@@ -447,7 +446,7 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 			m_in_1.i0 = m_io_pad[1]->read();
 			break;
 			
-		case 0x03:  /* zapper 2 */
+		case 0x02:  /* zapper 2 */
 			m_in_1.i0 = m_io_zapper2_t->read();
 			m_in_1.i1 = m_io_zapper2_x->read();
 			m_in_1.i2 = m_io_zapper2_y->read();
@@ -457,6 +456,10 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 			m_in_1.i0 = (UINT8) ((UINT8) m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
 			break;
 			
+		case 0x06:  /* crazy climber controller (right stick) */
+			m_in_1.i0 = m_io_cc_right->read();
+			break;
+
 		case 0x07: /* Mahjong Panel */
 			if (data & 0xf8)
 				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
