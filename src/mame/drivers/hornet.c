@@ -334,6 +334,7 @@ public:
 		m_sharc_dataram1(*this, "sharc_dataram1"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k056800(*this, "k056800"),
 		m_gn680(*this, "gn680"),
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
@@ -349,6 +350,7 @@ public:
 	optional_shared_ptr<UINT32> m_sharc_dataram1;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<k056800_device> m_k056800;
 	optional_device<cpu_device> m_gn680;
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
@@ -657,7 +659,7 @@ static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE_LEGACY("k056800", k056800_host_r, k056800_host_w)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE("k056800", k056800_device, host_r, host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM             /* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -674,7 +676,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("k056800", k056800_sound_r, k056800_sound_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_device, sound_r, sound_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP

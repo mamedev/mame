@@ -125,8 +125,8 @@ static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
-	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
-	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
+	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE("k056800", k056800_device, host_w)
+	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD("k056800", k056800_device, host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
@@ -142,10 +142,10 @@ READ16_MEMBER(ultrsprt_state::K056800_68k_r)
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
-		r |= k056800_sound_r(m_k056800, space, (offset*2)+0, 0xffff) << 8;
+		r |= m_k056800->sound_r(space, (offset*2)+0, 0xffff) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= k056800_sound_r(m_k056800, space, (offset*2)+1, 0xffff) << 0;
+		r |= m_k056800->sound_r(space, (offset*2)+1, 0xffff) << 0;
 
 	return r;
 }
@@ -153,10 +153,10 @@ READ16_MEMBER(ultrsprt_state::K056800_68k_r)
 WRITE16_MEMBER(ultrsprt_state::K056800_68k_w)
 {
 	if (ACCESSING_BITS_8_15)
-		k056800_sound_w(m_k056800, space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
+		m_k056800->sound_w(space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
 
 	if (ACCESSING_BITS_0_7)
-		k056800_sound_w(m_k056800, space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
+		m_k056800->sound_w(space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )

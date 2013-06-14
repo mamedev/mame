@@ -192,6 +192,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_k001604(*this, "k001604"),
+		m_k056800(*this, "k056800"),
 		m_k056832(*this, "k056832") { }
 
 	UINT8 m_led_reg0;
@@ -223,6 +224,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<k001604_device> m_k001604;
+	required_device<k056800_device> m_k056800;
 	optional_device<k056832_device> m_k056832;
 
 protected:
@@ -447,8 +449,8 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)               /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)      /* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_device, host_w)
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_device, host_r)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
 ADDRESS_MAP_END
@@ -475,8 +477,8 @@ static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)             /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)    /* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE("k056800", k056800_device, host_w)
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREAD("k056800", k056800_device, host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")  /* Program ROM */
@@ -491,8 +493,8 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, zr107_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff)
-	AM_RANGE(0x400000, 0x40000f) AM_DEVWRITE_LEGACY("k056800", k056800_sound_w)
-	AM_RANGE(0x400010, 0x40001f) AM_DEVREAD_LEGACY("k056800", k056800_sound_r)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVWRITE("k056800", k056800_device, sound_w)
+	AM_RANGE(0x400010, 0x40001f) AM_DEVREAD("k056800", k056800_device, sound_r)
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
