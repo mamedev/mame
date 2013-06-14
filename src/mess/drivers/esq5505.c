@@ -125,6 +125,221 @@
 static int shift = 32;
 #endif
 
+void print_to_stderr(const char *format, ...)
+{
+	va_list arg;
+	va_start(arg, format);
+	vfprintf(stderr, format, arg);
+	va_end(arg);
+}
+
+#define PUMP_DETECT_SILENCE 1
+#define PUMP_TRACK_SAMPLES 0
+#define PUMP_FAKE_ESP_PROCESSING 1
+class esq_5505_5510_pump : public device_t,
+	public device_sound_interface
+{
+public:
+	esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void set_otis(es5505_device *otis) { m_otis = otis; }
+	void set_esp(es5510_device *esp) { m_esp = esp; }
+	void set_esp_halted(bool esp_halted) { 
+		m_esp_halted = esp_halted;
+		logerror("ESP-halted -> %d\n", m_esp_halted);
+		if (!esp_halted) {
+			m_esp->list_program(print_to_stderr);
+		}
+	}
+	bool get_esp_halted() {
+		return m_esp_halted;
+	}
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_stop();
+	virtual void device_reset();
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	// timer callback overridea
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	// internal state:
+	// sound stream
+	sound_stream *m_stream;
+
+	// per-sample timer
+	emu_timer *m_timer;
+
+	// OTIS sound generator
+	es5505_device *m_otis;
+
+	// ESP signal processor
+	es5510_device *m_esp;
+
+	// Is the ESP halted by the CPU?
+	bool m_esp_halted;
+
+#if !PUMP_FAKE_ESP_PROCESSING
+	osd_ticks_t ticks_spent_processing;
+	int samples_processed;
+#endif
+
+#if PUMP_DETECT_SILENCE
+	int silent_for;
+	bool was_silence;
+#endif
+
+#if PUMP_TRACK_SAMPLES
+	int last_samples;
+	osd_ticks_t last_ticks;
+	osd_ticks_t next_report_ticks;
+#endif
+};
+
+const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
+
+esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock),
+		device_sound_interface(mconfig, *this),
+		m_esp_halted(true)
+{
+}
+
+void esq_5505_5510_pump::device_start()
+{
+	INT64 nsec_per_sample = 100 * 16 * 21;
+	attotime sample_time(0, 1000000000 * nsec_per_sample);
+	attotime initial_delay(0, 0);
+	logerror("Clock = %d\n", clock());
+	m_stream = machine().sound().stream_alloc(*this, 8, 2, clock(), this);
+	m_timer = timer_alloc(0);
+	m_timer->adjust(initial_delay, 0, sample_time);
+	m_timer->enable(true);
+
+#if PUMP_DETECT_SILENCE
+	silent_for = 500;
+	was_silence = 1;
+#endif
+#if !PUMP_FAKE_ESP_PROCESSING
+	ticks_spent_processing = 0;
+	samples_processed = 0;
+#endif
+#if PUMP_TRACK_SAMPLES
+	last_samples = 0;
+	last_ticks = osd_ticks();
+	next_report_ticks = last_ticks + osd_ticks_per_second();
+#endif
+}
+
+void esq_5505_5510_pump::device_stop()
+{
+	m_timer->enable(false);
+}
+
+void esq_5505_5510_pump::device_reset()
+{
+}
+
+void esq_5505_5510_pump::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	if (samples != 1) {
+		logerror("Pump: request for %d samples\n", samples);
+	}
+
+	stream_sample_t *left = outputs[0], *right = outputs[1];
+	for (int i = 0; i < samples; i++)
+	{
+	    // anything for the 'aux' output?
+		INT32 l = inputs[0][i] >> 4;
+		INT32 r = inputs[1][i] >> 4;
+
+		// push the samples into the ESP
+		m_esp->ser_w(0, inputs[2][i] >> 4);
+		m_esp->ser_w(1, inputs[3][i] >> 4);
+		m_esp->ser_w(2, inputs[4][i] >> 4);
+		m_esp->ser_w(3, inputs[5][i] >> 4);
+		m_esp->ser_w(4, inputs[6][i] >> 4);
+		m_esp->ser_w(5, inputs[7][i] >> 4);
+
+		m_esp->ser_w(6, 0);
+		m_esp->ser_w(7, 0);
+
+#if PUMP_FAKE_ESP_PROCESSING
+		m_esp->ser_w(6, m_esp->ser_r(0) + m_esp->ser_r(2) + m_esp->ser_r(4));
+		m_esp->ser_w(7, m_esp->ser_r(1) + m_esp->ser_r(3) + m_esp->ser_r(5));
+#else
+		if (!m_esp_halted) {
+			logerror("passing one sample through ESP\n");
+			osd_ticks_t a = osd_ticks();
+			m_esp->run_once();
+			osd_ticks_t b = osd_ticks();
+			ticks_spent_processing += (b - a);
+			samples_processed++;
+		}
+#endif
+
+		// read the processed result from the ESP and add to the saved AUX data
+		l += m_esp->ser_r(6);
+		r += m_esp->ser_r(7);
+
+		// write the combined data to the output
+		*left++  = l;
+		*right++ = r;
+	}
+
+#if PUMP_DETECT_SILENCE
+	for (int i = 0; i < samples; i++) {
+		if (outputs[0][i] == 0 && outputs[1][i] == 0) {
+			silent_for++;
+		} else {
+			silent_for = 0;
+		}
+	}
+	bool silence = silent_for >= 500;
+	if (was_silence != silence) {
+		if (!silence) {
+			fprintf(stderr, ".-*\n");
+		} else {
+			fprintf(stderr, "*-.\n");
+		}
+		was_silence = silence;
+	} 
+#endif
+
+#if PUMP_TRACK_SAMPLES
+	last_samples += samples;
+	osd_ticks_t now = osd_ticks();
+	if (now >= next_report_ticks)
+	{
+		osd_ticks_t elapsed = now - last_ticks;
+		osd_ticks_t tps = osd_ticks_per_second();
+		fprintf(stderr, "Pump: %d samples in %" I64FMT "d ticks for %f Hz\n", last_samples, elapsed, last_samples * (double)tps / (double)elapsed);
+		last_ticks = now;
+		while (next_report_ticks <= now) {
+			next_report_ticks += tps;
+		}
+		last_samples = 0;
+
+#if !PUMP_FAKE_ESP_PROCESSING
+		fprintf(stderr, "  ESP spent %" I64FMT "d ticks on %d samples, %f ticks per sample\n", ticks_spent_processing, samples_processed, (double)ticks_spent_processing / (double)samples_processed);
+		ticks_spent_processing = 0;
+		samples_processed = 0;
+#endif
+	}
+#endif
+}
+
+void esq_5505_5510_pump::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) {
+	// ecery time there's a new sample period, update the stream!
+	m_stream->update();
+}
+
+
 class esq5505_state : public driver_device
 {
 public:
@@ -132,7 +347,9 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
+		m_otis(*this, "otis"),
 		m_esp(*this, "esp"),
+		m_pump(*this, "pump"),
 		m_fdc(*this, "wd1772"),
 		m_panel(*this, "panel"),
 		m_dmac(*this, "mc68450"),
@@ -141,12 +358,15 @@ public:
 
 	required_device<m68000_device> m_maincpu;
 	required_device<duartn68681_device> m_duart;
+	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
+	required_device<esq_5505_5510_pump> m_pump;
 	optional_device<wd1772_t> m_fdc;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<serial_port_device> m_mdout;
 
+	virtual void machine_start();
 	virtual void machine_reset();
 
 	DECLARE_READ16_MEMBER(es5510_dsp_r);
@@ -200,23 +420,31 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 	int vector = 0;
 	switch(irqline) {
 	case 1:
-	otis_irq_state = 0;
-	vector = M68K_INT_ACK_AUTOVECTOR;
-	break;
+		otis_irq_state = 0;
+		vector = M68K_INT_ACK_AUTOVECTOR;
+		break;
 	case 2:
-	dmac_irq_state = 0;
-	vector = dmac_irq_vector;
-	break;
+		dmac_irq_state = 0;
+		vector = dmac_irq_vector;
+		break;
 	case 3:
-	duart_irq_state = 0;
-	vector = duart_irq_vector;
-	break;
+		duart_irq_state = 0;
+		vector = duart_irq_vector;
+		break;
 	default:
-	printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
-	return 0;
+		printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
+		return 0;
 	}
 	update_irq_to_maincpu();
 	return vector;
+}
+
+void esq5505_state::machine_start()
+{
+	driver_device::machine_start();
+	// tell the pump about the OTIS & ESP chips
+	m_pump->set_otis(m_otis);
+	m_pump->set_esp(m_esp);
 }
 
 void esq5505_state::machine_reset()
@@ -229,21 +457,21 @@ void esq5505_state::machine_reset()
 void esq5505_state::update_irq_to_maincpu() {
 	//printf("\nupdating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
 	if (duart_irq_state) {
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
 	} else if (dmac_irq_state) {
-	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
 	} else if (otis_irq_state) {
-	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 	} else {
-	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	}
 }
 
@@ -291,7 +519,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("otis", es5505_r, es5505_w)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
@@ -300,7 +528,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("otis", es5505_r, es5505_w)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
@@ -311,7 +539,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("otis", es5505_r, es5505_w)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
@@ -322,7 +550,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("otis", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
@@ -448,14 +676,14 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 	*/
 
 	if (data & 0x40) {
-		if (!m_esp->input_state(es5510_device::ES5510_HALT)) {
-	logerror("ESQ5505: Asserting ESPHALT\n");
-	m_esp->set_input_line(es5510_device::ES5510_HALT, ASSERT_LINE);
+		if (!m_pump->get_esp_halted()) {
+			logerror("ESQ5505: Asserting ESPHALT\n");
+			m_pump->set_esp_halted(true);
 		}
 	} else {
-		if (m_esp->input_state(es5510_device::ES5510_HALT)) {
-	logerror("ESQ5505: Clearing ESPHALT\n");
-	m_esp->set_input_line(es5510_device::ES5510_HALT, CLEAR_LINE);
+		if (m_pump->get_esp_halted()) {
+			logerror("ESQ5505: Clearing ESPHALT\n");
+			m_pump->set_esp_halted(false);
 		}
 	}
 
@@ -611,6 +839,7 @@ static const es5505_interface es5505_config =
 {
 	"waverom",  /* Bank 0 */
 	"waverom2", /* Bank 1 */
+	4,          /* channels */
 	DEVCB_DRIVER_LINE_MEMBER(esq5505_state,esq5505_otis_irq), /* irq */
 	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5505_read_adc)
 };
@@ -643,6 +872,7 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
@@ -652,10 +882,21 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
-	MCFG_SOUND_CONFIG(es5505_config)
+
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_10MHz / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+
+	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
+	MCFG_SOUND_CONFIG(es5505_config)
+	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(eps, vfx)
@@ -685,6 +926,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
@@ -694,10 +936,21 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
-	MCFG_SOUND_CONFIG(es5505_config)
+
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_30_4761MHz / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+
+	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_CONFIG(es5505_config)
+	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)

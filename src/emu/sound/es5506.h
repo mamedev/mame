@@ -16,6 +16,7 @@ struct es5505_interface
 {
 	const char * region0;                       /* memory region where the sample ROM lives */
 	const char * region1;                       /* memory region where the sample ROM lives */
+	int channels;                               /* number of output channels: 1 .. 4 */
 	devcb_write_line irq_callback;  /* irq callback */
 	devcb_read16 read_port;          /* input port read */
 };
@@ -58,6 +59,7 @@ struct es5506_interface
 	const char * region1;                       /* memory region where the sample ROM lives */
 	const char * region2;                       /* memory region where the sample ROM lives */
 	const char * region3;                       /* memory region where the sample ROM lives */
+	int channels;                               /* number of output channels: 1 .. 6 */
 	devcb_write_line irq_callback;  /* irq callback */
 	devcb_read16 read_port;          /* input port read */
 };
@@ -79,5 +81,6 @@ private:
 
 extern const device_type ES5505;
 
+extern STREAM_UPDATE( es5506_update );
 
 #endif /* __ES5506_H__ */

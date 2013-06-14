@@ -65,6 +65,7 @@ static const es5506_interface es5506_config =
 	"waverom2", /* Bank 1 */
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
+	1,          /* channels */
 	DEVCB_LINE(esq5506_otto_irq), /* irq */
 	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
 };
@@ -75,6 +76,7 @@ static const es5506_interface es5506_2_config =
 	"waverom2", /* Bank 1 */
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
+	1,          /* channels */
 	DEVCB_NULL,
 	DEVCB_NULL
 };

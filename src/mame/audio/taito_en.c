@@ -315,6 +315,7 @@ static const es5505_interface es5505_taito_en_config =
 {
 	"ensoniq.0",    /* Bank 0: Unused by F3 games? */
 	"ensoniq.0",    /* Bank 1: All games seem to use this */
+	1,              /* channels */
 	DEVCB_NULL            /* IRQ */
 };
 

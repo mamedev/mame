@@ -587,6 +587,7 @@ static const es5506_interface es5506_config =
 	"ensoniq.1",
 	"ensoniq.2",
 	"ensoniq.3",
+	1,             /* channels */
 	DEVCB_DRIVER_LINE_MEMBER(macrossp_state,irqhandler)
 };
 

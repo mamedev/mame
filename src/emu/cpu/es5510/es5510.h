@@ -13,59 +13,59 @@
 #include "emu.h"
 
 class es5510_device : public cpu_device {
-	public:
+public:
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(host_r);
 	DECLARE_WRITE8_MEMBER(host_w);
 
-	DECLARE_READ16_MEMBER(ser_r);
-	DECLARE_WRITE16_MEMBER(ser_w);
+	INT16 ser_r(int offset);
+	void ser_w(int offset, INT16 data);
 
 	enum line_t {
-	ES5510_HALT = 0
+		ES5510_HALT = 0
 	};
 
 	enum state_t {
-	STATE_RUNNING = 0,
-	STATE_HALTED = 1
+		STATE_RUNNING = 0,
+		STATE_HALTED = 1
 	};
 
 	struct alu_op_t {
-	int operands;
-	const char * const opcode;
+		int operands;
+		const char * const opcode;
 	};
 
 	enum op_src_dst_t {
-	SRC_DST_REG =   1 << 0,
-	SRC_DST_DELAY = 1 << 1,
-	SRC_DST_BOTH =  (1 << 0) | (1 << 1)
+		SRC_DST_REG =   1 << 0,
+		SRC_DST_DELAY = 1 << 1,
+		SRC_DST_BOTH =  (1 << 0) | (1 << 1)
 	};
 
 	struct op_select_t {
-	const op_src_dst_t alu_src;
-	const op_src_dst_t alu_dst;
-	const op_src_dst_t mac_src;
-	const op_src_dst_t mac_dst;
+		const op_src_dst_t alu_src;
+		const op_src_dst_t alu_dst;
+		const op_src_dst_t mac_src;
+		const op_src_dst_t mac_dst;
 	};
 
 	enum ram_control_access_t {
-	RAM_CONTROL_DELAY = 0,
-	RAM_CONTROL_TABLE_A,
-	RAM_CONTROL_TABLE_B,
-	RAM_CONTROL_IO
+		RAM_CONTROL_DELAY = 0,
+		RAM_CONTROL_TABLE_A,
+		RAM_CONTROL_TABLE_B,
+		RAM_CONTROL_IO
 	};
 
 	enum ram_cycle_t {
-	RAM_CYCLE_READ = 0,
-	RAM_CYCLE_WRITE = 1,
-	RAM_CYCLE_DUMP_FIFO = 2
+		RAM_CYCLE_READ = 0,
+		RAM_CYCLE_WRITE = 1,
+		RAM_CYCLE_DUMP_FIFO = 2
 	};
 
 	struct ram_control_t {
-	ram_cycle_t cycle;
-	ram_control_access_t access;
-	const char * const description;
+		ram_cycle_t cycle;
+		ram_control_access_t access;
+		const char * const description;
 	};
 
 	static const alu_op_t ALU_OPS[16];
@@ -73,38 +73,45 @@ class es5510_device : public cpu_device {
 	static const ram_control_t RAM_CONTROL[8];
 
 	struct alu_t {
-	UINT8 aReg;
-	UINT8 bReg;
-	op_src_dst_t src;
-	op_src_dst_t dst;
-	UINT8 op;
-	INT32 aValue;
-	INT32 bValue;
-	INT32 result;
-	bool update_ccr;
-	bool write_result;
+		UINT8 aReg;
+		UINT8 bReg;
+		op_src_dst_t src;
+		op_src_dst_t dst;
+		UINT8 op;
+		INT32 aValue;
+		INT32 bValue;
+		INT32 result;
+		bool update_ccr;
+		bool write_result;
 	};
 
 	struct mulacc_t {
-	UINT8 cReg;
-	UINT8 dReg;
-	op_src_dst_t src;
-	op_src_dst_t dst;
-	bool accumulate;
-	INT64 cValue;
-	INT64 dValue;
-	INT64 product;
-	INT64 result;
-	bool write_result;
+		UINT8 cReg;
+		UINT8 dReg;
+		op_src_dst_t src;
+		op_src_dst_t dst;
+		bool accumulate;
+		INT64 cValue;
+		INT64 dValue;
+		INT64 product;
+		INT64 result;
+		bool write_result;
 	};
 
 	struct ram_t {
-	INT32 address;     // up to 20 bits, left-justified within the right 24 bits of the 32-bit word
-	bool io;           // I/O space, rather than delay line memory
-	ram_cycle_t cycle; // cycle type
+		INT32 address;     // up to 20 bits, left-justified within the right 24 bits of the 32-bit word
+		bool io;           // I/O space, rather than delay line memory
+		ram_cycle_t cycle; // cycle type
 	};
 
-	protected:
+	// direct access to the 'HALT' pin - not just through the 
+	void set_HALT(bool halt) { halt_asserted = halt; }
+	bool get_HALT() { return halt_asserted; }
+
+	void run_once();
+	void list_program(void(p)(const char *, ...));
+
+protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -117,15 +124,18 @@ class es5510_device : public cpu_device {
 	virtual UINT32 disasm_min_opcode_bytes() const;
 	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void execute_set_input(int linenum, int state);
 
 	INT32 read_reg(UINT8 reg);
 	void write_reg(UINT8 reg, INT32 value);
 	void write_to_dol(INT32 value);
 
 	INT32 alu_operation(UINT8 op, INT32 aValue, INT32 bValue, UINT8 &flags);
+	void alu_operation_end();
 
-	private:
+private:
 	int icount;
+	bool halt_asserted;
 	UINT8 pc;
 	state_t state;
 	INT32 gpr[0xc0];     // 24 bits, right justified and sign extended

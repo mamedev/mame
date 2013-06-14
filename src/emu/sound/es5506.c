@@ -193,6 +193,8 @@ struct es5506_state
 	UINT16 *    volume_lookup;
 	device_t *device;
 
+	int			channels;				/* the number of output stereo channels: 1..4 for 5505, 1..6 for 5506 */
+
 #if MAKE_WAVS
 	void *      wavraw;                 /* raw waveform */
 #endif
@@ -783,7 +785,7 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int samples)
+static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, int samples)
 {
 	int v;
 
@@ -791,9 +793,11 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 	if (!samples)
 		return;
 
-	/* clear out the accumulator */
-	memset(left, 0, samples * sizeof(left[0]));
-	memset(right, 0, samples * sizeof(right[0]));
+	/* clear out the accumulators */
+	for (int i = 0; i < chip->channels << 1; i++)
+	{
+		memset(outputs[i] + offset, 0, sizeof(INT32) * samples);
+	}
 
 	/* loop over voices */
 	for (v = 0; v <= chip->active_voices; v++)
@@ -804,6 +808,13 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 		/* special case: if end == start, stop the voice */
 		if (voice->start == voice->end)
 			voice->control |= CONTROL_STOP0;
+
+		int voice_channel = (voice->control & CONTROL_CAMASK) >> 10;
+		int channel = voice_channel % chip->channels;
+		int l = channel << 1;
+		int r = l + 1;
+		INT32 *left = outputs[l] + offset;
+		INT32 *right = outputs[r] + offset;
 
 		/* generate from the appropriate source */
 		if (!base)
@@ -845,12 +856,9 @@ static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int 
 
 ***********************************************************************************************/
 
-static STREAM_UPDATE( es5506_update )
+STREAM_UPDATE( es5506_update )
 {
 	es5506_state *chip = (es5506_state *)param;
-	INT32 *lsrc = NULL, *rsrc = NULL;
-	stream_sample_t *ldest = outputs[0];
-	stream_sample_t *rdest = outputs[1];
 
 #if MAKE_WAVS
 	/* start the logging once we have a sample rate */
@@ -862,30 +870,36 @@ static STREAM_UPDATE( es5506_update )
 #endif
 
 	/* loop until all samples are output */
+	int offset = 0;
 	while (samples)
 	{
 		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-		int samp;
 
-		/* determine left/right source data */
-		lsrc = chip->scratch;
-		rsrc = chip->scratch + length;
-		generate_samples(chip, lsrc, rsrc, length);
-
-		/* copy the data */
-		for (samp = 0; samp < length; samp++)
-		{
-			*ldest++ = lsrc[samp] >> 4;
-			*rdest++ = rsrc[samp] >> 4;
-		}
+		generate_samples(chip, outputs, offset, length);
 
 #if MAKE_WAVS
 		/* log the raw data */
-		if (chip->wavraw)
+		if (chip->wavraw) {
+			/* determine left/right source data */
+			INT32 *lsrc = chip->scratch, *rsrc = chip->scratch + length;
+			int channel;
+			memset(lsrc, 0, sizeof(INT32) * length * 2);
+			/* loop over the output channels */
+			for (channel = 0; channel < chip->channels; channel++) {
+				INT32 *l = outputs[(channel << 1)] + offset;
+				INT32 *r = outputs[(channel << 1) + 1] + offset;
+				/* add the current channel's samples to the WAV data */
+				for (samp = 0; samp < length; samp++) {
+					lsrc[samp] += l[samp];
+					rsrc[samp] += r[samp];
+				}
+			}
 			wav_add_data_32lr(chip->wavraw, lsrc, rsrc, length, 4);
+		}
 #endif
 
 		/* account for these samples */
+		offset += length;
 		samples -= length;
 	}
 }
@@ -903,13 +917,18 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 	es5506_state *chip = get_safe_token(device);
 	int j;
 	UINT32 accum_mask;
+	int channels = 1;  /* 1 channel by default, for backward compatibility */
+
+	/* only override the number of channels if the value is in the valid range 1 .. 6 */
+	if (1 <= intf->channels && intf->channels <= 6)
+		channels = intf->channels;
 
 	/* debugging */
 	if (LOG_COMMANDS && !eslog)
 		eslog = fopen("es.log", "w");
 
 	/* create the stream */
-	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock() / (16*32), chip, es5506_update);
+	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2 * channels, device->clock() / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
 	chip->region_base[0] = intf->region0 ? (UINT16 *)device->machine().root_device().memregion(intf->region0)->base() : NULL;
@@ -923,6 +942,7 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 	chip->irq_callback.resolve(intf->irq_callback,*device);
 	chip->port_read.resolve(intf->read_port,*device);
 	chip->irqv = 0x80;
+	chip->channels = channels;
 
 	/* compute the tables */
 	compute_tables(chip);
@@ -1556,11 +1576,17 @@ static DEVICE_START( es5505 )
 {
 	const es5505_interface *intf = (const es5505_interface *)device->static_config();
 	es5506_interface es5506intf;
+	int channels = 1;  /* 1 channel by default, for backward compatibility */
+
+	/* only override the number of channels if the value is in the valid range 1 .. 4 */
+	if (1 <= intf->channels && intf->channels <= 4)
+		channels = intf->channels;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));
 
 	es5506intf.region0 = intf->region0;
 	es5506intf.region1 = intf->region1;
+	es5506intf.channels = channels;
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
@@ -2193,7 +2219,6 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	// should never get here
 	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
-
 
 const device_type ES5505 = &device_creator<es5505_device>;
 
