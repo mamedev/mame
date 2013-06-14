@@ -23,7 +23,7 @@ class ide_device_interface
 {
 public:
 	ide_device_interface(const machine_config &mconfig, device_t &device);
-	~ide_device_interface() {}
+	virtual ~ide_device_interface() {}
 
 	virtual UINT16 read_dma() = 0;
 	virtual DECLARE_READ16_MEMBER(read_cs0) = 0;
