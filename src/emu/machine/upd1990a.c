@@ -80,6 +80,7 @@ upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag,
 
 void upd1990a_device::device_start()
 {
+	(void)m_variant;
 	// resolve callbacks
 	m_write_data.resolve_safe();
 	m_write_tp.resolve_safe();
