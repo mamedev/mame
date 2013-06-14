@@ -21,16 +21,19 @@
 #define TIME_SEEK_MULTISECTOR               (attotime::from_msec(13))
 #define TIME_NO_SEEK_MULTISECTOR            (attotime::from_nsec(16300))
 
-#define IDE_BANK0_DATA                      0
-#define IDE_BANK0_ERROR                     1
-#define IDE_BANK0_SECTOR_COUNT              2
-#define IDE_BANK0_SECTOR_NUMBER             3
-#define IDE_BANK0_CYLINDER_LSB              4
-#define IDE_BANK0_CYLINDER_MSB              5
-#define IDE_BANK0_HEAD_NUMBER               6
-#define IDE_BANK0_STATUS_COMMAND            7
+#define IDE_CS0_DATA_RW              0
+#define IDE_CS0_ERROR_R              1
+#define IDE_CS0_FEATURE_W            1
+#define IDE_CS0_SECTOR_COUNT_RW      2
+#define IDE_CS0_SECTOR_NUMBER_RW     3
+#define IDE_CS0_CYLINDER_LOW_RW      4
+#define IDE_CS0_CYLINDER_HIGH_RW     5
+#define IDE_CS0_DEVICE_HEAD_RW       6
+#define IDE_CS0_STATUS_R             7
+#define IDE_CS0_COMMAND_W            7
 
-#define IDE_BANK1_STATUS_CONTROL            6
+#define IDE_CS1_ALTERNATE_STATUS_R   6
+#define IDE_CS1_DEVICE_CONTROL_W     6
 
 #define IDE_COMMAND_READ_SECTORS            0x20
 #define IDE_COMMAND_READ_SECTORS_NORETRY    0x21
@@ -90,26 +93,37 @@ ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, 
 	ide_device_interface(mconfig, *this),
 	device_slot_card_interface(mconfig, *this),
 	m_csel(0),
-	m_dasp(0)
+	m_dasp(0),
+	m_dmack(0),
+	m_dmarq(0),
+	m_irq(0)
 {
 }
 
 void ide_mass_storage_device::set_irq(int state)
 {
-	if (state == ASSERT_LINE)
-		LOG(("IDE interrupt assert\n"));
-	else
-		LOG(("IDE interrupt clear\n"));
+	if (m_irq != state)
+	{
+		m_irq = state;
 
-	m_interrupt_pending = state;
+		if (state == ASSERT_LINE)
+			LOG(("IDE interrupt assert\n"));
+		else
+			LOG(("IDE interrupt clear\n"));
 
-	/* signal an interrupt */
-	m_irq_handler(state);
+		/* signal an interrupt */
+		m_irq_handler(state);
+	}
 }
 
 void ide_mass_storage_device::set_dmarq(int state)
 {
-	m_dmarq_handler(state);
+	if (m_dmarq != state)
+	{
+		m_dmarq = state;
+
+		m_dmarq_handler(state);
+	}
 }
 
 WRITE_LINE_MEMBER( ide_mass_storage_device::write_csel )
@@ -120,6 +134,11 @@ WRITE_LINE_MEMBER( ide_mass_storage_device::write_csel )
 WRITE_LINE_MEMBER( ide_mass_storage_device::write_dasp )
 {
 	m_dasp = state;
+}
+
+WRITE_LINE_MEMBER( ide_mass_storage_device::write_dmack )
+{
+	m_dmack = state;
 }
 
 /*************************************
@@ -340,11 +359,12 @@ void ide_mass_storage_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_error));
 
-	save_item(NAME(m_adapter_control));
-	save_item(NAME(m_precomp_offset));
+	save_item(NAME(m_device_control));
+	save_item(NAME(m_feature));
 	save_item(NAME(m_sector_count));
 
-	save_item(NAME(m_interrupt_pending));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dmarq));
 	save_item(NAME(m_sectors_until_int));
 
 	save_item(NAME(m_master_password_enable));
@@ -368,7 +388,13 @@ void ide_mass_storage_device::device_reset()
 	m_master_password_enable = (m_master_password != NULL);
 	m_user_password_enable = (m_user_password != NULL);
 	m_error = IDE_ERROR_DEFAULT;
-	m_status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
+
+	m_status = IDE_STATUS_DSC;
+	if (is_ready())
+	{
+		m_status |= IDE_STATUS_DRDY;
+	}
+
 	m_cur_drive = 0;
 
 	/* reset the drive state */
@@ -381,13 +407,14 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 	switch(id)
 	{
 	case TID_DELAYED_INTERRUPT:
-		m_status &= ~IDE_STATUS_BUSY;
+		m_status &= ~IDE_STATUS_BSY;
 		set_irq(ASSERT_LINE);
 		break;
 
 	case TID_DELAYED_INTERRUPT_BUFFER_READY:
-		m_status &= ~IDE_STATUS_BUSY;
-		m_status |= IDE_STATUS_BUFFER_READY;
+		m_status &= ~IDE_STATUS_BSY;
+		m_status |= IDE_STATUS_DRQ;
+
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -397,8 +424,8 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 
 	case TID_SECURITY_ERROR_DONE:
 		/* clear error state */
-		m_status &= ~IDE_STATUS_ERROR;
-		m_status |= IDE_STATUS_DRIVE_READY;
+		m_status &= ~IDE_STATUS_ERR;
+		m_status |= IDE_STATUS_DRDY;
 		break;
 
 	case TID_READ_SECTOR_DONE_CALLBACK:
@@ -414,8 +441,8 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer_ready)
 {
 	/* clear buffer ready and set the busy flag */
-	m_status &= ~IDE_STATUS_BUFFER_READY;
-	m_status |= IDE_STATUS_BUSY;
+	m_status &= ~IDE_STATUS_DRQ;
+	m_status |= IDE_STATUS_BSY;
 
 	/* set a timer */
 	if (buffer_ready)
@@ -476,8 +503,8 @@ void ide_mass_storage_device::next_sector()
 void ide_mass_storage_device::security_error()
 {
 	/* set error state */
-	m_status |= IDE_STATUS_ERROR;
-	m_status &= ~IDE_STATUS_DRIVE_READY;
+	m_status |= IDE_STATUS_ERR;
+	m_status &= ~IDE_STATUS_DRDY;
 
 	/* just set a timer and mark ourselves error */
 	timer_set(TIME_SECURITY_ERROR, TID_SECURITY_ERROR_DONE);
@@ -497,8 +524,8 @@ void ide_mass_storage_device::read_buffer_empty()
 	m_buffer_offset = 0;
 
 	/* clear the buffer ready and busy flag */
-	m_status &= ~IDE_STATUS_BUFFER_READY;
-	m_status &= ~IDE_STATUS_BUSY;
+	m_status &= ~IDE_STATUS_DRQ;
+	m_status &= ~IDE_STATUS_BSY;
 	m_error = IDE_ERROR_DEFAULT;
 	set_dmarq(CLEAR_LINE);
 
@@ -525,8 +552,8 @@ void ide_mass_storage_device::read_sector_done()
 
 	/* GNET readlock check */
 	if (m_gnetreadlock) {
-		m_status &= ~IDE_STATUS_ERROR;
-		m_status &= ~IDE_STATUS_BUSY;
+		m_status &= ~IDE_STATUS_ERR;
+		m_status &= ~IDE_STATUS_BSY;
 		return;
 	}
 
@@ -535,12 +562,13 @@ void ide_mass_storage_device::read_sector_done()
 
 	/* by default, mark the buffer ready and the seek complete */
 	if (!m_verify_only)
-		m_status |= IDE_STATUS_BUFFER_READY;
-	m_status |= IDE_STATUS_SEEK_COMPLETE;
+		m_status |= IDE_STATUS_DRQ;
+
+	m_status |= IDE_STATUS_DSC;
 
 	/* and clear the busy and error flags */
-	m_status &= ~IDE_STATUS_ERROR;
-	m_status &= ~IDE_STATUS_BUSY;
+	m_status &= ~IDE_STATUS_ERR;
+	m_status &= ~IDE_STATUS_BSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -575,7 +603,7 @@ void ide_mass_storage_device::read_sector_done()
 	else
 	{
 		/* set the error flag and the error */
-		m_status |= IDE_STATUS_ERROR;
+		m_status |= IDE_STATUS_ERR;
 		m_error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
@@ -587,7 +615,7 @@ void ide_mass_storage_device::read_sector_done()
 void ide_mass_storage_device::read_first_sector()
 {
 	/* mark ourselves busy */
-	m_status |= IDE_STATUS_BUSY;
+	m_status |= IDE_STATUS_BSY;
 
 	/* just set a timer */
 	if (m_command == IDE_COMMAND_READ_MULTIPLE)
@@ -611,7 +639,7 @@ void ide_mass_storage_device::read_first_sector()
 void ide_mass_storage_device::read_next_sector()
 {
 	/* mark ourselves busy */
-	m_status |= IDE_STATUS_BUSY;
+	m_status |= IDE_STATUS_BSY;
 
 	if (m_command == IDE_COMMAND_READ_MULTIPLE)
 	{
@@ -641,8 +669,8 @@ void ide_mass_storage_device::continue_write()
 	m_buffer_offset = 0;
 
 	/* clear the buffer ready flag */
-	m_status &= ~IDE_STATUS_BUFFER_READY;
-	m_status |= IDE_STATUS_BUSY;
+	m_status &= ~IDE_STATUS_DRQ;
+	m_status |= IDE_STATUS_BSY;
 
 	if (m_command == IDE_COMMAND_WRITE_MULTIPLE)
 	{
@@ -668,6 +696,7 @@ void ide_mass_storage_device::continue_write()
 void ide_mass_storage_device::write_buffer_full()
 {
 	set_dmarq(CLEAR_LINE);
+
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
 		if (m_user_password_enable && memcmp(m_buffer, m_user_password, 2 + 32) == 0)
@@ -696,14 +725,14 @@ void ide_mass_storage_device::write_buffer_full()
 		}
 
 		/* clear the busy and error flags */
-		m_status &= ~IDE_STATUS_ERROR;
-		m_status &= ~IDE_STATUS_BUSY;
-		m_status &= ~IDE_STATUS_BUFFER_READY;
+		m_status &= ~IDE_STATUS_ERR;
+		m_status &= ~IDE_STATUS_BSY;
+		m_status &= ~IDE_STATUS_DRQ;
 
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
 		else
-			m_status |= IDE_STATUS_DRIVE_READY;
+			m_status |= IDE_STATUS_DRDY;
 	}
 	else if (m_command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
 	{
@@ -714,12 +743,12 @@ void ide_mass_storage_device::write_buffer_full()
 		for (i=0; !bad && i<512; i++)
 			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != key[i-2]);
 
-		m_status &= ~IDE_STATUS_BUSY;
-		m_status &= ~IDE_STATUS_BUFFER_READY;
+		m_status &= ~IDE_STATUS_BSY;
+		m_status &= ~IDE_STATUS_DRQ;
 		if (bad)
-			m_status |= IDE_STATUS_ERROR;
+			m_status |= IDE_STATUS_ERR;
 		else {
-			m_status &= ~IDE_STATUS_ERROR;
+			m_status &= ~IDE_STATUS_ERR;
 			m_gnetreadlock= 0;
 		}
 	}
@@ -738,12 +767,12 @@ void ide_mass_storage_device::write_sector_done()
 	count = write_sector(lba, m_buffer);
 
 	/* by default, mark the buffer ready and the seek complete */
-	m_status |= IDE_STATUS_BUFFER_READY;
-	m_status |= IDE_STATUS_SEEK_COMPLETE;
+	m_status |= IDE_STATUS_DRQ;
+	m_status |= IDE_STATUS_DSC;
 
 	/* and clear the busy adn error flags */
-	m_status &= ~IDE_STATUS_ERROR;
-	m_status &= ~IDE_STATUS_BUSY;
+	m_status &= ~IDE_STATUS_ERR;
+	m_status &= ~IDE_STATUS_BSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -767,7 +796,7 @@ void ide_mass_storage_device::write_sector_done()
 		if (m_sector_count > 0)
 			m_sector_count--;
 		if (m_sector_count == 0)
-			m_status &= ~IDE_STATUS_BUFFER_READY;
+			m_status &= ~IDE_STATUS_DRQ;
 
 		/* keep going for DMA */
 		if (m_dma_active && m_sector_count != 0)
@@ -780,7 +809,7 @@ void ide_mass_storage_device::write_sector_done()
 	else
 	{
 		/* set the error flag and the error */
-		m_status |= IDE_STATUS_ERROR;
+		m_status |= IDE_STATUS_ERR;
 		m_error = IDE_ERROR_BAD_SECTOR;
 
 		/* signal an interrupt */
@@ -796,14 +825,14 @@ void ide_mass_storage_device::write_sector_done()
  *
  *************************************/
 
-void ide_mass_storage_device::handle_command(UINT8 _command)
+void ide_mass_storage_device::handle_command()
 {
 	UINT8 key[5];
 
 	/* implicitly clear interrupts & dmarq here */
 	set_irq(CLEAR_LINE);
 	set_dmarq(CLEAR_LINE);
-	m_command = _command;
+
 	switch (m_command)
 	{
 		case IDE_COMMAND_READ_SECTORS:
@@ -875,7 +904,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			m_dma_active = 0;
 
 			/* mark the buffer ready */
-			m_status |= IDE_STATUS_BUFFER_READY;
+			m_status |= IDE_STATUS_DRQ;
 			break;
 
 		case IDE_COMMAND_WRITE_MULTIPLE:
@@ -888,7 +917,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			m_dma_active = 0;
 
 			/* mark the buffer ready */
-			m_status |= IDE_STATUS_BUFFER_READY;
+			m_status |= IDE_STATUS_DRQ;
 			break;
 
 		case IDE_COMMAND_WRITE_DMA:
@@ -899,6 +928,9 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			m_buffer_offset = 0;
 			m_sectors_until_int = m_sector_count;
 			m_dma_active = 1;
+
+			/* mark the buffer ready */
+			m_status |= IDE_STATUS_DRQ;
 
 			/* start the read going */
 			set_dmarq(ASSERT_LINE);
@@ -913,7 +945,8 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			m_dma_active = 0;
 
 			/* mark the buffer ready */
-			m_status |= IDE_STATUS_BUFFER_READY;
+			m_status |= IDE_STATUS_DRQ;
+
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -928,13 +961,13 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			memcpy(m_buffer, m_features, sizeof(m_buffer));
 
 			/* indicate everything is ready */
-			m_status |= IDE_STATUS_BUFFER_READY;
-			m_status |= IDE_STATUS_SEEK_COMPLETE;
-			m_status |= IDE_STATUS_DRIVE_READY;
+			m_status |= IDE_STATUS_DRQ;
+			m_status |= IDE_STATUS_DSC;
+			m_status |= IDE_STATUS_DRDY;
 
 			/* and clear the busy adn error flags */
-			m_status &= ~IDE_STATUS_ERROR;
-			m_status &= ~IDE_STATUS_BUSY;
+			m_status &= ~IDE_STATUS_ERR;
+			m_status &= ~IDE_STATUS_BSY;
 
 			/* clear the error too */
 			m_error = IDE_ERROR_NONE;
@@ -969,7 +1002,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", m_cur_head + 1, m_sector_count));
-			m_status &= ~IDE_STATUS_ERROR;
+			m_status &= ~IDE_STATUS_ERR;
 			m_error = IDE_ERROR_NONE;
 			set_geometry(m_sector_count,m_cur_head + 1);
 
@@ -986,7 +1019,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			break;
 
 		case IDE_COMMAND_SET_FEATURES:
-			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_precomp_offset, m_sector_count & 0xff, m_cur_sector, m_cur_cylinder & 0xff, m_cur_cylinder >> 8));
+			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_cur_sector, m_cur_cylinder & 0xff, m_cur_cylinder >> 8));
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
@@ -997,7 +1030,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 
 			m_block_count = m_sector_count;
 			// judge dredd wants 'drive ready' on this command
-			m_status |= IDE_STATUS_DRIVE_READY;
+			m_status |= IDE_STATUS_DRDY;
 
 			/* signal an interrupt */
 			set_irq(ASSERT_LINE);
@@ -1007,8 +1040,8 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			LOGPRINT(("IDE GNET Unlock 1\n"));
 
 			m_sector_count = 1;
-			m_status |= IDE_STATUS_DRIVE_READY;
-			m_status &= ~IDE_STATUS_ERROR;
+			m_status |= IDE_STATUS_DRDY;
+			m_status &= ~IDE_STATUS_ERR;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -1021,7 +1054,8 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 			m_dma_active = 0;
 
 			/* mark the buffer ready */
-			m_status |= IDE_STATUS_BUFFER_READY;
+			m_status |= IDE_STATUS_DRQ;
+
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -1030,14 +1064,14 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 
 			/* key check */
 			read_key(key);
-			if ((m_precomp_offset == key[0]) && (m_sector_count == key[1]) && (m_cur_sector == key[2]) && (m_cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
+			if ((m_feature == key[0]) && (m_sector_count == key[1]) && (m_cur_sector == key[2]) && (m_cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
 			{
 				m_gnetreadlock= 0;
 			}
 
 			/* update flags */
-			m_status |= IDE_STATUS_DRIVE_READY;
-			m_status &= ~IDE_STATUS_ERROR;
+			m_status |= IDE_STATUS_DRDY;
+			m_status &= ~IDE_STATUS_ERR;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -1059,7 +1093,7 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", m_command));
-			m_status |= IDE_STATUS_ERROR;
+			m_status |= IDE_STATUS_ERR;
 			m_error = IDE_ERROR_UNKNOWN_COMMAND;
 			set_irq(ASSERT_LINE);
 			//debugger_break(device->machine());
@@ -1069,21 +1103,37 @@ void ide_mass_storage_device::handle_command(UINT8 _command)
 
 UINT16 ide_mass_storage_device::read_dma()
 {
-	if (m_cur_drive != m_csel)
+	UINT16 result = 0xffff;
+
+	if (device_selected())
 	{
-		if (m_csel == 0 && m_dasp == 0)
-			return 0;
+		if (!m_dmack)
+		{
+			logerror( "%s: read_dma ignored (!DMACK)\n", machine().describe_context() );
+		}
+		else if( !m_dmarq)
+		{
+			logerror( "%s: read_dma ignored (!DMARQ)\n", machine().describe_context() );
+		}
+		else if (m_status & IDE_STATUS_BSY)
+		{
+			logerror( "%s: read_dma ignored (BSY)\n", machine().describe_context() );
+		}
+		else if (!(m_status & IDE_STATUS_DRQ))
+		{
+			logerror( "%s: read_dma ignored (!DRQ)\n", machine().describe_context() );
+		}
+		else
+		{
+			result = m_buffer[m_buffer_offset++];
+			result |= m_buffer[m_buffer_offset++] << 8;
 
-		return 0xffff;
-	}
-
-	UINT16 result = m_buffer[m_buffer_offset++];
-	result |= m_buffer[m_buffer_offset++] << 8;
-
-	if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
-	{
-		LOG(("%s:IDE completed DMA read\n", machine().describe_context()));
-		read_buffer_empty();
+			if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+			{
+				LOG(("%s:IDE completed DMA read\n", machine().describe_context()));
+				read_buffer_empty();
+			}
+		}
 	}
 
 	return result;
@@ -1091,92 +1141,129 @@ UINT16 ide_mass_storage_device::read_dma()
 
 READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 {
-	UINT16 result = 0;
-
 	/* logit */
-//  if (offset != IDE_BANK0_DATA && offset != IDE_BANK0_STATUS_COMMAND)
+//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
 		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
 
-	if (m_cur_drive != m_csel)
+	UINT16 result = 0xffff;
+
+	if (device_selected() || single_device())
 	{
-		if (m_csel == 0 && m_dasp == 0)
-			return 0;
-
-		return 0xffff;
-	}
-
-	if (is_ready()) {
-		m_status |= IDE_STATUS_DRIVE_READY;
-	} else {
-		m_status &= ~IDE_STATUS_DRIVE_READY;
-	}
-
-	switch (offset)
-	{
-		/* read data if there's data to be read */
-		case IDE_BANK0_DATA:
-			if (m_status & IDE_STATUS_BUFFER_READY)
+		if (m_dmack)
+		{
+			logerror( "%s: read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, mem_mask );
+		}
+		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
+		{
+			if (device_selected())
 			{
-				/* fetch the correct amount of data */
-				result = m_buffer[m_buffer_offset++];
-				if (mem_mask == 0xffff)
-					result |= m_buffer[m_buffer_offset++] << 8;
-
-				/* if we're at the end of the buffer, handle it */
-				if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+				switch (offset)
 				{
-					LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
-					read_buffer_empty();
+					case IDE_CS0_DATA_RW:
+						logerror( "%s: read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), offset, mem_mask );
+						break;
+
+					default:
+						result = m_status;
+
+						if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
+						{
+							result |= IDE_STATUS_IDX;
+							m_last_status_timer->adjust(attotime::never);
+						}
+						break;
 				}
 			}
-			break;
-
-		/* return the current error */
-		case IDE_BANK0_ERROR:
-			result = m_error;
-			break;
-
-		/* return the current sector count */
-		case IDE_BANK0_SECTOR_COUNT:
-			result = m_sector_count;
-			break;
-
-		/* return the current sector */
-		case IDE_BANK0_SECTOR_NUMBER:
-			result = m_cur_sector;
-			break;
-
-		/* return the current cylinder LSB */
-		case IDE_BANK0_CYLINDER_LSB:
-			result = m_cur_cylinder & 0xff;
-			break;
-
-		/* return the current cylinder MSB */
-		case IDE_BANK0_CYLINDER_MSB:
-			result = m_cur_cylinder >> 8;
-			break;
-
-		/* return the current head */
-		case IDE_BANK0_HEAD_NUMBER:
-			result = m_cur_head_reg;
-			break;
-
-		/* return the current status and clear any pending interrupts */
-		case IDE_BANK0_STATUS_COMMAND:
-			result = m_status;
-			if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
+			else
 			{
-				result |= IDE_STATUS_HIT_INDEX;
-				m_last_status_timer->adjust(attotime::never);
+				result = 0;
 			}
-			if (m_interrupt_pending == ASSERT_LINE)
-				set_irq(CLEAR_LINE);
-			break;
+		}
+		else
+		{
+			switch (offset)
+			{
+				/* read data if there's data to be read */
+				case IDE_CS0_DATA_RW:
+					if (device_selected())
+					{
+						if (m_status & IDE_STATUS_DRQ)
+						{
+							/* fetch the correct amount of data */
+							result = m_buffer[m_buffer_offset++];
+							if (mem_mask == 0xffff)
+								result |= m_buffer[m_buffer_offset++] << 8;
 
-		/* log anything else */
-		default:
-			logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
-			break;
+							/* if we're at the end of the buffer, handle it */
+							if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+							{
+								LOG(("%s:IDE completed PIO read\n", machine().describe_context()));
+								read_buffer_empty();
+							}
+						}
+					}
+					else
+					{
+						result = 0;
+					}
+					break;
+
+				/* return the current error */
+				case IDE_CS0_ERROR_R:
+					result = m_error;
+					break;
+
+				/* return the current sector count */
+				case IDE_CS0_SECTOR_COUNT_RW:
+					result = m_sector_count;
+					break;
+
+				/* return the current sector */
+				case IDE_CS0_SECTOR_NUMBER_RW:
+					result = m_cur_sector;
+					break;
+
+				/* return the current cylinder LSB */
+				case IDE_CS0_CYLINDER_LOW_RW:
+					result = m_cur_cylinder & 0xff;
+					break;
+
+				/* return the current cylinder MSB */
+				case IDE_CS0_CYLINDER_HIGH_RW:
+					result = m_cur_cylinder >> 8;
+					break;
+
+				/* return the current head */
+				case IDE_CS0_DEVICE_HEAD_RW:
+					result = m_cur_head_reg;
+					break;
+
+				/* return the current status and clear any pending interrupts */
+				case IDE_CS0_STATUS_R:
+					if (device_selected())
+					{
+						result = m_status;
+
+						if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
+						{
+							result |= IDE_STATUS_IDX;
+							m_last_status_timer->adjust(attotime::never);
+						}
+
+						set_irq(CLEAR_LINE);
+					}
+					else
+					{
+						result = 0;
+					}
+					break;
+
+				/* log anything else */
+				default:
+					logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+					break;
+			}
+		}
 	}
 
 	/* return the result */
@@ -1185,42 +1272,45 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 
 READ16_MEMBER( ide_mass_storage_device::read_cs1 )
 {
-	if (m_cur_drive != m_csel)
-	{
-		if (m_csel == 0 && m_dasp == 0)
-			return 0;
-
-		return 0xffff;
-	}
-
-	if (is_ready()) {
-		m_status |= IDE_STATUS_DRIVE_READY;
-	} else {
-		m_status &= ~IDE_STATUS_DRIVE_READY;
-	}
-
 	/* logit */
-//  if (offset != IDE_BANK1_STATUS_CONTROL)
+//  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
 		LOG(("%s:IDE cs1 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
-		/* return the current status but don't clear interrupts */
 
-	UINT16 result = 0;
+	UINT16 result = 0xffff;
 
-	switch (offset)
+	if (device_selected() || single_device())
 	{
-		case IDE_BANK1_STATUS_CONTROL:
-			result = m_status;
-			if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
+		if (m_dmack)
+		{
+			logerror( "%s: read_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, mem_mask );
+		}
+		else
+		{
+			switch (offset)
 			{
-				result |= IDE_STATUS_HIT_INDEX;
-				m_last_status_timer->adjust(attotime::never);
-			}
-			break;
+				case IDE_CS1_ALTERNATE_STATUS_R:
+					if( device_selected() )
+					{
+						/* return the current status but don't clear interrupts */
+						result = m_status;
+						if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
+						{
+							result |= IDE_STATUS_IDX;
+							m_last_status_timer->adjust(attotime::never);
+						}
+					}
+					else
+					{
+						result = 0;
+					}
+					break;
 
-		/* log anything else */
-		default:
-			logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
-			break;
+				/* log anything else */
+				default:
+					logerror("%s:unknown IDE cs1 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+					break;
+			}
+		}
 	}
 
 	/* return the result */
@@ -1229,118 +1319,162 @@ READ16_MEMBER( ide_mass_storage_device::read_cs1 )
 
 void ide_mass_storage_device::write_dma( UINT16 data )
 {
-	if (m_cur_drive != m_csel)
-		return;
-
-	m_buffer[m_buffer_offset++] = data;
-	m_buffer[m_buffer_offset++] = data >> 8;
-
-	/* if we're at the end of the buffer, handle it */
-	if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+	if (device_selected())
 	{
-		LOG(("%s:IDE completed DMA write\n", machine().describe_context()));
-		write_buffer_full();
+		if (!m_dmack)
+		{
+			logerror( "%s: write_dma %04x ignored (!DMACK)\n", machine().describe_context(), data );
+		}
+		else if( !m_dmarq)
+		{
+			logerror( "%s: write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), data );
+		}
+		else if (m_status & IDE_STATUS_BSY)
+		{
+			logerror( "%s: write_dma %04x ignored (BSY)\n", machine().describe_context(), data );
+		}
+		else if (!(m_status & IDE_STATUS_DRQ))
+		{
+			logerror( "%s: write_dma %04x ignored (!DRQ)\n", machine().describe_context(), data );
+		}
+		else
+		{
+			m_buffer[m_buffer_offset++] = data;
+			m_buffer[m_buffer_offset++] = data >> 8;
+
+			/* if we're at the end of the buffer, handle it */
+			if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+			{
+				LOG(("%s:IDE completed DMA write\n", machine().describe_context()));
+				write_buffer_full();
+			}
+		}
 	}
 }
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 {
-	switch (offset)
-	{
-		case IDE_BANK0_HEAD_NUMBER:
-			m_cur_drive = (data & 0x10) >> 4;
-			break;
-	}
-
-	if (m_cur_drive != m_csel)
-		return;
-
 	/* logit */
-	if (offset != IDE_BANK0_DATA)
+	if (offset != IDE_CS0_DATA_RW)
 		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 	//  fprintf(stderr, "ide write %03x %02x mem_mask=%d\n", offset, data, size);
-	switch (offset)
+
+	if (m_dmack)
 	{
-		/* write data */
-		case IDE_BANK0_DATA:
-			if (m_status & IDE_STATUS_BUFFER_READY)
-			{
-				/* store the correct amount of data */
-				m_buffer[m_buffer_offset++] = data;
-				if (mem_mask == 0xffff)
-					m_buffer[m_buffer_offset++] = data >> 8;
-
-				/* if we're at the end of the buffer, handle it */
-				if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+		logerror( "%s: write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, data, mem_mask );
+	}
+	else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_COMMAND_W)
+	{
+		logerror( "%s: write_cs0 %04x %04x %04x ignored (BSY)\n", machine().describe_context(), offset, data, mem_mask );
+	}
+	else if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && offset != IDE_CS0_COMMAND_W)
+	{
+		logerror( "%s: write_cs0 %04x %04x %04x ignored (DRQ)\n", machine().describe_context(), offset, data, mem_mask );
+	}
+	else
+	{
+		switch (offset)
+		{
+			/* write data */
+			case IDE_CS0_DATA_RW:
+				if( device_selected() )
 				{
-					LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
-					write_buffer_full();
+					if (!(m_status & IDE_STATUS_DRQ))
+					{
+						logerror( "%s: write_cs0 %04x %04x %04x ignored (!DRQ)\n", machine().describe_context(), offset, data, mem_mask );
+					}
+					else
+					{
+						/* store the correct amount of data */
+						m_buffer[m_buffer_offset++] = data;
+						if (mem_mask == 0xffff)
+							m_buffer[m_buffer_offset++] = data >> 8;
+
+						/* if we're at the end of the buffer, handle it */
+						if (m_buffer_offset >= IDE_DISK_SECTOR_SIZE)
+						{
+							LOG(("%s:IDE completed PIO write\n", machine().describe_context()));
+							write_buffer_full();
+						}
+					}
 				}
-			}
-			break;
+				break;
 
-		/* precompensation offset?? */
-		case IDE_BANK0_ERROR:
-			m_precomp_offset = data;
-			break;
+			case IDE_CS0_FEATURE_W:
+				m_feature = data;
+				break;
 
-		/* sector count */
-		case IDE_BANK0_SECTOR_COUNT:
-			m_sector_count = data ? data : 256;
-			break;
+			/* sector count */
+			case IDE_CS0_SECTOR_COUNT_RW:
+				m_sector_count = data ? data : 256;
+				break;
 
-		/* current sector */
-		case IDE_BANK0_SECTOR_NUMBER:
-			m_cur_sector = data;
-			break;
+			/* current sector */
+			case IDE_CS0_SECTOR_NUMBER_RW:
+				m_cur_sector = data;
+				break;
 
-		/* current cylinder LSB */
-		case IDE_BANK0_CYLINDER_LSB:
-			m_cur_cylinder = (m_cur_cylinder & 0xff00) | (data & 0xff);
-			break;
+			/* current cylinder LSB */
+			case IDE_CS0_CYLINDER_LOW_RW:
+				m_cur_cylinder = (m_cur_cylinder & 0xff00) | (data & 0xff);
+				break;
 
-		/* current cylinder MSB */
-		case IDE_BANK0_CYLINDER_MSB:
-			m_cur_cylinder = (m_cur_cylinder & 0x00ff) | ((data & 0xff) << 8);
-			break;
+			/* current cylinder MSB */
+			case IDE_CS0_CYLINDER_HIGH_RW:
+				m_cur_cylinder = ((data << 8) & 0xff00) | (m_cur_cylinder & 0xff);
+				break;
 
-		/* current head */
-		case IDE_BANK0_HEAD_NUMBER:
-			m_cur_head = data & 0x0f;
-			m_cur_head_reg = data;
-			// LBA mode = data & 0x40
-			break;
+			/* current head */
+			case IDE_CS0_DEVICE_HEAD_RW:
+				// LBA mode = data & 0x40
+				m_cur_drive = (data & 0x10) >> 4;
+				m_cur_head = data & 0x0f;
+				m_cur_head_reg = data;
+				break;
 
-		/* command */
-		case IDE_BANK0_STATUS_COMMAND:
-			handle_command(data);
-			break;
+			/* command */
+			case IDE_CS0_COMMAND_W:
+				m_command = data;
+
+				if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
+					handle_command();
+				break;
+		}
 	}
 }
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
 {
-	if (m_cur_drive != m_csel)
-		return;
-
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 
-	switch (offset)
+	if (m_dmack)
 	{
-		/* adapter control */
-		case IDE_BANK1_STATUS_CONTROL:
-			m_adapter_control = data;
+		logerror( "%s: write_cs1 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, data, mem_mask );
+	}
+	else
+	{
+		switch (offset)
+		{
+			/* adapter control */
+			case IDE_CS1_DEVICE_CONTROL_W:
+				m_device_control = data;
 
-			/* handle controller reset */
-			//if (data == 0x04)
-			if (data & 0x04)
-			{
-				m_status |= IDE_STATUS_BUSY;
-				m_status &= ~IDE_STATUS_DRIVE_READY;
-				m_reset_timer->adjust(attotime::from_msec(5));
-			}
-			break;
+				if (data & 0x02)
+				{
+					// nIEN
+					logerror( "%s: write_cs1 %04x %04x %04x nIEN not supported\n", machine().describe_context(), offset, data, mem_mask );
+				}
+
+				if (data & 0x04)
+				{
+					// SRST
+					m_status |= IDE_STATUS_BSY;
+					m_status &= ~IDE_STATUS_DRDY;
+					m_reset_timer->adjust(attotime::from_msec(5));
+				}
+				break;
+		}
 	}
 }
 
@@ -1371,8 +1505,6 @@ ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, 
 
 void ide_hdd_device::device_reset()
 {
-	ide_mass_storage_device::device_reset();
-
 	m_handle = subdevice<harddisk_image_device>("harddisk")->get_chd_file();
 
 	if (m_handle)
@@ -1384,6 +1516,8 @@ void ide_hdd_device::device_reset()
 		m_handle = get_disk_handle(machine(), tag());
 		m_disk = hard_disk_open(m_handle);
 	}
+
+	ide_mass_storage_device::device_reset();
 
 	if (m_disk != NULL)
 	{

@@ -232,6 +232,15 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 			m_slot[i]->dev()->write_cs1(space, offset, data, mem_mask);
 }
 
+WRITE_LINE_MEMBER( ide_controller_device::write_dmack )
+{
+//  printf( "write_dmack %04x\n", state );
+
+	for (int i = 0; i < 2; i++)
+		if (m_slot[i]->dev() != NULL)
+			m_slot[i]->dev()->write_dmack(state);
+}
+
 WRITE8_MEMBER( ide_controller_device::write_via_config )
 {
 //  printf( "write via config %04x %04x %04x\n", offset, data, mem_mask );
@@ -416,7 +425,9 @@ bus_master_ide_controller_device::bus_master_ide_controller_device(const machine
 	dma_last_buffer(0),
 	bus_master_command(0),
 	bus_master_status(0),
-	bus_master_descriptor(0)
+	bus_master_descriptor(0),
+	m_irq(0),
+	m_dmarq(0)
 {
 }
 
@@ -568,6 +579,8 @@ WRITE32_MEMBER( bus_master_ide_controller_device::ide_bus_master32_w )
 
 void bus_master_ide_controller_device::execute_dma()
 {
+	write_dmack(ASSERT_LINE);
+
 	while (m_dmarq && (bus_master_status & IDE_BUSMASTER_STATUS_ACTIVE))
 	{
 		/* if we're out of space, grab the next descriptor */
@@ -624,4 +637,6 @@ void bus_master_ide_controller_device::execute_dma()
 			}
 		}
 	}
+
+	write_dmack(CLEAR_LINE);
 }

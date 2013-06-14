@@ -3,12 +3,29 @@
 
 #define IDE_DISK_SECTOR_SIZE            512
 
-#define IDE_STATUS_ERROR                    0x01
-#define IDE_STATUS_HIT_INDEX                0x02
-#define IDE_STATUS_BUFFER_READY             0x08
-#define IDE_STATUS_SEEK_COMPLETE            0x10
-#define IDE_STATUS_DRIVE_READY              0x40
-#define IDE_STATUS_BUSY                     0x80
+// Error
+#define IDE_STATUS_ERR  (0x01)
+
+// Index
+#define IDE_STATUS_IDX  (0x02)
+
+// Corrected Data
+#define IDE_STATUS_CORR (0x04)
+
+// Data Request
+#define IDE_STATUS_DRQ  (0x08)
+
+// Drive Seek Complete
+#define IDE_STATUS_DSC  (0x10)
+
+// Drive Write Fault
+#define IDE_STATUS_DWF  (0x20)
+
+// Drive Ready
+#define IDE_STATUS_DRDY (0x40)
+
+// Busy
+#define IDE_STATUS_BSY  (0x80)
 
 #define IDE_ERROR_NONE                      0x00
 #define IDE_ERROR_DEFAULT                   0x01
@@ -32,6 +49,7 @@ public:
 	virtual void write_dma(UINT16 data) = 0;
 	virtual DECLARE_WRITE16_MEMBER(write_cs0) = 0;
 	virtual DECLARE_WRITE16_MEMBER(write_cs1) = 0;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
@@ -62,6 +80,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
 	virtual UINT8 *get_features() { return m_features; }
 	
@@ -74,6 +93,9 @@ protected:
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 	virtual bool is_ready() = 0;
 	virtual void read_key(UINT8 key[]) = 0;
+
+	bool device_selected() { return m_cur_drive == m_csel; }
+	bool single_device() { return m_csel == 0 && m_dasp == 0; }
 
 	void set_irq(int state);
 	void set_dmarq(int state);
@@ -98,12 +120,15 @@ private:
 	void security_error();
 	void continue_read();
 	void read_first_sector();
-	void handle_command(UINT8 _command);
+	void handle_command();
 	void read_buffer_empty();
 	void write_buffer_full();
 
 	int m_csel;
 	int m_dasp;
+	int m_dmack;
+	int m_dmarq;
+	int m_irq;
 
 	int             m_cur_drive;
 	UINT16          m_cur_cylinder;
@@ -119,12 +144,11 @@ private:
 	UINT8           m_buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_buffer_offset;
 
-	UINT8           m_adapter_control;
-	UINT8           m_precomp_offset;
+	UINT8           m_device_control;
+	UINT8           m_feature;
 	UINT16          m_sector_count;
 	UINT16          m_block_count;
 
-	UINT8           m_interrupt_pending;
 	UINT16          m_sectors_until_int;
 
 	UINT8           m_dma_active;
