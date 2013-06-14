@@ -211,52 +211,48 @@ void nes_state::machine_start()
 READ8_MEMBER(nes_state::nes_IN0_r)
 {
 	int cfg = m_io_ctrlsel->read();
-	int ret;
-
-	if ((cfg & 0x000f) >= 0x08) // for now we treat the FC keyboard separately from other inputs!
+	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
+	UINT8 ret = 0x40;
+	
+	if ((cfg & 0x000f) >= 0x08)
 	{
 		// here we should have the tape input
-		ret = 0;
+		ret |= 0;
 	}
-	else
+
+	ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
+
+	/* zapper */
+	if ((cfg & 0x000f) == 0x0002)
 	{
-		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-		/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
-		ret = 0x40;
+		int x = m_in_0.i1;  /* read Zapper x-position */
+		int y = m_in_0.i2;  /* read Zapper y-position */
+		UINT32 pix, color_base;
 
-		ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
+		/* get the pixel at the gun position */
+		pix = m_ppu->get_pixel(x, y);
 
-		/* zapper */
-		if ((cfg & 0x000f) == 0x0002)
+		/* get the color base from the ppu */
+		color_base = m_ppu->get_colorbase();
+
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33) || (pix == color_base + 0x34))
 		{
-			int x = m_in_0.i1;  /* read Zapper x-position */
-			int y = m_in_0.i2;  /* read Zapper y-position */
-			UINT32 pix, color_base;
-
-			/* get the pixel at the gun position */
-			pix = m_ppu->get_pixel(x, y);
-
-			/* get the color base from the ppu */
-			color_base = m_ppu->get_colorbase();
-
-			/* look at the screen and see if the cursor is over a bright pixel */
-			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-				(pix == color_base + 0x33) || (pix == color_base + 0x34))
-			{
-				ret &= ~0x08; /* sprite hit */
-			}
-			else
-				ret |= 0x08;  /* no sprite hit */
-
-			/* If button 1 is pressed, indicate the light gun trigger is pressed */
-			ret |= ((m_in_0.i0 & 0x01) << 4);
+			ret &= ~0x08; /* sprite hit */
 		}
+		else
+			ret |= 0x08;  /* no sprite hit */
 
-		if (LOG_JOY)
-			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_0.shift, m_in_0.i0);
-
-		m_in_0.shift++;
+		/* If button 1 is pressed, indicate the light gun trigger is pressed */
+		ret |= ((m_in_0.i0 & 0x01) << 4);
 	}
+
+	if (LOG_JOY)
+		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_0.shift, m_in_0.i0);
+
+	m_in_0.shift++;
 
 	return ret;
 }
@@ -264,138 +260,77 @@ READ8_MEMBER(nes_state::nes_IN0_r)
 READ8_MEMBER(nes_state::nes_IN1_r)
 {
 	int cfg = m_io_ctrlsel->read();
-	int ret;
-
+	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
+	UINT8 ret = 0x40;
+	
 	// row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
 	if ((cfg & 0x000f) == 0x08) // for now we treat the FC keyboard separately from other inputs!
 	{
 		if (m_fck_scan < 9)
-			ret = ~(((m_io_fckey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
+			ret |= ~(((m_io_fckey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
 		else
-			ret = 0x1e;
+			ret |= 0x1e;
 	}
-	else if ((cfg & 0x000f) == 0x09)    // for now we treat the Subor keyboard separately from other inputs!
+	
+	if ((cfg & 0x000f) == 0x09)    // for now we treat the Subor keyboard separately from other inputs!
 	{
 		if (m_fck_scan < 12)
-			ret = ~(((m_io_subkey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
+			ret |= ~(((m_io_subkey[m_fck_scan]->read() >> (m_fck_mode * 4)) & 0x0f) << 1) & 0x1e;
 		else
-			ret = 0x1e;
+			ret |= 0x1e;
 	}
+
+	/* Handle data line 0's serial output */
+	if ((cfg & 0x00f0) == 0x0070)
+		ret |= (((m_in_1.i0 >> m_in_1.shift) & 0x01) << 1);
 	else
+		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
+
+	/* zapper */
+	if ((cfg & 0x00f0) == 0x0030)
 	{
-		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-		/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
-		ret = 0x40;
-
-		/* Handle data line 0's serial output */
-		if((cfg & 0x00f0) == 0x0070)
-			ret |= (((m_in_1.i0 >> m_in_1.shift) & 0x01) << 1);
+		int x = m_in_1.i1;  /* read Zapper x-position */
+		int y = m_in_1.i2;  /* read Zapper y-position */
+		UINT32 pix, color_base;
+		
+		/* get the pixel at the gun position */
+		pix = m_ppu->get_pixel(x, y);
+		
+		/* get the color base from the ppu */
+		color_base = m_ppu->get_colorbase();
+		
+		/* look at the screen and see if the cursor is over a bright pixel */
+		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+			(pix == color_base + 0x33) || (pix == color_base + 0x34))
+		{
+			ret &= ~0x08; /* sprite hit */
+		}
 		else
-			ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
-
-		/* zapper */
-		if ((cfg & 0x00f0) == 0x0030)
-		{
-			int x = m_in_1.i1;  /* read Zapper x-position */
-			int y = m_in_1.i2;  /* read Zapper y-position */
-			UINT32 pix, color_base;
-
-			/* get the pixel at the gun position */
-			pix = m_ppu->get_pixel(x, y);
-
-			/* get the color base from the ppu */
-			color_base = m_ppu->get_colorbase();
-
-			/* look at the screen and see if the cursor is over a bright pixel */
-			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-				(pix == color_base + 0x33) || (pix == color_base + 0x34))
-			{
-				ret &= ~0x08; /* sprite hit */
-			}
-			else
-				ret |= 0x08;  /* no sprite hit */
-
-			/* If button 1 is pressed, indicate the light gun trigger is pressed */
-			ret |= ((m_in_1.i0 & 0x01) << 4);
-		}
-
-		/* arkanoid dial */
-		else if ((cfg & 0x00f0) == 0x0040)
-		{
-			/* Handle data line 2's serial output */
-			ret |= ((m_in_1.i2 >> m_in_1.shift) & 0x01) << 3;
-
-			/* Handle data line 3's serial output - bits are reversed */
-			/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-			/* ret |= ((m_in_1[3] >> m_in_1.shift) & 0x01) << 4; */
-			/* ret |= ((m_in_1[3] << m_in_1.shift) & 0x80) >> 3; */
-		}
-
-		if (LOG_JOY)
-			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_1.shift, m_in_1.i0);
-
-		m_in_1.shift++;
+			ret |= 0x08;  /* no sprite hit */
+		
+		/* If button 1 is pressed, indicate the light gun trigger is pressed */
+		ret |= ((m_in_1.i0 & 0x01) << 4);
 	}
+
+	/* arkanoid dial */
+	if ((cfg & 0x00f0) == 0x0040)
+	{
+		/* Handle data line 2's serial output */
+		ret |= ((m_in_1.i2 >> m_in_1.shift) & 0x01) << 3;
+
+		/* Handle data line 3's serial output - bits are reversed */
+		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
+		/* ret |= ((m_in_1[3] >> m_in_1.shift) & 0x01) << 4; */
+		/* ret |= ((m_in_1[3] << m_in_1.shift) & 0x80) >> 3; */
+	}
+
+	if (LOG_JOY)
+		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_1.shift, m_in_1.i0);
+
+	m_in_1.shift++;
 
 	return ret;
-}
-
-
-// FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up
-// to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
-static void nes_read_input_device( running_machine &machine, int cfg, nes_input *vals, int pad_port, int supports_zapper, int mux_data )
-{
-	nes_state *state = machine.driver_data<nes_state>();
-
-	vals->i0 = 0;
-	vals->i1 = 0;
-	vals->i2 = 0;
-
-	switch (cfg & 0x0f)
-	{
-		case 0x01:  /* gamepad */
-			if (pad_port >= 0)
-				vals->i0 = state->m_io_pad[pad_port]->read();
-			break;
-
-		case 0x02:  /* zapper 1 */
-			if (supports_zapper)
-			{
-				vals->i0 = state->m_io_zapper1_t->read();
-				vals->i1 = state->m_io_zapper1_x->read();
-				vals->i2 = state->m_io_zapper1_y->read();
-			}
-			break;
-
-		case 0x03:  /* zapper 2 */
-			if (supports_zapper)
-			{
-				vals->i0 = state->m_io_zapper2_t->read();
-				vals->i1 = state->m_io_zapper2_x->read();
-				vals->i2 = state->m_io_zapper2_y->read();
-			}
-			break;
-
-		case 0x04:  /* arkanoid paddle */
-			if (pad_port == 1)
-				vals->i0 = (UINT8) ((UINT8) state->m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
-			break;
-
-		case 0x06:  /* crazy climber controller */
-			if (pad_port == 0)
-			{
-				state->m_in_0.i0 = state->m_io_cc_left->read();
-				state->m_in_1.i0 = state->m_io_cc_right->read();
-			}
-			break;
-
-		case 0x07: /* Mahjong Panel */
-			if(mux_data & 0xf8)
-				logerror("Error: Mahjong panel read with mux data %02x\n",mux_data);
-			else
-				vals->i0 = state->m_io_mahjong[mux_data >> 1]->read();
-			break;
-	}
 }
 
 
@@ -444,13 +379,13 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
-	if ((cfg & 0x000f) >= 0x08) // for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x08)
 	{
 		// here we should also have the tape output
 
 		if (BIT(data, 2))   // keyboard active
 		{
-			int lines = ((cfg & 0x000f) == 0x04) ? 9 : 12;
+			int lines = ((cfg & 0x000f) == 0x08) ? 9 : 12;
 			UINT8 out = BIT(data, 1);   // scan
 
 			if (m_fck_mode && !out && ++m_fck_scan > lines)
@@ -462,40 +397,88 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 				m_fck_scan = 0;
 		}
 	}
-	else
+
+	// check 'standard' inputs
+	if (data & 0x01)
+		return;
+	
+	if (LOG_JOY)
+		logerror("joy 0 bits read: %d\n", m_in_0.shift);
+	
+	/* Toggling bit 0 high then low resets both controllers */
+	m_in_0.shift = 0;
+	m_in_1.shift = 0;
+	m_in_0.i0 = 0;
+	m_in_0.i1 = 0;
+	m_in_0.i2 = 0;
+	m_in_1.i0 = 0;
+	m_in_1.i1 = 0;
+	m_in_1.i2 = 0;
+	m_in_2.i0 = 0;
+	m_in_2.i1 = 0;
+	m_in_2.i2 = 0;
+	m_in_3.i0 = 0;
+	m_in_3.i1 = 0;
+	m_in_3.i2 = 0;
+	
+	// P1 inputs
+	switch (cfg & 0x000f)
 	{
-		if (data & 0x01)
-			return;
-
-		if (LOG_JOY)
-			logerror("joy 0 bits read: %d\n", m_in_0.shift);
-
-		/* Toggling bit 0 high then low resets both controllers */
-		m_in_0.shift = 0;
-		m_in_1.shift = 0;
-
-		/* Read the input devices */
-		if ((cfg & 0x000f) != 0x06)
-		{
-			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE,data & 0xfe);
-			nes_read_input_device(machine(), cfg >>  4, &m_in_1, 1,  TRUE,data & 0xfe);
-			nes_read_input_device(machine(), cfg >>  8, &m_in_2, 2, FALSE,data & 0xfe);
-			nes_read_input_device(machine(), cfg >> 12, &m_in_3, 3, FALSE,data & 0xfe);
-		}
-		else // crazy climber pad
-		{
-			nes_read_input_device(machine(), 0, &m_in_1, 1,  TRUE,data & 0xfe);
-			nes_read_input_device(machine(), 0, &m_in_2, 2, FALSE,data & 0xfe);
-			nes_read_input_device(machine(), 0, &m_in_3, 3, FALSE,data & 0xfe);
-			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE,data & 0xfe);
-		}
-
-		if (cfg & 0x0f00)
-			m_in_0.i0 |= (m_in_2.i0 << 8) | (0x08 << 16);
-
-		if (cfg & 0xf000)
-			m_in_1.i0 |= (m_in_3.i0 << 8) | (0x04 << 16);
+		case 0x01:  /* gamepad */
+			m_in_0.i0 = m_io_pad[0]->read();
+			break;
+			
+		case 0x02:  /* zapper 1 */
+			m_in_0.i0 = m_io_zapper1_t->read();
+			m_in_0.i1 = m_io_zapper1_x->read();
+			m_in_0.i2 = m_io_zapper1_y->read();
+			break;
+			
+		case 0x06:  /* crazy climber controller */
+			m_in_0.i0 = m_io_cc_left->read();
+			m_in_1.i0 = m_io_cc_right->read();
+			break;
 	}
+	
+	// P2 inputs
+	switch ((cfg & 0x00f0) >> 4)
+	{
+		case 0x01:  /* gamepad */
+			m_in_1.i0 = m_io_pad[1]->read();
+			break;
+			
+		case 0x03:  /* zapper 2 */
+			m_in_1.i0 = m_io_zapper2_t->read();
+			m_in_1.i1 = m_io_zapper2_x->read();
+			m_in_1.i2 = m_io_zapper2_y->read();
+			break;
+			
+		case 0x04:  /* arkanoid paddle */
+			m_in_1.i0 = (UINT8) ((UINT8) m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
+			break;
+			
+		case 0x07: /* Mahjong Panel */
+			if (data & 0xf8)
+				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
+			else
+				m_in_1.i0 = m_io_mahjong[(data & 0xfe) >> 1]->read();
+			break;
+	}
+	
+	// P3 inputs
+	if ((cfg & 0x0f00))
+		m_in_2.i0 = m_io_pad[2]->read();
+	
+	// P4 inputs
+	if ((cfg & 0x0f00))
+		m_in_3.i0 = m_io_pad[3]->read();
+	
+	if (cfg & 0x0f00)
+		m_in_0.i0 |= (m_in_2.i0 << 8) | (0x08 << 16);
+	
+	if (cfg & 0xf000)
+		m_in_1.i0 |= (m_in_3.i0 << 8) | (0x04 << 16);
+	
 }
 
 
