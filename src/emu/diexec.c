@@ -638,6 +638,17 @@ void device_execute_interface::interface_post_reset()
 
 void device_execute_interface::interface_clock_changed()
 {
+	// a clock of zero disables the device
+	if (device().clock() == 0)
+	{
+		suspend(SUSPEND_REASON_CLOCK, true);
+		return;
+	}
+
+	// if we were suspended because we had no clock, enable us now
+	if (suspended(SUSPEND_REASON_CLOCK))
+		resume(SUSPEND_REASON_CLOCK);
+
 	// recompute cps and spc
 	m_cycles_per_second = clocks_to_cycles(device().clock());
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
@@ -693,7 +704,11 @@ int device_execute_interface::standard_irq_callback(int irqline)
 
 attoseconds_t device_execute_interface::minimum_quantum() const
 {
-	// if we don't have that information, compute it
+	// if we don't have a clock, return a huge factor
+	if (device().clock() == 0)
+		return ATTOSECONDS_PER_SECOND - 1;
+
+	// if we don't have the quantum time, compute it
 	attoseconds_t basetick = m_attoseconds_per_cycle;
 	if (basetick == 0)
 		basetick = HZ_TO_ATTOSECONDS(clocks_to_cycles(device().clock()));
@@ -727,7 +742,7 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 		return;
 
 	// generate the interrupt callback
-	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
 	{
 		if (m_vblank_interrupt_legacy != NULL)
 			(*m_vblank_interrupt_legacy)(&device());
@@ -750,7 +765,7 @@ TIMER_CALLBACK( device_execute_interface::static_trigger_periodic_interrupt )
 void device_execute_interface::trigger_periodic_interrupt()
 {
 	// bail if there is no routine
-	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
 	{
 		if (m_timed_interrupt_legacy != NULL)
 			(*m_timed_interrupt_legacy)(&device());

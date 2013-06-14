@@ -58,6 +58,7 @@ const UINT32 SUSPEND_REASON_SPIN        = 0x0004;   // currently spinning
 const UINT32 SUSPEND_REASON_TRIGGER     = 0x0008;   // waiting for a trigger
 const UINT32 SUSPEND_REASON_DISABLE     = 0x0010;   // disabled (due to disable flag)
 const UINT32 SUSPEND_REASON_TIMESLICE   = 0x0020;   // waiting for the next timeslice
+const UINT32 SUSPEND_REASON_CLOCK       = 0x0040;   // currently not clocked
 const UINT32 SUSPEND_ANY_REASON         = ~0;       // all of the above
 
 
