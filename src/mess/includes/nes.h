@@ -452,8 +452,11 @@ public:
 
 	nes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cartslot(*this, "nes_slot")
-	{ }
+			m_maincpu(*this, "maincpu"),
+			m_ppu(*this, "ppu"),
+			m_sound(*this, "nessound"),
+			m_cartslot(*this, "nes_slot")
+		{ }
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input m_in_0, m_in_1, m_in_2, m_in_3;
@@ -482,7 +485,10 @@ public:
 	UINT8      *m_vram;
 	UINT8      *m_ciram; //PPU nametable RAM - external to PPU!
 
-	optional_device<nes_cart_slot_device> m_cartslot;   //mandatory
+	required_device<cpu_device> m_maincpu;
+	required_device<ppu2c0x_device> m_ppu;
+	required_device<device_t> m_sound;
+	optional_device<nes_cart_slot_device> m_cartslot;
 
 	int nes_ppu_vidaccess(int address, int data);
 	void ppu_nmi(int *ppu_regs);
@@ -545,10 +551,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	/* devices */
-	cpu_device        *m_maincpu;
-	ppu2c0x_device    *m_ppu;
-	device_t          *m_sound;
 	memory_bank       *m_prg_bank_mem[5];
 };
 

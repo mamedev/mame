@@ -80,36 +80,29 @@ static void nes_state_register( running_machine &machine )
 
 void nes_state::machine_start()
 {
-	m_maincpu           = machine().device<cpu_device>("maincpu");
-	m_ppu               = machine().device<ppu2c0x_device>("ppu");
-	m_sound             = machine().device("nessound");
+	for (int i = 0; i < 9; i++)
+	{
+		char str[7];
+		sprintf(str, "FCKEY%i", i);
+		m_io_fckey[i] = ioport(str);
+	}
+	for (int i = 0; i < 13; i++)
+	{
+		char str[9];
+		sprintf(str, "SUBKEY%i", i);
+		m_io_subkey[i] = ioport(str);
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		char str[5];
+		sprintf(str, "PAD%i", i + 1);
+		m_io_pad[i] = ioport(str);
+		sprintf(str, "MAH%i", i);
+		m_io_mahjong[i] = ioport(str);
+	}
+
 	m_io_ctrlsel        = ioport("CTRLSEL");
-	m_io_fckey[0]       = ioport("FCKEY0");
-	m_io_fckey[1]       = ioport("FCKEY1");
-	m_io_fckey[2]       = ioport("FCKEY2");
-	m_io_fckey[3]       = ioport("FCKEY3");
-	m_io_fckey[4]       = ioport("FCKEY4");
-	m_io_fckey[5]       = ioport("FCKEY5");
-	m_io_fckey[6]       = ioport("FCKEY6");
-	m_io_fckey[7]       = ioport("FCKEY7");
-	m_io_fckey[8]       = ioport("FCKEY8");
-	m_io_subkey[0 ]     = ioport("SUBKEY0");
-	m_io_subkey[1 ]     = ioport("SUBKEY1");
-	m_io_subkey[2 ]     = ioport("SUBKEY2");
-	m_io_subkey[3 ]     = ioport("SUBKEY3");
-	m_io_subkey[4 ]     = ioport("SUBKEY4");
-	m_io_subkey[5 ]     = ioport("SUBKEY5");
-	m_io_subkey[6 ]     = ioport("SUBKEY6");
-	m_io_subkey[7 ]     = ioport("SUBKEY7");
-	m_io_subkey[8 ]     = ioport("SUBKEY8");
-	m_io_subkey[9 ]     = ioport("SUBKEY9");
-	m_io_subkey[10]     = ioport("SUBKEY10");
-	m_io_subkey[11]     = ioport("SUBKEY11");
-	m_io_subkey[12]     = ioport("SUBKEY12");
-	m_io_pad[0]         = ioport("PAD1");
-	m_io_pad[1]         = ioport("PAD2");
-	m_io_pad[2]         = ioport("PAD3");
-	m_io_pad[3]         = ioport("PAD4");
+	m_io_paddle         = ioport("PADDLE");
 	m_io_cc_left        = ioport("CC_LEFT");
 	m_io_cc_right       = ioport("CC_RIGHT");
 	m_io_zapper1_t      = ioport("ZAPPER1_T");
@@ -118,11 +111,6 @@ void nes_state::machine_start()
 	m_io_zapper2_t      = ioport("ZAPPER2_T");
 	m_io_zapper2_x      = ioport("ZAPPER2_X");
 	m_io_zapper2_y      = ioport("ZAPPER2_Y");
-	m_io_paddle         = ioport("PADDLE");
-	m_io_mahjong[0]     = ioport("MAH0");
-	m_io_mahjong[1]     = ioport("MAH1");
-	m_io_mahjong[2]     = ioport("MAH2");
-	m_io_mahjong[3]     = ioport("MAH3");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
