@@ -58,7 +58,7 @@ WRITE16_MEMBER(volfied_state::volfied_video_mask_w)
 
 WRITE16_MEMBER(volfied_state::volfied_sprite_ctrl_w)
 {
-	pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0x3c) >> 2);
+	m_pc090oj->set_sprite_ctrl((data & 0x3c) >> 2);
 }
 
 
@@ -124,6 +124,6 @@ UINT32 volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 
 {
 	machine().priority_bitmap.fill(0, cliprect);
 	refresh_pixel_layer(bitmap);
-	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 0);
+	m_pc090oj->draw_sprites(bitmap, cliprect, 0);
 	return 0;
 }

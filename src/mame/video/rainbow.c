@@ -20,7 +20,7 @@ WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
+		m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
 	}
 }
 
@@ -52,7 +52,7 @@ UINT32 rbisland_state::screen_update_rainbow(screen_device &screen, bitmap_ind16
 	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
 
-	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 1);
+	m_pc090oj->draw_sprites(bitmap, cliprect, 1);
 	return 0;
 }
 

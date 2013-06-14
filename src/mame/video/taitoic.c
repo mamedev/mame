@@ -990,78 +990,94 @@ void pc080sn_device::restore_scroll()
 /*                                                                         */
 /***************************************************************************/
 
-struct pc090oj_state
-{
-/* NB: pc090oj_ctrl is the internal register controlling flipping
-
-   pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
-   which impacts on sprite plotting, and which varies between games. It
-   includes color banking and (optionally) priority. It allows each game to
-   control these aspects of the sprites in different ways, while keeping the
-   routines here modular.
-
-*/
-
-	UINT16     ctrl, buffer, gfxnum;
-	UINT16     sprite_ctrl;
-
-	UINT16 *   ram;
-	UINT16 *   ram_buffered;
-
-	int        xoffs, yoffs;
-};
 
 #define PC090OJ_RAM_SIZE 0x4000
 #define PC090OJ_ACTIVE_RAM_SIZE 0x800
 
+
+
 /*****************************************************************************
-    INLINE FUNCTIONS
+    DEVICE INTERFACE
 *****************************************************************************/
 
-INLINE pc090oj_state *pc090oj_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == PC090OJ);
 
-	return (pc090oj_state *)downcast<pc090oj_device *>(device)->token();
+
+const device_type PC090OJ = &device_creator<pc090oj_device>;
+
+pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
+{
 }
 
-INLINE const pc090oj_interface *pc090oj_get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pc090oj_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert((device->type() == PC090OJ));
-	return (const pc090oj_interface *) device->static_config();
+	// inherit a copy of the static data
+	const pc090oj_interface *intf = reinterpret_cast<const pc090oj_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<pc090oj_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pc090oj_device::device_start()
+{
+	m_ram = auto_alloc_array_clear(machine(), UINT16, PC090OJ_RAM_SIZE / 2);
+	m_ram_buffered = auto_alloc_array_clear(machine(), UINT16, PC090OJ_RAM_SIZE / 2);
+
+	save_pointer(NAME(m_ram), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram_buffered), PC090OJ_RAM_SIZE / 2);
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_sprite_ctrl));  // should this be set in intf?!?
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pc090oj_device::device_reset()
+{
+	m_ctrl = 0;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void pc090oj_set_sprite_ctrl( device_t *device, UINT16 sprctrl )
+void pc090oj_device::set_sprite_ctrl( UINT16 sprctrl )
 {
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-	pc090oj->sprite_ctrl = sprctrl;
+	m_sprite_ctrl = sprctrl;
 }
 
-READ16_DEVICE_HANDLER( pc090oj_word_r )
+READ16_MEMBER( pc090oj_device::word_r )
 {
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-	return pc090oj->ram[offset];
+	return m_ram[offset];
 }
 
-WRITE16_DEVICE_HANDLER( pc090oj_word_w )
+WRITE16_MEMBER( pc090oj_device::word_w )
 {
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-	COMBINE_DATA(&pc090oj->ram[offset]);
+	COMBINE_DATA(&m_ram[offset]);
 
 	/* If we're not buffering sprite ram, write it straight through... */
-	if (!pc090oj->buffer)
-		pc090oj->ram_buffered[offset] = pc090oj->ram[offset];
+	if (!m_use_buffer)
+		m_ram_buffered[offset] = m_ram[offset];
 
 	if (offset == 0xdff)
 	{
 		/* Bit 0 is flip control, others seem unused */
-		pc090oj->ctrl = data;
+		m_ctrl = data;
 
 #if 0
 	popmessage("pc090oj ctrl = %4x", data);
@@ -1069,23 +1085,21 @@ WRITE16_DEVICE_HANDLER( pc090oj_word_w )
 	}
 }
 
-void pc090oj_eof_callback( device_t *device )
+void pc090oj_device::eof_callback( )
 {
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-	if (pc090oj->buffer)
+	if (m_use_buffer)
 	{
 		int i;
 		for (i = 0; i < PC090OJ_ACTIVE_RAM_SIZE / 2; i++)
-			pc090oj->ram_buffered[i] = pc090oj->ram[i];
+			m_ram_buffered[i] = m_ram[i];
 	}
 }
 
 
-void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type )
+void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type )
 {
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
 	int offs, priority = 0;
-	int sprite_colbank = (pc090oj->sprite_ctrl & 0xf) << 4; /* top nibble */
+	int sprite_colbank = (m_sprite_ctrl & 0xf) << 4; /* top nibble */
 
 	switch (pri_type)
 	{
@@ -1098,7 +1112,7 @@ void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectang
 			break;
 
 		case 0x02:
-			priority = pc090oj->sprite_ctrl >> 15;  /* variable sprite/tile priority */
+			priority = m_sprite_ctrl >> 15;  /* variable sprite/tile priority */
 	}
 
 	for (offs = 0; offs < PC090OJ_ACTIVE_RAM_SIZE / 2; offs += 4)
@@ -1107,20 +1121,20 @@ void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectang
 		int x, y;
 		int data, code, color;
 
-		data = pc090oj->ram_buffered[offs];
+		data = m_ram_buffered[offs];
 		flipy = (data & 0x8000) >> 15;
 		flipx = (data & 0x4000) >> 14;
 		color = (data & 0x000f) | sprite_colbank;
 
-		code = pc090oj->ram_buffered[offs + 2] & 0x1fff;
-		x = pc090oj->ram_buffered[offs + 3] & 0x1ff;   /* mask verified with Rainbowe board */
-		y = pc090oj->ram_buffered[offs + 1] & 0x1ff;   /* mask verified with Rainbowe board */
+		code = m_ram_buffered[offs + 2] & 0x1fff;
+		x = m_ram_buffered[offs + 3] & 0x1ff;   /* mask verified with Rainbowe board */
+		y = m_ram_buffered[offs + 1] & 0x1ff;   /* mask verified with Rainbowe board */
 
 		/* treat coords as signed */
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		if (!(pc090oj->ctrl & 1))   /* sprites flipscreen */
+		if (!(m_ctrl & 1))   /* sprites flipscreen */
 		{
 			x = 320 - x - 16;
 			y = 256 - y - 16;
@@ -1128,89 +1142,19 @@ void pc090oj_draw_sprites( device_t *device, bitmap_ind16 &bitmap, const rectang
 			flipy = !flipy;
 		}
 
-		x += pc090oj->xoffs;
-		y += pc090oj->yoffs;
+		x += m_x_offset;
+		y += m_y_offset;
 
-		pdrawgfx_transpen(bitmap,cliprect,device->machine().gfx[pc090oj->gfxnum],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfxnum],
 				code,
 				color,
 				flipx,flipy,
 				x,y,
-				device->machine().priority_bitmap,
+				machine().priority_bitmap,
 				priority ? 0xfc : 0xf0,0);
 	}
 }
 
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( pc090oj )
-{
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-	const pc090oj_interface *intf = pc090oj_get_interface(device);
-
-	/* use the given gfx set */
-	pc090oj->gfxnum = intf->gfxnum;
-
-	pc090oj->xoffs = intf->x_offset;
-	pc090oj->yoffs = intf->y_offset;
-
-	pc090oj->buffer = intf->use_buffer;
-
-
-	pc090oj->ram = auto_alloc_array_clear(device->machine(), UINT16, PC090OJ_RAM_SIZE / 2);
-	pc090oj->ram_buffered = auto_alloc_array_clear(device->machine(), UINT16, PC090OJ_RAM_SIZE / 2);
-
-	device->save_pointer(NAME(pc090oj->ram), PC090OJ_RAM_SIZE / 2);
-	device->save_pointer(NAME(pc090oj->ram_buffered), PC090OJ_RAM_SIZE / 2);
-	device->save_item(NAME(pc090oj->ctrl));
-	device->save_item(NAME(pc090oj->sprite_ctrl));  // should this be set in intf?!?
-}
-
-static DEVICE_RESET( pc090oj )
-{
-	pc090oj_state *pc090oj = pc090oj_get_safe_token(device);
-
-	pc090oj->ctrl = 0;
-}
-
-const device_type PC090OJ = &device_creator<pc090oj_device>;
-
-pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
-{
-	m_token = global_alloc_clear(pc090oj_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc090oj_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pc090oj_device::device_start()
-{
-	DEVICE_START_NAME( pc090oj )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pc090oj_device::device_reset()
-{
-	DEVICE_RESET_NAME( pc090oj )(this);
-}
 
 
 /***************************************************************************/

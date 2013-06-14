@@ -14,7 +14,7 @@
 WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 {
 	/* bits 5-7 are the sprite palette bank */
-	pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
+	m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
 
 	/* bit 4 unused */
 
@@ -43,6 +43,6 @@ UINT32 rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &b
 	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	m_pc080sn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
 
-	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 0);
+	m_pc090oj->draw_sprites(bitmap, cliprect, 0);
 	return 0;
 }

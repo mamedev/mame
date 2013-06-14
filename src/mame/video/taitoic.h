@@ -27,10 +27,10 @@ struct pc080sn_interface
 
 struct pc090oj_interface
 {
-	int                gfxnum;
+	int                m_gfxnum;
 
-	int                x_offset, y_offset;
-	int                use_buffer;
+	int                m_x_offset, m_y_offset;
+	int                m_use_buffer;
 };
 
 
@@ -152,22 +152,42 @@ public:
 
 extern const device_type PC080SN;
 
-class pc090oj_device : public device_t
+class pc090oj_device : public device_t,
+										public pc090oj_interface
 {
 public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~pc090oj_device() { global_free(m_token); }
+	~pc090oj_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+
+	void set_sprite_ctrl(UINT16 sprctrl);
+	void eof_callback();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
-	// internal state
-	void *m_token;
+	/* NB: pc090oj_ctrl is the internal register controlling flipping
+
+   pc090oj_sprite_ctrl is a representation of the hardware OUTSIDE the pc090oj
+   which impacts on sprite plotting, and which varies between games. It
+   includes color banking and (optionally) priority. It allows each game to
+   control these aspects of the sprites in different ways, while keeping the
+   routines here modular.
+
+*/
+
+	UINT16     m_ctrl;
+	UINT16     m_sprite_ctrl;
+
+	UINT16 *   m_ram;
+	UINT16 *   m_ram_buffered;
 };
 
 extern const device_type PC090OJ;
@@ -407,15 +427,6 @@ extern const device_type TC0180VCU;
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
-
-/**  PC090OJ  **/
-DECLARE_READ16_DEVICE_HANDLER( pc090oj_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( pc090oj_word_w );
-
-void pc090oj_set_sprite_ctrl(device_t *device, UINT16 sprctrl);
-void pc090oj_eof_callback(device_t *device);
-void pc090oj_draw_sprites(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_type);
-
 
 /** TC0080VCO **/
 DECLARE_READ16_DEVICE_HANDLER( tc0080vco_word_r );
