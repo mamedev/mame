@@ -96,7 +96,6 @@ const int powervr2_device::pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8
 #define DEBUG_PALRAM (1)
 #define DEBUG_PVRCTRL   (0)
 
-// Perform a standard bilinear filter across four pixels
 inline INT32 powervr2_device::clamp(INT32 in, INT32 min, INT32 max)
 {
 	if(in < min) return min;
@@ -104,6 +103,7 @@ inline INT32 powervr2_device::clamp(INT32 in, INT32 min, INT32 max)
 	return in;
 }
 
+// Perform a standard bilinear filter across four pixels
 inline UINT32 powervr2_device::bilinear_filter(UINT32 c0, UINT32 c1, UINT32 c2, UINT32 c3, float u, float v)
 {
 	UINT32 ui = (u * 256.0);
@@ -130,12 +130,12 @@ inline UINT32 powervr2_device::blc(UINT32 c1, UINT32 c2)
 {
 	UINT32 cr =
 		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) >> 8)  |
-		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0x00ff0000) >> 8);
+		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0xff000000) >> 16);
 	c1 >>= 16;
 	c2 >>= 16;
 	cr |=
 		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) << 8)  |
-		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0x00ff0000) << 8);
+		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0xff000000));
 	return cr;
 }
 
@@ -144,12 +144,12 @@ inline UINT32 powervr2_device::blic(UINT32 c1, UINT32 c2)
 {
 	UINT32 cr =
 		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) >> 8)  |
-		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0x00ff0000) >> 8);
+		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0xff000000) >> 16);
 	c1 >>= 16;
 	c2 >>= 16;
 	cr |=
 		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) << 8)  |
-		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0x00ff0000) << 8);
+		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0xff000000));
 	return cr;
 }
 
