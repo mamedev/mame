@@ -25,6 +25,8 @@ public:
 		DMA_PVR_IRQ
 	};
 
+	DECLARE_ADDRESS_MAP(ta_map, 32);
+
 	struct {
 		UINT32 pvr_addr;
 		UINT32 sys_addr;
@@ -112,7 +114,7 @@ public:
 	UINT64 *pvr2_framebuffer_ram;
 	UINT64 *elan_ram;
 
-	UINT32 pvrta_regs[0x2000/4];
+
 	UINT32 pvrctrl_regs[0x100/4];
 	UINT32 debug_dip_status;
 	emu_timer *vbout_timer;
@@ -128,15 +130,106 @@ public:
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _cb> void set_irq_cb(_cb cb) { irq_cb.set_callback(cb); }
 
-	DECLARE_READ32_MEMBER( pvr_ctrl_r );
+	DECLARE_READ32_MEMBER(  id_r );
+	DECLARE_READ32_MEMBER(  revision_r );
+	DECLARE_READ32_MEMBER(  softreset_r );
+	DECLARE_WRITE32_MEMBER( softreset_w );
+	DECLARE_WRITE32_MEMBER( startrender_w );
+	DECLARE_READ32_MEMBER(  param_base_r );
+	DECLARE_WRITE32_MEMBER( param_base_w );
+	DECLARE_READ32_MEMBER(  region_base_r );
+	DECLARE_WRITE32_MEMBER( region_base_w );
+	DECLARE_READ32_MEMBER(  vo_border_col_r );
+	DECLARE_WRITE32_MEMBER( vo_border_col_w );
+	DECLARE_READ32_MEMBER(  fb_r_ctrl_r );
+	DECLARE_WRITE32_MEMBER( fb_r_ctrl_w );
+	DECLARE_READ32_MEMBER(  fb_w_ctrl_r );
+	DECLARE_WRITE32_MEMBER( fb_w_ctrl_w );
+	DECLARE_READ32_MEMBER(  fb_w_linestride_r );
+	DECLARE_WRITE32_MEMBER( fb_w_linestride_w );
+	DECLARE_READ32_MEMBER(  fb_r_sof1_r );
+	DECLARE_WRITE32_MEMBER( fb_r_sof1_w );
+	DECLARE_READ32_MEMBER(  fb_r_sof2_r );
+	DECLARE_WRITE32_MEMBER( fb_r_sof2_w );
+	DECLARE_READ32_MEMBER(  fb_r_size_r );
+	DECLARE_WRITE32_MEMBER( fb_r_size_w );
+	DECLARE_READ32_MEMBER(  fb_w_sof1_r );
+	DECLARE_WRITE32_MEMBER( fb_w_sof1_w );
+	DECLARE_READ32_MEMBER(  fb_w_sof2_r );
+	DECLARE_WRITE32_MEMBER( fb_w_sof2_w );
+	DECLARE_READ32_MEMBER(  fb_x_clip_r );
+	DECLARE_WRITE32_MEMBER( fb_x_clip_w );
+	DECLARE_READ32_MEMBER(  fb_y_clip_r );
+	DECLARE_WRITE32_MEMBER( fb_y_clip_w );
+	DECLARE_READ32_MEMBER(  fpu_param_cfg_r );
+	DECLARE_WRITE32_MEMBER( fpu_param_cfg_w );
+	DECLARE_READ32_MEMBER(  isp_backgnd_t_r );
+	DECLARE_WRITE32_MEMBER( isp_backgnd_t_w );
+	DECLARE_READ32_MEMBER(  spg_hblank_int_r );
+	DECLARE_WRITE32_MEMBER( spg_hblank_int_w );
+	DECLARE_READ32_MEMBER(  spg_vblank_int_r );
+	DECLARE_WRITE32_MEMBER( spg_vblank_int_w );
+	DECLARE_READ32_MEMBER(  spg_hblank_r );
+	DECLARE_WRITE32_MEMBER( spg_hblank_w );
+	DECLARE_READ32_MEMBER(  spg_load_r );
+	DECLARE_WRITE32_MEMBER( spg_load_w );
+	DECLARE_READ32_MEMBER(  spg_vblank_r );
+	DECLARE_WRITE32_MEMBER( spg_vblank_w );
+	DECLARE_READ32_MEMBER(  spg_width_r );
+	DECLARE_WRITE32_MEMBER( spg_width_w );
+	DECLARE_READ32_MEMBER(  text_control_r );
+	DECLARE_WRITE32_MEMBER( text_control_w );
+	DECLARE_READ32_MEMBER(  vo_control_r );
+	DECLARE_WRITE32_MEMBER( vo_control_w );
+	DECLARE_READ32_MEMBER(  vo_startx_r );
+	DECLARE_WRITE32_MEMBER( vo_startx_w );
+	DECLARE_READ32_MEMBER(  vo_starty_r );
+	DECLARE_WRITE32_MEMBER( vo_starty_w );
+	DECLARE_READ32_MEMBER(  pal_ram_ctrl_r );
+	DECLARE_WRITE32_MEMBER( pal_ram_ctrl_w );
+	DECLARE_READ32_MEMBER(  spg_status_r );
+
+	DECLARE_READ32_MEMBER(  ta_ol_base_r );
+	DECLARE_WRITE32_MEMBER( ta_ol_base_w );
+	DECLARE_READ32_MEMBER(  ta_isp_base_r );
+	DECLARE_WRITE32_MEMBER( ta_isp_base_w );
+	DECLARE_READ32_MEMBER(  ta_ol_limit_r );
+	DECLARE_WRITE32_MEMBER( ta_ol_limit_w );
+	DECLARE_READ32_MEMBER(  ta_isp_limit_r );
+	DECLARE_WRITE32_MEMBER( ta_isp_limit_w );
+	DECLARE_READ32_MEMBER(  ta_next_opb_r );
+	DECLARE_READ32_MEMBER(  ta_itp_current_r );
+	DECLARE_READ32_MEMBER(  ta_alloc_ctrl_r );
+	DECLARE_WRITE32_MEMBER( ta_alloc_ctrl_w );
+	DECLARE_READ32_MEMBER(  ta_list_init_r );
+	DECLARE_WRITE32_MEMBER( ta_list_init_w );
+	DECLARE_READ32_MEMBER(  ta_yuv_tex_base_r );
+	DECLARE_WRITE32_MEMBER( ta_yuv_tex_base_w );
+	DECLARE_READ32_MEMBER(  ta_yuv_tex_ctrl_r );
+	DECLARE_WRITE32_MEMBER( ta_yuv_tex_ctrl_w );
+	DECLARE_READ32_MEMBER(  ta_yuv_tex_cnt_r );
+	DECLARE_WRITE32_MEMBER( ta_yuv_tex_cnt_w );
+	DECLARE_READ32_MEMBER(  ta_list_cont_r );
+	DECLARE_WRITE32_MEMBER( ta_list_cont_w );
+	DECLARE_READ32_MEMBER(  ta_next_opb_init_r );
+	DECLARE_WRITE32_MEMBER( ta_next_opb_init_w );
+
+
+	DECLARE_READ32_MEMBER(  fog_table_r );
+	DECLARE_WRITE32_MEMBER( fog_table_w );
+	DECLARE_READ32_MEMBER(  palette_r );
+	DECLARE_WRITE32_MEMBER( palette_w );
+
+
+	DECLARE_READ32_MEMBER(  pvr_ctrl_r );
 	DECLARE_WRITE32_MEMBER( pvr_ctrl_w );
-	DECLARE_READ32_MEMBER( pvr_ta_r );
+	DECLARE_READ32_MEMBER(  pvr_ta_r );
 	DECLARE_WRITE32_MEMBER( pvr_ta_w );
-	DECLARE_READ32_MEMBER( pvr2_ta_r );
+	DECLARE_READ32_MEMBER(  pvr2_ta_r );
 	DECLARE_WRITE32_MEMBER( pvr2_ta_w );
-	DECLARE_READ32_MEMBER( pvrs_ta_r );
+	DECLARE_READ32_MEMBER(  pvrs_ta_r );
 	DECLARE_WRITE32_MEMBER( pvrs_ta_w );
-	DECLARE_READ32_MEMBER( elan_regs_r );
+	DECLARE_READ32_MEMBER(  elan_regs_r );
 	DECLARE_WRITE32_MEMBER( elan_regs_w );
 	DECLARE_WRITE64_MEMBER( ta_fifo_poly_w );
 	DECLARE_WRITE64_MEMBER( ta_fifo_yuv_w );
@@ -165,6 +258,27 @@ protected:
 
 private:
 	devcb2_write8 irq_cb;
+
+	// Core registers
+	UINT32 softreset;
+	UINT32 param_base, region_base;
+	UINT32 vo_border_col;
+	UINT32 fb_r_ctrl, fb_w_ctrl, fb_w_linestride, fb_r_sof1, fb_r_sof2, fb_r_size, fb_w_sof1, fb_w_sof2, fb_x_clip, fb_y_clip;
+	UINT32 fpu_param_cfg;
+	UINT32 isp_backgnd_t;
+	UINT32 spg_hblank_int, spg_vblank_int, spg_hblank, spg_load, spg_vblank, spg_width;
+	UINT32 vo_control, vo_startx, vo_starty;
+	UINT32 text_control;
+	UINT32 pal_ram_ctrl;
+
+	// TA registers
+	UINT32 ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit;
+	UINT32 ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init;
+	UINT32 ta_yuv_tex_base, ta_yuv_tex_ctrl, ta_yuv_tex_cnt;
+
+	// Other registers
+	UINT32 fog_table[0x80];
+	UINT32 palette[0x400];
 
 	static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d);
 
@@ -298,6 +412,7 @@ private:
 	void pvr_build_parameterconfig();
 	void process_ta_fifo();
 	void debug_paletteram();
+	void update_screen_format();
 };
 
 extern const device_type POWERVR2;
