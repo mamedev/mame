@@ -159,7 +159,7 @@ static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
 }
 
 
-void ide_hdd_device::ide_build_features()
+void ide_mass_storage_device::ide_build_features()
 {
 	memset(m_features, 0, IDE_DISK_SECTOR_SIZE);
 	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
@@ -374,6 +374,41 @@ void ide_mass_storage_device::device_reset()
 	/* reset the drive state */
 	set_irq(CLEAR_LINE);
 	set_dmarq(CLEAR_LINE);
+}
+
+void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TID_DELAYED_INTERRUPT:
+		m_status &= ~IDE_STATUS_BUSY;
+		set_irq(ASSERT_LINE);
+		break;
+
+	case TID_DELAYED_INTERRUPT_BUFFER_READY:
+		m_status &= ~IDE_STATUS_BUSY;
+		m_status |= IDE_STATUS_BUFFER_READY;
+		set_irq(ASSERT_LINE);
+		break;
+
+	case TID_RESET_CALLBACK:
+		reset();
+		break;
+
+	case TID_SECURITY_ERROR_DONE:
+		/* clear error state */
+		m_status &= ~IDE_STATUS_ERROR;
+		m_status |= IDE_STATUS_DRIVE_READY;
+		break;
+
+	case TID_READ_SECTOR_DONE_CALLBACK:
+		read_sector_done();
+		break;
+
+	case TID_WRITE_SECTOR_DONE_CALLBACK:
+		write_sector_done();
+		break;
+	}
 }
 
 void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer_ready)
@@ -1365,41 +1400,6 @@ void ide_hdd_device::device_reset()
 		UINT32 metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 			ide_build_features();
-	}
-}
-
-void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-	case TID_DELAYED_INTERRUPT:
-		m_status &= ~IDE_STATUS_BUSY;
-		set_irq(ASSERT_LINE);
-		break;
-
-	case TID_DELAYED_INTERRUPT_BUFFER_READY:
-		m_status &= ~IDE_STATUS_BUSY;
-		m_status |= IDE_STATUS_BUFFER_READY;
-		set_irq(ASSERT_LINE);
-		break;
-
-	case TID_RESET_CALLBACK:
-		reset();
-		break;
-
-	case TID_SECURITY_ERROR_DONE:
-		/* clear error state */
-		m_status &= ~IDE_STATUS_ERROR;
-		m_status |= IDE_STATUS_DRIVE_READY;
-		break;
-
-	case TID_READ_SECTOR_DONE_CALLBACK:
-		read_sector_done();
-		break;
-
-	case TID_WRITE_SECTOR_DONE_CALLBACK:
-		write_sector_done();
-		break;
 	}
 }
 

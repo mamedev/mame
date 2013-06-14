@@ -2656,7 +2656,7 @@ WRITE32_MEMBER( chihiro_state::dummy_w )
 
 // ======================> ide_baseboard_device
 
-class ide_baseboard_device : public ide_hdd_device
+class ide_baseboard_device : public ide_mass_storage_device
 {
 public:
 	// construction/destruction
@@ -2684,7 +2684,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ide_hdd_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
+	: ide_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
 {
 }
 

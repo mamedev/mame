@@ -77,6 +77,7 @@ protected:
 
 	void set_irq(int state);
 	void set_dmarq(int state);
+	void ide_build_features();
 
 	UINT8           m_gnetreadlock;
 
@@ -142,8 +143,8 @@ public:
 	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual int  read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
-	virtual int  write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
 
 protected:
 	// device-level overrides
@@ -154,8 +155,6 @@ protected:
 
 	virtual bool is_ready() { return (m_disk != NULL); }
 	virtual void read_key(UINT8 key[]);
-
-	void ide_build_features();
 
 	chd_file       *m_handle;
 	hard_disk_file *m_disk;
