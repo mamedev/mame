@@ -121,6 +121,8 @@ void nes_state::machine_start()
 	m_io_zapper2_t      = ioport("ZAPPER2_T");
 	m_io_zapper2_x      = ioport("ZAPPER2_X");
 	m_io_zapper2_y      = ioport("ZAPPER2_Y");
+	m_io_powerpad[0]    = ioport("POWERPAD1");
+	m_io_powerpad[1]    = ioport("POWERPAD2");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -292,7 +294,16 @@ READ8_MEMBER(nes_state::nes_in1_r)
 		m_paddle_latch <<= 1;
 		m_paddle_latch &= 0xff;
 	}
-
+	
+	// powerpad
+	if ((cfg & 0x00f0) == 0x0050 || (cfg & 0x00f0) == 0x0060)
+	{
+		ret |= ((m_powerpad_latch[0] & 0x01) << 3);
+		ret |= ((m_powerpad_latch[1] & 0x01) << 4);
+		m_powerpad_latch[0] >>= 1;
+		m_powerpad_latch[1] >>= 1;
+	}
+	
 	if (LOG_JOY)
 		logerror("joy 1 read, val: %02x, pc: %04x\n", ret, space.device().safe_pc());
 
@@ -323,6 +334,8 @@ WRITE8_MEMBER(nes_state::nes_in0_w)
 	m_zapper_latch[1][2] = 0;
 	m_paddle_btn_latch = 0;
 	m_paddle_latch = 0;
+	m_powerpad_latch[0] = 0;
+	m_powerpad_latch[1] = 0;
 	
 	// P1 inputs
 	switch (cfg & 0x000f)
@@ -354,6 +367,12 @@ WRITE8_MEMBER(nes_state::nes_in0_w)
 		case 0x04:  // arkanoid paddle
 			m_paddle_btn_latch = m_io_paddle_btn->read();
 			m_paddle_latch = (UINT8) (m_io_paddle->read() ^ 0xff);
+			break;
+			
+		case 0x05:  // power pad
+		case 0x06:  // power pad
+			m_powerpad_latch[0] = m_io_powerpad[0]->read();
+			m_powerpad_latch[1] = m_io_powerpad[1]->read() | 0xf0;
 			break;
 	}
 
