@@ -555,9 +555,10 @@ public:
 
 	void fds_irq(int scanline, int vblank, int blanked);
 	
-	UINT32 m_pad_latch[2];
+	UINT32 m_pad_latch[4];
 	UINT8 m_zapper_latch[2][3];
 	UINT8 m_paddle_latch, m_paddle_btn_latch;
+	UINT8 m_mjpanel_latch;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
