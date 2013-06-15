@@ -12,6 +12,7 @@
 
 #include "video/ppu2c0x.h"
 #include "machine/nes_slot.h"
+#include "imagedev/cassette.h"
 
 // official PCBs
 #include "machine/nes_nxrom.h"
@@ -456,7 +457,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_ppu(*this, "ppu"),
 			m_sound(*this, "nessound"),
-			m_cartslot(*this, "nes_slot")
+			m_cartslot(*this, "nes_slot"),
+			m_cassette(*this, "tape")
 		{ }
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
@@ -491,6 +493,7 @@ public:
 	required_device<ppu2c0x_device> m_ppu;
 	required_device<device_t> m_sound;
 	optional_device<nes_cart_slot_device> m_cartslot;
+	optional_device<cassette_image_device> m_cassette;
 
 	int nes_ppu_vidaccess(int address, int data);
 	void ppu_nmi(int *ppu_regs);

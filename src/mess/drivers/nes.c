@@ -589,6 +589,17 @@ static const nes_cart_interface nes_crt_interface =
 };
 
 
+static const cassette_interface fc_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	"fc_cass",
+	NULL
+};
+
+
+
 static MACHINE_CONFIG_START( nes, nes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
@@ -618,8 +629,8 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","nes")
-	MCFG_SOFTWARE_LIST_ADD("ntb_list","nes_ntbrom") // Nantettate Baseball mini_carts
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "nes")
+	MCFG_SOFTWARE_LIST_ADD("ntb_list", "nes_ntbrom") // Nantettate Baseball mini_carts
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespal, nes )
@@ -672,7 +683,10 @@ static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","famicom_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "famicom_flop")
+
+	MCFG_CASSETTE_ADD( "tape", fc_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
 

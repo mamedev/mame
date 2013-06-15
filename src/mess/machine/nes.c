@@ -386,8 +386,15 @@ READ8_MEMBER(nes_state::fc_in0_r)
 	
 	if ((exp & 0x0f) == 0x02)
 	{
-		// here we should have the tape input
-		ret |= 0;
+		// tape input
+		if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+		{
+			double level = m_cassette->input();
+			if (level <  0)
+				ret |= 0x00;
+			else
+				ret |= 0x02;
+		}
 	}
 	
 	ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
@@ -486,7 +493,9 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 
 	if ((exp & 0x0f) == 0x02 || (exp & 0x0f) == 0x03)
 	{
-		// here we should also have the tape output
+		// tape output (not fully tested)
+		if ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
+			m_cassette->output(((data & 0x07) == 0x07) ? +1.0 : -1.0);
 		
 		if (BIT(data, 2))   // keyboard active
 		{
