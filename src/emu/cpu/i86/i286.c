@@ -79,6 +79,8 @@ struct i80286_state
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 	UINT8 ea_seg;   /* effective segment of the address */
+
+	i80286_a20_cb a20_callback;
 };
 
 INLINE i80286_state *get_safe_token(device_t *device)
@@ -143,7 +145,8 @@ static void i80286_urinit(void)
 
 static void i80286_set_a20_line(i80286_state *cpustate, int state)
 {
-	cpustate->amask = state ? 0x00ffffff : 0x000fffff;
+	if(cpustate->a20_callback)
+		cpustate->amask = cpustate->a20_callback(state);
 }
 
 static CPU_RESET( i80286 )
@@ -310,20 +313,26 @@ static CPU_INIT( i80286 )
 	cpustate->io = &device->space(AS_IO);
 	cpustate->direct = &cpustate->program->direct();
 
-	/* If a reset parameter is given, take it as pointer to an address mask */
 	if( device->static_config() )
-		cpustate->amask = *(unsigned*)device->static_config();
+		cpustate->a20_callback = ((i80286_interface *)device->static_config())->a20_callback;
 	else
-		cpustate->amask = 0x00ffff;
+		cpustate->a20_callback = NULL;
+
+	cpustate->amask = 0xffffff;
 
 	cpustate->fetch_xor = BYTE_XOR_LE(0);
 
 	i80286_urinit();
 }
 
+static CPU_TRANSLATE( i80286 )
+{
+	i80286_state *cpustate = get_safe_token(device);
 
+	*address &= cpustate->amask;
 
-
+	return TRUE;
+}
 
 /**************************************************************************
  * Generic set_info
@@ -482,6 +491,7 @@ CPU_GET_INFO( i80286 )
 		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
 		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(i80286);       break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
+		case CPUINFO_FCT_TRANSLATE:                     info->translate = CPU_TRANSLATE_NAME(i80286); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "80286");               break;

@@ -227,8 +227,6 @@ static INPUT_PORTS_START( atvga )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static const unsigned i286_address_mask = 0x00ffffff;
-
 static const at_keyboard_controller_interface keyboard_controller_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
@@ -249,6 +247,16 @@ WRITE_LINE_MEMBER( at_state::at_mc146818_irq )
 {
 	m_pic8259_slave->ir0_w((state) ? 0 : 1);
 }
+
+UINT32 at_state::at_286_a20(bool state)
+{
+	return (state ? 0xffffff : 0xefffff);
+}
+
+static const i80286_interface at_286 =
+{
+	at_state::at_286_a20
+};
 
 static const isa16bus_interface isabus_intf =
 {
@@ -309,7 +317,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -345,7 +353,7 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 6000000 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -369,7 +377,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
@@ -391,7 +399,7 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(neat_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
@@ -414,7 +422,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
@@ -436,7 +444,7 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, 12500000)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
@@ -502,7 +510,7 @@ static MACHINE_CONFIG_START( k286i, at_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
+	MCFG_CPU_CONFIG(at_286)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

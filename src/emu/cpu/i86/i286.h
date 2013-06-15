@@ -69,6 +69,13 @@ enum
 
 #define TRAP(fault, code)  (UINT32)(((fault&0xffff)<<16)|(code&0xffff))
 
+typedef UINT32 (*i80286_a20_cb)(bool state);
+
+struct i80286_interface
+{
+	i80286_a20_cb a20_callback;
+};
+
 /* Public functions */
 DECLARE_LEGACY_CPU_DEVICE(I80286, i80286);
 

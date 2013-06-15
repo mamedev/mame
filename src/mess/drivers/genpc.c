@@ -59,8 +59,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pcgen )
 INPUT_PORTS_END
 
-static const unsigned i86_address_mask = 0x000fffff;
-
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
@@ -123,7 +121,6 @@ static MACHINE_CONFIG_START( pccga, genpc_state )
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc16_map)
 	MCFG_CPU_IO_MAP(pc16_io)
-	MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
@@ -149,7 +146,6 @@ static MACHINE_CONFIG_START( pcega, genpc_state )
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc16_map)
 	MCFG_CPU_IO_MAP(pc16_io)
-	MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)
@@ -175,7 +171,6 @@ static MACHINE_CONFIG_START( xtvga, genpc_state )
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(pc16_map)
 	MCFG_CPU_IO_MAP(pc16_io)
-	MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(vga)

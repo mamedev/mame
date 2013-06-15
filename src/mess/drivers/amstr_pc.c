@@ -210,8 +210,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 
 INPUT_PORTS_END
 
-static const unsigned i86_address_mask = 0x000fffff;
-
 static const pc_lpt_interface pc_lpt_config =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
@@ -236,8 +234,7 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
 	MCFG_CPU_IO_MAP(port##_io)  \
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, vblankfunc, "screen", 0, 1) \
-	MCFG_CPU_CONFIG(i86_address_mask)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, vblankfunc, "screen", 0, 1)
 
 
 static const gfx_layout pc200_charlayout =

@@ -301,7 +301,8 @@ TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
 
 WRITE_LINE_MEMBER(pc_state::pcjr_pic8259_set_int_line)
 {
-	if ( machine().firstcpu->pc() == 0xF0454 )
+	UINT32 pc = machine().firstcpu->pc();
+	if ( (pc == 0xF0454) || (pc == 0xFF197) )
 	{
 		pc_int_delay_timer->adjust( machine().firstcpu->cycles_to_attotime(1), state );
 	}

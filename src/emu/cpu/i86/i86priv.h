@@ -126,8 +126,8 @@ enum BREGS {
 #define WriteByte(ea,val)       write_mem_byte((ea) & AMASK, val);
 #define WriteWord(ea,val)       write_mem_word((ea) & AMASK, val);
 
-#define FETCH                   (cpustate->direct->read_raw_byte(cpustate->pc++, cpustate->fetch_xor))
-#define FETCHOP                 (cpustate->direct->read_decrypted_byte(cpustate->pc++, cpustate->fetch_xor))
+#define FETCH                   (cpustate->direct->read_raw_byte((cpustate->pc++) & AMASK, cpustate->fetch_xor))
+#define FETCHOP                 (cpustate->direct->read_decrypted_byte((cpustate->pc++) & AMASK, cpustate->fetch_xor))
 #define PEEKOP(addr)            (cpustate->direct->read_decrypted_byte(addr, cpustate->fetch_xor))
 #define FETCHWORD(var)          { var = cpustate->direct->read_raw_byte(cpustate->pc, cpustate->fetch_xor); var += (cpustate->direct->read_raw_byte(cpustate->pc + 1, cpustate->fetch_xor) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)

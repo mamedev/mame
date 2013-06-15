@@ -132,14 +132,11 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
-static const unsigned i286_address_mask = 0x00ffffff;
-
 static MACHINE_CONFIG_START( isbc286, isbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
@@ -150,7 +147,6 @@ static MACHINE_CONFIG_START( isbc2861, isbc_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
 	MCFG_CPU_IO_MAP(isbc2861_io)
-	MCFG_CPU_CONFIG(i286_address_mask)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

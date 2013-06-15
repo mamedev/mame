@@ -870,8 +870,6 @@ static INPUT_PORTS_START( mc1502 )          /* fix */
 INPUT_PORTS_END
 
 
-static const unsigned i86_address_mask = 0x000fffff;
-
 static const pc_lpt_interface pc_lpt_config =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
@@ -907,7 +905,6 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
 	MCFG_CPU_IO_MAP(port##_io)  \
-	MCFG_CPU_CONFIG(i86_address_mask)   \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1)
 
 
@@ -1408,7 +1405,6 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
-	MCFG_CPU_CONFIG(i86_address_mask)
 
 	MCFG_MACHINE_START_OVERRIDE(pc_state,mc1502)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
@@ -1966,12 +1962,6 @@ ROM_START( ibmpcjx )
 	ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
 	ROMX_LOAD("ipljx.rom", 0xe0000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
-	ROM_FILL(0xff195, 1, 0x20) // the bios has a bug that causes an interrupt
-	ROM_FILL(0xff196, 1, 0x06) // to arrive before a flag is set causing the boot to hang
-	ROM_FILL(0xff197, 1, 0x84) // technically this should be fixed in the PIC by delaying
-	ROM_FILL(0xff198, 1, 0x04) // sending an irq after the mask is changed but there is
-	ROM_FILL(0xff199, 1, 0xe6) // a strong possiblility that will cause problems with later
-	ROM_FILL(0xff19a, 1, 0x21) // faster x86 machines.
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
