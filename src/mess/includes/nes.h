@@ -512,6 +512,7 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	void state_register();
 
 	/***** FDS-floppy related *****/
 
@@ -551,11 +552,13 @@ public:
 
 	void fds_irq(int scanline, int vblank, int blanked);
 	
+	// input related
 	UINT32 m_pad_latch[4];
 	UINT8 m_zapper_latch[2][3];
 	UINT8 m_paddle_latch, m_paddle_btn_latch;
 	UINT8 m_mjpanel_latch;
 	UINT8 m_fck_scan, m_fck_mode;
+	UINT8 m_mic_obstruct;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

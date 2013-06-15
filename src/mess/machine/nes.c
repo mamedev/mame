@@ -51,33 +51,34 @@ void nes_state::machine_reset()
 	m_paddle_btn_latch = 0;
 }
 
-static void nes_state_register( running_machine &machine )
+void nes_state::state_register()
 {
-	nes_state *state = machine.driver_data<nes_state>();
+	save_item(NAME(m_last_frame_flip));
 
-	state->save_item(NAME(state->m_last_frame_flip));
+	save_item(NAME(m_fds_motor_on));
+	save_item(NAME(m_fds_door_closed));
+	save_item(NAME(m_fds_current_side));
+	save_item(NAME(m_fds_head_position));
+	save_item(NAME(m_fds_status0));
+	save_item(NAME(m_fds_read_mode));
+	save_item(NAME(m_fds_write_reg));
+	save_item(NAME(m_fds_last_side));
+	save_item(NAME(m_fds_count));
+	save_item(NAME(m_fds_mirroring));
 
-	state->save_item(NAME(state->m_fds_motor_on));
-	state->save_item(NAME(state->m_fds_door_closed));
-	state->save_item(NAME(state->m_fds_current_side));
-	state->save_item(NAME(state->m_fds_head_position));
-	state->save_item(NAME(state->m_fds_status0));
-	state->save_item(NAME(state->m_fds_read_mode));
-	state->save_item(NAME(state->m_fds_write_reg));
-	state->save_item(NAME(state->m_fds_last_side));
-	state->save_item(NAME(state->m_fds_count));
-	state->save_item(NAME(state->m_fds_mirroring));
+	save_pointer(NAME(m_ciram), 0x800);
 
-	state->save_pointer(NAME(state->m_ciram), 0x800);
+	if (m_disk_expansion)
+		save_pointer(NAME(m_vram), 0x800);
 
-	if (state->m_disk_expansion)
-		state->save_pointer(NAME(state->m_vram), 0x800);
-
-	state->save_item(NAME(state->m_pad_latch));
-	state->save_item(NAME(state->m_zapper_latch));
-	state->save_item(NAME(state->m_paddle_latch));
-	state->save_item(NAME(state->m_paddle_btn_latch));
-	state->save_item(NAME(state->m_mjpanel_latch));
+	save_item(NAME(m_pad_latch));
+	save_item(NAME(m_zapper_latch));
+	save_item(NAME(m_paddle_latch));
+	save_item(NAME(m_paddle_btn_latch));
+	save_item(NAME(m_mjpanel_latch));
+	save_item(NAME(m_fck_scan));
+	save_item(NAME(m_fck_mode));
+	save_item(NAME(m_mic_obstruct));
 }
 
 
@@ -197,7 +198,7 @@ void nes_state::machine_start()
 		membank("fdsram")->set_base(m_fds_ram);
 	}
 
-	nes_state_register(machine());
+	state_register();
 }
 
 
@@ -374,6 +375,7 @@ WRITE8_MEMBER(nes_state::nes_in1_w)
 
 READ8_MEMBER(nes_state::fc_in0_r)
 {
+	int cfg = m_io_ctrlsel->read();
 	int exp = m_io_exp->read();
 	
 	// Some games expect bit 6 to be set because the last entry on the data bus shows up
@@ -383,7 +385,11 @@ READ8_MEMBER(nes_state::fc_in0_r)
 	
 	// shift
 	m_pad_latch[0] >>= 1;
-	
+
+	// microphone bit
+	if ((cfg & 0x00f0) == 0x00f0)
+		ret |= m_mic_obstruct;	//bit2!
+
 	// EXP input
 	switch (exp & 0x0f)
 	{			
@@ -542,6 +548,7 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 	m_paddle_btn_latch = 0;
 	m_paddle_latch = 0;
 	m_mjpanel_latch = 0;
+	m_mic_obstruct = 0;
 	
 	// P1 inputs
 	switch (cfg & 0x000f)
@@ -566,6 +573,11 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 			m_pad_latch[1] = m_io_cc_right->read();
 			break;
 
+		case 0x0f:  // pad 2 old style with microphone instead of START/SELECT keys
+			// we only emulate obstruction of mic (when you blow or talk into it)
+			m_mic_obstruct = m_io_pad[1]->read() & 0x04;
+			m_pad_latch[1] = (m_io_pad[1]->read() & ~0x04);
+			break;
 	}
 	
 	// P3 & P4 inputs in Famicom (e.g. through Hori Twin Adapter or Hori 4 Players Adapter) 
