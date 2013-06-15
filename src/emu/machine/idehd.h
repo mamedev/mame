@@ -166,8 +166,8 @@ public:
 	ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	virtual int read_sector(UINT32 lba, void *buffer) { return hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(UINT32 lba, const void *buffer) { return hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(UINT32 lba, void *buffer) { if (m_disk == NULL) return 0; return hard_disk_read(m_disk, lba, buffer); }
+	virtual int write_sector(UINT32 lba, const void *buffer) { if (m_disk == NULL) return 0; return hard_disk_write(m_disk, lba, buffer); }
 
 protected:
 	// device-level overrides
