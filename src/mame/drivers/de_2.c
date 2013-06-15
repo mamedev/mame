@@ -1,5 +1,9 @@
 /*
-    DataEast/Sega Version 2
+    DataEast/Sega Version 1 and 2
+
+    Main CPU: 6808 @ 4MHz
+    Audio CPU: 68B09E @ 8MHz (internally divided by 4)
+    Audio: YM2151 @ 3.58MHz, MSM5205 @ 384kHz
 */
 
 
@@ -11,8 +15,10 @@
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
 #include "de2.lh"
+#include "de2a3.lh"
 
 // To start Secret Service, hold I, O and Left ALT while pressing Start.
+// To start Laser War, hold S, D, and F while pressing Start.
 
 // Data East CPU board is similar to Williams System 11, but without the generic audio board.
 // For now, we'll presume the timings are the same.
@@ -63,6 +69,7 @@ protected:
 public:
 	DECLARE_DRIVER_INIT(de_2);
 	DECLARE_MACHINE_RESET(de_2);
+	DECLARE_MACHINE_RESET(de_2_alpha3);
 	DECLARE_WRITE8_MEMBER(sample_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
 	DECLARE_READ8_MEMBER(switch_r);
@@ -94,6 +101,7 @@ public:
 	UINT8 m_sample_data;
 	bool m_more_data;
 	bool m_nmi_enable;
+	bool m_is_alpha3;
 
 private:
 	UINT32 m_segment1;
@@ -245,6 +253,14 @@ MACHINE_RESET_MEMBER(de_2_state, de_2)
 {
 	membank("sample_bank")->set_entry(0);
 	m_more_data = false;
+	m_is_alpha3 = false;
+}
+
+MACHINE_RESET_MEMBER(de_2_state, de_2_alpha3)
+{
+	membank("sample_bank")->set_entry(0);
+	m_more_data = false;
+	m_is_alpha3 = true;
 }
 
 DRIVER_INIT_MEMBER(de_2_state, de_2)
@@ -385,7 +401,10 @@ WRITE8_MEMBER( de_2_state::dig1_w )
 	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
+		if(m_is_alpha3)  // Alphanumeric type 2 uses 7 segment LEDs on the bottom row, type 3 uses 14 segment LEDs
+			output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		else
+			output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
@@ -582,6 +601,35 @@ static MACHINE_CONFIG_START( de_2, de_2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( de_2_alpha3, de_2 )
+MCFG_MACHINE_RESET_OVERRIDE(de_2_state, de_2_alpha3)
+	MCFG_DEFAULT_LAYOUT(layout_de2a3)
+MACHINE_CONFIG_END
+
+/*-------------------------------------------------------------------
+/ Laser War - CPU Rev 1 /Alpha Type 1 - 32K ROM - 32/64K Sound Roms
+/-------------------------------------------------------------------*/
+ROM_START(lwar_a83)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("lwar8-3.c5", 0x8000, 0x8000, CRC(eee158ee) SHA1(54db2342bdd15b16fee906dc65f183a957fd0012))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("lwar_e9.snd", 0x8000, 0x8000, CRC(9a6c834d) SHA1(c6e2c4658db4bd8dfcbb0351793837cdff30ba28))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("lwar_e6.snd", 0x00000, 0x10000, CRC(7307d795) SHA1(5d88b8d883a2f17ca9fa30c7e7ac29c9f236ac4d))
+	ROM_LOAD("lwar_e7.snd", 0x10000, 0x10000, CRC(0285cff9) SHA1(2c5e3de649e419ec7944059f2a226aaf58fe2af5))
+ROM_END
+
+ROM_START(lwar_e90)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("lwar9-0.e5", 0x8000, 0x8000, CRC(b596151f) SHA1(10dade79ded71625770ec7e21ea50b7aa64023d0))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("lwar_e9.snd", 0x8000, 0x8000, CRC(9a6c834d) SHA1(c6e2c4658db4bd8dfcbb0351793837cdff30ba28))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("lwar_e6.snd", 0x00000, 0x10000, CRC(7307d795) SHA1(5d88b8d883a2f17ca9fa30c7e7ac29c9f236ac4d))
+	ROM_LOAD("lwar_e7.snd", 0x10000, 0x10000, CRC(0285cff9) SHA1(2c5e3de649e419ec7944059f2a226aaf58fe2af5))
+ROM_END
+
+
 /*-----------------------------------------------------------------------------------
 / Monday Night Football - CPU Rev 2 /Alpha Type 3 16/32K Roms - 32/64K Sound Roms
 /----------------------------------------------------------------------------------*/
@@ -702,10 +750,12 @@ ROM_START(torp_e21)
 	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
-GAME(1989,  mnfb_c27,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       GAME_IS_SKELETON_MECHANICAL)
-GAME(1990,  poto_a32,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_a83,		0,      	de_2,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           GAME_IS_SKELETON_MECHANICAL)
+GAME(1987,  lwar_e90,		lwar_a83,	de_2,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  mnfb_c27,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  poto_a32,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  play_a24,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Playboy 35th Anniversary (2.4)",           GAME_IS_SKELETON_MECHANICAL)
-GAME(1989,  robo_a34,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Robocop (3.4)",                            GAME_IS_SKELETON_MECHANICAL)
+GAME(1989,  robo_a34,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Robocop (3.4)",                            GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_a26,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6)",                     GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_b26,       ssvc_a26,   de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6 alternate sound)",     GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  tmac_a24,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (2.4)",                       GAME_IS_SKELETON_MECHANICAL)

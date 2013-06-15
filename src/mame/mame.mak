@@ -1890,7 +1890,6 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/by68701.o  \
 	$(DRIVERS)/byvid.o  \
 	$(DRIVERS)/capcom.o  \
-	$(DRIVERS)/de_1.o  \
 	$(DRIVERS)/de_2.o  \
 	$(DRIVERS)/de_3.o  \
 	$(DRIVERS)/de_3b.o  \
@@ -2327,7 +2326,8 @@ $(DRIVERS)/corona.o:    $(LAYOUT)/re800.lh \
 
 $(DRIVERS)/darius.o:    $(LAYOUT)/darius.lh
 
-$(DRIVERS)/de_2.o:      $(LAYOUT)/de2.lh
+$(DRIVERS)/de_2.o:      $(LAYOUT)/de2.lh \
+			$(LAYOUT)/de2a3.lh
 
 $(DRIVERS)/destroyr.o:  $(LAYOUT)/destroyr.lh
 
