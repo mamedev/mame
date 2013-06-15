@@ -64,7 +64,7 @@
 
         0 .. STATIC_COUNT - 1 = fixed handlers
         STATIC_COUNT .. SUBTABLE_BASE - 1 = driver-specific handlers
-        SUBTABLE_BASE .. 255 = need to look up lower bits in subtable
+        SUBTABLE_BASE .. TOTAL_MEMORY_BANKS - 1 = need to look up lower bits in subtable
 
     Caveats:
 
@@ -565,7 +565,7 @@ class address_table
 	static const int LEVEL1_BITS    = 18;                       // number of address bits in the level 1 table
 	static const int LEVEL2_BITS    = 32 - LEVEL1_BITS;         // number of address bits in the level 2 table
 	static const int SUBTABLE_COUNT = 64;                       // number of slots reserved for subtables
-	static const int SUBTABLE_BASE  = 256 - SUBTABLE_COUNT;     // first index of a subtable
+	static const int SUBTABLE_BASE  = TOTAL_MEMORY_BANKS - SUBTABLE_COUNT;     // first index of a subtable
 	static const int ENTRY_COUNT    = SUBTABLE_BASE;            // number of legitimate (non-subtable) entries
 	static const int SUBTABLE_ALLOC = 8;                        // number of subtables to allocate at a time
 
@@ -604,37 +604,37 @@ public:
 	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : m_table; }
 
 	// table mapping helpers
-	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT8 staticentry);
+	void map_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT16 staticentry);
 	void setup_range(offs_t bytestart, offs_t byteend, offs_t bytemask, offs_t bytemirror, UINT64 mask, std::list<UINT32> &entries);
-	UINT8 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
+	UINT16 derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const;
 
 	// misc helpers
 	void mask_all_handlers(offs_t mask);
-	const char *handler_name(UINT8 entry) const;
+	const char *handler_name(UINT16 entry) const;
 
 protected:
 	// determine table indexes based on the address
 	UINT32 level1_index_large(offs_t address) const { return address >> LEVEL2_BITS; }
-	UINT32 level2_index_large(UINT8 l1entry, offs_t address) const { return (1 << LEVEL1_BITS) + ((l1entry - SUBTABLE_BASE) << LEVEL2_BITS) + (address & ((1 << LEVEL2_BITS) - 1)); }
+	UINT32 level2_index_large(UINT16 l1entry, offs_t address) const { return (1 << LEVEL1_BITS) + ((l1entry - SUBTABLE_BASE) << LEVEL2_BITS) + (address & ((1 << LEVEL2_BITS) - 1)); }
 	UINT32 level1_index(offs_t address) const { return m_large ? level1_index_large(address) : address; }
-	UINT32 level2_index(UINT8 l1entry, offs_t address) const { return m_large ? level2_index_large(l1entry, address) : 0; }
+	UINT32 level2_index(UINT16 l1entry, offs_t address) const { return m_large ? level2_index_large(l1entry, address) : 0; }
 
 	// table population/depopulation
-	void populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
-	void populate_range(offs_t bytestart, offs_t byteend, UINT8 handler);
+	void populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT16 handler);
+	void populate_range(offs_t bytestart, offs_t byteend, UINT16 handler);
 
 	// subtable management
-	UINT8 subtable_alloc();
-	void subtable_realloc(UINT8 subentry);
+	UINT16 subtable_alloc();
+	void subtable_realloc(UINT16 subentry);
 	int subtable_merge();
-	void subtable_release(UINT8 subentry);
-	UINT8 *subtable_open(offs_t l1index);
+	void subtable_release(UINT16 subentry);
+	UINT16 *subtable_open(offs_t l1index);
 	void subtable_close(offs_t l1index);
-	UINT8 *subtable_ptr(UINT8 entry) { return &m_table[level2_index(entry, 0)]; }
+	UINT16 *subtable_ptr(UINT16 entry) { return &m_table[level2_index(entry, 0)]; }
 
 	// internal state
-	UINT8 *                 m_table;                    // pointer to base of table
-	UINT8 *                 m_live_lookup;              // current lookup
+	UINT16 *                m_table;                    // pointer to base of table
+	UINT16 *                m_live_lookup;              // current lookup
 	address_space &         m_space;                    // pointer back to the space
 	bool                    m_large;                    // large memory model?
 
@@ -652,28 +652,28 @@ protected:
 		UINT32              m_usecount;                 // number of times this has been used
 	};
 	subtable_data *         m_subtable;                 // info about each subtable
-	UINT8                   m_subtable_alloc;           // number of subtables allocated
+	UINT16                  m_subtable_alloc;           // number of subtables allocated
 
 	// static global read-only watchpoint table
-	static UINT8            s_watchpoint_table[1 << LEVEL1_BITS];
+	static UINT16           s_watchpoint_table[1 << LEVEL1_BITS];
 
 private:
 	int handler_refcount[SUBTABLE_BASE-STATIC_COUNT];
-	UINT8 handler_next_free[SUBTABLE_BASE-STATIC_COUNT];
-	UINT8 handler_free;
-	UINT8 get_free_handler();
+	UINT16 handler_next_free[SUBTABLE_BASE-STATIC_COUNT];
+	UINT16 handler_free;
+	UINT16 get_free_handler();
 	void verify_reference_counts();
 	void setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries);
 	void setup_range_masked(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT64 mask, std::list<UINT32> &entries);
 
-	void handler_ref(UINT8 entry, int count)
+	void handler_ref(UINT16 entry, int count)
 	{
 		assert(entry < SUBTABLE_BASE);
 		if (entry >= STATIC_COUNT)
 			handler_refcount[entry - STATIC_COUNT] += count;
 	}
 
-	void handler_unref(UINT8 entry)
+	void handler_unref(UINT16 entry)
 	{
 		assert(entry < SUBTABLE_BASE);
 		if (entry >= STATIC_COUNT)
@@ -742,7 +742,7 @@ private:
 	{
 		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(_UintType), mask);
 
-		UINT8 *oldtable = m_live_lookup;
+		UINT16 *oldtable = m_live_lookup;
 		m_live_lookup = m_table;
 		_UintType result;
 		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
@@ -754,7 +754,7 @@ private:
 	}
 
 	// internal state
-	handler_entry_read *        m_handlers[256];        // array of user-installed handlers
+	handler_entry_read *        m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -810,7 +810,7 @@ private:
 	{
 		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(_UintType), data, mask);
 
-		UINT8 *oldtable = m_live_lookup;
+		UINT16 *oldtable = m_live_lookup;
 		m_live_lookup = m_table;
 		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
 		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
@@ -820,7 +820,7 @@ private:
 	}
 
 	// internal state
-	handler_entry_write *       m_handlers[256];        // array of user-installed handlers
+	handler_entry_write *       m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -1459,7 +1459,7 @@ typedef address_space_specific<UINT64, ENDIANNESS_BIG,    true> address_space_64
 //**************************************************************************
 
 // global watchpoint table
-UINT8 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
+UINT16 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
 
 
 
@@ -2208,7 +2208,7 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 	offs_t bytestart, byteend;
 	for (offs_t byteaddress = 0; byteaddress <= m_bytemask; byteaddress = byteend)
 	{
-		UINT8 entry = table.derive_range(byteaddress, bytestart, byteend);
+		UINT16 entry = table.derive_range(byteaddress, bytestart, byteend);
 		fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
 						bytestart, byteend, entry, table.handler_name(entry), table.handler(entry).bytestart());
 		if (++byteend == 0)
@@ -2787,7 +2787,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 //-------------------------------------------------
 
 address_table::address_table(address_space &space, bool large)
-	: m_table(auto_alloc_array(space.machine(), UINT8, 1 << LEVEL1_BITS)),
+	: m_table(auto_alloc_array(space.machine(), UINT16, 1 << LEVEL1_BITS)),
 		m_live_lookup(m_table),
 		m_space(space),
 		m_large(large),
@@ -2796,10 +2796,12 @@ address_table::address_table(address_space &space, bool large)
 {
 	// make our static table all watchpoints
 	if (s_watchpoint_table[0] != STATIC_WATCHPOINT)
-		memset(s_watchpoint_table, STATIC_WATCHPOINT, sizeof(s_watchpoint_table));
+		for (unsigned int i=0; i != sizeof(s_watchpoint_table)/sizeof(s_watchpoint_table[0]); i++)
+			s_watchpoint_table[i] = STATIC_WATCHPOINT;
 
 	// initialize everything to unmapped
-	memset(m_table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+	for (unsigned int i=0; i != 1 << LEVEL1_BITS; i++)
+		m_table[i] = STATIC_UNMAP;
 
 	// initialize the handlers freelist
 	for (int i=0; i != SUBTABLE_BASE-STATIC_COUNT-1; i++)
@@ -2828,7 +2830,7 @@ address_table::~address_table()
 //  map
 //-------------------------------------------------
 
-void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 entry)
+void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT16 entry)
 {
 	// convert addresses to bytes
 	offs_t bytestart = addrstart;
@@ -2856,12 +2858,12 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 	//  verify_reference_counts();
 }
 
-UINT8 address_table::get_free_handler()
+UINT16 address_table::get_free_handler()
 {
 	if (handler_free == STATIC_INVALID)
 		throw emu_fatalerror("Out of handler entries in address table");
 
-	UINT8 handler = handler_free;
+	UINT16 handler = handler_free;
 	handler_free = handler_next_free[handler - STATIC_COUNT];
 	return handler;
 }
@@ -2893,7 +2895,7 @@ void address_table::setup_range(offs_t addrstart, offs_t addrend, offs_t addrmas
 void address_table::setup_range_solid(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, std::list<UINT32> &entries)
 {
 	// Grab a free entry
-	UINT8 entry = get_free_handler();
+	UINT16 entry = get_free_handler();
 
 	// Add it in the "to be setup" list
 	entries.push_back(entry);
@@ -2931,7 +2933,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 
 	// Scan the memory to see what has to be done
 	std::list<subrange> range_override;
-	std::map<UINT8, std::list<subrange> > range_partial;
+	std::map<UINT16, std::list<subrange> > range_partial;
 
 	offs_t base_mirror = 0;
 	do
@@ -2942,7 +2944,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		do
 		{
 			offs_t range_start, range_end;
-			UINT8 entry = derive_range(base_address, range_start, range_end);
+			UINT16 entry = derive_range(base_address, range_start, range_end);
 			UINT32 stop_address = range_end > end_address ? end_address : range_end;
 
 			if (entry < STATIC_COUNT || handler(entry).overriden_by_mask(mask))
@@ -2963,7 +2965,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	if (!range_override.empty())
 	{
 		// Grab a free entry
-		UINT8 entry = get_free_handler();
+		UINT16 entry = get_free_handler();
 
 		// configure the entry to our parameters
 		handler_entry &curentry = handler(entry);
@@ -2983,7 +2985,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 	// Ranges in range_partial must duplicated then partially changed
 	if (!range_partial.empty())
 	{
-		for (std::map<UINT8, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); i++)
+		for (std::map<UINT16, std::list<subrange> >::const_iterator i = range_partial.begin(); i != range_partial.end(); i++)
 		{
 			// Theorically, if the handler to change matches the
 			// characteristics of ours, we can directly change it.  In
@@ -3002,7 +3004,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 				throw emu_fatalerror("Handlers on different subunits of the same address with different address masks are not supported.");
 
 			// Grab a new handler and copy it there
-			UINT8 entry = get_free_handler();
+			UINT16 entry = get_free_handler();
 			handler_entry &curentry = handler(entry);
 			curentry.copy(base_entry);
 
@@ -3038,12 +3040,12 @@ void address_table::verify_reference_counts()
 	int actual_refcounts[SUBTABLE_BASE-STATIC_COUNT];
 	memset(actual_refcounts, 0, sizeof(actual_refcounts));
 
-	bool subtable_seen[256 - SUBTABLE_BASE];
+	bool subtable_seen[TOTAL_MEMORY_BANKS - SUBTABLE_BASE];
 	memset(subtable_seen, 0, sizeof(subtable_seen));
 
 	for (int level1 = 0; level1 != 1 << LEVEL1_BITS; level1++)
 	{
-		UINT8 l1_entry = m_table[level1];
+		UINT16 l1_entry = m_table[level1];
 		if (l1_entry >= SUBTABLE_BASE)
 		{
 			assert(m_large);
@@ -3051,10 +3053,10 @@ void address_table::verify_reference_counts()
 				continue;
 
 			subtable_seen[l1_entry - SUBTABLE_BASE] = true;
-			const UINT8 *subtable = subtable_ptr(l1_entry);
+			const UINT16 *subtable = subtable_ptr(l1_entry);
 			for (int level2 = 0; level2 != 1 << LEVEL2_BITS; level2++)
 			{
-				UINT8 l2_entry = subtable[level2];
+				UINT16 l2_entry = subtable[level2];
 				assert(l2_entry < SUBTABLE_BASE);
 				if (l2_entry >= STATIC_COUNT)
 					actual_refcounts[l2_entry - STATIC_COUNT]++;
@@ -3079,7 +3081,7 @@ void address_table::verify_reference_counts()
 //  range of addresses
 //-------------------------------------------------
 
-void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handlerindex)
+void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT16 handlerindex)
 {
 	offs_t l2mask = (1 << level2_bits()) - 1;
 	offs_t l1start = bytestart >> level2_bits();
@@ -3094,7 +3096,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 	// handle the starting edge if it's not on a block boundary
 	if (l2start != 0)
 	{
-		UINT8 *subtable = subtable_open(l1start);
+		UINT16 *subtable = subtable_open(l1start);
 
 		// if the start and stop end within the same block, handle that
 		if (l1start == l1stop)
@@ -3124,7 +3126,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 	// handle the trailing edge if it's not on a block boundary
 	if (l2stop != l2mask)
 	{
-		UINT8 *subtable = subtable_open(l1stop);
+		UINT16 *subtable = subtable_open(l1stop);
 
 		// fill from the beginning
 		handler_ref(handlerindex, l2stop+1);
@@ -3146,7 +3148,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 	handler_ref(handlerindex, l1stop - l1start + 1);
 	for (offs_t l1index = l1start; l1index <= l1stop; l1index++)
 	{
-		UINT8 subindex = m_table[l1index];
+		UINT16 subindex = m_table[l1index];
 
 		// if we have a subtable here, release it
 		if (subindex >= SUBTABLE_BASE)
@@ -3164,7 +3166,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 //  mirrors
 //-------------------------------------------------
 
-void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handlerindex)
+void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT16 handlerindex)
 {
 	// determine the mirror bits
 	offs_t lmirrorbits = 0;
@@ -3180,7 +3182,7 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 			hmirrorbit[hmirrorbits++] = 1 << bit;
 
 	// loop over mirrors in the level 2 table
-	UINT8 prev_entry = STATIC_INVALID;
+	UINT16 prev_entry = STATIC_INVALID;
 	int prev_index = 0;
 	for (offs_t hmirrorcount = 0; hmirrorcount < (1 << hmirrorbits); hmirrorcount++)
 	{
@@ -3253,11 +3255,11 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 //  range based on the lookup tables
 //-------------------------------------------------
 
-UINT8 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const
+UINT16 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t &byteend) const
 {
 	// look up the initial address to get the entry we care about
-	UINT8 l1entry;
-	UINT8 entry = l1entry = m_table[level1_index(byteaddress)];
+	UINT16 l1entry;
+	UINT16 entry = l1entry = m_table[level1_index(byteaddress)];
 	if (l1entry >= SUBTABLE_BASE)
 		entry = m_table[level2_index(l1entry, byteaddress)];
 
@@ -3266,8 +3268,8 @@ UINT8 address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs_t 
 	handler(entry).mirrored_start_end(byteaddress, minscan, maxscan);
 
 	// first scan backwards to find the start address
-	UINT8 curl1entry = l1entry;
-	UINT8 curentry = entry;
+	UINT16 curl1entry = l1entry;
+	UINT16 curentry = entry;
 	bytestart = byteaddress;
 	while (1)
 	{
@@ -3368,13 +3370,13 @@ void address_table::mask_all_handlers(offs_t mask)
 //  and set its usecount to 1
 //-------------------------------------------------
 
-UINT8 address_table::subtable_alloc()
+UINT16 address_table::subtable_alloc()
 {
 	// loop
 	while (1)
 	{
 		// find a subtable with a usecount of 0
-		for (UINT8 subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
+		for (UINT16 subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
 			if (m_subtable[subindex].m_usecount == 0)
 			{
 				// if this is past our allocation budget, allocate some more
@@ -3384,14 +3386,13 @@ UINT8 address_table::subtable_alloc()
 					m_subtable_alloc += SUBTABLE_ALLOC;
 					UINT32 newsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
 
-					UINT8 *newtable = auto_alloc_array_clear(m_space.machine(), UINT8, newsize);
-					memcpy(newtable, m_table, oldsize);
+					UINT16 *newtable = auto_alloc_array_clear(m_space.machine(), UINT16, newsize);
+					memcpy(newtable, m_table, 2*oldsize);
 					if (m_live_lookup == m_table)
 						m_live_lookup = newtable;
 					auto_free(m_space.machine(), m_table);
 					m_table = newtable;
 				}
-
 				// bump the usecount and return
 				m_subtable[subindex].m_usecount++;
 				return subindex + SUBTABLE_BASE;
@@ -3409,9 +3410,9 @@ UINT8 address_table::subtable_alloc()
 //  a subtable
 //-------------------------------------------------
 
-void address_table::subtable_realloc(UINT8 subentry)
+void address_table::subtable_realloc(UINT16 subentry)
 {
-	UINT8 subindex = subentry - SUBTABLE_BASE;
+	UINT16 subindex = subentry - SUBTABLE_BASE;
 
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
@@ -3430,7 +3431,7 @@ void address_table::subtable_realloc(UINT8 subentry)
 int address_table::subtable_merge()
 {
 	int merged = 0;
-	UINT8 subindex;
+	UINT16 subindex;
 
 	VPRINTF(("Merging subtables....\n"));
 
@@ -3452,14 +3453,14 @@ int address_table::subtable_merge()
 	for (subindex = 0; subindex < SUBTABLE_COUNT; subindex++)
 		if (m_subtable[subindex].m_usecount != 0)
 		{
-			UINT8 *subtable = subtable_ptr(subindex + SUBTABLE_BASE);
+			UINT16 *subtable = subtable_ptr(subindex + SUBTABLE_BASE);
 			UINT32 checksum = m_subtable[subindex].m_checksum;
-			UINT8 sumindex;
+			UINT16 sumindex;
 
 			for (sumindex = subindex + 1; sumindex < SUBTABLE_COUNT; sumindex++)
 				if (m_subtable[sumindex].m_usecount != 0 &&
 					m_subtable[sumindex].m_checksum == checksum &&
-					!memcmp(subtable, subtable_ptr(sumindex + SUBTABLE_BASE), 1 << level2_bits()))
+					!memcmp(subtable, subtable_ptr(sumindex + SUBTABLE_BASE), 2*(1 << level2_bits())))
 				{
 					int l1index;
 
@@ -3486,10 +3487,9 @@ int address_table::subtable_merge()
 //  a subtable and free it if we're done
 //-------------------------------------------------
 
-void address_table::subtable_release(UINT8 subentry)
+void address_table::subtable_release(UINT16 subentry)
 {
-	UINT8 subindex = subentry - SUBTABLE_BASE;
-
+	UINT16 subindex = subentry - SUBTABLE_BASE;
 	// sanity check
 	if (m_subtable[subindex].m_usecount <= 0)
 		fatalerror("Called subtable_release on a table with a usecount of 0\n");
@@ -3500,7 +3500,7 @@ void address_table::subtable_release(UINT8 subentry)
 	if (m_subtable[subindex].m_usecount == 0)
 	{
 		m_subtable[subindex].m_checksum = 0;
-		UINT8 *subtable = subtable_ptr(subentry);
+		UINT16 *subtable = subtable_ptr(subentry);
 		for (int i = 0; i < (1 << LEVEL2_BITS); i++)
 			handler_unref(subtable[i]);
 	}
@@ -3512,17 +3512,19 @@ void address_table::subtable_release(UINT8 subentry)
 //  modification
 //-------------------------------------------------
 
-UINT8 *address_table::subtable_open(offs_t l1index)
+UINT16 *address_table::subtable_open(offs_t l1index)
 {
-	UINT8 subentry = m_table[l1index];
+	UINT16 subentry = m_table[l1index];
 
 	// if we don't have a subtable yet, allocate a new one
 	if (subentry < SUBTABLE_BASE)
 	{
 		int size = 1 << level2_bits();
-		UINT8 newentry = subtable_alloc();
+		UINT16 newentry = subtable_alloc();
 		handler_ref(subentry, size-1);
-		memset(subtable_ptr(newentry), subentry, size);
+		UINT16 *subptr = subtable_ptr(newentry);
+		for (int i=0; i<size; i++)
+			subptr[i] = subentry;
 		m_table[l1index] = newentry;
 		m_subtable[newentry - SUBTABLE_BASE].m_checksum = (subentry + (subentry << 8) + (subentry << 16) + (subentry << 24)) * ((1 << level2_bits())/4);
 		subentry = newentry;
@@ -3531,7 +3533,7 @@ UINT8 *address_table::subtable_open(offs_t l1index)
 	// if we're sharing this subtable, we also need to allocate a fresh copy
 	else if (m_subtable[subentry - SUBTABLE_BASE].m_usecount > 1)
 	{
-		UINT8 newentry = subtable_alloc();
+		UINT16 newentry = subtable_alloc();
 
 		// allocate may cause some additional merging -- look up the subentry again
 		// when we're done; it should still require a split
@@ -3540,11 +3542,11 @@ UINT8 *address_table::subtable_open(offs_t l1index)
 		assert(m_subtable[subentry - SUBTABLE_BASE].m_usecount > 1);
 
 		int size = 1 << level2_bits();
-		UINT8 *src = subtable_ptr(subentry);
+		UINT16 *src = subtable_ptr(subentry);
 		for(int i=0; i != size; i++)
 			handler_ref(src[i], 1);
 
-		memcpy(subtable_ptr(newentry), src, size);
+		memcpy(subtable_ptr(newentry), src, 2*size);
 		subtable_release(subentry);
 		m_table[l1index] = newentry;
 		m_subtable[newentry - SUBTABLE_BASE].m_checksum = m_subtable[subentry - SUBTABLE_BASE].m_checksum;
@@ -3574,7 +3576,7 @@ void address_table::subtable_close(offs_t l1index)
 //  description of a handler
 //-------------------------------------------------
 
-const char *address_table::handler_name(UINT8 entry) const
+const char *address_table::handler_name(UINT16 entry) const
 {
 	static const char *const strings[] =
 	{
@@ -3868,7 +3870,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 //  find_range - find a byte address in a range
 //-------------------------------------------------
 
-direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress, UINT8 &entry)
+direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress, UINT16 &entry)
 {
 	// determine which entry
 	byteaddress &= m_space.m_bytemask;

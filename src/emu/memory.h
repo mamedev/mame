@@ -52,6 +52,8 @@
 //  CONSTANTS
 //**************************************************************************
 
+enum { TOTAL_MEMORY_BANKS = 512 };
+
 // address spaces
 enum address_spacenum
 {
@@ -218,7 +220,7 @@ public:
 
 	// force a recomputation on the next read
 	void force_update() { m_byteend = 0; m_bytestart = 1; }
-	void force_update(UINT8 if_match) { if (m_entry == if_match) force_update(); }
+	void force_update(UINT16 if_match) { if (m_entry == if_match) force_update(); }
 
 	// custom update callbacks and configuration
 	direct_update_delegate set_direct_update(direct_update_delegate function);
@@ -241,7 +243,7 @@ public:
 private:
 	// internal helpers
 	bool set_direct_region(offs_t &byteaddress);
-	direct_range *find_range(offs_t byteaddress, UINT8 &entry);
+	direct_range *find_range(offs_t byteaddress, UINT16 &entry);
 	void remove_intersecting_ranges(offs_t bytestart, offs_t byteend);
 
 	// internal state
@@ -251,8 +253,8 @@ private:
 	offs_t                      m_bytemask;             // byte address mask
 	offs_t                      m_bytestart;            // minimum valid byte address
 	offs_t                      m_byteend;              // maximum valid byte address
-	UINT8                       m_entry;                // live entry
-	simple_list<direct_range>   m_rangelist[256];       // list of ranges for each entry
+	UINT16                      m_entry;                // live entry
+	simple_list<direct_range>   m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
 	simple_list<direct_range>   m_freerangelist;        // list of recycled range entries
 	direct_update_delegate      m_directupdate;         // fast direct-access update callback
 };
@@ -706,7 +708,7 @@ private:
 	running_machine &       m_machine;              // need the machine to free our memory
 	UINT8 **                m_baseptr;              // pointer to our base pointer in the global array
 	UINT8 **                m_basedptr;             // same for the decrypted base pointer
-	UINT8                   m_index;                // array index for this handler
+	UINT16                  m_index;                // array index for this handler
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
@@ -850,14 +852,14 @@ private:
 	running_machine &           m_machine;              // reference to the machine
 	bool                        m_initialized;          // have we completed initialization?
 
-	UINT8 *                     m_bank_ptr[256];        // array of bank pointers
-	UINT8 *                     m_bankd_ptr[256];       // array of decrypted bank pointers
+	UINT8 *                     m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
+	UINT8 *                     m_bankd_ptr[TOTAL_MEMORY_BANKS]; // array of decrypted bank pointers
 
 	simple_list<address_space>  m_spacelist;            // list of address spaces
 	simple_list<memory_block>   m_blocklist;            // head of the list of memory blocks
 
 	tagged_list<memory_bank>    m_banklist;             // data gathered for each bank
-	UINT8                       m_banknext;             // next bank to allocate
+	UINT16                      m_banknext;             // next bank to allocate
 
 	tagged_list<memory_share>   m_sharelist;            // map for share lookups
 
