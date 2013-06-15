@@ -360,10 +360,8 @@ protected:
 	void garouh_install_protection();
 	void mslug3_install_protection();
 	void kof2000_install_protection();
-	void pvc_w8( offs_t offset, UINT8 data );
-	UINT8 pvc_r8( offs_t offset );
-	void pvc_prot1();
-	void pvc_prot2(); // on writes to e8/e9/ea/eb
+	void pvc_write_unpack_color();
+	void pvc_write_pack_color();
 	void pvc_write_bankswitch( address_space &space );
 	DECLARE_READ16_MEMBER( pvc_prot_r );
 	DECLARE_WRITE16_MEMBER( pvc_prot_w );

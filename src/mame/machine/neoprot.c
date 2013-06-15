@@ -487,41 +487,34 @@ void neogeo_state::kof2000_install_protection()
   mslug5, svcchaos, kof2003
 ***************************************************************/
 
-void neogeo_state::pvc_w8(offs_t offset, UINT8 data )
+void neogeo_state::pvc_write_unpack_color()
 {
-	*(((UINT8*)m_pvc_cartridge_ram) + BYTE_XOR_LE(offset)) = data;
+	UINT16 pen = m_pvc_cartridge_ram[0xff0];
+
+	UINT8 b = ((pen & 0x000f) << 1) | ((pen & 0x1000) >> 12);
+	UINT8 g = ((pen & 0x00f0) >> 3) | ((pen & 0x2000) >> 13);
+	UINT8 r = ((pen & 0x0f00) >> 7) | ((pen & 0x4000) >> 14);
+	UINT8 s = (pen & 0x8000) >> 15;
+
+	m_pvc_cartridge_ram[0xff1] = (g << 8) | b;
+	m_pvc_cartridge_ram[0xff2] = (s << 8) | r;
 }
 
 
-UINT8 neogeo_state::pvc_r8(offs_t offset )
+void neogeo_state::pvc_write_pack_color()
 {
-	return *(((UINT8*)m_pvc_cartridge_ram) + BYTE_XOR_LE(offset));
-}
+	UINT8 b = m_pvc_cartridge_ram[0xff4] & 0xff;
+	UINT8 g = m_pvc_cartridge_ram[0xff4] >> 8;
+	UINT8 r = m_pvc_cartridge_ram[0xff5] & 0xff;
+	UINT8 s = m_pvc_cartridge_ram[0xff5] >> 8;
 
-
-void neogeo_state::pvc_prot1()
-{
-	UINT8 b1, b2;
-
-	b1 = pvc_r8(0x1fe1);
-	b2 = pvc_r8(0x1fe0);
-	pvc_w8(0x1fe2, (((b2 >> 0) & 0xf) << 1) | ((b1 >> 4) & 1));
-	pvc_w8(0x1fe3, (((b2 >> 4) & 0xf) << 1) | ((b1 >> 5) & 1));
-	pvc_w8(0x1fe4, (((b1 >> 0) & 0xf) << 1) | ((b1 >> 6) & 1));
-	pvc_w8(0x1fe5, (b1 >> 7));
-}
-
-
-void neogeo_state::pvc_prot2() // on writes to e8/e9/ea/eb
-{
-	UINT8 b1, b2, b3, b4;
-
-	b1 = pvc_r8(0x1fe9);
-	b2 = pvc_r8(0x1fe8);
-	b3 = pvc_r8(0x1feb);
-	b4 = pvc_r8(0x1fea);
-	pvc_w8(0x1fec, (b2 >> 1) | ((b1 >> 1) << 4));
-	pvc_w8(0x1fed, (b4 >> 1) | ((b2 & 1) << 4) | ((b1 & 1) << 5) | ((b4 & 1) << 6) | ((b3 & 1) << 7));
+	m_pvc_cartridge_ram[0xff6] = (b >> 1) |
+								((g >> 1) << 4) |
+								((r >> 1) << 8) |
+								((b & 1) << 12) |
+								((g & 1) << 13) |
+								((r & 1) << 14) |
+								((s & 1) << 15);
 }
 
 
@@ -530,9 +523,8 @@ void neogeo_state::pvc_write_bankswitch( address_space &space )
 	UINT32 bankaddress;
 
 	bankaddress = ((m_pvc_cartridge_ram[0xff8] >> 8)|(m_pvc_cartridge_ram[0xff9] << 8));
-	*(((UINT8 *)m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
-	*(((UINT8 *)m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
-	*(((UINT8 *)m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
+	m_pvc_cartridge_ram[0xff8] = (m_pvc_cartridge_ram[0xff8] & 0xfe00) | 0x00a0;
+	m_pvc_cartridge_ram[0xff9] &= 0x7fff;
 	neogeo_set_main_cpu_bank_address(bankaddress + 0x100000);
 }
 
@@ -547,9 +539,9 @@ WRITE16_MEMBER( neogeo_state::pvc_prot_w )
 {
 	COMBINE_DATA(&m_pvc_cartridge_ram[offset] );
 	if (offset == 0xff0)
-		pvc_prot1();
+		pvc_write_unpack_color();
 	else if(offset >= 0xff4 && offset <= 0xff5)
-		pvc_prot2();
+		pvc_write_pack_color();
 	else if(offset >= 0xff8)
 		pvc_write_bankswitch(space);
 }
