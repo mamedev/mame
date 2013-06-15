@@ -110,10 +110,10 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
 	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { UINT32 mask = m_nvram_size - 1; return m_nvram[offset & mask]; }   // NVRAM access
+	virtual DECLARE_READ8_MEMBER(read_ram) { if (m_nvram) { UINT32 mask = m_nvram_size - 1; return m_nvram[offset & mask]; } else return 0xff; }   // NVRAM access
 	virtual DECLARE_WRITE8_MEMBER(write_l) {}   // used by carts with subslots
 	virtual DECLARE_WRITE8_MEMBER(write_h) {}   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { UINT32 mask = m_nvram_size - 1; m_nvram[offset & mask] = data; return; } // NVRAM access
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (m_nvram) { UINT32 mask = m_nvram_size - 1; m_nvram[offset & mask] = data; return; } } // NVRAM access
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 	virtual void speedup_addon_bios_access() {};
