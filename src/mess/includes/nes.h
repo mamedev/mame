@@ -484,6 +484,7 @@ public:
 	ioport_port       *m_io_zapper2_x;
 	ioport_port       *m_io_zapper2_y;
 	ioport_port       *m_io_paddle;
+	ioport_port       *m_io_paddle_btn;
 	ioport_port       *m_io_exp;
 
 	UINT8      *m_vram;
@@ -553,6 +554,10 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
 
 	void fds_irq(int scanline, int vblank, int blanked);
+	
+	UINT8 m_pad_latch[4];
+	UINT8 m_zapper_latch[2][3];
+	UINT8 m_paddle_latch, m_paddle_btn_latch;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

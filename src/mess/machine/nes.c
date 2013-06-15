@@ -48,6 +48,11 @@ void nes_state::machine_reset()
 	m_in_1.shift = 0;
 
 	m_maincpu->reset();
+
+	memset(m_pad_latch, 0, sizeof(m_pad_latch));
+	memset(m_zapper_latch, 0, sizeof(m_zapper_latch));
+	m_paddle_latch = 0;
+	m_paddle_btn_latch = 0;
 }
 
 static void nes_state_register( running_machine &machine )
@@ -71,6 +76,11 @@ static void nes_state_register( running_machine &machine )
 
 	if (state->m_disk_expansion)
 		state->save_pointer(NAME(state->m_vram), 0x800);
+
+	state->save_item(NAME(state->m_pad_latch));
+	state->save_item(NAME(state->m_zapper_latch));
+	state->save_item(NAME(state->m_paddle_latch));
+	state->save_item(NAME(state->m_paddle_btn_latch));
 }
 
 
@@ -104,6 +114,7 @@ void nes_state::machine_start()
 	m_io_ctrlsel        = ioport("CTRLSEL");
 	m_io_exp            = ioport("EXP");
 	m_io_paddle         = ioport("PADDLE");
+	m_io_paddle_btn     = ioport("PADDLE_BUTTON");
 	m_io_cc_left        = ioport("CC_LEFT");
 	m_io_cc_right       = ioport("CC_RIGHT");
 	m_io_zapper1_t      = ioport("ZAPPER1_T");
@@ -200,41 +211,41 @@ void nes_state::machine_start()
 READ8_MEMBER(nes_state::nes_in0_r)
 {
 	int cfg = m_io_ctrlsel->read();
-	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
-	UINT8 ret = 0x40;
-	ret |= ((m_in_0.i0 >> m_in_0.shift) & 0x01);
 
-	/* zapper */
+	// Some games expect bit 6 to be set because the last entry on the data bus shows up
+	// in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there.
+	UINT8 ret = 0x40;
+	ret |= (m_pad_latch[0] & 0x01);
+	
+	// shift
+	m_pad_latch[0] >>= 1;
+	
+	// zapper
 	if ((cfg & 0x000f) == 0x0002)
 	{
-		int x = m_in_0.i1;  /* read Zapper x-position */
-		int y = m_in_0.i2;  /* read Zapper y-position */
+		int x = m_zapper_latch[0][1];  // x-position
+		int y = m_zapper_latch[0][2];  // y-position
 		UINT32 pix, color_base;
 
-		/* get the pixel at the gun position */
+		// get the pixel at the gun position
 		pix = m_ppu->get_pixel(x, y);
 
-		/* get the color base from the ppu */
+		// get the color base from the ppu
 		color_base = m_ppu->get_colorbase();
 
-		/* look at the screen and see if the cursor is over a bright pixel */
+		// check if the cursor is over a bright pixel
 		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 			(pix == color_base + 0x33) || (pix == color_base + 0x34))
-		{
-			ret &= ~0x08; /* sprite hit */
-		}
+			ret &= ~0x08; // sprite hit
 		else
-			ret |= 0x08;  /* no sprite hit */
+			ret |= 0x08;  // no sprite hit
 
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((m_in_0.i0 & 0x01) << 4);
+		// light gun trigger
+		ret |= (m_zapper_latch[0][0] << 4);
 	}
 
 	if (LOG_JOY)
 		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_0.shift, m_in_0.i0);
-
-	m_in_0.shift++;
 
 	return ret;
 }
@@ -242,53 +253,50 @@ READ8_MEMBER(nes_state::nes_in0_r)
 READ8_MEMBER(nes_state::nes_in1_r)
 {
 	int cfg = m_io_ctrlsel->read();
-	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
-	UINT8 ret = 0x40;
-	ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
 
-	/* zapper */
+	// Some games expect bit 6 to be set because the last entry on the data bus shows up
+	// in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there.
+	UINT8 ret = 0x40;
+	ret |= (m_pad_latch[1] & 0x01);
+
+	// shift
+	m_pad_latch[1] >>= 1;
+	
+	// zapper
 	if ((cfg & 0x00f0) == 0x0020)
 	{
-		int x = m_in_1.i1;  /* read Zapper x-position */
-		int y = m_in_1.i2;  /* read Zapper y-position */
+		int x = m_zapper_latch[1][1];  // x-position
+		int y = m_zapper_latch[1][2];  // y-position
 		UINT32 pix, color_base;
 		
-		/* get the pixel at the gun position */
+		// get the pixel at the gun position
 		pix = m_ppu->get_pixel(x, y);
 		
-		/* get the color base from the ppu */
+		// get the color base from the ppu
 		color_base = m_ppu->get_colorbase();
 		
-		/* look at the screen and see if the cursor is over a bright pixel */
+		// check if the cursor is over a bright pixel
 		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 			(pix == color_base + 0x33) || (pix == color_base + 0x34))
-		{
-			ret &= ~0x08; /* sprite hit */
-		}
+			ret &= ~0x08; // sprite hit
 		else
-			ret |= 0x08;  /* no sprite hit */
+			ret |= 0x08;  // no sprite hit
 		
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((m_in_1.i0 & 0x01) << 4);
+		// light gun trigger
+		ret |= (m_zapper_latch[1][0] << 4);
 	}
 
-	/* arkanoid dial */
+	// arkanoid paddle
 	if ((cfg & 0x00f0) == 0x0040)
 	{
-		/* Handle data line 2's serial output */
-		ret |= ((m_in_1.i2 >> m_in_1.shift) & 0x01) << 3;
-
-		/* Handle data line 3's serial output - bits are reversed */
-		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-		/* ret |= ((m_in_1[3] >> m_in_1.shift) & 0x01) << 4; */
-		/* ret |= ((m_in_1[3] << m_in_1.shift) & 0x80) >> 3; */
+		ret |= (m_paddle_btn_latch << 3);	// button
+		ret |= ((m_paddle_latch & 0x80) >> 3);		// paddle data
+		m_paddle_latch <<= 1;
+		m_paddle_latch &= 0xff;
 	}
 
 	if (LOG_JOY)
 		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, space.device().safe_pc(), m_in_1.shift, m_in_1.i0);
-
-	m_in_1.shift++;
 
 	return ret;
 }
@@ -297,78 +305,63 @@ WRITE8_MEMBER(nes_state::nes_in0_w)
 {
 	int cfg = m_io_ctrlsel->read();
 
-	/* Check if lightgun has been chosen as input: if so, enable crosshair */
+	// Check if lightgun has been chosen as input: if so, enable crosshair
 	timer_set(attotime::zero, TIMER_ZAPPER_TICK);
 
-	// check 'standard' inputs
 	if (data & 0x01)
 		return;
-	
-	if (LOG_JOY)
-		logerror("joy 0 bits read: %d\n", m_in_0.shift);
-	
-	/* Toggling bit 0 high then low resets both controllers */
-	m_in_0.shift = 0;
-	m_in_1.shift = 0;
-	m_in_0.i0 = 0;
-	m_in_0.i1 = 0;
-	m_in_0.i2 = 0;
-	m_in_1.i0 = 0;
-	m_in_1.i1 = 0;
-	m_in_1.i2 = 0;
-	m_in_2.i0 = 0;
-	m_in_2.i1 = 0;
-	m_in_2.i2 = 0;
-	m_in_3.i0 = 0;
-	m_in_3.i1 = 0;
-	m_in_3.i2 = 0;
+
+	// Toggling bit 0 high then low resets controllers
+	m_pad_latch[0] = 0;
+	m_pad_latch[1] = 0;
+	m_zapper_latch[0][0] = 0;	
+	m_zapper_latch[0][1] = 0;	
+	m_zapper_latch[0][2] = 0;	
+	m_zapper_latch[1][0] = 0;	
+	m_zapper_latch[1][1] = 0;	
+	m_zapper_latch[1][2] = 0;	
+	m_paddle_latch = 0;
 	
 	// P1 inputs
 	switch (cfg & 0x000f)
 	{
-		case 0x01:  /* gamepad */
-			m_in_0.i0 = m_io_pad[0]->read();
+		case 0x01:  // pad 1
+			m_pad_latch[0] = m_io_pad[0]->read();
 			break;
 			
-		case 0x02:  /* zapper 1 */
-			m_in_0.i0 = m_io_zapper1_t->read();
-			m_in_0.i1 = m_io_zapper1_x->read();
-			m_in_0.i2 = m_io_zapper1_y->read();
+		case 0x02:  // zapper (secondary)
+			m_zapper_latch[0][0] = m_io_zapper1_t->read();
+			m_zapper_latch[0][1] = m_io_zapper1_x->read();
+			m_zapper_latch[0][2] = m_io_zapper1_y->read();
 			break;
 	}
 	
 	// P2 inputs
 	switch ((cfg & 0x00f0) >> 4)
 	{
-		case 0x01:  /* gamepad */
-			m_in_1.i0 = m_io_pad[1]->read();
+		case 0x01:  // pad 2
+			m_pad_latch[1] = m_io_pad[1]->read();
 			break;
 			
-		case 0x02:  /* zapper 2 */
-			m_in_1.i0 = m_io_zapper2_t->read();
-			m_in_1.i1 = m_io_zapper2_x->read();
-			m_in_1.i2 = m_io_zapper2_y->read();
+		case 0x02:  // zapper (primary) - most games expect pad in port1 & zapper in port2
+			m_zapper_latch[1][0] = m_io_zapper2_t->read();
+			m_zapper_latch[1][1] = m_io_zapper2_x->read();
+			m_zapper_latch[1][2] = m_io_zapper2_y->read();
 			break;
 			
-		case 0x04:  /* arkanoid paddle */
-			m_in_1.i0 = (UINT8) ((UINT8) m_io_paddle->read() + (UINT8)0x52) ^ 0xff;
+		case 0x04:  // arkanoid paddle
+			m_paddle_btn_latch = m_io_paddle_btn->read();
+			m_paddle_latch = (UINT8) (m_io_paddle->read() ^ 0xff);
 			break;
 	}
 	
 	// P3 inputs
 	if ((cfg & 0x0f00))
-		m_in_2.i0 = m_io_pad[2]->read();
+		m_pad_latch[0] |= ((m_io_pad[2]->read() << 8) | (0x08 << 16));	  // pad 3 + signature
 	
 	// P4 inputs
-	if ((cfg & 0x0f00))
-		m_in_3.i0 = m_io_pad[3]->read();
-	
-	if (cfg & 0x0f00)
-		m_in_0.i0 |= (m_in_2.i0 << 8) | (0x08 << 16);
-	
-	if (cfg & 0xf000)
-		m_in_1.i0 |= (m_in_3.i0 << 8) | (0x04 << 16);
-	
+	if ((cfg & 0xf000))
+		m_pad_latch[1] |= ((m_io_pad[3]->read() << 8) | (0x04 << 16));	  // pad 4 + signature	
 }
 
 
