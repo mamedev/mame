@@ -555,7 +555,7 @@ public:
 
 	void fds_irq(int scanline, int vblank, int blanked);
 	
-	UINT8 m_pad_latch[4];
+	UINT32 m_pad_latch[2];
 	UINT8 m_zapper_latch[2][3];
 	UINT8 m_paddle_latch, m_paddle_btn_latch;
 
