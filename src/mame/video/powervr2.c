@@ -86,6 +86,17 @@ DEVICE_ADDRESS_MAP_START(ta_map, 32, powervr2_device)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(palette_r,          palette_w)
 ADDRESS_MAP_END
 
+DEVICE_ADDRESS_MAP_START(pd_dma_map, 32, powervr2_device)
+	AM_RANGE(0x00,   0x03)   AM_READWRITE(sb_pdstap_r,        sb_pdstap_w)
+	AM_RANGE(0x04,   0x07)   AM_READWRITE(sb_pdstar_r,        sb_pdstar_w)
+	AM_RANGE(0x08,   0x0b)   AM_READWRITE(sb_pdlen_r,         sb_pdlen_w)
+	AM_RANGE(0x0c,   0x0f)   AM_READWRITE(sb_pddir_r,         sb_pddir_w)
+	AM_RANGE(0x10,   0x13)   AM_READWRITE(sb_pdtsel_r,        sb_pdtsel_w)
+	AM_RANGE(0x14,   0x17)   AM_READWRITE(sb_pden_r,          sb_pden_w)
+	AM_RANGE(0x18,   0x1b)   AM_READWRITE(sb_pdst_r,          sb_pdst_w)
+	AM_RANGE(0x80,   0x83)   AM_READWRITE(sb_pdapro_r,        sb_pdapro_w)
+ADDRESS_MAP_END
+
 const int powervr2_device::pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 const int powervr2_device::pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
 const int powervr2_device::pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8,8,8,8, 8, 8,16,16,16,8, 8, 8};
@@ -1456,6 +1467,100 @@ void powervr2_device::update_screen_format()
 	machine().primary_screen->configure(spg_hbstart, spg_vbstart, visarea, machine().primary_screen->frame_period().attoseconds );
 }
 
+
+READ32_MEMBER( powervr2_device::sb_pdstap_r )
+{
+	return sb_pdstap;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdstap_w )
+{
+	COMBINE_DATA(&sb_pdstap);
+	m_pvr_dma.pvr_addr = sb_pdstap;
+}
+
+READ32_MEMBER( powervr2_device::sb_pdstar_r )
+{
+	return sb_pdstar;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdstar_w )
+{
+	COMBINE_DATA(&sb_pdstar);
+	m_pvr_dma.sys_addr = sb_pdstar;
+}
+
+READ32_MEMBER( powervr2_device::sb_pdlen_r )
+{
+	return sb_pdlen;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdlen_w )
+{
+	COMBINE_DATA(&sb_pdlen);
+	m_pvr_dma.size = sb_pdlen;
+}
+
+READ32_MEMBER( powervr2_device::sb_pddir_r )
+{
+	return sb_pddir;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pddir_w )
+{
+	COMBINE_DATA(&sb_pddir);
+	m_pvr_dma.dir = sb_pddir;
+}
+
+READ32_MEMBER( powervr2_device::sb_pdtsel_r )
+{
+	return sb_pdtsel;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdtsel_w )
+{
+	COMBINE_DATA(&sb_pdtsel);
+	m_pvr_dma.sel = sb_pdtsel & 1;
+}
+
+READ32_MEMBER( powervr2_device::sb_pden_r )
+{
+	return sb_pden;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pden_w )
+{
+	COMBINE_DATA(&sb_pden);
+	m_pvr_dma.flag = sb_pden & 1;
+}
+
+READ32_MEMBER( powervr2_device::sb_pdst_r )
+{
+	return sb_pdst;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdst_w )
+{
+	COMBINE_DATA(&sb_pdst);
+
+	UINT32 old = m_pvr_dma.start & 1;
+	m_pvr_dma.start = sb_pdst & 1;
+
+	if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0)) // 0 -> 1
+		pvr_dma_execute(space);
+}
+
+READ32_MEMBER( powervr2_device::sb_pdapro_r )
+{
+	return sb_pdapro;
+}
+
+WRITE32_MEMBER( powervr2_device::sb_pdapro_w )
+{
+	COMBINE_DATA(&sb_pdapro);
+}
+
+
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
 	irq_cb(EOXFER_OPLST_IRQ);
@@ -1804,7 +1909,9 @@ WRITE64_MEMBER( powervr2_device::ta_fifo_yuv_w )
 // SB_LMMODE0
 WRITE64_MEMBER(powervr2_device::ta_texture_directpath0_w )
 {
-	int mode = pvrctrl_regs[SB_LMMODE0]&1;
+	// That's not in the pvr control address space, it's in g2's
+	//	int mode = pvrctrl_regs[SB_LMMODE0]&1;
+	int mode = 0;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");
@@ -1819,7 +1926,9 @@ WRITE64_MEMBER(powervr2_device::ta_texture_directpath0_w )
 // SB_LMMODE1
 WRITE64_MEMBER(powervr2_device::ta_texture_directpath1_w )
 {
-	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	// That's not in the pvr control address space, it's in g2's
+	//	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	int mode = 0;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath1_w 32-bit access!\n");
@@ -2830,49 +2939,8 @@ WRITE32_MEMBER( powervr2_device::pvrs_ta_w )
 
 TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 {
-	m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
+	m_pvr_dma.start = sb_pdst = 0;
 	irq_cb(DMA_PVR_IRQ);
-}
-
-READ32_MEMBER(powervr2_device::pvr_ctrl_r)
-{
-	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x, mask %x (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[offset], offset, mem_mask, space.device().safe_pc());
-	#endif
-
-	return (UINT64)pvrctrl_regs[offset];
-}
-
-WRITE32_MEMBER(powervr2_device::pvr_ctrl_w)
-{
-	UINT8 old;
-
-	switch (offset)
-	{
-		case SB_PDSTAP: m_pvr_dma.pvr_addr = data; break;
-		case SB_PDSTAR: m_pvr_dma.sys_addr = data; break;
-		case SB_PDLEN: m_pvr_dma.size = data; break;
-		case SB_PDDIR: m_pvr_dma.dir = data & 1; break;
-		case SB_PDTSEL:
-			m_pvr_dma.sel = data & 1;
-			//if(m_pvr_dma.sel & 1)
-			//  printf("Warning: Unsupported irq mode trigger PVR-DMA\n");
-			break;
-		case SB_PDEN: m_pvr_dma.flag = data & 1; break;
-		case SB_PDST:
-			old = m_pvr_dma.start & 1;
-			m_pvr_dma.start = data & 1;
-
-			if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0)) // 0 -> 1
-				pvr_dma_execute(space);
-			break;
-	}
-
-	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x=%x] write %x to %x (reg %x), mask %x\n", 0x5f7c00+reg*4, data, offset, mem_mask);
-	#endif
-
-	pvrctrl_regs[offset] = data;
 }
 
 void powervr2_device::pvr_dma_execute(address_space &space)
@@ -2923,7 +2991,6 @@ void powervr2_device::device_start()
 {
 	irq_cb.resolve_safe();
 
-	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
 	memset(grab, 0, sizeof(grab));
 	pvr_build_parameterconfig();
 
@@ -2980,6 +3047,15 @@ void powervr2_device::device_start()
 	memset(fog_table, 0, sizeof(fog_table));
 	memset(palette, 0, sizeof(palette));
 
+	sb_pdstap = 0;
+	sb_pdstar = 0;
+	sb_pdlen = 0;
+	sb_pddir = 0;
+	sb_pdtsel = 0;
+	sb_pden = 0;
+	sb_pdst = 0;
+	sb_pdapro = 0;
+
 	save_item(NAME(softreset));
 	save_item(NAME(param_base));
 	save_item(NAME(region_base));
@@ -3021,6 +3097,15 @@ void powervr2_device::device_start()
 	save_pointer(NAME(fog_table), 0x80);
 	save_pointer(NAME(palette), 0x400);
 
+	save_item(NAME(sb_pdstap));
+	save_item(NAME(sb_pdstar));
+	save_item(NAME(sb_pdlen));
+	save_item(NAME(sb_pddir));
+	save_item(NAME(sb_pdtsel));
+	save_item(NAME(sb_pden));
+	save_item(NAME(sb_pdst));
+	save_item(NAME(sb_pdapro));
+
 	save_item(NAME(m_pvr_dma.pvr_addr));
 	save_item(NAME(m_pvr_dma.sys_addr));
 	save_item(NAME(m_pvr_dma.size));
@@ -3028,7 +3113,6 @@ void powervr2_device::device_start()
 	save_item(NAME(m_pvr_dma.dir));
 	save_item(NAME(m_pvr_dma.flag));
 	save_item(NAME(m_pvr_dma.start));
-	save_pointer(NAME(pvrctrl_regs),0x100/4);
 	save_item(NAME(debug_dip_status));
 	save_pointer(NAME(tafifo_buff),32);
 	save_item(NAME(scanline));

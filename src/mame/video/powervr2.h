@@ -26,6 +26,7 @@ public:
 	};
 
 	DECLARE_ADDRESS_MAP(ta_map, 32);
+	DECLARE_ADDRESS_MAP(pd_dma_map, 32);
 
 	struct {
 		UINT32 pvr_addr;
@@ -114,8 +115,6 @@ public:
 	UINT64 *pvr2_framebuffer_ram;
 	UINT64 *elan_ram;
 
-
-	UINT32 pvrctrl_regs[0x100/4];
 	UINT32 debug_dip_status;
 	emu_timer *vbout_timer;
 	emu_timer *vbin_timer;
@@ -220,9 +219,23 @@ public:
 	DECLARE_READ32_MEMBER(  palette_r );
 	DECLARE_WRITE32_MEMBER( palette_w );
 
+	DECLARE_READ32_MEMBER(  sb_pdstap_r );
+	DECLARE_WRITE32_MEMBER( sb_pdstap_w );
+	DECLARE_READ32_MEMBER(  sb_pdstar_r );
+	DECLARE_WRITE32_MEMBER( sb_pdstar_w );
+	DECLARE_READ32_MEMBER(  sb_pdlen_r );
+	DECLARE_WRITE32_MEMBER( sb_pdlen_w );
+	DECLARE_READ32_MEMBER(  sb_pddir_r );
+	DECLARE_WRITE32_MEMBER( sb_pddir_w );
+	DECLARE_READ32_MEMBER(  sb_pdtsel_r );
+	DECLARE_WRITE32_MEMBER( sb_pdtsel_w );
+	DECLARE_READ32_MEMBER(  sb_pden_r );
+	DECLARE_WRITE32_MEMBER( sb_pden_w );
+	DECLARE_READ32_MEMBER(  sb_pdst_r );
+	DECLARE_WRITE32_MEMBER( sb_pdst_w );
+	DECLARE_READ32_MEMBER(  sb_pdapro_r );
+	DECLARE_WRITE32_MEMBER( sb_pdapro_w );
 
-	DECLARE_READ32_MEMBER(  pvr_ctrl_r );
-	DECLARE_WRITE32_MEMBER( pvr_ctrl_w );
 	DECLARE_READ32_MEMBER(  pvr_ta_r );
 	DECLARE_WRITE32_MEMBER( pvr_ta_w );
 	DECLARE_READ32_MEMBER(  pvr2_ta_r );
@@ -279,6 +292,9 @@ private:
 	// Other registers
 	UINT32 fog_table[0x80];
 	UINT32 palette[0x400];
+
+	// PD DMA registers
+	UINT32 sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;
 
 	static UINT32 (*const blend_functions[64])(UINT32 s, UINT32 d);
 

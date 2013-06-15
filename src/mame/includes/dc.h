@@ -231,16 +231,6 @@ class dc_state : public driver_device
 #define SB_DDSTARD  ((0x005f78f4-0x005f7800)/4)
 #define SB_DDLEND   ((0x005f78f8-0x005f7800)/4)
 
-/*------------- PowerVR Interface -------------*/
-#define SB_PDSTAP   ((0x005f7c00-0x005f7c00)/4)
-#define SB_PDSTAR   ((0x005f7c04-0x005f7c00)/4)
-#define SB_PDLEN    ((0x005f7c08-0x005f7c00)/4)
-#define SB_PDDIR    ((0x005f7c0c-0x005f7c00)/4)
-#define SB_PDTSEL   ((0x005f7c10-0x005f7c00)/4)
-#define SB_PDEN     ((0x005f7c14-0x005f7c00)/4)
-#define SB_PDST     ((0x005f7c18-0x005f7c00)/4)
-#define SB_PDAPRO   ((0x005f7c80-0x005f7c00)/4)
-
 #define RTC1        ((0x00710000-0x00710000)/4)
 #define RTC2        ((0x00710004-0x00710000)/4)
 #define RTC3        ((0x00710008-0x00710000)/4)
