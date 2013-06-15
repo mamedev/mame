@@ -461,10 +461,6 @@ public:
 			m_cassette(*this, "tape")
 		{ }
 
-	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
-	nes_input m_in_0, m_in_1, m_in_2, m_in_3;
-	UINT8 m_fck_scan, m_fck_mode;
-
 	/* video-related */
 	int m_last_frame_flip;
 
@@ -559,6 +555,7 @@ public:
 	UINT8 m_zapper_latch[2][3];
 	UINT8 m_paddle_latch, m_paddle_btn_latch;
 	UINT8 m_mjpanel_latch;
+	UINT8 m_fck_scan, m_fck_mode;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

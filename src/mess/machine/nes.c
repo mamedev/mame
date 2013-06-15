@@ -43,10 +43,6 @@ void nes_state::machine_reset()
 	else if (m_cartslot)
 		m_cartslot->pcb_reset();
 
-	/* Reset the serial input ports */
-	m_in_0.shift = 0;
-	m_in_1.shift = 0;
-
 	m_maincpu->reset();
 
 	memset(m_pad_latch, 0, sizeof(m_pad_latch));
