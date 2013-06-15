@@ -9,6 +9,9 @@ ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, 
 
 void ata_flash_pccard_device::device_reset()
 {
+	m_locked = 0x1ff;
+	m_gnetreadlock = 1;
+
 	ide_hdd_device::device_reset();
 
 	UINT32 metalength;
@@ -16,9 +19,6 @@ void ata_flash_pccard_device::device_reset()
 
 	if (m_handle != NULL)
 		m_handle->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
-
-	m_locked = 0x1ff;
-	m_gnetreadlock = 1;
 }
 
 READ16_MEMBER( ata_flash_pccard_device::read_memory )

@@ -16,7 +16,6 @@
 
 #define TIME_PER_SECTOR                     (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
-#define TIME_SECURITY_ERROR                 (attotime::from_msec(1000))
 
 #define TIME_SEEK_MULTISECTOR               (attotime::from_msec(13))
 #define TIME_NO_SEEK_MULTISECTOR            (attotime::from_nsec(16300))
@@ -67,7 +66,6 @@ enum
 	TID_DELAYED_INTERRUPT,
 	TID_DELAYED_INTERRUPT_BUFFER_READY,
 	TID_RESET_CALLBACK,
-	TID_SECURITY_ERROR_DONE,
 	TID_READ_SECTOR_DONE_CALLBACK,
 	TID_WRITE_SECTOR_DONE_CALLBACK
 };
@@ -387,13 +385,12 @@ void ide_mass_storage_device::device_reset()
 	m_gnetreadlock = 0;
 	m_master_password_enable = (m_master_password != NULL);
 	m_user_password_enable = (m_user_password != NULL);
-	m_error = IDE_ERROR_DEFAULT;
+	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
 
 	m_status = IDE_STATUS_DSC;
-	if (is_ready())
-	{
+
+	if (!m_gnetreadlock)
 		m_status |= IDE_STATUS_DRDY;
-	}
 
 	m_cur_drive = 0;
 
@@ -420,12 +417,6 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 
 	case TID_RESET_CALLBACK:
 		reset();
-		break;
-
-	case TID_SECURITY_ERROR_DONE:
-		/* clear error state */
-		m_status &= ~IDE_STATUS_ERR;
-		m_status |= IDE_STATUS_DRDY;
 		break;
 
 	case TID_READ_SECTOR_DONE_CALLBACK:
@@ -504,10 +495,8 @@ void ide_mass_storage_device::security_error()
 {
 	/* set error state */
 	m_status |= IDE_STATUS_ERR;
+	m_error = IDE_ERROR_NONE;
 	m_status &= ~IDE_STATUS_DRDY;
-
-	/* just set a timer and mark ourselves error */
-	timer_set(TIME_SECURITY_ERROR, TID_SECURITY_ERROR_DONE);
 }
 
 
@@ -523,24 +512,20 @@ void ide_mass_storage_device::read_buffer_empty()
 	/* reset the totals */
 	m_buffer_offset = 0;
 
-	/* clear the buffer ready and busy flag */
 	m_status &= ~IDE_STATUS_DRQ;
-	m_status &= ~IDE_STATUS_BSY;
-	m_error = IDE_ERROR_DEFAULT;
 	set_dmarq(CLEAR_LINE);
 
 	if (m_master_password_enable || m_user_password_enable)
 	{
 		security_error();
-
 		m_sector_count = 0;
-
 		return;
 	}
 
 	/* if there is more data to read, keep going */
 	if (m_sector_count > 0)
 		m_sector_count--;
+
 	if (m_sector_count > 0)
 		read_next_sector();
 }
@@ -550,25 +535,16 @@ void ide_mass_storage_device::read_sector_done()
 {
 	int lba = lba_address(), count = 0;
 
+	m_status &= ~IDE_STATUS_BSY;
+
 	/* GNET readlock check */
-	if (m_gnetreadlock) {
-		m_status &= ~IDE_STATUS_ERR;
-		m_status &= ~IDE_STATUS_BSY;
+	if (m_gnetreadlock)
+	{
 		return;
 	}
 
 	/* now do the read */
 	count = read_sector(lba, m_buffer);
-
-	/* by default, mark the buffer ready and the seek complete */
-	if (!m_verify_only)
-		m_status |= IDE_STATUS_DRQ;
-
-	m_status |= IDE_STATUS_DSC;
-
-	/* and clear the busy and error flags */
-	m_status &= ~IDE_STATUS_ERR;
-	m_status &= ~IDE_STATUS_BSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -577,9 +553,6 @@ void ide_mass_storage_device::read_sector_done()
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
 		if (m_sector_count != 1)
 			next_sector();
-
-		/* clear the error value */
-		m_error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
 		if (!m_verify_only)
@@ -590,13 +563,18 @@ void ide_mass_storage_device::read_sector_done()
 			set_irq(ASSERT_LINE);
 		}
 
-		/* handle DMA */
-		if (m_dma_active)
-			set_dmarq(ASSERT_LINE);
-
 		/* if we're just verifying we can read the next sector */
 		if (m_verify_only)
+		{
 			read_buffer_empty();
+		}
+		else
+		{
+			m_status |= IDE_STATUS_DRQ;
+
+			if (m_dma_active)
+				set_dmarq(ASSERT_LINE);
+		}
 	}
 
 	/* if we got an error, we need to report it */
@@ -669,7 +647,6 @@ void ide_mass_storage_device::continue_write()
 	m_buffer_offset = 0;
 
 	/* clear the buffer ready flag */
-	m_status &= ~IDE_STATUS_DRQ;
 	m_status |= IDE_STATUS_BSY;
 
 	if (m_command == IDE_COMMAND_WRITE_MULTIPLE)
@@ -695,6 +672,7 @@ void ide_mass_storage_device::continue_write()
 
 void ide_mass_storage_device::write_buffer_full()
 {
+	m_status &= ~IDE_STATUS_DRQ;
 	set_dmarq(CLEAR_LINE);
 
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
@@ -724,15 +702,8 @@ void ide_mass_storage_device::write_buffer_full()
 			mame_printf_debug("\n");
 		}
 
-		/* clear the busy and error flags */
-		m_status &= ~IDE_STATUS_ERR;
-		m_status &= ~IDE_STATUS_BSY;
-		m_status &= ~IDE_STATUS_DRQ;
-
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
-		else
-			m_status |= IDE_STATUS_DRDY;
 	}
 	else if (m_command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
 	{
@@ -743,12 +714,13 @@ void ide_mass_storage_device::write_buffer_full()
 		for (i=0; !bad && i<512; i++)
 			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != key[i-2]);
 
-		m_status &= ~IDE_STATUS_BSY;
-		m_status &= ~IDE_STATUS_DRQ;
 		if (bad)
+		{
 			m_status |= IDE_STATUS_ERR;
-		else {
-			m_status &= ~IDE_STATUS_ERR;
+			m_error = IDE_ERROR_NONE;
+		}
+		else
+		{
 			m_gnetreadlock= 0;
 		}
 	}
@@ -763,16 +735,10 @@ void ide_mass_storage_device::write_sector_done()
 {
 	int lba = lba_address(), count = 0;
 
+	m_status &= ~IDE_STATUS_BSY;
+
 	/* now do the write */
 	count = write_sector(lba, m_buffer);
-
-	/* by default, mark the buffer ready and the seek complete */
-	m_status |= IDE_STATUS_DRQ;
-	m_status |= IDE_STATUS_DSC;
-
-	/* and clear the busy adn error flags */
-	m_status &= ~IDE_STATUS_ERR;
-	m_status &= ~IDE_STATUS_BSY;
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -781,9 +747,6 @@ void ide_mass_storage_device::write_sector_done()
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
 		if (m_sector_count != 1)
 			next_sector();
-
-		/* clear the error value */
-		m_error = IDE_ERROR_NONE;
 
 		/* signal an interrupt */
 		if (--m_sectors_until_int == 0 || m_sector_count == 1)
@@ -795,13 +758,15 @@ void ide_mass_storage_device::write_sector_done()
 		/* signal an interrupt if there's more data needed */
 		if (m_sector_count > 0)
 			m_sector_count--;
-		if (m_sector_count == 0)
-			m_status &= ~IDE_STATUS_DRQ;
 
-		/* keep going for DMA */
-		if (m_dma_active && m_sector_count != 0)
+		if (m_sector_count > 0)
 		{
-			set_dmarq(ASSERT_LINE);
+			m_status |= IDE_STATUS_DRQ;
+
+			if (m_dma_active)
+			{
+				set_dmarq(ASSERT_LINE);
+			}
 		}
 	}
 
@@ -832,6 +797,8 @@ void ide_mass_storage_device::handle_command()
 	/* implicitly clear interrupts & dmarq here */
 	set_irq(CLEAR_LINE);
 	set_dmarq(CLEAR_LINE);
+
+	m_status &= ~IDE_STATUS_ERR;
 
 	switch (m_command)
 	{
@@ -962,38 +929,25 @@ void ide_mass_storage_device::handle_command()
 
 			/* indicate everything is ready */
 			m_status |= IDE_STATUS_DRQ;
-			m_status |= IDE_STATUS_DSC;
-			m_status |= IDE_STATUS_DRDY;
-
-			/* and clear the busy adn error flags */
-			m_status &= ~IDE_STATUS_ERR;
 			m_status &= ~IDE_STATUS_BSY;
-
-			/* clear the error too */
-			m_error = IDE_ERROR_NONE;
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 1);
 			break;
 
 		case IDE_COMMAND_DIAGNOSTIC:
-			m_error = IDE_ERROR_DEFAULT;
+			m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_RECALIBRATE:
-			/* clear the error too */
-			m_error = IDE_ERROR_NONE;
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
 			break;
 
 		case IDE_COMMAND_IDLE:
-			/* clear the error too */
-			m_error = IDE_ERROR_NONE;
-
 			/* for timeout disabled value is 0 */
 			m_sector_count = 0;
 			/* signal an interrupt */
@@ -1002,8 +956,6 @@ void ide_mass_storage_device::handle_command()
 
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", m_cur_head + 1, m_sector_count));
-			m_status &= ~IDE_STATUS_ERR;
-			m_error = IDE_ERROR_NONE;
 			set_geometry(m_sector_count,m_cur_head + 1);
 
 			/* signal an interrupt */
@@ -1029,8 +981,6 @@ void ide_mass_storage_device::handle_command()
 			LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
 
 			m_block_count = m_sector_count;
-			// judge dredd wants 'drive ready' on this command
-			m_status |= IDE_STATUS_DRDY;
 
 			/* signal an interrupt */
 			set_irq(ASSERT_LINE);
@@ -1041,7 +991,7 @@ void ide_mass_storage_device::handle_command()
 
 			m_sector_count = 1;
 			m_status |= IDE_STATUS_DRDY;
-			m_status &= ~IDE_STATUS_ERR;
+
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -1068,10 +1018,11 @@ void ide_mass_storage_device::handle_command()
 			{
 				m_gnetreadlock= 0;
 			}
+			else
+			{
+				m_status &= ~IDE_STATUS_DRDY;
+			}
 
-			/* update flags */
-			m_status |= IDE_STATUS_DRDY;
-			m_status &= ~IDE_STATUS_ERR;
 			set_irq(ASSERT_LINE);
 			break;
 
@@ -1081,8 +1032,6 @@ void ide_mass_storage_device::handle_command()
 			    are all already set in this case so no need
 			    so that implements actual seek
 			*/
-			/* clear the error too */
-			m_error = IDE_ERROR_NONE;
 
 			/* for timeout disabled value is 0 */
 			m_sector_count = 0;
@@ -1250,12 +1199,18 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 							m_last_status_timer->adjust(attotime::never);
 						}
 
+						if (!(m_status & IDE_STATUS_DRDY) && !m_gnetreadlock)
+						{
+							m_status |= IDE_STATUS_DRDY;
+						}
+
 						set_irq(CLEAR_LINE);
 					}
 					else
 					{
 						result = 0;
 					}
+
 					break;
 
 				/* log anything else */
@@ -1354,6 +1309,9 @@ void ide_mass_storage_device::write_dma( UINT16 data )
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 {
+	if (!device_present())
+		return;
+
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
 		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
@@ -1445,6 +1403,9 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
 {
+	if (!device_present())
+		return;
+
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 

@@ -28,11 +28,15 @@
 #define IDE_STATUS_BSY  (0x80)
 
 #define IDE_ERROR_NONE                      0x00
-#define IDE_ERROR_DEFAULT                   0x01
+#define IDE_ERROR_DIAGNOSTIC_OK             0x01
 #define IDE_ERROR_TRACK0_NOT_FOUND          0x02
 #define IDE_ERROR_UNKNOWN_COMMAND           0x04
 #define IDE_ERROR_BAD_LOCATION              0x10
 #define IDE_ERROR_BAD_SECTOR                0x80
+
+#define IDE_ERROR_DIAGNOSTIC_FAILED 0x00
+#define IDE_ERROR_DIAGNOSTIC_PASSED 0x01
+#define IDE_ERROR_DIAGNOSTIC_DEVICE1_FAILED 0x81
 
 // ======================> ide_device_interface
 
@@ -53,6 +57,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
+	virtual bool device_present() = 0;
 	virtual UINT8 *get_features() = 0;
 
 	UINT8           m_master_password_enable;
@@ -91,11 +96,10 @@ protected:
 
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
-	virtual bool is_ready() = 0;
 	virtual void read_key(UINT8 key[]) = 0;
 
-	bool device_selected() { return m_cur_drive == m_csel; }
-	bool single_device() { return m_csel == 0 && m_dasp == 0; }
+	bool device_selected() { return m_csel == m_cur_drive && device_present(); }
+	bool single_device() { return m_csel == 0 && m_dasp == 0 && device_present(); }
 
 	void set_irq(int state);
 	void set_dmarq(int state);
@@ -177,7 +181,7 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual bool is_ready() { return (m_disk != NULL); }
+	virtual bool device_present() { return (m_disk != NULL); }
 	virtual void read_key(UINT8 key[]);
 
 	chd_file       *m_handle;
