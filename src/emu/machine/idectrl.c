@@ -351,7 +351,7 @@ void ide_controller_device::device_start()
 			}
 
 			dev->write_csel(i);
-			dev->write_dasp(m_slot[1]->dev() != NULL && m_slot[1]->dev()->device_present());
+			dev->write_dasp(m_slot[1]->dev() != NULL);
 		}
 	}
 

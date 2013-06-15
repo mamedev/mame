@@ -57,7 +57,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
-	virtual bool device_present() = 0;
+	virtual bool is_ready() { return true; }
 	virtual UINT8 *get_features() = 0;
 
 	UINT8           m_master_password_enable;
@@ -98,15 +98,30 @@ protected:
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 	virtual void read_key(UINT8 key[]) = 0;
 
-	bool device_selected() { return m_csel == m_cur_drive && device_present(); }
-	bool single_device() { return m_csel == 0 && m_dasp == 0 && device_present(); }
+	bool device_selected() { return m_csel == (m_device_head & 0x10) >> 4; }
+	bool single_device() { return m_csel == 0 && m_dasp == 0; }
 
 	void set_irq(int state);
 	void set_dmarq(int state);
 	void ide_build_features();
 
-	UINT8           m_gnetreadlock;
+	virtual bool process_command();
+	virtual void process_buffer();
 
+	UINT8           m_buffer[IDE_DISK_SECTOR_SIZE];
+	UINT16          m_buffer_offset;
+	UINT8           m_error;
+	UINT8           m_feature;
+	UINT16          m_sector_count;
+	UINT8           m_sector_number;
+	UINT8           m_cylinder_low;
+	UINT8           m_cylinder_high;
+	UINT8           m_device_head;
+	UINT8           m_status;
+	UINT8           m_command;
+	UINT8           m_device_control;
+
+	int m_has_features;
 	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;
 	UINT8           m_num_sectors;
@@ -124,9 +139,9 @@ private:
 	void security_error();
 	void continue_read();
 	void read_first_sector();
-	void handle_command();
 	void read_buffer_empty();
 	void write_buffer_full();
+	void update_irq();
 
 	int m_csel;
 	int m_dasp;
@@ -134,29 +149,9 @@ private:
 	int m_dmarq;
 	int m_irq;
 
-	int             m_cur_drive;
-	UINT16          m_cur_cylinder;
-	UINT8           m_cur_sector;
-	UINT8           m_cur_head;
-	UINT8           m_cur_head_reg;
 	UINT32          m_cur_lba;
-
-	UINT8           m_status;
-	UINT8           m_error;
-	UINT8           m_command;
-
-	UINT8           m_buffer[IDE_DISK_SECTOR_SIZE];
-	UINT16          m_buffer_offset;
-
-	UINT8           m_device_control;
-	UINT8           m_feature;
-	UINT16          m_sector_count;
 	UINT16          m_block_count;
-
 	UINT16          m_sectors_until_int;
-
-	UINT8           m_dma_active;
-	UINT8           m_verify_only;
 
 	emu_timer *     m_last_status_timer;
 	emu_timer *     m_reset_timer;
@@ -181,7 +176,6 @@ protected:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	virtual bool device_present() { return (m_disk != NULL); }
 	virtual void read_key(UINT8 key[]);
 
 	chd_file       *m_handle;

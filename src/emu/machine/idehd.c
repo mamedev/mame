@@ -56,9 +56,6 @@
 #define IDE_COMMAND_SEEK                    0x70
 #define IDE_COMMAND_IDLE_IMMEDIATE          0xe1
 #define IDE_COMMAND_IDLE                    0xe3
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_1     0xfe
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_2     0xfc
-#define IDE_COMMAND_TAITO_GNET_UNLOCK_3     0x0f
 
 enum
 {
@@ -98,6 +95,14 @@ ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, 
 {
 }
 
+void ide_mass_storage_device::update_irq()
+{
+	if (device_selected() && (m_device_control & 2) == 0)
+		m_irq_handler(m_irq);
+	else
+		m_irq_handler(CLEAR_LINE);
+}
+
 void ide_mass_storage_device::set_irq(int state)
 {
 	if (m_irq != state)
@@ -109,8 +114,7 @@ void ide_mass_storage_device::set_irq(int state)
 		else
 			LOG(("IDE interrupt clear\n"));
 
-		/* signal an interrupt */
-		m_irq_handler(state);
+		update_irq();
 	}
 }
 
@@ -148,12 +152,12 @@ WRITE_LINE_MEMBER( ide_mass_storage_device::write_dmack )
 UINT32 ide_mass_storage_device::lba_address()
 {
 	/* LBA direct? */
-	if (m_cur_head_reg & 0x40)
-		return m_cur_sector + m_cur_cylinder * 256 + m_cur_head * 16777216;
+	if (m_device_head & 0x40)
+		return ((m_device_head & 0xf) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number;
 
 	/* standard CHS */
 	else
-		return (m_cur_cylinder * m_num_heads + m_cur_head) * m_num_sectors + m_cur_sector - 1;
+		return (((((m_cylinder_high << 8 ) | m_cylinder_low) * m_num_heads) + (m_device_head & 0xf)) * m_num_sectors) + m_sector_number - 1;
 }
 
 
@@ -341,38 +345,28 @@ void ide_mass_storage_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_dmarq_handler.resolve_safe();
 
-	save_item(NAME(m_features));
-
-	save_item(NAME(m_cur_cylinder));
-	save_item(NAME(m_cur_sector));
-	save_item(NAME(m_cur_head));
-	save_item(NAME(m_cur_head_reg));
-
-	save_item(NAME(m_cur_lba));
-
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_buffer_offset));
-
-	save_item(NAME(m_status));
-	save_item(NAME(m_command));
 	save_item(NAME(m_error));
-
-	save_item(NAME(m_device_control));
 	save_item(NAME(m_feature));
 	save_item(NAME(m_sector_count));
+	save_item(NAME(m_sector_number));
+	save_item(NAME(m_cylinder_low));
+	save_item(NAME(m_cylinder_high));
+	save_item(NAME(m_device_head));
+	save_item(NAME(m_status));
+	save_item(NAME(m_command));
+	save_item(NAME(m_device_control));
 
+	save_item(NAME(m_has_features));
+	save_item(NAME(m_features));
+	save_item(NAME(m_cur_lba));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_dmarq));
 	save_item(NAME(m_sectors_until_int));
-
 	save_item(NAME(m_master_password_enable));
 	save_item(NAME(m_user_password_enable));
-
-	save_item(NAME(m_gnetreadlock));
 	save_item(NAME(m_block_count));
-
-	save_item(NAME(m_dma_active));
-	save_item(NAME(m_verify_only));
 
 	/* create a timer for timing status */
 	m_last_status_timer = timer_alloc(TID_NULL);
@@ -382,17 +376,15 @@ void ide_mass_storage_device::device_start()
 void ide_mass_storage_device::device_reset()
 {
 	m_buffer_offset = 0;
-	m_gnetreadlock = 0;
 	m_master_password_enable = (m_master_password != NULL);
 	m_user_password_enable = (m_user_password != NULL);
-	m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
 
 	m_status = IDE_STATUS_DSC;
 
-	if (!m_gnetreadlock)
+	if (is_ready())
+	{
 		m_status |= IDE_STATUS_DRDY;
-
-	m_cur_drive = 0;
+	}
 
 	/* reset the drive state */
 	set_irq(CLEAR_LINE);
@@ -405,6 +397,7 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 	{
 	case TID_DELAYED_INTERRUPT:
 		m_status &= ~IDE_STATUS_BSY;
+
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -451,14 +444,18 @@ void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer
 void ide_mass_storage_device::next_sector()
 {
 	/* LBA direct? */
-	if (m_cur_head_reg & 0x40)
+	if (m_device_head & 0x40)
 	{
-		m_cur_sector++;
-		if (m_cur_sector == 0)
+		m_sector_number++;
+		if (m_sector_number == 0)
 		{
-			m_cur_cylinder++;
-			if (m_cur_cylinder == 0)
-				m_cur_head++;
+			m_cylinder_low++;
+			if (m_cylinder_low == 0)
+			{
+				m_cylinder_high++;
+				if( m_cylinder_high == 0)
+					m_device_head = (m_device_head & ~0xf) | ((m_device_head + 1) & 0xf);
+			}
 		}
 	}
 
@@ -466,16 +463,18 @@ void ide_mass_storage_device::next_sector()
 	else
 	{
 		/* sectors are 1-based */
-		m_cur_sector++;
-		if (m_cur_sector > m_num_sectors)
+		m_sector_number++;
+		if (m_sector_number > m_num_sectors)
 		{
 			/* heads are 0 based */
-			m_cur_sector = 1;
-			m_cur_head++;
-			if (m_cur_head >= m_num_heads)
+			m_sector_number = 1;
+			m_device_head = (m_device_head & ~0xf) | ((m_device_head + 1) & 0xf);
+			if ((m_device_head & 0xf) >= m_num_heads)
 			{
-				m_cur_head = 0;
-				m_cur_cylinder++;
+				m_device_head &= ~0xf;
+				m_cylinder_low++;
+				if (m_cylinder_low == 0)
+					m_cylinder_high++;
 			}
 		}
 	}
@@ -537,12 +536,6 @@ void ide_mass_storage_device::read_sector_done()
 
 	m_status &= ~IDE_STATUS_BSY;
 
-	/* GNET readlock check */
-	if (m_gnetreadlock)
-	{
-		return;
-	}
-
 	/* now do the read */
 	count = read_sector(lba, m_buffer);
 
@@ -555,16 +548,15 @@ void ide_mass_storage_device::read_sector_done()
 			next_sector();
 
 		/* signal an interrupt */
-		if (!m_verify_only)
-			m_sectors_until_int--;
-		if (m_sectors_until_int == 0 || m_sector_count == 1)
+		if (--m_sectors_until_int == 0 || m_sector_count == 1)
 		{
 			m_sectors_until_int = ((m_command == IDE_COMMAND_READ_MULTIPLE) ? m_block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
 		/* if we're just verifying we can read the next sector */
-		if (m_verify_only)
+		if (m_command == IDE_COMMAND_VERIFY_SECTORS ||
+			m_command == IDE_COMMAND_VERIFY_SECTORS_NORETRY )
 		{
 			read_buffer_empty();
 		}
@@ -572,7 +564,7 @@ void ide_mass_storage_device::read_sector_done()
 		{
 			m_status |= IDE_STATUS_DRQ;
 
-			if (m_dma_active)
+			if (m_command == IDE_COMMAND_READ_DMA)
 				set_dmarq(ASSERT_LINE);
 		}
 	}
@@ -675,6 +667,11 @@ void ide_mass_storage_device::write_buffer_full()
 	m_status &= ~IDE_STATUS_DRQ;
 	set_dmarq(CLEAR_LINE);
 
+	process_buffer();
+}
+
+void ide_mass_storage_device::process_buffer()
+{
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
 		if (m_user_password_enable && memcmp(m_buffer, m_user_password, 2 + 32) == 0)
@@ -704,25 +701,6 @@ void ide_mass_storage_device::write_buffer_full()
 
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
-	}
-	else if (m_command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
-	{
-		UINT8 key[5] = { 0 };
-		int i, bad = 0;
-		read_key(key);
-
-		for (i=0; !bad && i<512; i++)
-			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != key[i-2]);
-
-		if (bad)
-		{
-			m_status |= IDE_STATUS_ERR;
-			m_error = IDE_ERROR_NONE;
-		}
-		else
-		{
-			m_gnetreadlock= 0;
-		}
 	}
 	else
 	{
@@ -763,10 +741,8 @@ void ide_mass_storage_device::write_sector_done()
 		{
 			m_status |= IDE_STATUS_DRQ;
 
-			if (m_dma_active)
-			{
+			if (m_command == IDE_COMMAND_WRITE_DMA)
 				set_dmarq(ASSERT_LINE);
-			}
 		}
 	}
 
@@ -783,145 +759,111 @@ void ide_mass_storage_device::write_sector_done()
 }
 
 
-
 /*************************************
  *
  *  Handle IDE commands
  *
  *************************************/
 
-void ide_mass_storage_device::handle_command()
+bool ide_mass_storage_device::process_command()
 {
-	UINT8 key[5];
-
-	/* implicitly clear interrupts & dmarq here */
-	set_irq(CLEAR_LINE);
-	set_dmarq(CLEAR_LINE);
-
-	m_status &= ~IDE_STATUS_ERR;
-
 	switch (m_command)
 	{
-		case IDE_COMMAND_READ_SECTORS:
-		case IDE_COMMAND_READ_SECTORS_NORETRY:
-			LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_READ_SECTORS:
+	case IDE_COMMAND_READ_SECTORS_NORETRY:
+		LOGPRINT(("IDE Read multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 1;
-			m_dma_active = 0;
-			m_verify_only = 0;
+		m_sectors_until_int = 1;
 
-			/* start the read going */
-			read_first_sector();
-			break;
+		/* start the read going */
+		read_first_sector();
+		return true;
 
-		case IDE_COMMAND_READ_MULTIPLE:
-			LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_READ_MULTIPLE:
+		LOGPRINT(("IDE Read multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 1;
-			m_dma_active = 0;
-			m_verify_only = 0;
+		m_sectors_until_int = 1;
 
-			/* start the read going */
-			read_first_sector();
-			break;
+		/* start the read going */
+		read_first_sector();
+		return true;
 
-		case IDE_COMMAND_VERIFY_SECTORS:
-		case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
-			LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_VERIFY_SECTORS:
+	case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
+		LOGPRINT(("IDE Read verify multiple with/without retries: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 1;
-			m_dma_active = 0;
-			m_verify_only = 1;
+		/* reset the buffer */
+		m_sectors_until_int = m_sector_count;
 
-			/* start the read going */
-			read_first_sector();
-			break;
+		/* start the read going */
+		read_first_sector();
+		return true;
 
-		case IDE_COMMAND_READ_DMA:
-			LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_READ_DMA:
+		LOGPRINT(("IDE Read multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = m_sector_count;
-			m_dma_active = 1;
-			m_verify_only = 0;
+		/* reset the buffer */
+		m_sectors_until_int = m_sector_count;
 
-			/* start the read going */
-			read_first_sector();
-			break;
+		/* start the read going */
+		read_first_sector();
+		return true;
 
-		case IDE_COMMAND_WRITE_SECTORS:
-		case IDE_COMMAND_WRITE_SECTORS_NORETRY:
-			LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_WRITE_SECTORS:
+	case IDE_COMMAND_WRITE_SECTORS_NORETRY:
+		LOGPRINT(("IDE Write multiple: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 1;
-			m_dma_active = 0;
+		/* reset the buffer */
+		m_sectors_until_int = 1;
 
-			/* mark the buffer ready */
-			m_status |= IDE_STATUS_DRQ;
-			break;
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+		return true;
 
-		case IDE_COMMAND_WRITE_MULTIPLE:
-			LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_WRITE_MULTIPLE:
+		LOGPRINT(("IDE Write multiple block: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 1;
-			m_dma_active = 0;
+		/* reset the buffer */
+		m_sectors_until_int = 1;
 
-			/* mark the buffer ready */
-			m_status |= IDE_STATUS_DRQ;
-			break;
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+		return true;
 
-		case IDE_COMMAND_WRITE_DMA:
-			LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
-				m_cur_cylinder, m_cur_head, m_cur_sector, lba_address(), m_sector_count));
+	case IDE_COMMAND_WRITE_DMA:
+		LOGPRINT(("IDE Write multiple DMA: C=%d H=%d S=%d LBA=%d count=%d\n",
+			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & 0xf, m_sector_number, lba_address(), m_sector_count));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = m_sector_count;
-			m_dma_active = 1;
+		/* reset the buffer */
+		m_sectors_until_int = m_sector_count;
 
-			/* mark the buffer ready */
-			m_status |= IDE_STATUS_DRQ;
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
 
-			/* start the read going */
-			set_dmarq(ASSERT_LINE);
-			break;
+		/* start the read going */
+		set_dmarq(ASSERT_LINE);
+		return true;
 
-		case IDE_COMMAND_SECURITY_UNLOCK:
-			LOGPRINT(("IDE Security Unlock\n"));
+	case IDE_COMMAND_SECURITY_UNLOCK:
+		LOGPRINT(("IDE Security Unlock\n"));
 
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 0;
-			m_dma_active = 0;
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
 
-			/* mark the buffer ready */
-			m_status |= IDE_STATUS_DRQ;
+		set_irq(ASSERT_LINE);
+		return true;
 
-			set_irq(ASSERT_LINE);
-			break;
+	case IDE_COMMAND_GET_INFO:
+		LOGPRINT(("IDE Read features\n"));
 
-		case IDE_COMMAND_GET_INFO:
-			LOGPRINT(("IDE Read features\n"));
-
-			/* reset the buffer */
-			m_buffer_offset = 0;
+		if (m_has_features)
+		{
 			m_sector_count = 1;
 
 			/* build the features page */
@@ -929,124 +871,86 @@ void ide_mass_storage_device::handle_command()
 
 			/* indicate everything is ready */
 			m_status |= IDE_STATUS_DRQ;
-			m_status &= ~IDE_STATUS_BSY;
 
 			/* signal an interrupt */
 			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 1);
-			break;
-
-		case IDE_COMMAND_DIAGNOSTIC:
-			m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_RECALIBRATE:
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_IDLE:
-			/* for timeout disabled value is 0 */
-			m_sector_count = 0;
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SET_CONFIG:
-			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", m_cur_head + 1, m_sector_count));
-			set_geometry(m_sector_count,m_cur_head + 1);
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_UNKNOWN_F9:
-			/* only used by Killer Instinct AFAICT */
-			LOGPRINT(("IDE unknown command (F9)\n"));
-
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SET_FEATURES:
-			LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_cur_sector, m_cur_cylinder & 0xff, m_cur_cylinder >> 8));
-
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
-			break;
-
-		case IDE_COMMAND_SET_BLOCK_COUNT:
-			LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
-
-			m_block_count = m_sector_count;
-
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
-			LOGPRINT(("IDE GNET Unlock 1\n"));
-
-			m_sector_count = 1;
-			m_status |= IDE_STATUS_DRDY;
-
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
-			LOGPRINT(("IDE GNET Unlock 2\n"));
-
-			/* reset the buffer */
-			m_buffer_offset = 0;
-			m_sectors_until_int = 0;
-			m_dma_active = 0;
-
-			/* mark the buffer ready */
-			m_status |= IDE_STATUS_DRQ;
-
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
-			LOGPRINT(("IDE GNET Unlock 3\n"));
-
-			/* key check */
-			read_key(key);
-			if ((m_feature == key[0]) && (m_sector_count == key[1]) && (m_cur_sector == key[2]) && (m_cur_cylinder == (((UINT16)key[4]<<8)|key[3])))
-			{
-				m_gnetreadlock= 0;
-			}
-			else
-			{
-				m_status &= ~IDE_STATUS_DRDY;
-			}
-
-			set_irq(ASSERT_LINE);
-			break;
-
-		case IDE_COMMAND_SEEK:
-			/*
-			    cur_cylinder, cur_sector and cur_head
-			    are all already set in this case so no need
-			    so that implements actual seek
-			*/
-
-			/* for timeout disabled value is 0 */
-			m_sector_count = 0;
-			/* signal an interrupt */
-			set_irq(ASSERT_LINE);
-			break;
-
-
-		default:
-			LOGPRINT(("IDE unknown command (%02X)\n", m_command));
+		}
+		else
+		{
 			m_status |= IDE_STATUS_ERR;
-			m_error = IDE_ERROR_UNKNOWN_COMMAND;
+			m_error = IDE_ERROR_NONE;
+			m_status &= ~IDE_STATUS_DRDY;
 			set_irq(ASSERT_LINE);
-			//debugger_break(device->machine());
-			break;
+		}
+		return true;
+
+	case IDE_COMMAND_DIAGNOSTIC:
+		m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
+
+		/* signal an interrupt */
+		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		return true;
+
+	case IDE_COMMAND_RECALIBRATE:
+		/* signal an interrupt */
+		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		return true;
+
+	case IDE_COMMAND_IDLE:
+		/* for timeout disabled value is 0 */
+		m_sector_count = 0;
+		/* signal an interrupt */
+		set_irq(ASSERT_LINE);
+		return true;
+
+	case IDE_COMMAND_SET_CONFIG:
+		LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", (m_device_head & 0xf) + 1, m_sector_count));
+		set_geometry(m_sector_count,(m_device_head & 0xf) + 1);
+
+		/* signal an interrupt */
+		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		return true;
+
+	case IDE_COMMAND_UNKNOWN_F9:
+		/* only used by Killer Instinct AFAICT */
+		LOGPRINT(("IDE unknown command (F9)\n"));
+
+		/* signal an interrupt */
+		set_irq(ASSERT_LINE);
+		return true;
+
+	case IDE_COMMAND_SET_FEATURES:
+		LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
+
+		/* signal an interrupt */
+		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		return true;
+
+	case IDE_COMMAND_SET_BLOCK_COUNT:
+		LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
+
+		m_block_count = m_sector_count;
+
+		/* signal an interrupt */
+		set_irq(ASSERT_LINE);
+		return true;
+
+	case IDE_COMMAND_SEEK:
+		/*
+			cur_cylinder, cur_sector and cur_head
+			are all already set in this case so no need
+			so that implements actual seek
+		*/
+
+		/* for timeout disabled value is 0 */
+		m_sector_count = 0;
+
+		/* signal an interrupt */
+		set_irq(ASSERT_LINE);
+		return true;
+
+	default:
+		return false;
 	}
 }
 
@@ -1169,22 +1073,22 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 
 				/* return the current sector */
 				case IDE_CS0_SECTOR_NUMBER_RW:
-					result = m_cur_sector;
+					result = m_sector_number;
 					break;
 
 				/* return the current cylinder LSB */
 				case IDE_CS0_CYLINDER_LOW_RW:
-					result = m_cur_cylinder & 0xff;
+					result = m_cylinder_low;
 					break;
 
 				/* return the current cylinder MSB */
 				case IDE_CS0_CYLINDER_HIGH_RW:
-					result = m_cur_cylinder >> 8;
+					result = m_cylinder_high;
 					break;
 
 				/* return the current head */
 				case IDE_CS0_DEVICE_HEAD_RW:
-					result = m_cur_head_reg;
+					result = m_device_head;
 					break;
 
 				/* return the current status and clear any pending interrupts */
@@ -1199,7 +1103,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 							m_last_status_timer->adjust(attotime::never);
 						}
 
-						if (!(m_status & IDE_STATUS_DRDY) && !m_gnetreadlock)
+						if (!(m_status & IDE_STATUS_DRDY) && is_ready())
 						{
 							m_status |= IDE_STATUS_DRDY;
 						}
@@ -1210,7 +1114,6 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 					{
 						result = 0;
 					}
-
 					break;
 
 				/* log anything else */
@@ -1309,9 +1212,6 @@ void ide_mass_storage_device::write_dma( UINT16 data )
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 {
-	if (!device_present())
-		return;
-
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
 		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
@@ -1369,25 +1269,24 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 
 			/* current sector */
 			case IDE_CS0_SECTOR_NUMBER_RW:
-				m_cur_sector = data;
+				m_sector_number = data;
 				break;
 
 			/* current cylinder LSB */
 			case IDE_CS0_CYLINDER_LOW_RW:
-				m_cur_cylinder = (m_cur_cylinder & 0xff00) | (data & 0xff);
+				m_cylinder_low = data;
 				break;
 
 			/* current cylinder MSB */
 			case IDE_CS0_CYLINDER_HIGH_RW:
-				m_cur_cylinder = ((data << 8) & 0xff00) | (m_cur_cylinder & 0xff);
+				m_cylinder_high = data;
 				break;
 
 			/* current head */
 			case IDE_CS0_DEVICE_HEAD_RW:
-				// LBA mode = data & 0x40
-				m_cur_drive = (data & 0x10) >> 4;
-				m_cur_head = data & 0x0f;
-				m_cur_head_reg = data;
+				m_device_head = data;
+
+				update_irq();
 				break;
 
 			/* command */
@@ -1395,7 +1294,25 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 				m_command = data;
 
 				if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
-					handle_command();
+				{
+					/* implicitly clear interrupts & dmarq here */
+					set_irq(CLEAR_LINE);
+					set_dmarq(CLEAR_LINE);
+
+					m_buffer_offset = 0;
+					m_sectors_until_int = 0;
+
+					m_status &= ~IDE_STATUS_ERR;
+
+					if (!process_command())
+					{
+						LOGPRINT(("IDE unknown command (%02X)\n", m_command));
+						m_status |= IDE_STATUS_ERR;
+						m_error = IDE_ERROR_UNKNOWN_COMMAND;
+						set_irq(ASSERT_LINE);
+						//debugger_break(device->machine());
+					}
+				}
 				break;
 		}
 	}
@@ -1403,9 +1320,6 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 
 WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
 {
-	if (!device_present())
-		return;
-
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 
@@ -1421,11 +1335,7 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
 			case IDE_CS1_DEVICE_CONTROL_W:
 				m_device_control = data;
 
-				if (data & 0x02)
-				{
-					// nIEN
-					logerror( "%s: write_cs1 %04x %04x %04x nIEN not supported\n", machine().describe_context(), offset, data, mem_mask );
-				}
+				update_irq();
 
 				if (data & 0x04)
 				{
@@ -1495,6 +1405,8 @@ void ide_hdd_device::device_reset()
 		UINT32 metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_features, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
 			ide_build_features();
+
+		m_has_features = 1;
 	}
 }
 

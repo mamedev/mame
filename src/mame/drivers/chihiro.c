@@ -2664,7 +2664,6 @@ public:
 
 	virtual int  read_sector(UINT32 lba, void *buffer);
 	virtual int  write_sector(UINT32 lba, const void *buffer);
-	virtual bool device_present() { return true; }
 	virtual void read_key(UINT8 key[]) { }
 protected:
 	// device-level overrides

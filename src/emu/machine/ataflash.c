@@ -1,5 +1,9 @@
 #include "ataflash.h"
 
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_1     0xfe
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_2     0xfc
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_3     0x0f
+
 const device_type ATA_FLASH_PCCARD = &device_creator<ata_flash_pccard_device>;
 
 ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -7,12 +11,20 @@ ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, 
 {
 }
 
+void ata_flash_pccard_device::device_start()
+{
+	ide_hdd_device::device_start();
+
+	save_item(NAME(m_locked));
+	save_item(NAME(m_gnetreadlock));
+}
+
 void ata_flash_pccard_device::device_reset()
 {
+	ide_hdd_device::device_reset();
+
 	m_locked = 0x1ff;
 	m_gnetreadlock = 1;
-
-	ide_hdd_device::device_reset();
 
 	UINT32 metalength;
 	memset(m_cis, 0xff, 512);
@@ -66,7 +78,7 @@ READ16_MEMBER( ata_flash_pccard_device::read_reg )
 		return 0x002e;
 
 	case 0x201:
-		return m_locked ? 0x0001 : 0;
+		return m_gnetreadlock;
 
 	default:
 		return 0;
@@ -97,5 +109,91 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 		{
 			m_gnetreadlock = 0;
 		}
+	}
+}
+
+bool ata_flash_pccard_device::is_ready()
+{
+	return !m_gnetreadlock;
+}
+
+bool ata_flash_pccard_device::process_command()
+{
+	UINT8 key[5];
+
+	switch (m_command)
+	{
+	case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
+		//LOGPRINT(("IDE GNET Unlock 1\n"));
+
+		m_sector_count = 1;
+		m_status |= IDE_STATUS_DRDY;
+
+		set_irq(ASSERT_LINE);
+		return true;
+
+	case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
+		//LOGPRINT(("IDE GNET Unlock 2\n"));
+
+		/* mark the buffer ready */
+		m_status |= IDE_STATUS_DRQ;
+
+		set_irq(ASSERT_LINE);
+		return true;
+
+	case IDE_COMMAND_TAITO_GNET_UNLOCK_3:
+		//LOGPRINT(("IDE GNET Unlock 3\n"));
+
+		/* key check */
+		read_key(key);
+		if (m_feature == key[0] && m_sector_count == key[1] && m_sector_number == key[2] && m_cylinder_low == key[3] && m_cylinder_high == key[4])
+		{
+			m_gnetreadlock = 0;
+		}
+		else
+		{
+			m_status &= ~IDE_STATUS_DRDY;
+		}
+
+		set_irq(ASSERT_LINE);
+		return true;
+
+	default:
+		if (m_gnetreadlock)
+		{
+			m_status |= IDE_STATUS_ERR;
+			m_error = IDE_ERROR_NONE;
+			m_status &= ~IDE_STATUS_DRDY;
+			return true;
+		}
+
+		return ide_hdd_device::process_command();
+	}
+}
+
+void ata_flash_pccard_device::process_buffer()
+{
+	if (m_command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
+	{
+		UINT8 key[5] = { 0 };
+		int i, bad = 0;
+		read_key(key);
+
+		for (i=0; !bad && i<512; i++)
+			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != key[i-2]);
+
+		if (bad)
+		{
+			m_status |= IDE_STATUS_ERR;
+			m_error = IDE_ERROR_NONE;
+		}
+		else
+		{
+			m_gnetreadlock= 0;
+		}
+	}
+	else
+	{
+		ide_hdd_device::process_buffer();
 	}
 }

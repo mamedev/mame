@@ -21,10 +21,16 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start();
 	virtual void device_reset();
+
+	virtual bool process_command();
+	virtual void process_buffer();
+	virtual bool is_ready();
 
 private:
 	unsigned char m_cis[512];
+	UINT8 m_gnetreadlock;
 	int m_locked;
 };
 
