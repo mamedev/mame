@@ -472,6 +472,7 @@ public:
 	ioport_port       *m_io_pad[4];
 	ioport_port       *m_io_powerpad[2];
 	ioport_port       *m_io_mahjong[4];
+	ioport_port       *m_io_ftrainer[3];
 	ioport_port       *m_io_cc_left;
 	ioport_port       *m_io_cc_right;
 	ioport_port       *m_io_zapper1_t;
@@ -561,6 +562,7 @@ public:
 	UINT8 m_fck_scan, m_fck_mode;
 	UINT8 m_mic_obstruct;
 	UINT8 m_powerpad_latch[2];
+	UINT8 m_ftrainer_scan;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

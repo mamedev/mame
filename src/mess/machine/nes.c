@@ -79,6 +79,8 @@ void nes_state::state_register()
 	save_item(NAME(m_fck_scan));
 	save_item(NAME(m_fck_mode));
 	save_item(NAME(m_mic_obstruct));
+	save_item(NAME(m_powerpad_latch));
+	save_item(NAME(m_ftrainer_scan));
 }
 
 
@@ -102,11 +104,13 @@ void nes_state::machine_start()
 	}
 	for (int i = 0; i < 4; i++)
 	{
-		char str[5];
+		char str[8];
 		sprintf(str, "PAD%i", i + 1);
 		m_io_pad[i] = ioport(str);
 		sprintf(str, "MAH%i", i);
 		m_io_mahjong[i] = ioport(str);
+		sprintf(str, "FT_COL%i", i);
+		m_io_ftrainer[i] = ioport(str);
 	}
 
 	m_io_ctrlsel        = ioport("CTRLSEL");
@@ -427,12 +431,12 @@ READ8_MEMBER(nes_state::fc_in0_r)
 			ret |= (m_paddle_btn_latch << 1);	// button
 			break;
 			
-		case 0x06:  // Mahjong Panel
+		case 0x07:  // Mahjong Panel
 			ret |= ((m_mjpanel_latch & 0x01) << 1);
 			m_mjpanel_latch >>= 1;
 			break;
 			
-		case 0x07:  // 'multitap' p3
+		case 0x08:  // 'multitap' p3
 			ret |= ((m_pad_latch[2] & 0x01) << 1);
 			m_pad_latch[2] >>= 1;
 			break;
@@ -504,12 +508,34 @@ READ8_MEMBER(nes_state::fc_in1_r)
 			m_paddle_latch &= 0xff;
 			break;
 			
-		case 0x06:  // Mahjong Panel
+		case 0x05:  // family trainer
+		case 0x06:  // family trainer
+			if (!BIT(m_ftrainer_scan, 0))
+			{		
+				// read low line: buttons 9,10,11,12
+				for (int i = 0; i < 4; i++)
+					ret |= ((m_io_ftrainer[i]->read() & 0x01) << (1 + i));
+			}
+			else if (!BIT(m_ftrainer_scan, 1))
+			{		
+				// read mid line: buttons 5,6,7,8
+				for (int i = 0; i < 4; i++)
+					ret |= ((m_io_ftrainer[i]->read() & 0x02) << (1 + i));
+			}
+			else if (!BIT(m_ftrainer_scan, 2))
+			{		
+				// read high line: buttons 1,2,3,4
+				for (int i = 0; i < 4; i++)
+					ret |= ((m_io_ftrainer[i]->read() & 0x04) << (1 + i));
+			}
+			break;
+			
+		case 0x07:  // Mahjong Panel
 			ret |= ((m_mjpanel_latch & 0x01) << 1);
 			m_mjpanel_latch >>= 1;
 			break;
 			
-		case 0x07:  // 'multitap' p4
+		case 0x08:  // 'multitap' p4
 			ret |= ((m_pad_latch[3] & 0x01) << 1);
 			m_pad_latch[3] >>= 1;
 			break;
@@ -532,6 +558,7 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 	// Check if lightgun has been chosen as input: if so, enable crosshair
 	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
+	// keyboards
 	if ((exp & 0x0f) == 0x02 || (exp & 0x0f) == 0x03)
 	{
 		// tape output (not fully tested)
@@ -551,6 +578,13 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 			if (BIT(data, 0))   // reset
 				m_fck_scan = 0;
 		}
+	}
+
+	// family trainer
+	if ((exp & 0x0f) == 0x05 || (exp & 0x0f) == 0x06)
+	{
+		// select raw to scan
+		m_ftrainer_scan = data & 0x07;
 	}
 
 	if (data & 0x01)
@@ -602,11 +636,11 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 	// P3 & P4 inputs in Famicom (e.g. through Hori Twin Adapter or Hori 4 Players Adapter) 
 	// are read in parallel with P1 & P2 (just using diff bits)
 	// P3 inputs
-	if ((exp & 0x0f) == 7 && (cfg & 0x0f00) == 0x0100)
+	if ((exp & 0x0f) == 8 && (cfg & 0x0f00) == 0x0100)
 		m_pad_latch[2] = m_io_pad[2]->read();	  // pad 3
 	
 	// P4 inputs
-	if ((exp & 0x0f) == 7 && (cfg & 0xf000) == 0x1000)
+	if ((exp & 0x0f) == 8 && (cfg & 0xf000) == 0x1000)
 		m_pad_latch[3] = m_io_pad[3]->read();	  // pad 4
 
 
@@ -630,8 +664,16 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 			m_paddle_btn_latch = m_io_paddle_btn->read();
 			m_paddle_latch = (UINT8) (m_io_paddle->read() ^ 0xff);
 			break;
+
+		case 0x05:  // family trainer
+		case 0x06:  // family trainer
+			// these are scanned differently than other devices:
+			// bit0-bit2 of writes to $4016 select the row to read 
+			// from from the mat input "columns"
+			break;
 			
-		case 0x06:  // Mahjong Panel
+			
+		case 0x07:  // Mahjong Panel
 			if (data & 0xf8)
 				logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
 			else

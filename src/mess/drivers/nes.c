@@ -544,6 +544,52 @@ static INPUT_PORTS_START( mahjong_panel )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Mahjong Start") PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
 INPUT_PORTS_END
 
+// these are read differently than the powerpad inputs, but we share the tags, to reduce 
+static INPUT_PORTS_START( fc_ftrainer )
+// difference between the two sides is that we mirror the key mapping to match the real pad layout!
+	PORT_START("FT_COL0")
+// side A layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                                                        PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Mid1")  PORT_CODE(KEYCODE_J) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                                                        PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+// side B layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 12")    PORT_CODE(KEYCODE_M) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 8")     PORT_CODE(KEYCODE_J) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 4")     PORT_CODE(KEYCODE_U) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+
+	PORT_START("FT_COL1")
+// side A layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Low1")  PORT_CODE(KEYCODE_N) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Mid2")  PORT_CODE(KEYCODE_H) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Top1")  PORT_CODE(KEYCODE_Y) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+// side B layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 11")    PORT_CODE(KEYCODE_N) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 7")     PORT_CODE(KEYCODE_H) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 3")     PORT_CODE(KEYCODE_Y) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+
+	PORT_START("FT_COL2")
+// side A layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Low2")  PORT_CODE(KEYCODE_B) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Mid3")  PORT_CODE(KEYCODE_G) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Top2")  PORT_CODE(KEYCODE_T) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+// side B layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 10")    PORT_CODE(KEYCODE_B) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 6")     PORT_CODE(KEYCODE_G) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 2")     PORT_CODE(KEYCODE_T) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+
+	PORT_START("FT_COL3")
+// side A layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )                                                        PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer Mid4")  PORT_CODE(KEYCODE_F) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )                                                        PORT_CONDITION("EXP", 0x0f, EQUALS, 0x05)
+// side B layout
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 9")     PORT_CODE(KEYCODE_V) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 5")     PORT_CODE(KEYCODE_F) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Family Trainer 1")     PORT_CODE(KEYCODE_R) PORT_CONDITION("EXP", 0x0f, EQUALS, 0x06)
+INPUT_PORTS_END
+
+
+
 static INPUT_PORTS_START( famicom )
 	PORT_INCLUDE( fc_pads12 )
 	PORT_INCLUDE( fc_pads34 )
@@ -557,6 +603,7 @@ static INPUT_PORTS_START( famicom )
 	PORT_INCLUDE( fc_keyboard )
 	PORT_INCLUDE( subor_keyboard )
 	PORT_INCLUDE( mahjong_panel )
+	PORT_INCLUDE( fc_ftrainer )
 
 	PORT_START("CTRLSEL")
 	PORT_CONFNAME( 0x000f, 0x0001, "P1 Controller")
@@ -582,9 +629,10 @@ static INPUT_PORTS_START( famicom )
 	PORT_CONFSETTING(  0x02, "FC Keyboard" )
 	PORT_CONFSETTING(  0x03, "Subor Keyboard" )
 	PORT_CONFSETTING(  0x04, "Arkanoid paddle" )
-//  PORT_CONFSETTING(  0x05, "Family Trainer" )
-	PORT_CONFSETTING(  0x06, "Mahjong Panel" )
-	PORT_CONFSETTING(  0x07, "Hori Twin Adapter" )
+	PORT_CONFSETTING(  0x05, "Family Trainer (Side A)" )
+	PORT_CONFSETTING(  0x06, "Family Trainer (Side B)" )
+	PORT_CONFSETTING(  0x07, "Mahjong Panel" )
+	PORT_CONFSETTING(  0x08, "Hori Twin Adapter" )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x00, "Draw Top/Bottom 8 Lines")
