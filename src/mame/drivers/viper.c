@@ -1419,17 +1419,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 						m_cf_card_ide = 1;
 
 						// soft reset
-						// sector count register is set to 0x01
-						// sector number register is set to 0x01
-						// cylinder low register is set to 0x00
-						// cylinder high register is set to 0x00
-
 						m_ide->write_cs1(space, 6, 0x04, 0xff);
-
-						m_ide->write_cs0(space, 2, 0x01, 0xff);
-						m_ide->write_cs0(space, 3, 0x01, 0xff);
-						m_ide->write_cs0(space, 4, 0x00, 0xff);
-						m_ide->write_cs0(space, 5, 0x00, 0xff);
 					}
 					break;
 				}
