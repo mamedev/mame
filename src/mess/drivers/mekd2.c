@@ -4,7 +4,8 @@
 
     system driver
 
-    Juergen Buchmueller <pullmoll@t-online.de>, Jan 2000
+    Juergen Buchmueller, Jan 2000
+    2013-06-16 Working driver [Robbbert]
 
     memory map
 
@@ -24,6 +25,28 @@
     e000-e3ff   ROM     JBUG monitor program
     e400-ffff   -/-     mirrors of monitor rom
 
+
+Enter the 4 digit address then the command key:
+
+  - M : Examine and Change Memory (example: E000M, then G to skip to next, ESC to exit)
+  - E : Escape (abort) operation (ESC key in our emulation)
+  - R : Examine Registers
+  - G : Begin execution at specified address
+  - P : Punch data from memory to magnetic tape
+  - L : Load memory from magnetic tape
+  - N : Trace one instruction
+  - V : Set (and remove) breakpoints
+
+The keys are laid out as:
+
+  P L N V
+
+  7 8 9 A  M
+  4 5 6 B  E
+  1 2 3 C  R
+  0 F E D  G
+
+
 Pasting:
         0-F : as is
         NEXT : ^
@@ -38,8 +61,11 @@ Test Paste:
         program that you need to enter in step 1:
         H0020=8E^00^FF^4F^C6^04^CE^00^10^AB^00^08^5A^26^FA^97^15^3F^H
 
+        Save the above program to tape:
+        HA002=00^20^00^32^HP (A002 has start address, A004 has end address, big endian)
+
 TODO
-        Cassette (it is extremely complex, with approx 10 chips)
+        Display should go blank during cassette operations
 
 
 ******************************************************************************/
@@ -65,28 +91,38 @@ public:
 
 	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pia_s(*this, "pia_s"),
-	m_pia_u(*this, "pia_u"),
-	m_acia(*this, "acia")
+		m_maincpu(*this, "maincpu"),
+		m_pia_s(*this, "pia_s"),
+		m_pia_u(*this, "pia_u"),
+		m_acia(*this, "acia"),
+		m_cass(*this, "cassette")
 	{ }
 
+	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
+	DECLARE_READ8_MEMBER(mekd2_key_r);
+	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
+	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
+	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mekd2_cart);
+	DECLARE_READ_LINE_MEMBER(cass_r);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	UINT8 m_cass_data[4];
+	UINT8 m_segment;
+	UINT8 m_digit;
+	UINT8 m_keydata;
+	bool m_cass_state;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
-	DECLARE_READ_LINE_MEMBER( mekd2_key40_r );
-	DECLARE_READ8_MEMBER( mekd2_key_r );
-	DECLARE_WRITE_LINE_MEMBER( mekd2_nmi_w );
-	DECLARE_WRITE8_MEMBER( mekd2_digit_w );
-	DECLARE_WRITE8_MEMBER( mekd2_segment_w );
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_keydata;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mekd2_cart);
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	required_device<cassette_image_device> m_cass;
 };
 
 
@@ -113,29 +149,6 @@ ADDRESS_MAP_END
 
 ************************************************************/
 
-/*
-
-Enter the 4 digit address then the command key:
-
-  - M : Examine and Change Memory (example: E000M, then G to skip to next, H to exit)
-  - E : Escape (abort) operation (H key in our emulation)
-  - R : Examine Registers
-  - G : Begin execution at specified address
-  - P : Punch data from memory to magnetic tape
-  - L : Load memory from magnetic tape
-  - N : Trace one instruction
-  - V : Set (and remove) breakpoints
-
-The keys are laid out as:
-
-  P L N V
-
-  7 8 9 A  M
-  4 5 6 B  E
-  1 2 3 C  R
-  0 F E D  G
-
- */
 static INPUT_PORTS_START( mekd2 )
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
@@ -312,16 +325,26 @@ static const pia6821_interface mekd2_u_mc6821_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
 };
 
+READ_LINE_MEMBER( mekd2_state::cass_r )
+{
+	return (bool)m_cass_data[2];
+}
+
+WRITE_LINE_MEMBER( mekd2_state::cass_w )
+{
+	m_cass_state = state;
+}
+
 static ACIA6850_INTERFACE( mekd2_acia_intf )
 {
-	XTAL_MEKD2 / 256,   //connected to cassette circuit /* tx clock 4800Hz */
-	XTAL_MEKD2 / 256,   //connected to cassette circuit /* rx clock varies, controlled by cassette circuit */
-	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* in rxd func */
-	DEVCB_NULL,//LINE(cass),//connected to cassette circuit /* out txd func */
-	DEVCB_NULL,                     /* in cts func */
-	DEVCB_NULL,     //connected to cassette circuit /* out rts func */
-	DEVCB_NULL,                     /* in dcd func */
-	DEVCB_NULL                      /* out irq func */
+	XTAL_MEKD2 / 256, /* tx clock 4800Hz */
+	300,     /* rx clock line, toggled by cassette circuit */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, cass_r), /* in rxd func */
+	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, cass_w), /* out txd func */
+	DEVCB_NULL, /* in cts func */
+	DEVCB_NULL, /* out rts func */
+	DEVCB_NULL, /* in dcd func */
+	DEVCB_NULL  /* out irq func NOT USED */
 };
 
 DEVICE_IMAGE_LOAD_MEMBER( mekd2_state,mekd2_cart )
@@ -347,6 +370,30 @@ DEVICE_IMAGE_LOAD_MEMBER( mekd2_state,mekd2_cart )
 		image.fread( &RAM[addr++], 1);
 
 	return IMAGE_INIT_PASS;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
+{
+	m_cass_data[3]++;
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
 }
 
 /***********************************************************
@@ -379,6 +426,8 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_PIA6821_ADD("pia_s", mekd2_s_mc6821_intf)
 	MCFG_PIA6821_ADD("pia_u", mekd2_u_mc6821_intf)
 	MCFG_ACIA6850_ADD("acia", mekd2_acia_intf)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
 MACHINE_CONFIG_END
 
 /***********************************************************
@@ -398,5 +447,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY     FULLNAME */
-CONS( 1977, mekd2,  0,  0,  mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT    COMPANY     FULLNAME   FLAGS */
+CONS( 1977, mekd2,  0,      0,      mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , 0 )
