@@ -38,6 +38,10 @@
 #define IDE_ERROR_DIAGNOSTIC_PASSED 0x01
 #define IDE_ERROR_DIAGNOSTIC_DEVICE1_FAILED 0x81
 
+#define IDE_DEVICE_HEAD_HS   0x0f
+#define IDE_DEVICE_HEAD_DRV  0x10
+#define IDE_DEVICE_HEAD_L    0x40
+
 // ======================> ide_device_interface
 
 class ide_device_interface
@@ -58,7 +62,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
 	virtual bool is_ready() { return true; }
-	virtual UINT8 *get_features() = 0;
+	virtual UINT8 *identify_device_buffer() = 0;
 
 	UINT8           m_master_password_enable;
 	UINT8           m_user_password_enable;
@@ -87,7 +91,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
-	virtual UINT8 *get_features() { return m_features; }
+	virtual UINT8 *identify_device_buffer() { return m_identify_device; }
 	
 protected:
 	virtual void device_start();
@@ -98,12 +102,12 @@ protected:
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 	virtual void read_key(UINT8 key[]) = 0;
 
-	bool device_selected() { return m_csel == (m_device_head & 0x10) >> 4; }
+	bool device_selected() { return m_csel == (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
 	bool single_device() { return m_csel == 0 && m_dasp == 0; }
 
 	void set_irq(int state);
 	void set_dmarq(int state);
-	void ide_build_features();
+	void ide_build_identify_device();
 
 	virtual bool process_command();
 	virtual void process_buffer();
@@ -121,8 +125,8 @@ protected:
 	UINT8           m_command;
 	UINT8           m_device_control;
 
-	int m_has_features;
-	UINT8           m_features[IDE_DISK_SECTOR_SIZE];
+	int m_can_identify_device;
+	UINT8           m_identify_device[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_num_cylinders;
 	UINT8           m_num_sectors;
 	UINT8           m_num_heads;

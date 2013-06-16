@@ -80,9 +80,9 @@ WRITE_LINE_MEMBER( ide_controller_device::dmarq1_write_line )
     INITIALIZATION AND RESET
 ***************************************************************************/
 
-UINT8 *ide_controller_device::ide_get_features(int _drive)
+UINT8 *ide_controller_device::identify_device_buffer(int _drive)
 {
-	return m_slot[_drive]->dev()->get_features();
+	return m_slot[_drive]->dev()->identify_device_buffer();
 }
 
 void ide_controller_device::ide_set_master_password(int _drive, const UINT8 *password)

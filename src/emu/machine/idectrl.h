@@ -87,7 +87,7 @@ public:
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ide_controller_device &>(device).m_dmarq_handler.set_callback(object); }
 
-	UINT8 *ide_get_features(int drive);
+	UINT8 *identify_device_buffer(int drive);
 	void ide_set_master_password(int drive, const UINT8 *password);
 	void ide_set_user_password(int drive, const UINT8 *password);
 

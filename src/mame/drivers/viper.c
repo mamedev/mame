@@ -2034,13 +2034,13 @@ void viper_state::machine_reset()
 	m_ide->reset();
 	mpc8240_epic_reset();
 
-	UINT8 *ide_features = m_ide->ide_get_features(0);
+	UINT8 *identify_device = m_ide->identify_device_buffer(0);
 
 	// Viper expects these settings or the BIOS fails
-	ide_features[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
-	ide_features[51*2+1] = 2;
-	ide_features[67*2+0] = 0xf0;        /* 67: minimum PIO transfer cycle time without flow control */
-	ide_features[67*2+1] = 0x00;
+	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
+	identify_device[51*2+1] = 2;
+	identify_device[67*2+0] = 0xf0;        /* 67: minimum PIO transfer cycle time without flow control */
+	identify_device[67*2+1] = 0x00;
 }
 
 static const voodoo_config voodoo_intf =

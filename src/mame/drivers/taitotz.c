@@ -2530,11 +2530,11 @@ void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != NULL)
 	{
-		UINT8 *ide_features = m_ide->ide_get_features(0);
+		UINT8 *identify_device = m_ide->identify_device_buffer(0);
 
 		for (int i=0; i < 20; i++)
 		{
-			ide_features[10*2+(i^1)] = m_hdd_serial_number[i];
+			identify_device[10*2+(i^1)] = m_hdd_serial_number[i];
 		}
 	}
 }

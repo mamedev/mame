@@ -2704,7 +2704,7 @@ void ide_baseboard_device::device_reset()
 	m_num_cylinders=65535;
 	m_num_sectors=255;
 	m_num_heads=255;
-	ide_build_features();
+	ide_build_identify_device();
 }
 
 int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)

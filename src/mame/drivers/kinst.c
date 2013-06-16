@@ -215,35 +215,35 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	UINT8 *features = m_ide->ide_get_features(0);
+	UINT8 *identify_device = m_ide->identify_device_buffer(0);
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
 		/* kinst: tweak the model number so we pass the check */
-		features[27*2+0] = 0x54;
-		features[27*2+1] = 0x53;
-		features[28*2+0] = 0x31;
-		features[28*2+1] = 0x39;
-		features[29*2+0] = 0x30;
-		features[29*2+1] = 0x35;
-		features[30*2+0] = 0x47;
-		features[30*2+1] = 0x41;
-		features[31*2+0] = 0x20;
-		features[31*2+1] = 0x20;
+		identify_device[27*2+0] = 0x54;
+		identify_device[27*2+1] = 0x53;
+		identify_device[28*2+0] = 0x31;
+		identify_device[28*2+1] = 0x39;
+		identify_device[29*2+0] = 0x30;
+		identify_device[29*2+1] = 0x35;
+		identify_device[30*2+0] = 0x47;
+		identify_device[30*2+1] = 0x41;
+		identify_device[31*2+0] = 0x20;
+		identify_device[31*2+1] = 0x20;
 	}
 	else
 	{
 		/* kinst2: tweak the model number so we pass the check */
-		features[10*2+0] = 0x30;
-		features[10*2+1] = 0x30;
-		features[11*2+0] = 0x54;
-		features[11*2+1] = 0x53;
-		features[12*2+0] = 0x31;
-		features[12*2+1] = 0x39;
-		features[13*2+0] = 0x30;
-		features[13*2+1] = 0x35;
-		features[14*2+0] = 0x47;
-		features[14*2+1] = 0x41;
+		identify_device[10*2+0] = 0x30;
+		identify_device[10*2+1] = 0x30;
+		identify_device[11*2+0] = 0x54;
+		identify_device[11*2+1] = 0x53;
+		identify_device[12*2+0] = 0x31;
+		identify_device[12*2+1] = 0x39;
+		identify_device[13*2+0] = 0x30;
+		identify_device[13*2+1] = 0x35;
+		identify_device[14*2+0] = 0x47;
+		identify_device[14*2+1] = 0x41;
 	}
 
 	/* set a safe base location for video */

@@ -3163,13 +3163,13 @@ void cobra_state::machine_reset()
 {
 	m_sub_interrupt = 0xff;
 
-	UINT8 *ide_features = m_ide->ide_get_features(0);
+	UINT8 *identify_device = m_ide->identify_device_buffer(0);
 
 	// Cobra expects these settings or the BIOS fails
-	ide_features[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
-	ide_features[51*2+1] = 2;
-	ide_features[67*2+0] = 0xe0;        /* 67: minimum PIO transfer cycle time without flow control */
-	ide_features[67*2+1] = 0x01;
+	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
+	identify_device[51*2+1] = 2;
+	identify_device[67*2+0] = 0xe0;        /* 67: minimum PIO transfer cycle time without flow control */
+	identify_device[67*2+1] = 0x01;
 
 	m_renderer->gfx_reset(machine());
 
