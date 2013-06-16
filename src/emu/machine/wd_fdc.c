@@ -109,7 +109,8 @@ void wd_fdc_t::device_reset()
 	live_abort();
 
 	// restore
-	cmd_w(0x03);
+	last_dir = 1;
+	seek_start(RESTORE);
 }
 
 void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
