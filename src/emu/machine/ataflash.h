@@ -29,7 +29,8 @@ protected:
 	virtual bool is_ready();
 
 private:
-	unsigned char m_cis[512];
+	UINT8 m_cis[512];
+	UINT8 m_key[5];
 	UINT8 m_gnetreadlock;
 	int m_locked;
 };

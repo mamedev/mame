@@ -1424,16 +1424,6 @@ void ide_hdd_device::device_reset()
 }
 
 //-------------------------------------------------
-//  read device key
-//-------------------------------------------------
-
-void ide_hdd_device::read_key(UINT8 key[])
-{
-	UINT32 metalength;
-	m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key, 5, metalength);
-}
-
-//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------

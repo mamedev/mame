@@ -100,7 +100,6 @@ protected:
 
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
-	virtual void read_key(UINT8 key[]) = 0;
 
 	bool device_selected() { return m_csel == (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
 	bool single_device() { return m_csel == 0 && m_dasp == 0; }
@@ -179,8 +178,6 @@ protected:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-
-	virtual void read_key(UINT8 key[]);
 
 	chd_file       *m_handle;
 	hard_disk_file *m_disk;

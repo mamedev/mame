@@ -23,14 +23,20 @@ void ata_flash_pccard_device::device_reset()
 {
 	ide_hdd_device::device_reset();
 
-	m_locked = 0x1ff;
-	m_gnetreadlock = 1;
-
 	UINT32 metalength;
+	memset(m_key, 0, sizeof(m_key));
 	memset(m_cis, 0xff, 512);
 
 	if (m_handle != NULL)
+	{
 		m_handle->read_metadata(PCMCIA_CIS_METADATA_TAG, 0, m_cis, 512, metalength);
+
+		if (m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, m_key, 5, metalength) == CHDERR_NONE)
+		{
+			m_locked = 0x1ff;
+			m_gnetreadlock = 1;
+		}
+	}
 }
 
 READ16_MEMBER( ata_flash_pccard_device::read_memory )
@@ -89,12 +95,9 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
 {
 	if(offset >= 0x280 && offset <= 0x288 && m_handle != NULL)
 	{
-		dynamic_buffer key(m_handle->hunk_bytes());
-		m_handle->read_metadata(HARD_DISK_KEY_METADATA_TAG, 0, key);
-
 		UINT8 v = data;
 		int pos = offset - 0x280;
-		UINT8 k = pos < key.count() ? key[pos] : 0;
+		UINT8 k = pos < sizeof(m_key) ? m_key[pos] : 0;
 
 		if(v == k)
 		{
@@ -119,8 +122,6 @@ bool ata_flash_pccard_device::is_ready()
 
 bool ata_flash_pccard_device::process_command()
 {
-	UINT8 key[5];
-
 	switch (m_command)
 	{
 	case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
@@ -145,8 +146,7 @@ bool ata_flash_pccard_device::process_command()
 		//LOGPRINT(("IDE GNET Unlock 3\n"));
 
 		/* key check */
-		read_key(key);
-		if (m_feature == key[0] && m_sector_count == key[1] && m_sector_number == key[2] && m_cylinder_low == key[3] && m_cylinder_high == key[4])
+		if (m_feature == m_key[0] && m_sector_count == m_key[1] && m_sector_number == m_key[2] && m_cylinder_low == m_key[3] && m_cylinder_high == m_key[4])
 		{
 			m_gnetreadlock = 0;
 		}
@@ -175,12 +175,10 @@ void ata_flash_pccard_device::process_buffer()
 {
 	if (m_command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
 	{
-		UINT8 key[5] = { 0 };
 		int i, bad = 0;
-		read_key(key);
 
 		for (i=0; !bad && i<512; i++)
-			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != key[i-2]);
+			bad = ((i < 2 || i >= 7) && m_buffer[i]) || ((i >= 2 && i < 7) && m_buffer[i] != m_key[i-2]);
 
 		if (bad)
 		{
