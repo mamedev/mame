@@ -160,7 +160,7 @@ UINT32 ide_mass_storage_device::lba_address()
 
 	/* standard CHS */
 	else
-		return (((((m_cylinder_high << 8 ) | m_cylinder_low) * m_num_heads) + (m_device_head & IDE_DEVICE_HEAD_HS)) * m_num_sectors) + m_sector_number - 1;
+		return (((((m_cylinder_high << 8) | m_cylinder_low) * m_num_heads) + (m_device_head & IDE_DEVICE_HEAD_HS)) * m_num_sectors) + m_sector_number - 1;
 }
 
 
@@ -457,6 +457,8 @@ void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer
 
 void ide_mass_storage_device::next_sector()
 {
+	UINT8 cur_head = m_device_head & IDE_DEVICE_HEAD_HS;
+
 	/* LBA direct? */
 	if (m_device_head & IDE_DEVICE_HEAD_L)
 	{
@@ -467,8 +469,8 @@ void ide_mass_storage_device::next_sector()
 			if (m_cylinder_low == 0)
 			{
 				m_cylinder_high++;
-				if( m_cylinder_high == 0)
-					m_device_head = (m_device_head & ~IDE_DEVICE_HEAD_HS) | ((m_device_head + 1) & IDE_DEVICE_HEAD_HS);
+				if (m_cylinder_high == 0)
+					cur_head++;
 			}
 		}
 	}
@@ -482,16 +484,18 @@ void ide_mass_storage_device::next_sector()
 		{
 			/* heads are 0 based */
 			m_sector_number = 1;
-			m_device_head = (m_device_head & ~IDE_DEVICE_HEAD_HS) | ((m_device_head + 1) & IDE_DEVICE_HEAD_HS);
-			if ((m_device_head & IDE_DEVICE_HEAD_HS) >= m_num_heads)
+			cur_head++;
+			if (cur_head >= m_num_heads)
 			{
-				m_device_head &= ~IDE_DEVICE_HEAD_HS;
+				cur_head = 0;
 				m_cylinder_low++;
 				if (m_cylinder_low == 0)
 					m_cylinder_high++;
 			}
 		}
 	}
+
+	m_device_head = (m_device_head & ~IDE_DEVICE_HEAD_HS) | cur_head;
 
 	m_cur_lba = lba_address();
 }
