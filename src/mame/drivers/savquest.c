@@ -603,7 +603,7 @@ MACHINE_CONFIG_END
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
-	ROM_LOAD( "sq-aflash.bin", 0x00000, 0x040000, BAD_DUMP CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) // first half is 1-filled
+	ROM_LOAD( "v451pg.bin", 0x00000, 0x040000, BAD_DUMP CRC(d02d6c44) SHA1(db4d1c1808be448c70d09a5fc5ff738eeecf60b6) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
 	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
