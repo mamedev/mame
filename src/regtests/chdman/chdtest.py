@@ -58,6 +58,13 @@ for root, dirs, files in os.walk(inputPath):
 		outFile = os.path.join(root, d, "out.chd").replace("input", "output")
 		tempFilePath = os.path.join(tempPath, d)
 		tempFile = os.path.join(tempFilePath, "out.chd")
+		inParams = inFile + ".params"
+		params = []
+		if os.path.exists(inParams):
+			f = open(inParams, 'r')
+			paramsstr = f.read()
+			f.close()
+			params = paramsstr.split(" ")
 		cmd = []
 		if not os.path.exists(tempFilePath):
 			os.makedirs(tempFilePath)
@@ -66,18 +73,14 @@ for root, dirs, files in os.walk(inputPath):
 			inFile += "." + ext
 			cmd = [chdmanBin, "createcd", "-f", "-i", inFile, "-o", tempFile]
 		elif d.startswith("createhd"):
-			inFile += ".params"
-			f = open(inFile, 'r')
-			paramsstr = f.read()
-			f.close()
-			params = paramsstr.split(" ")
-			cmd = [chdmanBin, "createhd", "-f", "-o", tempFile] + params
+			cmd = [chdmanBin, "createhd", "-f", "-o", tempFile]
 		elif d.startswith("copy"):
 			inFile += ".chd"
 			cmd = [chdmanBin, "copy", "-f", "-i", inFile, "-o", tempFile]
 		else:
 			print "unsupported mode"
 			continue
+		cmd += params
 		exitcode, stdout, stderr = runProcess(cmd)
 		if not exitcode == 0:
 			print d + " - command failed with " + str(exitcode) + " (" + stderr + ")"
