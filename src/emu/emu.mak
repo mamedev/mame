@@ -183,10 +183,7 @@ $(LIBEMU): $(LIBEMUOBJS)
 
 include $(EMUSRC)/cpu/cpu.mak
 
-$(LIBCPU): $(CPUOBJS)
-
 $(LIBDASM): $(DASMOBJS)
-
 
 
 #-------------------------------------------------
@@ -195,18 +192,11 @@ $(LIBDASM): $(DASMOBJS)
 
 include $(EMUSRC)/sound/sound.mak
 
-$(LIBSOUND): $(SOUNDOBJS)
-
-
-
 #-------------------------------------------------
 # video core objects
 #-------------------------------------------------
 
 include $(EMUSRC)/video/video.mak
-
-$(LIBVIDEO): $(VIDEOOBJS)
-
 
 #-------------------------------------------------
 # machine core objects
@@ -214,8 +204,11 @@ $(LIBVIDEO): $(VIDEOOBJS)
 
 include $(EMUSRC)/machine/machine.mak
 
-$(LIBMACHINE): $(MACHINEOBJS)
+#-------------------------------------------------
+# core optional library
+#-------------------------------------------------
 
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS)
 
 #-------------------------------------------------
 # additional dependencies
