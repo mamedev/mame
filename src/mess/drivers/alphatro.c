@@ -4,18 +4,23 @@
 
     skeleton driver
 
-    z80 + HD46505 as a CRTC
+    z80 + HD46505SP as a CRTC
 
-        Has a socket for monochrome (to the standard amber monitor),
-        and another for RGB. We emulate this with a configuration switch.
+    Other chips: 8251, 8257, 8259
+    Crystals: 16MHz, 17.73447MHz
+    Floppy format: 2 sides, 40 tracks, 16 sectors, 256 bytes = 320kb.
+    FDC (unknown) is in a plug-in module.
 
-        The Z80 must start at E000, but unlike other designs (Super80 for
-        example) which causes the ROMs to appear everywhere during boot,
-        this one (it seems) holds the data bus low until E000 is reached.
-        This kind of boot still needs to be emulated.
+    Has a socket for monochrome (to the standard amber monitor),
+    and another for RGB. We emulate this with a configuration switch.
 
-        This machine has 64k RAM, the ROMs being copied into RAM when
-        needed.
+    The Z80 must start at E000, but unlike other designs (Super80 for
+    example) which cause the ROMs to appear everywhere during boot,
+    this one (it seems) holds the data bus low until E000 is reached.
+    This kind of boot still needs to be emulated.
+
+    This machine has 64k RAM, the ROMs being copied into RAM when
+    needed.
 
 ***************************************************************************/
 
@@ -49,7 +54,7 @@ public:
 	m_cass(*this, "cassette"),
 	m_beep(*this, "beeper"),
 	m_p_ram(*this, "p_ram"),
-	m_p_videoram(*this, "p_videoram"){ }
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -62,6 +67,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
 
 	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_p_videoram;
@@ -75,6 +82,8 @@ public:
 
 private:
 	UINT8 m_timer_bit;
+	UINT8 m_cass_data[4];
+	bool m_cass_state;
 	virtual void palette_init();
 };
 
@@ -105,6 +114,9 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 	}
 
 	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+
+	if (BIT(data,2))
+		m_cass_state = 1;
 }
 
 void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -128,12 +140,12 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ_LINE_MEMBER( alphatro_state::rxdata_callback )
 {
-	return (m_cass->input() > -0.1) ? 1 : 0;
+	return (bool)m_cass_data[2];
 }
 
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 {
-	m_cass->output( (state) ? 0.8 : -0.8);
+	m_cass_state = state;
 }
 
 void alphatro_state::video_start()
@@ -186,7 +198,7 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
 	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
@@ -353,17 +365,20 @@ void alphatro_state::machine_start()
 void alphatro_state::machine_reset()
 {
 	// do what the IPL does
-	//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
 	UINT8* ROM = memregion("maincpu")->base();
 	m_maincpu->set_pc(0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
-	//  membank("bank1")->set_base(RAM);
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
-	m_serial_timer->adjust(attotime::from_hz(500),0,attotime::from_hz(500));  // USART clock - this is a guesstimate
+	m_serial_timer->adjust(attotime::from_hz(19225),0,attotime::from_hz(19225));  // USART clock - this value loads a real tape
 	m_timer_bit = 0;
+	m_cass_state = 1;
+	m_cass_data[0] = 0;
+	m_cass_data[1] = 0;
+	m_cass_data[2] = 0;
+	m_cass_data[3] = 0;
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
 }
@@ -412,11 +427,34 @@ static const i8251_interface alphatro_usart_interface =
 	DEVCB_NULL
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_c)
+{
+	m_cass_data[3]++;
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_p)
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
+}
+
 static const cassette_interface alphatro_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
-	//(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	"alphatro_cass",
 	NULL
@@ -446,13 +484,14 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12_288MHz / 8, alphatro_crtc6845_interface) // clk unknown
 
 	MCFG_I8251_ADD("usart", alphatro_usart_interface)
 
 	MCFG_CASSETTE_ADD("cassette", alphatro_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_c", alphatro_state, alphatro_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("alphatro_p", alphatro_state, alphatro_p, attotime::from_hz(40000))
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
