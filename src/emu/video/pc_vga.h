@@ -13,6 +13,7 @@ MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_cirrus_vga );
+MACHINE_CONFIG_EXTERN( pcvideo_s3_vga );
 
 // ======================> vga_device
 

@@ -15,6 +15,8 @@
     Protected by a HASP brand parallel port dongle.
     I/O board has a PIC17C43 which is not readable.
 
+    On boot it reports: S3 86C775/86C705 Video BIOS. Version 2.04.11 Copyright 1996 S3 Incorporated.
+
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -598,7 +600,7 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
 MACHINE_CONFIG_END
 
 ROM_START( savquest )
@@ -606,11 +608,11 @@ ROM_START( savquest )
 	ROM_LOAD( "v451pg.bin", 0x00000, 0x040000, BAD_DUMP CRC(d02d6c44) SHA1(db4d1c1808be448c70d09a5fc5ff738eeecf60b6) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
+	ROM_LOAD( "s3_764.bin",   0x000000, 0x008000, BAD_DUMP CRC(4f10aac7) SHA1(c77b3f11cc15679121314823588887dd547cd715) )
+	ROM_IGNORE( 0x8000 )
 
 	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "savquest", 0, SHA1(b20cacf45e093b533c538bf4fc08f05f9475d640) )
+	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
 
 
