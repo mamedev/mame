@@ -553,27 +553,6 @@ struct snes_cart_info
 	UINT8 rom_bank_map[0x100];
 };
 
-struct snes_joypad
-{
-	UINT16 buttons;
-};
-
-struct snes_mouse
-{
-	INT16 x, y, oldx, oldy;
-	UINT8 buttons;
-	UINT8 deltax, deltay;
-	int speed;
-};
-
-struct snes_superscope
-{
-	INT16 x, y;
-	UINT8 buttons;
-	int turbo_lock, pause_lock, fire_lock;
-	int offscreen;
-};
-
 class snes_state : public driver_device
 {
 public:
@@ -642,17 +621,9 @@ public:
 	UINT8                 m_oldjoy1_latch;
 
 	/* input-related */
-	UINT16                m_data1[2];
-	UINT16                m_data2[2];
-	UINT8                 m_read_idx[2];
-	snes_joypad           m_joypad[2];
-	snes_mouse            m_mouse[2];
-	snes_superscope       m_scope[2];
-
-	/* input callbacks (to allow MESS to have its own input handlers) */
-	write8_delegate     m_io_read;
-	read8_delegate      m_oldjoy1_read;
-	read8_delegate      m_oldjoy2_read;
+	UINT16                m_data1[4];	// JOY1/JOY2 + 3rd & 4th only used by multitap (hacky support)
+	UINT16                m_data2[4];	// JOY3/JOY4 + 3rd & 4th only used by multitap (hacky support)
+	UINT8                 m_read_idx[4];	// 3rd & 4th only used by multitap (hacky support)
 
 	/* cart related */
 	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!
@@ -685,13 +656,15 @@ public:
 	void hdma_init(address_space &space);
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
+	void write_joy_latch(UINT8 data);
 	inline UINT8 snes_rom_access(UINT32 offset);
 
 	void snes_init_ram();
 
-	DECLARE_WRITE8_MEMBER(nss_io_read);
-	DECLARE_READ8_MEMBER(nss_oldjoy1_read);
-	DECLARE_READ8_MEMBER(nss_oldjoy2_read);
+	// input related
+	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual UINT8 oldjoy1_read(int latched);
+	virtual UINT8 oldjoy2_read(int latched);
 
 	DECLARE_READ8_MEMBER(snes_r_io);
 	DECLARE_WRITE8_MEMBER(snes_w_io);
