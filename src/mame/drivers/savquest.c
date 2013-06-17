@@ -36,6 +36,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
+#include "video/voodoo.h"
 
 
 class savquest_state : public pcat_base_state
@@ -77,6 +78,8 @@ public:
 
 	DECLARE_READ32_MEMBER(parallel_port_r);
 	DECLARE_WRITE32_MEMBER(parallel_port_w);
+
+	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
 protected:
 
@@ -590,6 +593,21 @@ void savquest_state::machine_reset()
 	membank("bios_ec000")->set_base(memregion("bios")->base() + 0x2c000);
 }
 
+WRITE_LINE_MEMBER(savquest_state::vblank_assert)
+{
+}
+
+static const voodoo_config voodoo_intf =
+{
+	2, //               fbmem;
+	4,//                tmumem0;
+	4,//                tmumem1;
+	"screen",//     screen;
+	"maincpu",//            cputag;
+	DEVCB_DRIVER_LINE_MEMBER(savquest_state,vblank_assert),//    vblank;
+	DEVCB_NULL//             stall;
+};
+
 static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
@@ -606,6 +624,8 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
+
+	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, voodoo_intf)
 MACHINE_CONFIG_END
 
 ROM_START( savquest )
