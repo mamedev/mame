@@ -561,7 +561,12 @@ static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 //  AM_RANGE(0x5000, 0x5007) // routes to port $eb
 ADDRESS_MAP_END
 
+#define AT_KEYB_HELPER(bit, text, key1) \
+	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
+
 static INPUT_PORTS_START( savquest )
+	PORT_START("pc_keyboard_3")
+	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
 INPUT_PORTS_END
 
 void savquest_state::machine_start()
