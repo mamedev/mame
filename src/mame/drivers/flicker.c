@@ -37,7 +37,7 @@ public:
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<i4004_cpu_device> m_maincpu;
 
 private:
 	UINT8 m_out_data;
@@ -141,7 +141,7 @@ WRITE8_MEMBER( flicker_state::port01_w )
 	if (BIT(ioport("COIN")->read(), 0) )
 		test_port |= coin_port;
 
-	i4004_set_test(m_maincpu, BIT(test_port, offset));
+	m_maincpu->set_test(BIT(test_port, offset));
 }
 
 WRITE8_MEMBER( flicker_state::port10_w )
