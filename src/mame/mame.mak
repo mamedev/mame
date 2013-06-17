@@ -19,6 +19,10 @@ depend: maketree $(MAKEDEP_TARGET)
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/$(TARGET) > depend_$(TARGET).mak
 endif
 
+mak: maketree $(MAKEMAK_TARGET)
+	@echo Rebuilding $(SUBTARGET).mak...
+	$(MAKEMAK) $(SRC)/$(TARGET)/$(SUBTARGET).lst -I. $(INCPATH) -I$(SRC)/$(TARGET)/layout -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/$(TARGET)/drivers > $(SUBTARGET).mak
+
 MAMESRC = $(SRC)/mame
 MAMEOBJ = $(OBJ)/mame
 

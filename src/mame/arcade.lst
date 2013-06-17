@@ -1091,6 +1091,7 @@ gdvsgd
 
 // Misc Namco games
 30test          // (c) 1997
+@20pacgal
 25pacman        // (c) 2005 Ver 2.0 - Same hardware as 20pacgal
 20pacgal        // (c) 2000 Ver 1.08
 20pacgalr4      // (c) 2000 Ver 1.04
@@ -2795,6 +2796,7 @@ vulgusj         //  5/1984 (c) 1984
 sonson          //  7/1984 (c) 1984
 sonsonj         //  7/1984 (c) 1984 (Japan)
 higemaru        //  9/1984 (c) 1984
+@1942
 1942            // 12/1984 (c) 1984
 1942a           // 12/1984 (c) 1984
 1942abl         // bootleg
@@ -9878,6 +9880,7 @@ wallc           // (c) 1984 Midcoin
 wallca          // (c) 1984 Midcoin
 wink            // (c) 1985 Midcoin
 winka           // (c) 1985 Midcoin
+@24cdjuke
 24cdjuke        // (c) 1988 Midcoin
 skyarmy         // (c) 1982 Shoei
 lethalj         // (c) 1996 The Game Room

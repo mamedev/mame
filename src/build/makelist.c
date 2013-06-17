@@ -175,6 +175,11 @@ int parse_file(const char *srcfile)
 			ignorelst[ignorecount++] = name;
 			continue;
 		}
+		if (c == '@')
+		{
+			// Used for makemak tool
+			continue;
+		}
 
 		// otherwise treat as a driver name
 		char drivname[32];
