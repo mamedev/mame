@@ -456,6 +456,9 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
 	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "alphatro_flop")
 MACHINE_CONFIG_END
 
 
