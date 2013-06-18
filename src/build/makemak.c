@@ -483,17 +483,24 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 								printf("\t%s \\\n", t.cstr());
 							}
 						}
-						/*
+						
 						printf("\n");
 						printf("\n");
 						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
 						{
 							astring t(entry->tag());
-							if (core_filename_ends_with(t, ".h"))
+							if (core_filename_ends_with(t, ".lay"))
 							{
-								printf("\t%s\n", t.cstr());
+								astring target2(file.name);
+								target2.replace(0, "src/", "$(OBJ)/");
+								target2.replace(0, ".c", ".o");
+
+								t.replace(0, "src/", "$(OBJ)/");
+								t.replace(0, ".lay", ".lh");
+								
+								printf("%s:	%s\n", target2.cstr(), t.cstr());
 							}
-						}*/
+						}
 					}
 				}
 			}
