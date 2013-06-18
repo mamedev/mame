@@ -855,56 +855,56 @@ INLINE UINT16 get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *she
 /* checker = 0, textured = 0, transparent = 0 */
 #define MODEL2_FUNC 0
 #define MODEL2_FUNC_NAME    model2_3d_render_0
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 0, textured = 0, translucent = 1 */
 #define MODEL2_FUNC 1
 #define MODEL2_FUNC_NAME    model2_3d_render_1
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 0, textured = 1, translucent = 0 */
 #define MODEL2_FUNC 2
 #define MODEL2_FUNC_NAME    model2_3d_render_2
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 0, textured = 1, translucent = 1 */
 #define MODEL2_FUNC 3
 #define MODEL2_FUNC_NAME    model2_3d_render_3
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 1, textured = 0, translucent = 0 */
 #define MODEL2_FUNC 4
 #define MODEL2_FUNC_NAME    model2_3d_render_4
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 1, textured = 0, translucent = 1 */
 #define MODEL2_FUNC 5
 #define MODEL2_FUNC_NAME    model2_3d_render_5
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 1, textured = 1, translucent = 0 */
 #define MODEL2_FUNC 6
 #define MODEL2_FUNC_NAME    model2_3d_render_6
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 
 /* checker = 1, textured = 1, translucent = 1 */
 #define MODEL2_FUNC 7
 #define MODEL2_FUNC_NAME    model2_3d_render_7
-#include "model2rd.c"
+#include "model2rd.inc"
 #undef MODEL2_FUNC
 #undef MODEL2_FUNC_NAME
 

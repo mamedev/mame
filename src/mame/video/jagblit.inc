@@ -10,25 +10,25 @@
     #define COMMAND  -- blitter command bits for blitter
     #define A1FIXED  -- fixed A1 flag bits for blitter
     #define A2FIXED  -- fixed A2 flag bits for blitter
-    #include "jagblit.c"
+    #include "jagblit.inc"
 
 ****************************************************************************/
 
 
 #ifndef FUNCNAME
-#error jagblit.c -- requires FUNCNAME to be predefined
+#error jagblit.inc -- requires FUNCNAME to be predefined
 #endif
 
 #ifndef COMMAND
-#error jagblit.c -- requires COMMAND to be predefined
+#error jagblit.inc -- requires COMMAND to be predefined
 #endif
 
 #ifndef A1FIXED
-#error jagblit.c -- requires A1FIXED to be predefined
+#error jagblit.inc -- requires A1FIXED to be predefined
 #endif
 
 #ifndef A2FIXED
-#error jagblit.c -- requires A2FIXED to be predefined
+#error jagblit.inc -- requires A2FIXED to be predefined
 #endif
 
 #ifndef PIXEL_SHIFT_1

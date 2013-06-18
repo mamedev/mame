@@ -3599,4 +3599,4 @@ DRIVER_INIT_MEMBER( galaxian_state, froggrs )
 }
 
 
-#include "galdrvr.c"
+#include "galaxian.inc"

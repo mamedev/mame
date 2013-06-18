@@ -966,7 +966,7 @@ static void translate_matrix_stack(model3_state *state, float x, float y, float 
 /*****************************************************************************/
 /* transformation and rasterizing */
 
-#include "m3raster.c"
+#include "m3raster.inc"
 
 INLINE int is_point_inside(float x, float y, float z, PLANE cp)
 {

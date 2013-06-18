@@ -2414,14 +2414,14 @@ $(MESSOBJ)/skeleton.a:          \
 # miscellaneous dependencies
 #-------------------------------------------------
 
-$(MESS_MACHINE)/snescx4.o: $(MESSSRC)/machine/cx4ops.c \
-				$(MESSSRC)/machine/cx4oam.c \
-				$(MESSSRC)/machine/cx4fn.c \
-				$(MESSSRC)/machine/cx4data.c \
+$(MESS_MACHINE)/snescx4.o: $(MESSSRC)/machine/cx4ops.inc \
+				$(MESSSRC)/machine/cx4oam.inc \
+				$(MESSSRC)/machine/cx4fn.inc \
+				$(MESSSRC)/machine/cx4data.inc \
 
-$(MESS_MACHINE)/nes_slot.o:  $(MESSSRC)/machine/nes_ines.c \
-				$(MESSSRC)/machine/nes_pcb.c \
-				$(MESSSRC)/machine/nes_unif.c \
+$(MESS_MACHINE)/nes_slot.o:  $(MESSSRC)/machine/nes_ines.inc \
+				$(MESSSRC)/machine/nes_pcb.inc \
+				$(MESSSRC)/machine/nes_unif.inc \
 
 $(MESS_AUDIO)/mac.o:        $(MESSSRC)/audio/mac.c \
 				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h

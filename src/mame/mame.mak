@@ -2633,16 +2633,16 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 # misc dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galdrvr.c
-$(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neodrvr.c
-$(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.c \
-			$(MAMESRC)/video/jagblit.c
+$(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galaxian.inc
+$(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neogeo.inc
+$(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.inc \
+			$(MAMESRC)/video/jagblit.inc
 $(DRIVERS)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
 $(VIDEO)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
 $(MACHINE)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
-$(VIDEO)/model2.o:  $(MAMESRC)/video/model2rd.c
-$(VIDEO)/model3.o:  $(MAMESRC)/video/m3raster.c
-$(VIDEO)/n64.o:     $(MAMESRC)/video/rdpfiltr.c
+$(VIDEO)/model2.o:  $(MAMESRC)/video/model2rd.inc
+$(VIDEO)/model3.o:  $(MAMESRC)/video/m3raster.inc
+$(VIDEO)/n64.o:     $(MAMESRC)/video/rdpfiltr.inc
 $(DRIVERS)/bfm_sc4.o: $(MAMESRC)/includes/bfm_sc45.h
 $(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
 $(DRIVERS)/namcos2.o: $(MAMESRC)/includes/namcos2.h
