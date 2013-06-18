@@ -7,15 +7,17 @@
 
  TODO:
  - decrypt Music Ball
- - verify clock speeds etc.
 
 
 driver by Joseba Epalza
 
 - 4MHz XTAL, 20MHz XTAL
-- Z80 main CPU
-- Z80 sound CPU
+- Z80 main CPU (4MHz)
+- Z80 sound CPU (4MHz)
 - YM3812
+
+Video frequency is ~56.4Hz
+Interrupt frequency on audio CPU is not a periodical signal, but there are a lot of pulses of 1 MHz
 
  ======================================================================
 
@@ -235,19 +237,19 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( speedbal, speedbal_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ??? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 8*60) // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(56.4) // measured
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -259,7 +261,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)  /* 4 MHz ??? */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
