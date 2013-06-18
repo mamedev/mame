@@ -14,7 +14,7 @@ Macross                  1992 Banpresto  68000 <unknown cpu> YM2203 2xOKIM6295
 GunNail                  1993 NMK/Tecmo  68000 NMK004        YM2203 2xOKIM6295
 Macross II               1993 Banpresto  68000 Z80           YM2203 2xOKIM6295
 Thunder Dragon 2         1993 NMK        68000 Z80           YM2203 2xOKIM6295
-Rapid Hero               1994 NMK        68000 tmp90c841     YM2203 2xOKIM6295
+Arcadia / Rapid Hero     1994 NMK        68000 tmp90c841     YM2203 2xOKIM6295
 
 S.S. Mission             1992 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
 Air Attack               1996 Comad      68000 Z80           OKIM6295 (hack of Thunder Dragon)
@@ -6179,6 +6179,39 @@ AWA94099-ROME
 
 */
 
+ROM_START( arcadia )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "arcadia.3",      0x00000, 0x80000, CRC(8b46d609) SHA1(793870d74c9d7d04c53d898610c682b2dc90d0af) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )        /* tmp90c841 */
+	ROM_LOAD( "rhp94099.2",    0x00000, 0x20000, CRC(fe01ece1) SHA1(c469fb79f2774089848c814f92ddd3c9e384050f) )
+	ROM_RELOAD(                0x10000, 0x20000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "arcadia.1",    0x000000, 0x020000, CRC(1c2c4008) SHA1(583d74a0a44519a7050b1d8490011ff60222f466) )   /* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "rhp94099.4", 0x000000, 0x200000,  CRC(076eee7b) SHA1(7c315fe33d0fcd92e0ce2f274996c8059228b005) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x600000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.8", 0x000000, 0x200000, CRC(49892f07) SHA1(2f5d20cd193cffcba9041aa11d6665adebeffffa) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  /* 16x16 tiles */
+	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  /* 16x16 tiles */
+
+	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  /* all banked */
+
+	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 samples */
+	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  /* all banked */
+	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  /* all banked */
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) /* unknown */
+	ROM_LOAD( "prom2.u53",      0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) /* unknown */
+	ROM_LOAD( "prom3.u60",      0x0200, 0x0100, CRC(304f98c6) SHA1(8dfd9bf719087ec30c83efe95c4561666c7d1801) ) /* unknown */
+ROM_END
+
 ROM_START( raphero )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rhp94099.3",      0x00000, 0x80000, CRC(ec9b4f05) SHA1(e5bd797620dc449fd78b41d87e9ba5a764eb8b44) )
@@ -7326,7 +7359,8 @@ GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, driver_device, 0,        ROT
 GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, raphero,  0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, arcadia,  0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK",                          "Arcadia", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,  arcadia,  raphero,  raphero, driver_device,  0,        ROT270, "Media Trading Corporation",    "Rapid Hero", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
