@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import hashlib
 
 def runProcess(cmd):
 	process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -8,8 +9,8 @@ def runProcess(cmd):
 	return process.returncode, stdout, stderr
 	
 def compareInfo(info1, info2):
-	lines1 = info1.splitlines();
-	lines2 = info2.splitlines();
+	lines1 = info1.splitlines()
+	lines2 = info2.splitlines()
 	if not len(lines1) == len(lines2):
 		return False
 	
@@ -24,6 +25,15 @@ def compareInfo(info1, info2):
 			print lines1[i] + " - " + lines2[i]
 	
 	return mismatch == False
+
+def sha1sum(path):
+	if not os.path.exists(path):
+		return ""
+	sha1 = hashlib.sha1()
+	f = open(path, 'r')
+	sha1.update(f.read())
+	f.close()
+	return sha1.hexdigest()
 
 currentDirectory = os.path.dirname(os.path.realpath(__file__))
 inputPath = os.path.join(currentDirectory, 'input')
@@ -105,6 +115,11 @@ for root, dirs, files in os.walk(inputPath):
 			failure = True
 		if not compareInfo(info1, info2):
 			print d + " - info output differs"
+			failure = True
+		sha1_1 = sha1sum(tempFile)
+		sha1_2 = sha1sum(outFile)
+		if not sha1_1 == sha1_2:
+			print "SHA1 mismatch - expected: " + sha1_2 + " found: " + sha1_1
 			failure = True
 		# TODO: extract and compare
 
