@@ -1086,6 +1086,11 @@ static void parse_compression(const parameters_t &params, chd_codec_type compres
 		if (end == -1)
 			break;
 	}
+	
+	for(;index < 4; ++index)
+	{
+		compression[index] = CHD_CODEC_NONE;
+	}
 }
 
 
