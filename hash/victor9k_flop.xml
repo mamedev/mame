@@ -26,16 +26,4 @@
 		</part>
 	</software>
 
-	<software name="util">
-		<description>Utilities</description>
-		<year>1988</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="626688">
-				<rom name="victor9k__hl__utilities__5-16-88.sshd.img" size="626688" crc="b37e5fb9" sha1="04e2356a67698583817fa6246906241e55606019" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 </softwarelist>
