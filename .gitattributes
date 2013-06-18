@@ -2956,7 +2956,6 @@ src/mame/drivers/ddragon.c svneol=native#text/plain
 src/mame/drivers/ddragon3.c svneol=native#text/plain
 src/mame/drivers/ddribble.c svneol=native#text/plain
 src/mame/drivers/ddz.c svneol=native#text/plain
-src/mame/drivers/de_1.c svneol=native#text/plain
 src/mame/drivers/de_2.c svneol=native#text/plain
 src/mame/drivers/de_3.c svneol=native#text/plain
 src/mame/drivers/de_3b.c svneol=native#text/plain
