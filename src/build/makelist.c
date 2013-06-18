@@ -178,6 +178,13 @@ int parse_file(const char *srcfile)
 		if (c == '@')
 		{
 			// Used for makemak tool
+			char drivname[256];
+			drivname[0] = 0;
+			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
+			{
+				drivname[pos] = *srcptr++;
+				drivname[pos+1] = 0;
+			}
 			continue;
 		}
 
