@@ -101,7 +101,8 @@ protected:
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 
-	bool device_selected() { return m_csel == (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
+	int dev() { return (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
+	bool device_selected() { return m_csel == dev(); }
 	bool single_device() { return m_csel == 0 && m_dasp == 0; }
 
 	void set_irq(int state);
@@ -110,6 +111,7 @@ protected:
 
 	virtual bool process_command();
 	virtual void process_buffer();
+	virtual void fill_buffer();
 
 	UINT8           m_buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_buffer_offset;
@@ -137,7 +139,6 @@ private:
 	void write_sector_done();
 	void read_next_sector();
 	void continue_write();
-	void signal_delayed_interrupt(attotime time, int buffer_ready);
 	void next_sector();
 	void security_error();
 	void continue_read();

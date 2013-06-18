@@ -436,19 +436,6 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 }
 
-void ide_mass_storage_device::signal_delayed_interrupt(attotime time, int buffer_ready)
-{
-	/* clear buffer ready and set the busy flag */
-	m_status &= ~IDE_STATUS_DRQ;
-	m_status |= IDE_STATUS_BSY;
-
-	/* set a timer */
-	if (buffer_ready)
-		timer_set(time, TID_DELAYED_INTERRUPT_BUFFER_READY);
-	else
-		timer_set(time, TID_DELAYED_INTERRUPT);
-}
-
 /*************************************
  *
  *  Advance to the next sector
@@ -532,18 +519,32 @@ void ide_mass_storage_device::read_buffer_empty()
 	m_status &= ~IDE_STATUS_DRQ;
 	set_dmarq(CLEAR_LINE);
 
-	if (m_master_password_enable || m_user_password_enable)
+	fill_buffer();
+}
+
+void ide_mass_storage_device::fill_buffer()
+{
+	switch (m_command)
 	{
-		security_error();
-		return;
+	case IDE_COMMAND_IDENTIFY_DEVICE:
+		break;
+
+	default:
+		if (m_master_password_enable || m_user_password_enable)
+		{
+			security_error();
+		}
+		else
+		{
+			/* if there is more data to read, keep going */
+			if (m_sector_count > 0)
+				m_sector_count--;
+
+			if (m_sector_count > 0)
+				read_next_sector();
+		}
+		break;
 	}
-
-	/* if there is more data to read, keep going */
-	if (m_sector_count > 0)
-		m_sector_count--;
-
-	if (m_sector_count > 0)
-		read_next_sector();
 }
 
 
@@ -879,19 +880,18 @@ bool ide_mass_storage_device::process_command()
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		LOGPRINT(("IDE Identify device\n"));
 
+		m_status |= IDE_STATUS_BSY;
 		if (m_can_identify_device)
 		{
 			memcpy(m_buffer, m_identify_device, sizeof(m_buffer));
 
-			/* signal an interrupt */
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 1);
+			timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT_BUFFER_READY);
 		}
 		else
 		{
 			m_status |= IDE_STATUS_ERR;
 			m_error = IDE_ERROR_NONE;
-			m_status &= ~IDE_STATUS_DRDY;
-			signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+			timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		}
 		return true;
 
@@ -901,13 +901,13 @@ bool ide_mass_storage_device::process_command()
 		else
 			m_error = IDE_ERROR_DIAGNOSTIC_FAILED;
 
-		/* signal an interrupt */
-		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		m_status |= IDE_STATUS_BSY;
+		timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		return true;
 
 	case IDE_COMMAND_RECALIBRATE:
-		/* signal an interrupt */
-		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		m_status |= IDE_STATUS_BSY;
+		timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		return true;
 
 	case IDE_COMMAND_IDLE:
@@ -919,8 +919,8 @@ bool ide_mass_storage_device::process_command()
 		LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", (m_device_head & IDE_DEVICE_HEAD_HS) + 1, m_sector_count));
 		set_geometry(m_sector_count,(m_device_head & IDE_DEVICE_HEAD_HS) + 1);
 
-		/* signal an interrupt */
-		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		m_status |= IDE_STATUS_BSY;
+		timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		return true;
 
 	case IDE_COMMAND_UNKNOWN_F9:
@@ -934,8 +934,8 @@ bool ide_mass_storage_device::process_command()
 	case IDE_COMMAND_SET_FEATURES:
 		LOGPRINT(("IDE Set features (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
 
-		/* signal an interrupt */
-		signal_delayed_interrupt(MINIMUM_COMMAND_TIME, 0);
+		m_status |= IDE_STATUS_BSY;
+		timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		return true;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
@@ -965,19 +965,19 @@ UINT16 ide_mass_storage_device::read_dma()
 	{
 		if (!m_dmack)
 		{
-			logerror( "%s: read_dma ignored (!DMACK)\n", machine().describe_context() );
+			logerror( "%s: dev %d read_dma ignored (!DMACK)\n", machine().describe_context(), dev() );
 		}
 		else if( !m_dmarq)
 		{
-			logerror( "%s: read_dma ignored (!DMARQ)\n", machine().describe_context() );
+			logerror( "%s: dev %d read_dma ignored (!DMARQ)\n", machine().describe_context(), dev() );
 		}
 		else if (m_status & IDE_STATUS_BSY)
 		{
-			logerror( "%s: read_dma ignored (BSY)\n", machine().describe_context() );
+			logerror( "%s: dev %d read_dma ignored (BSY)\n", machine().describe_context(), dev() );
 		}
 		else if (!(m_status & IDE_STATUS_DRQ))
 		{
-			logerror( "%s: read_dma ignored (!DRQ)\n", machine().describe_context() );
+			logerror( "%s: dev %d read_dma ignored (!DRQ)\n", machine().describe_context(), dev() );
 		}
 		else
 		{
@@ -1007,7 +1007,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, mem_mask );
+			logerror( "%s: dev %d read_cs0 %04x %04x ignored (DMACK)\n", machine().describe_context(), dev(), offset, mem_mask );
 		}
 		else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_STATUS_R)
 		{
@@ -1016,7 +1016,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 				switch (offset)
 				{
 					case IDE_CS0_DATA_RW:
-						logerror( "%s: read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), offset, mem_mask );
+						logerror( "%s: dev %d read_cs0 %04x %04x ignored (BSY)\n", machine().describe_context(), dev(), offset, mem_mask );
 						break;
 
 					default:
@@ -1143,7 +1143,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs1 )
 	{
 		if (m_dmack)
 		{
-			logerror( "%s: read_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, mem_mask );
+			logerror( "%s: dev %d read_cs1 %04x %04x ignored (DMACK)\n", machine().describe_context(), dev(), offset, mem_mask );
 		}
 		else
 		{
@@ -1184,19 +1184,19 @@ void ide_mass_storage_device::write_dma( UINT16 data )
 	{
 		if (!m_dmack)
 		{
-			logerror( "%s: write_dma %04x ignored (!DMACK)\n", machine().describe_context(), data );
+			logerror( "%s: dev %d write_dma %04x ignored (!DMACK)\n", machine().describe_context(), dev(), data );
 		}
 		else if( !m_dmarq)
 		{
-			logerror( "%s: write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), data );
+			logerror( "%s: dev %d write_dma %04x ignored (!DMARQ)\n", machine().describe_context(), dev(), data );
 		}
 		else if (m_status & IDE_STATUS_BSY)
 		{
-			logerror( "%s: write_dma %04x ignored (BSY)\n", machine().describe_context(), data );
+			logerror( "%s: dev %d write_dma %04x ignored (BSY)\n", machine().describe_context(), dev(), data );
 		}
 		else if (!(m_status & IDE_STATUS_DRQ))
 		{
-			logerror( "%s: write_dma %04x ignored (!DRQ)\n", machine().describe_context(), data );
+			logerror( "%s: dev %d write_dma %04x ignored (!DRQ)\n", machine().describe_context(), dev(), data );
 		}
 		else
 		{
@@ -1222,15 +1222,15 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 
 	if (m_dmack)
 	{
-		logerror( "%s: write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, data, mem_mask );
+		logerror( "%s: dev %d write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), dev(), offset, data, mem_mask );
 	}
 	else if ((m_status & IDE_STATUS_BSY) && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: write_cs0 %04x %04x %04x ignored (BSY)\n", machine().describe_context(), offset, data, mem_mask );
+		logerror( "%s: dev %d write_cs0 %04x %04x %04x ignored (BSY)\n", machine().describe_context(), dev(), offset, data, mem_mask );
 	}
 	else if ((m_status & IDE_STATUS_DRQ) && offset != IDE_CS0_DATA_RW && offset != IDE_CS0_COMMAND_W)
 	{
-		logerror( "%s: write_cs0 %04x %04x %04x ignored (DRQ)\n", machine().describe_context(), offset, data, mem_mask );
+		logerror( "%s: dev %d write_cs0 %04x %04x %04x ignored (DRQ) command %02x\n", machine().describe_context(), dev(), offset, data, mem_mask, m_command );
 	}
 	else
 	{
@@ -1244,7 +1244,7 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 				{
 					if (!(m_status & IDE_STATUS_DRQ))
 					{
-						logerror( "%s: write_cs0 %04x %04x %04x ignored (!DRQ)\n", machine().describe_context(), offset, data, mem_mask );
+						logerror( "%s: dev %d write_cs0 %04x %04x %04x ignored (!DRQ)\n", machine().describe_context(), dev(), offset, data, mem_mask );
 					}
 					else
 					{
@@ -1309,6 +1309,8 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 					m_buffer_offset = 0;
 					m_sectors_until_int = 0;
 
+					m_status &= ~IDE_STATUS_BSY;
+					m_status &= ~IDE_STATUS_DRQ;
 					m_status &= ~IDE_STATUS_ERR;
 
 					if (!process_command())
@@ -1332,7 +1334,7 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
 
 	if (m_dmack)
 	{
-		logerror( "%s: write_cs1 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), offset, data, mem_mask );
+		logerror( "%s: dev %d write_cs1 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), dev(), offset, data, mem_mask );
 	}
 	else
 	{
