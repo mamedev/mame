@@ -608,6 +608,14 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 								
 								printf("%s:	%s\n", target2.cstr(), t.cstr());
 							}
+							if (core_filename_ends_with(t, ".inc"))
+							{
+								astring target2(file.name);
+								target2.replace(0, "src/", "$(OBJ)/");
+								target2.replace(0, ".c", ".o");
+
+								printf("%s:	%s\n", target2.cstr(), t.cstr());
+							}
 						}
 					}
 				}

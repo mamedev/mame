@@ -119,7 +119,7 @@ protected:
 	#include "h6280ops.h"
 
 	// include the opcode macros and functions
-	#include "tblh6280.c"
+	#include "tblh6280.inc"
 
 	// address spaces
 	const address_space_config m_program_config;

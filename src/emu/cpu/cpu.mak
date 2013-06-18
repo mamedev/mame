@@ -621,7 +621,6 @@ endif
 $(CPUOBJ)/h6280/h6280.o:    $(CPUSRC)/h6280/h6280.c \
 							$(CPUSRC)/h6280/h6280.h \
 							$(CPUSRC)/h6280/h6280ops.h \
-							$(CPUSRC)/h6280/tblh6280.c
 
 
 
