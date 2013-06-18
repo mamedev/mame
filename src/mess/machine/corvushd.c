@@ -1348,7 +1348,7 @@ static void corvus_process_command_packet(running_machine &machine, UINT8 invali
 		c->buffer.single_byte_response.status =
 			STAT_FATAL_ERR | STAT_ILL_CMD_OP_CODE;      // Respond with an Illegal Op Code
 
-		logerror("corvus_hdc_data_w: Illegal Command %02x, status: 0x%2.2x\n", c->buffer.single_byte_response.status, c->buffer.command.code);
+		logerror("corvus_hdc_data_w: Illegal command 0x%2.2x, status: 0x%2.2x\n", c->buffer.command.code, c->buffer.single_byte_response.status);
 	}
 	//
 	// Command execution complete, free up the controller
