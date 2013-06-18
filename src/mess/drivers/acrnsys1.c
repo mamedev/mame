@@ -27,13 +27,18 @@ Test Paste:
         -0100^11^22^33^44^55^66^77^88^99^-0100^
         Now press up-arrow to confirm the data has been entered.
 
-ToDo:
-- Artwork
-- Cassette
 
 Example usage: Turn on. Press -. Mode letter will show 'A'. Type in an address
                (example FE00). Press - (or any command key). Contents will show
                on the right. Use Up & Down keys to cycle through addresses.
+
+To save a tape, press S then enter start address, press S, enter end address+1,
+               start recording and press S. The save only takes a few seconds.
+
+To load a tape, the display must just have dots, (reset if necessary), start
+               playing tape and immediately press L. The last digit will flicker
+               as the bytes load. At the end, the dots will show again. There's
+               no error checking, so if it doesn't work, reset and try again.
 
 Note that left-most digit is not wired up, and therefore will always be blank.
 
@@ -43,6 +48,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "cpu/m6502/m6502.h"
 #include "machine/ins8154.h"
 #include "machine/74145.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "acrnsys1.lh"
 
 
@@ -51,17 +58,24 @@ class acrnsys1_state : public driver_device
 public:
 	acrnsys1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ttl74145(*this, "ic8_7445"),
-	m_digit(0)
+		m_maincpu(*this, "maincpu"),
+		m_ttl74145(*this, "ic8_7445"),
+		m_cass(*this, "cassette"),
+		m_digit(0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<ttl74145_device> m_ttl74145;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
 	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<ttl74145_device> m_ttl74145;
+	required_device<cassette_image_device> m_cass;
 	UINT8 m_digit;
+	UINT8 m_cass_data[4];
+	bool m_cass_state;
 };
 
 
@@ -72,7 +86,7 @@ public:
 // bit 7 is cassin
 READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 {
-	UINT8 data = 0xff, i, key_line = m_ttl74145->read();
+	UINT8 data = 0x7f, i, key_line = m_ttl74145->read();
 
 	for (i = 0; i < 8; i++)
 	{
@@ -84,17 +98,41 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 			break;
 		}
 	}
-
+	data |= m_cass_data[2];
 	return data;
 }
 
 // bit 6 is cassout
 WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
 {
-	m_digit = data & 0xc7;
+	m_digit = data & 0x47;
 	m_ttl74145->write(m_digit & 7);
+	m_cass_state = BIT(data, 6);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_c)
+{
+	m_cass_data[3]++;
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 128 : 0);
+		m_cass_data[1] = 0;
+	}
+}
 
 /***************************************************************************
     LED DISPLAY
@@ -209,9 +247,17 @@ static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	/* devices */
 	MCFG_INS8154_ADD("b1", ins8154_b1)
 	MCFG_TTL74145_ADD("ic8_7445", default_ttl74145)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
 MACHINE_CONFIG_END
 
 
@@ -230,4 +276,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE   INPUT     INIT  COMPANY  FULLNAME    FLAGS */
-COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, driver_device, 0,    "Acorn", "Acorn System 1", GAME_NO_SOUND_HW )
+COMP( 1978, acrnsys1, 0,     0,     acrnsys1, acrnsys1, driver_device, 0,    "Acorn", "Acorn System 1", 0 )
