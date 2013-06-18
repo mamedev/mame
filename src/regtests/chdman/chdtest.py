@@ -52,7 +52,8 @@ for root, dirs, files in os.walk(inputPath):
 	for d in dirs:
 		if d.startswith("."):
 			continue
-	
+
+		command = ext = d.split("_", 2)[0]			
 		inFile = os.path.join(root, d, "in")
 		# TODO: make this better
 		outFile = os.path.join(root, d, "out.chd").replace("input", "output")
@@ -65,27 +66,26 @@ for root, dirs, files in os.walk(inputPath):
 			paramsstr = f.read()
 			f.close()
 			params = paramsstr.split(" ")
-		cmd = []
 		if not os.path.exists(tempFilePath):
 			os.makedirs(tempFilePath)
-		if d.startswith("createcd"):
+		if command == "createcd":
 			ext = d.split("_", 2)[1]
 			inFile += "." + ext
-			cmd = [chdmanBin, "createcd", "-f", "-i", inFile, "-o", tempFile]
-		elif d.startswith("createhd"):
+		elif command == "createhd":
 			ext = d.split("_", 2)[1]
 			inFile += "." + ext
-			if os.path.exists(inFile):
-				cmd = [chdmanBin, "createhd", "-f", "-i", inFile, "-o", tempFile]
-			else:
-				cmd = [chdmanBin, "createhd", "-f", "-o", tempFile]
-		elif d.startswith("copy"):
+		elif command == "createld":
+			ext = d.split("_", 2)[1]
+			inFile += "." + ext
+		elif command == "copy":
 			inFile += ".chd"
-			cmd = [chdmanBin, "copy", "-f", "-i", inFile, "-o", tempFile]
 		else:
 			print "unsupported mode"
 			continue
-		cmd += params
+		if os.path.exists(inFile):
+			cmd = [chdmanBin, command, "-f", "-i", inFile, "-o", tempFile] + params
+		else:
+			cmd = [chdmanBin, command, "-f", "-o", tempFile] + params
 		exitcode, stdout, stderr = runProcess(cmd)
 		if not exitcode == 0:
 			print d + " - command failed with " + str(exitcode) + " (" + stderr + ")"
@@ -94,7 +94,7 @@ for root, dirs, files in os.walk(inputPath):
 		if not exitcode == 0:
 			print d + " - verify failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
-		# TODO: store exected output of reference file as well and compare
+		# TODO: store expected output of reference file as well and compare
 		exitcode, info1, stderr = runProcess([chdmanBin, "info", "-v", "-i", tempFile])
 		if not exitcode == 0:
 			print d + " - info (temp) failed with " + str(exitcode) + " (" + stderr + ")"
