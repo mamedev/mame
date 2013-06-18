@@ -15,6 +15,10 @@ SOUNDOBJ = $(EMUOBJ)/sound
 
 #-------------------------------------------------
 # DACs
+#@src/emu/sound/dac.h,SOUNDS += DAC
+#@src/emu/sound/dmadac.h,SOUNDS += DMADAC
+#@src/emu/sound/speaker.h,SOUNDS += SPEAKER
+#@src/emu/sound/beep.h,SOUNDS += BEEP
 #-------------------------------------------------
 
 ifneq ($(filter DAC,$(SOUNDS)),)
@@ -37,6 +41,7 @@ endif
 
 #-------------------------------------------------
 # CD audio
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter CDDA,$(SOUNDS)),)
@@ -47,6 +52,7 @@ endif
 
 #-------------------------------------------------
 # Discrete component audio
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter DISCRETE,$(SOUNDS)),)
@@ -65,6 +71,8 @@ $(SOUNDOBJ)/discrete.o: $(SOUNDSRC)/discrete.c \
 
 #-------------------------------------------------
 # Apple custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ASC,$(SOUNDS)),)
@@ -78,6 +86,8 @@ endif
 
 #-------------------------------------------------
 # Atari custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter POKEY,$(SOUNDS)),)
@@ -92,6 +102,7 @@ endif
 
 #-------------------------------------------------
 # Bally Astrocade sound system
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ASTROCADE,$(SOUNDS)),)
@@ -102,6 +113,7 @@ endif
 
 #-------------------------------------------------
 # CEM 3394 analog synthesizer chip
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter CEM3394,$(SOUNDS)),)
@@ -112,6 +124,7 @@ endif
 
 #-------------------------------------------------
 # Data East custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter BSMT2000,$(SOUNDS)),)
@@ -122,6 +135,7 @@ endif
 
 #-------------------------------------------------
 # Ensoniq 5503 (Apple IIgs)
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ES5503,$(SOUNDS)),)
@@ -132,6 +146,7 @@ endif
 
 #-------------------------------------------------
 # Ensoniq 5505/5506
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ES5505 ES5506,$(SOUNDS)),)
@@ -142,6 +157,7 @@ endif
 
 #-------------------------------------------------
 # Excellent Systems ADPCM sound chip
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ES8712,$(SOUNDS)),)
@@ -152,6 +168,8 @@ endif
 
 #-------------------------------------------------
 # Gaelco custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter GAELCO_CG1V,$(SOUNDS)),)
@@ -166,6 +184,7 @@ endif
 
 #-------------------------------------------------
 # RCA CDP1863
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter CDP1863,$(SOUNDS)),)
@@ -176,6 +195,7 @@ endif
 
 #-------------------------------------------------
 # RCA CDP1864
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter CDP1864,$(SOUNDS)),)
@@ -186,6 +206,7 @@ endif
 
 #-------------------------------------------------
 # RCA CDP1869
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter CDP1869,$(SOUNDS)),)
@@ -196,6 +217,7 @@ endif
 
 #-------------------------------------------------
 # GI AY-8910
+#@src/emu/sound/ay8910.h,SOUNDS += AY8910
 #-------------------------------------------------
 
 ifneq ($(filter AY8910,$(SOUNDS)),)
@@ -206,6 +228,7 @@ endif
 
 #-------------------------------------------------
 # Harris HC55516 CVSD
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter HC55516,$(SOUNDS)),)
@@ -216,6 +239,7 @@ endif
 
 #-------------------------------------------------
 # Hudsonsoft C6280 sound chip
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter C6280,$(SOUNDS)),)
@@ -226,6 +250,7 @@ endif
 
 #-------------------------------------------------
 # ICS2115 sound chip
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter ICS2115,$(SOUNDS)),)
@@ -236,6 +261,7 @@ endif
 
 #-------------------------------------------------
 # Imagetek I5000 sound
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter I5000_SND,$(SOUNDS)),)
@@ -246,6 +272,7 @@ endif
 
 #-------------------------------------------------
 # Irem custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter IREMGA20,$(SOUNDS)),)
@@ -256,6 +283,12 @@ endif
 
 #-------------------------------------------------
 # Konami custom sound chips
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter K005289,$(SOUNDS)),)
@@ -286,6 +319,7 @@ endif
 
 #-------------------------------------------------
 # LMC1992 mixer chip
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter LMC1992,$(SOUNDS)),)
@@ -296,6 +330,7 @@ endif
 
 #-------------------------------------------------
 # MAS 3507D MPEG 1/2 Layer 2/3 Audio Decoder
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter MAS3507D,$(SOUNDS)),)
@@ -306,6 +341,7 @@ endif
 
 #-------------------------------------------------
 # MOS 6560VIC
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter MOS656X,$(SOUNDS)),)
@@ -316,6 +352,7 @@ endif
 
 #-------------------------------------------------
 # MOS 7360 TED
+#@src/emu/sound/.h,SOUNDS += 
 #-------------------------------------------------
 
 ifneq ($(filter MOS7360,$(SOUNDS)),)
@@ -326,6 +363,7 @@ endif
 
 #-------------------------------------------------
 # Namco custom sound chips
+#@src/emu/sound/namco.h,SOUNDS += NAMCO
 #-------------------------------------------------
 
 ifneq ($(filter NAMCO NAMCO_15XX NAMCO_CUS30,$(SOUNDS)),)

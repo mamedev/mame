@@ -43,6 +43,7 @@
 #include "osdcore.h"
 #include "astring.h"
 #include "corefile.h"
+#include "corestr.h"
 #include "tagmap.h"
 
 
@@ -109,7 +110,7 @@ static exclude_path *excpaths;
 static tagmap_t<file_entry *> file_map;
 static const char *sourcelst[MAX_SOURCES];
 static int sourcecount;
-
+static tagmap_t<char *> include_map;
 
 
 /***************************************************************************
@@ -122,6 +123,67 @@ static file_entry &compute_dependencies(astring &srcfile);
 
 // path helpers
 static bool find_include_file(astring &srcincpath, const astring &srcfile, const astring &filename);
+
+
+int include_mapping(const char *srcfile)
+{
+	// read source file
+	void *buffer;
+	UINT32 length;
+	file_error filerr = core_fload(srcfile, &buffer, &length);
+	if (filerr != FILERR_NONE)
+	{
+		fprintf(stderr, "Unable to read source file '%s'\n", srcfile);
+		return 1;
+	}
+
+	// rip through it to find all drivers
+	char *srcptr = (char *)buffer;
+	char *endptr = srcptr + length;
+	while (srcptr < endptr)
+	{
+		char c = *srcptr++;
+		// count newlines
+		if (c == 13 || c == 10)
+		{
+			if (c == 13 && *srcptr == 10)
+				srcptr++;
+			continue;
+		}
+		// look for start of C comment
+		if (c == '#' && *srcptr == '@')
+		{
+			srcptr++;
+			//mapping
+			char filename[256];
+			filename[0] = 0;
+			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(filename) - 1 && (*srcptr!=','); pos++)
+			{
+				filename[pos] = *srcptr++;
+				filename[pos+1] = 0;
+			}
+			srcptr++;			// skip comma
+			char mapping[256];
+			mapping[0] = 0;
+			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(mapping) - 1 && (*srcptr!=10) && (*srcptr!=13); pos++)
+			{
+				mapping[pos] = *srcptr++;
+				mapping[pos+1] = 0;
+			}
+			include_map.add(filename,core_strdup(mapping));
+			continue;
+		}
+
+		for (int pos = 0; srcptr < endptr && !isspace(*srcptr); pos++)
+		{
+			c = *srcptr++;
+		}
+	}
+
+	osd_free(buffer);
+
+	return 0;
+}
 
 //-------------------------------------------------
 //  isonlist - return info if item is in source
@@ -275,6 +337,10 @@ int main(int argc, char *argv[])
 	if (parse_file(srcfile))
 		return 1;
 
+	include_mapping("src/emu/cpu/cpu.mak");
+	include_mapping("src/emu/video/video.mak");
+	include_mapping("src/emu/sound/sound.mak");
+	include_mapping("src/emu/machine/machine.mak");
 	// loop over arguments
 	for (int argnum = 2; argnum < argc; argnum++)
 	{
@@ -442,6 +508,48 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 		}
 		delete[] listarray;
 
+		// iterate through each file
+		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
+		{
+			astring srcfile;
+
+			// build the source filename
+			srcfile.printf("%s%c%s", srcdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
+
+			// if we have a file, output it
+			if (entry_type == ENTTYPE_FILE)
+			{
+				// make sure we care, first
+				if (core_filename_ends_with(curlist->name, ".c"))
+				{
+					dependency_map depend_map;
+
+					// find dependencies
+					file_entry &file = compute_dependencies(srcfile);
+					recurse_dependencies(file, depend_map);
+					astring fn = astring(curlist->name);
+					fn.replace(".c","");
+					if (isonlist(fn)) 
+					{
+						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+						{
+							astring t(entry->tag());
+							if (core_filename_ends_with(t, ".h"))
+							{
+								char *foundfile = include_map.find(t);
+								if (foundfile != NULL) {
+									printf("%s\n", foundfile);
+									// we add things just once when needed
+									include_map.remove(t);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		
 		// iterate through each file
 		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
 		{
