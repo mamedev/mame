@@ -269,6 +269,11 @@ avhuff_error avhuff_encoder::encode_data(const UINT8 *source, UINT8 *dest, UINT3
 		for (int chnum = 0; chnum < channels; chnum++)
 			dstoffs += (dest[10 + 2 * chnum] << 8) + dest[11 + 2 * chnum];
 	}
+	else
+	{
+		dest[8] = 0;
+		dest[9] = 0;
+	}
 
 	// encode the video data
 	if (width > 0 && height > 0)
