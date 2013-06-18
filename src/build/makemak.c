@@ -320,6 +320,24 @@ int main(int argc, char *argv[])
 	if (srcdir.len() == 0)
 		usage(argv[0]);
 
+
+	if (sourcecount>0) 
+	{	
+		printf("OBJDIRS += \\\n");
+		printf("\t$(OBJ)/mame/audio \\\n");
+		printf("\t$(OBJ)/mame/drivers \\\n");
+		printf("\t$(OBJ)/mame/layout \\\n");
+		printf("\t$(OBJ)/mame/machine \\\n");
+		printf("\t$(OBJ)/mame/video \\\n");
+		printf("\n\n");
+		printf("DRVLIBS += \\\n");
+		
+		for(int i=0;i<sourcecount;i++) {		
+			printf("\t$(OBJ)/mame/%s.a \\\n",sourcelst[i]);
+		}
+		printf("\n");
+	}	
+
 	// recurse over subdirectories
 	return recurse_dir(srcdir.len(), srcdir);
 }
@@ -450,12 +468,32 @@ static int recurse_dir(int srcrootlen, astring &srcdir)
 						// convert the target from source to object (makes assumptions about rules)
 						astring target(file.name);
 						target.replace(0, "src/", "$(OBJ)/");
-						target.replace(0, ".c", ".o");
+						target.replace(0, "drivers/", "");
+						target.replace(0, ".c", ".a");
 						printf("\n%s : \\\n", target.cstr());
 
 						// iterate over the hashed dependencies and output them as well
-						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry))
-							printf("\t%s \\\n", entry->tag().cstr());
+						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+						{
+							astring t(entry->tag());
+							t.replace(0, "src/", "$(OBJ)/");
+							t.replace(0, ".c", ".o");
+							if (core_filename_ends_with(t, ".o"))
+							{
+								printf("\t%s \\\n", t.cstr());
+							}
+						}
+						/*
+						printf("\n");
+						printf("\n");
+						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+						{
+							astring t(entry->tag());
+							if (core_filename_ends_with(t, ".h"))
+							{
+								printf("\t%s\n", t.cstr());
+							}
+						}*/
 					}
 				}
 			}
