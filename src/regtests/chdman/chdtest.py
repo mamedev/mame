@@ -73,7 +73,12 @@ for root, dirs, files in os.walk(inputPath):
 			inFile += "." + ext
 			cmd = [chdmanBin, "createcd", "-f", "-i", inFile, "-o", tempFile]
 		elif d.startswith("createhd"):
-			cmd = [chdmanBin, "createhd", "-f", "-o", tempFile]
+			ext = d.split("_", 2)[1]
+			inFile += "." + ext
+			if os.path.exists(inFile):
+				cmd = [chdmanBin, "createhd", "-f", "-i", inFile, "-o", tempFile]
+			else:
+				cmd = [chdmanBin, "createhd", "-f", "-o", tempFile]
 		elif d.startswith("copy"):
 			inFile += ".chd"
 			cmd = [chdmanBin, "copy", "-f", "-i", inFile, "-o", tempFile]
