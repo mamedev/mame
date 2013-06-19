@@ -5,6 +5,9 @@
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
 
+	TODO:
+	- currently asserts by selecting a s3 video bank above 1M (register 0x6a)
+
     H/W is a white-box PC consisting of:
     Pentium II 450 CPU
     DFI P2XBL motherboard (i440BX chipset)
@@ -632,9 +635,8 @@ ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD( "v451pg.bin", 0x00000, 0x040000, BAD_DUMP CRC(d02d6c44) SHA1(db4d1c1808be448c70d09a5fc5ff738eeecf60b6) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: needs proper video BIOS dumped
-	ROM_LOAD( "s3_764.bin",   0x000000, 0x008000, BAD_DUMP CRC(4f10aac7) SHA1(c77b3f11cc15679121314823588887dd547cd715) )
-	ROM_IGNORE( 0x8000 )
+	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: extracted thru DOS DEBUG program
+	ROM_LOAD( "myc000.bin",   0x000000, 0x008000, BAD_DUMP CRC(5c0b5d56) SHA1(73d68bd1fd2fd746cf33cf7962393312ef107b02) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
