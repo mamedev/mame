@@ -11,32 +11,67 @@
 
 #include "emu.h"
 #include "cpu/z8000/z8000.h"
+#include "machine/terminal.h"
+
 
 class c900_state : public driver_device
 {
 public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_READ16_MEMBER(key_r);
+	DECLARE_READ16_MEMBER(stat_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 static ADDRESS_MAP_START(c900_mem, AS_PROGRAM, 16, c900_state)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(c900_io, AS_IO, 8, c900_state)
+static ADDRESS_MAP_START(c900_io, AS_IO, 16, c900_state)
+	AM_RANGE(0x100, 0x101) AM_READ(stat_r)
+	AM_RANGE(0x110, 0x111) AM_READ(key_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END
 
-UINT32 c900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+//UINT32 c900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+//{
+//	return 0;
+//}
+
+
+READ16_MEMBER( c900_state::key_r )
 {
-	return 0;
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
 }
+
+READ16_MEMBER( c900_state::stat_r )
+{
+	return (m_term_data) ? 5 : 4;
+}
+
+WRITE8_MEMBER( c900_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(c900_state, kbd_put)
+};
 
 static MACHINE_CONFIG_START( c900, c900_state )
 	/* basic machine hardware */
@@ -45,13 +80,14 @@ static MACHINE_CONFIG_START( c900, c900_state )
 	MCFG_CPU_IO_MAP(c900_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_PALETTE_LENGTH(4)
-	MCFG_SCREEN_UPDATE_DRIVER(c900_state, screen_update)
+//	MCFG_SCREEN_ADD("screen", RASTER)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_SIZE(512, 256)
+//	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+//	MCFG_PALETTE_LENGTH(4)
+//	MCFG_SCREEN_UPDATE_DRIVER(c900_state, screen_update)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 ROM_START( c900 )
