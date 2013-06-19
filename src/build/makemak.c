@@ -118,7 +118,7 @@ static tagmap_t<char *> include_map;
 ***************************************************************************/
 
 // core output functions
-static int recurse_dir(int srcrootlen, astring &srcdir);
+static int recurse_dir(astring &srcdir);
 static file_entry &compute_dependencies(astring &srcfile);
 
 // path helpers
@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
 	}	
 
 	// recurse over subdirectories
-	return recurse_dir(srcdir.len(), srcdir);
+	return recurse_dir(srcdir);
 }
 
 
@@ -413,14 +413,6 @@ int main(int argc, char *argv[])
 /***************************************************************************
     CORE OUTPUT FUNCTIONS
 ***************************************************************************/
-
-static int compare_list_entries(const void *p1, const void *p2)
-{
-	const list_entry *entry1 = *(const list_entry **)p1;
-	const list_entry *entry2 = *(const list_entry **)p2;
-	return entry1->name.cmp(entry2->name);
-}
-
 
 /*-------------------------------------------------
     recurse_dependencies - recurse through the
@@ -451,187 +443,101 @@ static void recurse_dependencies(file_entry &file, dependency_map &map)
     recurse_dir - recurse through a directory
 -------------------------------------------------*/
 
-static int recurse_dir(int srcrootlen, astring &srcdir)
+static int recurse_dir(astring &srcdir)
 {
-	static const osd_dir_entry_type typelist[] = { ENTTYPE_DIR, ENTTYPE_FILE };
 	int result = 0;
 
-	// iterate first over directories, then over files
-	for (int entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
+	// iterate through each file
+	for(int i=0;i<sourcecount;i++)
 	{
-		osd_dir_entry_type entry_type = typelist[entindex];
+		astring srcfile;
 
-		// open the directory and iterate through it
-		osd_directory *dir = osd_opendir(srcdir);
-		if (dir == NULL)
-		{
-			result = 1;
-			goto error;
-		}
+		// build the source filename
+		srcfile.printf("%s%c%s.c", srcdir.cstr(), PATH_SEPARATOR[0], sourcelst[i]);
+	
+		dependency_map depend_map;
 
-		// build up the list of files
-		const osd_directory_entry *entry;
-		list_entry *list = NULL;
-		int found = 0;
-		while ((entry = osd_readdir(dir)) != NULL)
-			if (entry->type == entry_type && entry->name[0] != '.')
-			{
-				list_entry *lentry = new list_entry;
-				lentry->name.cpy(entry->name);
-				lentry->next = list;
-				list = lentry;
-				found++;
-			}
-
-		// close the directory
-		osd_closedir(dir);
-
-		// skip if nothing found
-		if (found == 0)
-			continue;
-
-		// allocate memory for sorting
-		list_entry **listarray = new list_entry *[found];
-		found = 0;
-		for (list_entry *curlist = list; curlist != NULL; curlist = curlist->next)
-			listarray[found++] = curlist;
-
-		// sort the list
-		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
-
-		// rebuild the list
-		list = NULL;
-		while (--found >= 0)
-		{
-			listarray[found]->next = list;
-			list = listarray[found];
-		}
-		delete[] listarray;
-
-		// iterate through each file
-		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
-		{
-			astring srcfile;
-
-			// build the source filename
-			srcfile.printf("%s%c%s", srcdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
-
-			// if we have a file, output it
-			if (entry_type == ENTTYPE_FILE)
-			{
-				// make sure we care, first
-				if (core_filename_ends_with(curlist->name, ".c"))
-				{
-					dependency_map depend_map;
-
-					// find dependencies
-					file_entry &file = compute_dependencies(srcfile);
-					recurse_dependencies(file, depend_map);
-					astring fn = astring(curlist->name);
-					fn.replace(".c","");
-					if (isonlist(fn)) 
-					{
-						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
-						{
-							astring t(entry->tag());
-							if (core_filename_ends_with(t, ".h"))
-							{
-								char *foundfile = include_map.find(t);
-								if (foundfile != NULL) {
-									printf("%s\n", foundfile);
-									// we add things just once when needed
-									include_map.remove(t);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
+		// find dependencies
+		file_entry &file = compute_dependencies(srcfile);
+		recurse_dependencies(file, depend_map);
 		
-		// iterate through each file
-		for (list_entry *curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
-		{
-			astring srcfile;
-
-			// build the source filename
-			srcfile.printf("%s%c%s", srcdir.cstr(), PATH_SEPARATOR[0], curlist->name.cstr());
-
-			// if we have a file, output it
-			if (entry_type == ENTTYPE_FILE)
+			for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
 			{
-				// make sure we care, first
-				if (core_filename_ends_with(curlist->name, ".c"))
+				astring t(entry->tag());
+				if (core_filename_ends_with(t, ".h"))
 				{
-					dependency_map depend_map;
-
-					// find dependencies
-					file_entry &file = compute_dependencies(srcfile);
-					recurse_dependencies(file, depend_map);
-					astring fn = astring(curlist->name);
-					fn.replace(".c","");
-					if (isonlist(fn)) 
-					{
-						// convert the target from source to object (makes assumptions about rules)
-						astring target(file.name);
-						target.replace(0, "src/", "$(OBJ)/");
-						target.replace(0, "drivers/", "");
-						target.replace(0, ".c", ".a");
-						printf("\n%s : \\\n", target.cstr());
-
-						// iterate over the hashed dependencies and output them as well
-						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
-						{
-							astring t(entry->tag());
-							t.replace(0, "src/", "$(OBJ)/");
-							t.replace(0, ".c", ".o");
-							if (core_filename_ends_with(t, ".o"))
-							{
-								printf("\t%s \\\n", t.cstr());
-							}
-						}
-						
-						printf("\n");
-						printf("\n");
-						for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
-						{
-							astring t(entry->tag());
-							if (core_filename_ends_with(t, ".lay"))
-							{
-								astring target2(file.name);
-								target2.replace(0, "src/", "$(OBJ)/");
-								target2.replace(0, ".c", ".o");
-
-								t.replace(0, "src/", "$(OBJ)/");
-								t.replace(0, ".lay", ".lh");
-								
-								printf("%s:	%s\n", target2.cstr(), t.cstr());
-							}
-							if (core_filename_ends_with(t, ".inc"))
-							{
-								astring target2(file.name);
-								target2.replace(0, "src/", "$(OBJ)/");
-								target2.replace(0, ".c", ".o");
-
-								printf("%s:	%s\n", target2.cstr(), t.cstr());
-							}
-						}
+					char *foundfile = include_map.find(t);
+					if (foundfile != NULL) {
+						printf("%s\n", foundfile);
+						// we add things just once when needed
+						include_map.remove(t);
 					}
 				}
 			}
-		}
-
-		// free all the allocated entries
-		while (list != NULL)
-		{
-			list_entry *next = list->next;
-			delete list;
-			list = next;
-		}
+		
 	}
 
-error:
+		
+	// iterate through each file
+	for(int i=0;i<sourcecount;i++)
+	{
+		astring srcfile;
+
+		// build the source filename
+		srcfile.printf("%s%c%s.c", srcdir.cstr(), PATH_SEPARATOR[0], sourcelst[i]);
+		
+		dependency_map depend_map;
+
+		// find dependencies
+		file_entry &file = compute_dependencies(srcfile);
+		recurse_dependencies(file, depend_map);
+
+		// convert the target from source to object (makes assumptions about rules)
+		astring target(file.name);
+		target.replace(0, "src/", "$(OBJ)/");
+		target.replace(0, "drivers/", "");
+		target.replace(0, ".c", ".a");
+		printf("\n%s : \\\n", target.cstr());
+
+		// iterate over the hashed dependencies and output them as well
+		for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+		{
+			astring t(entry->tag());
+			t.replace(0, "src/", "$(OBJ)/");
+			t.replace(0, ".c", ".o");
+			if (core_filename_ends_with(t, ".o"))
+			{
+				printf("\t%s \\\n", t.cstr());
+			}
+		}
+		
+		printf("\n");
+		printf("\n");
+		for (dependency_map::entry_t *entry = depend_map.first(); entry != NULL; entry = depend_map.next(entry)) 
+		{
+			astring t(entry->tag());
+			if (core_filename_ends_with(t, ".lay"))
+			{
+				astring target2(file.name);
+				target2.replace(0, "src/", "$(OBJ)/");
+				target2.replace(0, ".c", ".o");
+
+				t.replace(0, "src/", "$(OBJ)/");
+				t.replace(0, ".lay", ".lh");
+				
+				printf("%s:	%s\n", target2.cstr(), t.cstr());
+			}
+			if (core_filename_ends_with(t, ".inc"))
+			{
+				astring target2(file.name);
+				target2.replace(0, "src/", "$(OBJ)/");
+				target2.replace(0, ".c", ".o");
+
+				printf("%s:	%s\n", target2.cstr(), t.cstr());
+			}
+		}
+		
+	}
 	return result;
 }
 
