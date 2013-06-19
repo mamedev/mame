@@ -28,6 +28,7 @@
 
     - Change device video emulation x/y offsets when "show border color"
       is true
+    - Support 'interlace and video' mode
 
     - mos8563
 
@@ -68,6 +69,7 @@ const device_type MOS8568 = &device_creator<mos8568_device>;
 #define MODE_CURSOR_SKEW            ((m_mode_control & 0x20) != 0)
 #define MODE_DISPLAY_ENABLE_SKEW    ((m_mode_control & 0x10) != 0)
 #define MODE_ROW_COLUMN_ADDRESSING  ((m_mode_control & 0x04) != 0)
+#define MODE_INTERLACE_AND_VIDEO    ((m_mode_control & 0x03) == 3)
 
 #define VSS_CBRATE                  BIT(m_vert_scroll, 5)
 #define VSS_RVS                     BIT(m_vert_scroll, 6)
@@ -455,14 +457,17 @@ READ_LINE_MEMBER( mc6845_device::vsync_r )
 void mc6845_device::recompute_parameters(bool postload)
 {
 	UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
+	UINT16 video_char_height = (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) + 1;
+	// Would be useful for 'interlace and video' mode support...
+	// UINT16 frame_char_height = (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr / 2 : m_max_ras_addr) + 1;
 
 	/* compute the screen sizes */
 	UINT16 horiz_pix_total = (m_horiz_char_total + 1) * m_hpixels_per_column;
-	UINT16 vert_pix_total = (m_vert_char_total + 1) * (m_max_ras_addr + 1) + m_vert_total_adj;
+	UINT16 vert_pix_total = (m_vert_char_total + 1) * video_char_height + m_vert_total_adj;
 
 	/* determine the visible area, avoid division by 0 */
 	UINT16 max_visible_x = m_horiz_disp * m_hpixels_per_column - 1;
-	UINT16 max_visible_y = m_vert_disp * (m_max_ras_addr + 1) - 1;
+	UINT16 max_visible_y = m_vert_disp * video_char_height - 1;
 
 	/* determine the syncing positions */
 	UINT8 horiz_sync_char_width = m_sync_width & 0x0f;
@@ -479,7 +484,7 @@ void mc6845_device::recompute_parameters(bool postload)
 
 	hsync_on_pos = m_horiz_sync_pos * m_hpixels_per_column;
 	hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * m_hpixels_per_column);
-	vsync_on_pos = m_vert_sync_pos * (m_max_ras_addr + 1);
+	vsync_on_pos = m_vert_sync_pos * video_char_height;
 	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
 	/* the Commodore PET computers program a horizontal synch pulse that extends
@@ -639,7 +644,10 @@ void mc6845_device::handle_line_timer()
 		}
 	}
 
-	if ( m_raster_counter == m_max_ras_addr )
+	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
+	// The correct test would be:
+	// if ( m_raster_counter == m_max_ras_addr )
+	if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
 	{
 		/* Check if we have reached the end of the vertical area */
 		if ( m_line_counter == m_vert_char_total )
@@ -669,6 +677,8 @@ void mc6845_device::handle_line_timer()
 	}
 	else
 	{
+		// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
+		// m_raster_counter = ( m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1) ) & 0x1F;
 		m_raster_counter = ( m_raster_counter + 1 ) & 0x1F;
 	}
 

@@ -570,6 +570,9 @@ TFR:
 		UINT8 param = read_opcode_arg();
 		exgtfr_register reg = read_exgtfr_register(param >> 4);
 		write_exgtfr_register(param >> 0, reg);
+		if ((param & 0x0F) == 4) {
+			m_lds_encountered = true;
+		}
 	}
 	eat(hd6309_native_mode() ? 2 : 4);
 	return;
