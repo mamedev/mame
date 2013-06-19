@@ -633,10 +633,10 @@ MACHINE_CONFIG_END
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "bios", 0)
-	ROM_LOAD( "v451pg.bin", 0x00000, 0x040000, BAD_DUMP CRC(d02d6c44) SHA1(db4d1c1808be448c70d09a5fc5ff738eeecf60b6) )
+	ROM_LOAD( "award_pii_v451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317) )
 
-	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: extracted thru DOS DEBUG program
-	ROM_LOAD( "myc000.bin",   0x000000, 0x008000, BAD_DUMP CRC(5c0b5d56) SHA1(73d68bd1fd2fd746cf33cf7962393312ef107b02) )
+	ROM_REGION( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
+	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )

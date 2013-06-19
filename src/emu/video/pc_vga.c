@@ -3201,7 +3201,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				svga.bank_w = data & 0x3f;
 				svga.bank_r = svga.bank_w;
 				if(data & 0x60)
-					fatalerror("TODO: s3 bank selects above 1M\n");
+					popmessage("TODO: s3 bank selects above 1M\n");
 				break;
 			default:
 				if(LOG_8514) logerror("S3: 3D4 index %02x write %02x\n",index,data);
