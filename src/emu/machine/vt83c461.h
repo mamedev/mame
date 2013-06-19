@@ -1,0 +1,60 @@
+/***************************************************************************
+
+    vt83c461.h
+
+    VIA VT83C461 (IDE Hard Drive controller).
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
+
+#pragma once
+
+#ifndef __VT83C461_H__
+#define __VT83C461_H__
+
+#include "idectrl.h"
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_VT83C461_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+	MCFG_DEVICE_ADD(_tag, VT83C461, 0) \
+	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
+	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag)
+
+#define IDE_CONFIG_REGISTERS                0x10
+
+class vt83c461_device : public ide_controller_device
+{
+public:
+	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ32_MEMBER(read_config);
+	DECLARE_WRITE32_MEMBER(write_config);
+
+	virtual DECLARE_READ32_MEMBER(read_cs0);
+	virtual DECLARE_READ32_MEMBER(read_cs1);
+	virtual DECLARE_WRITE32_MEMBER(write_cs0);
+	virtual DECLARE_WRITE32_MEMBER(write_cs1);
+
+protected:
+	virtual void device_start();
+
+private:
+	using ide_controller_device::read_cs0;
+	using ide_controller_device::read_cs1;
+	using ide_controller_device::write_cs0;
+	using ide_controller_device::write_cs1;
+
+	UINT8           m_config_unknown;
+	UINT8           m_config_register[IDE_CONFIG_REGISTERS];
+	UINT8           m_config_register_num;
+};
+
+extern const device_type VT83C461;
+
+#endif

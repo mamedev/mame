@@ -535,6 +535,7 @@ MACHINEOBJS += $(MACHINEOBJ)/ataintf.o
 MACHINEOBJS += $(MACHINEOBJ)/atadev.o
 MACHINEOBJS += $(MACHINEOBJ)/idectrl.o
 MACHINEOBJS += $(MACHINEOBJ)/idehd.o
+MACHINEOBJS += $(MACHINEOBJ)/vt83c461.o
 endif
 
 #-------------------------------------------------

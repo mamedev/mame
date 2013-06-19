@@ -26,28 +26,16 @@
 	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
-#define IDE_CONFIG_REGISTERS                0x10
-
 class ide_controller_device : public ata_interface_device
 {
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER(read_via_config);
-	DECLARE_WRITE8_MEMBER(write_via_config);
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
 	virtual DECLARE_WRITE16_MEMBER(write_cs0);
 	virtual DECLARE_WRITE16_MEMBER(write_cs1);
-
-protected:
-	virtual void device_start();
-
-private:
-	UINT8           m_config_unknown;
-	UINT8           m_config_register[IDE_CONFIG_REGISTERS];
-	UINT8           m_config_register_num;
 };
 
 extern const device_type IDE_CONTROLLER;

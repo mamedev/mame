@@ -20,7 +20,7 @@
 #include "machine/znsec.h"
 #include "machine/zndip.h"
 #include "machine/ataintf.h"
-#include "machine/idectrl.h"
+#include "machine/vt83c461.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/ymz280b.h"
@@ -46,7 +46,7 @@ public:
 		m_cbaj_fifo1(*this, "cbaj_fifo1"),
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
 		m_mb3773(*this, "mb3773"),
-		m_ide(*this, "ide")
+		m_vt83c461(*this, "ide")
 	{
 	}
 
@@ -83,6 +83,10 @@ public:
 	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
 	DECLARE_READ8_MEMBER(cbaj_sound_main_status_r);
 	DECLARE_READ8_MEMBER(cbaj_sound_z80_status_r);
+	DECLARE_READ16_MEMBER(vt83c461_16_r);
+	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
+	DECLARE_READ16_MEMBER(vt83c461_32_r);
+	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
 	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000c);
@@ -116,6 +120,8 @@ private:
 	size_t m_nbajamex_eeprom_size;
 	UINT8 *m_nbajamex_eeprom;
 
+	UINT16 vt83c461_latch;
+
 	required_device<psxgpu_device> m_gpu;
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
@@ -126,7 +132,7 @@ private:
 	optional_device<fifo7200_device> m_cbaj_fifo1;
 	optional_device<fifo7200_device> m_cbaj_fifo2;
 	optional_device<mb3773_device> m_mb3773;
-	optional_device<ide_controller_device> m_ide;
+	optional_device<vt83c461_device> m_vt83c461;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1343,7 +1349,7 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 	n_size <<= 1;
 	while( n_size > 0 )
 	{
-		psxwriteword( p_n_psxram, n_address, m_ide->read_cs0(space, 0, 0xffff) );
+		psxwriteword( p_n_psxram, n_address, m_vt83c461->read_cs0(space, (UINT32) 0, (UINT32) 0xffff) );
 		n_address += 2;
 		n_size--;
 	}
@@ -1354,18 +1360,81 @@ void zn_state::atpsx_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_si
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
 
+READ16_MEMBER(zn_state::vt83c461_16_r)
+{
+	int shift = (16 * (offset & 1));
+
+	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
+	{
+		return m_vt83c461->read_config( space, ( offset / 2 ) & 3, mem_mask << shift ) >> shift; 
+	}
+	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
+	{
+		return m_vt83c461->read_cs0( space, ( offset / 2 ) & 1, (UINT32) mem_mask << shift ) >> shift;
+	}
+	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
+	{
+		return m_vt83c461->read_cs1( space, ( offset / 2 ) & 1, (UINT32) mem_mask << shift ) >> shift;
+	}
+	else
+	{
+		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask );
+		return 0xffff;
+	}
+}
+
+WRITE16_MEMBER(zn_state::vt83c461_16_w)
+{
+	int shift = (16 * (offset & 1));
+
+	if( offset >= 0x30 / 2 && offset < 0x40 / 2 )
+	{
+		m_vt83c461->write_config( space, ( offset / 2 ) & 3, data << shift, mem_mask << shift ); 
+	}
+	else if( offset >= 0x1f0 / 2 && offset < 0x1f8 / 2 )
+	{
+		m_vt83c461->write_cs0( space, ( offset / 2 ) & 1, (UINT32) data << shift, (UINT32) mem_mask << shift );
+	}
+	else if( offset >= 0x3f0 / 2 && offset < 0x3f8 / 2 )
+	{
+		m_vt83c461->write_cs1( space, ( offset / 2 ) & 1, (UINT32) data << shift, (UINT32) mem_mask << shift );
+	}
+	else
+	{
+		logerror( "unhandled 16 bit write %04x %04x %04x\n", offset, data, mem_mask );
+	}
+}
+
+READ16_MEMBER(zn_state::vt83c461_32_r)
+{
+	if( offset == 0x1f0/2 )
+	{
+		UINT32 data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
+		vt83c461_latch = data >> 16;
+		return data & 0xffff;
+	}
+	else if( offset == 0x1f2/2 )
+	{
+		return vt83c461_latch;
+	}
+	else
+	{
+		logerror( "unhandled 32 bit read %04x %04x\n", offset, mem_mask );
+		return 0xffff;
+	}
+}
+
+WRITE16_MEMBER(zn_state::vt83c461_32_w)
+{
+	logerror( "unhandled 32 bit write %04x %04x %04x\n", offset, data, mem_mask );
+}
+
 static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
 	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
-	// 8/16
-	AM_RANGE(0x1f7e4030, 0x1f7e403f) AM_DEVREADWRITE8("ide", ide_controller_device, read_via_config, write_via_config, 0xffffffff)
-	AM_RANGE(0x1f7e41f0, 0x1f7e41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x1f7e43f0, 0x1f7e43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	// 32
-	AM_RANGE(0x1f7f41f0, 0x1f7f41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x1f7f43f0, 0x1f7f43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-
+	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_READWRITE16(vt83c461_16_r, vt83c461_16_w, 0xffffffff)
+	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_READWRITE16(vt83c461_32_r, vt83c461_32_w, 0xffffffff)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
@@ -1376,7 +1445,7 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( zn_state::atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( zn_state::atpsx_dma_write ), (zn_state *) owner ) )

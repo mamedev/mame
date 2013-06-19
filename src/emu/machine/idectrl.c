@@ -25,77 +25,20 @@
     CONSTANTS
 ***************************************************************************/
 
-#define IDE_BANK2_CONFIG_UNK                4
-#define IDE_BANK2_CONFIG_REGISTER           8
-#define IDE_BANK2_CONFIG_DATA               0xc
-
 const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	m_config_unknown(0),
-	m_config_register_num(0)
+	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock)
 {
 }
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	ata_interface_device(mconfig, type, name, tag, owner, clock),
-	m_config_unknown(0),
-	m_config_register_num(0)
+	ata_interface_device(mconfig, type, name, tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_controller_device::device_start()
-{
-	ata_interface_device::device_start();
-
-	/* register ide states */
-	save_item(NAME(m_config_unknown));
-	save_item(NAME(m_config_register));
-	save_item(NAME(m_config_register_num));
-}
-
-READ8_MEMBER( ide_controller_device::read_via_config )
-{
-	UINT16 result = 0;
-
-	/* logit */
-	LOG(("%s:IDE via config read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
-
-	switch(offset)
-	{
-		/* unknown config register */
-		case IDE_BANK2_CONFIG_UNK:
-			result = m_config_unknown;
-			break;
-
-		/* active config register */
-		case IDE_BANK2_CONFIG_REGISTER:
-			result = m_config_register_num;
-			break;
-
-		/* data from active config register */
-		case IDE_BANK2_CONFIG_DATA:
-			if (m_config_register_num < IDE_CONFIG_REGISTERS)
-				result = m_config_register[m_config_register_num];
-			break;
-
-		default:
-			logerror("%s:unknown IDE via config read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
-			break;
-	}
-
-//  printf( "read via config %04x %04x %04x\n", offset, result, mem_mask );
-	return result;
 }
 
 READ16_MEMBER( ide_controller_device::read_cs0 )
 {
-	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit read of data register
 	if (mem_mask == 0xff00)
 	{
 		return ata_interface_device::read_cs0(space, (offset * 2) + 1, 0xff) << 8;
@@ -118,36 +61,8 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	}
 }
 
-WRITE8_MEMBER( ide_controller_device::write_via_config )
-{
-//  printf( "write via config %04x %04x %04x\n", offset, data, mem_mask );
-
-	/* logit */
-	LOG(("%s:IDE via config write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
-
-	switch (offset)
-	{
-		/* unknown config register */
-		case IDE_BANK2_CONFIG_UNK:
-			m_config_unknown = data;
-			break;
-
-		/* active config register */
-		case IDE_BANK2_CONFIG_REGISTER:
-			m_config_register_num = data;
-			break;
-
-		/* data from active config register */
-		case IDE_BANK2_CONFIG_DATA:
-			if (m_config_register_num < IDE_CONFIG_REGISTERS)
-				m_config_register[m_config_register_num] = data;
-			break;
-	}
-}
-
 WRITE16_MEMBER( ide_controller_device::write_cs0 )
 {
-	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit write to data register
 	if (mem_mask == 0xff00)
 	{
 		return ata_interface_device::write_cs0(space, (offset * 2) + 1, data >> 8, 0xff);

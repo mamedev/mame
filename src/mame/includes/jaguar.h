@@ -8,7 +8,7 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "machine/eeprom.h"
-#include "machine/idectrl.h"
+#include "machine/vt83c461.h"
 #include "imagedev/snapquik.h"
 
 #ifndef ENABLE_SPEEDUP_HACKS
@@ -211,8 +211,6 @@ public:
 	DECLARE_WRITE32_MEMBER( blitter_w );
 	DECLARE_READ16_MEMBER( tom_regs_r );
 	DECLARE_WRITE16_MEMBER( tom_regs_w );
-	DECLARE_READ32_MEMBER( vt83c461_r );
-	DECLARE_WRITE32_MEMBER( vt83c461_w );
 	DECLARE_READ32_MEMBER( cojag_gun_input_r );
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -325,5 +323,5 @@ protected:
 	void jaguar_nvram_load();
 	void jaguar_nvram_save();
 	optional_device<eeprom_device> m_eeprom;
-	optional_device<ide_controller_device> m_ide;
+	optional_device<vt83c461_device> m_ide;
 };
