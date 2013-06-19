@@ -29,7 +29,7 @@ Known to exist but not dumped:
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
@@ -80,7 +80,7 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 	m_timer[0] = machine().device<timer_device>("timer0");
 	m_timer[1] = machine().device<timer_device>("timer1");
 
-	machine().device("ide")->reset();
+	machine().device("ata")->reset();
 }
 
 
@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0x0000ffff)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff)
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_SHARE("midvplus_misc")
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_SHARE("textureram")
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(midway_serial_pic2)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
@@ -1665,7 +1665,7 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (10/09/1996) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "wargods_10-09-1996", 0, SHA1(7585bc65b1038589cb59d3e7c56e08ca9d7015b8) )
 ROM_END
 
@@ -1676,7 +1676,7 @@ ROM_START( wargodsa ) /* Boot EPROM Version 1.0, Game Type: 452 (08/15/1996) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "wargods_08-15-1996", 0, SHA1(5dee00be40c315fbb1d6e3994dae8e498ab87fb2) )
 ROM_END
 
@@ -1687,7 +1687,7 @@ ROM_START( wargodsb ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "wargods_12-11-1995", 0, SHA1(141063f95867fdcc4b15c844e510696604a70c6a) )
 ROM_END
 

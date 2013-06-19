@@ -8,7 +8,7 @@
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "formats/basicdsk.h"
 #include "imagedev/harddriv.h"
 
@@ -100,9 +100,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gide_w);
 
 private:
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 
-	UINT16              m_ide_data;
+	UINT16              m_ata_data;
 	int                 m_lh;
 };
 

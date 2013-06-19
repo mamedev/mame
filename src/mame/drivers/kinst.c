@@ -131,7 +131,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 
@@ -151,7 +151,7 @@ public:
 		m_control(*this, "control"),
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
-		m_ide(*this, "ide" )
+		m_ata(*this, "ata" )
 	{
 	}
 
@@ -175,7 +175,7 @@ public:
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	required_device<cpu_device> m_maincpu;
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -215,7 +215,7 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	UINT8 *identify_device = m_ide->identify_device_buffer(0);
+	UINT8 *identify_device = m_ata->identify_device_buffer(0);
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{
@@ -325,25 +325,25 @@ WRITE_LINE_MEMBER(kinst_state::ide_interrupt)
 
 READ32_MEMBER(kinst_state::kinst_ide_r)
 {
-	return m_ide->read_cs0(space, offset / 2, mem_mask);
+	return m_ata->read_cs0(space, offset / 2, mem_mask);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_w)
 {
-	m_ide->write_cs0(space, offset / 2, data, mem_mask);
+	m_ata->write_cs0(space, offset / 2, data, mem_mask);
 }
 
 
 READ32_MEMBER(kinst_state::kinst_ide_extra_r)
 {
-	return m_ide->read_cs1(space, 6, 0xff);
+	return m_ata->read_cs1(space, 6, 0xff);
 }
 
 
 WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
 {
-	m_ide->write_cs1(space, 6, data, 0xff);
+	m_ata->write_cs1(space, 6, data, 0xff);
 }
 
 
@@ -689,8 +689,8 @@ static MACHINE_CONFIG_START( kinst, kinst_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
 
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(kinst_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(kinst_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -731,7 +731,7 @@ ROM_START( kinst )
 	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
 	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
 ROM_END
 
@@ -750,7 +750,7 @@ ROM_START( kinst14 )
 	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
 	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
 ROM_END
 
@@ -769,7 +769,7 @@ ROM_START( kinst13 )
 	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
 	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
 ROM_END
 
@@ -788,7 +788,7 @@ ROM_START( kinstp )
 	ROM_LOAD16_BYTE( "u35-l1", 0xc00000, 0x80000, CRC(0aaef4fc) SHA1(48c4c954ac9db648f28ad64f9845e19ec432eec3) )
 	ROM_LOAD16_BYTE( "u36-l1", 0xe00000, 0x80000, CRC(0577bb60) SHA1(cc78070cc41701e9a91fde5cfbdc7e1e83354854) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst", 0, SHA1(81d833236e994528d1482979261401b198d1ca53) )
 ROM_END
 
@@ -807,7 +807,7 @@ ROM_START( kinst2 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
@@ -826,7 +826,7 @@ ROM_START( kinst2k4 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
@@ -845,7 +845,7 @@ ROM_START( kinst213 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
@@ -864,7 +864,7 @@ ROM_START( kinst2k3 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
@@ -883,7 +883,7 @@ ROM_START( kinst211 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 
@@ -902,7 +902,7 @@ ROM_START( kinst210 )
 	ROM_LOAD16_BYTE( "ki2_l1.u35", 0xc00000, 0x80000, CRC(7245ce69) SHA1(24a3ff009c8a7f5a0bfcb198b8dcb5df365770d3) )
 	ROM_LOAD16_BYTE( "ki2_l1.u36", 0xe00000, 0x80000, CRC(8920acbb) SHA1(0fca72c40067034939b984b4bf32972a5a6c26af) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "kinst2", 0, SHA1(e7c9291b4648eae0012ea0cc230731ed4987d1d5) )
 ROM_END
 

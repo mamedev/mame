@@ -102,7 +102,7 @@ void harddisk_image_device::device_start()
 	m_chd = NULL;
 
 	// try to locate the CHD from a DISK_REGION
-	chd_file *handle = get_disk_handle(machine(), owner()->tag());
+	chd_file *handle = get_disk_handle(machine(), tag());
 	if (handle != NULL)
 	{
 		m_hard_disk_handle = hard_disk_open(handle);

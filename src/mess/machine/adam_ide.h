@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "machine/adamexp.h"
 #include "machine/ctronics.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 
 
 
@@ -45,10 +45,10 @@ protected:
 	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 private:
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 	required_device<centronics_device> m_centronics;
 
-	UINT16 m_ide_data;
+	UINT16 m_ata_data;
 };
 
 

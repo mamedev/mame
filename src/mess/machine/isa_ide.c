@@ -11,16 +11,16 @@
 
 READ8_MEMBER(isa16_ide_device::ide16_alt_r )
 {
-	return m_ide->read_cs1_pc(space, 6/2, 0xff);
+	return m_ide->read_cs1(space, 6/2, 0xff);
 }
 
 WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 {
-	m_ide->write_cs1_pc(space, 6/2, data, 0xff);
+	m_ide->write_cs1(space, 6/2, data, 0xff);
 }
 
 DEVICE_ADDRESS_MAP_START(map, 16, isa16_ide_device)
-	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0_pc, write_cs0_pc)
+	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(alt_map, 8, isa16_ide_device)
@@ -40,8 +40,8 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 }
 
 static MACHINE_CONFIG_FRAGMENT( ide )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", "hdd", false)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )

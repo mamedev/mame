@@ -53,14 +53,14 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800001F0, 0x800001F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800001F0, 0x800001F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000480, 0x8000048F) AM_READWRITE8(bebox_80000480_r, bebox_80000480_w, U64(0xffffffffffffffff) )
@@ -218,8 +218,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
 	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
 
-	MCFG_IDE_CONTROLLER_ADD( "ide", ide_devices, "hdd", NULL, false ) /* FIXME */
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))
+	MCFG_IDE_CONTROLLER_ADD( "ide", ata_devices, "hdd", NULL, false ) /* FIXME */
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))
 
 	/* pci */
 	MCFG_PCI_BUS_ADD("pcibus", 0)

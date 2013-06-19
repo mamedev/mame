@@ -11,7 +11,7 @@
 
 #include "a2cffa.h"
 #include "includes/apple2.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
 
@@ -29,10 +29,10 @@ const device_type A2BUS_CFFA2 = &device_creator<a2bus_cffa2_device>;
 const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 
 #define CFFA2_ROM_REGION  "cffa2_rom"
-#define CFFA2_IDE_TAG     "cffa2_ide"
+#define CFFA2_ATA_TAG     "cffa2_ata"
 
 MACHINE_CONFIG_FRAGMENT( cffa2 )
-	MCFG_IDE_CONTROLLER_ADD(CFFA2_IDE_TAG, ide_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )
@@ -81,7 +81,7 @@ const rom_entry *a2bus_cffa2_6502_device::device_rom_region() const
 a2bus_cffa2000_device::a2bus_cffa2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ide(*this, CFFA2_IDE_TAG)
+	m_ata(*this, CFFA2_ATA_TAG)
 {
 }
 
@@ -143,7 +143,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 			break;
 
 		case 8:
-			m_lastdata = m_ide->read_cs0(space, offset-8, 0xffff);
+			m_lastdata = m_ata->read_cs0(space, offset-8, 0xffff);
 			return m_lastdata & 0xff;
 
 		case 9:
@@ -153,7 +153,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ide->read_cs0(space, offset-8, 0xff);
+			return m_ata->read_cs0(space, offset-8, 0xff);
 	}
 
 	return 0xff;
@@ -184,7 +184,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 8:
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
-			m_ide->write_cs0(space, offset-8, m_lastdata, 0xffff);
+			m_ata->write_cs0(space, offset-8, m_lastdata, 0xffff);
 			break;
 
 		case 9:
@@ -194,7 +194,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ide->write_cs0(space, offset-8, data, 0xff);
+			m_ata->write_cs0(space, offset-8, data, 0xff);
 			break;
 	}
 }

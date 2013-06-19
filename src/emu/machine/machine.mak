@@ -473,6 +473,8 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter IDE,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/ataintf.o
+MACHINEOBJS += $(MACHINEOBJ)/atadev.o
 MACHINEOBJS += $(MACHINEOBJ)/idectrl.o
 MACHINEOBJS += $(MACHINEOBJ)/idehd.o
 endif

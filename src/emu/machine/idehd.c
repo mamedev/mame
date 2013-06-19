@@ -48,7 +48,7 @@
 #define IDE_COMMAND_IDENTIFY_DEVICE         0xec
 #define IDE_COMMAND_SET_FEATURES            0xef
 #define IDE_COMMAND_SECURITY_UNLOCK         0xf2
-#define IDE_COMMAND_UNKNOWN_F9              0xf9
+#define IDE_COMMAND_SET_MAX              0xf9
 #define IDE_COMMAND_VERIFY_SECTORS          0x40
 #define IDE_COMMAND_VERIFY_SECTORS_NORETRY  0x41
 #define IDE_COMMAND_ATAPI_IDENTIFY          0xa1
@@ -70,25 +70,9 @@ enum
 	TID_WRITE_SECTOR_DONE_CALLBACK
 };
 
-//**************************************************************************
-//  IDE DEVICE INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ide_device_interface - constructor
-//-------------------------------------------------
-
-ide_device_interface::ide_device_interface(const machine_config &mconfig, device_t &device) :
-	m_master_password(NULL),
-	m_user_password(NULL),
-	m_irq_handler(device),
-	m_dmarq_handler(device)
-{
-}
-
-ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	ide_device_interface(mconfig, *this),
+	ata_device_interface(mconfig, *this),
 	device_slot_card_interface(mconfig, *this),
 	m_csel(0),
 	m_dasp(0),
@@ -98,7 +82,7 @@ ide_mass_storage_device::ide_mass_storage_device(const machine_config &mconfig, 
 {
 }
 
-void ide_mass_storage_device::update_irq()
+void ata_mass_storage_device::update_irq()
 {
 	if (device_selected() && (m_device_control & IDE_DEVICE_CONTROL_NIEN) == 0)
 		m_irq_handler(m_irq);
@@ -106,7 +90,7 @@ void ide_mass_storage_device::update_irq()
 		m_irq_handler(CLEAR_LINE);
 }
 
-void ide_mass_storage_device::set_irq(int state)
+void ata_mass_storage_device::set_irq(int state)
 {
 	if (m_irq != state)
 	{
@@ -121,7 +105,7 @@ void ide_mass_storage_device::set_irq(int state)
 	}
 }
 
-void ide_mass_storage_device::set_dmarq(int state)
+void ata_mass_storage_device::set_dmarq(int state)
 {
 	if (m_dmarq != state)
 	{
@@ -131,17 +115,17 @@ void ide_mass_storage_device::set_dmarq(int state)
 	}
 }
 
-WRITE_LINE_MEMBER( ide_mass_storage_device::write_csel )
+WRITE_LINE_MEMBER( ata_mass_storage_device::write_csel )
 {
 	m_csel = state;
 }
 
-WRITE_LINE_MEMBER( ide_mass_storage_device::write_dasp )
+WRITE_LINE_MEMBER( ata_mass_storage_device::write_dasp )
 {
 	m_dasp = state;
 }
 
-WRITE_LINE_MEMBER( ide_mass_storage_device::write_dmack )
+WRITE_LINE_MEMBER( ata_mass_storage_device::write_dmack )
 {
 	m_dmack = state;
 }
@@ -152,7 +136,7 @@ WRITE_LINE_MEMBER( ide_mass_storage_device::write_dmack )
  *
  *************************************/
 
-UINT32 ide_mass_storage_device::lba_address()
+UINT32 ata_mass_storage_device::lba_address()
 {
 	/* LBA direct? */
 	if (m_device_head & IDE_DEVICE_HEAD_L)
@@ -183,7 +167,7 @@ static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
 }
 
 
-void ide_mass_storage_device::ide_build_identify_device()
+void ata_mass_storage_device::ide_build_identify_device()
 {
 	memset(m_identify_device, 0, IDE_DISK_SECTOR_SIZE);
 	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
@@ -343,7 +327,7 @@ void ide_mass_storage_device::ide_build_identify_device()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ide_mass_storage_device::device_start()
+void ata_mass_storage_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 	m_dmarq_handler.resolve_safe();
@@ -376,7 +360,7 @@ void ide_mass_storage_device::device_start()
 	m_reset_timer = timer_alloc(TID_RESET_CALLBACK);
 }
 
-void ide_mass_storage_device::device_reset()
+void ata_mass_storage_device::device_reset()
 {
 	m_buffer_offset = 0;
 	m_master_password_enable = (m_master_password != NULL);
@@ -405,7 +389,7 @@ void ide_mass_storage_device::device_reset()
 	set_dmarq(CLEAR_LINE);
 }
 
-void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ata_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
@@ -442,7 +426,7 @@ void ide_mass_storage_device::device_timer(emu_timer &timer, device_timer_id id,
  *
  *************************************/
 
-void ide_mass_storage_device::next_sector()
+void ata_mass_storage_device::next_sector()
 {
 	UINT8 cur_head = m_device_head & IDE_DEVICE_HEAD_HS;
 
@@ -495,7 +479,7 @@ void ide_mass_storage_device::next_sector()
  *
  *************************************/
 
-void ide_mass_storage_device::security_error()
+void ata_mass_storage_device::security_error()
 {
 	/* set error state */
 	m_status |= IDE_STATUS_ERR;
@@ -511,7 +495,7 @@ void ide_mass_storage_device::security_error()
  *
  *************************************/
 
-void ide_mass_storage_device::read_buffer_empty()
+void ata_mass_storage_device::read_buffer_empty()
 {
 	/* reset the totals */
 	m_buffer_offset = 0;
@@ -522,7 +506,7 @@ void ide_mass_storage_device::read_buffer_empty()
 	fill_buffer();
 }
 
-void ide_mass_storage_device::fill_buffer()
+void ata_mass_storage_device::fill_buffer()
 {
 	switch (m_command)
 	{
@@ -548,7 +532,7 @@ void ide_mass_storage_device::fill_buffer()
 }
 
 
-void ide_mass_storage_device::read_sector_done()
+void ata_mass_storage_device::read_sector_done()
 {
 	int lba = lba_address(), count = 0;
 
@@ -600,7 +584,7 @@ void ide_mass_storage_device::read_sector_done()
 }
 
 
-void ide_mass_storage_device::read_first_sector()
+void ata_mass_storage_device::read_first_sector()
 {
 	/* mark ourselves busy */
 	m_status |= IDE_STATUS_BSY;
@@ -624,7 +608,7 @@ void ide_mass_storage_device::read_first_sector()
 }
 
 
-void ide_mass_storage_device::read_next_sector()
+void ata_mass_storage_device::read_next_sector()
 {
 	/* mark ourselves busy */
 	m_status |= IDE_STATUS_BSY;
@@ -651,7 +635,7 @@ void ide_mass_storage_device::read_next_sector()
  *
  *************************************/
 
-void ide_mass_storage_device::continue_write()
+void ata_mass_storage_device::continue_write()
 {
 	/* reset the totals */
 	m_buffer_offset = 0;
@@ -680,7 +664,7 @@ void ide_mass_storage_device::continue_write()
 }
 
 
-void ide_mass_storage_device::write_buffer_full()
+void ata_mass_storage_device::write_buffer_full()
 {
 	m_status &= ~IDE_STATUS_DRQ;
 	set_dmarq(CLEAR_LINE);
@@ -688,7 +672,7 @@ void ide_mass_storage_device::write_buffer_full()
 	process_buffer();
 }
 
-void ide_mass_storage_device::process_buffer()
+void ata_mass_storage_device::process_buffer()
 {
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
@@ -727,7 +711,7 @@ void ide_mass_storage_device::process_buffer()
 }
 
 
-void ide_mass_storage_device::write_sector_done()
+void ata_mass_storage_device::write_sector_done()
 {
 	int lba = lba_address(), count = 0;
 
@@ -783,7 +767,7 @@ void ide_mass_storage_device::write_sector_done()
  *
  *************************************/
 
-bool ide_mass_storage_device::process_command()
+bool ata_mass_storage_device::process_command()
 {
 	switch (m_command)
 	{
@@ -923,9 +907,8 @@ bool ide_mass_storage_device::process_command()
 		timer_set(MINIMUM_COMMAND_TIME, TID_DELAYED_INTERRUPT);
 		return true;
 
-	case IDE_COMMAND_UNKNOWN_F9:
-		/* only used by Killer Instinct AFAICT */
-		LOGPRINT(("IDE unknown command (F9)\n"));
+	case IDE_COMMAND_SET_MAX:
+		LOGPRINT(("IDE Set max (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
@@ -957,7 +940,7 @@ bool ide_mass_storage_device::process_command()
 	}
 }
 
-UINT16 ide_mass_storage_device::read_dma()
+UINT16 ata_mass_storage_device::read_dma()
 {
 	UINT16 result = 0xffff;
 
@@ -995,7 +978,7 @@ UINT16 ide_mass_storage_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ide_mass_storage_device::read_cs0 )
+READ16_MEMBER( ata_mass_storage_device::read_cs0 )
 {
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
@@ -1131,7 +1114,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ide_mass_storage_device::read_cs1 )
+READ16_MEMBER( ata_mass_storage_device::read_cs1 )
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
@@ -1178,7 +1161,7 @@ READ16_MEMBER( ide_mass_storage_device::read_cs1 )
 	return result;
 }
 
-void ide_mass_storage_device::write_dma( UINT16 data )
+void ata_mass_storage_device::write_dma( UINT16 data )
 {
 	if (device_selected())
 	{
@@ -1213,7 +1196,7 @@ void ide_mass_storage_device::write_dma( UINT16 data )
 	}
 }
 
-WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
+WRITE16_MEMBER( ata_mass_storage_device::write_cs0 )
 {
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
@@ -1327,7 +1310,7 @@ WRITE16_MEMBER( ide_mass_storage_device::write_cs0 )
 	}
 }
 
-WRITE16_MEMBER( ide_mass_storage_device::write_cs1 )
+WRITE16_MEMBER( ata_mass_storage_device::write_cs1 )
 {
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
@@ -1376,12 +1359,14 @@ const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
 //-------------------------------------------------
 
 ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ide_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__)
+	: ata_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
+	m_image(*this, "image")
 {
 }
 
 ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: ide_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	: ata_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_image(*this, "image")
 {
 }
 
@@ -1391,19 +1376,10 @@ ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, 
 
 void ide_hdd_device::device_reset()
 {
-	m_handle = subdevice<harddisk_image_device>("harddisk")->get_chd_file();
+	ata_mass_storage_device::device_reset();
 
-	if (m_handle)
-	{
-		m_disk = subdevice<harddisk_image_device>("harddisk")->get_hard_disk_file();
-	}
-	else
-	{
-		m_handle = get_disk_handle(machine(), tag());
-		m_disk = hard_disk_open(m_handle);
-	}
-
-	ide_mass_storage_device::device_reset();
+	m_handle = m_image->get_chd_file();
+	m_disk = m_image->get_hard_disk_file();
 
 	if (m_disk != NULL)
 	{
@@ -1416,6 +1392,7 @@ void ide_hdd_device::device_reset()
 			if (PRINTF_IDE_COMMANDS) mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 			mame_printf_debug("CHS: %d %d %d\n", m_num_cylinders, m_num_heads, m_num_sectors);
 		}
+
 		// build the features page
 		UINT32 metalength;
 		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_identify_device, IDE_DISK_SECTOR_SIZE, metalength) != CHDERR_NONE)
@@ -1430,7 +1407,7 @@ void ide_hdd_device::device_reset()
 //  machine configurations
 //-------------------------------------------------
 static MACHINE_CONFIG_FRAGMENT( hdd_image )
-	MCFG_HARDDISK_ADD( "harddisk" )
+	MCFG_HARDDISK_ADD( "image" )
 MACHINE_CONFIG_END
 
 machine_config_constructor ide_hdd_device::device_mconfig_additions() const

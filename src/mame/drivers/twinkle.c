@@ -235,7 +235,7 @@ Notes:
 #include "machine/am53cf96.h"
 #include "machine/rtc65271.h"
 #include "machine/i2cmem.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "sound/spu.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
@@ -713,7 +713,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	// 250000 = write to initiate DMA?
 	// 260000 = ???
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w )
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
 	// 34000E = ???
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )    // 8 MB window wave RAM
@@ -839,8 +839,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_AM53CF96_ADD("scsi:am53cf96")
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("^maincpu:irq", psxirq_device, intin10))
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(twinkle_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(twinkle_state, ide_interrupt))
 
 	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
 
@@ -939,7 +939,7 @@ ROM_START( bmiidx )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY("863jaa04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) ) // was part of a 1st mix machine, but "c44" indicates 8th mix?
 ROM_END
 
@@ -955,7 +955,7 @@ ROM_START( bmiidx2 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "985jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "985jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -971,7 +971,7 @@ ROM_START( bmiidx3 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "992jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "992jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -987,7 +987,7 @@ ROM_START( bmiidx4 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "a03jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "a03jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1003,7 +1003,7 @@ ROM_START( bmiidx6 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b4ujaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "b4ujaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1019,7 +1019,7 @@ ROM_START( bmiidx7 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "b44jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "b44jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1035,7 +1035,7 @@ ROM_START( bmiidx8 )
 	DISK_REGION( "cdrom1" ) // DVD
 	DISK_IMAGE_READONLY( "c44jaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c44jaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1051,7 +1051,7 @@ ROM_START( bmiidxc )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1067,7 +1067,7 @@ ROM_START( bmiidxc2 )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 
@@ -1083,7 +1083,7 @@ ROM_START( bmiidxca )
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
 ROM_END
 

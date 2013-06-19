@@ -4,7 +4,7 @@
 #define __ATAFLASH_H__
 
 #include "pccard.h"
-#include "machine/idectrl.h"
+#include "machine/idehd.h"
 
 extern const device_type ATA_FLASH_PCCARD;
 

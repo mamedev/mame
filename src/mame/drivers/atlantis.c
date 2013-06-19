@@ -142,7 +142,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -173,7 +173,7 @@ ROM_START( mwskins )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "mwskins", 0, SHA1(5cb293a6fdb2478293f48ddfc93cdd018acb2bb5) )
 ROM_END
 
@@ -181,7 +181,7 @@ ROM_START( mwskinsa )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )
 ROM_END
 
@@ -189,7 +189,7 @@ ROM_START( mwskinso )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "mwskins104", 0, SHA1(6917f66718999c144c854795c5856bf5659b85fa) )
 ROM_END
 

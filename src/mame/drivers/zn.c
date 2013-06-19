@@ -19,6 +19,7 @@
 #include "machine/7200fifo.h"
 #include "machine/znsec.h"
 #include "machine/zndip.h"
+#include "machine/ataintf.h"
 #include "machine/idectrl.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -88,10 +89,8 @@ public:
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
-	DECLARE_MACHINE_RESET(coh1000w);
 	DECLARE_MACHINE_RESET(coh1002e);
 	DECLARE_MACHINE_RESET(bam2);
-	DECLARE_MACHINE_RESET(jdredd);
 	DECLARE_MACHINE_RESET(coh1001l);
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
@@ -1359,19 +1358,16 @@ static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
 	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
+	// 8/16
 	AM_RANGE(0x1f7e4030, 0x1f7e403f) AM_DEVREADWRITE8("ide", ide_controller_device, read_via_config, write_via_config, 0xffffffff)
-	AM_RANGE(0x1f7e41f0, 0x1f7e41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
-	AM_RANGE(0x1f7e43f0, 0x1f7e43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
-	AM_RANGE(0x1f7f41f0, 0x1f7f41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
-	AM_RANGE(0x1f7f43f0, 0x1f7f43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1_pc, write_cs1_pc, 0xffffffff)
+	AM_RANGE(0x1f7e41f0, 0x1f7e41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x1f7e43f0, 0x1f7e43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
+	// 32
+	AM_RANGE(0x1f7f41f0, 0x1f7f41f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x1f7f43f0, 0x1f7f43f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
-
-MACHINE_RESET_MEMBER(zn_state,coh1000w)
-{
-	m_ide->reset();
-}
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
@@ -1380,10 +1376,8 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
-
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( zn_state::atpsx_dma_read ), (zn_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( zn_state::atpsx_dma_write ), (zn_state *) owner ) )
 MACHINE_CONFIG_END
@@ -1956,16 +1950,11 @@ static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
-	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
-	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
+	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
 
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
-
-MACHINE_RESET_MEMBER(zn_state,jdredd)
-{
-	m_ide->reset();
-}
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
@@ -1986,10 +1975,8 @@ static MACHINE_CONFIG_DERIVED( jdredd, zn1_2mb_vram )
 	MCFG_DEVICE_MODIFY("gpu")
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate( FUNC( zn_state::jdredd_vblank ), (zn_state *) owner))
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, jdredd)
-
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 MACHINE_CONFIG_END
 
 /*
@@ -4399,7 +4386,7 @@ ROM_START( bam2 )
 	ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
 	ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE("bam2", 0, SHA1(634d9a745a82c567fc4d7ce48e3570d88326c5f9) )
 ROM_END
 
@@ -4423,7 +4410,7 @@ ROM_START( primrag2 )
 	ROM_LOAD16_BYTE( "pr2_036.u17",  0x100001, 0x080000, CRC(3681516c) SHA1(714f73ea4ac190c36a6eb2308616a4aecabc4e69) )
 	ROM_LOAD16_BYTE( "pr2_036.u15",  0x100000, 0x080000, CRC(4b24bd54) SHA1(7f27cd524d10e5869aab6d4dc6a4217d049c475d) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "primrag2", 0, SHA1(bc615068ddf4fd967f770ee01c02f285c052c4c5) )
 ROM_END
 
@@ -4475,7 +4462,7 @@ ROM_START( jdredd )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "jdreddc", 0, SHA1(eee205f83e5f590f8baf36452c873d7063156bd0) )
 ROM_END
 
@@ -4486,7 +4473,7 @@ ROM_START( jdreddb )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) )
 ROM_END
 

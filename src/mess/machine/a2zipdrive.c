@@ -19,7 +19,7 @@
 
 #include "a2zipdrive.h"
 #include "includes/apple2.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
 //**************************************************************************
@@ -29,10 +29,10 @@
 const device_type A2BUS_ZIPDRIVE = &device_creator<a2bus_zipdrive_device>;
 
 #define ZIPDRIVE_ROM_REGION  "zipdrive_rom"
-#define ZIPDRIVE_IDE_TAG     "zipdrive_ide"
+#define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
 
 static MACHINE_CONFIG_FRAGMENT( zipdrive )
-	MCFG_IDE_CONTROLLER_ADD(ZIPDRIVE_IDE_TAG, ide_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( zipdrive )
@@ -70,7 +70,7 @@ const rom_entry *a2bus_zipdrivebase_device::device_rom_region() const
 a2bus_zipdrivebase_device::a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ide(*this, ZIPDRIVE_IDE_TAG)
+	m_ata(*this, ZIPDRIVE_ATA_TAG)
 {
 }
 
@@ -116,10 +116,10 @@ UINT8 a2bus_zipdrivebase_device::read_c0nx(address_space &space, UINT8 offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ide->read_cs0(space, offset, 0xff);
+			return m_ata->read_cs0(space, offset, 0xff);
 
 		case 8: // data port
-			m_lastdata = m_ide->read_cs0(space, offset, 0xffff);
+			m_lastdata = m_ata->read_cs0(space, offset, 0xffff);
 //          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -152,7 +152,7 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, UINT8 offset, U
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ide->write_cs0(space, offset, data, 0xff);
+			m_ata->write_cs0(space, offset, data, 0xff);
 			break;
 
 		case 8:
@@ -164,7 +164,7 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, UINT8 offset, U
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ide->write_cs0(space, offset, m_lastdata, 0xffff);
+			m_ata->write_cs0(space, offset, m_lastdata, 0xffff);
 			break;
 
 		default:

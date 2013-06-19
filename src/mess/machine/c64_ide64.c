@@ -31,7 +31,7 @@
 #define AT29C010A_TAG       "u3"
 #define DS1302_TAG          "u4"
 #define FT245R_TAG          "u21"
-#define IDE_TAG             "ide"
+#define ATA_TAG             "ata"
 
 
 
@@ -49,7 +49,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_ide64 )
 	MCFG_ATMEL_29C010_ADD(AT29C010A_TAG)
 	MCFG_DS1302_ADD(DS1302_TAG, XTAL_32_768kHz)
 
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 
@@ -100,7 +100,7 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AT29C010A_TAG),
 	m_rtc(*this, DS1302_TAG),
-	m_ide(*this, IDE_TAG),
+	m_ata(*this, ATA_TAG),
 	m_jp1(*this, "JP1")
 {
 }
@@ -117,7 +117,7 @@ void c64_ide64_cartridge_device::device_start()
 
 	// state saving
 	save_item(NAME(m_bank));
-	save_item(NAME(m_ide_data));
+	save_item(NAME(m_ata_data));
 	save_item(NAME(m_enable));
 }
 
@@ -181,19 +181,19 @@ UINT8 c64_ide64_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 
 		if (io1_offset >= 0x20 && io1_offset < 0x28)
 		{
-			m_ide_data = m_ide->read_cs0(space, offset & 0x07, 0xffff);
+			m_ata_data = m_ata->read_cs0(space, offset & 0x07, 0xffff);
 
-			data = m_ide_data & 0xff;
+			data = m_ata_data & 0xff;
 		}
 		else if (io1_offset >= 0x28 && io1_offset < 0x30)
 		{
-			m_ide_data = m_ide->read_cs1(space, offset & 0x07, 0xffff);
+			m_ata_data = m_ata->read_cs1(space, offset & 0x07, 0xffff);
 
-			data = m_ide_data & 0xff;
+			data = m_ata_data & 0xff;
 		}
 		else if (io1_offset == 0x31)
 		{
-			data = m_ide_data >> 8;
+			data = m_ata_data >> 8;
 		}
 		else if (io1_offset == 0x32)
 		{
@@ -282,19 +282,19 @@ void c64_ide64_cartridge_device::c64_cd_w(address_space &space, offs_t offset, U
 
 		if (io1_offset >= 0x20 && io1_offset < 0x28)
 		{
-			m_ide_data = (m_ide_data & 0xff00) | data;
+			m_ata_data = (m_ata_data & 0xff00) | data;
 
-			m_ide->write_cs0(space, offset & 0x07, m_ide_data, 0xffff);
+			m_ata->write_cs0(space, offset & 0x07, m_ata_data, 0xffff);
 		}
 		else if (io1_offset >= 0x28 && io1_offset < 0x30)
 		{
-			m_ide_data = (m_ide_data & 0xff00) | data;
+			m_ata_data = (m_ata_data & 0xff00) | data;
 
-			m_ide->write_cs1(space, offset & 0x07, m_ide_data, 0xffff);
+			m_ata->write_cs1(space, offset & 0x07, m_ata_data, 0xffff);
 		}
 		else if (io1_offset == 0x31)
 		{
-			m_ide_data = (data << 8) | (m_ide_data & 0xff);
+			m_ata_data = (data << 8) | (m_ata_data & 0xff);
 		}
 		else if (io1_offset == 0x5f)
 		{

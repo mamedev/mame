@@ -365,6 +365,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/idectrl.h"
+#include "machine/idehd.h"
 #include "machine/naomigd.h"
 #include "video/polynew.h"
 #include "bitmap.h"
@@ -2656,7 +2657,7 @@ WRITE32_MEMBER( chihiro_state::dummy_w )
 
 // ======================> ide_baseboard_device
 
-class ide_baseboard_device : public ide_mass_storage_device
+class ide_baseboard_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
@@ -2666,7 +2667,6 @@ public:
 	virtual int  write_sector(UINT32 lba, const void *buffer);
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_reset();
 };
 
@@ -2682,15 +2682,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //-------------------------------------------------
 
 ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ide_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_baseboard_device::device_start()
+	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
 {
 }
 
@@ -2700,6 +2692,8 @@ void ide_baseboard_device::device_start()
 
 void ide_baseboard_device::device_reset()
 {
+	ata_mass_storage_device::device_reset();
+
 	m_num_cylinders=65535;
 	m_num_sectors=255;
 	m_num_heads=255;
@@ -2951,7 +2945,7 @@ static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, chihiro_state )
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", bus_master_ide_controller_device, read_cs0_pc, write_cs0_pc, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", bus_master_ide_controller_device, read_cs0, write_cs0, 0xffffffff)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
@@ -3004,7 +2998,7 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
 	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD( "ide", ide_baseboard, NULL, "bb", true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
 	/* video hardware */

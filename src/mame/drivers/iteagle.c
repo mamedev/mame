@@ -84,7 +84,7 @@ www.multitech.com
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "video/voodoo.h"
 
 class iteagle_state : public driver_device
@@ -199,8 +199,8 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_CPU_CONFIG(r4310_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(iteagle_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(iteagle_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -258,20 +258,20 @@ MACHINE_CONFIG_END
 ROM_START( iteagle )
 	EAGLE_BIOS
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 ROM_END
 
 ROM_START( gtfore04 )
 	EAGLE_BIOS
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "gt2004", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) )
 ROM_END
 
 ROM_START( gtfore05 )
 	EAGLE_BIOS
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
 ROM_END
 

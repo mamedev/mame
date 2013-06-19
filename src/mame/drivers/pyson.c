@@ -221,7 +221,7 @@ ROM_START( pyson )
 	PYSON_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 ROM_END
 
 ROM_START( wswe )
@@ -235,7 +235,7 @@ ROM_START( wswe )
 	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
 		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(d4181cb5) SHA1(c5560d1ac043bfe2527fac3fb1989fa8fc53cf8a) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c18jaa03", 0, SHA1(b47190aa38f1f3a499b817758e3f29fac54391bd) )
 ROM_END
 
@@ -250,7 +250,7 @@ ROM_START( wswe2k3 )
 	ROM_REGION(0x2000, "timekeeper", ROMREGION_ERASE00)
 		ROM_LOAD( "m48t58y.u48",       0x000000, 0x002000, CRC(76068de0) SHA1(5f75b88ad04871fb3799fe904658c87524bad94f) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c27jaa03", 0, SHA1(9b2aa900711d88cf5effb3ba6be18726ea006ac4) )
 ROM_END
 

@@ -25,7 +25,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define IDE_TAG             "ide"
+#define ATA_TAG             "ata"
 #define CENTRONICS_TAG      "centronics"
 
 
@@ -38,10 +38,10 @@ const device_type ADAM_IDE = &device_creator<powermate_ide_device>;
 
 
 //-------------------------------------------------
-//  ROM( adam_ide )
+//  ROM( adam_ata )
 //-------------------------------------------------
 
-ROM_START( adam_ide )
+ROM_START( adam_ata )
 	ROM_REGION( 0x1000, "rom", 0 )
 	ROM_LOAD( "exp.rom", 0x0000, 0x1000, NO_DUMP )
 ROM_END
@@ -53,15 +53,15 @@ ROM_END
 
 const rom_entry *powermate_ide_device::device_rom_region() const
 {
-	return ROM_NAME( adam_ide );
+	return ROM_NAME( adam_ata );
 }
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( adam_ide )
+//  MACHINE_CONFIG_FRAGMENT( adam_ata )
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( adam_ide )
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_devices, "hdd", NULL, false)
+static MACHINE_CONFIG_FRAGMENT( adam_ata )
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END
 
@@ -73,7 +73,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor powermate_ide_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( adam_ide );
+	return MACHINE_CONFIG_NAME( adam_ata );
 }
 
 
@@ -87,9 +87,9 @@ machine_config_constructor powermate_ide_device::device_mconfig_additions() cons
 //-------------------------------------------------
 
 powermate_ide_device::powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ide", __FILE__),
+	: device_t(mconfig, ADAM_IDE, "Powermate HP IDE", tag, owner, clock, "adam_ata", __FILE__),
 		device_adam_expansion_slot_card_interface(mconfig, *this),
-		m_ide(*this, IDE_TAG),
+		m_ata(*this, ATA_TAG),
 		m_centronics(*this, CENTRONICS_TAG)
 {
 }
@@ -121,7 +121,7 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			data = m_ide->read_cs0(space, offset & 0x07, 0xff);
+			data = m_ata->read_cs0(space, offset & 0x07, 0xff);
 			break;
 
 		case 0x40: // Printer status
@@ -142,17 +142,17 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 			break;
 
 		case 0x58:
-			m_ide_data = m_ide->read_cs0(space, 0, 0xffff);
+			m_ata_data = m_ata->read_cs0(space, 0, 0xffff);
 
-			data = m_ide_data & 0xff;
+			data = m_ata_data & 0xff;
 			break;
 
 		case 0x59:
-			data = m_ide_data >> 8;
+			data = m_ata_data >> 8;
 			break;
 
 		case 0x5a:
-			data = m_ide->read_cs1(space, 6, 0xff);
+			data = m_ata->read_cs1(space, 6, 0xff);
 			break;
 
 		case 0x5b: // Digital Input Register
@@ -181,7 +181,7 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			m_ide->write_cs0(space, offset & 0x07, data, 0xff);
+			m_ata->write_cs0(space, offset & 0x07, data, 0xff);
 			break;
 
 		case 0x40:
@@ -192,12 +192,12 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 			break;
 
 		case 0x58:
-			m_ide_data |= data;
-			m_ide->write_cs0(space, 0, m_ide_data, 0xffff);
+			m_ata_data |= data;
+			m_ata->write_cs0(space, 0, m_ata_data, 0xffff);
 			break;
 
 		case 0x59:
-			m_ide_data = data << 8;
+			m_ata_data = data << 8;
 			break;
 
 		case 0x5a: // Fixed Disk Control Register

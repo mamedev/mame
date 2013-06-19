@@ -1090,16 +1090,16 @@ READ32_MEMBER(jaguar_state::vt83c461_r)
 	else if( offset >= 0x1f0/4 && offset < 0x1f8/4 )
 	{
 		if (ACCESSING_BITS_0_15)
-			data |= m_ide->read_cs0_pc(space, (offset * 2) & 7, mem_mask);
+			data |= m_ide->read_cs0(space, (offset * 2) & 7, mem_mask);
 		if (ACCESSING_BITS_16_31)
-			data |= m_ide->read_cs0_pc(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
+			data |= m_ide->read_cs0(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
 	}
 	else if( offset >= 0x3f0/4 && offset < 0x3f8/4 )
 	{
 		if (ACCESSING_BITS_0_15)
-			data |= m_ide->read_cs1_pc(space, (offset * 2) & 7, mem_mask);
+			data |= m_ide->read_cs1(space, (offset * 2) & 7, mem_mask);
 		if (ACCESSING_BITS_16_31)
-			data |= m_ide->read_cs1_pc(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
+			data |= m_ide->read_cs1(space, ((offset * 2) & 7) + 1, mem_mask >> 16) << 16;
 	}
 
 	return data;
@@ -1115,16 +1115,16 @@ WRITE32_MEMBER(jaguar_state::vt83c461_w)
 	else if( offset >= 0x1f0/4 && offset < 0x1f8/4 )
 	{
 		if (ACCESSING_BITS_0_15)
-			m_ide->write_cs0_pc(space, (offset * 2) & 7, data, mem_mask);
+			m_ide->write_cs0(space, (offset * 2) & 7, data, mem_mask);
 		if (ACCESSING_BITS_16_31)
-			m_ide->write_cs0_pc(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
+			m_ide->write_cs0(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
 	}
 	else if( offset >= 0x3f0/4 && offset < 0x3f8/4 )
 	{
 		if (ACCESSING_BITS_0_15)
-			m_ide->write_cs1_pc(space, (offset * 2) & 7, data, mem_mask);
+			m_ide->write_cs1(space, (offset * 2) & 7, data, mem_mask);
 		if (ACCESSING_BITS_16_31)
-			m_ide->write_cs1_pc(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
+			m_ide->write_cs1(space, ((offset * 2) & 7) + 1, data >> 16, mem_mask >> 16);
 	}
 }
 
@@ -1601,8 +1601,8 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1623,7 +1623,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
 	MCFG_DEVICE_REMOVE("ide:0")
-	MCFG_IDE_SLOT_ADD("ide:0", ide_devices, NULL, true)
+	MCFG_ATA_SLOT_ADD("ide:0", ata_devices, NULL, true)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
@@ -1897,7 +1897,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
@@ -1911,7 +1911,7 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
@@ -1925,7 +1925,7 @@ ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 *
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
@@ -1939,7 +1939,7 @@ ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" *
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
@@ -1954,7 +1954,7 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
@@ -1972,7 +1972,7 @@ ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
 	ROM_REGION( 0x800, "user2", 0 ) /* 28C16 style eeprom, currently loaded but not used */
 	ROM_LOAD( "28c16.17z", 0x000, 0x800, CRC(1cdd9088) SHA1(4f01f02ff95f31ced87a3cdd7f171afd92551266) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
@@ -1987,7 +1987,7 @@ ROM_START( area51mx )   /* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date:
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
 
@@ -2002,7 +2002,7 @@ ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "area51mx", 0, SHA1(5ff10f4e87094d4449eabf3de7549564ca568c7e) )
 ROM_END
 
@@ -2017,7 +2017,7 @@ ROM_START( vcircle )
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "vcircle", 0, SHA1(bfa79c4cacdc9c2cd6362f62a23056b3e35a2034) )
 ROM_END
 

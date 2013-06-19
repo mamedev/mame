@@ -1,4 +1,6 @@
 #include "emu.h"
+#include "atadev.h"
+#include "harddisk.h"
 #include "imagedev/harddriv.h"
 
 #define IDE_DISK_SECTOR_SIZE            512
@@ -42,43 +44,12 @@
 #define IDE_DEVICE_HEAD_DRV  0x10
 #define IDE_DEVICE_HEAD_L    0x40
 
-// ======================> ide_device_interface
-
-class ide_device_interface
-{
-public:
-	ide_device_interface(const machine_config &mconfig, device_t &device);
-	virtual ~ide_device_interface() {}
-
-	virtual UINT16 read_dma() = 0;
-	virtual DECLARE_READ16_MEMBER(read_cs0) = 0;
-	virtual DECLARE_READ16_MEMBER(read_cs1) = 0;
-
-	virtual void write_dma(UINT16 data) = 0;
-	virtual DECLARE_WRITE16_MEMBER(write_cs0) = 0;
-	virtual DECLARE_WRITE16_MEMBER(write_cs1) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
-
-	virtual bool is_ready() { return true; }
-	virtual UINT8 *identify_device_buffer() = 0;
-
-	UINT8           m_master_password_enable;
-	UINT8           m_user_password_enable;
-	const UINT8 *   m_master_password;
-	const UINT8 *   m_user_password;
-
-	devcb2_write_line m_irq_handler;
-	devcb2_write_line m_dmarq_handler;
-};
-
-class ide_mass_storage_device : public device_t,
-	public ide_device_interface,
+class ata_mass_storage_device : public device_t,
+	public ata_device_interface,
 	public device_slot_card_interface
 {
 public:
-	ide_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
 
 	virtual UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
@@ -98,6 +69,7 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	virtual bool is_ready() { return true; }
 	virtual int read_sector(UINT32 lba, void *buffer) = 0;
 	virtual int write_sector(UINT32 lba, const void *buffer) = 0;
 
@@ -163,7 +135,7 @@ private:
 
 // ======================> ide_hdd_device
 
-class ide_hdd_device : public ide_mass_storage_device
+class ide_hdd_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
@@ -182,6 +154,9 @@ protected:
 
 	chd_file       *m_handle;
 	hard_disk_file *m_disk;
+
+private:
+	required_device<harddisk_image_device> m_image;
 };
 
 // device type definition

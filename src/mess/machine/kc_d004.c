@@ -14,7 +14,7 @@
 #define Z80_TAG         "disk"
 #define Z80CTC_TAG      "z80ctc"
 #define UPD765_TAG      "upd765"
-#define IDE_TAG         "ide"
+#define ATA_TAG         "ata"
 
 /***************************************************************************
     IMPLEMENTATION
@@ -90,7 +90,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(kc_d004_gide_io)
 
-	MCFG_IDE_CONTROLLER_ADD(IDE_TAG, ide_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 
@@ -390,7 +390,7 @@ void kc_d004_device::fdc_drq(bool state)
 
 kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock, "kc_d004gide", __FILE__),
-		m_ide(*this, IDE_TAG)
+		m_ata(*this, ATA_TAG)
 {
 }
 
@@ -421,7 +421,7 @@ void kc_d004_gide_device::device_reset()
 {
 	kc_d004_device::device_reset();
 
-	m_ide_data  = 0;
+	m_ata_data  = 0;
 	m_lh        = 0;
 }
 
@@ -457,15 +457,15 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 			{
 				if (ide_cs == 0 )
 				{
-					m_ide_data = m_ide->read_cs0(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs0(space, io_addr & 0x07, 0xffff);
 				}
 				else
 				{
-					m_ide_data = m_ide->read_cs1(space, io_addr & 0x07, 0xffff);
+					m_ata_data = m_ata->read_cs1(space, io_addr & 0x07, 0xffff);
 				}
 			}
 
-			data = (m_ide_data >> data_shift) & 0xff;
+			data = (m_ata_data >> data_shift) & 0xff;
 		}
 
 		m_lh = (io_addr == 0x08) ? !m_lh : ((io_addr > 0x08) ? 0 : m_lh);
@@ -500,17 +500,17 @@ WRITE8_MEMBER(kc_d004_gide_device::gide_w)
 			if (io_addr == 0x08 && m_lh)
 				data_shift = 8;
 
-			m_ide_data = (data << data_shift) | (m_ide_data & (0xff00 >> data_shift));
+			m_ata_data = (data << data_shift) | (m_ata_data & (0xff00 >> data_shift));
 
 			if (io_addr == 0x06 || io_addr == 0x07 || io_addr > 0x08 || (io_addr == 0x08 && m_lh))
 			{
 				if (ide_cs == 0)
 				{
-					m_ide->write_cs0(space, io_addr & 0x07, m_ide_data, 0xffff);
+					m_ata->write_cs0(space, io_addr & 0x07, m_ata_data, 0xffff);
 				}
 				else
 				{
-					m_ide->write_cs1(space, io_addr & 0x07, m_ide_data, 0xffff);
+					m_ata->write_cs1(space, io_addr & 0x07, m_ata_data, 0xffff);
 				}
 			}
 		}

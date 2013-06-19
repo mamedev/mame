@@ -23,7 +23,7 @@ GP1 HDD data contents:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "machine/k053252.h"
@@ -199,7 +199,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 		}
 	}
 
-	return m_ide->read_cs0(space, offset, mem_mask);
+	return m_ata->read_cs0(space, offset, mem_mask);
 }
 
 
@@ -291,8 +291,8 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)          /* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)          /* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) /* IDE control regs */
-	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs1, write_cs1) /* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
+	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r, sndram_w)                               /* sound ram */
 ADDRESS_MAP_END
 
@@ -314,8 +314,8 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(gp2_vram_r, gp2_vram_w)                           /* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r, gp2_vram_mirror_w)             /* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE("ide", ide_controller_device, write_cs0) /* IDE control regs */
-	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs1, write_cs1) /* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE("ata", ata_interface_device, write_cs0) /* IDE control regs */
+	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)                                /* sound ram */
 ADDRESS_MAP_END
 
@@ -596,7 +596,6 @@ void qdrmfgp_state::machine_reset()
 
 	/* reset the IDE controller */
 	m_gp2_irq_control = 0;
-	m_ide->reset();
 }
 
 
@@ -615,8 +614,8 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(qdrmfgp_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -651,8 +650,8 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(qdrmfgp_state, gp2_ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(qdrmfgp_state, gp2_ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -697,7 +696,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
-	DISK_REGION( "ide:0:hdd" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "gq460a08", 0, SHA1(2f142f986fa3c79d5c4102e800980d1706c35f75) )
 ROM_END
 
@@ -714,7 +713,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 
-	DISK_REGION( "ide:0:hdd" )            /* IDE HARD DRIVE */
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "ge557a09", 0, SHA1(1ef8093b542fe0bf8240a5fd64e5af3839b6a04c) )
 ROM_END
 

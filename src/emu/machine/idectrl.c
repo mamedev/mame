@@ -1,25 +1,24 @@
 /***************************************************************************
 
-    Generic (PC-style) IDE controller implementation
+    idectrl.c
+
+    Generic (PC-style) IDE controller implementation.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "idectrl.h"
-#include "debugger.h"
+
 
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
 
 #define VERBOSE                     0
-#define PRINTF_IDE_COMMANDS         0
-#define PRINTF_IDE_PASSWORD         0
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) mame_printf_debug x; } while (0)
-
 
 
 /***************************************************************************
@@ -30,113 +29,34 @@
 #define IDE_BANK2_CONFIG_REGISTER           8
 #define IDE_BANK2_CONFIG_DATA               0xc
 
+const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
-void ide_controller_device::set_irq(int state)
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
+	m_config_unknown(0),
+	m_config_register_num(0)
 {
-	if (state == ASSERT_LINE)
-		LOG(("IDE interrupt assert\n"));
-	else
-		LOG(("IDE interrupt clear\n"));
-
-	/* signal an interrupt */
-	m_irq_handler(state);
 }
 
-void ide_controller_device::set_dmarq(int state)
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	ata_interface_device(mconfig, type, name, tag, owner, clock),
+	m_config_unknown(0),
+	m_config_register_num(0)
 {
-	m_dmarq_handler(state);
 }
 
-WRITE_LINE_MEMBER( ide_controller_device::irq0_write_line )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ide_controller_device::device_start()
 {
-	m_irq[0] = state;
+	ata_interface_device::device_start();
 
-	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER( ide_controller_device::irq1_write_line )
-{
-	m_irq[1] = state;
-
-	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER( ide_controller_device::dmarq0_write_line )
-{
-	m_dmarq[0] = state;
-
-	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER( ide_controller_device::dmarq1_write_line )
-{
-	m_dmarq[1] = state;
-
-	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
-}
-
-
-/***************************************************************************
-    INITIALIZATION AND RESET
-***************************************************************************/
-
-UINT8 *ide_controller_device::identify_device_buffer(int _drive)
-{
-	return m_slot[_drive]->dev()->identify_device_buffer();
-}
-
-void ide_controller_device::ide_set_master_password(int _drive, const UINT8 *password)
-{
-	m_slot[_drive]->dev()->m_master_password = password;
-	m_slot[_drive]->dev()->m_master_password_enable = (password != NULL);
-}
-
-
-void ide_controller_device::ide_set_user_password(int _drive, const UINT8 *password)
-{
-	m_slot[_drive]->dev()->m_user_password = password;
-	m_slot[_drive]->dev()->m_user_password_enable = (password != NULL);
-}
-
-/*************************************
- *
- *  IDE controller read
- *
- *************************************/
-
-UINT16 ide_controller_device::read_dma()
-{
-	UINT16 result = 0xffff;
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			result &= m_slot[i]->dev()->read_dma();
-
-//  printf( "read_dma %04x\n", result );
-	return result;
-}
-
-READ16_MEMBER( ide_controller_device::read_cs0 )
-{
-	UINT16 result = mem_mask;
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			result &= m_slot[i]->dev()->read_cs0(space, offset, mem_mask);
-
-//  printf( "read cs0 %04x %04x %04x\n", offset, result, mem_mask );
-
-	return result;
-}
-
-READ16_MEMBER( ide_controller_device::read_cs1 )
-{
-	UINT16 result = mem_mask;
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			result &= m_slot[i]->dev()->read_cs1(space, offset, mem_mask);
-
-//  printf( "read cs1 %04x %04x %04x\n", offset, result, mem_mask );
-
-	return result;
+	/* register ide states */
+	save_item(NAME(m_config_unknown));
+	save_item(NAME(m_config_register));
+	save_item(NAME(m_config_register_num));
 }
 
 READ8_MEMBER( ide_controller_device::read_via_config )
@@ -173,72 +93,29 @@ READ8_MEMBER( ide_controller_device::read_via_config )
 	return result;
 }
 
-READ16_MEMBER( ide_controller_device::read_cs0_pc )
+READ16_MEMBER( ide_controller_device::read_cs0 )
 {
 	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit read of data register
 	if (mem_mask == 0xff00)
 	{
-		return read_cs0(space, (offset * 2) + 1, 0xff) << 8;
+		return ata_interface_device::read_cs0(space, (offset * 2) + 1, 0xff) << 8;
 	}
 	else
 	{
-		return read_cs0(space, offset * 2, mem_mask);
+		return ata_interface_device::read_cs0(space, offset * 2, mem_mask);
 	}
 }
 
-READ16_MEMBER( ide_controller_device::read_cs1_pc )
+READ16_MEMBER( ide_controller_device::read_cs1 )
 {
 	if (mem_mask == 0xff00)
 	{
-		return read_cs1(space, (offset * 2) + 1, 0xff) << 8;
+		return ata_interface_device::read_cs1(space, (offset * 2) + 1, 0xff) << 8;
 	}
 	else
 	{
-		return read_cs1(space, offset * 2, mem_mask);
+		return ata_interface_device::read_cs1(space, offset * 2, mem_mask);
 	}
-}
-
-
-/*************************************
- *
- *  IDE controller write
- *
- *************************************/
-
-void ide_controller_device::write_dma( UINT16 data )
-{
-//  printf( "write_dma %04x\n", data );
-
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			m_slot[i]->dev()->write_dma(data);
-}
-
-WRITE16_MEMBER( ide_controller_device::write_cs0 )
-{
-//  printf( "write cs0 %04x %04x %04x\n", offset, data, mem_mask );
-
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			m_slot[i]->dev()->write_cs0(space, offset, data, mem_mask);
-}
-
-WRITE16_MEMBER( ide_controller_device::write_cs1 )
-{
-//  printf( "write cs1 %04x %04x %04x\n", offset, data, mem_mask );
-
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			m_slot[i]->dev()->write_cs1(space, offset, data, mem_mask);
-}
-
-WRITE_LINE_MEMBER( ide_controller_device::write_dmack )
-{
-//  printf( "write_dmack %04x\n", state );
-
-	for (int i = 0; i < 2; i++)
-		if (m_slot[i]->dev() != NULL)
-			m_slot[i]->dev()->write_dmack(state);
 }
 
 WRITE8_MEMBER( ide_controller_device::write_via_config )
@@ -268,148 +145,30 @@ WRITE8_MEMBER( ide_controller_device::write_via_config )
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs0_pc )
+WRITE16_MEMBER( ide_controller_device::write_cs0 )
 {
 	if (mem_mask == 0xffff && offset == 1 ) offset = 0; // hack for 32 bit write to data register
 	if (mem_mask == 0xff00)
 	{
-		return write_cs0(space, (offset * 2) + 1, data >> 8, 0xff);
+		return ata_interface_device::write_cs0(space, (offset * 2) + 1, data >> 8, 0xff);
 	}
 	else
 	{
-		return write_cs0(space, offset * 2, data, mem_mask);
+		return ata_interface_device::write_cs0(space, offset * 2, data, mem_mask);
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs1_pc )
+WRITE16_MEMBER( ide_controller_device::write_cs1 )
 {
 	if (mem_mask == 0xff00)
 	{
-		return write_cs1(space, (offset * 2) + 1, data >> 8, 0xff);
+		return ata_interface_device::write_cs1(space, (offset * 2) + 1, data >> 8, 0xff);
 	}
 	else
 	{
-		return write_cs1(space, offset * 2, data, mem_mask);
+		return ata_interface_device::write_cs1(space, offset * 2, data, mem_mask);
 	}
 }
-
-SLOT_INTERFACE_START(ide_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-SLOT_INTERFACE_END
-
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock),
-	m_config_unknown(0),
-	m_config_register_num(0),
-	m_irq_handler(*this),
-	m_dmarq_handler(*this)
-{
-}
-
-
-const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
-
-ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock),
-	m_config_unknown(0),
-	m_config_register_num(0),
-	m_irq_handler(*this),
-	m_dmarq_handler(*this)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_controller_device::device_start()
-{
-	m_irq_handler.resolve_safe();
-	m_dmarq_handler.resolve_safe();
-
-	/* set MAME harddisk handle */
-	m_slot[0] = subdevice<ide_slot_device>("0");
-	m_slot[1] = subdevice<ide_slot_device>("1");
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_irq[i] = 0;
-		m_dmarq[i] = 0;
-
-		ide_device_interface *dev = m_slot[i]->dev();
-		if (dev != NULL)
-		{
-			if (i == 0)
-			{
-				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, dmarq0_write_line));
-			}
-			else
-			{
-				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ide_controller_device, dmarq1_write_line));
-			}
-
-			dev->write_csel(i);
-			dev->write_dasp(m_slot[1]->dev() != NULL);
-		}
-	}
-
-	/* register ide states */
-	save_item(NAME(m_config_unknown));
-	save_item(NAME(m_config_register));
-	save_item(NAME(m_config_register_num));
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ide_controller_device::device_reset()
-{
-	LOG(("IDE controller reset performed\n"));
-}
-
-
-
-//**************************************************************************
-//  IDE SLOT DEVICE
-//**************************************************************************
-
-// device type definition
-const device_type IDE_SLOT = &device_creator<ide_slot_device>;
-
-//-------------------------------------------------
-//  ide_slot_device - constructor
-//-------------------------------------------------
-
-ide_slot_device::ide_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IDE_SLOT, "IDE Connector", tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ide_slot_device::device_config_complete()
-{
-	m_dev = dynamic_cast<ide_device_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ide_slot_device::device_start()
-{
-}
-
-
 
 #define IDE_BUSMASTER_STATUS_ACTIVE         0x01
 #define IDE_BUSMASTER_STATUS_ERROR          0x02
@@ -459,7 +218,7 @@ void bus_master_ide_controller_device::device_start()
 
 void bus_master_ide_controller_device::set_irq(int state)
 {
-	ide_controller_device::set_irq(state);
+	ata_interface_device::set_irq(state);
 
 	if (m_irq != state)
 	{
@@ -472,7 +231,7 @@ void bus_master_ide_controller_device::set_irq(int state)
 
 void bus_master_ide_controller_device::set_dmarq(int state)
 {
-	ide_controller_device::set_dmarq(state);
+	ata_interface_device::set_dmarq(state);
 
 	if (m_dmarq != state)
 	{

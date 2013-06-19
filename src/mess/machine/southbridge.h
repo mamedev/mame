@@ -10,7 +10,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/at_keybc.h"
 
 #include "imagedev/harddriv.h"

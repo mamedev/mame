@@ -64,7 +64,7 @@ ROM_START( maski )
 ROM_END
 
 #define MISSING_DISK \
-	DISK_REGION( "ide" ) \
+	DISK_REGION( "ata:0:hdd:image" ) \
 	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP )
 
 ROM_START( adults )

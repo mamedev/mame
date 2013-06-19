@@ -53,7 +53,7 @@
 
 #include "a2vulcan.h"
 #include "includes/apple2.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 
 //**************************************************************************
@@ -63,10 +63,10 @@
 const device_type A2BUS_VULCAN = &device_creator<a2bus_vulcan_device>;
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
-#define VULCAN_IDE_TAG     "vulcan_ide"
+#define VULCAN_ATA_TAG     "vulcan_ata"
 
 static MACHINE_CONFIG_FRAGMENT( vulcan )
-	MCFG_IDE_CONTROLLER_ADD(VULCAN_IDE_TAG, ide_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(VULCAN_ATA_TAG, ata_devices, "hdd", "hdd", false)
 MACHINE_CONFIG_END
 
 ROM_START( vulcan )
@@ -104,7 +104,7 @@ const rom_entry *a2bus_vulcanbase_device::device_rom_region() const
 a2bus_vulcanbase_device::a2bus_vulcanbase_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
-	m_ide(*this, VULCAN_IDE_TAG)
+	m_ata(*this, VULCAN_ATA_TAG)
 {
 }
 
@@ -151,7 +151,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 	switch (offset)
 	{
 		case 0:
-			m_lastdata = m_ide->read_cs0(space, offset, 0xffff);
+			m_lastdata = m_ata->read_cs0(space, offset, 0xffff);
 //          printf("IDE: read %04x\n", m_lastdata);
 			m_last_read_was_0 = true;
 			return m_lastdata&0xff;
@@ -164,7 +164,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 			}
 			else
 			{
-				return m_ide->read_cs0(space, offset, 0xff);
+				return m_ata->read_cs0(space, offset, 0xff);
 			}
 			break;
 
@@ -174,7 +174,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ide->read_cs0(space, offset, 0xff);
+			return m_ata->read_cs0(space, offset, 0xff);
 
 		default:
 //          printf("Read @ C0n%x\n", offset);
@@ -206,11 +206,11 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 				m_lastdata &= 0x00ff;
 				m_lastdata |= (data << 8);
 //              printf("IDE: write %04x\n", m_lastdata);
-				m_ide->write_cs0(space, offset, m_lastdata, 0xffff);
+				m_ata->write_cs0(space, offset, m_lastdata, 0xffff);
 			}
 			else
 			{
-				m_ide->write_cs0(space, offset, data, 0xff);
+				m_ata->write_cs0(space, offset, data, 0xff);
 			}
 			break;
 
@@ -221,7 +221,7 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ide->write_cs0(space, offset, data, 0xff);
+			m_ata->write_cs0(space, offset, data, 0xff);
 			break;
 
 		case 9: // ROM bank

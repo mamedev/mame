@@ -1,4 +1,4 @@
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 
 class djmain_state : public driver_device
 {
@@ -9,7 +9,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
-		m_ide(*this, "ide")
+		m_ata(*this, "ata")
 	{
 	}
 
@@ -21,8 +21,8 @@ public:
 	UINT8 m_pending_vb_int;
 	UINT16 m_v_ctrl;
 	UINT32 m_obj_regs[0xa0/4];
-	const UINT8 *m_ide_user_password;
-	const UINT8 *m_ide_master_password;
+	const UINT8 *m_ata_user_password;
+	const UINT8 *m_ata_master_password;
 	required_shared_ptr<UINT32> m_obj_ram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
@@ -65,7 +65,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<k055555_device> m_k055555;
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 };
 
 /*----------- defined in video/djmain.c -----------*/

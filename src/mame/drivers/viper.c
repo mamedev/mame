@@ -284,7 +284,7 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/timekpr.h"
 #include "video/voodoo.h"
 
@@ -310,7 +310,7 @@ public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ide(*this, "ide")
+		m_ata(*this, "ata")
 	{
 	}
 
@@ -363,7 +363,7 @@ public:
 	int ds2430_insert_cmd_bit(int bit);
 	void DS2430_w(int bit);
 	required_device<cpu_device> m_maincpu;
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1266,7 +1266,7 @@ READ64_MEMBER(viper_state::cf_card_data_r)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				r |= m_ide->read_cs0(space, 0, mem_mask >> 16) << 16;
+				r |= m_ata->read_cs0(space, 0, mem_mask >> 16) << 16;
 				break;
 			}
 
@@ -1287,7 +1287,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 		{
 			case 0x8:   // Duplicate Even RD Data
 			{
-				m_ide->write_cs0(space, 0, data >> 16, mem_mask >> 16);
+				m_ata->write_cs0(space, 0, data >> 16, mem_mask >> 16);
 				break;
 			}
 
@@ -1318,7 +1318,7 @@ READ64_MEMBER(viper_state::cf_card_r)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
 				{
-					r |= m_ide->read_cs0(space, offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->read_cs0(space, offset & 7, mem_mask >> 16) << 16;
 					break;
 				}
 
@@ -1327,13 +1327,13 @@ READ64_MEMBER(viper_state::cf_card_r)
 
 				case 0xd:   // Duplicate Error
 				{
-					r |= m_ide->read_cs0(space, 1, mem_mask >> 16) << 16;
+					r |= m_ata->read_cs0(space, 1, mem_mask >> 16) << 16;
 					break;
 				}
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
 				{
-					r |= m_ide->read_cs1(space, offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->read_cs1(space, offset & 7, mem_mask >> 16) << 16;
 					break;
 				}
 
@@ -1383,7 +1383,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
 				{
-					m_ide->write_cs0(space, offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->write_cs0(space, offset & 7, data >> 16, mem_mask >> 16);
 					break;
 				}
 
@@ -1392,13 +1392,13 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 
 				case 0xd:   // Duplicate Features
 				{
-					m_ide->write_cs0(space, 1, data >> 16, mem_mask >> 16);
+					m_ata->write_cs0(space, 1, data >> 16, mem_mask >> 16);
 					break;
 				}
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
 				{
-					m_ide->write_cs1(space, offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->write_cs1(space, offset & 7, data >> 16, mem_mask >> 16);
 					break;
 				}
 
@@ -1419,7 +1419,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 						m_cf_card_ide = 1;
 
 						// soft reset
-						m_ide->write_cs1(space, 6, 0x04, 0xff);
+						m_ata->write_cs1(space, 6, 0x04, 0xff);
 					}
 					break;
 				}
@@ -1454,10 +1454,10 @@ READ64_MEMBER(viper_state::ata_r)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			r |= m_ide->read_cs0(space, reg, mem_mask >> 16) << 16;
+			r |= m_ata->read_cs0(space, reg, mem_mask >> 16) << 16;
 			break;
 		case 0x80:
-			r |= m_ide->read_cs1(space, reg, mem_mask >> 16) << 16;
+			r |= m_ata->read_cs1(space, reg, mem_mask >> 16) << 16;
 			break;
 		}
 	}
@@ -1474,10 +1474,10 @@ WRITE64_MEMBER(viper_state::ata_w)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			m_ide->write_cs0(space, reg, data >> 16, mem_mask >> 16);
+			m_ata->write_cs0(space, reg, data >> 16, mem_mask >> 16);
 			break;
 		case 0x80:
-			m_ide->write_cs1(space, reg, data >> 16, mem_mask >> 16);
+			m_ata->write_cs1(space, reg, data >> 16, mem_mask >> 16);
 			break;
 		}
 	}
@@ -2021,10 +2021,9 @@ void viper_state::machine_start()
 
 void viper_state::machine_reset()
 {
-	m_ide->reset();
 	mpc8240_epic_reset();
 
-	UINT8 *identify_device = m_ide->identify_device_buffer(0);
+	UINT8 *identify_device = m_ata->identify_device_buffer(0);
 
 	// Viper expects these settings or the BIOS fails
 	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
@@ -2057,7 +2056,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 
 	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, voodoo_intf)
 
@@ -2126,7 +2125,7 @@ ROM_START(ppp2nd)
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "ppp2nd", 0, SHA1(b8b90483d515c83eac05ffa617af19612ea990b0))
 ROM_END
 
@@ -2140,7 +2139,7 @@ ROM_START(boxingm) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a45jaa_nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a45a02", 0, SHA1(9af2481f53de705ae48fad08d8dd26553667c2d0) )
 ROM_END
 
@@ -2153,7 +2152,7 @@ ROM_START(code1d) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
 ROM_END
 
@@ -2166,7 +2165,7 @@ ROM_START(code1db) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
 ROM_END
 
@@ -2180,7 +2179,7 @@ ROM_START(gticlub2) //*
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239)) //old dump, probably has non-default settings.
 	ROM_LOAD("941jab_nvram.u39", 0x00000, 0x2000, CRC(6c4a852f) SHA1(2753dda42cdd81af22dc6780678f1ddeb3c62013))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
 ROM_END
 
@@ -2190,7 +2189,7 @@ ROM_START(gticlub2ea) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "941a02", 0,  NO_DUMP )
 ROM_END
 
@@ -2203,7 +2202,7 @@ ROM_START(jpark3) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
 ROM_END
 
@@ -2217,7 +2216,7 @@ ROM_START(mocapglf) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b33a02", 0, SHA1(819d8fac5d2411542c1b989105cffe38a5545fc2) )
 ROM_END
 
@@ -2230,7 +2229,7 @@ ROM_START(mocapb) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29aaa_nvram.u39", 0x000000, 0x2000, CRC(14b9fe68) SHA1(3c59e6df1bb46bc1835c13fd182b1bb092c08759)) //supposed to be aab version?
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a29b02", 0, SHA1(f0c04310caf2cca804fde20805eb30a44c5a6796) ) //missing bootloader
 ROM_END
 
@@ -2243,7 +2242,7 @@ ROM_START(mocapbj) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a29jaa_nvram.u39", 0x000000, 0x2000, CRC(2f7cdf27) SHA1(0b69d8728be12909e235268268a312982f81d46a))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a29a02", 0, SHA1(00afad399737652b3e17257c70a19f62e37f3c97) )
 ROM_END
 
@@ -2256,7 +2255,7 @@ ROM_START(p911) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uad_nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a00uad02", 0, SHA1(6acb8dc41920e7025b87034a3a62b185ef0109d9) )
 ROM_END
 
@@ -2269,7 +2268,7 @@ ROM_START(p911uc) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00uac_nvram.u39", 0x000000, 0x2000,  NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a00uac02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
 ROM_END
 
@@ -2282,7 +2281,7 @@ ROM_START(p911kc) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00kac_nvram.u39", 0x000000, 0x2000,  CRC(8ddc921c) SHA1(901538da237679fc74966a301278b36d1335671f) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a00kac02", 0, SHA1(b268789416dbf8886118a634b911f0ee254970de) )
 ROM_END
 
@@ -2295,7 +2294,7 @@ ROM_START(p911e) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
 ROM_END
 
@@ -2308,7 +2307,7 @@ ROM_START(p911j) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a00jaa_nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a00jac02", 0, SHA1(d962d3a8ea84c380767d0fe336296911c289c224) )
 ROM_END
 
@@ -2321,7 +2320,7 @@ ROM_START(p9112) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b11a02", 0, SHA1(57665664321b78c1913d01f0d2c0b8d3efd42e04) )
 ROM_END
 
@@ -2334,7 +2333,7 @@ ROM_START(popn9) //Note: this is actually a Konami Pyson HW! (PlayStation 2-base
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
 
@@ -2347,7 +2346,7 @@ ROM_START(sscopex)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a13c02", 0, SHA1(d740784fa51a3f43695ea95e23f92ef05f43284a) )
 ROM_END
 
@@ -2362,7 +2361,7 @@ ROM_START(sogeki) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f325c55) SHA1(0bc44f40f981a815c8ce64eae95ae55db510c565))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a13b02", 0, SHA1(c25a61b76d365794c2da4a9e7de88a5519e944ec) )
 ROM_END
 
@@ -2376,7 +2375,7 @@ ROM_START(thrild2) //*
 	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
 //  a41eba_nvram == a41ebb_nvram
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
 ROM_END
 
@@ -2389,7 +2388,7 @@ ROM_START(thrild2a) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
 ROM_END
 
@@ -2403,7 +2402,7 @@ ROM_START(thrild2c) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a41c02", 0, SHA1(ab3020e8709768c0fd2467573e92b679a05944e5) )
 ROM_END
 
@@ -2416,7 +2415,7 @@ ROM_START(tsurugi) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30eab_nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a30b02", 0, SHA1(d2be83b7323c365ba445de7697c3fb8eb83d0212) )
 ROM_END
 
@@ -2429,7 +2428,7 @@ ROM_START(tsurugij) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a30jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
@@ -2443,7 +2442,7 @@ ROM_START(wcombat) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22d02", 0, BAD_DUMP SHA1(85d2a8b5ec4cfd932190486cad991f0c180ca6b3) )
 ROM_END
 
@@ -2453,7 +2452,7 @@ ROM_START(wcombatk) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatk_nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22c02", 0, BAD_DUMP SHA1(8bd1dfbf926ad5b28fa7dafd7e31c475325ec569) )
 ROM_END
 
@@ -2466,7 +2465,7 @@ ROM_START(wcombatj) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22a02", 0, BAD_DUMP SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
 ROM_END
 
@@ -2479,7 +2478,7 @@ ROM_START(xtrial) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b4xjab_nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
 ROM_END
 
@@ -2541,7 +2540,7 @@ ROM_START(mfightc) //*
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(9fb551a5) SHA1(a33d185e186d404c3bf62277d7e34e5ad0000b09)) //likely non-default settings
 	ROM_LOAD("c09jad_nvram.u39", 0x00000, 0x2000, CRC(33e960b7) SHA1(a9a249e68c89b18d4685f1859fe35dc21df18e14))
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c09d04", 0, SHA1(7395b7a33e953f65827aea44461e49f8388464fb) )
 ROM_END
 
@@ -2555,7 +2554,7 @@ ROM_START(mfightcc) //*
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("c09jac_nvram.u39", 0x00000, 0x2000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c09c04", 0, SHA1(bf5f7447d74399d34edd4eb6dfcca7f6fc2154f2) )
 ROM_END
 

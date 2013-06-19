@@ -174,7 +174,7 @@ Notes:
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "video/polynew.h"
 
@@ -567,7 +567,7 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ide(*this, "ide")
+		m_ata(*this, "ata")
 	{
 	}
 
@@ -575,7 +575,7 @@ public:
 	required_device<cpu_device> m_iocpu;
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT8>  m_mbox_ram;
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 
 	DECLARE_READ64_MEMBER(ppc_common_r);
 	DECLARE_WRITE64_MEMBER(ppc_common_w);
@@ -2118,7 +2118,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 	{
 		if ((offset & 1) == 0)
 		{
-			ide_cs0_latch_r = m_ide->read_cs0(space, reg, 0xffff);
+			ide_cs0_latch_r = m_ata->read_cs0(space, reg, 0xffff);
 			return (ide_cs0_latch_r & 0xff);
 		}
 		else
@@ -2131,7 +2131,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide0_r)
 		if (offset & 1)
 			fatalerror("tlcs_ide0_r: %02X, odd offset\n", offset);
 
-		UINT8 d = m_ide->read_cs0(space, reg, 0xff);
+		UINT8 d = m_ata->read_cs0(space, reg, 0xff);
 		if (reg == 7)
 			d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 							// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2154,14 +2154,14 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide0_w)
 		{
 			ide_cs0_latch_w &= 0x00ff;
 			ide_cs0_latch_w |= (UINT16)(data) << 8;
-			m_ide->write_cs0(space, reg, ide_cs0_latch_w, 0xffff);
+			m_ata->write_cs0(space, reg, ide_cs0_latch_w, 0xffff);
 		}
 	}
 	else
 	{
 		if (offset & 1)
 			fatalerror("tlcs_ide0_w: %02X, %02X, odd offset\n", offset, data);
-		m_ide->write_cs0(space, reg, data, 0xff);
+		m_ata->write_cs0(space, reg, data, 0xff);
 	}
 }
 
@@ -2174,7 +2174,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 
 	if ((offset & 1) == 0)
 	{
-		UINT8 d = m_ide->read_cs1(space, reg, 0xff);
+		UINT8 d = m_ata->read_cs1(space, reg, 0xff);
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
 		return d;
@@ -2182,7 +2182,7 @@ READ8_MEMBER(taitotz_state::tlcs_ide1_r)
 	else
 	{
 		//fatalerror("tlcs_ide1_r: %02X, odd offset\n", offset);
-		UINT8 d = m_ide->read_cs1(space, reg, 0xff);
+		UINT8 d = m_ata->read_cs1(space, reg, 0xff);
 		d &= ~0x2;
 		return d;
 	}
@@ -2204,7 +2204,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_ide1_w)
 	{
 		ide_cs1_latch_w &= 0x00ff;
 		ide_cs1_latch_w |= (UINT16)(data) << 16;
-		m_ide->write_cs1(space, reg, ide_cs1_latch_w, 0xffff);
+		m_ata->write_cs1(space, reg, ide_cs1_latch_w, 0xffff);
 	}
 }
 
@@ -2530,7 +2530,7 @@ void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != NULL)
 	{
-		UINT8 *identify_device = m_ide->identify_device_buffer(0);
+		UINT8 *identify_device = m_ata->identify_device_buffer(0);
 
 		for (int i=0; i < 20; i++)
 		{
@@ -2590,8 +2590,8 @@ static MACHINE_CONFIG_START( taitotz, taitotz_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120))
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(taitotz_state, ide_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2724,7 +2724,7 @@ ROM_START( taitotz )
 	ROM_REGION( 0x40000, "io_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 ROM_END
 
 ROM_START( landhigh )
@@ -2743,7 +2743,7 @@ ROM_START( landhigh )
 	ROM_LOAD( "e82-02.ic45", 0x117, 0x2dd, CRC(f581cff5) SHA1(468e0e6a3828f2dcda35c6d523154510f9c99db7) )
 	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "landhigh", 0, SHA1(7cea4ea5c3899e6ac774a4eb12821f44541d9c9c) )
 ROM_END
 
@@ -2758,7 +2758,7 @@ ROM_START( batlgear )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "batlgear", 0, SHA1(eab283839ad3e0a3e6be11f6482570db334eacca) )
 ROM_END
 
@@ -2773,7 +2773,7 @@ ROM_START( batlgr2 )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "bg2_204j", 0, SHA1(7ac100fba39ae0b93980c0af2f0212a731106912) )
 ROM_END
 
@@ -2788,7 +2788,7 @@ ROM_START( batlgr2a )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "bg2_201j", 0, SHA1(542d12682bd0f95143368578461c6a4fcc492fcc) )
 ROM_END
 
@@ -2812,7 +2812,7 @@ ROM_START( pwrshovl )
 	ROM_REGION( 0x20000, "oki2", 0 )
 	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
@@ -2827,7 +2827,7 @@ ROM_START( raizpin )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
 ROM_END
 

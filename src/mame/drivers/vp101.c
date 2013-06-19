@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 
 
 class vp10x_state : public driver_device
@@ -103,7 +103,7 @@ ROM_START(jnero)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 program - read-protected, need dumped */
 	ROM_LOAD( "8722a-1206.bin", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY("jn010108", 0, SHA1(4f3e9c6349c9be59213df1236dba7d79e7cd704e) )
 ROM_END
 
@@ -115,7 +115,7 @@ ROM_START(specfrce)
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY("sf010101", 0, SHA1(59b5e3d8e1d5537204233598830be2066aad0556) )
 ROM_END
 

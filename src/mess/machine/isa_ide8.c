@@ -55,7 +55,7 @@ Device Control (out)        14              7
 
 static READ8_DEVICE_HANDLER( ide8_r )
 {
-	ide_controller_device   *ide = (ide_controller_device *) device;
+	ata_interface_device   *ide = (ata_interface_device *) device;
 	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
 	UINT8   result  = 0;
 
@@ -80,7 +80,7 @@ static READ8_DEVICE_HANDLER( ide8_r )
 
 static WRITE8_DEVICE_HANDLER( ide8_w )
 {
-	ide_controller_device   *ide = (ide_controller_device *) device;
+	ata_interface_device   *ide = (ata_interface_device *) device;
 	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
 
 //  logerror("%s ide8_w: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
@@ -114,8 +114,8 @@ WRITE_LINE_MEMBER(isa8_ide_device::ide_interrupt)
 }
 
 static MACHINE_CONFIG_FRAGMENT( ide8_config )
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", "hdd", false)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa8_ide_device, ide_interrupt))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide8_port )

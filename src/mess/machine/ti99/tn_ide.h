@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "ti99defs.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/rtc65271.h"
 
 extern const device_type TI99_IDE;
@@ -30,7 +30,7 @@ public:
 	void    cruwrite(offs_t offset, UINT8 value);
 
 	void    do_inta(int state);
-	bool    m_ide_irq;
+	bool    m_ata_irq;
 	int     m_cru_register;
 
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
@@ -45,7 +45,7 @@ protected:
 
 private:
 	rtc65271_device*    m_rtc;
-	ide_controller_device* m_ide;
+	required_device<ata_interface_device> m_ata;
 
 	bool    m_clk_irq;
 	bool    m_sram_enable;

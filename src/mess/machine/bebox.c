@@ -100,7 +100,7 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 #include "machine/am9517a.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/pci.h"
 #include "machine/intelfsh.h"
 #include "machine/53c810.h"

@@ -314,7 +314,7 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
-#include "machine/idectrl.h"
+#include "machine/ataintf.h"
 #include "machine/timekpr.h"
 #include "machine/jvshost.h"
 #include "machine/jvsdev.h"
@@ -609,7 +609,7 @@ public:
 		m_gfxcpu(*this, "gfxcpu"),
 		m_gfx_pagetable(*this, "pagetable"),
 		m_k001604(*this, "k001604"),
-		m_ide(*this, "ide")
+		m_ata(*this, "ata")
 	{
 	}
 
@@ -618,7 +618,7 @@ public:
 	required_device<cpu_device> m_gfxcpu;
 	required_shared_ptr<UINT64> m_gfx_pagetable;
 	required_device<k001604_device> m_k001604;
-	required_device<ide_controller_device> m_ide;
+	required_device<ata_interface_device> m_ata;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
@@ -1819,7 +1819,7 @@ READ16_MEMBER(cobra_state::sub_ata0_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	UINT32 data = m_ide->read_cs0(space, offset, mem_mask);
+	UINT32 data = m_ata->read_cs0(space, offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
@@ -1830,14 +1830,14 @@ WRITE16_MEMBER(cobra_state::sub_ata0_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ide->write_cs0(space, offset, data, mem_mask);
+	m_ata->write_cs0(space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(cobra_state::sub_ata1_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	UINT32 data = m_ide->read_cs1(space, offset, mem_mask);
+	UINT32 data = m_ata->read_cs1(space, offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
@@ -1847,7 +1847,7 @@ WRITE16_MEMBER(cobra_state::sub_ata1_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ide->write_cs1(space, offset, data, mem_mask);
+	m_ata->write_cs1(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)
@@ -3163,7 +3163,7 @@ void cobra_state::machine_reset()
 {
 	m_sub_interrupt = 0xff;
 
-	UINT8 *identify_device = m_ide->identify_device_buffer(0);
+	UINT8 *identify_device = m_ata->identify_device_buffer(0);
 
 	// Cobra expects these settings or the BIOS fails
 	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */
@@ -3204,8 +3204,8 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, mpc106_pci_r, mpc106_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
-	MCFG_IDE_CONTROLLER_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(cobra_state, ide_interrupt))
 
 	/* video hardware */
 
@@ -3487,7 +3487,7 @@ ROM_START(bujutsu)
 
 	ROM_REGION(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
 
@@ -3506,7 +3506,7 @@ ROM_START(racjamdx)
 
 	ROM_REGION(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
 ROM_END
 
