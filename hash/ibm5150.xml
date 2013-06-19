@@ -2533,6 +2533,58 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="tbasic10">
+		<description>Turbo Basic</description>
+		<year>1987</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="313312">
+				<!--info name="serial" value="D1B0098461"/-->
+				<rom name="program disk.imd" size="313312" crc="0b1307d1" sha1="e2857a26879d01a6a95510a13cad9c010e791453" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="256589">
+				<rom name="sample programs.imd" size="256589" crc="7314f80c" sha1="3e2fb0130ea89d03fe6b4aa23100b0e4877bb3fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tligning">
+		<description>Turbo Lightning</description>
+		<year>1983</year>
+		<publisher>Borland</publisher>
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="147250">
+				<rom name="install and suppliment disk.imd" size="147250" crc="87c543d3" sha1="710e5eefc36916a6fca853e13189211151b8fafa" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368498">
+				<rom name="system disk.imd" size="368498" crc="017d6e7d" sha1="1448e02b6d9effc4431f1271557d24eb31b7029b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="349089">
+				<rom name="hard disk dictionary.imd" size="349089" crc="7a0302e5" sha1="fc435ed1c4b86eb8416f66be08544297e6892269" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbodos">
+		<description>TurboDOS/PC</description>
+		<year>1986</year>
+		<publisher>Software 2000</publisher>
+		<info name="version" value="1.08" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="266276">
+				<rom name="turbodospc.imd" size="266276" crc="3029fd8f" sha1="b383b04e77c27ebdded4ca1509819b66655471dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- SDK -->
 
 	<software name="win13sdk">
