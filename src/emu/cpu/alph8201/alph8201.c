@@ -151,6 +151,11 @@ Timming
 #include "debugger.h"
 #include "alph8201.h"
 
+
+const device_type ALPHA8201 = &device_creator<alpha8201_cpu_device>;
+const device_type ALPHA8301 = &device_creator<alpha8301_cpu_device>;
+
+
 /* instruction cycle count */
 #define C1 16
 #define C2 32
@@ -162,838 +167,482 @@ Timming
 #define BREAK_ON_UNKNOWN_OPCODE 0
 #define BREAK_ON_UNCERTAIN_OPCODE 0
 
-/* MAME is unnecessary */
-#define HANDLE_HALT_LINE 0
 
-#define M_RDMEM(A)      cpustate->program->read_byte(A)
-#define M_WRMEM(A,V)    cpustate->program->write_byte(A, V)
-#define M_RDOP(A)       cpustate->direct->read_decrypted_byte(A)
-#define M_RDOP_ARG(A)   cpustate->direct->read_raw_byte(A)
+#define FN(x) &alpha8201_cpu_device::x
 
-struct alpha8201_state
+
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, ALPHA8201, "ALPHA-8201", tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
+	, m_opmap(opcode_8201)
 {
-	UINT8 RAM[8*8];  /* internal GP register 8 * 8bank       */
-	unsigned PREVPC;
-	PAIR  retptr;   /* for 8301, return address of CALL       */
-	PAIR  pc;       /* 2bit+8bit program counter              */
-	UINT8 regPtr;   /* RB register base                       */
-	UINT8 mb;       /* MB memory bank reg. latch after Branch */
-	UINT8 cf;       /* C flag                                 */
-	UINT8 zf;       /* Z flag                                 */
-	UINT8 savec;    /* for 8301, save flags                   */
-	UINT8 savez;    /* for 8301, save flags                   */
-//
-	PAIR ix0;       /* 8bit memory read index reg. */
-	PAIR ix1;       /* 8bitmemory read index reg.  */
-	PAIR ix2;       /* 8bitmemory write index reg. */
-	UINT8 lp0;       /* 8bit loop reg.             */
-	UINT8 lp1;       /* 8bit loop reg.             */
-	UINT8 lp2;       /* 8bit loop reg.             */
-	UINT8 A;         /* 8bit accumerator           */
-	UINT8 B;         /* 8bit regiser               */
-//
-#if HANDLE_HALT_LINE
-	UINT8 halt;     /* halt input line                        */
-#endif
-
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	int icount;
-	int inst_cycles;
-};
-
-/* The opcode table now is a combination of cycle counts and function pointers */
-struct s_opcode {
-	unsigned cycles;
-	void (*function) (alpha8201_state *cpustate);
-};
-
-
-#define PC              pc.w.l
-#define PCL             pc.b.l
-#define RD_REG(x)       cpustate->RAM[(cpustate->regPtr<<3)+(x)]
-#define WR_REG(x,d)     cpustate->RAM[(cpustate->regPtr<<3)+(x)]=(d)
-#define IX0             ix0.b.l
-#define IX1             ix1.b.l
-#define IX2             ix2.b.l
-#define BIX0            ix0.w.l
-#define BIX1            ix1.w.l
-#define BIX2            ix2.w.l
-#define LP0             lp0
-#define LP1             lp1
-#define LP2             lp2
-
-INLINE alpha8201_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ALPHA8201 ||
-			device->type() == ALPHA8301);
-	return (alpha8201_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
+
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, type, name, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
+	, m_opmap(opcode_8201)
+{
+}
+
+alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: alpha8201_cpu_device(mconfig, ALPHA8301, "ALPHA-8301", tag, owner, clock)
+{
+	m_opmap = opcode_8301;
+}
+
+
 /* Get next opcode argument and increment program counter */
-INLINE unsigned M_RDMEM_OPCODE (alpha8201_state *cpustate)
+unsigned alpha8201_cpu_device::M_RDMEM_OPCODE()
 {
 	unsigned retval;
-	retval=M_RDOP_ARG(cpustate->PC);
-	cpustate->PCL++;
+	retval=M_RDOP_ARG(m_pc.w.l);
+	m_pc.b.l++;
 	return retval;
 }
 
-INLINE void M_ADD(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_ADD(UINT8 dat)
 {
-	UINT16 temp = cpustate->A + dat;
-	cpustate->A = temp & 0xff;
-	cpustate->zf = (cpustate->A==0);
-	cpustate->cf = temp>>8;
+	UINT16 temp = m_A + dat;
+	m_A = temp & 0xff;
+	m_zf = (m_A==0);
+	m_cf = temp>>8;
 }
 
-INLINE void M_ADDB(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_ADDB(UINT8 dat)
 {
-	UINT16 temp = cpustate->B + dat;
-	cpustate->B = temp & 0xff;
-	cpustate->zf = (cpustate->B==0);
-	cpustate->cf = temp>>8;
+	UINT16 temp = m_B + dat;
+	m_B = temp & 0xff;
+	m_zf = (m_B==0);
+	m_cf = temp>>8;
 }
 
-INLINE void M_SUB(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_SUB(UINT8 dat)
 {
-	cpustate->cf = (cpustate->A>=dat);  // cpustate->cf is No Borrow
-	cpustate->A -= dat;
-	cpustate->zf = (cpustate->A==0);
+	m_cf = (m_A>=dat);  // m_cf is No Borrow
+	m_A -= dat;
+	m_zf = (m_A==0);
 }
 
-INLINE void M_AND(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_AND(UINT8 dat)
 {
-	cpustate->A &= dat;
-	cpustate->zf = (cpustate->A==0);
+	m_A &= dat;
+	m_zf = (m_A==0);
 }
 
-INLINE void M_OR(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_OR(UINT8 dat)
 {
-	cpustate->A |= dat;
-	cpustate->zf = (cpustate->A==0);
+	m_A |= dat;
+	m_zf = (m_A==0);
 }
 
-INLINE void M_XOR(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_XOR(UINT8 dat)
 {
-	cpustate->A ^= dat;
-	cpustate->zf = (cpustate->A==0);
-	cpustate->cf = 0;
+	m_A ^= dat;
+	m_zf = (m_A==0);
+	m_cf = 0;
 }
 
-INLINE void M_JMP(alpha8201_state *cpustate, UINT8 dat)
+void alpha8201_cpu_device::M_JMP(UINT8 dat)
 {
-	cpustate->PCL = dat;
+	m_pc.b.l = dat;
 	/* update pc page */
-	cpustate->pc.b.h  = cpustate->ix0.b.h = cpustate->ix1.b.h = cpustate->ix2.b.h = cpustate->mb & 3;
+	m_pc.b.h  = m_ix0.b.h = m_ix1.b.h = m_ix2.b.h = m_mb & 3;
 }
 
-INLINE void M_UNDEFINED(alpha8201_state *cpustate)
+void alpha8201_cpu_device::M_UNDEFINED()
 {
-	logerror("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x\n", cpustate->PC-1, M_RDMEM(cpustate->PC-1));
+	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x\n", cpustate->PC-1, M_RDMEM(cpustate->PC-1));
+	mame_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x\n", m_pc.w.l-1, M_RDMEM(m_pc.w.l-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(cpustate->device->machine());
+	debugger_break(machine());
 #endif
 }
 
-INLINE void M_UNDEFINED2(alpha8201_state *cpustate)
+void alpha8201_cpu_device::M_UNDEFINED2()
 {
-	UINT8 op  = M_RDOP(cpustate->PC-1);
-	UINT8 imm = M_RDMEM_OPCODE(cpustate);
-	logerror("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x,%02x\n", cpustate->PC-2, op,imm);
+	UINT8 op  = M_RDOP(m_pc.w.l-1);
+	UINT8 imm = M_RDMEM_OPCODE();
+	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x,%02x\n", cpustate->PC-2, op,imm);
+	mame_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
-	debugger_break(cpustate->device->machine());
+	debugger_break(machine());
 #endif
 }
 
-static void undefined(alpha8201_state *cpustate)    { M_UNDEFINED(cpustate); }
-static void undefined2(alpha8201_state *cpustate)   { M_UNDEFINED2(cpustate); }
 
-static void nop(alpha8201_state *cpustate)       { }
-static void rora(alpha8201_state *cpustate)      { cpustate->cf = cpustate->A &1;     cpustate->A = (cpustate->A>>1) | (cpustate->A<<7); }
-static void rola(alpha8201_state *cpustate)      { cpustate->cf = (cpustate->A>>7)&1; cpustate->A = (cpustate->A<<1) | (cpustate->A>>7); }
-static void inc_b(alpha8201_state *cpustate)         { M_ADDB(cpustate, 0x02); }
-static void dec_b(alpha8201_state *cpustate)         { M_ADDB(cpustate, 0xfe); }
-static void inc_a(alpha8201_state *cpustate)         { M_ADD(cpustate, 0x01); }
-static void dec_a(alpha8201_state *cpustate)         { M_ADD(cpustate, 0xff); }
-static void cpl(alpha8201_state *cpustate)       { cpustate->A ^= 0xff; };
-
-static void ld_a_ix0_0(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+0); }
-static void ld_a_ix0_1(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+1); }
-static void ld_a_ix0_2(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+2); }
-static void ld_a_ix0_3(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+3); }
-static void ld_a_ix0_4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+4); }
-static void ld_a_ix0_5(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+5); }
-static void ld_a_ix0_6(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+6); }
-static void ld_a_ix0_7(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+7); }
-
-static void ld_a_ix1_0(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+0); }
-static void ld_a_ix1_1(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+1); }
-static void ld_a_ix1_2(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+2); }
-static void ld_a_ix1_3(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+3); }
-static void ld_a_ix1_4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+4); }
-static void ld_a_ix1_5(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+5); }
-static void ld_a_ix1_6(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+6); }
-static void ld_a_ix1_7(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+7); }
-
-static void ld_ix2_0_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+0,cpustate->A); }
-static void ld_ix2_1_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+1,cpustate->A); }
-static void ld_ix2_2_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+2,cpustate->A); }
-static void ld_ix2_3_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+3,cpustate->A); }
-static void ld_ix2_4_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+4,cpustate->A); }
-static void ld_ix2_5_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+5,cpustate->A); }
-static void ld_ix2_6_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+6,cpustate->A); }
-static void ld_ix2_7_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+7,cpustate->A); }
-
-static void ld_ix0_0_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+0); }
-static void ld_ix0_1_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+1); }
-static void ld_ix0_2_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+2); }
-static void ld_ix0_3_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+3); }
-static void ld_ix0_4_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+4); }
-static void ld_ix0_5_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+5); }
-static void ld_ix0_6_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+6); }
-static void ld_ix0_7_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+7); }
-
-static void bit_r0_0(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<0)?0:1; }
-static void bit_r0_1(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<1)?0:1; }
-static void bit_r0_2(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<2)?0:1; }
-static void bit_r0_3(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<3)?0:1; }
-static void bit_r0_4(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<4)?0:1; }
-static void bit_r0_5(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<5)?0:1; }
-static void bit_r0_6(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<6)?0:1; }
-static void bit_r0_7(alpha8201_state *cpustate)  { cpustate->zf = RD_REG(0)&(1<<7)?0:1; }
-
-static void ld_a_n(alpha8201_state *cpustate)    { cpustate->A = M_RDMEM_OPCODE(cpustate); }
-
-static void ld_a_r0(alpha8201_state *cpustate)   { cpustate->A = RD_REG(0); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r1(alpha8201_state *cpustate)   { cpustate->A = RD_REG(1); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r2(alpha8201_state *cpustate)   { cpustate->A = RD_REG(2); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r3(alpha8201_state *cpustate)   { cpustate->A = RD_REG(3); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r4(alpha8201_state *cpustate)   { cpustate->A = RD_REG(4); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r5(alpha8201_state *cpustate)   { cpustate->A = RD_REG(5); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r6(alpha8201_state *cpustate)   { cpustate->A = RD_REG(6); cpustate->zf = (cpustate->A==0); }
-static void ld_a_r7(alpha8201_state *cpustate)   { cpustate->A = RD_REG(7); cpustate->zf = (cpustate->A==0); }
-
-static void ld_r0_a(alpha8201_state *cpustate)   { WR_REG(0,cpustate->A); }
-static void ld_r1_a(alpha8201_state *cpustate)   { WR_REG(1,cpustate->A); }
-static void ld_r2_a(alpha8201_state *cpustate)   { WR_REG(2,cpustate->A); }
-static void ld_r3_a(alpha8201_state *cpustate)   { WR_REG(3,cpustate->A); }
-static void ld_r4_a(alpha8201_state *cpustate)   { WR_REG(4,cpustate->A); }
-static void ld_r5_a(alpha8201_state *cpustate)   { WR_REG(5,cpustate->A); }
-static void ld_r6_a(alpha8201_state *cpustate)   { WR_REG(6,cpustate->A); }
-static void ld_r7_a(alpha8201_state *cpustate)   { WR_REG(7,cpustate->A); }
-
-static void add_a_n(alpha8201_state *cpustate)   { M_ADD(cpustate, M_RDMEM_OPCODE(cpustate)); }
-
-static void add_a_r0(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(0)); }
-static void add_a_r1(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(1)); }
-static void add_a_r2(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(2)); }
-static void add_a_r3(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(3)); }
-static void add_a_r4(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(4)); }
-static void add_a_r5(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(5)); }
-static void add_a_r6(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(6)); }
-static void add_a_r7(alpha8201_state *cpustate)  { M_ADD(cpustate, RD_REG(7)); }
-
-static void sub_a_n(alpha8201_state *cpustate)   { M_SUB(cpustate, M_RDMEM_OPCODE(cpustate)); }
-
-static void sub_a_r0(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(0)); }
-static void sub_a_r1(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(1)); }
-static void sub_a_r2(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(2)); }
-static void sub_a_r3(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(3)); }
-static void sub_a_r4(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(4)); }
-static void sub_a_r5(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(5)); }
-static void sub_a_r6(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(6)); }
-static void sub_a_r7(alpha8201_state *cpustate)  { M_SUB(cpustate, RD_REG(7)); }
-
-static void and_a_n(alpha8201_state *cpustate)   { M_AND(cpustate, M_RDMEM_OPCODE(cpustate)); }
-
-static void and_a_r0(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(0)); }
-static void and_a_r1(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(1)); }
-static void and_a_r2(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(2)); }
-static void and_a_r3(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(3)); }
-static void and_a_r4(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(4)); }
-static void and_a_r5(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(5)); }
-static void and_a_r6(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(6)); }
-static void and_a_r7(alpha8201_state *cpustate)  { M_AND(cpustate, RD_REG(7)); }
-
-static void or_a_n(alpha8201_state *cpustate)    { M_OR(cpustate, M_RDMEM_OPCODE(cpustate)); }
-
-static void or_a_r0(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(0)); }
-static void or_a_r1(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(1)); }
-static void or_a_r2(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(2)); }
-static void or_a_r3(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(3)); }
-static void or_a_r4(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(4)); }
-static void or_a_r5(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(5)); }
-static void or_a_r6(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(6)); }
-static void or_a_r7(alpha8201_state *cpustate)   { M_OR(cpustate, RD_REG(7)); }
-
-static void add_ix0_0(alpha8201_state *cpustate)     { }
-static void add_ix0_1(alpha8201_state *cpustate)     { cpustate->IX0 += 1; }
-static void add_ix0_2(alpha8201_state *cpustate)     { cpustate->IX0 += 2; }
-static void add_ix0_3(alpha8201_state *cpustate)     { cpustate->IX0 += 3; }
-static void add_ix0_4(alpha8201_state *cpustate)     { cpustate->IX0 += 4; }
-static void add_ix0_5(alpha8201_state *cpustate)     { cpustate->IX0 += 5; }
-static void add_ix0_6(alpha8201_state *cpustate)     { cpustate->IX0 += 6; }
-static void add_ix0_7(alpha8201_state *cpustate)     { cpustate->IX0 += 7; }
-static void add_ix0_8(alpha8201_state *cpustate)     { cpustate->IX0 += 8; }
-static void add_ix0_9(alpha8201_state *cpustate)     { cpustate->IX0 += 9; }
-static void add_ix0_a(alpha8201_state *cpustate)     { cpustate->IX0 += 10; }
-static void add_ix0_b(alpha8201_state *cpustate)     { cpustate->IX0 += 11; }
-static void add_ix0_c(alpha8201_state *cpustate)     { cpustate->IX0 += 12; }
-static void add_ix0_d(alpha8201_state *cpustate)     { cpustate->IX0 += 13; }
-static void add_ix0_e(alpha8201_state *cpustate)     { cpustate->IX0 += 14; }
-static void add_ix0_f(alpha8201_state *cpustate)     { cpustate->IX0 += 15; }
-
-static void add_ix1_0(alpha8201_state *cpustate)     { }
-static void add_ix1_1(alpha8201_state *cpustate)     { cpustate->IX1 += 1; }
-static void add_ix1_2(alpha8201_state *cpustate)     { cpustate->IX1 += 2; }
-static void add_ix1_3(alpha8201_state *cpustate)     { cpustate->IX1 += 3; }
-static void add_ix1_4(alpha8201_state *cpustate)     { cpustate->IX1 += 4; }
-static void add_ix1_5(alpha8201_state *cpustate)     { cpustate->IX1 += 5; }
-static void add_ix1_6(alpha8201_state *cpustate)     { cpustate->IX1 += 6; }
-static void add_ix1_7(alpha8201_state *cpustate)     { cpustate->IX1 += 7; }
-static void add_ix1_8(alpha8201_state *cpustate)     { cpustate->IX1 += 8; }
-static void add_ix1_9(alpha8201_state *cpustate)     { cpustate->IX1 += 9; }
-static void add_ix1_a(alpha8201_state *cpustate)     { cpustate->IX1 += 10; }
-static void add_ix1_b(alpha8201_state *cpustate)     { cpustate->IX1 += 11; }
-static void add_ix1_c(alpha8201_state *cpustate)     { cpustate->IX1 += 12; }
-static void add_ix1_d(alpha8201_state *cpustate)     { cpustate->IX1 += 13; }
-static void add_ix1_e(alpha8201_state *cpustate)     { cpustate->IX1 += 14; }
-static void add_ix1_f(alpha8201_state *cpustate)     { cpustate->IX1 += 15; }
-
-static void add_ix2_0(alpha8201_state *cpustate)     { }
-static void add_ix2_1(alpha8201_state *cpustate)     { cpustate->IX2 += 1; }
-static void add_ix2_2(alpha8201_state *cpustate)     { cpustate->IX2 += 2; }
-static void add_ix2_3(alpha8201_state *cpustate)     { cpustate->IX2 += 3; }
-static void add_ix2_4(alpha8201_state *cpustate)     { cpustate->IX2 += 4; }
-static void add_ix2_5(alpha8201_state *cpustate)     { cpustate->IX2 += 5; }
-static void add_ix2_6(alpha8201_state *cpustate)     { cpustate->IX2 += 6; }
-static void add_ix2_7(alpha8201_state *cpustate)     { cpustate->IX2 += 7; }
-static void add_ix2_8(alpha8201_state *cpustate)     { cpustate->IX2 += 8; }
-static void add_ix2_9(alpha8201_state *cpustate)     { cpustate->IX2 += 9; }
-static void add_ix2_a(alpha8201_state *cpustate)     { cpustate->IX2 += 10; }
-static void add_ix2_b(alpha8201_state *cpustate)     { cpustate->IX2 += 11; }
-static void add_ix2_c(alpha8201_state *cpustate)     { cpustate->IX2 += 12; }
-static void add_ix2_d(alpha8201_state *cpustate)     { cpustate->IX2 += 13; }
-static void add_ix2_e(alpha8201_state *cpustate)     { cpustate->IX2 += 14; }
-static void add_ix2_f(alpha8201_state *cpustate)     { cpustate->IX2 += 15; }
-
-static void ld_base_0(alpha8201_state *cpustate)     { cpustate->regPtr = 0; }
-static void ld_base_1(alpha8201_state *cpustate)     { cpustate->regPtr = 1; }
-static void ld_base_2(alpha8201_state *cpustate)     { cpustate->regPtr = 2; }
-static void ld_base_3(alpha8201_state *cpustate)     { cpustate->regPtr = 3; }
-static void ld_base_4(alpha8201_state *cpustate)     { cpustate->regPtr = 4; }
-static void ld_base_5(alpha8201_state *cpustate)     { cpustate->regPtr = 5; }
-static void ld_base_6(alpha8201_state *cpustate)     { cpustate->regPtr = 6; }
-static void ld_base_7(alpha8201_state *cpustate)     { cpustate->regPtr = 7; }
-
-static void ld_bank_0(alpha8201_state *cpustate)     { cpustate->mb = 0; }
-static void ld_bank_1(alpha8201_state *cpustate)     { cpustate->mb = 1; }
-static void ld_bank_2(alpha8201_state *cpustate)     { cpustate->mb = 2; }
-static void ld_bank_3(alpha8201_state *cpustate)     { cpustate->mb = 3; }
-
-static void stop(alpha8201_state *cpustate)
+void alpha8201_cpu_device::stop()
 {
 	UINT8 pcptr = M_RDMEM(0x001) & 0x1f;
 	M_WRMEM(pcptr,(M_RDMEM(pcptr)&0xf)+0x08); /* mark entry point ODD to HALT */
-	cpustate->mb |= 0x08;        /* mark internal HALT state */
+	m_mb |= 0x08;        /* mark internal HALT state */
 }
 
-static void ld_ix0_n(alpha8201_state *cpustate)  { cpustate->IX0 = M_RDMEM_OPCODE(cpustate); }
-static void ld_ix1_n(alpha8201_state *cpustate)  { cpustate->IX1 = M_RDMEM_OPCODE(cpustate); }
-static void ld_ix2_n(alpha8201_state *cpustate)  { cpustate->IX2 = M_RDMEM_OPCODE(cpustate); }
-static void ld_lp0_n(alpha8201_state *cpustate)  { cpustate->LP0 = M_RDMEM_OPCODE(cpustate); }
-static void ld_lp1_n(alpha8201_state *cpustate)  { cpustate->LP1 = M_RDMEM_OPCODE(cpustate); }
-static void ld_lp2_n(alpha8201_state *cpustate)  { cpustate->LP2 = M_RDMEM_OPCODE(cpustate); }
-static void ld_b_n(alpha8201_state *cpustate)    { cpustate->B = M_RDMEM_OPCODE(cpustate); }
 
-static void djnz_lp0(alpha8201_state *cpustate) { UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP0--; if (cpustate->LP0 != 0) M_JMP(cpustate, i); }
-static void djnz_lp1(alpha8201_state *cpustate) { UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP1--; if (cpustate->LP1 != 0) M_JMP(cpustate, i); }
-static void djnz_lp2(alpha8201_state *cpustate) { UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP2--; if (cpustate->LP2 != 0) M_JMP(cpustate, i); }
-static void jnz(alpha8201_state *cpustate)  { UINT8 i=M_RDMEM_OPCODE(cpustate); if (!cpustate->zf) M_JMP(cpustate, i); }
-static void jnc(alpha8201_state *cpustate)  { UINT8 i=M_RDMEM_OPCODE(cpustate); if (!cpustate->cf) M_JMP(cpustate, i);}
-static void jz(alpha8201_state *cpustate)   { UINT8 i=M_RDMEM_OPCODE(cpustate); if ( cpustate->zf) M_JMP(cpustate, i); }
-static void jc(alpha8201_state *cpustate)   { UINT8 i=M_RDMEM_OPCODE(cpustate); if ( cpustate->cf) M_JMP(cpustate, i);}
-static void jmp(alpha8201_state *cpustate)  { M_JMP(cpustate,  M_RDMEM_OPCODE(cpustate) ); }
-
-static const s_opcode opcode_8201[256]=
+const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8201[256]=
 {
-	{C1, nop        },{C1,rora      },{C1, rola      },{C1,inc_b     },{C1,dec_b     },{C1, inc_a    },{C1, dec_a    },{C1, cpl      },
-	{C2,ld_a_ix0_0  },{C2,ld_a_ix0_1},{C2, ld_a_ix0_2},{C2,ld_a_ix0_3},{C2,ld_a_ix0_4},{C2,ld_a_ix0_5},{C2,ld_a_ix0_6},{C2,ld_a_ix0_7},
-	{C2,ld_a_ix1_0  },{C2,ld_a_ix1_1},{C2, ld_a_ix1_2},{C2,ld_a_ix1_3},{C2,ld_a_ix1_4},{C2,ld_a_ix1_5},{C2,ld_a_ix1_6},{C2,ld_a_ix1_7},
-	{C2,ld_ix2_0_a  },{C2,ld_ix2_1_a},{C2, ld_ix2_2_a},{C2,ld_ix2_3_a},{C2,ld_ix2_4_a},{C2,ld_ix2_5_a},{C2,ld_ix2_6_a},{C2,ld_ix2_7_a},
+	{C1, FN(nop)        },{C1,FN(rora)      },{C1, FN(rola)      },{C1,FN(inc_b)     },{C1,FN(dec_b)     },{C1, FN(inc_a)    },{C1, FN(dec_a)    },{C1, FN(cpl)      },
+	{C2,FN(ld_a_ix0_0)  },{C2,FN(ld_a_ix0_1)},{C2, FN(ld_a_ix0_2)},{C2,FN(ld_a_ix0_3)},{C2,FN(ld_a_ix0_4)},{C2,FN(ld_a_ix0_5)},{C2,FN(ld_a_ix0_6)},{C2,FN(ld_a_ix0_7)},
+	{C2,FN(ld_a_ix1_0)  },{C2,FN(ld_a_ix1_1)},{C2, FN(ld_a_ix1_2)},{C2,FN(ld_a_ix1_3)},{C2,FN(ld_a_ix1_4)},{C2,FN(ld_a_ix1_5)},{C2,FN(ld_a_ix1_6)},{C2,FN(ld_a_ix1_7)},
+	{C2,FN(ld_ix2_0_a)  },{C2,FN(ld_ix2_1_a)},{C2, FN(ld_ix2_2_a)},{C2,FN(ld_ix2_3_a)},{C2,FN(ld_ix2_4_a)},{C2,FN(ld_ix2_5_a)},{C2,FN(ld_ix2_6_a)},{C2,FN(ld_ix2_7_a)},
 /* 20 */
-	{C2,ld_ix0_0_b  },{C2,ld_ix0_1_b},{C2, ld_ix0_2_b},{C2,ld_ix0_3_b},{C2,ld_ix0_4_b},{C2,ld_ix0_5_b},{C2,ld_ix0_6_b},{C2,ld_ix0_7_b},
-	{C2,undefined   },{C2,undefined },{C2, undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },
-	{C2,undefined   },{C2,undefined },{C2, undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },
-	{C2,bit_r0_0    },{C2,bit_r0_1  },{C2, bit_r0_2 },{C2, bit_r0_3 },{C2, bit_r0_4 },{C2, bit_r0_5 },{C2, bit_r0_6 },{C2, bit_r0_7 },
+	{C2,FN(ld_ix0_0_b)  },{C2,FN(ld_ix0_1_b)},{C2, FN(ld_ix0_2_b)},{C2,FN(ld_ix0_3_b)},{C2,FN(ld_ix0_4_b)},{C2,FN(ld_ix0_5_b)},{C2,FN(ld_ix0_6_b)},{C2,FN(ld_ix0_7_b)},
+	{C2,FN(undefined)   },{C2,FN(undefined) },{C2, FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },
+	{C2,FN(undefined)   },{C2,FN(undefined) },{C2, FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },
+	{C2,FN(bit_r0_0)    },{C2,FN(bit_r0_1)  },{C2, FN(bit_r0_2) },{C2, FN(bit_r0_3) },{C2, FN(bit_r0_4) },{C2, FN(bit_r0_5) },{C2, FN(bit_r0_6) },{C2, FN(bit_r0_7) },
 /* 40 : 8201 */
-	{C2, ld_a_r0    },{C2, ld_r0_a  },{C2, ld_a_r1  },{C2, ld_r1_a  },{C2, ld_a_r2  },{C2, ld_r2_a  },{C2, ld_a_r3  },{C2, ld_r3_a  },
-	{C2, ld_a_r4    },{C2, ld_r4_a  },{C2, ld_a_r5  },{C2, ld_r5_a  },{C2, ld_a_r6  },{C2, ld_r6_a  },{C2, ld_a_r7  },{C2, ld_r7_a  },
-	{C1, add_a_r0   },{C1, sub_a_r0 },{C1, add_a_r1 },{C1, sub_a_r1 },{C1, add_a_r2 },{C1, sub_a_r2 },{C1, add_a_r3 },{C1, sub_a_r3 },
-	{C1, add_a_r4   },{C1, sub_a_r4 },{C1, add_a_r5 },{C1, sub_a_r5 },{C1, add_a_r6 },{C1, sub_a_r6 },{C1, add_a_r7 },{C1, sub_a_r7 },
-	{C1, and_a_r0   },{C1, or_a_r0  },{C1, and_a_r1 },{C1, or_a_r1  },{C1, and_a_r2 },{C1, or_a_r2  },{C1, and_a_r3 },{C1, or_a_r3  },
-	{C1, and_a_r4   },{C1, or_a_r4  },{C1, and_a_r5 },{C1, or_a_r5  },{C1, and_a_r6 },{C1, or_a_r6  },{C1, and_a_r7 },{C1, or_a_r7  },
-	{C1, add_ix0_0  },{C1, add_ix0_1},{C1, add_ix0_2},{C1, add_ix0_3},{C1, add_ix0_4},{C1, add_ix0_5},{C1, add_ix0_6},{C1, add_ix0_7},
-	{C1, add_ix0_8  },{C1, add_ix0_9},{C1, add_ix0_a},{C1, add_ix0_b},{C1, add_ix0_c},{C1, add_ix0_d},{C1, add_ix0_e},{C1, add_ix0_f},
+	{C2, FN(ld_a_r0)    },{C2, FN(ld_r0_a)  },{C2, FN(ld_a_r1)  },{C2, FN(ld_r1_a)  },{C2, FN(ld_a_r2)  },{C2, FN(ld_r2_a)  },{C2, FN(ld_a_r3)  },{C2, FN(ld_r3_a)  },
+	{C2, FN(ld_a_r4)    },{C2, FN(ld_r4_a)  },{C2, FN(ld_a_r5)  },{C2, FN(ld_r5_a)  },{C2, FN(ld_a_r6)  },{C2, FN(ld_r6_a)  },{C2, FN(ld_a_r7)  },{C2, FN(ld_r7_a)  },
+	{C1, FN(add_a_r0)   },{C1, FN(sub_a_r0) },{C1, FN(add_a_r1) },{C1, FN(sub_a_r1) },{C1, FN(add_a_r2) },{C1, FN(sub_a_r2) },{C1, FN(add_a_r3) },{C1, FN(sub_a_r3) },
+	{C1, FN(add_a_r4)   },{C1, FN(sub_a_r4) },{C1, FN(add_a_r5) },{C1, FN(sub_a_r5) },{C1, FN(add_a_r6) },{C1, FN(sub_a_r6) },{C1, FN(add_a_r7) },{C1, FN(sub_a_r7) },
+	{C1, FN(and_a_r0)   },{C1, FN(or_a_r0)  },{C1, FN(and_a_r1) },{C1, FN(or_a_r1)  },{C1, FN(and_a_r2) },{C1, FN(or_a_r2)  },{C1, FN(and_a_r3) },{C1, FN(or_a_r3)  },
+	{C1, FN(and_a_r4)   },{C1, FN(or_a_r4)  },{C1, FN(and_a_r5) },{C1, FN(or_a_r5)  },{C1, FN(and_a_r6) },{C1, FN(or_a_r6)  },{C1, FN(and_a_r7) },{C1, FN(or_a_r7)  },
+	{C1, FN(add_ix0_0)  },{C1, FN(add_ix0_1)},{C1, FN(add_ix0_2)},{C1, FN(add_ix0_3)},{C1, FN(add_ix0_4)},{C1, FN(add_ix0_5)},{C1, FN(add_ix0_6)},{C1, FN(add_ix0_7)},
+	{C1, FN(add_ix0_8)  },{C1, FN(add_ix0_9)},{C1, FN(add_ix0_a)},{C1, FN(add_ix0_b)},{C1, FN(add_ix0_c)},{C1, FN(add_ix0_d)},{C1, FN(add_ix0_e)},{C1, FN(add_ix0_f)},
 /* 80 : 8201 */
-	{C1, add_ix1_0  },{C1, add_ix1_1},{C1, add_ix1_2},{C1, add_ix1_3},{C1, add_ix1_4},{C1, add_ix1_5},{C1, add_ix1_6},{C1, add_ix1_7},
-	{C1, add_ix1_8  },{C1, add_ix1_9},{C1, add_ix1_a},{C1, add_ix1_b},{C1, add_ix1_c},{C1, add_ix1_d},{C1, add_ix1_e},{C1, add_ix1_f},
-	{C1, add_ix2_0  },{C1, add_ix2_1},{C1, add_ix2_2},{C1, add_ix2_3},{C1, add_ix2_4},{C1, add_ix2_5},{C1, add_ix2_6},{C1, add_ix2_7},
-	{C1, add_ix2_8  },{C1, add_ix2_9},{C1, add_ix2_a},{C1, add_ix2_b},{C1, add_ix2_c},{C1, add_ix2_d},{C1, add_ix2_e},{C1, add_ix2_f},
-	{C1, ld_base_0  },{C1, ld_base_1},{C1, ld_base_2},{C1, ld_base_3},{C1, ld_base_4},{C1, ld_base_5},{C1, ld_base_6},{C1, ld_base_7},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, ld_bank_0  },{C1, ld_bank_1},{C1, ld_bank_2},{C1, ld_bank_3},{C2, stop     },{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
+	{C1, FN(add_ix1_0)  },{C1, FN(add_ix1_1)},{C1, FN(add_ix1_2)},{C1, FN(add_ix1_3)},{C1, FN(add_ix1_4)},{C1, FN(add_ix1_5)},{C1, FN(add_ix1_6)},{C1, FN(add_ix1_7)},
+	{C1, FN(add_ix1_8)  },{C1, FN(add_ix1_9)},{C1, FN(add_ix1_a)},{C1, FN(add_ix1_b)},{C1, FN(add_ix1_c)},{C1, FN(add_ix1_d)},{C1, FN(add_ix1_e)},{C1, FN(add_ix1_f)},
+	{C1, FN(add_ix2_0)  },{C1, FN(add_ix2_1)},{C1, FN(add_ix2_2)},{C1, FN(add_ix2_3)},{C1, FN(add_ix2_4)},{C1, FN(add_ix2_5)},{C1, FN(add_ix2_6)},{C1, FN(add_ix2_7)},
+	{C1, FN(add_ix2_8)  },{C1, FN(add_ix2_9)},{C1, FN(add_ix2_a)},{C1, FN(add_ix2_b)},{C1, FN(add_ix2_c)},{C1, FN(add_ix2_d)},{C1, FN(add_ix2_e)},{C1, FN(add_ix2_f)},
+	{C1, FN(ld_base_0)  },{C1, FN(ld_base_1)},{C1, FN(ld_base_2)},{C1, FN(ld_base_3)},{C1, FN(ld_base_4)},{C1, FN(ld_base_5)},{C1, FN(ld_base_6)},{C1, FN(ld_base_7)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(ld_bank_0)  },{C1, FN(ld_bank_1)},{C1, FN(ld_bank_2)},{C1, FN(ld_bank_3)},{C2, FN(stop)     },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
 /* c0 : 8201 */
-	{C2, ld_ix0_n   },{C2, ld_ix1_n },{C2, ld_ix2_n },{C2, ld_a_n   },{C2, ld_lp0_n },{C2, ld_lp1_n },{C2, ld_lp2_n },{C2, ld_b_n   },
-	{C2, add_a_n    },{C2, sub_a_n  },{C2, and_a_n  },{C2, or_a_n   },{C2, djnz_lp0 },{C2, djnz_lp1 },{C2, djnz_lp2 },{C2, jnz      },
-	{C2, jnc            },{C2, jz       },{C2, jmp      },{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2, undefined2},
-	{C2, undefined2 },{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2,undefined2},{C2, undefined2},
+	{C2, FN(ld_ix0_n)   },{C2, FN(ld_ix1_n) },{C2, FN(ld_ix2_n) },{C2, FN(ld_a_n)   },{C2, FN(ld_lp0_n) },{C2, FN(ld_lp1_n) },{C2, FN(ld_lp2_n) },{C2, FN(ld_b_n)   },
+	{C2, FN(add_a_n)    },{C2, FN(sub_a_n)  },{C2, FN(and_a_n)  },{C2, FN(or_a_n)   },{C2, FN(djnz_lp0) },{C2, FN(djnz_lp1) },{C2, FN(djnz_lp2) },{C2, FN(jnz)      },
+	{C2, FN(jnc)            },{C2, FN(jz)       },{C2, FN(jmp)      },{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2, FN(undefined2)},
+	{C2, FN(undefined2) },{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2,FN(undefined2)},{C2, FN(undefined2)},
 /* E0 : 8201*/
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined }
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined) }
 };
 
 
-/* ALPHA 8301 : added instruction */
-static void exg_a_ix0(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX0; cpustate->IX0 = t; }
-static void exg_a_ix1(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX1; cpustate->IX1 = t; }
-static void exg_a_ix2(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX2; cpustate->IX2 = t; }
-static void exg_a_lp0(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP0; cpustate->LP0 = t; }
-static void exg_a_lp1(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP1; cpustate->LP1 = t; }
-static void exg_a_lp2(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP2; cpustate->LP2 = t; }
-static void exg_a_b(alpha8201_state *cpustate)    { UINT8 t=cpustate->A; cpustate->A = cpustate->B; cpustate->B = t; }
-static void exg_a_rb(alpha8201_state *cpustate)   { UINT8 t=cpustate->A; cpustate->A = cpustate->regPtr; cpustate->regPtr = t; }
-
-static void ld_ix0_a(alpha8201_state *cpustate)    { cpustate->IX0 = cpustate->A; }
-static void ld_ix1_a(alpha8201_state *cpustate)    { cpustate->IX1 = cpustate->A; }
-static void ld_ix2_a(alpha8201_state *cpustate)    { cpustate->IX2 = cpustate->A; }
-static void ld_lp0_a(alpha8201_state *cpustate)    { cpustate->LP0 = cpustate->A; }
-static void ld_lp1_a(alpha8201_state *cpustate)    { cpustate->LP1 = cpustate->A; }
-static void ld_lp2_a(alpha8201_state *cpustate)    { cpustate->LP2 = cpustate->A; }
-static void ld_b_a(alpha8201_state *cpustate)      { cpustate->B = cpustate->A; }
-static void ld_rb_a(alpha8201_state *cpustate)     { cpustate->regPtr = cpustate->A; }
-
-static void exg_ix0_ix1(alpha8201_state *cpustate)  { UINT8 t=cpustate->IX1; cpustate->IX1 = cpustate->IX0; cpustate->IX0 = t; }
-static void exg_ix0_ix2(alpha8201_state *cpustate)  { UINT8 t=cpustate->IX2; cpustate->IX2 = cpustate->IX0; cpustate->IX0 = t; }
-
-static void op_d4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
-static void op_d5(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->A ); }
-static void op_d6(alpha8201_state *cpustate) { cpustate->LP0 = M_RDMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
-static void op_d7(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->LP0 ); }
-
-static void ld_a_abs(alpha8201_state *cpustate) { cpustate->A = M_RDMEM( ((cpustate->mb & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
-static void ld_abs_a(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->mb & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->A ); }
-
-static void ld_a_r(alpha8201_state *cpustate) { cpustate->A = cpustate->RAM[(M_RDMEM_OPCODE(cpustate)>>1)&0x3f]; }
-static void ld_r_a(alpha8201_state *cpustate) { cpustate->RAM[(M_RDMEM_OPCODE(cpustate)>>1)&0x3f] = cpustate->A; }
-static void op_rep_ld_ix2_b(alpha8201_state *cpustate) { do { M_WRMEM(cpustate->BIX2, cpustate->RAM[(cpustate->B>>1)&0x3f]); cpustate->IX2++; cpustate->B+=2; cpustate->LP0--; } while (cpustate->LP0 != 0); }
-static void op_rep_ld_b_ix0(alpha8201_state *cpustate) { do { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0); cpustate->IX0++; cpustate->B+=2; cpustate->LP0--; } while (cpustate->LP0 != 0); }
-static void ld_rxb_a(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = cpustate->A; }
-static void ld_a_rxb(alpha8201_state *cpustate) { cpustate->A = cpustate->RAM[(cpustate->B>>1)&0x3f]; }
-static void cmp_a_rxb(alpha8201_state *cpustate) { UINT8 i=cpustate->RAM[(cpustate->B>>1)&0x3f];  cpustate->zf = (cpustate->A==i); cpustate->cf = (cpustate->A>=i); }
-static void xor_a_rxb(alpha8201_state *cpustate) { M_XOR(cpustate, cpustate->RAM[(cpustate->B>>1)&0x3f] ); }
-
-static void add_a_cf(alpha8201_state *cpustate) { if (cpustate->cf) inc_a(cpustate); }
-static void sub_a_cf(alpha8201_state *cpustate) { if (cpustate->cf) dec_a(cpustate); }
-static void tst_a(alpha8201_state *cpustate)     { cpustate->zf = (cpustate->A==0); }
-static void clr_a(alpha8201_state *cpustate)     { cpustate->A = 0; cpustate->zf = (cpustate->A==0); }
-static void cmp_a_n(alpha8201_state *cpustate)  { UINT8 i=M_RDMEM_OPCODE(cpustate);  cpustate->zf = (cpustate->A==i); cpustate->cf = (cpustate->A>=i); }
-static void xor_a_n(alpha8201_state *cpustate)  { M_XOR(cpustate, M_RDMEM_OPCODE(cpustate) ); }
-static void call(alpha8201_state *cpustate) { UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->retptr.w.l = cpustate->PC; M_JMP(cpustate, i); };
-static void ld_a_ix0_a(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+cpustate->A); }
-static void ret(alpha8201_state *cpustate) { cpustate->mb = cpustate->retptr.b.h; M_JMP(cpustate,  cpustate->retptr.b.l ); };
-static void save_zc(alpha8201_state *cpustate) { cpustate->savez = cpustate->zf; cpustate->savec = cpustate->cf; };
-static void rest_zc(alpha8201_state *cpustate) { cpustate->zf = cpustate->savez; cpustate->cf = cpustate->savec; };
-
-static const s_opcode opcode_8301[256]=
+const alpha8201_cpu_device::s_opcode alpha8201_cpu_device::opcode_8301[256]=
 {
-	{C1, nop        },{C1,rora      },{C1, rola      },{C1,inc_b     },{C1,dec_b     },{C1, inc_a    },{C1, dec_a    },{C1, cpl      },
-	{C2,ld_a_ix0_0  },{C2,ld_a_ix0_1},{C2, ld_a_ix0_2},{C2,ld_a_ix0_3},{C2,ld_a_ix0_4},{C2,ld_a_ix0_5},{C2,ld_a_ix0_6},{C2,ld_a_ix0_7},
-	{C2,ld_a_ix1_0  },{C2,ld_a_ix1_1},{C2, ld_a_ix1_2},{C2,ld_a_ix1_3},{C2,ld_a_ix1_4},{C2,ld_a_ix1_5},{C2,ld_a_ix1_6},{C2,ld_a_ix1_7},
-	{C2,ld_ix2_0_a  },{C2,ld_ix2_1_a},{C2, ld_ix2_2_a},{C2,ld_ix2_3_a},{C2,ld_ix2_4_a},{C2,ld_ix2_5_a},{C2,ld_ix2_6_a},{C2,ld_ix2_7_a},
+	{C1, FN(nop)        },{C1,FN(rora)      },{C1, FN(rola)      },{C1,FN(inc_b)     },{C1,FN(dec_b)     },{C1, FN(inc_a)    },{C1, FN(dec_a)    },{C1, FN(cpl)      },
+	{C2,FN(ld_a_ix0_0)  },{C2,FN(ld_a_ix0_1)},{C2, FN(ld_a_ix0_2)},{C2,FN(ld_a_ix0_3)},{C2,FN(ld_a_ix0_4)},{C2,FN(ld_a_ix0_5)},{C2,FN(ld_a_ix0_6)},{C2,FN(ld_a_ix0_7)},
+	{C2,FN(ld_a_ix1_0)  },{C2,FN(ld_a_ix1_1)},{C2, FN(ld_a_ix1_2)},{C2,FN(ld_a_ix1_3)},{C2,FN(ld_a_ix1_4)},{C2,FN(ld_a_ix1_5)},{C2,FN(ld_a_ix1_6)},{C2,FN(ld_a_ix1_7)},
+	{C2,FN(ld_ix2_0_a)  },{C2,FN(ld_ix2_1_a)},{C2, FN(ld_ix2_2_a)},{C2,FN(ld_ix2_3_a)},{C2,FN(ld_ix2_4_a)},{C2,FN(ld_ix2_5_a)},{C2,FN(ld_ix2_6_a)},{C2,FN(ld_ix2_7_a)},
 /* 20 : 8301 */
-	{C2,ld_ix0_0_b  },{C2,ld_ix0_1_b},{C2, ld_ix0_2_b},{C2,ld_ix0_3_b},{C2,ld_ix0_4_b},{C2,ld_ix0_5_b},{C2,ld_ix0_6_b},{C2,ld_ix0_7_b},
-	{C2,undefined   },{C2,undefined },{C2, undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },
-	{C2,undefined   },{C2,undefined },{C2, undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },{C2,undefined },
-	{C2,bit_r0_0    },{C2,bit_r0_1  },{C2, bit_r0_2 },{C2, bit_r0_3 },{C2, bit_r0_4 },{C2, bit_r0_5 },{C2, bit_r0_6 },{C2, bit_r0_7 },
+	{C2,FN(ld_ix0_0_b)  },{C2,FN(ld_ix0_1_b)},{C2, FN(ld_ix0_2_b)},{C2,FN(ld_ix0_3_b)},{C2,FN(ld_ix0_4_b)},{C2,FN(ld_ix0_5_b)},{C2,FN(ld_ix0_6_b)},{C2,FN(ld_ix0_7_b)},
+	{C2,FN(undefined)   },{C2,FN(undefined) },{C2, FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },
+	{C2,FN(undefined)   },{C2,FN(undefined) },{C2, FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },{C2,FN(undefined) },
+	{C2,FN(bit_r0_0)    },{C2,FN(bit_r0_1)  },{C2, FN(bit_r0_2) },{C2, FN(bit_r0_3) },{C2, FN(bit_r0_4) },{C2, FN(bit_r0_5) },{C2, FN(bit_r0_6) },{C2, FN(bit_r0_7) },
 /* 40 : 8301 */
-	{C2, ld_a_r0    },{C2, ld_r0_a  },{C2, ld_a_r1  },{C2, ld_r1_a  },{C2, ld_a_r2  },{C2, ld_r2_a  },{C2, ld_a_r3  },{C2, ld_r3_a  },
-	{C2, ld_a_r4    },{C2, ld_r4_a  },{C2, ld_a_r5  },{C2, ld_r5_a  },{C2, ld_a_r6  },{C2, ld_r6_a  },{C2, ld_a_r7  },{C2, ld_r7_a  },
-	{C1, add_a_r0   },{C1, sub_a_r0 },{C1, add_a_r1 },{C1, sub_a_r1 },{C1, add_a_r2 },{C1, sub_a_r2 },{C1, add_a_r3 },{C1, sub_a_r3 },
-	{C1, add_a_r4   },{C1, sub_a_r4 },{C1, add_a_r5 },{C1, sub_a_r5 },{C1, add_a_r6 },{C1, sub_a_r6 },{C1, add_a_r7 },{C1, sub_a_r7 },
+	{C2, FN(ld_a_r0)    },{C2, FN(ld_r0_a)  },{C2, FN(ld_a_r1)  },{C2, FN(ld_r1_a)  },{C2, FN(ld_a_r2)  },{C2, FN(ld_r2_a)  },{C2, FN(ld_a_r3)  },{C2, FN(ld_r3_a)  },
+	{C2, FN(ld_a_r4)    },{C2, FN(ld_r4_a)  },{C2, FN(ld_a_r5)  },{C2, FN(ld_r5_a)  },{C2, FN(ld_a_r6)  },{C2, FN(ld_r6_a)  },{C2, FN(ld_a_r7)  },{C2, FN(ld_r7_a)  },
+	{C1, FN(add_a_r0)   },{C1, FN(sub_a_r0) },{C1, FN(add_a_r1) },{C1, FN(sub_a_r1) },{C1, FN(add_a_r2) },{C1, FN(sub_a_r2) },{C1, FN(add_a_r3) },{C1, FN(sub_a_r3) },
+	{C1, FN(add_a_r4)   },{C1, FN(sub_a_r4) },{C1, FN(add_a_r5) },{C1, FN(sub_a_r5) },{C1, FN(add_a_r6) },{C1, FN(sub_a_r6) },{C1, FN(add_a_r7) },{C1, FN(sub_a_r7) },
 /* 60 : 8301 */
-	{C1, and_a_r0   },{C1, or_a_r0  },{C1, and_a_r1 },{C1, or_a_r1  },{C1, and_a_r2 },{C1, or_a_r2  },{C1, and_a_r3 },{C1, or_a_r3  },
-	{C1, and_a_r4   },{C1, or_a_r4  },{C1, and_a_r5 },{C1, or_a_r5  },{C1, and_a_r6 },{C1, or_a_r6  },{C1, and_a_r7 },{C1, or_a_r7  },
-	{C1, add_ix0_0  },{C1, add_ix0_1},{C1, add_ix0_2},{C1, add_ix0_3},{C1, add_ix0_4},{C1, add_ix0_5},{C1, add_ix0_6},{C1, add_ix0_7},
-	{C1, add_ix0_8  },{C1, add_ix0_9},{C1, add_ix0_a},{C1, add_ix0_b},{C1, add_ix0_c},{C1, add_ix0_d},{C1, add_ix0_e},{C1, add_ix0_f},
+	{C1, FN(and_a_r0)   },{C1, FN(or_a_r0)  },{C1, FN(and_a_r1) },{C1, FN(or_a_r1)  },{C1, FN(and_a_r2) },{C1, FN(or_a_r2)  },{C1, FN(and_a_r3) },{C1, FN(or_a_r3)  },
+	{C1, FN(and_a_r4)   },{C1, FN(or_a_r4)  },{C1, FN(and_a_r5) },{C1, FN(or_a_r5)  },{C1, FN(and_a_r6) },{C1, FN(or_a_r6)  },{C1, FN(and_a_r7) },{C1, FN(or_a_r7)  },
+	{C1, FN(add_ix0_0)  },{C1, FN(add_ix0_1)},{C1, FN(add_ix0_2)},{C1, FN(add_ix0_3)},{C1, FN(add_ix0_4)},{C1, FN(add_ix0_5)},{C1, FN(add_ix0_6)},{C1, FN(add_ix0_7)},
+	{C1, FN(add_ix0_8)  },{C1, FN(add_ix0_9)},{C1, FN(add_ix0_a)},{C1, FN(add_ix0_b)},{C1, FN(add_ix0_c)},{C1, FN(add_ix0_d)},{C1, FN(add_ix0_e)},{C1, FN(add_ix0_f)},
 /* 80 : 8301 */
-	{C1, add_ix1_0  },{C1, add_ix1_1},{C1, add_ix1_2},{C1, add_ix1_3},{C1, add_ix1_4},{C1, add_ix1_5},{C1, add_ix1_6},{C1, add_ix1_7},
-	{C1, add_ix1_8  },{C1, add_ix1_9},{C1, add_ix1_a},{C1, add_ix1_b},{C1, add_ix1_c},{C1, add_ix1_d},{C1, add_ix1_e},{C1, add_ix1_f},
-	{C1, add_ix2_0  },{C1, add_ix2_1},{C1, add_ix2_2},{C1, add_ix2_3},{C1, add_ix2_4},{C1, add_ix2_5},{C1, add_ix2_6},{C1, add_ix2_7},
-	{C1, add_ix2_8  },{C1, add_ix2_9},{C1, add_ix2_a},{C1, add_ix2_b},{C1, add_ix2_c},{C1, add_ix2_d},{C1, add_ix2_e},{C1, add_ix2_f},
+	{C1, FN(add_ix1_0)  },{C1, FN(add_ix1_1)},{C1, FN(add_ix1_2)},{C1, FN(add_ix1_3)},{C1, FN(add_ix1_4)},{C1, FN(add_ix1_5)},{C1, FN(add_ix1_6)},{C1, FN(add_ix1_7)},
+	{C1, FN(add_ix1_8)  },{C1, FN(add_ix1_9)},{C1, FN(add_ix1_a)},{C1, FN(add_ix1_b)},{C1, FN(add_ix1_c)},{C1, FN(add_ix1_d)},{C1, FN(add_ix1_e)},{C1, FN(add_ix1_f)},
+	{C1, FN(add_ix2_0)  },{C1, FN(add_ix2_1)},{C1, FN(add_ix2_2)},{C1, FN(add_ix2_3)},{C1, FN(add_ix2_4)},{C1, FN(add_ix2_5)},{C1, FN(add_ix2_6)},{C1, FN(add_ix2_7)},
+	{C1, FN(add_ix2_8)  },{C1, FN(add_ix2_9)},{C1, FN(add_ix2_a)},{C1, FN(add_ix2_b)},{C1, FN(add_ix2_c)},{C1, FN(add_ix2_d)},{C1, FN(add_ix2_e)},{C1, FN(add_ix2_f)},
 /* A0 : 8301 */
-	{C1, ld_base_0  },{C1, ld_base_1},{C1, ld_base_2},{C1, ld_base_3},{C1, ld_base_4},{C1, ld_base_5},{C1, ld_base_6},{C1, ld_base_7},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, ld_bank_0  },{C1, ld_bank_1},{C1, ld_bank_2},{C1, ld_bank_3},{C2, stop     },{C1, undefined},{C1, undefined},{C1, undefined},
-	{C1, undefined  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
+	{C1, FN(ld_base_0)  },{C1, FN(ld_base_1)},{C1, FN(ld_base_2)},{C1, FN(ld_base_3)},{C1, FN(ld_base_4)},{C1, FN(ld_base_5)},{C1, FN(ld_base_6)},{C1, FN(ld_base_7)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(ld_bank_0)  },{C1, FN(ld_bank_1)},{C1, FN(ld_bank_2)},{C1, FN(ld_bank_3)},{C2, FN(stop)     },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
+	{C1, FN(undefined)  },{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},{C1, FN(undefined)},
 /* c0 : 8301 */
-	{C2, ld_ix0_n   },{C2, ld_ix1_n},{C2, ld_ix2_n  },{C2, ld_a_n   },{C2, ld_lp0_n },{C2, ld_lp1_n },{C2, ld_lp2_n },{C2, ld_b_n   },
-	{C2, add_a_n    },{C2, sub_a_n  },{C2, and_a_n  },{C2, or_a_n   },{C2, djnz_lp0 },{C2, djnz_lp1 },{C2, djnz_lp2 },{C2, jnz      },
-	{C2, jnc            },{C2, jz       },{C2, jmp      },{C2,undefined2},{C2, op_d4    },{C2, op_d5    },{C2, op_d6    },{C2, op_d7    },
-	{C2, ld_a_abs  },{C2, ld_abs_a},{C2,cmp_a_n },{C2,xor_a_n   },{C2, ld_a_r   },{C2, ld_r_a   },{C2, jc       },{C2, call},
+	{C2, FN(ld_ix0_n)   },{C2, FN(ld_ix1_n)},{C2, FN(ld_ix2_n)  },{C2, FN(ld_a_n)   },{C2, FN(ld_lp0_n) },{C2, FN(ld_lp1_n) },{C2, FN(ld_lp2_n) },{C2, FN(ld_b_n)   },
+	{C2, FN(add_a_n)    },{C2, FN(sub_a_n)  },{C2, FN(and_a_n)  },{C2, FN(or_a_n)   },{C2, FN(djnz_lp0) },{C2, FN(djnz_lp1) },{C2, FN(djnz_lp2) },{C2, FN(jnz)      },
+	{C2, FN(jnc)            },{C2, FN(jz)       },{C2, FN(jmp)      },{C2,FN(undefined2)},{C2, FN(op_d4)    },{C2, FN(op_d5)    },{C2, FN(op_d6)    },{C2, FN(op_d7)    },
+	{C2, FN(ld_a_abs)  },{C2, FN(ld_abs_a)},{C2,FN(cmp_a_n) },{C2,FN(xor_a_n)   },{C2, FN(ld_a_r)   },{C2, FN(ld_r_a)   },{C2, FN(jc)       },{C2, FN(call)},
 /* E0 : 8301 */
-	{C1, exg_a_ix0  },{C1, exg_a_ix1},{C1, exg_a_ix2},{C1, exg_a_lp1},{C1, exg_a_lp2},{C1, exg_a_b  },{C1, exg_a_lp0},{C1, exg_a_rb },
-	{C1, ld_ix0_a   },{C1, ld_ix1_a },{C1, ld_ix2_a },{C1, ld_lp1_a },{C1, ld_lp2_a },{C1, ld_b_a   },{C1, ld_lp0_a },{C1, ld_rb_a  },
-	{C1,exg_ix0_ix1},{C1,exg_ix0_ix2},{C1,op_rep_ld_ix2_b},{C1, op_rep_ld_b_ix0},{C1, save_zc},{C1, rest_zc},{C1, ld_rxb_a },{C1, ld_a_rxb },
-	{C1, cmp_a_rxb },{C1, xor_a_rxb},{C1, add_a_cf },{C1, sub_a_cf },{C1, tst_a    },{C1, clr_a    },{C1, ld_a_ix0_a},{C1, ret     }
+	{C1, FN(exg_a_ix0)  },{C1, FN(exg_a_ix1)},{C1, FN(exg_a_ix2)},{C1, FN(exg_a_lp1)},{C1, FN(exg_a_lp2)},{C1, FN(exg_a_b)  },{C1, FN(exg_a_lp0)},{C1, FN(exg_a_rb) },
+	{C1, FN(ld_ix0_a)   },{C1, FN(ld_ix1_a) },{C1, FN(ld_ix2_a) },{C1, FN(ld_lp1_a) },{C1, FN(ld_lp2_a) },{C1, FN(ld_b_a)   },{C1, FN(ld_lp0_a) },{C1, FN(ld_rb_a)  },
+	{C1,FN(exg_ix0_ix1)},{C1,FN(exg_ix0_ix2)},{C1,FN(op_rep_ld_ix2_b)},{C1, FN(op_rep_ld_b_ix0)},{C1, FN(save_zc)},{C1, FN(rest_zc)},{C1, FN(ld_rxb_a) },{C1, FN(ld_a_rxb) },
+	{C1, FN(cmp_a_rxb) },{C1, FN(xor_a_rxb)},{C1, FN(add_a_cf) },{C1, FN(sub_a_cf) },{C1, FN(tst_a)    },{C1, FN(clr_a)    },{C1, FN(ld_a_ix0_a)},{C1, FN(ret)     }
 };
+
 
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static CPU_INIT( alpha8201 )
+void alpha8201_cpu_device::device_start()
 {
-	alpha8201_state *cpustate = get_safe_token(device);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
 
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
+	state_add( ALPHA8201_PC, "PC", m_pc.w.l ).mask(0x3ff).formatstr("%03X");
+	state_add( ALPHA8201_SP, "SP", m_sp ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_RB, "RB", m_regPtr ).mask(0x7);
+	state_add( ALPHA8201_MB, "MB", m_mb ).mask(0x3);
+	state_add( ALPHA8201_CF, "CF", m_cf ).mask(0x1);
+	state_add( ALPHA8201_ZF, "ZF", m_zf ).mask(0x1);
+	state_add( ALPHA8201_IX0, "IX0", m_ix0.b.l );
+	state_add( ALPHA8201_IX1, "IX1", m_ix1.b.l );
+	state_add( ALPHA8201_IX2, "IX2", m_ix2.b.l );
+	state_add( ALPHA8201_LP0, "LP0", m_lp0 );
+	state_add( ALPHA8201_LP1, "LP1", m_lp1 );
+	state_add( ALPHA8201_LP2, "LP2", m_lp2 );
+	state_add( ALPHA8201_A, "A", m_A );
+	state_add( ALPHA8201_B, "B", m_B );
+	state_add( ALPHA8201_R0, "R0", m_R[0] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R1, "R1", m_R[1] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R2, "R2", m_R[2] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R3, "R3", m_R[3] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R4, "R4", m_R[4] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R5, "R5", m_R[5] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R6, "R6", m_R[6] ).callimport().callexport().formatstr("%02X");
+	state_add( ALPHA8201_R7, "R7", m_R[7] ).callimport().callexport().formatstr("%02X");
 
-	device->save_item(NAME(cpustate->RAM));
-	device->save_item(NAME(cpustate->PREVPC));
-	device->save_item(NAME(cpustate->PC));
-	device->save_item(NAME(cpustate->regPtr));
-	device->save_item(NAME(cpustate->zf));
-	device->save_item(NAME(cpustate->cf));
-	device->save_item(NAME(cpustate->mb));
-#if HANDLE_HALT_LINE
-	device->save_item(NAME(cpustate->halt));
-#endif
-	device->save_item(NAME(cpustate->IX0));
-	device->save_item(NAME(cpustate->IX1));
-	device->save_item(NAME(cpustate->IX2));
-	device->save_item(NAME(cpustate->LP0));
-	device->save_item(NAME(cpustate->LP1));
-	device->save_item(NAME(cpustate->LP2));
-	device->save_item(NAME(cpustate->A));
-	device->save_item(NAME(cpustate->B));
-	device->save_item(NAME(cpustate->retptr));
-	device->save_item(NAME(cpustate->savec));
-	device->save_item(NAME(cpustate->savez));
+	save_item(NAME(m_RAM));
+	save_item(NAME(m_PREVPC));
+	save_item(NAME(m_pc.w.l));
+	save_item(NAME(m_regPtr));
+	save_item(NAME(m_zf));
+	save_item(NAME(m_cf));
+	save_item(NAME(m_mb));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_ix0.b.l));
+	save_item(NAME(m_ix1.b.l));
+	save_item(NAME(m_ix2.b.l));
+	save_item(NAME(m_lp0));
+	save_item(NAME(m_lp1));
+	save_item(NAME(m_lp2));
+	save_item(NAME(m_A));
+	save_item(NAME(m_B));
+	save_item(NAME(m_retptr));
+	save_item(NAME(m_savec));
+	save_item(NAME(m_savez));
+
+	m_icountptr = &m_icount;
 }
+
+
+void alpha8201_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case ALPHA8201_SP:
+			M_WRMEM(0x001, m_sp);
+			break;
+
+		case ALPHA8201_R0:
+			WR_REG(0, m_R[0]);
+			break;
+
+		case ALPHA8201_R1:
+			WR_REG(1, m_R[1]);
+			break;
+
+		case ALPHA8201_R2:
+			WR_REG(2, m_R[2]);
+			break;
+
+		case ALPHA8201_R3:
+			WR_REG(3, m_R[3]);
+			break;
+
+		case ALPHA8201_R4:
+			WR_REG(4, m_R[4]);
+			break;
+
+		case ALPHA8201_R5:
+			WR_REG(5, m_R[5]);
+			break;
+
+		case ALPHA8201_R6:
+			WR_REG(6, m_R[6]);
+			break;
+
+		case ALPHA8201_R7:
+			WR_REG(7, m_R[7]);
+			break;
+	}
+}
+
+
+void alpha8201_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case ALPHA8201_SP:
+			m_sp = M_RDMEM(0x001);
+			break;
+
+		case ALPHA8201_R0:
+			m_R[0] = RD_REG(0);
+			break;
+
+		case ALPHA8201_R1:
+			m_R[1] = RD_REG(1);
+			break;
+
+		case ALPHA8201_R2:
+			m_R[2] = RD_REG(2);
+			break;
+
+		case ALPHA8201_R3:
+			m_R[3] = RD_REG(3);
+			break;
+
+		case ALPHA8201_R4:
+			m_R[4] = RD_REG(4);
+			break;
+
+		case ALPHA8201_R5:
+			m_R[5] = RD_REG(5);
+			break;
+
+		case ALPHA8201_R6:
+			m_R[6] = RD_REG(6);
+			break;
+
+		case ALPHA8201_R7:
+			m_R[7] = RD_REG(7);
+			break;
+	}
+}
+
+
+void alpha8201_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c", m_cf?'C':'.', m_zf?'Z':'.');
+			break;
+	}
+}
+
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static CPU_RESET( alpha8201 )
+void alpha8201_cpu_device::device_reset()
 {
-	alpha8201_state *cpustate = get_safe_token(device);
-	cpustate->PC     = 0;
-	cpustate->regPtr = 0;
-	cpustate->zf     = 0;
-	cpustate->cf     = 0;
-	cpustate->mb   = 0;
-	cpustate->BIX0   = 0;
-	cpustate->BIX1   = 0;
-	cpustate->BIX2   = 0;
-	cpustate->LP0    = 0;
-	cpustate->LP1    = 0;
-	cpustate->LP2    = 0;
-	cpustate->A    = 0;
-	cpustate->B   = 0;
-#if HANDLE_HALT_LINE
-	cpustate->halt = 0;
-#endif
+	m_pc.w.l = 0;
+	m_regPtr = 0;
+	m_zf     = 0;
+	m_cf     = 0;
+	m_mb   = 0;
+	m_ix0.w.l = 0;
+	m_ix1.w.l = 0;
+	m_ix2.w.l = 0;
+	m_lp0  = 0;
+	m_lp1  = 0;
+	m_lp2  = 0;
+	m_A    = 0;
+	m_B   = 0;
+	m_halt = 0;
 }
 
-/****************************************************************************
- * Shut down CPU emulation
- ****************************************************************************/
-static CPU_EXIT( alpha8201 )
-{
-	/* nothing to do ? */
-}
 
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static void alpha8xxx_execute(device_t *device,const s_opcode *op_map)
+void alpha8201_cpu_device::execute_run()
 {
-	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;
 	UINT8 pcptr;
 
-#if HANDLE_HALT_LINE
-	if(cpustate->halt)
+	if(m_halt)
 	{
-		cpustate->icount = 0;
+		m_icount = 0;
 		return;
 	}
-#endif
 
 	/* setup address bank & fall safe */
-	cpustate->ix0.b.h =
-	cpustate->ix1.b.h =
-	cpustate->ix2.b.h = (cpustate->pc.b.h &= 3);
+	m_ix0.b.h =
+	m_ix1.b.h =
+	m_ix2.b.h = (m_pc.b.h &= 3);
 
 	/* reset start hack */
-	if(cpustate->PC<0x20)
-		cpustate->mb |= 0x08;
+	if(m_pc.w.l<0x20)
+		m_mb |= 0x08;
 
 	do
 	{
-		if(cpustate->mb & 0x08)
+		if(m_mb & 0x08)
 		{
 			pcptr = M_RDMEM(0x001) & 0x1f; /* pointer of entry point */
-			cpustate->icount -= C1;
+			m_icount -= C1;
 
 			/* entry point scan phase */
 			if( (pcptr&1) == 0)
 			{
-				/* EVEN , get cpustate->PC low */
-				cpustate->pc.b.l = M_RDMEM(pcptr);
-//mame_printf_debug("alpha8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, cpustate->pc.b.l);
-				cpustate->icount -= C1;
+				/* EVEN , get PC low */
+				m_pc.b.l = M_RDMEM(pcptr);
+//mame_printf_debug("alpha8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, m_pc.b.l);
+				m_icount -= C1;
 				M_WRMEM(0x001,pcptr+1);
 				continue;
 			}
 
 			/* ODD , check HALT flag */
-			cpustate->mb   = M_RDMEM(pcptr) & (0x08|0x03);
-			cpustate->icount -= C1;
+			m_mb   = M_RDMEM(pcptr) & (0x08|0x03);
+			m_icount -= C1;
 
 			/* not entryaddress 000,001 */
-			if(pcptr<2) cpustate->mb |= 0x08;
+			if(pcptr<2) m_mb |= 0x08;
 
-			if(cpustate->mb & 0x08)
+			if(m_mb & 0x08)
 			{
 				/* HALTED current entry point . next one */
 				pcptr = (pcptr+1)&0x1f;
 				M_WRMEM(0x001,pcptr);
-				cpustate->icount -= C1;
+				m_icount -= C1;
 				continue;
 			}
 
 			/* goto run phase */
-			M_JMP(cpustate, cpustate->pc.b.l);
+			M_JMP(m_pc.b.l);
 
 #if SHOW_ENTRY_POINT
-logerror("alpha8201 START ENTRY=%02X cpustate->PC=%03X\n",pcptr,cpustate->PC);
-mame_printf_debug("alpha8201 START ENTRY=%02X cpustate->PC=%03X\n",pcptr,cpustate->PC);
+logerror("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
+mame_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 #endif
 		}
 
 		/* run */
-		cpustate->PREVPC = cpustate->PC;
-		debugger_instruction_hook(device, cpustate->PC);
-		opcode =M_RDOP(cpustate->PC);
+		m_PREVPC = m_pc.w.l;
+		debugger_instruction_hook(this, m_pc.w.l);
+		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
-mame_printf_debug("alpha8201:  cpustate->PC = %03x,  opcode = %02x\n", cpustate->PC, opcode);
+mame_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);
 #endif
-		cpustate->PCL++;
-		cpustate->inst_cycles = op_map[opcode].cycles;
-		(*(op_map[opcode].function))(cpustate);
-		cpustate->icount -= cpustate->inst_cycles;
-	} while (cpustate->icount>0);
+		m_pc.b.l++;
+		m_inst_cycles = m_opmap[opcode].cycles;
+		(this->*m_opmap[opcode].opcode_func)();
+		m_icount -= m_inst_cycles;
+	} while (m_icount>0);
 }
 
-static CPU_EXECUTE( alpha8201 ) { alpha8xxx_execute(device,opcode_8201); }
-
-static CPU_EXECUTE( ALPHA8301 ) { alpha8xxx_execute(device,opcode_8301); }
 
 /****************************************************************************
  * Set IRQ line state
  ****************************************************************************/
-#if HANDLE_HALT_LINE
-static void set_irq_line(alpha8201_state *cpustate, int irqline, int state)
+void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 {
-	if(irqline == INPUT_LINE_HALT)
+	if(inputnum == INPUT_LINE_HALT)
 	{
-		cpustate->halt = (state==ASSERT_LINE) ? 1 : 0;
-/* mame_printf_debug("alpha8201 HALT %d\n",cpustate->halt); */
-	}
-}
-#endif
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( alpha8201 )
-{
-	alpha8201_state *cpustate = get_safe_token(device);
-	switch (state)
-	{
-#if HANDLE_HALT_LINE
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT: set_irq_line(cpustate, INPUT_LINE_HALT, info->i);   break;
-#endif
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ALPHA8201_PC:           cpustate->PC = info->i;                     break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + ALPHA8201_SP:           M_WRMEM(0x001,info->i);             break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_RB:           cpustate->regPtr = info->i & 7;             break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_MB:           cpustate->mb = info->i & 0x03;              break;
-#if 0
-		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:           cpustate->zf= info->i & 0x01;               break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_CF:           cpustate->cf= info->i & 0x01;               break;
-#endif
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:          cpustate->IX0 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:          cpustate->IX1 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:          cpustate->IX2 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:          cpustate->LP0 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:          cpustate->LP1 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:          cpustate->LP2 = info->i;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_A:            cpustate->A = info->i;                      break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_B:            cpustate->B = info->i;                      break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R0:           WR_REG(0,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R1:           WR_REG(1,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R2:           WR_REG(2,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R3:           WR_REG(3,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R4:           WR_REG(4,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R5:           WR_REG(5,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R6:           WR_REG(6,info->i);                  break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R7:           WR_REG(7,info->i);                  break;
+		m_halt = (state==ASSERT_LINE) ? 1 : 0;
+/* mame_printf_debug("alpha8201 HALT %d\n",m_halt); */
 	}
 }
 
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-/* 8201 and 8301 */
-static CPU_GET_INFO( alpha8xxx )
+offs_t alpha8201_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	alpha8201_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(alpha8201_state);      break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 16;                           break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 10;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 6;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-#if HANDLE_HALT_LINE
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:     info->i = cpustate->halt ? ASSERT_LINE : CLEAR_LINE; break;
-#endif
-		case CPUINFO_INT_PREVIOUSPC:                        info->i = cpustate->PREVPC;                 break;
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ALPHA8201_PC:           info->i = cpustate->PC & 0x3ff;             break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + ALPHA8201_SP:           info->i = M_RDMEM(0x001);           break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_RB:           info->i = cpustate->regPtr;                 break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_MB:           info->i = cpustate->mb;                     break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:           info->i = cpustate->zf;                     break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_CF:           info->i = cpustate->cf;                     break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:          info->i = cpustate->IX0;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:          info->i = cpustate->IX1;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:          info->i = cpustate->IX2;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:          info->i = cpustate->LP0;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:          info->i = cpustate->LP1;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:          info->i = cpustate->LP2;                        break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_A:            info->i = cpustate->A;                      break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_B:            info->i = cpustate->B;                      break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R0:           info->i = RD_REG(0);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R1:           info->i = RD_REG(1);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R2:           info->i = RD_REG(2);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R3:           info->i = RD_REG(3);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R4:           info->i = RD_REG(4);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R5:           info->i = RD_REG(5);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R6:           info->i = RD_REG(6);                break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_R7:           info->i = RD_REG(7);                break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(alpha8201);       break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(alpha8201);          break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(alpha8201);            break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(alpha8201);          break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(alpha8201);        break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "AlphaDenshi MCU");     break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "0.1");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Tatsuyuki Satoh"); break;
-		case CPUINFO_STR_FLAGS:                         sprintf(info->s, "%c%c", cpustate->cf?'C':'.',cpustate->zf?'Z':'.'); break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_PC:       sprintf(info->s, "cpustate->PC:%03X", cpustate->PC);        break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_SP:       sprintf(info->s, "SP:%02X", M_RDMEM(0x001) ); break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_RB:       sprintf(info->s, "RB:%X", cpustate->regPtr);        break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_MB:       sprintf(info->s, "MB:%X", cpustate->mb);        break;
-#if 0
-		case CPUINFO_STR_REGISTER + ALPHA8201_ZF:       sprintf(info->s, "cpustate->zf:%X", cpustate->zf);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_CF:       sprintf(info->s, "cpustate->cf:%X", cpustate->cf);      break;
-#endif
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX0:      sprintf(info->s, "cpustate->IX0:%02X", cpustate->IX0);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX1:      sprintf(info->s, "cpustate->IX1:%02X", cpustate->IX1);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX2:      sprintf(info->s, "cpustate->IX2:%02X", cpustate->IX2);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP0:      sprintf(info->s, "cpustate->LP0:%02X", cpustate->LP0);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP1:      sprintf(info->s, "cpustate->LP1:%02X", cpustate->LP1);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP2:      sprintf(info->s, "cpustate->LP2:%02X", cpustate->LP2);      break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_A:        sprintf(info->s, "A:%02X", cpustate->A);        break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_B:        sprintf(info->s, "B:%02X", cpustate->B);        break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R0:       sprintf(info->s, "R0:%02X", RD_REG(0));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R1:       sprintf(info->s, "R1:%02X", RD_REG(1));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R2:       sprintf(info->s, "R2:%02X", RD_REG(2));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R3:       sprintf(info->s, "R3:%02X", RD_REG(3));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R4:       sprintf(info->s, "R4:%02X", RD_REG(4));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R5:       sprintf(info->s, "R5:%02X", RD_REG(5));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R6:       sprintf(info->s, "R6:%02X", RD_REG(6));     break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_R7:       sprintf(info->s, "R7:%02X", RD_REG(7));     break;
-	}
-}
-CPU_GET_INFO( alpha8201 )
-{
-	switch (state)
-	{
-	case CPUINFO_STR_NAME:                          strcpy(info->s, "ALPHA-8201");              break;
-	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(alpha8201);            break;
-	default:
-		/* 8201 / 8301 */
-		CPU_GET_INFO_CALL(alpha8xxx);
-	}
+	extern CPU_DISASSEMBLE( alpha8201 );
+	return CPU_DISASSEMBLE_NAME(alpha8201)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( alpha8301 )
-{
-	switch (state)
-	{
-	case CPUINFO_STR_NAME:                          strcpy(info->s, "ALPHA-8301");              break;
-	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(ALPHA8301);            break;
-	default:
-		/* 8201 / 8301 */
-		CPU_GET_INFO_CALL(alpha8xxx);
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(ALPHA8201, alpha8201);
-DEFINE_LEGACY_CPU_DEVICE(ALPHA8301, alpha8301);
