@@ -68,11 +68,13 @@ def extractcdAndCompare(type):
 	sha1_extract_bin_2 = sha1sum(extractFileBin);
 		
 	if not sha1_extract == sha1_extract_2:
-		print "SHA1 mismatch (extractcd - " + type + " - toc) - expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_out + " found: " + sha1_temp
+		print d + " - SHA1 mismatch (extractcd - " + type + " - toc)"
 		failure = True
 
 	if not sha1_extract_bin == sha1_extract_bin_2:
-		print "SHA1 mismatch (extractcd - " + type + " - bin) - expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_out + " found: " + sha1_temp
+		print d + " - SHA1 mismatch (extractcd - " + type + " - bin)"
 		failure = True
 		
 def extractAndCompare(command, ext):
@@ -103,7 +105,8 @@ def extractAndCompare(command, ext):
 	sha1_extract_2 = sha1sum(extractFile);
 		
 	if not sha1_extract == sha1_extract_2:
-		print "SHA1 mismatch (" + command + " - " + ext + ") - expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_out + " found: " + sha1_temp
+		print d + " - SHA1 mismatch (" + command + " - " + ext + ")"
 		failure = True
 
 currentDirectory = os.path.dirname(os.path.realpath(__file__))
@@ -129,7 +132,7 @@ if not os.path.exists(outputPath):
 	
 shutil.rmtree(tempPath)
 	
-total_failure = False
+failure = False
 
 for root, dirs, files in os.walk(inputPath):
 	for d in dirs:
@@ -210,12 +213,9 @@ for root, dirs, files in os.walk(inputPath):
 		sha1_out = sha1sum(outFile)
 		sha1_temp = sha1sum(tempFile)
 		if not sha1_out == sha1_temp:
-			print "SHA1 mismatch (output file) - expected: " + sha1_out + " found: " + sha1_temp
+			print "expected: " + sha1_out + " found: " + sha1_temp
+			print d + " - SHA1 mismatch (output file)"
 			failure = True
 
-		if failure:
-			print d + " failed"
-			total_failure = True
-
-if not total_failure:
+if not failure:
 	print "All tests finished successfully"
