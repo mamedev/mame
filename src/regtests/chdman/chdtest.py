@@ -74,6 +74,37 @@ def extractcdAndCompare(type):
 	if not sha1_extract_bin == sha1_extract_bin_2:
 		print "SHA1 mismatch (extractcd - " + type + " - bin) - expected: " + sha1_out + " found: " + sha1_temp
 		failure = True
+		
+def extractAndCompare(command, ext):
+	extractFileDir = os.path.join(tempFilePath, ext + "_output")
+	if not os.path.exists(extractFileDir):
+		os.makedirs(extractFileDir)
+	extractFileBase = os.path.join(extractFileDir, "extract")
+	extractFile = extractFileBase + "." + ext
+	
+	exitcode, stdout, stderr = runProcess([chdmanBin, command, "-f", "-i", outFile, "-o", extractFile])
+	if not exitcode == 0:
+		print d + " - " + command + " (" + ext + ") failed with " + str(exitcode) + " (" + stderr + ")"
+		failure = True
+	
+	sha1_extract = sha1sum(extractFile);
+	
+	extractFileDir = os.path.join(tempFilePath, ext + "_temp")
+	if not os.path.exists(extractFileDir):
+		os.makedirs(extractFileDir)
+	extractFileBase = os.path.join(extractFileDir, "extract")
+	extractFile = extractFileBase + "." + ext
+	
+	exitcode, stdout, stderr = runProcess([chdmanBin, command, "-f", "-i", tempFile, "-o", extractFile])
+	if not exitcode == 0:
+		print d + " - " + command + " (" + ext + ") failed with " + str(exitcode) + " (" + stderr + ")"
+		failure = True
+		
+	sha1_extract_2 = sha1sum(extractFile);
+		
+	if not sha1_extract == sha1_extract_2:
+		print "SHA1 mismatch (" + command + " - " + ext + ") - expected: " + sha1_out + " found: " + sha1_temp
+		failure = True
 
 currentDirectory = os.path.dirname(os.path.realpath(__file__))
 inputPath = os.path.join(currentDirectory, 'input')
@@ -170,7 +201,10 @@ for root, dirs, files in os.walk(inputPath):
 		if command == "createcd":
 			extractcdAndCompare("toc")
 			extractcdAndCompare("cue")
-		# TODO: implement extraction for remaining cases
+		elif command == "createhd":
+			extractAndCompare("extracthd", "raw")
+		elif command == "createld":
+			extractAndCompare("extractld", "avi")
 			
 		# compare SHA1 of output files
 		sha1_out = sha1sum(outFile)
