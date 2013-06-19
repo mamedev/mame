@@ -36,6 +36,45 @@ def sha1sum(path):
 	f.close()
 	return sha1.hexdigest()
 
+def extractcdAndCompare(type):
+	extractFileDir = os.path.join(tempFilePath, type + "_output")
+	if not os.path.exists(extractFileDir):
+		os.makedirs(extractFileDir)
+	extractFileBase = os.path.join(extractFileDir, "extract")
+	extractFile = extractFileBase + "." + type
+	extractFileBin = extractFileBase + ".bin"
+	
+	exitcode, stdout, stderr = runProcess([chdmanBin, "extractcd", "-f", "-i", outFile, "-o", extractFile])
+	if not exitcode == 0:
+		print d + " - extractcd (" + type + ") failed with " + str(exitcode) + " (" + stderr + ")"
+		failure = True
+	
+	sha1_extract = sha1sum(extractFile);
+	sha1_extract_bin = sha1sum(extractFileBin);
+	
+	extractFileDir = os.path.join(tempFilePath, type + "_temp")
+	if not os.path.exists(extractFileDir):
+		os.makedirs(extractFileDir)
+	extractFileBase = os.path.join(extractFileDir, "extract")
+	extractFile = extractFileBase + "." + type
+	extractFileBin = extractFileBase + ".bin"
+	
+	exitcode, stdout, stderr = runProcess([chdmanBin, "extractcd", "-f", "-i", tempFile, "-o", extractFile])
+	if not exitcode == 0:
+		print d + " - extractcd (" + type + ") failed with " + str(exitcode) + " (" + stderr + ")"
+		failure = True
+		
+	sha1_extract_2 = sha1sum(extractFile);
+	sha1_extract_bin_2 = sha1sum(extractFileBin);
+		
+	if not sha1_extract == sha1_extract_2:
+		print "SHA1 mismatch (extractcd - " + type + " - toc) - expected: " + sha1_out + " found: " + sha1_temp
+		failure = True
+
+	if not sha1_extract_bin == sha1_extract_bin_2:
+		print "SHA1 mismatch (extractcd - " + type + " - bin) - expected: " + sha1_out + " found: " + sha1_temp
+		failure = True
+
 currentDirectory = os.path.dirname(os.path.realpath(__file__))
 inputPath = os.path.join(currentDirectory, 'input')
 outputPath = os.path.join(currentDirectory, "output")
@@ -126,12 +165,19 @@ for root, dirs, files in os.walk(inputPath):
 		if not compareInfo(info1, info2):
 			print d + " - info output differs"
 			failure = True
-		sha1_1 = sha1sum(tempFile)
-		sha1_2 = sha1sum(outFile)
-		if not sha1_1 == sha1_2:
-			print "SHA1 mismatch - expected: " + sha1_2 + " found: " + sha1_1
+			
+		# extract and compare
+		if command == "createcd":
+			extractcdAndCompare("toc")
+			extractcdAndCompare("cue")
+		# TODO: implement extraction for remaining cases
+			
+		# compare SHA1 of output files
+		sha1_out = sha1sum(outFile)
+		sha1_temp = sha1sum(tempFile)
+		if not sha1_out == sha1_temp:
+			print "SHA1 mismatch (output file) - expected: " + sha1_out + " found: " + sha1_temp
 			failure = True
-		# TODO: extract and compare
 
 		if failure:
 			print d + " failed"
