@@ -2452,7 +2452,7 @@ static avi_error yuy16_compress_to_yuy(avi_stream *stream, const bitmap_yuy16 &b
 
 			case FORMAT_VYUY:
 			case FORMAT_YUY2:
-				for (x = 0; x < stream->width && source < dataend; x++)
+				for (x = 0; x < stream->width && dest < dataend; x++)
 				{
 					UINT16 pix = *source++;
 					*dest++ = (pix >> 8) | (pix << 8);
