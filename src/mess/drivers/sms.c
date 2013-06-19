@@ -276,18 +276,18 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_0_r, sms_ym2413_register_port_0_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_1_r, sms_ym2413_data_port_0_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_dc_r, sms_ym2413_register_port_w)
+	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_dd_r, sms_ym2413_data_port_w)
 	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_dd_r)
 ADDRESS_MAP_END
 
 
@@ -299,18 +299,18 @@ static ADDRESS_MAP_START( sms_no3e3f_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_0_r, sms_ym2413_register_port_0_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_1_r, sms_ym2413_data_port_0_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_dc_r, sms_ym2413_register_port_w)
+	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_dd_r, sms_ym2413_data_port_w)
 	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_dd_r)
 ADDRESS_MAP_END
 
 
@@ -327,18 +327,18 @@ static ADDRESS_MAP_START( sms_kor_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_0_r, sms_ym2413_register_port_0_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_1_r, sms_ym2413_data_port_0_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_dc_r, sms_ym2413_register_port_w)
+	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_dd_r, sms_ym2413_data_port_w)
 	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_1_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_0_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_dd_r)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_dc_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_dd_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
@@ -358,101 +358,17 @@ static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("gamegear", gamegear_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0)                 AM_READ_PORT("PORT_DC")
-	AM_RANGE(0xc1, 0xc1)                 AM_READ_PORT("PORT_DD")
-	AM_RANGE(0xdc, 0xdc)                 AM_READ_PORT("PORT_DC")
-	AM_RANGE(0xdd, 0xdd)                 AM_READ_PORT("PORT_DD")
+	AM_RANGE(0xc0, 0xc0)                 AM_READ_PORT("GG_PORT_DC")
+	AM_RANGE(0xc1, 0xc1)                 AM_READ_PORT("GG_PORT_DD")
+	AM_RANGE(0xdc, 0xdc)                 AM_READ_PORT("GG_PORT_DC")
+	AM_RANGE(0xdd, 0xdd)                 AM_READ_PORT("GG_PORT_DD")
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( sms )
-	PORT_START("PORT_DC")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-
-	PORT_START("PORT_DD")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* Software Reset bit */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* Port A TH */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* Port B TH */
-
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME(DEF_STR(Pause))
-
-	PORT_START("LPHASER0")  /* Light phaser X - player 1 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun1_changed, NULL) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-
-	PORT_START("LPHASER1")  /* Light phaser Y - player 1 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun1_changed, NULL) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-
-	PORT_START("LPHASER2")  /* Light phaser X - player 2 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun2_changed, NULL) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-
-	PORT_START("LPHASER3")  /* Light phaser Y - player 2 */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sms_state, lgun2_changed, NULL) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-
-	PORT_START("RFU")   /* Rapid Fire Unit */
-	PORT_CONFNAME( 0x03, 0x00, "Rapid Fire Unit - Player 1" )
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x01, "Button A" )
-	PORT_CONFSETTING(   0x02, "Button B" )
-	PORT_CONFSETTING(   0x03, "Button A + B" )
-	PORT_CONFNAME( 0x0c, 0x00, "Rapid Fire Unit - Player 2" )
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x04, "Button A" )
-	PORT_CONFSETTING(   0x08, "Button B" )
-	PORT_CONFSETTING(   0x0c, "Button A + B" )
-
-	PORT_START("PADDLE0")   /* Paddle player 1 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-
-	PORT_START("PADDLE1")   /* Paddle player 2 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-
-	PORT_START("CTRLIPT")   /* Light Phaser and Paddle Control buttons */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x20)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
-
-	PORT_START("CTRLSEL")   /* Controller selection */
-	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
-	PORT_CONFSETTING( 0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING( 0x01, "Light Phaser" )
-	PORT_CONFSETTING( 0x02, "Sega Paddle Control" )
-	PORT_CONFSETTING( 0x04, "Sega Sports Pad" )
-	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
-	PORT_CONFSETTING( 0x00, DEF_STR( Joystick ) )
-	PORT_CONFSETTING( 0x10, "Light Phaser" )
-	PORT_CONFSETTING( 0x20, "Sega Paddle Control" )
-	PORT_CONFSETTING( 0x40, "Sega Sports Pad" )
-
-	PORT_START("SPORT0")    /* Player 1 Sports Pad X axis */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
-
-	PORT_START("SPORT1")    /* Player 1 Sports Pad Y axis */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x04)
-
-	PORT_START("SPORT2")    /* Player 2 Sports Pad X axis */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
-
-	PORT_START("SPORT3")    /* Player 2 Sports Pad Y axis */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(40) PORT_RESET PORT_REVERSE PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sms1 )
@@ -476,7 +392,7 @@ static INPUT_PORTS_START( sms1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gg )
-	PORT_START("PORT_DC")
+	PORT_START("GG_PORT_DC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
@@ -485,7 +401,7 @@ static INPUT_PORTS_START( gg )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PORT_DD")
+	PORT_START("GG_PORT_DD")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("START")
@@ -595,6 +511,14 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL1_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl1_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL2_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl2_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
@@ -721,6 +645,14 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 	MCFG_SMS_CARD_ADD("slot32", sms_cart, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL1_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl1_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL2_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl2_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sms_pal_base, sms_state )
@@ -743,6 +675,14 @@ static MACHINE_CONFIG_START( sms_pal_base, sms_state )
 	MCFG_SMS_CARTRIDGE_ADD("slot", sms_cart, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL1_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl1_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
+
+	MCFG_SMS_CONTROL_PORT_ADD(CONTROL2_TAG, sms_control_port_devices, "joypad")
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_state, sms_ctrl2_th_input))
+	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )

@@ -1928,7 +1928,13 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/sat_bram.o  \
 	$(MESS_DRIVERS)/saturn.o    \
 	$(MESS_MACHINE)/sms.o       \
-	$(MESS_MACHINE)/sega8_slot.o \
+	$(MESS_MACHINE)/smsctrl.o   \
+	$(MESS_MACHINE)/sms_joypad.o  \
+	$(MESS_MACHINE)/sms_lphaser.o \
+	$(MESS_MACHINE)/sms_paddle.o  \
+	$(MESS_MACHINE)/sms_sports.o  \
+	$(MESS_MACHINE)/sms_rfu.o     \
+	$(MESS_MACHINE)/sega8_slot.o  \
 	$(MESS_MACHINE)/sega8_rom.o \
 	$(MESS_DRIVERS)/sms.o       \
 	$(MESS_DRIVERS)/svmu.o      \

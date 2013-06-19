@@ -16,20 +16,16 @@
 
 #define MAX_CARTRIDGES        16
 
+#define CONTROL1_TAG   "ctrl1"
+#define CONTROL2_TAG   "ctrl2"
+
+#include "machine/smsctrl.h"
 #include "machine/sega8_slot.h"
 
 
 class sms_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RAPID_FIRE,
-		TIMER_LIGHTGUN_TICK,
-		TIMER_LPHASER_1,
-		TIMER_LPHASER_2
-	};
-
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -40,24 +36,11 @@ public:
 		m_cartslot(*this, "slot"),
 		m_card(*this, "mycard"),
 		m_region_maincpu(*this, "maincpu"),
-		m_port_dd(*this, "PORT_DD"),
-		m_port_dc(*this, "PORT_DC"),
+		m_port_ctrl1(*this, CONTROL1_TAG),
+		m_port_ctrl2(*this, CONTROL2_TAG),
 		m_port_pause(*this, "PAUSE"),
 		m_port_reset(*this, "RESET"),
 		m_port_start(*this, "START"),
-		m_port_ctrlsel(*this, "CTRLSEL"),
-		m_port_lphas0(*this, "LPHASER0"),
-		m_port_lphas1(*this, "LPHASER1"),
-		m_port_lphas2(*this, "LPHASER2"),
-		m_port_lphas3(*this, "LPHASER3"),
-		m_port_rfu(*this, "RFU"),
-		m_port_paddle0(*this, "PADDLE0"),
-		m_port_paddle1(*this, "PADDLE1"),
-		m_port_ctrlipt(*this, "CTRLIPT"),
-		m_port_sport0(*this, "SPORT0"),
-		m_port_sport1(*this, "SPORT1"),
-		m_port_sport2(*this, "SPORT2"),
-		m_port_sport3(*this, "SPORT3"),
 		m_port_scope(*this, "SEGASCOPE"),
 		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
@@ -78,24 +61,11 @@ public:
 	required_device<sega8_cart_slot_device> m_cartslot;
 	optional_device<sega8_card_slot_device> m_card;
 	required_memory_region m_region_maincpu;
-	required_ioport m_port_dd;
-	required_ioport m_port_dc;
+	optional_device<sms_control_port_device> m_port_ctrl1;
+	optional_device<sms_control_port_device> m_port_ctrl2;
 	optional_ioport m_port_pause;
 	optional_ioport m_port_reset;
 	optional_ioport m_port_start;
-	optional_ioport m_port_ctrlsel;
-	optional_ioport m_port_lphas0;
-	optional_ioport m_port_lphas1;
-	optional_ioport m_port_lphas2;
-	optional_ioport m_port_lphas3;
-	optional_ioport m_port_rfu;
-	optional_ioport m_port_paddle0;
-	optional_ioport m_port_paddle1;
-	optional_ioport m_port_ctrlipt;
-	optional_ioport m_port_sport0;
-	optional_ioport m_port_sport1;
-	optional_ioport m_port_sport2;
-	optional_ioport m_port_sport3;
 	optional_ioport m_port_scope;
 	optional_ioport m_port_persist;
 
@@ -105,13 +75,13 @@ public:
 
 	UINT8 m_bios_page_count;
 	UINT8 m_fm_detect;
-	UINT8 m_ctrl_reg;
+	UINT8 m_io_ctrl_reg;
 	int m_paused;
 	UINT8 m_bios_port;
 	UINT8 *m_BIOS;
 	UINT8 m_mapper[4];
-	UINT8 m_input_port0;
-	UINT8 m_input_port1;
+	UINT8 m_port_dc_reg;
+	UINT8 m_port_dd_reg;
 	UINT8 m_gg_sio[5];
 
 	// [0] for 0x400-0x3fff, [1] for 0x4000-0x7fff, [2] for 0x8000-0xffff, [3] for 0x0000-0x0400
@@ -135,32 +105,9 @@ public:
 	UINT8 m_has_bios;
 	UINT8 m_has_fm;
 
-	// Data needed for Rapid Fire Unit support
-	emu_timer *m_rapid_fire_timer;
-	UINT8 m_rapid_fire_state_1;
-	UINT8 m_rapid_fire_state_2;
-
-	// Data needed for Paddle Control controller
-	UINT32 m_last_paddle_read_time;
-	UINT8 m_paddle_read_state;
-
-	// Data needed for Sports Pad controller
-	UINT32 m_last_sports_pad_time_1;
-	UINT32 m_last_sports_pad_time_2;
-	UINT8 m_sports_pad_state_1;
-	UINT8 m_sports_pad_state_2;
-	UINT8 m_sports_pad_last_data_1;
-	UINT8 m_sports_pad_last_data_2;
-	UINT8 m_sports_pad_1_x;
-	UINT8 m_sports_pad_1_y;
-	UINT8 m_sports_pad_2_x;
-	UINT8 m_sports_pad_2_y;
-
 	// Data needed for Light Phaser
-	emu_timer *m_lphaser_1_timer;
-	emu_timer *m_lphaser_2_timer;
-	UINT8 m_lphaser_1_latch;
-	UINT8 m_lphaser_2_latch;
+	UINT8 m_ctrl1_th_latch;
+	UINT8 m_ctrl2_th_latch;
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
 
 	// Data needed for SegaScope (3D glasses)
@@ -174,15 +121,14 @@ public:
 	sega8_card_slot_device *m_cards[16];
 
 	/* Cartridge slot info */
-	DECLARE_WRITE8_MEMBER(sms_input_write);
 	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
 	DECLARE_READ8_MEMBER(sms_fm_detect_r);
 	DECLARE_WRITE8_MEMBER(sms_io_control_w);
 	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_input_port_0_r);
-	DECLARE_READ8_MEMBER(sms_input_port_1_r);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_0_w);
-	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_0_w);
+	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
+	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
+	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
 	DECLARE_READ8_MEMBER(gg_input_port_2_r);
 	DECLARE_READ8_MEMBER(sms_sscope_r);
 	DECLARE_WRITE8_MEMBER(sms_sscope_w);
@@ -211,27 +157,18 @@ public:
 	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_sms1(screen_device &screen, bool state);
-	DECLARE_INPUT_CHANGED_MEMBER(lgun1_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(lgun2_changed);
-	TIMER_CALLBACK_MEMBER(rapid_fire_callback);
-	TIMER_CALLBACK_MEMBER(lightgun_tick);
-	TIMER_CALLBACK_MEMBER(lphaser_1_callback);
-	TIMER_CALLBACK_MEMBER(lphaser_2_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
+	DECLARE_READ32_MEMBER(sms_pixel_color);
+	DECLARE_WRITE16_MEMBER(sms_ctrl1_th_input);
+	DECLARE_WRITE16_MEMBER(sms_ctrl2_th_input);
 
 protected:
 	void setup_bios();
 	void setup_rom();
 	void setup_sms_cart();
 	void lphaser_hcount_latch(int hpos);
-	void lphaser1_sensor_check();
-	void lphaser2_sensor_check();
-	UINT16 screen_hpos_nonscaled(int scaled_hpos);
-	UINT16 screen_vpos_nonscaled(int scaled_vpos);
-	int lgun_bright_aim_area(emu_timer *timer, int lgun_x, int lgun_y);
 	void sms_get_inputs(address_space &space);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class smssdisp_state : public sms_state
