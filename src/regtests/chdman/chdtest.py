@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import hashlib
+import shutil
 
 def runProcess(cmd):
 	process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -52,16 +53,20 @@ if not os.path.exists(inputPath):
 	print inputPath + " does not exist"
 	sys.exit(1)
 	
-if not os.path.exists(inputPath):
-	print inputPath + " does not exist"
+if not os.path.exists(outputPath):
+	print outputPath + " does not exist"
 	sys.exit(1)
 	
-failure = False
+shutil.rmtree(tempPath)
+	
+total_failure = False
 
 for root, dirs, files in os.walk(inputPath):
 	for d in dirs:
 		if d.startswith("."):
 			continue
+
+		failure = False
 
 		command = ext = d.split("_", 2)[0]			
 		inFile = os.path.join(root, d, "in")
@@ -96,14 +101,19 @@ for root, dirs, files in os.walk(inputPath):
 			cmd = [chdmanBin, command, "-f", "-i", inFile, "-o", tempFile] + params
 		else:
 			cmd = [chdmanBin, command, "-f", "-o", tempFile] + params
+
 		exitcode, stdout, stderr = runProcess(cmd)
 		if not exitcode == 0:
 			print d + " - command failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
+		
+		# verify
 		exitcode, stdout, stderr = runProcess([chdmanBin, "verify", "-i", tempFile])
 		if not exitcode == 0:
 			print d + " - verify failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
+			
+		# compare info
 		# TODO: store expected output of reference file as well and compare
 		exitcode, info1, stderr = runProcess([chdmanBin, "info", "-v", "-i", tempFile])
 		if not exitcode == 0:
@@ -123,5 +133,9 @@ for root, dirs, files in os.walk(inputPath):
 			failure = True
 		# TODO: extract and compare
 
-if not failure:
+		if failure:
+			print d + " failed"
+			total_failure = True
+
+if not total_failure:
 	print "All tests finished successfully"
