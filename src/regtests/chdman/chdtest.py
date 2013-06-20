@@ -129,8 +129,9 @@ if not os.path.exists(inputPath):
 if not os.path.exists(outputPath):
 	print outputPath + " does not exist"
 	sys.exit(1)
-	
-shutil.rmtree(tempPath)
+
+if os.path.exists(tempPath):	
+	shutil.rmtree(tempPath)
 	
 failure = False
 
