@@ -69,6 +69,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "includes/djmain.h"
+#include "machine/idehd.h"
 
 
 
@@ -1354,10 +1355,12 @@ static const k054539_interface k054539_config =
 
 void djmain_state::machine_start()
 {
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 	if (m_ata_master_password != NULL)
-		m_ata->set_master_password(0, m_ata_master_password);
+		hdd->set_master_password(m_ata_master_password);
+
 	if (m_ata_user_password != NULL)
-		m_ata->set_user_password(0, m_ata_user_password);
+		hdd->set_user_password(m_ata_user_password);
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));

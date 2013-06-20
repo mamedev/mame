@@ -78,7 +78,9 @@ ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, 
 	m_dasp(0),
 	m_dmack(0),
 	m_dmarq(0),
-	m_irq(0)
+	m_irq(0),
+	m_master_password(NULL),
+	m_user_password(NULL)
 {
 }
 

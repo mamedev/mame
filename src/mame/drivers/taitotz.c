@@ -175,6 +175,7 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
 #include "machine/ataintf.h"
+#include "machine/idehd.h"
 #include "machine/nvram.h"
 #include "video/polynew.h"
 
@@ -2530,7 +2531,8 @@ void taitotz_state::machine_reset()
 {
 	if (m_hdd_serial_number != NULL)
 	{
-		UINT8 *identify_device = m_ata->identify_device_buffer(0);
+		ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+		UINT8 *identify_device = hdd->identify_device_buffer();
 
 		for (int i=0; i < 20; i++)
 		{

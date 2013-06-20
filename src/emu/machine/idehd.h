@@ -62,8 +62,21 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
 
-	virtual UINT8 *identify_device_buffer() { return m_identify_device; }
-	
+	UINT8 *identify_device_buffer() { return m_identify_device; }
+
+	void set_master_password(const UINT8 *password)
+	{
+		m_master_password = password;
+		m_master_password_enable = (password != NULL);
+	}
+
+
+	void set_user_password(const UINT8 *password)
+	{
+		m_user_password = password;
+		m_user_password_enable = (password != NULL);
+	}
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -128,6 +141,11 @@ private:
 	UINT32          m_cur_lba;
 	UINT16          m_block_count;
 	UINT16          m_sectors_until_int;
+
+	UINT8           m_master_password_enable;
+	UINT8           m_user_password_enable;
+	const UINT8 *   m_master_password;
+	const UINT8 *   m_user_password;
 
 	emu_timer *     m_last_status_timer;
 	emu_timer *     m_reset_timer;

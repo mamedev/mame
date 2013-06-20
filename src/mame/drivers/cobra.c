@@ -315,9 +315,10 @@
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "machine/ataintf.h"
-#include "machine/timekpr.h"
+#include "machine/idehd.h"
 #include "machine/jvshost.h"
 #include "machine/jvsdev.h"
+#include "machine/timekpr.h"
 #include "video/konicdev.h"
 #include "video/polynew.h"
 #include "video/rgbgen.h"
@@ -3163,7 +3164,8 @@ void cobra_state::machine_reset()
 {
 	m_sub_interrupt = 0xff;
 
-	UINT8 *identify_device = m_ata->identify_device_buffer(0);
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	UINT8 *identify_device = hdd->identify_device_buffer();
 
 	// Cobra expects these settings or the BIOS fails
 	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */

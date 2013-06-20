@@ -83,10 +83,6 @@ public:
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
 
-	UINT8 *identify_device_buffer(int drive);
-	void set_master_password(int drive, const UINT8 *password);
-	void set_user_password(int drive, const UINT8 *password);
-
 	UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);

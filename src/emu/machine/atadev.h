@@ -35,13 +35,6 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) = 0;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) = 0;
 
-	virtual UINT8 *identify_device_buffer() = 0;
-
-	UINT8           m_master_password_enable;
-	UINT8           m_user_password_enable;
-	const UINT8 *   m_master_password;
-	const UINT8 *   m_user_password;
-
 	devcb2_write_line m_irq_handler;
 	devcb2_write_line m_dmarq_handler;
 };

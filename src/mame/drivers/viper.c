@@ -285,6 +285,7 @@ An additional control PCB is used for Mocap Golf for the golf club sensor. It co
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "machine/ataintf.h"
+#include "machine/idehd.h"
 #include "machine/timekpr.h"
 #include "video/voodoo.h"
 
@@ -2023,7 +2024,8 @@ void viper_state::machine_reset()
 {
 	mpc8240_epic_reset();
 
-	UINT8 *identify_device = m_ata->identify_device_buffer(0);
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	UINT8 *identify_device = hdd->identify_device_buffer();
 
 	// Viper expects these settings or the BIOS fails
 	identify_device[51*2+0] = 0;           /* 51: PIO data transfer cycle timing mode */

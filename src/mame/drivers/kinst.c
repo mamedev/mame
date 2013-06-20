@@ -132,6 +132,7 @@ Notes:
 #include "cpu/mips/mips3.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/ataintf.h"
+#include "machine/idehd.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
 
@@ -215,7 +216,8 @@ void kinst_state::machine_start()
 
 void kinst_state::machine_reset()
 {
-	UINT8 *identify_device = m_ata->identify_device_buffer(0);
+	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
+	UINT8 *identify_device = hdd->identify_device_buffer();
 
 	if (strncmp(machine().system().name, "kinst2", 6) != 0)
 	{

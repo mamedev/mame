@@ -67,28 +67,6 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
 }
 
 
-/***************************************************************************
-    INITIALIZATION AND RESET
-***************************************************************************/
-
-UINT8 *ata_interface_device::identify_device_buffer(int _drive)
-{
-	return m_slot[_drive]->dev()->identify_device_buffer();
-}
-
-void ata_interface_device::set_master_password(int _drive, const UINT8 *password)
-{
-	m_slot[_drive]->dev()->m_master_password = password;
-	m_slot[_drive]->dev()->m_master_password_enable = (password != NULL);
-}
-
-
-void ata_interface_device::set_user_password(int _drive, const UINT8 *password)
-{
-	m_slot[_drive]->dev()->m_user_password = password;
-	m_slot[_drive]->dev()->m_user_password_enable = (password != NULL);
-}
-
 /*************************************
  *
  *  ATA interface read
