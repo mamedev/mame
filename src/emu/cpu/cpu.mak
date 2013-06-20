@@ -1868,6 +1868,10 @@ $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 #-------------------------------------------------
 # Texas Instruments TMS99xx series
 #@src/emu/cpu/tms9900/tms9900.h,CPUS += TMS9900
+#@src/emu/cpu/tms9900/tms9900l.h,CPUS += TMS9900
+#@src/emu/cpu/tms9900/tms9980a.h,CPUS += TMS9900
+#@src/emu/cpu/tms9900/tms9995.h,CPUS += TMS9900
+
 #-------------------------------------------------
 
 ifneq ($(filter TMS9900,$(CPUS)),)

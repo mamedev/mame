@@ -133,7 +133,18 @@ static file_entry &compute_dependencies(astring &srcfile);
 // path helpers
 static bool find_include_file(astring &srcincpath, const astring &srcfile, const astring &filename);
 
-
+static bool check_file(astring &srcincpath)
+{
+	// see if we can open it
+	core_file *testfile;
+	if (core_fopen(srcincpath, OPEN_FLAG_READ, &testfile) == FILERR_NONE)
+	{
+		// close the file
+		core_fclose(testfile);
+		return true;
+	}
+	return false;
+}
 int include_mapping(const char *srcfile)
 {
 	// read source file
@@ -285,7 +296,6 @@ int parse_file(const char *srcfile)
 				drivname[pos] = *srcptr++;
 				drivname[pos+1] = 0;
 			}
-			fprintf(stderr, "Creating make dependancy for '%s'\n", drivname);
 
 			list_entry *lentry = new list_entry;
 			lentry->name.cpy(drivname);
@@ -311,7 +321,6 @@ int parse_file(const char *srcfile)
 				drivname[pos] = *srcptr++;
 				drivname[pos+1] = 0;
 			}
-			fprintf(stderr, "Creating library for '%s'\n", drivname);
 			
 			librarylist_entry *lentry = new librarylist_entry;
 			lentry->name.cpy(drivname);
@@ -342,6 +351,86 @@ int parse_file(const char *srcfile)
 
 	osd_free(buffer);
 
+	return 0;
+}
+
+int parse_for_drivers(const char *srcfile)
+{
+	// read source file
+	core_file *file = NULL;
+
+	file_error filerr = core_fopen(srcfile, OPEN_FLAG_READ, &file);
+	if (filerr != FILERR_NONE)
+	{
+		fprintf(stderr, "Unable to read source file '%s'\n", srcfile);
+		return 1;
+	}
+	// loop over lines in the file
+	char buffer[4096];
+	while (core_fgets(buffer, ARRAY_LENGTH(buffer), file) != NULL)
+	{
+		astring line;
+		
+		// rip through it to find all drivers
+		char *srcptr = (char *)buffer;
+		char *endptr = srcptr + strlen(buffer);
+		bool in_comment = false;
+		while (srcptr < endptr)
+		{
+			char c = *srcptr++;
+
+			// skip any spaces
+			if (isspace(c))
+				continue;
+
+			// look for end of C comment
+			if (in_comment && c == '*' && *srcptr == '/')
+			{
+				srcptr++;
+				in_comment = false;
+				continue;
+			}
+
+			// skip anything else inside a C comment
+			if (in_comment)
+				continue;
+
+			// look for start of C comment
+			if (c == '/' && *srcptr == '*')
+			{
+				srcptr++;
+				in_comment = true;
+				continue;
+			}
+
+			// if we hit a C++ comment, scan to the end of line
+			if (c == '/' && *srcptr == '/')
+			{
+				while (srcptr < endptr && *srcptr != 13 && *srcptr != 10)
+					srcptr++;
+				continue;
+			}
+
+			srcptr--;
+			for (int pos = 0; srcptr < endptr && !isspace(*srcptr); pos++)
+			{
+				line.cat(*srcptr++);
+			}
+		}
+		
+		if ((line.find(0,"GAME(")==0) || (line.find(0,"GAMEL(")==0) ||
+			(line.find(0,"COMP(")==0) || (line.find(0,"CONS(")==0) ||
+			(line.find(0,"SYST(")==0))
+		{
+			int p1 = line.find(0,",");
+			if (p1<0) continue;
+			int p2 = line.find(p1+1,",");
+			if (p2<0) continue;
+			
+			printf("%s\n",line.substr(p1+1,p2-p1-1).cstr());
+		}
+	}
+	core_fclose(file);
 	return 0;
 }
 
@@ -376,10 +465,6 @@ int main(int argc, char *argv[])
 	if (parse_file(srcfile))
 		return 1;
 
-	include_mapping("src/emu/cpu/cpu.mak");
-	include_mapping("src/emu/video/video.mak");
-	include_mapping("src/emu/sound/sound.mak");
-	include_mapping("src/emu/machine/machine.mak");
 	// loop over arguments
 	for (int argnum = 2; argnum < argc; argnum++)
 	{
@@ -421,31 +506,55 @@ int main(int argc, char *argv[])
 			usage(argv[0]);
 	}
 
-	// make sure we got 1 parameter
+	// generate list of drivers
 	if (srcdir.len() == 0)
-		usage(argv[0]);
-
-
-	if (librarylist!=NULL) 
-	{	
-		printf("OBJDIRS += \\\n");
-		printf("\t$(OBJ)/mame/audio \\\n");
-		printf("\t$(OBJ)/mame/drivers \\\n");
-		printf("\t$(OBJ)/mame/layout \\\n");
-		printf("\t$(OBJ)/mame/machine \\\n");
-		printf("\t$(OBJ)/mame/video \\\n");
-		printf("\n\n");
-		printf("DRVLIBS += \\\n");
-		
+	{
 		for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
 		{
-			printf("\t$(OBJ)/mame/%s.a \\\n",lib->name.cstr());
+			for (list_entry *src = lib->sourcefiles; src != NULL; src = src->next)	
+			{
+				printf("// Drivers from %s.c\n",src->name.cstr());
+				astring srcfile;
+				// build the source filename
+				srcfile.printf("%s%c%s.c", "src/mame/drivers", PATH_SEPARATOR[0], src->name.cstr());
+				parse_for_drivers(srcfile);
+				
+				astring srcfile_inc;
+				// build the source filename
+				srcfile_inc.printf("%s%c%s.inc", "src/mame/drivers", PATH_SEPARATOR[0], src->name.cstr());
+				if(check_file(srcfile_inc))
+					parse_for_drivers(srcfile_inc);
+			}
 		}
-		printf("\n");
-	}	
+		return 0;
+	} 
+	else 
+	{
+		include_mapping("src/emu/cpu/cpu.mak");
+		include_mapping("src/emu/video/video.mak");
+		include_mapping("src/emu/sound/sound.mak");
+		include_mapping("src/emu/machine/machine.mak");
+		if (librarylist!=NULL) 
+		{	
+			printf("OBJDIRS += \\\n");
+			printf("\t$(OBJ)/mame/audio \\\n");
+			printf("\t$(OBJ)/mame/drivers \\\n");
+			printf("\t$(OBJ)/mame/layout \\\n");
+			printf("\t$(OBJ)/mame/machine \\\n");
+			printf("\t$(OBJ)/mame/video \\\n");
+			printf("\n\n");
+			printf("DRVLIBS += \\\n");
+			
+			for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
+			{
+				printf("\t$(OBJ)/mame/mame/%s.a \\\n",lib->name.cstr());
+			}
+			printf("\n");
+		}	
 
-	// recurse over subdirectories
-	return recurse_dir(srcdir);
+		// recurse over subdirectories
+		return recurse_dir(srcdir);
+	}
 }
 
 
@@ -525,7 +634,7 @@ static int recurse_dir(astring &srcdir)
 	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
 	{
 		// convert the target from source to object (makes assumptions about rules)
-		astring target("$(OBJ)/mame/",lib->name.cstr());
+		astring target("$(OBJ)/mame/mame/",lib->name.cstr());
 		target.cat(".a");
 		printf("\n%s : \\\n", target.cstr());
 	
@@ -591,19 +700,6 @@ static int recurse_dir(astring &srcdir)
 		}
 	}
 	return result;
-}
-
-static bool check_file(astring &srcincpath)
-{
-	// see if we can open it
-	core_file *testfile;
-	if (core_fopen(srcincpath, OPEN_FLAG_READ, &testfile) == FILERR_NONE)
-	{
-		// close the file
-		core_fclose(testfile);
-		return true;
-	}
-	return false;
 }
 
 /*-------------------------------------------------
