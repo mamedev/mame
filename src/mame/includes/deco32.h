@@ -144,15 +144,17 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag),
-			m_dragngun_sprite_layout_0_ram(*this, "dragngun_lay0"),
-			m_dragngun_sprite_layout_1_ram(*this, "dragngun_lay1"),
-			m_dragngun_sprite_lookup_0_ram(*this, "dragngun_look0"),
-			m_dragngun_sprite_lookup_1_ram(*this, "dragngun_look1") { }
+		m_dragngun_sprite_layout_0_ram(*this, "dragngun_lay0"),
+		m_dragngun_sprite_layout_1_ram(*this, "dragngun_lay1"),
+		m_dragngun_sprite_lookup_0_ram(*this, "dragngun_look0"),
+		m_dragngun_sprite_lookup_1_ram(*this, "dragngun_look1")
+	{ }
 
 	required_shared_ptr<UINT32> m_dragngun_sprite_layout_0_ram;
 	required_shared_ptr<UINT32> m_dragngun_sprite_layout_1_ram;
 	required_shared_ptr<UINT32> m_dragngun_sprite_lookup_0_ram;
 	required_shared_ptr<UINT32> m_dragngun_sprite_lookup_1_ram;
+
 	UINT32 m_dragngun_sprite_ctrl;
 	int m_dragngun_lightgun_port;
 	DECLARE_READ32_MEMBER(dragngun_lightgun_r);
@@ -160,10 +162,12 @@ public:
 	DECLARE_WRITE32_MEMBER(dragngun_sprite_control_w);
 	DECLARE_WRITE32_MEMBER(dragngun_spriteram_dma_w);
 	DECLARE_DRIVER_INIT(dragngun);
+	DECLARE_DRIVER_INIT(dragngunj);
 	DECLARE_DRIVER_INIT(lockload);
 	DECLARE_VIDEO_START(dragngun);
 	DECLARE_VIDEO_START(lockload);
 	UINT32 screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void init_dragngun_common();
 	void screen_eof_dragngun(screen_device &screen, bool state);
 	void dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata);
 };

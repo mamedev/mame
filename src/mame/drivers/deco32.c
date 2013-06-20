@@ -2614,6 +2614,80 @@ ROM_START( dragngun )
 	ROM_LOAD( "mar-07.n19", 0x000000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
 ROM_END
 
+ROM_START( dragngunj )
+	ROM_REGION(0x400000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_BYTE( "ka-02.a9",  0x000000, 0x40000, CRC(402a03f9) SHA1(cdd5da9e35191bd716eb6245360702adb6078a94) )
+	ROM_LOAD32_BYTE( "ka-06.c9",  0x000001, 0x40000, CRC(26822853) SHA1(8a9e61c9ac9a5aa4b21f063f700acfebac8d408b) )
+	ROM_LOAD32_BYTE( "ka-00.a5",  0x000002, 0x40000, CRC(cc9e321b) SHA1(591d5f13a558960dbf286ca4541be0e42b234f2f) )
+	ROM_LOAD32_BYTE( "ka-04.c5",  0x000003, 0x40000, CRC(5fd9d935) SHA1(8fd87b05325fae84860bbf1e169a3946f3197307) )
+	ROM_LOAD32_BYTE( "ka-03.a10", 0x300000, 0x40000, CRC(e213c859) SHA1(aa0610427bbaa22da7f44289fdf9baf37b636710) )
+	ROM_LOAD32_BYTE( "ka-07.c10", 0x300001, 0x40000, CRC(f34c54eb) SHA1(6b67cdb1d2dcc272de96292254914a212ff351cd) )
+	ROM_LOAD32_BYTE( "ka-01.a7",  0x300002, 0x40000, CRC(1b52364c) SHA1(151365adc26bc7d71a4d2fc73bca598d3aa09f81) )
+	ROM_LOAD32_BYTE( "ka-05.c7",  0x300003, 0x40000, CRC(4c975f52) SHA1(3c6b287c77a049e3f8822ed9d545733e8ea3357b) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "ka-10.n25",  0x00000,  0x10000,  CRC(ec56f560) SHA1(feb9491683ba7f1000edebb568d6b3471fcc87fb) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ka-08.a15",  0x00000,  0x10000,  CRC(8fe4e5f5) SHA1(922b94f8ce0c35e965259c11e95891ef4be913d4) ) /* Encrypted tiles */
+	ROM_LOAD16_BYTE( "ka-09.a17",  0x00001,  0x10000,  CRC(e9dcac3f) SHA1(0621e601ffae73bbf69623042c9c8ab0526c3de6) )
+
+	ROM_REGION( 0x120000, "gfx2", 0 )
+	ROM_LOAD( "mar-00.bin",  0x00000,  0x80000,  CRC(d0491a37) SHA1(cc0ae1e9e5f42ba30159fb79bccd2e237cd037d0) ) /* Encrypted tiles */
+	ROM_LOAD( "mar-01.bin",  0x90000,  0x80000,  CRC(d5970365) SHA1(729baf1efbef15c9f3e1d700717f5ba4f10d3014) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_LOAD( "mar-02.bin",  0x000000, 0x40000,  CRC(c6cd4baf) SHA1(350286829a330b64f463d0a9cbbfdb71eecf5188) ) /* Encrypted tiles 0/4 */
+	ROM_CONTINUE(            0x100000, 0x40000 ) /* 2 bpp per 0x40000 chunk, 1/4 */
+	ROM_CONTINUE(            0x200000, 0x40000 ) /* 2/4 */
+	ROM_CONTINUE(            0x300000, 0x40000 ) /* 3/4 */
+	ROM_LOAD( "mar-03.bin",  0x040000, 0x40000,  CRC(793006d7) SHA1(7d8aba2fe75917f580a3a931a7defe5939a0874e) ) /* Encrypted tiles 0/4 */
+	ROM_CONTINUE(            0x140000, 0x40000 ) /* 2 bpp per 0x40000 chunk, 1/4 */
+	ROM_CONTINUE(            0x240000, 0x40000 ) /* 2/4 */
+	ROM_CONTINUE(            0x340000, 0x40000 ) /* 3/4 */
+	ROM_LOAD( "mar-04.bin",  0x080000, 0x40000,  CRC(56631a2b) SHA1(0fa3d6215df8ce923c153b96f39161ba88b2dd53) ) /* Encrypted tiles 0/4 */
+	ROM_CONTINUE(            0x180000, 0x40000 ) /* 2 bpp per 0x40000 chunk, 1/4 */
+	ROM_CONTINUE(            0x280000, 0x40000 ) /* 2/4 */
+	ROM_CONTINUE(            0x380000, 0x40000 ) /* 3/4 */
+	ROM_LOAD( "mar-05.bin",  0x0c0000, 0x40000,  CRC(ac16e7ae) SHA1(dca32e0a677a99f47a7b8e8f105483c57382f218) ) /* Encrypted tiles 0/4 */
+	ROM_CONTINUE(            0x1c0000, 0x40000 ) /* 2 bpp per 0x40000 chunk, 1/4 */
+	ROM_CONTINUE(            0x2c0000, 0x40000 ) /* 2/4 */
+	ROM_CONTINUE(            0x3c0000, 0x40000 ) /* 3/4 */
+
+	ROM_REGION( 0x800000, "gfx4", 0 )
+	ROM_LOAD32_BYTE( "mar-09.bin", 0x000000, 0x100000,  CRC(18fec9e1) SHA1(1290a9c13b4fd7d2197b39ec616206796e3a17a8) )
+	ROM_LOAD32_BYTE( "mar-10.bin", 0x400000, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
+	ROM_LOAD32_BYTE( "mar-11.bin", 0x000001, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
+	ROM_LOAD32_BYTE( "mar-12.bin", 0x400001, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
+	ROM_LOAD32_BYTE( "mar-13.bin", 0x000002, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
+	ROM_LOAD32_BYTE( "mar-14.bin", 0x400002, 0x100000,  CRC(22d38c71) SHA1(62273665975f3e6000fa4b01755aeb70e5dd002d) )
+	ROM_LOAD32_BYTE( "mar-15.bin", 0x000003, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
+	ROM_LOAD32_BYTE( "mar-16.bin", 0x400003, 0x100000,  CRC(8b329bc8) SHA1(6e34eb6e2628a01a699d20a5155afb2febc31255) )
+
+	ROM_REGION( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
+	ROM_LOAD32_BYTE( "mar-17.bin",  0x000000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
+	ROM_LOAD32_BYTE( "mar-20.bin",  0x000001,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
+	ROM_LOAD32_BYTE( "mar-28.bin",  0x000002,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
+	ROM_LOAD32_BYTE( "mar-25.bin",  0x000003,  0x100000,  CRC(d65d895c) SHA1(4508dfff95a7aff5109dc74622cbb4503b0b5840) ) // 49 I / 53 S
+	ROM_LOAD32_BYTE( "mar-18.bin",  0x400000,  0x100000,  CRC(ded66da9) SHA1(5134cb47043cc190a35ebdbf1912166669f9c055) )
+	ROM_LOAD32_BYTE( "mar-21.bin",  0x400001,  0x100000,  CRC(2d0a28ae) SHA1(d87f6f71bb76880e4d4f1eab8e0451b5c3df69a5) )
+	ROM_LOAD32_BYTE( "mar-27.bin",  0x400002,  0x100000,  CRC(3fcbd10f) SHA1(70fc7b88bbe35bbae1de14364b03d0a06d541de5) )
+	ROM_LOAD32_BYTE( "mar-24.bin",  0x400003,  0x100000,  CRC(5cec45c8) SHA1(f99a26afaca9d9320477e469b09e3873bc8c156f) )
+	ROM_LOAD32_BYTE( "mar-19.bin",  0x800000,  0x100000,  CRC(bdd1ed20) SHA1(2435b23210b8fee4d39c30d4d3c6ea40afaa3b93) ) // 56 V / 41 A
+	ROM_LOAD32_BYTE( "mar-22.bin",  0x800001,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
+	ROM_LOAD32_BYTE( "mar-26.bin",  0x800002,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
+	ROM_LOAD32_BYTE( "mar-23.bin",  0x800003,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
+
+	ROM_REGION(0x80000, "oki1", 0 )
+	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
+
+	ROM_REGION(0x80000, "oki2", 0 )
+	ROM_LOAD( "mar-08.n21", 0x000000, 0x80000,  CRC(b9281dfd) SHA1(449faf5d36f3b970d0a9b483e2152a5f68604a77) )
+
+	ROM_REGION(0x80000, "oki3", 0 )
+	ROM_LOAD( "mar-07.n19", 0x000000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
+ROM_END
+
 ROM_START( fghthist )
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_WORD( "kx00-unknown.bin", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) )
@@ -3233,9 +3307,8 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 }
 
 extern void process_dvi_data(UINT8* dvi_data, int offset, int regionsize);
-DRIVER_INIT_MEMBER(dragngun_state,dragngun)
+void dragngun_state::init_dragngun_common()
 {
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 	const UINT8 *SRC_RAM = memregion("gfx1")->base();
 	UINT8 *DST_RAM = memregion("gfx2")->base();
 
@@ -3245,8 +3318,6 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 
 	memcpy(DST_RAM+0x80000,SRC_RAM,0x10000);
 	memcpy(DST_RAM+0x110000,SRC_RAM+0x10000,0x10000);
-
-	ROM[0x1b32c/4]=0xe1a00000;//  NOP test switch lock
 
 #if 0
 	{
@@ -3270,8 +3341,24 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 	process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
 	process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
 	process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
-
 }
+
+DRIVER_INIT_MEMBER(dragngun_state,dragngun)
+{
+	init_dragngun_common();
+	
+	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
+}
+
+DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
+{
+	init_dragngun_common();
+	
+	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
+}
+
 
 DRIVER_INIT_MEMBER(deco32_state,fghthist)
 {
@@ -3345,7 +3432,6 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 
 	/* The board for Night Slashers is very close to the Fighter's History and
 	Tattoo Assassins boards, but has an encrypted ARM cpu. */
-
 }
 
 /**********************************************************************************/
@@ -3357,7 +3443,8 @@ GAME( 1991, captavenu,  captaven, captaven, captaven, deco32_state, captaven, RO
 GAME( 1991, captavenuu, captaven, captaven, captaven, deco32_state, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)", 0 )
 GAME( 1991, captavenua, captaven, captaven, captaven, deco32_state, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)", 0 )
 GAME( 1991, captavenj,  captaven, captaven, captaven, deco32_state, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", 0 )
-GAME( 1993, dragngun,   0,        dragngun, dragngun, dragngun_state, dragngun, ROT0, "Data East Corporation", "Dragon Gun (US)", GAME_IMPERFECT_GRAPHICS  )
+GAME( 1993, dragngun,   0,        dragngun, dragngun, dragngun_state, dragngun, ROT0, "Data East Corporation", "Dragon Gun (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dragngunj,  dragngun, dragngun, dragngun, dragngun_state, dragngunj, ROT0, "Data East Corporation", "Dragon Gun (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, fghthist,   0,        fghthist, fghthist, deco32_state, fghthist, ROT0, "Data East Corporation", "Fighter's History (World ver 43-07)", GAME_UNEMULATED_PROTECTION )
 GAME( 1993, fghthistu,  fghthist, fghthist, fghthist, deco32_state, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-03)", GAME_UNEMULATED_PROTECTION )
 GAME( 1993, fghthista,  fghthist, fghthsta, fghthist, deco32_state, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, alternate hardware)", GAME_UNEMULATED_PROTECTION )
