@@ -7361,7 +7361,7 @@ GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, driver_device, 0,        ROT
 
 /* arcadia was a name conflict to the Emerson Arcadia 2001 in mess */
 GAME( 1994, arcadian, 0,        raphero,  raphero, driver_device,  0,        ROT270, "NMK",                          "Arcadia", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
-GAME( 1994, raphero,  arcadian, raphero,  raphero, driver_device,  0,        ROT270, "Media Trading Corporation",    "Rapid Hero", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,  arcadian, raphero,  raphero, driver_device,  0,        ROT270, "NMK (Media Trading license)",    "Rapid Hero", GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
