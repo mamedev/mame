@@ -8491,6 +8491,7 @@ src/regtests/chdman/input/copy_cd_cue_audio_silence_wav_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_cue_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_nrg_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_toc_empty_v4/in.chd -text
+src/regtests/chdman/input/copy_hd_1/in.chd -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/silence.wav -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/in.cue svneol=native#text/plain
@@ -8527,6 +8528,7 @@ src/regtests/chdman/output/copy_cd_cue_audio_silence_wav_v4/out.chd -text
 src/regtests/chdman/output/copy_cd_cue_empty_v4/out.chd -text
 src/regtests/chdman/output/copy_cd_nrg_empty_v4/out.chd -text
 src/regtests/chdman/output/copy_cd_toc_empty_v4/out.chd -text
+src/regtests/chdman/output/copy_hd_1/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks_cdfl/out.chd -text
