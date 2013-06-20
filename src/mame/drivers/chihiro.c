@@ -2692,12 +2692,16 @@ ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const 
 
 void ide_baseboard_device::device_reset()
 {
-	ata_mass_storage_device::device_reset();
+	if (!m_can_identify_device)
+	{
+		m_num_cylinders=65535;
+		m_num_sectors=255;
+		m_num_heads=255;
+		ide_build_identify_device();
+		m_can_identify_device = 1;
+	}
 
-	m_num_cylinders=65535;
-	m_num_sectors=255;
-	m_num_heads=255;
-	ide_build_identify_device();
+	ata_mass_storage_device::device_reset();
 }
 
 int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)

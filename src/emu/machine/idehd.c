@@ -1376,8 +1376,6 @@ ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, 
 
 void ide_hdd_device::device_reset()
 {
-	ata_mass_storage_device::device_reset();
-
 	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
@@ -1400,6 +1398,8 @@ void ide_hdd_device::device_reset()
 
 		m_can_identify_device = 1;
 	}
+
+	ata_mass_storage_device::device_reset();
 }
 
 //-------------------------------------------------
