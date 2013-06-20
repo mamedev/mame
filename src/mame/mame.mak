@@ -2648,7 +2648,3 @@ $(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
 $(DRIVERS)/namcos2.o: $(MAMESRC)/includes/namcos2.h
 $(MACHINE)/namcos2.o: $(MAMESRC)/includes/namcos2.h
 $(VIDEO)/namcos2.o: $(MAMESRC)/includes/namcos2.h
-
-$(DRIVLISTSRC): $(MAMESRC)/arcade.lst
-$(DRIVLISTSRC): $(MAMESRC)/pinball.lst 
-$(DRIVLISTSRC): $(MAMESRC)/fruit.lst
