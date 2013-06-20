@@ -46,7 +46,6 @@ sprite RAM
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/taitoair.h"
 
 
@@ -89,12 +88,12 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (offs <  0x01b0 && priority == 0)    continue;
 		if (offs >= 0x01b0 && priority == 1)    continue;
 
-		x0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		zoomy     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x007f);
-		tile_offs = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(tc0080vco_sprram_r(m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
+		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
+		zoomy     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x007f);
+		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -130,7 +129,7 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (tc0080vco_flipscreen_r(m_tc0080vco))
+			if (m_tc0080vco->flipscreen_r())
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -153,12 +152,12 @@ void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = tc0080vco_cram_0_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
-						color = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
-						flipx = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
-						flipy = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
+						tile  = m_tc0080vco->cram_0_r(space, tile_offs, 0xffff) & 0x7fff;
+						color = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x001f;
+						flipx = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0040;
+						flipy = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0080;
 
-						if (tc0080vco_flipscreen_r(m_tc0080vco))
+						if (m_tc0080vco->flipscreen_r())
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
@@ -559,7 +558,7 @@ void taitoair_state::video_start()
 
 UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tc0080vco_tilemap_update(m_tc0080vco);
+	m_tc0080vco->tilemap_update();
 
 	bitmap.fill(0, cliprect);
 
@@ -592,17 +591,17 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 		#endif
 	}
 
-	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, 0, 0);
+	m_tc0080vco->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 
 	draw_sprites(bitmap, cliprect, 0);
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
-	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(bitmap, cliprect, 1, 0, 0);
 
 	draw_sprites(bitmap, cliprect, 1);
 
-	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
+	m_tc0080vco->tilemap_draw(bitmap, cliprect, 2, 0, 0);
 
 	/* Hacky 3d bitmap */
 	//copybitmap_trans(bitmap, m_buffer3d, 0, 0, 0, 0, cliprect, 0);

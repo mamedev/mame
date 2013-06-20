@@ -55,7 +55,7 @@ void wgp_state::wgp_core_vh_start( int piv_xoffs, int piv_yoffs )
 	m_piv_tilemap[2]->set_scrolldy(-piv_yoffs, 0);
 
 	/* We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually */
-	tc0100scn_set_colbanks(m_tc0100scn, 0x80, 0xc0, 0x40);
+	m_tc0100scn->set_colbanks(0x80, 0xc0, 0x40);
 
 	save_item(NAME(m_piv_ctrl_reg));
 	save_item(NAME(m_rotate_ctrl));
@@ -670,7 +670,7 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 		m_piv_tilemap[i]->set_scrolly(0, m_piv_scrolly[i]);
 	}
 
-	tc0100scn_tilemap_update(m_tc0100scn);
+	m_tc0100scn->tilemap_update();
 
 	bitmap.fill(0, cliprect);
 
@@ -704,17 +704,17 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(bitmap, cliprect, 16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
-	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);
+	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[0], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[3] == 0)
 #endif
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[1], 0, 0);
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[2], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 0);
 
 #if 0
 	{

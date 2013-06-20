@@ -197,13 +197,12 @@ void groundfx_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	device_t *tc0100scn = machine().device("tc0100scn");
 	device_t *tc0480scp = machine().device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
 
-	tc0100scn_tilemap_update(tc0100scn);
+	m_tc0100scn->tilemap_update();
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
@@ -214,15 +213,15 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[0] = m_tc0100scn->bottomlayer();
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
 
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[1], 0, 0);
 
 	/*  BIG HACK!
 
@@ -240,14 +239,14 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 	    it's contents the usual way.
 
 	*/
-	if (tc0100scn_long_r(tc0100scn, space, 0x4090 / 4, 0xffffffff) ||
+	if (m_tc0100scn->long_r(space, 0x4090 / 4, 0xffffffff) ||
 			tc0480scp_long_r(tc0480scp, space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
-		//tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, 0, pivlayer[2], 0, 0);
+		//m_tc0100scn->tilemap_draw(bitmap, cliprect, 0, pivlayer[2], 0, 0);
 
 		if (tc0480scp_long_r(tc0480scp, space, 0x20 / 4, 0xffffffff) != 0x240866) /* Stupid hack for start of race */
 			tc0480scp_tilemap_draw(tc0480scp, bitmap, m_hack_cliprect, layer[0], 0, 0);
@@ -260,7 +259,7 @@ UINT32 groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind1
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 		tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
-		tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+		m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0);
 
 		draw_sprites(bitmap, cliprect, 0, 44, -574);
 	}

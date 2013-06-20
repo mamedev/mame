@@ -7,7 +7,7 @@
 void ninjaw_state::video_start()
 {
 	/* Ensure palette from correct TC0110PCR used for each screen */
-	tc0100scn_set_colbanks(m_tc0100scn_1, 0x0, 0x100, 0x200);
+	m_tc0100scn_1->set_colbanks(0x0, 0x100, 0x200);
 }
 
 /************************************************************
@@ -94,19 +94,19 @@ void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
+UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
-	tc0100scn_tilemap_update(tc0100scn);
+	tc0100scn->tilemap_update();
 
-	layer[0] = tc0100scn_bottomlayer(tc0100scn);
+	layer[0] = m_tc0100scn_1->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
 	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
 	// draw bottom layer
-	nodraw  = tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
+	nodraw  = tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);    /* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
@@ -116,12 +116,12 @@ UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, 
 	draw_sprites(bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 0);
+	tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 0);
 
 	draw_sprites(bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);
+	tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 0);
 	return 0;
 }
 

@@ -429,7 +429,6 @@ void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcb
 
 UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *tc0100scn = machine().device("tc0100scn");
 	device_t *tc0480scp = machine().device("tc0480scp");
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
@@ -439,7 +438,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 
 	rectangle clip(0, screen.width() -1, 0, screen.height() -1);
 
-	tc0100scn_tilemap_update(tc0100scn);
+	m_tc0100scn->tilemap_update();
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
@@ -449,7 +448,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[0] = m_tc0100scn->bottomlayer();
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
@@ -457,8 +456,8 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	priority_bitmap.fill(0, clip);
 	m_tmpbitmaps.fill(0, clip);
 
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], 0, 0);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[0], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[1], 0, 0);
 
 #if 0
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
@@ -503,7 +502,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	draw_sprites(machine(),bitmap,cliprect,primasks,0);
 
 	if (!machine().input().code_pressed(KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
-	if (!machine().input().code_pressed(KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+	if (!machine().input().code_pressed(KEYCODE_M)) m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0);
 
 
 
@@ -550,7 +549,7 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 	draw_sprites(bitmap,cliprect,primasks,0);
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0);
 #endif
 
 	return 0;

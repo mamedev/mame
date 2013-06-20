@@ -36,28 +36,28 @@ struct pc090oj_interface
 
 struct tc0080vco_interface
 {
-	int                gfxnum;
-	int                txnum;
+	int                m_gfxnum;
+	int                m_txnum;
 
-	int                bg_xoffs, bg_yoffs;
-	int                bg_flip_yoffs;
+	int                m_bg_xoffs, m_bg_yoffs;
+	int                m_bg_flip_yoffs;
 
-	int                has_fg0; /* for debug */
+	int                m_has_fg0; /* for debug */
 };
 
 struct tc0100scn_interface
 {
-	const char         *screen;
+	const char         *m_screen_tag;
 
-	int                gfxnum;
-	int                txnum;
+	int                m_gfxnum;
+	int                m_txnum;
 
-	int                x_offset, y_offset;
-	int                flip_xoffs, flip_yoffs;
-	int                flip_text_xoffs, flip_text_yoffs;
+	int                m_x_offset, m_y_offset;
+	int                m_flip_xoffs, m_flip_yoffs;
+	int                m_flip_text_xoffs, m_flip_text_yoffs;
 
-	int                multiscrn_xoffs;
-	int                multiscrn_hack;
+	int                m_multiscrn_xoffs;
+	int                m_multiscrn_hack;
 };
 
 
@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
 	DECLARE_WRITE16_MEMBER( yscroll_word_w );
 	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+	DECLARE_WRITE16_MEMBER( scrollram_w );
 	
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -192,51 +193,156 @@ private:
 
 extern const device_type PC090OJ;
 
-class tc0080vco_device : public device_t
+class tc0080vco_device : public device_t,
+											public tc0080vco_interface
 {
 public:
 	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0080vco_device() { global_free(m_token); }
+	~tc0080vco_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	void tc0080vco_postload();
-protected:
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+
+	void tilemap_update();
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+
+	DECLARE_READ16_MEMBER( cram_0_r );
+	DECLARE_READ16_MEMBER( cram_1_r );
+	DECLARE_READ16_MEMBER( sprram_r );
+	DECLARE_READ16_MEMBER( scrram_r );
+	DECLARE_WRITE16_MEMBER( scrollram_w );
+	READ_LINE_MEMBER( flipscreen_r );
+	void postload();
+
+	protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-private:
-	// internal state
-	void *m_token;
 
-	TILE_GET_INFO_MEMBER(tc0080vco_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(tc0080vco_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(tc0080vco_get_tx_tile_info);
+	private:
+	// internal state
+	UINT16 *       m_ram;
+	UINT16 *       m_bg0_ram_0;
+	UINT16 *       m_bg0_ram_1;
+	UINT16 *       m_bg1_ram_0;
+	UINT16 *       m_bg1_ram_1;
+	UINT16 *       m_tx_ram_0;
+	UINT16 *       m_tx_ram_1;
+	UINT16 *       m_char_ram;
+	UINT16 *       m_bgscroll_ram;
+
+/* FIXME: This sprite related stuff still needs to be accessed in
+   video/taito_h */
+	UINT16 *       m_chain_ram_0;
+	UINT16 *       m_chain_ram_1;
+	UINT16 *       m_spriteram;
+	UINT16 *       m_scroll_ram;
+
+	UINT16         m_bg0_scrollx;
+	UINT16         m_bg0_scrolly;
+	UINT16         m_bg1_scrollx;
+	UINT16         m_bg1_scrolly;
+
+	tilemap_t        *m_tilemap[3];
+
+	INT32          m_flipscreen;
+	
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void bg0_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
+	void bg1_tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority );
 };
 
 extern const device_type TC0080VCO;
 
-class tc0100scn_device : public device_t
+class tc0100scn_device : public device_t,
+											public tc0100scn_interface
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0100scn_device() { global_free(m_token); }
+	~tc0100scn_device() {}
+	
+	#define TC0100SCN_SINGLE_VDU    1024
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	void tc0100scn_postload();
+	/* Function to set separate color banks for the three tilemapped layers.
+	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
+	void set_colbanks(int bg0, int bg1, int tx);
+
+	/* Function to set separate color banks for each TC0100SCN.
+	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
+	void set_colbank(int colbank);
+
+	/* Function to set bg tilemask < 0xffff */
+	void set_bg_tilemask(int mask);
+
+	/* Function to for Mjnquest to select gfx bank */
+	DECLARE_WRITE16_MEMBER(gfxbank_w);
+
+	DECLARE_READ16_MEMBER(word_r);
+	DECLARE_WRITE16_MEMBER(word_w);
+	DECLARE_READ16_MEMBER(ctrl_word_r);
+	DECLARE_WRITE16_MEMBER(ctrl_word_w);
+
+	/* Functions for use with 68020 (Under Fire) */
+	DECLARE_READ32_MEMBER(long_r);
+	DECLARE_WRITE32_MEMBER(long_w);
+	DECLARE_READ32_MEMBER(ctrl_long_r);
+	DECLARE_WRITE32_MEMBER(ctrl_long_w);
+
+	void tilemap_update();
+	int tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+
+	/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
+	register. Use this function to draw tilemaps in the correct order. */
+	int bottomlayer();
+	
+	void postload();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	UINT16       m_ctrl[8];
 
-	TILE_GET_INFO_MEMBER(tc0100scn_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(tc0100scn_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(tc0100scn_get_tx_tile_info);
+	UINT16 *     m_ram;
+	UINT16 *     m_bg_ram;
+	UINT16 *     m_fg_ram;
+	UINT16 *     m_tx_ram;
+	UINT16 *     m_char_ram;
+	UINT16 *     m_bgscroll_ram;
+	UINT16 *     m_fgscroll_ram;
+	UINT16 *     m_colscroll_ram;
+
+	int          m_bgscrollx, m_bgscrolly, m_fgscrollx, m_fgscrolly;
+
+	/* We keep two tilemaps for each of the 3 actual tilemaps: one at standard width, one double */
+	tilemap_t      *m_tilemap[3][2];
+	rectangle    m_cliprect;
+
+	int          m_bg_col_mult, m_bg_tilemask, m_tx_col_mult;
+	INT32        m_gfxbank, m_colbank;
+	INT32        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
+	int          m_dblwidth;
+
+	screen_device *m_screen;
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	
+	void common_get_bg0_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
+	void common_get_bg1_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
+	void common_get_tx_tile_info(tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum, int colbank, int dblwidth);
+	
+	void tilemap_draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t* tmap, int flags, UINT32 priority);
+	void set_layer_ptrs();
+	void dirty_tilemaps();
+	void restore_scroll();
 };
 
 extern const device_type TC0100SCN;
@@ -427,55 +533,6 @@ extern const device_type TC0180VCU;
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
-
-/** TC0080VCO **/
-DECLARE_READ16_DEVICE_HANDLER( tc0080vco_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0080vco_word_w );
-
-void tc0080vco_tilemap_update(device_t *device);
-void tc0080vco_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
-
-DECLARE_READ16_DEVICE_HANDLER( tc0080vco_cram_0_r );
-DECLARE_READ16_DEVICE_HANDLER( tc0080vco_cram_1_r );
-DECLARE_READ16_DEVICE_HANDLER( tc0080vco_sprram_r );
-DECLARE_READ16_DEVICE_HANDLER( tc0080vco_scrram_r );
-READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r );
-
-
-/** TC0100SCN **/
-#define TC0100SCN_SINGLE_VDU    1024
-
-/* Function to set separate color banks for the three tilemapped layers.
-   To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
-void tc0100scn_set_colbanks(device_t *device, int bg0, int bg1, int tx);
-
-/* Function to set separate color banks for each TC0100SCN.
-   To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
-void tc0100scn_set_colbank(device_t *device, int colbank);
-
-/* Function to set bg tilemask < 0xffff */
-void tc0100scn_set_bg_tilemask(device_t *device, int mask);
-
-/* Function to for Mjnquest to select gfx bank */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0100scn_gfxbank_w );
-
-DECLARE_READ16_DEVICE_HANDLER( tc0100scn_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0100scn_word_w );
-DECLARE_READ16_DEVICE_HANDLER( tc0100scn_ctrl_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0100scn_ctrl_word_w );
-
-/* Functions for use with 68020 (Under Fire) */
-DECLARE_READ32_DEVICE_HANDLER( tc0100scn_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( tc0100scn_long_w );
-DECLARE_READ32_DEVICE_HANDLER( tc0100scn_ctrl_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( tc0100scn_ctrl_long_w );
-
-void tc0100scn_tilemap_update(device_t *device);
-int tc0100scn_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
-
-/* returns 0 or 1 depending on the lowest priority tilemap set in the internal
-   register. Use this function to draw tilemaps in the correct order. */
-int tc0100scn_bottomlayer(device_t *device);
 
 
 /** TC0280GRD & TC0430GRW **/

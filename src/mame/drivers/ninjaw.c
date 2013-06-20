@@ -406,9 +406,9 @@ WRITE8_MEMBER(ninjaw_state::ninjaw_pancontrol)
 
 WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
-	tc0100scn_word_w(m_tc0100scn_1, space, offset, data, mem_mask);
-	tc0100scn_word_w(m_tc0100scn_2, space, offset, data, mem_mask);
-	tc0100scn_word_w(m_tc0100scn_3, space, offset, data, mem_mask);
+	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
+	m_tc0100scn_2->word_w(space, offset, data, mem_mask);
+	m_tc0100scn_3->word_w(space, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -424,12 +424,12 @@ static ADDRESS_MAP_START( ninjaw_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)      /* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE_LEGACY("tc0100scn_3", tc0100scn_word_r, tc0100scn_word_w)      /* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE_LEGACY("tc0100scn_3", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, ctrl_word_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, word_r, word_w)      /* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, ctrl_word_r, ctrl_word_w)
+	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, word_r, word_w)      /* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (2nd screen) */
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE_LEGACY("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (3rd screen) */
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( ninjaw_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (2nd screen) */
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE_LEGACY("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (3rd screen) */
@@ -460,12 +460,12 @@ static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
-	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)      /* tilemaps (2nd screen) */
-	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE_LEGACY("tc0100scn_3", tc0100scn_word_r, tc0100scn_word_w)      /* tilemaps (3rd screen) */
-	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE_LEGACY("tc0100scn_3", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, ctrl_word_w)
+	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, word_r, word_w)      /* tilemaps (2nd screen) */
+	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, ctrl_word_r, ctrl_word_w)
+	AM_RANGE(0x300000, 0x313fff) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, word_r, word_w)      /* tilemaps (3rd screen) */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn_3", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (2nd screen) */
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE_LEGACY("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)        /* palette (3rd screen) */
@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( darius2_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD("tc0100scn_1", tc0100scn_device, word_r) AM_WRITE(tc0100scn_triple_screen_w) /* tilemaps (1st screen/all screens) */
 ADDRESS_MAP_END
 
 

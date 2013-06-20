@@ -184,8 +184,8 @@ static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)                               /* TC0110PCR */
 	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)                              /* TC0610 */
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(galastrm_tc0610_1_w)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)        /* piv tilemaps */
-	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, long_r, long_w)        /* piv tilemaps */
+	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_long_r, ctrl_long_w)
 ADDRESS_MAP_END
 
 /***********************************************************

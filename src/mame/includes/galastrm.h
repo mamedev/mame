@@ -1,3 +1,4 @@
+#include "video/taitoic.h"
 #include "video/poly.h"
 #include "machine/eeprom.h"
 
@@ -24,11 +25,15 @@ public:
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_tc0100scn(*this, "tc0100scn") { }
 
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
+	required_device<tc0100scn_device> m_tc0100scn;
 	UINT16 m_coin_word;
 	UINT16 m_frame_counter;
 	int m_tc0110pcr_addr;
@@ -61,8 +66,6 @@ public:
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
-	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -346,7 +346,6 @@ void undrfire_state::draw_sprites_cbombers(bitmap_ind16 &bitmap,const rectangle 
 
 UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *tc0100scn = machine().device("tc0100scn");
 	device_t *tc0480scp = machine().device("tc0480scp");
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
@@ -390,7 +389,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	tc0100scn_tilemap_update(tc0100scn);
+	m_tc0100scn->tilemap_update();
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
@@ -401,7 +400,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[0] = m_tc0100scn->bottomlayer();
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
@@ -415,8 +414,8 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -458,7 +457,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 
@@ -489,7 +488,6 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 
 UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *tc0100scn = machine().device("tc0100scn");
 	device_t *tc0480scp = machine().device("tc0480scp");
 	address_space &space = machine().driver_data()->generic_space();
 	UINT8 layer[5];
@@ -533,7 +531,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	tc0100scn_tilemap_update(tc0100scn);
+	m_tc0100scn->tilemap_update();
 	tc0480scp_tilemap_update(tc0480scp);
 
 	priority = tc0480scp_get_bg_priority(tc0480scp);
@@ -544,7 +542,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	pivlayer[0] = tc0100scn_bottomlayer(tc0100scn);
+	pivlayer[0] = m_tc0100scn->bottomlayer();
 	pivlayer[1] = pivlayer[0] ^ 1;
 	pivlayer[2] = 2;
 
@@ -558,8 +556,8 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[1], 0, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[0], TILEMAP_DRAW_OPAQUE, 0);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[1], 0, 0);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]]==0)
@@ -601,7 +599,7 @@ UINT32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[5]==0)
 #endif
-	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, pivlayer[2], 0, 0); /* piv text layer */
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
 

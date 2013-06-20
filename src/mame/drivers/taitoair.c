@@ -221,7 +221,6 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 #include "includes/taitoipt.h"
 #include "includes/taitoair.h"
 #include "audio/taitosnd.h"
-#include "video/taitoic.h"
 #include "cpu/tms32025/tms32025.h"
 #include "sound/2610intf.h"
 
@@ -392,7 +391,7 @@ static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w) /* Pause the TMS32025 */
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_SHARE("gradram")                 /* "gradiation ram (0/1)" */
 	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_SHARE("paletteram")
-	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)    /* tilemaps, sprites */
+	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)    /* tilemaps, sprites */
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_SHARE("line_ram")    /* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM AM_SHARE("dsp_ram") /* "dsp common ram" (TMS320C25) */

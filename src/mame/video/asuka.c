@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/asuka.h"
 
 /**************************************************************
@@ -21,9 +20,9 @@ UINT32 asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &bit
 {
 	UINT8 layer[3];
 
-	tc0100scn_tilemap_update(m_tc0100scn);
+	m_tc0100scn->tilemap_update();
 
-	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);
+	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -32,9 +31,9 @@ UINT32 asuka_state::screen_update_asuka(screen_device &screen, bitmap_ind16 &bit
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
 
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites may be over or under top bg layer */
 	m_pc090oj->draw_sprites(bitmap, cliprect, 2);
@@ -46,9 +45,9 @@ UINT32 asuka_state::screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &
 {
 	UINT8 layer[3];
 
-	tc0100scn_tilemap_update(m_tc0100scn);
+	m_tc0100scn->tilemap_update();
 
-	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);
+	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -57,9 +56,9 @@ UINT32 asuka_state::screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap.fill(0, cliprect);
 
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_tc0100scn->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites are always over both bg layers */
 	m_pc090oj->draw_sprites(bitmap, cliprect, 0);

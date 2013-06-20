@@ -636,8 +636,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)            /* tilemaps */
-	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
+	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)            /* tilemaps */
+	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_SHARE("spritemap")   /* sprite tilemaps */
 	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITENOP    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
