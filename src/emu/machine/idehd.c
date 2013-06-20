@@ -1306,6 +1306,10 @@ WRITE16_MEMBER( ata_mass_storage_device::write_cs0 )
 					}
 				}
 				break;
+
+			default:
+				logerror("%s:unknown IDE cs0 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
+				break;
 		}
 	}
 }
@@ -1342,6 +1346,10 @@ WRITE16_MEMBER( ata_mass_storage_device::write_cs1 )
 						m_reset_timer->adjust(attotime::from_msec(5));
 					}
 				}
+				break;
+
+			default:
+				logerror("%s:unknown IDE cs1 write at %03X = %04x, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask);
 				break;
 		}
 	}
