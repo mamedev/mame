@@ -1381,7 +1381,7 @@ void ide_hdd_device::device_reset()
 	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
 
-	if (m_disk != NULL)
+	if (m_disk != NULL && !m_can_identify_device)
 	{
 		const hard_disk_info *hdinfo = hard_disk_get_info(m_disk);
 		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
