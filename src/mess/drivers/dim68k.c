@@ -35,6 +35,8 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
+#include "machine/keyboard.h"
+#include "machine/upd765.h"
 
 
 class dim68k_state : public driver_device
@@ -42,15 +44,11 @@ class dim68k_state : public driver_device
 public:
 	dim68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_crtc(*this, "crtc"),
-			m_speaker(*this, "speaker")
-	,
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_speaker(*this, "speaker"),
 		m_ram(*this, "ram"){ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
 	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
@@ -64,12 +62,17 @@ public:
 	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
 	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	required_shared_ptr<UINT16> m_ram;
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	const UINT8 *m_p_chargen;
 	bool m_speaker_bit;
 	UINT8 m_video_control;
+	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void video_start();
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<speaker_sound_device> m_speaker;
+	required_shared_ptr<UINT16> m_ram;
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -78,6 +81,9 @@ READ16_MEMBER( dim68k_state::dim68k_duart_r )
 // Device = SCN2681, not emulated. The keyboard is standard ASCII, so we can use the terminal
 // keyboard for now.
 {
+	if (offset==3)
+		return m_term_data;
+	else
 	return 0;
 }
 
@@ -187,7 +193,8 @@ static ADDRESS_MAP_START(dim68k_mem, AS_PROGRAM, 16, dim68k_state)
 	AM_RANGE(0x00ffc400, 0x00ffc41f) AM_READWRITE(dim68k_duart_r,dim68k_duart_w) // Signetics SCN2681AC1N40 Dual UART
 	AM_RANGE(0x00ffc800, 0x00ffc801) AM_READWRITE(dim68k_speaker_r,dim68k_speaker_w)
 	AM_RANGE(0x00ffcc00, 0x00ffcc1f) AM_READWRITE(dim68k_game_switches_r,dim68k_reset_timers_w)
-	AM_RANGE(0x00ffd000, 0x00ffd005) AM_READWRITE(dim68k_fdc_r,dim68k_fdc_w) // NEC uPD765A
+	AM_RANGE(0x00ffd000, 0x00ffd003) AM_DEVICE8("fdc",upd765a_device,map,0x00ff) // NEC uPD765A
+	AM_RANGE(0x00ffd004, 0x00ffd005) AM_READWRITE(dim68k_fdc_r,dim68k_fdc_w)
 	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
 	AM_RANGE(0x00ffd800, 0x00ffd801) AM_WRITE(dim68k_printer_strobe_w)
 	AM_RANGE(0x00ffdc00, 0x00ffdc01) AM_WRITE(dim68k_banksw_w)
@@ -298,6 +305,20 @@ static MC6845_INTERFACE( dim68k_crtc )
 	NULL
 };
 
+static SLOT_INTERFACE_START( dim68k_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
+WRITE8_MEMBER( dim68k_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static ASCII_KEYBOARD_INTERFACE( kb_intf )
+{
+	DEVCB_DRIVER_MEMBER(dim68k_state, kbd_put)
+};
+
 static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -320,7 +341,11 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
+	MCFG_UPD765A_ADD("fdc", true, true) // these options unknown
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, 1790000, dim68k_crtc)
+	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
 MACHINE_CONFIG_END
 
 /*
