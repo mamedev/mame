@@ -5,6 +5,7 @@
 *************************************************************************/
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
+#include "machine/k053252.h"
 
 class moo_state : public driver_device
 {
@@ -19,6 +20,7 @@ public:
 		m_k054539(*this, "k054539"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338") { }
 
@@ -45,6 +47,7 @@ public:
 	optional_device<k054539_device> m_k054539;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	optional_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
 	required_device<k054338_device> m_k054338;
 

@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 
 class dbz_state : public driver_device
 {
@@ -16,6 +17,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k053936_1(*this, "k053936_1"),
 		m_k053936_2(*this, "k053936_2") { }
@@ -40,6 +42,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
 	required_device<k053936_device> m_k053936_1;
 	required_device<k053936_device> m_k053936_2;

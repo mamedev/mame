@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
 #include "video/k053250.h"
-#include "machine/k053252.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
@@ -163,7 +162,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP            /* unknown (always 0x30) */
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)          /* 053252? (LSB) */
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)          /* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITENOP //watchdog reset?
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0xff00)

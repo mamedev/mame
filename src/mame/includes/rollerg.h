@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/k053260.h"
+#include "machine/k053252.h"
 
 class rollerg_state : public driver_device
 {
@@ -19,7 +20,9 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k053260(*this, "k053260"),
 		m_k053244(*this, "k053244"),
-		m_k051316(*this, "k051316") { }
+		m_k051316(*this, "k051316"),
+		m_k053252(*this, "k053252")
+		{ }
 
 	/* memory pointers */
 //  UINT8 *    m_paletteram;    // currently this uses generic palette handling
@@ -37,6 +40,7 @@ public:
 	required_device<k053260_device> m_k053260;
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;
+	required_device<k053252_device> m_k053252;
 	DECLARE_WRITE8_MEMBER(rollerg_0010_w);
 	DECLARE_READ8_MEMBER(rollerg_k051316_r);
 	DECLARE_WRITE8_MEMBER(soundirq_w);

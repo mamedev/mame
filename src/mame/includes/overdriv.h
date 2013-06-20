@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/k053260.h"
+#include "machine/k053252.h"
 
 class overdriv_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		m_k051316_1(*this, "k051316_1"),
 		m_k051316_2(*this, "k051316_2"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"){ }
 
 	/* memory pointers */
 //  UINT16 *   m_paletteram;    // currently this uses generic palette handling
@@ -41,6 +43,7 @@ public:
 	required_device<k051316_device> m_k051316_2;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
 	DECLARE_READ16_MEMBER(cpuB_ctrl_r);

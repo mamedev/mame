@@ -26,7 +26,6 @@ GP1 HDD data contents:
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
-#include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "includes/qdrmfgp.h"
 
@@ -280,7 +279,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)                                      /* video reg */
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0x00ff)                    /* ccu */
+	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service sw */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")                                         /* inputport */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP                                                    /* unknown */
@@ -303,7 +302,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)                                      /* video reg */
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0xff00)                    /* ccu */
+	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")                                         /* inputport */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP                                                    /* unknown */

@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/k053260.h"
+#include "machine/k053252.h"
 
 class vendetta_state : public driver_device
 {
@@ -21,6 +22,7 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
 		m_k054000(*this, "k054000") { }
 
 	/* memory pointers */
@@ -43,6 +45,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
+	optional_device<k053252_device> m_k053252;
 	optional_device<k054000_device> m_k054000;
 	DECLARE_WRITE8_MEMBER(vendetta_eeprom_w);
 	DECLARE_READ8_MEMBER(vendetta_K052109_r);

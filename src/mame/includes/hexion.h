@@ -1,10 +1,16 @@
+#include "machine/k053252.h"
+
 class hexion_state : public driver_device
 {
 public:
 	hexion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
-
+		m_maincpu(*this, "maincpu"),
+		m_k053252(*this, "k053252")
+		{ }
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<k053252_device> m_k053252;
 	UINT8 *m_vram[2];
 	UINT8 *m_unkram;
 	int m_bankctrl;
@@ -26,5 +32,4 @@ public:
 	UINT32 screen_update_hexion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(hexion_scanline);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram);
-	required_device<cpu_device> m_maincpu;
 };
