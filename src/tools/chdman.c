@@ -2888,14 +2888,9 @@ int CLIB_DECL main(int argc, char *argv[])
 			{
 				return err.error();
 			}
-			catch (std::bad_alloc &)
+			catch (std::exception& ex)
 			{
-				fprintf(stderr, "Out of memory\n");
-				return 1;
-			}
-			catch (...)
-			{
-				fprintf(stderr, "Unhandled exception\n");
+				fprintf(stderr, "Unhandled exception: %s\n", ex.what());
 				return 1;
 			}
 		}

@@ -2422,13 +2422,13 @@ void chd_file_compressor::compress_begin()
 
 chd_error chd_file_compressor::compress_continue(double &progress, double &ratio)
 {
+	// if we got an error, return an error
+	if (m_read_error)
+		return CHDERR_READ_ERROR;
+
 	// if done reading, queue some more
 	while (m_read_queue_offset < m_logicalbytes && osd_work_queue_items(m_read_queue) < 2)
 	{
-		// if we got an error, return an error
-		if (m_read_error)
-			return CHDERR_READ_ERROR;
-
 		// see if we have enough free work items to read the next half of a buffer
 		UINT32 startitem = m_read_queue_offset / hunk_bytes();
 		UINT32 enditem = startitem + WORK_BUFFER_HUNKS / 2;
@@ -2690,8 +2690,9 @@ void chd_file_compressor::async_read()
 		// advance the read pointer
 		m_read_done_offset += numbytes;
 	}
-	catch (...)
+	catch (std::exception& ex)
 	{
+		fprintf(stderr, "exception occured: %s\n", ex.what());
 		m_read_error = true;
 	}
 }
