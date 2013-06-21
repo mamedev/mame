@@ -9732,7 +9732,7 @@ DRIVER_INIT_MEMBER(neogeo_state,kf2k3pcb)
 	DRIVER_INIT_CALL(neogeo);
 	kf2k3pcb_decrypt_68k();
 	kf2k3pcb_gfx_decrypt();
-	kof2003biosdecode();
+	kf2k3pcb_sp1_decrypt();
 	neogeo_cmc50_m1_decrypt();
 
 	/* extra little swap on the m1 - this must be performed AFTER the m1 decrypt

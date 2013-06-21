@@ -450,7 +450,7 @@ protected:
 	void kof2003h_decrypt_68k();
 	void neo_pcm2_snk_1999(int value);
 	void neo_pcm2_swap(int value);
-	void kof2003biosdecode();
+	void kf2k3pcb_sp1_decrypt();
 };
 
 
