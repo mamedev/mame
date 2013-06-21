@@ -1309,7 +1309,7 @@ const gfx_layout namco_c45_road_device::s_tile_layout =
 //-------------------------------------------------
 
 namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock),
+	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
 		m_transparent_color(~0),
 		m_gfx(NULL),
 		m_tilemap(NULL)

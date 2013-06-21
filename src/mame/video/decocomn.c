@@ -142,7 +142,7 @@ static DEVICE_RESET( decocomn )
 const device_type DECOCOMN = &device_creator<decocomn_device>;
 
 decocomn_device::decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECOCOMN, "Data East Common Video Functions", tag, owner, clock)
+	: device_t(mconfig, DECOCOMN, "Data East Common Video Functions", tag, owner, clock, "decocomn", __FILE__)
 {
 	m_token = global_alloc_clear(decocomn_state);
 }

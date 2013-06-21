@@ -202,7 +202,7 @@ WRITE8_MEMBER( ym2608_device::write )
 const device_type YM2608 = &device_creator<ym2608_device>;
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2608, "YM2608", tag, owner, clock),
+	: device_t(mconfig, YM2608, "YM2608", tag, owner, clock, "ym2608", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_ay8910_config(NULL)

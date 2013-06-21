@@ -591,7 +591,7 @@ ADDRESS_MAP_END
 const device_type SEIBU_ADPCM = &device_creator<seibu_adpcm_device>;
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock),
+	: device_t(mconfig, SEIBU_ADPCM, "Seibu ADPCM", tag, owner, clock, "seibu_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(seibu_adpcm_state);

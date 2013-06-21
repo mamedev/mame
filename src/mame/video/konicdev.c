@@ -1578,7 +1578,7 @@ static DEVICE_RESET( k007121 )
 const device_type K007121 = &device_creator<k007121_device>;
 
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007121, "Konami 007121", tag, owner, clock)
+	: device_t(mconfig, K007121, "Konami 007121", tag, owner, clock, "k007121", __FILE__)
 {
 	m_token = global_alloc_clear(k007121_state);
 }
@@ -1851,7 +1851,7 @@ TILE_GET_INFO_MEMBER(k007342_device::k007342_get_tile_info1)
 const device_type K007342 = &device_creator<k007342_device>;
 
 k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007342, "Konami 007342", tag, owner, clock)
+	: device_t(mconfig, K007342, "Konami 007342", tag, owner, clock, "k007342", __FILE__)
 {
 	m_token = global_alloc_clear(k007342_state);
 }
@@ -2184,7 +2184,7 @@ static DEVICE_RESET( k007420 )
 const device_type K007420 = &device_creator<k007420_device>;
 
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock)
+	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock, "k007420", __FILE__)
 {
 	m_token = global_alloc_clear(k007420_state);
 }
@@ -2755,7 +2755,7 @@ static void k052109_tileflip_reset(k052109_state *k052109)
 const device_type K052109 = &device_creator<k052109_device>;
 
 k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K052109, "Konami 052109", tag, owner, clock)
+	: device_t(mconfig, K052109, "Konami 052109", tag, owner, clock, "k052109", __FILE__)
 {
 	m_token = global_alloc_clear(k052109_state);
 }
@@ -3425,7 +3425,7 @@ static DEVICE_RESET( k051960 )
 const device_type K051960 = &device_creator<k051960_device>;
 
 k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051960, "Konami 051960", tag, owner, clock)
+	: device_t(mconfig, K051960, "Konami 051960", tag, owner, clock, "k051960", __FILE__)
 {
 	m_token = global_alloc_clear(k051960_state);
 }
@@ -4256,7 +4256,7 @@ static DEVICE_RESET( k05324x )
 const device_type K053244 = &device_creator<k05324x_device>;
 
 k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053244, "Konami 053244 & 053245", tag, owner, clock)
+	: device_t(mconfig, K053244, "Konami 053244 & 053245", tag, owner, clock, "k05324x", __FILE__)
 {
 	m_token = global_alloc_clear(k05324x_state);
 }
@@ -5268,7 +5268,7 @@ static DEVICE_RESET( k053247 )
 const device_type K055673 = &device_creator<k055673_device>;
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K055673, "Konami 055673", tag, owner, clock)
+	: device_t(mconfig, K055673, "Konami 055673", tag, owner, clock, "k055673", __FILE__)
 {
 	m_token = global_alloc_clear(k053247_state);
 }
@@ -5304,7 +5304,7 @@ void k055673_device::device_reset()
 const device_type K053246 = &device_creator<k053247_device>;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock)
+	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock, "k053247", __FILE__)
 {
 	m_token = global_alloc_clear(k053247_state);
 }
@@ -5537,7 +5537,7 @@ void k051316_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 const device_type K051316 = &device_creator<k051316_device>;
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock)
+	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock, "k051316", __FILE__)
 {
 	m_token = global_alloc_clear(k051316_state);
 }
@@ -5910,7 +5910,7 @@ static DEVICE_RESET( k053936 )
 const device_type K053936 = &device_creator<k053936_device>;
 
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock)
+	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock, "k053936", __FILE__)
 {
 	m_token = global_alloc_clear(k053936_state);
 }
@@ -6101,7 +6101,7 @@ static DEVICE_RESET( k053251 )
 const device_type K053251 = &device_creator<k053251_device>;
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053251, "Konami 053251", tag, owner, clock)
+	: device_t(mconfig, K053251, "Konami 053251", tag, owner, clock, "k053251", __FILE__)
 {
 	m_token = global_alloc_clear(k053251_state);
 }
@@ -6246,7 +6246,7 @@ static DEVICE_RESET( k054000 )
 const device_type K054000 = &device_creator<k054000_device>;
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K054000, "Konami 054000", tag, owner, clock)
+	: device_t(mconfig, K054000, "Konami 054000", tag, owner, clock, "k054000", __FILE__)
 {
 	m_token = global_alloc_clear(k054000_state);
 }
@@ -6434,7 +6434,7 @@ static DEVICE_RESET( k051733 )
 const device_type K051733 = &device_creator<k051733_device>;
 
 k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051733, "Konami 051733", tag, owner, clock)
+	: device_t(mconfig, K051733, "Konami 051733", tag, owner, clock, "k051733", __FILE__)
 {
 	m_token = global_alloc_clear(k051733_state);
 }
@@ -8181,7 +8181,7 @@ static void k056832_postload(k056832_state *k056832)
 const device_type K056832 = &device_creator<k056832_device>;
 
 k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock)
+	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock, "k056832", __FILE__)
 {
 	m_token = global_alloc_clear(k056832_state);
 }
@@ -8571,7 +8571,7 @@ static DEVICE_RESET( k055555 )
 const device_type K055555 = &device_creator<k055555_device>;
 
 k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K055555, "Konami 055555", tag, owner, clock)
+	: device_t(mconfig, K055555, "Konami 055555", tag, owner, clock, "k055555", __FILE__)
 {
 	m_token = global_alloc_clear(k055555_state);
 }
@@ -8909,7 +8909,7 @@ static DEVICE_RESET( k054338 )
 const device_type K054338 = &device_creator<k054338_device>;
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock)
+	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__)
 {
 	m_token = global_alloc_clear(k054338_state);
 }
@@ -9120,7 +9120,7 @@ static DEVICE_RESET( k001006 )
 const device_type K001006 = &device_creator<k001006_device>;
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001006, "Konami 001006", tag, owner, clock)
+	: device_t(mconfig, K001006, "Konami 001006", tag, owner, clock, "k001006", __FILE__)
 {
 	m_token = global_alloc_clear(k001006_state);
 }
@@ -10082,7 +10082,7 @@ static DEVICE_STOP( k001005 )
 const device_type K001005 = &device_creator<k001005_device>;
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001005, "Konami 001005", tag, owner, clock)
+	: device_t(mconfig, K001005, "Konami 001005", tag, owner, clock, "k001005", __FILE__)
 {
 	m_token = global_alloc_clear(k001005_state);
 }
@@ -10519,7 +10519,7 @@ WRITE32_DEVICE_HANDLER( k001604_reg_w )
 const device_type K001604 = &device_creator<k001604_device>;
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock)
+	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock, "k001604", __FILE__)
 {
 	m_token = global_alloc_clear(k001604_state);
 }
@@ -10809,7 +10809,7 @@ WRITE32_DEVICE_HANDLER( k037122_reg_w )
 const device_type K037122 = &device_creator<k037122_device>;
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K037122, "Konami 0371222", tag, owner, clock)
+	: device_t(mconfig, K037122, "Konami 0371222", tag, owner, clock, "k037122", __FILE__)
 {
 	m_token = global_alloc_clear(k037122_state);
 }

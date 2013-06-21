@@ -53,7 +53,7 @@
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_PANDORA, "Kaneko Pandora - PX79C480FP-3", tag, owner, clock)
+	: device_t(mconfig, KANEKO_PANDORA, "Kaneko Pandora - PX79C480FP-3", tag, owner, clock, "kaneko_pandora", __FILE__)
 {
 }
 

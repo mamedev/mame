@@ -2469,7 +2469,7 @@ static DEVICE_STOP( sn76477 )
 const device_type SN76477 = &device_creator<sn76477_device>;
 
 sn76477_device::sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock),
+	: device_t(mconfig, SN76477, "SN76477", tag, owner, clock, "sn76477", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(sn76477_state);

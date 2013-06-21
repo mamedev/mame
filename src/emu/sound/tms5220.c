@@ -1826,7 +1826,7 @@ void tms5220_device::set_frequency(int frequency)
 const device_type TMS5220C = &device_creator<tms5220c_device>;
 
 tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms5220_device(mconfig, TMS5220C, "TMS5220C", tag, owner, clock)
+	: tms5220_device(mconfig, TMS5220C, "TMS5220C", tag, owner, clock, "tms5220c", __FILE__)
 {
 }
 
@@ -1834,7 +1834,7 @@ tms5220c_device::tms5220c_device(const machine_config &mconfig, const char *tag,
 const device_type TMS5220 = &device_creator<tms5220_device>;
 
 tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock),
+	: device_t(mconfig, TMS5220, "TMS5220", tag, owner, clock, "tms5220", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
@@ -1842,8 +1842,8 @@ tms5220_device::tms5220_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+tms5220_device::tms5220_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_readyq_handler(*this),
@@ -1865,7 +1865,7 @@ void tms5220_device::device_config_complete()
 const device_type TMC0285 = &device_creator<tmc0285_device>;
 
 tmc0285_device::tmc0285_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms5220_device(mconfig, TMC0285, "TMC0285", tag, owner, clock)
+	: tms5220_device(mconfig, TMC0285, "TMC0285", tag, owner, clock, "tmc0285", __FILE__)
 {
 }
 
@@ -1873,6 +1873,6 @@ tmc0285_device::tmc0285_device(const machine_config &mconfig, const char *tag, d
 const device_type TMS5200 = &device_creator<tms5200_device>;
 
 tms5200_device::tms5200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms5220_device(mconfig, TMS5200, "TMS5200", tag, owner, clock)
+	: tms5220_device(mconfig, TMS5200, "TMS5200", tag, owner, clock, "tms5200", __FILE__)
 {
 }

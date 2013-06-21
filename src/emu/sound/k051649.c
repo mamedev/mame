@@ -42,7 +42,7 @@ const device_type K051649 = &device_creator<k051649_device>;
 //-------------------------------------------------
 
 k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
+	: device_t(mconfig, K051649, "K051649", tag, owner, clock, "k051649", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_mclock(0),

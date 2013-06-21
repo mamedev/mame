@@ -179,7 +179,7 @@ static DEVICE_START( speech_sound )
 const device_type SEGASPEECH = &device_creator<speech_sound_device>;
 
 speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock),
+	: device_t(mconfig, SEGASPEECH, "Sega Speech Sound Board", tag, owner, clock, "sega_speech_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(speech_state);
@@ -882,7 +882,7 @@ static DEVICE_START( usb_sound )
 const device_type SEGAUSB = &device_creator<usb_sound_device>;
 
 usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock),
+	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock, "usb_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(usb_state);

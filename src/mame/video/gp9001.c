@@ -203,7 +203,7 @@ ADDRESS_MAP_END
 const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
 
 gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GP9001_VDP, "GP9001_VDP", tag, owner, clock),
+	: device_t(mconfig, GP9001_VDP, "GP9001_VDP", tag, owner, clock, "gp9001vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
 		m_gfxregion(0)

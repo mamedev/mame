@@ -70,7 +70,7 @@ Abstracts the VS9210
 const device_type VSYSTEM_SPR = &device_creator<vsystem_spr_device>;
 
 vsystem_spr_device::vsystem_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VSYSTEM_SPR, "vsystem_spr_device", tag, owner, clock)
+	: device_t(mconfig, VSYSTEM_SPR, "vsystem_spr_device", tag, owner, clock, "vsystem_spr", __FILE__)
 {
 	m_transpen = 15;
 	m_pal_base = 0;

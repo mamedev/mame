@@ -34,7 +34,7 @@ const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
 
 
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SCN2674_VIDEO, "scn2674_device", tag, owner, clock),
+	: device_t(mconfig, SCN2674_VIDEO, "scn2674_device", tag, owner, clock, "scn2674_device", __FILE__),
 		m_interrupt_callback(*this)
 {
 }

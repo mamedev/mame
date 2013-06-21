@@ -13,7 +13,7 @@
 const device_type ST0020_SPRITES = &device_creator<st0020_device>;
 
 st0020_device::st0020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock)
+	: device_t(mconfig, ST0020_SPRITES, "st0020_device", tag, owner, clock, "st0020", __FILE__)
 {
 	m_is_st0032 = 0;
 	m_is_jclub2 = 0;

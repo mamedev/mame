@@ -788,13 +788,13 @@ void upd7759_set_bank_base(device_t *device, UINT32 base)
 const device_type UPD7759 = &device_creator<upd7759_device>;
 
 upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD7759, "uPD7759", tag, owner, clock),
+	: device_t(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(upd7759_state);
 }
-upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(upd7759_state);
@@ -842,7 +842,7 @@ void upd7759_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 const device_type UPD7756 = &device_creator<upd7756_device>;
 
 upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd7759_device(mconfig, UPD7756, "uPD7756", tag, owner, clock)
+	: upd7759_device(mconfig, UPD7756, "uPD7756", tag, owner, clock, "upd7756", __FILE__)
 {
 }
 

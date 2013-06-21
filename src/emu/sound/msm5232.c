@@ -853,7 +853,7 @@ void msm5232_set_clock(device_t *device, int clock)
 const device_type MSM5232 = &device_creator<msm5232_device>;
 
 msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock),
+	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock, "msm5232", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(msm5232_state);

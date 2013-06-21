@@ -26,7 +26,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 const device_type PSX_DMA = &device_creator<psxdma_device>;
 
 psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PSX_DMA, "PSX DMA", tag, owner, clock),
+	device_t(mconfig, PSX_DMA, "PSX DMA", tag, owner, clock, "psxdma", __FILE__),
 	m_irq_handler(*this)
 {
 }

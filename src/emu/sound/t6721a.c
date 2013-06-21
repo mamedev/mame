@@ -37,7 +37,7 @@ const device_type T6721A = &device_creator<t6721a_device>;
 //-------------------------------------------------
 
 t6721a_device::t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, T6721A, "T6721A", tag, owner, clock),
+	: device_t(mconfig, T6721A, "T6721A", tag, owner, clock, "t6721a", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_eos_handler(*this),
 		m_dtrd_handler(*this),

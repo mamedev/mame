@@ -170,7 +170,7 @@ const device_type TIA_VIDEO = &device_creator<tia_video_device>;
 //-------------------------------------------------
 
 tia_video_device::tia_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TIA_VIDEO, "TIA Video", tag, owner, clock)
+	: device_t(mconfig, TIA_VIDEO, "TIA Video", tag, owner, clock, "tia_video", __FILE__)
 {
 }
 

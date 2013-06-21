@@ -29,7 +29,7 @@
 const device_type KANEKO_HIT = &device_creator<kaneko_hit_device>;
 
 kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_HIT, "kaneko_hit_device", tag, owner, clock)
+	: device_t(mconfig, KANEKO_HIT, "kaneko_hit_device", tag, owner, clock, "kaneko_hit", __FILE__)
 {
 	m_hittype = -1;
 	memset(&m_hit, 0, sizeof m_hit);

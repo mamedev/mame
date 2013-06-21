@@ -575,7 +575,7 @@ static DEVICE_RESET( buggyboy_sound )
 const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Custom", tag, owner, clock)
+	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
 {
 }
 
@@ -621,14 +621,14 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 const device_type TX1 = &device_creator<tx1_sound_device>;
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TX1, "TX-1 Custom", tag, owner, clock),
+	: device_t(mconfig, TX1, "TX-1 Custom", tag, owner, clock, "tx1_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tx1_sound_state);
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(tx1_sound_state);

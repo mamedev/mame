@@ -45,7 +45,7 @@ const device_type OKIM6258 = &device_creator<okim6258_device>;
 //-------------------------------------------------
 
 okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
+	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock, "okim6258", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_status(0),
 		m_master_clock(0),

@@ -488,7 +488,7 @@ MACHINE_CONFIG_END
 const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
 
 irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock),
+	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock, "irem_audio", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(irem_audio_state);

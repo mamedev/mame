@@ -60,7 +60,7 @@ const device_type ZSG2 = &device_creator<zsg2_device>;
 //-------------------------------------------------
 
 zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
+	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock, "zsg2", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_alow(0),
 		m_ahigh(0),

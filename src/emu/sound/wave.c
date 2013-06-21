@@ -85,7 +85,7 @@ static DEVICE_START( wave )
 const device_type WAVE = &device_creator<wave_device>;
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WAVE, "Cassette", tag, owner, clock),
+	: device_t(mconfig, WAVE, "Cassette", tag, owner, clock, "wawe", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

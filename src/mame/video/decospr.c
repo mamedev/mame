@@ -160,7 +160,7 @@ void decospr_device::set_col_callback(device_t &device, decospr_colour_callback_
 const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock),
+	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock, "decospr", __FILE__),
 		m_gfxregion(0),
 		m_pricallback(NULL),
 		m_colcallback(decospr_default_colour_callback),

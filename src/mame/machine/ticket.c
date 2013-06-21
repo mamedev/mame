@@ -68,7 +68,7 @@ const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
 //-------------------------------------------------
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TICKET_DISPENSER, "Ticket Dispenser", tag, owner, clock),
+	: device_t(mconfig, TICKET_DISPENSER, "Ticket Dispenser", tag, owner, clock, "ticket_dispenser", __FILE__),
 		m_motor_sense(TICKET_MOTOR_ACTIVE_LOW),
 		m_status_sense(TICKET_STATUS_ACTIVE_LOW),
 		m_period(attotime::from_msec(100)),

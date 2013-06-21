@@ -74,7 +74,7 @@ void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int
 const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 
 deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock),
+	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock, "deco_bac06", __FILE__),
 		m_gfxregion8x8(0),
 		m_gfxregion16x16(0),
 		m_wide(0)

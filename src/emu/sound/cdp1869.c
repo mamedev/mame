@@ -342,7 +342,7 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //-------------------------------------------------
 
 cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock),
+	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_stream(NULL),

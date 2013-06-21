@@ -53,7 +53,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 //-------------------------------------------------
 
 cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MACHINE_CDI68070, "CDI68070", tag, owner, clock)
+	: device_t(mconfig, MACHINE_CDI68070, "CDI68070", tag, owner, clock, "cdi68070", __FILE__)
 {
 }
 

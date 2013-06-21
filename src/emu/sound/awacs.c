@@ -23,7 +23,7 @@ const device_type AWACS = &device_creator<awacs_device>;
 //-------------------------------------------------
 
 awacs_device::awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AWACS, "AWACS", tag, owner, clock),
+	: device_t(mconfig, AWACS, "AWACS", tag, owner, clock, "awacs", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

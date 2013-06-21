@@ -573,14 +573,14 @@ static DEVICE_START( redline_80186_sound )
 const device_type LELAND = &device_creator<leland_sound_device>;
 
 leland_sound_device::leland_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LELAND, "Leland DAC", tag, owner, clock),
+	: device_t(mconfig, LELAND, "Leland DAC", tag, owner, clock, "leland_dac", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(leland_sound_state);
 }
 
-leland_sound_device::leland_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+leland_sound_device::leland_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(leland_sound_state);
@@ -619,12 +619,12 @@ void leland_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 const device_type LELAND_80186 = &device_creator<leland_80186_sound_device>;
 
 leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: leland_sound_device(mconfig, LELAND_80186, "Leland 80186 DAC", tag, owner, clock)
+	: leland_sound_device(mconfig, LELAND_80186, "Leland 80186 DAC", tag, owner, clock, "leland_80186_sound", __FILE__)
 {
 }
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: leland_sound_device(mconfig, type, name, tag, owner, clock)
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: leland_sound_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -671,7 +671,7 @@ void leland_80186_sound_device::sound_stream_update(sound_stream &stream, stream
 const device_type REDLINE_80186 = &device_creator<redline_80186_sound_device>;
 
 redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "Redline Racer 80186 DAC", tag, owner, clock)
+	: leland_80186_sound_device(mconfig, REDLINE_80186, "Redline Racer 80186 DAC", tag, owner, clock, "redline_80186_sound", __FILE__)
 {
 }
 

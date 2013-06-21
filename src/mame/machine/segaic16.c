@@ -202,7 +202,7 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 //-------------------------------------------------
 
 sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock),
+	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, "Sega 315-5195 Memory Mapper", tag, owner, clock, "sega_315_5195", __FILE__),
 		m_cputag(NULL),
 		m_cpu(NULL),
 		m_space(NULL),
@@ -742,7 +742,7 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 //-------------------------------------------------
 
 sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5248 Multiplier", tag, owner, clock, "sega_315_5248", __FILE__)
 {
 }
 
@@ -810,7 +810,7 @@ void sega_315_5248_multiplier_device::device_reset()
 //-------------------------------------------------
 
 sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock)
+	: device_t(mconfig, SEGA_315_5248_MULTIPLIER, "Sega 315-5249 Divider", tag, owner, clock, "sega_315_5249", __FILE__)
 {
 }
 
@@ -955,7 +955,7 @@ void sega_315_5249_divider_device::execute(int mode)
 //-------------------------------------------------
 
 sega_315_5250_compare_timer_device::sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock)
+	: device_t(mconfig, SEGA_315_5250_COMPARE_TIMER, "Sega 315-5250 Compare/Timer", tag, owner, clock, "sega_315_5250", __FILE__)
 {
 }
 

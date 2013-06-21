@@ -45,7 +45,7 @@ class tms5110_device : public device_t,
 {
 public:
 	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );

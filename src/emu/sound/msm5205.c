@@ -56,20 +56,20 @@ const device_type MSM6585 = &device_creator<msm6585_device>;
 
 
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock),
+					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock, "msm5205", __FILE__),
 						device_sound_interface(mconfig, *this)
 {
 }
 
-msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, type, name, tag, owner, clock),
+msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sound_interface(mconfig, *this)
 {
 }
 
 
 msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock)
+					: msm5205_device(mconfig, MSM6585, "MSM6585", tag, owner, clock, "msm6585", __FILE__)
 {
 }
 

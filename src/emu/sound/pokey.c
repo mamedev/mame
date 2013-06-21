@@ -181,7 +181,7 @@ const device_type POKEY = &device_creator<pokey_device>;
 //-------------------------------------------------
 
 pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, POKEY, "POKEY", tag, owner, clock),
+	: device_t(mconfig, POKEY, "POKEY", tag, owner, clock, "pokey", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),

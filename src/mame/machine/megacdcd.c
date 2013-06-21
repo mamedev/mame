@@ -11,7 +11,7 @@
 const device_type LC89510_TEMP = &device_creator<lc89510_temp_device>;
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LC89510_TEMP, "lc89510_temp_device", tag, owner, clock)
+	: device_t(mconfig, LC89510_TEMP, "lc89510_temp_device", tag, owner, clock, "lc89510_temp", __FILE__)
 {
 	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
 	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);

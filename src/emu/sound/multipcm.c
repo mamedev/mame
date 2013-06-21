@@ -675,7 +675,7 @@ void multipcm_set_bank(device_t *device, UINT32 leftoffs, UINT32 rightoffs)
 const device_type MULTIPCM = &device_creator<multipcm_device>;
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock),
+	: device_t(mconfig, MULTIPCM, "Sega/Yamaha 315-5560", tag, owner, clock, "multipcm", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(MultiPCM);

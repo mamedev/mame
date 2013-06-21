@@ -237,7 +237,7 @@ static DEVICE_RESET( buggychl_mcu )
 const device_type BUGGYCHL_MCU = &device_creator<buggychl_mcu_device>;
 
 buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BUGGYCHL_MCU, "BuggyChl MCU", tag, owner, clock)
+	: device_t(mconfig, BUGGYCHL_MCU, "BuggyChl MCU", tag, owner, clock, "buggychl_mcu", __FILE__)
 {
 	m_token = global_alloc_clear(buggychl_mcu_state);
 }

@@ -95,7 +95,7 @@ There are more!
 const device_type KANEKO_TMAP = &device_creator<kaneko_view2_tilemap_device>;
 
 kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_TMAP, "kaneko_view2_tilemap_device", tag, owner, clock)
+	: device_t(mconfig, KANEKO_TMAP, "kaneko_view2_tilemap_device", tag, owner, clock, "kaneko_view2_tilemap", __FILE__)
 {
 	m_invert_flip = 0;
 }

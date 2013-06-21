@@ -910,7 +910,7 @@ WRITE32_DEVICE_HANDLER( amiga_akiko32_w )
 const device_type AKIKO = &device_creator<akiko_device>;
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AKIKO, "Akiko", tag, owner, clock)
+	: device_t(mconfig, AKIKO, "Akiko", tag, owner, clock, "akiko", __FILE__)
 {
 	m_token = global_alloc_clear(akiko_state);
 }

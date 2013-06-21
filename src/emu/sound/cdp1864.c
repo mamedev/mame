@@ -98,7 +98,7 @@ inline void cdp1864_device::initialize_palette()
 //-------------------------------------------------
 
 cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock),
+	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock, "cdp1864", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_read_inlace(*this),
 		m_read_rdata(*this),

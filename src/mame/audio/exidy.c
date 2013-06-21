@@ -421,14 +421,14 @@ static DEVICE_START( exidy_sound )
 const device_type EXIDY = &device_creator<exidy_sound_device>;
 
 exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock),
+	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock, "exidy_sfx", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy_sound_state);
 }
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy_sound_state);
@@ -887,7 +887,7 @@ static DEVICE_RESET( venture_sound )
 const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
 
 venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock)
+	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock, "venture_sound", __FILE__)
 {
 }
 
@@ -1154,7 +1154,7 @@ static DEVICE_RESET( victory_sound )
 const device_type EXIDY_VICTORY = &device_creator<victory_sound_device>;
 
 victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock)
+	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock, "victory_sound", __FILE__)
 {
 }
 

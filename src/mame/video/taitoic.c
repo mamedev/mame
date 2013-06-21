@@ -549,7 +549,7 @@ INLINE void taitoic_drawscanline( bitmap_ind16 &bitmap, const rectangle &cliprec
 const device_type PC080SN = &device_creator<pc080sn_device>;
 
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock)
+	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__)
 {
 }
 
@@ -1005,7 +1005,7 @@ void pc080sn_device::restore_scroll()
 const device_type PC090OJ = &device_creator<pc090oj_device>;
 
 pc090oj_device::pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock)
+	: device_t(mconfig, PC090OJ, "Taito PC090OJ", tag, owner, clock, "pc090oj", __FILE__)
 {
 }
 
@@ -1176,7 +1176,7 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 const device_type TC0080VCO = &device_creator<tc0080vco_device>;
 
 tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock)
+	: device_t(mconfig, TC0080VCO, "Taito TC0080VCO", tag, owner, clock, "tc0080vco", __FILE__)
 {
 }
 
@@ -1810,7 +1810,7 @@ void tc0080vco_device::postload()
 const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock)
+	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__)
 {
 }
 
@@ -2522,7 +2522,7 @@ void tc0430grw_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangl
 const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock)
+	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__)
 {
 	m_token = global_alloc_clear(tc0280grd_state);
 }
@@ -2643,7 +2643,7 @@ static DEVICE_RESET( tc0360pri )
 const device_type TC0360PRI = &device_creator<tc0360pri_device>;
 
 tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock)
+	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock, "tc0360pri", __FILE__)
 {
 	m_token = global_alloc_clear(tc0360pri_state);
 }
@@ -3527,7 +3527,7 @@ void tc0480scp_device::tc0480scp_postload()
 const device_type TC0480SCP = &device_creator<tc0480scp_device>;
 
 tc0480scp_device::tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock)
+	: device_t(mconfig, TC0480SCP, "Taito TC0480SCP", tag, owner, clock, "tc0480scp", __FILE__)
 {
 	m_token = global_alloc_clear(tc0480scp_state);
 }
@@ -4471,7 +4471,7 @@ static DEVICE_START( tc0150rod )
 const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock)
+	: device_t(mconfig, TC0150ROD, "Taito TC0150ROD", tag, owner, clock, "tc0150rod", __FILE__)
 {
 	m_token = global_alloc_clear(tc0150rod_state);
 }
@@ -4698,7 +4698,7 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w )
 const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 
 tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock)
+	: device_t(mconfig, TC0110PCR, "Taito TC0110PCR", tag, owner, clock, "tc0110pcr", __FILE__)
 {
 	m_token = global_alloc_clear(tc0110pcr_state);
 }
@@ -5043,7 +5043,7 @@ void tc0180vcu_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const recta
 const device_type TC0180VCU = &device_creator<tc0180vcu_device>;
 
 tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock)
+	: device_t(mconfig, TC0180VCU, "Taito TC0180VCU", tag, owner, clock, "tc0180vcu", __FILE__)
 {
 	m_token = global_alloc_clear(tc0180vcu_state);
 }

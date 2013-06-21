@@ -26,7 +26,7 @@ void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running
 }
 
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MAPLE_DC, "MAPLE_DC", tag, owner, clock)
+	: device_t(mconfig, MAPLE_DC, "MAPLE_DC", tag, owner, clock, "maple_dc", __FILE__)
 {
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.

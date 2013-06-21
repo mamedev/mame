@@ -54,7 +54,7 @@ class mos6581_device : public device_t,
 						public device_sound_interface
 {
 public:
-	mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mos6581_device() { global_free(m_token); }
 

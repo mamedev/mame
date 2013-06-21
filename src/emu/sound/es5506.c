@@ -2160,14 +2160,14 @@ void es5505_voice_bank_w(device_t *device, int voice, int bank)
 const device_type ES5506 = &device_creator<es5506_device>;
 
 es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock),
+	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(es5506_state);
 }
 
-es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(es5506_state);
@@ -2223,7 +2223,7 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 const device_type ES5505 = &device_creator<es5505_device>;
 
 es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: es5506_device(mconfig, ES5505, "ES5505", tag, owner, clock)
+	: es5506_device(mconfig, ES5505, "ES5505", tag, owner, clock, "es5505", __FILE__)
 {
 }
 

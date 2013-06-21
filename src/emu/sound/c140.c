@@ -85,7 +85,7 @@ INLINE int limit(INT32 in)
 //-------------------------------------------------
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C140, "C140", tag, owner, clock),
+	: device_t(mconfig, C140, "C140", tag, owner, clock, "c140", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sample_rate(0),
 		m_stream(NULL),

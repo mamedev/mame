@@ -20,7 +20,7 @@ const device_type SNKWAVE = &device_creator<snkwave_device>;
 //-------------------------------------------------
 
 snkwave_device::snkwave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock),
+	: device_t(mconfig, SNKWAVE, "SNK Wave", tag, owner, clock, "snkwave", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_external_clock(0),

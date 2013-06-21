@@ -573,7 +573,7 @@ static DEVICE_START( phoenix_sound )
 const device_type PHOENIX = &device_creator<phoenix_sound_device>;
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PHOENIX, "Phoenix Custom", tag, owner, clock),
+	: device_t(mconfig, PHOENIX, "Phoenix Custom", tag, owner, clock, "phoenix_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(phoenix_sound_state);

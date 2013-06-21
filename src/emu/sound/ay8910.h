@@ -100,7 +100,7 @@ class ay8910_device : public device_t,
 {
 public:
 	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -174,7 +174,7 @@ class ym2149_device : public ay8910_device
 {
 public:
 	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ym2149_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	ym2149_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 protected:
 	// device-level overrides
 	virtual void device_start();

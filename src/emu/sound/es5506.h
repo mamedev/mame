@@ -30,7 +30,7 @@ class es5506_device : public device_t,
 {
 public:
 	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~es5506_device() { global_free(m_token); }
 
 	// access to legacy token

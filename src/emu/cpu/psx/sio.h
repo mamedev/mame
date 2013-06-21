@@ -38,7 +38,7 @@ extern const device_type PSX_SIO1;
 class psxsio_device : public device_t
 {
 public:
-	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }

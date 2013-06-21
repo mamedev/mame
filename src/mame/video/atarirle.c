@@ -370,7 +370,7 @@ static DEVICE_START( atarirle )
 const device_type ATARIRLE = &device_creator<atarirle_device>;
 
 atarirle_device::atarirle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ATARIRLE, "Atari RLE", tag, owner, clock)
+	: device_t(mconfig, ATARIRLE, "Atari RLE", tag, owner, clock, "atari_rle", __FILE__)
 {
 	m_token = global_alloc_clear(atarirle_data);
 }

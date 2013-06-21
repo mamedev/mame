@@ -38,8 +38,8 @@ const device_type MOS8580 = &device_creator<mos8580_device>;
 //  mos6581_device - constructor
 //-------------------------------------------------
 
-mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_read_potx(*this),
 		m_read_poty(*this),
@@ -50,7 +50,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6581, "MOS6581", tag, owner, clock),
+	: device_t(mconfig, MOS6581, "MOS6581", tag, owner, clock, "mos6581", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_read_potx(*this),
 		m_read_poty(*this),
@@ -66,7 +66,7 @@ mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mos6581_device(mconfig, MOS8580, "MOS8580", tag, owner, clock, TYPE_8580)
+	: mos6581_device(mconfig, MOS8580, "MOS8580", tag, owner, clock, TYPE_8580, "mos8580", __FILE__)
 {
 }
 

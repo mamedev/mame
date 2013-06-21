@@ -198,7 +198,7 @@ _32x32_END
 class sega_segacd_device : public device_t
 {
 public:
-	sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type);
+	sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *shortname, const char *source);
 
 	required_device<cpu_device> m_scdcpu;
 	lc89510_temp_device *lc89510_temp;

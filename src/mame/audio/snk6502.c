@@ -1252,7 +1252,7 @@ WRITE8_HANDLER( fantasy_speech_w )
 const device_type SNK6502 = &device_creator<snk6502_sound_device>;
 
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SNK6502, "snk6502 Custom", tag, owner, clock),
+	: device_t(mconfig, SNK6502, "snk6502 Custom", tag, owner, clock, "snk6502_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(snk6502_sound_state);

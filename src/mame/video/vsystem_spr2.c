@@ -28,7 +28,7 @@
 const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VSYSTEM_SPR2, "vsystem_spr2_device", tag, owner, clock)
+	: device_t(mconfig, VSYSTEM_SPR2, "vsystem_spr2_device", tag, owner, clock, "vsystem_spr2", __FILE__)
 {
 	m_newtilecb =  vsystem_tile2_indirection_delegate(FUNC(vsystem_spr2_device::tile_callback_noindirect), this);
 	m_pritype = 0; // hack until we have better handling

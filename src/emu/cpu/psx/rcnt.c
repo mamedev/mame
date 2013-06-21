@@ -25,7 +25,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 const device_type PSX_RCNT = &device_creator<psxrcnt_device>;
 
 psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PSX_RCNT, "PSX RCNT", tag, owner, clock),
+	device_t(mconfig, PSX_RCNT, "PSX RCNT", tag, owner, clock, "psxrcnt", __FILE__),
 	m_irq0_handler(*this),
 	m_irq1_handler(*this),
 	m_irq2_handler(*this)

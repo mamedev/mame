@@ -100,7 +100,7 @@ static const UINT16 BD1charset[]=
 };
 
 bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock),
+	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock, "bfm_bd1", __FILE__),
 	m_port_val(0)
 {
 }

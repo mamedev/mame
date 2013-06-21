@@ -55,15 +55,15 @@ static wav_file* wavraw; // Raw waveform
 const device_type GAELCO_GAE1 = &device_creator<gaelco_gae1_device>;
 
 gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock),
+	: device_t(mconfig, GAELCO_GAE1, "Gaelco GAE1", tag, owner, clock, "gaelco_gae1", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_snd_data(NULL)
 {
 }
 
-gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_snd_data(NULL)
@@ -277,6 +277,6 @@ void gaelco_gae1_device::device_stop()
 const device_type GAELCO_CG1V = &device_creator<gaelco_cg1v_device>;
 
 gaelco_cg1v_device::gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: gaelco_gae1_device(mconfig, GAELCO_CG1V, "Gaelco CG1V", tag, owner, clock)
+	: gaelco_gae1_device(mconfig, GAELCO_CG1V, "Gaelco CG1V", tag, owner, clock, "gaelco_cg1v", __FILE__)
 {
 }

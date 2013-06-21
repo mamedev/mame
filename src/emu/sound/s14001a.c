@@ -636,7 +636,7 @@ void s14001a_set_volume(device_t *device, int volume)
 const device_type S14001A = &device_creator<s14001a_device>;
 
 s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock),
+	: device_t(mconfig, S14001A, "S14001A", tag, owner, clock, "s14001a", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(S14001AChip);

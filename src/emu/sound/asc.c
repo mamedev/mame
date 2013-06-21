@@ -44,7 +44,7 @@ const device_type ASC = &device_creator<asc_device>;
 //-------------------------------------------------
 
 asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASC, "ASC", tag, owner, clock),
+	: device_t(mconfig, ASC, "ASC", tag, owner, clock, "asc", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_chip_type(0),
 		m_irq_cb(NULL)

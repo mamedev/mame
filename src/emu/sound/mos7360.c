@@ -255,7 +255,7 @@ inline UINT8 mos7360_device::read_rom(offs_t offset)
 //-------------------------------------------------
 
 mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS7360, "MOS7360", tag, owner, clock),
+	: device_t(mconfig, MOS7360, "MOS7360", tag, owner, clock, "mos7360", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos7360_videoram_map)),

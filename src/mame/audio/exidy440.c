@@ -992,7 +992,7 @@ ADDRESS_MAP_END
 const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock),
+	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(exidy440_audio_state);

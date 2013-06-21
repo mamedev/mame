@@ -22,7 +22,7 @@ void ics2115_device::static_set_irqf(device_t &device, void (*irqf)(device_t *de
 }
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock),
+	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_cb(NULL)
 {

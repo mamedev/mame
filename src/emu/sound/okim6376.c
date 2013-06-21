@@ -619,7 +619,7 @@ WRITE8_DEVICE_HANDLER( okim6376_w )
 const device_type OKIM6376 = &device_creator<okim6376_device>;
 
 okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock),
+	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(okim6376_state);

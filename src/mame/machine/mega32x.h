@@ -25,7 +25,7 @@
 class sega_32x_device : public device_t
 {
 public:
-	sega_32x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type);
+	sega_32x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *shortname, const char *source);
 
 	required_device<cpu_device> m_master_cpu;
 	required_device<cpu_device> m_slave_cpu;

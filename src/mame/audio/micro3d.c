@@ -405,7 +405,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
 const device_type MICRO3D = &device_creator<micro3d_sound_device>;
 
 micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock),
+	: device_t(mconfig, MICRO3D, "Microprose Custom", tag, owner, clock, "micro3d_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(noise_state);

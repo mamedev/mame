@@ -48,7 +48,7 @@ extern const device_type SEGA005;
 const device_type SEGA005 = &device_creator<sega005_sound_device>;
 
 sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEGA005, "005 Custom", tag, owner, clock),
+	: device_t(mconfig, SEGA005, "005 Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

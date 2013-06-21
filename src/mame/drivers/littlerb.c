@@ -285,7 +285,7 @@ protected:
 const device_type LITTLERBVDP = &device_creator<littlerb_vdp_device>;
 
 littlerb_vdp_device::littlerb_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LITTLERBVDP, "LITTLERBVDP", tag, owner, clock),
+	: device_t(mconfig, LITTLERBVDP, "LITTLERBVDP", tag, owner, clock, "littlerb_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
 {

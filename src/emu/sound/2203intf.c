@@ -203,7 +203,7 @@ WRITE8_MEMBER( ym2203_device::write_port_w )
 const device_type YM2203 = &device_creator<ym2203_device>;
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2203, "YM2203", tag, owner, clock),
+	: device_t(mconfig, YM2203, "YM2203", tag, owner, clock, "ym2203", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this),
 		m_ay8910_config(NULL)

@@ -30,7 +30,7 @@
 const device_type SETA001_SPRITE = &device_creator<seta001_device>;
 
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SETA001_SPRITE, "seta001_device", tag, owner, clock)
+	: device_t(mconfig, SETA001_SPRITE, "seta001_device", tag, owner, clock, "seta001", __FILE__)
 {
 }
 

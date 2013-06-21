@@ -498,7 +498,7 @@ static DEVICE_STOP( gaelco_serial )
 const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock)
+	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock, "gaelco_serial", __FILE__)
 {
 	m_token = global_alloc_clear(gaelco_serial_state);
 }

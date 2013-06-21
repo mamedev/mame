@@ -954,7 +954,7 @@ static int shift_register15(int &shift)
 //-------------------------------------------------
 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SPU, "SPU", tag, owner, clock),
+	device_t(mconfig, SPU, "SPU", tag, owner, clock, "spu", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_irq_handler(*this),
 	dirty_flags(-1),

@@ -816,14 +816,14 @@ WRITE8_DEVICE_HANDLER( namco_snd_sharedram_w )
 const device_type NAMCO = &device_creator<namco_device>;
 
 namco_device::namco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO, "Namco", tag, owner, clock),
+	: device_t(mconfig, NAMCO, "Namco", tag, owner, clock, "namco", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(namco_sound);
 }
 
-namco_device::namco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+namco_device::namco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(namco_sound);
@@ -862,13 +862,13 @@ void namco_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 const device_type NAMCO_15XX = &device_creator<namco_15xx_device>;
 
 namco_15xx_device::namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: namco_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock)
+	: namco_device(mconfig, NAMCO_15XX, "Namco 15XX", tag, owner, clock, "namco_15xx", __FILE__)
 {
 }
 
 const device_type NAMCO_CUS30 = &device_creator<namco_cus30_device>;
 
 namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: namco_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock)
+	: namco_device(mconfig, NAMCO_CUS30, "Namco CUS30", tag, owner, clock, "namco_cus30", __FILE__)
 {
 }

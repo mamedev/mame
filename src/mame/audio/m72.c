@@ -256,7 +256,7 @@ WRITE8_DEVICE_HANDLER( m72_sample_w )
 const device_type M72 = &device_creator<m72_audio_device>;
 
 m72_audio_device::m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, M72, "M72 Custom", tag, owner, clock),
+	: device_t(mconfig, M72, "M72 Custom", tag, owner, clock, "m72_audio", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(m72_audio_state);

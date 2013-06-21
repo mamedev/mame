@@ -28,7 +28,7 @@
 const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
 
 kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_CALC3, "kaneko_calc3_device", tag, owner, clock)
+	: device_t(mconfig, KANEKO_CALC3, "kaneko_calc3_device", tag, owner, clock, "kaneko_calc3", __FILE__)
 {
 	memset(&m_calc3, 0, sizeof m_calc3);
 }

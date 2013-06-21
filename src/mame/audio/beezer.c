@@ -397,7 +397,7 @@ static DEVICE_START( beezer_sound )
 const device_type BEEZER = &device_creator<beezer_sound_device>;
 
 beezer_sound_device::beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock),
+	: device_t(mconfig, BEEZER, "beezer SFX", tag, owner, clock, "beezer_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(beezer_sound_state);

@@ -219,14 +219,14 @@ WRITE8_MEMBER( ym2610_device::write )
 const device_type YM2610 = &device_creator<ym2610_device>;
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, YM2610, "YM2610", tag, owner, clock),
+	: device_t(mconfig, YM2610, "YM2610", tag, owner, clock, "ym2610", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
 {
 }
 
-ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
 {
@@ -245,6 +245,6 @@ void ym2610_device::device_config_complete()
 const device_type YM2610B = &device_creator<ym2610b_device>;
 
 ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock)
+	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock, "ym2610b", __FILE__)
 {
 }
