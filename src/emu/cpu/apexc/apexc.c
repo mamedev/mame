@@ -336,7 +336,7 @@ const device_type APEXC = &device_creator<apexc_cpu_device>;
 
 
 apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc", __FILE__)
+	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock, "apexc_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
 {

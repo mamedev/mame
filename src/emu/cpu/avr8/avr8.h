@@ -85,7 +85,7 @@ public:
 	DECLARE_READ8_MEMBER( regs_r );
 
 protected:
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, const char *shortname, const char *source);
+	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();

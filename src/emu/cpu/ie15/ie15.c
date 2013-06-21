@@ -27,7 +27,7 @@ const device_type IE15 = &device_creator<ie15_device>;
 //  ie15_device - constructor
 //-------------------------------------------------
 ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, IE15, "ie15", tag, owner, clock, "ie15", __FILE__),
+	: cpu_device(mconfig, IE15, "ie15", tag, owner, clock, "ie15_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8),
 		m_program(0),
