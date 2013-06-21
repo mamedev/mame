@@ -1808,6 +1808,7 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_MACHINE)/pc_keyboards.o \
 	$(MESS_MACHINE)/kb_keytro.o \
 	$(MESS_MACHINE)/kb_msnat.o  \
+	$(MESS_MACHINE)/kb_pcxt83.o \
 	$(MESS_MACHINE)/ser_mouse.o \
 	$(MESS_VIDEO)/crtc_ega.o    \
 	$(MESS_MACHINE)/i82371ab.o  \

@@ -10,6 +10,7 @@
 
 // PC XT protocol keyboards
 #define STR_KBD_KEYTRONIC_PC3270    "keytronc_pc3270"
+#define STR_KBD_IBM_PC_XT_83		"pcxt83"
 
 SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
 

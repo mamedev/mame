@@ -3,9 +3,11 @@
 #include "machine/pc_keyboards.h"
 #include "machine/kb_keytro.h"
 #include "machine/kb_msnat.h"
+#include "machine/kb_pcxt83.h"
 
 SLOT_INTERFACE_START(pc_xt_keyboards)
 	SLOT_INTERFACE(STR_KBD_KEYTRONIC_PC3270, PC_KBD_KEYTRONIC_PC3270)
+	SLOT_INTERFACE(STR_KBD_IBM_PC_XT_83, PC_KBD_IBM_PC_XT_83)
 SLOT_INTERFACE_END
 
 
