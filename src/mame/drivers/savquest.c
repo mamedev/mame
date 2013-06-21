@@ -8,6 +8,18 @@
 	TODO:
 	- currently asserts by selecting a s3 video bank above 1M (register 0x6a)
 
+	PCI list:
+	Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ
+	0       7          1        8086      7111      IDE Controller        14
+	0       7          2        8086      7112      Serial Bus Controller 11
+	0       9          0        5333      8901      Display Controller    10
+	0       13         0        121a      0002      Multimedia Device     NA
+	- First two are PIIX4/4E/4M IDE Controller / PIIX4/4E/4M USB Interface
+	  Third is S3 trio64uv+
+	  Fourth is Voodoo 2 3D Accelerator
+	Sound Blaster is ISA/PNP
+
+============================================================================
     H/W is a white-box PC consisting of:
     Pentium II 450 CPU
     DFI P2XBL motherboard (i440BX chipset)
@@ -46,7 +58,8 @@ class savquest_state : public pcat_base_state
 {
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
+		: pcat_base_state(mconfig, type, tag),
+		m_vga(*this, "vga")
 	{
 	}
 
@@ -55,6 +68,10 @@ public:
 	UINT32 *m_bios_e4000_ram;
 	UINT32 *m_bios_e8000_ram;
 	UINT32 *m_bios_ec000_ram;
+
+	UINT8 *m_smram;
+
+	required_device<s3_vga_device> m_vga;
 
 	int m_haspind;
 	int m_haspstate;
@@ -84,6 +101,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
+	DECLARE_READ8_MEMBER(smram_r);
+	DECLARE_WRITE8_MEMBER(smram_w);
+
 protected:
 
 
@@ -101,6 +121,12 @@ static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, 
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
+
+	if((reg & 0xfe) == 0)
+		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
+
+	if((reg & 0xfe) == 2)
+		return (reg & 1) ? 0x70 : 0x00; // Device ID, MXTC
 
 	return state->m_mxtc_config_reg[reg];
 }
@@ -183,6 +209,7 @@ void savquest_state::intel82439tx_init()
 	m_mxtc_config_reg[0x63] = 0x02;
 	m_mxtc_config_reg[0x64] = 0x02;
 	m_mxtc_config_reg[0x65] = 0x02;
+	m_smram = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -233,6 +260,19 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 {
 	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
+
+	if((reg & 0xfe) == 0)
+		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
+
+	if((reg & 0xfe) == 2)
+	{
+		/* TODO: it isn't detected properly (i.e. PCI writes always goes to function == 0) */
+		if(function == 1)
+			return (reg & 1) ? 0x71 : 0x11; // Device ID, 82371AB IDE Controller
+		if(function == 2)
+			return (reg & 1) ? 0x71 : 0x12; // Device ID, 82371AB Serial Bus Controller
+	}
+
 	return state->m_piix4_config_reg[function][reg];
 }
 
@@ -536,17 +576,35 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 	}
 }
 
+READ8_MEMBER(savquest_state::smram_r)
+{
+	/* TODO: way more complex than this */
+	if(m_mxtc_config_reg[0x72] & 0x40)
+		return m_smram[offset];
+	else
+		return m_vga->mem_r(space,offset,0xff);
+}
+
+WRITE8_MEMBER(savquest_state::smram_w)
+{
+	/* TODO: way more complex than this */
+	if(m_mxtc_config_reg[0x72] & 0x40)
+		m_smram[offset] = data;
+	else
+		m_vga->mem_w(space,offset,data,0xff);
+
+}
+
 static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_READWRITE8(smram_r,smram_w,0xffffffff) //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_f0000") AM_WRITE(bios_f0000_ram_w)
 	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_e0000") AM_WRITE(bios_e0000_ram_w)
 	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_e4000") AM_WRITE(bios_e4000_ram_w)
 	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_e8000") AM_WRITE(bios_e8000_ram_w)
 	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ec000") AM_WRITE(bios_ec000_ram_w)
-	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-//  AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
+	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 128MB RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
