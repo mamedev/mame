@@ -1563,19 +1563,4 @@ void neogeo_state::kf2k3pcb_sp1_decrypt()
 
 	memcpy(rom, buf, 0x80000);
 	auto_free(machine(), buf);
-
-	{
-		FILE *fp;
-		const char *gamename = machine().system().name;
-		int rom_size = memregion("mainbios")->bytes();
-		char filename[256];
-		sprintf(filename, "%s_bios.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(rom, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
 }
