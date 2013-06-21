@@ -58,15 +58,20 @@ READ8Z_MEMBER(ti_32k_expcard_device::readz)
 	}
 	if (access)
 	{
-		if ((offset&1)!=1) *value = ~val;
-		else *value = val;
+		// There is no evidence for an inverted write on the even addresses;
+		// we assume that the FF00 byte sequence in this memory is a power-on
+		// artifact.
+
+		/* if ((offset&1)!=1) *value = ~val;
+		else */
+		*value = val;
 	}
 }
 
 WRITE8_MEMBER(ti_32k_expcard_device::write)
 {
 	UINT8 data1 = data;
-	if ((offset&1)!=1) data1 = ~data;
+	// if ((offset&1)!=1) data1 = ~data;
 	switch((offset & 0xe000)>>13)
 	{
 	case 1:
@@ -103,6 +108,12 @@ void ti_32k_expcard_device::device_start(void)
 {
 	m_ram_ptr = memregion(RAMREGION)->base();
 	m_cru_base = 0;
+	// See above. Preset the memory with FF00
+	// ROM_FILL does not seem to allow filling with an alternating pattern
+	for (int i=0; i < 0x8000; i+=2)
+	{
+		m_ram_ptr[i] = (UINT8)0xff;
+	}
 }
 
 ROM_START( ti_exp_32k )

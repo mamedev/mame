@@ -249,7 +249,11 @@ void ti99_datamux_device::device_reset(void)
 	m_use32k = (ioport("RAM")->read()==1);
 
 	// better use a region?
-	if (m_ram16b==NULL) m_ram16b = (UINT16*)malloc(32768);
+	if (m_ram16b==NULL)
+	{
+		m_ram16b = (UINT16*)malloc(32768);
+		memset(m_ram16b, 0, 32768);
+	}
 
 	// Now building the list of active devices at this databus multiplex.
 	// We allow for turning off devices according to configuration switch settings.
