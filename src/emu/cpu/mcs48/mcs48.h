@@ -87,6 +87,9 @@ enum
     MACROS
 ***************************************************************************/
 
+#define MCS48_LC_CLOCK(_L, _C) \
+    (1 / (2 * 3.14159265358979323846 * sqrt(_L * _C)))
+
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))
 
