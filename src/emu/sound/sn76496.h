@@ -144,7 +144,7 @@ class gamegear_device : public sn76496_base_device
 {
 public:
 	gamegear_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:  sn76496_base_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock, "gamegear", __FILE__)
+	:  sn76496_base_device(mconfig, GAMEGEAR, "Game Gear PSG", tag, 0x8000, 0x01, 0x08, true, true, 8, false, owner, clock, "gamegear_psg", __FILE__)
 	{ }
 };
 

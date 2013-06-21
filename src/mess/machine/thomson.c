@@ -670,7 +670,7 @@ const device_type TO7_IO_LINE = &device_creator<to7_io_line_device>;
 //-------------------------------------------------
 
 to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TO7_IO_LINE, "Serial source", tag, owner, clock, "to7_io_line", __FILE__),
+	: device_t(mconfig, TO7_IO_LINE, "T07 Serial source", tag, owner, clock, "to7_io_line", __FILE__),
 		device_serial_interface(mconfig, *this)
 {
 }

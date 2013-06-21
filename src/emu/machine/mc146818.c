@@ -112,7 +112,7 @@ const device_type MC146818 = &device_creator<mc146818_device>;
 //-------------------------------------------------
 
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC146818, "NVRAM", tag, owner, clock, "mc146818", __FILE__),
+	: device_t(mconfig, MC146818, "MC146818", tag, owner, clock, "mc146818", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_write_irq(*this),
