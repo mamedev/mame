@@ -182,7 +182,7 @@ class cosmac_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// public interfaces
 	offs_t get_memory_address();

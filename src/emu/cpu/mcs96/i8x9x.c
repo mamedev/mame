@@ -41,7 +41,7 @@
 #include "i8x9x.h"
 
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	mcs96_device(mconfig, type, name, tag, owner, clock, 8),
+	mcs96_device(mconfig, type, name, tag, owner, clock, 8, "i8x9x", __FILE__),
 	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
 {
 }

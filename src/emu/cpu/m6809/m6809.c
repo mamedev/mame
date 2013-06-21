@@ -106,8 +106,8 @@ const device_type M6809E = &device_creator<m6809e_device>;
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider)
-	: cpu_device(mconfig, type, name, tag, owner, clock),
+m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_clock_divider(divider)
 {
@@ -539,7 +539,7 @@ void m6809_base_device::execute_run()
 //-------------------------------------------------
 
 m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m6809_base_device(mconfig, "M6809", tag, owner, clock, M6809, 1)
+	: m6809_base_device(mconfig, "M6809", tag, owner, clock, M6809, 1, "m6809", __FILE__)
 {
 }
 
@@ -550,7 +550,7 @@ m6809_device::m6809_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: m6809_base_device(mconfig, "M6809E", tag, owner, clock, M6809E, 4)
+		: m6809_base_device(mconfig, "M6809E", tag, owner, clock, M6809E, 4, "m6809e", __FILE__)
 {
 }
 

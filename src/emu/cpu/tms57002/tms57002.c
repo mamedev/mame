@@ -50,7 +50,7 @@ static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32, tms57002_device)
 ADDRESS_MAP_END
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock),
+	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock, "tms57002", __FILE__),
 		program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm)),
 		data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {

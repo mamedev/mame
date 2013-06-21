@@ -28,7 +28,7 @@ const device_type HCD62121 = &device_creator<hcd62121_cpu_device>;
 
 
 hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock)
+	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock, "hcd62121", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
 {

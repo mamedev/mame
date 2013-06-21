@@ -123,7 +123,7 @@ enum
 ****************************************************************************/
 
 tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock),
+	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock, "tms9995", __FILE__),
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),

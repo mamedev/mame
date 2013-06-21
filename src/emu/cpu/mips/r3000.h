@@ -75,7 +75,7 @@ protected:
 	};
 
 	// construction/destruction
-	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype);
+	r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, chip_type chiptype, const char *shortname, const char *source);
 	virtual ~r3000_device();
 
 public:

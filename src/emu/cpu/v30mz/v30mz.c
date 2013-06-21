@@ -96,7 +96,7 @@ const device_type V30MZ = &device_creator<v30mz_cpu_device>;
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock)
+	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock, "v30mz", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ip(0)

@@ -42,7 +42,7 @@
 
 class mcs96_device : public cpu_device {
 public:
-	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width);
+	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source);
 
 	UINT64 get_cycle();
 

@@ -1692,7 +1692,7 @@ const device_type ESRIP = &device_creator<esrip_device>;
 //-------------------------------------------------
 
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock),
+	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock, "esrip", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
 {
 	// build the opcode table

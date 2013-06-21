@@ -81,7 +81,7 @@ const device_type SSEMCPU = &device_creator<ssem_device>;
 //-------------------------------------------------
 
 ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock),
+	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock, "ssem", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_pc(1),
 		m_shifted_pc(1<<2),

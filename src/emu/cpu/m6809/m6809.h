@@ -30,7 +30,7 @@ class m6809_base_device : public cpu_device
 {
 public:
 	// construction/destruction
-	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider);
+	m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 	DECLARE_WRITE_LINE_MEMBER( firq_line );

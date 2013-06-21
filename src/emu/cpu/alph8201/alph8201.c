@@ -172,7 +172,7 @@ const device_type ALPHA8301 = &device_creator<alpha8301_cpu_device>;
 
 
 alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, ALPHA8201, "ALPHA-8201", tag, owner, clock)
+	: cpu_device(mconfig, ALPHA8201, "ALPHA-8201", tag, owner, clock, "alpha8201", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_opmap(opcode_8201)
@@ -180,8 +180,8 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const 
 }
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, type, name, tag, owner, clock)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_opmap(opcode_8201)
@@ -189,7 +189,7 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device
 }
 
 alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: alpha8201_cpu_device(mconfig, ALPHA8301, "ALPHA-8301", tag, owner, clock)
+	: alpha8201_cpu_device(mconfig, ALPHA8301, "ALPHA-8301", tag, owner, clock, "alpha8301", __FILE__)
 {
 	m_opmap = opcode_8301;
 }

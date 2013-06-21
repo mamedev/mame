@@ -127,7 +127,7 @@ class tms99xx_device : public cpu_device
 public:
 	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
 				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, UINT32 clock);
+				device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	~tms99xx_device();
 

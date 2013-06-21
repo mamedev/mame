@@ -406,8 +406,8 @@ void m6805_base_device::interrupt()
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width)
-	: cpu_device(mconfig, type, name, tag, owner, clock),
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, addr_width)
 {
 }

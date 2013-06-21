@@ -54,7 +54,7 @@ const device_type LR35902 = &device_creator<lr35902_cpu_device>;
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock)
+	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock, "lr35902", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_A(0)
 	, m_F(0)

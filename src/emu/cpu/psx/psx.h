@@ -183,7 +183,7 @@ public:
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 
 protected:
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();

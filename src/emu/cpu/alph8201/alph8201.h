@@ -41,7 +41,7 @@ class alpha8201_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides

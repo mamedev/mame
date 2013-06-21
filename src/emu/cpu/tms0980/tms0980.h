@@ -28,8 +28,8 @@ public:
 	// construction/destruction
 	tms1xxx_cpu_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock
 	                  , const UINT32* decode_table, UINT16 o_mask, UINT16 r_mask, UINT8 pc_size, UINT8 byte_size, UINT8 x_bits
-	                  , int program_addrbus_width, address_map_constructor program, int data_addrbus_width, address_map_constructor data)
-		: cpu_device( mconfig, type, name, tag, owner, clock )
+	                  , int program_addrbus_width, address_map_constructor program, int data_addrbus_width, address_map_constructor data, const char *shortname, const char *source)
+		: cpu_device( mconfig, type, name, tag, owner, clock, shortname, source)
 		, m_program_config("program", ENDIANNESS_BIG, byte_size > 8 ? 16 : 8, program_addrbus_width, 0, program )
 		, m_data_config("data", ENDIANNESS_BIG, 8, data_addrbus_width, 0, data )
 		, m_o_mask( o_mask )
@@ -144,7 +144,7 @@ class tms1000_cpu_device : public tms1xxx_cpu_device
 {
 public:
 	tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask);
+	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source);
 
 protected:
 	// device_state_interface overrides
@@ -179,7 +179,7 @@ class tms1100_cpu_device : public tms1xxx_cpu_device
 {
 public:
 	tms1100_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask);
+	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 o_mask, UINT16 r_mask, const char *shortname, const char *source);
 
 protected:
 	// device_state_interface overrides

@@ -327,7 +327,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(avr8_internal_map))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(avr8_internal_map), "atmega88", __FILE__)
 {
 }
 
@@ -336,7 +336,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(avr8_internal_map))
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(avr8_internal_map), "atmega644", __FILE__)
 {
 }
 
@@ -344,8 +344,8 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, "AVR8", tag, owner, clock),
+avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, "AVR8", tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 2),

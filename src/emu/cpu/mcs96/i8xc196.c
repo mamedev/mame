@@ -41,7 +41,7 @@
 #include "i8xc196.h"
 
 i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	mcs96_device(mconfig, type, name, tag, owner, clock, 16)
+	mcs96_device(mconfig, type, name, tag, owner, clock, 16, shortname, source)
 {
 }
 
