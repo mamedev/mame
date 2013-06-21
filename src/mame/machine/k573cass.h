@@ -45,7 +45,7 @@ class konami573_cassette_x_device: public device_t,
 {
 public:
 	konami573_cassette_x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	konami573_cassette_x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	virtual DECLARE_READ_LINE_MEMBER(read_line_secflash_sda);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d0);
@@ -120,7 +120,7 @@ class konami573_cassette_y_device: public device_t,
 {
 public:
 	konami573_cassette_y_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	konami573_cassette_y_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_d0_handler(device_t &device, _Object object) { return downcast<konami573_cassette_y_device &>(device).m_d0_handler.set_callback(object); }
