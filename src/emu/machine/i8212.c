@@ -32,7 +32,7 @@ const device_type I8212 = &device_creator<i8212_device>;
 //-------------------------------------------------
 
 i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8212, "Intel 8212", tag, owner, clock),
+	: device_t(mconfig, I8212, "Intel 8212", tag, owner, clock, "i8212", __FILE__),
 		m_md(I8212_MODE_INPUT),
 		m_stb(0)
 {

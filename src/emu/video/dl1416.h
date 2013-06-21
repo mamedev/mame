@@ -53,7 +53,7 @@ DECLARE_WRITE8_DEVICE_HANDLER( dl1416_data_w );
 class dl1416_device : public device_t
 {
 public:
-	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~dl1416_device() { global_free(m_token); }
 
 	// access to legacy token

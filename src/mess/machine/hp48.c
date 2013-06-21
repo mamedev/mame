@@ -1059,7 +1059,7 @@ void hp48_port_image_device::device_start()
 }
 
 hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock),
+	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

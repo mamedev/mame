@@ -112,7 +112,7 @@ void huc6270_device::device_config_complete()
 
 
 huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6270, "Hudson/NEC HuC6270", tag, owner, clock)
+	: device_t(mconfig, HUC6270, "Hudson/NEC HuC6270", tag, owner, clock, "huc6270", __FILE__)
 {
 }
 

@@ -281,7 +281,7 @@ inline void mccs1850_device::advance_seconds()
 //-------------------------------------------------
 
 mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MCCS1850, "MCCS1850", tag, owner, clock),
+	: device_t(mconfig, MCCS1850, "MCCS1850", tag, owner, clock, "mccs1850", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_pse(1),

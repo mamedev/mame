@@ -1016,7 +1016,7 @@ inline void z8536_device::external_port_w(int port, int bit, int state)
 //-------------------------------------------------
 
 z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock),
+	: device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock, "z8536", __FILE__),
 		device_z80daisy_interface(mconfig, *this),
 		m_int(CLEAR_LINE)
 {

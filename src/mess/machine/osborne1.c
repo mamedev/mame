@@ -508,7 +508,7 @@ const device_type OSBORNE1_DAISY = &device_creator<osborne1_daisy_device>;
 //  z80ctc_device - constructor
 //-------------------------------------------------
 osborne1_daisy_device::osborne1_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OSBORNE1_DAISY, "Osborne 1 daisy", tag, owner, clock),
+	: device_t(mconfig, OSBORNE1_DAISY, "Osborne 1 daisy", tag, owner, clock, "osborne1_daisy", __FILE__),
 		device_z80daisy_interface(mconfig, *this)
 {
 }

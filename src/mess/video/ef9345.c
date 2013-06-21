@@ -121,7 +121,7 @@ inline void ef9345_device::inc_y(UINT8 r)
 //-------------------------------------------------
 
 ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EF9345, "EF9345", tag, owner, clock),
+	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
 {

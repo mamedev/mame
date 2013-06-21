@@ -848,7 +848,7 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 //-------------------------------------------------
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock),
+	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_token(NULL)
 {

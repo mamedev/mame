@@ -671,7 +671,7 @@ const device_type RTC65271 = &device_creator<rtc65271_device>;
 //-------------------------------------------------
 
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RTC65271, "RTC65271", tag, owner, clock),
+	: device_t(mconfig, RTC65271, "RTC65271", tag, owner, clock, "rtc65271", __FILE__),
 		device_nvram_interface(mconfig, *this)
 {
 }

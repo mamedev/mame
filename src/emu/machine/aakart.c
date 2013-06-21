@@ -38,7 +38,7 @@ const device_type AAKART = &device_creator<aakart_device>;
 //-------------------------------------------------
 
 aakart_device::aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AAKART, "aakart", tag, owner, clock)
+	: device_t(mconfig, AAKART, "aakart", tag, owner, clock, "aakart", __FILE__)
 {
 }
 

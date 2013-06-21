@@ -80,7 +80,7 @@ const device_type I8275x = &device_creator<i8275x_device>;
 //-------------------------------------------------
 
 i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8275x, "I8275", tag, owner, clock),
+	: device_t(mconfig, I8275x, "I8275", tag, owner, clock, "i8275x", __FILE__),
 		m_status(0),
 		m_param_idx(0),
 		m_param_end(0),

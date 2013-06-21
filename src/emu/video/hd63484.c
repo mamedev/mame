@@ -1579,7 +1579,7 @@ static DEVICE_RESET( hd63484 )
 const device_type HD63484 = &device_creator<hd63484_device>;
 
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HD63484, "HD63484", tag, owner, clock)
+	: device_t(mconfig, HD63484, "HD63484", tag, owner, clock, "hd63484", __FILE__)
 {
 	m_token = global_alloc_clear(hd63484_state);
 }

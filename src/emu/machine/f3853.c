@@ -48,7 +48,7 @@ const device_type F3853 = &device_creator<f3853_device>;
 //-------------------------------------------------
 
 f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, F3853, "F3853", tag, owner, clock)
+	: device_t(mconfig, F3853, "F3853", tag, owner, clock, "f3853", __FILE__)
 {
 }
 

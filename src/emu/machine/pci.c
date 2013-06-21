@@ -88,7 +88,7 @@ const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
 pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
+		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus_legacy", __FILE__),
 		m_father(NULL)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
@@ -305,7 +305,7 @@ const device_type PCI_BUS = &device_creator<pci_bus_device>;
 //  pci_bus_device - constructor
 //-------------------------------------------------
 pci_bus_device::pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock),
+		device_t(mconfig, PCI_BUS, "PCI Bus", tag, owner, clock, "pci_bus", __FILE__),
 		m_father(NULL)
 {
 	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++) {
@@ -530,7 +530,7 @@ const device_type PCI_CONNECTOR = &device_creator<pci_connector>;
 
 
 pci_connector::pci_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock),
+	device_t(mconfig, PCI_CONNECTOR, "PCI device connector abstraction", tag, owner, clock, "pci_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
 }

@@ -465,7 +465,7 @@ WRITE16_DEVICE_HANDLER(hd63450_w) { hd63450_write(device,offset,data,mem_mask); 
 const device_type HD63450 = &device_creator<hd63450_device>;
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock)
+	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock, "hd63450", __FILE__)
 {
 	m_token = global_alloc_clear(hd63450_t);
 }

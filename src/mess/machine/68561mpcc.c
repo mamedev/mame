@@ -27,7 +27,7 @@ const device_type MPCC68561 = &device_creator<mpcc68561_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock)
+mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock, "mpcc68561", __FILE__)
 {
 }
 

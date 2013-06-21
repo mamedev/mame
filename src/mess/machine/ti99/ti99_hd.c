@@ -32,7 +32,7 @@
 #define SYNC 13
 
 mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_MFMHD, "MFM Harddisk", tag, owner, clock)
+: device_t(mconfig, TI99_MFMHD, "MFM Harddisk", tag, owner, clock, "mfm_harddisk", __FILE__)
 {
 }
 

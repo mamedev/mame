@@ -39,7 +39,7 @@ const device_type CONCEPT_EXP_PORT = &device_creator<concept_exp_port_device>;
 //-------------------------------------------------
 
 concept_exp_port_device::concept_exp_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-					device_t(mconfig, CONCEPT_EXP_PORT, "Corvus Concept expansion port", tag, owner, clock),
+					device_t(mconfig, CONCEPT_EXP_PORT, "Corvus Concept expansion port", tag, owner, clock, "concept_exp_port", __FILE__),
 					device_slot_interface(mconfig, *this)
 {
 }

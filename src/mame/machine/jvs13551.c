@@ -31,7 +31,7 @@ ioport_constructor sega_837_13551::device_input_ports() const
 	return INPUT_PORTS_NAME(sega_837_13551_coins);
 }
 
-sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "SEGA-837-13551", tag, owner, clock)
+sega_837_13551::sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : jvs_device(mconfig, SEGA_837_13551, "SEGA-837-13551", tag, owner, clock, "sega_837_13551", __FILE__)
 {
 	memset(port_tag, 0, sizeof(port_tag));
 }

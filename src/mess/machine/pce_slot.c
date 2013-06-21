@@ -125,7 +125,7 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 //  pce_cart_slot_device - constructor
 //-------------------------------------------------
 pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, PCE_CART_SLOT, "PCE & TG16 Cartridge Slot", tag, owner, clock),
+						device_t(mconfig, PCE_CART_SLOT, "PCE & TG16 Cartridge Slot", tag, owner, clock, "pce_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_interface("pce_cart"),

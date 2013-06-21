@@ -188,7 +188,7 @@ enum
 #define LOG logerror
 
 smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock)
+: device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock, "smc92x4", __FILE__)
 {
 }
 

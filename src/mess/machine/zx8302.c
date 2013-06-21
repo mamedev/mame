@@ -171,7 +171,7 @@ inline void zx8302_device::transmit_ipc_data()
 //-------------------------------------------------
 
 zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock),
+	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock, "zx8302", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_idr(1),
 		m_irq(0),

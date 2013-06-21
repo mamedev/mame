@@ -108,7 +108,7 @@ class mos6526_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _irq> void set_callbacks(int tod_clock, _irq irq) {

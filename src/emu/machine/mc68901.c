@@ -651,7 +651,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 //-------------------------------------------------
 
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock),
+	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_gpip(0),
 		m_tsr(TSR_BUFFER_EMPTY)

@@ -583,8 +583,8 @@ static DEVICE_RESET( smc91c9x )
 }
 
 
-smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_token = global_alloc_clear(smc91c9x_state);
 }
@@ -621,7 +621,7 @@ void smc91c9x_device::device_reset()
 const device_type SMC91C94 = &device_creator<smc91c94_device>;
 
 smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: smc91c9x_device(mconfig, SMC91C94, "SMC91C94", tag, owner, clock)
+	: smc91c9x_device(mconfig, SMC91C94, "SMC91C94", tag, owner, clock, "smc91c94", __FILE__)
 {
 }
 
@@ -629,6 +629,6 @@ smc91c94_device::smc91c94_device(const machine_config &mconfig, const char *tag,
 const device_type SMC91C96 = &device_creator<smc91c96_device>;
 
 smc91c96_device::smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock)
+	: smc91c9x_device(mconfig, SMC91C96, "SMC91C96", tag, owner, clock, "smc91c96", __FILE__)
 {
 }

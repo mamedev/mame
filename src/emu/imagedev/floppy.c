@@ -45,7 +45,7 @@ const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 };
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock),
+	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock, "floppy_connector", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
 }

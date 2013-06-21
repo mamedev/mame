@@ -53,7 +53,7 @@ device_c64_user_port_interface::~device_c64_user_port_interface()
 //-------------------------------------------------
 
 c64_user_port_device::c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, C64_USER_PORT, "C64 user port", tag, owner, clock),
+		device_t(mconfig, C64_USER_PORT, "C64 user port", tag, owner, clock, "c64_user_port", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_write_cnt1(*this),
 		m_write_sp1(*this),

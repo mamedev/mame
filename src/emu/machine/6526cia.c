@@ -76,22 +76,22 @@ inline attotime legacy_mos6526_device::cycles_to_time(int c)
 //  legacy_mos6526_device - constructor
 //-------------------------------------------------
 
-legacy_mos6526_device::legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+legacy_mos6526_device::legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 legacy_mos6526r1_device::legacy_mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "MOS6526r1", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "MOS6526r1", tag, owner, clock, "legacy_mos6526r1", __FILE__) { }
 
 legacy_mos6526r2_device::legacy_mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "MOS6526r2", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "MOS6526r2", tag, owner, clock, "legacy_mos6526r2", __FILE__) { }
 
 legacy_mos8520_device::legacy_mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock, "legacy_mos8520", __FILE__) { }
 
 legacy_mos5710_device::legacy_mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock, "legacy_mos5710", __FILE__) { }
 
 
 void legacy_mos6526_device::static_set_tod_clock(device_t &device, int tod_clock)

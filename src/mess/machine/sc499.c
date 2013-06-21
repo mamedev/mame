@@ -161,7 +161,7 @@ const device_type SC499 = &device_creator<sc499_device>;
 //-------------------------------------------------
 
 sc499_device::sc499_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock)
+	: device_t(mconfig, SC499, "Archive SC-499", tag, owner, clock, "sc499", __FILE__)
 {
 	memset(static_cast<sc499_interface *>(this), 0, sizeof(sc499_interface));
 }
@@ -1171,7 +1171,7 @@ extern const device_type SC499_CTAPE;
 const device_type SC499_CTAPE = &device_creator<sc499_ctape_image_device>;
 
 sc499_ctape_image_device::sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock),
+	: device_t(mconfig, SC499_CTAPE, "Cartridge Tape", tag, owner, clock, "sc499_ctape", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

@@ -193,7 +193,7 @@ inline void upd3301_device::recompute_parameters()
 //-------------------------------------------------
 
 upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock),
+	: device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
 		m_status(0),
 		m_param_count(0),
 		m_data_fifo_pos(0),

@@ -49,7 +49,7 @@ const device_type CRT = &device_creator<crt_device>;
 //-------------------------------------------------
 
 crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock),
+	: device_t(mconfig, CRT, "CRT Video", tag, owner, clock, "crt", __FILE__),
 		m_list(NULL),
 		m_list_head(NULL),
 		m_decay_counter(0),

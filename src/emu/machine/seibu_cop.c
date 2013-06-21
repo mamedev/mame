@@ -67,7 +67,7 @@ inline void seibu_cop_device::write_word(offs_t address, UINT16 data)
 //-------------------------------------------------
 
 seibu_cop_device::seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEIBU_COP, "seibu_cop", tag, owner, clock),
+	: device_t(mconfig, SEIBU_COP, "seibu_cop", tag, owner, clock, "seibu_cop", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("io", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_cop_io))
 {

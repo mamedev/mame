@@ -467,7 +467,7 @@ WRITE8_MEMBER( z80dart_device::ba_cd_w )
 //-------------------------------------------------
 
 z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80DART_CHANNEL, "Z80-DART channel", tag, owner, clock),
+	: device_t(mconfig, Z80DART_CHANNEL, "Z80-DART channel", tag, owner, clock, "z80dart_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
 		m_rx_fifo(-1),

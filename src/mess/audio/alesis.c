@@ -33,7 +33,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 alesis_dm3ag_device::alesis_dm3ag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock),
+	: device_t(mconfig, ALESIS_DM3AG, "Alesis DM3AG", tag, owner, clock, "alesis_dm3ag", __FILE__),
 		m_dac(*this, "dac")
 {
 }

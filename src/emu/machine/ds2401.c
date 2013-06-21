@@ -28,7 +28,7 @@ inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *
 const device_type DS2401 = &device_creator<ds2401_device>;
 
 ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DS2401, "DS2401", tag, owner, clock)
+	: device_t(mconfig, DS2401, "DS2401", tag, owner, clock, "ds2401", __FILE__)
 {
 }
 

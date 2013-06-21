@@ -40,7 +40,7 @@ const device_type CDP1861 = &device_creator<cdp1861_device>;
 //-------------------------------------------------
 
 cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock),
+	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock, "cdp1861", __FILE__),
 		m_write_irq(*this),
 		m_write_dma_out(*this),
 		m_write_efx(*this)

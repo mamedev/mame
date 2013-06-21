@@ -77,7 +77,7 @@ inline void im6402_device::set_tre(int state)
 //-------------------------------------------------
 
 im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock),
+	: device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock, "im6402", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rrc_count(0),
 		m_trc_count(0)

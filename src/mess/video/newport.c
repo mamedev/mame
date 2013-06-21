@@ -80,7 +80,7 @@ const device_type NEWPORT_VIDEO = &device_creator<newport_video_device>;
 
 
 newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, NEWPORT_VIDEO, "SGI Newport graphics board", tag, owner, clock)
+				: device_t(mconfig, NEWPORT_VIDEO, "SGI Newport graphics board", tag, owner, clock, "newport_video", __FILE__)
 {
 }
 

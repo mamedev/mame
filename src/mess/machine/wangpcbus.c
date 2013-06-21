@@ -29,7 +29,7 @@ const device_type WANGPC_BUS_SLOT = &device_creator<wangpcbus_slot_device>;
 //-------------------------------------------------
 
 wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock),
+		device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock, "wangpcbus_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -103,7 +103,7 @@ void wangpcbus_device::device_config_complete()
 //-------------------------------------------------
 
 wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock)
+		device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock, "wangpcbus", __FILE__)
 {
 }
 

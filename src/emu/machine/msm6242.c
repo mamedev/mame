@@ -64,7 +64,7 @@ const device_type msm6242 = &device_creator<msm6242_device>;
 //-------------------------------------------------
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock),
+	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock, "msm6242", __FILE__),
 		device_rtc_interface(mconfig, *this)
 {
 }

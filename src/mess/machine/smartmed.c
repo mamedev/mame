@@ -75,7 +75,7 @@ enum
 const device_type NAND = &device_creator<nand_device>;
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock)
+	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__)
 {
 }
 nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)

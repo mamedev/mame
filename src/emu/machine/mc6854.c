@@ -1038,7 +1038,7 @@ static DEVICE_START( mc6854 )
 const device_type MC6854 = &device_creator<mc6854_device>;
 
 mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6854, "Motorola MC6854 ADLC", tag, owner, clock)
+	: device_t(mconfig, MC6854, "Motorola MC6854 ADLC", tag, owner, clock, "mc6854", __FILE__)
 {
 	m_token = global_alloc_clear(mc6854_t);
 }

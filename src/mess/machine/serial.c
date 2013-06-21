@@ -15,7 +15,7 @@ device_serial_port_interface::~device_serial_port_interface()
 }
 
 serial_port_device::serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERIAL_PORT, "Serial Port", tag, owner, clock),
+	: device_t(mconfig, SERIAL_PORT, "Serial Port", tag, owner, clock, "serial_port", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_dev(NULL)
 {

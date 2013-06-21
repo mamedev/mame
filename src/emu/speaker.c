@@ -73,7 +73,7 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 //-------------------------------------------------
 
 speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock),
+	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock, "speaker", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_x(0.0),
 		m_y(0.0),

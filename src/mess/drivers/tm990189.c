@@ -465,7 +465,7 @@ protected:
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock),
+	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

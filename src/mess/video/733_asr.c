@@ -219,7 +219,7 @@ static DEVICE_RESET( asr733 )
 const device_type ASR733 = &device_creator<asr733_device>;
 
 asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock)
+	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__)
 {
 	m_token = global_alloc_clear(asr_t);
 }

@@ -296,8 +296,8 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 	}
 }
 
-dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+dl1416_device::dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_token = global_alloc_clear(dl1416_state);
 }
@@ -334,7 +334,7 @@ void dl1416_device::device_reset()
 const device_type DL1416B = &device_creator<dl1416b_device>;
 
 dl1416b_device::dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: dl1416_device(mconfig, DL1416B, "DL1416B", tag, owner, clock)
+	: dl1416_device(mconfig, DL1416B, "DL1416B", tag, owner, clock, "dl1416b", __FILE__)
 {
 }
 
@@ -342,6 +342,6 @@ dl1416b_device::dl1416b_device(const machine_config &mconfig, const char *tag, d
 const device_type DL1416T = &device_creator<dl1416t_device>;
 
 dl1416t_device::dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock)
+	: dl1416_device(mconfig, DL1416T, "DL1416T", tag, owner, clock, "dl1416t", __FILE__)
 {
 }

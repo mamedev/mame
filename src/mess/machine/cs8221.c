@@ -57,7 +57,7 @@ static const char *const register_names[] =
 //-------------------------------------------------
 
 cs8221_device::cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock),
+	: device_t(mconfig, CS8221, "CS8221", tag, owner, clock, "cs8221", __FILE__),
 		m_address(0),
 		m_address_valid(false)
 {

@@ -20,7 +20,7 @@ const device_type SERFLASH = &device_creator<serflash_device>;
 //-------------------------------------------------
 
 serflash_device::serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERFLASH, "SERFLASH", tag, owner, clock),
+	: device_t(mconfig, SERFLASH, "SERFLASH", tag, owner, clock, "serflash", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_length(0)
 {

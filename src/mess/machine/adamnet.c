@@ -52,7 +52,7 @@ device_adamnet_card_interface::~device_adamnet_card_interface()
 //  adamnet_slot_device - constructor
 //-------------------------------------------------
 adamnet_slot_device::adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ADAMNET_SLOT, "ADAMnet slot", tag, owner, clock),
+	device_t(mconfig, ADAMNET_SLOT, "ADAMnet slot", tag, owner, clock, "adamnet_slot", __FILE__),
 	device_slot_interface(mconfig, *this)
 {
 }
@@ -80,7 +80,7 @@ void adamnet_slot_device::device_start()
 //-------------------------------------------------
 
 adamnet_device::adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ADAMNET, "ADAMnet bus", tag, owner, clock),
+	device_t(mconfig, ADAMNET, "ADAMnet bus", tag, owner, clock, "adamnet", __FILE__),
 	m_txd(1),
 	m_reset(CLEAR_LINE)
 {

@@ -56,7 +56,7 @@ const device_type Z80PIO = &device_creator<z80pio_device>;
 //-------------------------------------------------
 
 z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80PIO, "Z8420", tag, owner, clock),
+	: device_t(mconfig, Z80PIO, "Z8420", tag, owner, clock, "z80pio", __FILE__),
 		device_z80daisy_interface(mconfig, *this)
 {
 }

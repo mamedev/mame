@@ -523,7 +523,7 @@ static DEVICE_RESET( upd4990a )
 const device_type UPD4990A_OLD = &device_creator<upd4990a_old_device>;
 
 upd4990a_old_device::upd4990a_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD4990A_OLD, "NEC uPD4990A", tag, owner, clock)
+	: device_t(mconfig, UPD4990A_OLD, "NEC uPD4990A", tag, owner, clock, "upd4990a_old", __FILE__)
 {
 	m_token = global_alloc_clear(upd4990a_state);
 }

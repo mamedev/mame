@@ -187,7 +187,7 @@ machine_config_constructor cs4031_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CS4031, "CS4031", tag, owner, clock),
+	device_t(mconfig, CS4031, "CS4031", tag, owner, clock, "cs4031", __FILE__),
 	m_read_ior(*this),
 	m_write_iow(*this),
 	m_write_tc(*this),

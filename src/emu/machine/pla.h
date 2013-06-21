@@ -64,7 +64,7 @@ class pla_device :  public device_t
 {
 public:
 	// construction/destruction
-	pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask);
+	pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 output_mask, const char *shortname, const char *source);
 
 	UINT32 read(UINT32 input);
 

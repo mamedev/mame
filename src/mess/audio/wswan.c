@@ -24,7 +24,7 @@ const device_type WSWAN = &device_creator<wswan_sound_device>;
 //-------------------------------------------------
 
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WSWAN, "WonderSwan Custom", tag, owner, clock),
+	: device_t(mconfig, WSWAN, "WonderSwan Custom", tag, owner, clock, "wswan_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_channel(NULL),
 		m_sweep_step(0),

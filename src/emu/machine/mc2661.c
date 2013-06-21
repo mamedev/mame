@@ -100,7 +100,7 @@ enum
 //-------------------------------------------------
 
 mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC2661, "MC2661", tag, owner, clock),
+	: device_t(mconfig, MC2661, "MC2661", tag, owner, clock, "mc2661", __FILE__),
 		device_serial_interface(mconfig, *this)
 {
 }

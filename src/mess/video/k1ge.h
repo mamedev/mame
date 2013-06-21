@@ -22,7 +22,7 @@ class k1ge_device : public device_t
 {
 public:
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER( reg_read );
 	DECLARE_WRITE8_MEMBER( reg_write );

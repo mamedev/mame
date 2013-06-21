@@ -38,7 +38,7 @@ const device_type RAMDAC = &device_creator<ramdac_device>;
 //-------------------------------------------------
 
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock),
+	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram))
 {

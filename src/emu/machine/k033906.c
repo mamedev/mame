@@ -21,7 +21,7 @@ const device_type K033906 = &device_creator<k033906_device>;
 //-------------------------------------------------
 
 k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K033906, "Konami 033906", tag, owner, clock)
+	: device_t(mconfig, K033906, "Konami 033906", tag, owner, clock, "k033906", __FILE__)
 {
 }
 

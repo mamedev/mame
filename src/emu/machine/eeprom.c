@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EEPROM, "EEPROM", tag, owner, clock),
+	: device_t(mconfig, EEPROM, "EEPROM", tag, owner, clock, "eeprom", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_default_data_size(0),

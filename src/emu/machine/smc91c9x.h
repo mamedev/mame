@@ -52,7 +52,7 @@ DECLARE_WRITE16_DEVICE_HANDLER( smc91c9x_w );
 class smc91c9x_device : public device_t
 {
 public:
-	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~smc91c9x_device() { global_free(m_token); }
 
 	// access to legacy token

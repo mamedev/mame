@@ -112,7 +112,7 @@ class wd_fdc_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;
 
-	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
@@ -414,7 +414,7 @@ private:
 
 class wd_fdc_analog_t : public wd_fdc_t {
 public:
-	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	virtual void pll_reset(bool fm, attotime when);
@@ -432,7 +432,7 @@ private:
 
 class wd_fdc_digital_t : public wd_fdc_t {
 public:
-	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	static const int wd_digital_step_times[4];

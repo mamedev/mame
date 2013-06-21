@@ -68,7 +68,7 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 //-------------------------------------------------
 
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock)
+	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__)
 {
 	memset(static_cast<ptm6840_interface *>(this), 0, sizeof(ptm6840_interface));
 }

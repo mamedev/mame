@@ -260,7 +260,7 @@ inline int i8255_device::port_c_upper_mode()
 //-------------------------------------------------
 
 i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8255, "I8255", tag, owner, clock)
+	: device_t(mconfig, I8255, "I8255", tag, owner, clock, "i8279", __FILE__)
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 	m_control = 0;

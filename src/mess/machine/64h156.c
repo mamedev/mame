@@ -397,7 +397,7 @@ inline void c64h156_device::decode_bit()
 //-------------------------------------------------
 
 c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C64H156, "64H156", tag, owner, clock),
+	: device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_floppy(NULL),

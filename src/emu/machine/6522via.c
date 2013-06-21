@@ -147,7 +147,7 @@ const device_type VIA6522 = &device_creator<via6522_device>;
 //-------------------------------------------------
 
 via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock),
+	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
 		m_irq(CLEAR_LINE)
 {
 }

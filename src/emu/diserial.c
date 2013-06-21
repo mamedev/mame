@@ -449,7 +449,7 @@ const device_type SERIAL_SOURCE = &device_creator<serial_source_device>;
 //-------------------------------------------------
 
 serial_source_device::serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERIAL_SOURCE, "Serial source", tag, owner, clock),
+	: device_t(mconfig, SERIAL_SOURCE, "Serial source", tag, owner, clock, "serial_source", __FILE__),
 		device_serial_interface(mconfig, *this)
 {
 }

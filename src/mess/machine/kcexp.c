@@ -152,13 +152,13 @@ device_kcexp_interface::~device_kcexp_interface()
 //  kcexp_slot_device - constructor
 //-------------------------------------------------
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock),
+		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock, "kcexp_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
 
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -316,7 +316,7 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //  kccart_slot_device - constructor
 //-------------------------------------------------
 kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock),
+		kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock, "kccart_slot", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

@@ -8,7 +8,7 @@ class microtouch_device :
 		public device_t
 {
 public:
-	microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb2_base &static_set_tx_callback(device_t &device, _Object object) { return downcast<microtouch_device &>(device).m_out_tx_func.set_callback(object); }
 

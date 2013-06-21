@@ -95,18 +95,18 @@ Start bit (low), Bit 0, Bit 1... highest bit, Parity bit (if enabled), 1-2 stop 
 const device_type AY31015 = &device_creator<ay31015_device>;
 const device_type AY51013 = &device_creator<ay51013_device>;
 
-ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, type, name, tag, owner, clock)
+ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock)
+				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__)
 {
 }
 
 ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: ay31015_device(mconfig, AY31015, "AY-5-1013", tag, owner, clock)
+				: ay31015_device(mconfig, AY31015, "AY-5-1013", tag, owner, clock, "ay51013", __FILE__)
 {
 }
 

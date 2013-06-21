@@ -72,7 +72,7 @@ DEVICE_START( s3c2410 )
 const device_type S3C2410 = &device_creator<s3c2410_device>;
 
 s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock)
+		: device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock, "s3c2410", __FILE__)
 {
 	m_token = global_alloc_clear(s3c24xx_t);
 }

@@ -124,13 +124,13 @@ ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const ch
 /* Ports */
 
 ti_rs232_attached_device::ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_RS232_DEV, "Serial attached device", tag, owner, clock),
+: device_t(mconfig, TI99_RS232_DEV, "Serial attached device", tag, owner, clock, "ti_rs232_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
 }
 
 ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_PIO_DEV, "Parallel attached device", tag, owner, clock),
+: device_t(mconfig, TI99_PIO_DEV, "Parallel attached device", tag, owner, clock, "ti_pio_attached", __FILE__),
 	device_image_interface(mconfig, *this)
 {
 }

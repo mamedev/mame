@@ -64,7 +64,7 @@ device_econet_interface::~device_econet_interface()
 //-------------------------------------------------
 
 econet_slot_device::econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock),
+		device_t(mconfig, ECONET_SLOT, "Econet station", tag, owner, clock, "econet_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -231,7 +231,7 @@ inline int econet_device::get_signal(int signal)
 //-------------------------------------------------
 
 econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ECONET, "Econet", tag, owner, clock)
+	: device_t(mconfig, ECONET, "Econet", tag, owner, clock, "econet", __FILE__)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{

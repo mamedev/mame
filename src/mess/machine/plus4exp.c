@@ -176,7 +176,7 @@ UINT8* device_plus4_expansion_card_interface::plus4_nvram_pointer(running_machin
 //-------------------------------------------------
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock),
+		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock, "plus4_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
 		m_write_irq(*this),

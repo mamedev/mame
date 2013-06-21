@@ -54,7 +54,7 @@ const device_type MACHINE_TTL7474 = &device_creator<ttl7474_device>;
 //-------------------------------------------------
 
 ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock),
+	: device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock, "7474", __FILE__),
 		m_output_func(*this),
 		m_comp_output_func(*this)
 {

@@ -331,7 +331,7 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 //-------------------------------------------------
 
 gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, GGF1, "Gravis GF1", tag, owner, clock),
+		: device_t(mconfig, GGF1, "Gravis GF1", tag, owner, clock, "gf1", __FILE__),
 		device_sound_interface( mconfig, *this )
 {
 }

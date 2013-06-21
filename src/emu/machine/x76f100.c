@@ -31,7 +31,7 @@ inline void ATTR_PRINTF(3,4) x76f100_device::verboselog(int n_level, const char 
 const device_type X76F100 = &device_creator<x76f100_device>;
 
 x76f100_device::x76f100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_secure_serial_flash(mconfig, X76F100, "X76F100", tag, owner, clock)
+	: device_secure_serial_flash(mconfig, X76F100, "X76F100", tag, owner, clock, "x76f100", __FILE__)
 {
 }
 

@@ -151,7 +151,7 @@ extern const device_type APOLLO_CONF;
 const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
 apollo_config_device::apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock)
+	: device_t(mconfig, APOLLO_CONF, "Apollo Configuration", tag, owner, clock, "apollo_config", __FILE__)
 {
 }
 

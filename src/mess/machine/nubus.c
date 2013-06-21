@@ -25,7 +25,7 @@ const device_type NUBUS_SLOT = &device_creator<nubus_slot_device>;
 //  nubus_slot_device - constructor
 //-------------------------------------------------
 nubus_slot_device::nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock),
+		device_t(mconfig, NUBUS_SLOT, "NUBUS_SLOT", tag, owner, clock, "nubus_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -102,7 +102,7 @@ void nubus_device::device_config_complete()
 //-------------------------------------------------
 
 nubus_device::nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock)
+		device_t(mconfig, NUBUS, "NUBUS", tag, owner, clock, "nubus", __FILE__)
 {
 }
 

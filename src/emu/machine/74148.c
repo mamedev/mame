@@ -216,7 +216,7 @@ static DEVICE_RESET( ttl74148 )
 const device_type TTL74148 = &device_creator<ttl74148_device>;
 
 ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74148, "74148", tag, owner, clock)
+	: device_t(mconfig, TTL74148, "74148", tag, owner, clock, "74148", __FILE__)
 {
 	m_token = global_alloc_clear(ttl74148_state);
 }

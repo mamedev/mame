@@ -87,7 +87,7 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
 a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock),
+		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock, "a2bus_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -161,7 +161,7 @@ void a2bus_device::device_config_complete()
 //-------------------------------------------------
 
 a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock)
+		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__)
 {
 }
 

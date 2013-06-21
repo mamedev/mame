@@ -30,7 +30,7 @@ const device_type PC_KBDC_SLOT = &device_creator<pc_kbdc_slot_device>;
 //  pc_kbdc_slot_device - constructor
 //-------------------------------------------------
 pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PC_KBDC_SLOT, "PC_KBDC_SLOT", tag, owner, clock),
+		device_t(mconfig, PC_KBDC_SLOT, "PC_KBDC_SLOT", tag, owner, clock, "pc_kbdc_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -68,7 +68,7 @@ const device_type PC_KBDC = &device_creator<pc_kbdc_device>;
 //  pc_kbdc_device - constructor
 //-------------------------------------------------
 pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PC_KBDC, "PC_KBDC", tag, owner, clock),
+		device_t(mconfig, PC_KBDC, "PC_KBDC", tag, owner, clock, "pc_kbdc", __FILE__),
 		m_clock_state(-1),
 		m_data_state(-1),
 		m_kb_clock_state(1),

@@ -14,7 +14,7 @@
 const device_type ADC1038 = &device_creator<adc1038_device>;
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADC1038, "A/D Converters 1038", tag, owner, clock)
+	: device_t(mconfig, ADC1038, "A/D Converters 1038", tag, owner, clock, "adc1038", __FILE__)
 {
 }
 

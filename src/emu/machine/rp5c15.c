@@ -184,7 +184,7 @@ inline void rp5c15_device::check_alarm()
 //-------------------------------------------------
 
 rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RP5C15, "RP5C15", tag, owner, clock),
+	: device_t(mconfig, RP5C15, "RP5C15", tag, owner, clock, "rp5c15", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_alarm(1),
 		m_alarm_on(1),

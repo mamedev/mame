@@ -123,7 +123,7 @@ class mc6845_device :   public device_t,
 public:
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
@@ -380,7 +380,7 @@ class mos8563_device : public mc6845_device,
 						public device_memory_interface
 {
 public:
-	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;

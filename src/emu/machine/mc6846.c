@@ -637,7 +637,7 @@ static DEVICE_START( mc6846 )
 const device_type MC6846 = &device_creator<mc6846_device>;
 
 mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock)
+	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__)
 {
 	m_token = global_alloc_clear(mc6846_t);
 }

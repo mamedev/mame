@@ -298,7 +298,7 @@ inline attotime z80sio_device::sio_channel::compute_time_per_character()
 //-------------------------------------------------
 
 z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80SIO, "Zilog Z80 SIO", tag, owner, clock),
+	: device_t(mconfig, Z80SIO, "Zilog Z80 SIO", tag, owner, clock, "z80sio", __FILE__),
 		device_z80daisy_interface(mconfig, *this)
 {
 	for (int i = 0; i < 8; i++)

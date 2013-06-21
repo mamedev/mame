@@ -873,14 +873,14 @@ void k1ge_device::device_reset()
 const device_type K1GE = &device_creator<k1ge_device>;
 
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock)
+	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock, "k1ge", __FILE__)
 	, m_vblank_pin_w(*this)
 	, m_hblank_pin_w(*this)
 {
 }
 
-k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_vblank_pin_w(*this)
 	, m_hblank_pin_w(*this)
 {
@@ -890,6 +890,6 @@ k1ge_device::k1ge_device(const machine_config &mconfig, device_type type, const 
 const device_type K2GE = &device_creator<k2ge_device>;
 
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock)
+	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock, "k2ge", __FILE__)
 {
 }

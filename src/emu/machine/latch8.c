@@ -234,7 +234,7 @@ static DEVICE_RESET( latch8 )
 const device_type LATCH8 = &device_creator<latch8_device>;
 
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock)
+		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__)
 {
 	m_token = global_alloc_clear(latch8_t);
 	memset((void*)&m_inline_config,0,sizeof(m_inline_config));

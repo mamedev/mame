@@ -39,7 +39,7 @@ void huc6261_device::device_config_complete()
 
 
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock)
+	: device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__)
 {
 	// Set up UV lookup table
 	for ( int ur = 0; ur < 256; ur++ )

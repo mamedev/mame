@@ -28,8 +28,8 @@ const device_type MOS8721 = &device_creator<mos8721_device>;
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 input_mask)
-	: device_t(mconfig, type, name, tag, owner, clock),
+pla_device::pla_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int inputs, int outputs, int terms, UINT32 input_mask, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_inputs(inputs),
 		m_outputs(outputs),
 		m_terms(terms),
@@ -38,12 +38,12 @@ pla_device::pla_device(const machine_config &mconfig, device_type type, const ch
 }
 
 pls100_device::pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pla_device(mconfig, PLS100, "PLS100", tag, owner, clock, 16, 8, 48, 0xffff)
+	: pla_device(mconfig, PLS100, "PLS100", tag, owner, clock, 16, 8, 48, 0xffff, "pls100", __FILE__)
 {
 }
 
 mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 379, 0x7ffffff) // TODO actual number of terms is unknown
+	: pla_device(mconfig, MOS8721, "MOS8721", tag, owner, clock, 27, 18, 379, 0x7ffffff, "mos8721", __FILE__) // TODO actual number of terms is unknown
 {
 }
 

@@ -20,7 +20,7 @@ const device_type SOCRATES_SOUND = &device_creator<socrates_snd_device>;
 //-------------------------------------------------
 
 socrates_snd_device::socrates_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SOCRATES_SOUND, "Socrates Sound", tag, owner, clock),
+	: device_t(mconfig, SOCRATES_SOUND, "Socrates Sound", tag, owner, clock, "socrates_snd", __FILE__),
 	device_sound_interface(mconfig, *this)
 {
 }

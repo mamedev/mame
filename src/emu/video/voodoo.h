@@ -126,7 +126,7 @@ DECLARE_READ32_DEVICE_HANDLER( banshee_rom_r );
 class voodoo_device : public device_t
 {
 public:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~voodoo_device() { global_free(m_token); }
 
 	// access to legacy token

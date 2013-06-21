@@ -225,7 +225,7 @@ static void decode_command(er59256_t *er59256)
 const device_type ER59256 = &device_creator<er59256_device>;
 
 er59256_device::er59256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ER59256, "Microchip ER59256 serial eeprom.", tag, owner, clock)
+	: device_t(mconfig, ER59256, "Microchip ER59256 serial eeprom.", tag, owner, clock, "er59256", __FILE__)
 {
 	m_token = global_alloc_clear(er59256_t);
 }

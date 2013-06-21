@@ -410,7 +410,7 @@ UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 const device_type I8275 = &device_creator<i8275_device>;
 
 i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8275, "Intel 8275", tag, owner, clock)
+	: device_t(mconfig, I8275, "Intel 8275", tag, owner, clock, "i8275", __FILE__)
 {
 }
 

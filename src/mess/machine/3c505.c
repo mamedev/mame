@@ -196,7 +196,7 @@ const device_type THREECOM3C505 = &device_creator<threecom3c505_device> ;
 //-------------------------------------------------
 
 threecom3c505_device::threecom3c505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock),
+	: device_t(mconfig, THREECOM3C505, "Threecom 3C505", tag, owner, clock, "threecom3c505", __FILE__),
 		device_network_interface(mconfig, *this, 10.0f)
 {
 	memset(static_cast<threecom3c505_interface *>(this), 0, sizeof(threecom3c505_interface));

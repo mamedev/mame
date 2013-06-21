@@ -49,7 +49,7 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 }
 
 generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock)
+	: device_t(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock, "generic_keyboard", __FILE__)
 	, m_io_kbd0(*this, "TERM_LINE0")
 	, m_io_kbd1(*this, "TERM_LINE1")
 	, m_io_kbd2(*this, "TERM_LINE2")

@@ -70,7 +70,7 @@ inline void dm9368_device::set_rbo(int state)
 //-------------------------------------------------
 
 dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DM9368, "DM9368", tag, owner, clock),
+	: device_t(mconfig, DM9368, "DM9368", tag, owner, clock, "dm9368", __FILE__),
 		m_rbi(1),
 		m_rbo(1)
 {

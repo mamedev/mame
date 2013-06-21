@@ -40,7 +40,7 @@ void crtc_ega_device::device_config_complete()
 
 
 crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock)
+	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__)
 {
 }
 

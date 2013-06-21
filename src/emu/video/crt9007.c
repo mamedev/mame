@@ -446,7 +446,7 @@ inline void crt9007_device::recompute_parameters()
 //-------------------------------------------------
 
 crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock),
+	: device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock, "crt9007", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
 {

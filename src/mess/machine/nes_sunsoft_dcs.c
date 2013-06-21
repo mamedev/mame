@@ -47,7 +47,7 @@ ntb_cart_interface::~ntb_cart_interface()
 const device_type NES_NTB_SLOT = &device_creator<nes_ntb_slot_device>;
 
 nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, NES_NTB_SLOT, "NES NTB Cartridge Slot", tag, owner, clock),
+						device_t(mconfig, NES_NTB_SLOT, "NES NTB Cartridge Slot", tag, owner, clock, "nes_ntb_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this)
 {

@@ -31,7 +31,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 const device_type S3C44B0 = &device_creator<s3c44b0_device>;
 
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock)
+				: device_t(mconfig, S3C44B0, "Samsung S3C44B0", tag, owner, clock, "s3c44b0", __FILE__)
 {
 	memset(&m_irq, 0, sizeof(s3c44b0_irq_t));
 	memset(m_zdma, 0, sizeof(s3c44b0_dma_t)*2);

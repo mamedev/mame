@@ -15,8 +15,8 @@
 
 const device_type MICROTOUCH = &device_creator<microtouch_device>;
 
-microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock, "microtouch", __FILE__),
+microtouch_device::microtouch_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_out_tx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
@@ -283,7 +283,7 @@ ioport_constructor microtouch_device::device_input_ports() const
 const device_type MICROTOUCH_SERIAL = &device_creator<microtouch_serial_device>;
 
 microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock),
+	: microtouch_device(mconfig, MICROTOUCH_SERIAL, "Microtouch Serial Touchscreen", tag, owner, clock, "microtouch_serial", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_out_stx_func(*this)
 {

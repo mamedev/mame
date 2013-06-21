@@ -1157,7 +1157,7 @@ extern const device_type OMTI_DISK;
 const device_type OMTI_DISK = &device_creator<omti_disk_image_device>;
 
 omti_disk_image_device::omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock),
+	: device_t(mconfig, OMTI_DISK, "Winchester", tag, owner, clock, "omti_disk_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -1332,7 +1332,7 @@ static DEVICE_RESET( omti8621 )
 const device_type OMTI8621 = &device_creator<omti8621_device>;
 
 omti8621_device::omti8621_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OMTI8621, "OMTI 8621", tag, owner, clock)
+	: device_t(mconfig, OMTI8621, "OMTI 8621", tag, owner, clock, "omti8621", __FILE__)
 {
 	m_token = global_alloc_clear(omti8621_state);
 }

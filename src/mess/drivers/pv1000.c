@@ -44,7 +44,7 @@ extern const device_type PV1000;
 const device_type PV1000 = &device_creator<pv1000_sound_device>;
 
 pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock),
+				: device_t(mconfig, PV1000, "NEC D65010G031", tag, owner, clock, "pv1000_sound", __FILE__),
 					device_sound_interface(mconfig, *this)
 {
 }

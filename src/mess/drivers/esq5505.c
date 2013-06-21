@@ -204,7 +204,7 @@ private:
 const device_type ESQ_5505_5510_PUMP = &device_creator<esq_5505_5510_pump>;
 
 esq_5505_5510_pump::esq_5505_5510_pump(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock),
+	: device_t(mconfig, ESQ_5505_5510_PUMP, "ESQ_5505_5510_PUMP", tag, owner, clock, "esq_5505_5510_pump", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_esp_halted(true)
 {

@@ -129,7 +129,7 @@ void mb89352_device::device_config_complete()
  */
 
 mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock)
+	: device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__)
 {
 }
 

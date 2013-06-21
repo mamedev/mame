@@ -829,7 +829,7 @@ static DEVICE_START( mc6843 )
 const device_type MC6843 = &device_creator<mc6843_device>;
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6843, "Motorola MC6843 floppy controller", tag, owner, clock)
+	: device_t(mconfig, MC6843, "Motorola MC6843 floppy controller", tag, owner, clock, "mc6843", __FILE__)
 {
 	m_token = global_alloc_clear(mc6843_t);
 }

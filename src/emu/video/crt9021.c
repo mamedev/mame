@@ -82,7 +82,7 @@ enum
 //-------------------------------------------------
 
 crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock)
+	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock, "crt9021", __FILE__)
 {
 }
 

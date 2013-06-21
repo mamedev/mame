@@ -42,7 +42,7 @@ const device_type INS8154 = &device_creator<ins8154_device>;
 //-------------------------------------------------
 
 ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, INS8154, "INS8154", tag, owner, clock)
+	: device_t(mconfig, INS8154, "INS8154", tag, owner, clock, "ins8154", __FILE__)
 {
 }
 

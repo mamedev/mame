@@ -59,7 +59,7 @@ const device_type PSION_DATAPACK = &device_creator<datapack_device>;
 //-------------------------------------------------
 
 datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock),
+	: device_t(mconfig, PSION_DATAPACK, "Psion Datapack", tag, owner, clock, "datapack", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

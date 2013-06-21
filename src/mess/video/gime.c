@@ -106,8 +106,8 @@
 //  ctor
 //-------------------------------------------------
 
-gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false)
+gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source)
 {
 }
 
@@ -2054,7 +2054,7 @@ const device_type GIME_PAL = &device_creator<gime_pal_device>;
 //-------------------------------------------------
 
 gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: gime_base_device(mconfig, GIME_NTSC, "GIME_NTSC", tag, owner, clock, ntsc_round_fontdata8x12)
+	: gime_base_device(mconfig, GIME_NTSC, "GIME_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, "gime_ntsc", __FILE__)
 {
 }
 
@@ -2065,6 +2065,6 @@ gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: gime_base_device(mconfig, GIME_PAL, "GIME_PAL", tag, owner, clock, pal_round_fontdata8x12)
+	: gime_base_device(mconfig, GIME_PAL, "GIME_PAL", tag, owner, clock, pal_round_fontdata8x12, "gime_pal", __FILE__)
 {
 }

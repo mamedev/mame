@@ -7,7 +7,7 @@
 const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_device>;
 
 psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PSX_CONTROLLER_PORT, "Playstation Controller Port", tag, owner, clock),
+		device_t(mconfig, PSX_CONTROLLER_PORT, "Playstation Controller Port", tag, owner, clock, "psx_controller_port", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_card(*this, "card")
 {

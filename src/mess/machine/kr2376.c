@@ -377,7 +377,7 @@ static DEVICE_START( kr2376 )
 const device_type KR2376 = &device_creator<kr2376_device>;
 
 kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock)
+	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__)
 {
 	m_token = global_alloc_clear(kr2376_t);
 }

@@ -73,7 +73,7 @@ UINT32 screen_device::m_id_counter = 0;
 //-------------------------------------------------
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SCREEN, "Video Screen", tag, owner, clock),
+	: device_t(mconfig, SCREEN, "Video Screen", tag, owner, clock, "screen", __FILE__),
 		m_type(SCREEN_TYPE_RASTER),
 		m_oldstyle_vblank_supplied(false),
 		m_refresh(0),

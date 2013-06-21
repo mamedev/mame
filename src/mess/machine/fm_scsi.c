@@ -37,7 +37,7 @@ const device_type FMSCSI = &device_creator<fmscsi_device>;
  */
 
 fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock),
+	: device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
 {

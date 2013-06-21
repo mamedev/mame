@@ -144,7 +144,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock),
+	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
 		m_io_term_frame(*this, "TERM_FRAME"),
 		m_io_term_conf(*this, "TERM_CONF")
 {

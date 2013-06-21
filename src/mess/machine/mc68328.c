@@ -31,7 +31,7 @@ const device_type MC68328 = &device_creator<mc68328_device>;
 
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock)
+				: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__)
 {
 }
 

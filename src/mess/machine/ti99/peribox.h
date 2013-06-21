@@ -47,6 +47,7 @@ class peribox_device : public bus8z_device
 	friend class peribox_slot_device;
 public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// Next six methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz);

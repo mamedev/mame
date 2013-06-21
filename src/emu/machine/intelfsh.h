@@ -113,7 +113,7 @@ public:
 
 protected:
 	// construction/destruction
-	intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -159,7 +159,7 @@ class intelfsh8_device : public intelfsh_device
 {
 protected:
 	// construction/destruction
-	intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 public:
 	// public interface
@@ -179,7 +179,7 @@ class intelfsh16_device : public intelfsh_device
 {
 protected:
 	// construction/destruction
-	intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 public:
 	// public interface

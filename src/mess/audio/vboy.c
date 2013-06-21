@@ -194,7 +194,7 @@ INLINE void mputb(UINT8 *ptr, INT8 data) { *ptr = data; }
 //-------------------------------------------------
 
 vboysnd_device::vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VBOYSND, "Virtual Boy audio", tag, owner, clock),
+	: device_t(mconfig, VBOYSND, "Virtual Boy audio", tag, owner, clock, "vboysnd", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }

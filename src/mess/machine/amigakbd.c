@@ -20,7 +20,7 @@ const device_type AMIGAKBD = &device_creator<amigakbd_device>;
 //-------------------------------------------------
 
 amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AMIGAKBD, "Amiga Keyboard", tag, owner, clock)
+	: device_t(mconfig, AMIGAKBD, "Amiga Keyboard", tag, owner, clock, "amigakbd", __FILE__)
 {
 }
 

@@ -106,7 +106,7 @@ TODO: Tests on a real machine
     Constructor
 */
 tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TMS9901, "TMS9901 Programmable System Interface", tag, owner, clock)
+: device_t(mconfig, TMS9901, "TMS9901 Programmable System Interface", tag, owner, clock, "tms9901", __FILE__)
 {
 }
 

@@ -112,8 +112,8 @@ void device_sega8_cart_interface::ram_alloc(running_machine &machine, UINT32 siz
 //  sega8_cart_slot_device - constructor
 //-------------------------------------------------
 
-sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_card) :
-						device_t(mconfig, type, name, tag, owner, clock),
+sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_card, const char *shortname, const char *source) :
+						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(SEGA8_BASE_ROM),
@@ -125,7 +125,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, de
 }
 
 sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, SEGA8_CART_SLOT, "Sega Master System / Game Gear / SG1000 Cartridge Slot", tag, owner, clock),
+						device_t(mconfig, SEGA8_CART_SLOT, "Sega Master System / Game Gear / SG1000 Cartridge Slot", tag, owner, clock, "sega8_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(SEGA8_BASE_ROM),
@@ -137,7 +137,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, co
 }
 
 sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, TRUE)
+						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, TRUE, "sega8_card_slot", __FILE__)
 {
 }
 

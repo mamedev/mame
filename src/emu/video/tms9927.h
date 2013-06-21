@@ -24,7 +24,7 @@ class tms9927_device : public device_t,
 {
 public:
 	tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~tms9927_device() {}
 
 	DECLARE_WRITE8_MEMBER(write);

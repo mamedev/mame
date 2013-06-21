@@ -222,7 +222,7 @@ const device_type UPD1771C = &device_creator<upd1771c_device>;
 
 
 upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock),
+				: device_t(mconfig, UPD1771C, "NEC uPD1771C 017", tag, owner, clock, "upd1771c", __FILE__),
 					device_sound_interface(mconfig, *this)
 {
 }

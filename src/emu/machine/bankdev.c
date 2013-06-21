@@ -4,7 +4,7 @@
 const device_type ADDRESS_MAP_BANK = &device_creator<address_map_bank_device>;
 
 address_map_bank_device::address_map_bank_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, ADDRESS_MAP_BANK, "Address Map Bank", tag, owner, clock),
+	: device_t(mconfig, ADDRESS_MAP_BANK, "Address Map Bank", tag, owner, clock, "address_map_bank", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_endianness(ENDIANNESS_NATIVE),
 		m_databus_width(0),

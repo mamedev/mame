@@ -23,7 +23,7 @@ const device_type DS2404 = &device_creator<ds2404_device>;
 //-------------------------------------------------
 
 ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DS2404, "DS2404", tag, owner, clock),
+	: device_t(mconfig, DS2404, "DS2404", tag, owner, clock, "ds2404", __FILE__),
 		device_nvram_interface(mconfig, *this)
 {
 }

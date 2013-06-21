@@ -37,7 +37,7 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //-------------------------------------------------
 
 cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock),
+	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

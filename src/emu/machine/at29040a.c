@@ -33,7 +33,7 @@
     Constructor.
 */
 at29040a_device::at29040a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, AT29040A, "ATMEL 29040A 512K*8 FEEPROM", tag, owner, clock),
+: device_t(mconfig, AT29040A, "ATMEL 29040A 512K*8 FEEPROM", tag, owner, clock, "at29040a", __FILE__),
 	device_nvram_interface(mconfig, *this)
 {
 }

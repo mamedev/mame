@@ -146,7 +146,7 @@
 #define LOG logerror
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock)
+: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__)
 {
 	m_eprom = NULL;
 }
@@ -958,7 +958,7 @@ static const UINT8 MF1_CODE[0xe] =
 };
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock)
+: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__)
 {
 }
 
@@ -1415,7 +1415,7 @@ const device_type GENEVE_KEYBOARD = &device_creator<geneve_keyboard_device>;
 ****************************************************************************/
 
 geneve_mouse_device::geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock)
+: device_t(mconfig, GENEVE_MOUSE, "Geneve mouse", tag, owner, clock, "geneve_mouse", __FILE__)
 {
 }
 

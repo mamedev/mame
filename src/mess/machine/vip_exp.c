@@ -52,7 +52,7 @@ device_vip_expansion_card_interface::device_vip_expansion_card_interface(const m
 //-------------------------------------------------
 
 vip_expansion_slot_device::vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock),
+	device_t(mconfig, VIP_EXPANSION_SLOT, "VIP expansion port", tag, owner, clock, "vip_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_dma_out(*this),

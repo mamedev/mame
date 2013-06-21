@@ -92,7 +92,7 @@ inline void i8355_device::write_port(int port, UINT8 data)
 //-------------------------------------------------
 
 i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock),
+	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock, "i8355", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(i8355))
 {

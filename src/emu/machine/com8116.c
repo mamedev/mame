@@ -47,7 +47,7 @@ const int com8116_device::divisors_32X_5_0688MHz[] =
 //-------------------------------------------------
 
 com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, COM8116, "COM8116", tag, owner, clock),
+	: device_t(mconfig, COM8116, "COM8116", tag, owner, clock, "com8116", __FILE__),
 		m_write_fx4(*this),
 		m_write_fr(*this),
 		m_write_ft(*this)

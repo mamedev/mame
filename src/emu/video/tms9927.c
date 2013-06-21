@@ -36,27 +36,27 @@ const device_type CRT5037 = &device_creator<crt5037_device>;
 const device_type CRT5057 = &device_creator<crt5057_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock)
+				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock, "tms9927", __FILE__)
 {
 }
 
-tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, type, name, tag, owner, clock)
+tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 crt5027_device::crt5027_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock)
+				: tms9927_device(mconfig, CRT5027, "CRT5027", tag, owner, clock, "crt5027", __FILE__)
 {
 }
 
 crt5037_device::crt5037_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock)
+				: tms9927_device(mconfig, CRT5037, "CRT5037", tag, owner, clock, "crt5037", __FILE__)
 {
 }
 
 crt5057_device::crt5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock)
+				: tms9927_device(mconfig, CRT5057, "CRT5057", tag, owner, clock, "crt5057", __FILE__)
 {
 }
 

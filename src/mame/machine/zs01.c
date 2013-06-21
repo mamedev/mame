@@ -35,7 +35,7 @@ void zs01_device::static_set_ds2401_tag(device_t &device, const char *ds2401_tag
 }
 
 zs01_device::zs01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_secure_serial_flash(mconfig, ZS01, "ZS01", tag, owner, clock)
+	: device_secure_serial_flash(mconfig, ZS01, "ZS01", tag, owner, clock, "zs01", __FILE__)
 {
 }
 

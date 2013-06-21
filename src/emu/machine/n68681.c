@@ -489,7 +489,7 @@ void duartn68681_device::set_ISR_bits(int mask)
 // DUART channel class stuff
 
 duart68681_channel::duart68681_channel(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DUART68681CHANNEL, "DUART 68681 channel", tag, owner, clock),
+	: device_t(mconfig, DUART68681CHANNEL, "DUART 68681 channel", tag, owner, clock, "duart68681_channel", __FILE__),
 	device_serial_interface(mconfig, *this),
 	MR1(0),
 	MR2(0),

@@ -110,7 +110,7 @@ const device_type MOS8722 = &device_creator<mos8722_device>;
 //-------------------------------------------------
 
 mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock)
+	: device_t(mconfig, MOS8722, "MOS8722", tag, owner, clock, "mos8722", __FILE__)
 {
 }
 

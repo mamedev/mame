@@ -28,7 +28,7 @@ const device_type RTC4543 = &device_creator<rtc4543_device>;
 //-------------------------------------------------
 
 rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RTC4543, "Epson R4543", tag, owner, clock),
+	: device_t(mconfig, RTC4543, "Epson R4543", tag, owner, clock, "rtc4543", __FILE__),
 		device_rtc_interface(mconfig, *this)
 {
 }

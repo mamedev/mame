@@ -218,7 +218,7 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w )
 const device_type E05A03 = &device_creator<e05a03_device>;
 
 e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock)
+	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock, "e05a03", __FILE__)
 {
 	m_token = global_alloc_clear(e05a03_state);
 }

@@ -52,7 +52,7 @@ device_abc1600bus_card_interface::~device_abc1600bus_card_interface()
 //-------------------------------------------------
 
 abc1600bus_slot_device::abc1600bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ABC1600BUS_SLOT, "ABC 1600 bus slot", tag, owner, clock),
+		device_t(mconfig, ABC1600BUS_SLOT, "ABC 1600 bus slot", tag, owner, clock, "abc1600bus_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_int(CLEAR_LINE),
 		m_pren(1),

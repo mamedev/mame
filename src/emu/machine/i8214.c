@@ -90,7 +90,7 @@ inline void i8214_device::check_interrupt()
 //-------------------------------------------------
 
 i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8214, "I8214", tag, owner, clock)
+	: device_t(mconfig, I8214, "I8214", tag, owner, clock, "i8214", __FILE__)
 {
 }
 

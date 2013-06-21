@@ -19,7 +19,7 @@ const device_type CARTSLOT = &device_creator<cartslot_image_device>;
 //-------------------------------------------------
 
 cartslot_image_device::cartslot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CARTSLOT, "Cartslot", tag, owner, clock),
+	: device_t(mconfig, CARTSLOT, "Cartslot", tag, owner, clock, "cartslot_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_extensions("bin"),
 		m_interface(NULL),

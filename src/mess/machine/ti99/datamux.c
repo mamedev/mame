@@ -73,7 +73,7 @@
     Constructor
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock)
+: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__)
 {
 }
 

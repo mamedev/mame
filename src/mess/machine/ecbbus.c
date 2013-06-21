@@ -28,7 +28,7 @@ const device_type ECBBUS_SLOT = &device_creator<ecbbus_slot_device>;
 //-------------------------------------------------
 
 ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ECBBUS_SLOT, "ECB bus slot", tag, owner, clock),
+		device_t(mconfig, ECBBUS_SLOT, "ECB bus slot", tag, owner, clock, "ecbbus_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -132,7 +132,7 @@ device_ecbbus_card_interface::~device_ecbbus_card_interface()
 //-------------------------------------------------
 
 ecbbus_device::ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ECBBUS, "ECB bus", tag, owner, clock)
+		device_t(mconfig, ECBBUS, "ECB bus", tag, owner, clock, "ecbbus", __FILE__)
 {
 	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
 		m_ecbbus_device[i] = NULL;

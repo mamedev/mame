@@ -73,7 +73,7 @@ const device_type APOLLO_KBD = &device_creator<apollo_kbd_device>;
 //-------------------------------------------------
 
 apollo_kbd_device::apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock)
+	: device_t(mconfig, APOLLO_KBD, "Apollo Keyboard", tag, owner, clock, "apollo_kbd", __FILE__)
 {
 	memset(static_cast<apollo_kbd_interface *>(this), 0, sizeof(apollo_kbd_interface));
 }

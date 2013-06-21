@@ -580,7 +580,7 @@ inline void mos6566_device::draw_multi( UINT16 p, UINT8 c0, UINT8 c1, UINT8 c2, 
 //-------------------------------------------------
 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock),
+	: device_t(mconfig, MOS6566, "MOS6566", tag, owner, clock, "mos6566", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -594,8 +594,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -613,28 +613,28 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock, TYPE_6567) { }
+	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock, TYPE_6567, "mos6567", __FILE__) { }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	:mos6566_device(mconfig, type, name, tag, owner, clock, TYPE_6567) { }
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock, TYPE_8562) { }
+	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock, TYPE_8562, "mos8562", __FILE__) { }
 
 mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock, TYPE_8564) { }
+	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock, TYPE_8564, "mos8564", __FILE__) { }
 
 mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569) { }
+	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	:mos6566_device(mconfig, type, name, tag, owner, clock, TYPE_6569) { }
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock, TYPE_8565) { }
+	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock, TYPE_8565, "mos8565", __FILE__) { }
 
 mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6569_device(mconfig, MOS8566, "MOS8566", tag, owner, clock, TYPE_8566) { }
+	:mos6569_device(mconfig, MOS8566, "MOS8566", tag, owner, clock, TYPE_8566, "mos8566", __FILE__) { }
 
 
 //-------------------------------------------------

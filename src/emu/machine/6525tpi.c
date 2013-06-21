@@ -619,7 +619,7 @@ UINT8 tpi6525_get_ddr_c(device_t *device)
 const device_type TPI6525 = &device_creator<tpi6525_device>;
 
 tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock)
+	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock, "tpi6525", __FILE__)
 {
 	m_token = global_alloc_clear(tpi6525_state);
 }

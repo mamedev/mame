@@ -28,12 +28,12 @@
 const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
 ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock)
+	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock, "ide_controller", __FILE__)
 {
 }
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	ata_interface_device(mconfig, type, name, tag, owner, clock)
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	ata_interface_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -92,7 +92,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
 
 bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	ide_controller_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock),
+	ide_controller_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock, "bus_master_ide_controller", __FILE__),
 	dma_address(0),
 	dma_bytes_left(0),
 	dma_descriptor(0),

@@ -229,7 +229,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_w )
 const device_type PC_LPT = &device_creator<pc_lpt_device>;
 
 pc_lpt_device::pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock)
+	: device_t(mconfig, PC_LPT, "PC-LPT", tag, owner, clock, "pc_lpt", __FILE__)
 {
 	m_token = global_alloc_clear(pc_lpt_state);
 }

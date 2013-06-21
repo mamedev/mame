@@ -51,7 +51,7 @@ FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
 FLOPPY_FORMATS_END
 
 amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock)
+	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__)
 {
 }
 

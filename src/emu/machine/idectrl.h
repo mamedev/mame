@@ -30,7 +30,7 @@ class ide_controller_device : public ata_interface_device
 {
 public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);

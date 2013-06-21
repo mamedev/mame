@@ -65,7 +65,7 @@ device_ieee488_interface::~device_ieee488_interface()
 //-------------------------------------------------
 
 ieee488_slot_device::ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock),
+		device_t(mconfig, IEEE488_SLOT, "IEEE-488 slot", tag, owner, clock, "ieee488_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -291,7 +291,7 @@ inline UINT8 ieee488_device::get_data()
 //-------------------------------------------------
 
 ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock),
+	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock, "ieee488", __FILE__),
 		m_write_eoi(*this),
 		m_write_dav(*this),
 		m_write_nrfd(*this),

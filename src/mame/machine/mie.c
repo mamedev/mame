@@ -77,7 +77,7 @@ machine_config_constructor mie_device::device_mconfig_additions() const
 }
 
 mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: jvs_host(mconfig, MIE_JVS, "MIE-JVS", tag, owner, clock)
+	: jvs_host(mconfig, MIE_JVS, "MIE-JVS", tag, owner, clock, "mie_jvs", __FILE__)
 {
 }
 

@@ -18,7 +18,7 @@ const device_type SERIAL = &device_creator<serial_image_device>;
 //-------------------------------------------------
 
 serial_image_device::serial_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERIAL, "Serial", tag, owner, clock),
+	: device_t(mconfig, SERIAL, "Serial", tag, owner, clock, "serial_image", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {

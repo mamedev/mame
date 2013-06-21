@@ -78,7 +78,7 @@ static const UINT8 timer_name[] = { TMS5501_TIMER_0_INT, TMS5501_TIMER_1_INT, TM
 //-------------------------------------------------
 
 tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS5501, "TMS5501", tag, owner, clock)
+	: device_t(mconfig, TMS5501, "TMS5501", tag, owner, clock, "tms5501", __FILE__)
 {
 }
 

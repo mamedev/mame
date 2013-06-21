@@ -143,7 +143,7 @@
 const device_type VIC3 = &device_creator<vic3_device>;
 
 vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock)
+			: device_t(mconfig, VIC3, "4567 VIC III", tag, owner, clock, "vic3", __FILE__)
 {
 }
 

@@ -740,7 +740,7 @@ READ8_MEMBER(wd33c93_device::read)
 }
 
 wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock)
+	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__)
 {
 }
 

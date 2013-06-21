@@ -138,7 +138,7 @@ const device_type NCR539X = &device_creator<ncr539x_device>;
 //-------------------------------------------------
 
 ncr539x_device::ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NCR539X, "539x SCSI", tag, owner, clock)
+	: device_t(mconfig, NCR539X, "539x SCSI", tag, owner, clock, "ncr539x", __FILE__)
 {
 }
 

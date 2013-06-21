@@ -692,7 +692,7 @@ protected:
 const device_type PDP1_READTAPE = &device_creator<pdp1_readtape_image_device>;
 
 pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock),
+	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock, "pdp1_readtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -727,7 +727,7 @@ protected:
 const device_type PDP1_PUNCHTAPE = &device_creator<pdp1_punchtape_image_device>;
 
 pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock),
+	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock, "pdp1_punchtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -763,7 +763,7 @@ protected:
 const device_type PDP1_PRINTER = &device_creator<pdp1_printer_image_device>;
 
 pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock),
+	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock, "pdp1_printer_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -798,7 +798,7 @@ protected:
 const device_type PDP1_CYLINDER = &device_creator<pdp1_cylinder_image_device>;
 
 pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock),
+	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock, "pdp1_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }

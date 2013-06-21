@@ -273,7 +273,7 @@ class mos6566_device :  public device_t,
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _irq, class _k> void set_callbacks(const char *screen_tag, const char *cpu_tag, _irq irq, _k k) {
@@ -441,7 +441,7 @@ class mos6567_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 };
 
 
@@ -472,7 +472,7 @@ class mos6569_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void execute_run();

@@ -173,7 +173,7 @@ inline void rp5c01_device::check_alarm()
 //-------------------------------------------------
 
 rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock),
+	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_mode(0),

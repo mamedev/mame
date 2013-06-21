@@ -43,7 +43,7 @@ typedef double (*adc083x_input_callback)(device_t *device, UINT8 input);
 class adc083x_device : public device_t
 {
 public:
-	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_input_callback(device_t &device, adc083x_input_callback input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }

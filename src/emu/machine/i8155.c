@@ -199,7 +199,7 @@ inline void i8155_device::write_port(int port, UINT8 data)
 //-------------------------------------------------
 
 i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8155, "Intel 8155", tag, owner, clock),
+	: device_t(mconfig, I8155, "Intel 8155", tag, owner, clock, "i8155", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_command(0),
 		m_status(0),

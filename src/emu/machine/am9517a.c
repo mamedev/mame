@@ -372,7 +372,7 @@ inline void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock),
+	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_hack(0),

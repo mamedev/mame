@@ -30,7 +30,7 @@ class vt100_video_device : public device_t,
 							public vt_video_interface
 {
 public:
-	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~vt100_video_device() {}
 

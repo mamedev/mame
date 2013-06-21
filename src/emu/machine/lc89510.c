@@ -10,7 +10,7 @@
 const device_type LC89510 = &device_creator<lc89510_device>;
 
 lc89510_device::lc89510_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LC89510, "lc89510_device", tag, owner, clock)
+	: device_t(mconfig, LC89510, "lc89510_device", tag, owner, clock, "lc89510", __FILE__)
 {
 }
 

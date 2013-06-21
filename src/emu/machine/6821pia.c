@@ -48,7 +48,7 @@ const device_type PIA6821 = &device_creator<pia6821_device>;
 //-------------------------------------------------
 
 pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PIA6821, "6822 PIA", tag, owner, clock),
+	: device_t(mconfig, PIA6821, "6822 PIA", tag, owner, clock, "pia6821", __FILE__),
 	m_irq_a_state(0),
 	m_in_cb1(0),
 	m_ctl_b(0),

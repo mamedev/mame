@@ -90,8 +90,8 @@ static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 	RGB_WHITE
 };
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99 )
-	: device_t( mconfig, type, name, tag, owner, clock ),
+tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
+	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
@@ -103,7 +103,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type typ
 
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock ),
+	: device_t( mconfig, TMS9928A, "TMS9928A", tag, owner, clock, "tms9928a", __FILE__),
 		device_memory_interface(mconfig, *this),
 	m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {

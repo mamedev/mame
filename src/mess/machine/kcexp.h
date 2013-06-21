@@ -52,7 +52,7 @@ class kcexp_slot_device : public device_t,
 public:
 	// construction/destruction
 	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~kcexp_slot_device();
 
 	// device-level overrides

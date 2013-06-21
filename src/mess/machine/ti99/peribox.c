@@ -227,6 +227,12 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 }
 
+peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+: bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, shortname, source)
+{
+	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
+}
+
 READ8Z_MEMBER(peribox_device::readz)
 {
 	for (int i=2; i <= 8; i++)
@@ -430,7 +436,7 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
 *****************************************************************************/
 
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: peribox_device(mconfig, tag, owner, clock)
+: peribox_device(mconfig, tag, owner, clock, "peribox_gen", __FILE__)
 {
 };
 
@@ -467,7 +473,7 @@ machine_config_constructor peribox_gen_device::device_mconfig_additions() const
 *****************************************************************************/
 
 peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: peribox_device(mconfig, tag, owner, clock)
+: peribox_device(mconfig, tag, owner, clock, "peribox_sg", __FILE__)
 {
 };
 
@@ -511,7 +517,7 @@ machine_config_constructor peribox_sg_device::device_mconfig_additions() const
 *****************************************************************************/
 
 peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: peribox_device(mconfig, tag, owner, clock)
+: peribox_device(mconfig, tag, owner, clock, "peribox_ev", __FILE__)
 {
 };
 

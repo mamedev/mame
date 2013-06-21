@@ -441,7 +441,7 @@ void pic8259_device::device_reset()
 const device_type PIC8259 = &device_creator<pic8259_device>;
 
 pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PIC8259, "Intel PIC8259", tag, owner, clock)
+	: device_t(mconfig, PIC8259, "Intel PIC8259", tag, owner, clock, "pit8259", __FILE__)
 	, m_out_int_func(*this)
 	, m_sp_en_func(*this)
 	, m_read_slave_ack_func(*this)

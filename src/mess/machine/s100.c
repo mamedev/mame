@@ -26,7 +26,7 @@ const device_type S100_SLOT = &device_creator<s100_slot_device>;
 //  s100_slot_device - constructor
 //-------------------------------------------------
 s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock),
+		device_t(mconfig, S100_SLOT, "S100 slot", tag, owner, clock, "s100_slot", __FILE__),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -101,7 +101,7 @@ void s100_device::device_config_complete()
 //-------------------------------------------------
 
 s100_device::s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, S100, "S100", tag, owner, clock)
+		device_t(mconfig, S100, "S100", tag, owner, clock, "s100", __FILE__)
 {
 }
 

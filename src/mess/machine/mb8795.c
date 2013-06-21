@@ -17,7 +17,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock),
+	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
 		device_network_interface(mconfig, *this, 10)
 {
 }

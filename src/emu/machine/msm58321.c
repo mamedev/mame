@@ -92,7 +92,7 @@ inline void msm58321_device::write_counter(int counter, int value)
 //-------------------------------------------------
 
 msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSM58321, "MSM58321", tag, owner, clock),
+	: device_t(mconfig, MSM58321, "MSM58321", tag, owner, clock, "msm58321", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_cs2(0)
 {

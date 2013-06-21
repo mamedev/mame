@@ -158,7 +158,7 @@ WRITE8_MEMBER( am53cf96_device::write )
 }
 
 am53cf96_device::am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AM53CF96, "53CF96 SCSI", tag, owner, clock),
+	device_t(mconfig, AM53CF96, "53CF96 SCSI", tag, owner, clock, "am53cf96", __FILE__),
 	m_irq_handler(*this)
 {
 }

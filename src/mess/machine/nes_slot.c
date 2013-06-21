@@ -797,7 +797,7 @@ void device_nes_cart_interface::nes_banks_restore()
 //  nes_cart_slot_device - constructor
 //-------------------------------------------------
 nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock),
+						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock, "nes_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_crc_hack(0),

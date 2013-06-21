@@ -105,7 +105,7 @@ inline void mc6852_device::transmit()
 //-------------------------------------------------
 
 mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6852, "MC6852", tag, owner, clock)
+	: device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__)
 {
 }
 

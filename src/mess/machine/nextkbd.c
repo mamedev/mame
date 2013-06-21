@@ -9,7 +9,7 @@ DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 	AM_RANGE(0x8, 0xb) AM_READWRITE(data_r,  data_w)
 ADDRESS_MAP_END
 
-nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock)
+nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__)
 {
 }
 

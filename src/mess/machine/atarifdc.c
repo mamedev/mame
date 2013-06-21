@@ -815,7 +815,7 @@ static DEVICE_RESET(atari_fdc)
 const device_type ATARI_FDC = &device_creator<atari_fdc_device>;
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock)
+	: device_t(mconfig, ATARI_FDC, "Atari FDC", tag, owner, clock, "atari_fdc", __FILE__)
 {
 	m_token = global_alloc_clear(atari_fdc_t);
 }

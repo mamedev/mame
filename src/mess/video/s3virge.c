@@ -17,7 +17,7 @@
 const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: s3_vga_device(mconfig, S3VIRGE, "S3VIRGE", tag, owner, clock)
+	: s3_vga_device(mconfig, S3VIRGE, "S3VIRGE", tag, owner, clock, "s3virge_vga", __FILE__)
 {
 }
 

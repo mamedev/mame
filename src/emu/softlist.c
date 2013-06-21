@@ -32,7 +32,7 @@ const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
 //-------------------------------------------------
 
 software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock),
+	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
 		m_list_name(NULL),
 		m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 		m_filter(NULL)

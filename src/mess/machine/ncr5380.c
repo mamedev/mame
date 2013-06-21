@@ -95,7 +95,7 @@ const device_type NCR5380 = &device_creator<ncr5380_device>;
 //-------------------------------------------------
 
 ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock)
+	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__)
 {
 }
 

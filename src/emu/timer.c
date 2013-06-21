@@ -62,7 +62,7 @@ const device_type TIMER = &device_creator<timer_device>;
 //-------------------------------------------------
 
 timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TIMER, "Timer", tag, owner, clock),
+	: device_t(mconfig, TIMER, "Timer", tag, owner, clock, "timer", __FILE__),
 		m_type(TIMER_TYPE_GENERIC),
 		m_callback(timer_device_expired_delegate()),
 		m_ptr(NULL),

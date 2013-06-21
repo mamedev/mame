@@ -881,7 +881,7 @@ NETLIB_UPDATE(netdev_callback)
 const device_type NETLIST = &device_creator<netlist_mame_device>;
 
 netlist_mame_device::netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NETLIST, "netlist", tag, owner, clock),
+	: device_t(mconfig, NETLIST, "netlist", tag, owner, clock, "netlist_mame", __FILE__),
 		device_execute_interface(mconfig, *this)
 {
 }

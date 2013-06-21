@@ -57,7 +57,7 @@ void t6a04_device::device_validity_check(validity_checker &valid) const
 //-------------------------------------------------
 
 t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, T6A04, "T6A04", tag, owner, clock)
+	device_t(mconfig, T6A04, "T6A04", tag, owner, clock, "t6a04", __FILE__)
 {
 }
 

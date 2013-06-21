@@ -972,7 +972,7 @@ protected:
 const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TI990_TAPE, "TI990 Magnetic Tape", tag, owner, clock),
+	: device_t(mconfig, TI990_TAPE, "TI990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -1067,7 +1067,7 @@ static DEVICE_START(tap_990)
 const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI990 Tape Controller", tag, owner, clock)
+	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI990 Tape Controller", tag, owner, clock, "tap_990", __FILE__)
 {
 	m_token = global_alloc_clear(tap_990_t);
 }

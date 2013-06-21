@@ -93,7 +93,7 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 //-------------------------------------------------
 
 cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock),
+	: device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock, "cdp1871", __FILE__),
 		m_inhibit(false),
 		m_sense(0),
 		m_drive(0),
