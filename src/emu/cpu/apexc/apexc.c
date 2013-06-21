@@ -327,51 +327,19 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "debugger.h"
 #include "apexc.h"
 
-#ifndef SUPPORT_ODD_WORD_SIZES
-#define apexc_readmem(address)  cpustate->program->read_dword((address)<<2)
-#define apexc_writemem(address, data)   cpustate->program->write_dword((address)<<2, (data))
-/* eewww ! - Fortunately, there is no memory mapped I/O, so we can simulate masked write
-without danger */
-#define apexc_writemem_masked(address, data, mask)                                      \
-	apexc_writemem((address), (apexc_readmem(address) & ~(mask)) | ((data) & (mask)))
-#else
-#define apexc_readmem(address)  cpu_readmem13_32(address)
-#define apexc_writemem(address, data)   cpu_writemem13_32((address), (data))
-#define apexc_writemem_masked(address, data, mask)  cpu_writemem13_32masked((address), (data), (mask))
-#endif
 
+const device_type APEXC = &device_creator<apexc_cpu_device>;
 
-#define apexc_readop(address)   apexc_readmem(address)
-
-struct apexc_state
-{
-	UINT32 a;   /* accumulator */
-	UINT32 r;   /* register */
-	UINT32 cr;  /* control register (i.e. instruction register) */
-	int ml;     /* memory location (current track in working store, and requested
-                word position within track) (10 bits) */
-	int working_store;  /* current working store (group of 16 tracks) (1-15) */
-	int current_word;   /* current word position within track (0-31) */
-
-	int running;    /* 1 flag: */
-				/* running: flag implied by the existence of the stop instruction */
-	UINT32 pc;  /* address of next instruction for the disassembler */
-
-	legacy_cpu_device *device;
-	address_space *program;
-	address_space *io;
-	int icount;
-};
 
 /* decrement ICount by n */
-#define DELAY(n)    {cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
+#define DELAY(n)    {m_icount -= (n); m_current_word = (m_current_word + (n)) & 0x1f;}
 
 
-INLINE apexc_state *get_safe_token(device_t *device)
+apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, APEXC, "APEXC", tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 15, 0)
+	, m_io_config("io", ENDIANNESS_BIG, 8, 1, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == APEXC);
-	return (apexc_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -391,47 +359,37 @@ INLINE apexc_state *get_safe_token(device_t *device)
 
 /* compute complete word address (i.e. translate a logical track address (expressed
 in current working store) to an absolute track address) */
-static int effective_address(apexc_state *cpustate, int address)
+UINT32 apexc_cpu_device::effective_address(UINT32 address)
 {
 	if (address & 0x200)
 	{
-		address = (address & 0x1FF) | (cpustate->working_store) << 9;
+		address = (address & 0x1FF) | (m_working_store) << 9;
 	}
 
 	return address;
 }
 
 /* read word */
-static UINT32 word_read(apexc_state *cpustate, int address, int special)
+UINT32 apexc_cpu_device::word_read(UINT32 address, UINT32 special)
 {
 	UINT32 result;
 
 	/* compute absolute track address */
-	address = effective_address(cpustate, address);
+	address = effective_address(address);
 
 	if (special)
 	{
 		/* ignore word position in x - use current position instead */
-		address = (address & ~ 0x1f) | cpustate->current_word;
+		address = (address & ~ 0x1f) | m_current_word;
 	}
 	else
 	{
 		/* wait for requested word to appear under the heads */
-		DELAY(((address /*& 0x1f*/) - cpustate->current_word) & 0x1f);
+		DELAY(((address /*& 0x1f*/) - m_current_word) & 0x1f);
 	}
 
 	/* read 32 bits */
-#if 0
-	/* note that the APEXC reads LSBits first */
-	result = 0;
-	for (i=0; i<31; i++)
-	{
-		/*if (mask & (1 << i))*/
-			result |= bit_read((address << 5) | i) << i;
-	}
-#else
 	result = apexc_readmem(address);
-#endif
 
 	/* read takes one memory cycle */
 	DELAY(1);
@@ -440,25 +398,16 @@ static UINT32 word_read(apexc_state *cpustate, int address, int special)
 }
 
 /* write word (or part of a word, according to mask) */
-static void word_write(apexc_state *cpustate, int address, UINT32 data, UINT32 mask)
+void apexc_cpu_device::word_write(UINT32 address, UINT32 data, UINT32 mask)
 {
 	/* compute absolute track address */
-	address = effective_address(cpustate, address);
+	address = effective_address(address);
 
 	/* wait for requested word to appear under the heads */
-	DELAY(((address /*& 0x1f*/) - cpustate->current_word) & 0x1f);
+	DELAY(((address /*& 0x1f*/) - m_current_word) & 0x1f);
 
 	/* write 32 bits according to mask */
-#if 0
-	/* note that the APEXC reads LSBits first */
-	for (i=0; i<31; i++)
-	{
-		if (mask & (1 << i))
-			bit_write((address << 5) | i, (data >> i) & 1);
-	}
-#else
 	apexc_writemem_masked(address, data, mask);
-#endif
 
 	/* write takes one memory cycle (2, actually, but the 2nd cycle is taken into
 	account in execute) */
@@ -471,14 +420,14 @@ static void word_write(apexc_state *cpustate, int address, UINT32 data, UINT32 m
     no address is used, these functions just punch or read 5 bits
 */
 
-static int papertape_read(apexc_state *cpustate)
+UINT8 apexc_cpu_device::papertape_read()
 {
-	return cpustate->io->read_byte(0) & 0x1f;
+	return m_io->read_byte(0) & 0x1f;
 }
 
-static void papertape_punch(apexc_state *cpustate, int data)
+void apexc_cpu_device::papertape_punch(UINT8 data)
 {
-	cpustate->io->write_byte(0, data);
+	m_io->write_byte(0, data);
 }
 
 /*
@@ -488,17 +437,17 @@ static void papertape_punch(apexc_state *cpustate, int data)
 /*
     set the memory location (i.e. address) register, and compute the associated delay
 */
-INLINE int load_ml(apexc_state *cpustate, int address, int vector)
+UINT32 apexc_cpu_device::load_ml(UINT32 address, UINT32 vector)
 {
 	int delay;
 
 	/* additionnal delay appears if we switch tracks */
-	if (((cpustate->ml & 0x3E0) != (address & 0x3E0)) /*|| vector*/)
+	if (((m_ml & 0x3E0) != (address & 0x3E0)) /*|| vector*/)
 		delay = 6;  /* if tracks are different, delay to allow for track switching */
 	else
 		delay = 0;  /* else, no problem */
 
-	cpustate->ml = address; /* save ml */
+	m_ml = address; /* save ml */
 
 	return delay;
 }
@@ -518,7 +467,7 @@ INLINE int load_ml(apexc_state *cpustate, int address, int vector)
     execute it.
     This solution makes timing simulation much simpler, too.
 */
-static void execute(apexc_state *cpustate)
+void apexc_cpu_device::execute()
 {
 	int x, y, function, c6, vector; /* instruction fields */
 	int i = 0;          /* misc counter */
@@ -533,12 +482,12 @@ static void execute(apexc_state *cpustate)
 	int delay3; /* pre-operand-fetch delay */
 
 	/* first isolate the instruction fields */
-	x = (cpustate->cr >> 22) & 0x3FF;
-	y = (cpustate->cr >> 12) & 0x3FF;
-	function = (cpustate->cr >> 7) & 0x1F;
-	c6 = (cpustate->cr >> 1) & 0x3F;
-	vector = cpustate->cr & 1;
-	cpustate->pc = y<<2;
+	x = (m_cr >> 22) & 0x3FF;
+	y = (m_cr >> 12) & 0x3FF;
+	function = (m_cr >> 7) & 0x1F;
+	c6 = (m_cr >> 1) & 0x3F;
+	vector = m_cr & 1;
+	m_pc = y<<2;
 
 	function &= 0x1E;   /* this is a mere guess - the LSBit is reserved for future additions */
 
@@ -548,7 +497,7 @@ static void execute(apexc_state *cpustate)
 	if (has_operand)
 	{
 		/* load ml with X */
-		delay1 = load_ml(cpustate, x, vector);
+		delay1 = load_ml(x, vector);
 		/* burn pre-operand-access delay if needed */
 		if (delay1)
 		{
@@ -565,7 +514,7 @@ static void execute(apexc_state *cpustate)
 		case 0:
 			/* stop */
 
-			cpustate->running = FALSE;
+			m_running = FALSE;
 
 			/* BTW, I don't know whether stop loads y into ml or not, and whether
 			subsequent fetch is done */
@@ -575,14 +524,14 @@ static void execute(apexc_state *cpustate)
 			/* I */
 			/* I do not know whether the CPU does an OR or whatever, but since docs say that
 			the 5 bits must be cleared initially, an OR kind of makes sense */
-			cpustate->r |= papertape_read(cpustate) << 27;
+			m_r |= papertape_read() << 27;
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
                             or as a value in delay2 */
 			break;
 
 		case 4:
 			/* P */
-			papertape_punch(cpustate, (cpustate->r >> 27) & 0x1f);
+			papertape_punch((m_r >> 27) & 0x1f);
 			delay2 = 32;    /* no idea whether this should be counted as an absolute delay
                             or as a value in delay2 */
 			break;
@@ -590,11 +539,11 @@ static void execute(apexc_state *cpustate)
 		case 6:
 			/* B<(x)>=(y) */
 			/* I have no idea what we should do if the vector bit is set */
-			if (cpustate->a & 0x80000000UL)
+			if (m_a & 0x80000000UL)
 			{
 				/* load ml with X */
-				delay1 = load_ml(cpustate, x, vector);
-				cpustate->pc = x<<2;
+				delay1 = load_ml(x, vector);
+				m_pc = x<<2;
 				/* burn pre-fetch delay if needed */
 				if (delay1)
 				{
@@ -616,13 +565,13 @@ static void execute(apexc_state *cpustate)
 				int shifted_bit = 0;
 
 				/* shift and increment c6 */
-				shifted_bit = cpustate->r & 1;
-				cpustate->r >>= 1;
-				if (cpustate->a & 1)
-					cpustate->r |= 0x80000000UL;
-				cpustate->a >>= 1;
+				shifted_bit = m_r & 1;
+				m_r >>= 1;
+				if (m_a & 1)
+					m_r |= 0x80000000UL;
+				m_a >>= 1;
 				if (shifted_bit)
-					cpustate->a |= 0x80000000UL;
+					m_a |= 0x80000000UL;
 
 				c6 = (c6+1) & 0x3f;
 			}
@@ -637,10 +586,10 @@ static void execute(apexc_state *cpustate)
 			while (c6 != 0)
 			{
 				/* shift and increment c6 */
-				cpustate->r >>= 1;
-				if (cpustate->a & 1)
-					cpustate->r |= 0x80000000UL;
-				cpustate->a = ((INT32) cpustate->a) >> 1;
+				m_r >>= 1;
+				if (m_a & 1)
+					m_r |= 0x80000000UL;
+				m_a = ((INT32) m_a) >> 1;
 
 				c6 = (c6+1) & 0x3f;
 			}
@@ -661,15 +610,15 @@ static void execute(apexc_state *cpustate)
 			{
 				int shifted_bit;
 
-				cpustate->a = 0;
+				m_a = 0;
 				shifted_bit = 0;
 				while (1)
 				{
 					/* note we read word at current word position */
-					if (shifted_bit && ! (cpustate->r & 1))
-						cpustate->a += word_read(cpustate, x, 1);
-					else if ((! shifted_bit) && (cpustate->r & 1))
-						cpustate->a -= word_read(cpustate, x, 1);
+					if (shifted_bit && ! (m_r & 1))
+						m_a += word_read(x, 1);
+					else if ((! shifted_bit) && (m_r & 1))
+						m_a -= word_read(x, 1);
 					else
 						/* Even if we do not read anything, the loop still takes 1 cycle of
 						the memory word clock. */
@@ -685,11 +634,11 @@ static void execute(apexc_state *cpustate)
 					c6 = (c6+1) & 0x3f;
 
 					/* shift */
-					shifted_bit = cpustate->r & 1;
-					cpustate->r >>= 1;
-					if (cpustate->a & 1)
-						cpustate->r |= 0x80000000UL;
-					cpustate->a = ((INT32) cpustate->a) >> 1;
+					shifted_bit = m_r & 1;
+					m_r >>= 1;
+					if (m_a & 1)
+						m_r |= 0x80000000UL;
+					m_a = ((INT32) m_a) >> 1;
 				}
 			}
 
@@ -701,27 +650,27 @@ static void execute(apexc_state *cpustate)
 
 		case 16:
 			/* +c(x) */
-			cpustate->a = + word_read(cpustate, cpustate->ml, 0);
+			m_a = + word_read(m_ml, 0);
 			break;
 
 		case 18:
 			/* -c(x) */
-			cpustate->a = - word_read(cpustate, cpustate->ml, 0);
+			m_a = - word_read(m_ml, 0);
 			break;
 
 		case 20:
 			/* +(x) */
-			cpustate->a += word_read(cpustate, cpustate->ml, 0);
+			m_a += word_read(m_ml, 0);
 			break;
 
 		case 22:
 			/* -(x) */
-			cpustate->a -= word_read(cpustate, cpustate->ml, 0);
+			m_a -= word_read(m_ml, 0);
 			break;
 
 		case 24:
 			/* T(x) */
-			cpustate->r = word_read(cpustate, cpustate->ml, 0);
+			m_r = word_read(m_ml, 0);
 			break;
 
 		case 26:
@@ -735,10 +684,10 @@ static void execute(apexc_state *cpustate)
 				else
 					mask = 0xFFFFFFFFUL >> c6;
 
-				word_write(cpustate, cpustate->ml, cpustate->r, mask);
+				word_write(m_ml, m_r, mask);
 			}
 
-			cpustate->r = (cpustate->r & 0x80000000UL) ? 0xFFFFFFFFUL : 0;
+			m_r = (m_r & 0x80000000UL) ? 0xFFFFFFFFUL : 0;
 
 			delay2 = 1;
 			break;
@@ -754,7 +703,7 @@ static void execute(apexc_state *cpustate)
 				else
 					mask = 0xFFFFFFFFUL >> c6;
 
-				word_write(cpustate, cpustate->ml, cpustate->a, mask);
+				word_write(m_ml, m_a, mask);
 			}
 
 			delay2 = 1;
@@ -762,19 +711,19 @@ static void execute(apexc_state *cpustate)
 
 		case 30:
 			/* S(x) */
-			cpustate->working_store = (x >> 5) & 0xf;   /* or is it (x >> 6)? */
+			m_working_store = (x >> 5) & 0xf;   /* or is it (x >> 6)? */
 			DELAY(32);  /* no idea what the value is...  All I know is that it takes much
                         more time than track switching (which takes 6 cycles) */
 			break;
 		}
 		if (vector)
 			/* increment word position in vector operations */
-			cpustate->ml = (cpustate->ml & 0x3E0) | ((cpustate->ml + 1) & 0x1F);
+			m_ml = (m_ml & 0x3E0) | ((m_ml + 1) & 0x1F);
 	} while (vector && has_operand && (++i < 32));  /* iterate 32 times if vector bit is set */
 													/* the has_operand is a mere guess */
 
 	/* load ml with Y */
-	delay3 = load_ml(cpustate, y, 0);
+	delay3 = load_ml(y, 0);
 
 	/* compute max(delay2, delay3) */
 	if (delay2 > delay3)
@@ -791,163 +740,118 @@ static void execute(apexc_state *cpustate)
 special_fetch:
 
 	/* fetch current instruction into control register */
-	cpustate->cr = word_read(cpustate, cpustate->ml, 0);
+	m_cr = word_read(m_ml, 0);
 }
 
 
-static CPU_INIT( apexc )
+void apexc_cpu_device::device_start()
 {
-	apexc_state *cpustate = get_safe_token(device);
+	m_program = &space(AS_PROGRAM);
+	m_io = &space(AS_IO);
 
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->io = &device->space(AS_IO);
+	save_item(NAME(m_a));
+	save_item(NAME(m_r));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_ml));
+	save_item(NAME(m_working_store));
+	save_item(NAME(m_current_word));
+	save_item(NAME(m_running));
+	save_item(NAME(m_pc));
 
-	device->save_item(NAME(cpustate->a));
-	device->save_item(NAME(cpustate->r));
-	device->save_item(NAME(cpustate->cr));
-	device->save_item(NAME(cpustate->ml));
-	device->save_item(NAME(cpustate->working_store));
-	device->save_item(NAME(cpustate->current_word));
-	device->save_item(NAME(cpustate->running));
-	device->save_item(NAME(cpustate->pc));
+	state_add( APEXC_CR, "CR", m_cr ).formatstr("%08X");
+	state_add( APEXC_A, "A", m_a ).formatstr("%08X");
+	state_add( APEXC_R, "R", m_r ).formatstr("%08X");
+	state_add( APEXC_ML, "ML", m_ml ).mask(0xfff).formatstr("%03X");
+	state_add( APEXC_WS, "WS", m_working_store ).mask(0x01);
+	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
+	state_add( APEXC_PC, "PC", m_pc ).callimport().callexport().formatstr("%03X");
+	state_add( APEXC_ML_FULL, "ML_FULL", m_ml_full ).callimport().callexport().noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_RESET( apexc )
-{
-	apexc_state *cpustate = get_safe_token(device);
 
+void apexc_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case APEXC_PC:
+			/* keep address 9 LSBits - 10th bit depends on whether we are accessing the permanent
+			track group or a switchable one */
+			m_ml = m_pc & 0x1ff;
+			if (m_pc & 0x1e00)
+			{   /* we are accessing a switchable track group */
+				m_ml |= 0x200;  /* set 10th bit */
+
+				if (((m_pc >> 9) & 0xf) != m_working_store)
+				{   /* we need to do a store switch */
+					m_working_store = ((m_pc >> 9) & 0xf);
+				}
+			}
+			break;
+	}
+}
+
+
+void apexc_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case APEXC_ML_FULL:
+			m_ml_full = effective_address(m_ml);
+			break;
+	}
+}
+
+
+void apexc_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c", m_running ? "R" : "S" );
+			break;
+	}
+}
+
+
+void apexc_cpu_device::device_reset()
+{
 	/* mmmh...  I don't know what happens on reset with an actual APEXC. */
 
-	cpustate->working_store = 1;    /* mere guess */
-	cpustate->current_word = 0;     /* well, we do have to start somewhere... */
+	m_working_store = 1;    /* mere guess */
+	m_current_word = 0;     /* well, we do have to start somewhere... */
 
 	/* next two lines are just the product of my bold fantasy */
-	cpustate->cr = 0;               /* first instruction executed will be a stop */
-	cpustate->running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
-                                which enables easy booting (just press run on the panel) */
+	m_cr = 0;               /* first instruction executed will be a stop */
+	m_running = TRUE;       /* this causes the CPU to load the instruction at 0/0,
+	                           which enables easy booting (just press run on the panel) */
+	m_a = 0;
+	m_r = 0;
+	m_pc = 0;
+	m_ml = 0;
 }
 
-static CPU_EXECUTE( apexc )
-{
-	apexc_state *cpustate = get_safe_token(device);
 
+void apexc_cpu_device::execute_run()
+{
 	do
 	{
-		debugger_instruction_hook(device, cpustate->pc);
+		debugger_instruction_hook(this, m_pc);
 
-		if (cpustate->running)
-			execute(cpustate);
+		if (m_running)
+			execute();
 		else
 		{
-			DELAY(cpustate->icount);    /* burn cycles once for all */
+			DELAY(m_icount);    /* burn cycles once for all */
 		}
-	} while (cpustate->icount > 0);
+	} while (m_icount > 0);
 }
 
-static CPU_SET_INFO( apexc )
+
+offs_t apexc_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	apexc_state *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-	/* --- the following bits of info are set as 64-bit signed integers --- */
-	/*case CPUINFO_INT_INPUT_STATE + ...:*/                         /* no interrupts */
-
-	case CPUINFO_INT_PC:
-		/* keep address 9 LSBits - 10th bit depends on whether we are accessing the permanent
-		track group or a switchable one */
-		cpustate->ml = info->i & 0x1ff;
-		if (info->i & 0x1e00)
-		{   /* we are accessing a switchable track group */
-			cpustate->ml |= 0x200;  /* set 10th bit */
-
-			if (((info->i >> 9) & 0xf) != cpustate->working_store)
-			{   /* we need to do a store switch */
-				cpustate->working_store = ((info->i >> 9) & 0xf);
-			}
-		}
-		break;
-
-	case CPUINFO_INT_SP:                        (void) info->i; /* no SP */                 break;
-
-	case CPUINFO_INT_REGISTER + APEXC_CR:       cpustate->cr = info->i;                         break;
-	case CPUINFO_INT_REGISTER + APEXC_A:        cpustate->a = info->i;                          break;
-	case CPUINFO_INT_REGISTER + APEXC_R:        cpustate->r = info->i;                          break;
-	case CPUINFO_INT_REGISTER + APEXC_ML:       cpustate->ml = info->i & 0x3ff;                 break;
-	case CPUINFO_INT_REGISTER + APEXC_PC:       cpustate->pc = info->i;                 break;
-	case CPUINFO_INT_REGISTER + APEXC_WS:       cpustate->working_store = info->i & 0xf;        break;
-	case CPUINFO_INT_REGISTER + APEXC_STATE:    cpustate->running = info->i ? TRUE : FALSE;     break;
-	}
+	extern CPU_DISASSEMBLE( apexc );
+	return CPU_DISASSEMBLE_NAME(apexc)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( apexc )
-{
-	apexc_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-	case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(apexc_state);          break;
-	case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                            break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-	case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;   /*don't care*/  break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-	case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-	case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;    /* IIRC */              break;
-	case CPUINFO_INT_MAX_CYCLES:                    info->i = 75;   /* IIRC */              break;
-
-	case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;  /*13+2 ignored bits to make double word address*/   break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-	case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = /*5*/8;   /* no I/O bus, but we use address 0 for punchtape I/O */    break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = /*0*/1;   /*0 is quite enough but the MAME core does not understand*/ break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-	case CPUINFO_INT_SP:                            info->i = 0;    /* no SP */             break;
-	case CPUINFO_INT_PC:
-	case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->pc; /* psuedo-PC */             break;
-
-	/*case CPUINFO_INT_INPUT_STATE + ...:*/                         /* no interrupts */
-
-	case CPUINFO_INT_REGISTER + APEXC_CR:           info->i = cpustate->cr;                     break;
-	case CPUINFO_INT_REGISTER + APEXC_A:            info->i = cpustate->a;                      break;
-	case CPUINFO_INT_REGISTER + APEXC_R:            info->i = cpustate->r;                      break;
-	case CPUINFO_INT_REGISTER + APEXC_ML:           info->i = cpustate->ml;                     break;
-	case CPUINFO_INT_REGISTER + APEXC_PC:           info->i = cpustate->pc;                     break;
-	case CPUINFO_INT_REGISTER + APEXC_WS:           info->i = cpustate->working_store;          break;
-	case CPUINFO_INT_REGISTER + APEXC_STATE:        info->i = cpustate->running;                break;
-	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:      info->i = effective_address(cpustate, cpustate->ml);    break;
-
-	case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(apexc);           break;
-	case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(apexc);              break;
-	case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(apexc);                break;
-	case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(apexc);            break;
-	case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-	case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(apexc);            break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;           break;
-
-	case CPUINFO_STR_NAME:                          strcpy(info->s, "APEXC"); break;
-	case CPUINFO_STR_FAMILY:                    strcpy(info->s, "APEC"); break;
-	case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0"); break;
-	case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__); break;
-	case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Raphael Nabet"); break;
-
-	case CPUINFO_STR_FLAGS:                         sprintf(info->s, "%c", (cpustate->running) ? 'R' : 'S'); break;
-
-	case CPUINFO_STR_REGISTER + APEXC_CR:           sprintf(info->s, "CR:%08X", cpustate->cr); break;
-	case CPUINFO_STR_REGISTER + APEXC_A:            sprintf(info->s, "A :%08X", cpustate->a); break;
-	case CPUINFO_STR_REGISTER + APEXC_R:            sprintf(info->s, "R :%08X", cpustate->r); break;
-	case CPUINFO_STR_REGISTER + APEXC_ML:           sprintf(info->s, "ML:%03X", cpustate->ml); break;
-	case CPUINFO_STR_REGISTER + APEXC_PC:           sprintf(info->s, "PC:%03X", cpustate->pc); break;
-	case CPUINFO_STR_REGISTER + APEXC_WS:           sprintf(info->s, "WS:%01X", cpustate->working_store); break;
-
-	case CPUINFO_STR_REGISTER + APEXC_STATE:        sprintf(info->s, "CPU state:%01X", cpustate->running ? TRUE : FALSE); break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(APEXC, apexc);
