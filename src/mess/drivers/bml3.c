@@ -1101,6 +1101,8 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
+	MCFG_SOFTWARE_LIST_ADD("disk_list","bml3_flop")
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
