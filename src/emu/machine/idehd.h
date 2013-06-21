@@ -49,7 +49,7 @@ class ata_mass_storage_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	virtual UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);

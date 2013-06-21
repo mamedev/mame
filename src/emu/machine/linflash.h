@@ -17,7 +17,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_memory);
 
 protected:
-	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname = "", const char *source = __FILE__);
+	linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
