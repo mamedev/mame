@@ -261,6 +261,17 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
+	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
@@ -401,13 +412,59 @@ static INPUT_PORTS_START( recordbr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL2) in service mode */
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( gogold )
 	PORT_INCLUDE(recordbr)
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( tetristh )
+	PORT_START("DSWA")
+	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
+
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY_LOC(SW2)
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( dleague )
 	/* 0x200000 -> 0x100526.b ($526,A5) */
@@ -597,7 +654,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_CPU_PROGRAM_MAP(recordbr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -628,6 +685,14 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tetristh_map)
 MACHINE_CONFIG_END
 
 
@@ -776,6 +841,36 @@ ROM_START( gogold )
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
+// Sega Tetris on a Taito H-System board, with some roms from ‘Go For The Gold’ still on the board.
+ROM_START( tetristh )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* main cpu */
+	ROM_LOAD16_BYTE( "c26-12-1.ic36", 0x00000, 0x20000, CRC(77e80c82) SHA1(840dc5a54a865b8cd2e0d03001a493987d66c23b) )
+	ROM_LOAD16_BYTE( "c26-11-1.ic18", 0x00001, 0x20000, CRC(069d77d2) SHA1(06c229d1b335797fcd2ac8df09ba3da11e3e43f7) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "c26-13.ic56", 0x00000, 0x04000, CRC(efa89dfa) SHA1(556e77c63cb95e441ea1d1beb3d43c61a48a3bb1) )
+	ROM_CONTINUE(            0x10000, 0x0c000 )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "c26-04.ic51", 0x000000, 0x20000, CRC(23ddf00f) SHA1(f7bb19db62d5e6cb27a6e98db68c54c01e34b776) )
+	ROM_LOAD16_BYTE( "c26-08.ic65", 0x000001, 0x20000, CRC(86071824) SHA1(00ba24b35ad93aa0f29e05068ddc9276f2d333af) )
+	ROM_LOAD16_BYTE( "c26-03.ic50", 0x100000, 0x20000, CRC(341be9ac) SHA1(a93c55cb20cb0433855ceb125bffcbcecb0e552d) )
+	ROM_LOAD16_BYTE( "c26-07.ic64", 0x100001, 0x20000, CRC(c236311f) SHA1(9c292083064793a99887fe2de25a169c1af73432) )
+	ROM_LOAD16_BYTE( "c26-02.ic49", 0x200000, 0x20000, CRC(0b0bc88f) SHA1(bf9707beed1eb553e6603c88a65d7365cd66e8ab) )
+	ROM_LOAD16_BYTE( "c26-06.ic63", 0x200001, 0x20000, CRC(deae0394) SHA1(6072e04a5d9422c1f8ae88efcfc97659bef2aa99) )
+	ROM_LOAD16_BYTE( "c26-01.ic48", 0x300000, 0x20000, CRC(7efc7311) SHA1(ee3357dfc77eb4b9af846deaf89c910fc25c9f12) )
+	ROM_LOAD16_BYTE( "c26-05.ic62", 0x300001, 0x20000, CRC(12718d97) SHA1(5c7a79d45ee38a16d7ed70fbe3303f415d6af986) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
+
+	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
+	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
+ROM_END
+
 ROM_START( dleague )
 	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c02-xx.33", 0x00000, 0x20000, CRC(eda870a7) SHA1(1749a6eb80c137b042d4935fcb9cff1ca50d4397) ) /* Need to verify proper Taito chip number */
@@ -841,9 +936,10 @@ ROM_START( dleaguej )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY                      FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0,       ROT0,    "Taito Corporation",         "Syvalion (Japan)",        GAME_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0,       ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",   GAME_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold, driver_device,   0,       ROT0,    "Taito Corporation",         "Go For The Gold (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague, driver_device,  0,       ROT0,    "Taito America Corporation", "Dynamite League (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0,       ROT0,    "Taito Corporation",         "Dynamite League (Japan)", GAME_SUPPORTS_SAVE )
+/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT              MONITOR  COMPANY                      FULLNAME */
+GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (Japan)",         GAME_SUPPORTS_SAVE )
+GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",    GAME_SUPPORTS_SAVE )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   driver_device, 0, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",  GAME_SUPPORTS_SAVE )
+GAME( 1988, tetristh, tetris,   tetristh, tetristh, driver_device, 0, ROT0,    "Sega",                      "Tetris (Japan, H-System)", GAME_SUPPORTS_SAVE )
+GAME( 1990, dleague,  0,        dleague,  dleague,  driver_device, 0, ROT0,    "Taito America Corporation", "Dynamite League (US)",     GAME_SUPPORTS_SAVE )
+GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",  GAME_SUPPORTS_SAVE )

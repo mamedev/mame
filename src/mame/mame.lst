@@ -2197,6 +2197,7 @@ recordbr        // B56 (c) 1988 Taito Corporation Japan (World)
 gogold          // B56 (c) 1988 Taito Corporation (Japan)
 dleague         // C02 (c) 1990 Taito America Corporation (US)
 dleaguej        // C02 (c) 1990 Taito Corporation (Japan)
+tetristh        // C26 (c) 1988 Sega Enterprises,Ltd. (Japan)
 
 // Taito B-System games
 masterw         // B72 (c) 1989 Taito Corporation Japan (World)
@@ -2211,8 +2212,8 @@ rambo3p         // B93 (c) 1989 Taito Europe Corporation (Europe) Proto or bootl
 crimec          // B99 (c) 1989 Taito Corporation Japan (World)
 crimecu         // B99 (c) 1989 Taito America Corporation (US)
 crimecj         // B99 (c) 1989 Taito Corporation (Japan)
-tetrist         // C12 (c) 1989 Sega Enterprises,Ltd. (Japan)
-tetrista        // C35 (c) 1989 Sega Enterprises,Ltd. (Japan)
+tetrist         // C12 (c) 1988 Sega Enterprises,Ltd. (Japan)
+tetrista        // C35 (c) 1988 Sega Enterprises,Ltd. (Japan)
 viofight        // C16 (c) 1989 Taito Corporation Japan (World)
 viofightu       // C16 (c) 1989 Taito America Corporation (US)
 viofightj       // C16 (c) 1989 Taito Corporation (Japan)
