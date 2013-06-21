@@ -296,31 +296,6 @@ int parse_file(const char *srcfile)
 				drivname[pos] = *srcptr++;
 				drivname[pos+1] = 0;
 			}
-
-			list_entry *lentry = new list_entry;
-			lentry->name.cpy(drivname);
-			lentry->next = NULL;
-			if (last_sourceitem!=NULL)
-			{
-				last_sourceitem->next = lentry;			
-			}			
-			last_sourceitem = lentry;			
-			if (last_libraryitem->sourcefiles==NULL)
-			{
-				last_libraryitem->sourcefiles = lentry;
-			}
-			continue;
-		}
-		if (c == '+')
-		{
-			// Used for makemak tool
-			char drivname[256];
-			drivname[0] = 0;
-			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
-			{
-				drivname[pos] = *srcptr++;
-				drivname[pos+1] = 0;
-			}
 			
 			librarylist_entry *lentry = new librarylist_entry;
 			lentry->name.cpy(drivname);
@@ -341,11 +316,27 @@ int parse_file(const char *srcfile)
 			continue;
 		}
 
-
 		srcptr--;
-		for (int pos = 0; srcptr < endptr && !isspace(*srcptr); pos++)
+		// Used for makemak tool
+		char drivname[256];
+		drivname[0] = 0;
+		for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
 		{
-			c = *srcptr++;
+			drivname[pos] = *srcptr++;
+			drivname[pos+1] = 0;
+		}
+
+		list_entry *lentry = new list_entry;
+		lentry->name.cpy(drivname);
+		lentry->next = NULL;
+		if (last_sourceitem!=NULL)
+		{
+			last_sourceitem->next = lentry;			
+		}			
+		last_sourceitem = lentry;			
+		if (last_libraryitem->sourcefiles==NULL)
+		{
+			last_libraryitem->sourcefiles = lentry;
 		}
 	}
 
@@ -516,12 +507,12 @@ int main(int argc, char *argv[])
 				printf("// Drivers from %s.c\n",src->name.cstr());
 				astring srcfile;
 				// build the source filename
-				srcfile.printf("%s%c%s.c", "src/mame/drivers", PATH_SEPARATOR[0], src->name.cstr());
+				srcfile.printf("%s%c%s.c", "src", PATH_SEPARATOR[0], src->name.cstr());
 				parse_for_drivers(srcfile);
 				
 				astring srcfile_inc;
 				// build the source filename
-				srcfile_inc.printf("%s%c%s.inc", "src/mame/drivers", PATH_SEPARATOR[0], src->name.cstr());
+				srcfile_inc.printf("%s%c%s.inc", "src", PATH_SEPARATOR[0], src->name.cstr());
 				if(check_file(srcfile_inc))
 					parse_for_drivers(srcfile_inc);
 			}
@@ -537,17 +528,23 @@ int main(int argc, char *argv[])
 		if (librarylist!=NULL) 
 		{	
 			printf("OBJDIRS += \\\n");
+			printf("\t$(OBJ)/target \\\n");
 			printf("\t$(OBJ)/mame/audio \\\n");
 			printf("\t$(OBJ)/mame/drivers \\\n");
 			printf("\t$(OBJ)/mame/layout \\\n");
 			printf("\t$(OBJ)/mame/machine \\\n");
 			printf("\t$(OBJ)/mame/video \\\n");
+			printf("\t$(OBJ)/mess/audio \\\n");
+			printf("\t$(OBJ)/mess/drivers \\\n");
+			printf("\t$(OBJ)/mess/layout \\\n");
+			printf("\t$(OBJ)/mess/machine \\\n");
+			printf("\t$(OBJ)/mess/video \\\n");
 			printf("\n\n");
 			printf("DRVLIBS += \\\n");
 			
 			for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
 			{
-				printf("\t$(OBJ)/mame/mame/%s.a \\\n",lib->name.cstr());
+				printf("\t$(OBJ)/target/%s.a \\\n",lib->name.cstr());
 			}
 			printf("\n");
 		}	
@@ -605,7 +602,7 @@ static int recurse_dir(astring &srcdir)
 			astring srcfile;
 
 			// build the source filename
-			srcfile.printf("%s%c%s.c", srcdir.cstr(), PATH_SEPARATOR[0], src->name.cstr());
+			srcfile.printf("%s%s.c", srcdir.cstr(), src->name.cstr());
 		
 			dependency_map depend_map;
 
@@ -634,7 +631,7 @@ static int recurse_dir(astring &srcdir)
 	for (librarylist_entry *lib = librarylist; lib != NULL; lib = lib->next)	
 	{
 		// convert the target from source to object (makes assumptions about rules)
-		astring target("$(OBJ)/mame/mame/",lib->name.cstr());
+		astring target("$(OBJ)/target/",lib->name.cstr());
 		target.cat(".a");
 		printf("\n%s : \\\n", target.cstr());
 	
@@ -643,7 +640,7 @@ static int recurse_dir(astring &srcdir)
 			astring srcfile;
 
 			// build the source filename
-			srcfile.printf("%s%c%s.c", srcdir.cstr(), PATH_SEPARATOR[0], src->name.cstr());
+			srcfile.printf("%s%s.c", srcdir.cstr(), src->name.cstr());
 			dependency_map depend_map;
 
 			// find dependencies
@@ -668,7 +665,7 @@ static int recurse_dir(astring &srcdir)
 			astring srcfile;
 
 			// build the source filename
-			srcfile.printf("%s%c%s.c", srcdir.cstr(), PATH_SEPARATOR[0], src->name.cstr());
+			srcfile.printf("%s%s.c", srcdir.cstr(), src->name.cstr());
 			dependency_map depend_map;
 
 			// find dependencies
