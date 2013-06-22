@@ -393,7 +393,7 @@ void softbox_state::device_reset_after_children()
 
 static MACHINE_CONFIG_START( softbox, softbox_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // ???
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)
 	MCFG_CPU_IO_MAP(softbox_io)
 

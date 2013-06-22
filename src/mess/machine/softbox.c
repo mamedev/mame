@@ -267,7 +267,7 @@ static const rs232_port_interface rs232_intf =
 
 static MACHINE_CONFIG_FRAGMENT( softbox )
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000) // ???
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)
 	MCFG_CPU_IO_MAP(softbox_io)
 
