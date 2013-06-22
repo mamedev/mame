@@ -1,7 +1,7 @@
 
 /* commands */
 
-#define SEC_REQUE$T_STATUS     (0x20)
+#define SEC_REQUEST_STATUS     (0x20)
 #define SEC_REQUEST_MARKET     (0x21)
 #define SEC_REQEUST_LAST_ERROR (0x22)
 #define SEC_REQUEST_VERSION    (0x23)
