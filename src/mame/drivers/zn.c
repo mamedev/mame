@@ -4542,7 +4542,7 @@ ROM_START( jdreddb )
 	ROM_LOAD16_BYTE( "j-dread.u36",  0x000001, 0x020000, CRC(37addbf9) SHA1(a4061a1ba9e230f080f0bfea69bf77efe9264a92) )
 	ROM_LOAD16_BYTE( "j-dread.u35",  0x000000, 0x020000, CRC(c1e17191) SHA1(82901439b1a51b9aadb4df4b9d944f26697a1460) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "jdreddb", 0, SHA1(20f696fa6e1fbf97793bac2a794631c5dd4fb39a) )
 ROM_END
 
