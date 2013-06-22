@@ -38,8 +38,9 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( p1_r );
+	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
+	DECLARE_READ8_MEMBER( t0_r );
 	DECLARE_READ8_MEMBER( t1_r );
 
 protected:
@@ -48,37 +49,28 @@ protected:
 	virtual void device_reset();
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, !state); };
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) { };
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_dr00;
-	required_ioport m_dr01;
-	required_ioport m_dr02;
-	required_ioport m_dr03;
-	required_ioport m_dr04;
-	required_ioport m_dr05;
-	required_ioport m_dr06;
-	required_ioport m_dr07;
-	required_ioport m_dr08;
-	required_ioport m_dr09;
-	required_ioport m_dr10;
-	required_ioport m_dr11;
-	required_ioport m_dr12;
-	required_ioport m_dr13;
-	required_ioport m_dr14;
-	required_ioport m_dr15;
-	required_ioport m_dr16;
-	required_ioport m_dr17;
-	required_ioport m_dr18;
-	required_ioport m_dr19;
-	required_ioport m_dr20;
-	required_ioport m_dr21;
-	required_ioport m_dr22;
-	required_ioport m_dr23;
+	required_ioport m_p10;
+	required_ioport m_p11;
+	required_ioport m_p12;
+	required_ioport m_p13;
+	required_ioport m_p14;
+	required_ioport m_p15;
+	required_ioport m_p16;
+	required_ioport m_p17;
+	required_ioport m_p23;
+	required_ioport m_p24;
+	required_ioport m_p25;
+	required_ioport m_p26;
+	required_ioport m_p27;
 
-	UINT8 m_cnt;
+	UINT8 m_p1;
+	UINT8 m_p2;
+	int m_sense;
 };
 
 
