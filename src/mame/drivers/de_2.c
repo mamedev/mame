@@ -19,6 +19,8 @@
 
 // To start Secret Service, hold I, O and Left ALT while pressing Start.
 // To start Laser War, hold S, D, and F while pressing Start.
+// To start Back to the Future, hold D and F while pressing Start.
+// To start The Simpsons, hold D, F and G while pressing Start (can be tempremental)
 
 // Data East CPU board is similar to Williams System 11, but without the generic audio board.
 // For now, we'll presume the timings are the same.
@@ -606,6 +608,53 @@ MCFG_MACHINE_RESET_OVERRIDE(de_2_state, de_2_alpha3)
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 MACHINE_CONFIG_END
 
+/*--------------------------------------------------------------------------------
+/ Back To the Future - CPU Rev 3 /Alpha Type 3 - 32K Roms - 32/64K Sound Roms
+/--------------------------------------------------------------------------------*/
+ROM_START(bttf_a27)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bttfb5.2-7", 0x4000, 0x4000, CRC(24b53174) SHA1(00a5e47e70ce4244873980c946479f0bbc414f2e))
+	ROM_LOAD("bttfc5.2-7", 0x8000, 0x8000, CRC(c4d85d7e) SHA1(88bb91f9ed50335fc402b68983b49319c7dd4e99))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("bttfsf7.rom", 0x8000, 0x8000, CRC(7673146e) SHA1(d6bd7cf39c78c8aff0b1a0b6cfd46a2a8ce9e086))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("bttfsf6.rom", 0x00000, 0x10000, CRC(468a8d9c) SHA1(713cf84cc5f0531e2e9f7aaa58ebeb53c28ba395))
+	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
+ROM_END
+
+ROM_START(bttf_a20)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bttfb5.2-0", 0x0000, 0x8000, CRC(c0d4df6b) SHA1(647d0d0a5af04f4255a588da41a6cdb2cf522875))
+	ROM_LOAD("bttfc5.2-0", 0x8000, 0x8000, CRC(a189a189) SHA1(9669653280c78c811931ea3944817c717f3b5b77))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("bttfsf7.rom", 0x8000, 0x8000, CRC(7673146e) SHA1(d6bd7cf39c78c8aff0b1a0b6cfd46a2a8ce9e086))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("bttfsf6.rom", 0x00000, 0x10000, CRC(468a8d9c) SHA1(713cf84cc5f0531e2e9f7aaa58ebeb53c28ba395))
+	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
+ROM_END
+
+ROM_START(bttf_a21)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bktofutr.b5", 0x4000, 0x4000, CRC(a651f867) SHA1(99cff09a06a99abac505c7732bb4ed985f0946e4))
+	ROM_LOAD("bktofutr.c5", 0x8000, 0x8000, CRC(118ae58e) SHA1(a17e4cc3c12ca770e6e0674cfbeb55482739f735))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("bttfsf7.rom", 0x8000, 0x8000, CRC(7673146e) SHA1(d6bd7cf39c78c8aff0b1a0b6cfd46a2a8ce9e086))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("bttfsf6.rom", 0x00000, 0x10000, CRC(468a8d9c) SHA1(713cf84cc5f0531e2e9f7aaa58ebeb53c28ba395))
+	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
+ROM_END
+
+ROM_START(bttf_g27)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bttfb5g.2-7", 0x4000, 0x4000, CRC(5e3e3cfa) SHA1(2d489c48463c7d28614d56aa566ffbc745bf6a8b))
+	ROM_LOAD("bttfc5g.2-7", 0x8000, 0x8000, CRC(31dec6d0) SHA1(b0f9323ace3f6d96790be7fe2df67b974c291a29))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("bttfsf7.rom", 0x8000, 0x8000, CRC(7673146e) SHA1(d6bd7cf39c78c8aff0b1a0b6cfd46a2a8ce9e086))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("bttfsf6.rom", 0x00000, 0x10000, CRC(468a8d9c) SHA1(713cf84cc5f0531e2e9f7aaa58ebeb53c28ba395))
+	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Laser War - CPU Rev 1 /Alpha Type 1 - 32K ROM - 32/64K Sound Roms
 /-------------------------------------------------------------------*/
@@ -711,6 +760,31 @@ ROM_START(ssvc_b26)
 	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
 ROM_END
 
+/*------------------------------------------------------------------------
+/ The Simpsons - CPU Rev 3 /Alpha Type 3 16/32K Roms - 32/128K Sound Roms
+/------------------------------------------------------------------------*/
+ROM_START(simp_a27)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("simpb5.2-7", 0x4000, 0x4000, CRC(701c4a4b) SHA1(2a19e2340d119e8813df27a9455aefb599c20a61))
+	ROM_LOAD("simpc5.2-7", 0x8000, 0x8000, CRC(400a98b2) SHA1(8d11063712dd718ff8badc29586c700208e7442c))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("simpf7.rom", 0x8000, 0x8000, CRC(a36febbc) SHA1(3b96e05f797dd0dc0d4d52544ed995d477991a9f))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("simpf6.rom", 0x00000, 0x20000, CRC(2eb32ed0) SHA1(e7bc3291cb88bf70010865f64496a3ca393257e7))
+	ROM_LOAD("simpf5.rom", 0x20000, 0x20000, CRC(bd0671ae) SHA1(b116a23db956a3dd9fc138ec25af250885ba4ef5))
+ROM_END
+
+ROM_START(simp_a20)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("simpa2-0.b5", 0x4000, 0x4000, CRC(e67038d1) SHA1(f3eae2ed45caca97a1eb53d847366c52ea68bbee))
+	ROM_LOAD("simpa2-0.c5", 0x8000, 0x8000, CRC(43662bc3) SHA1(d8171a5c083eb8bffa61353b74db6b3ebab96923))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("simpf7.rom", 0x8000, 0x8000, CRC(a36febbc) SHA1(3b96e05f797dd0dc0d4d52544ed995d477991a9f))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("simpf6.rom", 0x00000, 0x20000, CRC(2eb32ed0) SHA1(e7bc3291cb88bf70010865f64496a3ca393257e7))
+	ROM_LOAD("simpf5.rom", 0x20000, 0x20000, CRC(bd0671ae) SHA1(b116a23db956a3dd9fc138ec25af250885ba4ef5))
+ROM_END
+
 /*--------------------------------------------------------------------------
 / Time Machine - CPU Rev 2 /Alpha Type 2 16/32K Roms - 32/64K Sound Roms
 /--------------------------------------------------------------------------*/
@@ -750,6 +824,11 @@ ROM_START(torp_e21)
 	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
+
+GAME(1990,  bttf_a27,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7)",                                     GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a20,       bttf_a27,   de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",                                     GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a21,       bttf_a27,   de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",                                     GAME_IS_SKELETON_MECHANICAL)
+GAME(199?,  bttf_g27,       bttf_a27,   de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",                             GAME_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a83,		0,      	de_2,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           GAME_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_e90,		lwar_a83,	de_2,	de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    GAME_IS_SKELETON_MECHANICAL)
 GAME(1989,  mnfb_c27,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       GAME_IS_SKELETON_MECHANICAL)
@@ -758,6 +837,8 @@ GAME(1989,  play_a24,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0
 GAME(1989,  robo_a34,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Robocop (3.4)",                            GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_a26,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6)",                     GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  ssvc_b26,       ssvc_a26,   de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Secret Service (2.6 alternate sound)",     GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  simp_a27,       0,          de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "The Simpsons (2.7)",               GAME_IS_SKELETON_MECHANICAL)
+GAME(1990,  simp_a20,       simp_a27,   de_2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "The Simpsons (2.0)",               GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  tmac_a24,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (2.4)",                       GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  tmac_a18,       tmac_a24,   de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Time Machine (1.8)",                       GAME_IS_SKELETON_MECHANICAL)
 GAME(1988,  torp_e21,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Torpedo Alley (2.1, Europe)",              GAME_IS_SKELETON_MECHANICAL)
