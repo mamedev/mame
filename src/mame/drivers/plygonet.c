@@ -50,24 +50,6 @@
     5c0000-5fffff = UNUSED
 
 
-    SYS (Write only?)
-    =================
-
-    D28 = /FIXKILL     - Disable 'FIX' layer?
-    D27 = MUTE
-    D26 = EEPROM CLK
-    D25 = EEPROM CS
-    D24 = EEPROM DATA
-    D23 = BRMAS        - 68k bus error mask
-    D22 = L7MAS        - L7 interrupt mask (unusued - should always be '1')
-    D21 = /L5MAS       - L5 interrupt mask/acknowledge
-    D20 = L3MAS        - L3 interrupt mask
-    D19 = VFLIP        - Flip video vertically
-    D18 = HFLIP        - Flip video horizontally
-    D17 = COIN2        - Coin counter 2
-    D16 = COIN1        - Coin counter 1
-
-
     DSP
     ===
 
@@ -92,61 +74,69 @@ enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
 static const eeprom_interface eeprom_intf =
 {
-	7,              /* address bits */
-	8,              /* data bits */
-	"011000",       /* read command */
-	"010100",       /* write command */
-	"0100100000000",/* erase command */
-	"0100000000000",/* lock command */
-	"0100110000000" /* unlock command */
+	9,               // address bits
+	8,               // data bits
+	"*110",          // read command
+	"*101",          // write command
+	"*111",          // erase command
+	"*10000xxxxxxx", // lock command
+	"*10011xxxxxxx", // unlock command
+	1,
+	0
+//  "*10001xxxxxxx", // write all
+//  "*10010xxxxxxx"  // erase all
 };
 
-READ32_MEMBER(polygonet_state::polygonet_eeprom_r)
+READ8_MEMBER(polygonet_state::polygonet_inputs_r)
 {
-	if (ACCESSING_BITS_0_15)
+	return m_inputs[offset]->read();
+}
+
+
+WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
+{
+	switch (offset)
 	{
-		return 0x0200 | (m_eeprom->read_bit() << 8);
+		case 0:
+		/*
+			D28 = /FIXKILL     - Disable 'FIX' layer?
+			D27 = MUTE
+			D26 = EEPROM CLK
+			D25 = EEPROM CS
+			D24 = EEPROM DATA
+    	*/
+			m_eeprom->write_bit(data & 1);
+			m_eeprom->set_cs_line((data & 2) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->set_clock_line((data & 4) ? ASSERT_LINE : CLEAR_LINE);
+			
+			m_sys0 = data;
+			break;
+		
+		case 1:
+		/*
+			D23 = BRMAS        - 68k bus error mask
+			D22 = L7MAS        - L7 interrupt mask (unused - should always be '1')
+			D21 = /L5MAS       - L5 interrupt mask/acknowledge (vblank)
+			D20 = L3MAS        - L3 interrupt mask (network)
+			D19 = VFLIP        - Flip video vertically
+			D18 = HFLIP        - Flip video horizontally
+			D17 = COIN2        - Coin counter 2
+			D16 = COIN1        - Coin counter 1
+		*/
+			coin_counter_w(machine(), 0, data & 1);
+			coin_counter_w(machine(), 1, data & 2);
+			
+			if (~data & 0x20)
+				m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+			
+			m_sys1 = data;
+			break;
+		
+		default:
+			break;
 	}
-	else
-	{
-		UINT8 lowInputBits = ioport("IN1")->read();
-		UINT8 highInputBits = ioport("IN0")->read();
-		return ((highInputBits << 24) | (lowInputBits << 16));
-	}
-
-	logerror("unk access to eeprom port (mask %x)\n", mem_mask);
-	return 0;
 }
 
-
-WRITE32_MEMBER(polygonet_state::polygonet_eeprom_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		ioport("EEPROMOUT")->write(data, 0xffffffff);
-		return;
-	}
-
-	logerror("unknown write %x (mask %x) to eeprom\n", data, mem_mask);
-}
-
-/* TTL tile readback for ROM test */
-READ32_MEMBER(polygonet_state::ttl_rom_r)
-{
-	UINT32 *ROM;
-	ROM = (UINT32 *)memregion("gfx1")->base();
-
-	return ROM[offset];
-}
-
-/* PSAC2 tile readback for ROM test */
-READ32_MEMBER(polygonet_state::psac_rom_r)
-{
-	UINT32 *ROM;
-	ROM = (UINT32 *)memregion("gfx2")->base();
-
-	return ROM[offset];
-}
 
 /* irqs 3, 5, and 7 have valid vectors                */
 /* irq 3 is network.  don't generate if you don't emulate the network h/w! */
@@ -154,34 +144,53 @@ READ32_MEMBER(polygonet_state::psac_rom_r)
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
 INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 {
-	device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
+	if (m_sys1 & 0x20)
+		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
 /* sound CPU communications */
-READ32_MEMBER(polygonet_state::sound_r)
+READ8_MEMBER(polygonet_state::sound_comms_r)
 {
-	int latch = soundlatch3_byte_r(space, 0);
-
-	if ((latch == 0xd) || (latch == 0xe)) latch = 0xf;  /* hack: until 54539 NMI disable found */
-
-	return latch<<8;
+	switch (offset)
+	{
+		case 0:
+			// unknown
+			return 0;
+		
+		case 2:
+			return soundlatch_byte_r(space, 0);
+		
+		default:
+			break;
+	}
+	
+	return 0;
 }
 
-WRITE32_MEMBER(polygonet_state::sound_w)
+WRITE8_MEMBER(polygonet_state::sound_comms_w)
 {
-	if (ACCESSING_BITS_8_15)
+	switch (offset)
 	{
-		soundlatch_byte_w(space, 0, (data>>8)&0xff);
-	}
-	else
-	{
-		soundlatch2_byte_w(space, 0, data&0xff);
+		case 0:
+			// unknown
+			break;
+		
+		case 2:
+			soundlatch2_byte_w(space, 0, data);
+			break;
+		
+		case 3:
+			soundlatch3_byte_w(space, 0, data);
+			break;
+		
+		default:
+			break;
 	}
 }
 
 WRITE32_MEMBER(polygonet_state::sound_irq_w)
 {
-	m_soundcpu->set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE); // where is ack?
 }
 
 /* DSP communications */
@@ -256,10 +265,6 @@ WRITE32_MEMBER(polygonet_state::dsp_w_lines)
 	{
 //      logerror("RESET ASSERTED\n");
 		m_dsp->set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
-
-		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		m_dsp->set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
-		m_dsp->set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
@@ -503,8 +508,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16_LEGACY("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
-	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
+	AM_RANGE(0x480000, 0x480003) AM_READ8(polygonet_inputs_r, 0xffffffff)
+	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE8(polygonet_sys_w, 0xffffffff)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_SHARE("shared_ram")
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
@@ -512,12 +517,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP /* network RAM | registers? */
-	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
-	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
+	AM_RANGE(0x600004, 0x600007) AM_WRITE8(sound_comms_w, 0xffffffff)
+	AM_RANGE(0x600008, 0x60000b) AM_READ8(sound_comms_r, 0xffffffff)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x700000, 0x73ffff) AM_READ(psac_rom_r)
-	AM_RANGE(0x780000, 0x79ffff) AM_READ(ttl_rom_r)
+	AM_RANGE(0x700000, 0x73ffff) AM_ROM AM_REGION("gfx2", 0)
+	AM_RANGE(0x780000, 0x79ffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -540,41 +545,46 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-void polygonet_state::reset_sound_region()
-{
-	membank("bank2")->set_base(memregion("soundcpu")->base() + 0x10000 + m_cur_sound_region*0x4000);
-}
 
 WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)
 {
-	m_cur_sound_region = (data & 0x1f);
-	reset_sound_region();
+	// d0-d2: bank
+	// higher bits: ? (only used in plygonet)
+	if ((m_sound_bank & 7) != (data & 7))
+		membank("bank1")->set_entry(data & 7);
+	
+	m_sound_bank = data;
 }
 
-INTERRUPT_GEN_MEMBER(polygonet_state::audio_interrupt)
-{
-	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
+
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch3_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xfff1, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
+
+
+static void sound_nmi( device_t *device )
+{
+	polygonet_state *state = device->machine().driver_data<polygonet_state>();
+	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // where is ack?
+}
+
 
 static const k054539_interface k054539_config =
 {
-	"shared"
+	"shared",
+	NULL,
+	sound_nmi
 };
 
 /**********************************************************************************/
@@ -589,24 +599,44 @@ static const gfx_layout bglayout =
 	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
 		9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
 
-		128*8
+	128*8
 };
 
 static GFXDECODE_START( plygonet )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
+
+void polygonet_state::machine_reset()
+{
+	membank("bank1")->set_entry(0);
+	m_sound_bank = 0;
+	
+	m_sys0 = 0;
+	m_sys1 = 0;
+
+	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
+	m_dsp->set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+	m_dsp->set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
+}
+
 void polygonet_state::machine_start()
 {
-	logerror("Polygonet machine start\n");
+	m_inputs[0] = ioport("IN0");
+	m_inputs[1] = ioport("IN1");
+	m_inputs[2] = ioport("IN2");
+	m_inputs[3] = ioport("IN3");
 
-	/* Set the dsp56k lines */
-	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
-	/* TODO: This should work, but the MAME core appears to do something funny.
-	         Not a big deal - it's hacked in dsp_w_lines. */
-	//m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	//m_dsp->set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
-	//m_dsp->set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
+	/* save states */
+	save_item(NAME(m_dsp56k_bank00_ram));
+	save_item(NAME(m_dsp56k_bank01_ram));
+	save_item(NAME(m_dsp56k_bank02_ram));
+	save_item(NAME(m_dsp56k_shared_ram_16));
+	save_item(NAME(m_dsp56k_bank04_ram));
+	save_item(NAME(m_sys0));
+	save_item(NAME(m_sys1));
+	save_item(NAME(m_sound_bank));
 }
 
 static const k053936_interface polygonet_k053936_intf =
@@ -616,25 +646,22 @@ static const k053936_interface polygonet_k053936_intf =
 
 static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz (xtal is 32.0 MHz) */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state,  polygonet_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
 
-	MCFG_CPU_ADD("dsp", DSP56156, 40000000)     /* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
+	MCFG_CPU_ADD("dsp", DSP56156, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(polygonet_state, audio_interrupt,  480)
-
-
-	MCFG_GFXDECODE(plygonet)
+	
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
-	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200000))
+	MCFG_GFXDECODE(plygonet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -645,7 +672,6 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
 
 	MCFG_PALETTE_LENGTH(32768)
-
 
 	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
 
@@ -668,62 +694,62 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 1, unused
+	PORT_DIPNAME( 0x30, 0x00, "Player Color" ) /* 0x10(SW1), 0x20(SW2).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
+	PORT_DIPSETTING(    0x00, "Red" )
+	PORT_DIPSETTING(    0x10, "Yellow" )
+	PORT_DIPSETTING(    0x20, "Green" )
+	PORT_DIPSETTING(    0x30, "Blue" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+	
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )   PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )    PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )  PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 2, unused
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( polynetw )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* SW1 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* SW2 (changes player color).  It's mapped on the JAMMA connector and plugs into an external switch mech. */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( polygonet )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 /**********************************************************************************/
 DRIVER_INIT_MEMBER(polygonet_state,polygonet)
 {
-	/* Set default bankswitch */
-	m_cur_sound_region = 2;
-	reset_sound_region();
+	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 
 	/* Allocate space for the dsp56k banking */
 	memset(m_dsp56k_bank00_ram, 0, sizeof(m_dsp56k_bank00_ram));
@@ -735,74 +761,54 @@ DRIVER_INIT_MEMBER(polygonet_state,polygonet)
 	/* The dsp56k occasionally executes out of mapped memory */
 	address_space &space = machine().device<dsp56k_device>("dsp")->space(AS_PROGRAM);
 	m_dsp56k_update_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(polygonet_state::plygonet_dsp56k_direct_handler), this));
-
-	/* save states */
-	save_item(NAME(m_dsp56k_bank00_ram));
-	save_item(NAME(m_dsp56k_bank01_ram));
-	save_item(NAME(m_dsp56k_bank02_ram));
-	save_item(NAME(m_dsp56k_shared_ram_16));
-	save_item(NAME(m_dsp56k_bank04_ram));
-	save_item(NAME(m_cur_sound_region));
 }
 
 
 /**********************************************************************************/
 ROM_START( plygonet )
-	/* main program */
-	ROM_REGION( 0x200000, "maincpu", 0)
-	ROM_LOAD32_BYTE( "305uaa01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) ) /* Boards exist without the "UA" in the label IE: 305a01, ect... */
+	ROM_REGION( 0x200000, "maincpu", 0) /* main program */
+	ROM_LOAD32_BYTE( "305uaa01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) ) /* Boards exist without the "UA" in the label IE: 305a01, etc... */
 	ROM_LOAD32_BYTE( "305uaa02.2k", 0x000002, 512*1024, CRC(4d7e32b3) SHA1(25731526535036972577637d186f02ae467296bd) )
 	ROM_LOAD32_BYTE( "305uaa03.2h", 0x000001, 512*1024, CRC(36e4e3fe) SHA1(e8fcad4f196c9b225a0fbe70791493ff07c648a9) )
 	ROM_LOAD32_BYTE( "305uaa04.4h", 0x000000, 512*1024, CRC(d8394e72) SHA1(eb6bcf8aedb9ba5843204ab8aacb735cbaafb74d) )
-
-	/* Z80 sound program */
-	ROM_REGION( 0x30000, "soundcpu", 0 )
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD("305b05.7b", 0x000000, 0x20000, CRC(2d3d9654) SHA1(784a409df47cee877e507b8bbd3610d161d63753) )
-	ROM_RELOAD( 0x10000, 0x20000)
-
-	/* TTL text plane tiles */
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
 	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
-
-	/* '936 tiles */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
-
-	/* sound data */
-	ROM_REGION( 0x200000, "shared", 0 )
+	
+	ROM_REGION( 0x200000, "shared", 0 ) /* sound data */
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASEFF )
 	ROM_LOAD( "plygonet.nv", 0x0000, 0x0080, CRC(627748ac) SHA1(ea1b06739fee235b049ff8daffff7d43cb093112) )
 ROM_END
 
 ROM_START( polynetw )
-	/* main program */
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", 0) /* main program */
 	ROM_LOAD32_BYTE( "305jaa01.4k", 0x000003, 0x080000, CRC(ea889bd9) SHA1(102e7c0f0c064662c0f6137ad5da97a9ccd49a97) )
 	ROM_LOAD32_BYTE( "305jaa02.2k", 0x000002, 0x080000, CRC(d0710379) SHA1(cf0970d63e8d021edf2d404838c658a5b7cb8fb8) )
 	ROM_LOAD32_BYTE( "305jaa03.2h", 0x000001, 0x080000, CRC(278b5928) SHA1(2ea96054e2ef637731cd64f2bef0b5b2bbe7e24f) )
 	ROM_LOAD32_BYTE( "305jaa04.4h", 0x000000, 0x080000, CRC(b069353b) SHA1(12fbe2df09328bb7193e89a49d84a61eab5bfdcb) )
-
-	/* Z80 sound program */
-	ROM_REGION( 0x30000, "soundcpu", 0 )
+	
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 sound program */
 	ROM_LOAD( "305jaa05.7b", 0x000000, 0x020000, CRC(06053db6) SHA1(c7d43c2650d949ee552a49db93dece842c17e68d) )
-	ROM_RELOAD( 0x10000, 0x20000)
-
-	/* TTL text plane tiles */
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* TTL text plane tiles */
 	ROM_LOAD( "305a06.18g", 0x000000, 0x020000, CRC(4b9b7e9c) SHA1(8c3c0f1ec7e26fd9552f6da1e6bdd7ff4453ba57) )
-
-	/* '936 tiles */
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	
+	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
-
-	/* sound data */
-	ROM_REGION( 0x400000, "shared", 0 )
+	
+	ROM_REGION( 0x400000, "shared", 0 ) /* sound data */
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
 	ROM_LOAD( "305a09.3e", 0x200000, 0x200000, CRC(6da1be58) SHA1(d63ac16ac551193ff8a6036724fb59e1d702e06b) )
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASEFF )
 	ROM_LOAD( "polynetw.nv", 0x0000, 0x0080, CRC(8f39d644) SHA1(8733e1a288ba20c4b04b3aedde52801d05cebdf9) )
 ROM_END
 

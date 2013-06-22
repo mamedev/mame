@@ -11,21 +11,31 @@ class polygonet_state : public driver_device
 public:
 	polygonet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_shared_ram(*this, "shared_ram"),
-		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
-		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_eeprom(*this, "eeprom"),
-		m_k053936(*this, "k053936") { }
+		m_k053936(*this, "k053936"),
+		m_shared_ram(*this, "shared_ram"),
+		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
+		m_dsp56k_p_8000(*this, "dsp56k_p_8000")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
+	required_device<eeprom_device> m_eeprom;
+	required_device<k053936_device> m_k053936;
 
 	/* 68k-side shared ram */
 	required_shared_ptr<UINT32> m_shared_ram;
 
 	required_shared_ptr<UINT16> m_dsp56k_p_mirror;
 	required_shared_ptr<UINT16> m_dsp56k_p_8000;
-	int m_cur_sound_region;
+	ioport_port *m_inputs[4];
+	UINT8 m_sys0;
+	UINT8 m_sys1;
+	UINT8 m_sound_bank;
 
 	direct_update_delegate m_dsp56k_update_handler;
 
@@ -42,11 +52,11 @@ public:
 	UINT16 m_dsp56k_bank02_ram[2 * 8 * dsp56k_bank02_size];
 	UINT16 m_dsp56k_shared_ram_16[2 * 8 * dsp56k_shared_ram_16_size];
 	UINT16 m_dsp56k_bank04_ram[2 * 8 * dsp56k_bank04_size];
-	DECLARE_WRITE32_MEMBER(polygonet_eeprom_w);
-	DECLARE_READ32_MEMBER(ttl_rom_r);
-	DECLARE_READ32_MEMBER(psac_rom_r);
-	DECLARE_READ32_MEMBER(sound_r);
-	DECLARE_WRITE32_MEMBER(sound_w);
+
+	DECLARE_WRITE8_MEMBER(polygonet_sys_w);
+	DECLARE_READ8_MEMBER(polygonet_inputs_r);
+	DECLARE_READ8_MEMBER(sound_comms_r);
+	DECLARE_WRITE8_MEMBER(sound_comms_w);
 	DECLARE_WRITE32_MEMBER(sound_irq_w);
 	DECLARE_READ32_MEMBER(dsp_host_interface_r);
 	DECLARE_WRITE32_MEMBER(shared_ram_write);
@@ -71,21 +81,14 @@ public:
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_roz_ram_w);
 	DIRECT_UPDATE_MEMBER(plygonet_dsp56k_direct_handler);
-	DECLARE_READ32_MEMBER(polygonet_eeprom_r);
 	DECLARE_DRIVER_INIT(polygonet);
 	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	TILE_GET_INFO_MEMBER(roz_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan);
 	TILEMAP_MAPPER_MEMBER(plygonet_scan_cols);
+	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
-	INTERRUPT_GEN_MEMBER(audio_interrupt);
-	void reset_sound_region();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<cpu_device> m_dsp;
-	required_device<eeprom_device> m_eeprom;
-	required_device<k053936_device> m_k053936;
 };
