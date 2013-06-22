@@ -125,6 +125,7 @@ public:
 	DECLARE_DRIVER_INIT(grdnstrm);
 	DECLARE_DRIVER_INIT(spec2k);
 	DECLARE_DRIVER_INIT(redfoxwp2a);
+	DECLARE_DRIVER_INIT(grdnstrmg);
 	DECLARE_DRIVER_INIT(bjtwin);
 	TILEMAP_MAPPER_MEMBER(afega_tilemap_scan_pages);
 	TILE_GET_INFO_MEMBER(macross_get_bg0_tile_info);
