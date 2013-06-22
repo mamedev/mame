@@ -639,7 +639,7 @@ WRITE8_MEMBER( snes_console_state::snessa1_lo_w )
 	if (offset >= 0x400000 && offset < 0x500000)
 		m_cartslot->chip_write(space, offset, data);        // SA-1 BWRAM (not mirrored above!)
 	else
-		snessfx_hi_w(space, offset, data, 0xff);
+		snessa1_hi_w(space, offset, data, 0xff);
 }
 
 //---------------------------------------------------------------------------------

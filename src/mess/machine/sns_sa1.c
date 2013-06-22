@@ -35,6 +35,15 @@
 #include "emu.h"
 #include "machine/sns_sa1.h"
 
+#define SA1_IRQ_SCPU	(0x80)
+#define SA1_IRQ_TIMER	(0x40)
+#define SA1_IRQ_DMA		(0x20)
+#define SA1_NMI_SCPU	(0x10)
+
+#define SCPU_IRQ_SA1	(0x80)
+#define SCPU_IRQV_ALT	(0x40)
+#define SCPU_IRQ_CHARCONV (0x20)
+#define SCPU_NMIV_ALT	(0x10)
 
 //-------------------------------------------------
 //  constructor
@@ -48,6 +57,7 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 						device_sns_cart_interface( mconfig, *this ),
 						m_sa1(*this, "sa1cpu")
 {
+
 }
 
 
@@ -96,12 +106,50 @@ void sns_sa1_device::device_reset()
 	m_drm = 0;
 	m_hcr = 0;
 	m_vcr = 0;
+	m_scpu_sie = m_sa1_sie = 0;
+	m_scpu_flags = m_sa1_flags = 0;
+
+	// sa-1 CPU starts out not running?
+	m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
+
+void sns_sa1_device::recalc_irqs()
+{
+	#if 0	// how do we get the maincpu from here?
+	if (m_scpu_flags & m_scpu_sie & (SCPU_IRQ_SA1|SCPU_IRQ_CHARCONV))
+	{
+		set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+	}
+	else
+	{
+		set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
+	}
+	#endif
+
+	if (m_sa1_flags & m_sa1_sie & (SA1_IRQ_SCPU|SA1_IRQ_TIMER|SA1_IRQ_DMA))
+	{
+		m_sa1->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+	}
+	else
+	{
+		m_sa1->set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
+	}
+
+	if (m_sa1_flags & m_sa1_sie & SA1_NMI_SCPU)
+	{
+		m_sa1->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+	}
+	else
+	{
+		m_sa1->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+	}
+}
+
 
 /*-------------------------------------------------
   RAM / SRAM / Registers
@@ -154,11 +202,11 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 	{
 		case 0x100:
 			// S-CPU Flag Read
-			value = (m_scpu_ctrl & ~0xa0); // | (IRQ Flags);
+			value = (m_scpu_ctrl & 0x0f) | m_scpu_flags;
 			break;
 		case 0x101:
 			// SA-1 Flag Read
-			value = (m_sa1_ctrl & ~0x0f); // | (IRQ/NMI/Timer Flags);
+			value = (m_sa1_ctrl & 0x0f) | m_sa1_flags;
 			break;
 		case 0x102:
 			// H-Count Read Low
@@ -249,58 +297,126 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 	{
 		case 0x000:
 			// SA-1 control flags
-			if (BIT(m_sa1_ctrl, 5) && !BIT(data, 7))
+			if ((BIT(data, 5)) && !(BIT(m_sa1_ctrl, 5)))
 			{
-				// reset sa-1?
+				printf("Engaging SA-1 reset\n");
+				m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			}
+			else if (!(BIT(data, 5)) && (BIT(m_sa1_ctrl, 5)))
+			{
+				printf("Releasing SA-1 reset\n");
+				m_sa1->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+				m_sa1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				m_sa1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
+
 			m_sa1_ctrl = data;
+
+			// message to S-CPU
+			m_scpu_ctrl &= 0xf0;
+			m_scpu_ctrl |= (data & 0x0f);
 
 			if (BIT(m_sa1_ctrl, 7))
 			{
-				// IRQ
+				m_sa1_flags |= SA1_IRQ_SCPU;
 			}
 			if (BIT(m_sa1_ctrl, 4))
 			{
-				// NMI
+				m_sa1_flags |= SA1_NMI_SCPU;
 			}
+			recalc_irqs();
 			break;
 		case 0x001:
 			// SNES  SIE   00h   SNES CPU Int Enable (W)
+			m_scpu_sie = data;
+			recalc_irqs();
 			break;
 		case 0x002:
 			// SNES  SIC   00h   SNES CPU Int Clear  (W)
+			if (BIT(data, 7))	// ack IRQ from SA-1
+			{
+				m_scpu_flags &= ~SCPU_IRQ_SA1;
+			}
+			if (BIT(data, 5))	// ack character conversion IRQ
+			{
+				m_scpu_flags &= ~SCPU_IRQ_CHARCONV;
+			}
+			recalc_irqs();
 			break;
 		case 0x003:
 			// SNES  CRV   -     SA-1 CPU Reset Vector Lsb (W)
+			m_sa1_reset &= 0xff00;
+			m_sa1_reset |= data;
 			break;
 		case 0x004:
 			// SNES  CRV   -     SA-1 CPU Reset Vector Msb (W)
+			m_sa1_reset &= 0x00ff;
+			m_sa1_reset |= (data<<8);
 			break;
 		case 0x005:
 			// SNES  CNV   -     SA-1 CPU NMI Vector Lsb (W)
+			m_sa1_nmi &= 0xff00;
+			m_sa1_nmi |= data;
 			break;
 		case 0x006:
 			// SNES  CNV   -     SA-1 CPU NMI Vector Msb (W)
+			m_sa1_nmi &= 0x00ff;
+			m_sa1_nmi |= (data<<8);
 			break;
 		case 0x007:
 			// SNES  CIV   -     SA-1 CPU IRQ Vector Lsb (W)
+			m_sa1_irq &= 0xff00;
+			m_sa1_irq |= data;
 			break;
 		case 0x008:
 			// SNES  CIV   -     SA-1 CPU IRQ Vector Msb (W)
+			m_sa1_irq &= 0x00ff;
+			m_sa1_irq |= (data<<8);
 			break;
 		case 0x009:
 			// S-CPU control flags
 			m_scpu_ctrl = data;
 			if (m_scpu_ctrl & 0x80)
 			{
-				// IRQ
+				m_scpu_flags |= SCPU_IRQ_SA1;
 			}
+
+			// message to SA-1
+			m_sa1_ctrl &= 0xf0;
+			m_sa1_ctrl |= (data & 0x0f);
+
+			// clear IRQ/NMI override flags in flags word
+			m_scpu_flags &= ~(SCPU_IRQV_ALT|SCPU_NMIV_ALT);
+
+			// and set them
+			m_scpu_flags |= (data & (SCPU_IRQV_ALT|SCPU_NMIV_ALT)); 
+
+			recalc_irqs();
 			break;
 		case 0x00a:
 			// SA-1  CIE   00h   SA-1 CPU Int Enable (W)
+			m_sa1_sie = data;
+			recalc_irqs();
 			break;
 		case 0x00b:
 			// SA-1  CIC   00h   SA-1 CPU Int Clear  (W)
+			if (BIT(data, 7))
+			{
+				m_sa1_flags &= ~SA1_IRQ_SCPU;
+			}
+			if (BIT(data, 6))
+			{
+				m_sa1_flags &= ~SA1_IRQ_TIMER;
+			}
+			if (BIT(data, 5))
+			{
+				m_sa1_flags &= ~SA1_IRQ_DMA;
+			}
+			if (BIT(data, 4))
+			{
+				m_sa1_flags &= ~SA1_NMI_SCPU;
+			}
+			recalc_irqs();
 			break;
 		case 0x00c:
 			// NMI Vector Low
@@ -771,6 +887,30 @@ READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 		}
 		else if (address < 0x8000)
 			return read_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
+		else if (address == 0xffee)
+		{
+			return m_sa1_irq & 0xff;
+		}
+		else if (address == 0xffef)
+		{
+			return m_sa1_irq>>8;
+		}
+		else if (address == 0xffea)
+		{
+			return m_sa1_nmi & 0xff;
+		}
+		else if (address == 0xffeb)
+		{
+			return m_sa1_nmi>>8;
+		}
+		else if (address == 0xfffc)
+		{
+			return m_sa1_reset & 0xff;
+		}
+		else if (address == 0xfffd)
+		{
+			return m_sa1_reset>>8;
+		}
 		else
 			return read_l(space, offset);   // ROM
 
@@ -821,7 +961,7 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( snes_sa1 )
-	MCFG_CPU_ADD("sa1cpu", _5A22, 10000000)
+	MCFG_CPU_ADD("sa1cpu", G65816, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sa1_map)
 MACHINE_CONFIG_END
 

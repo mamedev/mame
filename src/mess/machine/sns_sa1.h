@@ -44,16 +44,23 @@ private:
 	void write_regs(UINT32 offset, UINT8 data);
 	void write_iram(UINT32 offset, UINT8 data);
 	void write_bwram(UINT32 offset, UINT8 data);
+	void recalc_irqs();
 
-	required_device<_5a22_device> m_sa1;
+	required_device<g65816_device> m_sa1;
 
 	UINT8 m_internal_ram[0x800];
 
 	// register related
 	// $2200
 	UINT8 m_sa1_ctrl;
+	// $2201
+	UINT8 m_scpu_sie;
+	// $2203-$2208
+	UINT16 m_sa1_reset, m_sa1_nmi, m_sa1_irq;
 	// $2209
 	UINT8 m_scpu_ctrl;
+	// $220a
+	UINT8 m_sa1_sie;
 	// $200c-$200d - S-CPU vectors
 	UINT16 m_irq_vector, m_nmi_vector;
 	// $2012-$2015
@@ -84,6 +91,8 @@ private:
 	UINT32 m_vda;
 	UINT8 m_vbit, m_vlen;
 	int m_drm;
+	// $2300-$2301
+	UINT8 m_scpu_flags, m_sa1_flags;
 	// $2302-$2305
 	UINT16 m_hcr, m_vcr;
 };
