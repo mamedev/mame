@@ -49,7 +49,8 @@ public:
 			m_pia30(*this, "pia30"),
 			m_pia34(*this, "pia34"),
 			m_audiocpu(*this, "audiocpu"),
-			m_msm5205(*this, "msm5205")
+			m_msm5205(*this, "msm5205"),
+			m_sample_bank(*this, "sample_bank")
 	{ }
 
 protected:
@@ -100,6 +101,7 @@ public:
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm5205;
+	required_memory_bank m_sample_bank;
 	UINT8 m_sample_data;
 	bool m_more_data;
 	bool m_nmi_enable;
@@ -116,7 +118,7 @@ private:
 	bool m_irq_active;
 	UINT8 m_sound_data;
 
-	UINT8 m_sample_bank;
+	UINT8 m_sample_bank_num;
 	UINT8 m_msm_prescaler;
 };
 
@@ -253,14 +255,14 @@ void de_2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 MACHINE_RESET_MEMBER(de_2_state, de_2)
 {
-	membank("sample_bank")->set_entry(0);
+	m_sample_bank->set_entry(0);
 	m_more_data = false;
 	m_is_alpha3 = false;
 }
 
 MACHINE_RESET_MEMBER(de_2_state, de_2_alpha3)
 {
-	membank("sample_bank")->set_entry(0);
+	m_sample_bank->set_entry(0);
 	m_more_data = false;
 	m_is_alpha3 = true;
 }
@@ -271,8 +273,8 @@ DRIVER_INIT_MEMBER(de_2_state, de_2)
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 	m_irq_active = false;
-	membank("sample_bank")->configure_entries(0, 16, &ROM[0x0000], 0x4000);
-	membank("sample_bank")->set_entry(0);
+	m_sample_bank->configure_entries(0, 16, &ROM[0x0000], 0x4000);
+	m_sample_bank->set_entry(0);
 }
 
 WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
@@ -556,8 +558,8 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 {
 	static const UINT8 prescale[4] = { MSM5205_S96_4B, MSM5205_S48_4B, MSM5205_S64_4B, 0 };
 
-	m_sample_bank = (data & 0x07);
-	membank("sample_bank")->set_entry(m_sample_bank);
+	m_sample_bank_num = (data & 0x07);
+	m_sample_bank->set_entry(m_sample_bank_num);
 	m_msm_prescaler = (data & 0x30) >> 4;
 	m_nmi_enable = (~data & 0x80);
 	m_msm5205->playmode_w(prescale[m_msm_prescaler]);
@@ -604,7 +606,7 @@ static MACHINE_CONFIG_START( de_2, de_2_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( de_2_alpha3, de_2 )
-MCFG_MACHINE_RESET_OVERRIDE(de_2_state, de_2_alpha3)
+	MCFG_MACHINE_RESET_OVERRIDE(de_2_state, de_2_alpha3)
 	MCFG_DEFAULT_LAYOUT(layout_de2a3)
 MACHINE_CONFIG_END
 
