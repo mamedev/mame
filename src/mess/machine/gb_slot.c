@@ -602,6 +602,15 @@ const char * base_gb_cart_slot_device::get_default_card_software(const machine_c
 }
 
 
+const char * megaduck_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+{
+	if (open_image_file(options))
+		return "rom";
+	
+	return software_get_default_slot(config, options, this, "rom");
+}
+
+
 
 /*-------------------------------------------------
  read
