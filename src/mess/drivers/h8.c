@@ -2,22 +2,54 @@
 
         Heathkit H8
 
-        12/05/2009 Skeleton driver.
+        2009-05-12 Skeleton driver.
 
-    STATUS:
-    - It runs, keyboard works, you can enter data
+        This system uses Octal rather than the usual hexadecimal.
 
-    TODO:
-    - Proper artwork
-    - Fix interrupts
-    - Seems to crash when GO pressed (needs a subject-matter expert to test)
-    - Add load/dump facility (cassette port)
+STATUS:
+        It runs, keyboard works, you can enter data.
+
+Meaning of LEDs:
+        PWR = power is turned on
+        MON = controls should work
+        RUN = CPU is running (not halted)
+        ION = Interrupts are enabled
+
+Pasting:
+        0-F : as is
+        + : ^
+        - : V
+        MEM : -
+        ALTER : =
+
+        Addresses must have all 6 digits entered.
+        Data must have all 3 digits entered.
+        System has a short beep for each key, and a slightly longer beep
+            for each group of 3 digits. The largest number allowed is 377 (=0xFF).
+
+Test Paste:
+        -041000=123 245 333 144 255 366 077=-041000
+        Now press up-arrow to confirm the data has been entered.
+
+Official test program from pages 4 to 8 of the operator's manual:
+        -040100=076 002 062 010 040 006 004 041 170 040 021 013 040 016 011 176
+                022 043 023 015 302 117 040 016 003 076 377 315 053 000 015 302
+                131 040 005 302 112 040 076 062 315 140 002 076 062 315 053 000
+                076 062 315 140 002 303 105 040 377 262 270 272 275 377 222 200
+                377 237 244 377 272 230 377 220 326 302 377 275 272 271 271 373
+                271 240 377 236 376 362 236 376 362 236 376 362 R6=040100=4
+
+TODO:
+        - Cassette (coded but not working)
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8251.h"
+#include "imagedev/cassette.h"
 #include "sound/beep.h"
+#include "sound/wave.h"
 #include "h8.lh"
 
 
@@ -26,25 +58,34 @@ class h8_state : public driver_device
 public:
 	h8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	//m_cass(*this, "cassette"),
-	m_beep(*this, "beeper")
+		m_maincpu(*this, "maincpu"),
+		m_uart(*this, "uart"),
+		m_cass(*this, "cassette"),
+		m_beep(*this, "beeper")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	//required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
-	DECLARE_READ8_MEMBER(h8_f0_r);
-	DECLARE_WRITE8_MEMBER(h8_f0_w);
-	DECLARE_WRITE8_MEMBER(h8_f1_w);
+	DECLARE_READ8_MEMBER(portf0_r);
+	DECLARE_WRITE8_MEMBER(portf0_w);
+	DECLARE_WRITE8_MEMBER(portf1_w);
 	DECLARE_WRITE8_MEMBER(h8_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
+	DECLARE_READ_LINE_MEMBER(rxdata_callback);
+	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
+	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
+private:
 	UINT8 m_digit;
 	UINT8 m_segment;
 	UINT8 m_irq_ctl;
-	UINT8 m_ff_b;
+	bool m_ff_b;
+	UINT8 m_cass_data[4];
+	bool m_cass_state;
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
+	required_device<cassette_image_device> m_cass;
+	required_device<beep_device> m_beep;
 };
 
 
@@ -59,7 +100,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
-READ8_MEMBER( h8_state::h8_f0_r )
+READ8_MEMBER( h8_state::portf0_r )
 {
 	// reads the keyboard
 
@@ -89,7 +130,7 @@ READ8_MEMBER( h8_state::h8_f0_r )
 	return data;
 }
 
-WRITE8_MEMBER( h8_state::h8_f0_w )
+WRITE8_MEMBER( h8_state::portf0_w )
 {
 	// this will always turn off int10 that was set by the timer
 	// d0-d3 = digit select
@@ -101,16 +142,16 @@ WRITE8_MEMBER( h8_state::h8_f0_w )
 	m_digit = data & 15;
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
 
-	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
-	m_beep->set_state((data & 0x80) ? 0 : 1);
+	output_set_value("mon_led", !BIT(data, 5));
+	m_beep->set_state(!BIT(data, 7));
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_ctl &= 0xf0;
-	if (data & 0x40) m_irq_ctl |= 1;
-	if (~data & 0x10) m_irq_ctl |= 2;
+	if (BIT(data, 6)) m_irq_ctl |= 1;
+	if (!BIT(data, 4)) m_irq_ctl |= 2;
 }
 
-WRITE8_MEMBER( h8_state::h8_f1_w )
+WRITE8_MEMBER( h8_state::portf1_w )
 {
 	//d7 segment dot
 	//d6 segment f
@@ -127,19 +168,20 @@ WRITE8_MEMBER( h8_state::h8_f1_w )
 
 static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8_io, AS_IO, 8, h8_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(h8_f0_r,h8_f0_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(h8_f1_w)
-	//AM_RANGE(0xf8, 0xf8) load and dump data port
-	//AM_RANGE(0xf9, 0xf9) load and dump control port
-	//AM_RANGE(0xfa, 0xfa) console data port
-	//AM_RANGE(0xfb, 0xfb) console control port
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(portf0_r,portf0_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(portf1_w)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
+	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+	// optional connection to a serial terminal @ 600 baud
+	//AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	//AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -157,12 +199,12 @@ static INPUT_PORTS_START( h8 )
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8 LOAD") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("9 DUMP") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("* CANCEL") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("// ALTER RST") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("# MEM RTM") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("@ REG") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CANCEL") PORT_CODE(KEYCODE_ESC) PORT_CHAR('Q')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ALTER") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MEM") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REG") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 INPUT_PORTS_END
 
 void h8_state::machine_reset()
@@ -170,12 +212,17 @@ void h8_state::machine_reset()
 	m_beep->set_frequency(H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);
 	m_irq_ctl = 1;
+	m_cass_state = 1;
+	m_cass_data[0] = 0;
+	m_cass_data[1] = 0;
+	m_cass_data[2] = 0;
+	m_cass_data[3] = 0;
 }
 
 WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 {
 		// operate the ION LED
-	output_set_value("ion_led",(state) ? 0 : 1);
+	output_set_value("ion_led", !state);
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
@@ -186,29 +233,52 @@ the data is /INTE while the clock is /M1. If the system is in Single Instruction
 a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
 But, all of this can only occur if bit 5 of port F0 is low. */
 
-	UINT8 state = (data & I8085_STATUS_M1) ? 0 : 1;
-	UINT8 c,a = (m_irq_ctl & 0x80) ? 1 : 0;
+	bool state = (data & I8085_STATUS_M1) ? 0 : 1;
+	bool c,a = (m_irq_ctl & 0x80) ? 1 : 0;
 
 	if (m_irq_ctl & 2)
 	{
 		if (!state) // rising pulse to push data through flipflops
 		{
-			c=m_ff_b^1; // from /Q of 2nd flipflop
-			m_ff_b=a; // from Q of 1st flipflop
+			c = ~m_ff_b; // from /Q of 2nd flipflop
+			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
 				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
 		}
 	}
 	else
 	{ // flipflops are 'set'
-		c=0;
-		m_ff_b=1;
+		c = 0;
+		m_ff_b = 1;
 	}
 
 
 		// operate the RUN LED
 	output_set_value("run_led", state);
 }
+
+READ_LINE_MEMBER( h8_state::rxdata_callback )
+{//printf("%X",m_cass_data[2]);
+	return (bool)m_cass_data[2];
+}
+
+WRITE_LINE_MEMBER( h8_state::txdata_callback )
+{
+	m_cass_state = state;
+}
+
+static const i8251_interface uart_intf =
+{
+	DEVCB_DRIVER_LINE_MEMBER(h8_state,rxdata_callback), //rxd_cb
+	DEVCB_DRIVER_LINE_MEMBER(h8_state,txdata_callback), //txd_cb
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 static I8085_CONFIG( h8_cpu_config )
 {
@@ -218,14 +288,48 @@ static I8085_CONFIG( h8_cpu_config )
 	DEVCB_NULL                  /* SOD changed callback (I8085A only) */
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
+{
+	m_uart->receive_clock();
+	m_uart->transmit_clock();
+	m_cass_data[3]++;
+
+	if (m_cass_state)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = (m_cass_data[1] < 12) ? 1 : 0;
+		m_cass_data[1] = 0;
+	}
+}
+
+static const cassette_interface h8_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	//(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	(cassette_state) (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	"h8_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( h8, h8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(h8_mem)
 	MCFG_CPU_IO_MAP(h8_io)
 	MCFG_CPU_CONFIG(h8_cpu_config)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_timer", h8_state, h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h8)
@@ -234,6 +338,15 @@ static MACHINE_CONFIG_START( h8, h8_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* Devices */
+	MCFG_I8251_ADD("uart", uart_intf)
+	MCFG_CASSETTE_ADD("cassette", h8_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_c", h8_state, h8_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_p", h8_state, h8_p, attotime::from_hz(40000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("h8_timer", h8_state, h8_irq_pulse, attotime::from_hz(H8_IRQ_PULSE))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -251,5 +364,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1977, h8,  0,       0,    h8,     h8, driver_device,   0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )
+/*    YEAR  NAME PARENT  COMPAT MACHINE INPUT    CLASS,         INIT    COMPANY       FULLNAME       FLAGS */
+COMP( 1977, h8,  0,       0,    h8,     h8,      driver_device,   0, "Heath, Inc.", "Heathkit H8", GAME_NOT_WORKING )
