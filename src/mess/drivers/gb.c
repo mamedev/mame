@@ -556,16 +556,16 @@ WRITE8_MEMBER(megaduck_state::bank2_w)
 static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w)  /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", gb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)    /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
 	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w)    /* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", gb_lcd_device, oam_r, oam_w)    /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)      /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave ram */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gb_video_r, gb_io2_w)     /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", gb_lcd_device, video_r) AM_WRITE(gb_io2_w)     /* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
@@ -573,16 +573,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w)  /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", sgb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)    /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
 	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w)    /* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", sgb_lcd_device, oam_r, oam_w)    /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w)     /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gb_video_r, gb_io2_w)        /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", sgb_lcd_device, video_r) AM_WRITE(gb_io2_w)        /* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
@@ -590,17 +590,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gbc_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w) /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", cgb_lcd_device, vram_r, vram_w) /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w)   /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM                     /* 4k fixed RAM bank */
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("cgb_ram")                    /* 4k switched RAM bank */
 	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w)  /* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", cgb_lcd_device, oam_r, oam_w)  /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)        /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound controller */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gbc_io2_r, gbc_io2_w)        /* Other I/O and video controller */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", cgb_lcd_device, video_r) AM_WRITE(gbc_io2_w)        /* Other I/O and video controller */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* high RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
@@ -608,12 +608,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(cart_r, bank1_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w)        /* 8k VRAM */
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("lcd", gb_lcd_device, vram_r, vram_w)        /* 8k VRAM */
 	AM_RANGE(0xa000, 0xafff) AM_NOP                         /* unused? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)
 	AM_RANGE(0xb001, 0xbfff) AM_NOP                         /* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM                         /* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w)      /* OAM RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("lcd", gb_lcd_device, oam_r, oam_w)      /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)            /* I/O */
 	AM_RANGE(0xff10, 0xff1f) AM_READWRITE(megaduck_video_r, megaduck_video_w)  /* video controller */
 	AM_RANGE(0xff20, 0xff2f) AM_READWRITE(megaduck_sound_r1, megaduck_sound_w1) /* sound controller pt1 */
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)
 	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_UPDATE_DRIVER(gb_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 //  MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_SIZE( 458, 154 )
@@ -696,6 +696,8 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_GFXDECODE(gb)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gb)
+
+	MCFG_GB_LCD_DMG_ADD( "lcd" )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -728,6 +730,9 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,sgb)
+
+	MCFG_DEVICE_REMOVE("lcd")
+	MCFG_GB_LCD_SGB_ADD( "lcd" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
@@ -739,6 +744,9 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_MACHINE_START_OVERRIDE(gb_state, gbpocket)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbp)
+
+	MCFG_DEVICE_REMOVE("lcd")
+	MCFG_GB_LCD_MGB_ADD( "lcd" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
@@ -751,6 +759,9 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbc)
+
+	MCFG_DEVICE_REMOVE("lcd")
+	MCFG_GB_LCD_CGB_ADD( "lcd" )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -779,7 +790,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck )
 	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck )
 
-	MCFG_SCREEN_UPDATE_DRIVER(gb_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("lcd", gb_lcd_device, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
@@ -787,6 +798,8 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_GFXDECODE(gb)
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_PALETTE_INIT_OVERRIDE(megaduck_state,megaduck)
+
+	MCFG_GB_LCD_DMG_ADD( "lcd" )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)

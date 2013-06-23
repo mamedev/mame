@@ -135,11 +135,6 @@ void gb_state::save_gbc_only()
 
 void gb_state::save_sgb_only()
 {
-	save_item(NAME(m_sgb_pal));
-	save_item(NAME(m_sgb_tile_map));
-	save_item(NAME(m_sgb_window_mask));
-	save_item(NAME(m_sgb_pal_data));
-	save_item(NAME(m_sgb_atf_data));
 	save_item(NAME(m_sgb_packets));
 	save_item(NAME(m_sgb_bitcount));
 	save_item(NAME(m_sgb_bytecount));
@@ -148,10 +143,6 @@ void gb_state::save_sgb_only()
 	save_item(NAME(m_sgb_controller_no));
 	save_item(NAME(m_sgb_controller_mode));
 	save_item(NAME(m_sgb_data));
-	save_item(NAME(m_sgb_atf));
-
-	save_pointer(NAME(m_sgb_tile_data), 0x2000);
-	save_item(NAME(m_sgb_pal_map));
 }
 
 
@@ -184,7 +175,6 @@ MACHINE_START_MEMBER(gb_state,gb)
 	m_gb_serial_timer->enable( 0 );
 
 	save_gb_base();
-	gb_video_start(GB_VIDEO_DMG);
 }
 
 MACHINE_START_MEMBER(gb_state,gbpocket)
@@ -194,7 +184,6 @@ MACHINE_START_MEMBER(gb_state,gbpocket)
 	m_gb_serial_timer->enable( 0 );
 
 	save_gb_base();
-	gb_video_start(GB_VIDEO_MGB);
 }
 
 MACHINE_START_MEMBER(gb_state,gbc)
@@ -208,14 +197,12 @@ MACHINE_START_MEMBER(gb_state,gbc)
 
 	save_gb_base();
 	save_gbc_only();
-	gb_video_start(GB_VIDEO_CGB);
 }
 
 
 MACHINE_START_MEMBER(gb_state,sgb)
 {
 	m_sgb_packets = -1;
-	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -223,14 +210,14 @@ MACHINE_START_MEMBER(gb_state,sgb)
 
 	save_gb_base();
 	save_sgb_only();
-	gb_video_start(GB_VIDEO_SGB);
+
+	if (m_cartslot && m_cartslot->get_sgb_hack())
+		machine().device<sgb_lcd_device>("lcd")->set_sgb_hack(TRUE);
 }
 
 MACHINE_RESET_MEMBER(gb_state,gb)
 {
 	gb_init();
-
-	gb_video_reset(GB_VIDEO_DMG);
 
 	/* Enable BIOS rom */
 	m_bios_disable = 0;
@@ -241,8 +228,6 @@ MACHINE_RESET_MEMBER(gb_state,gb)
 MACHINE_RESET_MEMBER(gb_state,gbpocket)
 {
 	gb_init();
-
-	gb_video_reset(GB_VIDEO_MGB);
 
 	gb_init_regs();
 
@@ -260,8 +245,6 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 {
 	gb_init();
 
-	gb_video_reset( GB_VIDEO_CGB );
-
 	gb_init_regs();
 
 	/* Enable BIOS rom */
@@ -275,19 +258,10 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 {
 	gb_init();
 
-	gb_video_reset(GB_VIDEO_SGB);
-
 	gb_init_regs();
-
 
 	/* Enable BIOS rom */
 	m_bios_disable = 0;
-
-	memset(m_sgb_tile_data, 0, 0x2000);
-
-	m_sgb_window_mask = 0;
-	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
-	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
 
 	m_divcount = 0x0004;
 }
@@ -376,7 +350,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 		//printf("here again?\n");
 	}
 	else
-		gb_video_w(space, offset, data);
+		machine().device<gb_lcd_device>("lcd")->video_w(space, offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -473,398 +447,20 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 						m_sgb_packets = sgb_data[0] & 0x07;
 						m_sgb_start = 0;
 					}
-					if (m_sgb_bytecount == (m_sgb_packets << 4) )
+					if (m_sgb_bytecount == (m_sgb_packets << 4))
 					{
-						switch( sgb_data[0] >> 3 )
+						switch (sgb_data[0] >> 3)
 						{
-							case 0x00:  /* PAL01 */
-								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								m_sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								m_sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								break;
-							case 0x01:  /* PAL23 */
-								m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								m_sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								m_sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								break;
-							case 0x02:  /* PAL03 */
-								m_sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								m_sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								m_sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								m_sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								m_sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								m_sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								break;
-							case 0x03:  /* PAL12 */
-								m_sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								m_sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								m_sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								m_sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								m_sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								m_sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								m_sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								break;
-							case 0x04:  /* ATTR_BLK */
-								{
-									UINT8 I, J, K, o;
-									for( K = 0; K < sgb_data[1]; K++ )
-									{
-										o = K * 6;
-										if( sgb_data[o + 2] & 0x1 )
-										{
-											for( I = sgb_data[ o + 4]; I <= sgb_data[o + 6]; I++ )
-											{
-												for( J = sgb_data[o + 5]; J <= sgb_data[o + 7]; J++ )
-												{
-													m_sgb_pal_map[I][J] = sgb_data[o + 3] & 0x3;
-												}
-											}
-										}
-									}
-								}
-								break;
-							case 0x05:  /* ATTR_LIN */
-								{
-									UINT8 J, K;
-									if( sgb_data[1] > 15 )
-										sgb_data[1] = 15;
-									for( K = 0; K < sgb_data[1]; K++ )
-									{
-										if( sgb_data[K + 1] & 0x80 )
-										{
-											for( J = 0; J < 20; J++ )
-											{
-												m_sgb_pal_map[J][sgb_data[K + 1] & 0x1f] = (sgb_data[K + 1] & 0x60) >> 5;
-											}
-										}
-										else
-										{
-											for( J = 0; J < 18; J++ )
-											{
-												m_sgb_pal_map[sgb_data[K + 1] & 0x1f][J] = (sgb_data[K + 1] & 0x60) >> 5;
-											}
-										}
-									}
-								}
-								break;
-							case 0x06:  /* ATTR_DIV */
-								{
-									UINT8 I, J;
-									if( sgb_data[1] & 0x40 ) /* Vertical */
-									{
-										for( I = 0; I < sgb_data[2]; I++ )
-										{
-											for( J = 0; J < 20; J++ )
-											{
-												m_sgb_pal_map[J][I] = (sgb_data[1] & 0xC) >> 2;
-											}
-										}
-										for( J = 0; J < 20; J++ )
-										{
-											m_sgb_pal_map[J][sgb_data[2]] = (sgb_data[1] & 0x30) >> 4;
-										}
-										for( I = sgb_data[2] + 1; I < 18; I++ )
-										{
-											for( J = 0; J < 20; J++ )
-											{
-												m_sgb_pal_map[J][I] = sgb_data[1] & 0x3;
-											}
-										}
-									}
-									else /* Horizontal */
-									{
-										for( I = 0; I < sgb_data[2]; I++ )
-										{
-											for( J = 0; J < 18; J++ )
-											{
-												m_sgb_pal_map[I][J] = (sgb_data[1] & 0xC) >> 2;
-											}
-										}
-										for( J = 0; J < 18; J++ )
-										{
-											m_sgb_pal_map[sgb_data[2]][J] = (sgb_data[1] & 0x30) >> 4;
-										}
-										for( I = sgb_data[2] + 1; I < 20; I++ )
-										{
-											for( J = 0; J < 18; J++ )
-											{
-												m_sgb_pal_map[I][J] = sgb_data[1] & 0x3;
-											}
-										}
-									}
-								}
-								break;
-							case 0x07:  /* ATTR_CHR */
-								{
-									UINT16 I, sets;
-									UINT8 x, y;
-									sets = (sgb_data[3] | (sgb_data[4] << 8) );
-									if( sets > 360 )
-										sets = 360;
-									sets >>= 2;
-									sets += 6;
-									x = sgb_data[1];
-									y = sgb_data[2];
-									if( sgb_data[5] ) /* Vertical */
-									{
-										for( I = 6; I < sets; I++ )
-										{
-											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC0) >> 6;
-											if( y > 17 )
-											{
-												y = 0;
-												x++;
-												if( x > 19 )
-													x = 0;
-											}
-
-											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0x30) >> 4;
-											if( y > 17 )
-											{
-												y = 0;
-												x++;
-												if( x > 19 )
-													x = 0;
-											}
-
-											m_sgb_pal_map[x][y++] = (sgb_data[I] & 0xC) >> 2;
-											if( y > 17 )
-											{
-												y = 0;
-												x++;
-												if( x > 19 )
-													x = 0;
-											}
-
-											m_sgb_pal_map[x][y++] = sgb_data[I] & 0x3;
-											if( y > 17 )
-											{
-												y = 0;
-												x++;
-												if( x > 19 )
-													x = 0;
-											}
-										}
-									}
-									else /* horizontal */
-									{
-										for( I = 6; I < sets; I++ )
-										{
-											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC0) >> 6;
-											if( x > 19 )
-											{
-												x = 0;
-												y++;
-												if( y > 17 )
-													y = 0;
-											}
-
-											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0x30) >> 4;
-											if( x > 19 )
-											{
-												x = 0;
-												y++;
-												if( y > 17 )
-													y = 0;
-											}
-
-											m_sgb_pal_map[x++][y] = (sgb_data[I] & 0xC) >> 2;
-											if( x > 19 )
-											{
-												x = 0;
-												y++;
-												if( y > 17 )
-													y = 0;
-											}
-
-											m_sgb_pal_map[x++][y] = sgb_data[I] & 0x3;
-											if( x > 19 )
-											{
-												x = 0;
-												y++;
-												if( y > 17 )
-													y = 0;
-											}
-										}
-									}
-								}
-								break;
-							case 0x08:  /* SOUND */
-								/* This command enables internal sound effects */
-								/* Not Implemented */
-								break;
-							case 0x09:  /* SOU_TRN */
-								/* This command sends data to the SNES sound processor.
-								   We'll need to emulate that for this to be used */
-								/* Not Implemented */
-								break;
-							case 0x0A:  /* PAL_SET */
-								{
-									UINT16 index_, J, I;
-
-									/* Palette 0 */
-									index_ = (UINT16)(sgb_data[1] | (sgb_data[2] << 8)) * 4;
-									m_sgb_pal[0] = m_sgb_pal_data[index_];
-									m_sgb_pal[1] = m_sgb_pal_data[index_ + 1];
-									m_sgb_pal[2] = m_sgb_pal_data[index_ + 2];
-									m_sgb_pal[3] = m_sgb_pal_data[index_ + 3];
-									/* Palette 1 */
-									index_ = (UINT16)(sgb_data[3] | (sgb_data[4] << 8)) * 4;
-									m_sgb_pal[4] = m_sgb_pal_data[index_];
-									m_sgb_pal[5] = m_sgb_pal_data[index_ + 1];
-									m_sgb_pal[6] = m_sgb_pal_data[index_ + 2];
-									m_sgb_pal[7] = m_sgb_pal_data[index_ + 3];
-									/* Palette 2 */
-									index_ = (UINT16)(sgb_data[5] | (sgb_data[6] << 8)) * 4;
-									m_sgb_pal[8] = m_sgb_pal_data[index_];
-									m_sgb_pal[9] = m_sgb_pal_data[index_ + 1];
-									m_sgb_pal[10] = m_sgb_pal_data[index_ + 2];
-									m_sgb_pal[11] = m_sgb_pal_data[index_ + 3];
-									/* Palette 3 */
-									index_ = (UINT16)(sgb_data[7] | (sgb_data[8] << 8)) * 4;
-									m_sgb_pal[12] = m_sgb_pal_data[index_];
-									m_sgb_pal[13] = m_sgb_pal_data[index_ + 1];
-									m_sgb_pal[14] = m_sgb_pal_data[index_ + 2];
-									m_sgb_pal[15] = m_sgb_pal_data[index_ + 3];
-									/* Attribute File */
-									if( sgb_data[9] & 0x40 )
-										m_sgb_window_mask = 0;
-									m_sgb_atf = (sgb_data[9] & 0x3f) * (18 * 5);
-									if( sgb_data[9] & 0x80 )
-									{
-										for( J = 0; J < 18; J++ )
-										{
-											for( I = 0; I < 5; I++ )
-											{
-												m_sgb_pal_map[I * 4][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC0) >> 6;
-												m_sgb_pal_map[(I * 4) + 1][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x30) >> 4;
-												m_sgb_pal_map[(I * 4) + 2][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC) >> 2;
-												m_sgb_pal_map[(I * 4) + 3][J] = m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x3;
-											}
-										}
-									}
-								}
-								break;
-							case 0x0B:  /* PAL_TRN */
-								{
-									UINT16 I, col;
-
-									for( I = 0; I < 2048; I++ )
-									{
-										col = (m_lcd.gb_vram[0x0800 + (I*2) + 1] << 8) | m_lcd.gb_vram[0x0800 + (I*2)];
-										m_sgb_pal_data[I] = col;
-									}
-								}
-								break;
-							case 0x0C:  /* ATRC_EN */
-								/* Not Implemented */
-								break;
-							case 0x0D:  /* TEST_EN */
-								/* Not Implemented */
-								break;
-							case 0x0E:  /* ICON_EN */
-								/* Not Implemented */
-								break;
-							case 0x0F:  /* DATA_SND */
-								/* Not Implemented */
-								break;
-							case 0x10:  /* DATA_TRN */
-								/* Not Implemented */
-								break;
 							case 0x11:  /* MLT_REQ - Multi controller request */
 								if (sgb_data[1] == 0x00)
 									m_sgb_controller_mode = 0;
 								else if (sgb_data[1] == 0x01)
 									m_sgb_controller_mode = 2;
 								break;
-							case 0x12:  /* JUMP */
-								/* Not Implemented */
-								break;
-							case 0x13:  /* CHR_TRN */
-								if (sgb_data[1] & 0x1)
-									memcpy(m_sgb_tile_data + 4096, m_lcd.gb_vram + 0x0800, 4096);
-								else
-									memcpy(m_sgb_tile_data, m_lcd.gb_vram + 0x0800, 4096);
-								break;
-							case 0x14:  /* PCT_TRN */
-								{
-									int I;
-									UINT16 col;
-									if (m_cartslot && m_cartslot->get_sgb_hack())
-									{
-										memcpy(m_sgb_tile_map, m_lcd.gb_vram + 0x1000, 2048);
-										for( I = 0; I < 64; I++ )
-										{
-											col = (m_lcd.gb_vram[0x0800 + (I*2) + 1 ] << 8) | m_lcd.gb_vram[0x0800 + (I*2)];
-											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
-										}
-									}
-									else /* Do things normally */
-									{
-										memcpy(m_sgb_tile_map, m_lcd.gb_vram + 0x0800, 2048);
-										for( I = 0; I < 64; I++ )
-										{
-											col = (m_lcd.gb_vram[0x1000 + (I*2) + 1] << 8) | m_lcd.gb_vram[0x1000 + (I*2)];
-											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
-										}
-									}
-								}
-								break;
-							case 0x15:  /* ATTR_TRN */
-								memcpy( m_sgb_atf_data, m_lcd.gb_vram + 0x0800, 4050 );
-								break;
-							case 0x16:  /* ATTR_SET */
-								{
-									UINT8 J, I;
-
-									/* Attribute File */
-									if( sgb_data[1] & 0x40 )
-										m_sgb_window_mask = 0;
-									m_sgb_atf = (sgb_data[1] & 0x3f) * (18 * 5);
-									for( J = 0; J < 18; J++ )
-									{
-										for( I = 0; I < 5; I++ )
-										{
-											m_sgb_pal_map[I * 4][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC0) >> 6;
-											m_sgb_pal_map[(I * 4) + 1][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x30) >> 4;
-											m_sgb_pal_map[(I * 4) + 2][J] = (m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0xC) >> 2;
-											m_sgb_pal_map[(I * 4) + 3][J] = m_sgb_atf_data[(J * 5) + m_sgb_atf + I] & 0x3;
-										}
-									}
-								}
-								break;
-							case 0x17:  /* MASK_EN */
-								m_sgb_window_mask = sgb_data[1];
-								break;
-							case 0x18:  /* OBJ_TRN */
-								/* Not Implemnted */
-								break;
-							case 0x19:  /* ? */
-								/* Called by: dkl,dkl2,dkl3,zeldadx
-								   But I don't know what it is for. */
-								/* Not Implemented */
-								break;
-							case 0x1E:  /* Used by bootrom to transfer the gb cart header */
-								break;
-							case 0x1F:  /* Used by bootrom to transfer the gb cart header */
-								break;
 							default:
-								logerror( "SGB: Unknown Command 0x%02x!\n", sgb_data[0] >> 3 );
+								machine().device<sgb_lcd_device>("lcd")->sgb_io_write_pal(sgb_data[0] >> 3, &sgb_data[0]);
+								break;								
 						}
-
 						m_sgb_start = 0;
 						m_sgb_bytecount = 0;
 						m_sgb_packets = -1;
@@ -1040,7 +636,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 		default:
 			break;
 	}
-	gbc_video_w( space, offset, data );
+	machine().device<cgb_lcd_device>("lcd")->video_w(space, offset, data);
 }
 
 READ8_MEMBER(gb_state::gbc_io2_r)
@@ -1056,7 +652,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	default:
 		break;
 	}
-	return gbc_video_r( space, offset );
+	return machine().device<cgb_lcd_device>("lcd")->video_r(space, offset);
 }
 
 /****************************************************************************
@@ -1072,7 +668,6 @@ MACHINE_START_MEMBER(megaduck_state,megaduck)
 	m_gb_serial_timer->enable( 0 );
 
 	save_gb_base();
-	gb_video_start(GB_VIDEO_DMG);
 }
 
 MACHINE_RESET_MEMBER(megaduck_state,megaduck)
@@ -1081,8 +676,6 @@ MACHINE_RESET_MEMBER(megaduck_state,megaduck)
 	gb_init();
 
 	m_bios_disable = 1;
-
-	gb_video_reset( GB_VIDEO_DMG );
 }
 
 /*
@@ -1125,11 +718,11 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 {
 	UINT8 data;
 
-	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) )
+	if ((offset & 0x0C) && ((offset & 0x0C) ^ 0x0C))
 	{
 		offset ^= 0x0C;
 	}
-	data = gb_video_r( space, offset );
+	data = machine().device<gb_lcd_device>("lcd")->video_r(space, offset);
 	if ( offset )
 		return data;
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
@@ -1137,15 +730,15 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 
 WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 {
-	if ( !offset )
+	if (!offset)
 	{
 		data = BITSWAP8(data,7,3,5,4,2,1,0,6);
 	}
-	if ( (offset & 0x0C) && ((offset & 0x0C) ^ 0x0C) )
+	if ((offset & 0x0C) && ((offset & 0x0C) ^ 0x0C))
 	{
 		offset ^= 0x0C;
 	}
-	gb_video_w(space, offset, data );
+	machine().device<gb_lcd_device>("lcd")->video_w(space, offset, data);
 }
 
 /* Map megaduck audio offset to game boy audio offsets */
