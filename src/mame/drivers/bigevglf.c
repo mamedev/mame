@@ -58,7 +58,6 @@ J1100072A
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/msm5232.h"
 #include "cpu/m6805/m6805.h"
 #include "includes/bigevglf.h"
 
@@ -364,7 +363,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
 	AM_RANGE(0xce00, 0xce00) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w) /* write to D800 sets bit 1 in status */

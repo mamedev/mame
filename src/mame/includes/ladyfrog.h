@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "sound/msm5232.h"
+
 class ladyfrog_state : public driver_device
 {
 public:
@@ -12,7 +14,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scrlram(*this, "scrlram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm")	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -64,4 +67,5 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5232_device> m_msm;
 };

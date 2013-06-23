@@ -196,7 +196,6 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "cpu/m6805/m6805.h"
 #include "includes/taitoipt.h"
 #include "sound/ay8910.h"
-#include "sound/msm5232.h"
 #include "includes/nycaptor.h"
 
 
@@ -382,7 +381,7 @@ static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP

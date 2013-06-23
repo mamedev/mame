@@ -227,7 +227,6 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/msm5232.h"
 #include "machine/buggychl.h"
 #include "includes/40love.h"
 
@@ -739,7 +738,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r) AM_WRITE(to_main_w)

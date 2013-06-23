@@ -109,5 +109,5 @@ public:
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
-	optional_device<msm5232_device> m_msm;
+	required_device<msm5232_device> m_msm;
 };

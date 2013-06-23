@@ -368,7 +368,6 @@ D                                                                               
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
@@ -404,7 +403,7 @@ TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 {
 	UINT8 frq = ioport(FRQ_ADJUSTER_TAG)->read();
 
-	msm5232_set_clock(m_msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+	m_msm->set_clock(MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_eq8155_port_c, m_eq8155_port_a, m_ay_port_a, m_ay_port_b, m_eq_cymbal_ctrl & 15);
 
 	m_cymvol *= 0.94f;
@@ -740,7 +739,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
