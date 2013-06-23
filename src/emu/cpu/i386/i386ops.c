@@ -2498,12 +2498,6 @@ static void I386OP(loadall)(i386_state *cpustate)       // Opcode 0x0f 0x07 (0x0
 	fatalerror("i386: LOADALL unimplemented at %08X\n", cpustate->pc - 1);
 }
 
-static void I386OP(rsm)(i386_state *cpustate)
-{
-	logerror("i386: Invalid RSM outside SMM at %08X\n", cpustate->pc - 1);
-	i386_trap(cpustate, 6, 0, 0);
-}
-
 static void I386OP(invalid)(i386_state *cpustate)
 {
 	report_invalid_opcode(cpustate);

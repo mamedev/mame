@@ -144,6 +144,98 @@ static void PENTIUMOP(ud2)(i386_state *cpustate)    // Opcode 0x0f 0b
 	i386_trap(cpustate, 6, 0, 0);
 }
 
+static void PENTIUMOP(rsm)(i386_state *cpustate)
+{
+	UINT32 smram_state = cpustate->smbase + 0xfe00;
+	if(!cpustate->smm)
+	{
+		logerror("i386: Invalid RSM outside SMM at %08X\n", cpustate->pc - 1);
+		i386_trap(cpustate, 6, 0, 0);
+		return;
+	}
+
+	// load state, no sanity checks anywhere
+	cpustate->smbase = READ32(cpustate, smram_state+SMRAM_SMBASE);
+	cpustate->cr[4] = READ32(cpustate, smram_state+SMRAM_IP5_CR4);
+	cpustate->sreg[ES].limit = READ32(cpustate, smram_state+SMRAM_IP5_ESLIM);
+	cpustate->sreg[ES].base = READ32(cpustate, smram_state+SMRAM_IP5_ESBASE);
+	cpustate->sreg[ES].flags = READ32(cpustate, smram_state+SMRAM_IP5_ESACC);
+	cpustate->sreg[CS].limit = READ32(cpustate, smram_state+SMRAM_IP5_CSLIM);
+	cpustate->sreg[CS].base = READ32(cpustate, smram_state+SMRAM_IP5_CSBASE);
+	cpustate->sreg[CS].flags = READ32(cpustate, smram_state+SMRAM_IP5_CSACC);
+	cpustate->sreg[SS].limit = READ32(cpustate, smram_state+SMRAM_IP5_SSLIM);
+	cpustate->sreg[SS].base = READ32(cpustate, smram_state+SMRAM_IP5_SSBASE);
+	cpustate->sreg[SS].flags = READ32(cpustate, smram_state+SMRAM_IP5_SSACC);
+	cpustate->sreg[DS].limit = READ32(cpustate, smram_state+SMRAM_IP5_DSLIM);
+	cpustate->sreg[DS].base = READ32(cpustate, smram_state+SMRAM_IP5_DSBASE);
+	cpustate->sreg[DS].flags = READ32(cpustate, smram_state+SMRAM_IP5_DSACC);
+	cpustate->sreg[FS].limit = READ32(cpustate, smram_state+SMRAM_IP5_FSLIM);
+	cpustate->sreg[FS].base = READ32(cpustate, smram_state+SMRAM_IP5_FSBASE);
+	cpustate->sreg[FS].flags = READ32(cpustate, smram_state+SMRAM_IP5_FSACC);
+	cpustate->sreg[GS].limit = READ32(cpustate, smram_state+SMRAM_IP5_GSLIM);
+	cpustate->sreg[GS].base = READ32(cpustate, smram_state+SMRAM_IP5_GSBASE);
+	cpustate->sreg[GS].flags = READ32(cpustate, smram_state+SMRAM_IP5_GSACC);
+	cpustate->ldtr.flags = READ32(cpustate, smram_state+SMRAM_IP5_LDTACC);
+	cpustate->ldtr.limit = READ32(cpustate, smram_state+SMRAM_IP5_LDTLIM);
+	cpustate->ldtr.base = READ32(cpustate, smram_state+SMRAM_IP5_LDTBASE);
+	cpustate->gdtr.limit = READ32(cpustate, smram_state+SMRAM_IP5_GDTLIM);
+	cpustate->gdtr.base = READ32(cpustate, smram_state+SMRAM_IP5_GDTBASE);
+	cpustate->idtr.limit = READ32(cpustate, smram_state+SMRAM_IP5_IDTLIM);
+	cpustate->idtr.base = READ32(cpustate, smram_state+SMRAM_IP5_IDTBASE);
+	cpustate->task.limit = READ32(cpustate, smram_state+SMRAM_IP5_TRLIM);
+	cpustate->task.base = READ32(cpustate, smram_state+SMRAM_IP5_TRBASE);
+	cpustate->task.flags = READ32(cpustate, smram_state+SMRAM_IP5_TRACC);
+
+	cpustate->sreg[ES].selector = READ32(cpustate, smram_state+SMRAM_ES);
+	cpustate->sreg[CS].selector = READ32(cpustate, smram_state+SMRAM_CS);
+	cpustate->sreg[SS].selector = READ32(cpustate, smram_state+SMRAM_SS);
+	cpustate->sreg[DS].selector = READ32(cpustate, smram_state+SMRAM_DS);
+	cpustate->sreg[FS].selector = READ32(cpustate, smram_state+SMRAM_FS);
+	cpustate->sreg[GS].selector = READ32(cpustate, smram_state+SMRAM_GS);
+	cpustate->ldtr.segment = READ32(cpustate, smram_state+SMRAM_LDTR);
+	cpustate->task.segment = READ32(cpustate, smram_state+SMRAM_TR);
+
+	cpustate->dr[7] = READ32(cpustate, smram_state+SMRAM_DR7);
+	cpustate->dr[6] = READ32(cpustate, smram_state+SMRAM_DR6);
+	REG32(EAX) = READ32(cpustate, smram_state+SMRAM_EAX);
+	REG32(ECX) = READ32(cpustate, smram_state+SMRAM_ECX);
+	REG32(EDX) = READ32(cpustate, smram_state+SMRAM_EDX);
+	REG32(EBX) = READ32(cpustate, smram_state+SMRAM_EBX);
+	REG32(ESP) = READ32(cpustate, smram_state+SMRAM_ESP);
+	REG32(EBP) = READ32(cpustate, smram_state+SMRAM_EBP);
+	REG32(ESI) = READ32(cpustate, smram_state+SMRAM_ESI);
+	REG32(EDI) = READ32(cpustate, smram_state+SMRAM_EDI);
+	cpustate->eip = READ32(cpustate, smram_state+SMRAM_EIP);
+	cpustate->eflags = READ32(cpustate, smram_state+SMRAM_EAX);
+	cpustate->cr[3] = READ32(cpustate, smram_state+SMRAM_CR3);
+	cpustate->cr[0] = READ32(cpustate, smram_state+SMRAM_CR0);
+
+	cpustate->CPL = (cpustate->sreg[SS].flags >> 13) & 3; // cpl == dpl of ss
+
+	for(int i = 0; i < GS; i++)
+	{
+		if(PROTECTED_MODE && !V8086_MODE)
+		{
+			cpustate->sreg[i].valid = cpustate->sreg[i].selector ? true : false;
+			cpustate->sreg[i].d = (cpustate->sreg[i].flags & 0x4000) ? 1 : 0;
+		}
+		else
+			cpustate->sreg[i].valid = true;
+	}
+
+	if(!cpustate->smiact.isnull())
+		cpustate->smiact(false);
+	cpustate->smm = false;
+
+	CHANGE_PC(cpustate,cpustate->eip);
+	cpustate->nmi_masked = false;
+	if(cpustate->nmi_latched)
+	{
+		cpustate->nmi_latched = false;
+		i386_trap(cpustate, 2, 1, 0);
+	}
+}
+
 static void SSEOP(cvttss2si)(i386_state *cpustate) // Opcode f3 0f 2c
 {
 	UINT32 src;

@@ -170,6 +170,76 @@ enum
 	MMX_MM7=X87_ST7
 };
 
+enum smram
+{
+	SMRAM_SMBASE = 0xF8,
+	SMRAM_SMREV  = 0xFC,
+	SMRAM_IORSRT = 0x100,
+	SMRAM_AHALT  = 0x102,
+	SMRAM_IOEDI  = 0x104,
+	SMRAM_IOECX  = 0x108,
+	SMRAM_IOESI  = 0x10C,
+
+	SMRAM_ES     = 0x1A8,
+	SMRAM_CS     = 0x1AC,
+	SMRAM_SS     = 0x1B0,
+	SMRAM_DS     = 0x1B4,
+	SMRAM_FS     = 0x1B8,
+	SMRAM_GS     = 0x1BC,
+	SMRAM_LDTR   = 0x1C0,
+	SMRAM_TR     = 0x1C4,
+	SMRAM_DR7    = 0x1C8,
+	SMRAM_DR6    = 0x1CC,
+	SMRAM_EAX    = 0x1D0,
+	SMRAM_ECX    = 0x1D4,
+	SMRAM_EDX    = 0x1D8,
+	SMRAM_EBX    = 0x1DC,
+	SMRAM_ESP    = 0x1E0,
+	SMRAM_EBP    = 0x1E4,
+	SMRAM_ESI    = 0x1E8,
+	SMRAM_EDI    = 0x1EC,
+	SMRAM_EIP    = 0x1F0,
+	SMRAM_EFLAGS = 0x1F4,
+	SMRAM_CR3    = 0x1F8,
+	SMRAM_CR0    = 0x1FC,
+};
+
+enum smram_intel_p5
+{
+	SMRAM_IP5_IOEIP   = 0x110,
+	SMRAM_IP5_CR4     = 0x128,
+	SMRAM_IP5_ESLIM   = 0x130,
+	SMRAM_IP5_ESBASE  = 0x134,
+	SMRAM_IP5_ESACC   = 0x138,
+	SMRAM_IP5_CSLIM   = 0x13C,
+	SMRAM_IP5_CSBASE  = 0x140,
+	SMRAM_IP5_CSACC   = 0x144,
+	SMRAM_IP5_SSLIM   = 0x148,
+	SMRAM_IP5_SSBASE  = 0x14C,
+	SMRAM_IP5_SSACC   = 0x150,
+	SMRAM_IP5_DSLIM   = 0x154,
+	SMRAM_IP5_DSBASE  = 0x158,
+	SMRAM_IP5_DSACC   = 0x15C,
+	SMRAM_IP5_FSLIM   = 0x160,
+	SMRAM_IP5_FSBASE  = 0x164,
+	SMRAM_IP5_FSACC   = 0x168,
+	SMRAM_IP5_GSLIM   = 0x16C,
+	SMRAM_IP5_GSBASE  = 0x170,
+	SMRAM_IP5_GSACC   = 0x174,
+	SMRAM_IP5_LDTLIM  = 0x178,
+	SMRAM_IP5_LDTBASE = 0x17C,
+	SMRAM_IP5_LDTACC  = 0x180,
+	SMRAM_IP5_GDTLIM  = 0x184,
+	SMRAM_IP5_GDTBASE = 0x188,
+	SMRAM_IP5_GDTACC  = 0x18C,
+	SMRAM_IP5_IDTLIM  = 0x190,
+	SMRAM_IP5_IDTBASE = 0x194,
+	SMRAM_IP5_IDTACC  = 0x198,
+	SMRAM_IP5_TRLIM   = 0x19C,
+	SMRAM_IP5_TRBASE  = 0x1A0,
+	SMRAM_IP5_TRACC   = 0x1A4,
+};
+
 /* Protected mode exceptions */
 #define FAULT_UD 6   // Invalid Opcode
 #define FAULT_NM 7   // Coprocessor not available
@@ -362,6 +432,12 @@ struct i386_state
 	UINT8 *cycle_table_rm;
 
 	vtlb_state *vtlb;
+
+	bool smm;
+	bool nmi_masked;
+	bool nmi_latched;
+	UINT32 smbase;
+	devcb_resolved_write_line smiact;
 
 	// bytes in current opcode, debug only
 #ifdef DEBUG_MISSING_OPCODE
