@@ -203,10 +203,10 @@ inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset
 		return read_h(space, (offset & 0x7fffff));
 
 	if ((offset & 0x40e000) == 0x006000)  //$00-3f|80-bf:6000-7fff
-		return read_bwram(offset);
+		return read_bwram(offset & 0x1fff);
 
 	if ((offset & 0xf00000) == 0x400000)  //$40-4f:0000-ffff
-		return read_bwram(offset);
+		return read_bwram(offset & 0xfffff);
 
 	if ((offset & 0x40f800) == 0x000000)  //$00-3f|80-bf:0000-07ff
 		return read_iram(offset);
@@ -841,7 +841,7 @@ READ8_MEMBER( sns_sa1_device::chip_read )
 		return read_bwram((m_bwram_snes * 0x2000) + (offset & 0x1fff)); // SA-1 BWRAM
 
 	if (offset >= 0x400000 && offset < 0x500000)
-		return read_bwram(offset);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
+		return read_bwram(offset & 0xfffff);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
 
 	return 0xff;
 }
@@ -861,7 +861,7 @@ WRITE8_MEMBER( sns_sa1_device::chip_write )
 		write_bwram((m_bwram_snes * 0x2000) + (offset & 0x1fff), data); // SA-1 BWRAM
 
 	if (offset >= 0x400000 && offset < 0x500000)
-		write_bwram(offset, data);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
+		write_bwram(offset & 0xfffff, data);  // SA-1 BWRAM again (but not called for the [c0-cf] range, because it's not mirrored)
 }
 
 
@@ -946,7 +946,7 @@ READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 		return 0xff;    // maybe open bus? same as the main system one or diff? (currently not accessible from carts anyway...)
 	}
 	else if (offset < 0x500000)
-		return read_bwram(offset);      // SA-1 BWRAM (not mirrored above!)
+		return read_bwram(offset & 0xfffff);      // SA-1 BWRAM (not mirrored above!)
 	else if (offset >= 0x600000 && offset < 0x700000)
 		return read_bwram((offset & 0xfffff) + 0x100000);       // SA-1 BWRAM Bitmap mode
 	else
