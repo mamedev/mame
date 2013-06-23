@@ -28,7 +28,33 @@
  - test case for BWRAM & IRAM write protect (bsnes does not seem to ever protect either, so it's not implemented
    for the moment)
  - almost everything CPU related!
-
+ 
+ Compatibility:
+	sdf1gpp, sdf1gp: corrupt menu gfx, hangs going into game (I think)
+    habumeij: boots, goes into game, on-screen timer counts down after SA-1 is enabled but controls aren't responsive
+    kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
+	kirby3j, kirby3: uses SA-1 DMA
+    itoibass: boots, some missing gfx
+    jl96drem: hangs entering gameplay with SA-1 disabled
+	haruaug3a, pebble, haruaug3: uses SA-1 DMA
+    miniyonk: corrupt gfx, can't get past press start
+    pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
+	przeo, przeou: plays OK 
+    sdgungnx: plays music and hangs, both CPUs are waiting for RAM locations to change
+    panicbw: plays OK
+    smrpgj, smrpg: boots, hangs with music playing and missing gfx
+    daisenx2: goes into game, garbage gfx, presuably uses SA-1 graphics functions
+    derbyjo2: plays OK, some garbage gfx, presuably uses SA-1 graphics functions
+    dbzhypd, dbzhypdj: plays OK
+    jikkpaaro: plays OK
+    jumpind: boots and runs, uses SA-1 DMA and character conversion
+    kakinoki: S-CPU crashes after pressing start
+    marvelou: locks up, not sure what's going on
+	shinshog: goes into game, seems to hang after you move a piece?
+    shogisai: plays OK
+    shogisa2: plays OK
+    srobotg: plays OK
+ 
  ***********************************************************************************************************/
 
 
@@ -69,7 +95,7 @@ void sns_sa1_device::device_reset()
 {
 	memset(m_internal_ram, 0, 0x800);
 
-	m_sa1_ctrl = 0;
+	m_sa1_ctrl = 0x20;
 	m_scpu_ctrl = 0;
 	m_irq_vector = 0;
 	m_nmi_vector = 0;
@@ -120,16 +146,14 @@ void sns_sa1_device::device_reset()
 
 void sns_sa1_device::recalc_irqs()
 {
-	#if 0	// how do we get the maincpu from here?
 	if (m_scpu_flags & m_scpu_sie & (SCPU_IRQ_SA1|SCPU_IRQ_CHARCONV))
 	{
-		set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 	}
 	else
 	{
-		set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
 	}
-	#endif
 
 	if (m_sa1_flags & m_sa1_sie & (SA1_IRQ_SCPU|SA1_IRQ_TIMER|SA1_IRQ_DMA))
 	{
@@ -297,14 +321,15 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 	{
 		case 0x000:
 			// SA-1 control flags
+//			printf("%02x to SA-1 control\n", data);
 			if ((BIT(data, 5)) && !(BIT(m_sa1_ctrl, 5)))
 			{
-				printf("Engaging SA-1 reset\n");
+//				printf("Engaging SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			}
 			else if (!(BIT(data, 5)) && (BIT(m_sa1_ctrl, 5)))
 			{
-				printf("Releasing SA-1 reset\n");
+//				printf("Releasing SA-1 reset\n");
 				m_sa1->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				m_sa1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 				m_sa1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -329,6 +354,7 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 		case 0x001:
 			// SNES  SIE   00h   SNES CPU Int Enable (W)
 			m_scpu_sie = data;
+//			printf("S-CPU IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x002:
@@ -379,6 +405,7 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 			if (m_scpu_ctrl & 0x80)
 			{
 				m_scpu_flags |= SCPU_IRQ_SA1;
+//				printf("SA-1 cause S-CPU IRQ\n");
 			}
 
 			// message to SA-1
@@ -396,6 +423,7 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 		case 0x00a:
 			// SA-1  CIE   00h   SA-1 CPU Int Enable (W)
 			m_sa1_sie = data;
+//			printf("SA-1 IE = %02x\n", data);
 			recalc_irqs();
 			break;
 		case 0x00b:
@@ -507,6 +535,7 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 			break;
 		case 0x030:
 			// SA-1  DCNT  00h   DMA Control (W)
+//			printf("%02x to SA-1 DMA control\n", data);
 			break;
 		case 0x031:
 			// Both  CDMA  00h   Character Conversion DMA Parameters (W)
