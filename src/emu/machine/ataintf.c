@@ -44,30 +44,42 @@ void ata_interface_device::set_dmarq(int state)
 
 WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
 {
-	m_irq[0] = state;
+	if (m_irq[0] != state)
+	{
+		m_irq[0] = state;
 
-	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
+		set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
 {
-	m_irq[1] = state;
+	if (m_irq[1] != state)
+	{
+		m_irq[1] = state;
 
-	set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
+		set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::dmarq0_write_line )
 {
-	m_dmarq[0] = state;
+	if (m_dmarq[0] != state)
+	{
+		m_dmarq[0] = state;
 
-	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+		set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+	}
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
 {
-	m_dmarq[1] = state;
+	if (m_dmarq[1] != state)
+	{
+		m_dmarq[1] = state;
 
-	set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+		set_dmarq(m_dmarq[0] == ASSERT_LINE || m_dmarq[1] == ASSERT_LINE);
+	}
 }
 
 
