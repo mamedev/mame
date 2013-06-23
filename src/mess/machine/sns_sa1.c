@@ -170,13 +170,13 @@ inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset
 	}
 
 	if ((offset & 0xc08000) == 0x008000)  //$00-3f:8000-ffff
-		return read_l(space, offset);
+		return read_l(space, (offset & 0x7fffff));
 
 	if ((offset & 0xc08000) == 0x808000)  //$80-bf:8000-ffff
-		return read_h(space, offset);
+		return read_h(space, (offset & 0x7fffff));
 
 	if ((offset & 0xc00000) == 0xc00000)  //$c0-ff:0000-ffff
-		return read_h(space, offset);
+		return read_h(space, (offset & 0x7fffff));
 
 	if ((offset & 0x40e000) == 0x006000)  //$00-3f|80-bf:6000-7fff
 		return read_bwram(offset);
@@ -781,13 +781,13 @@ READ8_MEMBER(sns_sa1_device::read_h)
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else if (offset < 0x500000)
-		return m_rom[rom_bank_map[(m_bank_c_rom * 0x20) + (offset / 0x8000)] * 0x8000 + (offset & 0x7fff)];
+		return m_rom[rom_bank_map[(m_bank_c_rom * 0x20) + ((offset - 0x400000) / 0x8000)] * 0x8000 + (offset & 0x7fff)];
 	else if (offset < 0x600000)
-		return m_rom[rom_bank_map[(m_bank_d_rom * 0x20) + (offset / 0x8000)] * 0x8000 + (offset & 0x7fff)];
+		return m_rom[rom_bank_map[(m_bank_d_rom * 0x20) + ((offset - 0x500000) / 0x8000)] * 0x8000 + (offset & 0x7fff)];
 	else if (offset < 0x700000)
-		return m_rom[rom_bank_map[(m_bank_e_rom * 0x20) + (offset / 0x8000)] * 0x8000 + (offset & 0x7fff)];
+		return m_rom[rom_bank_map[(m_bank_e_rom * 0x20) + ((offset - 0x600000) / 0x8000)] * 0x8000 + (offset & 0x7fff)];
 	else
-		return m_rom[rom_bank_map[(m_bank_f_rom * 0x20) + (offset / 0x8000)] * 0x8000 + (offset & 0x7fff)];
+		return m_rom[rom_bank_map[(m_bank_f_rom * 0x20) + ((offset - 0x700000) / 0x8000)] * 0x8000 + (offset & 0x7fff)];
 }
 
 WRITE8_MEMBER(sns_sa1_device::write_l)
