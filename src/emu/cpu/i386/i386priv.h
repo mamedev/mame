@@ -306,19 +306,29 @@ union I386_GPR {
 	UINT8 b[32];
 };
 
-union X87_REG {
-	UINT64 i;
-	double f;
+union MMX_REG {
+	UINT32 d[2];
+	INT32  i[2];
+	UINT16 w[4];
+	INT16  s[4];
+	UINT8  b[8];
+	INT8   c[8];
+	float  f[2];
+	UINT64 q;
+	INT64  l;
 };
 
-typedef UINT64 MMX_REG;
-
 union XMM_REG {
-	UINT32 d[4];
+	UINT8  b[16];
 	UINT16 w[8];
-	UINT8 b[16];
+	UINT32 d[4];
 	UINT64 q[2];
-	float f[4];
+	INT8   c[16];
+	INT16  s[8];
+	INT32  i[4];
+	INT64  l[2];
+	float  f[4];
+	double  f64[2];
 };
 
 struct i386_state
@@ -434,6 +444,8 @@ struct i386_state
 	vtlb_state *vtlb;
 
 	bool smm;
+	bool smi;
+	bool smi_latched;
 	bool nmi_masked;
 	bool nmi_latched;
 	UINT32 smbase;
@@ -496,7 +508,7 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset);
 #define SetSZPF16(x)        {cpustate->ZF = ((UINT16)(x)==0);  cpustate->SF = ((x)&0x8000) ? 1 : 0; cpustate->PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF32(x)        {cpustate->ZF = ((UINT32)(x)==0);  cpustate->SF = ((x)&0x80000000) ? 1 : 0; cpustate->PF = i386_parity_table[x & 0xFF]; }
 
-#define MMX(n)              cpustate->fpu_reg[(n)].i
+#define MMX(n)              (*((MMX_REG *)(&cpustate->x87_reg[(n)].low)))
 #define XMM(n)              cpustate->sse_reg[(n)]
 
 /***********************************************************************************/
@@ -866,6 +878,7 @@ INLINE UINT16 READ16PL0(i386_state *cpustate,UINT32 ea)
 	}
 	return value;
 }
+
 INLINE UINT32 READ32PL0(i386_state *cpustate,UINT32 ea)
 {
 	UINT32 value;

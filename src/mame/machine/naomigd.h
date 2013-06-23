@@ -14,6 +14,8 @@ public:
 
 	static void static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag);
 
+	UINT8 *memory(UINT32 &size) { size = dimm_data_size; return dimm_data; }
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();

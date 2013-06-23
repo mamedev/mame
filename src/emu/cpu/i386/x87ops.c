@@ -3762,6 +3762,51 @@ void x87_fcomp_sti(i386_state *cpustate, UINT8 modrm)
 	CYCLES(cpustate, 4);
 }
 
+void x87_fcomip_sti(i386_state *cpustate, UINT8 modrm)
+{
+	int i = modrm & 7;
+
+	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(i))
+	{
+		x87_set_stack_underflow(cpustate);
+		cpustate->ZF = 1;
+		cpustate->PF = 1;
+		cpustate->CF = 1;
+	}
+	else
+	{
+		cpustate->x87_sw &= ~X87_SW_C1;
+
+		floatx80 a = ST(0);
+		floatx80 b = ST(i);
+
+		if (floatx80_is_nan(a) || floatx80_is_nan(b))
+		{
+			cpustate->ZF = 1;
+			cpustate->PF = 1;
+			cpustate->CF = 1;
+			cpustate->x87_sw |= X87_SW_IE;
+		}
+		else
+		{
+			cpustate->ZF = 0;
+			cpustate->PF = 0;
+			cpustate->CF = 0;
+
+			if (floatx80_eq(a, b))
+				cpustate->ZF = 1;
+
+			if (floatx80_lt(a, b))
+				cpustate->CF = 1;
+		}
+	}
+
+	if (x87_check_exceptions(cpustate))
+		x87_inc_stack(cpustate);
+
+	CYCLES(cpustate, 4); // TODO: correct cycle count
+}
+
 void x87_fcompp(i386_state *cpustate, UINT8 modrm)
 {
 	if (X87_IS_ST_EMPTY(0) || X87_IS_ST_EMPTY(1))
@@ -4651,6 +4696,7 @@ void build_x87_opcode_table_df(i386_state *cpustate)
 			switch (modrm)
 			{
 				case 0xe0: ptr = x87_fstsw_ax;      break;
+				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: ptr = x87_fcomip_sti;    break;
 			}
 		}
 

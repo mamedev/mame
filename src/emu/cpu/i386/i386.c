@@ -31,6 +31,7 @@ MODRM_TABLE i386_MODRM_table[256];
 static void i386_trap_with_error(i386_state* cpustate, int irq, int irq_gate, int trap_level, UINT32 err);
 static void i286_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested);
 static void i386_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested);
+static void pentium_smi(i386_state* cpustate);
 
 #define FAULT(fault,error) {cpustate->ext = 1; i386_trap_with_error(cpustate,fault,0,0,error); return;}
 #define FAULT_EXP(fault,error) {cpustate->ext = 1; i386_trap_with_error(cpustate,fault,0,trap_level+1,error); return;}
@@ -1224,6 +1225,12 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 
 static void i386_check_irq_line(i386_state *cpustate)
 {
+	if(!cpustate->smm && cpustate->smi)
+	{
+		pentium_smi(cpustate);
+		return;
+	}
+
 	/* Check if the interrupts are enabled */
 	if ( (cpustate->irq_state) && cpustate->IF )
 	{
@@ -2987,6 +2994,8 @@ static void i386_common_init(legacy_cpu_device *device, device_irq_acknowledge_c
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
 	i386_state *cpustate = get_safe_token(device);
 
+	assert((sizeof(XMM_REG)/sizeof(double)) == 2);
+
 	build_cycle_table(device->machine());
 
 	for( i=0; i < 256; i++ ) {
@@ -3014,6 +3023,7 @@ static void i386_common_init(legacy_cpu_device *device, device_irq_acknowledge_c
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = &device->space(AS_IO);
 	cpustate->vtlb = vtlb_alloc(device, AS_PROGRAM, 0, tlbsize);
+	cpustate->smi = false;
 
 	device->save_item(NAME( cpustate->reg.d));
 	device->save_item(NAME(cpustate->sreg[ES].selector));
@@ -3070,6 +3080,8 @@ static void i386_common_init(legacy_cpu_device *device, device_irq_acknowledge_c
 	device->save_item(NAME(cpustate->performed_intersegment_jump));
 	device->save_item(NAME(cpustate->mxcsr));
 	device->save_item(NAME(cpustate->smm));
+	device->save_item(NAME(cpustate->smi_latched));
+	device->save_item(NAME(cpustate->smi));
 	device->save_item(NAME(cpustate->nmi_masked));
 	device->save_item(NAME(cpustate->nmi_latched));
 	device->save_item(NAME(cpustate->smbase));
@@ -3171,6 +3183,7 @@ static CPU_RESET( i386 )
 	cpustate->idtr.base = 0;
 	cpustate->idtr.limit = 0x3ff;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
 
@@ -3204,13 +3217,14 @@ static void pentium_smi(i386_state *cpustate)
 	UINT32 old_flags = get_flags(cpustate);
 
 	if(cpustate->smm)
-		return; // TODO: latch
+		return;
 
 	cpustate->cr[0] &= ~(0x8000000d);
 	set_flags(cpustate, 2);
 	if(!cpustate->smiact.isnull())
 		cpustate->smiact(true);
 	cpustate->smm = true;
+	cpustate->smi_latched = false;
 
 	// save state
 	WRITE32(cpustate, cpustate->cr[4], smram_state+SMRAM_IP5_CR4);
@@ -3777,6 +3791,7 @@ static CPU_RESET( i486 )
 	cpustate->eflags_mask = 0x00077fd7;
 	cpustate->eip = 0xfff0;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
 
@@ -3892,6 +3907,7 @@ static CPU_RESET( pentium )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
@@ -3938,8 +3954,9 @@ static CPU_SET_INFO( pentium )
 	switch (state)
 	{
 		case CPUINFO_INT_INPUT_STATE+INPUT_LINE_SMI:
-			if(state)
-				pentium_smi(cpustate);
+			if(!cpustate->smi && state && cpustate->smm)
+				cpustate->smi_latched = true;
+			cpustate->smi = state;
 			break;
 		case CPUINFO_INT_REGISTER + X87_CTRL:           cpustate->x87_cw = info->i;     break;
 		case CPUINFO_INT_REGISTER + X87_STATUS:         cpustate->x87_sw = info->i;     break;
@@ -4026,6 +4043,7 @@ static CPU_RESET( mediagx )
 	cpustate->eflags_mask = 0x00277fd7; /* TODO: is this correct? */
 	cpustate->eip = 0xfff0;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
 
@@ -4149,6 +4167,7 @@ static CPU_RESET( pentium_pro )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
@@ -4253,6 +4272,7 @@ static CPU_RESET( pentium_mmx )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
@@ -4357,6 +4377,7 @@ static CPU_RESET( pentium2 )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
@@ -4461,6 +4482,7 @@ static CPU_RESET( pentium3 )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
@@ -4567,6 +4589,7 @@ static CPU_RESET( pentium4 )
 	cpustate->eip = 0xfff0;
 	cpustate->mxcsr = 0x1f80;
 	cpustate->smm = false;
+	cpustate->smi_latched = false;
 	cpustate->smbase = 0x30000;
 	cpustate->nmi_masked = false;
 	cpustate->nmi_latched = false;
