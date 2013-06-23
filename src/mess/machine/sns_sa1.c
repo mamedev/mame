@@ -203,7 +203,7 @@ inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset
 		return read_h(space, (offset & 0x7fffff));
 
 	if ((offset & 0x40e000) == 0x006000)  //$00-3f|80-bf:6000-7fff
-		return read_bwram(offset & 0x1fff);
+		return read_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff));
 
 	if ((offset & 0xf00000) == 0x400000)  //$40-4f:0000-ffff
 		return read_bwram(offset & 0xfffff);
@@ -698,6 +698,8 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 		return m_nvram[offset & (m_nvram_size - 1)];
 
 	// Bitmap BWRAM
+	offset -= 0x100000;
+	
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
@@ -731,6 +733,8 @@ void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 	}
 
 	// Bitmap BWRAM
+	offset -= 0x100000;
+	
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
