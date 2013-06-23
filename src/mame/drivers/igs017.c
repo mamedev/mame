@@ -22,6 +22,7 @@ Year + Game                     PCB        CPU    Sound         Custom          
 99? Tarzan (V107)?              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 99? Tarzan (V109C)?             NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
+??  Super Poker / Formosa       NO-0187    Z180   M6295 YM2413  IGS017 IGS025         Battery
 -------------------------------------------------------------------------------------------------------------
                                                                                     * not present in one set
 To Do:
@@ -118,6 +119,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tjsb_paletteram_w);
 	DECLARE_WRITE8_MEMBER(tjsb_output_w);
 	DECLARE_READ8_MEMBER(tjsb_input_r);
+	DECLARE_READ8_MEMBER(spkrform_input_r);
 	DECLARE_WRITE16_MEMBER(lhzb2a_paletteram_w);
 	DECLARE_READ16_MEMBER(lhzb2a_input_r);
 	DECLARE_WRITE16_MEMBER(lhzb2a_input_addr_w);
@@ -144,6 +146,7 @@ public:
 	DECLARE_DRIVER_INIT(starzan);
 	DECLARE_DRIVER_INIT(mgcs);
 	DECLARE_DRIVER_INIT(tjsb);
+	DECLARE_DRIVER_INIT(spkrform);
 	DECLARE_DRIVER_INIT(iqblockf);
 	DECLARE_DRIVER_INIT(sdmg2);
 	DECLARE_DRIVER_INIT(tarzan);
@@ -158,7 +161,7 @@ public:
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
 	UINT32 screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irqblocka_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
 	void expand_sprites();
@@ -178,6 +181,7 @@ public:
 	void lhzb2_decrypt_sprites();
 	void slqz2_patch_rom();
 	void slqz2_decrypt_tiles();
+	void spkrform_decrypt_sprites();
 };
 
 
@@ -512,6 +516,12 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 		int addr = (i & ~0xff) | BITSWAP8(i,a7,a6,a5,a4,a3,a2,a1,a0);
 		rom[i] = tmp[addr];
 	}
+
+#if 0
+	FILE *f = fopen("igs017_decrypted.bin", "wb");
+	fwrite(rom, 1, length, f);
+	fclose(f);
+#endif
 }
 
 
@@ -1250,6 +1260,35 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 	slqz2_patch_rom();
 }
 
+// spkrform
+
+void igs017_state::spkrform_decrypt_sprites()
+{
+	int length = memregion("sprites")->bytes();
+	UINT8 *rom = memregion("sprites")->base();
+	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	int i, addr;
+
+	// address lines swap
+	memcpy(tmp, rom, length);
+	for (i = 0; i < length; i++)
+	{
+		if (i & 0x80000)
+			addr = (i & ~0xff) | BITSWAP8(i,7,6,3,4,5,2,1,0);
+		else
+			addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10, 4, 8,7,6,5, 9,3,2,1,0);
+
+		rom[i] = tmp[addr];
+	}
+}
+
+DRIVER_INIT_MEMBER(igs017_state,spkrform)
+{
+	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
+
+	spkrform_decrypt_sprites();
+}
+
 /***************************************************************************
                                 Memory Maps
 ***************************************************************************/
@@ -1773,6 +1812,63 @@ static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
+ADDRESS_MAP_END
+
+
+// spkrform
+
+
+static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
+	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
+	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP	// hack: uncomment to switch to Formosa
+	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
+	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
+	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
+ADDRESS_MAP_END
+
+READ8_MEMBER(igs017_state::spkrform_input_r)
+{
+	switch (m_input_select)
+	{
+		case 0x00:  return ioport("PLAYER1")->read();
+		case 0x01:  return ioport("PLAYER2")->read();
+		case 0x02:  return ioport("COINS")->read();
+		case 0x03:
+		{
+			return ioport("BUTTONS")->read();
+		}
+
+		default:
+			logerror("%s: input %02x read\n", machine().describe_context(), m_input_select);
+			return 0xff;
+	}
+}
+
+static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
+
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
+
+	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
+	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
+
+	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
+	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
+
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
+
+	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+
+	AM_RANGE( 0x9000, 0x9001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
+
+	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "A000" )	// Game selection
+	AM_RANGE( 0xa001, 0xa001 ) AM_READ_PORT( "A001" )
+
+	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE(input_select_w )
+	AM_RANGE( 0xb001, 0xb001 ) AM_READ(spkrform_input_r )
 ADDRESS_MAP_END
 
 
@@ -3179,6 +3275,94 @@ static INPUT_PORTS_START( tjsb )
 
 INPUT_PORTS_END
 
+// to do:
+static INPUT_PORTS_START( spkrform )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Win Up Pool" )
+	PORT_DIPSETTING(    0x03, "300" )
+	PORT_DIPSETTING(    0x02, "500" )
+	PORT_DIPSETTING(    0x01, "800" )
+	PORT_DIPSETTING(    0x00, "800" )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("PLAYER1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // ?? exit poker
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) // start (formosa)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) // up
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) // down / start
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        )
+
+	PORT_START("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)  // right / bet
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)  // button1 / hold1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2)  // hold2
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(2)
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1    )  // left
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2    )  // hold3
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3    )  // credit in
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4    )  // credit out
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1     )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2     )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3     )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4     )
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // coin (coin error)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )   // coin (coin error)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 )   // hopper error
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)  // record
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
+
+	PORT_START("A000")
+	PORT_DIPNAME( 0xff, 0xff, "A000" )
+	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("A001")
+	PORT_DIPNAME( 0xff, 0xff, "A001" )
+	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Graphics Layout
@@ -3234,7 +3418,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::irqblocka_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 {
 	int scanline = param;
 
@@ -3269,7 +3453,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, irqblocka_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
@@ -3360,6 +3544,7 @@ MACHINE_CONFIG_END
 
 
 // lhzb2
+
 static I8255A_INTERFACE( lhzb2_ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("COINS"),          /* Port A read */
@@ -3468,6 +3653,7 @@ MACHINE_CONFIG_END
 
 
 // sdmg2
+
 static I8255A_INTERFACE( sdmg2_ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("DSW1"),           /* Port A read */
@@ -3563,7 +3749,41 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, irqblocka_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
+
+	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
+
+	MCFG_MACHINE_RESET_OVERRIDE(igs017_state,iqblocka)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
+
+	MCFG_GFXDECODE(igs017)
+	MCFG_PALETTE_LENGTH(0x100*2)
+
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
+
+
+// spkrform
+
+static MACHINE_CONFIG_START( spkrform, igs017_state )
+	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(spkrform_map)
+	MCFG_CPU_IO_MAP(spkrform_io)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
 
 	MCFG_I8255A_ADD( "ppi8255", iqblocka_ppi8255_intf )
 
@@ -4172,17 +4392,50 @@ ROM_START( starzan )
 	ROM_LOAD( "palce22v10h_tar97_u20.u20",   0x2dd, 0x2dd, NO_DUMP )
 ROM_END
 
+/***************************************************************************
 
-GAME( 1996,  iqblocka, iqblock, iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",              "Shu Zi Le Yuan (V127M)",                      GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock, iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",              "Shu Zi Le Yuan (V113FR)",                     GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1997,  mgdh,     0,       mgdha,    mgdh, igs017_state,     mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
-GAME( 1997,  mgdha,    mgdh,    mgdha,    mgdh , igs017_state,    mgdha,    ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
-GAME( 1997,  sdmg2,    0,       sdmg2,    sdmg2, igs017_state,    sdmg2,    ROT0, "IGS",              "Mahjong Super Da Man Guan II (China, V754C)", 0 )
-GAME( 1997,  tjsb,     0,       tjsb,     tjsb, igs017_state,     tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing (V137C)",        GAME_UNEMULATED_PROTECTION )
-GAME( 1998,  mgcs,     0,       mgcs,     mgcs, igs017_state,     mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,       lhzb2,    lhzb2, igs017_state,     lhzb2,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,   lhzb2a,   lhzb2a, igs017_state,    lhzb2a,  ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
-GAME( 1998,  slqz2,    0,       slqz2,    slqz2, igs017_state,    slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1999?, tarzan,   0,       iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              GAME_NOT_WORKING )
-GAME( 1999?, tarzana,  tarzan,  iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               GAME_NOT_WORKING )
-GAME( 2000?, starzan,  0,       iqblocka, iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 GAME_NOT_WORKING )
+Super Poker (v100xD03) / Formosa
+
+PCB NO-0187
+
+CPU Z8018008psc
+IGS017
+IGS025
+K668 (AD-65)
+UM3567 (YM2413)
+Audio Xtal 3.579545
+CPU Xtal 16Mhz
+3 x DSW8
+
+***************************************************************************/
+
+ROM_START( spkrform )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "super2in1-v100xd03.u29", 0x00000, 0x40000, CRC(e8f7476c) SHA1(e20241d68d22ee01a65f5d7921fe2291077f081f) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD( "super2in1.u26", 0x00000, 0x80000, CRC(af3b1d9d) SHA1(ce84b076939d2c9d959cd430d4f5664f32735d60) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "super2in1.u25", 0x80000, 0x80000, CRC(7ebaf0a0) SHA1(c278810742cd7e1daa89a93fd7fe82495543ccbf) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_LOAD( "super2in1.u24", 0x00000, 0x40000, CRC(54d68c49) SHA1(faad78779c3a5b4ecb1c733192d9477ce3324f71) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "super2in1sp.u28", 0x00000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
+
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",              "Shu Zi Le Yuan (V127M)",                      GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",              "Shu Zi Le Yuan (V113FR)",                     GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",              "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",              "Mahjong Super Da Man Guan II (China, V754C)", 0 )
+GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",              "Mahjong Tian Jiang Shen Bing (V137C)",        GAME_UNEMULATED_PROTECTION )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",              "Mahjong Man Guan Cai Shen (V103CS)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (set 1)",          GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",              "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
+GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",              "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1999?, tarzan,   0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",              "Tarzan (V109C)",                              GAME_NOT_WORKING )
+GAME( 1999?, tarzana,  tarzan,   iqblocka, iqblocka, igs017_state, tarzana,  ROT0, "IGS",              "Tarzan (V107)",                               GAME_NOT_WORKING )
+GAME( 2000?, starzan,  0,        iqblocka, iqblocka, igs017_state, starzan,  ROT0, "IGS / G.F. Gioca", "Super Tarzan (Italy, V100I)",                 GAME_NOT_WORKING )
+GAME( ????,  spkrform, spk116it, spkrform, spkrform, igs017_state, spkrform, ROT0, "IGS",              "Super Poker (v100xD03) / Formosa",            GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
