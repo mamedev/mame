@@ -35,25 +35,25 @@
     kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
 	kirby3j, kirby3: uses SA-1 DMA
     itoibass: boots, some missing gfx
-    jl96drem: hangs entering gameplay with SA-1 disabled
+    jl96drem: sprites corrupt in gameplay, SA-1 DMA/character conversion?
 	haruaug3a, pebble, haruaug3: uses SA-1 DMA
-    miniyonk: corrupt gfx, can't get past press start
+    miniyonk: plays OK
     pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
 	przeo, przeou: plays OK 
-    sdgungnx: plays music and hangs, both CPUs are waiting for RAM locations to change
+    sdgungnx: plays OK
     panicbw: plays OK
-    smrpgj, smrpg: boots, hangs with music playing and missing gfx
-    daisenx2: goes into game, garbage gfx, presuably uses SA-1 graphics functions
-    derbyjo2: plays OK, some garbage gfx, presuably uses SA-1 graphics functions
+    smrpgj, smrpg: boots, can't start game (SRAM mapping?)
+    daisenx2: plays OK
+    derbyjo2: hangs going into game
     dbzhypd, dbzhypdj: plays OK
-    jikkpaaro: plays OK
+    jikkparo: plays OK
     jumpind: boots and runs, uses SA-1 DMA and character conversion
     kakinoki: S-CPU crashes after pressing start
-    marvelou: locks up, not sure what's going on
-	shinshog: goes into game, seems to hang after you move a piece?
+    marvelou: plays OK, some gfx corruption
+	shinshog: plays OK
     shogisai: plays OK
     shogisa2: plays OK
-    srobotg: corrupt and missing in-game GFX, character conversion/DMA?
+    srobotg: some corrupt in-game GFX, may be SNES rendering errors
  
  ***********************************************************************************************************/
 
