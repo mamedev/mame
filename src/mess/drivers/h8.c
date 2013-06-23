@@ -168,8 +168,10 @@ WRITE8_MEMBER( h8_state::portf1_w )
 
 static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_RAM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM // main rom
+	AM_RANGE(0x1400, 0x17ff) AM_RAM // fdc ram
+	AM_RANGE(0x1800, 0x1fff) AM_ROM // fdc rom
+	AM_RANGE(0x2000, 0x9fff) AM_RAM // main ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8_io, AS_IO, 8, h8_state)
