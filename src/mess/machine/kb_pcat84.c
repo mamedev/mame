@@ -288,6 +288,22 @@ INPUT_PORTS_START( ibm_pc_at_84_keyboard )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
+
+	PORT_START("SW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
+
+	PORT_START("SW2")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
@@ -349,9 +365,12 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 	  m_dr13(*this, "DR13"),
 	  m_dr14(*this, "DR14"),
 	  m_dr15(*this, "DR15"),
+	  m_sw1(*this, "SW1"),
+	  m_sw2(*this, "SW2"),
 	  m_db(0),
 	  m_cnt(0),
-	  m_sense(0)
+	  m_sense(0),
+	  m_t1(1)
 {
 }
 
@@ -375,9 +394,12 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 	  m_dr13(*this, "DR13"),
 	  m_dr14(*this, "DR14"),
 	  m_dr15(*this, "DR15"),
+	  m_sw1(*this, "SW1"),
+	  m_sw2(*this, "SW2"),
 	  m_db(0),
 	  m_cnt(0),
-	  m_sense(0)
+	  m_sense(0),
+	  m_t1(1)
 {
 }
 
@@ -391,10 +413,13 @@ ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_con
 
 void ibm_pc_at_84_keyboard_device::device_start()
 {
+	set_pc_kbdc_device();
+
 	// state saving
 	save_item(NAME(m_db));
 	save_item(NAME(m_cnt));
 	save_item(NAME(m_sense));
+	save_item(NAME(m_t1));
 }
 
 
@@ -431,7 +456,7 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::bus_w )
 
 	m_db = data;
 
-	if (BIT(data, 7))
+	if (!BIT(data, 7))
 	{
 		m_cnt = (data >> 3) & 0x0f;
 	}
@@ -459,7 +484,12 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p1_r )
 	
 	*/
 
-	UINT8 data = 0xfc;
+	UINT8 data = 0x01;
+
+	m_t1 = 1;
+	data |= key_depressed() << 1;
+
+	data |= m_sw1->read() << 2;
 
 	return data;
 }
@@ -486,10 +516,12 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p1_w )
 	
 	*/
 
-	if (BIT(data, 0))
+	if (!BIT(data, 0))
 	{
 		m_sense = m_db & 0x07;
 	}
+
+	m_t1 = BIT(data, 1);
 }
 
 
@@ -514,7 +546,12 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::p2_r )
 	
 	*/
 
-	return 0xff;
+	UINT8 data = 0xc0;
+
+	data |= m_sw2->read() & 0x0f;
+	data |= (m_sw1->read() >> 2) & 0x30;
+
+	return data;
 }
 
 
@@ -539,9 +576,9 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 	
 	*/
 
-	output_set_led_value(LED_SCROLL, !BIT(data, 0));
-	output_set_led_value(LED_NUM, !BIT(data, 1));
-	output_set_led_value(LED_CAPS, !BIT(data, 2));
+	output_set_led_value(LED_SCROLL, BIT(data, 0));
+	output_set_led_value(LED_NUM, BIT(data, 1));
+	output_set_led_value(LED_CAPS, BIT(data, 2));
 
 	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 7));
@@ -563,6 +600,16 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::t0_r )
 //-------------------------------------------------
 
 READ8_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
+{
+	return key_depressed();
+}
+
+
+//-------------------------------------------------
+//  key_depressed -
+//-------------------------------------------------
+
+int ibm_pc_at_84_keyboard_device::key_depressed()
 {
 	UINT8 data = 0xff;
 
@@ -586,5 +633,5 @@ READ8_MEMBER( ibm_pc_at_84_keyboard_device::t1_r )
 	case 15: data = m_dr15->read(); break;
 	}
 
-	return BIT(data, m_sense);
+	return m_t1 && BIT(data, m_sense);	
 }

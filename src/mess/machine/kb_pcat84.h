@@ -63,6 +63,8 @@ private:
 		LED_CAPS
 	};
 
+	int key_depressed();
+
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_dr00;
 	required_ioport m_dr01;
@@ -80,10 +82,13 @@ private:
 	required_ioport m_dr13;
 	required_ioport m_dr14;
 	required_ioport m_dr15;
+	required_ioport m_sw1;
+	required_ioport m_sw2;
 
 	UINT8 m_db;
 	int m_cnt;
 	int m_sense;
+	int m_t1;
 };
 
 
