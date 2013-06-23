@@ -769,6 +769,7 @@ READ8_MEMBER(sns_sa1_device::read_l)
 		else    // when HiROM mapping is enabled, we mirror [c0-cf][0000-ffff] bank
 			bank = (offset / 0x10000) + (m_bank_c_rom * 0x20);
 
+		bank &= 0xff;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else if (offset < 0x400000)
@@ -779,6 +780,7 @@ READ8_MEMBER(sns_sa1_device::read_l)
 		else    // when HiROM mapping is enabled, we mirror [d0-df][0000-ffff] bank
 			bank = (offset / 0x10000) + (m_bank_d_rom * 0x20);
 
+		bank &= 0xff;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else
@@ -797,6 +799,7 @@ READ8_MEMBER(sns_sa1_device::read_h)
 		else    // when HiROM mapping is enabled, we mirror [e0-ef][0000-ffff] bank
 			bank = (offset / 0x10000) + (m_bank_e_rom * 0x20);
 
+		bank &= 0xff;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else if (offset < 0x400000)
@@ -807,6 +810,7 @@ READ8_MEMBER(sns_sa1_device::read_h)
 		else    // when HiROM mapping is enabled, we mirror [f0-ff][0000-ffff] bank
 			bank = (offset / 0x10000) + (m_bank_f_rom * 0x20);
 
+		bank &= 0xff;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else if (offset < 0x500000)
