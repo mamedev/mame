@@ -104,11 +104,11 @@ void sns_sa1_device::device_reset()
 	m_bank_c_hi = 0;
 	m_bank_c_rom = 0;
 	m_bank_d_hi = 0;
-	m_bank_d_rom = 0;
+	m_bank_d_rom = 1;
 	m_bank_e_hi = 0;
-	m_bank_e_rom = 0;
+	m_bank_e_rom = 2;
 	m_bank_f_hi = 0;
-	m_bank_f_rom = 0;
+	m_bank_f_rom = 3;
 	m_bwram_snes = 0;
 	m_bwram_sa1 = 0;
 	m_bwram_sa1_source = 0;
