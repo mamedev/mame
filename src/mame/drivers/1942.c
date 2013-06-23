@@ -291,7 +291,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( 1942 )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "srb-03.m3", 0x00000, 0x4000, CRC(d9dafcc3) SHA1(a089a9bc55fb7d6d0ac53f91b258396d5d62677a) )
 	ROM_LOAD( "srb-04.m4", 0x04000, 0x4000, CRC(da0cf924) SHA1(856fbb302c9a4ec7850a26ab23dab8467f79bba4) )
 	ROM_LOAD( "srb-05.m5", 0x10000, 0x4000, CRC(d102911c) SHA1(35ba1d82bd901940f61d8619273463d02fc0a952) )
@@ -332,7 +332,7 @@ ROM_START( 1942 )
 ROM_END
 
 ROM_START( 1942a )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sra-03.m3", 0x00000, 0x4000, CRC(40201bab) SHA1(4886c07a4602223c21419118e10aadce9c99fa5a) )
 	ROM_LOAD( "sr-04.m4",  0x04000, 0x4000, CRC(a60ac644) SHA1(f37862db3cf5e6cc9ab3276f3bc45fd629fd70dd) )
 	ROM_LOAD( "sr-05.m5",  0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
@@ -374,7 +374,7 @@ ROM_END
 
 /* this is the same as the 1942a set, but with a different rom arrangement (larger roms), it appears to be a common bootleg */
 ROM_START( 1942abl )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "3.bin", 0x00000, 0x8000, CRC(f3184f5a) SHA1(a566c344ee1f63580d41aca95ece9ad1f7a135d2) )
 	ROM_LOAD( "5.bin", 0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
 	ROM_LOAD( "7.bin", 0x14000, 0x8000, CRC(2f456c6e) SHA1(b728c72f97ccdb57a4aac53ef7ca3f4516fc2ecb) )
@@ -411,7 +411,7 @@ ROM_START( 1942abl )
 ROM_END
 
 ROM_START( 1942b )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sr-03.m3", 0x00000, 0x4000, CRC(612975f2) SHA1(f3744335862dd4c53925cc32792badd4a378c837) )
 	ROM_LOAD( "sr-04.m4", 0x04000, 0x4000, CRC(a60ac644) SHA1(f37862db3cf5e6cc9ab3276f3bc45fd629fd70dd) )
 	ROM_LOAD( "sr-05.m5", 0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
@@ -452,7 +452,7 @@ ROM_START( 1942b )
 ROM_END
 
 ROM_START( 1942w )
-	ROM_REGION( 0x1c000, "maincpu", 0 ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sw-03.m3", 0x00000, 0x4000, CRC(afd79770) SHA1(74c7a887fe3d4abfce1dcfec4c75b21ab81adc8c) )
 	ROM_LOAD( "sw-04.m4", 0x04000, 0x4000, CRC(933d9910) SHA1(9c73ef880f56e30a865be959f8bbdbe79c7ef8e2) )
 	ROM_LOAD( "sw-05.m5", 0x10000, 0x4000, CRC(e9a71bb6) SHA1(1f0d52c9282d15f9e4898b3b144ece25d345b71f) )
@@ -496,7 +496,7 @@ ROM_END
 DRIVER_INIT_MEMBER(_1942_state,1942)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 
