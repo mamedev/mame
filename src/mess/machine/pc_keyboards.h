@@ -19,6 +19,8 @@ SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
 // Reuses STR_KBD_KEYTRONIC_PC3270 (same keyboard in AT protocol mode by default)
 
 #define STR_KBD_MICROSOFT_NATURAL   "ms_naturl"
+#define STR_KBD_IBM_PC_AT_84		"pcat"
+#define STR_KBD_IBM_3270PC_122		"3270pc"
 
 SLOT_INTERFACE_EXTERN(pc_at_keyboards);
 
