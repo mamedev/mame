@@ -53,7 +53,7 @@
 	shinshog: goes into game, seems to hang after you move a piece?
     shogisai: plays OK
     shogisa2: plays OK
-    srobotg: plays OK
+    srobotg: corrupt and missing in-game GFX, character conversion/DMA?
  
  ***********************************************************************************************************/
 
