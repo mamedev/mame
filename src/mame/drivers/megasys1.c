@@ -13,7 +13,8 @@ Year + Game                         System      Protection
 88  Legend of Makai (World) /       Z
     Makai Densetsu  (Japan)         Z
     P-47  (World) /                 A
-    P-47  (Japan)                   A
+    P-47  (Japan) /                 A
+    P-47  (Japan, Export)           A
     Kick Off (Japan)                A
     Takeda Shingen (Japan)          A                 Encryption (key 1)
     Ninja Kazan (World) /           A           Yes + Encryption (key 1)
@@ -2922,7 +2923,7 @@ ROM_START( p47 )
 	ROM_LOAD( "p47j_12.bin", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
 
 	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
-	ROM_LOAD( "p47us16.bin", 0x000000, 0x010000, CRC(5a682c8f) SHA1(0910025e2ee068e5a1fe7f2daae64c9112ab1de6) )
+	ROM_LOAD( "p47us16.bin", 0x000000, 0x010000, CRC(5a682c8f) SHA1(0910025e2ee068e5a1fe7f2daae64c9112ab1de6) )	// "phantom" instead of "freedom" in the logo
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
 	ROM_LOAD( "p47j_27.bin", 0x000000, 0x020000, CRC(9e2bde8e) SHA1(8cac74c8177a6953b78c6fbf734dfee5da8fc961) )
@@ -2970,6 +2971,58 @@ ROM_START( p47j )
 	ROM_LOAD( "p47j_18.bin", 0x020000, 0x020000, CRC(29d8f676) SHA1(6af5ec9aa96ea67c2c95bcca2164afc128e84a31) )
 	ROM_LOAD( "p47j_26.bin", 0x040000, 0x020000, CRC(4d07581a) SHA1(768693e1fcb822b8284ba14c9a5c3d6b00f73383) )
 	ROM_RELOAD(              0x060000, 0x020000 )   /* why? */
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "p47j_20.bin", 0x000000, 0x020000, CRC(2ed53624) SHA1(2b8ed16cffb6179587e7f01fcbcc30ed436d7afa) )
+	ROM_LOAD( "p47j_21.bin", 0x020000, 0x020000, CRC(6f56b56d) SHA1(30f386870411ff0e65684a8d8e6d4afb9125718a) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "p47j_10.bin", 0x000000, 0x020000, CRC(b9d79c1e) SHA1(315dbed9b7cc289b383c95e6c94267682324154c) )
+	ROM_LOAD( "p47j_11.bin", 0x020000, 0x020000, CRC(fa0d1887) SHA1(d24c17806669f5b12527b36bc9c10fd16222e23c) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
+
+/***************************************************************************
+
+P-47 (Japan, Export)
+
+MB 8843 sub-board with "P-47 (B)TYPE" sticker.
+The program ROMs are labelled "JALECO EXPORT P-47 #".
+Extra EPROM labelled "JALECO EXPORT 17".
+It contains enemy sprites without the German "Iron Cross" emblem.
+
+***************************************************************************/
+
+ROM_START( p47je )
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_LOAD16_BYTE( "export_p-47_3.rom2", 0x000000, 0x020000, CRC(37185412) SHA1(02c4c7dcc448d9ac85a699bd2cee9a060ad9e088) )
+	ROM_LOAD16_BYTE( "export_p-47_1.rom1", 0x000001, 0x020000, CRC(3925dd4f) SHA1(687bac19e5786d09addb313123f2c32d9601c0ff) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "p47j_9.bin",  0x000000, 0x010000, CRC(ffcf318e) SHA1(c675968c931a7e8e00ae83e49e8cef3fd193da57) )
+	ROM_LOAD16_BYTE( "p47j_19.bin", 0x000001, 0x010000, CRC(adb8c12e) SHA1(31590b037133f81a52779dbd4f2b5ac5b59198ae) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 */
+	ROM_LOAD( "p47j_5.bin",  0x000000, 0x020000, CRC(fe65b65c) SHA1(b13902bf3b469c06d0646c49ddf211f16cb5e5c3) )
+	ROM_LOAD( "p47j_6.bin",  0x020000, 0x020000, CRC(e191d2d2) SHA1(d494c652953f5c8dcd8c8b696a011d085d335fea) )
+	ROM_LOAD( "p47j_7.bin",  0x040000, 0x020000, CRC(f77723b7) SHA1(2f95ea5e55bc21c4e9a760f102f2dc13b9ca6cf1) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "p47j_23.bin", 0x000000, 0x020000, CRC(6e9bc864) SHA1(f56ea2dd638a8f6952796535eb549ddd55573bcf) )
+	ROM_RELOAD(              0x020000, 0x020000 )   /* why? */
+	ROM_LOAD( "p47j_12.bin", 0x040000, 0x020000, CRC(5268395f) SHA1(de0cba1e7a7d4acc27467d1b553e8f39bea7282e) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "p47j_16.bin", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites */
+	ROM_LOAD( "p47j_27.bin",     0x000000, 0x020000, CRC(9e2bde8e) SHA1(8cac74c8177a6953b78c6fbf734dfee5da8fc961) )
+	ROM_LOAD( "p47j_18.bin",     0x020000, 0x020000, CRC(29d8f676) SHA1(6af5ec9aa96ea67c2c95bcca2164afc128e84a31) )
+	ROM_LOAD( "export_17.rom15", 0x040000, 0x020000, CRC(b6c2e241) SHA1(54c9cc9e858a3060117acc0128ea7e759d255a67) )	// German "Iron Cross" emblem removed from enemies
+	ROM_LOAD( "p47j_26.bin",     0x060000, 0x020000, CRC(4d07581a) SHA1(768693e1fcb822b8284ba14c9a5c3d6b00f73383) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
 	ROM_LOAD( "p47j_20.bin", 0x000000, 0x020000, CRC(2ed53624) SHA1(2b8ed16cffb6179587e7f01fcbcc30ed436d7afa) )
@@ -4063,6 +4116,7 @@ GAME( 1988, lomakai,  0,        system_Z,          lomakai,  driver_device,  0, 
 GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  driver_device,  0,        ROT0,   "Jaleco", "Makai Densetsu (Japan)", 0 )
 GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", 0 )
 GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
+GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", 0 )
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", 0 )
