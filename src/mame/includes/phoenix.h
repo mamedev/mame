@@ -1,7 +1,6 @@
-#include "devlegcy.h"
 #include "devcb.h"
 #include "sound/discrete.h"
-
+#include "sound/tms36xx.h"
 
 class phoenix_state : public driver_device
 {
@@ -58,20 +57,31 @@ public:
 
 /*----------- defined in audio/phoenix.c -----------*/
 
-DISCRETE_SOUND_EXTERN( phoenix );
+struct c_state
+{
+	INT32 counter;
+	INT32 level;
+};
 
-DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
-DECLARE_WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
+struct n_state
+{
+	INT32 counter;
+	INT32 polyoffs;
+	INT32 polybit;
+	INT32 lowpass_counter;
+	INT32 lowpass_polybit;
+};
 
 class phoenix_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
 	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~phoenix_sound_device() { global_free(m_token); }
+	~phoenix_sound_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( control_a_w );
+	DECLARE_WRITE8_MEMBER( control_b_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -81,7 +91,20 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	void *m_token;
+	struct c_state      m_c24_state;
+	struct c_state      m_c25_state;
+	struct n_state      m_noise_state;
+	UINT8               m_sound_latch_a;
+	sound_stream *      m_channel;
+	UINT32 *                m_poly18;
+	device_t *m_discrete;
+	tms36xx_device *m_tms;
+	
+	int update_c24(int samplerate);
+	int update_c25(int samplerate);
+	int noise(int samplerate);
 };
 
 extern const device_type PHOENIX;
+
+DISCRETE_SOUND_EXTERN( phoenix );
