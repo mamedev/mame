@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    IBM Model F PC/XT 5150/5160 83-key keyboard emulation
+    IBM Model F PC/XT 83-key keyboard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __PCXT83_KEYBOARD__
-#define __PCXT83_KEYBOARD__
+#ifndef __PC_KBD_IBM_PC_XT_83__
+#define __PC_KBD_IBM_PC_XT_83__
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -49,7 +49,7 @@ protected:
 	virtual void device_reset();
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, !state); };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(MCS48_INPUT_IRQ, !state); };
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) { };
 
 private:

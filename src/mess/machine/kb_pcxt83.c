@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    IBM Model F PC/XT 5150/5160 83-key keyboard emulation
+    IBM Model F PC/XT 83-key keyboard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -328,8 +328,8 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 	
 	*/
 
-	m_pc_kbdc->clock_write_from_kb(BIT(data, 5));
 	m_pc_kbdc->data_write_from_kb(BIT(data, 6));
+	m_pc_kbdc->clock_write_from_kb(BIT(data, 5));
 
 	if (BIT(data, 7))
 	{

@@ -24,7 +24,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8048_TAG       "i8048"
+#define I8048_TAG       "m5"
 
 
 
@@ -49,7 +49,7 @@ ROM_START( ibm_pc_at_84_keyboard )
 	D 878154
 	8441 D H
 	*/
-	ROM_LOAD( "1503099.bin", 0x000, 0x400, CRC(1e921f37) SHA1(5f722bdb3b57f5a532c02a5c3f78f30d785796f2) )
+	ROM_LOAD( "1503099.m5", 0x000, 0x400, CRC(1e921f37) SHA1(5f722bdb3b57f5a532c02a5c3f78f30d785796f2) )
 ROM_END
 
 
@@ -76,7 +76,7 @@ ROM_START( ibm_3270pc_122_keyboard )
 	D
 	8512 D H
 	*/
-	ROM_LOAD( "1385001.bin", 0x000, 0x400, CRC(c19767e9) SHA1(a3701e4617383a4de0fd5e2e86c4b74beaf94a7b) )
+	ROM_LOAD( "1385001.m5", 0x000, 0x400, CRC(c19767e9) SHA1(a3701e4617383a4de0fd5e2e86c4b74beaf94a7b) )
 ROM_END
 
 
@@ -580,8 +580,8 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 	output_set_led_value(LED_NUM, BIT(data, 1));
 	output_set_led_value(LED_CAPS, BIT(data, 2));
 
-	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 7));
+	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));
 }
 
 

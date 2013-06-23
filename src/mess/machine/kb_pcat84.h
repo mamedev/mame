@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __PCAT84_KEYBOARD__
-#define __PCAT84_KEYBOARD__
+#ifndef __PC_KBD_IBM_PC_AT_84__
+#define __PC_KBD_IBM_PC_AT_84__
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -52,7 +52,7 @@ protected:
 	virtual void device_reset();
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(INPUT_LINE_IRQ0, state); };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(MCS48_INPUT_IRQ, state); };
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) { };
 
 private:
