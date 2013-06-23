@@ -1296,7 +1296,7 @@ MACHINE_CONFIG_END
 
 Super Real Mahjong PI
 (c)1987 Seta
-PO-023
+P0-023
 M6100242A
 860161517
 
@@ -1404,7 +1404,7 @@ Real Mahjong Gold Yumehai
 The game is BET version of Super Real Mahjong P3,
 but the PCB is totally different.
 
-PO-064A
+P0-064A
 
 CPU: Z80
 Sound: AY-3-8910, M5205

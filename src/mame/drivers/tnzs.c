@@ -2388,7 +2388,7 @@ PCB Layout
 ----------
 
 M6100356A (on PCB)
-PO-043A (Seta number; on PCB)
+P0-043A (Seta number; on PCB)
 |---------------------------------------------------|
 |     VOL  HA17408           B53-26.U34  DSWB DSWA  |
 |      4558       YM2203 Z80  62256              Z80|
@@ -2573,7 +2573,7 @@ PCB Layout
 
 M6100356A (on PCB)
 M6100356A (on sticker)
-PO-043A (Seta number; on PCB)
+P0-043A (Seta number; on PCB)
 |---------------------------------------------------|
 |     VOL  HA17408           B50-07.U34  DSWB DSWA  |
 |      4558       YM2203 Z80  62256              Z80|

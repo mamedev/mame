@@ -15,7 +15,7 @@ This game runs on Seta Hardware.
 PCB Layout
 ----------
 
-PO-052A
+P0-052A
 |---------------------------------------------------------|
 | MB3712     SW1        AB001009  AB001007  AB001005      |
 |                 X1-007                                  |
@@ -50,7 +50,7 @@ PO-052A
 ROM Sub Board (plugs into DIP32 socket on main board)
 -------------
 
-PO-047A
+P0-047A
 |--------------------------------------------|
 |                                            |
 |     AB003003           AB002003            |

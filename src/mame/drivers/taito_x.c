@@ -186,7 +186,7 @@ This game runs on Seta hardware and also using one Taito custom chip.
 PCB Layout
 ----------
 
-PO-057A
+P0-057A
 |------------------------------- |
 |  YM2610    IC.18D  6264        |
 |YM3016                          |
@@ -205,7 +205,7 @@ PO-057A
 
 Notes:
         All M-8-x ROMs are held on a plug-in sub-board.
-        The sub-board has printed on it "East Technology" and has PCB Number PO-046A
+        The sub-board has printed on it "East Technology" and has PCB Number P0-046A
 
          68000 clock: 8.000MHz
            Z80 clock: 4.000MHz
@@ -995,7 +995,7 @@ PCB Layout
 
 J1100145A
 K1100331A
-PO-039A
+P0-039A
 |---------------------------------------------------|
 | VOL                        B50-07.U34  DSWB DSWA  |
 |      4558       YM2610 Z80  62256              Z80|
@@ -1110,7 +1110,7 @@ Taito, 1988
 
 J1100188A X SYSTEM
 K1100443A MAIN PCB
-PO-051A
+P0-051A
 
 */
 
