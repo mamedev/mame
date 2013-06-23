@@ -482,7 +482,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ethernet_w);
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
-	DECLARE_READ16_MEMBER(seattle_ide_r);
+	DECLARE_READ32_MEMBER(seattle_ide_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);
@@ -1773,10 +1773,10 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-READ16_MEMBER(seattle_state::seattle_ide_r)
+READ32_MEMBER(seattle_state::seattle_ide_r)
 {
 	/* note that blitz times out if we don't have this cycle stealing */
-	if (offset == 6/2)
+	if (offset == 6/4)
 		m_maincpu->eat_cycles(100);
 	return m_ide->read_cs1(space, offset, mem_mask);
 }
@@ -1785,10 +1785,10 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("rambase") // wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a0001f0, 0x0a0001f7) AM_DEVREADWRITE16("ide", bus_master_ide_controller_device, read_cs0, write_cs0, 0xffffffff)
-	AM_RANGE(0x0a0003f0, 0x0a0003f7) AM_READ16(seattle_ide_r, 0xffffffff) AM_DEVWRITE16("ide", bus_master_ide_controller_device, write_cs1, 0xffffffff)
+	AM_RANGE(0x0a0001f0, 0x0a0001f7) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, read_cs0, write_cs0)
+	AM_RANGE(0x0a0003f0, 0x0a0003f7) AM_READ(seattle_ide_r) AM_DEVWRITE("ide", bus_master_ide_controller_device, write_cs1)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP                     // IDE-related, but annoying
-	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", bus_master_ide_controller_device, bmdma_r, bmdma_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)

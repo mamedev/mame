@@ -28,7 +28,7 @@
 
 #define IDE_CONFIG_REGISTERS                0x10
 
-class vt83c461_device : public ide_controller_device
+class vt83c461_device : public ide_controller_32_device
 {
 public:
 	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -36,20 +36,10 @@ public:
 	DECLARE_READ32_MEMBER(read_config);
 	DECLARE_WRITE32_MEMBER(write_config);
 
-	virtual DECLARE_READ32_MEMBER(read_cs0);
-	virtual DECLARE_READ32_MEMBER(read_cs1);
-	virtual DECLARE_WRITE32_MEMBER(write_cs0);
-	virtual DECLARE_WRITE32_MEMBER(write_cs1);
-
 protected:
 	virtual void device_start();
 
 private:
-	using ide_controller_device::read_cs0;
-	using ide_controller_device::read_cs1;
-	using ide_controller_device::write_cs0;
-	using ide_controller_device::write_cs1;
-
 	UINT8           m_config_unknown;
 	UINT8           m_config_register[IDE_CONFIG_REGISTERS];
 	UINT8           m_config_register_num;

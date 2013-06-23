@@ -1459,64 +1459,42 @@ static WRITE32_HANDLER( asic_fifo_w )
 static READ32_DEVICE_HANDLER( ide_main_r )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-
-	UINT32 data = 0;
-	if (ACCESSING_BITS_0_15)
-		data |= ide->read_cs0(space, offset * 2, mem_mask);
-	if (ACCESSING_BITS_16_31)
-		data |= ide->read_cs0(space, (offset * 2) + 1, mem_mask >> 16) << 16;
-
-	return data;
+	return ide->read_cs0(space, offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-
-	if (ACCESSING_BITS_0_15)
-		ide->write_cs0(space, offset * 2, data, mem_mask);
-	if (ACCESSING_BITS_16_31)
-		ide->write_cs0(space, (offset * 2) + 1, data >> 16, mem_mask >> 16);
+	ide->write_cs0(space, offset, data, mem_mask);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-
-	UINT32 data = 0;
-	if (ACCESSING_BITS_0_15)
-		data |= ide->read_cs1(space, (4/2) + (offset * 2), mem_mask);
-	if (ACCESSING_BITS_16_31)
-		data |= ide->read_cs1(space, (4/2) + (offset * 2) + 1, mem_mask >> 16) << 16;
-
-	return data;
+	return ide->read_cs1(space, offset + 1, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-
-	if (ACCESSING_BITS_0_15)
-		ide->write_cs1(space, 6/2 + offset * 2, data, mem_mask);
-	if (ACCESSING_BITS_16_31)
-		ide->write_cs1(space, 6/2 + (offset * 2) + 1, data >> 16, mem_mask >> 16);
+	ide->write_cs1(space, offset + 1, data, mem_mask);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_bus_master32_r )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-	return ide->ide_bus_master32_r(space, offset, mem_mask);
+	return ide->bmdma_r(space, offset, mem_mask);
 }
 
 
 static WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
 {
 	bus_master_ide_controller_device *ide = (bus_master_ide_controller_device *) device;
-	ide->ide_bus_master32_w(space, offset, data, mem_mask);
+	ide->bmdma_w(space, offset, data, mem_mask);
 }
 
 

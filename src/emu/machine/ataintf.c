@@ -24,6 +24,8 @@
 
 void ata_interface_device::set_irq(int state)
 {
+//  printf( "irq %d\n", state );
+
 	if (state == ASSERT_LINE)
 		LOG(("ATA interrupt assert\n"));
 	else
@@ -35,6 +37,8 @@ void ata_interface_device::set_irq(int state)
 
 void ata_interface_device::set_dmarq(int state)
 {
+//  printf( "dmarq %d\n", state );
+
 	m_dmarq_handler(state);
 }
 
