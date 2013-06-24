@@ -46,6 +46,11 @@
 #define HALTED  0x02
 
 
+const UINT8 lr35902_cpu_device::FLAG_Z = 0x80;
+const UINT8 lr35902_cpu_device::FLAG_N = 0x40;
+const UINT8 lr35902_cpu_device::FLAG_H = 0x20;
+const UINT8 lr35902_cpu_device::FLAG_C = 0x10;
+
 //**************************************************************************
 //  LR35902 DEVICE
 //**************************************************************************
