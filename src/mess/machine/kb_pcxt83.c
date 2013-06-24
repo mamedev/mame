@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( ibm_pc_xt_83_keyboard )
-	MCFG_CPU_ADD(I8048_TAG, I8048, 5247000)
+	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
 	MCFG_CPU_IO_MAP(ibm_pc_xt_83_keyboard_io)
 MACHINE_CONFIG_END
 
@@ -107,7 +107,7 @@ machine_config_constructor ibm_pc_xt_83_keyboard_device::device_mconfig_addition
 //-------------------------------------------------
 
 INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
-	PORT_START("P10")
+	PORT_START("MD00")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -117,7 +117,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P11")
+	PORT_START("MD01")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -127,7 +127,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P12")
+	PORT_START("MD02")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -137,7 +137,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P13")
+	PORT_START("MD03")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -147,7 +147,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P14")
+	PORT_START("MD04")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -157,7 +157,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P15")
+	PORT_START("MD05")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -167,7 +167,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P16")
+	PORT_START("MD06")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -177,7 +177,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P17")
+	PORT_START("MD07")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -187,7 +187,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P23")
+	PORT_START("MD08")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -197,7 +197,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P24")
+	PORT_START("MD09")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -207,7 +207,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P25")
+	PORT_START("MD10")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -217,17 +217,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 
-	PORT_START("P26")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
-
-	PORT_START("P27")
+	PORT_START("MD11")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) 
@@ -262,22 +252,20 @@ ibm_pc_xt_83_keyboard_device::ibm_pc_xt_83_keyboard_device(const machine_config 
 	: device_t(mconfig, PC_KBD_IBM_PC_XT_83, "IBM PC/XT Keyboard", tag, owner, clock, "kb_pcxt83", __FILE__),
 	  device_pc_kbd_interface(mconfig, *this),
 	  m_maincpu(*this, I8048_TAG),
-	  m_p10(*this, "P10"),
-	  m_p11(*this, "P11"),
-	  m_p12(*this, "P12"),
-	  m_p13(*this, "P13"),
-	  m_p14(*this, "P14"),
-	  m_p15(*this, "P15"),
-	  m_p16(*this, "P16"),
-	  m_p17(*this, "P17"),
-	  m_p23(*this, "P23"),
-	  m_p24(*this, "P24"),
-	  m_p25(*this, "P25"),
-	  m_p26(*this, "P26"),
-	  m_p27(*this, "P27"),
+	  m_md00(*this, "MD00"),
+	  m_md01(*this, "MD01"),
+	  m_md02(*this, "MD02"),
+	  m_md03(*this, "MD03"),
+	  m_md04(*this, "MD04"),
+	  m_md05(*this, "MD05"),
+	  m_md06(*this, "MD06"),
+	  m_md07(*this, "MD07"),
+	  m_md08(*this, "MD08"),
+	  m_md09(*this, "MD09"),
+	  m_md10(*this, "MD10"),
+	  m_md11(*this, "MD11"),
 	  m_p1(0),
-	  m_p2(0),
-	  m_sense(0)
+	  m_p2(0)
 {
 }
 
@@ -293,7 +281,6 @@ void ibm_pc_xt_83_keyboard_device::device_start()
 	// state saving
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
-	save_item(NAME(m_sense));
 }
 
 
@@ -304,6 +291,25 @@ void ibm_pc_xt_83_keyboard_device::device_start()
 void ibm_pc_xt_83_keyboard_device::device_reset()
 {
 	m_maincpu->reset();
+}
+
+
+//-------------------------------------------------
+//  clock_write -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::clock_write )
+{
+}
+
+
+//-------------------------------------------------
+//  data_write -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::data_write )
+{
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -322,19 +328,14 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 	    2       
 	    3       
 	    4       
-	    5       CLOCK
-	    6       DATA
-	    7       IC4 G
+	    5       DATAOUT
+	    6       -REQOUT
+	    7       RESET
 	
 	*/
 
-	m_pc_kbdc->data_write_from_kb(BIT(data, 6));
-	m_pc_kbdc->clock_write_from_kb(BIT(data, 5));
-
-	if (BIT(data, 7))
-	{
-		m_sense = m_p2 & 0x07;
-	}
+	m_pc_kbdc->data_write_from_kb(BIT(data, 5));
+	m_pc_kbdc->clock_write_from_kb(BIT(data, 6));
 }
 
 
@@ -348,14 +349,14 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 	
 	    bit     description
 	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
+	    0       MD00
+	    1       MD01
+	    2       MD02
+	    3       MD03
+	    4       MD04
+	    5       MD05
+	    6       MD06
+	    7       MD07
 	
 	*/
 
@@ -373,14 +374,14 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 	
 	    bit     description
 	
-	    0       SENSE 0
-	    1       SENSE 1
-	    2       SENSE 2
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
+	    0       SELECT 2
+	    1       SELECT 1
+	    2       SELECT 0
+	    3       SA CLOSED, T1
+	    4       MD08
+	    5       MD09
+	    6       MD10
+	    7       MD11
 	
 	*/
 
@@ -394,7 +395,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 
 READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t0_r )
 {
-	return data_signal();
+	return clock_signal();
 }
 
 
@@ -404,21 +405,32 @@ READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t0_r )
 
 READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t1_r )
 {
+	return sa_closed();
+}
+
+
+//-------------------------------------------------
+//  sa_closed -
+//-------------------------------------------------
+
+int ibm_pc_xt_83_keyboard_device::sa_closed()
+{
 	UINT8 data = 0xff;
 
-	if (BIT(m_p1, 0)) data &= m_p10->read();
-	if (BIT(m_p1, 1)) data &= m_p11->read();
-	if (BIT(m_p1, 2)) data &= m_p12->read();
-	if (BIT(m_p1, 3)) data &= m_p13->read();
-	if (BIT(m_p1, 4)) data &= m_p14->read();
-	if (BIT(m_p1, 5)) data &= m_p15->read();
-	if (BIT(m_p1, 6)) data &= m_p16->read();
-	if (BIT(m_p1, 7)) data &= m_p17->read();
-	if (BIT(m_p2, 3)) data &= m_p23->read();
-	if (BIT(m_p2, 4)) data &= m_p24->read();
-	if (BIT(m_p2, 5)) data &= m_p25->read();
-	if (BIT(m_p2, 6)) data &= m_p26->read();
-	if (BIT(m_p2, 7)) data &= m_p27->read();
+	logerror("md %03x sense %01x\n", m_p2 << 4 | m_p1, m_p2&0x07);
 
-	return BIT(data, m_sense);
+	if (BIT(m_p1, 0)) data &= m_md00->read();
+	if (BIT(m_p1, 1)) data &= m_md01->read();
+	if (BIT(m_p1, 2)) data &= m_md02->read();
+	if (BIT(m_p1, 3)) data &= m_md03->read();
+	if (BIT(m_p1, 4)) data &= m_md04->read();
+	if (BIT(m_p1, 5)) data &= m_md05->read();
+	if (BIT(m_p1, 6)) data &= m_md06->read();
+	if (BIT(m_p1, 7)) data &= m_md07->read();
+	if (BIT(m_p2, 4)) data &= m_md08->read();
+	if (BIT(m_p2, 5)) data &= m_md09->read();
+	if (BIT(m_p2, 6)) data &= m_md10->read();
+	if (BIT(m_p2, 7)) data &= m_md11->read();
+
+	return BIT(m_p2, 3) && BIT(data, m_p2 & 0x07);
 }

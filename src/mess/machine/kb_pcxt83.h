@@ -49,28 +49,28 @@ protected:
 	virtual void device_reset();
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) { m_maincpu->set_input_line(MCS48_INPUT_IRQ, !state); };
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) { };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write );
+	virtual DECLARE_WRITE_LINE_MEMBER( data_write );
 
 private:
+	int sa_closed();
+
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_p10;
-	required_ioport m_p11;
-	required_ioport m_p12;
-	required_ioport m_p13;
-	required_ioport m_p14;
-	required_ioport m_p15;
-	required_ioport m_p16;
-	required_ioport m_p17;
-	required_ioport m_p23;
-	required_ioport m_p24;
-	required_ioport m_p25;
-	required_ioport m_p26;
-	required_ioport m_p27;
+	required_ioport m_md00;
+	required_ioport m_md01;
+	required_ioport m_md02;
+	required_ioport m_md03;
+	required_ioport m_md04;
+	required_ioport m_md05;
+	required_ioport m_md06;
+	required_ioport m_md07;
+	required_ioport m_md08;
+	required_ioport m_md09;
+	required_ioport m_md10;
+	required_ioport m_md11;
 
 	UINT8 m_p1;
 	UINT8 m_p2;
-	int m_sense;
 };
 
 
