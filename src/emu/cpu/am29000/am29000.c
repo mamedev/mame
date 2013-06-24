@@ -82,6 +82,38 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
 {
+	memset( m_r, 0, sizeof(m_r) );
+	memset( m_tlb, 0, sizeof(m_tlb) );
+	m_vab = 0;
+	m_ops = 0;
+	m_cha = 0;
+	m_chd = 0;
+	m_chc = 0;
+	m_rbp = 0;
+	m_tmc = 0;
+	m_tmr = 0;
+	m_pc0 = 0;
+	m_pc1 = 0;
+	m_pc2 = 0;
+	m_mmu = 0;
+	m_lru = 0;
+	m_ipc = 0;
+	m_ipa = 0;
+	m_ipb = 0;
+	m_q = 0;
+	m_alu = 0;
+	m_fpe = 0;
+	m_inte = 0;
+	m_fps = 0;
+	memset( m_exception_queue, 0, sizeof( m_exception_queue) );;
+	m_irq_active = 0;
+	m_irq_lines = 0;
+	m_exec_ir = 0;
+	m_next_ir = 0;
+	m_pl_flags = 0;
+	m_iret_pc = 0;
+	m_exec_pc = 0;
+	m_next_pc = 0;
 }
 
 
@@ -393,39 +425,6 @@ void am29000_cpu_device::state_string_export(const device_state_entry &entry, as
 
 void am29000_cpu_device::device_reset()
 {
-	memset( m_r, 0, sizeof(m_r) );
-	memset( m_tlb, 0, sizeof(m_tlb) );
-	m_vab = 0;
-	m_ops = 0;
-	m_cha = 0;
-	m_chd = 0;
-	m_chc = 0;
-	m_rbp = 0;
-	m_tmc = 0;
-	m_tmr = 0;
-	m_pc0 = 0;
-	m_pc1 = 0;
-	m_pc2 = 0;
-	m_mmu = 0;
-	m_lru = 0;
-	m_ipc = 0;
-	m_ipa = 0;
-	m_ipb = 0;
-	m_q = 0;
-	m_alu = 0;
-	m_fpe = 0;
-	m_inte = 0;
-	m_fps = 0;
-	memset( m_exception_queue, 0, sizeof( m_exception_queue) );;
-	m_irq_active = 0;
-	m_irq_lines = 0;
-	m_exec_ir = 0;
-	m_next_ir = 0;
-	m_pl_flags = 0;
-	m_iret_pc = 0;
-	m_exec_pc = 0;
-	m_next_pc = 0;
-
 	m_cps = CPS_FZ | CPS_RE | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA;
 	m_cfg &= ~(CFG_DW | CFG_CD);
 	m_chc &= ~CHC_CV;
