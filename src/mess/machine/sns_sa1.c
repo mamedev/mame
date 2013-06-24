@@ -28,33 +28,42 @@
  - test case for BWRAM & IRAM write protect (bsnes does not seem to ever protect either, so it's not implemented
    for the moment)
  - almost everything CPU related!
- 
+
  Compatibility:
-	sdf1gpp, sdf1gp: corrupt menu gfx, hangs going into game (I think)
-    habumeij: boots, goes into game, on-screen timer counts down after SA-1 is enabled but controls aren't responsive
-    kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
-	kirby3j, kirby3: uses SA-1 DMA
-    itoibass: boots, some missing gfx
-    jl96drem: sprites corrupt in gameplay, SA-1 DMA/character conversion?
-	haruaug3a, pebble, haruaug3: uses SA-1 DMA
-    miniyonk: plays OK
-    pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
-	przeo, przeou: plays OK 
-    sdgungnx: plays OK
-    panicbw: plays OK
-    smrpgj, smrpg: boots, can't start game (SRAM mapping?)
+    asahishi: plays OK
     daisenx2: plays OK
     derbyjo2: hangs going into game
     dbzhypd, dbzhypdj: plays OK
+    habumeij: boots, goes into game, on-screen timer counts down after SA-1 is enabled but controls aren't responsive
+    haruaug3a, pebble, haruaug3: uses SA-1 DMA
+    itoibass: boots, some missing gfx
     jikkparo: plays OK
+    jl96drem: sprites corrupt in gameplay, SA-1 DMA/character conversion?
     jumpind: boots and runs, uses SA-1 DMA and character conversion
     kakinoki: S-CPU crashes after pressing start
+    kirby3j, kirby3: uses SA-1 DMA
+    kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
     marvelou: plays OK, some gfx corruption
-	shinshog: plays OK
+    miniyonk: plays OK
+    panicbw: plays OK
+    pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
+    przeo, przeou: plays OK
+    prokishi: plays OK
+    rinkaiho: plays OK
+    saikouso: plays OK
+    sdf1gpp, sdf1gp: corrupt menu gfx, hangs going into game (I think)
+    sdgungnx: plays OK
+    shinshog: plays OK
     shogisai: plays OK
     shogisa2: plays OK
+    smrpgj, smrpg: boots, can't start game (SRAM mapping?)
     srobotg: some corrupt in-game GFX, may be SNES rendering errors
- 
+    sshogi3: plays OK
+    taikyoid: plays OK
+    takemiya: plays OK
+ [Note: for Igo & Shougi games, "plays OK" means you can get ingame and the CPU replies to your moves... subtle bugs
+ might indeed exist...]
+
  ***********************************************************************************************************/
 
 
@@ -83,7 +92,6 @@ sns_sa1_device::sns_sa1_device(const machine_config &mconfig, const char *tag, d
 						device_sns_cart_interface( mconfig, *this ),
 						m_sa1(*this, "sa1cpu")
 {
-
 }
 
 
@@ -699,7 +707,7 @@ UINT8 sns_sa1_device::read_bwram(UINT32 offset)
 
 	// Bitmap BWRAM
 	offset -= 0x100000;
-	
+
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
@@ -734,7 +742,7 @@ void sns_sa1_device::write_bwram(UINT32 offset, UINT8 data)
 
 	// Bitmap BWRAM
 	offset -= 0x100000;
-	
+
 	if (m_bwram_sa1_format)
 	{
 		// 2bits mode
