@@ -11,6 +11,7 @@
 #include "cpu/dsp32/dsp32.h"
 #include "sound/dac.h"
 #include "machine/atarigen.h"
+#include "machine/n68681.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
@@ -46,7 +47,8 @@ public:
 			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
 			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
-			m_dac(*this, "dac") { }
+			m_dac(*this, "dac"),
+			m_duart(*this, "duartn68681") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -261,6 +263,8 @@ public:
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	optional_device<dac_device> m_dac;
+	required_device<duartn68681_device> m_duart;
+	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
 };
 
 
@@ -295,8 +299,6 @@ DECLARE_WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
 
 DECLARE_READ16_HANDLER( hd68k_zram_r );
 DECLARE_WRITE16_HANDLER( hd68k_zram_w );
-
-void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector);
 
 DECLARE_WRITE16_HANDLER( hdgsp_io_w );
 

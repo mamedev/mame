@@ -484,11 +484,10 @@ WRITE16_HANDLER( hd68k_zram_w )
  *
  *************************************/
 
-void harddriv_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
 {
-	harddriv_state *hd_state = device->machine().driver_data<harddriv_state>();
-	hd_state->m_duart_irq_state = state;
-	hd_state->update_interrupts();
+	m_duart_irq_state = state;
+	update_interrupts();
 }
 
 

@@ -326,7 +326,6 @@ Notes:
 #include "emu.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
-#include "machine/68681.h"
 #include "audio/atarijsa.h"
 #include "sound/dac.h"
 #include "includes/slapstic.h"
@@ -408,12 +407,13 @@ static const dsp32_config dsp32c_config =
  *
  *************************************/
 
-static const duart68681_config duart_config =
+static const duartn68681_config duart_config =
 {
-	harddriv_duart_irq_handler,     /* irq callback */
-	NULL,                           /* serial transmit */
-	NULL,                           /* output port */
-	NULL                            /* input port */
+	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, harddriv_duart_irq_handler),     /* irq callback */
+	DEVCB_NULL,                           /* serial transmit A */
+	DEVCB_NULL,                     /* serial transmit B */
+	DEVCB_NULL,                     /* input port */
+	DEVCB_NULL,                     /* output port */
 };
 
 
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( driver_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff00)
 	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( multisync_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff00)
 	AM_RANGE(0xff4000, 0xff4fff) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( multisync2_68k_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0xb80000, 0xbfffff) AM_READWRITE_LEGACY(hd68k_adc12_r, hd68k_adc_control_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(hd68k_gsp_io_r, hd68k_gsp_io_w)
 	AM_RANGE(0xc04000, 0xc07fff) AM_READWRITE_LEGACY(hd68k_msp_io_r, hd68k_msp_io_w)
-	AM_RANGE(0xfc0000, 0xfc001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
+	AM_RANGE(0xfc0000, 0xfc001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff00)
 	AM_RANGE(0xfd0000, 0xfd0fff) AM_MIRROR(0x004000) AM_READWRITE_LEGACY(hd68k_zram_r, hd68k_zram_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -1353,7 +1353,7 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_MACHINE_RESET_OVERRIDE(harddriv_state,harddriv)
 	MCFG_NVRAM_ADD_1FILL("eeprom")
 
-	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, duart_config)
+	MCFG_DUARTN68681_ADD("duartn68681", XTAL_3_6864MHz, duart_config)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
