@@ -5,7 +5,10 @@
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
 
- TODO: almost everything
+ TODO: almost everything, e.g.
+ * implement gb_timer_callback
+ * gb_io_r/w
+ * add hook-up to copy LCD scanline to m_lcd_buffer
 
  ***********************************************************************************************************/
 
