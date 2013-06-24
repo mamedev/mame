@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x220002, 0x220003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, word_r, word_w)  /* tilemaps */
-	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, word_w)
+	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, word_r, word_w)  /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
