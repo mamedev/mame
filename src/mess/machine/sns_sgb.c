@@ -13,8 +13,6 @@
 #include "emu.h"
 #include "machine/sns_sgb.h"
 
-#include "cpu/lr35902/lr35902.h"
-
 //-------------------------------------------------
 //  sns_rom_sgb_device - constructor
 //-------------------------------------------------
@@ -89,13 +87,12 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_io_w)
 
 READ8_MEMBER(sns_rom_sgb_device::gb_ie_r)
 {
-//	return m_gb_cpu->get_ie();
-	return 0;
+	return m_gb_cpu->get_ie();
 }
 
 WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 {
-//	m_gb_cpu->set_ie(data & 0x1f);
+	m_gb_cpu->set_ie(data & 0x1f);
 }
 
 

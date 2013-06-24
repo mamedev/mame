@@ -4,7 +4,7 @@
 #include "machine/sns_slot.h"
 #include "machine/sns_rom.h"
 
-//#include "cpu/lr35902/lr35902.h"
+#include "cpu/lr35902/lr35902.h"
 #include "machine/gb_slot.h"
 #include "machine/gb_rom.h"
 #include "machine/gb_mbc.h"
@@ -43,7 +43,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(gb_ie_w);
 	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
-	required_device<cpu_device> m_gb_cpu;
+	required_device<lr35902_cpu_device> m_gb_cpu;
 	required_device<gameboy_sound_device> m_gb_snd;
 	required_device<sgb_lcd_device> m_gb_lcd;
 	required_device<gb_cart_slot_device> m_cartslot;
