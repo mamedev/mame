@@ -97,8 +97,8 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset();
 private:
-	UINT32 m_segment1;
-	UINT32 m_segment2;
+//	UINT32 m_segment1;
+//	UINT32 m_segment2;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
 	UINT8 m_diag;
