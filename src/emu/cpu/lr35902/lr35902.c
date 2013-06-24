@@ -46,11 +46,6 @@
 #define HALTED  0x02
 
 
-const UINT8 lr35902_cpu_device::FLAG_Z = 0x80;
-const UINT8 lr35902_cpu_device::FLAG_N = 0x40;
-const UINT8 lr35902_cpu_device::FLAG_H = 0x20;
-const UINT8 lr35902_cpu_device::FLAG_C = 0x10;
-
 //**************************************************************************
 //  LR35902 DEVICE
 //**************************************************************************
@@ -182,10 +177,10 @@ void lr35902_cpu_device::state_string_export(const device_state_entry &entry, as
 
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c",
-				m_F & FLAG_Z   ? 'Z' : '.',
-				m_F & FLAG_N   ? 'N' : '.',
-				m_F & FLAG_H   ? 'H' : '.',
-				m_F & FLAG_C   ? 'C' : '.'
+				m_F & LR35902_FLAG_Z   ? 'Z' : '.',
+				m_F & LR35902_FLAG_N   ? 'N' : '.',
+				m_F & LR35902_FLAG_H   ? 'H' : '.',
+				m_F & LR35902_FLAG_C   ? 'C' : '.'
 			);
 			break;
 	}

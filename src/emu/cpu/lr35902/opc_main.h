@@ -3,9 +3,9 @@
 	register UINT8 r,f; \
 	x++; \
 	r=(x);  \
-	f=(UINT8)(m_F&FLAG_C); \
-	if( r==0 )       f|=FLAG_Z; \
-	if( (r&0xF)==0 ) f|=FLAG_H; \
+	f=(UINT8)(m_F&LR35902_FLAG_C); \
+	if( r==0 )       f|=LR35902_FLAG_Z; \
+	if( (r&0xF)==0 ) f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -14,9 +14,9 @@
 	register UINT8 r,f; \
 	x--; \
 	r=(x);  \
-	f=(UINT8)((m_F&FLAG_C)|FLAG_N); \
-	if( r==0 )       f|=FLAG_Z; \
-	if( (r&0xF)==0xF ) f|=FLAG_H; \
+	f=(UINT8)((m_F&LR35902_FLAG_C)|LR35902_FLAG_N); \
+	if( r==0 )       f|=LR35902_FLAG_Z; \
+	if( (r&0xF)==0xF ) f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -26,9 +26,9 @@
 	register UINT8 f; \
 	r1=((m_H<<8)|m_L)+(x); \
 	r2=(((m_H<<8)|m_L)&0xFFF)+((x)&0xFFF); \
-	f=(UINT8)(m_F&FLAG_Z); \
-	if( r1>0xFFFF ) f|=FLAG_C; \
-	if( r2>0x0FFF ) f|=FLAG_H; \
+	f=(UINT8)(m_F&LR35902_FLAG_Z); \
+	if( r1>0xFFFF ) f|=LR35902_FLAG_C; \
+	if( r2>0x0FFF ) f|=LR35902_FLAG_H; \
 	m_L = r1; \
 	m_H = r1 >> 8; \
 	m_F=f; \
@@ -41,10 +41,10 @@
 	r1=(UINT16)((m_A&0xF)+((x)&0xF)); \
 	r2=(UINT16)(m_A+(x)); \
 	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_Z; \
+	if( ((UINT8)r2)==0 ) f=LR35902_FLAG_Z; \
 	else f=0; \
-	if( r2>0xFF ) f|=FLAG_C; \
-	if( r1>0xF )  f|=FLAG_H; \
+	if( r2>0xFF ) f|=LR35902_FLAG_C; \
+	if( r1>0xF )  f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -55,10 +55,10 @@
 	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
 	r2=(UINT16)(m_A-(x)); \
 	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
-	else f=FLAG_N; \
-	if( r2>0xFF ) f|=FLAG_C; \
-	if( r1>0xF )  f|=FLAG_H; \
+	if( ((UINT8)r2)==0 ) f=LR35902_FLAG_N|LR35902_FLAG_Z; \
+	else f=LR35902_FLAG_N; \
+	if( r2>0xFF ) f|=LR35902_FLAG_C; \
+	if( r1>0xF )  f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -69,12 +69,12 @@
    register UINT8 f; \
    r=(UINT16)(m_A-(x)); \
    if( ((UINT8)r)==0 ) \
-   f=FLAG_N|FLAG_Z; \
+   f=LR35902_FLAG_N|LR35902_FLAG_Z; \
    else \
-   f=FLAG_N; \
-   f|=(UINT8)((r>>8)&FLAG_C); \
+   f=LR35902_FLAG_N; \
+   f|=(UINT8)((r>>8)&LR35902_FLAG_C); \
    if( (r^m_A^(x))&0x10 ) \
-   f|=FLAG_H; \
+   f|=LR35902_FLAG_H; \
    m_F=f; \
    }
  */
@@ -85,10 +85,10 @@
 	register UINT8 f; \
 	r1=(UINT16)((m_A&0xF)-((x)&0xF)); \
 	r2=(UINT16)(m_A-(x)); \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
-	else f=FLAG_N; \
-	if( r2>0xFF ) f|=FLAG_C; \
-	if( r1>0xF )  f|=FLAG_H; \
+	if( ((UINT8)r2)==0 ) f=LR35902_FLAG_N|LR35902_FLAG_Z; \
+	else f=LR35902_FLAG_N; \
+	if( r2>0xFF ) f|=LR35902_FLAG_C; \
+	if( r1>0xF )  f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -96,13 +96,13 @@
 { \
 	register UINT16 r1,r2; \
 	register UINT8 f; \
-	r1=(UINT16)((m_A&0xF)-((x)&0xF)-((m_F&FLAG_C)?1:0)); \
-	r2=(UINT16)(m_A-(x)-((m_F&FLAG_C)?1:0)); \
+	r1=(UINT16)((m_A&0xF)-((x)&0xF)-((m_F&LR35902_FLAG_C)?1:0)); \
+	r2=(UINT16)(m_A-(x)-((m_F&LR35902_FLAG_C)?1:0)); \
 	m_A=(UINT8)r2; \
-	if( ((UINT8)r2)==0 ) f=FLAG_N|FLAG_Z; \
-	else f=FLAG_N; \
-	if( r2>0xFF ) f|=FLAG_C; \
-	if( r1>0xF )  f|=FLAG_H; \
+	if( ((UINT8)r2)==0 ) f=LR35902_FLAG_N|LR35902_FLAG_Z; \
+	else f=LR35902_FLAG_N; \
+	if( r2>0xFF ) f|=LR35902_FLAG_C; \
+	if( r1>0xF )  f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
@@ -110,30 +110,30 @@
 { \
 	register UINT16 r1,r2;  \
 	register UINT8 f; \
-	r1=(UINT16)((m_A&0xF)+((x)&0xF)+((m_F&FLAG_C)?1:0));  \
-	r2=(UINT16)(m_A+(x)+((m_F&FLAG_C)?1:0)); \
-	if( (m_A=(UINT8)r2)==0 ) f=FLAG_Z; \
+	r1=(UINT16)((m_A&0xF)+((x)&0xF)+((m_F&LR35902_FLAG_C)?1:0));  \
+	r2=(UINT16)(m_A+(x)+((m_F&LR35902_FLAG_C)?1:0)); \
+	if( (m_A=(UINT8)r2)==0 ) f=LR35902_FLAG_Z; \
 	else f=0; \
-	if( r2>0xFF )   f|=FLAG_C; \
-	if( r1>0xF )    f|=FLAG_H; \
+	if( r2>0xFF )   f|=LR35902_FLAG_C; \
+	if( r1>0xF )    f|=LR35902_FLAG_H; \
 	m_F=f; \
 }
 
 #define AND_A_X(x) \
 	if( (m_A&=(x))==0 ) \
-	m_F=FLAG_H|FLAG_Z; \
+	m_F=LR35902_FLAG_H|LR35902_FLAG_Z; \
 	else \
-	m_F=FLAG_H;
+	m_F=LR35902_FLAG_H;
 
 #define XOR_A_X(x) \
 	if( (m_A^=(x))==0 ) \
-	m_F=FLAG_Z; \
+	m_F=LR35902_FLAG_Z; \
 	else \
 	m_F=0;
 
 #define OR_A_X(x) \
 	if( (m_A|=(x))==0 ) \
-	m_F=FLAG_Z; \
+	m_F=LR35902_FLAG_Z; \
 	else \
 	m_F=0;
 
@@ -190,7 +190,7 @@ case 0x07: /*      RLCA */
 	m_A = (UINT8) ((m_A << 1) | (m_A >> 7));
 	if (m_A & 1)
 	{
-	m_F = FLAG_C;
+	m_F = LR35902_FLAG_C;
 	}
 	else
 	{
@@ -244,7 +244,7 @@ case 0x0F: /*      RRCA */
 	m_F = 0;
 	if (m_A & 0x80)
 	{
-	m_F |= FLAG_C;
+	m_F |= LR35902_FLAG_C;
 	}
 	break;
 case 0x10: /*      STOP */
@@ -289,9 +289,9 @@ case 0x16: /*      LD D,n8 */
 	break;
 case 0x17: /*      RLA */
 
-	x = (m_A & 0x80) ? FLAG_C : 0;
+	x = (m_A & 0x80) ? LR35902_FLAG_C : 0;
 
-	m_A = (UINT8) ((m_A << 1) | ((m_F & FLAG_C) ? 1 : 0));
+	m_A = (UINT8) ((m_A << 1) | ((m_F & LR35902_FLAG_C) ? 1 : 0));
 	m_F = x;
 	break;
 case 0x18: /*      JR      n8 */
@@ -340,15 +340,15 @@ case 0x1E: /*      LD E,n8 */
 	break;
 case 0x1F: /*      RRA */
 
-	x = (m_A & 1) ? FLAG_C : 0;
+	x = (m_A & 1) ? LR35902_FLAG_C : 0;
 
-	m_A = (UINT8) ((m_A >> 1) | ((m_F & FLAG_C) ? 0x80 : 0));
+	m_A = (UINT8) ((m_A >> 1) | ((m_F & LR35902_FLAG_C) ? 0x80 : 0));
 	m_F = x;
 	break;
 case 0x20: /*      JR NZ,n8 */
 	{
 		INT8 offset = mem_read_byte( m_PC++ );
-		if (! (m_F & FLAG_Z) )
+		if (! (m_F & LR35902_FLAG_Z) )
 		{
 			m_PC += offset;
 			cycles_passed( 4 );
@@ -405,33 +405,33 @@ case 0x27: /*      DAA */
 	{
 		int tmp = m_A;
 
-		if ( ! ( m_F & FLAG_N ) ) {
-			if ( ( m_F & FLAG_H ) || ( tmp & 0x0F ) > 9 )
+		if ( ! ( m_F & LR35902_FLAG_N ) ) {
+			if ( ( m_F & LR35902_FLAG_H ) || ( tmp & 0x0F ) > 9 )
 				tmp += 6;
-			if ( ( m_F & FLAG_C ) || tmp > 0x9F )
+			if ( ( m_F & LR35902_FLAG_C ) || tmp > 0x9F )
 				tmp += 0x60;
 		} else {
-			if ( m_F & FLAG_H ) {
+			if ( m_F & LR35902_FLAG_H ) {
 				tmp -= 6;
-				if ( ! ( m_F & FLAG_C ) )
+				if ( ! ( m_F & LR35902_FLAG_C ) )
 					tmp &= 0xFF;
 			}
-			if ( m_F & FLAG_C )
+			if ( m_F & LR35902_FLAG_C )
 					tmp -= 0x60;
 		}
-		m_F &= ~ ( FLAG_H | FLAG_Z );
+		m_F &= ~ ( LR35902_FLAG_H | LR35902_FLAG_Z );
 		if ( tmp & 0x100 )
-			m_F |= FLAG_C;
+			m_F |= LR35902_FLAG_C;
 		m_A = tmp & 0xFF;
 		if ( ! m_A )
-			m_F |= FLAG_Z;
+			m_F |= LR35902_FLAG_Z;
 	}
 	break;
 case 0x28: /*      JR Z,n8 */
 	{
 		INT8 offset = mem_read_byte( m_PC++ );
 
-		if (m_F & FLAG_Z)
+		if (m_F & LR35902_FLAG_Z)
 		{
 			m_PC += offset;
 			cycles_passed( 4 );
@@ -486,13 +486,13 @@ case 0x2E: /*      LD L,n8 */
 case 0x2F: /*      CPL */
 
 	m_A = ~m_A;
-	m_F |= FLAG_N | FLAG_H;
+	m_F |= LR35902_FLAG_N | LR35902_FLAG_H;
 	break;
 case 0x30: /*      JR NC,n8 */
 	{
 		INT8 offset = mem_read_byte( m_PC++ );
 
-		if ( ! (m_F & FLAG_C) )
+		if ( ! (m_F & LR35902_FLAG_C) )
 		{
 			m_PC += offset;
 			cycles_passed( 4 );
@@ -528,16 +528,16 @@ case 0x34: /*      INC (HL) */
 		UINT16 addr = ( m_H << 8 ) | m_L;
 		register UINT8 r, f;
 
-		f = (UINT8) (m_F & FLAG_C);
+		f = (UINT8) (m_F & LR35902_FLAG_C);
 		r = mem_read_byte( addr );
 		r += 1;
 		mem_write_byte( addr, r );
 
 		if (r == 0)
-			f |= FLAG_Z;
+			f |= LR35902_FLAG_Z;
 
 		if ((r & 0xF) == 0)
-			f |= FLAG_H;
+			f |= LR35902_FLAG_H;
 
 		m_F = f;
 	}
@@ -547,16 +547,16 @@ case 0x35: /*      DEC (HL) */
 		UINT16 addr = ( m_H << 8 ) | m_L;
 		register UINT8 r, f;
 
-		f = (UINT8) ((m_F & FLAG_C) | FLAG_N);
+		f = (UINT8) ((m_F & LR35902_FLAG_C) | LR35902_FLAG_N);
 		r = mem_read_byte( addr );
 		r -= 1;
 		mem_write_byte( addr, r );
 
 		if (r == 0)
-			f |= FLAG_Z;
+			f |= LR35902_FLAG_Z;
 
 		if ((r & 0xF) == 0xF)
-			f |= FLAG_H;
+			f |= LR35902_FLAG_H;
 
 		m_F = f;
 	}
@@ -569,13 +569,13 @@ case 0x36: /*      LD (HL),n8 */
 	break;
 case 0x37: /*      SCF */
 
-	m_F = (UINT8) ((m_F & FLAG_Z) | FLAG_C);
+	m_F = (UINT8) ((m_F & LR35902_FLAG_Z) | LR35902_FLAG_C);
 	break;
 case 0x38: /*      JR C,n8 */
 	{
 		INT8 offset = mem_read_byte( m_PC++ );
 
-		if (m_F & FLAG_C)
+		if (m_F & LR35902_FLAG_C)
 		{
 			m_PC += offset;
 			cycles_passed( 4 );
@@ -618,7 +618,7 @@ case 0x3E: /*      LD A,n8 */
 	break;
 case 0x3F: /*      CCF */
 
-	m_F = (UINT8) ((m_F & FLAG_Z) | ((m_F & FLAG_C) ? 0 : FLAG_C));
+	m_F = (UINT8) ((m_F & LR35902_FLAG_Z) | ((m_F & LR35902_FLAG_C) ? 0 : LR35902_FLAG_C));
 	break;
 case 0x40: /*      LD B,B */
 	break;
@@ -1026,7 +1026,7 @@ case 0xA6: /*      AND A,(HL) */
 	break;
 case 0xA7: /*      AND A,A */
 
-	m_F = (m_A == 0) ? (FLAG_H | FLAG_Z) : FLAG_H;
+	m_F = (m_A == 0) ? (LR35902_FLAG_H | LR35902_FLAG_Z) : LR35902_FLAG_H;
 	break;
 case 0xA8: /*      XOR A,B */
 
@@ -1132,7 +1132,7 @@ case 0xBF: /*      CP A,A */
 	break;
 case 0xC0: /*      RET NZ */
 	cycles_passed( 4 );
-	if (!(m_F & FLAG_Z))
+	if (!(m_F & LR35902_FLAG_Z))
 	{
 		m_PC = mem_read_word( m_SP );
 		m_SP += 2;
@@ -1147,7 +1147,7 @@ case 0xC2: /*      JP NZ,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if ( ! (m_F & FLAG_Z) )
+		if ( ! (m_F & LR35902_FLAG_Z) )
 		{
 			m_PC = addr;
 			cycles_passed( 4 );
@@ -1163,7 +1163,7 @@ case 0xC4: /*      CALL NZ,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if ( ! (m_F & FLAG_Z) )
+		if ( ! (m_F & LR35902_FLAG_Z) )
 		{
 			m_SP -= 2;
 			mem_write_word( m_SP, m_PC );
@@ -1189,7 +1189,7 @@ case 0xC7: /*      RST 0 */
 	break;
 case 0xC8: /*      RET Z */
 	cycles_passed( 4 );
-	if (m_F & FLAG_Z)
+	if (m_F & LR35902_FLAG_Z)
 	{
 		m_PC = mem_read_word( m_SP );
 		m_SP += 2;
@@ -1206,7 +1206,7 @@ case 0xCA: /*      JP Z,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if (m_F & FLAG_Z)
+		if (m_F & LR35902_FLAG_Z)
 		{
 			m_PC = addr;
 			cycles_passed( 4 );
@@ -1225,7 +1225,7 @@ case 0xCC: /*      CALL Z,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if (m_F & FLAG_Z)
+		if (m_F & LR35902_FLAG_Z)
 		{
 			m_SP -= 2;
 			mem_write_word( m_SP, m_PC );
@@ -1258,7 +1258,7 @@ case 0xCF: /*      RST 8 */
 	break;
 case 0xD0: /*      RET NC */
 	cycles_passed( 4 );
-	if (!(m_F & FLAG_C))
+	if (!(m_F & LR35902_FLAG_C))
 	{
 		m_PC = mem_read_word( m_SP );
 		m_SP += 2;
@@ -1273,7 +1273,7 @@ case 0xD2: /*      JP NC,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if ( ! (m_F & FLAG_C) )
+		if ( ! (m_F & LR35902_FLAG_C) )
 		{
 			m_PC = addr;
 			cycles_passed( 4 );
@@ -1287,7 +1287,7 @@ case 0xD4: /*      CALL NC,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if ( ! (m_F & FLAG_C) )
+		if ( ! (m_F & LR35902_FLAG_C) )
 		{
 			m_SP -= 2;
 			mem_write_word( m_SP, m_PC );
@@ -1313,7 +1313,7 @@ case 0xD7: /*      RST     $10 */
 	break;
 case 0xD8: /*      RET C */
 	cycles_passed( 4 );
-	if (m_F & FLAG_C)
+	if (m_F & LR35902_FLAG_C)
 	{
 		m_PC = mem_read_word( m_SP );
 		m_SP += 2;
@@ -1331,7 +1331,7 @@ case 0xDA: /*      JP C,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if (m_F & FLAG_C)
+		if (m_F & LR35902_FLAG_C)
 		{
 			m_PC = addr;
 			cycles_passed( 4 );
@@ -1345,7 +1345,7 @@ case 0xDC: /*      CALL C,n16 */
 		UINT16 addr = mem_read_word( m_PC );
 		m_PC += 2;
 
-		if (m_F & FLAG_C)
+		if (m_F & LR35902_FLAG_C)
 		{
 			m_SP -= 2;
 			mem_write_word( m_SP, m_PC );
@@ -1414,7 +1414,7 @@ case 0xE8: /*      ADD SP,n8 */
 
 	if ( ( m_SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
 	{
-		m_F = FLAG_C;
+		m_F = LR35902_FLAG_C;
 	}
 	else
 	{
@@ -1423,7 +1423,7 @@ case 0xE8: /*      ADD SP,n8 */
 
 	if ( ( m_SP & 0x0F ) + ( n & 0x0F ) > 0x0F )
 	{
-		m_F |= FLAG_H;
+		m_F |= LR35902_FLAG_H;
 	}
 
 	m_SP = (UINT16) ( m_SP + n );
@@ -1509,7 +1509,7 @@ case 0xF8: /*      LD HL,SP+n8 */
 
 	if ( ( m_SP & 0xFF ) + (UINT8)(n & 0xFF) > 0xFF )
 	{
-		m_F = FLAG_C;
+		m_F = LR35902_FLAG_C;
 	}
 	else
 	{
@@ -1518,7 +1518,7 @@ case 0xF8: /*      LD HL,SP+n8 */
 
 	if ( ( m_SP & 0x0F ) + ( n & 0x0F ) > 0x0F )
 	{
-		m_F |= FLAG_H;
+		m_F |= LR35902_FLAG_H;
 	}
 
 	UINT16 res = m_SP + n;

@@ -3,21 +3,21 @@
 	register UINT8 f;           \
 	(x)=(UINT8)(((x)<<1)|((x)>>7));      \
 	if( (x)&1 )                 \
-		f=FLAG_C;               \
+		f=LR35902_FLAG_C;               \
 	else                        \
 		f=0;                    \
 	if( (x)==0 )                \
-		f|=FLAG_Z;              \
+		f|=LR35902_FLAG_Z;              \
 	m_F=f;          \
 }
 
 #define RL_8BIT(x)              \
 {                               \
 	register UINT8 r;           \
-	r=((x)&0x80)?FLAG_C:0;      \
-	(x)=(UINT8)(((x)<<1)|((m_F&FLAG_C)?1:0));    \
+	r=((x)&0x80)?LR35902_FLAG_C:0;      \
+	(x)=(UINT8)(((x)<<1)|((m_F&LR35902_FLAG_C)?1:0));    \
 	if( (x)==0 )                \
-		r|=FLAG_Z;              \
+		r|=LR35902_FLAG_Z;              \
 	m_F=r;          \
 }
 
@@ -26,21 +26,21 @@
 	register UINT8 f;           \
 	(x)=(UINT8)(((x)>>1)|((x)<<7));      \
 	if( (x)&0x80 )              \
-		f=FLAG_C;               \
+		f=LR35902_FLAG_C;               \
 	else                        \
 		f=0;                    \
 	if( (x)==0 )                \
-		f|=FLAG_Z;              \
+		f|=LR35902_FLAG_Z;              \
 	m_F=f;          \
 }
 
 #define RR_8BIT(x)              \
 {                               \
 	register UINT8 r;           \
-	r=((x)&1)?FLAG_C:0;         \
-	(x)=(UINT8)(((x)>>1)|((m_F&FLAG_C)?0x80:0));     \
+	r=((x)&1)?LR35902_FLAG_C:0;         \
+	(x)=(UINT8)(((x)>>1)|((m_F&LR35902_FLAG_C)?0x80:0));     \
 	if( (x)==0 )                \
-		r|=FLAG_Z;              \
+		r|=LR35902_FLAG_Z;              \
 	m_F=r;          \
 }
 
@@ -48,12 +48,12 @@
 {                               \
 	register UINT8 f;           \
 	if( (x)&0x80 )              \
-		f=FLAG_C;               \
+		f=LR35902_FLAG_C;               \
 	else                        \
 		f=0;                    \
 	(x)<<=1;                    \
 	if( (x)==0 )                \
-		f|=FLAG_Z;              \
+		f|=LR35902_FLAG_Z;              \
 	m_F=f;          \
 }
 
@@ -61,19 +61,19 @@
 {                               \
 	register UINT8 f;           \
 	if( (x)&1 )                 \
-		f=FLAG_C;               \
+		f=LR35902_FLAG_C;               \
 	else                        \
 		f=0;                    \
 	(x)=(UINT8)(((char)(x))>>1);     \
 	if( (x)==0 )                \
-		f|=FLAG_Z;              \
+		f|=LR35902_FLAG_Z;              \
 	m_F=f;          \
 }
 
 #define SWAP_8BIT(x)            \
 	(x)=(UINT8)(((x)>>4)|((x)<<4));      \
 	if( (x)==0 )                \
-		m_F=FLAG_Z; \
+		m_F=LR35902_FLAG_Z; \
 	else                        \
 		m_F=0;
 
@@ -82,20 +82,20 @@
 {                               \
 	register UINT8 f;           \
 	if( (x)&1 )                 \
-		f=FLAG_C;               \
+		f=LR35902_FLAG_C;               \
 	else                        \
 		f=0;                    \
 	(x)>>=1;                    \
 	if( (x)==0 )                \
-		f|=FLAG_Z;              \
+		f|=LR35902_FLAG_Z;              \
 	m_F=f;          \
 }
 
 #define BIT_8BIT(n,x)           \
 	if( (x)&(1<<(n)) )          \
-		m_F=(UINT8)(FLAG_H|(m_F&FLAG_C));  \
+		m_F=(UINT8)(LR35902_FLAG_H|(m_F&LR35902_FLAG_C));  \
 	else                        \
-		m_F=(UINT8)(FLAG_Z|FLAG_H|(m_F&FLAG_C));
+		m_F=(UINT8)(LR35902_FLAG_Z|LR35902_FLAG_H|(m_F&LR35902_FLAG_C));
 
 #define RES_8BIT(n,x)   (x)&=~(1<<(n));
 
