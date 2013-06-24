@@ -17,11 +17,12 @@
 #include "am29000.h"
 
 
+const device_type AM29000 = &device_creator<am29000_cpu_device>;
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define MAX_EXCEPTIONS              (4)
 
 #define PFLAG_FETCH_EN              (1 << 0)
 #define PFLAG_DECODE_EN             (1 << 1)
@@ -45,10 +46,10 @@
 #define MMU_PROGRAM_ACCESS          (0)
 #define MMU_DATA_ACCESS             (1)
 
-#define FREEZE_MODE                 (am29000->cps & CPS_FZ)
-#define SUPERVISOR_MODE             (am29000->cps & CPS_SM)
-#define USER_MODE                   (~am29000->cps & CPS_SM)
-#define REGISTER_IS_PROTECTED(x)    (am29000->rbp & (1 << ((x) >> 4)))
+#define FREEZE_MODE                 (m_cps & CPS_FZ)
+#define SUPERVISOR_MODE             (m_cps & CPS_SM)
+#define USER_MODE                   (~m_cps & CPS_SM)
+#define REGISTER_IS_PROTECTED(x)    (m_rbp & (1 << ((x) >> 4)))
 
 #define INST_RB_FIELD(x)            ((x) & 0xff)
 #define INST_RA_FIELD(x)            (((x) >> 8) & 0xff)
@@ -59,218 +60,426 @@
 #define FIELD_RB                    1
 #define FIELD_RC                    2
 
-#define SIGNAL_EXCEPTION(x)         (signal_exception(am29000, x))
+#define SIGNAL_EXCEPTION(x)         (signal_exception(x))
 
 
-#define GET_ALU_FC                  ((am29000->alu >> ALU_FC_SHIFT) & ALU_FC_MASK)
-#define GET_ALU_BP                  ((am29000->alu >> ALU_BP_SHIFT) & ALU_BP_MASK)
-#define GET_CHC_CR                  ((am29000->chc >> CHC_CR_SHIFT) & CHC_CR_MASK)
+#define GET_ALU_FC                  ((m_alu >> ALU_FC_SHIFT) & ALU_FC_MASK)
+#define GET_ALU_BP                  ((m_alu >> ALU_BP_SHIFT) & ALU_BP_MASK)
+#define GET_CHC_CR                  ((m_chc >> CHC_CR_SHIFT) & CHC_CR_MASK)
 
-#define SET_ALU_FC(x)               do { am29000->alu &= ~(ALU_FC_MASK << ALU_FC_SHIFT); am29000->alu |= ((x) & ALU_FC_MASK) << ALU_FC_SHIFT; } while(0)
-#define SET_ALU_BP(x)               do { am29000->alu &= ~(ALU_BP_MASK << ALU_BP_SHIFT); am29000->alu |= ((x) & ALU_BP_MASK) << ALU_BP_SHIFT; } while(0)
-#define SET_CHC_CR(x)               do { am29000->chc &= ~(CHC_CR_MASK << CHC_CR_SHIFT); am29000->chc |= ((x) & CHC_CR_MASK) << CHC_CR_SHIFT; } while(0)
-
-
-/***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-
-struct am29000_state
-{
-	INT32           icount;
-	UINT32          pc;
-
-	/* General purpose */
-	UINT32          r[256];     // TODO: There's only 192 implemented!
-
-	/* TLB */
-	UINT32          tlb[128];
-
-	/* Protected SPRs */
-	UINT32          vab;
-	UINT32          ops;
-	UINT32          cps;
-	UINT32          cfg;
-	UINT32          cha;
-	UINT32          chd;
-	UINT32          chc;
-	UINT32          rbp;
-	UINT32          tmc;
-	UINT32          tmr;
-	UINT32          pc0;
-	UINT32          pc1;
-	UINT32          pc2;
-	UINT32          mmu;
-	UINT32          lru;
-
-	/* Unprotected SPRs */
-	UINT32          ipc;
-	UINT32          ipa;
-	UINT32          ipb;
-	UINT32          q;
-	UINT32          alu;
-	UINT32          fpe;
-	UINT32          inte;
-	UINT32          fps;
-
-	/* Pipeline state */
-	UINT32          exceptions;
-	UINT32          exception_queue[MAX_EXCEPTIONS];
-
-	UINT8           irq_active;
-	UINT8           irq_lines;
-
-	UINT32          exec_ir;
-	UINT32          next_ir;
-
-	UINT32          pl_flags;
-	UINT32          next_pl_flags;
-
-	UINT32          iret_pc;
-
-	UINT32          exec_pc;
-	UINT32          next_pc;
-
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	direct_read_data *datadirect;
-	address_space *io;
-};
+#define SET_ALU_FC(x)               do { m_alu &= ~(ALU_FC_MASK << ALU_FC_SHIFT); m_alu |= ((x) & ALU_FC_MASK) << ALU_FC_SHIFT; } while(0)
+#define SET_ALU_BP(x)               do { m_alu &= ~(ALU_BP_MASK << ALU_BP_SHIFT); m_alu |= ((x) & ALU_BP_MASK) << ALU_BP_SHIFT; } while(0)
+#define SET_CHC_CR(x)               do { m_chc &= ~(CHC_CR_MASK << CHC_CR_SHIFT); m_chc |= ((x) & CHC_CR_MASK) << CHC_CR_SHIFT; } while(0)
 
 
 /***************************************************************************
     STATE ACCESSORS
 ***************************************************************************/
 
-INLINE am29000_state *get_safe_token(device_t *device)
+am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
+	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
+	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == AM29000);
-	return (am29000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-static CPU_INIT( am29000 )
-{
-	am29000_state *am29000 = get_safe_token(device);
 
-	am29000->program = &device->space(AS_PROGRAM);
-	am29000->direct = &am29000->program->direct();
-	am29000->data = &device->space(AS_DATA);
-	am29000->datadirect = &am29000->data->direct();
-	am29000->io = &device->space(AS_IO);
-	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
+void am29000_cpu_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_datadirect = &m_data->direct();
+	m_io = &space(AS_IO);
+	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
 	/* Register state for saving */
-	device->save_item(NAME(am29000->icount));
-	device->save_item(NAME(am29000->pc));
-	device->save_item(NAME(am29000->r));
-	device->save_item(NAME(am29000->tlb));
+	save_item(NAME(m_icount));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_r));
+	save_item(NAME(m_tlb));
 
-	device->save_item(NAME(am29000->vab));
-	device->save_item(NAME(am29000->ops));
-	device->save_item(NAME(am29000->cps));
-	device->save_item(NAME(am29000->cfg));
-	device->save_item(NAME(am29000->cha));
-	device->save_item(NAME(am29000->chd));
-	device->save_item(NAME(am29000->chc));
-	device->save_item(NAME(am29000->rbp));
-	device->save_item(NAME(am29000->tmc));
-	device->save_item(NAME(am29000->tmr));
-	device->save_item(NAME(am29000->pc0));
-	device->save_item(NAME(am29000->pc1));
-	device->save_item(NAME(am29000->pc2));
-	device->save_item(NAME(am29000->mmu));
-	device->save_item(NAME(am29000->lru));
+	save_item(NAME(m_vab));
+	save_item(NAME(m_ops));
+	save_item(NAME(m_cps));
+	save_item(NAME(m_cfg));
+	save_item(NAME(m_cha));
+	save_item(NAME(m_chd));
+	save_item(NAME(m_chc));
+	save_item(NAME(m_rbp));
+	save_item(NAME(m_tmc));
+	save_item(NAME(m_tmr));
+	save_item(NAME(m_pc0));
+	save_item(NAME(m_pc1));
+	save_item(NAME(m_pc2));
+	save_item(NAME(m_mmu));
+	save_item(NAME(m_lru));
 
-	device->save_item(NAME(am29000->ipc));
-	device->save_item(NAME(am29000->ipa));
-	device->save_item(NAME(am29000->ipb));
-	device->save_item(NAME(am29000->q));
+	save_item(NAME(m_ipc));
+	save_item(NAME(m_ipa));
+	save_item(NAME(m_ipb));
+	save_item(NAME(m_q));
 
-	device->save_item(NAME(am29000->alu));
-	device->save_item(NAME(am29000->fpe));
-	device->save_item(NAME(am29000->inte));
-	device->save_item(NAME(am29000->fps));
+	save_item(NAME(m_alu));
+	save_item(NAME(m_fpe));
+	save_item(NAME(m_inte));
+	save_item(NAME(m_fps));
 
-	device->save_item(NAME(am29000->exceptions));
-	device->save_item(NAME(am29000->exception_queue));
+	save_item(NAME(m_exceptions));
+	save_item(NAME(m_exception_queue));
 
-	device->save_item(NAME(am29000->irq_active));
-	device->save_item(NAME(am29000->irq_lines));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_irq_lines));
 
-	device->save_item(NAME(am29000->exec_ir));
-	device->save_item(NAME(am29000->next_ir));
+	save_item(NAME(m_exec_ir));
+	save_item(NAME(m_next_ir));
 
-	device->save_item(NAME(am29000->pl_flags));
-	device->save_item(NAME(am29000->next_pl_flags));
+	save_item(NAME(m_pl_flags));
+	save_item(NAME(m_next_pl_flags));
 
-	device->save_item(NAME(am29000->iret_pc));
-	device->save_item(NAME(am29000->exec_pc));
-	device->save_item(NAME(am29000->next_pc));
+	save_item(NAME(m_iret_pc));
+	save_item(NAME(m_exec_pc));
+	save_item(NAME(m_next_pc));
+
+	// Register state for debugger
+	state_add( AM29000_PC,   "PC",   m_pc     ).formatstr("%08X");
+	state_add( AM29000_VAB,  "VAB",  m_vab    ).formatstr("%08X");
+	state_add( AM29000_OPS,  "OPS",  m_ops    ).formatstr("%08X");
+	state_add( AM29000_CPS,  "CPS",  m_cps    ).formatstr("%08X");
+	state_add( AM29000_CFG,  "CFG",  m_cfg    ).formatstr("%08X");
+	state_add( AM29000_CHA,  "CHA",  m_cha    ).formatstr("%08X");
+	state_add( AM29000_CHD,  "CHD",  m_chd    ).formatstr("%08X");
+	state_add( AM29000_CHC,  "CHC",  m_chc    ).formatstr("%08X");
+	state_add( AM29000_RBP,  "RBP",  m_rbp    ).formatstr("%08X");
+	state_add( AM29000_TMC,  "TMC",  m_tmc    ).formatstr("%08X");
+	state_add( AM29000_TMR,  "TMR",  m_tmr    ).formatstr("%08X");
+	state_add( AM29000_PC0,  "PC0",  m_pc0    ).formatstr("%08X");
+	state_add( AM29000_PC1,  "PC1",  m_pc1    ).formatstr("%08X");
+	state_add( AM29000_PC2,  "PC2",  m_pc2    ).formatstr("%08X");
+	state_add( AM29000_MMU,  "MMU",  m_mmu    ).formatstr("%08X");
+	state_add( AM29000_LRU,  "LRU",  m_lru    ).formatstr("%08X");
+	state_add( AM29000_IPC,  "IPC",  m_ipc    ).formatstr("%08X");
+	state_add( AM29000_IPA,  "IPA",  m_ipa    ).formatstr("%08X");
+	state_add( AM29000_IPB,  "IPB",  m_ipb    ).formatstr("%08X");
+	state_add( AM29000_Q,    "Q",    m_q      ).formatstr("%08X");
+	state_add( AM29000_ALU,  "ALU",  m_alu    ).formatstr("%08X");
+//	state_add( AM29000_BP,   "BP",   GET_ALU_BP).formatstr("%08X");
+//	state_add( AM29000_FC,   "FC",   GET_ALU_FC).formatstr("%08X");
+//	state_add( AM29000_CR,   "CR",   GET_CHC_CR).formatstr("%08X");
+	state_add( AM29000_FPE,  "FPE",  m_fpe    ).formatstr("%08X");
+	state_add( AM29000_INTE, "INTE", m_inte   ).formatstr("%08X");
+	state_add( AM29000_FPS,  "FPS",  m_fps    ).formatstr("%08X");
+	state_add( AM29000_R1,   "R1",   m_r[1]   ).formatstr("%08X");
+	state_add( AM29000_R64,  "R64",  m_r[64]  ).formatstr("%08X");
+	state_add( AM29000_R65,  "R65",  m_r[65]  ).formatstr("%08X");
+	state_add( AM29000_R66,  "R66",  m_r[66]  ).formatstr("%08X");
+	state_add( AM29000_R67,  "R67",  m_r[67]  ).formatstr("%08X");
+	state_add( AM29000_R68,  "R68",  m_r[68]  ).formatstr("%08X");
+	state_add( AM29000_R69,  "R69",  m_r[69]  ).formatstr("%08X");
+	state_add( AM29000_R70,  "R70",  m_r[70]  ).formatstr("%08X");
+	state_add( AM29000_R71,  "R71",  m_r[71]  ).formatstr("%08X");
+	state_add( AM29000_R72,  "R72",  m_r[72]  ).formatstr("%08X");
+	state_add( AM29000_R73,  "R73",  m_r[73]  ).formatstr("%08X");
+	state_add( AM29000_R74,  "R74",  m_r[74]  ).formatstr("%08X");
+	state_add( AM29000_R75,  "R75",  m_r[75]  ).formatstr("%08X");
+	state_add( AM29000_R76,  "R76",  m_r[76]  ).formatstr("%08X");
+	state_add( AM29000_R77,  "R77",  m_r[77]  ).formatstr("%08X");
+	state_add( AM29000_R78,  "R78",  m_r[78]  ).formatstr("%08X");
+	state_add( AM29000_R79,  "R79",  m_r[79]  ).formatstr("%08X");
+	state_add( AM29000_R80,  "R80",  m_r[80]  ).formatstr("%08X");
+	state_add( AM29000_R81,  "R81",  m_r[81]  ).formatstr("%08X");
+	state_add( AM29000_R82,  "R82",  m_r[82]  ).formatstr("%08X");
+	state_add( AM29000_R83,  "R83",  m_r[83]  ).formatstr("%08X");
+	state_add( AM29000_R84,  "R84",  m_r[84]  ).formatstr("%08X");
+	state_add( AM29000_R85,  "R85",  m_r[85]  ).formatstr("%08X");
+	state_add( AM29000_R86,  "R86",  m_r[86]  ).formatstr("%08X");
+	state_add( AM29000_R87,  "R87",  m_r[87]  ).formatstr("%08X");
+	state_add( AM29000_R88,  "R88",  m_r[88]  ).formatstr("%08X");
+	state_add( AM29000_R89,  "R89",  m_r[89]  ).formatstr("%08X");
+	state_add( AM29000_R90,  "R90",  m_r[90]  ).formatstr("%08X");
+	state_add( AM29000_R91,  "R91",  m_r[91]  ).formatstr("%08X");
+	state_add( AM29000_R92,  "R92",  m_r[92]  ).formatstr("%08X");
+	state_add( AM29000_R93,  "R93",  m_r[93]  ).formatstr("%08X");
+	state_add( AM29000_R94,  "R94",  m_r[94]  ).formatstr("%08X");
+	state_add( AM29000_R95,  "R95",  m_r[95]  ).formatstr("%08X");
+	state_add( AM29000_R96,  "R96",  m_r[96]  ).formatstr("%08X");
+	state_add( AM29000_R97,  "R97",  m_r[97]  ).formatstr("%08X");
+	state_add( AM29000_R98,  "R98",  m_r[98]  ).formatstr("%08X");
+	state_add( AM29000_R99,  "R99",  m_r[99]  ).formatstr("%08X");
+	state_add( AM29000_R100, "R100", m_r[100] ).formatstr("%08X");
+	state_add( AM29000_R101, "R101", m_r[101] ).formatstr("%08X");
+	state_add( AM29000_R102, "R102", m_r[102] ).formatstr("%08X");
+	state_add( AM29000_R103, "R103", m_r[103] ).formatstr("%08X");
+	state_add( AM29000_R104, "R104", m_r[104] ).formatstr("%08X");
+	state_add( AM29000_R105, "R105", m_r[105] ).formatstr("%08X");
+	state_add( AM29000_R106, "R106", m_r[106] ).formatstr("%08X");
+	state_add( AM29000_R107, "R107", m_r[107] ).formatstr("%08X");
+	state_add( AM29000_R108, "R108", m_r[108] ).formatstr("%08X");
+	state_add( AM29000_R109, "R109", m_r[109] ).formatstr("%08X");
+	state_add( AM29000_R110, "R110", m_r[110] ).formatstr("%08X");
+	state_add( AM29000_R111, "R111", m_r[111] ).formatstr("%08X");
+	state_add( AM29000_R112, "R112", m_r[112] ).formatstr("%08X");
+	state_add( AM29000_R113, "R113", m_r[113] ).formatstr("%08X");
+	state_add( AM29000_R114, "R114", m_r[114] ).formatstr("%08X");
+	state_add( AM29000_R115, "R115", m_r[115] ).formatstr("%08X");
+	state_add( AM29000_R116, "R116", m_r[116] ).formatstr("%08X");
+	state_add( AM29000_R117, "R117", m_r[117] ).formatstr("%08X");
+	state_add( AM29000_R118, "R118", m_r[118] ).formatstr("%08X");
+	state_add( AM29000_R119, "R119", m_r[119] ).formatstr("%08X");
+	state_add( AM29000_R120, "R120", m_r[120] ).formatstr("%08X");
+	state_add( AM29000_R121, "R121", m_r[121] ).formatstr("%08X");
+	state_add( AM29000_R122, "R122", m_r[122] ).formatstr("%08X");
+	state_add( AM29000_R123, "R123", m_r[123] ).formatstr("%08X");
+	state_add( AM29000_R124, "R124", m_r[124] ).formatstr("%08X");
+	state_add( AM29000_R125, "R125", m_r[125] ).formatstr("%08X");
+	state_add( AM29000_R126, "R126", m_r[126] ).formatstr("%08X");
+	state_add( AM29000_R127, "R127", m_r[127] ).formatstr("%08X");
+	state_add( AM29000_R128, "R128", m_r[128] ).formatstr("%08X");
+	state_add( AM29000_R129, "R129", m_r[129] ).formatstr("%08X");
+	state_add( AM29000_R130, "R130", m_r[130] ).formatstr("%08X");
+	state_add( AM29000_R131, "R131", m_r[131] ).formatstr("%08X");
+	state_add( AM29000_R132, "R132", m_r[132] ).formatstr("%08X");
+	state_add( AM29000_R133, "R133", m_r[133] ).formatstr("%08X");
+	state_add( AM29000_R134, "R134", m_r[134] ).formatstr("%08X");
+	state_add( AM29000_R135, "R135", m_r[135] ).formatstr("%08X");
+	state_add( AM29000_R136, "R136", m_r[136] ).formatstr("%08X");
+	state_add( AM29000_R137, "R137", m_r[137] ).formatstr("%08X");
+	state_add( AM29000_R138, "R138", m_r[138] ).formatstr("%08X");
+	state_add( AM29000_R139, "R139", m_r[139] ).formatstr("%08X");
+	state_add( AM29000_R140, "R140", m_r[140] ).formatstr("%08X");
+	state_add( AM29000_R141, "R141", m_r[141] ).formatstr("%08X");
+	state_add( AM29000_R142, "R142", m_r[142] ).formatstr("%08X");
+	state_add( AM29000_R143, "R143", m_r[143] ).formatstr("%08X");
+	state_add( AM29000_R144, "R144", m_r[144] ).formatstr("%08X");
+	state_add( AM29000_R145, "R145", m_r[145] ).formatstr("%08X");
+	state_add( AM29000_R146, "R146", m_r[146] ).formatstr("%08X");
+	state_add( AM29000_R147, "R147", m_r[147] ).formatstr("%08X");
+	state_add( AM29000_R148, "R148", m_r[148] ).formatstr("%08X");
+	state_add( AM29000_R149, "R149", m_r[149] ).formatstr("%08X");
+	state_add( AM29000_R150, "R150", m_r[150] ).formatstr("%08X");
+	state_add( AM29000_R151, "R151", m_r[151] ).formatstr("%08X");
+	state_add( AM29000_R152, "R152", m_r[152] ).formatstr("%08X");
+	state_add( AM29000_R153, "R153", m_r[153] ).formatstr("%08X");
+	state_add( AM29000_R154, "R154", m_r[154] ).formatstr("%08X");
+	state_add( AM29000_R155, "R155", m_r[155] ).formatstr("%08X");
+	state_add( AM29000_R156, "R156", m_r[156] ).formatstr("%08X");
+	state_add( AM29000_R157, "R157", m_r[157] ).formatstr("%08X");
+	state_add( AM29000_R158, "R158", m_r[158] ).formatstr("%08X");
+	state_add( AM29000_R159, "R159", m_r[159] ).formatstr("%08X");
+	state_add( AM29000_R160, "R160", m_r[160] ).formatstr("%08X");
+	state_add( AM29000_R161, "R161", m_r[161] ).formatstr("%08X");
+	state_add( AM29000_R162, "R162", m_r[162] ).formatstr("%08X");
+	state_add( AM29000_R163, "R163", m_r[163] ).formatstr("%08X");
+	state_add( AM29000_R164, "R164", m_r[164] ).formatstr("%08X");
+	state_add( AM29000_R165, "R165", m_r[165] ).formatstr("%08X");
+	state_add( AM29000_R166, "R166", m_r[166] ).formatstr("%08X");
+	state_add( AM29000_R167, "R167", m_r[167] ).formatstr("%08X");
+	state_add( AM29000_R168, "R168", m_r[168] ).formatstr("%08X");
+	state_add( AM29000_R169, "R169", m_r[169] ).formatstr("%08X");
+	state_add( AM29000_R170, "R170", m_r[170] ).formatstr("%08X");
+	state_add( AM29000_R171, "R171", m_r[171] ).formatstr("%08X");
+	state_add( AM29000_R172, "R172", m_r[172] ).formatstr("%08X");
+	state_add( AM29000_R173, "R173", m_r[173] ).formatstr("%08X");
+	state_add( AM29000_R174, "R174", m_r[174] ).formatstr("%08X");
+	state_add( AM29000_R175, "R175", m_r[175] ).formatstr("%08X");
+	state_add( AM29000_R176, "R176", m_r[176] ).formatstr("%08X");
+	state_add( AM29000_R177, "R177", m_r[177] ).formatstr("%08X");
+	state_add( AM29000_R178, "R178", m_r[178] ).formatstr("%08X");
+	state_add( AM29000_R179, "R179", m_r[179] ).formatstr("%08X");
+	state_add( AM29000_R180, "R180", m_r[180] ).formatstr("%08X");
+	state_add( AM29000_R181, "R181", m_r[181] ).formatstr("%08X");
+	state_add( AM29000_R182, "R182", m_r[182] ).formatstr("%08X");
+	state_add( AM29000_R183, "R183", m_r[183] ).formatstr("%08X");
+	state_add( AM29000_R184, "R184", m_r[184] ).formatstr("%08X");
+	state_add( AM29000_R185, "R185", m_r[185] ).formatstr("%08X");
+	state_add( AM29000_R186, "R186", m_r[186] ).formatstr("%08X");
+	state_add( AM29000_R187, "R187", m_r[187] ).formatstr("%08X");
+	state_add( AM29000_R188, "R188", m_r[188] ).formatstr("%08X");
+	state_add( AM29000_R189, "R189", m_r[189] ).formatstr("%08X");
+	state_add( AM29000_R190, "R190", m_r[190] ).formatstr("%08X");
+	state_add( AM29000_R191, "R191", m_r[191] ).formatstr("%08X");
+	state_add( AM29000_R192, "R192", m_r[192] ).formatstr("%08X");
+	state_add( AM29000_R193, "R193", m_r[193] ).formatstr("%08X");
+	state_add( AM29000_R194, "R194", m_r[194] ).formatstr("%08X");
+	state_add( AM29000_R195, "R195", m_r[195] ).formatstr("%08X");
+	state_add( AM29000_R196, "R196", m_r[196] ).formatstr("%08X");
+	state_add( AM29000_R197, "R197", m_r[197] ).formatstr("%08X");
+	state_add( AM29000_R198, "R198", m_r[198] ).formatstr("%08X");
+	state_add( AM29000_R199, "R199", m_r[199] ).formatstr("%08X");
+	state_add( AM29000_R200, "R200", m_r[200] ).formatstr("%08X");
+	state_add( AM29000_R201, "R201", m_r[201] ).formatstr("%08X");
+	state_add( AM29000_R202, "R202", m_r[202] ).formatstr("%08X");
+	state_add( AM29000_R203, "R203", m_r[203] ).formatstr("%08X");
+	state_add( AM29000_R204, "R204", m_r[204] ).formatstr("%08X");
+	state_add( AM29000_R205, "R205", m_r[205] ).formatstr("%08X");
+	state_add( AM29000_R206, "R206", m_r[206] ).formatstr("%08X");
+	state_add( AM29000_R207, "R207", m_r[207] ).formatstr("%08X");
+	state_add( AM29000_R208, "R208", m_r[208] ).formatstr("%08X");
+	state_add( AM29000_R209, "R209", m_r[209] ).formatstr("%08X");
+	state_add( AM29000_R210, "R210", m_r[210] ).formatstr("%08X");
+	state_add( AM29000_R211, "R211", m_r[211] ).formatstr("%08X");
+	state_add( AM29000_R212, "R212", m_r[212] ).formatstr("%08X");
+	state_add( AM29000_R213, "R213", m_r[213] ).formatstr("%08X");
+	state_add( AM29000_R214, "R214", m_r[214] ).formatstr("%08X");
+	state_add( AM29000_R215, "R215", m_r[215] ).formatstr("%08X");
+	state_add( AM29000_R216, "R216", m_r[216] ).formatstr("%08X");
+	state_add( AM29000_R217, "R217", m_r[217] ).formatstr("%08X");
+	state_add( AM29000_R218, "R218", m_r[218] ).formatstr("%08X");
+	state_add( AM29000_R219, "R219", m_r[219] ).formatstr("%08X");
+	state_add( AM29000_R220, "R220", m_r[220] ).formatstr("%08X");
+	state_add( AM29000_R221, "R221", m_r[221] ).formatstr("%08X");
+	state_add( AM29000_R222, "R222", m_r[222] ).formatstr("%08X");
+	state_add( AM29000_R223, "R223", m_r[223] ).formatstr("%08X");
+	state_add( AM29000_R224, "R224", m_r[224] ).formatstr("%08X");
+	state_add( AM29000_R225, "R225", m_r[225] ).formatstr("%08X");
+	state_add( AM29000_R226, "R226", m_r[226] ).formatstr("%08X");
+	state_add( AM29000_R227, "R227", m_r[227] ).formatstr("%08X");
+	state_add( AM29000_R228, "R228", m_r[228] ).formatstr("%08X");
+	state_add( AM29000_R229, "R229", m_r[229] ).formatstr("%08X");
+	state_add( AM29000_R230, "R230", m_r[230] ).formatstr("%08X");
+	state_add( AM29000_R231, "R231", m_r[231] ).formatstr("%08X");
+	state_add( AM29000_R232, "R232", m_r[232] ).formatstr("%08X");
+	state_add( AM29000_R233, "R233", m_r[233] ).formatstr("%08X");
+	state_add( AM29000_R234, "R234", m_r[234] ).formatstr("%08X");
+	state_add( AM29000_R235, "R235", m_r[235] ).formatstr("%08X");
+	state_add( AM29000_R236, "R236", m_r[236] ).formatstr("%08X");
+	state_add( AM29000_R237, "R237", m_r[237] ).formatstr("%08X");
+	state_add( AM29000_R238, "R238", m_r[238] ).formatstr("%08X");
+	state_add( AM29000_R239, "R239", m_r[239] ).formatstr("%08X");
+	state_add( AM29000_R240, "R240", m_r[240] ).formatstr("%08X");
+	state_add( AM29000_R241, "R241", m_r[241] ).formatstr("%08X");
+	state_add( AM29000_R242, "R242", m_r[242] ).formatstr("%08X");
+	state_add( AM29000_R243, "R243", m_r[243] ).formatstr("%08X");
+	state_add( AM29000_R244, "R244", m_r[244] ).formatstr("%08X");
+	state_add( AM29000_R245, "R245", m_r[245] ).formatstr("%08X");
+	state_add( AM29000_R246, "R246", m_r[246] ).formatstr("%08X");
+	state_add( AM29000_R247, "R247", m_r[247] ).formatstr("%08X");
+	state_add( AM29000_R248, "R248", m_r[248] ).formatstr("%08X");
+	state_add( AM29000_R249, "R249", m_r[249] ).formatstr("%08X");
+	state_add( AM29000_R250, "R250", m_r[250] ).formatstr("%08X");
+	state_add( AM29000_R251, "R251", m_r[251] ).formatstr("%08X");
+	state_add( AM29000_R252, "R252", m_r[252] ).formatstr("%08X");
+	state_add( AM29000_R253, "R253", m_r[253] ).formatstr("%08X");
+	state_add( AM29000_R254, "R254", m_r[254] ).formatstr("%08X");
+	state_add( AM29000_R255, "R255", m_r[255] ).formatstr("%08X");
+
+	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%08X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_alu).formatstr("%13s").noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_RESET( am29000 )
+
+void am29000_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	am29000_state *am29000 = get_safe_token(device);
-
-	am29000->cps = CPS_FZ | CPS_RE | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA;
-	am29000->cfg &= ~(CFG_DW | CFG_CD);
-	am29000->chc &= ~CHC_CV;
-
-	am29000->pc = 0;
-	am29000->next_pl_flags = 0;
-	am29000->exceptions = 0;
-	am29000->irq_lines = 0;
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
+			                                        m_alu & ALU_Z ? 'Z' : '.',
+			                                        m_alu & ALU_N ? 'N' : '.',
+			                                        m_alu & ALU_C ? 'C' : '.',
+			                                        m_cps & CPS_IP ? 'I' : '.',
+			                                        m_cps & CPS_FZ ? 'F' : '.',
+			                                        m_cps & CPS_SM ? 'S' : 'U',
+			                                        m_cps & CPS_DI ? 'I' : '.',
+			                                        m_cps & CPS_DA ? 'D' : '.',
+			                                        (m_r[1] >> 2) & 0x7f);
+			break;
+	}
 }
 
 
-static CPU_EXIT( am29000 )
+void am29000_cpu_device::device_reset()
 {
+	memset( m_r, 0, sizeof(m_r) );
+	memset( m_tlb, 0, sizeof(m_tlb) );
+	m_vab = 0;
+	m_ops = 0;
+	m_cha = 0;
+	m_chd = 0;
+	m_chc = 0;
+	m_rbp = 0;
+	m_tmc = 0;
+	m_tmr = 0;
+	m_pc0 = 0;
+	m_pc1 = 0;
+	m_pc2 = 0;
+	m_mmu = 0;
+	m_lru = 0;
+	m_ipc = 0;
+	m_ipa = 0;
+	m_ipb = 0;
+	m_q = 0;
+	m_alu = 0;
+	m_fpe = 0;
+	m_inte = 0;
+	m_fps = 0;
+	memset( m_exception_queue, 0, sizeof( m_exception_queue) );;
+	m_irq_active = 0;
+	m_irq_lines = 0;
+	m_exec_ir = 0;
+	m_next_ir = 0;
+	m_pl_flags = 0;
+	m_iret_pc = 0;
+	m_exec_pc = 0;
+	m_next_pc = 0;
+
+	m_cps = CPS_FZ | CPS_RE | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA;
+	m_cfg &= ~(CFG_DW | CFG_CD);
+	m_chc &= ~CHC_CV;
+
+	m_pc = 0;
+	m_next_pl_flags = 0;
+	m_exceptions = 0;
+	m_irq_lines = 0;
 }
 
 
-static void signal_exception(am29000_state *am29000, UINT32 type)
+void am29000_cpu_device::signal_exception(UINT32 type)
 {
-	am29000->exception_queue[am29000->exceptions++] = type;
+	m_exception_queue[m_exceptions++] = type;
 }
 
-static void external_irq_check(am29000_state *am29000)
+
+void am29000_cpu_device::external_irq_check()
 {
-	int mask = (am29000->cps >> CPS_IM_SHIFT) & CPS_IM_MASK;
-	int irq_en = !(am29000->cps & CPS_DI) && !(am29000->cps & CPS_DA);
+	int mask = (m_cps >> CPS_IM_SHIFT) & CPS_IM_MASK;
+	int irq_en = !(m_cps & CPS_DI) && !(m_cps & CPS_DA);
 	int i;
 
 	/* Clear interrupt pending bit to begin with */
-	am29000->cps &= ~CPS_IP;
+	m_cps &= ~CPS_IP;
 
 	for (i = 0; i < 4; ++i)
 	{
-		if (!(am29000->irq_active & (1 << i)) && (am29000->irq_lines & (1 << i)))
+		if (!(m_irq_active & (1 << i)) && (m_irq_lines & (1 << i)))
 		{
 			if (irq_en)
 			{
 				if (i <= mask)
 				{
-					am29000->irq_active |= (1 << i);
-					SIGNAL_EXCEPTION(EXCEPTION_INTR0 + i);
-					am29000->pl_flags |= PFLAG_IRQ;
+					m_irq_active |= (1 << i);
+					signal_exception(EXCEPTION_INTR0 + i);
+					m_pl_flags |= PFLAG_IRQ;
 					return;
 				}
 			}
 			/* Set interrupt pending bit if interrupt was disabled */
-			am29000->cps |= CPS_IP;
+			m_cps |= CPS_IP;
 		}
 		else
-			am29000->irq_active &= ~(1 << i);
+			m_irq_active &= ~(1 << i);
 	}
 }
 
-static UINT32 read_program_word(am29000_state *state, UINT32 address)
+
+UINT32 am29000_cpu_device::read_program_word(UINT32 address)
 {
 	/* TODO: ROM enable? */
-	if (state->cps & CPS_PI || state->cps & CPS_RE)
-		return state->direct->read_decrypted_dword(address);
+	if (m_cps & CPS_PI || m_cps & CPS_RE)
+		return m_direct->read_decrypted_dword(address);
 	else
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!\n");
@@ -282,12 +491,12 @@ static UINT32 read_program_word(am29000_state *state, UINT32 address)
     HELPER FUNCTIONS
 ***************************************************************************/
 
-INLINE UINT32 get_abs_reg(am29000_state *am29000, UINT8 r, UINT32 iptr)
+UINT32 am29000_cpu_device::get_abs_reg(UINT8 r, UINT32 iptr)
 {
 	if (r & 0x80)
 	{
 		/* Stack pointer access */
-		r = ((am29000->r[1] >> 2) & 0x7f) + (r & 0x7f);
+		r = ((m_r[1] >> 2) & 0x7f) + (r & 0x7f);
 		r |= 0x80;
 	}
 	else if (r == 0)
@@ -314,22 +523,22 @@ INLINE UINT32 get_abs_reg(am29000_state *am29000, UINT8 r, UINT32 iptr)
     PIPELINE STAGES
 ***************************************************************************/
 
-INLINE void fetch_decode(am29000_state *am29000)
+void am29000_cpu_device::fetch_decode()
 {
 	UINT32 inst;
-	op_info op;
+	UINT32 op_flags;
 
-	inst = read_program_word(am29000, am29000->pc);
-	am29000->next_ir = inst;
+	inst = read_program_word(m_pc);
+	m_next_ir = inst;
 
-	op = op_table[inst >> 24];
+	op_flags = op_table[inst >> 24].flags;
 
 	/* Illegal instruction */
 	/* TODO: This should be checked at this point */
 #if 0
-	if (op.flags & IFLAG_ILLEGAL)
+	if (op_flags & IFLAG_ILLEGAL)
 	{
-		fatalerror("Illegal instruction: %x PC:%x PC0:%x PC1:%x\n", inst, am29000->pc, am29000->pc0, am29000->pc1);
+		fatalerror("Illegal instruction: %x PC:%x PC0:%x PC1:%x\n", inst, m_pc, m_pc0, m_pc1);
 		SIGNAL_EXCEPTION(EXCEPTION_ILLEGAL_OPCODE);
 		return;
 	}
@@ -338,13 +547,13 @@ INLINE void fetch_decode(am29000_state *am29000)
 	/* Privledge violations */
 	if (USER_MODE)
 	{
-		if ((op.flags & IFLAG_SUPERVISOR_ONLY))
+		if ((op_flags & IFLAG_SUPERVISOR_ONLY))
 		{
-			SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
+			signal_exception(EXCEPTION_PROTECTION_VIOLATION);
 			return;
 		}
 
-		if ((op.flags & IFLAG_SPR_ACCESS))
+		if ((op_flags & IFLAG_SPR_ACCESS))
 		{
 			/* TODO: Is this the right place to check this? */
 			if (INST_SA_FIELD(inst) < 128)
@@ -355,861 +564,116 @@ INLINE void fetch_decode(am29000_state *am29000)
 		}
 
 		/* Register bank protection */
-		if ((op.flags & IFLAG_RA_PRESENT) && REGISTER_IS_PROTECTED(INST_RA_FIELD(inst)))
+		if ((op_flags & IFLAG_RA_PRESENT) && REGISTER_IS_PROTECTED(INST_RA_FIELD(inst)))
 		{
 			SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
 			return;
 		}
 
-		if ((op.flags & IFLAG_RB_PRESENT) && REGISTER_IS_PROTECTED(INST_RB_FIELD(inst)))
+		if ((op_flags & IFLAG_RB_PRESENT) && REGISTER_IS_PROTECTED(INST_RB_FIELD(inst)))
 		{
 			SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
 			return;
 		}
 
-		if ((op.flags & IFLAG_RC_PRESENT) && REGISTER_IS_PROTECTED(INST_RC_FIELD(inst)))
+		if ((op_flags & IFLAG_RC_PRESENT) && REGISTER_IS_PROTECTED(INST_RC_FIELD(inst)))
 		{
 			SIGNAL_EXCEPTION(EXCEPTION_PROTECTION_VIOLATION);
 			return;
 		}
 	}
 
-	if (am29000->pl_flags & PFLAG_IRET)
-		am29000->next_pc = am29000->iret_pc;
+	if (m_pl_flags & PFLAG_IRET)
+		m_next_pc = m_iret_pc;
 	else
-		am29000->next_pc += 4;
+		m_next_pc += 4;
 }
 
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static CPU_EXECUTE( am29000 )
+void am29000_cpu_device::execute_run()
 {
-	am29000_state *am29000 = get_safe_token(device);
-	UINT32 call_debugger = (device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	UINT32 call_debugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
 
-	external_irq_check(am29000);
+	external_irq_check();
 
 	do
 	{
-		am29000->next_pl_flags = PFLAG_EXECUTE_EN;
+		m_next_pl_flags = PFLAG_EXECUTE_EN;
 
 		if (!FREEZE_MODE)
 		{
-			am29000->pc1 = am29000->pc0;
-			am29000->pc0 = am29000->pc;
+			m_pc1 = m_pc0;
+			m_pc0 = m_pc;
 		}
 
-		if (am29000->exceptions)
+		if (m_exceptions)
 		{
-			am29000->ops = am29000->cps;
-			am29000->cps &= ~(CPS_TE | CPS_TP | CPS_TU | CPS_FZ | CPS_LK | CPS_WM | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA);
-			am29000->cps |= (CPS_FZ | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA);
+			m_ops = m_cps;
+			m_cps &= ~(CPS_TE | CPS_TP | CPS_TU | CPS_FZ | CPS_LK | CPS_WM | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA);
+			m_cps |= (CPS_FZ | CPS_PD | CPS_PI | CPS_SM | CPS_DI | CPS_DA);
 
-			if (am29000->pl_flags & PFLAG_IRET)
+			if (m_pl_flags & PFLAG_IRET)
 			{
-				am29000->pc0 = am29000->iret_pc;
-				am29000->pc1 = am29000->next_pc;
+				m_pc0 = m_iret_pc;
+				m_pc1 = m_next_pc;
 			}
 
 
-			if (am29000->cfg & CFG_VF)
+			if (m_cfg & CFG_VF)
 			{
-				UINT32 vaddr = am29000->vab | am29000->exception_queue[0] * 4;
-				UINT32 vect = am29000->datadirect->read_decrypted_dword(vaddr);
+				UINT32 vaddr = m_vab | m_exception_queue[0] * 4;
+				UINT32 vect = m_datadirect->read_decrypted_dword(vaddr);
 
-				am29000->pc = vect & ~3;
-				am29000->next_pc = am29000->pc;
+				m_pc = vect & ~3;
+				m_next_pc = m_pc;
 			}
 			else
 			{
 				fatalerror("Am29000: Non vectored interrupt fetch!\n");
 			}
 
-			am29000->exceptions = 0;
-			am29000->pl_flags = 0;
+			m_exceptions = 0;
+			m_pl_flags = 0;
 		}
 
 		if (call_debugger)
-			debugger_instruction_hook(device, am29000->pc);
+			debugger_instruction_hook(this, m_pc);
 
-		fetch_decode(am29000);
+		fetch_decode();
 
-		if (am29000->pl_flags & PFLAG_EXECUTE_EN)
+		if (m_pl_flags & PFLAG_EXECUTE_EN)
 		{
 			if (!FREEZE_MODE)
-				am29000->pc2 = am29000->pc1;
+				m_pc2 = m_pc1;
 
-			op_table[am29000->exec_ir >> 24].opcode(am29000);
+			(this->*op_table[m_exec_ir >> 24].opcode)();
 		}
 
-		am29000->exec_ir = am29000->next_ir;
-		am29000->pl_flags = am29000->next_pl_flags;
-		am29000->exec_pc = am29000->pc;
-		am29000->pc = am29000->next_pc;
-	} while (--am29000->icount > 0);
+		m_exec_ir = m_next_ir;
+		m_pl_flags = m_next_pl_flags;
+		m_exec_pc = m_pc;
+		m_pc = m_next_pc;
+	} while (--m_icount > 0);
 }
 
-static void set_irq_line(am29000_state *am29000, int line, int state)
+
+void am29000_cpu_device::execute_set_input(int inputnum, int state)
 {
 	if (state)
-		am29000->irq_lines |= (1 << line);
+		m_irq_lines |= (1 << inputnum);
 	else
-		am29000->irq_lines &= ~(1 << line);
+		m_irq_lines &= ~(1 << inputnum);
 
 	// TODO : CHECK IRQs
 }
 
-/***************************************************************************
-    DISASSEMBLY HOOK
-***************************************************************************/
 
-extern CPU_DISASSEMBLE( am29000 );
-
-
-static CPU_SET_INFO( am29000 )
+offs_t am29000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	am29000_state *am29000 = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + AM29000_INTR0:   set_irq_line(am29000, AM29000_INTR0, info->i);      break;
-		case CPUINFO_INT_INPUT_STATE + AM29000_INTR1:   set_irq_line(am29000, AM29000_INTR1, info->i);      break;
-		case CPUINFO_INT_INPUT_STATE + AM29000_INTR2:   set_irq_line(am29000, AM29000_INTR2, info->i);      break;
-		case CPUINFO_INT_INPUT_STATE + AM29000_INTR3:   set_irq_line(am29000, AM29000_INTR3, info->i);      break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + AM29000_PC:     am29000->pc = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_VAB:    am29000->vab = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_OPS:    am29000->ops = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_CPS:    am29000->cps = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_CFG:    am29000->cfg = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_CHA:    am29000->cha = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_CHD:    am29000->chd = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_CHC:    am29000->chc = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_RBP:    am29000->rbp = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_TMC:    am29000->tmc = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_TMR:    am29000->tmr = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_PC0:    am29000->pc0 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_PC1:    am29000->pc1 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_PC2:    am29000->pc2 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_MMU:    am29000->mmu = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_LRU:    am29000->lru = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_IPC:    am29000->ipc = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_IPA:    am29000->ipa = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_IPB:    am29000->ipb = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_Q:      am29000->q = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_ALU:    am29000->alu = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_BP:     SET_ALU_BP(info->i);                            break;
-		case CPUINFO_INT_REGISTER + AM29000_FC:     SET_ALU_FC(info->i);                            break;
-		case CPUINFO_INT_REGISTER + AM29000_CR:     SET_CHC_CR(info->i);                            break;
-		case CPUINFO_INT_REGISTER + AM29000_FPE:    am29000->fpe = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_INTE:   am29000->inte = info->i;                        break;
-		case CPUINFO_INT_REGISTER + AM29000_FPS:    am29000->fps = info->i;                         break;
-		case CPUINFO_INT_REGISTER + AM29000_R1:     am29000->r[1] = info->i;                            break;
-		case CPUINFO_INT_REGISTER + AM29000_R64:    am29000->r[64] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R65:    am29000->r[65] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R66:    am29000->r[66] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R67:    am29000->r[67] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R68:    am29000->r[68] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R69:    am29000->r[69] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R70:    am29000->r[70] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R71:    am29000->r[71] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R72:    am29000->r[72] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R73:    am29000->r[73] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R74:    am29000->r[74] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R75:    am29000->r[75] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R76:    am29000->r[76] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R77:    am29000->r[77] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R78:    am29000->r[78] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R79:    am29000->r[79] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R80:    am29000->r[80] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R81:    am29000->r[81] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R82:    am29000->r[82] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R83:    am29000->r[83] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R84:    am29000->r[84] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R85:    am29000->r[85] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R86:    am29000->r[86] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R87:    am29000->r[87] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R88:    am29000->r[88] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R89:    am29000->r[89] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R90:    am29000->r[90] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R91:    am29000->r[91] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R92:    am29000->r[92] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R93:    am29000->r[93] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R94:    am29000->r[94] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R95:    am29000->r[95] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R96:    am29000->r[96] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R97:    am29000->r[97] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R98:    am29000->r[98] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R99:    am29000->r[99] = info->i;                           break;
-		case CPUINFO_INT_REGISTER + AM29000_R100:   am29000->r[100] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R101:   am29000->r[101] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R102:   am29000->r[102] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R103:   am29000->r[103] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R104:   am29000->r[104] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R105:   am29000->r[105] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R106:   am29000->r[106] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R107:   am29000->r[107] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R108:   am29000->r[108] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R109:   am29000->r[109] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R110:   am29000->r[110] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R111:   am29000->r[111] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R112:   am29000->r[112] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R113:   am29000->r[113] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R114:   am29000->r[114] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R115:   am29000->r[115] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R116:   am29000->r[116] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R117:   am29000->r[117] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R118:   am29000->r[118] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R119:   am29000->r[119] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R120:   am29000->r[120] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R121:   am29000->r[121] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R122:   am29000->r[122] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R123:   am29000->r[123] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R124:   am29000->r[124] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R125:   am29000->r[125] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R126:   am29000->r[126] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R127:   am29000->r[127] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R128:   am29000->r[128] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R129:   am29000->r[129] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R130:   am29000->r[130] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R131:   am29000->r[131] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R132:   am29000->r[132] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R133:   am29000->r[133] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R134:   am29000->r[134] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R135:   am29000->r[135] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R136:   am29000->r[136] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R137:   am29000->r[137] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R138:   am29000->r[138] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R139:   am29000->r[139] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R140:   am29000->r[140] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R141:   am29000->r[141] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R142:   am29000->r[142] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R143:   am29000->r[143] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R144:   am29000->r[144] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R145:   am29000->r[145] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R146:   am29000->r[146] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R147:   am29000->r[147] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R148:   am29000->r[148] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R149:   am29000->r[149] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R150:   am29000->r[150] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R151:   am29000->r[151] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R152:   am29000->r[152] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R153:   am29000->r[153] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R154:   am29000->r[154] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R155:   am29000->r[155] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R156:   am29000->r[156] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R157:   am29000->r[157] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R158:   am29000->r[158] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R159:   am29000->r[159] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R160:   am29000->r[160] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R161:   am29000->r[161] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R162:   am29000->r[162] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R163:   am29000->r[163] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R164:   am29000->r[164] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R165:   am29000->r[165] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R166:   am29000->r[166] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R167:   am29000->r[167] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R168:   am29000->r[168] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R169:   am29000->r[169] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R170:   am29000->r[170] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R171:   am29000->r[171] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R172:   am29000->r[172] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R173:   am29000->r[173] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R174:   am29000->r[174] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R175:   am29000->r[175] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R176:   am29000->r[176] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R177:   am29000->r[177] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R178:   am29000->r[178] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R179:   am29000->r[179] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R180:   am29000->r[180] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R181:   am29000->r[181] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R182:   am29000->r[182] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R183:   am29000->r[183] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R184:   am29000->r[184] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R185:   am29000->r[185] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R186:   am29000->r[186] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R187:   am29000->r[187] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R188:   am29000->r[188] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R189:   am29000->r[189] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R190:   am29000->r[190] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R191:   am29000->r[191] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R192:   am29000->r[192] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R193:   am29000->r[193] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R194:   am29000->r[194] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R195:   am29000->r[195] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R196:   am29000->r[196] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R197:   am29000->r[197] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R198:   am29000->r[198] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R199:   am29000->r[199] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R200:   am29000->r[200] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R201:   am29000->r[201] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R202:   am29000->r[202] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R203:   am29000->r[203] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R204:   am29000->r[204] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R205:   am29000->r[205] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R206:   am29000->r[206] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R207:   am29000->r[207] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R208:   am29000->r[208] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R209:   am29000->r[209] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R210:   am29000->r[210] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R211:   am29000->r[211] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R212:   am29000->r[212] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R213:   am29000->r[213] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R214:   am29000->r[214] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R215:   am29000->r[215] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R216:   am29000->r[216] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R217:   am29000->r[217] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R218:   am29000->r[218] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R219:   am29000->r[219] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R220:   am29000->r[220] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R221:   am29000->r[221] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R222:   am29000->r[222] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R223:   am29000->r[223] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R224:   am29000->r[224] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R225:   am29000->r[225] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R226:   am29000->r[226] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R227:   am29000->r[227] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R228:   am29000->r[228] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R229:   am29000->r[229] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R230:   am29000->r[230] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R231:   am29000->r[231] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R232:   am29000->r[232] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R233:   am29000->r[233] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R234:   am29000->r[234] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R235:   am29000->r[235] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R236:   am29000->r[236] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R237:   am29000->r[237] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R238:   am29000->r[238] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R239:   am29000->r[239] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R240:   am29000->r[240] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R241:   am29000->r[241] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R242:   am29000->r[242] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R243:   am29000->r[243] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R244:   am29000->r[244] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R245:   am29000->r[245] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R246:   am29000->r[246] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R247:   am29000->r[247] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R248:   am29000->r[248] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R249:   am29000->r[249] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R250:   am29000->r[250] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R251:   am29000->r[251] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R252:   am29000->r[252] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R253:   am29000->r[253] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R254:   am29000->r[254] = info->i;                          break;
-		case CPUINFO_INT_REGISTER + AM29000_R255:   am29000->r[255] = info->i;                          break;
-	}
+	extern CPU_DISASSEMBLE( am29000 );
+	return CPU_DISASSEMBLE_NAME(am29000)(this, buffer, pc, oprom, opram, options);
 }
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( am29000 )
-{
-	am29000_state *am29000 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(am29000_state);        break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;               break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 2;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 32;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + AM29000_PC:     info->i = am29000->pc;              break;
-		case CPUINFO_INT_REGISTER + AM29000_VAB:    info->i = am29000->vab;             break;
-		case CPUINFO_INT_REGISTER + AM29000_OPS:    info->i = am29000->ops;             break;
-		case CPUINFO_INT_REGISTER + AM29000_CPS:    info->i = am29000->cps;             break;
-		case CPUINFO_INT_REGISTER + AM29000_CFG:    info->i = am29000->cfg;             break;
-		case CPUINFO_INT_REGISTER + AM29000_CHA:    info->i = am29000->cha;             break;
-		case CPUINFO_INT_REGISTER + AM29000_CHD:    info->i = am29000->chd;             break;
-		case CPUINFO_INT_REGISTER + AM29000_CHC:    info->i = am29000->chc;             break;
-		case CPUINFO_INT_REGISTER + AM29000_RBP:    info->i = am29000->rbp;             break;
-		case CPUINFO_INT_REGISTER + AM29000_TMC:    info->i = am29000->tmc;             break;
-		case CPUINFO_INT_REGISTER + AM29000_TMR:    info->i = am29000->tmr;             break;
-		case CPUINFO_INT_REGISTER + AM29000_PC0:    info->i = am29000->pc0;             break;
-		case CPUINFO_INT_REGISTER + AM29000_PC1:    info->i = am29000->pc1;             break;
-		case CPUINFO_INT_REGISTER + AM29000_PC2:    info->i = am29000->pc2;             break;
-		case CPUINFO_INT_REGISTER + AM29000_MMU:    info->i = am29000->mmu;             break;
-		case CPUINFO_INT_REGISTER + AM29000_LRU:    info->i = am29000->lru;             break;
-		case CPUINFO_INT_REGISTER + AM29000_IPC:    info->i = am29000->ipc;             break;
-		case CPUINFO_INT_REGISTER + AM29000_IPA:    info->i = am29000->ipa;             break;
-		case CPUINFO_INT_REGISTER + AM29000_IPB:    info->i = am29000->ipb;             break;
-		case CPUINFO_INT_REGISTER + AM29000_Q:      info->i = am29000->q;               break;
-		case CPUINFO_INT_REGISTER + AM29000_ALU:    info->i = am29000->alu;             break;
-		case CPUINFO_INT_REGISTER + AM29000_BP:     info->i = GET_ALU_BP;               break;
-		case CPUINFO_INT_REGISTER + AM29000_FC:     info->i = GET_ALU_FC;               break;
-		case CPUINFO_INT_REGISTER + AM29000_CR:     info->i = GET_CHC_CR;               break;
-		case CPUINFO_INT_REGISTER + AM29000_FPE:    info->i = am29000->fpe;             break;
-		case CPUINFO_INT_REGISTER + AM29000_INTE:   info->i = am29000->inte;            break;
-		case CPUINFO_INT_REGISTER + AM29000_FPS:    info->i = am29000->fps;             break;
-		case CPUINFO_INT_REGISTER + AM29000_R1:     info->i = am29000->r[1];            break;
-		case CPUINFO_INT_REGISTER + AM29000_R64:    info->i = am29000->r[64];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R65:    info->i = am29000->r[65];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R66:    info->i = am29000->r[66];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R67:    info->i = am29000->r[67];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R68:    info->i = am29000->r[68];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R69:    info->i = am29000->r[69];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R70:    info->i = am29000->r[70];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R71:    info->i = am29000->r[71];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R72:    info->i = am29000->r[72];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R73:    info->i = am29000->r[73];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R74:    info->i = am29000->r[74];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R75:    info->i = am29000->r[75];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R76:    info->i = am29000->r[76];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R77:    info->i = am29000->r[77];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R78:    info->i = am29000->r[78];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R79:    info->i = am29000->r[79];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R80:    info->i = am29000->r[80];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R81:    info->i = am29000->r[81];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R82:    info->i = am29000->r[82];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R83:    info->i = am29000->r[83];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R84:    info->i = am29000->r[84];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R85:    info->i = am29000->r[85];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R86:    info->i = am29000->r[86];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R87:    info->i = am29000->r[87];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R88:    info->i = am29000->r[88];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R89:    info->i = am29000->r[89];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R90:    info->i = am29000->r[90];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R91:    info->i = am29000->r[91];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R92:    info->i = am29000->r[92];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R93:    info->i = am29000->r[93];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R94:    info->i = am29000->r[94];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R95:    info->i = am29000->r[95];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R96:    info->i = am29000->r[96];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R97:    info->i = am29000->r[97];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R98:    info->i = am29000->r[98];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R99:    info->i = am29000->r[99];           break;
-		case CPUINFO_INT_REGISTER + AM29000_R100:   info->i = am29000->r[100];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R101:   info->i = am29000->r[101];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R102:   info->i = am29000->r[102];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R103:   info->i = am29000->r[103];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R104:   info->i = am29000->r[104];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R105:   info->i = am29000->r[105];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R106:   info->i = am29000->r[106];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R107:   info->i = am29000->r[107];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R108:   info->i = am29000->r[108];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R109:   info->i = am29000->r[109];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R110:   info->i = am29000->r[110];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R111:   info->i = am29000->r[111];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R112:   info->i = am29000->r[112];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R113:   info->i = am29000->r[113];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R114:   info->i = am29000->r[114];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R115:   info->i = am29000->r[115];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R116:   info->i = am29000->r[116];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R117:   info->i = am29000->r[117];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R118:   info->i = am29000->r[118];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R119:   info->i = am29000->r[119];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R120:   info->i = am29000->r[120];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R121:   info->i = am29000->r[121];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R122:   info->i = am29000->r[122];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R123:   info->i = am29000->r[123];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R124:   info->i = am29000->r[124];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R125:   info->i = am29000->r[125];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R126:   info->i = am29000->r[126];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R127:   info->i = am29000->r[127];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R128:   info->i = am29000->r[128];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R129:   info->i = am29000->r[129];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R130:   info->i = am29000->r[130];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R131:   info->i = am29000->r[131];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R132:   info->i = am29000->r[132];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R133:   info->i = am29000->r[133];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R134:   info->i = am29000->r[134];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R135:   info->i = am29000->r[135];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R136:   info->i = am29000->r[136];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R137:   info->i = am29000->r[137];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R138:   info->i = am29000->r[138];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R139:   info->i = am29000->r[139];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R140:   info->i = am29000->r[140];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R141:   info->i = am29000->r[141];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R142:   info->i = am29000->r[142];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R143:   info->i = am29000->r[143];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R144:   info->i = am29000->r[144];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R145:   info->i = am29000->r[145];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R146:   info->i = am29000->r[146];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R147:   info->i = am29000->r[147];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R148:   info->i = am29000->r[148];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R149:   info->i = am29000->r[149];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R150:   info->i = am29000->r[150];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R151:   info->i = am29000->r[151];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R152:   info->i = am29000->r[152];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R153:   info->i = am29000->r[153];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R154:   info->i = am29000->r[154];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R155:   info->i = am29000->r[155];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R156:   info->i = am29000->r[156];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R157:   info->i = am29000->r[157];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R158:   info->i = am29000->r[158];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R159:   info->i = am29000->r[159];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R160:   info->i = am29000->r[160];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R161:   info->i = am29000->r[161];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R162:   info->i = am29000->r[162];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R163:   info->i = am29000->r[163];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R164:   info->i = am29000->r[164];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R165:   info->i = am29000->r[165];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R166:   info->i = am29000->r[166];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R167:   info->i = am29000->r[167];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R168:   info->i = am29000->r[168];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R169:   info->i = am29000->r[169];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R170:   info->i = am29000->r[170];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R171:   info->i = am29000->r[171];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R172:   info->i = am29000->r[172];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R173:   info->i = am29000->r[173];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R174:   info->i = am29000->r[174];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R175:   info->i = am29000->r[175];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R176:   info->i = am29000->r[176];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R177:   info->i = am29000->r[177];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R178:   info->i = am29000->r[178];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R179:   info->i = am29000->r[179];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R180:   info->i = am29000->r[180];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R181:   info->i = am29000->r[181];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R182:   info->i = am29000->r[182];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R183:   info->i = am29000->r[183];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R184:   info->i = am29000->r[184];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R185:   info->i = am29000->r[185];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R186:   info->i = am29000->r[186];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R187:   info->i = am29000->r[187];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R188:   info->i = am29000->r[188];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R189:   info->i = am29000->r[189];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R190:   info->i = am29000->r[190];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R191:   info->i = am29000->r[191];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R192:   info->i = am29000->r[192];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R193:   info->i = am29000->r[193];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R194:   info->i = am29000->r[194];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R195:   info->i = am29000->r[195];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R196:   info->i = am29000->r[196];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R197:   info->i = am29000->r[197];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R198:   info->i = am29000->r[198];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R199:   info->i = am29000->r[199];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R200:   info->i = am29000->r[200];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R201:   info->i = am29000->r[201];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R202:   info->i = am29000->r[202];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R203:   info->i = am29000->r[203];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R204:   info->i = am29000->r[204];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R205:   info->i = am29000->r[205];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R206:   info->i = am29000->r[206];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R207:   info->i = am29000->r[207];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R208:   info->i = am29000->r[208];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R209:   info->i = am29000->r[209];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R210:   info->i = am29000->r[210];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R211:   info->i = am29000->r[211];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R212:   info->i = am29000->r[212];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R213:   info->i = am29000->r[213];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R214:   info->i = am29000->r[214];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R215:   info->i = am29000->r[215];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R216:   info->i = am29000->r[216];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R217:   info->i = am29000->r[217];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R218:   info->i = am29000->r[218];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R219:   info->i = am29000->r[219];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R220:   info->i = am29000->r[220];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R221:   info->i = am29000->r[221];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R222:   info->i = am29000->r[222];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R223:   info->i = am29000->r[223];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R224:   info->i = am29000->r[224];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R225:   info->i = am29000->r[225];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R226:   info->i = am29000->r[226];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R227:   info->i = am29000->r[227];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R228:   info->i = am29000->r[228];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R229:   info->i = am29000->r[229];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R230:   info->i = am29000->r[230];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R231:   info->i = am29000->r[231];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R232:   info->i = am29000->r[232];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R233:   info->i = am29000->r[233];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R234:   info->i = am29000->r[234];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R235:   info->i = am29000->r[235];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R236:   info->i = am29000->r[236];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R237:   info->i = am29000->r[237];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R238:   info->i = am29000->r[238];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R239:   info->i = am29000->r[239];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R240:   info->i = am29000->r[240];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R241:   info->i = am29000->r[241];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R242:   info->i = am29000->r[242];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R243:   info->i = am29000->r[243];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R244:   info->i = am29000->r[244];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R245:   info->i = am29000->r[245];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R246:   info->i = am29000->r[246];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R247:   info->i = am29000->r[247];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R248:   info->i = am29000->r[248];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R249:   info->i = am29000->r[249];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R250:   info->i = am29000->r[250];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R251:   info->i = am29000->r[251];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R252:   info->i = am29000->r[252];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R253:   info->i = am29000->r[253];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R254:   info->i = am29000->r[254];          break;
-		case CPUINFO_INT_REGISTER + AM29000_R255:   info->i = am29000->r[255];          break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(am29000);         break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(am29000);                break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(am29000);              break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(am29000);                break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(am29000);          break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                                  break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(am29000);  break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &am29000->icount;                    break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "Am29000");                         break;
-		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "AMD Am29000");                     break;
-		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.0");                             break;
-		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                          break;
-		case CPUINFO_STR_CREDITS:                       strcpy(info->s, "Copyright Philip Bennett");        break;
-
-		case CPUINFO_STR_FLAGS:                         sprintf(info->s, "%c%c%c%c%c%c%c%c%c|%3d",  am29000->alu & ALU_V ? 'V' : '.',
-																									am29000->alu & ALU_Z ? 'Z' : '.',
-																									am29000->alu & ALU_N ? 'N' : '.',
-																									am29000->alu & ALU_C ? 'C' : '.',
-
-																									am29000->cps & CPS_IP ? 'I' : '.',
-																									am29000->cps & CPS_FZ ? 'F' : '.',
-																									am29000->cps & CPS_SM ? 'S' : 'U',
-																									am29000->cps & CPS_DI ? 'I' : '.',
-																									am29000->cps & CPS_DA ? 'D' : '.',
-																									(am29000->r[1] >> 2) & 0x7f); break;
-
-		case CPUINFO_STR_REGISTER + AM29000_PC:         sprintf(info->s, "PC: %08X", am29000->pc);          break;
-		case CPUINFO_STR_REGISTER + AM29000_VAB:        sprintf(info->s, "VAB: %08X", am29000->vab);        break;
-		case CPUINFO_STR_REGISTER + AM29000_OPS:        sprintf(info->s, "OPS: %08X", am29000->ops);        break;
-		case CPUINFO_STR_REGISTER + AM29000_CPS:        sprintf(info->s, "CPS: %08X", am29000->cps);        break;
-		case CPUINFO_STR_REGISTER + AM29000_CFG:        sprintf(info->s, "CFG: %08X", am29000->cfg);        break;
-		case CPUINFO_STR_REGISTER + AM29000_CHA:        sprintf(info->s, "CHA: %08X", am29000->cha);        break;
-		case CPUINFO_STR_REGISTER + AM29000_CHD:        sprintf(info->s, "CHD: %08X", am29000->chd);        break;
-		case CPUINFO_STR_REGISTER + AM29000_CHC:        sprintf(info->s, "CHC: %08X", am29000->chc);        break;
-		case CPUINFO_STR_REGISTER + AM29000_RBP:        sprintf(info->s, "RBP: %08X", am29000->rbp);        break;
-		case CPUINFO_STR_REGISTER + AM29000_TMC:        sprintf(info->s, "TMC: %08X", am29000->tmc);        break;
-		case CPUINFO_STR_REGISTER + AM29000_TMR:        sprintf(info->s, "TMR: %08X", am29000->tmr);        break;
-		case CPUINFO_STR_REGISTER + AM29000_PC0:        sprintf(info->s, "PC0: %08X", am29000->pc0);        break;
-		case CPUINFO_STR_REGISTER + AM29000_PC1:        sprintf(info->s, "PC1: %08X", am29000->pc1);        break;
-		case CPUINFO_STR_REGISTER + AM29000_PC2:        sprintf(info->s, "PC2: %08X", am29000->pc2);        break;
-		case CPUINFO_STR_REGISTER + AM29000_MMU:        sprintf(info->s, "MMU: %08X", am29000->mmu);        break;
-		case CPUINFO_STR_REGISTER + AM29000_LRU:        sprintf(info->s, "LRU: %08X", am29000->lru);        break;
-		case CPUINFO_STR_REGISTER + AM29000_IPC:        sprintf(info->s, "IPC: %08X", am29000->ipc);        break;
-		case CPUINFO_STR_REGISTER + AM29000_IPA:        sprintf(info->s, "IPA: %08X", am29000->ipa);        break;
-		case CPUINFO_STR_REGISTER + AM29000_IPB:        sprintf(info->s, "IPB: %08X", am29000->ipb);        break;
-		case CPUINFO_STR_REGISTER + AM29000_Q:          sprintf(info->s, "Q: %08X", am29000->q);            break;
-		case CPUINFO_STR_REGISTER + AM29000_ALU:        sprintf(info->s, "ALU: %08X", am29000->alu);        break;
-		case CPUINFO_STR_REGISTER + AM29000_BP:         sprintf(info->s, "BP: %08X", GET_ALU_BP);           break;
-		case CPUINFO_STR_REGISTER + AM29000_FC:         sprintf(info->s, "FC: %08X", GET_ALU_FC);           break;
-		case CPUINFO_STR_REGISTER + AM29000_CR:         sprintf(info->s, "CR: %08X", GET_CHC_CR);           break;
-		case CPUINFO_STR_REGISTER + AM29000_FPE:        sprintf(info->s, "FPE: %08X", am29000->fpe);        break;
-		case CPUINFO_STR_REGISTER + AM29000_INTE:       sprintf(info->s, "INTE: %08X", am29000->inte);      break;
-		case CPUINFO_STR_REGISTER + AM29000_FPS:        sprintf(info->s, "FPS: %08X", am29000->fps);        break;
-		case CPUINFO_STR_REGISTER + AM29000_R1:         sprintf(info->s, "R1: %08X", am29000->r[1]);        break;
-		case CPUINFO_STR_REGISTER + AM29000_R64:        sprintf(info->s, "R64: %08X", am29000->r[64]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R65:        sprintf(info->s, "R65: %08X", am29000->r[65]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R66:        sprintf(info->s, "R66: %08X", am29000->r[66]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R67:        sprintf(info->s, "R67: %08X", am29000->r[67]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R68:        sprintf(info->s, "R68: %08X", am29000->r[68]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R69:        sprintf(info->s, "R69: %08X", am29000->r[69]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R70:        sprintf(info->s, "R70: %08X", am29000->r[70]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R71:        sprintf(info->s, "R71: %08X", am29000->r[71]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R72:        sprintf(info->s, "R72: %08X", am29000->r[72]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R73:        sprintf(info->s, "R73: %08X", am29000->r[73]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R74:        sprintf(info->s, "R74: %08X", am29000->r[74]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R75:        sprintf(info->s, "R75: %08X", am29000->r[75]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R76:        sprintf(info->s, "R76: %08X", am29000->r[76]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R77:        sprintf(info->s, "R77: %08X", am29000->r[77]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R78:        sprintf(info->s, "R78: %08X", am29000->r[78]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R79:        sprintf(info->s, "R79: %08X", am29000->r[79]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R80:        sprintf(info->s, "R80: %08X", am29000->r[80]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R81:        sprintf(info->s, "R81: %08X", am29000->r[81]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R82:        sprintf(info->s, "R82: %08X", am29000->r[82]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R83:        sprintf(info->s, "R83: %08X", am29000->r[83]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R84:        sprintf(info->s, "R84: %08X", am29000->r[84]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R85:        sprintf(info->s, "R85: %08X", am29000->r[85]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R86:        sprintf(info->s, "R86: %08X", am29000->r[86]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R87:        sprintf(info->s, "R87: %08X", am29000->r[87]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R88:        sprintf(info->s, "R88: %08X", am29000->r[88]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R89:        sprintf(info->s, "R89: %08X", am29000->r[89]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R90:        sprintf(info->s, "R90: %08X", am29000->r[90]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R91:        sprintf(info->s, "R91: %08X", am29000->r[91]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R92:        sprintf(info->s, "R92: %08X", am29000->r[92]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R93:        sprintf(info->s, "R93: %08X", am29000->r[93]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R94:        sprintf(info->s, "R94: %08X", am29000->r[94]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R95:        sprintf(info->s, "R95: %08X", am29000->r[95]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R96:        sprintf(info->s, "R96: %08X", am29000->r[96]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R97:        sprintf(info->s, "R97: %08X", am29000->r[97]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R98:        sprintf(info->s, "R98: %08X", am29000->r[98]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R99:        sprintf(info->s, "R99: %08X", am29000->r[99]);      break;
-		case CPUINFO_STR_REGISTER + AM29000_R100:       sprintf(info->s, "R100: %08X", am29000->r[100]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R101:       sprintf(info->s, "R101: %08X", am29000->r[101]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R102:       sprintf(info->s, "R102: %08X", am29000->r[102]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R103:       sprintf(info->s, "R103: %08X", am29000->r[103]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R104:       sprintf(info->s, "R104: %08X", am29000->r[104]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R105:       sprintf(info->s, "R105: %08X", am29000->r[105]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R106:       sprintf(info->s, "R106: %08X", am29000->r[106]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R107:       sprintf(info->s, "R107: %08X", am29000->r[107]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R108:       sprintf(info->s, "R108: %08X", am29000->r[108]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R109:       sprintf(info->s, "R109: %08X", am29000->r[109]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R110:       sprintf(info->s, "R110: %08X", am29000->r[110]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R111:       sprintf(info->s, "R111: %08X", am29000->r[111]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R112:       sprintf(info->s, "R112: %08X", am29000->r[112]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R113:       sprintf(info->s, "R113: %08X", am29000->r[113]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R114:       sprintf(info->s, "R114: %08X", am29000->r[114]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R115:       sprintf(info->s, "R115: %08X", am29000->r[115]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R116:       sprintf(info->s, "R116: %08X", am29000->r[116]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R117:       sprintf(info->s, "R117: %08X", am29000->r[117]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R118:       sprintf(info->s, "R118: %08X", am29000->r[118]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R119:       sprintf(info->s, "R119: %08X", am29000->r[119]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R120:       sprintf(info->s, "R120: %08X", am29000->r[120]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R121:       sprintf(info->s, "R121: %08X", am29000->r[121]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R122:       sprintf(info->s, "R122: %08X", am29000->r[122]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R123:       sprintf(info->s, "R123: %08X", am29000->r[123]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R124:       sprintf(info->s, "R124: %08X", am29000->r[124]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R125:       sprintf(info->s, "R125: %08X", am29000->r[125]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R126:       sprintf(info->s, "R126: %08X", am29000->r[126]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R127:       sprintf(info->s, "R127: %08X", am29000->r[127]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R128:       sprintf(info->s, "R128: %08X", am29000->r[128]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R129:       sprintf(info->s, "R129: %08X", am29000->r[129]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R130:       sprintf(info->s, "R130: %08X", am29000->r[130]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R131:       sprintf(info->s, "R131: %08X", am29000->r[131]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R132:       sprintf(info->s, "R132: %08X", am29000->r[132]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R133:       sprintf(info->s, "R133: %08X", am29000->r[133]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R134:       sprintf(info->s, "R134: %08X", am29000->r[134]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R135:       sprintf(info->s, "R135: %08X", am29000->r[135]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R136:       sprintf(info->s, "R136: %08X", am29000->r[136]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R137:       sprintf(info->s, "R137: %08X", am29000->r[137]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R138:       sprintf(info->s, "R138: %08X", am29000->r[138]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R139:       sprintf(info->s, "R139: %08X", am29000->r[139]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R140:       sprintf(info->s, "R140: %08X", am29000->r[140]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R141:       sprintf(info->s, "R141: %08X", am29000->r[141]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R142:       sprintf(info->s, "R142: %08X", am29000->r[142]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R143:       sprintf(info->s, "R143: %08X", am29000->r[143]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R144:       sprintf(info->s, "R144: %08X", am29000->r[144]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R145:       sprintf(info->s, "R145: %08X", am29000->r[145]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R146:       sprintf(info->s, "R146: %08X", am29000->r[146]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R147:       sprintf(info->s, "R147: %08X", am29000->r[147]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R148:       sprintf(info->s, "R148: %08X", am29000->r[148]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R149:       sprintf(info->s, "R149: %08X", am29000->r[149]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R150:       sprintf(info->s, "R150: %08X", am29000->r[150]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R151:       sprintf(info->s, "R151: %08X", am29000->r[151]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R152:       sprintf(info->s, "R152: %08X", am29000->r[152]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R153:       sprintf(info->s, "R153: %08X", am29000->r[153]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R154:       sprintf(info->s, "R154: %08X", am29000->r[154]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R155:       sprintf(info->s, "R155: %08X", am29000->r[155]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R156:       sprintf(info->s, "R156: %08X", am29000->r[156]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R157:       sprintf(info->s, "R157: %08X", am29000->r[157]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R158:       sprintf(info->s, "R158: %08X", am29000->r[158]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R159:       sprintf(info->s, "R159: %08X", am29000->r[159]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R160:       sprintf(info->s, "R160: %08X", am29000->r[160]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R161:       sprintf(info->s, "R161: %08X", am29000->r[161]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R162:       sprintf(info->s, "R162: %08X", am29000->r[162]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R163:       sprintf(info->s, "R163: %08X", am29000->r[163]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R164:       sprintf(info->s, "R164: %08X", am29000->r[164]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R165:       sprintf(info->s, "R165: %08X", am29000->r[165]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R166:       sprintf(info->s, "R166: %08X", am29000->r[166]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R167:       sprintf(info->s, "R167: %08X", am29000->r[167]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R168:       sprintf(info->s, "R168: %08X", am29000->r[168]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R169:       sprintf(info->s, "R169: %08X", am29000->r[169]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R170:       sprintf(info->s, "R170: %08X", am29000->r[170]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R171:       sprintf(info->s, "R171: %08X", am29000->r[171]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R172:       sprintf(info->s, "R172: %08X", am29000->r[172]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R173:       sprintf(info->s, "R173: %08X", am29000->r[173]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R174:       sprintf(info->s, "R174: %08X", am29000->r[174]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R175:       sprintf(info->s, "R175: %08X", am29000->r[175]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R176:       sprintf(info->s, "R176: %08X", am29000->r[176]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R177:       sprintf(info->s, "R177: %08X", am29000->r[177]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R178:       sprintf(info->s, "R178: %08X", am29000->r[178]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R179:       sprintf(info->s, "R179: %08X", am29000->r[179]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R180:       sprintf(info->s, "R180: %08X", am29000->r[180]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R181:       sprintf(info->s, "R181: %08X", am29000->r[181]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R182:       sprintf(info->s, "R182: %08X", am29000->r[182]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R183:       sprintf(info->s, "R183: %08X", am29000->r[183]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R184:       sprintf(info->s, "R184: %08X", am29000->r[184]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R185:       sprintf(info->s, "R185: %08X", am29000->r[185]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R186:       sprintf(info->s, "R186: %08X", am29000->r[186]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R187:       sprintf(info->s, "R187: %08X", am29000->r[187]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R188:       sprintf(info->s, "R188: %08X", am29000->r[188]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R189:       sprintf(info->s, "R189: %08X", am29000->r[189]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R190:       sprintf(info->s, "R190: %08X", am29000->r[190]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R191:       sprintf(info->s, "R191: %08X", am29000->r[191]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R192:       sprintf(info->s, "R192: %08X", am29000->r[192]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R193:       sprintf(info->s, "R193: %08X", am29000->r[193]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R194:       sprintf(info->s, "R194: %08X", am29000->r[194]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R195:       sprintf(info->s, "R195: %08X", am29000->r[195]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R196:       sprintf(info->s, "R196: %08X", am29000->r[196]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R197:       sprintf(info->s, "R197: %08X", am29000->r[197]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R198:       sprintf(info->s, "R198: %08X", am29000->r[198]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R199:       sprintf(info->s, "R199: %08X", am29000->r[199]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R200:       sprintf(info->s, "R200: %08X", am29000->r[200]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R201:       sprintf(info->s, "R201: %08X", am29000->r[201]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R202:       sprintf(info->s, "R202: %08X", am29000->r[202]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R203:       sprintf(info->s, "R203: %08X", am29000->r[203]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R204:       sprintf(info->s, "R204: %08X", am29000->r[204]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R205:       sprintf(info->s, "R205: %08X", am29000->r[205]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R206:       sprintf(info->s, "R206: %08X", am29000->r[206]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R207:       sprintf(info->s, "R207: %08X", am29000->r[207]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R208:       sprintf(info->s, "R208: %08X", am29000->r[208]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R209:       sprintf(info->s, "R209: %08X", am29000->r[209]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R210:       sprintf(info->s, "R210: %08X", am29000->r[210]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R211:       sprintf(info->s, "R211: %08X", am29000->r[211]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R212:       sprintf(info->s, "R212: %08X", am29000->r[212]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R213:       sprintf(info->s, "R213: %08X", am29000->r[213]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R214:       sprintf(info->s, "R214: %08X", am29000->r[214]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R215:       sprintf(info->s, "R215: %08X", am29000->r[215]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R216:       sprintf(info->s, "R216: %08X", am29000->r[216]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R217:       sprintf(info->s, "R217: %08X", am29000->r[217]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R218:       sprintf(info->s, "R218: %08X", am29000->r[218]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R219:       sprintf(info->s, "R219: %08X", am29000->r[219]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R220:       sprintf(info->s, "R220: %08X", am29000->r[220]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R221:       sprintf(info->s, "R221: %08X", am29000->r[221]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R222:       sprintf(info->s, "R222: %08X", am29000->r[222]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R223:       sprintf(info->s, "R223: %08X", am29000->r[223]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R224:       sprintf(info->s, "R224: %08X", am29000->r[224]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R225:       sprintf(info->s, "R225: %08X", am29000->r[225]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R226:       sprintf(info->s, "R226: %08X", am29000->r[226]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R227:       sprintf(info->s, "R227: %08X", am29000->r[227]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R228:       sprintf(info->s, "R228: %08X", am29000->r[228]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R229:       sprintf(info->s, "R229: %08X", am29000->r[229]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R230:       sprintf(info->s, "R230: %08X", am29000->r[230]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R231:       sprintf(info->s, "R231: %08X", am29000->r[231]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R232:       sprintf(info->s, "R232: %08X", am29000->r[232]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R233:       sprintf(info->s, "R233: %08X", am29000->r[233]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R234:       sprintf(info->s, "R234: %08X", am29000->r[234]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R235:       sprintf(info->s, "R235: %08X", am29000->r[235]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R236:       sprintf(info->s, "R236: %08X", am29000->r[236]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R237:       sprintf(info->s, "R237: %08X", am29000->r[237]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R238:       sprintf(info->s, "R238: %08X", am29000->r[238]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R239:       sprintf(info->s, "R239: %08X", am29000->r[239]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R240:       sprintf(info->s, "R240: %08X", am29000->r[240]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R241:       sprintf(info->s, "R241: %08X", am29000->r[241]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R242:       sprintf(info->s, "R242: %08X", am29000->r[242]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R243:       sprintf(info->s, "R243: %08X", am29000->r[243]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R244:       sprintf(info->s, "R244: %08X", am29000->r[244]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R245:       sprintf(info->s, "R245: %08X", am29000->r[245]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R246:       sprintf(info->s, "R246: %08X", am29000->r[246]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R247:       sprintf(info->s, "R247: %08X", am29000->r[247]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R248:       sprintf(info->s, "R248: %08X", am29000->r[248]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R249:       sprintf(info->s, "R249: %08X", am29000->r[249]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R250:       sprintf(info->s, "R250: %08X", am29000->r[250]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R251:       sprintf(info->s, "R251: %08X", am29000->r[251]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R252:       sprintf(info->s, "R252: %08X", am29000->r[252]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R253:       sprintf(info->s, "R253: %08X", am29000->r[253]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R254:       sprintf(info->s, "R254: %08X", am29000->r[254]);    break;
-		case CPUINFO_STR_REGISTER + AM29000_R255:       sprintf(info->s, "R255: %08X", am29000->r[255]);    break;
-	}
-}
-
-
-DEFINE_LEGACY_CPU_DEVICE(AM29000, am29000);

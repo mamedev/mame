@@ -429,10 +429,230 @@ enum
 #define AM29000_INTR3       3
 
 
-/***************************************************************************
-    PUBLIC FUNCTIONS
-***************************************************************************/
+class am29000_cpu_device :  public cpu_device
+{
+public:
+	// construction/destruction
+	am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-DECLARE_LEGACY_CPU_DEVICE(AM29000, am29000);
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 2; }
+	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	{
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program_config;
+			case AS_IO:      return &m_io_config;
+			case AS_DATA:    return &m_data_config;
+			default:         return NULL;
+		}
+	}
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	void signal_exception(UINT32 type);
+	void external_irq_check();
+	UINT32 read_program_word(UINT32 address);
+	UINT32 get_abs_reg(UINT8 r, UINT32 iptr);
+	void fetch_decode();
+	UINT32 read_spr(UINT32 idx);
+	void write_spr(UINT32 idx, UINT32 val);
+	void ADD();
+	void ADDS();
+	void ADDU();
+	void ADDC();
+	void ADDCS();
+	void ADDCU();
+	void SUB();
+	void SUBS();
+	void SUBU();
+	void SUBC();
+	void SUBCS();
+	void SUBCU();
+	void SUBR();
+	void SUBRS();
+	void SUBRU();
+	void SUBRC();
+	void SUBRCS();
+	void SUBRCU();
+	void MULTIPLU();
+	void MULTIPLY();
+	void MUL();
+	void MULL();
+	void MULU();
+	void DIVIDE();
+	void DIVIDU();
+	void DIV0();
+	void DIV();
+	void DIVL();
+	void DIVREM();
+	void CPEQ();
+	void CPNEQ();
+	void CPLT();
+	void CPLTU();
+	void CPLE();
+	void CPLEU();
+	void CPGT();
+	void CPGTU();
+	void CPGE();
+	void CPGEU();
+	void CPBYTE();
+	void ASEQ();
+	void ASNEQ();
+	void ASLT();
+	void ASLTU();
+	void ASLE();
+	void ASLEU();
+	void ASGT();
+	void ASGTU();
+	void ASGE();
+	void ASGEU();
+	void AND();
+	void ANDN();
+	void NAND();
+	void OR();
+	void NOR();
+	void XOR();
+	void XNOR();
+	void SLL();
+	void SRL();
+	void SRA();
+	void EXTRACT();
+	void LOAD();
+	void LOADL();
+	void LOADSET();
+	void LOADM();
+	void STORE();
+	void STOREL();
+	void STOREM();
+	void EXBYTE();
+	void EXHW();
+	void EXHWS();
+	void INBYTE();
+	void INHW();
+	void MFSR();
+	void MFTLB();
+	void MTSR();
+	void MTSRIM();
+	void MTTLB();
+	void CONST();
+	void CONSTH();
+	void CONSTN();
+	void CALL();
+	void CALLI();
+	void JMP();
+	void JMPI();
+	void JMPT();
+	void JMPTI();
+	void JMPF();
+	void JMPFI();
+	void JMPFDEC();
+	void CLZ();
+	void SETIP();
+	void EMULATE();
+	void INV();
+	void IRET();
+	void IRETINV();
+	void HALT();
+	void ILLEGAL();
+	void CONVERT();
+	void SQRT();
+	void CLASS();
+	void MULTM();
+	void MULTMU();
+
+	address_space_config m_program_config;
+	address_space_config m_io_config;
+	address_space_config m_data_config;
+
+	INT32           m_icount;
+	UINT32          m_pc;
+
+	/* General purpose */
+	UINT32          m_r[256];     // TODO: There's only 192 implemented!
+
+	/* TLB */
+	UINT32          m_tlb[128];
+
+	/* Protected SPRs */
+	UINT32          m_vab;
+	UINT32          m_ops;
+	UINT32          m_cps;
+	UINT32          m_cfg;
+	UINT32          m_cha;
+	UINT32          m_chd;
+	UINT32          m_chc;
+	UINT32          m_rbp;
+	UINT32          m_tmc;
+	UINT32          m_tmr;
+	UINT32          m_pc0;
+	UINT32          m_pc1;
+	UINT32          m_pc2;
+	UINT32          m_mmu;
+	UINT32          m_lru;
+
+	/* Unprotected SPRs */
+	UINT32          m_ipc;
+	UINT32          m_ipa;
+	UINT32          m_ipb;
+	UINT32          m_q;
+	UINT32          m_alu;
+	UINT32          m_fpe;
+	UINT32          m_inte;
+	UINT32          m_fps;
+
+	/* Pipeline state */
+	UINT32          m_exceptions;
+	UINT32          m_exception_queue[4];
+
+	UINT8           m_irq_active;
+	UINT8           m_irq_lines;
+
+	UINT32          m_exec_ir;
+	UINT32          m_next_ir;
+
+	UINT32          m_pl_flags;
+	UINT32          m_next_pl_flags;
+
+	UINT32          m_iret_pc;
+
+	UINT32          m_exec_pc;
+	UINT32          m_next_pc;
+
+	address_space *m_program;
+	direct_read_data *m_direct;
+	address_space *m_data;
+	direct_read_data *m_datadirect;
+	address_space *m_io;
+
+	typedef void ( am29000_cpu_device::*opcode_func ) ();
+	struct op_info {
+		opcode_func opcode;
+		UINT32 flags;
+	};
+
+	static const op_info op_table[256];
+};
+
+
+extern const device_type AM29000;
+
 
 #endif /* __AM29000_H__ */
