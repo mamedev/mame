@@ -24,7 +24,9 @@ const device_type SNS_LOROM_SUPERGB = &device_creator<sns_rom_sgb_device>;
 
 sns_rom_sgb_device::sns_rom_sgb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom_device(mconfig, SNS_LOROM_SUPERGB, "SNES Super Game Boy Cart", tag, owner, clock, "sns_rom_sgb", __FILE__),
-					m_gb_cpu(*this, "supergb"),
+					m_gb_cpu(*this, "sgb_cpu"),
+					m_gb_snd(*this, "sgb_snd"),
+					m_gb_lcd(*this, "sgb_lcd"),
 					m_cartslot(*this, "gb_slot")
 {
 }
@@ -66,14 +68,53 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ram_w)
 	m_cartslot->write_ram(space, offset, data);
 }
 
+READ8_MEMBER(sns_rom_sgb_device::gb_echo_r)
+{
+	return space.read_byte(0xc000 + offset);
+}
+
+WRITE8_MEMBER(sns_rom_sgb_device::gb_echo_w)
+{
+	return space.write_byte(0xc000 + offset, data);
+}
+
+READ8_MEMBER(sns_rom_sgb_device::gb_io_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(sns_rom_sgb_device::gb_io_w)
+{
+}
+
+READ8_MEMBER(sns_rom_sgb_device::gb_ie_r)
+{
+//	return m_gb_cpu->get_ie();
+	return 0;
+}
+
+WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
+{
+//	m_gb_cpu->set_ie(data & 0x1f);
+}
+
+
 
 static ADDRESS_MAP_START(supergb_map, AS_PROGRAM, 8, sns_rom_sgb_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, vram_r, vram_w)  /* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w)  /* echo RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)      /* I/O */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("sgb_snd", gameboy_sound_device, sound_r, sound_w)      /* sound registers */
+	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, oam_r, oam_w)    /* OAM RAM */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("sgb_snd", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
+	AM_RANGE(0xff40, 0xff7f) AM_DEVREADWRITE("sgb_lcd", sgb_lcd_device, video_r, video_w) /* also disable bios?? */        /* Video controller & BIOS flip-flop */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
 
 
@@ -84,13 +125,19 @@ WRITE8_MEMBER( sns_rom_sgb_device::gb_timer_callback )
 
 
 static SLOT_INTERFACE_START(supergb_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( supergb )
-	MCFG_CPU_ADD("supergb", LR35902, 4295454)   /* 4.295454 MHz */
+	MCFG_CPU_ADD("sgb_cpu", LR35902, 4295454)   /* 4.295454 MHz */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
+
+	MCFG_GB_LCD_SGB_ADD("sgb_lcd")
+
+	MCFG_SOUND_ADD("sgb_snd", GAMEBOY, 0)
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, NULL)
 MACHINE_CONFIG_END
