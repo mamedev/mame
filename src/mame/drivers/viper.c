@@ -1419,8 +1419,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 					{
 						m_cf_card_ide = 1;
 
-						// soft reset
-						m_ata->write_cs1(space, 6, 0x04, 0xff);
+						m_ata->reset();
 					}
 					break;
 				}

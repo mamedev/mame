@@ -61,6 +61,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack);
+	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag);
 
 	UINT8 *identify_device_buffer() { return m_identify_device; }
 
@@ -88,15 +89,17 @@ protected:
 
 	int dev() { return (m_device_head & IDE_DEVICE_HEAD_DRV) >> 4; }
 	bool device_selected() { return m_csel == dev(); }
-	bool single_device() { return m_csel == 0 && m_dasp == 0; }
 
 	void set_irq(int state);
 	void set_dmarq(int state);
+	void set_dasp(int state);
+	void set_pdiag(int state);
 	void ide_build_identify_device();
 
 	virtual bool process_command();
 	virtual void process_buffer();
 	virtual void fill_buffer();
+	virtual void finished_busy(int param);
 
 	UINT8           m_buffer[IDE_DISK_SECTOR_SIZE];
 	UINT16          m_buffer_offset;
@@ -131,12 +134,23 @@ private:
 	void read_buffer_empty();
 	void write_buffer_full();
 	void update_irq();
+	void start_busy(attotime time, int param);
+	void stop_busy();
+	void soft_reset();
+	void perform_diagnostic();
+	void finished_diagnostic();
 
 	int m_csel;
-	int m_dasp;
+	int m_daspin;
+	int m_daspout;
 	int m_dmack;
 	int m_dmarq;
 	int m_irq;
+	int m_pdiagin;
+	int m_pdiagout;
+
+	bool m_resetting;
+	bool m_single_device;
 
 	UINT32          m_cur_lba;
 	UINT16          m_block_count;
@@ -148,7 +162,7 @@ private:
 	const UINT8 *   m_user_password;
 
 	emu_timer *     m_last_status_timer;
-	emu_timer *     m_reset_timer;
+	emu_timer *     m_busy_timer;
 };
 
 // ======================> ide_hdd_device

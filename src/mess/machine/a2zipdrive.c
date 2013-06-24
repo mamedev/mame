@@ -32,7 +32,7 @@ const device_type A2BUS_ZIPDRIVE = &device_creator<a2bus_zipdrive_device>;
 #define ZIPDRIVE_ATA_TAG     "zipdrive_ata"
 
 static MACHINE_CONFIG_FRAGMENT( zipdrive )
-	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(ZIPDRIVE_ATA_TAG, ata_devices, "hdd", NULL, false)
 MACHINE_CONFIG_END
 
 ROM_START( zipdrive )

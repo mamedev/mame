@@ -51,6 +51,9 @@ extern const device_type ATA_SLOT;
 #define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
 	devcb = &ata_interface_device::set_dmarq_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
+	devcb = &ata_interface_device::set_dasp_handler(*device, DEVCB2_##_devcb);
+
 SLOT_INTERFACE_EXTERN(ata_devices);
 
 /***************************************************************************
@@ -82,7 +85,7 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
-
+	template<class _Object> static devcb2_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
 	UINT16 read_dma();
 	virtual DECLARE_READ16_MEMBER(read_cs0);
 	virtual DECLARE_READ16_MEMBER(read_cs1);
@@ -95,24 +98,31 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);
+	virtual void set_dasp(int state);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
 	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
+	DECLARE_WRITE_LINE_MEMBER(dasp0_write_line);
+	DECLARE_WRITE_LINE_MEMBER(pdiag0_write_line);
 
 	DECLARE_WRITE_LINE_MEMBER(irq1_write_line);
 	DECLARE_WRITE_LINE_MEMBER(dmarq1_write_line);
+	DECLARE_WRITE_LINE_MEMBER(dasp1_write_line);
+	DECLARE_WRITE_LINE_MEMBER(pdiag1_write_line);
 
 	ata_slot_device *m_slot[2];
 	int m_irq[2];
 	int m_dmarq[2];
+	int m_dasp[2];
+	int m_pdiag[2];
 
 	devcb2_write_line m_irq_handler;
 	devcb2_write_line m_dmarq_handler;
+	devcb2_write_line m_dasp_handler;
 };
 
 extern const device_type ATA_INTERFACE;

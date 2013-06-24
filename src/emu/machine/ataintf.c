@@ -14,24 +14,10 @@
 #include "debugger.h"
 #include "idehd.h"
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
-
-#define VERBOSE                     0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
 void ata_interface_device::set_irq(int state)
 {
 //  printf( "irq %d\n", state );
 
-	if (state == ASSERT_LINE)
-		LOG(("ATA interrupt assert\n"));
-	else
-		LOG(("ATA interrupt clear\n"));
-
-	/* signal an interrupt */
 	m_irq_handler(state);
 }
 
@@ -40,6 +26,13 @@ void ata_interface_device::set_dmarq(int state)
 //  printf( "dmarq %d\n", state );
 
 	m_dmarq_handler(state);
+}
+
+void ata_interface_device::set_dasp(int state)
+{
+//  printf( "dasp %d\n", state );
+
+	m_dasp_handler(state);
 }
 
 WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
@@ -59,6 +52,30 @@ WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
 		m_irq[1] = state;
 
 		set_irq(m_irq[0] == ASSERT_LINE || m_irq[1] == ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER( ata_interface_device::dasp0_write_line )
+{
+	if (m_dasp[0] != state)
+	{
+		m_dasp[0] = state;
+
+		set_dasp(m_dasp[0] == ASSERT_LINE || m_dasp[1] == ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
+{
+	if (m_dasp[1] != state)
+	{
+		m_dasp[1] = state;
+
+		ata_device_interface *dev = m_slot[0]->dev();
+		if (dev != NULL)
+			dev->write_dasp(state);
+
+		set_dasp(m_dasp[0] == ASSERT_LINE || m_dasp[1] == ASSERT_LINE);
 	}
 }
 
@@ -82,6 +99,22 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
 	}
 }
 
+WRITE_LINE_MEMBER( ata_interface_device::pdiag0_write_line )
+{
+	m_pdiag[0] = state;
+}
+
+WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
+{
+	if (m_pdiag[1] != state)
+	{
+		m_pdiag[1] = state;
+
+		ata_device_interface *dev = m_slot[0]->dev();
+		if (dev != NULL)
+			dev->write_pdiag(state);
+	}
+}
 
 /*************************************
  *
@@ -174,8 +207,8 @@ SLOT_INTERFACE_END
 ata_interface_device::ata_interface_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_irq_handler(*this),
-	m_dmarq_handler(*this)
-{
+	m_dmarq_handler(*this),
+	m_dasp_handler(*this){
 }
 
 
@@ -184,7 +217,8 @@ const device_type ATA_INTERFACE = &device_creator<ata_interface_device>;
 ata_interface_device::ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ATA_INTERFACE, "ATA Interface", tag, owner, clock, "ata_interface", __FILE__),
 	m_irq_handler(*this),
-	m_dmarq_handler(*this)
+	m_dmarq_handler(*this),
+	m_dasp_handler(*this)
 {
 }
 
@@ -196,6 +230,7 @@ void ata_interface_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 	m_dmarq_handler.resolve_safe();
+	m_dasp_handler.resolve_safe();
 
 	/* set MAME harddisk handle */
 	m_slot[0] = subdevice<ata_slot_device>("0");
@@ -205,6 +240,8 @@ void ata_interface_device::device_start()
 	{
 		m_irq[i] = 0;
 		m_dmarq[i] = 0;
+		m_dasp[i] = 0;
+		m_pdiag[i] = 0;
 
 		ata_device_interface *dev = m_slot[i]->dev();
 		if (dev != NULL)
@@ -213,29 +250,21 @@ void ata_interface_device::device_start()
 			{
 				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, irq0_write_line));
 				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dmarq0_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dasp0_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, pdiag0_write_line));
 			}
 			else
 			{
 				dev->m_irq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, irq1_write_line));
 				dev->m_dmarq_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dmarq1_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, dasp1_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB2_DEVWRITELINE("^", ata_interface_device, pdiag1_write_line));
 			}
 
 			dev->write_csel(i);
-			dev->write_dasp(m_slot[1]->dev() != NULL);
 		}
 	}
 }
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ata_interface_device::device_reset()
-{
-	LOG(("ATA interface reset\n"));
-}
-
-
 
 //**************************************************************************
 //  ATA SLOT DEVICE

@@ -90,7 +90,7 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(kc_d004_gide_io)
 
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", NULL, false)
 MACHINE_CONFIG_END
 
 

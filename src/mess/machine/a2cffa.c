@@ -32,7 +32,7 @@ const device_type A2BUS_CFFA2_6502 = &device_creator<a2bus_cffa2_6502_device>;
 #define CFFA2_ATA_TAG     "cffa2_ata"
 
 MACHINE_CONFIG_FRAGMENT( cffa2 )
-	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", "hdd", false)
+	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", NULL, false)
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )
