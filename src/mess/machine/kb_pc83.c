@@ -250,7 +250,7 @@ ioport_constructor ibm_pc_83_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 ibm_pc_83_keyboard_device::ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_KBD_IBM_PC_83, "IBM PC Keyboard", tag, owner, clock, "kb_ibm5150", __FILE__),
+	: device_t(mconfig, PC_KBD_IBM_PC_83, "IBM PC Keyboard", tag, owner, clock, "kb_pc83", __FILE__),
 	  device_pc_kbd_interface(mconfig, *this),
 	  m_maincpu(*this, I8048_TAG),
 	  m_dr00(*this, "DR00"),
