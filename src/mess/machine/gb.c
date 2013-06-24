@@ -81,10 +81,6 @@ TODO:
 #define __MACHINE_GB_C
 
 #include "emu.h"
-#include "cpu/lr35902/lr35902.h"
-#include "imagedev/cartslot.h"
-#include "machine/ram.h"
-#include "audio/gb.h"
 #include "includes/gb.h"
 
 
@@ -571,7 +567,7 @@ void gb_state::gb_timer_check_irq()
 		if ( TIMECNT == 0 )
 		{
 			TIMECNT = TIMEMOD;
-			m_maincpu->set_input_line(TIM_INT, ASSERT_LINE );
+			m_maincpu->set_input_line(TIM_INT, ASSERT_LINE);
 			m_reloading = 1;
 		}
 	}

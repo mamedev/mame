@@ -1719,7 +1719,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_DRIVERS)/snes.o      \
 	$(MESS_DRIVERS)/n64.o       \
 	$(MESS_AUDIO)/gb.o          \
-	$(MESS_VIDEO)/gb.o          \
+	$(MESS_VIDEO)/gb_lcd.o      \
 	$(MESS_MACHINE)/gb.o        \
 	$(MESS_MACHINE)/gb_slot.o   \
 	$(MESS_MACHINE)/gb_rom.o    \

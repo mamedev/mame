@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  gb.c
+  gb_lcd.c
 
   Video file to handle emulation of the Nintendo Game Boy.
 
@@ -15,8 +15,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/lr35902/lr35902.h"
-#include "includes/gb.h"
+//#include "cpu/lr35902/lr35902.h"
+#include "video/gb_lcd.h"
+
+/* Interrupts (copied from includes/gb.h)... */
+#define VBL_INT               0       /* V-Blank    */
+#define LCD_INT               1       /* LCD Status */
+#define TIM_INT               2       /* Timer      */
+#define SIO_INT               3       /* Serial I/O */
+#define EXT_INT               4       /* Joypad     */
+
+
 
 #define LCDCONT     m_vid_regs[0x00]  /* LCD control register                       */
 #define LCDSTAT     m_vid_regs[0x01]  /* LCD status register                        */
@@ -39,6 +48,12 @@
 #define GBCBCPD     m_vid_regs[0x29]  /* Backgound palette data                     */
 #define GBCOCPS     m_vid_regs[0x2A]  /* Object palette spec                        */
 #define GBCOCPD     m_vid_regs[0x2B]  /* Object palette data                        */
+
+/* -- Super Game Boy specific -- */
+#define SGB_BORDER_PAL_OFFSET   64  /* Border colours stored from pal 4-7   */
+#define SGB_XOFFSET             48  /* GB screen starts at column 48        */
+#define SGB_YOFFSET             40  /* GB screen starts at row 40           */
+
 
 enum {
 	UNLOCKED=0,
@@ -63,77 +78,6 @@ enum {
 	GB_LCD_STATE_LY00_M1_2,
 	GB_LCD_STATE_LY00_M0
 };
-
-
-static const unsigned char palette[] =
-{
-/* Simple black and white palette */
-/*  0xFF,0xFF,0xFF,
-    0xB0,0xB0,0xB0,
-    0x60,0x60,0x60,
-    0x00,0x00,0x00 */
-
-/* Possibly needs a little more green in it */
-	0xFF,0xFB,0x87,     /* Background */
-	0xB1,0xAE,0x4E,     /* Light */
-	0x84,0x80,0x4E,     /* Medium */
-	0x4E,0x4E,0x4E,     /* Dark */
-
-/* Palette for Game Boy Pocket/Light */
-	0xC4,0xCF,0xA1,     /* Background */
-	0x8B,0x95,0x6D,     /* Light      */
-	0x6B,0x73,0x53,     /* Medium     */
-	0x41,0x41,0x41,     /* Dark       */
-};
-
-static const unsigned char palette_megaduck[] = {
-	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
-};
-
-/* Initialise the palettes */
-PALETTE_INIT_MEMBER(gb_state, gb)
-{
-	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette[i * 3 + 0], palette[i * 3 + 1], palette[i * 3 + 2]);
-}
-
-PALETTE_INIT_MEMBER(gb_state, gbp)
-{
-	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette[(i + 4) * 3 + 0], palette[(i + 4) * 3 + 1], palette[(i + 4) * 3 + 2]);
-}
-
-PALETTE_INIT_MEMBER(gb_state, sgb)
-{
-	int r, g, b;
-	
-	for (int i = 0; i < 32768; i++)
-	{
-		r = (i & 0x1F) << 3;
-		g = ((i >> 5) & 0x1F) << 3;
-		b = ((i >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine(), i, r, g, b);
-	}
-}
-
-PALETTE_INIT_MEMBER(gb_state, gbc)
-{
-	int r, g, b;
-
-	for (int i = 0; i < 32768; i++)
-	{
-		r = (i & 0x1F) << 3;
-		g = ((i >> 5) & 0x1F) << 3;
-		b = ((i >> 10) & 0x1F) << 3;
-		palette_set_color_rgb(machine(), i, r, g, b);
-	}
-}
-
-PALETTE_INIT_MEMBER(megaduck_state, megaduck)
-{
-	for (int i = 0; i < 4; i++)
-		palette_set_color_rgb(machine(), i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);
-}
 
 
 /* OAM contents on power up.
