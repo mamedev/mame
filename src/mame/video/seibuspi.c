@@ -293,11 +293,6 @@ void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &clipre
 		y2 = cliprect.max_y;
 	}
 
-	if (gfx->elements() <= 0x10000)
-	{
-		code &= 0xffff;
-	}
-
 	dp = gfx->get_data(code);
 
 	// draw
@@ -338,6 +333,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	int priority;
 	int x1, y1;
 	gfx_element *gfx = machine().gfx[2];
+	const int gfx_high_mask = (gfx->elements() > 0x10000) ? 0x10000 : 0;
 
 	static const int sprite_xtable[2][8] =
 	{
@@ -370,7 +366,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			-------- -------- ---x---- --------  tile_num high (only on RISE10/11 chip)
 			-------- -------- ------xx xxxxxxxx  xpos
 		*/
-		tile_num = (m_sprite_ram[a + 0] >> 16 & 0xffff) | (m_sprite_ram[a + 1] << 4 & 0x10000);
+		tile_num = m_sprite_ram[a + 0] >> 16 & 0xffff;
 		if (tile_num == 0)
 			continue;
 
@@ -385,6 +381,7 @@ void seibuspi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		if (ypos & 0x100)
 			ypos |= 0xfe00;
 		color = m_sprite_ram[a + 0] & 0x3f;
+		tile_num |= m_sprite_ram[a + 1] << 4 & gfx_high_mask;
 
 		width = (m_sprite_ram[a + 0] >> 8 & 0x7) + 1;
 		height = (m_sprite_ram[a + 0] >> 12 & 0x7) + 1;
