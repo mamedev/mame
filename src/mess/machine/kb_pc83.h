@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    IBM 5160 83-key keyboard emulation
+    IBM 5150 83-key keyboard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __PC_KBD_IBM_5160__
-#define __PC_KBD_IBM_5160__
+#ifndef __PC_KBD_IBM_PC_83__
+#define __PC_KBD_IBM_PC_83__
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
@@ -23,14 +23,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ibm_5160_keyboard_device
+// ======================> ibm_pc_83_keyboard_device
 
-class ibm_5160_keyboard_device :  public device_t,
+class ibm_pc_83_keyboard_device :  public device_t,
 								  public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
-	ibm_5160_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ibm_pc_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -83,7 +83,7 @@ private:
 
 
 // device type definition
-extern const device_type PC_KBD_IBM_5160;
+extern const device_type PC_KBD_IBM_PC_83;
 
 
 
