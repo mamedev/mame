@@ -1,7 +1,11 @@
 /*.exe
+/*.ini
+/*.log
 /*.map
 /*.pdb
 /*.sym
+/cfg
+/nvram
 /obj
 src/regtests/chdman/temp
 src/regtests/jedutil/output
