@@ -1892,6 +1892,7 @@ $(MAMEOBJ)/pinball.a: \
 	$(DRIVERS)/capcom.o  \
 	$(DRIVERS)/de_2.o  \
 	$(DRIVERS)/de_3.o  \
+	$(VIDEO)/decodmd2.o \
 	$(DRIVERS)/de_3b.o  \
 	$(DRIVERS)/flicker.o  \
 	$(DRIVERS)/g627.o  \
