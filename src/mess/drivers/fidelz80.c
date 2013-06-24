@@ -8,7 +8,7 @@
 *  TODO:
 *  * Figure out why it says the first speech line twice; it shouldn't. (It sometimes does this on the sensory chess challenger real hardware)
 *  * Get rom locations from pcb (done for UVC, VCC is probably similar)
-*  * correctly hook up VBC and 7014/bridgec3 speech so that the z80 is halted while words are being spoken
+*  * correctly hook up 7002/VBRC and 7014/bridgec3 speech so that the z80 is halted while words are being spoken
 *
 ***********************************************************************
 
@@ -150,16 +150,18 @@ PC.6 - button column C (W)
 PC.7 - button column D (W)
 
 ******************************************************************************
-Voice Bridge Challenger (VBC)
-and Bridge Challenger 3 (7014)
+Voice Bridge Challenger (Model VBRC, later reissued as Model 7002)
+and Bridge Challenger 3 (Model 7014)
+(which both share the same* hardware)
 --------------------------------
+* The Bridge Challenger 3 does not actually have the 8 LEDs nor the
+latches which operate them populated and the plastic indicator cap locations
+are instead are covered by a piece of plastic, but they do work if manually
+added.
 
 This unit is similar in construction kinda to the chess challengers, however it
 has an 8041 which does ALL of the system I/O.  The Z80 has NO IO AT ALL other than
 what is performed through the 8041!
-
-Note: The Bridge Challenger 3 does not actually have the 8 LEDs nor the
-latches which operate them populated, but they do work if manually added.
 
 The main CPU is a Z80 running at 2.5MHz
 
@@ -844,7 +846,7 @@ static Z80PIO_INTERFACE( vsc_z80pio_intf )
 };
 
 /******************************************************************************
-    I8041 MCU, for VBC and bridgec3/7014
+    I8041 MCU, for VBRC/7002 and bridgec3/7014
 ******************************************************************************/
 
 WRITE8_MEMBER(fidelz80_state::kp_matrix_w)
@@ -1404,8 +1406,9 @@ ROM_START(vsc)
 	ROM_LOAD("101-32107.bin", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d))
 ROM_END
 
-ROM_START(vbc)
+ROM_START(vbrc) // AKA model 7002
 	ROM_REGION(0x10000, "maincpu", 0)
+	// nec 2364 mask roms; pin 27 (PGM, probably NC here due to mask roms) goes to the pcb
 	ROM_LOAD("101-64108.g3", 0x0000, 0x2000, CRC(08472223) SHA1(859865B13C908DBB474333263DC60F6A32461141))
 	ROM_LOAD("101-64109.f3", 0x2000, 0x2000, CRC(320AFA0F) SHA1(90EDFE0AC19B108D232CDA376B03A3A24BEFAD4C))
 	ROM_LOAD("101-64110.e3", 0x4000, 0x2000, CRC(3040D0BD) SHA1(CAA55FC8D9196E408FB41E7171A68E5099519813))
@@ -1419,7 +1422,7 @@ ROM_END
 
 ROM_START(bridgec3) // 510-1016 Rev.1 PCB has neither locations nor ic labels, so I declare the big heatsink is at C1, numbers count on the shorter length of pcb
 	ROM_REGION(0x10000, "maincpu", 0)
-	// these 3 roms are TMM2764AD-20 chips with tiny hole-punch sized colored stickers (mostly) covering the quartz windows.
+	// TMM2764AD-20 EPROMS with tiny hole-punch sized colored stickers (mostly) covering the quartz windows. pin 27 (PGM) is tied to vcc with small rework wires and does not connect to pcb.
 	ROM_LOAD("7014_white.g3", 0x0000, 0x2000, CRC(eb1620ef) SHA1(987a9abc8c685f1a68678ea4ee65ec4a99419179)) // white sticker
 	ROM_LOAD("7014_red.f3", 0x2000, 0x2000, CRC(74af0019) SHA1(8dc05950c254ca050b95b93e5d0cf48f913a6d49)) // red sticker
 	ROM_LOAD("7014_blue.e3", 0x4000, 0x2000, CRC(341d9ca6) SHA1(370876573bb9408e75f4fc797304b6c64af0590a)) // blue sticker
@@ -1438,7 +1441,7 @@ ROM_END
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
 COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, driver_device, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
 COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
-COMP( 1979, vbc,        0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",  GAME_NOT_WORKING )
+COMP( 1979, vbrc,       0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBRC/7002)",  GAME_NOT_WORKING )
 COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
-COMP( 1980, bridgec3,   vbc,        0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", GAME_NOT_WORKING )
+COMP( 1980, bridgec3,   vbrc,       0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", GAME_NOT_WORKING )
 COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
