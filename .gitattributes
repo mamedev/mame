@@ -6171,6 +6171,7 @@ src/mess/drivers/gp32.c svneol=native#text/plain
 src/mess/drivers/h19.c svneol=native#text/plain
 src/mess/drivers/h8.c svneol=native#text/plain
 src/mess/drivers/h89.c svneol=native#text/plain
+src/mess/drivers/harriet.c svneol=native#text/plain
 src/mess/drivers/hec2hrp.c svneol=native#text/plain
 src/mess/drivers/homelab.c svneol=native#text/plain
 src/mess/drivers/homez80.c svneol=native#text/plain
