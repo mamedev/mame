@@ -24,6 +24,10 @@ OBJDIRS += \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
 	$(LIBOBJ)/lua \
+	$(LIBOBJ)/librocket \
+	$(LIBOBJ)/librocket/Controls \
+	$(LIBOBJ)/librocket/Core \
+	$(LIBOBJ)/librocket/Debugger \
 
 
 #-------------------------------------------------
@@ -484,3 +488,190 @@ endif
 $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
+
+#-------------------------------------------------
+# LUA library objects
+#-------------------------------------------------
+
+ROCKETOBJS = \
+	$(LIBOBJ)/librocket/Controls/Clipboard.o  \
+	$(LIBOBJ)/librocket/Controls/Controls.o  \
+	$(LIBOBJ)/librocket/Controls/DataFormatter.o  \
+	$(LIBOBJ)/librocket/Controls/DataQuery.o  \
+	$(LIBOBJ)/librocket/Controls/DataSource.o  \
+	$(LIBOBJ)/librocket/Controls/DataSourceListener.o  \
+	$(LIBOBJ)/librocket/Controls/ElementDataGrid.o  \
+	$(LIBOBJ)/librocket/Controls/ElementDataGridCell.o  \
+	$(LIBOBJ)/librocket/Controls/ElementDataGridExpandButton.o  \
+	$(LIBOBJ)/librocket/Controls/ElementDataGridRow.o  \
+	$(LIBOBJ)/librocket/Controls/ElementForm.o  \
+	$(LIBOBJ)/librocket/Controls/ElementFormControl.o  \
+	$(LIBOBJ)/librocket/Controls/ElementFormControlDataSelect.o  \
+	$(LIBOBJ)/librocket/Controls/ElementFormControlInput.o  \
+	$(LIBOBJ)/librocket/Controls/ElementFormControlSelect.o  \
+	$(LIBOBJ)/librocket/Controls/ElementFormControlTextArea.o  \
+	$(LIBOBJ)/librocket/Controls/ElementTabSet.o  \
+	$(LIBOBJ)/librocket/Controls/ElementTextSelection.o  \
+	$(LIBOBJ)/librocket/Controls/InputType.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeButton.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeCheckbox.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeRadio.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeRange.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeSubmit.o  \
+	$(LIBOBJ)/librocket/Controls/InputTypeText.o  \
+	$(LIBOBJ)/librocket/Controls/SelectOption.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetDropDown.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetSlider.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetSliderInput.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetTextInput.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetTextInputMultiLine.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetTextInputSingleLine.o  \
+	$(LIBOBJ)/librocket/Controls/WidgetTextInputSingleLinePassword.o  \
+	$(LIBOBJ)/librocket/Controls/XMLNodeHandlerDataGrid.o  \
+	$(LIBOBJ)/librocket/Controls/XMLNodeHandlerTabSet.o  \
+	$(LIBOBJ)/librocket/Controls/XMLNodeHandlerTextArea.o  \
+	$(LIBOBJ)/librocket/Core/BaseXMLParser.o  \
+	$(LIBOBJ)/librocket/Core/Box.o  \
+	$(LIBOBJ)/librocket/Core/Clock.o  \
+	$(LIBOBJ)/librocket/Core/Context.o  \
+	$(LIBOBJ)/librocket/Core/ContextInstancer.o  \
+	$(LIBOBJ)/librocket/Core/ContextInstancerDefault.o  \
+	$(LIBOBJ)/librocket/Core/ConvolutionFilter.o  \
+	$(LIBOBJ)/librocket/Core/Core.o  \
+	$(LIBOBJ)/librocket/Core/Decorator.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorNone.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorNoneInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiled.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledBox.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledBoxInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledHorizontal.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledHorizontalInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledImage.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledImageInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledInstancer.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledVertical.o  \
+	$(LIBOBJ)/librocket/Core/DecoratorTiledVerticalInstancer.o  \
+	$(LIBOBJ)/librocket/Core/Dictionary.o  \
+	$(LIBOBJ)/librocket/Core/DocumentHeader.o  \
+	$(LIBOBJ)/librocket/Core/Element.o  \
+	$(LIBOBJ)/librocket/Core/ElementBackground.o  \
+	$(LIBOBJ)/librocket/Core/ElementBorder.o  \
+	$(LIBOBJ)/librocket/Core/ElementDecoration.o  \
+	$(LIBOBJ)/librocket/Core/ElementDefinition.o  \
+	$(LIBOBJ)/librocket/Core/ElementDocument.o  \
+	$(LIBOBJ)/librocket/Core/ElementHandle.o  \
+	$(LIBOBJ)/librocket/Core/ElementImage.o  \
+	$(LIBOBJ)/librocket/Core/ElementInstancer.o  \
+	$(LIBOBJ)/librocket/Core/ElementReference.o  \
+	$(LIBOBJ)/librocket/Core/ElementScroll.o  \
+	$(LIBOBJ)/librocket/Core/ElementStyle.o  \
+	$(LIBOBJ)/librocket/Core/ElementText.o  \
+	$(LIBOBJ)/librocket/Core/ElementTextDefault.o  \
+	$(LIBOBJ)/librocket/Core/ElementUtilities.o  \
+	$(LIBOBJ)/librocket/Core/Event.o  \
+	$(LIBOBJ)/librocket/Core/EventDispatcher.o  \
+	$(LIBOBJ)/librocket/Core/EventInstancer.o  \
+	$(LIBOBJ)/librocket/Core/EventInstancerDefault.o  \
+	$(LIBOBJ)/librocket/Core/EventListenerInstancer.o  \
+	$(LIBOBJ)/librocket/Core/Factory.o  \
+	$(LIBOBJ)/librocket/Core/FileInterface.o  \
+	$(LIBOBJ)/librocket/Core/FileInterfaceDefault.o  \
+	$(LIBOBJ)/librocket/Core/FontDatabase.o  \
+	$(LIBOBJ)/librocket/Core/FontEffect.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectInstancer.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectNone.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectNoneInstancer.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectOutline.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectOutlineInstancer.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectShadow.o  \
+	$(LIBOBJ)/librocket/Core/FontEffectShadowInstancer.o  \
+	$(LIBOBJ)/librocket/Core/FontFace.o  \
+	$(LIBOBJ)/librocket/Core/FontFaceHandle.o  \
+	$(LIBOBJ)/librocket/Core/FontFaceLayer.o  \
+	$(LIBOBJ)/librocket/Core/FontFamily.o  \
+	$(LIBOBJ)/librocket/Core/Geometry.o  \
+	$(LIBOBJ)/librocket/Core/GeometryDatabase.o  \
+	$(LIBOBJ)/librocket/Core/GeometryUtilities.o  \
+	$(LIBOBJ)/librocket/Core/LayoutBlockBox.o  \
+	$(LIBOBJ)/librocket/Core/LayoutBlockBoxSpace.o  \
+	$(LIBOBJ)/librocket/Core/LayoutEngine.o  \
+	$(LIBOBJ)/librocket/Core/LayoutInlineBox.o  \
+	$(LIBOBJ)/librocket/Core/LayoutInlineBoxText.o  \
+	$(LIBOBJ)/librocket/Core/LayoutLineBox.o  \
+	$(LIBOBJ)/librocket/Core/Log.o  \
+	$(LIBOBJ)/librocket/Core/Math.o  \
+	$(LIBOBJ)/librocket/Core/Plugin.o  \
+	$(LIBOBJ)/librocket/Core/PluginRegistry.o  \
+	$(LIBOBJ)/librocket/Core/precompiled.o  \
+	$(LIBOBJ)/librocket/Core/Property.o  \
+	$(LIBOBJ)/librocket/Core/PropertyDefinition.o  \
+	$(LIBOBJ)/librocket/Core/PropertyDictionary.o  \
+	$(LIBOBJ)/librocket/Core/PropertyParserColour.o  \
+	$(LIBOBJ)/librocket/Core/PropertyParserKeyword.o  \
+	$(LIBOBJ)/librocket/Core/PropertyParserNumber.o  \
+	$(LIBOBJ)/librocket/Core/PropertyParserString.o  \
+	$(LIBOBJ)/librocket/Core/PropertySpecification.o  \
+	$(LIBOBJ)/librocket/Core/ReferenceCountable.o  \
+	$(LIBOBJ)/librocket/Core/RenderInterface.o  \
+	$(LIBOBJ)/librocket/Core/Stream.o  \
+	$(LIBOBJ)/librocket/Core/StreamFile.o  \
+	$(LIBOBJ)/librocket/Core/StreamMemory.o  \
+	$(LIBOBJ)/librocket/Core/String.o  \
+	$(LIBOBJ)/librocket/Core/StringCache.o  \
+	$(LIBOBJ)/librocket/Core/StringUtilities.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheet.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetFactory.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNode.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelector.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorEmpty.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorFirstChild.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorFirstOfType.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorLastChild.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorLastOfType.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorNthChild.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorNthLastChild.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorNthLastOfType.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorNthOfType.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorOnlyChild.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetNodeSelectorOnlyOfType.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetParser.o  \
+	$(LIBOBJ)/librocket/Core/StyleSheetSpecification.o  \
+	$(LIBOBJ)/librocket/Core/SystemInterface.o  \
+	$(LIBOBJ)/librocket/Core/Template.o  \
+	$(LIBOBJ)/librocket/Core/TemplateCache.o  \
+	$(LIBOBJ)/librocket/Core/Texture.o  \
+	$(LIBOBJ)/librocket/Core/TextureDatabase.o  \
+	$(LIBOBJ)/librocket/Core/TextureLayout.o  \
+	$(LIBOBJ)/librocket/Core/TextureLayoutRectangle.o  \
+	$(LIBOBJ)/librocket/Core/TextureLayoutRow.o  \
+	$(LIBOBJ)/librocket/Core/TextureLayoutTexture.o  \
+	$(LIBOBJ)/librocket/Core/TextureResource.o  \
+	$(LIBOBJ)/librocket/Core/UnicodeRange.o  \
+	$(LIBOBJ)/librocket/Core/URL.o  \
+	$(LIBOBJ)/librocket/Core/Variant.o  \
+	$(LIBOBJ)/librocket/Core/Vector2.o  \
+	$(LIBOBJ)/librocket/Core/WidgetSlider.o  \
+	$(LIBOBJ)/librocket/Core/WidgetSliderScroll.o  \
+	$(LIBOBJ)/librocket/Core/WString.o  \
+	$(LIBOBJ)/librocket/Core/XMLNodeHandler.o  \
+	$(LIBOBJ)/librocket/Core/XMLNodeHandlerBody.o  \
+	$(LIBOBJ)/librocket/Core/XMLNodeHandlerDefault.o  \
+	$(LIBOBJ)/librocket/Core/XMLNodeHandlerHead.o  \
+	$(LIBOBJ)/librocket/Core/XMLNodeHandlerTemplate.o  \
+	$(LIBOBJ)/librocket/Core/XMLParser.o  \
+	$(LIBOBJ)/librocket/Core/XMLParseTools.o  \
+	$(LIBOBJ)/librocket/Debugger/Debugger.o  \
+	$(LIBOBJ)/librocket/Debugger/ElementContextHook.o  \
+	$(LIBOBJ)/librocket/Debugger/ElementInfo.o  \
+	$(LIBOBJ)/librocket/Debugger/ElementLog.o  \
+	$(LIBOBJ)/librocket/Debugger/Geometry.o  \
+	$(LIBOBJ)/librocket/Debugger/Plugin.o  \
+	$(LIBOBJ)/librocket/Debugger/SystemInterface.o  \
+
+
+$(OBJ)/librocket.a: $(ROCKETOBJS)
+
+$(LIBOBJ)/librocket/%.o: $(LIBSRC)/librocket/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c -I$(LIBSRC)/librocket/Include -DSTATIC_LIB -UINLINE $< -o $@
