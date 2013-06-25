@@ -16,7 +16,7 @@ def load_file(fname, lines):
 	if path != "":
 		path = path + '/'
 	try:
-		f = open(fname, "r")
+		f = open(fname, "rU")
 	except Exception, err:
 		print "Cannot read opcodes file %s [%s]" % (fname, err)
 		sys.exit(1)
