@@ -2362,9 +2362,10 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/eti660.o    \
 	$(MESS_DRIVERS)/fk1.o       \
 	$(MESS_DRIVERS)/fidelz80.o  \
+	$(MESS_DRIVERS)/harriet.o   \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
-	$(MESS_DRIVERS)/ie15.o     \
+	$(MESS_DRIVERS)/ie15.o      \
 	$(MESS_DRIVERS)/if800.o     \
 	$(MESS_DRIVERS)/indiana.o   \
 	$(MESS_DRIVERS)/itt3030.o   \
