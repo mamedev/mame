@@ -97,7 +97,11 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 		return;
 
 	// safety check
-	if ((m_video_dma_address & 3) != 0 || (m_video_dma_length & 3) != 3 || (m_video_dma_address + ((m_rowscroll_enable) ? 0x4000 : 0x2800)) > 0x40000)
+	int dma_length_user = m_rowscroll_enable ? 0x4000 : 0x2800;
+	int dma_length_real = (m_video_dma_length + 1) * 2; // ideally we should be using this, let's check if we have to:
+	if (m_video_dma_length != 0 && dma_length_user != dma_length_real)
+		popmessage("Tile LEN %X %X, contact MAMEdev", dma_length_user, dma_length_real); // shouldn't happen
+	else if ((m_video_dma_address & 3) != 0 || (m_video_dma_length & 3) != 3 || (m_video_dma_address + dma_length_user) > 0x40000)
 		popmessage("Tile DMA %X %X, contact MAMEdev", m_video_dma_address, m_video_dma_length); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("tilemap_dma_start_w in I/O area: %X\n", m_video_dma_address);
