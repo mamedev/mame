@@ -10363,6 +10363,112 @@ ROM_START( zombraid )
 	ROM_LOAD( "fy001011.a",  0x280000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
 ROM_END
 
+/* Notes about the Proto/Test roms:
+
+Each rom was labeled with PCB location, use, SUM16 and final date EX:
+
+LOGO  Zombie Raid
+
+U3 Master USA
+PRG E_L DD28 9/28/95
+
+
+The "LOGO" above means that the actual Sammy logo was printed there.
+
+These look like final prototype or test roms before production and combining the data into larger MASK roms.
+*/
+
+
+ROM_START( zombraidp ) /* Prototype or test board version.  Data matches released MASK rom version */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "u3_master_usa_prg_e_l_dd28.u3",     0x000000, 0x080000, CRC(0b34b8f7) SHA1(8c6d7d208ece08695169f2e06806e7e55c595eb2) ) /* These 4 roms dated 9/28/95 */
+	ROM_LOAD16_BYTE( "u4_master_usa_prg_o_l_5e2b.u4",     0x000001, 0x080000, CRC(71bfeb1a) SHA1(75747b0c6e655624a5dc2e4fa8f16a6a51bd8769) )
+	ROM_LOAD16_BYTE( "u103_master_usa_prg_e_h_789e.u103", 0x100000, 0x080000, CRC(313fd68f) SHA1(792733acc72b4719b3f7f79b57fb874c71e8abfb) )
+	ROM_LOAD16_BYTE( "u102_master_usa_prg_o_h_1f25.u102", 0x100001, 0x080000, CRC(a0f61f13) SHA1(ba14c5ae0d0b3f217c130eeebd987dfde4c64c0d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "u142_master_obj_00_1bb3.u142", 0x000001, 0x040000, CRC(ed6c8541) SHA1(a119ad751184d575e135da0598cf1172025ddd48) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE(             "obj_01",           0x000000, 0x040000, CRC(a423620e) SHA1(8d9351eddeecb444a1ab2f99d0da1d74f01bad88) )
+	ROM_LOAD16_BYTE( "u143_master_obj_04_b5aa.u143", 0x080001, 0x040000, CRC(1242670d) SHA1(e6189a1974981cedbd16f5ea0295ff73cfd6a666) )
+	ROM_LOAD16_BYTE(             "obj_05",           0x080000, 0x040000, CRC(57fe3e97) SHA1(2f9e79d6984099495c0c025b11bea7c9f72f9ef4) )
+	ROM_LOAD16_BYTE( "u146_master_obj_02_6cc6.u146", 0x100001, 0x040000, CRC(7562ee1b) SHA1(bffb1a172e5259687dc0bc84916127419825c1b7) )
+	ROM_LOAD16_BYTE( "u144_master_obj_03_1cb5.u144", 0x100000, 0x040000, CRC(a83040f1) SHA1(c7efacaa706e7f07c95f23509c738665775db2d2) )
+	ROM_LOAD16_BYTE( "u147_master_obj_06_c3d8.u147", 0x180001, 0x040000, CRC(a32c3da8) SHA1(fd63c0fb13fb546732351dc2ee5fa33c1c275274) )
+	ROM_LOAD16_BYTE( "u145_master_obj_07_8ad4.u145", 0x180000, 0x040000, CRC(8071f0b6) SHA1(e596897e52beaf686e95ad643a36beefe311d85c) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000000, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
+	ROM_LOAD16_BYTE( "u149_master_scn_1-3_71bb.u149", 0x100000, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
+	ROM_LOAD16_BYTE( "u151_master_scn_1-4_872e.u151", 0x100001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
+	ROM_LOAD16_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x200000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
+	ROM_LOAD16_BYTE( "u155_master_scn_1-5_daef.u155", 0x300000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000000, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
+	ROM_LOAD16_BYTE( "u165_master_scn_2-3_be68.u165", 0x100000, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )	
+	ROM_LOAD16_BYTE( "u167_master_scn_2-4_c515.u167", 0x100001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
+	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
+	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
+
+	ROM_REGION( 0x480000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
+	// skip 80000-fffff (banked region)
+	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x100000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
+	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x180000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
+	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x200000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
+	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x280000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
+	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
+	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
+	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+ROM_END
+
+ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches released MASK rom version */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "u3_master_usa_prg_e_l_dd28.u3",     0x000000, 0x080000, CRC(0b34b8f7) SHA1(8c6d7d208ece08695169f2e06806e7e55c595eb2) ) /* These 4 roms dated 9/28/95 */
+	ROM_LOAD16_BYTE( "u4_master_jpn_prg_o_l_5e2c.u4",     0x000001, 0x080000, CRC(3cb6bdf0) SHA1(4c1babeb4d7dbf7d26f8e34b552c0338432abd57) )
+	ROM_LOAD16_BYTE( "u103_master_usa_prg_e_h_789e.u103", 0x100000, 0x080000, CRC(313fd68f) SHA1(792733acc72b4719b3f7f79b57fb874c71e8abfb) )
+	ROM_LOAD16_BYTE( "u102_master_usa_prg_o_h_1f25.u102", 0x100001, 0x080000, CRC(a0f61f13) SHA1(ba14c5ae0d0b3f217c130eeebd987dfde4c64c0d) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "u142_master_obj_00_1bb3.u142", 0x000001, 0x040000, CRC(ed6c8541) SHA1(a119ad751184d575e135da0598cf1172025ddd48) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE(             "obj_01",           0x000000, 0x040000, CRC(a423620e) SHA1(8d9351eddeecb444a1ab2f99d0da1d74f01bad88) )
+	ROM_LOAD16_BYTE( "u143_master_obj_04_b5aa.u143", 0x080001, 0x040000, CRC(1242670d) SHA1(e6189a1974981cedbd16f5ea0295ff73cfd6a666) )
+	ROM_LOAD16_BYTE(             "obj_05",           0x080000, 0x040000, CRC(57fe3e97) SHA1(2f9e79d6984099495c0c025b11bea7c9f72f9ef4) )
+	ROM_LOAD16_BYTE( "u146_master_obj_02_6cc6.u146", 0x100001, 0x040000, CRC(7562ee1b) SHA1(bffb1a172e5259687dc0bc84916127419825c1b7) )
+	ROM_LOAD16_BYTE( "u144_master_obj_03_1cb5.u144", 0x100000, 0x040000, CRC(a83040f1) SHA1(c7efacaa706e7f07c95f23509c738665775db2d2) )
+	ROM_LOAD16_BYTE( "u147_master_obj_06_c3d8.u147", 0x180001, 0x040000, CRC(a32c3da8) SHA1(fd63c0fb13fb546732351dc2ee5fa33c1c275274) )
+	ROM_LOAD16_BYTE( "u145_master_obj_07_8ad4.u145", 0x180000, 0x040000, CRC(8071f0b6) SHA1(e596897e52beaf686e95ad643a36beefe311d85c) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000000, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
+	ROM_LOAD16_BYTE( "u149_master_scn_1-3_71bb.u149", 0x100000, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
+	ROM_LOAD16_BYTE( "u151_master_scn_1-4_872e.u151", 0x100001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
+	ROM_LOAD16_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x200000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
+	ROM_LOAD16_BYTE( "u155_master_scn_1-5_daef.u155", 0x300000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000000, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD16_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
+	ROM_LOAD16_BYTE( "u165_master_scn_2-3_be68.u165", 0x100000, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )	
+	ROM_LOAD16_BYTE( "u167_master_scn_2-4_c515.u167", 0x100001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
+	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
+	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
+
+	ROM_REGION( 0x480000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
+	// skip 80000-fffff (banked region)
+	ROM_LOAD( "u157_master_snd_1_c20a.u157", 0x100000, 0x080000, CRC(b449a8ba) SHA1(3248a767132f60dec848fdc21a76481caa428cd2) )
+	ROM_LOAD( "u158_master_snd_2_5c69.u158", 0x180000, 0x080000, CRC(ed6de791) SHA1(416c39c03a9ac2214702eaea7716e9aa74c8c228) )
+	ROM_LOAD( "u159_master_snd_3_0727.u159", 0x200000, 0x080000, CRC(794cec21) SHA1(5c44286ea14c0e6a7a4588e523015f83d64dd1a7) )
+	ROM_LOAD( "u160_master_snd_4_5a70.u160", 0x280000, 0x080000, CRC(e81ace66) SHA1(f4984e855c222e1cf3287538f536f7b0275f03d5) )
+	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
+	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
+	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+ROM_END
+
 ROM_START( madshark )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "fq001002.201",  0x000000, 0x080000, CRC(4286a811) SHA1(c8d4a28008548fe7d1d70758462205862142c56b) )
@@ -10973,5 +11079,7 @@ GAME( 1993, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT
 GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, gundhara, 0,        gundhara, gundhara, driver_device, 0,        ROT270, "Banpresto",              "Gundhara", 0 )
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
-GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", GAME_NO_COCKTAIL )
+GAME( 1995, zombraidp,zombraid, gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", GAME_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid,gundhara, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", GAME_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                   "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

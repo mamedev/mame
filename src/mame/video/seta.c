@@ -200,6 +200,8 @@ static const game_offset game_offsets[] =
 	{ "sokonuke", {  0,  0 }, { -2, -2 } }, // correct (game selection, test grid)
 	{ "gundhara", {  0,  0 }, {  0,  0 } }, // unknown, flip screen not supported?
 	{ "zombraid", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
+	{ "zombraidp", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
+	{ "zombraidpj", {  0,  0 }, { -2, -2 } }, // correct for normal, flip screen not working yet
 	{ "madshark", {  0,  0 }, {  0,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "utoukond", {  0,  0 }, { -2,  0 } }, // unknown (wrong when flipped, but along y)
 	{ "crazyfgt", {  0,  0 }, { -2,  0 } }, // wrong (empty background column in title screen, but aligned sprites in screen select)
@@ -217,7 +219,7 @@ static const game_offset game_offsets[] =
 void seta_state::seta_coin_lockout_w(int data)
 {
 	static const char *const seta_nolockout[] =
-	{ "blandia", "eightfrc", "extdwnhl", "gundhara", "kamenrid", "magspeed", "sokonuke", "zingzip", "zombraid"};
+	{ "blandia", "eightfrc", "extdwnhl", "gundhara", "kamenrid", "magspeed", "sokonuke", "zingzip", "zombraid", "zombraidp", "zombraidpj"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
 	if (!m_coin_lockout_initialized)
