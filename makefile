@@ -544,7 +544,7 @@ CCOMFLAGS += -fPIE
 endif
 ifneq (,$(findstring memory,$(SANITIZE)))
 ifneq (,$(findstring clang,$(CC)))
-CCOMFLAGS += -fsanitize-memory-track-origins
+CCOMFLAGS += -fsanitize-memory-track-origins -fPIE
 endif
 endif
 endif
@@ -617,6 +617,9 @@ endif
 ifdef SANITIZE
 LDFLAGS += -fsanitize=$(SANITIZE)
 ifneq (,$(findstring thread,$(SANITIZE)))
+LDFLAGS += -pie
+endif
+ifneq (,$(findstring memory,$(SANITIZE)))
 LDFLAGS += -pie
 endif
 endif
