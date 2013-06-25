@@ -769,7 +769,19 @@ inline void m68000_base_device::cpu_execute(void)
 	if(!stopped)
 	{
 		/* Return point if we had an address error */
-		m68ki_set_address_error_trap(this); /* auto-disable (see m68kcpu.h) */
+		check_address_error:
+		if (m_address_error==1)
+		{
+			m_address_error = 0;
+			m68ki_exception_address_error(this);
+			if(stopped)
+			{
+				if (remaining_cycles > 0)
+					remaining_cycles = 0;
+				return;
+			}
+		}
+
 
 		/* Main loop.  Keep going until we run out of clock cycles */
 		while (remaining_cycles > 0)
@@ -787,6 +799,8 @@ inline void m68000_base_device::cpu_execute(void)
 			/* Record previous program counter */
 			REG_PPC(this) = REG_PC(this);
 
+			try
+			{
 			if (!pmmu_enabled)
 			{
 				run_mode = RUN_MODE_NORMAL;
@@ -866,6 +880,18 @@ inline void m68000_base_device::cpu_execute(void)
 					// remaining_cycles -= cyc_exception[EXCEPTION_BUS_ERROR] - cyc_instruction[ir];
 				}
 			}
+			}
+			catch (int error)
+			{
+				if (error==10)
+				{
+					m_address_error = 1;
+					goto check_address_error;
+				}
+				else
+					throw;
+			}
+
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(this); /* auto-disable (see m68kcpu.h) */
@@ -2600,7 +2626,6 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 
 void m68000_base_device::clear_all()
 {
-
 	cpu_type= 0;
 //	dasm_type= 0;
 	for (int i=0;i<16;i++)
@@ -2659,7 +2684,7 @@ void m68000_base_device::clear_all()
 	reset_cycles = 0;
 	tracing = 0;
 
-//	aerr_trap = 0;
+	m_address_error = 0;
 
 	aerr_address = 0;
 	aerr_write_mode = 0;

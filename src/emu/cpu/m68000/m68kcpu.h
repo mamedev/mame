@@ -31,7 +31,7 @@ class m68000_base_device;
 
 
 #include <limits.h>
-#include <setjmp.h>
+
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */

@@ -16,7 +16,6 @@
 
 #include "../../../lib/softfloat/milieu.h"
 #include "../../../lib/softfloat/softfloat.h"
-#include <setjmp.h>
 
 
 /* MMU constants */
@@ -28,52 +27,14 @@
 
 
 
-/* Address error */
-/* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
-#ifdef _BSD_SETJMP_H
-#define m68ki_set_address_error_trap(m68k) \
-	if(sigsetjmp(m68k->aerr_trap, 0) != 0) \
-	{ \
-		m68ki_exception_address_error(m68k); \
-		if(m68k->stopped) \
-		{ \
-			if (m68k->remaining_cycles > 0) \
-				m68k->remaining_cycles = 0; \
-			return; \
-		} \
-	}
-
 #define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
 	if((ADDR)&1) \
 	{ \
 		m68k->aerr_address = ADDR; \
 		m68k->aerr_write_mode = WRITE_MODE; \
 		m68k->aerr_fc = FC; \
-		siglongjmp(m68k->aerr_trap, 1); \
+		throw 10; \
 	}
-#else
-#define m68ki_set_address_error_trap(m68k) \
-	SETJMP_GNUC_PROTECT(); \
-	if(setjmp(m68k->aerr_trap) != 0) \
-	{ \
-		m68ki_exception_address_error(m68k); \
-		if(m68k->stopped) \
-		{ \
-			if (m68k->remaining_cycles > 0) \
-				m68k->remaining_cycles = 0; \
-			return; \
-		} \
-	}
-
-#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
-	if((ADDR)&1) \
-	{ \
-		m68k->aerr_address = ADDR; \
-		m68k->aerr_write_mode = WRITE_MODE; \
-		m68k->aerr_fc = FC; \
-		longjmp(m68k->aerr_trap, 1); \
-	}
-#endif
 
 
 
@@ -286,11 +247,8 @@ public:
 	int  reset_cycles;
 	UINT32 tracing;
 
-#ifdef _BSD_SETJMP_H
-	sigjmp_buf aerr_trap;
-#else
-	jmp_buf aerr_trap;
-#endif
+	int m_address_error;
+
 	UINT32    aerr_address;
 	UINT32    aerr_write_mode;
 	UINT32    aerr_fc;
@@ -312,7 +270,6 @@ public:
 	m68k_tas_func tas_instr_callback;             /* Called when a TAS instruction is encountered, allows / disallows writeback */
 
 	address_space *program;
-
 
 
 	/* Redirect memory calls */
