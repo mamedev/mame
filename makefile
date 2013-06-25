@@ -440,12 +440,6 @@ ifneq ($(BUILD_JPEGLIB),1)
 DEFS += -DUSE_SYSTEM_JPEGLIB
 endif
 
-# disable initialization of memory in malloc overload
-ifdef SANITIZE
-ifneq (,$(findstring memory,$(SANITIZE)))
-DEFS += -DNO_MEMORY_INITIALIZATION
-endif
-endif
 
 
 #-------------------------------------------------
