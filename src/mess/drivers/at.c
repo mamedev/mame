@@ -914,11 +914,6 @@ ROM_START( cmdpc30 )
 	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0xf8001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
 ROM_END
 
-ROM_START( cmdpc10 )
-	ROM_REGION(0x1000000,"maincpu", 0)
-	ROM_LOAD( "commodore pc bios v4.41.bin", 0xf8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc))
-ROM_END
-
 ROM_START( atvga )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "vl82c", "VL82C311L-FC4")/*(Motherboard Manufacturer: Biostar Microtech Corp.) (BIOS release date: 05-05-1991)*/
@@ -1361,7 +1356,6 @@ COMP ( 1993, apxena1,  ibm5170, 0,       at486,     atvga, at_state,      atvga,
 COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot XEN PC (P2 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1990, c386sx16, ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
-COMP ( 1988, cmdpc10,  ibm5170, 0,       atvga,     atvga, at_state,      atvga,  "Commodore Business Machines",  "PC 10 III", GAME_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "FIC", "486-PIO-2", GAME_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga, driver_device,      0,      "FIC", "VT-503", GAME_NOT_WORKING )
 COMP ( 1985, k286i,    ibm5170, 0,       k286i,     atcga, at_state,      atcga,  "Kaypro",   "286i", GAME_NOT_WORKING )
