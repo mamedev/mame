@@ -503,18 +503,18 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = tc0360pri_r(m_tc0360pri, space, 4) & 0x0f;     /* bg0 */
-	tilepri[1] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;       /* bg1 */
-	tilepri[2] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f;     /* bg2 */
-	tilepri[3] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;       /* bg3 */
+	tilepri[0] = m_tc0360pri->read(space, 4) & 0x0f;     /* bg0 */
+	tilepri[1] = m_tc0360pri->read(space, 4) >> 4;       /* bg1 */
+	tilepri[2] = m_tc0360pri->read(space, 5) & 0x0f;     /* bg2 */
+	tilepri[3] = m_tc0360pri->read(space, 5) >> 4;       /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;    /* fg (text layer) */
+	tilepri[layer[4]] = m_tc0360pri->read(space, 7) & 0x0f;    /* fg (text layer) */
 
-	spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);

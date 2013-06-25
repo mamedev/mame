@@ -63,7 +63,7 @@ struct tc0100scn_interface
 
 struct tc0280grd_interface
 {
-	int                gfxnum;
+	int                m_gfxnum;
 };
 
 
@@ -101,7 +101,7 @@ struct tc0180vcu_interface
 };
 
 class pc080sn_device : public device_t,
-										pc080sn_interface
+						public pc080sn_interface
 {
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -154,7 +154,7 @@ public:
 extern const device_type PC080SN;
 
 class pc090oj_device : public device_t,
-										public pc090oj_interface
+						public pc090oj_interface
 {
 public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -194,7 +194,7 @@ private:
 extern const device_type PC090OJ;
 
 class tc0080vco_device : public device_t,
-											public tc0080vco_interface
+							public tc0080vco_interface
 {
 public:
 	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -257,7 +257,7 @@ public:
 extern const device_type TC0080VCO;
 
 class tc0100scn_device : public device_t,
-											public tc0100scn_interface
+							public tc0100scn_interface
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -347,45 +347,66 @@ private:
 
 extern const device_type TC0100SCN;
 
-class tc0280grd_device : public device_t
+class tc0280grd_device : public device_t,
+							public tc0280grd_interface
 {
 public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0280grd_device() { global_free(m_token); }
+	~tc0280grd_device() {}
+	
+	DECLARE_READ16_MEMBER( tc0280grd_word_r );
+	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
+	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
+	void tc0280grd_tilemap_update(int base_color);
+	void tc0280grd_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ16_MEMBER( tc0430grw_word_r );
+	DECLARE_WRITE16_MEMBER( tc0430grw_word_w );
+	DECLARE_WRITE16_MEMBER( tc0430grw_ctrl_word_w );
+	void tc0430grw_tilemap_update(int base_color);
+	void tc0430grw_zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	UINT16 *       m_ram;
+
+	tilemap_t      *m_tilemap;
+
+	UINT16         m_ctrl[8];
+	int            m_base_color;
 
 	TILE_GET_INFO_MEMBER(tc0280grd_get_tile_info);
+	void zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply );
 };
 
 extern const device_type TC0280GRD;
 
 #define TC0430GRW TC0280GRD
+
 class tc0360pri_device : public device_t
 {
 public:
 	tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0360pri_device() { global_free(m_token); }
+	~tc0360pri_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	UINT8   m_regs[16];
 };
 
 extern const device_type TC0360PRI;
@@ -533,25 +554,6 @@ extern const device_type TC0180VCU;
 /***************************************************************************
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
-
-
-/** TC0280GRD & TC0430GRW **/
-DECLARE_READ16_DEVICE_HANDLER( tc0280grd_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0280grd_word_w );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w );
-void tc0280grd_tilemap_update(device_t *device, int base_color);
-void tc0280grd_zoom_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
-
-DECLARE_READ16_DEVICE_HANDLER( tc0430grw_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0430grw_word_w );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w );
-void tc0430grw_tilemap_update(device_t *device, int base_color);
-void tc0430grw_zoom_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority);
-
-
-/** TC0360PRI **/
-DECLARE_WRITE8_DEVICE_HANDLER( tc0360pri_w );
-DECLARE_READ8_DEVICE_HANDLER( tc0360pri_r );
 
 
 /** TC0480SCP **/

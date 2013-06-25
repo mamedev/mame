@@ -2379,152 +2379,13 @@ int tc0100scn_device::bottomlayer()
 /*                                                                         */
 /***************************************************************************/
 
-struct tc0280grd_state
-{
-	UINT16 *       ram;
-
-	tilemap_t      *tilemap;
-
-	UINT16         ctrl[8];
-	int            gfxnum, base_color;
-};
-
 #define TC0280GRD_RAM_SIZE 0x2000
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE tc0280grd_state *tc0280grd_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
-
-	return (tc0280grd_state *)downcast<tc0280grd_device *>(device)->token();
-}
-
-INLINE const tc0280grd_interface *tc0280grd_get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
-	return (const tc0280grd_interface *) device->static_config();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
-	int attr = tc0280grd->ram[tile_index];
-	SET_TILE_INFO_MEMBER(
-			tc0280grd->gfxnum,
-			attr & 0x3fff,
-			((attr & 0xc000) >> 14) + tc0280grd->base_color,
-			0);
-}
-
-READ16_DEVICE_HANDLER( tc0280grd_word_r )
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	return tc0280grd->ram[offset];
-}
-
-WRITE16_DEVICE_HANDLER( tc0280grd_word_w )
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	COMBINE_DATA(&tc0280grd->ram[offset]);
-	tc0280grd->tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_DEVICE_HANDLER( tc0280grd_ctrl_word_w )
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	COMBINE_DATA(&tc0280grd->ctrl[offset]);
-}
-
-READ16_DEVICE_HANDLER( tc0430grw_word_r )
-{
-	return tc0280grd_word_r(device, space, offset, mem_mask);
-}
-
-WRITE16_DEVICE_HANDLER( tc0430grw_word_w )
-{
-	tc0280grd_word_w(device, space, offset, data, mem_mask);
-}
-
-WRITE16_DEVICE_HANDLER( tc0430grw_ctrl_word_w )
-{
-	tc0280grd_ctrl_word_w(device, space, offset, data, mem_mask);
-}
-
-void tc0280grd_tilemap_update( device_t *device, int base_color )
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	if (tc0280grd->base_color != base_color)
-	{
-		tc0280grd->base_color = base_color;
-		tc0280grd->tilemap->mark_all_dirty();
-	}
-}
-
-void tc0430grw_tilemap_update( device_t *device, int base_color )
-{
-	tc0280grd_tilemap_update(device, base_color);
-}
-
-static void zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
-{
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(device);
-	UINT32 startx, starty;
-	int incxx, incxy, incyx, incyy;
-
-	/* 24-bit signed */
-	startx = ((tc0280grd->ctrl[0] & 0xff) << 16) + tc0280grd->ctrl[1];
-
-	if (startx & 0x800000)
-		startx -= 0x1000000;
-
-	incxx = (INT16)tc0280grd->ctrl[2];
-	incxx *= xmultiply;
-	incyx = (INT16)tc0280grd->ctrl[3];
-
-	/* 24-bit signed */
-	starty = ((tc0280grd->ctrl[4] & 0xff) << 16) + tc0280grd->ctrl[5];
-
-	if (starty & 0x800000)
-		starty -= 0x1000000;
-
-	incxy = (INT16)tc0280grd->ctrl[6];
-	incxy *= xmultiply;
-	incyy = (INT16)tc0280grd->ctrl[7];
-
-	startx -= xoffset * incxx + yoffset * incyx;
-	starty -= xoffset * incxy + yoffset * incyy;
-
-	tc0280grd->tilemap->draw_roz(bitmap, cliprect, startx << 4, starty << 4,
-			incxx << 4, incxy << 4, incyx << 4, incyy << 4,
-			1,  /* copy with wraparound */
-			0, priority);
-}
-
-void tc0280grd_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
-{
-	zoom_draw(device, bitmap, cliprect, xoffset, yoffset, priority, 2);
-}
-
-void tc0430grw_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
-{
-	zoom_draw(device, bitmap, cliprect, xoffset, yoffset, priority, 1);
-}
 
 const device_type TC0280GRD = &device_creator<tc0280grd_device>;
 
 tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0280GRD, "Taito TC0280GRD & TC0430GRW", tag, owner, clock, "tc0280grd", __FILE__)
 {
-	m_token = global_alloc_clear(tc0280grd_state);
 }
 
 //-------------------------------------------------
@@ -2535,6 +2396,15 @@ tc0280grd_device::tc0280grd_device(const machine_config &mconfig, const char *ta
 
 void tc0280grd_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const tc0280grd_interface *intf = reinterpret_cast<const tc0280grd_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<tc0280grd_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	}
 }
 
 //-------------------------------------------------
@@ -2543,18 +2413,13 @@ void tc0280grd_device::device_config_complete()
 
 void tc0280grd_device::device_start()
 {
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
-	const tc0280grd_interface *intf = tc0280grd_get_interface(this);
+	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap->set_transparent_pen(0);
 
-	tc0280grd->gfxnum = intf->gfxnum;
+	m_ram = auto_alloc_array(machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
 
-	tc0280grd->tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tc0280grd_device::tc0280grd_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	tc0280grd->tilemap->set_transparent_pen(0);
-
-	tc0280grd->ram = auto_alloc_array(machine(), UINT16, TC0280GRD_RAM_SIZE / 2);
-
-	save_pointer(NAME(tc0280grd->ram), TC0280GRD_RAM_SIZE / 2);
-	save_item(NAME(tc0280grd->ctrl));
+	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
+	save_item(NAME(m_ctrl));
 }
 
 //-------------------------------------------------
@@ -2563,11 +2428,113 @@ void tc0280grd_device::device_start()
 
 void tc0280grd_device::device_reset()
 {
-	tc0280grd_state *tc0280grd = tc0280grd_get_safe_token(this);
 	int i;
 
 	for (i = 0; i < 8; i++)
-		tc0280grd->ctrl[i] = 0;
+		m_ctrl[i] = 0;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
+{
+	int attr = m_ram[tile_index];
+	SET_TILE_INFO_MEMBER(
+			m_gfxnum,
+			attr & 0x3fff,
+			((attr & 0xc000) >> 14) + m_base_color,
+			0);
+}
+
+READ16_MEMBER( tc0280grd_device::tc0280grd_word_r )
+{
+	return m_ram[offset];
+}
+
+WRITE16_MEMBER( tc0280grd_device::tc0280grd_word_w )
+{
+	COMBINE_DATA(&m_ram[offset]);
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE16_MEMBER( tc0280grd_device::tc0280grd_ctrl_word_w )
+{
+	COMBINE_DATA(&m_ctrl[offset]);
+}
+
+READ16_MEMBER( tc0280grd_device::tc0430grw_word_r )
+{
+	return tc0280grd_word_r(space, offset, mem_mask);
+}
+
+WRITE16_MEMBER( tc0280grd_device::tc0430grw_word_w )
+{
+	tc0280grd_word_w(space, offset, data, mem_mask);
+}
+
+WRITE16_MEMBER( tc0280grd_device::tc0430grw_ctrl_word_w )
+{
+	tc0280grd_ctrl_word_w(space, offset, data, mem_mask);
+}
+
+void tc0280grd_device::tc0280grd_tilemap_update( int base_color )
+{
+	if (m_base_color != base_color)
+	{
+		m_base_color = base_color;
+		m_tilemap->mark_all_dirty();
+	}
+}
+
+void tc0280grd_device::tc0430grw_tilemap_update( int base_color )
+{
+	tc0280grd_tilemap_update(base_color);
+}
+
+void tc0280grd_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority, int xmultiply )
+{
+	UINT32 startx, starty;
+	int incxx, incxy, incyx, incyy;
+
+	/* 24-bit signed */
+	startx = ((m_ctrl[0] & 0xff) << 16) + m_ctrl[1];
+
+	if (startx & 0x800000)
+		startx -= 0x1000000;
+
+	incxx = (INT16)m_ctrl[2];
+	incxx *= xmultiply;
+	incyx = (INT16)m_ctrl[3];
+
+	/* 24-bit signed */
+	starty = ((m_ctrl[4] & 0xff) << 16) + m_ctrl[5];
+
+	if (starty & 0x800000)
+		starty -= 0x1000000;
+
+	incxy = (INT16)m_ctrl[6];
+	incxy *= xmultiply;
+	incyy = (INT16)m_ctrl[7];
+
+	startx -= xoffset * incxx + yoffset * incyx;
+	starty -= xoffset * incxy + yoffset * incyy;
+
+	m_tilemap->draw_roz(bitmap, cliprect, startx << 4, starty << 4,
+			incxx << 4, incxy << 4, incyx << 4, incyy << 4,
+			1,  /* copy with wraparound */
+			0, priority);
+}
+
+void tc0280grd_device::tc0280grd_zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
+{
+	zoom_draw(bitmap, cliprect, xoffset, yoffset, priority, 2);
+}
+
+void tc0280grd_device::tc0430grw_zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, UINT32 priority )
+{
+	zoom_draw(bitmap, cliprect, xoffset, yoffset, priority, 1);
 }
 
 
@@ -2577,75 +2544,13 @@ void tc0280grd_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-struct tc0360pri_state
-{
-	UINT8   regs[16];
-};
 
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE tc0360pri_state *tc0360pri_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == TC0360PRI);
-
-	return (tc0360pri_state *)downcast<tc0360pri_device *>(device)->token();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-WRITE8_DEVICE_HANDLER( tc0360pri_w )
-{
-	tc0360pri_state *tc0360pri = tc0360pri_get_safe_token(device);
-	tc0360pri->regs[offset] = data;
-
-if (offset >= 0x0a)
-	popmessage("write %02x to unused TC0360PRI reg %x", data, offset);
-#if 0
-#define regs tc0360pri->regs
-	popmessage("%02x %02x  %02x %02x  %02x %02x %02x %02x %02x %02x",
-		regs[0x00], regs[0x01], regs[0x02], regs[0x03],
-		regs[0x04], regs[0x05], regs[0x06], regs[0x07],
-		regs[0x08], regs[0x09]);
-#endif
-}
-
-READ8_DEVICE_HANDLER( tc0360pri_r )
-{
-	tc0360pri_state *tc0360pri = tc0360pri_get_safe_token(device);
-	return tc0360pri->regs[offset];
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( tc0360pri )
-{
-	tc0360pri_state *tc0360pri = tc0360pri_get_safe_token(device);
-	device->save_item(NAME(tc0360pri->regs));
-}
-
-static DEVICE_RESET( tc0360pri )
-{
-	tc0360pri_state *tc0360pri = tc0360pri_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 16; i++)
-		tc0360pri->regs[i] = 0;
-
-}
 
 const device_type TC0360PRI = &device_creator<tc0360pri_device>;
 
 tc0360pri_device::tc0360pri_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0360PRI, "Taito TC0360PRI", tag, owner, clock, "tc0360pri", __FILE__)
 {
-	m_token = global_alloc_clear(tc0360pri_state);
 }
 
 //-------------------------------------------------
@@ -2664,7 +2569,7 @@ void tc0360pri_device::device_config_complete()
 
 void tc0360pri_device::device_start()
 {
-	DEVICE_START_NAME( tc0360pri )(this);
+	save_item(NAME(m_regs));
 }
 
 //-------------------------------------------------
@@ -2673,8 +2578,38 @@ void tc0360pri_device::device_start()
 
 void tc0360pri_device::device_reset()
 {
-	DEVICE_RESET_NAME( tc0360pri )(this);
+		int i;
+
+	for (i = 0; i < 16; i++)
+		m_regs[i] = 0;
 }
+
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+WRITE8_MEMBER( tc0360pri_device::write )
+{
+	m_regs[offset] = data;
+
+if (offset >= 0x0a)
+	popmessage("write %02x to unused TC0360PRI reg %x", data, offset);
+#if 0
+#define regs m_regs
+	popmessage("%02x %02x  %02x %02x  %02x %02x %02x %02x %02x %02x",
+		regs[0x00], regs[0x01], regs[0x02], regs[0x03],
+		regs[0x04], regs[0x05], regs[0x06], regs[0x07],
+		regs[0x08], regs[0x09]);
+#endif
+}
+
+READ8_MEMBER( tc0360pri_device::read )
+{
+	return m_regs[offset];
+}
+
+
 
 /***************************************************************************/
 /*                                                                         */

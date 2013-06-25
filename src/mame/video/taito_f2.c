@@ -1025,16 +1025,16 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
-	m_tilepri[layer[0]] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f;
-	m_tilepri[layer[1]] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;
-	m_tilepri[layer[2]] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;
+	m_tilepri[layer[0]] = m_tc0360pri->read(space, 5) & 0x0f;
+	m_tilepri[layer[1]] = m_tc0360pri->read(space, 5) >> 4;
+	m_tilepri[layer[2]] = m_tc0360pri->read(space, 4) >> 4;
 
-	m_spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	m_spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	m_spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	m_spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	m_spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	m_spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	m_spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	m_spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
-	m_spriteblendmode = tc0360pri_r(m_tc0360pri, space, 0) & 0xc0;
+	m_spriteblendmode = m_tc0360pri->read(space, 0) & 0xc0;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
@@ -1052,10 +1052,10 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 void taitof2_state::draw_roz_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority)
 {
 	if (m_tc0280grd != NULL)
-		tc0280grd_zoom_draw(m_tc0280grd, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
+		m_tc0280grd->tc0280grd_zoom_draw(bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 
 	if (m_tc0430grw != NULL)
-		tc0430grw_zoom_draw(m_tc0430grw, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
+		m_tc0430grw->tc0430grw_zoom_draw(bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 }
 
 UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1066,35 +1066,35 @@ UINT32 taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitma
 	int layer[3];
 	int drawn;
 	int i,j;
-	int roz_base_color = (tc0360pri_r(m_tc0360pri, space, 1) & 0x3f) << 2;
+	int roz_base_color = (m_tc0360pri->read(space, 1) & 0x3f) << 2;
 
 	taitof2_handle_sprite_buffering();
 
 	if (m_tc0280grd != NULL)
-		tc0280grd_tilemap_update(m_tc0280grd, roz_base_color);
+		m_tc0280grd->tc0280grd_tilemap_update(roz_base_color);
 
 	if (m_tc0430grw != NULL)
-		tc0430grw_tilemap_update(m_tc0430grw, roz_base_color);
+		m_tc0430grw->tc0430grw_tilemap_update(roz_base_color);
 
 	m_tc0100scn->tilemap_update();
 
-	rozpri = (tc0360pri_r(m_tc0360pri, space, 1) & 0xc0) >> 6;
-	rozpri = (tc0360pri_r(m_tc0360pri, space, 8 + rozpri / 2) >> 4 * (rozpri & 1)) & 0x0f;
+	rozpri = (m_tc0360pri->read(space, 1) & 0xc0) >> 6;
+	rozpri = (m_tc0360pri->read(space, 8 + rozpri / 2) >> 4 * (rozpri & 1)) & 0x0f;
 
 	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	tilepri[layer[0]] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f;
-	tilepri[layer[1]] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;
-	tilepri[layer[2]] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;
+	tilepri[layer[0]] = m_tc0360pri->read(space, 5) & 0x0f;
+	tilepri[layer[1]] = m_tc0360pri->read(space, 5) >> 4;
+	tilepri[layer[2]] = m_tc0360pri->read(space, 4) >> 4;
 
-	m_spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	m_spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	m_spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	m_spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	m_spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	m_spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	m_spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	m_spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
-	m_spriteblendmode = tc0360pri_r(m_tc0360pri, space, 0) & 0xc0;
+	m_spriteblendmode = m_tc0360pri->read(space, 0) & 0xc0;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
@@ -1143,21 +1143,21 @@ UINT32 taitof2_state::screen_update_taitof2_thundfox(screen_device &screen, bitm
 	layer[0][0] = m_tc0100scn_1->bottomlayer();
 	layer[0][1] = layer[0][0] ^ 1;
 	layer[0][2] = 2;
-	tilepri[0][layer[0][0]] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f;
-	tilepri[0][layer[0][1]] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;
-	tilepri[0][layer[0][2]] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;
+	tilepri[0][layer[0][0]] = m_tc0360pri->read(space, 5) & 0x0f;
+	tilepri[0][layer[0][1]] = m_tc0360pri->read(space, 5) >> 4;
+	tilepri[0][layer[0][2]] = m_tc0360pri->read(space, 4) >> 4;
 
 	layer[1][0] = m_tc0100scn_2->bottomlayer();
 	layer[1][1] = layer[1][0] ^ 1;
 	layer[1][2] = 2;
-	tilepri[1][layer[1][0]] = tc0360pri_r(m_tc0360pri, space, 9) & 0x0f;
-	tilepri[1][layer[1][1]] = tc0360pri_r(m_tc0360pri, space, 9) >> 4;
-	tilepri[1][layer[1][2]] = tc0360pri_r(m_tc0360pri, space, 8) >> 4;
+	tilepri[1][layer[1][0]] = m_tc0360pri->read(space, 9) & 0x0f;
+	tilepri[1][layer[1][1]] = m_tc0360pri->read(space, 9) >> 4;
+	tilepri[1][layer[1][2]] = m_tc0360pri->read(space, 8) >> 4;
 
-	spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);   /* wrong color? */
@@ -1287,18 +1287,18 @@ UINT32 taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap
 	invlayer[layer[2]] = 2;
 	invlayer[layer[3]] = 3;
 
-	m_tilepri[invlayer[0]] = tc0360pri_r(m_tc0360pri, space, 4) & 0x0f; /* bg0 */
-	m_tilepri[invlayer[1]] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;   /* bg1 */
-	m_tilepri[invlayer[2]] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f; /* bg2 */
-	m_tilepri[invlayer[3]] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;   /* bg3 */
-	m_tilepri[4] = tc0360pri_r(m_tc0360pri, space, 9) & 0x0f;           /* fg (text layer) */
+	m_tilepri[invlayer[0]] = m_tc0360pri->read(space, 4) & 0x0f; /* bg0 */
+	m_tilepri[invlayer[1]] = m_tc0360pri->read(space, 4) >> 4;   /* bg1 */
+	m_tilepri[invlayer[2]] = m_tc0360pri->read(space, 5) & 0x0f; /* bg2 */
+	m_tilepri[invlayer[3]] = m_tc0360pri->read(space, 5) >> 4;   /* bg3 */
+	m_tilepri[4] = m_tc0360pri->read(space, 9) & 0x0f;           /* fg (text layer) */
 
-	m_spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	m_spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	m_spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	m_spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	m_spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	m_spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	m_spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	m_spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
-	m_spriteblendmode = tc0360pri_r(m_tc0360pri, space, 0) & 0xc0;
+	m_spriteblendmode = m_tc0360pri->read(space, 0) & 0xc0;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
@@ -1335,18 +1335,18 @@ UINT32 taitof2_state::screen_update_taitof2_deadconx(screen_device &screen, bitm
 	layer[3] = (priority & 0x000f) >>  0;   /* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = tc0360pri_r(m_tc0360pri, space, 4) >> 4;      /* bg0 */
-	tilepri[1] = tc0360pri_r(m_tc0360pri, space, 5) & 0x0f;    /* bg1 */
-	tilepri[2] = tc0360pri_r(m_tc0360pri, space, 5) >> 4;      /* bg2 */
-	tilepri[3] = tc0360pri_r(m_tc0360pri, space, 4) & 0x0f;    /* bg3 */
+	tilepri[0] = m_tc0360pri->read(space, 4) >> 4;      /* bg0 */
+	tilepri[1] = m_tc0360pri->read(space, 5) & 0x0f;    /* bg1 */
+	tilepri[2] = m_tc0360pri->read(space, 5) >> 4;      /* bg2 */
+	tilepri[3] = m_tc0360pri->read(space, 4) & 0x0f;    /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;    /* fg (text layer) */
+	tilepri[layer[4]] = m_tc0360pri->read(space, 7) >> 4;    /* fg (text layer) */
 
-	spritepri[0] = tc0360pri_r(m_tc0360pri, space, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(m_tc0360pri, space, 6) >> 4;
-	spritepri[2] = tc0360pri_r(m_tc0360pri, space, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(m_tc0360pri, space, 7) >> 4;
+	spritepri[0] = m_tc0360pri->read(space, 6) & 0x0f;
+	spritepri[1] = m_tc0360pri->read(space, 6) >> 4;
+	spritepri[2] = m_tc0360pri->read(space, 7) & 0x0f;
+	spritepri[3] = m_tc0360pri->read(space, 7) >> 4;
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
