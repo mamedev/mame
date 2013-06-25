@@ -45,7 +45,6 @@
 
 #include <stdio.h>
 #include <string.h>
-//#include <stdlib.h>
 
 
 /***************************************************************************
@@ -174,7 +173,7 @@ __extension__ typedef signed long long      INT64;
 
 
 /* U64 and S64 are used to wrap long integer constants. */
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(_MSC_VER)
 #define U64(val) val##ULL
 #define S64(val) val##LL
 #else
@@ -233,5 +232,9 @@ __extension__ typedef signed long long      INT64;
 #define LITTLE_ENDIANIZE_INT64(x)   (FLIPENDIAN_INT64(x))
 #endif /* LSB_FIRST */
 
+// compatibility with non-clang compilers
+#ifndef __has_feature
+	#define __has_feature(x) 0
+#endif
 
 #endif  /* __OSDCOMM_H__ */
