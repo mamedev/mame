@@ -60,7 +60,7 @@
 
 /*----------- machine/apollo_dbg.c -----------*/
 
-int apollo_debug_instruction_hook(device_t *device, offs_t curpc);
+int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 /*----------- drivers/apollo.c -----------*/
 

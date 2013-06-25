@@ -1100,7 +1100,7 @@ static const UINT16 *get_data(m68000_base_device *m68k, offs_t addr)
 //  before executing each instruction
 //-------------------------------------------------
 
-int apollo_debug_instruction_hook(device_t *device, offs_t curpc)
+int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 {
 	// trap data remembered for next rte
 	static struct {
@@ -1114,7 +1114,7 @@ int apollo_debug_instruction_hook(device_t *device, offs_t curpc)
 	{
 		UINT32 ppc_save;
 		UINT16 ir;
-		m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *> (device)->token();
+		m68000_base_device *m68k = device;
 		m68k->mmu_tmp_buserror_occurred = 0;
 
 		/* Read next instruction */

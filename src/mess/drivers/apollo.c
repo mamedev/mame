@@ -219,7 +219,6 @@ UINT32 apollo_get_node_id(void) {
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc)
 {
 	m68000_base_device *m68k = device;
-	//m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *> (device)->token();
 
 	static UINT16 idle_counter = 0;
 
@@ -513,7 +512,7 @@ READ32_MEMBER(apollo_state::apollo_unmapped_r)
 {
 	offs_t address = offset * 4;
 
-	m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *>(&space.device())->token();
+	m68000_base_device *m68k = m_maincpu;
 
 	if ((address & 0xfff00000) == 0xfa800000 && VERBOSE < 2) {
 		// ?
