@@ -1033,6 +1033,29 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
+static const gfx_layout pc10iii_16_charlayout =
+{
+	8, 16,                  /* 8 x 16 characters */
+	2048,                    /* 2048 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	8*16                    /* every char takes 16 bytes */
+};
+
+// 8-byte chars: 080-0FF, 180-27F, 300-37F, 480-4FF, 580-67F, 700-77F
+// 16-byte chars: 000-07F, 100-17F, 280-2FF, 380-47F, 500-57F, 680-6FF, 780-7FF
+static GFXDECODE_START( pc10iii )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, pc10iii_16_charlayout, 3, 1 )
+GFXDECODE_END
+
+static MACHINE_CONFIG_DERIVED( pc10iii, pccga )
+	MCFG_GFXDECODE(pc10iii)
+MACHINE_CONFIG_END
+
 static const gfx_layout europc_8_charlayout =
 {
 	8, 8,                   /* 8 x 8 characters */
@@ -2425,32 +2448,20 @@ ROM_START( sx16 )
 ROM_END
 
 ROM_START( compc1 )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD("380270-01.bin", 0xfc000, 0x4000, BAD_DUMP CRC(75135d37) SHA1(177283642240fee191ba2d87e1d0c2a377c78ccb))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("pc1_char.bin", 0x0000, 0x8000, CRC(4773a945) SHA1(bcc38abecc75d3f641d42987cb0d2ed71d71bc4c))
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "compc1.bin",0xfc000, 0x4000, CRC(75135d37) SHA1(177283642240fee191ba2d87e1d0c2a377c78ccb))
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("pc1_char.bin", 0x00000, 0x8000, CRC(4773a945) SHA1(bcc38abecc75d3f641d42987cb0d2ed71d71bc4c))
 ROM_END
 
-// Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
 ROM_START( pc10iii )
-	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_DEFAULT_BIOS("v441")
-	ROM_SYSTEM_BIOS(0, "v435", "v4.35")
-	ROMX_LOAD("318085-01.u201", 0xf8000, 0x8000, NO_DUMP, ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "v436", "v4.36")
-	ROMX_LOAD("318085-02.u201", 0xf8000, 0x8000, NO_DUMP, ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "v436c", "v4.36c")
-	ROMX_LOAD("318085-04.u201", 0xf8000, 0x8000, NO_DUMP, ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "v438", "v4.38")
-	ROMX_LOAD("318085-05.u201", 0xf8000, 0x8000, CRC(ae9e6a31) SHA1(853ee251cf230818c407a8d13ef060a21c90a8c1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "v439", "v4.39")
-	ROMX_LOAD("318085-06.u201", 0xf8000, 0x8000, NO_DUMP, ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(5, "v440", "v4.40")
-	ROMX_LOAD("318085-07.u201", 0xf8000, 0x8000, NO_DUMP, ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(6, "v441", "v4.41")
-	ROMX_LOAD("318085-08.u201", 0xf8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(7))
-	ROM_REGION(0x8000, "gfx1", 0)
-	ROM_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "v438", "v4.38")
+	ROMX_LOAD( "pc10iii_bios.bin",0xf8000, 0x8000, CRC(ae9e6a31) SHA1(853ee251cf230818c407a8d13ef060a21c90a8c1),ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v441", "v4.41")
+	ROMX_LOAD( "commodore pc bios v4.41.bin", 0xf8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc),ROM_BIOS(2))
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("pc10iii_char.bin", 0x00000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
 ROM_END
 
 ROM_START( mbc16 )
@@ -2485,7 +2496,7 @@ COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, pc_state,    
 COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell, pc_state,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
 COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
 COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-1" , GAME_NOT_WORKING)
-COMP( 1987, pc10iii,    ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-10 III" , GAME_NOT_WORKING)
+COMP( 1987, pc10iii,    ibm5150,    0,          pc10iii,    pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-10 III" , GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
 COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr,  pc_state,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
