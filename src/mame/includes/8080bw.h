@@ -92,9 +92,6 @@ public:
 	DECLARE_WRITE8_MEMBER(shuttlei_ff_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(shuttlei_sh_port_2_w);
-	DECLARE_WRITE8_MEMBER(galactic_07_w);
-	DECLARE_WRITE8_MEMBER(galactic_sh_port_1_w);
-	DECLARE_WRITE8_MEMBER(galactic_sh_port_2_w);
 	DECLARE_READ8_MEMBER(claybust_gun_lo_r);
 	DECLARE_READ8_MEMBER(claybust_gun_hi_r);
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
@@ -156,7 +153,6 @@ extern const samples_interface lupin3_samples_interface;
 
 DISCRETE_SOUND_EXTERN( ballbomb );
 DISCRETE_SOUND_EXTERN( indianbt );
-DISCRETE_SOUND_EXTERN( galactic );
 DISCRETE_SOUND_EXTERN( polaris );
 
 extern const sn76477_interface lupin3_sn76477_interface;
