@@ -2,7 +2,10 @@
 
 	Harriet (c) 1990 Quadtel
 
-
+	TODO:
+	- PCB pics would be very useful
+	- "Failed to read NVR" message.
+	- hook-up keyboard/terminal, shouldn't be too hard by studying the code.
 
 ***************************************************************************/
 
@@ -10,8 +13,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 //#include "sound/ay8910.h"
-
-#define MAIN_CLOCK XTAL_8MHz
 
 class harriet_state : public driver_device
 {
@@ -26,6 +27,13 @@ public:
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_READ8_MEMBER(unk2_r);
+	DECLARE_READ8_MEMBER(unk3_r);
+	DECLARE_READ8_MEMBER(unk4_r);
 
 protected:
 	// driver_device overrides
@@ -45,8 +53,57 @@ UINT32 harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+/* tested at POST (PC=0x612), halts the CPU if cmp.b $f1000f.l, d0 for 0x4000 DBRAs */
+READ8_MEMBER(harriet_state::unk_r)
+{
+	return machine().rand();
+}
+
+WRITE8_MEMBER(harriet_state::unk_w)
+{
+/*	if(offset)
+		printf("%02x\n",data);
+	else if(data != 0xcf)
+		printf("$f1001d Control (offset 0) write %02x\n",data);*/
+}
+
+/* PC=0x676/0x694 */
+READ8_MEMBER(harriet_state::unk2_r)
+{
+	return machine().rand();
+}
+
+
+WRITE8_MEMBER(harriet_state::serial_w)
+{
+	printf("%c",data);
+}
+
+/* tested before putting data to serial port at PC=0x4c78 */
+READ8_MEMBER(harriet_state::unk3_r)
+{
+	return 0xff;//machine().rand();
+}
+
+/* 0x314c, terminal status? */
+READ8_MEMBER(harriet_state::unk4_r)
+{
+	return 0;//machine().rand();
+}
+
 static ADDRESS_MAP_START( harriet_map, AS_PROGRAM, 16, harriet_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM // NVRAM
+	AM_RANGE(0x7f0000, 0x7fffff) AM_RAM // todo: boundaries, 0x7fe000 - 0x7fffff tested on boot
+	AM_RANGE(0xf1000e, 0xf1000f) AM_READ8(unk_r,0x00ff)
+	AM_RANGE(0xf1001c, 0xf1001f) AM_WRITE8(unk_w,0x00ff)
+	AM_RANGE(0xf20022, 0xf20023) AM_READ8(unk2_r,0x00ff)
+	AM_RANGE(0xf20024, 0xf20025) AM_READ8(unk2_r,0x00ff)
+	AM_RANGE(0xf2002c, 0xf2002d) AM_READ8(unk3_r,0x00ff)
+	AM_RANGE(0xf2002e, 0xf2002f) AM_WRITE8(serial_w,0x00ff)
+	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(unk4_r,0x00ff)
+//	AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(unk4_r,0x00ff)
+//	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(unk4_r,0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( harriet )
@@ -105,21 +162,6 @@ static INPUT_PORTS_START( harriet )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static GFXDECODE_START( harriet )
-	GFXDECODE_ENTRY( "maincpu", 0, charlayout,     0, 1 )
-GFXDECODE_END
-
 
 void harriet_state::machine_start()
 {
@@ -137,7 +179,7 @@ void harriet_state::palette_init()
 static MACHINE_CONFIG_START( harriet, harriet_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68010,MAIN_CLOCK) // TODO
+	MCFG_CPU_ADD("maincpu",M68010,XTAL_8MHz) // TODO: clock
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
 	/* video hardware */
@@ -147,8 +189,6 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 	MCFG_SCREEN_UPDATE_DRIVER(harriet_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-
-	MCFG_GFXDECODE(harriet)
 
 	MCFG_PALETTE_LENGTH(8)
 
@@ -166,7 +206,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( harriet )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "harriet 36-74c.tfb v5.01 lobyte 533f.bin", 0x0001, 0x4000, CRC(f07fff76) SHA1(8288f7eaa8f4155e0e4746635f63ca2cc3da25d1) )
 	ROM_LOAD16_BYTE( "harriet 36-74c.tdb v5.01 hibyte 2a0c.bin", 0x0000, 0x4000, CRC(a61f441d) SHA1(76af6eddd5c042f1b2eef590eb822379944b9b28) )
 ROM_END
