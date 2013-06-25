@@ -3,6 +3,7 @@
 #pragma once
 
 #include "video/315_5124.h"
+#include "cpu/m68000/m68000.h"
 
 
 /*  The VDP occupies addresses C00000h to C0001Fh.
@@ -299,7 +300,7 @@ private:
 	UINT16* megadrive_vdp_palette_lookup_highlight;
 
 	address_space *m_space68k;
-	legacy_cpu_device* m_cpu68k;
+	m68000_base_device* m_cpu68k;
 
 };
 

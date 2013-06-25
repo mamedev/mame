@@ -120,7 +120,7 @@ public:
 		m_io_mouse_y(*this, "MOUSE_Y")
 	{ }
 
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	optional_device<applefdc_base_device> m_fdc;
