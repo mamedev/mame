@@ -1131,7 +1131,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
 
 	return (result << 8) | result;
 }
@@ -1141,7 +1141,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);
@@ -1500,7 +1500,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 	else if (ADB_IS_EGRET)
 	{
 		#if LOG_ADB
-		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
+		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
 		#endif
 		m_egret->set_via_full((data&0x10) ? 1 : 0);
 		m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1508,7 +1508,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 	else if (ADB_IS_CUDA)
 	{
 		#if LOG_ADB
-		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
+		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
 		#endif
 		m_cuda->set_byteack((data&0x10) ? 1 : 0);
 		m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -1578,7 +1578,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	data = m_via2->read(space, offset);
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, m_maincpu->pc());
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, space.device().safe_pc());
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1589,7 +1589,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(space, offset, data & 0xff);

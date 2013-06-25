@@ -5,9 +5,9 @@
 #include "m68kcpu.h"
 
 
-READ8_HANDLER( m68307_internal_mbus_r )
+READ8_MEMBER( m68000_base_device::m68307_internal_mbus_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;
 	assert(mbus != NULL);
 	UINT8 retval;
@@ -53,9 +53,9 @@ READ8_HANDLER( m68307_internal_mbus_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( m68307_internal_mbus_w )
+WRITE8_MEMBER( m68000_base_device::m68307_internal_mbus_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;
 	assert(mbus != NULL);
 

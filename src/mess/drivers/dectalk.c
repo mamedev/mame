@@ -291,7 +291,7 @@ public:
 	void dectalk_x2212_recall(  );
 	void dectalk_semaphore_w ( UINT16 data );
 	UINT16 dectalk_outfifo_r (  );
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	required_device<dac_device> m_dac;
 

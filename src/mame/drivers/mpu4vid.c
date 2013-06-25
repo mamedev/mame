@@ -195,6 +195,7 @@ TODO:
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
 #include "includes/mpu4.h"
+ #include "cpu/m68000/m68000.h"
 
 
 struct ef9369_t
@@ -230,7 +231,7 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_videocpu;
+	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
 	optional_shared_ptr<UINT16> m_vid_vidram;
 	optional_shared_ptr<UINT16> m_vid_mainram;

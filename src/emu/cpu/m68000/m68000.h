@@ -14,6 +14,69 @@
 #include "68340ser.h"
 #include "68340tmu.h"
 
+#include "../../../lib/softfloat/milieu.h"
+#include "../../../lib/softfloat/softfloat.h"
+#include <setjmp.h>
+
+
+/* MMU constants */
+#define MMU_ATC_ENTRIES (22)    // 68851 has 64, 030 has 22
+
+/* instruction cache constants */
+#define M68K_IC_SIZE 128
+
+
+
+
+/* Address error */
+/* sigjmp() on Mac OS X and *BSD in general saves signal contexts and is super-slow, use sigsetjmp() to tell it not to */
+#ifdef _BSD_SETJMP_H
+#define m68ki_set_address_error_trap(m68k) \
+	if(sigsetjmp(m68k->aerr_trap, 0) != 0) \
+	{ \
+		m68ki_exception_address_error(m68k); \
+		if(m68k->stopped) \
+		{ \
+			if (m68k->remaining_cycles > 0) \
+				m68k->remaining_cycles = 0; \
+			return; \
+		} \
+	}
+
+#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
+	if((ADDR)&1) \
+	{ \
+		m68k->aerr_address = ADDR; \
+		m68k->aerr_write_mode = WRITE_MODE; \
+		m68k->aerr_fc = FC; \
+		siglongjmp(m68k->aerr_trap, 1); \
+	}
+#else
+#define m68ki_set_address_error_trap(m68k) \
+	SETJMP_GNUC_PROTECT(); \
+	if(setjmp(m68k->aerr_trap) != 0) \
+	{ \
+		m68ki_exception_address_error(m68k); \
+		if(m68k->stopped) \
+		{ \
+			if (m68k->remaining_cycles > 0) \
+				m68k->remaining_cycles = 0; \
+			return; \
+		} \
+	}
+
+#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
+	if((ADDR)&1) \
+	{ \
+		m68k->aerr_address = ADDR; \
+		m68k->aerr_write_mode = WRITE_MODE; \
+		m68k->aerr_fc = FC; \
+		longjmp(m68k->aerr_trap, 1); \
+	}
+#endif
+
+
+
 /* There are 7 levels of interrupt to the 68K.
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  */
@@ -108,52 +171,753 @@ typedef void (*m68307_portb_write_callback)(address_space &space, bool dedicated
 
 
 
-DECLARE_LEGACY_CPU_DEVICE(M68000, m68000);
-DECLARE_LEGACY_CPU_DEVICE(M68301, m68301);
-DECLARE_LEGACY_CPU_DEVICE(M68307, m68307);
-DECLARE_LEGACY_CPU_DEVICE(M68008, m68008);
-DECLARE_LEGACY_CPU_DEVICE(M68008PLCC, m68008plcc);
-DECLARE_LEGACY_CPU_DEVICE(M68010, m68010);
-DECLARE_LEGACY_CPU_DEVICE(M68EC020, m68ec020);
-DECLARE_LEGACY_CPU_DEVICE(M68020, m68020);
-DECLARE_LEGACY_CPU_DEVICE(M68020PMMU, m68020pmmu);
-DECLARE_LEGACY_CPU_DEVICE(M68020HMMU, m68020hmmu);
-DECLARE_LEGACY_CPU_DEVICE(M68EC030, m68ec030);
-DECLARE_LEGACY_CPU_DEVICE(M68030, m68030);
-DECLARE_LEGACY_CPU_DEVICE(M68EC040, m68ec040);
-DECLARE_LEGACY_CPU_DEVICE(M68LC040, m68lc040);
-DECLARE_LEGACY_CPU_DEVICE(M68040, m68040);
-DECLARE_LEGACY_CPU_DEVICE(SCC68070, scc68070);
-DECLARE_LEGACY_CPU_DEVICE(M68340, m68340);
-DECLARE_LEGACY_CPU_DEVICE(MCF5206E, mcf5206e);
-
-
-void m68k_set_encrypted_opcode_range(device_t *device, offs_t start, offs_t end);
-
-void m68k_set_hmmu_enable(device_t *device, int enable);
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
-void m68k_set_reset_callback(device_t *device, m68k_reset_func callback);
-void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
-void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
-void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
-UINT16 m68k_get_fc(device_t *device);
 
-void m68307_set_port_callbacks(device_t *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback m_m68307_porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback m_m68307_portb_w);
-UINT16 m68307_get_cs(device_t *device, offs_t address);
-UINT16 m68340_get_cs(device_t *device, offs_t address);
-void m68307_set_interrupt(device_t *device, int level, int vector);
-void m68307_timer0_interrupt(legacy_cpu_device *cpudev);
-void m68307_timer1_interrupt(legacy_cpu_device *cpudev);
-void m68307_serial_interrupt(legacy_cpu_device *cpudev, int vector);
-void m68307_mbus_interrupt(legacy_cpu_device *cpudev);
-void m68307_licr2_interrupt(legacy_cpu_device *cpudev);
 
-void m68307_set_duart68681(device_t* cpudev, device_t* duart68681);
+typedef int (*instruction_hook_t)(m68000_base_device *device, offs_t curpc);
 
-typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
-void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook);
 
+
+extern const device_type M68K;
+
+class m68000_base_device : public cpu_device
+{
+public:
+
+	// construction/destruction
+	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, const char *shortname, const char *source);
+
+	m68000_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
+
+	m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void clear_all(void);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+
+
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+	virtual UINT32 execute_input_lines() const { return 8; }; // number of input lines
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_stop();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// address spaces
+	const address_space_config m_program_config;
+
+	void define_state(void);
+
+
+
+
+public:
+
+
+	UINT32 cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, 68020, 68EC030, 68030, 68EC040, or 68040 */
+//	UINT32 dasm_type;    /* disassembly type */
+	UINT32 dar[16];      /* Data and Address Registers */
+	UINT32 ppc;        /* Previous program counter */
+	UINT32 pc;           /* Program Counter */
+	UINT32 sp[7];        /* User, Interrupt, and Master Stack Pointers */
+	UINT32 vbr;          /* Vector Base Register (m68010+) */
+	UINT32 sfc;          /* Source Function Code Register (m68010+) */
+	UINT32 dfc;          /* Destination Function Code Register (m68010+) */
+	UINT32 cacr;         /* Cache Control Register (m68020, unemulated) */
+	UINT32 caar;         /* Cache Address Register (m68020, unemulated) */
+	UINT32 ir;           /* Instruction Register */
+	floatx80 fpr[8];     /* FPU Data Register (m68030/040) */
+	UINT32 fpiar;        /* FPU Instruction Address Register (m68040) */
+	UINT32 fpsr;         /* FPU Status Register (m68040) */
+	UINT32 fpcr;         /* FPU Control Register (m68040) */
+	UINT32 t1_flag;      /* Trace 1 */
+	UINT32 t0_flag;      /* Trace 0 */
+	UINT32 s_flag;       /* Supervisor */
+	UINT32 m_flag;       /* Master/Interrupt state */
+	UINT32 x_flag;       /* Extend */
+	UINT32 n_flag;       /* Negative */
+	UINT32 not_z_flag;   /* Zero, inverted for speedups */
+	UINT32 v_flag;       /* Overflow */
+	UINT32 c_flag;       /* Carry */
+	UINT32 int_mask;     /* I0-I2 */
+	UINT32 int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
+	UINT32 stopped;      /* Stopped state */
+	UINT32 pref_addr;    /* Last prefetch address */
+	UINT32 pref_data;    /* Data in the prefetch queue */
+	UINT32 sr_mask;      /* Implemented status register bits */
+	UINT32 instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
+	UINT32 run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
+	int    has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
+	int    has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
+	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
+	int    hmmu_enabled; /* Indicates if the HMMU is enabled */
+	int    has_fpu;      /* Indicates if a FPU is available (yes on 030, 040, may be on 020) */
+	int    fpu_just_reset; /* Indicates the FPU was just reset */
+
+	/* Clocks required for instructions / exceptions */
+	UINT32 cyc_bcc_notake_b;
+	UINT32 cyc_bcc_notake_w;
+	UINT32 cyc_dbcc_f_noexp;
+	UINT32 cyc_dbcc_f_exp;
+	UINT32 cyc_scc_r_true;
+	UINT32 cyc_movem_w;
+	UINT32 cyc_movem_l;
+	UINT32 cyc_shift;
+	UINT32 cyc_reset;
+
+	int  initial_cycles;
+	int  remaining_cycles;                     /* Number of clocks remaining */
+	int  reset_cycles;
+	UINT32 tracing;
+
+#ifdef _BSD_SETJMP_H
+	sigjmp_buf aerr_trap;
+#else
+	jmp_buf aerr_trap;
+#endif
+	UINT32    aerr_address;
+	UINT32    aerr_write_mode;
+	UINT32    aerr_fc;
+
+	/* Virtual IRQ lines state */
+	UINT32 virq_state;
+	UINT32 nmi_pending;
+
+	void (**jump_table)(m68000_base_device *m68k);
+	const UINT8* cyc_instruction;
+	const UINT8* cyc_exception;
+
+	/* Callbacks to host */
+	device_irq_acknowledge_callback int_ack_callback;             /* Interrupt Acknowledge */
+	m68k_bkpt_ack_func bkpt_ack_callback;         /* Breakpoint Acknowledge */
+	m68k_reset_func reset_instr_callback;         /* Called when a RESET instruction is encountered */
+	m68k_cmpild_func cmpild_instr_callback;       /* Called when a CMPI.L #v, Dn instruction is encountered */
+	m68k_rte_func rte_instr_callback;             /* Called when a RTE instruction is encountered */
+	m68k_tas_func tas_instr_callback;             /* Called when a TAS instruction is encountered, allows / disallows writeback */
+
+	address_space *program;
+
+
+
+	/* Redirect memory calls */
+
+	typedef delegate<UINT8 (offs_t)> m68k_read8_delegate;
+	typedef delegate<UINT16 (offs_t)> m68k_readimm16_delegate;
+	typedef delegate<UINT16 (offs_t)> m68k_read16_delegate;
+	typedef delegate<UINT32 (offs_t)> m68k_read32_delegate;
+	typedef delegate<void (offs_t, UINT8)> m68k_write8_delegate;
+	typedef delegate<void (offs_t, UINT16)> m68k_write16_delegate;
+	typedef delegate<void (offs_t, UINT32)> m68k_write32_delegate;
+
+//	class m68k_memory_interface
+//	{
+	public:
+		void init8(address_space &space);
+		void init16(address_space &space);
+		void init16_m68307(address_space &space);
+		void init32(address_space &space);
+		void init32mmu(address_space &space);
+		void init32hmmu(address_space &space);
+
+		offs_t  opcode_xor;                     // Address Calculation
+		m68k_readimm16_delegate readimm16;      // Immediate read 16 bit
+		m68k_read8_delegate read8;
+		m68k_read16_delegate read16;
+		m68k_read32_delegate read32;
+		m68k_write8_delegate write8;
+		m68k_write16_delegate write16;
+		m68k_write32_delegate write32;
+
+	private:
+		UINT16 m68008_read_immediate_16(offs_t address);
+		UINT16 read_immediate_16(offs_t address);
+		UINT16 simple_read_immediate_16(offs_t address);
+
+		UINT16 simple_read_immediate_16_m68307(offs_t address);
+		UINT8 read_byte_m68307(offs_t address);
+		UINT16 read_word_m68307(offs_t address);
+		UINT32 read_dword_m68307(offs_t address);
+		void write_byte_m68307(offs_t address, UINT8 data);
+		void write_word_m68307(offs_t address, UINT16 data);
+		void write_dword_m68307(offs_t address, UINT32 data);
+
+		UINT8 read_byte_32_mmu(offs_t address);
+		void write_byte_32_mmu(offs_t address, UINT8 data);
+		UINT16 read_immediate_16_mmu(offs_t address);
+		UINT16 readword_d32_mmu(offs_t address);
+		void writeword_d32_mmu(offs_t address, UINT16 data);
+		UINT32 readlong_d32_mmu(offs_t address);
+		void writelong_d32_mmu(offs_t address, UINT32 data);
+
+		UINT8 read_byte_32_hmmu(offs_t address);
+		void write_byte_32_hmmu(offs_t address, UINT8 data);
+		UINT16 read_immediate_16_hmmu(offs_t address);
+		UINT16 readword_d32_hmmu(offs_t address);
+		void writeword_d32_hmmu(offs_t address, UINT16 data);
+		UINT32 readlong_d32_hmmu(offs_t address);
+		void writelong_d32_hmmu(offs_t address, UINT32 data);
+
+		address_space *m_space;
+		direct_read_data *m_direct;
+//		m68000_base_device *m_cpustate;
+//	};
+
+	public:
+//	m68k_memory_interface memory;
+	offs_t encrypted_start;
+	offs_t encrypted_end;
+
+	UINT32      iotemp;
+
+	/* save state data */
+	UINT16 save_sr;
+	UINT8 save_stopped;
+	UINT8 save_halted;
+
+	/* PMMU registers */
+	UINT32 mmu_crp_aptr, mmu_crp_limit;
+	UINT32 mmu_srp_aptr, mmu_srp_limit;
+	UINT32 mmu_urp_aptr;    /* 040 only */
+	UINT32 mmu_tc;
+	UINT16 mmu_sr;
+	UINT32 mmu_sr_040;
+	UINT32 mmu_atc_tag[MMU_ATC_ENTRIES], mmu_atc_data[MMU_ATC_ENTRIES];
+	UINT32 mmu_atc_rr;
+	UINT32 mmu_tt0, mmu_tt1;
+	UINT32 mmu_itt0, mmu_itt1, mmu_dtt0, mmu_dtt1;
+	UINT32 mmu_acr0, mmu_acr1, mmu_acr2, mmu_acr3;
+
+	UINT16 mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
+	UINT16 mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */
+	UINT16 mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
+	UINT32 mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
+	UINT16 mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
+	UINT16 mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
+	UINT16 mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
+
+	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
+	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
+
+	/* 68307 peripheral modules */
+	m68307_sim*    m68307SIM;
+	m68307_mbus*   m68307MBUS;
+	m68307_serial* m68307SERIAL;
+	m68307_timer*  m68307TIMER;
+
+	UINT16 m68307_base;
+	UINT16 m68307_scrhigh;
+	UINT16 m68307_scrlow;
+
+	int m68307_currentcs;
+
+	/* 68340 peripheral modules */
+	m68340_sim*    m68340SIM;
+	m68340_dma*    m68340DMA;
+	m68340_serial* m68340SERIAL;
+	m68340_timer*  m68340TIMER;
+
+	UINT32 m68340_base;
+
+
+	DECLARE_READ16_MEMBER( m68307_internal_base_r );
+	DECLARE_WRITE16_MEMBER( m68307_internal_base_w );
+	DECLARE_READ16_MEMBER( m68307_internal_timer_r );
+	DECLARE_WRITE16_MEMBER( m68307_internal_timer_w );
+	DECLARE_READ16_MEMBER( m68307_internal_sim_r );
+	DECLARE_WRITE16_MEMBER( m68307_internal_sim_w );
+	DECLARE_READ8_MEMBER( m68307_internal_serial_r );
+	DECLARE_WRITE8_MEMBER( m68307_internal_serial_w );
+	DECLARE_READ8_MEMBER( m68307_internal_mbus_r );
+	DECLARE_WRITE8_MEMBER( m68307_internal_mbus_w );
+
+	READ32_MEMBER( m68340_internal_base_r );
+	WRITE32_MEMBER( m68340_internal_base_w );
+	READ32_MEMBER( m68340_internal_dma_r );
+	WRITE32_MEMBER( m68340_internal_dma_w );
+	READ32_HANDLER( m68340_internal_serial_r );
+	WRITE32_MEMBER( m68340_internal_serial_w );
+	READ16_MEMBER( m68340_internal_sim_r );
+	READ8_MEMBER( m68340_internal_sim_ports_r );
+	READ32_MEMBER( m68340_internal_sim_cs_r );
+	WRITE16_MEMBER( m68340_internal_sim_w );
+	WRITE8_MEMBER( m68340_internal_sim_ports_w );
+	WRITE32_MEMBER( m68340_internal_sim_cs_w );
+	READ32_MEMBER( m68340_internal_timer_r );
+	WRITE32_MEMBER( m68340_internal_timer_w );
+
+
+	/* 68308 / 68340 internal address map */
+	address_space *internal;
+
+	/* callbacks for internal ports */
+	m68307_porta_read_callback m_m68307_porta_r;
+	m68307_porta_write_callback m_m68307_porta_w;
+	m68307_portb_read_callback m_m68307_portb_r;
+	m68307_portb_write_callback m_m68307_portb_w;
+
+
+
+	/* external instruction hook (does not depend on debug mode) */
+	instruction_hook_t instruction_hook;
+
+
+
+	void init_cpu_common(void);
+	void init_cpu_m68000(void);
+	void init_cpu_m68307(void);
+	void init_cpu_m68008(void);
+	void init_cpu_m68010(void);
+	void init_cpu_m68020(void);
+	void init_cpu_m68020pmmu(void);
+	void init_cpu_m68020hmmu(void);
+	void init_cpu_m68ec020(void);
+	void init_cpu_m68030(void);
+	void init_cpu_m68ec030(void);
+	void init_cpu_m68040(void);
+	void init_cpu_m68ec040(void);
+	void init_cpu_m68lc040(void);
+	void init_cpu_m68340(void);
+	void init_cpu_scc68070(void);
+	void init_cpu_coldfire(void);
+
+
+	void m68ki_exception_interrupt(m68000_base_device *m68k, UINT32 int_level);
+
+	void reset_cpu(void);
+	inline void cpu_execute(void);
+	
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry);
+	virtual void state_export(const device_state_entry &entry);
+	virtual void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_memory_interface overrides
+	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address);
+};
+
+
+
+class m68000_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68301_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+
+class m68307_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68307_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68008_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68008_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68008plcc_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68008plcc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68010_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68ec020_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68ec020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68020_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68020pmmu_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68020pmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68020hmmu_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68020hmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	virtual bool memory_translate(address_spacenum space, int intention, offs_t &address);
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68ec030_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68ec030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68030_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68ec040_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68ec040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68lc040_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68lc040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class m68040_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+class scc68070_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	scc68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 4; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+
+
+
+class m68340_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	m68340_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+
+
+class mcf5206e_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
+	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual UINT32 execute_min_cycles() const { return 2; };
+	virtual UINT32 execute_max_cycles() const { return 158; };
+
+	virtual UINT32 execute_default_irq_vector() const { return -1; };
+
+
+	// device-level overrides
+	virtual void device_start();
+protected:
+};
+
+
+extern const device_type M68000;
+extern const device_type M68301;
+extern const device_type M68307;
+extern const device_type M68008;
+extern const device_type M68008PLCC;
+extern const device_type M68010;
+extern const device_type M68EC020;
+extern const device_type M68020;
+extern const device_type M68020PMMU;
+extern const device_type M68020HMMU;
+extern const device_type M68EC030;
+extern const device_type M68030;
+extern const device_type M68EC040;
+extern const device_type M68LC040;
+extern const device_type M68040;
+extern const device_type SCC68070;
+extern const device_type M68340;
+extern const device_type MCF5206E;
+
+extern void m68k_set_reset_callback(m68000_base_device *device, m68k_reset_func callback);
+extern void m68k_set_cmpild_callback(m68000_base_device *device, m68k_cmpild_func callback);
+extern void m68k_set_rte_callback(m68000_base_device *device, m68k_rte_func callback);
+extern void m68k_set_tas_callback(m68000_base_device *device, m68k_tas_func callback);
+extern UINT16 m68k_get_fc(m68000_base_device *device);
+extern void m68307_set_port_callbacks(m68000_base_device *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w);
+extern void m68307_set_duart68681(m68000_base_device* cpudev, device_t* duart68681);
+extern UINT16 m68307_get_cs(m68000_base_device *device, offs_t address);
+extern UINT16 m68340_get_cs(m68000_base_device *device, offs_t address);
+extern void m68307_timer0_interrupt(m68000_base_device *cpudev);
+extern void m68307_timer1_interrupt(m68000_base_device *cpudev);
+extern void m68307_serial_interrupt(m68000_base_device *cpudev, int vector);
+extern void m68307_mbus_interrupt(m68000_base_device *cpudev);
+extern void m68307_licr2_interrupt(m68000_base_device *cpudev);
+extern void m68k_set_encrypted_opcode_range(m68000_base_device *device, offs_t start, offs_t end);
+extern void m68k_set_hmmu_enable(m68000_base_device *device, int enable);
+extern void m68k_set_instruction_hook(m68000_base_device *device, instruction_hook_t ihook);
 
 #endif /* __M68000_H__ */

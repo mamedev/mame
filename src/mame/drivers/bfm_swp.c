@@ -127,7 +127,7 @@ public:
 protected:
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 
 	virtual void machine_start();
 };

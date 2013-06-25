@@ -68,7 +68,7 @@ int apollo_debug_instruction_hook(device_t *device, offs_t curpc);
 const char *apollo_cpu_context(device_t *cpu);
 
 // enable/disable the FPU
-void apollo_set_cpu_has_fpu(device_t *device, int onoff);
+void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff);
 
 // check for excessive logging
 void apollo_check_log();
@@ -86,7 +86,7 @@ UINT8 apollo_get_ram_config_byte(void);
 UINT32 apollo_get_node_id(void);
 
 	// should be called by the CPU core before executing each instruction
-int apollo_instruction_hook(device_t *device, offs_t curpc);
+int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
 
 void apollo_set_cache_status_register(UINT8 mask, UINT8 data);
 
@@ -123,7 +123,7 @@ public:
 			m_pic8259_slave(*this, "pic8259_slave")
 			{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<sc499_device> m_ctape;
 	required_shared_ptr<UINT32> m_messram_ptr;
 

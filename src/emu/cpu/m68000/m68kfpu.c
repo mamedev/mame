@@ -51,7 +51,7 @@ INLINE floatx80 double_to_fx80(double in)
 	return float64_to_floatx80(*d);
 }
 
-INLINE floatx80 load_extended_float80(m68ki_cpu_core *m68k, UINT32 ea)
+INLINE floatx80 load_extended_float80(m68000_base_device *m68k, UINT32 ea)
 {
 	UINT32 d1,d2;
 	UINT16 d3;
@@ -67,7 +67,7 @@ INLINE floatx80 load_extended_float80(m68ki_cpu_core *m68k, UINT32 ea)
 	return fp;
 }
 
-INLINE void store_extended_float80(m68ki_cpu_core *m68k, UINT32 ea, floatx80 fpr)
+INLINE void store_extended_float80(m68000_base_device *m68k, UINT32 ea, floatx80 fpr)
 {
 	m68ki_write_16(m68k, ea+0, fpr.high);
 	m68ki_write_16(m68k, ea+2, 0);
@@ -75,7 +75,7 @@ INLINE void store_extended_float80(m68ki_cpu_core *m68k, UINT32 ea, floatx80 fpr
 	m68ki_write_32(m68k, ea+8, fpr.low&0xffffffff);
 }
 
-INLINE floatx80 load_pack_float80(m68ki_cpu_core *m68k, UINT32 ea)
+INLINE floatx80 load_pack_float80(m68000_base_device *m68k, UINT32 ea)
 {
 	UINT32 dw1, dw2, dw3;
 	floatx80 result;
@@ -126,7 +126,7 @@ INLINE floatx80 load_pack_float80(m68ki_cpu_core *m68k, UINT32 ea)
 	return result;
 }
 
-INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 fpr)
+INLINE void store_pack_float80(m68000_base_device *m68k, UINT32 ea, int k, floatx80 fpr)
 {
 	UINT32 dw1, dw2, dw3;
 	char str[128], *ch;
@@ -258,7 +258,7 @@ INLINE void store_pack_float80(m68ki_cpu_core *m68k, UINT32 ea, int k, floatx80 
 	m68ki_write_32(m68k, ea+8, dw3);
 }
 
-INLINE void SET_CONDITION_CODES(m68ki_cpu_core *m68k, floatx80 reg)
+INLINE void SET_CONDITION_CODES(m68000_base_device *m68k, floatx80 reg)
 {
 //  UINT64 *regi;
 
@@ -291,7 +291,7 @@ INLINE void SET_CONDITION_CODES(m68ki_cpu_core *m68k, floatx80 reg)
 	}
 }
 
-INLINE int TEST_CONDITION(m68ki_cpu_core *m68k, int condition)
+INLINE int TEST_CONDITION(m68000_base_device *m68k, int condition)
 {
 	int n = (REG_FPSR(m68k) & FPCC_N) != 0;
 	int z = (REG_FPSR(m68k) & FPCC_Z) != 0;
@@ -353,7 +353,7 @@ INLINE int TEST_CONDITION(m68ki_cpu_core *m68k, int condition)
 	return r;
 }
 
-static UINT8 READ_EA_8(m68ki_cpu_core *m68k, int ea)
+static UINT8 READ_EA_8(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -429,7 +429,7 @@ static UINT8 READ_EA_8(m68ki_cpu_core *m68k, int ea)
 	return 0;
 }
 
-static UINT16 READ_EA_16(m68ki_cpu_core *m68k, int ea)
+static UINT16 READ_EA_16(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -506,7 +506,7 @@ static UINT16 READ_EA_16(m68ki_cpu_core *m68k, int ea)
 	return 0;
 }
 
-static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
+static UINT32 READ_EA_32(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -581,7 +581,7 @@ static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
 	return 0;
 }
 
-static UINT64 READ_EA_64(m68ki_cpu_core *m68k, int ea)
+static UINT64 READ_EA_64(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -668,7 +668,7 @@ static UINT64 READ_EA_64(m68ki_cpu_core *m68k, int ea)
 }
 
 
-static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
+static floatx80 READ_EA_FPE(m68000_base_device *m68k, int ea)
 {
 	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
@@ -743,7 +743,7 @@ static floatx80 READ_EA_FPE(m68ki_cpu_core *m68k, int ea)
 	return fpr;
 }
 
-static floatx80 READ_EA_PACK(m68ki_cpu_core *m68k, int ea)
+static floatx80 READ_EA_PACK(m68000_base_device *m68k, int ea)
 {
 	floatx80 fpr;
 	int mode = (ea >> 3) & 0x7;
@@ -790,7 +790,7 @@ static floatx80 READ_EA_PACK(m68ki_cpu_core *m68k, int ea)
 	return fpr;
 }
 
-static void WRITE_EA_8(m68ki_cpu_core *m68k, int ea, UINT8 data)
+static void WRITE_EA_8(m68000_base_device *m68k, int ea, UINT8 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -858,7 +858,7 @@ static void WRITE_EA_8(m68ki_cpu_core *m68k, int ea, UINT8 data)
 	}
 }
 
-static void WRITE_EA_16(m68ki_cpu_core *m68k, int ea, UINT16 data)
+static void WRITE_EA_16(m68000_base_device *m68k, int ea, UINT16 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -926,7 +926,7 @@ static void WRITE_EA_16(m68ki_cpu_core *m68k, int ea, UINT16 data)
 	}
 }
 
-static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
+static void WRITE_EA_32(m68000_base_device *m68k, int ea, UINT32 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -999,7 +999,7 @@ static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
 	}
 }
 
-static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)
+static void WRITE_EA_64(m68000_base_device *m68k, int ea, UINT64 data)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1072,7 +1072,7 @@ static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)
 	}
 }
 
-static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
+static void WRITE_EA_FPE(m68000_base_device *m68k, int ea, floatx80 fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1116,7 +1116,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, floatx80 fpr)
 	}
 }
 
-static void WRITE_EA_PACK(m68ki_cpu_core *m68k, int ea, int k, floatx80 fpr)
+static void WRITE_EA_PACK(m68000_base_device *m68k, int ea, int k, floatx80 fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -1160,7 +1160,7 @@ static void WRITE_EA_PACK(m68ki_cpu_core *m68k, int ea, int k, floatx80 fpr)
 	}
 }
 
-static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
+static void fpgen_rm_reg(m68000_base_device *m68k, UINT16 w2)
 {
 	int ea = m68k->ir & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
@@ -1525,7 +1525,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 	}
 }
 
-static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
+static void fmove_reg_mem(m68000_base_device *m68k, UINT16 w2)
 {
 	int ea = m68k->ir & 0x3f;
 	int src = (w2 >>  7) & 0x7;
@@ -1597,7 +1597,7 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 	m68k->remaining_cycles -= 12;
 }
 
-static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
+static void fmove_fpcr(m68000_base_device *m68k, UINT16 w2)
 {
 	int ea = m68k->ir & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
@@ -1699,7 +1699,7 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 	m68k->remaining_cycles -= 10;
 }
 
-static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
+static void fmovem(m68000_base_device *m68k, UINT16 w2)
 {
 	int i;
 	int ea = m68k->ir & 0x3f;
@@ -1813,7 +1813,7 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 	}
 }
 
-static void fscc(m68ki_cpu_core *m68k)
+static void fscc(m68000_base_device *m68k)
 {
 	int ea = m68k->ir & 0x3f;
 	int condition = (INT16)(OPER_I_16(m68k));
@@ -1822,7 +1822,7 @@ static void fscc(m68ki_cpu_core *m68k)
 	m68k->remaining_cycles -= 7; // ???
 }
 
-static void fbcc16(m68ki_cpu_core *m68k)
+static void fbcc16(m68000_base_device *m68k)
 {
 	INT32 offset;
 	int condition = m68k->ir & 0x3f;
@@ -1839,7 +1839,7 @@ static void fbcc16(m68ki_cpu_core *m68k)
 	m68k->remaining_cycles -= 7;
 }
 
-static void fbcc32(m68ki_cpu_core *m68k)
+static void fbcc32(m68000_base_device *m68k)
 {
 	INT32 offset;
 	int condition = m68k->ir & 0x3f;
@@ -1857,7 +1857,7 @@ static void fbcc32(m68ki_cpu_core *m68k)
 }
 
 
-void m68040_fpu_op0(m68ki_cpu_core *m68k)
+void m68040_fpu_op0(m68000_base_device *m68k)
 {
 	m68k->fpu_just_reset = 0;
 
@@ -1928,7 +1928,7 @@ void m68040_fpu_op0(m68ki_cpu_core *m68k)
 	}
 }
 
-static int perform_fsave(m68ki_cpu_core *m68k, UINT32 addr, int inc)
+static int perform_fsave(m68000_base_device *m68k, UINT32 addr, int inc)
 {
 	if(m68k->cpu_type & CPU_TYPE_040)
 	{
@@ -1970,7 +1970,7 @@ static int perform_fsave(m68ki_cpu_core *m68k, UINT32 addr, int inc)
 }
 
 // FRESTORE on a NULL frame reboots the FPU - all registers to NaN, the 3 status regs to 0
-static void do_frestore_null(m68ki_cpu_core *m68k)
+static void do_frestore_null(m68000_base_device *m68k)
 {
 	int i;
 
@@ -1988,7 +1988,7 @@ static void do_frestore_null(m68ki_cpu_core *m68k)
 	m68k->fpu_just_reset = 1;
 }
 
-static void m68040_do_fsave(m68ki_cpu_core *m68k, UINT32 addr, int reg, int inc)
+static void m68040_do_fsave(m68000_base_device *m68k, UINT32 addr, int reg, int inc)
 {
 	if (m68k->fpu_just_reset)
 	{
@@ -2003,7 +2003,7 @@ static void m68040_do_fsave(m68ki_cpu_core *m68k, UINT32 addr, int reg, int inc)
 	}
 }
 
-static void m68040_do_frestore(m68ki_cpu_core *m68k, UINT32 addr, int reg)
+static void m68040_do_frestore(m68000_base_device *m68k, UINT32 addr, int reg)
 {
 	bool m40 = m68k->cpu_type & CPU_TYPE_040;
 	UINT32 temp = m68ki_read_32(m68k, addr);
@@ -2041,7 +2041,7 @@ static void m68040_do_frestore(m68ki_cpu_core *m68k, UINT32 addr, int reg)
 	}
 }
 
-void m68040_fpu_op1(m68ki_cpu_core *m68k)
+void m68040_fpu_op1(m68000_base_device *m68k)
 {
 	int ea = m68k->ir & 0x3f;
 	int mode = (ea >> 3) & 0x7;

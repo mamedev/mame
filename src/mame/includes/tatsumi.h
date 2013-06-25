@@ -1,4 +1,5 @@
 #include "sound/okim6295.h"
+#include "cpu/m68000/m68000.h"
 
 class tatsumi_state : public driver_device
 {
@@ -136,7 +137,7 @@ public:
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<m68000_base_device> m_subcpu;
 	optional_device<cpu_device> m_subcpu2;
 	required_device<okim6295_device> m_oki;
 };

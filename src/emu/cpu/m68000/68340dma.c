@@ -4,9 +4,9 @@
 #include "m68kcpu.h"
 
 
-READ32_HANDLER( m68340_internal_dma_r )
+READ32_MEMBER( m68000_base_device::m68340_internal_dma_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_dma* dma = m68k->m68340DMA;
 	assert(dma != NULL);
 
@@ -19,9 +19,9 @@ READ32_HANDLER( m68340_internal_dma_r )
 	return 0x00000000;
 }
 
-WRITE32_HANDLER( m68340_internal_dma_w )
+WRITE32_MEMBER( m68000_base_device::m68340_internal_dma_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_dma* dma = m68k->m68340DMA;
 	assert(dma != NULL);
 

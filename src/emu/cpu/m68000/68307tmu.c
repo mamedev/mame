@@ -4,9 +4,9 @@
 #include "emu.h"
 #include "m68kcpu.h"
 
-READ16_HANDLER( m68307_internal_timer_r )
+READ16_MEMBER( m68000_base_device::m68307_internal_timer_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
@@ -32,9 +32,9 @@ READ16_HANDLER( m68307_internal_timer_r )
 	return 0x0000;
 }
 
-WRITE16_HANDLER( m68307_internal_timer_w )
+WRITE16_MEMBER( m68000_base_device::m68307_internal_timer_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
@@ -101,26 +101,24 @@ WRITE16_HANDLER( m68307_internal_timer_w )
 
 static TIMER_CALLBACK( m68307_timer0_callback )
 {
-	legacy_cpu_device *dev = (legacy_cpu_device *)ptr;
-	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
+	m68000_base_device* m68k = (m68000_base_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	m68307_timer0_interrupt(dev);
+	m68307_timer0_interrupt(m68k);
 
-	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
+	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 }
 
 static TIMER_CALLBACK( m68307_timer1_callback )
 {
-	legacy_cpu_device *dev = (legacy_cpu_device *)ptr;
-	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
+	m68000_base_device* m68k = (m68000_base_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	m68307_timer1_interrupt(dev);
+	m68307_timer1_interrupt(m68k);
 
-	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(20000));
+	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 
 }
 
@@ -129,19 +127,20 @@ static TIMER_CALLBACK( m68307_wd_timer_callback )
 	printf("wd timer\n");
 }
 
-void m68307_timer::init(legacy_cpu_device *device)
+void m68307_timer::init(m68000_base_device *device)
 {
+	parent = device;
+
 	m68307_single_timer* tptr;
 
 	tptr = &singletimer[0];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer0_callback), device);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer0_callback), parent);
 
 	tptr = &singletimer[1];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer1_callback), device);
+	tptr->mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_timer1_callback), parent);
 
-	parent = device;
 
-	wd_mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_wd_timer_callback), device);
+	wd_mametimer = device->machine().scheduler().timer_alloc(FUNC(m68307_wd_timer_callback), parent);
 
 
 }
@@ -162,7 +161,7 @@ void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
 
 void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 {
-	m68ki_cpu_core* m68k = m68k_get_safe_token(parent);
+	m68000_base_device* m68k = parent;
 	m68307_single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TMR]);
@@ -204,7 +203,7 @@ void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 	if (rst==0x0) logerror("(timer is reset)\n");
 	if (rst==0x1) logerror("(timer is running)\n");
 
-	tptr->mametimer->adjust(m68k->device->cycles_to_attotime(100000));
+	tptr->mametimer->adjust(m68k->cycles_to_attotime(100000));
 
 	logerror("\n");
 

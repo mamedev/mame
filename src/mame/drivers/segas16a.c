@@ -300,7 +300,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 		case 0x2000/2:
 			return ioport((offset & 1) ? "DSW2" : "DSW1")->read();
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	//logerror("%06X:standard_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return 0xffff;
 }
 
@@ -321,7 +321,7 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 				synchronize(TID_PPI_WRITE, ((offset & 3) << 8) | (data & 0xff));
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 

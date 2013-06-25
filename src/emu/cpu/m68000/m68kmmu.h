@@ -47,7 +47,7 @@
 #define M68K_MMU_TC_SRE        0x02000000
 
 /* decodes the effective address */
-static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
+static UINT32 DECODE_EA_32(m68000_base_device *m68k, int ea)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);
@@ -106,7 +106,7 @@ static UINT32 DECODE_EA_32(m68ki_cpu_core *m68k, int ea)
 /*
     pmmu_atc_add: adds this address to the ATC
 */
-void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
+void pmmu_atc_add(m68000_base_device *m68k, UINT32 logical, UINT32 physical, int fc)
 {
 	int i, found;
 
@@ -163,7 +163,7 @@ void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
 
     7fff0003 001ffd10 80f05750 is what should load
 */
-void pmmu_atc_flush(m68ki_cpu_core *m68k)
+void pmmu_atc_flush(m68000_base_device *m68k)
 {
 	int i;
 	// printf("ATC flush: pc=%08x\n", REG_PPC(m68k));
@@ -177,7 +177,7 @@ void pmmu_atc_flush(m68ki_cpu_core *m68k)
 }
 
 
-INLINE UINT32 get_dt2_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest)
+INLINE UINT32 get_dt2_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 ptest)
 {
 	UINT32 tbl_entry = m68k->program->read_dword(tptr);
 	UINT32 dt = tbl_entry & M68K_MMU_DF_DT;
@@ -199,7 +199,7 @@ INLINE UINT32 get_dt2_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 	return tbl_entry;
 }
 
-INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, UINT8 ptest)
+INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 fc, UINT8 ptest)
 {
 	UINT32 tbl_entry2 = m68k->program->read_dword(tptr);
 	UINT32 tbl_entry = m68k->program->read_dword(tptr + 4);
@@ -227,7 +227,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 /*
     pmmu_translate_addr_with_fc: perform 68851/68030-style PMMU address translation
 */
-/*INLINE*/ static UINT32 pmmu_translate_addr_with_fc(m68ki_cpu_core *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
+/*INLINE*/ static UINT32 pmmu_translate_addr_with_fc(m68000_base_device *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
 {
 	UINT32 addr_out, tbl_entry = 0, tamode = 0, tbmode = 0, tcmode = 0;
 	UINT32 root_aptr, root_limit, tofs, ps, is, abits, bbits, cbits;
@@ -526,7 +526,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 
 // FC bits: 2 = supervisor, 1 = program, 0 = data
 // the 68040 is a subset of the 68851 and 68030 PMMUs - the page table sizes are fixed, there is no early termination, etc, etc.
-/*INLINE*/ static UINT32 pmmu_translate_addr_with_fc_040(m68ki_cpu_core *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
+/*INLINE*/ static UINT32 pmmu_translate_addr_with_fc_040(m68000_base_device *m68k, UINT32 addr_in, UINT8 fc, UINT8 ptest)
 {
 	UINT32 addr_out, tt0, tt1;
 
@@ -761,7 +761,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
 /*
     pmmu_translate_addr: perform 68851/68030-style PMMU address translation
 */
-/*INLINE*/ static UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
+/*INLINE*/ static UINT32 pmmu_translate_addr(m68000_base_device *m68k, UINT32 addr_in)
 {
 	UINT32 addr_out;
 
@@ -787,7 +787,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 fc, U
     m68851_mmu_ops: COP 0 MMU opcode handling
 */
 
-void m68881_mmu_ops(m68ki_cpu_core *m68k)
+void m68881_mmu_ops(m68000_base_device *m68k)
 {
 	UINT16 modes;
 	UINT32 ea = m68k->ir & 0x3f;
@@ -1063,7 +1063,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 
 
 /* Apple HMMU translation is much simpler */
-INLINE UINT32 hmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
+INLINE UINT32 hmmu_translate_addr(m68000_base_device *m68k, UINT32 addr_in)
 {
 	UINT32 addr_out;
 

@@ -1,3 +1,4 @@
+#include "m68000.h"
 #include "machine/68681.h"
 
 #define m68307SER_UMR1_UMR2  (0x01)
@@ -16,10 +17,6 @@
 #define m68307SER_UIP        (0x1b)
 #define m68307SER_UOP1       (0x1d)
 #define m68307SER_UOP0       (0x1f)
-
-
-DECLARE_READ8_HANDLER( m68307_internal_serial_r );
-DECLARE_WRITE8_HANDLER( m68307_internal_serial_w );
 
 class m68307_serial
 {

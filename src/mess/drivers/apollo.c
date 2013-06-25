@@ -141,7 +141,7 @@ const char *apollo_cpu_context(device_t *cpu) {
  apollo_set_cpu_has_fpu - enable/disable the FPU
  -------------------------------------------------*/
 
-void apollo_set_cpu_has_fpu(device_t *device, int onoff)
+void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff)
 {
 	if (device == NULL || (device->type() != M68020PMMU && device->type() != M68030))
 	{
@@ -149,8 +149,8 @@ void apollo_set_cpu_has_fpu(device_t *device, int onoff)
 	}
 	else
 	{
-		m68ki_cpu_core *cpu = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
-		cpu->has_fpu = onoff;
+		
+		device->has_fpu = onoff;
 		DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
 	}
 }
@@ -216,9 +216,10 @@ UINT32 apollo_get_node_id(void) {
   apollo_instruction_hook
   must be called by the CPU core before executing each instruction
 ***************************************************************************/
-int apollo_instruction_hook(device_t *device, offs_t curpc)
+int apollo_instruction_hook(m68000_base_device *device, offs_t curpc)
 {
-	m68ki_cpu_core *m68k = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
+	m68000_base_device *m68k = device;
+	//m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *> (device)->token();
 
 	static UINT16 idle_counter = 0;
 
@@ -512,7 +513,7 @@ READ32_MEMBER(apollo_state::apollo_unmapped_r)
 {
 	offs_t address = offset * 4;
 
-	m68ki_cpu_core *m68k = (m68ki_cpu_core *) downcast<legacy_cpu_device *>(&space.device())->token();
+	m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *>(&space.device())->token();
 
 	if ((address & 0xfff00000) == 0xfa800000 && VERBOSE < 2) {
 		// ?

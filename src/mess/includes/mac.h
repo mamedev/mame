@@ -21,6 +21,7 @@
 #include "machine/macrtc.h"
 #include "sound/asc.h"
 #include "sound/awacs.h"
+#include "cpu/m68000/m68000.h"
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "scsi:539x_1"
@@ -220,7 +221,7 @@ public:
 		m_vram16(*this,"vram16")
 		{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;

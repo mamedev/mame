@@ -15,7 +15,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_mo_command(*this, "mo_command") { }
 
-	required_device<m68000_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	bool            m_is_pitfight;
 

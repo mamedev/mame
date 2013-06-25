@@ -5,6 +5,7 @@
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
 #include "machine/timekpr.h"
+#include "cpu/m68000/m68000.h"
 
 struct gfx_range
 {
@@ -166,7 +167,7 @@ public:
 	UINT16       *m_bootleg_work_ram;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<m48t35_device> m_m48t35;

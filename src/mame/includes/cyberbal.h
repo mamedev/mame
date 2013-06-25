@@ -23,10 +23,10 @@ public:
 			m_paletteram_0(*this, "paletteram_0"),
 			m_paletteram_1(*this, "paletteram_1") { }
 
-	required_device<m68000_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<m6502_device> m_audiocpu;
-	optional_device<m68000_device> m_extracpu;
-	optional_device<m68000_device> m_daccpu;
+	optional_device<cpu_device> m_extracpu;
+	optional_device<cpu_device> m_daccpu;
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
 	optional_shared_ptr<UINT16> m_paletteram_0;

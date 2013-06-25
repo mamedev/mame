@@ -14,6 +14,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
+#include "cpu/m68000/m68000.h"
+
 
 /*************************************
  *
@@ -400,7 +402,7 @@ public:
 
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<legacy_mos6526_device> m_cia_0;
 	required_device<legacy_mos6526_device> m_cia_1;
 	optional_device<amiga_fdc> m_fdc;

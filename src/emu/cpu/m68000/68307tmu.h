@@ -1,6 +1,8 @@
 
-DECLARE_READ16_HANDLER( m68307_internal_timer_r );
-DECLARE_WRITE16_HANDLER( m68307_internal_timer_w );
+#include "m68000.h"
+
+class m68000_base_device;
+
 
 #define m68307TIMER_TMR (0x0)
 #define m68307TIMER_TRR (0x1)
@@ -25,13 +27,13 @@ class m68307_timer
 	m68307_single_timer singletimer[2];
 
 	emu_timer *wd_mametimer;
-	legacy_cpu_device *parent;
+	m68000_base_device *parent;
 
 	void write_tmr(UINT16 data, UINT16 mem_mask, int which);
 	void write_trr(UINT16 data, UINT16 mem_mask, int which);
 	void write_ter(UINT16 data, UINT16 mem_mask, int which);
 	UINT16 read_tcn(UINT16 mem_mask, int which);
 
-	void init(legacy_cpu_device *device);
+	void init(m68000_base_device *device);
 	void reset(void);
 };

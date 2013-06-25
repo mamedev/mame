@@ -215,7 +215,7 @@ const fd1089_base_device::decrypt_parameters fd1089_base_device::s_data_params_a
 //-------------------------------------------------
 
 fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: m68000_device(mconfig, M68000, tag, owner, clock)
+	: m68000_device(mconfig, tag, owner, clock)
 {
 	// override the name after the m68000 initializes
 	m_name.cpy(name);

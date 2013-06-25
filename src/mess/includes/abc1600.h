@@ -85,7 +85,7 @@ public:
 			m_video_ram(*this, "video_ram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
 	required_device<z80dma_device> m_dma2;

@@ -270,12 +270,12 @@ WRITE16_MEMBER(apollo_state::apollo_csr_control_register_w)
 	else if ((data & APOLLO_CSR_CR_FPU_TRAP_ENABLE) == 0)
 	{
 		// enable FPU (i.e. FPU opcodes in CPU)
-		apollo_set_cpu_has_fpu(&space.device(), 1);
+		apollo_set_cpu_has_fpu(m_maincpu, 1);
 	}
 	else
 	{
 		// disable FPU (i.e. FPU opcodes in CPU)
-		apollo_set_cpu_has_fpu(&space.device(), 0);
+		apollo_set_cpu_has_fpu(m_maincpu, 0);
 
 		if (!apollo_is_dn3000())
 		{

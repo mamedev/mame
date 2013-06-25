@@ -864,7 +864,7 @@ static const char* trap8[] = {
 
 // get parameter string for parameter type and value at addr
 
-static const char *get_param(m68ki_cpu_core *m68k, UINT32 addr, char type)
+static const char *get_param(m68000_base_device *m68k, UINT32 addr, char type)
 {
 	UINT32 value = ~0;
 
@@ -880,16 +880,16 @@ static const char *get_param(m68ki_cpu_core *m68k, UINT32 addr, char type)
 
 	if (!m68k->mmu_tmp_buserror_occurred)
 	{
-		value = m68k->memory.read32(addr);
+		value = m68k->read32(addr);
 		if (!m68k->mmu_tmp_buserror_occurred && (value != ~0))
 		{
 			switch (type)
 			{
 			case 'S': // string w/o terminating 0
-				value1 = m68k->memory.read32(addr + 4);
+				value1 = m68k->read32(addr + 4);
 				if (!m68k->mmu_tmp_buserror_occurred && (value1 != ~0))
 				{
-					maxlen = m68k->memory.read16(value1);
+					maxlen = m68k->read16(value1);
 					if (maxlen > sizeof(sb) - 2)
 					{
 						maxlen = sizeof(sb) - 2;
@@ -898,7 +898,7 @@ static const char *get_param(m68ki_cpu_core *m68k, UINT32 addr, char type)
 			case 's': // string
 				i = 0;
 				sb[i++] = '"';
-				while (i <= maxlen && (ch = m68k->memory.read8(value++)) != 0
+				while (i <= maxlen && (ch = m68k->read8(value++)) != 0
 						&& !m68k->mmu_tmp_buserror_occurred)
 				{
 					sb[i++] = ch < 32 ? '.' : ch;
@@ -907,20 +907,20 @@ static const char *get_param(m68ki_cpu_core *m68k, UINT32 addr, char type)
 				sb[i] = 0;
 				break;
 			case 'b': // byte (1 byte)
-				sprintf(sb, "0x%x", m68k->memory.read8(value));
+				sprintf(sb, "0x%x", m68k->read8(value));
 				break;
 			case 'p': // pointer
 				sprintf(sb, "0x%x", value);
 				break;
 			case 'w': // word (2 byte)
-				sprintf(sb, "0x%x", m68k->memory.read16(value));
+				sprintf(sb, "0x%x", m68k->read16(value));
 				break;
 			case 'x': // default  (hex 32 bit)
-				sprintf(sb, "0x%x", m68k->memory.read32(value));
+				sprintf(sb, "0x%x", m68k->read32(value));
 				break;
 			case 'u': // uid
-				sprintf(sb, "%08x.%08x", m68k->memory.read32(value),
-						m68k->memory.read32(value + 4));
+				sprintf(sb, "%08x.%08x", m68k->read32(value),
+						m68k->read32(value + 4));
 				break;
 			default:
 				sprintf(sb, "%c", type);
@@ -934,7 +934,7 @@ static const char *get_param(m68ki_cpu_core *m68k, UINT32 addr, char type)
 
 // get the svc call string
 
-static const char* get_svc_call(m68ki_cpu_core *m68k, int trap_no,
+static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 		int trap_code,  char *sb)
 {
 	UINT32 sp = REG_A(m68k)[7];
@@ -1034,7 +1034,7 @@ static const char* get_svc_call(m68ki_cpu_core *m68k, int trap_no,
 	return sb;
 }
 
-static const char * disassemble(m68ki_cpu_core *m68k, offs_t pc, char* sb)
+static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
 {
 	UINT8 oprom[10];
 	UINT8 opram[10];
@@ -1050,7 +1050,7 @@ static const char * disassemble(m68ki_cpu_core *m68k, offs_t pc, char* sb)
 	int i;
 	for (i = 0; i < sizeof(oprom); i++)
 	{
-		oprom[i] = opram[i] = m68k->memory.read8(pc + i);
+		oprom[i] = opram[i] = m68k->read8(pc + i);
 		if (m68k->mmu_tmp_buserror_occurred)
 		{
 			sprintf(sb, "- (apollo_disassemble failed at %08x)", pc + i);
@@ -1062,7 +1062,7 @@ static const char * disassemble(m68ki_cpu_core *m68k, offs_t pc, char* sb)
 			return sb;
 		}
 	}
-	m68k->device->disassemble(sb, pc, oprom, opram, options);
+	m68k->disassemble(sb, pc, oprom, opram, options);
 
 	// restore previous bus error state
 	m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
@@ -1071,7 +1071,7 @@ static const char * disassemble(m68ki_cpu_core *m68k, offs_t pc, char* sb)
 	return sb;
 }
 
-static const UINT16 *get_data(m68ki_cpu_core *m68k, offs_t addr)
+static const UINT16 *get_data(m68000_base_device *m68k, offs_t addr)
 {
 	static UINT16 data[4];
 
@@ -1085,7 +1085,7 @@ static const UINT16 *get_data(m68ki_cpu_core *m68k, offs_t addr)
 	int i;
 	for (i = 0; i < sizeof(data); i += 2)
 	{
-		data[i/2] = m68k->memory.read16(addr + i);
+		data[i/2] = m68k->read16(addr + i);
 	}
 
 	// restore previous bus error state
@@ -1114,11 +1114,11 @@ int apollo_debug_instruction_hook(device_t *device, offs_t curpc)
 	{
 		UINT32 ppc_save;
 		UINT16 ir;
-		m68ki_cpu_core *m68k = (m68ki_cpu_core *) downcast<legacy_cpu_device *> (device)->token();
+		m68000_base_device *m68k = (m68000_base_device *) downcast<legacy_cpu_device *> (device)->token();
 		m68k->mmu_tmp_buserror_occurred = 0;
 
 		/* Read next instruction */
-		ir = (m68k->pref_addr == REG_PC(m68k)) ? m68k->pref_data : m68k->memory.readimm16(REG_PC(m68k));
+		ir = (m68k->pref_addr == REG_PC(m68k)) ? m68k->pref_data : m68k->readimm16(REG_PC(m68k));
 
 		// apollo_cpu_context expects the PC of current opcode in REG_PPC (not the previous PC)
 		ppc_save = REG_PPC(m68k);

@@ -790,8 +790,8 @@ static void get_base_name(char* base_name, opcode_struct* op)
 /* Write the name of an opcode handler function */
 static void write_function_name(FILE* filep, char* base_name)
 {
-	fprintf(filep, "void _m68ki_cpu_core::%s(_m68ki_cpu_core* mc68kcpu)\n", base_name);
-	fprintf(g_prototype_file, "static void %s(_m68ki_cpu_core* mc68kcpu);\n", base_name);
+	fprintf(filep, "void m68000_base_device_ops::%s(m68000_base_device* mc68kcpu)\n", base_name);
+	fprintf(g_prototype_file, "static void %s(m68000_base_device* mc68kcpu);\n", base_name);
 }
 
 static void add_opcode_output_table_entry(opcode_struct* op, char* name)
@@ -804,7 +804,7 @@ static void add_opcode_output_table_entry(opcode_struct* op, char* name)
 
 	*ptr = *op;
 
-	sprintf( ptr->name, "_m68ki_cpu_core::%s", name);
+	sprintf( ptr->name, "m68000_base_device_ops::%s", name);
 	ptr->bits = num_bits(ptr->op_mask);
 }
 

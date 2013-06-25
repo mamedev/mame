@@ -102,7 +102,7 @@ M68KMAKE_PROTOTYPE_FOOTER
 /* Build the opcode handler table */
 void m68ki_build_opcode_table(void);
 
-extern void (*m68ki_instruction_jump_table[][0x10000])(m68ki_cpu_core *m68k); /* opcode handler jump table */
+extern void (*m68ki_instruction_jump_table[][0x10000])(m68000_base_device *m68k); /* opcode handler jump table */
 extern unsigned char m68ki_cycles[][0x10000];
 
 
@@ -124,13 +124,13 @@ M68KMAKE_TABLE_HEADER
 
 #define NUM_CPU_TYPES 7
 
-void (*m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000])(m68ki_cpu_core *m68k); /* opcode handler jump table */
+void (*m68ki_instruction_jump_table[NUM_CPU_TYPES][0x10000])(m68000_base_device *m68k); /* opcode handler jump table */
 unsigned char m68ki_cycles[NUM_CPU_TYPES][0x10000]; /* Cycles used by CPU type */
 
 /* This is used to generate the opcode handler jump table */
 struct opcode_handler_struct
 {
-	void (*opcode_handler)(m68ki_cpu_core *m68k);        /* handler function */
+	void (*opcode_handler)(m68000_base_device *m68k);        /* handler function */
 	unsigned int  mask;                  /* mask on opcode */
 	unsigned int  match;                 /* what to match after masking */
 	unsigned char cycles[NUM_CPU_TYPES]; /* cycles each cpu type takes */
@@ -174,7 +174,7 @@ void m68ki_build_opcode_table(void)
 		/* default to illegal */
 		for(k=0;k<NUM_CPU_TYPES;k++)
 		{
-			m68ki_instruction_jump_table[k][i] = _m68ki_cpu_core::m68k_op_illegal;
+			m68ki_instruction_jump_table[k][i] = m68000_base_device_ops::m68k_op_illegal;
 			m68ki_cycles[k][i] = 0;
 		}
 	}
@@ -269,9 +269,9 @@ M68KMAKE_OPCODE_HANDLER_HEADER
 
 #include "emu.h"
 #include "m68kcpu.h"
-extern void m68040_fpu_op0(m68ki_cpu_core *m68k);
-extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
-extern void m68881_mmu_ops(m68ki_cpu_core *m68k);
+extern void m68040_fpu_op0(m68000_base_device *m68k);
+extern void m68040_fpu_op1(m68000_base_device *m68k);
+extern void m68881_mmu_ops(m68000_base_device *m68k);
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
@@ -3159,7 +3159,7 @@ M68KMAKE_OP(bkpt, 0, ., .)
 	if(CPU_TYPE_IS_010_PLUS((mc68kcpu)->cpu_type))
 	{
 		if ((mc68kcpu)->bkpt_ack_callback != NULL)
-			(*(mc68kcpu)->bkpt_ack_callback)((mc68kcpu)->device, CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) ? (mc68kcpu)->ir & 7 : 0);
+			(*(mc68kcpu)->bkpt_ack_callback)((mc68kcpu), CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) ? (mc68kcpu)->ir & 7 : 0);
 	}
 	m68ki_exception_illegal(mc68kcpu);
 }
@@ -3324,7 +3324,7 @@ M68KMAKE_OP(callm, 32, ., .)
 		REG_PC(mc68kcpu) += 2;
 (void)ea;   /* just to avoid an 'unused variable' warning */
 		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -4261,7 +4261,7 @@ M68KMAKE_OP(cmpi, 32, ., d)
 	UINT32 res = dst - src;
 
 	if ((mc68kcpu)->cmpild_instr_callback != NULL)
-		(*(mc68kcpu)->cmpild_instr_callback)((mc68kcpu)->device, src, (mc68kcpu)->ir & 7);
+		(*(mc68kcpu)->cmpild_instr_callback)((mc68kcpu), src, (mc68kcpu)->ir & 7);
 
 	(mc68kcpu)->n_flag = NFLAG_32(res);
 	(mc68kcpu)->not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -4402,7 +4402,7 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4414,7 +4414,7 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4426,7 +4426,7 @@ M68KMAKE_OP(cpgen, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->has_fpu || mc68kcpu->has_pmmu))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4438,7 +4438,7 @@ M68KMAKE_OP(cpscc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -4450,7 +4450,7 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -8262,7 +8262,7 @@ M68KMAKE_OP(reset, 0, ., .)
 	if((mc68kcpu)->s_flag)
 	{
 		if ((mc68kcpu)->reset_instr_callback != NULL)
-			(*(mc68kcpu)->reset_instr_callback)((mc68kcpu)->device);
+			(*(mc68kcpu)->reset_instr_callback)((mc68kcpu));
 		(mc68kcpu)->remaining_cycles -= (mc68kcpu)->cyc_reset;
 		return;
 	}
@@ -8968,7 +8968,7 @@ M68KMAKE_OP(rte, 32, ., .)
 		UINT32 format_word;
 
 		if ((mc68kcpu)->rte_instr_callback != NULL)
-			(*(mc68kcpu)->rte_instr_callback)((mc68kcpu)->device);
+			(*(mc68kcpu)->rte_instr_callback)((mc68kcpu));
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 
 		if(CPU_TYPE_IS_000((mc68kcpu)->cpu_type))
@@ -9129,7 +9129,7 @@ M68KMAKE_OP(rtm, 32, ., .)
 	{
 		m68ki_trace_t0(mc68kcpu);              /* auto-disable (see m68kcpu.h) */
 		logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_illegal(mc68kcpu);
@@ -10003,10 +10003,10 @@ M68KMAKE_OP(tas, 8, ., .)
 
 	/* The Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS writeback
 	   disabled in order to function properly.  Some Amiga software may also rely
-	   on (mc68kcpu), but only when accessing specific addresses so additional functionality
+	   on this, but only when accessing specific addresses so additional functionality
 	   will be needed. */
 	if ((mc68kcpu)->tas_instr_callback != NULL)
-		allow_writeback = (*(mc68kcpu)->tas_instr_callback)((mc68kcpu)->device);
+		allow_writeback = (*(mc68kcpu)->tas_instr_callback)((mc68kcpu));
 
 	if (allow_writeback)
 		m68ki_write_8((mc68kcpu), ea, dst | 0x80);
@@ -10511,7 +10511,7 @@ M68KMAKE_OP(cpush, 32, ., .)
 	if(CPU_TYPE_IS_040_PLUS((mc68kcpu)->cpu_type))
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-						(mc68kcpu)->device->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);

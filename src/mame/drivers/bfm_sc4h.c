@@ -551,7 +551,7 @@ void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UI
 //  if (dedicated == false)
 	{
 		int pc = space.device().safe_pc();
-		//m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+		//_m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
@@ -603,12 +603,15 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 {
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
+
 	m68307_set_port_callbacks(m_maincpu,
 		bfm_sc4_68307_porta_r,
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
 	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
+
+	
 
 	int reels = 6;
 	m_reels=reels;

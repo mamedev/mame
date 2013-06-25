@@ -11,6 +11,7 @@
 // VDP related
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
+#include "cpu/m68000/m68000.h"
 // Cache the CPUs and VDPs for faster access
 class toaplan2_state : public driver_device
 {
@@ -148,7 +149,7 @@ public:
 	void toaplan2_vblank_irq(int irq_line);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<nmk112_device> m_nmk112;
 	optional_device<okim6295_device> m_oki;

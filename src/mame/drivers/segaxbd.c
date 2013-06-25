@@ -601,7 +601,7 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 
 READ16_MEMBER( segaxbd_state::rascot_excs_r )
 {
-	logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
+	//logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 
 	// probably receives commands from the server here
 	//return space.machine().rand() & 0xff;
@@ -616,7 +616,7 @@ READ16_MEMBER( segaxbd_state::rascot_excs_r )
 
 WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
 {
-	logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
+	//logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
 
@@ -627,7 +627,7 @@ WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
 
 READ16_MEMBER( segaxbd_state::smgp_excs_r )
 {
-	logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
+	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 	return 0xffff;
 }
 
@@ -639,7 +639,7 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 
 WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
+	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
 
 

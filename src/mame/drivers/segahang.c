@@ -243,7 +243,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 		}
 	}
 
-	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	//logerror("%06X:hangon_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -271,7 +271,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 				return;
 		}
 
-	logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -304,7 +304,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 		}
 	}
 
-	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
+	//logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -333,7 +333,7 @@ WRITE16_MEMBER( segahang_state::sharrier_io_w )
 				return;
 		}
 
-	logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 

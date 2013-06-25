@@ -1,11 +1,11 @@
+#include "m68000.h"
+
 #define m68307BUS_MADR (0x01)
 #define m68307BUS_MFDR (0x03)
 #define m68307BUS_MBCR (0x05)
 #define m68307BUS_MBSR (0x07)
 #define m68307BUS_MBDR (0x09)
 
-DECLARE_READ8_HANDLER( m68307_internal_mbus_r );
-DECLARE_WRITE8_HANDLER( m68307_internal_mbus_w );
 
 class m68307_mbus
 {

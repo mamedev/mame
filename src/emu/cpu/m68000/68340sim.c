@@ -4,9 +4,9 @@
 #include "m68kcpu.h"
 
 
-READ16_HANDLER( m68340_internal_sim_r )
+READ16_MEMBER( m68000_base_device::m68340_internal_sim_r )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -54,10 +54,10 @@ READ16_HANDLER( m68340_internal_sim_r )
 	return 0x0000;
 }
 
-READ8_HANDLER( m68340_internal_sim_ports_r )
+READ8_MEMBER( m68000_base_device::m68340_internal_sim_ports_r )
 {
 	offset += 0x10;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -109,11 +109,11 @@ READ8_HANDLER( m68340_internal_sim_ports_r )
 	return 0x00;
 }
 
-READ32_HANDLER( m68340_internal_sim_cs_r )
+READ32_MEMBER( m68000_base_device::m68340_internal_sim_cs_r )
 {
 	offset += m68340SIM_AM_CS0>>2;
 
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -141,9 +141,9 @@ READ32_HANDLER( m68340_internal_sim_cs_r )
 	return 0x00000000;
 }
 
-WRITE16_HANDLER( m68340_internal_sim_w )
+WRITE16_MEMBER( m68000_base_device::m68340_internal_sim_w )
 {
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -190,10 +190,10 @@ WRITE16_HANDLER( m68340_internal_sim_w )
 	}
 }
 
-WRITE8_HANDLER( m68340_internal_sim_ports_w )
+WRITE8_MEMBER( m68000_base_device::m68340_internal_sim_ports_w )
 {
 	offset += 0x10;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -243,10 +243,10 @@ WRITE8_HANDLER( m68340_internal_sim_ports_w )
 	}
 }
 
-WRITE32_HANDLER( m68340_internal_sim_cs_w )
+WRITE32_MEMBER( m68000_base_device::m68340_internal_sim_cs_w )
 {
 	offset += m68340SIM_AM_CS0>>2;
-	m68ki_cpu_core *m68k = m68k_get_safe_token(&space.device());
+	m68000_base_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 

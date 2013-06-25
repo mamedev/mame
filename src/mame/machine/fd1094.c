@@ -605,8 +605,9 @@ UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 //  fd1094_device - constructor
 //-------------------------------------------------
 
+
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m68000_device(mconfig, M68000, tag, owner, clock),
+	: m68000_device(mconfig, tag, owner, clock),
 		m_state(0x00),
 		m_irqmode(false),
 		m_cache(*this),

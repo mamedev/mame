@@ -9,6 +9,7 @@
 #include "sound/ymz280b.h"
 #include "machine/68681.h"
 #include "machine/nvram.h"
+#include "cpu/m68000/m68000.h"
 
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
@@ -24,7 +25,7 @@ public:
 	}
 
 public:
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<duart68681_device> m_duart;
 	optional_device<bfm_bda_t> m_vfd0;
 	required_device<ymz280b_device> m_ymz;
@@ -547,7 +548,7 @@ public:
 	DECLARE_MACHINE_START(adder4);
 
 	// devices
-	required_device<cpu_device> m_adder4cpu;
+	required_device<m68000_base_device> m_adder4cpu;
 };
 
 

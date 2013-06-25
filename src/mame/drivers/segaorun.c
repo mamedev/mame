@@ -348,19 +348,19 @@ static I8255_INTERFACE(single_ppi_intf)
 
 READ8_MEMBER( segaorun_state::unknown_porta_r )
 {
-	logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
+	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
 	return 0;
 }
 
 READ8_MEMBER( segaorun_state::unknown_portb_r )
 {
-	logerror("%06X:read from 8255 port B\n", m_maincpu->pc());
+	//logerror("%06X:read from 8255 port B\n", m_maincpu->pc());
 	return 0;
 }
 
 READ8_MEMBER( segaorun_state::unknown_portc_r )
 {
-	logerror("%06X:read from 8255 port C\n", m_maincpu->pc());
+	//logerror("%06X:read from 8255 port C\n", m_maincpu->pc());
 	return 0;
 }
 
@@ -372,12 +372,12 @@ READ8_MEMBER( segaorun_state::unknown_portc_r )
 
 WRITE8_MEMBER( segaorun_state::unknown_porta_w )
 {
-	logerror("%06X:write %02X to 8255 port A\n", m_maincpu->pc(), data);
+	//logerror("%06X:write %02X to 8255 port A\n", m_maincpu->pc(), data);
 }
 
 WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 {
-	logerror("%06X:write %02X to 8255 port B\n", m_maincpu->pc(), data);
+	//logerror("%06X:write %02X to 8255 port B\n", m_maincpu->pc(), data);
 }
 
 
