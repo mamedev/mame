@@ -117,10 +117,11 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	// check if TH is set to input (1).
 	if (data & 0x02)
 	{
-		UINT8 th_level = (m_port_ctrl1->port_r() & 0x40) >> 1;
+		if (!m_is_gamegear)
+			ctrl1_port_data &= ~0x40 | m_port_ctrl1->port_r();
 
-		// check if TH pin level is high (1) and was low (0)
-		if ((th_level & 0x20) && !(m_io_ctrl_reg & 0x20))
+		// check if TH input level is high (1) and was output/low (0)
+		if ((ctrl1_port_data & 0x40) && !(m_io_ctrl_reg & 0x22))
 			latch_hcount = true;
 	}
 
@@ -143,10 +144,11 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	// check if TH is set to input (1).
 	if (data & 0x08)
 	{
-		UINT8 th_level = (m_port_ctrl2->port_r() & 0x40) << 1;
+		if (!m_is_gamegear)
+			ctrl2_port_data &= ~0x40 | m_port_ctrl2->port_r();
 
-		// check if TH pin level is high (1) and was low (0)
-		if ((th_level & 0x80) && !(m_io_ctrl_reg & 0x80))
+		// check if TH input level is high (1) and was output/low (0)
+		if ((ctrl2_port_data & 0x40) && !(m_io_ctrl_reg & 0x88))
 			latch_hcount = true;
 	}
 
