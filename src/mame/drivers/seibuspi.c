@@ -51,8 +51,11 @@
 TODO:
 - Improve alpha blending. In Viper Phase 1, see the blue "Viper" logo when on the
   "push 1 or 2 players button" screen. Note that the alpha blended red logo on the
-  title screen is tiles(that effect is emulated), this blue logo is sprites.
+  title screen is tiles(that effect is simulated), this blue logo is sprites.
   The current implementation is a crude hack.
+  * DMA table? can't find any
+  * data in transparent pen? nope
+  * color bit 15? nope
 - not sure if sprite priorities are completely right
 
 */
@@ -944,8 +947,6 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
-//  AM_RANGE(0x00000104, 0x00000107) AM_WRITENOP // ?
-//  AM_RANGE(0x00000108, 0x0000010b) AM_WRITENOP // ?
 	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
@@ -957,7 +958,9 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000498, 0x0000049b) AM_WRITENOP // ? dma address high bits? (always writes 0)
 	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000524, 0x00000527) AM_WRITENOP // SEI252 sprite decryption key, see machine/spisprit.c
+	AM_RANGE(0x00000528, 0x0000052b) AM_WRITENOP // SEI252 sprite decryption unknown
 	AM_RANGE(0x00000530, 0x00000533) AM_WRITENOP // SEI252 sprite decryption table key, see machine/spisprit.c
+	AM_RANGE(0x00000534, 0x00000537) AM_WRITENOP // SEI252 sprite decryption unknown
 	AM_RANGE(0x0000053c, 0x0000053f) AM_WRITENOP // SEI252 sprite decryption table index, see machine/spisprit.c
 	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
@@ -1083,7 +1086,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_soundmap, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
-	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JP1")
+	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JP1") // is JP1 physically really here?
 	AM_IMPORT_FROM( sxx2e_soundmap )
 ADDRESS_MAP_END
 
