@@ -3508,5 +3508,5 @@ GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,    segas16a
 GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
 GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )
 GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,   segas16a_state,generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", GAME_SUPPORTS_SAVE )
-GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", GAME_SUPPORTS_SAVE )
-GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, System 16A, FD1089A 317-0086)", GAME_SUPPORTS_SAVE )
+GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, Japan, System 16A, FD1094 317-0084)", GAME_SUPPORTS_SAVE )
+GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, Japan, System 16A, FD1089A 317-0086)", GAME_SUPPORTS_SAVE )

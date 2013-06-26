@@ -6716,7 +6716,7 @@ GAME( 1994, toryumon,   0,        system16b_5797,      toryumon, segas16b_state,
 GAME( 1989, tturf,      0,        system16b_i8751,     tturf,    segas16b_state,tturf_5704,         ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND ) // due to missing ROM only
 GAME( 1989, tturfu,     tturf,    system16b_i8751,     tturf,    segas16b_state,generic_5358,       ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
 
-GAME( 1988, wb3,        0,        system16b_i8751,     wb3,      segas16b_state,wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, World, System 16B, 8751 317-0098)", 0 )
+GAME( 1988, wb3,        0,        system16b_i8751,     wb3,      segas16b_state,wb3_5704,           ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, World, System 16B, 8751 317-0098)", 0 )
 GAME( 1988, wb34,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B, FD1094 317-0087)", 0 )
 GAME( 1988, wb33,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B, FD1094 317-0089)", 0 )
 GAME( 1988, wb32,       wb3,      system16b_fd1094,    wb3,      segas16b_state,generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B, FD1094 317-0085)", 0 )
