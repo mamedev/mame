@@ -14,7 +14,11 @@
 // TODO:
 //  * Store the cache in 15 unique memory locations as it is on-chip.
 //  * Modify cycle counts when running from within the cache
-//
+//  * A write to PI resets the pseudoramdom sequence generator)  (page 2-4)
+//  * Handle virtual shift addressing using RB & RE (when RE is enabled)  (page 2-6)
+//  * The ALU sign-extends 32-bit operands from y or p to 36 bits and produces a 36-bit output
+//  * Interrupt lines  (page 2-15)
+// 
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -104,15 +108,15 @@ void dsp16_device::device_start()
 	state_add(DSP16_P,        "P",         m_p);
 	state_add(DSP16_A0,       "A0",        m_a0).mask(U64(0xfffffffff));
 	state_add(DSP16_A1,       "A1",        m_a1).mask(U64(0xfffffffff));
-	state_add(DSP16_AUC,      "AUC",       m_auc); //.formatstr("%6s");
-	state_add(DSP16_PSW,      "PSW",       m_psw); //.formatstr("%16s");
+	state_add(DSP16_AUC,      "AUC",       m_auc).formatstr("%8s");
+	state_add(DSP16_PSW,      "PSW",       m_psw).formatstr("%16s");
 	state_add(DSP16_C0,       "C0",        m_c0);
 	state_add(DSP16_C1,       "C1",        m_c1);
 	state_add(DSP16_C2,       "C2",        m_c2);
-	state_add(DSP16_SIOC,     "SIOC",      m_sioc).formatstr("%16s");
+	state_add(DSP16_SIOC,     "SIOC",      m_sioc).formatstr("%10s");
 	state_add(DSP16_SRTA,     "SRTA",      m_srta);
 	state_add(DSP16_SDX,      "SDX",       m_sdx);
-	state_add(DSP16_PIOC,     "PIOC",      m_pioc);
+	state_add(DSP16_PIOC,     "PIOC",      m_pioc).formatstr("%16s");
 	state_add(DSP16_PDX0,     "PDX0",      m_pdx0);
 	state_add(DSP16_PDX1,     "PDX1",      m_pdx1);
 
@@ -170,12 +174,15 @@ void dsp16_device::device_reset()
 {
 	// Page 7-5
 	m_pc = 0x0000;
-	m_sioc = 0x0000;
+	m_pi = 0x0000;
+	m_sioc = 0x0000;    // (page 5-4)
+    
 	// SRTA is unaltered by reset
 	m_pioc = 0x0008;
 	m_rb = 0x0000;
 	m_re = 0x0000;
-	// AUC is not affected by reset
+	
+    // AUC is not affected by reset
 	m_ppc = m_pc;
 
 	// Hacky cache emulation.
@@ -195,8 +202,8 @@ void dsp16_device::device_reset()
 const address_space_config *dsp16_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_PROGRAM) ? &m_program_config :
-			(spacenum == AS_DATA) ? &m_data_config :
-			NULL;
+		   (spacenum == AS_DATA) ? &m_data_config :
+		   NULL;
 }
 
 
@@ -213,10 +220,101 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 		string.printf("(below)");
 			break;
 
+        case DSP16_AUC:
+        {
+            astring alignString;
+            const UINT8 align = m_auc & 0x03;
+            switch (align)
+            {
+                case 0x00: alignString.printf("xy"); break;
+                case 0x01: alignString.printf("/4"); break;
+                case 0x02: alignString.printf("x4"); break;
+                case 0x03: alignString.printf(",,"); break;
+            }
+            string.printf("%c%c%c%c%c%s",
+                          m_auc & 0x40 ? 'Y':'.',
+                          m_auc & 0x20 ? '1':'.',
+                          m_auc & 0x10 ? '0':'.',
+                          m_auc & 0x08 ? '1':'.',
+                          m_auc & 0x04 ? '0':'.',
+                          alignString.cstr());
+            break;
+        }
+
+        case DSP16_PSW:
+            string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+                          m_psw & 0x8000 ? 'M':'.',
+                          m_psw & 0x4000 ? 'E':'.',
+                          m_psw & 0x2000 ? 'L':'.',
+                          m_psw & 0x1000 ? 'V':'.',
+                          m_psw & 0x0800 ? ',':',',
+                          m_psw & 0x0400 ? ',':',',
+                          m_psw & 0x0200 ? 'O':'.',
+                          m_psw & 0x0100 ? '1':'.',
+                          m_psw & 0x0080 ? '1':'.',
+                          m_psw & 0x0040 ? '1':'.',
+                          m_psw & 0x0020 ? '1':'.',
+                          m_psw & 0x0010 ? 'O':'.',
+                          m_psw & 0x0008 ? '1':'.',
+                          m_psw & 0x0004 ? '1':'.',
+                          m_psw & 0x0002 ? '1':'.',
+                          m_psw & 0x0001 ? '1':'.');
+            break;
+
+        case DSP16_PIOC:
+        {
+            astring strobeString;
+            const UINT8 strobe = (m_pioc & 0x6000) >> 13;
+            switch (strobe)
+            {
+                case 0x00: strobeString.printf("1T"); break;
+                case 0x01: strobeString.printf("2T"); break;
+                case 0x02: strobeString.printf("3T"); break;
+                case 0x03: strobeString.printf("4T"); break;
+            }
+            string.printf("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
+                          m_pioc & 0x8000 ? 'I':'.',
+                          strobeString.cstr(),
+                          m_pioc & 0x1000 ? 'O':'I',
+                          m_pioc & 0x0800 ? 'O':'I',
+                          m_pioc & 0x0400 ? 'S':'.',
+                          m_pioc & 0x0200 ? 'I':'.',
+                          m_pioc & 0x0100 ? 'O':'.',
+                          m_pioc & 0x0080 ? 'P':'.',
+                          m_pioc & 0x0040 ? 'P':'.',
+                          m_pioc & 0x0020 ? 'I':'.',
+                          m_pioc & 0x0010 ? 'I':'.',
+                          m_pioc & 0x0008 ? 'O':'.',
+                          m_pioc & 0x0004 ? 'P':'.',
+                          m_pioc & 0x0002 ? 'P':'.',
+                          m_pioc & 0x0001 ? 'I':'.');
+            break;
+        }
+            
 		// Placeholder for a better view later (TODO)
 		case DSP16_SIOC:
-			string.printf("%04x", *(UINT16*)entry.dataptr());
-			break;
+        {
+            astring clkString;
+            const UINT8 clk = (m_sioc & 0x0180) >> 7;
+            switch (clk)
+            {
+                case 0x00: clkString.printf("/4"); break;
+                case 0x01: clkString.printf("12"); break;
+                case 0x02: clkString.printf("16"); break;
+                case 0x03: clkString.printf("20"); break;
+            }
+            string.printf("%c%s%c%c%c%c%c%c%c",
+                          m_sioc & 0x0200 ? 'I':'O',
+                          clkString.cstr(),
+                          m_sioc & 0x0040 ? 'L':'M',
+                          m_sioc & 0x0020 ? 'I':'O',
+                          m_sioc & 0x0010 ? 'I':'O',
+                          m_sioc & 0x0008 ? 'I':'O',
+                          m_sioc & 0x0004 ? 'I':'O',
+                          m_sioc & 0x0002 ? '2':'1',
+                          m_sioc & 0x0001 ? '2':'1');
+            break;
+        }
 	}
 }
 
@@ -342,6 +440,10 @@ void dsp16_device::execute_run()
 		// step
 		m_pc += pcAdvance;
 		m_icount -= cycles;
+
+        // The 16 bit PI "shadow" register gets set to PC on each instruction except
+        // when an interrupt service routine is active (TODO: Interrupt check)  (page 2-4)
+        m_pi = m_pc;
 
 	} while (m_icount > 0);
 }

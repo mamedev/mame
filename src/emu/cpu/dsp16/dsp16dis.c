@@ -535,10 +535,10 @@ CPU_DISASSEMBLE( dsp16a )
 		case 0x02: case 0x03:
 		{
 			// R = M
-			const UINT8 M = (op & 0x00ff);
-			const UINT8 R = (op & 0x0e00) >> 9;
+			const UINT16 M = (op & 0x01ff);
+			const UINT8  R = (op & 0x0e00) >> 9;
 			astring rString = disasmRImmediateField(R);
-			sprintf(buffer, "%s = 0x%02x", rString.cstr(), M);
+			sprintf(buffer, "%s = 0x%04x", rString.cstr(), M);
 			break;
 		}
 
