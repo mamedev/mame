@@ -22,6 +22,7 @@ Sega Naomi is Dreamcast based Arcade hardware.
 Compatibility list (as per 26-jun-2013)
 - sfz3ugd: currently dies at disclaimer screen (regression);
 - sprtjam: garbage on initial attract mode screen (regression).
+- puyofev: hangs after pressing start.
 - vtennisg: crashes after stage screen.
 
 TODO (general):
@@ -7148,6 +7149,24 @@ ROM_START( ngdup23e )
 	// PIC and sticker unknown
 	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
 ROM_END
+
+/*
+0C03F492: MOV     R5,R0
+0C03F494: MOV     R0,R5
+0C03F496: CMP/EQ  R5,R4
+0C03F498: BF      $0C03F4A6
+0C03F4A6: MOV.L   @($28,R14),R0
+0C03F4A8: TST     R0,R0
+0C03F4AA: BT      $0C03F4C4
+0C03F4AC: BRA     $0C03F4BC
+0C03F4BA: BT      $0C03F4C4
+0C03F4BC: MOV.L   @($28,R14),R3
+0C03F4BE: MOV     #$FD,R5
+0C03F4C0: JSR     R3
+0C03F134: NOP
+0C03F136: BRA     $0C03F136
+0C03F134: NOP
+*/
 
 ROM_START( puyofev )
 	NAOMIGD_BIOS
