@@ -19,6 +19,11 @@
 
 Sega Naomi is Dreamcast based Arcade hardware.
 
+Compatibility list (as per 26-jun-2013)
+- sfz3ugd: currently dies at disclaimer screen (regression);
+- sprtjam: garbage on initial attract mode screen (regression).
+- vtennisg: crashes after stage screen.
+
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
     - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
@@ -70,7 +75,6 @@ TODO (game-specific):
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
     - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
-    - Street Fighter Zero 3 Upper: currently dies at disclaimer screen (regression);
     - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
@@ -2493,10 +2497,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK/2/4, 820, 0, 640, 532, 0, 480) /* TODO: PVR is clocked at 100 MHz, pixel clock is guessed to be /4 so ~57 fps. */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
@@ -8184,7 +8185,7 @@ ROM_END
 // 0012A Virtua Fighter 4 (Rev A)
 /* 0012B */ GAME( 2001, vf4b,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_FLAGS )
 /* 0012C */ GAME( 2001, vf4c,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev C) (GDS-0012C)", GAME_FLAGS )
-/* 0013  */ GAME( 2001, shaktmsp,  naomigd,  naomigd, shaktamb, naomi_state, naomigd,  ROT0, "Sega", "Shakatto Tambourine 2K1 SPR (GDS-0013)", GAME_FLAGS )
+/* 0013  */ GAME( 2001, shaktmsp, naomigd, naomigd,  shaktamb,naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine 2K1 SPR (GDS-0013)", GAME_FLAGS )
 /* 0014  */ GAME( 2001, beachspi, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Beach Spikers (GDS-0014)", GAME_FLAGS )
 // 0015  Virtua Tennis 2 / Power Smash 2
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )

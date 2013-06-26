@@ -200,10 +200,7 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK/2/4, 820, 0, 640, 532, 0, 480) /* TODO: PVR is clocked at 100 MHz, pixel clock is guessed to be /4 so ~57 fps. */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_LENGTH(0x1000)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
