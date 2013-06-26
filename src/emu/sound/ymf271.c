@@ -981,6 +981,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
+				mixp = &mix[0];
 				update_pcm(j + (3*12), mixp, samples);
 				break;
 			}
