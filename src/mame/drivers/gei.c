@@ -1673,7 +1673,7 @@ ROM_START( gtsers8 )
 	/* Missing Alternate question set: "Adult Sex" */
 ROM_END
 
-ROM_START( gtsers9 )
+ROM_START( gtsers9 ) /* TRIV-3 PCB, stickered 256 TRIV #9 7/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc",  0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "facts",           0x10000, 0x8000, CRC(21bd6181) SHA1(609ae1097a4011e90d03d4c4f03140fbe84c084a) )
@@ -1686,7 +1686,7 @@ ROM_END
 
 ROM_START( gtsers10 ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) ) /* Also found with program v5.03 (not dumped) */
 	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
 	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
 	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
@@ -1696,7 +1696,7 @@ ROM_END
 
 ROM_START( gtsers10a ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
-	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
+	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) ) /* Also found with program v5.03 (not dumped) */
 	ROM_LOAD( "new_general",    0x10000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
 	ROM_LOAD( "new_tv_mash",    0x18000, 0x8000, CRC(f73240c6) SHA1(78020644074da719414133a86a91c1328e5d8929) )
 	ROM_LOAD( "new_entrtnmnt",  0x20000, 0x8000, CRC(0f54340c) SHA1(1ca4c23b542339791a2d8f4a9a857f755feca8a1) )
@@ -1704,7 +1704,7 @@ ROM_START( gtsers10a ) /* TRIV-3 PCB, stickered 256 TRIV #10 8/85 */
 	ROM_LOAD( "adult_sex_3",    0x30000, 0x8000, CRC(2c46e355) SHA1(387ab389abaaea8e870b00039dd884237f7dd9c6) ) /* Listed as an alternate question set */
 ROM_END
 
-ROM_START( gtsers11 )
+ROM_START( gtsers11 ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
@@ -1714,7 +1714,7 @@ ROM_START( gtsers11 )
 	ROM_LOAD( "general_facts",  0x30000, 0x8000, CRC(f921f108) SHA1(fd72282df5cee0e6ab55268b40785b3dc8e3d65b) )
 ROM_END
 
-ROM_START( gtsers11a )
+ROM_START( gtsers11a ) /* TRIV-3 PCB, stickered 256 TRIV #11 8/85 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "rich-famous",    0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
