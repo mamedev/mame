@@ -1,0 +1,68 @@
+<!-- zac_proto.lay -->
+
+<!-- 2012-08-25: Initial version.  [Robbbert] -->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="P0"><text string="Balls"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text string="Score"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="0" right="318" bottom="180" />
+		</backdrop>
+
+		<!-- LEDs -->
+		<bezel name="digit5" element="digit">
+			<bounds left="10" top="45" right="44" bottom="84" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="54" top="45" right="88" bottom="84" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="98" top="45" right="132" bottom="84" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="142" top="45" right="176" bottom="84" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="186" top="45" right="220" bottom="84" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="230" top="45" right="264" bottom="84" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds left="274" top="45" right="308" bottom="84" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="30" top="145" right="54" bottom="170" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="64" top="145" right="88" bottom="170" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="230" top="145" right="254" bottom="170" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="264" top="145" right="288" bottom="170" />
+		</bezel>
+		<bezel element="P0"><bounds left="230" right="288" top="110" bottom="135" /></bezel>
+		<bezel element="P1"><bounds left="30" right="88" top="110" bottom="135" /></bezel>
+		<bezel element="P3"><bounds left="100" right="200" top="10" bottom="35" /></bezel>
+	</view>
+</mamelayout>

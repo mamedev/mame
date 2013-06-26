@@ -1,0 +1,37 @@
+class ssrj_state : public driver_device
+{
+public:
+	ssrj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_vram1(*this, "vram1"),
+		m_vram2(*this, "vram2"),
+		m_vram3(*this, "vram3"),
+		m_vram4(*this, "vram4"),
+		m_scrollram(*this, "scrollram"),
+		m_maincpu(*this, "maincpu") { }
+
+	int m_oldport;
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
+	tilemap_t *m_tilemap4;
+	required_shared_ptr<UINT8> m_vram1;
+	required_shared_ptr<UINT8> m_vram2;
+	required_shared_ptr<UINT8> m_vram3;
+	required_shared_ptr<UINT8> m_vram4;
+	required_shared_ptr<UINT8> m_scrollram;
+	UINT8 *m_buffer_spriteram;
+	DECLARE_READ8_MEMBER(ssrj_wheel_r);
+	DECLARE_WRITE8_MEMBER(ssrj_vram1_w);
+	DECLARE_WRITE8_MEMBER(ssrj_vram2_w);
+	DECLARE_WRITE8_MEMBER(ssrj_vram4_w);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info4);
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	UINT32 screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_ssrj(screen_device &screen, bool state);
+	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
+};

@@ -1,0 +1,30 @@
+# MAME/MESS keymap for Portuguese QWERTY 105-keys keyboard (Linux)
+# SDL can tell the difference between the two COMPOSE keys but assigns them the same label
+# thus both CLOSEBRACE and BACKSLASH appear like "´ ~" in the user interface.
+# The following definitions are therefore correct.
+#
+# Row 1
+#
+ITEM_ID_TILDE      SDLK_BACKSLASH 0x31 0x5c \
+ITEM_ID_MINUS      SDLK_QUOTE     0x14 0x27 '
+ITEM_ID_EQUALS     SDLK_WORLD_11  0x15 0xab «
+#
+# Row 2
+#
+ITEM_ID_OPENBRACE  SDLK_PLUS      0x22 0x2b +
+ITEM_ID_CLOSEBRACE SDLK_COMPOSE   0x23 0x00 ´
+#
+# Row 3
+#
+ITEM_ID_COLON      SDLK_WORLD_71  0x2f 0xe7 Ç
+ITEM_ID_QUOTE      SDLK_WORLD_26  0x30 0xba º
+ITEM_ID_BACKSLASH  SDLK_COMPOSE   0x33 0x00 ~
+#
+# Row 4
+#
+ITEM_ID_BACKSLASH2 SDLK_LESS      0x5e 0x3c <
+ITEM_ID_SLASH      SDLK_MINUS     0x3d 0x2d -
+#
+# Row 5
+#
+ITEM_ID_RALT       SDLK_MODE      0x71 0x00 ALTGR

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="special_flop" description="Specialist MX disk images">
+
+	<software name="bstcpm0">
+		<description>BST_CPM0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="bst_cpm0.odi" size="819200" crc="0bc1a7e8" sha1="d6af8ef893a7e099d7d468a1a53bb107dbe5ce0d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstmx0">
+		<description>bst_mx0</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="bst_mx0.odi" size="819200" crc="15bffc00" sha1="320871829e8cbe8f9230edad191f2047b9c9ddfc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

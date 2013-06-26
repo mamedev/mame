@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<view name="Portrait">
+		<screen index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+	</view>
+	<view name="Landscape">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+			<orientation rotate="90" />
+		</screen>
+	</view>
+</mamelayout>

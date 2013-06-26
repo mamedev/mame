@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sgx" description="NEC Supergrafx cartridges">
+	<software name="1941">
+		<description>1941 - Counter Attack</description>
+		<year>1991</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="HC91048"/>
+		<info name="release" value="19910823"/>
+		<info name="alt_title" value="1941カウンターアタック"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="1941 - counter attack (japan).pce" size="1048576" crc="8c4588e2" sha1="66873b0e0cc699aa75daf06a3f74c0508037e605" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aldynes">
+		<description>Aldynes</description>
+		<year>1991</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="HC91044"/>
+		<info name="release" value="19910222"/>
+		<info name="alt_title" value="オルディネス"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="aldynes (japan).pce" size="1048576" crc="4c2126b0" sha1="d876248ee1b80ad11633fd4be8aa21a187b52193" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlace">
+		<description>Battle Ace</description>
+		<year>1989</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="HC89026"/>
+		<info name="release" value="19891130"/>
+		<info name="alt_title" value="バトルエース"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="battle ace (japan).pce" size="524288" crc="3b13af61" sha1="edc8f7d2233c92ebd309ac804527c461851a4b63" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daimakai">
+		<description>Dai Makaimura</description>
+		<year>1990</year>
+		<publisher>NEC Avenue</publisher>
+		<info name="serial" value="NAPH-1008"/>
+		<info name="release" value="19900727"/>
+		<info name="alt_title" value="大魔界村"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="daimakai mura (japan).pce" size="1048576" crc="b486a8ed" sha1="cab9e4a1a8b6da07cc2c5cc35949928199a417ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="granzort">
+		<description>Madou Ou Granzort</description>
+		<year>1990</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="HC90029"/>
+		<info name="release" value="19900406"/>
+		<info name="alt_title" value="魔動王グランゾート"/>
+		<part name="cart" interface="pce_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="madou ou granzort (japan).pce" size="524288" crc="1f041166" sha1="5ed16565753c902e14da9a0c5361ef01fa74463b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,11 @@
+/******************************************************************************
+
+    ume.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makemak.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+#src/targets/mame.lst
+#src/targets/mess.lst

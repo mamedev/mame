@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.4" green="0.4" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.9" green="0.9" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="str_holes">
+		<text string="Playfiel Holes"/>
+	</element>
+	<element name="str_play">
+		<text string="Play" align="2"/>
+	</element>
+	<element name="str_good_game">
+		<text string="Good Game" align="2"/>
+	</element>
+	<element name="str_game_over">
+		<text string="Game Over" align="2"/>
+	</element>
+	<element name="str_tilt">
+		<text string="Tilt" align="2"/>
+	</element>
+	<element name="str_start">
+		<text string="Start" align="2"/>
+	</element>
+
+	<view name="Simple">
+
+	<!-- Display line -->
+		<bezel name="digit0" element="digit">
+			<bounds x="10" y="190"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="70" y="190"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="130" y="190"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="190" y="190"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="10" y="100"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="70" y="100"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds x="130" y="100"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds x="10" y="10"  width="50" height="80" />
+		</bezel>
+
+	<!-- Playfiel Holes lamps -->
+		<bezel name="lbl_holes" element="str_holes">
+			<bounds x="100" y="27" width="100" height="10" />
+		</bezel>
+		<bezel name="lamp1" element="lamp">
+			<bounds x="100" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp2" element="lamp">
+			<bounds x="110" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp3" element="lamp">
+			<bounds x="120" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp4" element="lamp">
+			<bounds x="130" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp5" element="lamp">
+			<bounds x="140" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp6" element="lamp">
+			<bounds x="150" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp7" element="lamp">
+			<bounds x="160" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp8" element="lamp">
+			<bounds x="170" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp9" element="lamp">
+			<bounds x="180" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lamp10" element="lamp">
+			<bounds x="190" y="40"  width="8" height="8" />
+		</bezel>
+
+	<!-- Panels -->
+		<bezel name="lbl_play" element="str_play">
+			<bounds x="235" y="40" width="13" height="10" />
+		</bezel>
+		<bezel name="in_play" element="lamp">
+			<bounds x="250" y="40"  width="8" height="8" />
+		</bezel>
+		<bezel name="lbl_good_game" element="str_good_game">
+			<bounds x="218" y="50" width="30" height="10" />
+		</bezel>
+		<bezel name="good_game" element="lamp">
+			<bounds x="250" y="50"  width="8" height="8" />
+		</bezel>
+		<bezel name="lbl_game_over" element="str_game_over">
+			<bounds x="218" y="60" width="30" height="10" />
+		</bezel>
+		<bezel name="game_over" element="lamp">
+			<bounds x="250" y="60"  width="8" height="8" />
+		</bezel>
+		<bezel name="lbl_tilt" element="str_tilt">
+			<bounds x="237" y="70" width="11" height="10" />
+		</bezel>
+		<bezel name="tilt" element="lamp">
+			<bounds x="250" y="70"  width="8" height="8" />
+		</bezel>
+		<bezel name="lbl_start" element="str_start">
+			<bounds x="232" y="80" width="16" height="10" />
+		</bezel>
+		<bezel name="start" element="lamp">
+			<bounds x="250" y="80"  width="8" height="8" />
+		</bezel>
+	</view>
+</mamelayout>

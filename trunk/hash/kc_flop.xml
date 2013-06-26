@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+    Loading instructions:
+    - install the D004 floppy disk interface into expansion slot.
+    - execute the command "JUMP FC"
+-->
+
+<softwarelist name="kc_flop" description="VEB Mikroelektronik KC 85 disk images">
+	<software name="mdos">
+		<description>MicroDOS 2.6</description>
+		<year>1988</year>
+		<publisher>IRIMS</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="microdos.img" size="819200" crc="ce91a44e" sha1="0924e9d2d964b4456b18170df5b7df172c8a043d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdosa" cloneof="mdos">
+		<description>MicroDOS 2.6 (Alt)</description>
+		<year>1988</year>
+		<publisher>IRIMS</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="kc85microdos.img" size="819200" crc="3222ac4b" sha1="c378850fb492b56caf28f8eb7fbe987d72b07e40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mldos">
+		<description>ML-DOS 2.2</description>
+		<year>1997</year>
+		<publisher>ML-Soft</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="268528">
+				<rom name="ml-dos.td0" size="268528" crc="abdf8f62" sha1="b3e80cfe894cbe563de1f34727d8bf58c86285f5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caos">
+		<description>CAOS</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="caos.img" size="819200" crc="c988c92a" sha1="42d7605846a39254cd9cac97aa9e404eb51e3b66" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caosa" cloneof="caos">
+		<description>CAOS (Alt)</description>
+		<year>198?</year>
+		<publisher>VEB Mikroelektronik</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="334695">
+				<rom name="kc85caos.td0" size="334695" crc="6abbd7d3" sha1="f5b36850674a971db1d3adc3601588b4b0193fef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
+

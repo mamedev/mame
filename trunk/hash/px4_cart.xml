@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="px4_cart" description="EPSON PX-4 ROM capsules">
+
+	<software name="basic">
+		<description>PX-4 BASIC</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="m25126aa.bin" size="32768" crc="f76f1c12" sha1="d7dc90ecd158012c0a54626b8bf962255bfd1b27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utils">
+		<description>PX-4 Utilities</description>
+		<year>198?</year>
+		<publisher>EPSON</publisher>
+		<part name="cart" interface="px4_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="m25124aa.bin" size="32768" crc="beabb0de" sha1="1c7bbda68635d2ee641fdfd7c08047f54caf4eb4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

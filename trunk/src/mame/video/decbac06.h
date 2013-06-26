@@ -1,0 +1,115 @@
+/* BAC06 */
+
+
+class deco_bac06_device : public device_t
+{
+public:
+	deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide);
+
+	void set_gfxregion(int region8x8, int region16x16) { m_gfxregion8x8 = region8x8; m_gfxregion16x16 = region16x16; };
+
+
+	UINT16* pf_data;
+	UINT16* pf_rowscroll, *pf_colscroll;
+
+	tilemap_t* pf8x8_tilemap[3];
+	tilemap_t* pf16x16_tilemap[3];
+	int    tile_region;
+	void create_tilemaps(int region8x8,int region16x16);
+	UINT16 pf_control_0[8];
+	UINT16 pf_control_1[8];
+
+	void deco_bac06_pf_draw(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
+	void deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type);
+
+
+	/* I wonder if pf_control_0 is really registers, or a selection of pins.
+
+	  For games with multiple chips typically the flip bit only gets set on one of the chips, but
+	  is expected to apply to both (and often the sprites as well?)
+
+	  Furthermore we have the m_rambank thing used by Stadium Hero which appears to be used to
+	  control the upper address line on some external RAM even if it gets written to the control_0
+	  area
+
+	  For now we have this get_flip_state function so that drivers can query the bit and set other
+	  flip flags accordingly
+	*/
+	UINT8 get_flip_state(void) { return pf_control_0[0]&0x80; };
+
+
+	void set_colmask(int data) { m_gfxcolmask = data; }
+	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles
+	UINT8 m_gfxcolmask;
+	int m_rambank; // external connection?
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+
+	UINT8 m_gfxregion8x8;
+	UINT8 m_gfxregion16x16;
+	int m_wide;
+
+	UINT8 m_bppmult;
+	UINT8 m_bppmask;
+
+	void custom_tilemap_draw(running_machine &machine,
+							bitmap_ind16 &bitmap,
+							const rectangle &cliprect,
+							tilemap_t *tilemap_ptr,
+							const UINT16 *rowscroll_ptr,
+							const UINT16 *colscroll_ptr,
+							const UINT16 *control0,
+							const UINT16 *control1,
+							int flags,
+							UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
+
+private:
+	TILEMAP_MAPPER_MEMBER(tile_shape0_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape1_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape2_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape0_8x8_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape1_8x8_scan);
+	TILEMAP_MAPPER_MEMBER(tile_shape2_8x8_scan);
+	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
+	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
+};
+
+/* 16-bit accessors */
+
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w );
+
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_data_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_r );
+DECLARE_WRITE16_DEVICE_HANDLER( deco_bac06_pf_colscroll_w );
+DECLARE_READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r );
+
+/* 8-bit accessors */
+
+/* for dec8.c, pcktgal.c */
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w );
+
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w );
+
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w );
+
+/* for hippodrm (dec0.c) and actfancr / triothep (H6280 based games)*/
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w );
+DECLARE_READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r );
+DECLARE_WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w );
+
+extern const device_type DECO_BAC06;

@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define periscope lamps -->
+
+	<element name="lamp_1" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+		</disk>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_2" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+		</disk>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_3" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+		</disk>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_4" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+		</disk>
+		<text string="4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_ready" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</disk>
+
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="1.5" y="0" width="1" height="1" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="1.5" y="0" width="1" height="1" />
+		</disk>
+
+		<rect state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="0.5" y="0" width="1.5" height="1" />
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="0.5" y="0" width="1.5" height="1" />
+		</rect>
+
+		<text string="READY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="2.5" height="0.6" />
+		</text>
+	</element>
+
+	<element name="lamp_reload" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</disk>
+
+		<disk state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="1.5" y="0" width="1" height="1" />
+		</disk>
+		<disk state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="1.5" y="0" width="1" height="1" />
+		</disk>
+
+		<rect state="1">
+			<color red="1.0" green="0.25" blue="0.10" />
+			<bounds x="0.5" y="0" width="1.5" height="1" />
+		</rect>
+		<rect state="0">
+			<color red="0.25" green="0.05" blue="0.0" />
+			<bounds x="0.5" y="0" width="1.5" height="1" />
+		</rect>
+
+		<text string="RELOAD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="2.5" height="0.6" />
+		</text>
+	</element>
+
+
+<!-- NOTE: does not include explosion lamps yet -->
+
+	<view name="Periscope Lamps">
+		<bounds left="0" top="0" right="400" bottom="390" />
+		<screen index="0">
+			<bounds left="0" top="0" right="400" bottom="300" />
+		</screen>
+
+<!-- player 1 is right -->
+
+		<bezel name="lamp3" element="lamp_1">
+			<bounds x="225" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp4" element="lamp_2">
+			<bounds x="270" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp5" element="lamp_3">
+			<bounds x="315" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp6" element="lamp_4">
+			<bounds x="360" y="310" width="30" height="30" />
+		</bezel>
+
+		<bezel name="lamp2" element="lamp_ready">
+			<bounds x="225" y="350" width="75" height="30" />
+		</bezel>
+		<bezel name="lamp1" element="lamp_reload">
+			<bounds x="315" y="350" width="75" height="30" />
+		</bezel>
+
+<!-- player 2 is left -->
+
+		<bezel name="lamp10" element="lamp_1">
+			<bounds x="10" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp11" element="lamp_2">
+			<bounds x="55" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp12" element="lamp_3">
+			<bounds x="100" y="310" width="30" height="30" />
+		</bezel>
+		<bezel name="lamp13" element="lamp_4">
+			<bounds x="145" y="310" width="30" height="30" />
+		</bezel>
+
+		<bezel name="lamp9" element="lamp_ready">
+			<bounds x="10" y="350" width="75" height="30" />
+		</bezel>
+		<bezel name="lamp8" element="lamp_reload">
+			<bounds x="100" y="350" width="75" height="30" />
+		</bezel>
+
+	</view>
+</mamelayout>

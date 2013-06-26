@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="gamepock" description="Epoch Game Pocket Computer cartridges">
+
+	<software name="astrobom">
+		<description>Astro Bomber</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="1" />
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="astrobom.bin" size="8192" crc="b0fd260f" sha1="453a0f3c0952ebd8e691316c39960731f1996c09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockmaz">
+		<description>Block Maze</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="2" />
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="blockmaz.bin" size="8192" crc="cfb3291b" sha1="50dc5736200986b326b372c17c233c4180474471" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokemahj">
+		<description>Pokekon Mahjongg</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="3" />
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pokemahj.bin" size="16384" crc="5c3eed48" sha1="918e1caa16cfae6b74da2026f3426d0a5818061c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokereve">
+		<description>Pokekon Reversi</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="4" />
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pokereve.bin" size="8192" crc="1c461f91" sha1="ead4a4efe5439e2ec1f6befb50c350f73919da8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokoban">
+		<description>Soukoban - Store Keepers</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="5" />
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="soukoban.bin" size="8192" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

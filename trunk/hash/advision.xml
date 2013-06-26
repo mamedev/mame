@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="advision" description="Entex AdventureVision cartridges">
+	<software name="defender">
+		<description>Defender</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<info name="serial" value="6075" />
+
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender.bin" size="4096" crc="3e280096" sha1="33e6bc08b3e8a951942e078102e90fbc8ba729a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtles">
+		<description>Turtles</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<info name="serial" value="6076" />
+
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="turtles.bin" size="4096" crc="33a23eba" sha1="88748cf4080646e0a2f115a7f6e6001916314816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scobra">
+		<description>Super Cobra</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<info name="serial" value="6077" />
+
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="supcobra.bin" size="4096" crc="b6045c9e" sha1="fd059081d8d82f51dd1415cc3710f1fa5ebb1336" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacefrc">
+		<description>Space Force</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<info name="serial" value="6078" />
+
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spcforce.bin" size="4096" crc="c70d4028" sha1="86c1a6eb8a5070f4be32bf4e83c0d5951e831d27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

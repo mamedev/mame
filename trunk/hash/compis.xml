@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="compis" description="Telenova Compis disk images">
+
+	<software name="abcenkat">
+		<description>ABC enkät etikett klockan (Swe)</description>
+		<year>1989</year>
+		<publisher>Gävle DPC</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1: Matsnill, rita, schema, stava"/>
+			<dataarea name="flop" size="309963">
+				<rom name="compis-program.td0" size="309963" crc="bc2e30cb" sha1="02b12b205104547869773f5bc7a0100a7a70c997" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demospel">
+		<description>Demospel (Swe)</description>
+		<year>19??</year>
+		<publisher>DataNova</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="331170">
+				<rom name="demospel.td0" size="331170" crc="974cd06e" sha1="656baa0c46ad443e8d2507d783a2a1371cdd2d1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harmonie">
+		<description>PI HarmoniEtt (Delta)</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="246025">
+				<rom name="harmoniett.td0" size="246025" crc="85334c70" sha1="d8d49ee3c246a44bb0c714f465af2853534c92ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos32">
+		<description>MS-DOS v3.2</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="335909">
+				<rom name="msdos32.td0" size="335909" crc="90ac044f" sha1="74f4d42481447b38d2597a0016dc3e5e7fc1a1df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system2">
+		<description>Systemskiva II (Swe)</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="408254">
+				<rom name="sysii.td0" size="408254" crc="c9c601e8" sha1="0d8186c4e0ed07ee315138b1c3639870e15a97a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

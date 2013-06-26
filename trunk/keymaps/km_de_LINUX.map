@@ -1,0 +1,29 @@
+# MAME/MESS keymap for German QWERTZ 105-keys keyboard (Linux)
+#
+# Row 1
+#
+ITEM_ID_TILDE      SDLK_CARET    0x31 0x00 ^
+ITEM_ID_MINUS      SDLK_WORLD_63 0x14 0xdf ß
+ITEM_ID_EQUALS     SDLK_COMPOSE  0x15 0x00 ´
+#
+# Row 2
+#
+ITEM_ID_Y          SDLK_z        0x1d 0x7a Z
+ITEM_ID_OPENBRACE  SDLK_WORLD_92 0x22 0xfc Ü
+ITEM_ID_CLOSEBRACE SDLK_PLUS     0x23 0x2b +
+#
+# Row 3
+#
+ITEM_ID_COLON      SDLK_WORLD_86 0x2f 0xf6 Ö
+ITEM_ID_QUOTE      SDLK_WORLD_68 0x30 0xe4 Ä
+ITEM_ID_BACKSLASH  SDLK_HASH     0x33 0x23 #
+#
+# Row 4
+#
+ITEM_ID_BACKSLASH2 SDLK_LESS     0x5e 0x3c <
+ITEM_ID_Z          SDLK_y        0x34 0x79 Y
+ITEM_ID_SLASH      SDLK_MINUS    0x3d 0x2d -
+#
+# Row 5
+#
+ITEM_ID_RALT       SDLK_MODE     0x71 0x00 ALTGR

@@ -1,0 +1,62 @@
+Title 'PEEL18CV8 Combinatorial Feedback Test Data'
+Designer 'MAMEDev'
+Date '11-11-2012'
+
+Description
+    Determine Combinatorial Feedback fuses.
+End_Desc;
+
+PEEL18CV8
+
+I1 PIN 1
+I2 PIN 2
+I3 PIN 3
+I4 PIN 4
+I5 PIN 5
+I6 PIN 6
+I7 PIN 7
+I8 PIN 8
+I9 PIN 9
+I11 PIN 11
+
+IOC (12 'I12'  POS IN  FEED_PIN)
+IOC (13 'RF13' NEG REG FEED_OR)
+IOC (14 'I14'  POS IN  FEED_PIN)
+IOC (15 'RF15' POS REG FEED_OR)
+IOC (16 'I16'  NEG IN  FEED_PIN)
+IOC (17 'O17'  POS COM FEED_OR)
+IOC (18 'I18'  NEG IN  FEED_PIN)
+IOC (19 'O19'  NEG COM FEED_OR)
+
+
+AR NODE 21; " Asynchronous reset
+SP NODE 22; " Synchronous reset
+
+Define
+
+EQUATIONS
+
+AR = 0;
+SP = 0;
+
+RF13.REG = I1 & /I2 & O19 #
+           I12 & /RF15 #
+           /I3 & /I4 & /I5 & I6 #
+           I14 & RF15 #
+           /O17 & /O19;
+RF13.OE = O17;
+
+RF15.REG = I11 & /I12 & RF13 & /O17 #
+           /O19 #
+           O17 & O19;
+RF15.OE = /RF13;
+
+O17.COM = /RF13 & RF15 & I16 & O19 #
+          RF13 & /RF15 #
+          /O19;
+O17.OE = 1;
+
+O19.COM = /I7 & I8 & /RF13 & /RF15 #
+          /I9 & /I11 & RF15 #
+          RF13 & I16 & /O17 & /I18;
+O19.OE = O17;

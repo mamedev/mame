@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="busy_text" defstate="0">
+		<text string="BUSY" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="shift_text" defstate="0">
+		<text string="SHIFT" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="sml_text" defstate="0">
+		<text string="SML" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="small_text" defstate="0">
+		<text string="SMALL" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="iii_text" defstate="0">
+		<text string="III" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="ii_text" defstate="0">
+		<text string="II" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="i_text" defstate="0">
+		<text string="I" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="def_text" defstate="0">
+		<text string="DEF" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="de_text" defstate="0">
+		<text string="DE" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="g_text" defstate="0">
+		<text string="G" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="rad_text" defstate="0">
+		<text string="RAD" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="reserve_text" defstate="0">
+		<text string="RESERVE" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="pro_text" defstate="0">
+		<text string="PRO" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="run_text" defstate="0">
+		<text string="RUN" state="1">
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<color red="0.54" green="0.57" blue="0.58" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- LCD background -->
+		<bezel element="background">
+			<bounds left="0" top="0" right="156" bottom="4" />
+		</bezel>
+
+		<bezel name="BUSY" element="busy_text">
+			<bounds left="0" top="0" right="7" bottom="3" />
+		</bezel>
+		<bezel name="SHIFT" element="shift_text">
+			<bounds left="15" top="0" right="23" bottom="3" />
+		</bezel>
+		<bezel name="SML" element="sml_text">
+			<bounds left="30" top="0" right="35" bottom="3" />
+		</bezel>
+		<bezel name="SMALL" element="small_text">
+			<bounds left="40" top="0" right="60" bottom="3" />
+		</bezel>
+		<bezel name="I" element="i_text">
+			<bounds left="138" top="0" right="140" bottom="3" />
+		</bezel>
+		<bezel name="II" element="ii_text">
+			<bounds left="141" top="0" right="144" bottom="3" />
+		</bezel>
+		<bezel name="III" element="iii_text">
+			<bounds left="145" top="0" right="150" bottom="3" />
+		</bezel>
+		<bezel name="DEF" element="def_text">
+			<bounds left="125" top="0" right="130" bottom="3" />
+		</bezel>
+		<bezel name="DE" element="de_text">
+			<bounds left="56" top="0" right="59" bottom="3" />
+		</bezel>
+		<bezel name="G" element="g_text">
+			<bounds left="59" top="0" right="61" bottom="3" />
+		</bezel>
+		<bezel name="RAD" element="rad_text">
+			<bounds left="63" top="0" right="68" bottom="3" />
+		</bezel>
+		<bezel name="RESERVE" element="reserve_text">
+			<bounds left="105" top="0" right="118" bottom="3" />
+		</bezel>
+		<bezel name="PRO" element="pro_text">
+			<bounds left="95" top="0" right="100" bottom="3" />
+		</bezel>
+		<bezel name="RUN" element="run_text">
+			<bounds left="80" top="0" right="85" bottom="3" />
+		</bezel>
+
+		<screen index="0">
+			<bounds left="0" top="4" right="156" bottom="11" />
+		</screen>
+	</view>
+</mamelayout>

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ibm5140" description="IBM PC 5140 Convertible disk images">
+
+	<software name="startup">
+		<description>IBM PC Convertible Start-Up Diskette (v1.03)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="serial" value="84X0107" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ibm_pc_convertible_startup_103_image.dsk" size="737280" crc="3504808e" sha1="36668799d41c63c950e4b3153a4bf96746a713ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startup101" cloneof="startup">
+		<description>IBM PC Convertible Start-Up Diskette (v1.01)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="5140 starter disk with app selector.ima" size="737280" crc="7ab4d598" sha1="b6ba39970db4cb1628d080a7b070e3ca4fb39ee5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diags">
+		<description>IBM PC Convertible Diagnostics/Update Diskette (v1.03)</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="serial" value="84X0111" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="ibm_pc_convertible_diagnostics_103_image.dsk" size="737280" crc="656a3428" sha1="de97423357fbac2ce492121cb1e02a9f3def3aad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdiags">
+		<description>IBM PC Convertible Advanced Diagnostics</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="serial" value="6280623" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="advanced diags.ima" size="737280" crc="bd4d7f93" sha1="a11216975cc3f31d10c91b9dd575206b49caa18d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

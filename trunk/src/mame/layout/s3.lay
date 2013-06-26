@@ -1,0 +1,142 @@
+<!-- s3.lay -->
+
+<!-- 2012-10-21: Initial version.  [Robbbert] -->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.25" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="red_led">
+		<disk><color red="1.0" green="0.0" blue="0.0" /></disk>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="P0"><text string="Ball / Match"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P1"><text string="Credits"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P3"><text string="Player 1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P4"><text string="Player 2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P5"><text string="Player 3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="P6"><text string="Player 4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<view name="Default Layout">
+
+		<!-- Background -->
+		<backdrop element="background">
+			<bounds left="0" top="20" right="274" bottom="394" />
+		</backdrop>
+
+		<!-- LEDs -->
+
+		<!-- Player 1 Score -->
+
+		<bezel name="digit0" element="digit">
+			<bounds left="10" top="45" right="44" bottom="84" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="54" top="45" right="88" bottom="84" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="98" top="45" right="132" bottom="84" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="142" top="45" right="176" bottom="84" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="186" top="45" right="220" bottom="84" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="230" top="45" right="264" bottom="84" />
+		</bezel>
+
+		<!-- Player 2 Score -->
+		<bezel name="digit8" element="digit">
+			<bounds left="10" top="105" right="44" bottom="144" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="54" top="105" right="88" bottom="144" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds left="98" top="105" right="132" bottom="144" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds left="142" top="105" right="176" bottom="144" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds left="186" top="105" right="220" bottom="144" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds left="230" top="105" right="264" bottom="144" />
+		</bezel>
+
+		<!-- Player 3 Score -->
+		<bezel name="digit16" element="digit">
+			<bounds left="10" top="165" right="44" bottom="204" />
+		</bezel>
+		<bezel name="digit17" element="digit">
+			<bounds left="54" top="165" right="88" bottom="204" />
+		</bezel>
+		<bezel name="digit18" element="digit">
+			<bounds left="98" top="165" right="132" bottom="204" />
+		</bezel>
+		<bezel name="digit19" element="digit">
+			<bounds left="142" top="165" right="176" bottom="204" />
+		</bezel>
+		<bezel name="digit20" element="digit">
+			<bounds left="186" top="165" right="220" bottom="204" />
+		</bezel>
+		<bezel name="digit21" element="digit">
+			<bounds left="230" top="165" right="264" bottom="204" />
+		</bezel>
+
+		<!-- Player 4 Score -->
+		<bezel name="digit24" element="digit">
+			<bounds left="10" top="225" right="44" bottom="264" />
+		</bezel>
+		<bezel name="digit25" element="digit">
+			<bounds left="54" top="225" right="88" bottom="264" />
+		</bezel>
+		<bezel name="digit26" element="digit">
+			<bounds left="98" top="225" right="132" bottom="264" />
+		</bezel>
+		<bezel name="digit27" element="digit">
+			<bounds left="142" top="225" right="176" bottom="264" />
+		</bezel>
+		<bezel name="digit28" element="digit">
+			<bounds left="186" top="225" right="220" bottom="264" />
+		</bezel>
+		<bezel name="digit29" element="digit">
+			<bounds left="230" top="225" right="264" bottom="264" />
+		</bezel>
+
+		<!-- Credits and Balls -->
+		<bezel name="digit14" element="digit">
+			<bounds left="10" top="345" right="44" bottom="384" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds left="54" top="345" right="88" bottom="384" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="186" top="345" right="220" bottom="384" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="230" top="345" right="264" bottom="384" />
+		</bezel>
+		<bezel element="P0"><bounds left="200" right="258" top="330" bottom="342" /></bezel>
+		<bezel element="P1"><bounds left="30" right="88" top="330" bottom="342" /></bezel>
+		<bezel name="text3" element="P3"><bounds left="100" right="180" top="30" bottom="42" /></bezel>
+		<bezel name="text2" element="P4"><bounds left="100" right="180" top="90" bottom="102" /></bezel>
+		<bezel name="text1" element="P5"><bounds left="100" right="180" top="150" bottom="162" /></bezel>
+		<bezel name="text0" element="P6"><bounds left="100" right="180" top="210" bottom="222" /></bezel>
+		<bezel name="led0" element="red_led">
+			<bounds left="110" right="125" top="360" bottom="375" /></bezel>
+		<bezel name="led1" element="red_led">
+			<bounds left="144" right="159" top="360" bottom="375" /></bezel>
+	</view>
+</mamelayout>

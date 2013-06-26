@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="aim65_cart" description="Rockwell AIM 65 cartridges">
+
+<!--
+
+  There are 5 ROM sockets on the AIM 65 PCB: 2 sockets were for the boot strap and 3 sockets for software roms,
+  at locations z24, z25, and z26.
+
+  There are the BASIC ROMs, PL65 and FORTH. Each has 2 ROMs and they all work.
+
+  The Assembler ROM works. The Mathpack does not work (it needs another ROM which is missing).
+
+-->
+
+	<software name="assemblr">
+		<description>Assembler</description>
+		<year>197?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load in &quot;cart3&quot;, then press N to start"/>
+
+		<part name="cart" interface="aim65_cart">
+			<dataarea name="z24" size="4096">
+				<rom name="assembler.z24" size="4096" crc="0878b399" sha1="483e92b57d64be51643a9f6490521a8572aa2f68" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic11">
+		<description>AIM 65 BASIC v1.1</description>
+		<year>1978</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
+
+		<part name="cart" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="basic.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392" offset="0x0000" />
+			</dataarea>
+
+			<dataarea name="z26" size="4096">
+				<rom name="basic.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth13">
+		<description>AIM 65 FORTH v1.3</description>
+		<year>197?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
+
+		<part name="cart" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" offset="0x0000" />
+			</dataarea>
+
+			<dataarea name="z26" size="4096">
+				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathpack" supported="no">
+		<description>Mathpack</description>
+		<year>197?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cart" interface="aim65_cart">
+			<dataarea name="z24" size="4096">
+				<rom name="mathpack.z24" size="4096" crc="4889af55" sha1="5e9541ddfc06e3802d09b30d1bd89c5da914c76e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pl65">
+		<description>AIM 65 PL/65 v1.0</description>
+		<year>1978</year>
+		<publisher>Rockwell</publisher>
+		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
+
+		<part name="cart" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="pl65 v1.0.z25" size="4096" crc="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e" offset="0x0000" />
+			</dataarea>
+
+			<dataarea name="z26" size="4096">
+				<rom name="pl65 v1.0.z26" size="4096" crc="2ac71abd" sha1="6df5e3125bebefac80d51d9337555f54bdf0d8ea" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

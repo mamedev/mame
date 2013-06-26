@@ -1,0 +1,83 @@
+/*************************************************************************
+
+    Macross Plus
+
+*************************************************************************/
+
+class macrossp_state : public driver_device
+{
+public:
+	macrossp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
+		m_scra_videoram(*this, "scra_videoram"),
+		m_scra_videoregs(*this, "scra_videoregs"),
+		m_scrb_videoram(*this, "scrb_videoram"),
+		m_scrb_videoregs(*this, "scrb_videoregs"),
+		m_scrc_videoram(*this, "scrc_videoram"),
+		m_scrc_videoregs(*this, "scrc_videoregs"),
+		m_text_videoram(*this, "text_videoram"),
+		m_text_videoregs(*this, "text_videoregs"),
+		m_paletteram(*this, "paletteram"),
+		m_mainram(*this, "mainram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
+
+	/* memory pointers */
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_scra_videoram;
+	required_shared_ptr<UINT32> m_scra_videoregs;
+	required_shared_ptr<UINT32> m_scrb_videoram;
+	required_shared_ptr<UINT32> m_scrb_videoregs;
+	required_shared_ptr<UINT32> m_scrc_videoram;
+	required_shared_ptr<UINT32> m_scrc_videoregs;
+	required_shared_ptr<UINT32> m_text_videoram;
+	required_shared_ptr<UINT32> m_text_videoregs;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_mainram;
+	UINT32 *         m_spriteram_old;
+	UINT32 *         m_spriteram_old2;
+
+	/* video-related */
+	tilemap_t  *m_scra_tilemap;
+	tilemap_t  *m_scrb_tilemap;
+	tilemap_t  *m_scrc_tilemap;
+	tilemap_t  *m_text_tilemap;
+
+	/* misc */
+	int              m_sndpending;
+	int              m_snd_toggle;
+	INT32            m_fade_effect;
+	INT32            m_old_fade;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
+	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
+	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);
+	DECLARE_READ16_MEMBER(macrossp_soundcmd_r);
+	DECLARE_WRITE32_MEMBER(macrossp_palette_fade_w);
+	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
+	DECLARE_WRITE32_MEMBER(quizmoon_speedup_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scra_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);
+	DECLARE_WRITE32_MEMBER(macrossp_text_videoram_w);
+	DECLARE_DRIVER_INIT(quizmoon);
+	DECLARE_DRIVER_INIT(macrossp);
+	TILE_GET_INFO_MEMBER(get_macrossp_scra_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_scrb_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_scrc_tile_info);
+	TILE_GET_INFO_MEMBER(get_macrossp_text_tile_info);
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	UINT32 screen_update_macrossp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_macrossp(screen_device &screen, bool state);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority );
+	void draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer );
+	void sortlayers(int *layer,int *pri);
+	void update_colors(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+};

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="victor9k_flop" description="Victor 9000 / ACT Sirius 1 diskettes">
+
+	<software name="audiokit">
+		<description>Victor Audio Toolkit (v1.2)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="victor__audio_toolkit__version_1.2_s-n_302__copyright_1983_victor_technologies,inc.__beta_release_part_no.103779-01_rev_b.ssdd.img" size="626688" crc="afea9d2f" sha1="c20b56631f622872aa462ad4cfed84ee806c1a42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86">
+		<description>CP/M 86 v1.1-2.4</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hl(v9k)__cpm86_1.1-2.4_12-22-82.ssdd.img" size="626688" crc="451513e7" sha1="60e7f080d9d099244d7628c532113883bda7ee13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="overlay">
+		<rect>
+			<bounds left="0" top="0.125" right="1" bottom="0.2" />
+			<color red="1.0" green="0.125" blue="0.125" />
+		</rect>
+		<rect>
+			<bounds left="0" top="0.2" right="1" bottom="0.875" />
+			<color red="0.125" green="0.125" blue="1.0" />
+		</rect>
+		<disk>
+			<bounds left="0.47" top="0.47" right="0.53" bottom="0.53" />
+			<color red="1.0" green="1.0" blue="0.125" />
+		</disk>
+	</element>
+
+	<view name="Color Overlay">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<overlay element="overlay">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</overlay>
+	</view>
+</mamelayout>

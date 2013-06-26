@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Preliminary list.
+
+     This list contains software for the Russian 'Pentagon 128' systems.
+
+     These systems are Spectrum clones, but offer various extended features.
+
+     The software listed here will not function correctly (if at all) on a regular Spectrum
+-->
+
+<softwarelist name="pentagon_cass" description="Pentagon (ZX Spectrum clone) cassettes">
+
+	<software name="bouldmix">
+		<description>Boulder Mix (Russia)</description>
+		<year>1996</year>
+		<publisher>Firesoft</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="45895">
+				<rom name="boulder mix (19xx)(firesoft)(ru)[pentagon 128].tzx" size="45895" crc="dd36b3bf" sha1="26430d66baaf04c2e7757f23169ffb201190d5c6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+
+
+
+
+
+

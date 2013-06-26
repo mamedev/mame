@@ -1,0 +1,480 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="channelf" description="Fairchild Channel F cartridges">
+
+	<software name="democrt1">
+		<description>Democart 1</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Democart 1" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="democrt1.bin" size="2048" crc="42727ad5" sha1="e462e594c14cdb10ddc4c263b74e753316c3b358" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="democrt2">
+		<description>Democart 2</description>
+		<year>197?</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Democart 2" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="democrt2.bin" size="2048" crc="44cf1d89" sha1="13a5ca0471e6f4a7a5a2fc4d2b8f881516a28ec4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tctactoe">
+		<description>Tic-Tac-Toe / Shooting Gallery / Doodle / Quadra-Doodle</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 1" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="tctactoe.bin" size="2048" crc="ff4768b0" sha1="8edfb668b3eb759f8597fb13b1aeaf43aaf53680" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muehle" cloneof="tctactoe">
+		<description>Muehle / Tontauben-Schiessen / Kreatives Malspiel / Videoscope (Ger)</description>
+		<year>1978</year>
+		<publisher>SABA</publisher>
+		<info name="series" value="Videocart 1" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="muehle.bin" size="2048" crc="7124dc59" sha1="15d5e6d152d93a2099b97a2bd5dcf7134dd1a770" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsrtfox">
+		<description>Desert Fox / Shooting Gallery</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 2" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="dsrtfox.bin" size="2048" crc="1570934b" sha1="3440928903f39354e1358018cebf12a00c8dff77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vblckjck">
+		<description>Video Blackjack</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 3" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="vblckjck.bin" size="2048" crc="e98d4456" sha1="86579196567c9686009ad271263269181496a9c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spitfire">
+		<description>Spitfire</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 4" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="spitfire.bin" size="2048" crc="5357c5f6" sha1="9af18e7fa3b2d040f33cbe2286392ce5fe31d0df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spitfirep" cloneof="spitfire">
+		<description>Spitfire (Prototype)</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="spitfire (proto).bin" size="2048" crc="0a728afc" sha1="66e2d158095721c0c9b4d50de4a6d9925ec62c73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacewar">
+		<description>Space War</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 5" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="spacewar.bin" size="2048" crc="22ef49e8" sha1="c1d83b1e89d11465456bd5829a85db06c4ef322f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthquiz1">
+		<description>Math Quiz 1</description>
+		<year>1976</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 6" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mthquiz1.bin" size="2048" crc="bb4c24a2" sha1="f0bfdc8f6beed2ef54add820c5e164005d2d1d25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthquiz2">
+		<description>Math Quiz 2</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 7" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mthquiz2.bin" size="2048" crc="4aa7ea97" sha1="4c643e00f32629c066e778be92f37e3f7bfd1ad6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicnum">
+		<description>Magic Numbers / Mind Reader / Nim</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 8" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="magicnum.bin" size="2048" crc="24da0529" sha1="4b696a4f8a20f6dcd6a4ba690756d862956515a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragrace">
+		<description>Drag Race</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 9" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="dragrace.bin" size="2048" crc="6a64dda3" sha1="d915c8997f56ae09548498feecebf3c3bfcdf6c4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maze">
+		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 10" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="maze.bin" size="2048" crc="4d42b296" sha1="a7b70fb6f24bb1dd79f2cbb1e57b3edb04332e04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazea" cloneof="maze">
+		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer (Alt)</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 10" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mazealt.bin" size="2048" crc="0a948b61" sha1="b53ba16c6d91e2f62e020d18445217b91907a83b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgamm">
+		<description>Backgammon / Acey-Deucey</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 11" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="backgmmn.bin" size="2048" crc="a1731b52" sha1="9ac23df58c95bdbe68e3a0d0a477f07cd4e951d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 12" />
+		<info name="usage" value="Hit CTRL and A to start." />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="baseball.bin" size="2048" crc="01129bcd" sha1="9b0c9bd3e52da22ca7f2aab6fbb5f3c24f89ef75" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotwar">
+		<description>Robot War / Torpedo Alley</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 13" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="robotwar.bin" size="2048" crc="38241e4f" sha1="87f3f9afcc232d767cf6a5040c88b31283f76199" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotwarp" cloneof="robotwar">
+		<description>Robot War (Prototype)</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="robot war (proto).bin" size="2048" crc="7f62a23c" sha1="7e5966c1c393dc1b02ac34d57733a357bbcd4d5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonrsrch">
+		<description>Sonar Search</description>
+		<year>1977</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 14" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sonrsrch.bin" size="2048" crc="dbdc56bf" sha1="a15449eec75382af6dd71e766cae1171308d192c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory">
+		<description>Memory Match 1 &amp; 2</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 15" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mmrymtch.bin" size="2048" crc="104b5e18" sha1="e46406119020c85002513b1c01352f76dcd604a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dodgeit">
+		<description>Dodge It</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 16" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="dodgeit.bin" size="2048" crc="e3c1811c" sha1="54fdab06a07f84d073858f56a054a59ec0b1142e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball Challenge</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 17" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pinball.bin" size="2048" crc="c610b330" sha1="9267d85982414af753172e4c9998863463c32c99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinballa" cloneof="pinball">
+		<description>Pinball Challenge (Alt)</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 17" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pinballa.bin" size="2048" crc="7cadf0fd" sha1="cc69feb8243e6fce3e6317bf9ea82d70a85eae1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 18" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="hangman.bin" size="3072" crc="9238d6ce" sha1="19166d49dec273cae1f2dbac983b130d282ed231" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ordtvlng" cloneof="hangman">
+		<description>Ordtävling (Swe)</description>
+		<year>1978</year>
+		<publisher>Luxor</publisher>
+		<info name="series" value="Luxor 18" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="ordtvlng.bin" size="3072" crc="3a386e79" sha1="62509545b8eef641c432705ff82cd8264c3e1d82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratmal" cloneof="hangman">
+		<description>Rat' Mal (Ger)</description>
+		<year>197?</year>
+		<publisher>SABA</publisher>
+		<info name="series" value="SABA 16" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="ratmal.bin" size="3072" crc="87752425" sha1="35f3fb741b643c4b8e8fdbff4ed0ea24402c4528" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="checkers">
+		<description>Checkers</description>
+		<year>1978</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 19" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="checkers.bin" size="2048" crc="fdae7044" sha1="2683b330dc2350341a51f1e3bdf75922bb425a9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whizball">
+		<description>Video Whizball</description>
+		<year>1978</year>
+		<publisher>Fairchild</publisher>
+		<info name="series" value="Videocart 20" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="3072">
+				<rom name="vwhzball.bin" size="3072" crc="65fdfe49" sha1="61babb950ebc0b0acab29acf5dcbecc60dcd70a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schach">
+		<description>Schach (Ger)</description>
+		<year>197?</year>
+		<publisher>SABA</publisher>
+		<info name="series" value="SABA 20" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="6144">
+				<rom name="schach.bin" size="6144" crc="04fb6dce" sha1="cbbaa8522fee16a0cc13ed3140d41e22919da24b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<description>Bowling</description>
+		<year>1978</year>
+		<publisher>Fairchild/Zircon</publisher>
+		<info name="series" value="Videocart 21" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bowling.bin" size="2048" crc="94322c79" sha1="82d49201ee82e8cba6a907aca80969796a84d7f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slotmchn">
+		<description>Slot Machine</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 22" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="slotmchn.bin" size="2048" crc="b7eabd08" sha1="97e12dba298460ce466509e9aefb82fe2503ef6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galactic">
+		<description>Galactic Space Wars / Lunar Lander</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 23" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="galactic.bin" size="2048" crc="c8ef3410" sha1="fc3cadc90d73ce7e3b32b5c9a855d621e79c592a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galacticp" cloneof="galactic">
+		<description>Galactic Space Wars (Prototype)</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="glactic space war (proto).bin" size="2048" crc="a61258a8" sha1="7077e42b2e8a101da05bb2188d7b65858ca8ec1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfootbll">
+		<description>Pro Football</description>
+		<year>1981</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 24" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pfootbll.bin" size="4096" crc="a1ae99be" sha1="9be97cace9b99f15a373bd95f3996034d633fff5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football" cloneof="pfootbll">
+		<description>Football (Prototype)</description>
+		<year>1981</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="football (proto).bin" size="4096" crc="7e5dafea" sha1="db17bbc4f3f64bc5cb698de66b0f4838be430afa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casinop">
+		<description>Casino Poker</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 25" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="casinop.bin" size="4096" crc="5aa30c12" sha1="4540b1cfca461d6eba26754c34090aa74822a4bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drawpkr" cloneof="casinop">
+		<description>Draw Poker (Prototype)</description>
+		<year>1980</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="draw poker (proto).bin" size="4096" crc="619fcc00" sha1="f1bd458f1efc4e9afe06db190a2a7ddb660418bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Alien Invasion</description>
+		<year>1981</year>
+		<publisher>Zircon</publisher>
+		<info name="series" value="Videocart 26" />
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alieninv.bin" size="4096" crc="85e00865" sha1="1837e95e6631687fc6d008207e56a31705d55cdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clrorgan">
+		<description>Color Organ (Prototype)</description>
+		<year>19??</year>
+		<publisher>Zircon</publisher>
+		<part name="cart" interface="channelf_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="color organ (proto).bin" size="2048" crc="3fa2d4eb" sha1="1ccc13a2f4aeb4538379d77d08ac7bf425bc4780" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

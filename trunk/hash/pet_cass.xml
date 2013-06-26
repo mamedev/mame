@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pet_cass" description="Commodore PET cassettes">
+
+	<software name="lunarlnd">
+		<description>Lunar Lander</description>
+		<year>197?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="342602">
+				<rom name="lunar-lander.tap" size="342602" crc="b4a77f48" sha1="28e2d8d4adce42968173996fac92365dcfc67b07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

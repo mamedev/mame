@@ -1,0 +1,457 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit">
+	<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+	</led7seg>
+	</element>
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<backdrop name="reel1" element="Steppers" state="0">
+			<bounds x="10" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel2" element="Steppers" state="0">
+			<bounds x="60" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel3" element="Steppers" state="0">
+			<bounds x="110" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel4" element="Steppers" state="0">
+			<bounds x="160" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel5" element="Steppers" state="0">
+			<bounds x="220" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="reel6" element="Steppers" state="0">
+			<bounds x="280" y="300" width="50" height="50"/>
+		</backdrop>
+		<backdrop name="lamp0" element="matrixlamp" state="0">
+			<bounds x="0" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp1" element="matrixlamp" state="0">
+			<bounds x="0" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp2" element="matrixlamp" state="0">
+			<bounds x="0" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp3" element="matrixlamp" state="0">
+			<bounds x="0" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp4" element="matrixlamp" state="0">
+			<bounds x="0" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp5" element="matrixlamp" state="0">
+			<bounds x="0" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp6" element="matrixlamp" state="0">
+			<bounds x="0" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp7" element="matrixlamp" state="0">
+			<bounds x="0" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp8" element="matrixlamp" state="0">
+			<bounds x="8" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp9" element="matrixlamp" state="0">
+			<bounds x="8" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp10" element="matrixlamp" state="0">
+			<bounds x="8" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp11" element="matrixlamp" state="0">
+			<bounds x="8" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp12" element="matrixlamp" state="0">
+			<bounds x="8" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp13" element="matrixlamp" state="0">
+			<bounds x="8" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp14" element="matrixlamp" state="0">
+			<bounds x="8" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp15" element="matrixlamp" state="0">
+			<bounds x="8" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp16" element="matrixlamp" state="0">
+			<bounds x="16" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp17" element="matrixlamp" state="0">
+			<bounds x="16" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp18" element="matrixlamp" state="0">
+			<bounds x="16" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp19" element="matrixlamp" state="0">
+			<bounds x="16" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp20" element="matrixlamp" state="0">
+			<bounds x="16" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp21" element="matrixlamp" state="0">
+			<bounds x="16" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp22" element="matrixlamp" state="0">
+			<bounds x="16" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp23" element="matrixlamp" state="0">
+			<bounds x="16" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp24" element="matrixlamp" state="0">
+			<bounds x="24" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp25" element="matrixlamp" state="0">
+			<bounds x="24" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp26" element="matrixlamp" state="0">
+			<bounds x="24" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp27" element="matrixlamp" state="0">
+			<bounds x="24" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp28" element="matrixlamp" state="0">
+			<bounds x="24" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp29" element="matrixlamp" state="0">
+			<bounds x="24" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp30" element="matrixlamp" state="0">
+			<bounds x="24" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp31" element="matrixlamp" state="0">
+			<bounds x="24" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp32" element="matrixlamp" state="0">
+			<bounds x="32" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp33" element="matrixlamp" state="0">
+			<bounds x="32" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp34" element="matrixlamp" state="0">
+			<bounds x="32" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp35" element="matrixlamp" state="0">
+			<bounds x="32" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp36" element="matrixlamp" state="0">
+			<bounds x="32" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp37" element="matrixlamp" state="0">
+			<bounds x="32" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp38" element="matrixlamp" state="0">
+			<bounds x="32" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp39" element="matrixlamp" state="0">
+			<bounds x="32" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp40" element="matrixlamp" state="0">
+			<bounds x="40" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp41" element="matrixlamp" state="0">
+			<bounds x="40" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp42" element="matrixlamp" state="0">
+			<bounds x="40" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp43" element="matrixlamp" state="0">
+			<bounds x="40" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp44" element="matrixlamp" state="0">
+			<bounds x="40" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp45" element="matrixlamp" state="0">
+			<bounds x="40" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp46" element="matrixlamp" state="0">
+			<bounds x="40" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp47" element="matrixlamp" state="0">
+			<bounds x="40" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp48" element="matrixlamp" state="0">
+			<bounds x="48" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp49" element="matrixlamp" state="0">
+			<bounds x="48" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp50" element="matrixlamp" state="0">
+			<bounds x="48" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp51" element="matrixlamp" state="0">
+			<bounds x="48" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp52" element="matrixlamp" state="0">
+			<bounds x="48" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp53" element="matrixlamp" state="0">
+			<bounds x="48" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp54" element="matrixlamp" state="0">
+			<bounds x="48" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp55" element="matrixlamp" state="0">
+			<bounds x="48" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp56" element="matrixlamp" state="0">
+			<bounds x="56" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp57" element="matrixlamp" state="0">
+			<bounds x="56" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp58" element="matrixlamp" state="0">
+			<bounds x="56" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp59" element="matrixlamp" state="0">
+			<bounds x="56" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp60" element="matrixlamp" state="0">
+			<bounds x="56" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp61" element="matrixlamp" state="0">
+			<bounds x="56" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp62" element="matrixlamp" state="0">
+			<bounds x="56" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp63" element="matrixlamp" state="0">
+			<bounds x="56" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp64" element="matrixlamp" state="0">
+			<bounds x="64" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp65" element="matrixlamp" state="0">
+			<bounds x="64" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp66" element="matrixlamp" state="0">
+			<bounds x="64" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp67" element="matrixlamp" state="0">
+			<bounds x="64" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp68" element="matrixlamp" state="0">
+			<bounds x="64" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp69" element="matrixlamp" state="0">
+			<bounds x="64" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp70" element="matrixlamp" state="0">
+			<bounds x="64" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp71" element="matrixlamp" state="0">
+			<bounds x="64" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp72" element="matrixlamp" state="0">
+			<bounds x="72" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp73" element="matrixlamp" state="0">
+			<bounds x="72" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp74" element="matrixlamp" state="0">
+			<bounds x="72" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp75" element="matrixlamp" state="0">
+			<bounds x="72" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp76" element="matrixlamp" state="0">
+			<bounds x="72" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp77" element="matrixlamp" state="0">
+			<bounds x="72" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp78" element="matrixlamp" state="0">
+			<bounds x="72" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp79" element="matrixlamp" state="0">
+			<bounds x="72" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp80" element="matrixlamp" state="0">
+			<bounds x="80" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp81" element="matrixlamp" state="0">
+			<bounds x="80" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp82" element="matrixlamp" state="0">
+			<bounds x="80" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp83" element="matrixlamp" state="0">
+			<bounds x="80" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp84" element="matrixlamp" state="0">
+			<bounds x="80" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp85" element="matrixlamp" state="0">
+			<bounds x="80" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp86" element="matrixlamp" state="0">
+			<bounds x="80" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp87" element="matrixlamp" state="0">
+			<bounds x="80" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp88" element="matrixlamp" state="0">
+			<bounds x="88" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp89" element="matrixlamp" state="0">
+			<bounds x="88" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp90" element="matrixlamp" state="0">
+			<bounds x="88" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp91" element="matrixlamp" state="0">
+			<bounds x="88" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp92" element="matrixlamp" state="0">
+			<bounds x="88" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp93" element="matrixlamp" state="0">
+			<bounds x="88" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp94" element="matrixlamp" state="0">
+			<bounds x="88" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp95" element="matrixlamp" state="0">
+			<bounds x="88" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp96" element="matrixlamp" state="0">
+			<bounds x="96" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp97" element="matrixlamp" state="0">
+			<bounds x="96" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp98" element="matrixlamp" state="0">
+			<bounds x="96" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp99" element="matrixlamp" state="0">
+			<bounds x="96" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp100" element="matrixlamp" state="0">
+			<bounds x="96" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp101" element="matrixlamp" state="0">
+			<bounds x="96" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp102" element="matrixlamp" state="0">
+			<bounds x="96" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp103" element="matrixlamp" state="0">
+			<bounds x="96" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp104" element="matrixlamp" state="0">
+			<bounds x="104" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp105" element="matrixlamp" state="0">
+			<bounds x="104" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp106" element="matrixlamp" state="0">
+			<bounds x="104" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp107" element="matrixlamp" state="0">
+			<bounds x="104" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp108" element="matrixlamp" state="0">
+			<bounds x="104" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp109" element="matrixlamp" state="0">
+			<bounds x="104" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp110" element="matrixlamp" state="0">
+			<bounds x="104" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp111" element="matrixlamp" state="0">
+			<bounds x="104" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp112" element="matrixlamp" state="0">
+			<bounds x="112" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp113" element="matrixlamp" state="0">
+			<bounds x="112" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp114" element="matrixlamp" state="0">
+			<bounds x="112" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp115" element="matrixlamp" state="0">
+			<bounds x="112" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp116" element="matrixlamp" state="0">
+			<bounds x="112" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp117" element="matrixlamp" state="0">
+			<bounds x="112" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp118" element="matrixlamp" state="0">
+			<bounds x="112" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp119" element="matrixlamp" state="0">
+			<bounds x="112" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp120" element="matrixlamp" state="0">
+			<bounds x="120" y="0" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp121" element="matrixlamp" state="0">
+			<bounds x="120" y="8" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp122" element="matrixlamp" state="0">
+			<bounds x="120" y="16" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp123" element="matrixlamp" state="0">
+			<bounds x="120" y="24" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp124" element="matrixlamp" state="0">
+			<bounds x="120" y="32" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp125" element="matrixlamp" state="0">
+			<bounds x="120" y="40" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp126" element="matrixlamp" state="0">
+			<bounds x="120" y="48" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="lamp127" element="matrixlamp" state="0">
+			<bounds x="120" y="56" width="7" height="7"/>
+		</backdrop>
+		<backdrop name="digit0" element="digit" state="0">
+			<bounds x="300" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit1" element="digit" state="0">
+			<bounds x="308" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit2" element="digit" state="0">
+			<bounds x="316" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit3" element="digit" state="0">
+			<bounds x="324" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit4" element="digit" state="0">
+			<bounds x="332" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit5" element="digit" state="0">
+			<bounds x="340" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit6" element="digit" state="0">
+			<bounds x="348" y="200" width="8" height="10"/>
+		</backdrop>
+		<backdrop name="digit7" element="digit" state="0">
+			<bounds x="356" y="200" width="8" height="10"/>
+		</backdrop>
+	</view>
+</mamelayout>

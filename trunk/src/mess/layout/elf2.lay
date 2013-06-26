@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="red_led" defstate="0">
+	<disk state="1">
+		<color red="0.75" green="0.0" blue="0.0" />
+	</disk>
+	<disk state="0">
+		<color red="0.09375" green="0.0" blue="0.0" />
+	</disk>
+	</element>
+
+	<view name="Standard">
+		<!-- Led address display -->
+		<bezel name="digit0" element="digit">
+			<bounds x="0" y="0" width="18" height="24" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="18" y="0" width="18" height="24" />
+		</bezel>
+	<!-- OUT led -->
+	<bezel name="led0" element="red_led">
+		<bounds x="40" y="5" width="5" height="5" />
+	</bezel>
+	</view>
+
+	<view name="CDP1861">
+	<screen index="0">
+		<bounds left="0" top="0" right="4" bottom="3" />
+	</screen>
+	</view>
+</mamelayout>

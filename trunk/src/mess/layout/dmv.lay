@@ -1,0 +1,115 @@
+<mamelayout version="2">
+	<element name="led" defstate="0">
+		<disk state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="l1">
+		<text string="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l2">
+		<text string="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l3">
+		<text string="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l4">
+		<text string="4">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l5">
+		<text string="5">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l6">
+		<text string="6">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l7">
+		<text string="7">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l8">
+		<text string="8">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+
+	<view name="Default Layout">
+		<screen index="0">
+			<bounds x="30" y="0" width="640" height="480" />
+		</screen>
+
+		<bezel name="led1" element="led">
+			<bounds x="15" y="33" width="10" height="10" />
+		</bezel>
+		<bezel name="led2" element="led">
+			<bounds x="15" y="53" width="10" height="10" />
+		</bezel>
+		<bezel name="led3" element="led">
+			<bounds x="15" y="73" width="10" height="10" />
+		</bezel>
+		<bezel name="led4" element="led">
+			<bounds x="15" y="93" width="10" height="10" />
+		</bezel>
+		<bezel name="led5" element="led">
+			<bounds x="15" y="113" width="10" height="10" />
+		</bezel>
+		<bezel name="led6" element="led">
+			<bounds x="15" y="133" width="10" height="10" />
+		</bezel>
+		<bezel name="led7" element="led">
+			<bounds x="15" y="153" width="10" height="10" />
+		</bezel>
+		<bezel name="led8" element="led">
+			<bounds x="15" y="173" width="10" height="10" />
+		</bezel>
+
+		<bezel name="label1" element="l1">
+			<bounds x="0" y="30" width="15" height="16" />
+		</bezel>
+		<bezel name="label2" element="l2">
+			<bounds x="0" y="50" width="15" height="16" />
+		</bezel>
+		<bezel name="label3" element="l3">
+			<bounds x="0" y="70" width="15" height="16" />
+		</bezel>
+		<bezel name="label4" element="l4">
+			<bounds x="0" y="90" width="15" height="16" />
+		</bezel>
+		<bezel name="label5" element="l5">
+			<bounds x="0" y="110" width="15" height="16" />
+		</bezel>
+		<bezel name="label6" element="l6">
+			<bounds x="0" y="130" width="15" height="16" />
+		</bezel>
+		<bezel name="label7" element="l7">
+			<bounds x="0" y="150" width="15" height="16" />
+		</bezel>
+		<bezel name="label8" element="l8">
+			<bounds x="0" y="170" width="15" height="16" />
+		</bezel>
+	</view>
+
+	<view name="Screen Only">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+	</view>
+
+</mamelayout>

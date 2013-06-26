@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- load software with LOAD ""
+
+    Tape must be started manually from the MESS menu
+    " is mapped to ] by default on a UK keyboard layout
+
+   The Sam Coupe will recognize most Spectrum tapes but isn't actually directly compatible with the majority of them due to different memory mapping
+-->
+
+<softwarelist name="samcoupe_cass" description="Sam Coupe cassettes">
+
+	<!-- it loads, includes the SAM specific title screen, but the game doesn't boot -->
+	<software name="snare" supported="no">
+		<description>Snare</description>
+		<year>1992</year>
+		<publisher>Enigma Software Developments</publisher>
+		<part name="cass" interface="samcoupe_cass">
+			<!-- side A is for the ZX Spectrum, see spectrum_cass.xml -->
+			<dataarea name="cass" size="67044">
+				<rom name="snare - alternate - side b.tzx" size="67044" crc="3278d671" sha1="9046c7b2ca54c8dd653cc797f7cc2ac6616791af" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
+
+
+
+

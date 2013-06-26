@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="BET" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="DEAL" defstate="1">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<text string="DEAL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="HOLD" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="HOLD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="TAKE" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="CANCEL" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp2" element="HOLD">
+			<bounds x="0.0" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="HOLD">
+			<bounds x="0.4" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="HOLD">
+			<bounds x="0.8" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="HOLD">
+			<bounds x="1.2" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="HOLD">
+			<bounds x="1.6" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="CANCEL">
+			<bounds x="2.0" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp0" element="BET">
+			<bounds x="2.85" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="DEAL">
+			<bounds x="3.25" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="TAKE">
+			<bounds x="3.65" y="3.45" width="0.35" height="0.24" />
+		</bezel>
+	</view>
+</mamelayout>

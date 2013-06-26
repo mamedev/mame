@@ -1,0 +1,35 @@
+Inputs:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19
+
+Outputs:
+
+13 (Combinatorial, Output feedback registered, Active high)
+15 (Registered, Output feedback registered, Active low)
+17 (Combinatorial, Output feedback registered, Active low)
+19 (Registered, Output feedback registered, Active high)
+
+Equations:
+
+o13 = i3 & rf17 +
+      /i12 & rf15 +
+      /rf15 & /rf17 +
+      i7 & rf19 +
+      /i9 & /rf19
+o13.oe = vcc
+
+/rf15 := /rf17 +
+         /rf13 & rf19 +
+         rf13 & rf17 & /rf19
+rf15.oe = rf17
+
+/o17 = rf13 +
+       i1 & /rf13 & /rf15 & i16 +
+       rf15 & rf19
+o17.oe = /rf19
+
+rf19 := rf13 & /rf17 +
+        i8 & rf15 & rf17 +
+        i1 & i2 & /rf15
+rf19.oe = /rf13
+

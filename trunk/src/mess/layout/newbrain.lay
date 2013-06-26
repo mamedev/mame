@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+	<led16seg>
+		<color red="0.0" green="1.0" blue="1.0" />
+	</led16seg>
+	</element>
+
+	<view name="VF Display">
+		<bezel name="digit0" element="digit">
+			<bounds x="0" y="0" width="20" height="30" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="20" y="0" width="20" height="30" />
+		</bezel>
+	<bezel name="digit2" element="digit">
+		<bounds x="40" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit3" element="digit">
+		<bounds x="60" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit4" element="digit">
+		<bounds x="80" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit5" element="digit">
+		<bounds x="100" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit6" element="digit">
+		<bounds x="120" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit7" element="digit">
+		<bounds x="140" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit8" element="digit">
+		<bounds x="160" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit9" element="digit">
+		<bounds x="180" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit10" element="digit">
+		<bounds x="200" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit11" element="digit">
+		<bounds x="220" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit12" element="digit">
+		<bounds x="240" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit13" element="digit">
+		<bounds x="260" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit14" element="digit">
+		<bounds x="280" y="0" width="20" height="30" />
+	</bezel>
+	<bezel name="digit15" element="digit">
+		<bounds x="300" y="0" width="20" height="30" />
+	</bezel>
+	</view>
+
+	<view name="Standard">
+	<screen index="0">
+		<bounds left="0" top="0" right="4" bottom="3" />
+	</screen>
+	</view>
+</mamelayout>

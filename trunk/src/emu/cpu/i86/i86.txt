@@ -1,0 +1,111 @@
+intel 8086 and compatibles
+--------------------------
+
+this info is here, 
+to list and give some remarks on all 8086 compatible processors
+
+excellent info in Hamarsoft's 86BUGS list
+(also distributed in ralf browns interrupt list)
+
+8086/8088
+---------
+20 bit address bus, 16 bit data bus and registers
+many 8080 assembler sources should be compilable/reusable
+
+8086 
+----
+6 bytes prefetch queue
+
+8088
+----
+8086 with 8 bit data bus, 
+prefetch queue only 4 byte, and refilled when 1 byte empty
+
+early 8086/8088 revisions bug
+-----------------------------
+(copyright 1978 on package)
+mov sreg, doesnot disable until next operation is executed
+
+8086/8088
+---------
+"mov cs, " causes unconditional jump!
+
+80C86/80C88
+-----------
+"mov cs, " ignored
+
+80186/80188
+-----------
+integrated pic8259, pit8253, dma8253 (but not at standard pc addresses)
+additional instructions
+"mov cs, " ?
+shift count anded with 0x1f
+
+80188
+-----
+8bit data bus
+
+NEC series
+----------
+80186 instruction set, additional nec instructions
+although it is based on 80186 instruction set, some behaviours follow 8086
+8080 emulation mode
+"mov cs, " ignored
+shift count not anded (acts like 8086)
+
+NEC 70116 (V30)
+---------------
+8086 pin compatible
+
+NEC 70108 (V20)
+---------------
+8088 pinout
+
+NEC V30MX
+---------
+on die ems hardware
+24 bit address but for ems memory!?
+no 8080 emulation mode
+
+NEC V40
+-------
+pinout, integrated peripherals as 80186
+
+NEC V50
+-------
+pinout, integrated peripherals as 80188
+
+NEC V33?
+--------
+speed optimized V30?
+
+NEC V25/V35?
+------------
+
+NEC V25+/V35+?
+--------------
+
+NEC V60/V70
+-----------
+risc (misc/delux) like instruction set
+v30? emulation mode (without 8080 emulation mode)
+
+80286
+-----
+80186 with additional instructions
+24 bit address bus, 
+protected mode
+
+80386 and later
+---------------
+not covered here
+
+8087/80287/80387/80387sx
+------------------------
+mathematical coprocessors
+
+weitek, iit variants
+
+in 80486 coprocessor integrated 
+(except 80486sx and several clones)
+80487: 80486 with other pinout

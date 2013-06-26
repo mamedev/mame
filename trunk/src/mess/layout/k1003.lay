@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="1" top="1" right="920" bottom="100" />
+		</bezel>
+
+		<!-- first 2 digits are away from others -->
+		<bezel name="digit0" element="digit">
+			<bounds left="0" top="10" right="48" bottom="90" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="48" top="10" right="96" bottom="90" />
+		</bezel>
+
+		<bezel name="digit2" element="digit">
+			<bounds left="196" top="10" right="244" bottom="90" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="244" top="10" right="292" bottom="90" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="292" top="10" right="340" bottom="90" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="340" top="10" right="388" bottom="90" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="388" top="10" right="436" bottom="90" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="436" top="10" right="484" bottom="90" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="484" top="10" right="532" bottom="90" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="532" top="10" right="580" bottom="90" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds left="580" top="10" right="628" bottom="90" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds left="628" top="10" right="676" bottom="90" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds left="676" top="10" right="724" bottom="90" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds left="772" top="10" right="820" bottom="90" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds left="820" top="10" right="868" bottom="90" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds left="868" top="10" right="916" bottom="90" />
+		</bezel>
+	</view>
+</mamelayout>

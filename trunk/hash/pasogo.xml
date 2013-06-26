@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pasogo" description="Koei PasoGo cartridges">
+	<!-- KS-1010. Contians 8M SOP44 ROM, 62256 SOP32 RAM, Microchip 1081N (reset IC?watchdog?battery-power-switcher?) and 3V battery. -->
+	<software name="dgoban">
+		<description>Denshi Goban</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ks-1010.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1004. Contains 4M SOP40 ROM only. -->
+	<software name="igmks1">
+		<description>Igo Meikyokushuu - Dai Ikkan</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="yrm0442m-184s" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1009. Contains 4M SOP40 ROM only. -->
+	<software name="tnt1">
+		<description>Tsuyoku Naru Tesuji - Dai Ikkan</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ks-1009.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

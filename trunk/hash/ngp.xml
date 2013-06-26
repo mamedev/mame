@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ngp" description="SNK Neo Geo Pocket cartridges">
+
+<!-- Undumped:
+NEOP00060 Dokodemo Mahjong
+-->
+
+	<!-- Developer: SNK -->
+	<software name="bstars">
+		<description>Pocket Sports Series - Baseball Stars (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00070" />
+		<info name="release" value="19981126 (JPN)" />
+		<info name="alt_title" value="ポケットスポーツシリーズ ベースボール スターズ" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="baseball stars (japan, europe) (en,ja).bin" size="1048576" crc="4781ae84" sha1="8ece00f21ae49ed4777a9c990b2782465ef95380" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof_mlon">
+		<description>King of Fighters R-1 &amp; Melon-chan no Seichou Nikki (Jpn, Prototype)</description>
+		<year>199?</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00130" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-1 &amp; melon-chan no seichou nikki (japan) (beta).bin" size="2097152" crc="2660bfc4" sha1="a02d1b1113dbeac895832f1501029e40d9aab493" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: SNK -->
+	<software name="kofr1">
+		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00010" />
+		<info name="release" value="19981028 (JPN)" />
+		<info name="alt_title" value="ポケット格闘シリーズ キング・オブ・ファイターズ R-1" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-1 (japan, europe) (en,ja).bin" size="2097152" crc="dceb7e11" sha1="4a7adbcccb05b6047a38bb861523cbae7d956bfa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: ADK -->
+	<software name="melonchn">
+		<description>Melon-chan no Seichou Nikki (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00040" />
+		<info name="release" value="19981028" />
+		<info name="alt_title" value="めろんちゃんの成長日記" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="melon-chan no seichou nikki (japan).bin" size="1048576" crc="cb42cfa4" sha1="2dbf9c40ab0167ff172f10354d4674e5e6c901d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: Dyna -->
+	<software name="neocher">
+	<!-- NGPC, rated "Over 18" -->
+		<description>Pocket Casino Series - Neo Cherry Master (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00140" />
+		<info name="release" value="19981225 (JPN)" />
+		<info name="alt_title" value="ポケットカジノシリーズ ネオ・チェリーマスター" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo cherry master - real casino series (japan, europe) (en,ja).bin" size="1048576" crc="5c067579" sha1="c171d8d22d667d713bfc73c2b1c04bc77aacbb5c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: SNK -->
+	<software name="neocup98">
+		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00020" />
+		<info name="release" value="19981028 (JPN)" />
+		<info name="alt_title" value="ポケットスポーツシリーズ ネオジオカップ'98" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo geo cup '98 (japan, europe) (en,ja).bin" size="1048576" crc="33add5bd" sha1="445743119c65a6765a0bdc849a12e9038192840c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: Yumekobo -->
+	<software name="ptennis">
+		<description>Pocket Sports Series - Pocket Tennis (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00090" />
+		<info name="release" value="19981028 (JPN)" />
+		<info name="alt_title" value="ポケットスポーツシリーズ ポケットテニス" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pocket tennis - pocket sports series (japan, europe) (en,ja).bin" size="524288" crc="89410850" sha1="59602e44c631a00b2db53196204a4bc22ccd7025" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: SNK -->
+	<software name="samsho">
+	<!-- NGPC -->
+		<description>Pocket Fighting Series - Samurai Spirit! (Jpn) ~ Samurai Shodown! (Euro)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00080" />
+		<info name="release" value="19981225 (JPN)" />
+		<info name="alt_title" value="ポケット格闘シリーズ サムライスピリッツ!" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samurai shodown! - pocket fighting series (japan, europe) (en,ja).bin" size="2097152" crc="32e4696a" sha1="2c6adfa69e7aeada7d4198b373436eee35b70d01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: ADK -->
+	<software name="shougi">
+		<description>Shougi no Tatsujin (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00050" />
+		<info name="release" value="19981120" />
+		<info name="alt_title" value="将棋の達人" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="shougi no tatsujin (japan).bin" size="524288" crc="f34d0c9b" sha1="ab0c33236f72d2b317d91d034756b56cfca1b0b4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: Yumekobo -->
+	<software name="tsunapn">
+		<description>Renketsu Puzzle Tsunagete Pon! (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NeoP00120" />
+		<info name="release" value="19981028" />
+		<info name="alt_title" value="連結パズル つなげてポンッ!" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="renketsu puzzle tsunagete pon! (japan).bin" size="524288" crc="ce09f534" sha1="cbe53b08d03ef684c08fc6ee28fca168a3d091a7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="background">
+	</element>
+	<element name="green_led" defstate="1">
+		<disk state="0">
+			<color red="0" green="0.2" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0" green="0.8" blue="0" />
+		</disk>
+	</element>
+	<element name="red_led" defstate="1">
+		<disk state="0">
+			<color red="0.2" green="0" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0" blue="0" />
+		</disk>
+	</element>
+	<element name="yellow_led" defstate="1">
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.8" blue="0" />
+		</disk>
+	</element>
+	<view name="Screen with status LEDs">
+		<bezel element="background">
+			<bounds x="0" y="0" width="640" height="500" />
+		</bezel>
+		<screen index="0">
+			<bounds left="0" top="0" right="640" bottom="480" />
+		</screen>
+		<bezel name="led_0" element="red_led">
+			<bounds x="10" y="485" width="8" height="8" />
+		</bezel>
+		<bezel name="led_1" element="yellow_led">
+			<bounds x="20" y="485" width="8" height="8" />
+		</bezel>
+		<bezel name="led_2" element="green_led">
+			<bounds x="30" y="485" width="8" height="8" />
+		</bezel>
+		<bezel name="led_3" element="red_led">
+			<bounds x="40" y="485" width="8" height="8" />
+		</bezel>
+	</view>
+</mamelayout>

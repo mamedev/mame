@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- This list contains the system floppies distributed with the Amiga 500, it is not a general purpose Software List -->
+
+<softwarelist name="amiga500_flop" description="Amiga 500 System Floppies">
+
+	<software name="wb13">
+		<description>Workbench v1.3 rev 34.207 (GB)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v1.3 rev 34.20 (1988)(commodore)(a500-a2000)(gb)(disk 1 of 2)(workbench).adf" size="901120" crc="30bef4c6" sha1="44bace7520746691969d08f28dd68ef5ab2f15fb" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Extras" />
+			<dataarea name="flop" size="901120">
+				<rom name="workbench v1.3 rev 34.20 (1988)(commodore)(a500-a2000)(gb)(disk 2 of 2)(extras).adf"    size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+

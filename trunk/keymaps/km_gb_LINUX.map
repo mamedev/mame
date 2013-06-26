@@ -1,0 +1,20 @@
+# MAME/MESS keymap for British QWERTY 105-keys keyboard (Linux)
+#
+# Row 1
+#
+ITEM_ID_TILDE      SDLK_BACKQUOTE 0x31 0x60 `
+#
+# Row 2
+#
+#
+# Row 3
+#
+ITEM_ID_BACKSLASH  SDLK_HASH      0x33 0x23 #
+#
+# Row 4
+#
+ITEM_ID_BACKSLASH2 SDLK_BACKSLASH 0x5e 0x5c \
+#
+# Row 5
+#
+ITEM_ID_RALT       SDLK_MODE      0x71 0x00 ALTGR

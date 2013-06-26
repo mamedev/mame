@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="red_led" defstate="1">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<screen index="0">
+			<bounds x="0" y="0" width="342" height="262" />
+		</screen>
+		<bezel element="background">
+			<bounds left="0" top="262" right="342" bottom="300" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="5" top="267" right="20" bottom="295" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="20" top="267" right="35" bottom="295" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="35" top="267" right="50" bottom="295" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="50" top="267" right="65" bottom="295" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="65" top="267" right="80" bottom="295" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="80" top="267" right="95" bottom="295" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="95" top="267" right="110" bottom="295" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="110" top="267" right="125" bottom="295" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="125" top="267" right="140" bottom="295" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="140" top="267" right="155" bottom="295" />
+		</bezel>
+
+		<bezel name="led3" element="red_led"><!-- 3 -->
+			<bounds left="160" right="170" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led2" element="red_led"><!-- 2 -->
+			<bounds left="180" right="190" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led1" element="red_led"><!-- 1 -->
+			<bounds left="200" right="210" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led0" element="red_led"><!-- 0 -->
+			<bounds left="220" right="230" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led6" element="red_led"><!-- IDLE -->
+			<bounds left="240" right="250" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led5" element="red_led"><!-- FWD -->
+			<bounds left="260" right="270" top="280" bottom="290" />
+		</bezel>
+		<bezel name="led4" element="red_led"><!-- SHIFT -->
+			<bounds left="280" right="290" top="280" bottom="290" />
+		</bezel>
+	</view>
+
+	<view name="LEDs Only">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="97" top="90" right="597" bottom="235" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="107" top="105" right="155" bottom="185" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="155" top="105" right="203" bottom="185" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="203" top="105" right="251" bottom="185" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="251" top="105" right="299" bottom="185" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds left="299" top="105" right="347" bottom="185" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="347" top="105" right="395" bottom="185" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="395" top="105" right="443" bottom="185" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="443" top="105" right="491" bottom="185" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="491" top="105" right="539" bottom="185" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="539" top="105" right="587" bottom="185" />
+		</bezel>
+
+		<bezel name="led3" element="red_led"><!-- 3 -->
+			<bounds left="210" right="230" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led2" element="red_led"><!-- 2 -->
+			<bounds left="240" right="260" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led1" element="red_led"><!-- 1 -->
+			<bounds left="270" right="290" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led0" element="red_led"><!-- 0 -->
+			<bounds left="300" right="320" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led6" element="red_led"><!-- IDLE -->
+			<bounds left="330" right="350" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led5" element="red_led"><!-- FWD -->
+			<bounds left="360" right="380" top="205" bottom="225" />
+		</bezel>
+		<bezel name="led4" element="red_led"><!-- SHIFT -->
+			<bounds left="390" right="410" top="205" bottom="225" />
+		</bezel>
+	</view>
+
+	<view name="Screen Only">
+		<screen index="0">
+			<bounds x="0" y="0" width="342" height="262" />
+		</screen>
+	</view>
+</mamelayout>

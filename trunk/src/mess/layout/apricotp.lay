@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<view name="LCD">
+		<screen index="0">
+			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
+		</screen>
+	</view>
+
+	<view name="CRT">
+		<screen index="1">
+			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="Dual Side-by-Side">
+		<screen index="0">
+			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
+		<screen index="1">
+			<bounds x="~scr0width~" y="0" width="~scr1width~" height="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="Dual Over-Under">
+		<screen index="0">
+			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
+		</screen>
+		<screen index="1">
+			<bounds x="0" y="~scr0height~" width="~scr1width~" height="~scr1height~" />
+		</screen>
+	</view>
+</mamelayout>

@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="led">
+	<led16segsc>
+			<color red="1" green="0" blue="0" />
+	</led16segsc>
+	</element>
+
+	<view name="cops">
+		<screen index="0">
+			<bounds left="0" top="0" right="256" bottom="256" />
+		</screen>
+
+		<backdrop name="digit0" element="led" state="0">
+			<bounds x="60" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit1" element="led" state="0">
+			<bounds x="69" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit2" element="led" state="0">
+			<bounds x="78" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit3" element="led" state="0">
+			<bounds x="87" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit4" element="led" state="0">
+			<bounds x="96" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit5" element="led" state="0">
+			<bounds x="105" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit6" element="led" state="0">
+			<bounds x="114" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit7" element="led" state="0">
+			<bounds x="123" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit8" element="led" state="0">
+			<bounds x="132" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit9" element="led" state="0">
+			<bounds x="141" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit10" element="led" state="0">
+			<bounds x="150" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit11" element="led" state="0">
+			<bounds x="159" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit12" element="led" state="0">
+			<bounds x="168" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit13" element="led" state="0">
+			<bounds x="177" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit14" element="led" state="0">
+			<bounds x="186" y="240" width="9" height="9"/>
+		</backdrop>
+		<backdrop name="digit15" element="led" state="0">
+			<bounds x="195" y="240" width="9" height="9"/>
+		</backdrop>
+	</view>
+</mamelayout>
+

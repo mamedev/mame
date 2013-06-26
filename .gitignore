@@ -10,3 +10,15 @@
 /snap
 src/regtests/chdman/temp
 src/regtests/jedutil/output
+trunk/*.exe
+trunk/*.ini
+trunk/*.log
+trunk/*.map
+trunk/*.pdb
+trunk/*.sym
+trunk/cfg
+trunk/nvram
+trunk/obj
+trunk/snap
+trunk/src/regtests/chdman/temp
+trunk/src/regtests/jedutil/output

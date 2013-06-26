@@ -1,0 +1,46 @@
+/*
+ * s3virge.h
+ *
+ * S3 ViRGE 2D/3D video card
+ *
+ */
+
+#ifndef S3VIRGE_H_
+#define S3VIRGE_H_
+
+#include "emu.h"
+#include "video/pc_vga.h"
+
+// ======================> s3virge_vga_device
+
+class s3virge_vga_device :  public s3_vga_device
+{
+public:
+	// construction/destruction
+	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03c0_r);
+	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
+
+	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existant 8514/A device\n"); return NULL; }
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+private:
+	virtual UINT8 s3_crtc_reg_read(UINT8 index);
+	virtual void s3_define_video_mode(void);
+	virtual void s3_crtc_reg_write(UINT8 index, UINT8 data);
+	// has no 8514/A device
+};
+
+// device type definition
+extern const device_type S3VIRGE;
+
+#endif /* S3VIRGE_H_ */

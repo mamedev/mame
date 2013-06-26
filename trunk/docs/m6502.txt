@@ -1,0 +1,482 @@
+The new 6502 family implementation
+----------------------------------
+
+  1. Introduction
+
+The new 6502 family implementation has been created to reach
+sub-instruction accuracy in observable behaviour.  It is designed with
+3 goals in mind:
+
+- every bus cycle must happen at the exact time it would happen in a
+  real cpu, and every access the real cpu does is done
+
+- instructions can be interrupted at any time in the middle then
+  restarted at that point transparently
+
+- instructions can be interrupted even from within a memory handler
+  for bus contention/wait states emulation purposes
+
+Point 1 has been ensured through bisimulation with the gate-level
+simulation perfect6502.  Point 2 has been ensured structurally through
+a code generator which will be explained in section 8.  Point 3 is not
+done yet due to lack of support on the memory subsystem side, but
+section 9 shows how it will be handled.
+
+
+  2. The 6502 family
+
+The MOS 6502 family has been large and productive.  A large number of
+variants exist, varying on bus sizes, i/o, and even opcodes.  Some
+offshots (g65c816, hu6280) even exist that live elsewhere in the mame
+tree.  The final class hierarchy is this:
+
+                          6502
+                           |
+        +------+--------+--+--+-------+-------+
+        |      |        |     |       |       |
+      6510   deco16   6504   6509   n2a03   65c02 
+        |                                     |
+  +-----+-----+                            r65c02
+  |     |     |                               |
+6510t  7501  8502                         +---+---+     
+                                          |       |
+                                       65ce02   65sc02
+                                          |
+                                        4510
+
+The 6510 adds an up to 8 bits i/o port, with the 6510t, 7501 and 8502
+being software-identical variants with different pin count (hence i/o
+count), die process (nmos, hnmos, etc) and clock support.
+
+The deco16 is a Deco variant with a small number of not really understood
+additional instructions and some i/o.
+
+The 6504 is a pin and address-bus reduced version.
+
+The 6509 adds internal support for paging.
+
+The n2a03 is the nes variant with the D flag disabled and sound
+functionality integrated.
+
+The 65c02 is the very first cmos variant with some additional
+instructions, some fixes, and most of the undocumented instructions
+turned into nops.  The R (rockwell, but eventually produced by wdc too
+among others) variant adds a number of bitwise instructions and also
+stp and wai.  The sc variant, used by the Lynx portable console, looks
+identical to the R variant.  The 's' probably indicates a
+static-ram-cell process allowing full dc-to-max clock control.
+
+The 65ce02 is the final evolution of the ISA in this hierarchy, with
+additional instructions, registers, and removals of a lot of dummy
+accesses that slowed the original 6502 down by at least 25%.  The 4510
+is a 65ce02 with integrated mmu and gpio support.
+
+
+  3. Usage of the classes
+
+All the cpus are standard modern cpu devices, with all the normal
+interaction with the device infrastructure.  To include one of these
+cpu in your driver you need to include "cpu/m6502/<cpu>.h" and then do
+a MCFG_CPU_ADD("tag", <CPU>, clock).
+
+6510 variants port i/o callbacks are setup through:
+  MCFG_<CPU>_PORT_CALLBACKS(READ8(type, read_method), WRITE8(type, write_method))
+
+And the pullup and floating lines mask is given through:
+  MCFG_<CPU>_PORT_PULLS(pullups, floating)
+
+In order to see all bus accesses on the memory handlers it is possible
+to disable accesses through the direct map (at a cpu cost, of course)
+with:
+  MCFG_M6502_DISABLE_DIRECT()
+
+In that case, transparent decryption support is also disabled,
+everything goes through normal memory-map read/write calls.  The state
+of the sync line is given by the cpu method get_sync(), making
+implementing the decryption in the handler possible.
+
+In a final addition, the cpu method get_cycle() gives the current time
+in cycles since the start of the machine from the point of view of the
+cpu.  Or, in other words, what is usually called the cycle number for
+the cpu when somebody talks about bus contention or wait states.  The
+call is designed to be fast (no system-wide sync, usually no call to
+machine.time()) and is precise.  Cycle number for every access is
+exact at the sub-instruction level.
+
+The 4510 special nomap line is accessible through get_nomap().
+
+Other than these specifics, these are perfectly normal cpu classes.
+
+
+  4. General structure of the emulations
+
+Each variant is emulated through up to 4 files:
+- <cpu>.h    = header for the cpu class
+- <cpu>.c    = implementation of most of the cpu class
+- d<cpu>.lst = dispatch table for the cpu
+- o<cpu>.lst = opcode implementation code for the cpu
+
+The last two are optional.  They're used to generate a <cpu>.inc file
+in the object directory which is included by the .c file.
+
+At a minimum, the class must include a constructor and an enum picking
+up the correct input line ids.  See m65sc02 for a minimalist example.
+The header can also include specific configuration macros (see m8502)
+and also the class can include specific memory accessors (more on
+these later, simple example in m6504).
+
+If the cpu has its own dispatch table, the class must also include the
+declaration (but not definition) of disasm_entries, do_exec_full and
+do_exec_partial, the declaration and definition of disasm_disassemble
+(identical for all classes but refers to the class-specific
+disasm_entries array) and include the .inc file (which provides the
+missing definitions).  Support for the generation must also be added
+to cpu.mak.
+
+If the cpu has in addition its own opcodes, their declaration must be
+done through a macro, see f.i. m65c02.  The .inc file will provide the
+definitions.
+
+
+  5. Dispatch tables
+
+Each d<cpu>.lst is the dispatch table for the cpu.  Lines starting
+with '#' are comments.  The file must include 257 entries, the first
+256 being opcodes and the 257th what the cpu should do on reset.  In
+the 6502 irq and nmi actually magically call the "brk" opcode, hence
+the lack of specific description for them.
+
+Entries 0 to 255, i.e. the opcodes, must have one of these two
+structures:
+- opcode_addressing-mode
+- opcode_middle_addressing-mode
+
+Opcode is traditionally a three-character value.  Addressing mode must
+be a 3-letter value corresponding to one of the DASM_* macros in
+m6502.h.  Opcode and addressing mode are used to generate the
+disassembly table.  The full entry text is used in the opcode
+description file and the dispatching methods, allowing for per-cpu
+variants for identical-looking opcodes.
+
+An entry of "." was usable for unimplemented/unknown opcodes,
+generating "???" in the disassembly, but is not a good idea at this
+point since it will infloop in execute() if encountered.
+
+
+  6. Opcode descriptions
+
+Each o<cpu>.lst file includes the cpu-specific opcodes descriptions.
+An opcode description is a series of lines starting by an opcode entry
+by itself and followed by a series of indented lines with code
+executing the opcode.
+
+For instance the asl <absolute adress> opcode looks like this:
+
+asl_aba
+    TMP = read_pc();
+    TMP = set_h(TMP, read_pc());
+    TMP2 = read(TMP);
+    write(TMP, TMP2);
+    TMP2 = do_asl(TMP2);
+    write(TMP, TMP2);
+    prefetch();
+
+First the low part of the address is read, then the high part (read_pc
+is auto-incrementing).  Then, now that the address is available the
+value to shift is read, then re-written (yes, the 6502 does that),
+shifted then the final result is written (do_asl takes care of the
+flags).  The instruction finishes with a prefetch of the next
+instruction, as all non-cpu-crashing instructions do.
+
+Available bus-accessing functions are:
+- read(adr)             - standard read
+- read_direct(adr)      - read from program space
+- read_pc()             - read at the PC address and increment it
+- read_pc_noinc()       - read at the PC address
+- read_9()              - 6509 indexed-y banked read
+- write(adr, val)       - standard write
+- prefetch()            - instruction prefetch
+- prefetch_noirq()      - instruction prefetch without irq check
+
+Cycle counting is done by the code generator which detects (through
+string matching) the accesses and generates the appropriate code.  In
+addition to the bus-accessing functions a special line can be used to
+wait for the next event (irq or whatever).  "eat-all-cycles;" on a
+line will do that wait then continue.  It is used by wai_imp and
+stp_imp for the m65c02.
+
+Due to the constraints of the code generation, some rules have to be
+followed:
+
+- in general, stay with one instruction/expression per line
+
+- there must be no side effects in the parameters of a bus-accessing
+  function
+
+- local variables lifetime must not go past a bus access.  In general,
+  it's better to leave them to helper methods (like do_asl) which do not
+  do bus accesses.  Note that "TMP" and "TMP2" are not local variables,
+  they're variables of the class.
+
+- single-line then or else constructs must have braces around them if
+  they're calling a bus-accessing function
+
+The per-opcode generated code are methods of the cpu class.  As such
+they have complete access to other methods of the class, variables of
+the class, everything.
+
+
+  7. Memory interface
+
+For better opcode reuse with the mmu/banking variants, a memory access
+subclass has been created.  It's called memory_interface, declared in
+m6502_device, and provides the following accessors:
+
+- UINT8 read(UINT16 adr)                  - normal read
+- UINT8 read_direct(UINT16 adr)           - direct read
+- UINT8 read_decrypted(UINT16 adr)        - decrypted data read
+- void write(UINT16 adr, UINT8 val)       - normal write
+
+- UINT8 read_9(UINT16 adr)                - special y-indexed 6509 read, defaults to read()
+- void write_9(UINT16 adr, UINT8 val);    - special y-indexed 6509 write, defaults to write()
+
+Two implementations are given by default, one usual,
+mi_default_normal, one disabling direct access, mi_default_nd.  A cpu
+that wants its own interface (see 6504 or 6509 for instance) must
+override device_start, intialize mintf there then call init().
+
+
+  8. The generated code
+
+A code generator is used to support interrupting and restarting an
+instruction in the middle.  This is done through a two-level state
+machine with updates only at the boundaries.  More precisely,
+inst_state tells you which main state you're in.  It's equal to the
+opcode byte when 0-255, and 0xff00 means reset.  It's always valid and
+used by instructions like rmb.  inst_substate indicates at which step
+we are in an instruction, but it set only when an instruction has been
+interrupted.  Let's go back to the asl <abs> code:
+
+asl_aba
+    TMP = read_pc();
+    TMP = set_h(TMP, read_pc());
+    TMP2 = read(TMP);
+    write(TMP, TMP2);
+    TMP2 = do_asl(TMP2);
+    write(TMP, TMP2);
+    prefetch();
+
+
+The complete generated code is:
+void m6502_device::asl_aba_partial()
+{
+switch(inst_substate) {
+case 0:
+    if(icount == 0) { inst_substate = 1; return; }
+case 1:
+    TMP = read_pc();
+    icount--;
+    if(icount == 0) { inst_substate = 2; return; }
+case 2:
+    TMP = set_h(TMP, read_pc());
+    icount--;
+    if(icount == 0) { inst_substate = 3; return; }
+case 3:
+    TMP2 = read(TMP);
+    icount--;
+    if(icount == 0) { inst_substate = 4; return; }
+case 4:
+    write(TMP, TMP2);
+    icount--;
+    TMP2 = do_asl(TMP2);
+    if(icount == 0) { inst_substate = 5; return; }
+case 5:
+    write(TMP, TMP2);
+    icount--;
+    if(icount == 0) { inst_substate = 6; return; }
+case 6:
+    prefetch();
+    icount--;
+}
+    inst_substate = 0;
+}
+
+
+One can see that the initial switch() restarts the instruction at the
+appropriate substate, that icount is updated after each access, and
+upon reaching 0 the instruction is interrupted and the substate
+updated.  Since most instructions are started from the beginning a
+specific variant is generated for when inst_substate is known to be 0:
+
+void m6502_device::asl_aba_full()
+{
+    if(icount == 0) { inst_substate = 1; return; }
+    TMP = read_pc();
+    icount--;
+    if(icount == 0) { inst_substate = 2; return; }
+    TMP = set_h(TMP, read_pc());
+    icount--;
+    if(icount == 0) { inst_substate = 3; return; }
+    TMP2 = read(TMP);
+    icount--;
+    if(icount == 0) { inst_substate = 4; return; }
+    write(TMP, TMP2);
+    icount--;
+    TMP2 = do_asl(TMP2);
+    if(icount == 0) { inst_substate = 5; return; }
+    write(TMP, TMP2);
+    icount--;
+    if(icount == 0) { inst_substate = 6; return; }
+    prefetch();
+    icount--;
+}
+
+That variant removes the switch, avoiding a costly computed branch and
+also an inst_substate write.  There is in addition a fair chance that
+the decrement-test with zero pair is compiled into something
+efficient.
+
+All these opcode functions are called through two virtual methods,
+do_exec_full and do_exec_partial, which are generated into a 257-entry
+switch statement.  Pointers-to-methods being expensive to call, a
+virtual function implementing a switch has a fair chance of being
+better.
+
+The execute main call ends up very simple:
+void m6502_device::execute_run()
+{
+    if(inst_substate)
+        do_exec_partial();
+
+    while(icount > 0) {
+        if(inst_state < 0x100) {
+            PPC = NPC;
+            inst_state = IR;
+            if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+                debugger_instruction_hook(this, NPC);
+        }
+        do_exec_full();
+    }
+}
+
+If an instruction was partially executed finish it (icount will then
+be zero if it still doesn't finish).  Then try to run complete
+instructions.  The NPC/IR dance is due to the fact that the 6502 does
+instruction prefetching, so the instruction PC and opcode come from
+the prefetch results.
+
+
+  9. Future bus contention/delay slot support
+
+Supporting bus contention and delay slots in the context of the code
+generator only requires being able to abort a bus access when not
+enough cycles are available into icount, and restart it when cycles
+have become available again.  The implementation plan is to:
+
+- Have a delay() method on the cpu that removes cycles from icount.
+  If icount becomes zero or less, having it throw a suspend() exception.
+
+- Change the code generator to generate this:
+void m6502_device::asl_aba_partial()
+{
+switch(inst_substate) {
+case 0:
+    if(icount == 0) { inst_substate = 1; return; }
+case 1:
+    try {
+    TMP = read_pc();
+    } catch(suspend) { inst_substate = 1; return; }
+    icount--;
+    if(icount == 0) { inst_substate = 2; return; }
+case 2:
+    try {
+    TMP = set_h(TMP, read_pc());
+    } catch(suspend) { inst_substate = 2; return; }
+    icount--;
+    if(icount == 0) { inst_substate = 3; return; }
+case 3:
+    try {
+    TMP2 = read(TMP);
+    } catch(suspend) { inst_substate = 3; return; }
+    icount--;
+    if(icount == 0) { inst_substate = 4; return; }
+case 4:
+    try {
+    write(TMP, TMP2);
+    } catch(suspend) { inst_substate = 4; return; }
+    icount--;
+    TMP2 = do_asl(TMP2);
+    if(icount == 0) { inst_substate = 5; return; }
+case 5:
+    try {
+    write(TMP, TMP2);
+    } catch(suspend) { inst_substate = 5; return; }
+    icount--;
+    if(icount == 0) { inst_substate = 6; return; }
+case 6:
+    try {
+    prefetch();
+    } catch(suspend) { inst_substate = 6; return; }
+    icount--;
+}
+    inst_substate = 0;
+}
+
+A modern try/catch costs nothing if an exception is not thrown.  Using
+this the control will go back to the main loop, which will then look
+like this:
+
+void m6502_device::execute_run()
+{
+    if(waiting_cycles) {
+        icount -= waiting_cycles;
+        waiting_cycles = 0;
+    }
+
+    if(icount > 0 && inst_substate)
+        do_exec_partial();
+
+    while(icount > 0) {
+        if(inst_state < 0x100) {
+            PPC = NPC;
+            inst_state = IR;
+            if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+                debugger_instruction_hook(this, NPC);
+        }
+        do_exec_full();
+    }
+
+    waiting_cycles = -icount;
+    icount = 0;
+}
+
+A negative icount means that the cpu won't be able to do anything for
+some time in the future, because it's either waiting for the bus to be
+free or for a peripheral to answer.  These cycles will be counted
+until elapsed and then normal processing will go on.  It's important
+to note that the exception path only happens when the contention/wait
+state goes further than the scheduling slice of the cpu.  That should
+not usually be the case, so the cost should be minimal.
+
+  10. Multi-dispatch variants
+
+Some variants currently in the process of being supported change
+instruction set depending on an internal flag, either switching to a
+16-bits mode or changing some register accesses to memory accesses.
+This is handled by having multiple dispatch tables for the cpu, the
+d<cpu>.lst not being 257 entries anymore but 256*n+1.  The variable
+inst_state_base must select which instruction table to use at a given
+time.  It must be a multiple of 256, and is in fact simply or-ed to
+the first instruction byte to get the dispatch table index (aka
+inst_state).
+
+  11. Current TODO
+
+- Implement the bus contention/wait states stuff, but that requires
+  support on the memory map side first.
+
+- Integrate the i/o subsystems in the 4510
+
+- Possibly integrate the sound subsytem in the n2a03
+
+- Add decent hookups for the apple 3 madness
