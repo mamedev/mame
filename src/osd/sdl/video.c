@@ -225,7 +225,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 		#endif // defined(SDLMAME_X11)
 		{
 			static int first_call=0;
-			static int cw, ch;
+			static int cw = 0, ch = 0;
 
 			SDL_VideoDriverName(monitor->monitor_device, sizeof(monitor->monitor_device)-1);
 			if (first_call==0)
