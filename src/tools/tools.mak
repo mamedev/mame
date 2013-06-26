@@ -43,6 +43,7 @@ TOOLSOBJ = $(OBJ)/tools
 
 OBJDIRS += \
 	$(TOOLSOBJ) \
+	$(TOOLSOBJ)/win32 \
 
 
 
@@ -61,6 +62,7 @@ TOOLS += \
 	srcclean$(EXE) \
 	src2html$(EXE) \
 	split$(EXE) \
+	rocket$(EXE) \
 
 
 
@@ -192,3 +194,27 @@ SPLITOBJS = \
 split$(EXE): $(SPLITOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+#-------------------------------------------------
+# rocket
+#-------------------------------------------------
+
+ROCKETTOOLOBJS = \
+	$(TOOLSOBJ)/main.o \
+	$(TOOLSOBJ)/Shell.o \
+	$(TOOLSOBJ)/RocketInput.o \
+	$(TOOLSOBJ)/ShellFileInterface.o \
+	$(TOOLSOBJ)/ShellRenderInterfaceOpenGL.o \
+	$(TOOLSOBJ)/ShellSystemInterface.o \
+	$(TOOLSOBJ)/ShellSystemInterface.o \
+	$(TOOLSOBJ)/win32/InputWin32.o \
+	$(TOOLSOBJ)/win32/ShellWin32.o \
+
+rocket$(EXE): $(ROCKETTOOLOBJS) $(ROCKET_LIB) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) 
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -lfreetype -lopengl32 -o $@
+
+$(TOOLSOBJ)/%.o: $(TOOLSSRC)/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c -I$(TOOLSSRC) -I$(LIBSRC)/librocket/Include -DSTATIC_LIB $< -o $@
+

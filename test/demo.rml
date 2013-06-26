@@ -1,0 +1,39 @@
+<rml>
+	<head>
+		<title>MAME</title>
+		<link type="text/template" href="window.rml" />
+		<style>
+			body
+			{
+				width: 400px;
+				height: 525px;
+				
+				margin: auto;
+			}
+			
+			div#title_bar div#icon
+			{
+				icon-image-s: 332px 383px;
+				icon-image-t: 191px 231px;
+			}
+
+			button 
+			{
+				width: 350px;
+			}
+		</style>
+	</head>
+	<body template="window">
+		<button>Input (general)</button><br />
+		<button>Input (this game)</button><br />
+		<button>Bookkeeping Info</button><br />
+		<button>Game Information</button><br />
+		<button>Bios Selection</button><br />
+		<button>Slot Devices</button><br />
+		<button>Slider Controls</button><br />
+		<button>Video Options</button><br />
+		<button>Cheat</button><br />
+		<button>Select New Game</button><br />
+		<button onclick="exit">Exit</button>
+	</body>
+</rml>

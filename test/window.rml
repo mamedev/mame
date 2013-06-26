@@ -1,0 +1,19 @@
+<template name="window" content="content">
+<head>
+	<link type="text/rcss" href="rkt.rcss"/>
+	<link type="text/rcss" href="invader.rcss"/>
+</head>
+<body class="window">
+	<div id="title_bar">
+		<handle move_target="#document">
+			<div id="icon"></div>
+			<span id="title">MAME Main Menu</span>
+		</handle>
+	</div>
+	<div id="window">
+		<div id="content">
+		</div>
+	</div>
+	<handle size_target="#document" style="position: absolute; width: 16px; height: 16px; bottom: 0px; right: 0px;"></handle>
+</body>
+</template>
