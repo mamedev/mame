@@ -1812,6 +1812,55 @@ const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0100SCN, "Taito TC0100SCN", tag, owner, clock, "tc0100scn", __FILE__)
 {
+	// device stuff
+	for (int i=0;i<8;i++)
+		m_ctrl[i] = 0;
+
+	m_ram = 0;
+	m_bg_ram = 0;
+	m_fg_ram = 0;
+	m_tx_ram = 0;
+	m_char_ram = 0;
+	m_bgscroll_ram = 0;
+	m_fgscroll_ram = 0;
+	m_colscroll_ram = 0;
+
+	m_bgscrollx = 0;	
+	m_bgscrolly = 0;
+	m_fgscrollx = 0;
+	m_fgscrolly = 0;
+
+	m_bg_col_mult = 0;
+	m_bg_tilemask = 0;
+	m_tx_col_mult = 0;
+	m_gfxbank = 0;
+	m_colbank = 0;
+	m_bg0_colbank = 0;
+	m_bg1_colbank = 0;
+	m_tx_colbank = 0;
+	m_dblwidth = 0;
+
+	//m_tilemap[3][2];
+	//m_cliprect;
+
+	m_screen = 0;
+
+	// interface stuff
+	m_screen_tag = 0;
+
+	m_gfxnum = 0;
+	m_txnum = 0;
+
+	m_x_offset = 0;
+	m_y_offset = 0;
+	m_flip_xoffs = 0;
+	m_flip_yoffs = 0;
+	m_flip_text_xoffs = 0;
+	m_flip_text_yoffs = 0;
+
+	m_multiscrn_xoffs = 0;
+	m_multiscrn_hack = 0;
+
 }
 
 //-------------------------------------------------
