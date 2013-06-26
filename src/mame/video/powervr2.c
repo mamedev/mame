@@ -1368,7 +1368,7 @@ WRITE32_MEMBER( powervr2_device::ta_list_init_w )
 		grab[grabsel].valid=1;
 		grab[grabsel].verts_size=0;
 		grab[grabsel].strips_size=0;
-		
+
 		g_profiler.stop();
 	}
 }

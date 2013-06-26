@@ -70,6 +70,7 @@ TODO (game-specific):
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
     - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
+    - Street Fighter Zero 3 Upper: currently dies at disclaimer screen (regression);
     - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);

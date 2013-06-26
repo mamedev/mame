@@ -225,7 +225,7 @@ void dc_state::wave_dma_execute(address_space &space)
 	m_wave_dma.flag = (m_wave_dma.indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(dc_state::aica_dma_irq),this));
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_wave_dma.size/4), timer_expired_delegate(FUNC(dc_state::aica_dma_irq),this));
 }
 
 // register decode helpers
