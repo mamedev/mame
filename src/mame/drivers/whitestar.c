@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "video/mc6845.h"
 #include "audio/decobsmt.h"
+#include "video/decodmd2.h"
 #include "rendlay.h"
 
 class whitestar_state : public driver_device
@@ -14,22 +15,20 @@ public:
 	whitestar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dmdcpu(*this, "dmdcpu"),
-		m_mc6845(*this, "mc6845"),
 		m_decobsmt(*this, "decobsmt"),
-		m_vram(*this, "vram"){ }
+		m_decodmd(*this, "decodmd")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dmdcpu;
-	required_device<mc6845_device> m_mc6845;
+	//required_device<cpu_device> m_dmdcpu;
+	//required_device<mc6845_device> m_mc6845;
 	required_device<decobsmt_device> m_decobsmt;
+	required_device<decodmd_type2_device> m_decodmd;
 
 	UINT8 m_dmd_latch;
 	UINT8 m_dmd_ctrl;
 	UINT8 m_dmd_status;
 	UINT8 m_dmd_busy;
-
-	required_shared_ptr<UINT8> m_vram;
 
 	DECLARE_WRITE8_MEMBER(dmd_latch_w);
 	DECLARE_READ8_MEMBER(dmd_latch_r);
@@ -40,6 +39,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(dmd_bank_w);
+	DECLARE_WRITE8_MEMBER(dmddata_w);
 
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
@@ -47,7 +47,6 @@ public:
 	DECLARE_READ8_MEMBER(dedicated_switch_r);
 	DECLARE_DRIVER_INIT(whitestar);
 	virtual void machine_reset();
-	virtual void palette_init();
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 };
 
@@ -82,9 +81,9 @@ static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(bank_w)
 	AM_RANGE(0x3300, 0x3300) AM_WRITE(switch_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(switch_r)
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmd_latch_w)
-	AM_RANGE(0x3601, 0x3601) AM_READWRITE(dmd_ctrl_r, dmd_ctrl_w)
-	AM_RANGE(0x3700, 0x3700) AM_READ(dmd_status_r)
+	AM_RANGE(0x3600, 0x3600) AM_WRITE(dmddata_w)
+	AM_RANGE(0x3601, 0x3601) AM_DEVREADWRITE("decodmd",decodmd_type2_device,ctrl_r, ctrl_w)
+	AM_RANGE(0x3700, 0x3700) AM_DEVREAD("decodmd",decodmd_type2_device,busy_r)
 	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE(DECOBSMT_TAG, decobsmt_device, bsmt_comms_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
@@ -104,77 +103,16 @@ WRITE8_MEMBER(whitestar_state::bank_w)
 	membank("bank1")->set_base(memregion("user1")->base() + (data & 0x1f) * 0x4000);
 }
 
-WRITE8_MEMBER(whitestar_state::dmd_bank_w)
+// Whitestar automatically pulses the DMD IRQ line?  DE hardware doesn't do that...
+WRITE8_MEMBER(whitestar_state::dmddata_w)
 {
-	membank("dmd_bank1")->set_base(memregion("dmdcpu")->base() + (data & 0x1f) * 0x4000);
+	m_decodmd->data_w(space,offset,data);
+	m_decodmd->ctrl_w(space,0,1);
+	m_decodmd->ctrl_w(space,0,0);
 }
-
-READ8_MEMBER(whitestar_state::dmd_latch_r)
-{
-	m_dmd_busy = 0;
-	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	return m_dmd_latch;
-}
-
-WRITE8_MEMBER(whitestar_state::dmd_latch_w)
-{
-	m_dmd_latch = data;
-	m_dmd_busy = 1;
-	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	m_dmdcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-}
-
-READ8_MEMBER(whitestar_state::dmd_ctrl_r)
-{
-	return m_dmd_ctrl;
-}
-
-WRITE8_MEMBER(whitestar_state::dmd_ctrl_w)
-{
-	m_dmd_ctrl = data;
-	m_dmdcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	if (data!=0) {
-		bank_w(space,0,0);
-		m_dmdcpu->reset();
-	}
-}
-
-/*U202 - HC245
-  D0 = BUSY   -> SOUND BUSY?
-  D1 = SSTO   -> SOUND RELATED
-  D2 = MPIN   -> ??
-  D3 = CN8-22 -> DMD STAT0
-  D4 = CN8-23 -> DMD STAT1
-  D5 = CN8-24 -> DMD STAT2
-  D6 = CN8-25 -> DMD STAT3
-  D7 = CN8-26 -> DMD BUSY
-*/
-READ8_MEMBER(whitestar_state::dmd_status_r)
-{
-	return (m_dmd_busy ? 0x80 : 0x00) | (m_dmd_status << 3);
-}
-
-WRITE8_MEMBER(whitestar_state::dmd_status_w)
-{
-	m_dmd_status = data & 0x0f;
-}
-
-static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vram") // video out
-	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("mc6845", mc6845_device, register_w)
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(dmd_bank_w)
-	AM_RANGE(0x3003, 0x3003) AM_READ(dmd_latch_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmd_bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(dmd_status_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("dmdcpu", 0x78000)
-ADDRESS_MAP_END
-
 void whitestar_state::machine_reset()
 {
 	membank("bank1")->set_base(memregion("user1")->base());
-	membank("dmd_bank1")->set_base(memregion("dmdcpu")->base());
 }
 
 DRIVER_INIT_MEMBER(whitestar_state,whitestar)
@@ -187,86 +125,10 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-#define DMD_CHUNK_SIZE 10
-#define MCFG_DMD_ADD(_tag, _width, _height) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(LCD) \
-	MCFG_SCREEN_REFRESH_RATE(60) \
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update) \
-	MCFG_SCREEN_SIZE( _width * DMD_CHUNK_SIZE, _height *DMD_CHUNK_SIZE) \
-	MCFG_SCREEN_VISIBLE_AREA( 0, _width * DMD_CHUNK_SIZE-1, 0, _height*DMD_CHUNK_SIZE-1 ) \
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
-
-
-void dmd_put_pixel(bitmap_rgb32 &bitmap, int x, int y, rgb_t color)
+static const decodmd_intf decodmd_interface =
 {
-	int midx = x * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
-	int midy = y * DMD_CHUNK_SIZE + DMD_CHUNK_SIZE/2;
-	int width = DMD_CHUNK_SIZE-2;
-	// compute parameters
-	width /= 2;
-	float ooradius2 = 1.0f / (float)(width * width);
-
-	// iterate over y
-	for (UINT32 y = 0; y <= width; y++)
-	{
-		UINT32 *d0 = &bitmap.pix32(midy - y);
-		UINT32 *d1 = &bitmap.pix32(midy + y);
-		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
-		INT32 left, right;
-
-		// compute left/right coordinates
-		left = midx - (INT32)(xval + 0.5f);
-		right = midx + (INT32)(xval + 0.5f);
-
-		// draw this scanline
-		for (UINT32 x = left; x < right; x++)
-			d0[x] = d1[x] = color;
-	}
-}
-
-MC6845_UPDATE_ROW( whitestar_update_row )
-{
-	whitestar_state *state = device->machine().driver_data<whitestar_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *vram  = state->m_vram + ((ma & 0x100)<<2) + (ra << 4);
-	int xi;
-
-	for (int x = 0; x < 128/8; x++)
-	{
-		UINT16 val = (vram[x]<<8) + vram[x+0x200];
-		val = BITSWAP16(val,15,7,14,6,13,5,12,4,11,3,10,2,9,1,8,0);
-
-		for(xi=0;xi<8;xi++)
-			dmd_put_pixel(bitmap, (x*8 + xi), ra, palette[((val>>(14-xi*2)) & 0x03) + 1]);
-	}
-}
-
-static MC6845_INTERFACE( whitestar_crtc6845_interface )
-{
-	NULL,
-	false,      /* show border area */
-	1,
-	NULL,
-	whitestar_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
+	":dmdcpu"  // region containing DMD ROM data
 };
-
-void whitestar_state::palette_init()
-{
-	palette_set_color(machine(), 0, MAKE_RGB(0, 0, 0));
-
-	palette_set_color(machine(), 1, MAKE_RGB(20, 20, 20));
-	palette_set_color(machine(), 2, MAKE_RGB(84, 73, 10));
-	palette_set_color(machine(), 3, MAKE_RGB(168, 147, 21));
-	palette_set_color(machine(), 4, MAKE_RGB(255, 224, 32));
-}
 
 static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	/* basic machine hardware */
@@ -274,20 +136,10 @@ static MACHINE_CONFIG_START( whitestar, whitestar_state )
 	MCFG_CPU_PROGRAM_MAP(whitestar_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  976) // value taken from PinMAME
 
-	MCFG_CPU_ADD("dmdcpu", M6809, (8000000/4))
-	MCFG_CPU_PROGRAM_MAP(whitestar_dmd_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(whitestar_state, whitestar_firq_interrupt,  80) // value taken from PinMAME
-
-
 	/* sound hardware */
 	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
-	MCFG_MC6845_ADD("mc6845", MC6845, 2000000, whitestar_crtc6845_interface)
-
-	/* video hardware */
-	MCFG_DMD_ADD("screen", 128, 32)
-
-	MCFG_PALETTE_LENGTH(5)
+	MCFG_DECODMD_TYPE2_ADD("decodmd",decodmd_interface)
 MACHINE_CONFIG_END
 
 // 8Mbit ROMs are mapped oddly: the first 4Mbit of each of the ROMs goes in order u17, u21, u36, u37
