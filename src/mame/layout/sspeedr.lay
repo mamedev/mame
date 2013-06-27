@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="panel">
+		<rect>
+			<bounds left="-168.29" top="0" right="0" bottom="376" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+
+		<text string="1ST">
+			<bounds left="-88" top="33" right="0" bottom="52" />
+		</text>
+
+		<text string="2ND">
+			<bounds left="-88" top="60" right="0" bottom="79" />
+		</text>
+
+		<text string="3RD">
+			<bounds left="-88" top="87" right="0" bottom="106" />
+		</text>
+
+		<text string="4TH">
+			<bounds left="-88" top="114" right="0" bottom="133" />
+		</text>
+
+		<text string="5TH">
+			<bounds left="-88" top="141" right="0" bottom="160" />
+		</text>
+
+		<text string="SCORE">
+			<bounds left="-88" top="175" right="0" bottom="194" />
+		</text>
+
+		<text string="TIME">
+			<bounds left="-88" top="264" right="0" bottom="283" />
+		</text>
+	</element>
+
+	<element name="lampGO" defstate="0">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="GAME OVER" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+		<text string="GAME OVER" state="1">
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lampEP" defstate="0">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<text string="EXTENDED PLAY" state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+		<text string="EXTENDED PLAY" state="1">
+			<bounds x="0.0" y="0.1" width="1.0" height="0.8" />
+		</text>
+	</element>
+
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="0" right="32" top="0" bottom="64" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</rect>
+		<rect>
+			<bounds left="2" right="30" top="2" bottom="62" />
+			<color red="0.14" green="0.17" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="14" right="18" top="15" bottom="49" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</rect>
+		<disk>
+			<bounds left="14" right="18" top="13" bottom="17" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<disk>
+			<bounds left="14" right="18" top="47" bottom="51" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<text string="LOW" state="1">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<text string="LOW" state="0">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+
+		<text string="HIGH" state="1">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="HIGH" state="0">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<disk state="1">
+			<bounds left="9" right="23" top="14" bottom="28" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+		<disk state="0">
+			<bounds left="9" right="23" top="36" bottom="50" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+
+	<view name="Simple LEDs">
+
+		<screen index="0">
+			<bounds left="0" top="0" right="282" bottom="376" />
+		</screen>
+
+		<bezel name="panel" element="panel">
+			<bounds left="-168.29" top="0" right="0" bottom="376" />
+		</bezel>
+
+		<bezel name="lampGO" element="lampGO">
+			<bounds left="-73.91" top="355" right="-9.0968" bottom="368" />
+		</bezel>
+
+		<bezel name="lampEP" element="lampEP">
+			<bounds left="-160.33" top="355" right="-75.0484" bottom="368" />
+		</bezel>
+
+
+		<bezel name="digit24" element="digit">
+			<bounds left="-131.90" top="264" right="-120.532" bottom="283" />
+		</bezel>
+
+		<bezel name="digit25" element="digit">
+			<bounds left="-115.984" top="264" right="-104.613" bottom="283" />
+		</bezel>
+
+
+		<bezel name="digit0" element="digit">
+			<bounds left="-147.823" top="33" right="-136.452" bottom="52" />
+		</bezel>
+
+		<bezel name="digit1" element="digit">
+			<bounds left="-131.903" top="33" right="-120.532" bottom="52" />
+		</bezel>
+
+		<bezel name="digit2" element="digit">
+			<bounds left="-115.984" top="33" right="-104.613" bottom="52" />
+		</bezel>
+
+		<bezel name="digit3" element="digit">
+			<bounds left="-100.065" top="33" right="-88.694" bottom="52" />
+		</bezel>
+
+
+		<bezel name="digit4" element="digit">
+			<bounds left="-147.823" top="60" right="-136.452" bottom="79" />
+		</bezel>
+
+		<bezel name="digit5" element="digit">
+			<bounds left="-131.903" top="60" right="-120.532" bottom="79" />
+		</bezel>
+
+		<bezel name="digit6" element="digit">
+			<bounds left="-115.984" top="60" right="-104.613" bottom="79" />
+		</bezel>
+
+		<bezel name="digit7" element="digit">
+			<bounds left="-100.065" top="60" right="-88.694" bottom="79" />
+		</bezel>
+
+
+		<bezel name="digit8" element="digit">
+			<bounds left="-147.823" top="87" right="-136.452" bottom="106" />
+		</bezel>
+
+		<bezel name="digit9" element="digit">
+			<bounds left="-131.903" top="87" right="-120.532" bottom="106" />
+		</bezel>
+
+		<bezel name="digit10" element="digit">
+			<bounds left="-115.984" top="87" right="-104.613" bottom="106" />
+		</bezel>
+
+		<bezel name="digit11" element="digit">
+			<bounds left="-100.065" top="87" right="-88.694" bottom="106" />
+		</bezel>
+
+
+		<bezel name="digit12" element="digit">
+			<bounds left="-147.823" top="114" right="-136.452" bottom="133" />
+		</bezel>
+
+		<bezel name="digit13" element="digit">
+			<bounds left="-131.903" top="114" right="-120.532" bottom="133" />
+		</bezel>
+
+		<bezel name="digit14" element="digit">
+			<bounds left="-115.984" top="114" right="-104.613" bottom="133" />
+		</bezel>
+
+		<bezel name="digit15" element="digit">
+			<bounds left="-100.065" top="114" right="-88.694" bottom="133" />
+		</bezel>
+
+
+		<bezel name="digit16" element="digit">
+			<bounds left="-147.823" top="141" right="-136.452" bottom="160" />
+		</bezel>
+
+		<bezel name="digit17" element="digit">
+			<bounds left="-131.903" top="141" right="-120.532" bottom="160" />
+		</bezel>
+
+		<bezel name="digit18" element="digit">
+			<bounds left="-115.984" top="141" right="-104.613" bottom="160" />
+		</bezel>
+
+		<bezel name="digit19" element="digit">
+			<bounds left="-100.065" top="141" right="-88.694" bottom="160" />
+		</bezel>
+
+
+		<bezel name="digit20" element="digit">
+			<bounds left="-147.823" top="175" right="-136.452" bottom="194" />
+		</bezel>
+
+		<bezel name="digit21" element="digit">
+			<bounds left="-131.903" top="175" right="-120.532" bottom="194" />
+		</bezel>
+
+		<bezel name="digit22" element="digit">
+			<bounds left="-115.984" top="175" right="-104.613" bottom="194" />
+		</bezel>
+
+		<bezel name="digit23" element="digit">
+			<bounds left="-100.065" top="175" right="-88.694" bottom="194" />
+		</bezel>
+
+
+		<bezel element="shifter" inputtag="IN2" inputmask="0x04">
+			<bounds x="256" y="326" width="24" height="48" />
+			<color alpha="0.6" />
+		</bezel>
+
+	</view>
+</mamelayout>

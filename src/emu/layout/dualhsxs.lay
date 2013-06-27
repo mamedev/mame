@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<view name="Screen 0 Standard (4:3)">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="Screen 1 Standard (4:3)">
+		<screen index="1">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="Screen 0 Pixel Aspect (~scr0nativexaspect~:~scr0nativeyaspect~)">
+		<screen index="0">
+			<bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" />
+		</screen>
+	</view>
+
+	<view name="Screen 1 Pixel Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
+		<screen index="1">
+			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="Dual Side-by-Side">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="1">
+			<bounds x="4.03" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Dual Side-by-Side (Gapless)">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="1">
+			<bounds x="4" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Dual Over-Under">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="1">
+			<bounds x="0" y="-3.03" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Dual Over-Under (Gapless)">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="1">
+			<bounds x="0" y="-3" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="Cocktail">
+		<screen index="1">
+			<bounds x="0" y="-3.03" width="4" height="3" />
+			<orientation rotate="180" />
+		</screen>
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+</mamelayout>

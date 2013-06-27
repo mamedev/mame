@@ -1,0 +1,137 @@
+/*****************************************************************************
+ *
+ * includes/nc.h
+ *
+ ****************************************************************************/
+
+#ifndef NC_H_
+#define NC_H_
+#include "machine/ram.h"
+#include "sound/beep.h"
+
+#define NC_NUM_COLOURS 4
+
+#define NC_SCREEN_WIDTH        480
+#define NC_SCREEN_HEIGHT       64
+
+#define NC200_SCREEN_WIDTH      480
+#define NC200_SCREEN_HEIGHT     128
+
+#define NC200_NUM_COLOURS 4
+
+enum
+{
+	NC_TYPE_1xx, /* nc100/nc150 */
+	NC_TYPE_200  /* nc200 */
+};
+
+
+class nc_state : public driver_device
+{
+public:
+	nc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_beeper1(*this, "beep.1"),
+		m_beeper2(*this, "beep.2") { }
+
+	emu_timer *m_serial_timer;
+	char m_memory_config[4];
+	emu_timer *m_keyboard_timer;
+	int m_membank_rom_mask;
+	int m_membank_internal_ram_mask;
+	UINT8 m_poweroff_control;
+	int m_card_status;
+	unsigned char m_uart_control;
+	int m_irq_mask;
+	int m_irq_status;
+	int m_irq_latch;
+	int m_irq_latch_mask;
+	int m_sound_channel_periods[2];
+	emu_file *m_file;
+	int m_previous_inputport_10_state;
+	int m_previous_alarm_state;
+	UINT8 m_nc200_uart_interrupt_irq;
+	unsigned char *m_card_ram;
+	int m_membank_card_ram_mask;
+	unsigned long m_display_memory_start;
+	UINT8 m_type;
+	int m_card_size;
+	int m_nc200_backlight;
+	DECLARE_READ8_MEMBER(nc_memory_management_r);
+	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
+	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
+	DECLARE_WRITE8_MEMBER(nc_irq_status_w);
+	DECLARE_READ8_MEMBER(nc_irq_status_r);
+	DECLARE_READ8_MEMBER(nc_key_data_in_r);
+	DECLARE_WRITE8_MEMBER(nc_sound_w);
+	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
+	DECLARE_WRITE8_MEMBER(nc100_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
+	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
+	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
+	DECLARE_WRITE8_MEMBER(nc200_display_memory_start_w);
+	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
+	DECLARE_READ8_MEMBER(nc200_printer_status_r);
+	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
+	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	virtual void video_start();
+	virtual void palette_init();
+	DECLARE_MACHINE_START(nc200);
+	DECLARE_MACHINE_RESET(nc200);
+	UINT32 screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
+	TIMER_CALLBACK_MEMBER(nc_serial_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_rxrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc100_centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(nc200_centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
+	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
+
+	void nc200_fdc_interrupt(bool state);
+
+	DECLARE_DRIVER_INIT( nc );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+
+	void nc100_machine_stop();
+	void nc200_machine_stop();
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<beep_device> m_beeper1;
+	required_device<beep_device> m_beeper2;
+
+	void nc200_video_set_backlight(int state);
+	void nc_card_save(device_image_interface &image);
+	int nc_card_calculate_mask(int size);
+	int nc_card_load(device_image_interface &image, unsigned char **ptr);
+	void nc_set_card_present_state(int state);
+	void nc_update_interrupts();
+	void nc_refresh_memory_bank_config(int bank);
+	void nc_refresh_memory_config();
+	void nc_common_restore_memory_from_stream();
+	void nc_common_store_memory_to_stream();
+	void nc_common_open_stream_for_reading();
+	void nc_common_open_stream_for_writing();
+	void nc_common_close_stream();
+	void nc_common_init_machine();
+	void nc_sound_update(int channel);
+	void nc_printer_update(UINT8 data);
+	void nc150_init_machine();
+	void nc200_refresh_uart_interrupt();
+	void nc200_floppy_drive_index_callback(int drive_id);
+};
+
+
+
+#endif /* NC_H_ */

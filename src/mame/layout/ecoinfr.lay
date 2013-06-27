@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="Steppers" defstate="0">
+	<simplecounter maxstate="999" digits="3">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+	</simplecounter>
+	</element>
+
+	<element name="digit" defstate="0">
+	<led7seg>
+		<color red="1.0" green="0.3" blue="0.0" />
+	</led7seg>
+	</element>
+
+
+	<!-- a stateoffset of 682 will shift us by 1 step on a 96 step reel (0x10000/96) which seems a good default alignment for 96 step / 16 symbol reels -->
+	<element name="SteppersReel1" defstate="0">
+	<reel stateoffset="682" symbollist="Fruit1:image11.png,Fruit2:image12.png,Fruit3:image13.png,Fruit4:image14.png,Fruit5:image15.png,Fruit6:image16.png,Fruit7:image17.png,Fruit8:image18.png,Fruit9:image19.png,Fruit10:image110.png,Fruit11:image111.png,Fruit12:image112.png,Fruit13:image113.png,Fruit14:image114.png,Fruit15:image115.png,Fruit16:image116.png">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+	</reel>
+	</element>
+
+	<element name="SteppersReel2" defstate="0">
+	<reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+		"<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+	</reel>
+	</element>
+
+	<element name="SteppersReel3" defstate="0">
+	<reel stateoffset="682" symbollist="Fruit1,Fruit2,Fruit3,Fruit4,Fruit5,Fruit6,Fruit7,Fruit8,Fruit9,Fruit10,Fruit11,Fruit12,Fruit13,Fruit14,Fruit15,Fruit16">
+		<color red="1.0" green="1.0" blue="1.0" />
+		<bounds x="0" y="0" width="1" height="1" />
+	</reel>
+	</element>
+
+
+
+	<view name="AWP Simulated Video (No Artwork)">
+
+	<!-- 'BANK' Digits -->
+	<backdrop name="digit0" element="digit" state="0">
+		<bounds x="180" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit1" element="digit" state="0">
+		<bounds x="190" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit2" element="digit" state="0">
+		<bounds x="200" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit3" element="digit" state="0">
+		<bounds x="210" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit4" element="digit" state="0">
+		<bounds x="220" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit5" element="digit" state="0">
+		<bounds x="230" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit6" element="digit" state="0">
+		<bounds x="240" y="64" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit7" element="digit" state="0">
+		<bounds x="250" y="64" width="9" height="19"/>
+	</backdrop>
+
+	<!-- Credit Digits -->
+	<backdrop name="digit8" element="digit" state="0">
+		<bounds x="180" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit9" element="digit" state="0">
+		<bounds x="190" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit10" element="digit" state="0">
+		<bounds x="200" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit11" element="digit" state="0">
+		<bounds x="210" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit12" element="digit" state="0">
+		<bounds x="220" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit13" element="digit" state="0">
+		<bounds x="230" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit14" element="digit" state="0">
+		<bounds x="240" y="90" width="9" height="19"/>
+	</backdrop>
+	<backdrop name="digit15" element="digit" state="0">
+		<bounds x="250" y="90" width="9" height="19"/>
+	</backdrop>
+
+
+	<backdrop name="sreel1" element="SteppersReel1" state="0">
+		<bounds x="17" y="300" width="32" height="32"/>
+	</backdrop>
+	<backdrop name="sreel2" element="SteppersReel2" state="0">
+		<bounds x="50" y="300" width="32" height="32"/>
+	</backdrop>
+	<backdrop name="sreel3" element="SteppersReel3" state="0">
+		<bounds x="83" y="300" width="32" height="32"/>
+	</backdrop>
+
+	<backdrop name="reel1" element="Steppers" state="0">
+		<bounds x="20" y="330" width="5" height="2"/>
+	</backdrop>
+	<backdrop name="reel2" element="Steppers" state="0">
+		<bounds x="52" y="330" width="5" height="2"/>
+	</backdrop>
+	<backdrop name="reel3" element="Steppers" state="0">
+		<bounds x="85" y="330" width="5" height="2"/>
+	</backdrop>
+
+	</view>
+</mamelayout>
+

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="tab1">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SUPER STAR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="tab2">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="LADY LUCK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="tab3">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BIG BAR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="bet">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+		<text string="ANTE/BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp8" element="tab1">
+			<bounds x="0.30" y="3.02" width="1.00" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp0" element="tab2">
+			<bounds x="1.50" y="3.02" width="1.00" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp3" element="bet">
+			<bounds x="1.50" y="3.28" width="1.00" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp2" element="tab3">
+			<bounds x="2.70" y="3.02" width="1.00" height="0.24" />
+		</bezel>
+	</view>
+</mamelayout>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led16segsc>
+			<color red="0.0" green="0.6" blue="1.0" />
+		</led16segsc>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Internal Layout">
+		<bezel element="background">
+			<bounds left="00" top="00" right="920" bottom="700" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="10" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="70" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="130" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="190" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit4" element="digit">
+			<bounds x="250" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="310" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds x="370" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds x="430" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds x="490" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds x="550" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds x="610" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds x="670" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds x="730" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds x="790" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds x="850" y="10"  width="50" height="80" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds x="910" y="10"  width="50" height="80" />
+		</bezel>
+	</view>
+</mamelayout>

@@ -1,0 +1,1829 @@
+fetch
+	if(irq_requested) {
+		int level;
+		for(level = 7; level >= 0 && !(PSW & pending_irq & (1<<level)); level--);
+		pending_irq &= ~(1<<level);
+		OP1 = level;
+		TMP = reg_r16(0x18);
+		TMP -= 2;
+		reg_w16(0x18, TMP);
+		any_w16(TMP, PC);
+		PC = any_r16(0x2000+2*OP1);
+		standard_irq_callback(OP1);
+		check_irq();
+	}
+	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+		debugger_instruction_hook(this, PC);
+	PPC = PC;
+	OP1 = read_pc();
+	if(OP1 == 0xfe) {
+		OP1 = read_pc();
+		inst_state = 0x100 | OP1;
+	} else
+		inst_state = OP1;
+
+fetch_noirq
+	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+		debugger_instruction_hook(this, PC);
+	PPC = PC;
+	OP1 = read_pc();
+	if(OP1 == 0xfe) {
+		OP1 = read_pc();
+		inst_state = 0x100 | OP1;
+	} else
+		inst_state = OP1;
+
+eadr  rel8
+	OP1 = INT8(read_pc());
+
+eadr  rel11
+	OP1 = read_pc();
+	OP1 = OP1 | ((inst_state & 7) << 8);
+	if(OP1 & 0x400)
+		OP1 |= 0xfc00;
+
+eadr  rel16
+	OP1 = read_pc();
+	OP1 |= read_pc() << 8;
+
+eadr  rrel8
+	OP2 = read_pc();
+	OP1 = INT8(read_pc());
+
+eadr  brrel8
+	OP2 = read_pc();
+	OP1 = INT8(read_pc());
+
+eadr  direct_1
+	OP1 = read_pc();
+
+eadr  direct_2
+	OP1 = read_pc();
+	OP2 = read_pc();
+
+eadr  direct_3
+	OP1 = read_pc();
+	OP2 = read_pc();
+	OP3 = read_pc();
+
+eadr  immed_1b
+	OP1 = read_pc();
+
+eadr  immed_2b
+	OP1 = read_pc();
+	OP2 = read_pc();
+
+eadr  immed_3b
+	OP1 = read_pc();
+	OP2 = read_pc();
+	OP3 = read_pc();
+
+eadr  immed_1w
+	OP1 = read_pc();
+	OP1 |= read_pc() << 8;
+
+eadr  immed_2w
+	OP1 = read_pc();
+	OP1 |= read_pc() << 8;
+	OP2 = read_pc();
+
+eadr  immed_3w
+	OP1 = read_pc();
+	OP1 |= read_pc() << 8;
+	OP2 = read_pc();
+	OP3 = read_pc();
+
+eadr  indirect_1n
+	OPI = read_pc() & 0xfe;
+	OP1 = reg_r16(OPI);
+
+eadr  indirect_1
+	OPI = read_pc();
+	OP1 = reg_r16(OPI);
+
+eadr  indirect_2
+	OPI = read_pc();
+	OP1 = reg_r16(OPI);
+	OP2 = read_pc();
+
+eadr  indirect_3
+	OPI = read_pc();
+	OP1 = reg_r16(OPI);
+	OP2 = read_pc();
+	OP3 = read_pc();
+
+macro post_indirect $size $cycles1 $cycles2
+	if(OPI & 0x01) {
+		reg_w16(OPI, OP1 + $size);
+		next($cycles2); // +4 when external
+	} else {
+		next($cycles1); // +4 when external
+	}
+
+eadr  indexed_1
+	OPI = read_pc();
+	OP1 = read_pc();
+	if(OPI & 0x01) {
+		OPI &= 0xfe;
+		OP1 |= read_pc() << 8;
+	} else
+		OP1 = INT8(OP1);
+	if(OPI) {
+		OP1 += reg_r16(OPI);
+	}
+
+eadr  indexed_2
+	OPI = read_pc();
+	OP1 = read_pc();
+	if(OPI & 0x01) {
+		OPI &= 0xfe;
+		OP1 |= read_pc() << 8;
+	} else if(OP1 & 0x80)
+		OP1 |= 0xff00;
+	if(OPI) {
+		OP1 += reg_r16(OPI);
+	}
+	OP2 = read_pc();
+
+eadr  indexed_3
+	OPI = read_pc();
+	OP1 = read_pc();
+	if(OPI & 0x01) {
+		OPI &= 0xfe;
+		OP1 |= read_pc() << 8;
+	} else if(OP1 & 0x80)
+		OP1 |= 0xff00;
+	if(OPI) {
+		OP1 += reg_r16(OPI);
+	}
+	OP2 = read_pc();
+	OP3 = read_pc();
+
+macro post_indexed $cycles1 $cycles2
+	next(OPI & 0x01 ? $cycles2 : $cycles1);
+
+00    skip  immed_1b
+	next(4);
+
+01    clr   direct_1
+	reg_w16(OP1, 0x0000);
+	next(4);
+
+02    not   direct_1
+	TMP = ~reg_r16(OP1);
+	set_nz16(TMP);
+	reg_w16(OP1, TMP);
+	next(4);
+
+03    neg   direct_1
+	TMP = reg_r16(OP1);
+	reg_w16(OP1, do_sub(0, TMP));
+	next(4);
+
+04    xch   direct_2
+
+05    dec   direct_1
+	TMP = reg_r16(OP1);
+	reg_w16(OP1, do_sub(TMP, 1));
+	next(4);
+
+06    ext   direct_1
+	OP1 &= 0xfc;
+	TMP = INT16(reg_r16(OP1));
+	set_nz16(TMP);
+	reg_w16(OP1+2, TMP >> 16);
+	next(4);
+
+07    inc   direct_1
+	TMP = reg_r16(OP1);
+	reg_w16(OP1, do_add(TMP, 1));
+	next(4);
+
+08    shr   immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r16(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffff >> (OP1 <= 16 ? 17-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 16 && (TMP & (0x0001 << (OP1-1))))
+		PSW |= F_C;
+	TMP = UINT16(TMP) >> OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT16(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+09    shl   immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r16(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffff << (OP1 <= 16 ? 17-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 16 && (TMP & (0x8000 >> (OP1-1))))
+		PSW |= F_C;
+	TMP = UINT16(TMP << OP1);
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT16(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+0a    shra  immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r16(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffff >> (OP1 <= 16 ? 17-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 16 && (TMP & (0x0001 << (OP1-1))))
+		PSW |= F_C;
+	TMP = INT16(TMP) >> OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT16(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+0c    shrl  immed_2b
+	OP1 &= 0x1f;
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP2);
+	TMP |= reg_r16(OP2+2) << 16;
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffffffff >> (33-OP1))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && (TMP & (0x00000001 << (OP1-1))))
+		PSW |= F_C;
+	TMP = TMP >> OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT32(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(OP1 ? 7+OP1 : 8);
+
+0d    shll  immed_2b
+	OP1 &= 0x1f;
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP2);
+	TMP |= reg_r16(OP2+2) << 16;
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffffffff << (33-OP1))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && (TMP & (0x80000000 >> (OP1-1))))
+		PSW |= F_C;
+	TMP = TMP << OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT32(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(OP1 ? 7+OP1 : 8);
+
+0e    shral immed_2b
+	OP1 &= 0x1f;
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP2);
+	TMP |= reg_r16(OP2+2) << 16;
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xffffffff >> (33-OP1))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && (TMP & (0x00000001 << (OP1-1))))
+		PSW |= F_C;
+	TMP = INT32(TMP) >> OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT32(TMP) < 0)
+		PSW |= F_N;
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(OP1 ? 7+OP1 : 8);
+
+0f    norml direct_2
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP2);
+	TMP |= reg_r16(OP2+2) << 16;
+	for(OP3 = 0; OP3 < 31 && INT32(TMP) >= 0; OP3++);
+	PSW &= ~(F_Z|F_N|F_C);
+	if(!TMP)
+		PSW |= F_Z;
+	reg_w8(OP1, OP3);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(11+OP3);
+
+11    clrb  direct_1
+	reg_w8(OP1, 0x00);
+	next(4);
+
+12    notb  direct_1
+	TMP = ~reg_r8(OP1);
+	set_nz8(TMP);
+	reg_w8(OP1, TMP);
+	next(4);
+
+13    negb  direct_1
+	TMP = reg_r8(OP1);
+	reg_w8(OP1, do_subb(0, TMP));
+	next(4);
+
+14    xchb  direct_2
+
+15    decb  direct_1
+	TMP = reg_r8(OP1);
+	reg_w8(OP1, do_subb(TMP, 1));
+	next(4);
+
+16    extb  direct_1
+	OP1 &= 0xfe;
+	TMP = INT8(reg_r8(OP1));
+	set_nz8(TMP);
+	reg_w16(OP1, TMP);
+	next(4);
+
+17    incb  direct_1
+	TMP = reg_r8(OP1);
+	reg_w8(OP1, do_addb(TMP, 1));
+	next(4);
+
+18    shrb  immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r8(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xff >> (OP1 <= 8 ? 9-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 8 && (TMP & (0x01 << (OP1-1))))
+		PSW |= F_C;
+	TMP = UINT8(TMP) >> OP1;
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT8(TMP) < 0)
+		PSW |= F_N;
+	reg_w8(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+19    shlb  immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r8(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xff << (OP1 <= 8 ? 9-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 8 && (TMP & (0x80 >> (OP1-1))))
+		PSW |= F_C;
+	TMP = UINT8(TMP << OP1);
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT8(TMP) < 0)
+		PSW |= F_N;
+	reg_w8(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+1a    shrab immed_2b
+	OP1 &= 0x1f;
+	TMP = reg_r8(OP2);
+	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
+	if(OP1 >= 2 && (TMP & (0xff >> (OP1 <= 8 ? 9-OP1 : 0))))
+		PSW |= F_ST;
+	if(OP1 >= 1 && OP1 <= 8 && (TMP & (0x01 << (OP1-1))))
+		PSW |= F_C;
+	TMP = UINT8(INT8(TMP) >> OP1);
+	if(!TMP)
+		PSW |= F_Z;
+	else if(INT8(TMP) < 0)
+		PSW |= F_N;
+	reg_w8(OP2, TMP);
+	next(OP1 ? 7+OP1 : 8);
+
+20-27 sjmp  rel11
+	PC += OP1;
+	next(8);
+
+28-2f scall rel11
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	any_w16(TMP, PC);
+	PC += OP1;
+	next(13); // real is 13/16 depending on sp's position
+
+30-37 jbc   brrel8
+	TMP = reg_r8(OP2);
+	if(!((TMP >> (inst_state & 7)) & 1)) {
+		PC += OP1;
+		next(9);
+	} else {
+		next(5);
+	}
+
+38-3f jbs   brrel8
+	TMP = reg_r8(OP2);
+	if((TMP >> (inst_state & 7)) & 1) {
+		PC += OP1;
+		next(9);
+	} else {
+		next(5);
+	}
+
+40    and   direct_3
+	TMP = reg_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP3, TMP);
+	next(5);
+
+41    and   immed_3w
+	TMP = OP1 & reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP3, TMP);
+	next(6);
+
+42    and   indirect_3
+	TMP = any_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP3, TMP);
+	post_indirect 2 7 8 // +5 when external
+
+43    and   indexed_3
+	TMP = any_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+44    add   direct_3
+	TMP = reg_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	next(5);
+
+45    add   immed_3w
+	TMP = do_add(reg_r16(OP2), OP1);
+	reg_w16(OP3, TMP);
+	next(6);
+
+46    add   indirect_3
+	TMP = any_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	post_indirect 2 7 8 // +5 when external
+
+47    add   indexed_3
+	TMP = any_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+48    sub   direct_3
+	TMP = reg_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	next(5);
+
+49    sub   immed_3w
+	TMP = do_sub(reg_r16(OP2), OP1);
+	reg_w16(OP3, TMP);
+	next(6);
+
+4a    sub   indirect_3
+	TMP = any_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+4b    sub   indexed_3
+	TMP = any_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+4c    mulu  direct_3
+	TMP = reg_r16(OP1);
+	TMP *= reg_r16(OP2);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	next(26);
+
+4d    mulu  immed_3w
+	TMP = OP1 * reg_r16(OP2);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	next(27);
+
+4e    mulu  indirect_3
+	TMP = any_r16(OP1);
+	TMP *= reg_r16(OP2);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	post_indirect 2 28 29 // +5 when external
+
+4f    mulu  indexed_3
+	TMP = any_r16(OP1);
+	TMP *= reg_r16(OP2);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	post_indexed 28 29 // +5 when external
+
+fe4c  mul   direct_3
+	TMP = reg_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	next(30);
+
+fe4d  mul   immed_3w
+	TMP = INT16(OP1) * INT16(reg_r16(OP2));
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	next(31);
+
+fe4e  mul   indirect_3
+	TMP = any_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	post_indirect 2 32 33 // +5 when external
+
+fe4f  mul   indexed_3
+	TMP = any_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	OP3 &= 0xfc;
+	reg_w16(OP3, TMP);
+	reg_w16(OP3+2, TMP >> 16);
+	post_indexed 32 33 // +5 when external
+
+50    andb  direct_3
+	TMP = reg_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP3, TMP);
+	next(5);
+
+51    andb  immed_3b
+	TMP = OP1 & reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP3, TMP);
+	next(5);
+
+52    andb  indirect_3
+	TMP = any_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP3, TMP);
+	post_indirect 1 7 8 // +5 when external
+
+53    andb  indexed_3
+	TMP = any_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+54    addb  direct_3
+	TMP = reg_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	next(5);
+
+55    addb  immed_3b
+	TMP = do_addb(reg_r8(OP2), OP1);
+	reg_w8(OP3, TMP);
+	next(5);
+
+56    addb  indirect_3
+	TMP = any_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	post_indirect 1 7 8 // +5 when external
+
+57    addb  indexed_3
+	TMP = any_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+58    subb  direct_3
+	TMP = reg_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	next(5);
+
+59    subb  immed_3b
+	TMP = do_subb(reg_r8(OP2), OP1);
+	reg_w8(OP3, TMP);
+	next(5);
+
+5a    subb  indirect_3
+	TMP = any_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	post_indirect 1 7 8 // +5 when external
+
+5b    subb  indexed_3
+	TMP = any_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP3, TMP);
+	post_indexed 7 8 // +5 when external
+
+5c    mulub direct_3
+	TMP = reg_r8(OP1);
+	TMP *= reg_r8(OP2);
+	reg_w16(OP3, TMP);
+	next(18);
+
+5d    mulub immed_3b
+	TMP = OP1 * reg_r8(OP2);
+	reg_w16(OP3, TMP);
+	next(18);
+
+5e    mulub indirect_3
+	TMP = any_r8(OP1);
+	TMP *= reg_r8(OP2);
+	reg_w16(OP3, TMP);
+	post_indirect 1 20 21 // +5 when external
+
+5f    mulub indexed_3
+	TMP = any_r8(OP1);
+	TMP = reg_r8(OP2);
+	reg_w16(OP3, TMP);
+	post_indexed 20 21 // +5 when external
+
+fe5c  mulb  direct_3
+	TMP = reg_r8(OP1);
+	TMP = INT8(reg_r8(OP2)) * INT8(TMP);
+	reg_w16(OP3, TMP);
+	next(22);
+
+fe5d  mulb  immed_3b
+	TMP = INT8(OP1) * INT8(reg_r8(OP2));
+	reg_w16(OP3, TMP);
+	next(22);
+
+fe5e  mulb  indirect_3
+	TMP = any_r8(OP1);
+	TMP = INT8(reg_r8(OP2)) * INT8(TMP);
+	reg_w16(OP3, TMP);
+	post_indirect 1 24 25 // +5 when external
+
+fe5f  mulb  indexed_3
+	TMP = any_r8(OP1);
+	TMP = INT8(reg_r8(OP2)) * INT8(TMP);
+	reg_w16(OP3, TMP);
+	post_indexed 24 25 // +5 when external
+
+60    and   direct_2
+	TMP = reg_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+61    and   immed_2w
+	TMP = OP1 & reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(5);
+
+62    and   indirect_2
+	TMP = any_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+63    and   indexed_2
+	TMP = any_r16(OP1);
+	TMP &= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+64    add   direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+65    add   immed_2w
+	TMP = do_add(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
+
+66    add   indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+67    add   indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_add(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+68    sub   direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+69    sub   immed_2w
+	TMP = do_sub(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
+
+6a    sub   indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+6b    sub   indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_sub(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+6c    mulu  direct_2
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP1);
+	TMP *= reg_r16(OP2);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(25);
+
+6d    mulu  immed_2w
+	OP2 &= 0xfc;
+	TMP = OP1 * reg_r16(OP2);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(26);
+
+6e    mulu  indirect_2
+	OP2 &= 0xfc;
+	TMP = any_r16(OP1);
+	TMP *= reg_r16(OP2);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	post_indirect 2 27 28 // +5 when external
+
+6f    mulu  indexed_2
+	OP2 &= 0xfc;
+	TMP = any_r16(OP1);
+	TMP *= reg_r16(OP2);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	post_indexed 27 28 // +5 when external
+
+fe6c  mul   direct_2
+	OP2 &= 0xfc;
+	TMP = reg_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(29);
+
+fe6d  mul   immed_2w
+	OP2 &= 0xfc;
+	TMP = INT16(OP1) * INT16(reg_r16(OP2));
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	next(30);
+
+fe6e  mul   indirect_2
+	OP2 &= 0xfc;
+	TMP = any_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	post_indirect 2 31 32 // +5 when external
+
+fe6f  mul   indexed_2
+	OP2 &= 0xfc;
+	TMP = any_r16(OP1);
+	TMP = INT16(reg_r16(OP2)) * INT16(TMP);
+	reg_w16(OP2, TMP);
+	reg_w16(OP2+2, TMP >> 16);
+	post_indexed 31 32 // +5 when external
+
+70    andb  direct_2
+	TMP = reg_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+71    andb  immed_2b
+	TMP = OP1 & reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+72    andb  indirect_2
+	TMP = any_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+73    andb  indexed_2
+	TMP = any_r8(OP1);
+	TMP &= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP3, TMP);
+	post_indexed 6 7 // +5 when external
+
+74    addb  direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+75    addb  immed_2b
+	TMP = do_addb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
+
+76    addb  indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+77    addb  indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_addb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+78    subb  direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+79    subb  immed_2b
+	TMP = do_subb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
+
+7a    subb  indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+7b    subb  indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_subb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+7c    mulub direct_2
+	OP2 &= 0xfe;
+	TMP = reg_r8(OP1);
+	TMP *= reg_r8(OP2);
+	reg_w16(OP2, TMP);
+	next(17);
+
+7d    mulub immed_2b
+	OP2 &= 0xfe;
+	TMP = OP1 * reg_r8(OP2);
+	reg_w16(OP2, TMP);
+	next(17);
+
+7e    mulub indirect_2
+	OP2 &= 0xfe;
+	TMP = any_r8(OP1);
+	TMP *= reg_r8(OP2);
+	reg_w16(OP2, TMP);
+	post_indirect 1 19 20 // +5 when external
+
+7f    mulub indexed_2
+	OP2 &= 0xfe;
+	TMP = any_r8(OP1);
+	TMP *= reg_r8(OP2);
+	reg_w16(OP2, TMP);
+	post_indexed 19 20 // +5 when external
+
+fe7c  mulb  direct_2
+	OP2 &= 0xfe;
+	TMP = reg_r8(OP1);
+	TMP = INT8(reg_r16(OP2)) * INT8(TMP);
+	reg_w16(OP2, TMP);
+	next(21);
+
+fe7d  mulb  immed_2b
+	OP2 &= 0xfe;
+	TMP = INT8(OP1) * INT8(reg_r8(OP2));
+	reg_w16(OP2, TMP);
+	next(21);
+
+fe7e  mulb  indirect_2
+	OP2 &= 0xfe;
+	TMP = any_r8(OP1);
+	TMP = INT8(reg_r8(OP2)) * INT8(TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 1 23 24 // +5 when external
+
+fe7f  mulb  indexed_2
+	OP2 &= 0xfe;
+	TMP = any_r16(OP1);
+	TMP = INT8(reg_r16(OP2)) * INT8(TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 23 24 // +5 when external
+
+80    or    direct_2
+	TMP = reg_r16(OP1);
+	TMP |= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+81    or    immed_2w
+	TMP = OP1 | reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(5);
+
+82    or    indirect_2
+	TMP = any_r16(OP1);
+	TMP |= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+83    or    indexed_2
+	TMP = any_r16(OP1);
+	TMP |= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+84    xor   direct_2
+	TMP = reg_r16(OP1);
+	TMP ^= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+85    xor   immed_2w
+	TMP = OP1 ^ reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	next(5);
+
+86    xor   indirect_2
+	TMP = any_r16(OP1);
+	TMP ^= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+87    xor   indexed_2
+	TMP = any_r16(OP1);
+	TMP ^= reg_r16(OP2);
+	set_nz16(TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+88    cmp   direct_2
+	TMP = reg_r16(OP1);
+	do_sub(reg_r16(OP2), TMP);
+	next(4);
+
+89    cmp   immed_2w
+	do_sub(reg_r16(OP2), OP1);
+	next(5);
+
+8a    cmp   indirect_2
+	TMP = any_r16(OP1);
+	do_sub(reg_r16(OP2), TMP);
+	post_indirect 2 6 7 // +5 when external
+
+8b    cmp   indexed_2
+	TMP = any_r16(OP1);
+	do_sub(reg_r16(OP2), TMP);
+	post_indexed 6 7 // +5 when external
+
+8c    divu  direct_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	OP1 = reg_r16(OP1);
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		UINT32 TMP2 = TMP / OP1;
+		if(TMP2 > 65535)
+			PSW |= F_V|F_VT;
+		TMP = TMP % OP1;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	next(25);
+
+8d    divu  immed_2w
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		UINT32 TMP2 = TMP / OP1;
+		if(TMP2 > 65535)
+			PSW |= F_V|F_VT;
+		TMP = TMP % OP1;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	next(26);
+
+8e    divu  indirect_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	UINT32 d = any_r16(OP1);
+	if(d) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		UINT32 TMP2 = TMP / d;
+		if(TMP2 > 65535)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	post_indirect 2 28 29 // +4 when external
+
+8f    divu  indexed_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	UINT32 d = any_r16(OP1);
+	if(d) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		UINT32 TMP2 = TMP / d;
+		if(TMP2 > 65535)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	post_indexed 28 29 // +4 when external
+
+fe8c  div   direct_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	OP1 = reg_r16(OP1);
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		INT32 TMP2 = INT32(TMP) / INT16(OP1);
+		if(TMP2 > 32767 || TMP2 < -32768)
+			PSW |= F_V|F_VT;
+		TMP = TMP % INT16(OP1);
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	next(30);
+
+fe8d  div   immed_2w
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		INT32 TMP2 = INT32(TMP) / INT16(OP1);
+		if(TMP2 > 32767 || TMP2 < -32768)
+			PSW |= F_V|F_VT;
+		TMP = TMP % INT16(OP1);
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	next(30);
+
+fe8e  div   indirect_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	INT32 d = INT16(any_r16(OP1));
+	if(d) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		INT32 TMP2 = INT32(TMP) / d;
+		if(TMP2 > 32767 || TMP2 < -32768)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	post_indirect 2 32 33  // +4 when external
+
+fe8f  div   indexed_2
+	OP2 &= 0xfc;
+	PSW &= ~F_V;
+	INT32 d = INT16(any_r16(OP1));
+	if(d) {
+		TMP = reg_r16(OP2);
+		TMP |= reg_r16(OP2+2);
+		INT32 TMP2 = INT32(TMP) / d;
+		if(TMP2 > 32767 || TMP2 < -32768)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
+		reg_w16(OP2, TMP);
+		reg_w16(OP2+2, TMP >> 16);
+	}
+	post_indexed 32 33  // +4 when external
+
+90    orb   direct_2
+	TMP = reg_r8(OP1);
+	TMP |= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+91    orb   immed_2b
+	TMP = OP1 | reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+92    orb   indirect_2
+	TMP = any_r8(OP1);
+	TMP |= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+93    orb   indexed_2
+	TMP = any_r8(OP1);
+	TMP |= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+94    xorb  direct_2
+	TMP = reg_r8(OP1);
+	TMP ^= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+95    xorb  immed_2b
+	TMP = OP1 ^ reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+96    xorb  indirect_2
+	TMP = any_r8(OP1);
+	TMP ^= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+97    xorb  indexed_2
+	TMP = any_r8(OP1);
+	TMP ^= reg_r8(OP2);
+	set_nz8(TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+98    cmpb  direct_2
+	TMP = reg_r8(OP1);
+	do_subb(reg_r8(OP2), TMP);
+	next(4);
+
+99    cmpb  immed_2b
+	do_subb(reg_r8(OP2), OP1);
+	next(4);
+
+9a    cmpb  indirect_2
+	TMP = any_r8(OP1);
+	do_subb(reg_r8(OP2), TMP);
+	post_indirect 1 6 7 // +5 when external
+
+9b    cmpb  indexed_2
+	TMP = any_r8(OP1);
+	do_subb(reg_r8(OP2), TMP);
+	post_indexed 6 7 // +5 when external
+
+9c    divub direct_2
+	PSW &= ~F_V;
+	OP1 = reg_r8(OP1);
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = TMP / OP1;
+		if(TMP2 > 255)
+			PSW |= F_V|F_VT;
+		TMP = TMP % OP1;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	next(17);
+
+9d    divub immed_2b
+	PSW &= ~F_V;
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = TMP / OP1;
+		if(TMP2 > 255)
+			PSW |= F_V|F_VT;
+		TMP = TMP % OP1;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	next(17);
+
+9e    divub indirect_2
+	PSW &= ~F_V;
+	UINT32 d = any_r8(OP1);
+	if(d) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = TMP / d;
+		if(TMP2 > 255)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	post_indirect 1 20 21 // +4 when external
+
+9f    divub indexed_2
+	PSW &= ~F_V;
+	UINT32 d = any_r8(OP1);
+	if(d) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = TMP / d;
+		if(TMP2 > 255)
+			PSW |= F_V|F_VT;
+		TMP = TMP % d;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	post_indexed 20 21 // +4 when external
+
+fe9c  divb  direct_2
+	PSW &= ~F_V;
+	OP1 = reg_r8(OP1);
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = INT16(TMP) / INT8(OP1);
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
+			PSW |= F_V|F_VT;
+		TMP = INT16(TMP) % INT8(OP1);
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	next(21);
+
+fe9d  divb  immed_2b
+	PSW &= ~F_V;
+	if(OP1) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = INT16(TMP) / INT8(OP1);
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
+			PSW |= F_V|F_VT;
+		TMP = INT16(TMP) % INT8(OP1);
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	next(21);
+
+fe9e  divb  indirect_2
+	PSW &= ~F_V;
+	INT32 d = INT8(any_r8(OP1));
+	if(d) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = INT16(TMP) / d;
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
+			PSW |= F_V|F_VT;
+		TMP = INT16(TMP) % d;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	post_indirect 1 24 25 // +4 when external
+
+fe9f  divb  indexed_2
+	PSW &= ~F_V;
+	INT32 d = INT8(any_r8(OP1));
+	if(d) {
+		TMP = reg_r16(OP2);
+		UINT32 TMP2 = INT16(TMP) / d;
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
+			PSW |= F_V|F_VT;
+		TMP = INT16(TMP) % d;
+		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
+		reg_w16(OP2, TMP);
+	}
+	post_indexed 1 24 25 // +4 when external
+
+a0    ld    direct_2
+	reg_w16(OP2, reg_r16(OP1));
+	next(4);
+
+a1    ld    immed_2w
+	reg_w16(OP2, OP1);
+	next(5);
+
+a2    ld    indirect_2
+	reg_w16(OP2, any_r16(OP1));
+	post_indirect 2 6 7 // +5 when external
+
+a3    ld    indexed_2
+	reg_w16(OP2, any_r16(OP1));
+	post_indexed 6 7 // +5 when external
+
+a4    addc  direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+a5    addc  immed_2w
+	TMP = do_addc(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
+
+a6    addc  indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+a7    addc  indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+a8    subc  direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
+
+a9    subc  immed_2w
+	TMP = do_subc(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
+
+aa    subc  indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
+
+ab    subc  indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+ac    ldbze direct_2
+	reg_w16(OP2, UINT8(reg_r8(OP1)));
+	next(4);
+
+ad    ldbze immed_2b
+	reg_w16(OP2, UINT8(OP1));
+	next(4);
+
+ae    ldbze indirect_2
+	reg_w16(OP2, UINT8(any_r8(OP1)));
+	post_indirect 1 6 7 // +5 when external
+
+af    ldbze indexed_2
+	reg_w16(OP2, UINT8(any_r8(OP1)));
+	post_indexed 6 7 // +5 when external
+
+b0    ldb   direct_2
+	reg_w8(OP2, reg_r8(OP1));
+	next(4);
+
+b1    ldb   immed_2b
+	reg_w8(OP2, OP1);
+	next(4);
+
+b2    ldb   indirect_2
+	reg_w8(OP2, any_r8(OP1));
+	post_indirect 1 6 7 // +5 when external
+
+b3    ldb   indexed_2
+	reg_w8(OP2, any_r8(OP1));
+	post_indexed 6 7 // +5 when external
+
+b4    addcb direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+b5    addcb immed_2w
+	TMP = do_addcb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
+
+b6    addcb indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+b7    addcb indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+b8    subcb direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
+
+b9    subcb immed_2w
+	TMP = do_subcb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
+
+ba    subcb indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
+
+bb    subcb indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
+
+bc    ldbse direct_2
+	reg_w16(OP2, INT8(reg_r8(OP1)));
+	next(4);
+
+bd    ldbse immed_2b
+	reg_w16(OP2, INT8(OP1));
+	next(4);
+
+be    ldbse indirect_2
+	reg_w16(OP2, INT8(any_r8(OP1)));
+	post_indirect 1 6 7 // +5 when external
+
+bf    ldbse indexed_2
+	reg_w16(OP2, INT8(any_r8(OP1)));
+	post_indexed 6 7 // +5 when external
+
+c0    st    direct_2
+	reg_w16(OP1, reg_r16(OP2));
+	next(4);
+
+c1    bmov  direct_2 196
+
+c2    st    indirect_2
+	any_w16(OP1, reg_r16(OP2));
+	post_indirect 2 7 8 // +4 when external
+
+c3    st    indexed_2
+	any_w16(OP1, reg_r16(OP2));
+	post_indexed 7 8 // +4 when external
+
+c4    stb   direct_2
+	reg_w8(OP1, reg_r8(OP2));
+	next(4);
+
+c5    cmpl  direct_2 196
+
+c6    stb   indirect_2
+	any_w8(OP1, reg_r8(OP2));
+	post_indirect 1 7 8 // +4 when external
+
+c7    stb   indexed_2
+	any_w8(OP1, reg_r8(OP2));
+	post_indexed 7 8 // +5 when external
+
+c8    push  direct_1
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	OP1 = reg_r16(OP1);
+	any_w16(TMP, OP1);
+	next(8); // +4 is external sp
+
+c9    push  immed_1w
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	any_w16(TMP, OP1);
+	next(8); // +4 is external sp
+
+ca    push  indirect_1
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	OP1 = any_r16(OP1);
+	any_w16(TMP, OP1);
+	post_indirect 2 11 12 // +4 when external
+
+cb    push  indexed_1
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	OP1 = any_r16(OP1);
+	any_w16(TMP, OP1);
+	post_indexed 11 12 // +4 when external
+
+cc    pop   direct_1
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	TMP = any_r16(TMP);
+	reg_w16(OP1, TMP);
+	next(12); // +2 when external sp
+
+cd    bmovi direct_2 196
+
+ce    pop   indirect_1
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	TMP = any_r16(TMP);
+	if((OPI & 0xfe) == 0x18)
+		OP1 += 2;
+	any_w16(OP1, TMP);
+	post_indirect 2 14 14 // +2 when external sp, +4 when external write
+
+ce    pop   indirect_1 196
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	TMP = any_r16(TMP);
+	if((OPI & 0xfe) == 0x18)
+		OP1 += 2;
+	any_w16(OP1, TMP);
+	post_indirect 2 14 14 // +2 when external sp, +4 when external write
+
+cf    pop   indexed_1
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	TMP = any_r16(TMP);
+	any_w16(OP1, TMP);
+	post_indexed 14 14 // +2 when external sp, +4 when external write
+
+cf    pop   indexed_1 196
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	TMP = any_r16(TMP);
+	if((OPI & 0xfe) == 0x18)
+		OP1 += 2;
+	any_w16(OP1, TMP);
+	post_indexed 14 14 // +2 when external sp, +4 when external write
+
+d0    jnst  rel8
+	if(!(PSW & F_ST)) {
+		PC += OP1;
+		next(8);
+	} else {
+		PSW &= ~F_VT;
+		next(4);
+	}
+
+d1    jnh   rel8
+	if((PSW & (F_Z|F_N)) != F_C) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d2    jgt   rel8
+	if(!(PSW & (F_Z|F_N))) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d3    jnc   rel8
+	if(!(PSW & F_C)) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d4    jnvt  rel8
+	if(!(PSW & F_VT)) {
+		PC += OP1;
+		next(8);
+	} else {
+		PSW &= ~F_VT;
+		next(4);
+	}
+
+d5    jnv   rel8
+	if(!(PSW & F_V)) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d6    jge   rel8
+	if(!(PSW & F_N)) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d7    jne   rel8
+	if(!(PSW & F_Z)) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+d8    jst   rel8
+	if(PSW & F_ST) {
+		PC += OP1;
+		next(8);
+	} else {
+		PSW &= ~F_VT;
+		next(4);
+	}
+
+d9    jh    rel8
+	if((PSW & (F_Z|F_N)) == F_C) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+da    jle   rel8
+	if(PSW & (F_Z|F_N)) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+db    jc    rel8
+	if(PSW & F_C) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+dc    jvt   rel8
+	if(PSW & F_VT) {
+		PSW &= ~F_VT;
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+dd    jv    rel8
+	if(PSW & F_V) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+de    jlt   rel8
+	if(PSW & F_N) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+df    je    rel8
+	if(PSW & F_Z) {
+		PC += OP1;
+		next(8);
+	} else {
+		next(4);
+	}
+
+e0    djnz  rrel8
+	TMP = reg_r8(OP2);
+	TMP = UINT8(TMP-1);
+	reg_w8(OP2, TMP);
+	if(TMP) {
+		PC += OP1;
+		next(9);
+	} else {
+		next(5);
+	}
+
+e1    djnzw rrel8 196
+	TMP = reg_r16(OP2);
+	TMP = TMP-1;
+	reg_w16(OP2, TMP);
+	if(TMP) {
+		PC += OP1;
+		next(10);
+	} else {
+		next(6);
+	}
+
+e3    br    indirect_1n
+	PC = OP1;
+	next(8);
+
+e7    ljmp  rel16
+	PC += OP1;
+	next(8);
+
+ef    lcall rel16
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	any_w16(TMP, PC);
+	PC += OP1;
+	next(13); // +3 for external sp
+
+f0    ret   none
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	PC = any_r16(TMP);
+	next(12); // +4 for external sp
+
+f2    pushf none
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	any_w16(TMP, PSW);
+	PSW = 0x0000;
+	check_irq();
+	next_noirq(8); // +4 for external sp
+
+f3    popf  none
+	TMP = reg_r16(0x18);
+	reg_w16(0x18, TMP+2);
+	PSW = any_r16(TMP);
+	check_irq();
+	next_noirq(9); // +4 for external sp
+
+f4    pusha none 196
+
+f5    popa  none 196
+
+f6    idlpd none 196
+
+f7    trap  none
+	TMP = reg_r16(0x18);
+	TMP -= 2;
+	reg_w16(0x18, TMP);
+	any_w16(TMP, PC);
+	PC  = any_r16(0x2010);
+	next_noirq(21); // +3 for external sp
+
+f8    clrc  none
+	PSW &= ~F_C;
+	next(4);
+
+f9    setc  none
+	PSW |= F_C;
+	next(4);
+
+fa    di    none
+	PSW &= ~F_I;
+	check_irq();
+	next_noirq(4);
+
+fb    ei    none
+	PSW |= F_I;
+	check_irq();
+	next_noirq(4);
+
+fc    clrvt none
+	PSW &= ~F_VT;
+	next(4);
+
+fd    nop   none
+	next(4);
+
+ff    rst   none
+	PC = 0x2080;
+	next(4);

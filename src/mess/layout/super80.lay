@@ -1,0 +1,36 @@
+<mamelayout version="2">
+
+	<element name="red_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="CASSETTE">
+		<text string="CASSETTE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Cassette LED">
+	<!--    <bezel name="cass_txt" element="CASSETTE">
+			<bounds left="0" right="100" top="1030" bottom="1050" />
+		</bezel> -->
+		<bezel name="cass_led" element="red_led">
+			<bounds left="0" right="20" top="1020" bottom="1045" />
+		</bezel>
+	<!--    <bezel element="background">
+			<bounds left="0" top="850" right="1" bottom="855" />
+		</bezel> -->
+		<screen index="0">
+			<bounds x="0" y="0" width="1400" height="1050" />
+		</screen>
+	</view>
+
+</mamelayout>

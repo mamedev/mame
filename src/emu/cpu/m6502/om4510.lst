@@ -1,0 +1,12 @@
+# 4510 opcodes
+
+eom_imp
+	inhibit_interrupts = false; // before or after prefetch?
+	prefetch();
+
+map_imp
+	inhibit_interrupts = true;
+	map_offset[0] = (A<<8) | ((X & 0xf) << 16);
+	map_offset[1] = (Y<<8) | ((Z & 0xf) << 16);
+	map_enable = ((X & 0xf0) >> 4) | (Z & 0xf0);
+	prefetch();

@@ -1,0 +1,101 @@
+# deco 16 opcodes
+brk_16_imp
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	if(irq_taken) {
+		read_pc_noinc();
+	} else {
+		read_pc();
+	}
+	write(SP, PC >> 8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, irq_taken ? P & ~F_B : P);
+	dec_SP();
+	if(nmi_state) {
+		PC = read_direct(0xfff7);
+		PC = set_h(PC, read_direct(0xfff6));
+		nmi_state = false;
+		standard_irq_callback(NMI_LINE);
+	} else {
+		PC = read_direct(0xfff3);
+		PC = set_h(PC, read_direct(0xfff2));
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE);
+	}
+	irq_taken = false;
+	P |= F_I; // Do *not* move after the prefetch
+	prefetch();
+	inst_state = -1;
+
+ill_non
+	logerror("%s: Unimplemented instruction %02x\n", tag(), inst_state);
+	prefetch();
+
+u0B_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OP0B %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+u13_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OP13 %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+u23_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OP23 %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+u3F_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+u4B_zpg
+	TMP2 = read_pc();
+	A = io->read_byte(1);
+	prefetch();
+
+u87_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OP87 %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+u8F_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), NPC, TMP2);
+	io->write_byte(0, TMP2);
+	prefetch();
+
+uA3_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OPA3 %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+uBB_zpg
+	TMP2 = read_pc();
+	if(DECO16_VERBOSE)
+		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+vbl_zpg
+	TMP2 = read_pc();
+	A = io->read_byte(0);
+	if(DECO16_VERBOSE)
+		logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
+	prefetch();
+
+#   exceptions
+reset_16
+	PC = read_direct(0xfff1);
+	PC = set_h(PC, read_direct(0xfff0));
+	prefetch();
+	inst_state = -1;

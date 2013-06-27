@@ -1,0 +1,100 @@
+<!-- aim65.lay -->
+
+<!-- 2007-07-30: Initial version.  [Dirk Best] -->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led16seg>
+			<!-- Note: Peak wavelength of the DL1416 chips = 660 nm -->
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led16seg>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="55" top="60" right="758" bottom="130" />
+		</bezel>
+
+		<!-- DL1416A DS1 -->
+		<bezel name="digit0" element="digit">
+			<bounds left="65" top="70" right="90" bottom="120" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="99" top="70" right="124" bottom="120" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="133" top="70" right="158" bottom="120" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="167" top="70" right="192" bottom="120" />
+		</bezel>
+
+		<!-- DL1416A DS2 -->
+		<bezel name="digit4" element="digit">
+			<bounds left="204" top="70" right="229" bottom="120" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="238" top="70" right="263" bottom="120" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="272" top="70" right="297" bottom="120" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="306" top="70" right="331" bottom="120" />
+		</bezel>
+
+		<!-- DL1416A DS3 -->
+		<bezel name="digit8" element="digit">
+			<bounds left="343" top="70" right="368" bottom="120" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="377" top="70" right="402" bottom="120" />
+		</bezel>
+		<bezel name="digit10" element="digit">
+			<bounds left="411" top="70" right="436" bottom="120" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds left="445" top="70" right="470" bottom="120" />
+		</bezel>
+
+		<!-- DL1416A DS4 -->
+		<bezel name="digit12" element="digit">
+			<bounds left="482" top="70" right="507" bottom="120" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds left="516" top="70" right="541" bottom="120" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds left="550" top="70" right="575" bottom="120" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds left="584" top="70" right="609" bottom="120" />
+		</bezel>
+
+		<!-- DL1416A DS5 -->
+		<bezel name="digit16" element="digit">
+			<bounds left="621" top="70" right="646" bottom="120" />
+		</bezel>
+		<bezel name="digit17" element="digit">
+			<bounds left="655" top="70" right="680" bottom="120" />
+		</bezel>
+		<bezel name="digit18" element="digit">
+			<bounds left="689" top="70" right="714" bottom="120" />
+		</bezel>
+		<bezel name="digit19" element="digit">
+			<bounds left="723" top="70" right="748" bottom="120" />
+		</bezel>
+
+	</view>
+
+</mamelayout>

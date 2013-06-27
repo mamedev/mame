@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="labels">
+		<text string="+">
+			<bounds x="0" y="65" width="8" height="8" />
+		</text>
+		<text string="LOSE">
+			<bounds x="31" y="65" width="16" height="8" />
+		</text>
+		<text string="BLACK">
+			<bounds x="66" y="65" width="16" height="8" />
+		</text>
+		<text string="WHITE">
+			<bounds x="100" y="65" width="16" height="8" />
+		</text>
+	</element>
+
+	<view name="Default Layout">
+		<bezel name="labels" element="labels">
+			<bounds left="0" top="65" right="133" bottom="73" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="24" y="0" width="22" height="27" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="53" y="0" width="22" height="27" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="82" y="0" width="22" height="27" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="111" y="0" width="22" height="27" />
+		</bezel>
+
+		<bezel name="led0" element="led">
+			<bounds x="0" y="75" width="5" height="5" />
+		</bezel>
+		<bezel name="led1" element="led">
+			<bounds x="39" y="75" width="5" height="5" />
+		</bezel>
+		<bezel name="led2" element="led">
+			<bounds x="78" y="75" width="5" height="5" />
+		</bezel>
+		<bezel name="led3" element="led">
+			<bounds x="116" y="75" width="5" height="5" />
+		</bezel>
+	</view>
+</mamelayout>

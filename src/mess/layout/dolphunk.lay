@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="r_digit">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+	<element name="g_digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.5" blue="0.0" />
+		</led7seg>
+	</element>  <element name="red_led">
+		<disk>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Default Layout">
+		<!-- Black background -->
+		<bezel element="background">
+			<bounds left="97" top="65" right="308" bottom="156" />
+		</bezel>
+		<bezel name="digit0" element="r_digit">
+			<bounds left="107" top="075" right="154" bottom="146" />
+		</bezel>
+		<bezel name="digit1" element="r_digit">
+			<bounds left="155" top="075" right="202" bottom="146" />
+		</bezel>
+		<bezel name="digit2" element="g_digit">
+			<bounds left="203" top="075" right="250" bottom="146" />
+		</bezel>
+		<bezel name="digit3" element="g_digit">
+			<bounds left="251" top="075" right="298" bottom="146" />
+		</bezel>
+	</view>
+</mamelayout>

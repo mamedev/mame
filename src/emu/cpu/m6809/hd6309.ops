@@ -1,0 +1,1095 @@
+MAIN:
+	// check interrupt lines
+	switch(check_pending_interrupt())
+	{
+		case VECTOR_NMI:	goto NMI;
+		case VECTOR_FIRQ:	goto FIRQ;
+		case VECTOR_IRQ:	goto IRQ;
+	}
+
+	// debugger hook
+	m_ppc = m_pc;
+	debugger_instruction_hook(this, m_pc.w);
+
+	// opcode fetch
+	@m_opcode = read_opcode();
+
+	// burn delay loops
+	burn_any_delay_loops();
+
+	// dispatch opcode
+	switch(m_opcode)
+	{
+		case 0x00:										%DIRECT;		%NEG8;	return;
+		case 0x01:				%IMM_IM;				%DIRECT;		%OIM;	return;
+		case 0x02:				%IMM_IM;				%DIRECT;		%AIM;	return;
+		case 0x03:										%DIRECT;		%COM8;	return;
+		case 0x04:										%DIRECT;		%LSR8;	return;
+		case 0x05:				%IMM_IM;				%DIRECT;		%EIM;	return;
+		case 0x06:										%DIRECT;		%ROR8;	return;
+		case 0x07:										%DIRECT;		%ASR8;	return;
+		case 0x08:										%DIRECT;		%ASL8;	return;
+		case 0x09:										%DIRECT;		%ROL8;	return;
+		case 0x0A:										%DIRECT;		%DEC8;	return;
+		case 0x0B:				%IMM_IM;				%DIRECT;		%TIM;	return;
+		case 0x0C:										%DIRECT;		%INC8;	return;
+		case 0x0D:										%DIRECT;		%TST8;	return;
+		case 0x0E:										%DIRECT;		%JMP;	return;
+		case 0x0F:										%DIRECT;		%CLR8;	return;
+
+		case 0x10:								%DISPATCH10;	return;
+		case 0x11:								%DISPATCH11;	return;
+		case 0x12:								%NOP;			return;
+		case 0x13:								%SYNC;			return;
+		case 0x14:								%SEXW;			return;
+		case 0x16:				set_cond(true);	%LBRANCH;		return;
+		case 0x17:								%LBSR;			return;
+		case 0x19:								%DAA;			return;
+		case 0x1A:				set_imm();		%ORCC;			return;
+		case 0x1C:				set_imm();		%ANDCC;			return;
+		case 0x1D:								%SEX;			return;
+		case 0x1E:								%EXG;			return;
+		case 0x1F:								%TFR;			return;
+
+		case 0x20:				set_cond(true);			%BRANCH;	return;
+		case 0x21:				set_cond(false);		%BRANCH;	return;
+		case 0x22:				set_cond(cond_hi());	%BRANCH;	return;
+		case 0x23:				set_cond(!cond_hi());	%BRANCH;	return;
+		case 0x24:				set_cond(cond_cc());	%BRANCH;	return;
+		case 0x25:				set_cond(!cond_cc());	%BRANCH;	return;
+		case 0x26:				set_cond(cond_ne());	%BRANCH;	return;
+		case 0x27:				set_cond(!cond_ne());	%BRANCH;	return;
+		case 0x28:				set_cond(cond_vc());	%BRANCH;	return;
+		case 0x29:				set_cond(!cond_vc());	%BRANCH;	return;
+		case 0x2A:				set_cond(cond_pl());	%BRANCH;	return;
+		case 0x2B:				set_cond(!cond_pl());	%BRANCH;	return;
+		case 0x2C:				set_cond(cond_ge());	%BRANCH;	return;
+		case 0x2D:				set_cond(!cond_ge());	%BRANCH;	return;
+		case 0x2E:				set_cond(cond_gt());	%BRANCH;	return;
+		case 0x2F:				set_cond(!cond_gt());	%BRANCH;	return;
+
+		case 0x30:				set_regop16(m_x);		%INDEXED;	%LEA_xy;	return;
+		case 0x31:				set_regop16(m_y);		%INDEXED;	%LEA_xy;	return;
+		case 0x32:				set_regop16(m_s);		%INDEXED;	%LEA_us;	return;
+		case 0x33:				set_regop16(m_u);		%INDEXED;	%LEA_us;	return;
+		case 0x34:													%PSHS;		return;
+		case 0x35:													%PULS;		return;
+		case 0x36:													%PSHU;		return;
+		case 0x37:													%PULU;		return;
+		case 0x39:													%RTS;		return;
+		case 0x3A:													%ABX;		return;
+		case 0x3B:													%RTI;		return;
+		case 0x3C:													%CWAI;		return;
+		case 0x3D:													%MUL;		return;
+		case 0x3F:													%SWI;		return;
+
+		case 0x40:										set_a();	%NEG8;		return;
+		case 0x43:										set_a();	%COM8;		return;
+		case 0x44:										set_a();	%LSR8;		return;
+		case 0x46:										set_a();	%ROR8;		return;
+		case 0x47:										set_a();	%ASR8;		return;
+		case 0x48:										set_a();	%ASL8;		return;
+		case 0x49:										set_a();	%ROL8;		return;
+		case 0x4A:										set_a();	%DEC8;		return;
+		case 0x4C:										set_a();	%INC8;		return;
+		case 0x4D:										set_a();	%TST8;		return;
+		case 0x4F:										set_a();	%CLR8;		return;
+
+		case 0x50:										set_b();	%NEG8;		return;
+		case 0x53:										set_b();	%COM8;		return;
+		case 0x54:										set_b();	%LSR8;		return;
+		case 0x56:										set_b();	%ROR8;		return;
+		case 0x57:										set_b();	%ASR8;		return;
+		case 0x58:										set_b();	%ASL8;		return;
+		case 0x59:										set_b();	%ROL8;		return;
+		case 0x5A:										set_b();	%DEC8;		return;
+		case 0x5C:										set_b();	%INC8;		return;
+		case 0x5D:										set_b();	%TST8;		return;
+		case 0x5F:										set_b();	%CLR8;		return;
+
+		case 0x60:										%INDEXED;	%NEG8;		return;
+		case 0x61:				%IMM_IM;				%INDEXED;	%OIM;		return;
+		case 0x62:				%IMM_IM;				%INDEXED;	%AIM;		return;
+		case 0x63:										%INDEXED;	%COM8;		return;
+		case 0x64:										%INDEXED;	%LSR8;		return;
+		case 0x65:				%IMM_IM;				%INDEXED;	%EIM;		return;
+		case 0x66:										%INDEXED;	%ROR8;		return;
+		case 0x67:										%INDEXED;	%ASR8;		return;
+		case 0x68:										%INDEXED;	%ASL8;		return;
+		case 0x69:										%INDEXED;	%ROL8;		return;
+		case 0x6A:										%INDEXED;	%DEC8;		return;
+		case 0x6B:				%IMM_IM;				%INDEXED;	%TIM;		return;
+		case 0x6C:										%INDEXED;	%INC8;		return;
+		case 0x6D:										%INDEXED;	%TST8;		return;
+		case 0x6E:										%INDEXED;	%JMP;		return;
+		case 0x6F:										%INDEXED;	%CLR8;		return;
+
+		case 0x70:										%EXTENDED;	%NEG8;		return;
+		case 0x71:				%IMM_IM;				%EXTENDED;	%OIM;		return;
+		case 0x72:				%IMM_IM;				%EXTENDED;	%AIM;		return;
+		case 0x73:										%EXTENDED;	%COM8;		return;
+		case 0x74:										%EXTENDED;	%LSR8;		return;
+		case 0x75:				%IMM_IM;				%EXTENDED;	%EIM;		return;
+		case 0x76:										%EXTENDED;	%ROR8;		return;
+		case 0x77:										%EXTENDED;	%ASR8;		return;
+		case 0x78:										%EXTENDED;	%ASL8;		return;
+		case 0x79:										%EXTENDED;	%ROL8;		return;
+		case 0x7A:										%EXTENDED;	%DEC8;		return;
+		case 0x7B:				%IMM_IM;				%EXTENDED;	%TIM;		return;
+		case 0x7C:										%EXTENDED;	%INC8;		return;
+		case 0x7D:										%EXTENDED;	%TST8;		return;
+		case 0x7E:										%EXTENDED;	%JMP;		return;
+		case 0x7F:										%EXTENDED;	%CLR8;		return;
+
+		case 0x80:				set_regop8(m_d.b.h);	set_imm();	%SUB8;		return;
+		case 0x81:				set_regop8(m_d.b.h);	set_imm();	%CMP8;		return;
+		case 0x82:				set_regop8(m_d.b.h);	set_imm();	%SBC8;		return;
+		case 0x83:				set_regop16(m_d);		set_imm();	%SUB16;		return;
+		case 0x84:				set_regop8(m_d.b.h);	set_imm();	%AND8;		return;
+		case 0x85:				set_regop8(m_d.b.h);	set_imm();	%BIT8;		return;
+		case 0x86:				set_regop8(m_d.b.h);	set_imm();	%LD8;		return;
+		case 0x88:				set_regop8(m_d.b.h);	set_imm();	%EOR8;		return;
+		case 0x89:				set_regop8(m_d.b.h);	set_imm();	%ADC8;		return;
+		case 0x8A:				set_regop8(m_d.b.h);	set_imm();	%OR8;		return;
+		case 0x8B:				set_regop8(m_d.b.h);	set_imm();	%ADD8;		return;
+		case 0x8C:				set_regop16(m_x);		set_imm();	%CMP16;		return;
+		case 0x8D:													%BSR;		return;
+		case 0x8E:				set_regop16(m_x);		set_imm();	%LD16;		return;
+
+		case 0x90:				set_regop8(m_d.b.h);	%DIRECT;	%SUB8;		return;
+		case 0x91:				set_regop8(m_d.b.h);	%DIRECT;	%CMP8;		return;
+		case 0x92:				set_regop8(m_d.b.h);	%DIRECT;	%SBC8;		return;
+		case 0x93:				set_regop16(m_d);		%DIRECT;	%SUB16;		return;
+		case 0x94:				set_regop8(m_d.b.h);	%DIRECT;	%AND8;		return;
+		case 0x95:				set_regop8(m_d.b.h);	%DIRECT;	%BIT8;		return;
+		case 0x96:				set_regop8(m_d.b.h);	%DIRECT;	%LD8;		return;
+		case 0x97:				set_regop8(m_d.b.h);	%DIRECT;	%ST8;		return;
+		case 0x98:				set_regop8(m_d.b.h);	%DIRECT;	%EOR8;		return;
+		case 0x99:				set_regop8(m_d.b.h);	%DIRECT;	%ADC8;		return;
+		case 0x9A:				set_regop8(m_d.b.h);	%DIRECT;	%OR8;		return;
+		case 0x9B:				set_regop8(m_d.b.h);	%DIRECT;	%ADD8;		return;
+		case 0x9C:				set_regop16(m_x);		%DIRECT;	%CMP16;		return;
+		case 0x9D:										%DIRECT;	%JSR;		return;
+		case 0x9E:				set_regop16(m_x);		%DIRECT;	%LD16;		return;
+		case 0x9F:				set_regop16(m_x);		%DIRECT;	%ST16;		return;
+
+		case 0xA0:				set_regop8(m_d.b.h);	%INDEXED;	%SUB8;		return;
+		case 0xA1:				set_regop8(m_d.b.h);	%INDEXED;	%CMP8;		return;
+		case 0xA2:				set_regop8(m_d.b.h);	%INDEXED;	%SBC8;		return;
+		case 0xA3:				set_regop16(m_d);		%INDEXED;	%SUB16;		return;
+		case 0xA4:				set_regop8(m_d.b.h);	%INDEXED;	%AND8;		return;
+		case 0xA5:				set_regop8(m_d.b.h);	%INDEXED;	%BIT8;		return;
+		case 0xA6:				set_regop8(m_d.b.h);	%INDEXED;	%LD8;		return;
+		case 0xA7:				set_regop8(m_d.b.h);	%INDEXED;	%ST8;		return;
+		case 0xA8:				set_regop8(m_d.b.h);	%INDEXED;	%EOR8;		return;
+		case 0xA9:				set_regop8(m_d.b.h);	%INDEXED;	%ADC8;		return;
+		case 0xAA:				set_regop8(m_d.b.h);	%INDEXED;	%OR8;		return;
+		case 0xAB:				set_regop8(m_d.b.h);	%INDEXED;	%ADD8;		return;
+		case 0xAC:				set_regop16(m_x);		%INDEXED;	%CMP16;		return;
+		case 0xAD:										%INDEXED;	%JSR_ind;	return;
+		case 0xAE:				set_regop16(m_x);		%INDEXED;	%LD16;		return;
+		case 0xAF:				set_regop16(m_x);		%INDEXED;	%ST16;		return;
+
+		case 0xB0:				set_regop8(m_d.b.h);	%EXTENDED;	%SUB8;		return;
+		case 0xB1:				set_regop8(m_d.b.h);	%EXTENDED;	%CMP8;		return;
+		case 0xB2:				set_regop8(m_d.b.h);	%EXTENDED;	%SBC8;		return;
+		case 0xB3:				set_regop16(m_d);		%EXTENDED;	%SUB16;		return;
+		case 0xB4:				set_regop8(m_d.b.h);	%EXTENDED;	%AND8;		return;
+		case 0xB5:				set_regop8(m_d.b.h);	%EXTENDED;	%BIT8;		return;
+		case 0xB6:				set_regop8(m_d.b.h);	%EXTENDED;	%LD8;		return;
+		case 0xB7:				set_regop8(m_d.b.h);	%EXTENDED;	%ST8;		return;
+		case 0xB8:				set_regop8(m_d.b.h);	%EXTENDED;	%EOR8;		return;
+		case 0xB9:				set_regop8(m_d.b.h);	%EXTENDED;	%ADC8;		return;
+		case 0xBA:				set_regop8(m_d.b.h);	%EXTENDED;	%OR8;		return;
+		case 0xBB:				set_regop8(m_d.b.h);	%EXTENDED;	%ADD8;		return;
+		case 0xBC:				set_regop16(m_x);		%EXTENDED;	%CMP16;		return;
+		case 0xBD:										%EXTENDED;	%JSR;		return;
+		case 0xBE:				set_regop16(m_x);		%EXTENDED;	%LD16;		return;
+		case 0xBF:				set_regop16(m_x);		%EXTENDED;	%ST16;		return;
+
+		case 0xC0:				set_regop8(m_d.b.l);	set_imm();	%SUB8;		return;
+		case 0xC1:				set_regop8(m_d.b.l);	set_imm();	%CMP8;		return;
+		case 0xC2:				set_regop8(m_d.b.l);	set_imm();	%SBC8;		return;
+		case 0xC3:				set_regop16(m_d);		set_imm();	%ADD16;		return;
+		case 0xC4:				set_regop8(m_d.b.l);	set_imm();	%AND8;		return;
+		case 0xC5:				set_regop8(m_d.b.l);	set_imm();	%BIT8;		return;
+		case 0xC6:				set_regop8(m_d.b.l);	set_imm();	%LD8;		return;
+		case 0xC8:				set_regop8(m_d.b.l);	set_imm();	%EOR8;		return;
+		case 0xC9:				set_regop8(m_d.b.l);	set_imm();	%ADC8;		return;
+		case 0xCA:				set_regop8(m_d.b.l);	set_imm();	%OR8;		return;
+		case 0xCB:				set_regop8(m_d.b.l);	set_imm();	%ADD8;		return;
+		case 0xCC:				set_regop16(m_d);		set_imm();	%LD16;		return;
+		case 0xCD:										set_imm();	%LDQ;		return;
+		case 0xCE:				set_regop16(m_u);		set_imm();	%LD16;		return;
+
+		case 0xD0:				set_regop8(m_d.b.l);	%DIRECT;	%SUB8;		return;
+		case 0xD1:				set_regop8(m_d.b.l);	%DIRECT;	%CMP8;		return;
+		case 0xD2:				set_regop8(m_d.b.l);	%DIRECT;	%SBC8;		return;
+		case 0xD3:				set_regop16(m_d);		%DIRECT;	%ADD16;		return;
+		case 0xD4:				set_regop8(m_d.b.l);	%DIRECT;	%AND8;		return;
+		case 0xD5:				set_regop8(m_d.b.l);	%DIRECT;	%BIT8;		return;
+		case 0xD6:				set_regop8(m_d.b.l);	%DIRECT;	%LD8;		return;
+		case 0xD7:				set_regop8(m_d.b.l);	%DIRECT;	%ST8;		return;
+		case 0xD8:				set_regop8(m_d.b.l);	%DIRECT;	%EOR8;		return;
+		case 0xD9:				set_regop8(m_d.b.l);	%DIRECT;	%ADC8;		return;
+		case 0xDA:				set_regop8(m_d.b.l);	%DIRECT;	%OR8;		return;
+		case 0xDB:				set_regop8(m_d.b.l);	%DIRECT;	%ADD8;		return;
+		case 0xDC:				set_regop16(m_d);		%DIRECT;	%LD16;		return;
+		case 0xDD:				set_regop16(m_d);		%DIRECT;	%ST16;		return;
+		case 0xDE:				set_regop16(m_u);		%DIRECT;	%LD16;		return;
+		case 0xDF:				set_regop16(m_u);		%DIRECT;	%ST16;		return;
+
+		case 0xE0:				set_regop8(m_d.b.l);	%INDEXED;	%SUB8;		return;
+		case 0xE1:				set_regop8(m_d.b.l);	%INDEXED;	%CMP8;		return;
+		case 0xE2:				set_regop8(m_d.b.l);	%INDEXED;	%SBC8;		return;
+		case 0xE3:				set_regop16(m_d);		%INDEXED;	%ADD16;		return;
+		case 0xE4:				set_regop8(m_d.b.l);	%INDEXED;	%AND8;		return;
+		case 0xE5:				set_regop8(m_d.b.l);	%INDEXED;	%BIT8;		return;
+		case 0xE6:				set_regop8(m_d.b.l);	%INDEXED;	%LD8;		return;
+		case 0xE7:				set_regop8(m_d.b.l);	%INDEXED;	%ST8;		return;
+		case 0xE8:				set_regop8(m_d.b.l);	%INDEXED;	%EOR8;		return;
+		case 0xE9:				set_regop8(m_d.b.l);	%INDEXED;	%ADC8;		return;
+		case 0xEA:				set_regop8(m_d.b.l);	%INDEXED;	%OR8;		return;
+		case 0xEB:				set_regop8(m_d.b.l);	%INDEXED;	%ADD8;		return;
+		case 0xEC:				set_regop16(m_d);		%INDEXED;	%LD16;		return;
+		case 0xED:				set_regop16(m_d);		%INDEXED;	%ST16;		return;
+		case 0xEE:				set_regop16(m_u);		%INDEXED;	%LD16;		return;
+		case 0xEF:				set_regop16(m_u);		%INDEXED;	%ST16;		return;
+
+		case 0xF0:				set_regop8(m_d.b.l);	%EXTENDED;	%SUB8;		return;
+		case 0xF1:				set_regop8(m_d.b.l);	%EXTENDED;	%CMP8;		return;
+		case 0xF2:				set_regop8(m_d.b.l);	%EXTENDED;	%SBC8;		return;
+		case 0xF3:				set_regop16(m_d);		%EXTENDED;	%ADD16;		return;
+		case 0xF4:				set_regop8(m_d.b.l);	%EXTENDED;	%AND8;		return;
+		case 0xF5:				set_regop8(m_d.b.l);	%EXTENDED;	%BIT8;		return;
+		case 0xF6:				set_regop8(m_d.b.l);	%EXTENDED;	%LD8;		return;
+		case 0xF7:				set_regop8(m_d.b.l);	%EXTENDED;	%ST8;		return;
+		case 0xF8:				set_regop8(m_d.b.l);	%EXTENDED;	%EOR8;		return;
+		case 0xF9:				set_regop8(m_d.b.l);	%EXTENDED;	%ADC8;		return;
+		case 0xFA:				set_regop8(m_d.b.l);	%EXTENDED;	%OR8;		return;
+		case 0xFB:				set_regop8(m_d.b.l);	%EXTENDED;	%ADD8;		return;
+		case 0xFC:				set_regop16(m_d);		%EXTENDED;	%LD16;		return;
+		case 0xFD:				set_regop16(m_d);		%EXTENDED;	%ST16;		return;
+		case 0xFE:				set_regop16(m_u);		%EXTENDED;	%LD16;		return;
+		case 0xFF:				set_regop16(m_u);		%EXTENDED;	%ST16;		return;
+		default:													%ILLEGAL;	return;			
+	}
+	return;
+
+DISPATCH10:
+	@m_opcode = read_opcode();
+	switch(m_opcode)
+	{
+		case 0x20:				set_cond(true);						%LBRANCH;	return;
+		case 0x21:				set_cond(false);					%LBRANCH;	return;
+		case 0x22:				set_cond(cond_hi());				%LBRANCH;	return;
+		case 0x23:				set_cond(!cond_hi());				%LBRANCH;	return;
+		case 0x24:				set_cond(cond_cc());				%LBRANCH;	return;
+		case 0x25:				set_cond(!cond_cc());				%LBRANCH;	return;
+		case 0x26:				set_cond(cond_ne());				%LBRANCH;	return;
+		case 0x27:				set_cond(!cond_ne());				%LBRANCH;	return;
+		case 0x28:				set_cond(cond_vc());				%LBRANCH;	return;
+		case 0x29:				set_cond(!cond_vc());				%LBRANCH;	return;
+		case 0x2A:				set_cond(cond_pl());				%LBRANCH;	return;
+		case 0x2B:				set_cond(!cond_pl());				%LBRANCH;	return;
+		case 0x2C:				set_cond(cond_ge());				%LBRANCH;	return;
+		case 0x2D:				set_cond(!cond_ge());				%LBRANCH;	return;
+		case 0x2E:				set_cond(cond_gt());				%LBRANCH;	return;
+		case 0x2F:				set_cond(!cond_gt());				%LBRANCH;	return;
+
+		case 0x30:				register_register_op();				%ADD*;		return;
+		case 0x31:				register_register_op();				%ADC*;		return;
+		case 0x32:				register_register_op();				%SUB*;		return;
+		case 0x33:				register_register_op();				%SBC*;		return;
+		case 0x34:				register_register_op();				%AND*;		return;
+		case 0x35:				register_register_op();				%OR*;		return;
+		case 0x36:				register_register_op();				%EOR*;		return;
+		case 0x37:				register_register_op();				%CMP*;		return;
+		case 0x38:													%PSHSW;		return;
+		case 0x39:													%PULSW;		return;
+		case 0x3A:													%PSHUW;		return;
+		case 0x3B:													%PULUW;		return;
+		case 0x3F:													%SWI2;		return;
+
+		case 0x40:									set_d();		%NEG16;		return;
+		case 0x43:									set_d();		%COM16;		return;
+		case 0x44:									set_d();		%LSR16;		return;
+		case 0x46:									set_d();		%ROR16;		return;
+		case 0x47:									set_d();		%ASR16;		return;
+		case 0x48:									set_d();		%ASL16;		return;
+		case 0x49:									set_d();		%ROL16;		return;
+		case 0x4A:									set_d();		%DEC16;		return;
+		case 0x4C:									set_d();		%INC16;		return;
+		case 0x4D:									set_d();		%TST16;		return;
+		case 0x4F:									set_d();		%CLR16;		return;
+
+		case 0x50:									set_w();		%NEG16;		return;
+		case 0x53:									set_w();		%COM16;		return;
+		case 0x54:									set_w();		%LSR16;		return;
+		case 0x56:									set_w();		%ROR16;		return;
+		case 0x57:									set_w();		%ASR16;		return;
+		case 0x58:									set_w();		%ASL16;		return;
+		case 0x59:									set_w();		%ROL16;		return;
+		case 0x5A:									set_w();		%DEC16;		return;
+		case 0x5C:									set_w();		%INC16;		return;
+		case 0x5D:									set_w();		%TST16;		return;
+		case 0x5F:									set_w();		%CLR16;		return;
+
+		case 0x80:				set_regop16(m_w);	set_imm();		%SUB16;		return;
+		case 0x81:				set_regop16(m_w);	set_imm();		%CMP16;		return;
+		case 0x82:				set_regop16(m_d);	set_imm();		%SBC16;		return;
+		case 0x83:				set_regop16(m_d);	set_imm();		%CMP16;		return;
+		case 0x84:				set_regop16(m_d);	set_imm();		%AND16;		return;
+		case 0x85:				set_regop16(m_d);	set_imm();		%BIT16;		return;
+		case 0x86:				set_regop16(m_w);	set_imm();		%LD16;		return;
+		case 0x88:				set_regop16(m_d);	set_imm();		%EOR16;		return;
+		case 0x89:				set_regop16(m_d);	set_imm();		%ADC16;		return;
+		case 0x8A:				set_regop16(m_d);	set_imm();		%OR16;		return;
+		case 0x8B:				set_regop16(m_w);	set_imm();		%ADD16;		return;
+		case 0x8C:				set_regop16(m_y);	set_imm();		%CMP16;		return;
+		case 0x8E:				set_regop16(m_y);	set_imm();		%LD16;		return;
+
+		case 0x90:				set_regop16(m_w);	%DIRECT;		%SUB16;		return;
+		case 0x91:				set_regop16(m_w);	%DIRECT;		%CMP16;		return;
+		case 0x92:				set_regop16(m_d);	%DIRECT;		%SBC16;		return;
+		case 0x93:				set_regop16(m_d);	%DIRECT;		%CMP16;		return;
+		case 0x94:				set_regop16(m_d);	%DIRECT;		%AND16;		return;
+		case 0x95:				set_regop16(m_d);	%DIRECT;		%BIT16;		return;
+		case 0x96:				set_regop16(m_w);	%DIRECT;		%LD16;		return;
+		case 0x97:				set_regop16(m_w);	%DIRECT;		%ST16;		return;
+		case 0x98:				set_regop16(m_d);	%DIRECT;		%EOR16;		return;
+		case 0x99:				set_regop16(m_d);	%DIRECT;		%ADC16;		return;
+		case 0x9A:				set_regop16(m_d);	%DIRECT;		%OR16;		return;
+		case 0x9B:				set_regop16(m_w);	%DIRECT;		%ADD16;		return;
+		case 0x9C:				set_regop16(m_y);	%DIRECT;		%CMP16;		return;
+		case 0x9E:				set_regop16(m_y);	%DIRECT;		%LD16;		return;
+		case 0x9F:				set_regop16(m_y);	%DIRECT;		%ST16;		return;
+
+		case 0xA0:				set_regop16(m_w);	%INDEXED;		%SUB16;		return;
+		case 0xA1:				set_regop16(m_w);	%INDEXED;		%CMP16;		return;
+		case 0xA2:				set_regop16(m_d);	%INDEXED;		%SBC16;		return;
+		case 0xA3:				set_regop16(m_d);	%INDEXED;		%CMP16;		return;
+		case 0xA4:				set_regop16(m_d);	%INDEXED;		%AND16;		return;
+		case 0xA5:				set_regop16(m_d);	%INDEXED;		%BIT16;		return;
+		case 0xA6:				set_regop16(m_w);	%INDEXED;		%LD16;		return;
+		case 0xA7:				set_regop16(m_w);	%INDEXED;		%ST16;		return;
+		case 0xA8:				set_regop16(m_d);	%INDEXED;		%EOR16;		return;
+		case 0xA9:				set_regop16(m_d);	%INDEXED;		%ADC16;		return;
+		case 0xAA:				set_regop16(m_d);	%INDEXED;		%OR16;		return;
+		case 0xAB:				set_regop16(m_w);	%INDEXED;		%ADD16;		return;
+		case 0xAC:				set_regop16(m_y);	%INDEXED;		%CMP16;		return;
+		case 0xAE:				set_regop16(m_y);	%INDEXED;		%LD16;		return;
+		case 0xAF:				set_regop16(m_y);	%INDEXED;		%ST16;		return;
+
+		case 0xB0:				set_regop16(m_w);	%EXTENDED;		%SUB16;		return;
+		case 0xB1:				set_regop16(m_w);	%EXTENDED;		%CMP16;		return;
+		case 0xB2:				set_regop16(m_d);	%EXTENDED;		%SBC16;		return;
+		case 0xB3:				set_regop16(m_d);	%EXTENDED;		%CMP16;		return;
+		case 0xB4:				set_regop16(m_d);	%EXTENDED;		%AND16;		return;
+		case 0xB5:				set_regop16(m_d);	%EXTENDED;		%BIT16;		return;
+		case 0xB6:				set_regop16(m_w);	%EXTENDED;		%LD16;		return;
+		case 0xB7:				set_regop16(m_w);	%EXTENDED;		%ST16;		return;
+		case 0xB8:				set_regop16(m_d);	%EXTENDED;		%EOR16;		return;
+		case 0xB9:				set_regop16(m_d);	%EXTENDED;		%ADC16;		return;
+		case 0xBA:				set_regop16(m_d);	%EXTENDED;		%OR16;		return;
+		case 0xBB:				set_regop16(m_w);	%EXTENDED;		%ADD16;		return;
+		case 0xBC:				set_regop16(m_y);	%EXTENDED;		%CMP16;		return;
+		case 0xBE:				set_regop16(m_y);	%EXTENDED;		%LD16;		return;
+		case 0xBF:				set_regop16(m_y);	%EXTENDED;		%ST16;		return;
+
+		case 0xCE:				set_regop16(m_s);	set_imm();		%LD16;		return;
+		case 0xDC:									%DIRECT;		%LDQ;		return;
+		case 0xDD:									%DIRECT;		%STQ;		return;
+		case 0xDE:				set_regop16(m_s);	%DIRECT;		%LD16;		return;
+		case 0xDF:				set_regop16(m_s);	%DIRECT;		%ST16;		return;
+		case 0xEC:									%INDEXED;		%LDQ;		return;
+		case 0xED:									%INDEXED;		%STQ;		return;
+		case 0xEE:				set_regop16(m_s);	%INDEXED;		%LD16;		return;
+		case 0xEF:				set_regop16(m_s);	%INDEXED;		%ST16;		return;
+		case 0xFC:									%EXTENDED;		%LDQ;		return;
+		case 0xFD:									%EXTENDED;		%STQ;		return;
+		case 0xFE:				set_regop16(m_s);	%EXTENDED;		%LD16;		return;
+		case 0xFF:				set_regop16(m_s);	%EXTENDED;		%ST16;		return;
+
+		default:													%ILLEGAL;	return;			
+	}
+	return;
+
+DISPATCH11:
+	@m_opcode = read_opcode();
+	switch(m_opcode)
+	{
+		case 0x30:													%BAND;		return;
+		case 0x31:													%BIAND;		return;
+		case 0x32:													%BOR;		return;
+		case 0x33:													%BIOR;		return;
+		case 0x34:													%BEOR;		return;
+		case 0x35:													%BIEOR;		return;
+		case 0x36:													%LDBT;		return;
+		case 0x37:													%STBT;		return;
+		case 0x38:													%TFM;		return;
+		case 0x39:													%TFM;		return;
+		case 0x3A:													%TFM;		return;
+		case 0x3B:													%TFM;		return;
+		case 0x3C:				set_regop8(m_md);	set_imm();		%BIT8;		return;
+		case 0x3D:				set_regop8(m_md);	set_imm();		%LD8;		return;
+		case 0x3F:													%SWI3;		return;
+
+		case 0x43:									set_e();		%COM8;		return;
+		case 0x4A:									set_e();		%DEC8;		return;
+		case 0x4C:									set_e();		%INC8;		return;
+		case 0x4D:									set_e();		%TST8;		return;
+		case 0x4F:									set_e();		%CLR8;		return;
+
+		case 0x53:									set_f();		%COM8;		return;
+		case 0x5A:									set_f();		%DEC8;		return;
+		case 0x5C:									set_f();		%INC8;		return;
+		case 0x5D:									set_f();		%TST8;		return;
+		case 0x5F:									set_f();		%CLR8;		return;
+
+		case 0x80:				set_regop8(m_w.b.h);	set_imm();		%SUB8;		return;
+		case 0x81:				set_regop8(m_w.b.h);	set_imm();		%CMP8;		return;
+		case 0x83:				set_regop16(m_u);		set_imm();		%CMP16;		return;
+		case 0x86:				set_regop8(m_w.b.h);	set_imm();		%LD8;		return;
+		case 0x8B:				set_regop8(m_w.b.h);	set_imm();		%ADD8;		return;
+		case 0x8C:				set_regop16(m_s);		set_imm();		%CMP16;		return;
+		case 0x8D:										set_imm();		%DIVD;		return;
+		case 0x8E:										set_imm();		%DIVQ;		return;
+		case 0x8F:										set_imm();		%MULD;		return;
+
+		case 0x90:				set_regop8(m_w.b.h);	%DIRECT;		%SUB8;		return;
+		case 0x91:				set_regop8(m_w.b.h);	%DIRECT;		%CMP8;		return;
+		case 0x93:				set_regop16(m_u);		%DIRECT;		%CMP16;		return;
+		case 0x96:				set_regop8(m_w.b.h);	%DIRECT;		%LD8;		return;
+		case 0x97:				set_regop8(m_w.b.h);	%DIRECT;		%ST8;		return;
+		case 0x9B:				set_regop8(m_w.b.h);	%DIRECT;		%ADD8;		return;
+		case 0x9C:				set_regop16(m_s);		%DIRECT;		%CMP16;		return;
+		case 0x9D:										%DIRECT;		%DIVD;		return;
+		case 0x9E:										%DIRECT;		%DIVQ;		return;
+		case 0x9F:										%DIRECT;		%MULD;		return;
+
+		case 0xA0:				set_regop8(m_w.b.h);	%INDEXED;		%SUB8;		return;
+		case 0xA1:				set_regop8(m_w.b.h);	%INDEXED;		%CMP8;		return;
+		case 0xA3:				set_regop16(m_u);		%INDEXED;		%CMP16;		return;
+		case 0xA6:				set_regop8(m_w.b.h);	%INDEXED;		%LD8;		return;
+		case 0xA7:				set_regop8(m_w.b.h);	%INDEXED;		%ST8;		return;
+		case 0xAB:				set_regop8(m_w.b.h);	%INDEXED;		%ADD8;		return;
+		case 0xAC:				set_regop16(m_s);		%INDEXED;		%CMP16;		return;
+		case 0xAD:										%INDEXED;		%DIVD;		return;
+		case 0xAE:										%INDEXED;		%DIVQ;		return;
+		case 0xAF:										%INDEXED;		%MULD;		return;
+
+		case 0xB0:				set_regop8(m_w.b.h);	%EXTENDED;		%SUB8;		return;
+		case 0xB1:				set_regop8(m_w.b.h);	%EXTENDED;		%CMP8;		return;
+		case 0xB3:				set_regop16(m_u);		%EXTENDED;		%CMP16;		return;
+		case 0xB6:				set_regop8(m_w.b.h);	%EXTENDED;		%LD8;		return;
+		case 0xB7:				set_regop8(m_w.b.h);	%EXTENDED;		%ST8;		return;
+		case 0xBB:				set_regop8(m_w.b.h);	%EXTENDED;		%ADD8;		return;
+		case 0xBC:				set_regop16(m_s);		%EXTENDED;		%CMP16;		return;
+		case 0xBD:										%EXTENDED;		%DIVD;		return;
+		case 0xBE:										%EXTENDED;		%DIVQ;		return;
+		case 0xBF:										%EXTENDED;		%MULD;		return;
+
+		case 0xC0:				set_regop8(m_w.b.l);	set_imm();		%SUB8;		return;
+		case 0xC1:				set_regop8(m_w.b.l);	set_imm();		%CMP8;		return;
+		case 0xC6:				set_regop8(m_w.b.l);	set_imm();		%LD8;		return;
+		case 0xCB:				set_regop8(m_w.b.l);	set_imm();		%ADD8;		return;
+
+		case 0xD0:				set_regop8(m_w.b.l);	%DIRECT;		%SUB8;		return;
+		case 0xD1:				set_regop8(m_w.b.l);	%DIRECT;		%CMP8;		return;
+		case 0xD6:				set_regop8(m_w.b.l);	%DIRECT;		%LD8;		return;
+		case 0xD7:				set_regop8(m_w.b.l);	%DIRECT;		%ST8;		return;
+		case 0xDB:				set_regop8(m_w.b.l);	%DIRECT;		%ADD8;		return;
+
+		case 0xE0:				set_regop8(m_w.b.l);	%INDEXED;		%SUB8;		return;
+		case 0xE1:				set_regop8(m_w.b.l);	%INDEXED;		%CMP8;		return;
+		case 0xE6:				set_regop8(m_w.b.l);	%INDEXED;		%LD8;		return;
+		case 0xE7:				set_regop8(m_w.b.l);	%INDEXED;		%ST8;		return;
+		case 0xEB:				set_regop8(m_w.b.l);	%INDEXED;		%ADD8;		return;
+
+		case 0xF0:				set_regop8(m_w.b.l);	%EXTENDED;		%SUB8;		return;
+		case 0xF1:				set_regop8(m_w.b.l);	%EXTENDED;		%CMP8;		return;
+		case 0xF6:				set_regop8(m_w.b.l);	%EXTENDED;		%LD8;		return;
+		case 0xF7:				set_regop8(m_w.b.l);	%EXTENDED;		%ST8;		return;
+		case 0xFB:				set_regop8(m_w.b.l);	%EXTENDED;		%ADD8;		return;
+
+		default:														%ILLEGAL;	return;			
+	}
+	return;
+
+#include "base6x09.ops"
+
+PUSH_REGISTERS:
+	if (m_temp.w & 0x80)
+	{
+		@write_memory(--regop16().w, m_pc.b.l);
+		@write_memory(--regop16().w, m_pc.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x40)
+	{
+		@write_memory(--regop16().w, (&regop16() == &m_s) ? m_u.b.l : m_s.b.l);
+		@write_memory(--regop16().w, (&regop16() == &m_s) ? m_u.b.h : m_s.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x20)
+	{
+		@write_memory(--regop16().w, m_y.b.l);
+		@write_memory(--regop16().w, m_y.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x10)
+	{
+		@write_memory(--regop16().w, m_x.b.l);
+		@write_memory(--regop16().w, m_x.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x08)
+	{
+		@write_memory(--regop16().w, m_dp);
+		nop();
+	}
+	if (m_temp.w & 0x200)
+	{
+		@write_memory(--regop16().w, m_w.b.l);
+		nop();
+	}
+	if (m_temp.w & 0x100)
+	{
+		@write_memory(--regop16().w, m_w.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x04)
+	{
+		@write_memory(--regop16().w, m_d.b.l);
+		nop();
+	}
+	if (m_temp.w & 0x02)
+	{
+		@write_memory(--regop16().w, m_d.b.h);
+		nop();
+	}
+	if (m_temp.w & 0x01)
+	{
+		@write_memory(--regop16().w, m_cc);
+		nop();
+	}
+	return;
+
+PULL_REGISTERS:
+	if (m_temp.w & 0x01)
+	{
+		@m_cc = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x02)
+	{
+		@m_d.b.h = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x04)
+	{
+		@m_d.b.l = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x100)
+	{
+		@m_w.b.h = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x200)
+	{
+		@m_w.b.l = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x08)
+	{
+		@m_dp = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x10)
+	{
+		@m_x.b.h = read_memory(regop16().w++);
+		@m_x.b.l = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x20)
+	{
+		@m_y.b.h = read_memory(regop16().w++);
+		@m_y.b.l = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x40)
+	{
+		@(&regop16() == &m_s ? m_u : m_s).b.h = read_memory(regop16().w++);
+		@(&regop16() == &m_s ? m_u : m_s).b.l = read_memory(regop16().w++);
+		nop();
+	}
+	if (m_temp.w & 0x80)
+	{
+		@m_pc.b.h = read_memory(regop16().w++);
+		@m_pc.b.l = read_memory(regop16().w++);
+		nop();
+	}
+	@eat(1);
+	return;
+
+INDEXED:
+	@m_opcode = read_opcode_arg();
+	if (m_opcode & 0x80)
+	{
+		switch(m_opcode & 0x7F)
+		{
+			case 0x00: case 0x20: case 0x40: case 0x60:
+				m_temp.w = ireg();
+				ireg()++;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 3);
+				break;
+
+			case 0x01: case 0x21: case 0x41: case 0x61:
+			case 0x11: case 0x31: case 0x51: case 0x71:
+				m_temp.w = ireg();
+				ireg() += 2;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 3 : 4);
+				break;
+
+			case 0x02: case 0x22: case 0x42: case 0x62:
+				ireg()--;
+				m_temp.w = ireg();
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 3);
+				break;
+
+			case 0x03: case 0x23: case 0x43: case 0x63:
+			case 0x13: case 0x33: case 0x53: case 0x73:
+				ireg() -= 2;
+				m_temp.w = ireg();
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 3 : 4);
+				break;
+
+			case 0x04: case 0x24: case 0x44: case 0x64:
+			case 0x14: case 0x34: case 0x54: case 0x74:
+				m_temp.w = ireg();
+				eat(1);
+				break;
+
+			case 0x05: case 0x25: case 0x45: case 0x65:
+			case 0x15: case 0x35: case 0x55: case 0x75:
+				m_temp.w = ireg() + (INT8) m_d.b.l;
+				eat(2);
+				break;
+
+			case 0x06: case 0x26: case 0x46: case 0x66:
+			case 0x16: case 0x36: case 0x56: case 0x76:
+				m_temp.w = ireg() + (INT8) m_d.b.h;
+				eat(2);
+				break;
+
+			case 0x08: case 0x28: case 0x48: case 0x68:
+			case 0x18: case 0x38: case 0x58: case 0x78:
+				@m_temp.w = ireg() + (INT8) read_opcode_arg();
+				eat(1);
+				break;
+
+			case 0x09: case 0x29: case 0x49: case 0x69:
+			case 0x19: case 0x39: case 0x59: case 0x79:
+				@m_temp.b.h = read_opcode_arg();
+				@m_temp.b.l = read_opcode_arg();
+				m_temp.w = ireg() + m_temp.w;
+				eat(hd6309_native_mode() ? 2 : 3);
+				break;
+
+			case 0x0B: case 0x2B: case 0x4B: case 0x6B:
+			case 0x1B: case 0x3B: case 0x5B: case 0x7B:
+				m_temp.w = ireg() + m_d.w;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 3 : 5);
+				break;
+
+			case 0x0C: case 0x2C: case 0x4C: case 0x6C:
+			case 0x1C: case 0x3C: case 0x5C: case 0x7C:
+				@m_temp.b.l = read_opcode_arg();
+				m_temp.w = m_pc.w + (INT8) m_temp.b.l;
+				eat(1);
+				break;
+
+			case 0x0D: case 0x2D: case 0x4D: case 0x6D:
+			case 0x1D: case 0x3D: case 0x5D: case 0x7D:
+				@m_temp.b.h = read_opcode_arg();
+				@m_temp.b.l = read_opcode_arg();
+				m_temp.w = m_pc.w + (INT16) m_temp.w;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 4);
+				break;
+
+			case 0x1F: case 0x3F: case 0x5F: case 0x7F:
+				@m_temp.b.h = read_opcode_arg();
+				@m_temp.b.l = read_opcode_arg();
+				eat(1);
+				break;
+
+			case 0x07: case 0x27: case 0x47: case 0x67:
+			case 0x17: case 0x37: case 0x57: case 0x77:
+				// 6309 specific mode
+				m_temp.w = ireg() + (INT8) m_w.b.h;
+				eat(2);
+				break;
+
+			case 0x0A: case 0x2A: case 0x4A: case 0x6A:
+			case 0x1A: case 0x3A: case 0x5A: case 0x7A:
+				// 6309 specific mode
+				m_temp.w = ireg() + (INT8) m_w.b.l;
+				eat(2);
+				break;
+
+			case 0x0E: case 0x2E: case 0x4E: case 0x6E:
+			case 0x1E: case 0x3E: case 0x5E: case 0x7E:
+				// 6309 specific mode
+				m_temp.w = ireg() + m_w.w;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 5);
+				break;
+
+			case 0x0F:
+				// 6309 specific mode
+				m_temp.w = m_w.w;
+				eat(1);
+				break;
+
+			case 0x2F:
+				// 6309 specific mode
+				@m_temp.b.h = read_opcode_arg();
+				@m_temp.b.l = read_opcode_arg();
+				m_temp.w = m_w.w + m_temp.w;
+				eat(hd6309_native_mode() ? 1 : 5);
+				break;
+
+			case 0x4F:
+				// 6309 specific mode
+				m_temp.w = m_w.w;
+				m_w.w += 2;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 4);
+				break;
+
+			case 0x6F:
+				// 6309 specific mode
+				m_w.w -= 2;
+				m_temp.w = m_w.w;
+				eat((hd6309_native_mode() && !(m_opcode & 0x10)) ? 2 : 4);
+				break;
+
+			default:
+				goto ILLEGAL;
+		}
+
+		// indirect mode
+		if (m_opcode & 0x10)
+		{
+			set_ea(m_temp.w);
+			@m_temp.b.h = read_operand(0);
+			@m_temp.b.l = read_operand(1);
+			eat(1);
+		}
+	}
+	else
+	{
+		// 5-bit offset
+		m_temp.w = ireg() + (INT8) ((m_opcode & 0x0F) | (m_opcode & 0x10 ? 0xF0 : 0x00));
+		eat(2);
+	}
+	@set_ea(m_temp.w);
+	return;
+
+EXG:
+	{
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
+		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
+		write_exgtfr_register(param >> 4, reg2);
+		write_exgtfr_register(param >> 0, reg1);
+	}
+	eat(hd6309_native_mode() ? 3 : 6);
+	return;
+
+TFR:
+	{
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg = read_exgtfr_register(param >> 4);
+		write_exgtfr_register(param >> 0, reg);
+	}
+	eat(hd6309_native_mode() ? 2 : 4);
+	return;
+
+ILLEGAL:
+	m_md |= 0x40;		// illegal op flag
+	set_ea(VECTOR_ILLEGAL);
+	goto SOFTWARE_INTERRUPT;
+
+DIVIDE_BY_ZERO:
+	m_md |= 0x80;		// divide by zero flag
+	set_ea(VECTOR_ILLEGAL);
+	goto SOFTWARE_INTERRUPT;
+
+IMM_IM:
+	@m_temp_im = read_opcode_arg();
+	return;
+
+JSR_ind:
+	// this is dubious, but the old core did this
+	eat(hd6309_native_mode() ? -1 : 0);
+	goto JSR;
+
+LDQ:
+	@m_d.b.h = read_operand(0);
+	@m_d.b.l = read_operand(1);
+	@m_w.b.h = read_operand(2);
+	@m_w.b.l = read_operand(3);
+	set_flags<UINT32>(CC_NZV, get_q());
+	return;
+
+STQ:
+	@write_operand(0, m_d.b.h);
+	@write_operand(1, m_d.b.l);
+	@write_operand(2, m_w.b.h);
+	@write_operand(3, m_w.b.l);
+	set_flags<UINT32>(CC_NZV, get_q());
+	return;
+
+OIM:
+	@m_temp.b.l = read_operand();
+	m_cc &= ~CC_V;
+	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l | m_temp_im);
+	@eat(1);	// this is just a guess
+	@write_operand(m_temp.b.l);
+	return;
+
+AIM:
+	@m_temp.b.l = read_operand();
+	m_cc &= ~CC_V;
+	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l & m_temp_im);
+	@eat(1);	// this is just a guess
+	@write_operand(m_temp.b.l);
+	return;
+
+EIM:
+	@m_temp.b.l = read_operand();
+	m_cc &= ~CC_V;
+	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l ^ m_temp_im);
+	@eat(1);	// this is just a guess
+	@write_operand(m_temp.b.l);
+	return;
+
+TIM:
+	@m_temp.b.l = read_operand();
+	m_cc &= ~CC_V;
+	m_temp.b.l = set_flags(CC_NZ, (UINT8)0, m_temp.b.l, m_temp.b.l & m_temp_im);
+	@eat(2);	// this is just a guess
+	return;
+
+TFM:
+	// The TFM instruction takes up 6 CPU cycles, plus 3 CPU cycles
+	// for each byte transferred.  At least three of these are spent
+	// reading the opcodes (00010001 001110xx xxxxxxxx).
+	//
+	// The old (pre-0.149) core allowed interrupts to interrupt
+	// execution of the transfer by implementing a transfer as an
+	// operation that executed one transfer, and bumped the program
+	// counter back.  However, some documentation suggests that TFM
+	// was abortable, so we now have a get_pending_interrupt() call
+	// here. 
+	//
+	// Lastly, I have no information on the precise sub-instruction timing
+	// here; the timings of the reads and writes are really just a guess.
+	@m_temp.b.l = read_opcode_arg();
+
+	while (m_w.w != 0x0000)
+	{
+		// TFM is abortable - we need to check for a pending interrupt
+		if (get_pending_interrupt() != 0)
+		{
+			m_pc.w -= 3;
+			return;
+		}
+
+		if (!tfr_read(m_opcode, m_temp.b.l, m_temp.b.h))
+			goto ILLEGAL;
+		@eat(0);
+
+		if (!tfr_write(m_opcode, m_temp.b.l, m_temp.b.h))
+			goto ILLEGAL;
+		@eat(1);
+
+		m_w.w--;
+	}
+
+	// Not sure if this sub instruction timing is accurate either
+	@eat(3);
+	return;
+
+COM16:
+	m_temp.b.h = read_operand(0);
+	m_temp.b.l = read_operand(1);
+	m_cc &= ~CC_V;
+	m_cc |= CC_C;
+	m_temp.w = set_flags(CC_NZ, (UINT16) ~m_temp.w);
+	eat(hd6309_native_mode() ? 0 : 1);
+	write_operand(0, m_temp.b.h);
+	write_operand(1, m_temp.b.l);
+	return;
+
+ADC16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	regop16().w = set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w + m_temp.w + (m_cc & CC_C ? 1 : 0));
+	eat(hd6309_native_mode() ? 0 : 1);
+	return;
+
+SBC16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	regop16().w = set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w - m_temp.w - (m_cc & CC_C ? 1 : 0));
+	eat(hd6309_native_mode() ? 0 : 1);
+	return;
+
+AND16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	m_cc &= ~CC_V;
+	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w & m_temp.w);
+	return;
+
+BIT16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	m_cc &= ~CC_V;
+	set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w & m_temp.w);
+	return;
+
+OR16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	m_cc &= ~CC_V;
+	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w | m_temp.w);
+	return;
+
+EOR16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	m_cc &= ~CC_V;
+	regop16().w = set_flags(CC_NZ, (UINT16)0, regop16().w, regop16().w ^ m_temp.w);
+	return;
+
+PSHSW:
+	m_temp.w = 0x300;	// PSHS W
+	eat(2);
+	set_regop16(m_s);
+	goto PUSH_REGISTERS;
+
+PULSW:
+	m_temp.w = 0x300;	// PULS W
+	eat(2);
+	set_regop16(m_s);
+	goto PULL_REGISTERS;
+
+PSHUW:
+	m_temp.w = 0x300;	// PSHU W
+	eat(2);
+	set_regop16(m_u);
+	goto PUSH_REGISTERS;
+
+PULUW:
+	m_temp.w = 0x300;	// PULU W
+	eat(2);
+	set_regop16(m_u);
+	goto PULL_REGISTERS;
+
+BAND:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() && bittest_source());
+	return;
+
+BIAND:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() && !bittest_source());
+	return;
+
+BOR:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() || bittest_source());
+	return;
+
+BIOR:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() || !bittest_source());
+	return;
+
+BEOR:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() != bittest_source());
+	return;
+
+BIEOR:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_dest() != !bittest_source());
+	return;
+
+LDBT:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	bittest_set(bittest_source());
+	return;
+
+STBT:
+	%IMM_IM;
+	%DIRECT;
+	@m_temp.b.l = read_operand();
+	if (bittest_source())
+		m_temp.b.l |= (1 << ((m_temp_im >> 0) & 0x07));
+	else
+		m_temp.b.l &= ~(1 << ((m_temp_im >> 0) & 0x07));
+	@eat(2);
+	write_operand(m_temp.b.l);
+	return;
+
+MULD:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	muld();
+	{
+		PAIR result;
+		result.d = ((INT16) m_d.w) * ((INT16) m_temp.w);
+		m_d.w = set_flags<UINT16>(CC_NZ, result.w.h);
+		m_w.w = result.w.l;
+		m_cc &= ~CC_VC;
+	}
+	return;
+
+DIVQ:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	if (!divq())
+		goto DIVIDE_BY_ZERO;
+	return;
+
+DIVD:
+	@m_temp.b.l = read_operand();
+	if (!divd())
+		goto DIVIDE_BY_ZERO;
+	return;
+
+SEXW:
+	m_d.w = set_flags<UINT16>(CC_N, (m_w.w & 0x8000) ? 0xFFFF : 0x0000);
+	if ((m_d.w == 0x0000) && (m_w.w == 0x0000))
+		m_cc |= CC_Z;
+	else
+		m_cc &= ~CC_Z;
+	return;

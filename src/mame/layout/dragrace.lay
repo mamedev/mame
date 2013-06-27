@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="road_overlay">
+		<rect>
+			<bounds left="0" top="0" right="256" bottom="240" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds left="0" top="47" right="256" bottom="129" />
+			<color red="0.95" green="0.08" blue="0.13" />
+		</rect>
+		<rect>
+			<bounds left="0" top="159" right="256" bottom="240" />
+			<color red="1.0" green="0.97" blue="0.31" />
+		</rect>
+	</element>
+
+	<element name="circle_red">
+		<disk>
+			<color red="0.95" green="0.08" blue="0.13" />
+		</disk>
+	</element>
+	<element name="circle_green">
+		<disk>
+			<color red="0.16" green="0.58" blue="0.25" />
+		</disk>
+	</element>
+	<element name="circle_yellow">
+		<disk>
+			<color red="1.0" green="0.97" blue="0.31" />
+		</disk>
+	</element>
+
+
+<!-- NOTE: still need to add the RPM tachometers, -->
+<!-- but first figure out how they're hooked up -->
+
+	<view name="Color Overlay">
+		<screen index="0">
+			<bounds left="0" top="0" right="400" bottom="300" />
+		</screen>
+
+		<overlay element="road_overlay">
+			<bounds left="0" top="0" right="400" bottom="300" />
+		</overlay>
+
+		<bezel element="circle_red">
+			<bounds x="24.5" y="168.5" width="24" height="24" />
+			<color alpha=".3" />
+		</bezel>
+		<bezel element="circle_green">
+			<bounds x="49.5" y="168.5" width="24" height="24" />
+			<color alpha=".3" />
+		</bezel>
+		<bezel element="circle_yellow">
+			<bounds x="74.5" y="168.5" width="24" height="24" />
+			<color alpha=".3" />
+		</bezel>
+		<bezel element="circle_yellow">
+			<bounds x="99.5" y="168.5" width="24" height="24" />
+			<color alpha=".3" />
+		</bezel>
+		<bezel element="circle_yellow">
+			<bounds x="124.5" y="168.5" width="24" height="24" />
+			<color alpha=".3" />
+		</bezel>
+
+		<overlay element="circle_red">
+			<bounds x="24.5" y="168.5" width="24" height="24" />
+		</overlay>
+		<overlay element="circle_green">
+			<bounds x="49.5" y="168.5" width="24" height="24" />
+		</overlay>
+		<overlay element="circle_yellow">
+			<bounds x="74.5" y="168.5" width="24" height="24" />
+		</overlay>
+		<overlay element="circle_yellow">
+			<bounds x="99.5" y="168.5" width="24" height="24" />
+		</overlay>
+		<overlay element="circle_yellow">
+			<bounds x="124.5" y="168.5" width="24" height="24" />
+		</overlay>
+
+	</view>
+</mamelayout>
