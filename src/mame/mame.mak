@@ -1737,6 +1737,7 @@ $(MAMEOBJ)/taito.a: \
 	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taitoic.o \
 	$(AUDIO)/taito_zm.o \
+	$(DRIVERS)/taito_type_x.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
