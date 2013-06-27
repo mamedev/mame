@@ -447,6 +447,8 @@ DEFS += -DNO_MEMORY_INITIALIZATION
 endif
 endif
 
+# make librocket H files know that we are using them as static lib
+DEFS += -DSTATIC_LIB 
 
 #-------------------------------------------------
 # compile flags
@@ -560,6 +562,7 @@ INCPATH += \
 	-I$(SRC)/emu \
 	-I$(OBJ)/emu \
 	-I$(OBJ)/emu/layout \
+	-I$(SRC)/lib/librocket/Include \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/lib \
 	-I$(SRC)/osd \
@@ -722,6 +725,7 @@ ifneq (,$(findstring clang,$(CC)))
 LIBS += -lstdc++ -lpthread
 endif
 
+LIBS += -lfreetype
 #-------------------------------------------------
 # 'default' target needs to go here, before the
 # include files which define additional targets
