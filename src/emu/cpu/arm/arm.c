@@ -22,10 +22,10 @@
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
 
-#define READ8(addr)         cpu_read8(cpustate,addr)
-#define WRITE8(addr,data)   cpu_write8(cpustate,addr,data)
-#define READ32(addr)        cpu_read32(cpustate,addr)
-#define WRITE32(addr,data)  cpu_write32(cpustate,addr,data)
+#define READ8(addr)         cpu_read8(addr)
+#define WRITE8(addr,data)   cpu_write8(addr,data)
+#define READ32(addr)        cpu_read32(addr)
+#define WRITE32(addr,data)  cpu_write32(addr,data)
 
 #define ARM_DEBUG_CORE 0
 #define ARM_DEBUG_COPRO 0
@@ -125,7 +125,7 @@ static const int sRegisterTable[kNumModes][16] =
 #define ADDRESS_MASK    ((UINT32) 0x03fffffcu)
 #define MODE_MASK       ((UINT32) 0x00000003u)
 
-#define R15                     cpustate->sArmRegister[eR15]
+#define R15                     m_sArmRegister[eR15]
 #define MODE                    (R15&0x03)
 #define SIGN_BIT                ((UINT32)(1<<31))
 #define SIGN_BITS_DIFFER(a,b)   (((a)^(b)) >> 31)
@@ -224,68 +224,61 @@ enum
 #define ROL(v,s) (LSL((v),(s)) | (LSR((v),32u - (s))))
 #define ROR(v,s) (LSR((v),(s)) | (LSL((v),32u - (s))))
 
-/* Private Data */
-
-/* sArmRegister defines the CPU state */
-struct ARM_REGS
-{
-	int icount;
-	UINT32 sArmRegister[kNumRegisters];
-	UINT32 coproRegister[16];
-	UINT8 pendingIrq;
-	UINT8 pendingFiq;
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	endianness_t endian;
-};
-
-/* Prototypes */
-static void HandleALU( ARM_REGS* cpustate, UINT32 insn);
-static void HandleMul( ARM_REGS* cpustate, UINT32 insn);
-static void HandleBranch( ARM_REGS* cpustate, UINT32 insn);
-static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn);
-static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn);
-static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn);
-static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry);
-static void arm_check_irq_state(ARM_REGS* cpustate);
 
 /***************************************************************************/
 
-INLINE ARM_REGS *get_safe_token(device_t *device)
+const device_type ARM = &device_creator<arm_cpu_device>;
+const device_type ARM_BE = &device_creator<arm_be_cpu_device>;
+
+
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, ARM, "ARM", tag, owner, clock, "arm", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 26, 0)
+	, m_endian(ENDIANNESS_LITTLE)
 {
-	assert(device != NULL);
-	assert(device->type() == ARM || device->type() == ARM_BE);
-	return (ARM_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
+
+arm_cpu_device::arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, endianness_t endianness)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", endianness, 32, 26, 0)
+	, m_endian(endianness)
+{
+}
+
+
+arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: arm_cpu_device(mconfig, ARM_BE, "ARM (big endian)", tag, owner, clock, "arm be", __FILE__, ENDIANNESS_BIG)
+{
+}
+
+
+void arm_cpu_device::cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
-	if ( cpustate->endian == ENDIANNESS_BIG )
-		cpustate->program->write_dword(addr&ADDRESS_MASK,data);
+	if ( m_endian == ENDIANNESS_BIG )
+		m_program->write_dword(addr&ADDRESS_MASK,data);
 	else
-		cpustate->program->write_dword(addr&ADDRESS_MASK,data);
+		m_program->write_dword(addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
-INLINE void cpu_write8( ARM_REGS* cpustate, int addr, UINT8 data )
+void arm_cpu_device::cpu_write8( int addr, UINT8 data )
 {
-	if ( cpustate->endian == ENDIANNESS_BIG )
-		cpustate->program->write_byte(addr,data);
+	if ( m_endian == ENDIANNESS_BIG )
+		m_program->write_byte(addr,data);
 	else
-		cpustate->program->write_byte(addr,data);
+		m_program->write_byte(addr,data);
 }
 
-INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
+UINT32 arm_cpu_device::cpu_read32( int addr )
 {
 	UINT32 result;
 
-	if ( cpustate->endian == ENDIANNESS_BIG )
-		result = cpustate->program->read_dword(addr&ADDRESS_MASK);
+	if ( m_endian == ENDIANNESS_BIG )
+		result = m_program->read_dword(addr&ADDRESS_MASK);
 	else
-		result = cpustate->program->read_dword(addr&ADDRESS_MASK);
+		result = m_program->read_dword(addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
 	if (addr&3) {
@@ -303,73 +296,67 @@ INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
 	return result;
 }
 
-INLINE UINT8 cpu_read8( ARM_REGS* cpustate, int addr )
+UINT8 arm_cpu_device::cpu_read8( int addr )
 {
-	if ( cpustate->endian == ENDIANNESS_BIG )
-		return cpustate->program->read_byte(addr);
+	if ( m_endian == ENDIANNESS_BIG )
+		return m_program->read_byte(addr);
 	else
-		return cpustate->program->read_byte(addr);
+		return m_program->read_byte(addr);
 }
 
-INLINE UINT32 GetRegister( ARM_REGS* cpustate, int rIndex )
+UINT32 arm_cpu_device::GetRegister( int rIndex )
 {
-	return cpustate->sArmRegister[sRegisterTable[MODE][rIndex]];
+	return m_sArmRegister[sRegisterTable[MODE][rIndex]];
 }
 
-INLINE void SetRegister( ARM_REGS* cpustate, int rIndex, UINT32 value )
+void arm_cpu_device::SetRegister( int rIndex, UINT32 value )
 {
-	cpustate->sArmRegister[sRegisterTable[MODE][rIndex]] = value;
+	m_sArmRegister[sRegisterTable[MODE][rIndex]] = value;
 }
 
-INLINE UINT32 GetModeRegister( ARM_REGS* cpustate, int mode, int rIndex )
+UINT32 arm_cpu_device::GetModeRegister( int mode, int rIndex )
 {
-	return cpustate->sArmRegister[sRegisterTable[mode][rIndex]];
+	return m_sArmRegister[sRegisterTable[mode][rIndex]];
 }
 
-INLINE void SetModeRegister( ARM_REGS* cpustate, int mode, int rIndex, UINT32 value )
+void arm_cpu_device::SetModeRegister( int mode, int rIndex, UINT32 value )
 {
-	cpustate->sArmRegister[sRegisterTable[mode][rIndex]] = value;
+	m_sArmRegister[sRegisterTable[mode][rIndex]] = value;
 }
 
 
 /***************************************************************************/
 
-static CPU_RESET( arm )
+void arm_cpu_device::device_reset()
 {
-	ARM_REGS *cpustate = get_safe_token(device);
-
-	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
-	endianness_t save_endian = cpustate->endian;
-
-	memset(cpustate, 0, sizeof(ARM_REGS));
-	cpustate->irq_callback = save_irqcallback;
-	cpustate->endian = save_endian;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
+	for ( int i = 0; i < 27; i++ )
+	{
+		m_sArmRegister[i] = 0;
+	}
+	for ( int i = 0; i < 16; i++ )
+	{
+		m_coproRegister[i] = 0;
+	}
+	m_pendingIrq = 0;
+	m_pendingFiq = 0; 
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
 }
 
-static CPU_EXIT( arm )
-{
-	/* nothing to do here */
-}
 
-static CPU_EXECUTE( arm )
+void arm_cpu_device::execute_run()
 {
 	UINT32 pc;
 	UINT32 insn;
-	ARM_REGS *cpustate = get_safe_token(device);
 
 	do
 	{
-		debugger_instruction_hook(device, R15 & ADDRESS_MASK);
+		debugger_instruction_hook(this, R15 & ADDRESS_MASK);
 
 		/* load instruction */
 		pc = R15;
-		insn = cpustate->direct->read_decrypted_dword( pc & ADDRESS_MASK );
+		insn = m_direct->read_decrypted_dword( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -421,55 +408,55 @@ static CPU_EXECUTE( arm )
 		/* Condition satisfied, so decode the instruction */
 		if ((insn & 0x0fc000f0u) == 0x00000090u)    /* Multiplication */
 		{
-			HandleMul(cpustate, insn);
+			HandleMul(insn);
 			R15 += 4;
 		}
 		else if (!(insn & 0x0c000000u)) /* Data processing */
 		{
-			HandleALU(cpustate, insn);
+			HandleALU(insn);
 		}
 		else if ((insn & 0x0c000000u) == 0x04000000u) /* Single data access */
 		{
-			HandleMemSingle(cpustate, insn);
+			HandleMemSingle(insn);
 			R15 += 4;
 		}
 		else if ((insn & 0x0e000000u) == 0x08000000u ) /* Block data access */
 		{
-			HandleMemBlock(cpustate, insn);
+			HandleMemBlock(insn);
 			R15 += 4;
 		}
 		else if ((insn & 0x0e000000u) == 0x0a000000u)   /* Branch */
 		{
-			HandleBranch(cpustate, insn);
+			HandleBranch(insn);
 		}
 		else if ((insn & 0x0f000000u) == 0x0e000000u)   /* Coprocessor */
 		{
-			HandleCoPro(cpustate, insn);
+			HandleCoPro(insn);
 			R15 += 4;
 		}
 		else if ((insn & 0x0f000000u) == 0x0f000000u)   /* Software interrupt */
 		{
 			pc=R15+4;
 			R15 = eARM_MODE_SVC;    /* Set SVC mode so PC is saved to correct R14 bank */
-			SetRegister( cpustate, 14, pc );    /* save PC */
+			SetRegister( 14, pc );    /* save PC */
 			R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x8|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
-			cpustate->icount -= 2 * S_CYCLE + N_CYCLE;
+			m_icount -= 2 * S_CYCLE + N_CYCLE;
 		}
 		else /* Undefined */
 		{
 			logerror("%08x:  Undefined instruction\n",R15);
 		L_Next:
-			cpustate->icount -= S_CYCLE;
+			m_icount -= S_CYCLE;
 			R15 += 4;
 		}
 
-		arm_check_irq_state(cpustate);
+		arm_check_irq_state();
 
-	} while( cpustate->icount > 0 );
+	} while( m_icount > 0 );
 } /* arm_execute */
 
 
-static void arm_check_irq_state(ARM_REGS* cpustate)
+void arm_cpu_device::arm_check_irq_state()
 {
 	UINT32 pc = R15+4; /* save old pc (already incremented in pipeline) */;
 
@@ -483,86 +470,122 @@ static void arm_check_irq_state(ARM_REGS* cpustate)
 	    Undefined instruction
 	*/
 
-	if (cpustate->pendingFiq && (pc&F_MASK)==0) {
+	if (m_pendingFiq && (pc&F_MASK)==0) {
 		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
-		SetRegister( cpustate, 14, pc );    /* save PC */
+		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		cpustate->pendingFiq=0;
+		m_pendingFiq=0;
 		return;
 	}
 
-	if (cpustate->pendingIrq && (pc&I_MASK)==0) {
+	if (m_pendingIrq && (pc&I_MASK)==0) {
 		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
-		SetRegister( cpustate, 14, pc );    /* save PC */
+		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		cpustate->pendingIrq=0;
+		m_pendingIrq=0;
 		return;
 	}
 }
 
-static void set_irq_line(ARM_REGS* cpustate, int irqline, int state)
+
+void arm_cpu_device::execute_set_input(int irqline, int state)
 {
 	switch (irqline) {
 	case ARM_IRQ_LINE: /* IRQ */
 		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
-			cpustate->pendingIrq=1;
+			m_pendingIrq=1;
 		else
-			cpustate->pendingIrq=0;
+			m_pendingIrq=0;
 		break;
 
 	case ARM_FIRQ_LINE: /* FIRQ */
 		if (state && (R15&0x3)!=eARM_MODE_FIQ) /* Don't allow nested FIRQs */
-			cpustate->pendingFiq=1;
+			m_pendingFiq=1;
 		else
-			cpustate->pendingFiq=0;
+			m_pendingFiq=0;
 		break;
 	}
 
-	arm_check_irq_state(cpustate);
-}
-
-static CPU_INIT( arm )
-{
-	ARM_REGS *cpustate = get_safe_token(device);
-
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->endian = ENDIANNESS_LITTLE;
-
-	device->save_item(NAME(cpustate->sArmRegister));
-	device->save_item(NAME(cpustate->coproRegister));
-	device->save_item(NAME(cpustate->pendingIrq));
-	device->save_item(NAME(cpustate->pendingFiq));
+	arm_check_irq_state();
 }
 
 
-static CPU_INIT( arm_be )
+void arm_cpu_device::device_start()
 {
-	ARM_REGS *cpustate = get_safe_token(device);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
 
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->endian = ENDIANNESS_BIG;
+	save_item(NAME(m_sArmRegister));
+	save_item(NAME(m_coproRegister));
+	save_item(NAME(m_pendingIrq));
+	save_item(NAME(m_pendingFiq));
 
-	device->save_item(NAME(cpustate->sArmRegister));
-	device->save_item(NAME(cpustate->coproRegister));
-	device->save_item(NAME(cpustate->pendingIrq));
-	device->save_item(NAME(cpustate->pendingFiq));
+	state_add( ARM32_PC,   "PC",   m_sArmRegister[15]       ).mask(ADDRESS_MASK).formatstr("%08X");
+	state_add( ARM32_R0,   "R0",   m_sArmRegister[ 0]       ).formatstr("%08X");
+	state_add( ARM32_R1,   "R1",   m_sArmRegister[ 1]       ).formatstr("%08X");
+	state_add( ARM32_R2,   "R2",   m_sArmRegister[ 2]       ).formatstr("%08X");
+	state_add( ARM32_R3,   "R3",   m_sArmRegister[ 3]       ).formatstr("%08X");
+	state_add( ARM32_R4,   "R4",   m_sArmRegister[ 4]       ).formatstr("%08X");
+	state_add( ARM32_R5,   "R5",   m_sArmRegister[ 5]       ).formatstr("%08X");
+	state_add( ARM32_R6,   "R6",   m_sArmRegister[ 6]       ).formatstr("%08X");
+	state_add( ARM32_R7,   "R7",   m_sArmRegister[ 7]       ).formatstr("%08X");
+	state_add( ARM32_R8,   "R8",   m_sArmRegister[ 8]       ).formatstr("%08X");
+	state_add( ARM32_R9,   "R9",   m_sArmRegister[ 9]       ).formatstr("%08X");
+	state_add( ARM32_R10,  "R10",  m_sArmRegister[10]       ).formatstr("%08X");
+	state_add( ARM32_R11,  "R11",  m_sArmRegister[11]       ).formatstr("%08X");
+	state_add( ARM32_R12,  "R12",  m_sArmRegister[12]       ).formatstr("%08X");
+	state_add( ARM32_R13,  "R13",  m_sArmRegister[13]       ).formatstr("%08X");
+	state_add( ARM32_R14,  "R14",  m_sArmRegister[14]       ).formatstr("%08X");
+	state_add( ARM32_R15,  "R15",  m_sArmRegister[15]       ).formatstr("%08X");
+	state_add( ARM32_FR8,  "FR8",  m_sArmRegister[eR8_FIQ]  ).formatstr("%08X");
+	state_add( ARM32_FR9,  "FR9",  m_sArmRegister[eR9_FIQ]  ).formatstr("%08X");
+	state_add( ARM32_FR10, "FR10", m_sArmRegister[eR10_FIQ] ).formatstr("%08X");
+	state_add( ARM32_FR11, "FR11", m_sArmRegister[eR11_FIQ] ).formatstr("%08X");
+	state_add( ARM32_FR12, "FR12", m_sArmRegister[eR12_FIQ] ).formatstr("%08X");
+	state_add( ARM32_FR13, "FR13", m_sArmRegister[eR13_FIQ] ).formatstr("%08X");
+	state_add( ARM32_FR14, "FR14", m_sArmRegister[eR14_FIQ] ).formatstr("%08X");
+	state_add( ARM32_IR13, "IR13", m_sArmRegister[eR13_IRQ] ).formatstr("%08X");
+	state_add( ARM32_IR14, "IR14", m_sArmRegister[eR14_IRQ] ).formatstr("%08X");
+	state_add( ARM32_SR13, "SR13", m_sArmRegister[eR13_SVC] ).formatstr("%08X");
+	state_add( ARM32_SR14, "SR14", m_sArmRegister[eR14_SVC] ).formatstr("%08X");
+
+	state_add(STATE_GENPC, "curpc", m_sArmRegister[15]).mask(ADDRESS_MASK).callimport().callexport().formatstr("%11s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%8s").noshow();
+
+	m_icountptr = &m_icount;
+}
+
+
+void arm_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	static const char *s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
+
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c %s",
+			    (m_sArmRegister[15] & N_MASK) ? 'N' : '-',
+			    (m_sArmRegister[15] & Z_MASK) ? 'Z' : '-',
+			    (m_sArmRegister[15] & C_MASK) ? 'C' : '-',
+			    (m_sArmRegister[15] & V_MASK) ? 'V' : '-',
+			    (m_sArmRegister[15] & I_MASK) ? 'I' : '-',
+			    (m_sArmRegister[15] & F_MASK) ? 'F' : '-',
+			    s[m_sArmRegister[15] & 3] );
+			break;
+	}
 }
 
 
 /***************************************************************************/
 
-static void HandleBranch( ARM_REGS* cpustate, UINT32 insn )
+void arm_cpu_device::HandleBranch( UINT32 insn )
 {
 	UINT32 off = (insn & INSN_BRANCH) << 2;
 
 	/* Save PC into LR if this is a branch with link */
 	if (insn & INSN_BL)
 	{
-		SetRegister(cpustate, 14,R15 + 4);
+		SetRegister(14,R15 + 4);
 	}
 
 	/* Sign-extend the 24-bit offset in our calculations */
@@ -574,17 +597,18 @@ static void HandleBranch( ARM_REGS* cpustate, UINT32 insn )
 	{
 		R15 += off + 8;
 	}
-	cpustate->icount -= 2 * S_CYCLE + N_CYCLE;
+	m_icount -= 2 * S_CYCLE + N_CYCLE;
 }
 
-static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
+
+void arm_cpu_device::HandleMemSingle( UINT32 insn )
 {
 	UINT32 rn, rnv, off, rd;
 
 	/* Fetch the offset */
 	if (insn & INSN_I)
 	{
-		off = decodeShift(cpustate, insn, NULL);
+		off = decodeShift(insn, NULL);
 	}
 	else
 	{
@@ -602,21 +626,21 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		if (insn & INSN_SDT_U)
 		{
 			if (rn != eR15)
-				rnv = (GetRegister(cpustate, rn) + off);
+				rnv = (GetRegister(rn) + off);
 			else
 				rnv = (R15 & ADDRESS_MASK) + off;
 		}
 		else
 		{
 			if (rn != eR15)
-				rnv = (GetRegister(cpustate, rn) - off);
+				rnv = (GetRegister(rn) - off);
 			else
 				rnv = (R15 & ADDRESS_MASK) - off;
 		}
 
 		if (insn & INSN_SDT_W)
 		{
-			SetRegister(cpustate, rn,rnv);
+			SetRegister(rn,rnv);
 			if (ARM_DEBUG_CORE && rn == eR15)
 				logerror("writeback R15 %08x\n", R15);
 		}
@@ -634,7 +658,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		}
 		else
 		{
-			rnv = GetRegister(cpustate, rn);
+			rnv = GetRegister(rn);
 		}
 	}
 
@@ -643,12 +667,12 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 	if (insn & INSN_SDT_L)
 	{
 		/* Load */
-		cpustate->icount -= S_CYCLE + I_CYCLE + N_CYCLE;
+		m_icount -= S_CYCLE + I_CYCLE + N_CYCLE;
 		if (insn & INSN_SDT_B)
 		{
 			if (ARM_DEBUG_CORE && rd == eR15)
 				logerror("read byte R15 %08x\n", R15);
-			SetRegister(cpustate, rd,(UINT32) READ8(rnv) );
+			SetRegister(rd,(UINT32) READ8(rnv) );
 		}
 		else
 		{
@@ -667,31 +691,31 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 				if ((READ32(rnv)&3)==0)
 					R15 -= 4;
 
-				cpustate->icount -= S_CYCLE + N_CYCLE;
+				m_icount -= S_CYCLE + N_CYCLE;
 			}
 			else
 			{
-				SetRegister(cpustate, rd, READ32(rnv));
+				SetRegister(rd, READ32(rnv));
 			}
 		}
 	}
 	else
 	{
 		/* Store */
-		cpustate->icount -= 2 * N_CYCLE;
+		m_icount -= 2 * N_CYCLE;
 		if (insn & INSN_SDT_B)
 		{
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in byte mode\n");
 
-			WRITE8(rnv, (UINT8) GetRegister(cpustate, rd) & 0xffu);
+			WRITE8(rnv, (UINT8) GetRegister(rd) & 0xffu);
 		}
 		else
 		{
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in 32bit mode\n");
 
-			WRITE32(rnv, rd == eR15 ? R15 + 8 : GetRegister(cpustate, rd));
+			WRITE32(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
 		}
 	}
 
@@ -703,13 +727,13 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd==rn) {
-				SetRegister(cpustate, rn,GetRegister(cpustate, rd));
+				SetRegister(rn,GetRegister(rd));
 			}
 			else {
 				if ((insn&INSN_SDT_W)!=0)
 				logerror("%08x:  RegisterWritebackIncrement %d %d %d\n",R15,(insn & INSN_SDT_P)!=0,(insn&INSN_SDT_W)!=0,(insn & INSN_SDT_U)!=0);
 
-				SetRegister(cpustate, rn,(rnv + off));
+				SetRegister(rn,(rnv + off));
 			}
 		}
 		else
@@ -717,10 +741,10 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd==rn) {
-				SetRegister(cpustate, rn,GetRegister(cpustate, rd));
+				SetRegister(rn,GetRegister(rd));
 			}
 			else {
-				SetRegister(cpustate, rn,(rnv - off));
+				SetRegister(rn,(rnv - off));
 
 				if ((insn&INSN_SDT_W)!=0)
 				logerror("%08x:  RegisterWritebackDecrement %d %d %d\n",R15,(insn & INSN_SDT_P)!=0,(insn&INSN_SDT_W)!=0,(insn & INSN_SDT_U)!=0);
@@ -768,13 +792,13 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 						| (((sc) != 0) << C_BIT)) + 4; \
 	else R15 += 4;
 
-static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
+void arm_cpu_device::HandleALU( UINT32 insn )
 {
 	UINT32 op2, sc=0, rd, rn, opcode;
 	UINT32 by, rdn;
 
 	opcode = (insn & INSN_OPCODE) >> INSN_OPCODE_SHIFT;
-	cpustate->icount -= S_CYCLE;
+	m_icount -= S_CYCLE;
 
 	rd = 0;
 	rn = 0;
@@ -797,7 +821,7 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 	}
 	else
 	{
-		op2 = decodeShift(cpustate, insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
 
 			if (!(insn & INSN_S))
 			sc=0;
@@ -817,7 +841,7 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 		}
 		else
 		{
-			rn = GetRegister(cpustate, rn);
+			rn = GetRegister(rn);
 		}
 	}
 
@@ -888,7 +912,7 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 		{
 			/* Merge the old NZCV flags into the new PC value */
 			R15 = (rd & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15&MODE_MASK);
-			cpustate->icount -= S_CYCLE + N_CYCLE;
+			m_icount -= S_CYCLE + N_CYCLE;
 		}
 		else
 		{
@@ -897,17 +921,17 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 				/* S Flag is set - update PSR & mode if in non-user mode only */
 				if ((R15&MODE_MASK)!=0)
 				{
-					SetRegister(cpustate,rdn,rd);
+					SetRegister(rdn,rd);
 				}
 				else
 				{
-					SetRegister(cpustate, rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
+					SetRegister(rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
 				}
-				cpustate->icount -= S_CYCLE + N_CYCLE;
+				m_icount -= S_CYCLE + N_CYCLE;
 			}
 			else
 			{
-				SetRegister(cpustate,rdn,rd);
+				SetRegister(rdn,rd);
 			}
 		}
 	/* TST & TEQ can affect R15 (the condition code register) with the S bit set */
@@ -920,24 +944,24 @@ static void HandleALU( ARM_REGS* cpustate, UINT32 insn )
 			// combine the flags from rd with the address from R15
 			rd &= ~ADDRESS_MASK;
 			rd |= (R15 & ADDRESS_MASK);
-			SetRegister(cpustate,rdn,rd);
+			SetRegister(rdn,rd);
 		}
 		else
 		{
 			// combine the flags from rd with the address from R15
 			rd &= ~ADDRESS_MASK;    // clear address part of RD
 			rd |= (R15 & ADDRESS_MASK); // RD = address part of R15
-			SetRegister(cpustate, rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
+			SetRegister(rdn,(rd&ADDRESS_MASK) | (rd&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK));
 		}
-		cpustate->icount -= S_CYCLE + N_CYCLE;
+		m_icount -= S_CYCLE + N_CYCLE;
 	}
 }
 
-static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
+void arm_cpu_device::HandleMul( UINT32 insn)
 {
 	UINT32 r;
 
-	cpustate->icount -= S_CYCLE + I_CYCLE;
+	m_icount -= S_CYCLE + I_CYCLE;
 	/* should be:
 	        Range of Rs            Number of cycles
 
@@ -960,8 +984,8 @@ static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
 	*/
 
 	/* Do the basic multiply of Rm and Rs */
-	r = GetRegister( cpustate, insn&INSN_MUL_RM ) *
-		GetRegister( cpustate, (insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT );
+	r = GetRegister( insn&INSN_MUL_RM ) *
+		GetRegister( (insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT );
 
 	if (ARM_DEBUG_CORE && ((insn&INSN_MUL_RM)==0xf
 		|| ((insn&INSN_MUL_RS)>>INSN_MUL_RS_SHIFT )==0xf
@@ -972,11 +996,11 @@ static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
 	{
-		r += GetRegister(cpustate, (insn&INSN_MUL_RN)>>INSN_MUL_RN_SHIFT);
+		r += GetRegister((insn&INSN_MUL_RN)>>INSN_MUL_RN_SHIFT);
 	}
 
 	/* Write the result */
-	SetRegister(cpustate,(insn&INSN_MUL_RD)>>INSN_MUL_RD_SHIFT,r);
+	SetRegister((insn&INSN_MUL_RD)>>INSN_MUL_RD_SHIFT,r);
 
 	/* Set N and Z if asked */
 	if( insn & INSN_S )
@@ -985,7 +1009,8 @@ static void HandleMul( ARM_REGS* cpustate, UINT32 insn)
 	}
 }
 
-static int loadInc ( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
+
+int arm_cpu_device::loadInc(UINT32 pat, UINT32 rbv, UINT32 s)
 {
 	int i,result;
 
@@ -996,11 +1021,11 @@ static int loadInc ( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
 		{
 			if (i==15) {
 				if (s) /* Pull full contents from stack */
-					SetRegister( cpustate, 15, READ32(rbv+=4) );
+					SetRegister( 15, READ32(rbv+=4) );
 				else /* Pull only address, preserve mode & status flags */
-					SetRegister( cpustate, 15, (R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((READ32(rbv+=4))&ADDRESS_MASK) );
+					SetRegister( 15, (R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((READ32(rbv+=4))&ADDRESS_MASK) );
 			} else
-				SetRegister( cpustate, i, READ32(rbv+=4) );
+				SetRegister( i, READ32(rbv+=4) );
 
 			result++;
 		}
@@ -1008,7 +1033,8 @@ static int loadInc ( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv, UINT32 s)
 	return result;
 }
 
-static int loadDec( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv, UINT32 s, UINT32* deferredR15, int* defer)
+
+int arm_cpu_device::loadDec(UINT32 pat, UINT32 rbv, UINT32 s, UINT32* deferredR15, int* defer)
 {
 	int i,result;
 
@@ -1025,14 +1051,15 @@ static int loadDec( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv, UINT32 s, UINT32
 					*deferredR15=(R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((READ32(rbv-=4))&ADDRESS_MASK);
 			}
 			else
-				SetRegister( cpustate, i, READ32(rbv -=4) );
+				SetRegister( i, READ32(rbv -=4) );
 			result++;
 		}
 	}
 	return result;
 }
 
-static int storeInc( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv)
+
+int arm_cpu_device::storeInc(UINT32 pat, UINT32 rbv)
 {
 	int i,result;
 
@@ -1044,14 +1071,15 @@ static int storeInc( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv)
 			if (ARM_DEBUG_CORE && i==15) /* R15 is plus 12 from address of STM */
 				logerror("%08x: StoreInc on R15\n",R15);
 
-			WRITE32( rbv += 4, GetRegister(cpustate, i) );
+			WRITE32( rbv += 4, GetRegister(i) );
 			result++;
 		}
 	}
 	return result;
 } /* storeInc */
 
-static int storeDec( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv)
+
+int arm_cpu_device::storeDec(UINT32 pat, UINT32 rbv)
 {
 	int i,result;
 
@@ -1063,17 +1091,18 @@ static int storeDec( ARM_REGS* cpustate, UINT32 pat, UINT32 rbv)
 			if (ARM_DEBUG_CORE && i==15) /* R15 is plus 12 from address of STM */
 				logerror("%08x: StoreDec on R15\n",R15);
 
-			WRITE32( rbv -= 4, GetRegister(cpustate, i) );
+			WRITE32( rbv -= 4, GetRegister(i) );
 			result++;
 		}
 	}
 	return result;
 } /* storeDec */
 
-static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
+
+void arm_cpu_device::HandleMemBlock( UINT32 insn )
 {
 	UINT32 rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
-	UINT32 rbp = GetRegister(cpustate, rb);
+	UINT32 rbp = GetRegister(rb);
 	int result;
 
 	if (ARM_DEBUG_CORE && insn & INSN_BDT_S)
@@ -1089,11 +1118,11 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 			/* Incrementing */
 			if (!(insn & INSN_BDT_P)) rbp = rbp + (- 4);
 
-			result = loadInc( cpustate, insn & 0xffff, rbp, insn&INSN_BDT_S );
+			result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
 
 			if (insn & 0x8000) {
 				R15-=4;
-				cpustate->icount -= S_CYCLE + N_CYCLE;
+				m_icount -= S_CYCLE + N_CYCLE;
 			}
 
 			if (insn & INSN_BDT_W)
@@ -1113,7 +1142,7 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 					logerror("%08x:  Illegal LDRM writeback to r15\n",R15);
 
 				if ((insn&(1<<rb))==0)
-					SetModeRegister(cpustate, mode, rb, GetModeRegister(cpustate, mode, rb) + result * 4);
+					SetModeRegister(mode, rb, GetModeRegister(mode, rb) + result * 4);
 				else if (ARM_DEBUG_CORE)
 					logerror("%08x:  Illegal LDRM writeback to base register (%d)\n",R15, rb);
 			}
@@ -1129,27 +1158,27 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 				rbp = rbp - (- 4);
 			}
 
-			result = loadDec( cpustate, insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
+			result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
 
 			if (insn & INSN_BDT_W)
 			{
 				if (rb==0xf)
 					logerror("%08x:  Illegal LDRM writeback to r15\n",R15);
-				SetRegister(cpustate,rb,GetRegister(cpustate, rb)-result*4);
+				SetRegister(rb,GetRegister(rb)-result*4);
 			}
 
 			// If R15 is pulled from memory we defer setting it until after writeback
 			// is performed, else we may writeback to the wrong context (ie, the new
 			// context if the mode has changed as a result of the R15 read)
 			if (defer)
-				SetRegister(cpustate, 15, deferredR15);
+				SetRegister(15, deferredR15);
 
 			if (insn & 0x8000) {
-				cpustate->icount -= S_CYCLE + N_CYCLE;
+				m_icount -= S_CYCLE + N_CYCLE;
 				R15-=4;
 			}
 		}
-		cpustate->icount -= result * S_CYCLE + N_CYCLE + I_CYCLE;
+		m_icount -= result * S_CYCLE + N_CYCLE + I_CYCLE;
 	} /* Loading */
 	else
 	{
@@ -1175,10 +1204,10 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 			{
 				rbp = rbp + (- 4);
 			}
-			result = storeInc( cpustate, insn&0xffff, rbp );
+			result = storeInc( insn&0xffff, rbp );
 			if( insn & INSN_BDT_W )
 			{
-				SetRegister(cpustate,rb,GetRegister(cpustate, rb)+result*4);
+				SetRegister(rb,GetRegister(rb)+result*4);
 			}
 		}
 		else
@@ -1188,16 +1217,16 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 			{
 				rbp = rbp - (- 4);
 			}
-			result = storeDec( cpustate, insn&0xffff, rbp );
+			result = storeDec( insn&0xffff, rbp );
 			if( insn & INSN_BDT_W )
 			{
-				SetRegister(cpustate,rb,GetRegister(cpustate, rb)-result*4);
+				SetRegister(rb,GetRegister(rb)-result*4);
 			}
 		}
 		if( insn & (1<<eR15) )
 			R15 -= 12;
 
-		cpustate->icount -= (result - 1) * S_CYCLE + 2 * N_CYCLE;
+		m_icount -= (result - 1) * S_CYCLE + 2 * N_CYCLE;
 	}
 } /* HandleMemBlock */
 
@@ -1207,10 +1236,10 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
  * shifter carry output will manifest itself as @*carry == 0@ for carry clear
  * and @*carry != 0@ for carry set.
  */
-static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
+UINT32 arm_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 {
 	UINT32 k    = (insn & INSN_OP2_SHIFT) >> INSN_OP2_SHIFT_SHIFT;
-	UINT32 rm   = GetRegister( cpustate, insn & INSN_OP2_RM );
+	UINT32 rm   = GetRegister( insn & INSN_OP2_RM );
 	UINT32 t    = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
 	if ((insn & INSN_OP2_RM)==0xf) {
@@ -1222,13 +1251,13 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 	/* All shift types ending in 1 are Rk, not #k */
 	if( t & 1 )
 	{
-//      logerror("%08x:  RegShift %02x %02x\n",R15, k>>1,GetRegister(cpustate, k >> 1));
+//      logerror("%08x:  RegShift %02x %02x\n",R15, k>>1,GetRegister(k >> 1));
 		if (ARM_DEBUG_CORE && (insn&0x80)==0x80)
 			logerror("%08x:  RegShift ERROR (p36)\n",R15);
 
 		//see p35 for check on this
-		k = GetRegister(cpustate, k >> 1)&0x1f;
-		cpustate->icount -= S_CYCLE;
+		k = GetRegister(k >> 1)&0x1f;
+		m_icount -= S_CYCLE;
 		if( k == 0 ) /* Register shift by 0 is a no-op */
 		{
 //          logerror("%08x:  NO-OP Regshift\n",R15);
@@ -1299,7 +1328,7 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 } /* decodeShift */
 
 
-static UINT32 BCDToDecimal(UINT32 value)
+UINT32 arm_cpu_device::BCDToDecimal(UINT32 value)
 {
 	UINT32  accumulator = 0;
 	UINT32  multiplier = 1;
@@ -1316,7 +1345,8 @@ static UINT32 BCDToDecimal(UINT32 value)
 	return accumulator;
 }
 
-static UINT32 DecimalToBCD(UINT32 value)
+
+UINT32 arm_cpu_device::DecimalToBCD(UINT32 value)
 {
 	UINT32  accumulator = 0;
 	UINT32  divisor = 10;
@@ -1338,92 +1368,93 @@ static UINT32 DecimalToBCD(UINT32 value)
 	return accumulator;
 }
 
-static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn )
+
+void arm_cpu_device::HandleCoPro( UINT32 insn )
 {
 	UINT32 rn=(insn>>12)&0xf;
 	UINT32 crn=(insn>>16)&0xf;
 
-	cpustate->icount -= S_CYCLE;
+	m_icount -= S_CYCLE;
 
 	/* MRC - transfer copro register to main register */
 	if( (insn&0x0f100010)==0x0e100010 )
 	{
-		SetRegister(cpustate, rn, cpustate->coproRegister[crn]);
+		SetRegister(rn, m_coproRegister[crn]);
 
 		if (ARM_DEBUG_COPRO)
-			logerror("%08x:  Copro read CR%d (%08x) to R%d\n", R15, crn, cpustate->coproRegister[crn], rn);
+			logerror("%08x:  Copro read CR%d (%08x) to R%d\n", R15, crn, m_coproRegister[crn], rn);
 	}
 	/* MCR - transfer main register to copro register */
 	else if( (insn&0x0f100010)==0x0e000010 )
 	{
-		cpustate->coproRegister[crn]=GetRegister(cpustate, rn);
+		m_coproRegister[crn]=GetRegister(rn);
 
 		/* Data East 156 copro specific - trigger BCD operation */
 		if (crn==2)
 		{
-			if (cpustate->coproRegister[crn]==0)
+			if (m_coproRegister[crn]==0)
 			{
 				/* Unpack BCD */
-				int v0=BCDToDecimal(cpustate->coproRegister[0]);
-				int v1=BCDToDecimal(cpustate->coproRegister[1]);
+				int v0=BCDToDecimal(m_coproRegister[0]);
+				int v1=BCDToDecimal(m_coproRegister[1]);
 
 				/* Repack vcd */
-				cpustate->coproRegister[5]=DecimalToBCD(v0+v1);
+				m_coproRegister[5]=DecimalToBCD(v0+v1);
 
 				if (ARM_DEBUG_COPRO)
-					logerror("Cmd:  Add 0 + 1, result in 5 (%08x + %08x == %08x)\n", v0, v1, cpustate->coproRegister[5]);
+					logerror("Cmd:  Add 0 + 1, result in 5 (%08x + %08x == %08x)\n", v0, v1, m_coproRegister[5]);
 			}
-			else if (cpustate->coproRegister[crn]==1)
+			else if (m_coproRegister[crn]==1)
 			{
 				/* Unpack BCD */
-				int v0=BCDToDecimal(cpustate->coproRegister[0]);
-				int v1=BCDToDecimal(cpustate->coproRegister[1]);
+				int v0=BCDToDecimal(m_coproRegister[0]);
+				int v1=BCDToDecimal(m_coproRegister[1]);
 
 				/* Repack vcd */
-				cpustate->coproRegister[5]=DecimalToBCD(v0*v1);
+				m_coproRegister[5]=DecimalToBCD(v0*v1);
 
 				if (ARM_DEBUG_COPRO)
-					logerror("Cmd:  Multiply 0 * 1, result in 5 (%08x * %08x == %08x)\n", v0, v1, cpustate->coproRegister[5]);
+					logerror("Cmd:  Multiply 0 * 1, result in 5 (%08x * %08x == %08x)\n", v0, v1, m_coproRegister[5]);
 			}
-			else if (cpustate->coproRegister[crn]==3)
+			else if (m_coproRegister[crn]==3)
 			{
 				/* Unpack BCD */
-				int v0=BCDToDecimal(cpustate->coproRegister[0]);
-				int v1=BCDToDecimal(cpustate->coproRegister[1]);
+				int v0=BCDToDecimal(m_coproRegister[0]);
+				int v1=BCDToDecimal(m_coproRegister[1]);
 
 				/* Repack vcd */
-				cpustate->coproRegister[5]=DecimalToBCD(v0-v1);
+				m_coproRegister[5]=DecimalToBCD(v0-v1);
 
 				if (ARM_DEBUG_COPRO)
-					logerror("Cmd:  Sub 0 - 1, result in 5 (%08x - %08x == %08x)\n", v0, v1, cpustate->coproRegister[5]);
+					logerror("Cmd:  Sub 0 - 1, result in 5 (%08x - %08x == %08x)\n", v0, v1, m_coproRegister[5]);
 			}
 			else
 			{
-				logerror("Unknown bcd copro command %08x\n", cpustate->coproRegister[crn]);
+				logerror("Unknown bcd copro command %08x\n", m_coproRegister[crn]);
 			}
 		}
 
 		if (ARM_DEBUG_COPRO)
-			logerror("%08x:  Copro write R%d (%08x) to CR%d\n", R15, rn, GetRegister(cpustate, rn), crn);
+			logerror("%08x:  Copro write R%d (%08x) to CR%d\n", R15, rn, GetRegister(rn), crn);
 	}
 	/* CDP - perform copro operation */
 	else if( (insn&0x0f000010)==0x0e000000 )
 	{
 		/* Data East 156 copro specific divider - result in reg 3/4 */
-		if (cpustate->coproRegister[1])
+		if (m_coproRegister[1])
 		{
-			cpustate->coproRegister[3]=cpustate->coproRegister[0] / cpustate->coproRegister[1];
-			cpustate->coproRegister[4]=cpustate->coproRegister[0] % cpustate->coproRegister[1];
+			m_coproRegister[3]=m_coproRegister[0] / m_coproRegister[1];
+			m_coproRegister[4]=m_coproRegister[0] % m_coproRegister[1];
 		}
 		else
 		{
 			/* Unverified */
-			cpustate->coproRegister[3]=0xffffffff;
-			cpustate->coproRegister[4]=0xffffffff;
+			m_coproRegister[3]=0xffffffff;
+			m_coproRegister[4]=0xffffffff;
 		}
 
 		if (ARM_DEBUG_COPRO)
-			logerror("%08x:  Copro cdp (%08x) (3==> %08x, 4==> %08x)\n", R15, insn, cpustate->coproRegister[3], cpustate->coproRegister[4]);
+			logerror("%08x:  Copro cdp (%08x) (3==> %08x, 4==> %08x)\n", R15, insn, m_coproRegister[3], m_coproRegister[4]);
 	}
 	else
 	{
@@ -1432,217 +1463,16 @@ static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn )
 }
 
 
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( arm )
+offs_t arm_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	ARM_REGS *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:    set_irq_line(cpustate, ARM_IRQ_LINE, info->i);  break;
-		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:   set_irq_line(cpustate, ARM_FIRQ_LINE, info->i); break;
-
-		case CPUINFO_INT_REGISTER + ARM32_R0:   cpustate->sArmRegister[ 0]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R1:   cpustate->sArmRegister[ 1]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R2:   cpustate->sArmRegister[ 2]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R3:   cpustate->sArmRegister[ 3]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R4:   cpustate->sArmRegister[ 4]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R5:   cpustate->sArmRegister[ 5]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R6:   cpustate->sArmRegister[ 6]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R7:   cpustate->sArmRegister[ 7]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R8:   cpustate->sArmRegister[ 8]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R9:   cpustate->sArmRegister[ 9]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R10:  cpustate->sArmRegister[10]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R11:  cpustate->sArmRegister[11]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R12:  cpustate->sArmRegister[12]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R13:  cpustate->sArmRegister[13]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R14:  cpustate->sArmRegister[14]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_R15:  cpustate->sArmRegister[15]= info->i;                    break;
-		case CPUINFO_INT_REGISTER + ARM32_FR8:  cpustate->sArmRegister[eR8_FIQ] = info->i;          break;
-		case CPUINFO_INT_REGISTER + ARM32_FR9:  cpustate->sArmRegister[eR9_FIQ] = info->i;          break;
-		case CPUINFO_INT_REGISTER + ARM32_FR10: cpustate->sArmRegister[eR10_FIQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_FR11: cpustate->sArmRegister[eR11_FIQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_FR12: cpustate->sArmRegister[eR12_FIQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_FR13: cpustate->sArmRegister[eR13_FIQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_FR14: cpustate->sArmRegister[eR14_FIQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_IR13: cpustate->sArmRegister[eR13_IRQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_IR14: cpustate->sArmRegister[eR14_IRQ] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_SR13: cpustate->sArmRegister[eR13_SVC] = info->i;         break;
-		case CPUINFO_INT_REGISTER + ARM32_SR14: cpustate->sArmRegister[eR14_SVC] = info->i;         break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ARM32_PC:   R15 = (R15&~ADDRESS_MASK)|info->i;              break;
-		case CPUINFO_INT_SP:                    SetRegister(cpustate,13,info->i);                       break;
-	}
+	extern CPU_DISASSEMBLE( arm );
+	return CPU_DISASSEMBLE_NAME(arm)(this, buffer, pc, oprom, opram, options);
 }
 
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( arm )
+offs_t arm_be_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	ARM_REGS *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(ARM_REGS);             break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 2;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 3;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 26;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + ARM_IRQ_LINE:    info->i = cpustate->pendingIrq;         break;
-		case CPUINFO_INT_INPUT_STATE + ARM_FIRQ_LINE:   info->i = cpustate->pendingFiq;         break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = 0;    /* not implemented */   break;
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ARM32_PC:           info->i = cpustate->sArmRegister[15]&ADDRESS_MASK; break;
-		case CPUINFO_INT_SP:                            info->i = GetRegister(cpustate, 13);    break;
-
-		case CPUINFO_INT_REGISTER + ARM32_R0:           info->i = cpustate->sArmRegister[ 0];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R1:           info->i = cpustate->sArmRegister[ 1];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R2:           info->i = cpustate->sArmRegister[ 2];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R3:           info->i = cpustate->sArmRegister[ 3];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R4:           info->i = cpustate->sArmRegister[ 4];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R5:           info->i = cpustate->sArmRegister[ 5];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R6:           info->i = cpustate->sArmRegister[ 6];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R7:           info->i = cpustate->sArmRegister[ 7];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R8:           info->i = cpustate->sArmRegister[ 8];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R9:           info->i = cpustate->sArmRegister[ 9];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R10:          info->i = cpustate->sArmRegister[10];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R11:          info->i = cpustate->sArmRegister[11];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R12:          info->i = cpustate->sArmRegister[12];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R13:          info->i = cpustate->sArmRegister[13];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R14:          info->i = cpustate->sArmRegister[14];   break;
-		case CPUINFO_INT_REGISTER + ARM32_R15:          info->i = cpustate->sArmRegister[15];   break;
-
-		case CPUINFO_INT_REGISTER + ARM32_FR8:          info->i = cpustate->sArmRegister[eR8_FIQ];  break;
-		case CPUINFO_INT_REGISTER + ARM32_FR9:          info->i = cpustate->sArmRegister[eR9_FIQ];  break;
-		case CPUINFO_INT_REGISTER + ARM32_FR10:         info->i = cpustate->sArmRegister[eR10_FIQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_FR11:         info->i = cpustate->sArmRegister[eR11_FIQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_FR12:         info->i = cpustate->sArmRegister[eR12_FIQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_FR13:         info->i = cpustate->sArmRegister[eR13_FIQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_FR14:         info->i = cpustate->sArmRegister[eR14_FIQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_IR13:         info->i = cpustate->sArmRegister[eR13_IRQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_IR14:         info->i = cpustate->sArmRegister[eR14_IRQ]; break;
-		case CPUINFO_INT_REGISTER + ARM32_SR13:         info->i = cpustate->sArmRegister[eR13_SVC]; break;
-		case CPUINFO_INT_REGISTER + ARM32_SR14:         info->i = cpustate->sArmRegister[eR14_SVC]; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(arm);         break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(arm);                break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(arm);              break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(arm);                break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(arm);          break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(arm);  break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "ARM");                 break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Acorn Risc Machine");  break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.3");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Bryan McPhail, bmcphail@tendril.co.uk"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c",
-				(cpustate->sArmRegister[15] & N_MASK) ? 'N' : '-',
-				(cpustate->sArmRegister[15] & Z_MASK) ? 'Z' : '-',
-				(cpustate->sArmRegister[15] & C_MASK) ? 'C' : '-',
-				(cpustate->sArmRegister[15] & V_MASK) ? 'V' : '-',
-				(cpustate->sArmRegister[15] & I_MASK) ? 'I' : '-',
-				(cpustate->sArmRegister[15] & F_MASK) ? 'F' : '-');
-			switch (cpustate->sArmRegister[15] & 3)
-			{
-			case 0:
-				strcat(info->s, " USER");
-				break;
-			case 1:
-				strcat(info->s, " FIRQ");
-				break;
-			case 2:
-				strcat(info->s, " IRQ ");
-				break;
-			default:
-				strcat(info->s, " SVC ");
-				break;
-			}
-			break;
-
-		case CPUINFO_STR_REGISTER + ARM32_PC:   sprintf( info->s, "PC  :%08x", cpustate->sArmRegister[15]&ADDRESS_MASK ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R0:   sprintf( info->s, "R0  :%08x", cpustate->sArmRegister[ 0] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R1:   sprintf( info->s, "R1  :%08x", cpustate->sArmRegister[ 1] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R2:   sprintf( info->s, "R2  :%08x", cpustate->sArmRegister[ 2] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R3:   sprintf( info->s, "R3  :%08x", cpustate->sArmRegister[ 3] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R4:   sprintf( info->s, "R4  :%08x", cpustate->sArmRegister[ 4] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R5:   sprintf( info->s, "R5  :%08x", cpustate->sArmRegister[ 5] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R6:   sprintf( info->s, "R6  :%08x", cpustate->sArmRegister[ 6] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R7:   sprintf( info->s, "R7  :%08x", cpustate->sArmRegister[ 7] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R8:   sprintf( info->s, "R8  :%08x", cpustate->sArmRegister[ 8] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R9:   sprintf( info->s, "R9  :%08x", cpustate->sArmRegister[ 9] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R10:  sprintf( info->s, "R10 :%08x", cpustate->sArmRegister[10] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R11:  sprintf( info->s, "R11 :%08x", cpustate->sArmRegister[11] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R12:  sprintf( info->s, "R12 :%08x", cpustate->sArmRegister[12] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R13:  sprintf( info->s, "R13 :%08x", cpustate->sArmRegister[13] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R14:  sprintf( info->s, "R14 :%08x", cpustate->sArmRegister[14] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_R15:  sprintf( info->s, "R15 :%08x", cpustate->sArmRegister[15] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR8:  sprintf( info->s, "FR8 :%08x", cpustate->sArmRegister[eR8_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR9:  sprintf( info->s, "FR9 :%08x", cpustate->sArmRegister[eR9_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR10: sprintf( info->s, "FR10:%08x", cpustate->sArmRegister[eR10_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR11: sprintf( info->s, "FR11:%08x", cpustate->sArmRegister[eR11_FIQ]); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR12: sprintf( info->s, "FR12:%08x", cpustate->sArmRegister[eR12_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR13: sprintf( info->s, "FR13:%08x", cpustate->sArmRegister[eR13_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_FR14: sprintf( info->s, "FR14:%08x", cpustate->sArmRegister[eR14_FIQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_IR13: sprintf( info->s, "IR13:%08x", cpustate->sArmRegister[eR13_IRQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_IR14: sprintf( info->s, "IR14:%08x", cpustate->sArmRegister[eR14_IRQ] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_SR13: sprintf( info->s, "SR13:%08x", cpustate->sArmRegister[eR13_SVC] ); break;
-		case CPUINFO_STR_REGISTER + ARM32_SR14: sprintf( info->s, "SR14:%08x", cpustate->sArmRegister[eR14_SVC] ); break;
-	}
+	extern CPU_DISASSEMBLE( arm_be );
+	return CPU_DISASSEMBLE_NAME(arm_be)(this, buffer, pc, oprom, opram, options);
 }
 
-
-CPU_GET_INFO( arm_be )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                           break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(arm_be);                 break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(arm_be);   break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "ARM (big endian)");                break;
-
-		default:                                        CPU_GET_INFO_CALL(arm);                             break;
-	}
-}
-
-
-DEFINE_LEGACY_CPU_DEVICE(ARM, arm);
-DEFINE_LEGACY_CPU_DEVICE(ARM_BE, arm_be);

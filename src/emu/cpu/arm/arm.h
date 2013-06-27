@@ -14,8 +14,6 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-DECLARE_LEGACY_CPU_DEVICE(ARM, arm);
-DECLARE_LEGACY_CPU_DEVICE(ARM_BE, arm_be);
 
 enum
 {
@@ -25,5 +23,88 @@ enum
 	ARM32_FR8, ARM32_FR9, ARM32_FR10, ARM32_FR11, ARM32_FR12, ARM32_FR13, ARM32_FR14,
 	ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 };
+
+
+class arm_cpu_device : public cpu_device
+{
+public:
+	// construction/destruction
+	arm_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	arm_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, endianness_t endianness);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 3; }
+	virtual UINT32 execute_max_cycles() const { return 4; }
+	virtual UINT32 execute_input_lines() const { return 2; }
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+
+	// device_state_interface overrides
+	void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	address_space_config m_program_config;
+
+	int m_icount;
+	UINT32 m_sArmRegister[27];
+	UINT32 m_coproRegister[16];
+	UINT8 m_pendingIrq;
+	UINT8 m_pendingFiq;
+	address_space *m_program;
+	direct_read_data *m_direct;
+	endianness_t m_endian;
+
+	void cpu_write32( int addr, UINT32 data );
+	void cpu_write8( int addr, UINT8 data );
+	UINT32 cpu_read32( int addr );
+	UINT8 cpu_read8( int addr );
+	UINT32 GetRegister( int rIndex );
+	void SetRegister( int rIndex, UINT32 value );
+	UINT32 GetModeRegister( int mode, int rIndex );
+	void SetModeRegister( int mode, int rIndex, UINT32 value );
+	void HandleALU(UINT32 insn);
+	void HandleMul(UINT32 insn);
+	void HandleBranch(UINT32 insn);
+	void HandleMemSingle(UINT32 insn);
+	void HandleMemBlock(UINT32 insn);
+	void HandleCoPro(UINT32 insn);
+	UINT32 decodeShift(UINT32 insn, UINT32 *pCarry);
+	void arm_check_irq_state();
+	int loadInc(UINT32 pat, UINT32 rbv, UINT32 s);
+	int loadDec(UINT32 pat, UINT32 rbv, UINT32 s, UINT32* deferredR15, int* defer);
+	int storeInc(UINT32 pat, UINT32 rbv);
+	int storeDec(UINT32 pat, UINT32 rbv);
+	static UINT32 BCDToDecimal(UINT32 value);
+	static UINT32 DecimalToBCD(UINT32 value);
+
+};
+
+
+class arm_be_cpu_device : public arm_cpu_device
+{
+public:
+    // construction/destruction
+    arm_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+};
+
+
+extern const device_type ARM;
+extern const device_type ARM_BE;
+
 
 #endif /* __ARM_H__ */
