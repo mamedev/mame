@@ -442,11 +442,6 @@ int running_machine::run(bool firstrun)
 		mame_printf_error("Caught unhandled emulator exception\n");
 		error = MAMERR_FATALERROR;
 	}
-	catch (std::bad_alloc &)
-	{
-		mame_printf_error("Out of memory!\n");
-		error = MAMERR_FATALERROR;
-	}
 	catch (binding_type_exception &btex)
 	{
 		mame_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
@@ -455,6 +450,11 @@ int running_machine::run(bool firstrun)
 	catch (std::exception &ex)
 	{
 		mame_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
+		error = MAMERR_FATALERROR;
+	}
+	catch (...)
+	{
+		mame_printf_error("Caught unhandled exception\n");
 		error = MAMERR_FATALERROR;
 	}
 
