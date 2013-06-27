@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="mac_flop" description="Macintosh Disk images">
+
+	<software name="sys603">
+		<!-- This version of the System Software was shipped with the Macintosh IIcx and SE/30 -->
+		<description>System Software 6.0.3</description>
+		<year>1990</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="system tools.img" size="819200" crc="297023b0" sha1="ced0f8d2e950ef59bc4ff2477e09ea4cc6f7b24c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 1.img" size="819200" crc="67ab3033" sha1="247a99f42237a780ea08f068473e6ee127a5eab7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 2.img" size="819200" crc="0b1d1e4d" sha1="4969936683619562dfd1437849da9119118cb695" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="printing tools.img" size="819200" crc="8b69b1ed" sha1="087e19062715c59a9ce01106ed03049a364b4018" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="sys605">
+		<!-- This version of the System Software was shipped with the Macintosh IIfx -->
+		<description>System Software 6.0.5</description>
+		<year>1990</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="system tools.img" size="819200" crc="9b8df224" sha1="0dd936f001ad8884382d20b4d7beb2e082194feb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 1.img" size="819200" crc="2ba093df" sha1="fc9b8f7b7ba941ff778703e262f0c6992b368610" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 2.img" size="819200" crc="279123df" sha1="0519b697c13a407b46fe4079d2889adf37dc9864" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="printing tools.img" size="819200" crc="3496eee8" sha1="ba396f501180467db34d3c22eab94b900b14dc22" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys608">
+		<!-- This version of the System Software was an update to System Software 6.0.7 with added System 7 printer compatibility -->
+		<description>System Software 6.0.8</description>
+		<year>1991</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="system tools.img" size="819200" crc="febb735f" sha1="fb89deb29ff341e92fd30307934f7c7616c2c8e2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 1.img" size="819200" crc="936e35d8" sha1="85e1667b236451149e06db76a60b8852432622a3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="utilities 2.img" size="819200" crc="4d00c41a" sha1="3d5261d6ec11b11c16e745cd957aa77c4bebdf08" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="printing tools.img" size="819200" crc="e7ba71b1" sha1="bd7194407769a2f2f4ebde8b94f8d85e92419d32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

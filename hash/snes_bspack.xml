@@ -1,0 +1,3185 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="snes_bspack" description="Nintendo SNES Satellaview Memory Packs">
+
+<!-- Memory packs sold w/games -->
+
+	<software name="samegmcc" supported="no">
+		<description>Same Game - Chara Cassette (Jpn, BSROM)</description>
+		<year>1996</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="BSMC-ZS5J-JPN" />
+		<info name="release" value="19960301" />
+		<part name="cart" interface="bspack">
+			<feature name="pcb" value="BSMC-CR-01" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="cart_model" value="SHVC-031" />
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="bsmc-zs5j-0.u1" size="524288" crc="4c3439c2" sha1="c974673e0365dadc54afcf8dd2e6b41b512c6fe7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samegmcd" supported="no">
+		<description>Same Game - Chara Data Shuu (Jpn, BSROM, Not for sale)</description>
+		<year>1996</year>
+		<publisher>Hudson</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="same game - chara data shuu (japan) (bsrom).bs" size="524288" crc="12a80829" sha1="ff3e6b558aaa9c36a35460ba61821e09aef50a9e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdgunmap" supported="no">
+		<description>SD Gundam G Next - Unit &amp; Map Collection (Jpn, BSROM)</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="SHVC-039 ?" />
+		<info name="release" value="19960329" />
+		<info name="alt_title" value="SDガンダム ジーネクスト ユニット&amp; マップコレクション" />
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="sd gundam g next - unit &amp; map collection (japan) (bsrom).bs" size="524288" crc="60b1b7e0" sha1="81a75b1a19907e831b3b80d2067108a61c4bae40" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!-- BS-X Satellaview Memory packs with downloaded contents from broadcast -->
+
+	<software name="bsdragon" supported="no">
+		<description>BS Dragon Quest I (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs dragon quest i (japan) [b].bs" size="1048576" crc="577f6d20" sha1="aed921ff60c7c01a80e7e8f2d24d6684465a941e" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeld2" supported="no">
+		<description>BS Zelda no Densetsu Map 2 - Dai-4-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu map 2 - dai-4-wa (japan) [b].bs" size="1048576" crc="670b51ca" sha1="4a53e22e2b01f55245112da5bdd24aed7a9f7c10" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdandnu" supported="no">
+		<description>Dandan Belt Conveyor - Ukulele no Maki (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dandan belt conveyor - ukulele no maki (japan) [b].bs" size="1048576" crc="10205b4b" sha1="da3c4c0bb0c36b7605a93fed9ff220e46d71f6d6" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bs3jiw5g" supported="no">
+		<description>3-ji no Wide Shou - 5 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="3-ji no wide shou - 5 gatsugou (japan).bs" size="524288" crc="78ce2bf6" sha1="d9821b56e5837818875ef99734cd208aa368d23c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bs3jiw6g" supported="no">
+		<description>3-ji no Wide Shou - 6 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="3-ji no wide shou - 6 gatsugou (japan).bs" size="524288" crc="dbe754c6" sha1="8016d1d9db9af87d59edba7a4be39f46f7561253" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsalbody" supported="no">
+		<description>Albert Odyssey (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="albert odyssey (japan).bs" size="1048576" crc="d5f6ad68" sha1="a1a682f723573254046a8af06b92fe408fc4207a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsarkand" supported="no">
+		<description>Arkanoid - Doh It Again (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="arkanoid - doh it again (japan).bs" size="524288" crc="ded48e0a" sha1="699c4aa1045118cdc83a1cb88416f11732e69a11" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbdas2" supported="no">
+		<description>B Dash - 2 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="b dash - 2 gatsugou (japan).bs" size="1048576" crc="6b16f32b" sha1="60aaee780b290dd1b4ad9a339b00d76fb00f0ced" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbdas3" supported="no">
+		<description>B Dash - 3 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="b dash - 3 gatsugou (japan).bs" size="1048576" crc="f2630bed" sha1="be0f839f619cbd226f1499ef80fcb91ec950e74d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzero4" supported="no">
+		<description>BS F-Zero Grand Prix - Ace League - Dai-4-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs f-zero grand prix - ace league - dai-4-shuu (japan).bs" size="1048576" crc="f57d28dc" sha1="2c29ebf2fece378fc4d1186d0b60fdb6db3beef0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzero3" supported="no">
+		<description>BS F-Zero Grand Prix - King League - Dai-3-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs f-zero grand prix - king league - dai-3-shuu (japan).bs" size="1048576" crc="f75713db" sha1="72ce3866ce9b7edd856515b033a69ad6fa3d96ba" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzero1" supported="no">
+		<description>BS F-Zero Grand Prix - Knight League - Dai-1-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs f-zero grand prix - knight league - dai-1-shuu (japan).bs" size="1048576" crc="dbacf9f0" sha1="c5197d43eb637e537ad358f7b2aa01fb6acb774a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzero2" supported="no">
+		<description>BS F-Zero Grand Prix - Queen League - Dai-2-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs f-zero grand prix - queen league - dai-2-shuu (japan).bs" size="1048576" crc="ee6c9473" sha1="15050b25916eb39caf16b5f4cc3e391693251580" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzgp2" supported="no">
+		<description>BS F-Zero Grand Prix 2 - Practice (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs f-zero grand prix 2 - practice (japan).bs" size="1048576" crc="c4808858" sha1="881ef90e6dca67895a6096db20c5cea13de13baa" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfirem1" supported="no">
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-1-wa - Palace Kanraku (Jpn, 0929)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fire emblem - akaneia senki hen - dai-1-wa - palace kanraku (r) (9-29).bs" size="1048576" crc="2bcdf855" sha1="da2c02ff04d454a183c9e07df5323adfe0961ce8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfirem1a" cloneof="bsfirem1" supported="no">
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-1-wa - Palace Kanraku (Jpn, 0404)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fire emblem - akaneia senki hen - dai-1-wa - palace kanraku (japan).bs" size="1048576" crc="14915411" sha1="0b22231d4d4a18183d5b8ce90510efab6456ca3d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfirem2" supported="no">
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-2-wa - Akai Ryuu Kishi (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fire emblem - akaneia senki hen - dai-2-wa - akai ryuu kishi (japan).bs" size="1048576" crc="bb73aadf" sha1="e400fe6080809fd4909091f9af42ae5413b8415f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfirem3" supported="no">
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-3-wa - Seigi no Touzokudan (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fire emblem - akaneia senki hen - dai-3-wa - seigi no touzokudan (japan).bs" size="1048576" crc="4ac9d49c" sha1="5e0996433e0384d7d209a9e11a7671ff4dea9cf1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfirem4" supported="no">
+		<description>BS Fire Emblem - Akaneia Senki Hen - Dai-4-wa - Hajimari no Toki (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fire emblem - akaneia senki hen - dai-4-wa - hajimari no toki (japan).bs" size="1048576" crc="0b4b6c1f" sha1="3b0568bb44e3ac728fe4723c6d2e2de1ee8f7bb4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfuurai" supported="no">
+		<description>BS Fuurai no Shiren - Surara o Sukue - Dai-2-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs fuurai no shiren - surara o sukue - dai-2-shuu (japan).bs" size="1048576" crc="882bf819" sha1="dfdd964e323e677fcc3e3807fff8c98ee3aca4b4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscamp1" supported="no">
+		<description>BS Marvelous - Camp Arnold Course - Dai-1-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - camp arnold course - dai-1-shuu (japan).bs" size="1048576" crc="6b90c767" sha1="8d15078191f7b7b49b7dda602207456a7caf3b12" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscamp2" supported="no">
+		<description>BS Marvelous - Camp Arnold Course - Dai-2-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - camp arnold course - dai-2-shuu (japan).bs" size="1048576" crc="f5357704" sha1="fc3d84ad42ebda1f81ea5620f313675076b2f80b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscamp3" supported="no">
+		<description>BS Marvelous - Camp Arnold Course - Dai-3-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - camp arnold course - dai-3-shuu (japan).bs" size="1048576" crc="2b87dbaa" sha1="c89632aec2699e3adbb449b841ec7c582aac58b2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscamp4" supported="no">
+		<description>BS Marvelous - Camp Arnold Course - Dai-4-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - camp arnold course - dai-4-shuu (japan).bs" size="1048576" crc="6986937e" sha1="4a7336cd58e5da4256bb7ac64716bd9fac445be4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstime1" supported="no">
+		<description>BS Marvelous - Time Athletic Course - Dai-1-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - time athletic course - dai-1-shuu (japan).bs" size="1048576" crc="1639db9d" sha1="4d63a2457303bb55b5f647614c321881155dedaa" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstime2" supported="no">
+		<description>BS Marvelous - Time Athletic Course - Dai-2-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - time athletic course - dai-2-shuu (japan).bs" size="1048576" crc="27d62709" sha1="f9347676f342a3d692f1af799ea0b7f84711e80b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstime3" supported="no">
+		<description>BS Marvelous - Time Athletic Course - Dai-3-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - time athletic course - dai-3-shuu (japan).bs" size="1048576" crc="5a88e3fb" sha1="6025b65a0aa2b0be7ee6e6b50b09a9295137d85a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstime4" supported="no">
+		<description>BS Marvelous - Time Athletic Course - Dai-4-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs marvelous - time athletic course - dai-4-shuu (japan).bs" size="1048576" crc="fba7789e" sha1="374b3edc9e0b0d2438f4457481cbc8095a566cce" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsnichmt" supported="no">
+		<description>BS Nichibutsu Mahjong - Mahjong Taikai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs nichibutsu mahjong - mahjong taikai (japan).bs" size="1048576" crc="f10028b1" sha1="9a46696609186336a4cdc380569f01e6af7050ec" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsnichic" supported="no">
+		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Ichimantou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs nichibutsu mahjong - renshuu mahjong - ichimantou (japan).bs" size="1048576" crc="a0b0e5ca" sha1="67a6db29af61b94c1918daaa77022feca82bb4fe" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsnichni" supported="no">
+		<description>BS Nichibutsu Mahjong - Renshuu Mahjong - Nimantou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs nichibutsu mahjong - renshuu mahjong - nimantou (japan).bs" size="1048576" crc="3cec7861" sha1="57e1a364268ef180ed517e13fea63ee89c607a18" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bshp517" supported="no">
+		<description>BS Nintendo HP - 5-17 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs nintendo hp - 5-17 gou (japan).bs" size="1048576" crc="768f50f4" sha1="cb1c842f74eb3869e765feb196644708987ff051" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bshp531" supported="no">
+		<description>BS Nintendo HP - 5-31 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs nintendo hp - 5-31 gou (japan).bs" size="1048576" crc="c9b05ce4" sha1="71642ccce9f133e4566c36b64e098b1db737ad0c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsparlor" supported="no">
+		<description>BS Parlor! Parlor! - Dai-2-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs parlor! parlor! - dai-2-shuu (japan).bs" size="1048576" crc="3ed9a005" sha1="235499d1922646dde43c6aa93f595fc2fa09ed64" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsoniga1" supported="no">
+		<description>BS Shin Onigashima - Dai-1-wa - Kataribe no Koya (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs shin onigashima - dai-1-wa - kataribe no koya (japan).bs" size="1048576" crc="514eb6c8" sha1="a8c132c0c8323b740603b3b61bcb4082ce473e2a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsoniga2" supported="no">
+		<description>BS Shin Onigashima - Dai-2-wa - Kataribe no Koya (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs shin onigashima - dai-2-wa - kataribe no koya (japan).bs" size="1048576" crc="67a5b7c4" sha1="05403e4829f8481b212864079286cac91d2b7761" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsoniga3" supported="no">
+		<description>BS Shin Onigashima - Dai-3-wa - Kataribe no Koya (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs shin onigashima - dai-3-wa - kataribe no koya (japan).bs" size="1048576" crc="abe60813" sha1="1ef184e69a7cb23d2062286cf71af186311393dd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsoniga4" supported="no">
+		<description>BS Shin Onigashima - Dai-4-wa - Kataribe no Koya (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs shin onigashima - dai-4-wa - kataribe no koya (japan).bs" size="1048576" crc="f9ab3b92" sha1="93dd095f3e32e5749663ce5418cc6e194d46b281" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsstgiga" supported="no">
+		<description>BS St. Giga PG - 10 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs st. giga pg - 10 gatsugou (japan).bs" size="1048576" crc="8dabd48a" sha1="572018f28976681013aad5428ebab00c4c9ec794" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmcol" supported="no">
+		<description>BS Super Mario Collection - Dai-3-shuu (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs super mario collection - dai-3-shuu (japan).bs" size="1048576" crc="a40a3089" sha1="06c58882acf1e62e54cc0c51515448b40f057e6e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmusa1" supported="no">
+		<description>BS Super Mario USA - Power Challenge - Dai-1-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs super mario usa - power challenge - dai-1-kai (japan).bs" size="1048576" crc="8f85a235" sha1="07d5d7f097b3999bb12cdcac40909a064bb69548" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmusa2" supported="no">
+		<description>BS Super Mario USA - Power Challenge - Dai-2-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs super mario usa - power challenge - dai-2-kai (japan).bs" size="1048576" crc="b967025a" sha1="ab1e8db79e207f136e58989a5c0302da25fb19e5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmusa3" supported="no">
+		<description>BS Super Mario USA - Power Challenge - Dai-3-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs super mario usa - power challenge - dai-3-kai (japan).bs" size="1048576" crc="8b22a708" sha1="1c92e890f95b222c22d4bb8beb08124087c48641" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssmusa4" supported="no">
+		<description>BS Super Mario USA - Power Challenge - Dai-4-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs super mario usa - power challenge - dai-4-kai (japan).bs" size="1048576" crc="ff1ded46" sha1="5f2f794c410dc7bf6d7600c9e79545a6739662d1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstantch" supported="no">
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Chuuhen (Jpn, 0620)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs tantei club - yuki ni kieta kako - chuuhen (japan) (6-20).bs" size="1048576" crc="67568b74" sha1="e88c6f7c140c57d6388c18a4c2e9d241779800d1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstantcha" cloneof="bstantch" supported="no">
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Chuuhen (Jpn, 0614)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs tantei club - yuki ni kieta kako - chuuhen (japan).bs" size="1048576" crc="7947abd1" sha1="db8cfcfe668ca1afb88fa8183227e154f2c421f0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstantko" supported="no">
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Kouhen (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs tantei club - yuki ni kieta kako - kouhen (japan).bs" size="1048576" crc="0cd818cf" sha1="f271b67a713b96e66cbad0461e752e27c22e6c61" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstantze" supported="no">
+		<description>BS Tantei Club - Yuki ni Kieta Kako - Zenpen (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs tantei club - yuki ni kieta kako - zenpen (japan).bs" size="1048576" crc="f26300c8" sha1="db0efaa48fa0b1ab1147791cca7a032e3ca113f5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszelda" supported="no">
+		<description>BS Zelda no Densetsu - Dai-3-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu - dai-3-wa (japan).bs" size="1048576" crc="ddc54398" sha1="4a2280a33785e89aecaa4141ac29f3dd1bdcf40c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeldk1" supported="no">
+		<description>BS Zelda no Densetsu - Kodai no Sekiban - Dai-1-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-1-wa (japan).bs" size="1048576" crc="0d2b95a8" sha1="e784f04736f354a05a19a0e86efd8a1f40589aa4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeldk2" supported="no">
+		<description>BS Zelda no Densetsu - Kodai no Sekiban - Dai-2-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-2-wa (japan).bs" size="1048576" crc="1b71a609" sha1="0877f63d8d096e7a35a5721ec1e4ce2cb86a7211" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeldk3" supported="no">
+		<description>BS Zelda no Densetsu - Kodai no Sekiban - Dai-3-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-3-wa (japan).bs" size="1048576" crc="c251d4fa" sha1="25efee5199c9da0805306edac3367d60253ea828" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszeldk4" supported="no">
+		<description>BS Zelda no Densetsu - Kodai no Sekiban - Dai-4-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-4-wa (japan).bs" size="1048576" crc="8385bbf4" sha1="63c1110e32d4b3b2d6525919e10e50abcc7677a3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscheap" supported="no">
+		<description>Cheap de Gorgeous Vol. 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cheap de gorgeous vol. 1 (japan).bs" size="1048576" crc="ee02126e" sha1="62e98832c90321ecd9ea7cb1c6dbb3c68d3e8ee0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsctrigc" supported="no">
+		<description>Chrono Trigger - Character Zukan (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="chrono trigger - character zukan (japan).bs" size="1048576" crc="6d46f88b" sha1="602136761415a010b691299a8ab6f61c5efbf197" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsctrigj" supported="no">
+		<description>Chrono Trigger - Jet Bike Special (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="chrono trigger - jet bike special (japan).bs" size="262144" crc="9dfb3014" sha1="1f916454d4a9cedbd66babe4bb9eebc446410335" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsctrigm" supported="no">
+		<description>Chrono Trigger - Music Library (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="chrono trigger - music library (japan).bs" size="524288" crc="027b726b" sha1="a21e00ee5e13722e57abeac58df57f12aacfd63b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscolum1" supported="no">
+		<description>Columbus no Tamagoyaki - Dai-1-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="columbus no tamagoyaki - dai-1-kai (japan).bs" size="1048576" crc="2289c65f" sha1="a2c91755d52d5c5b230e665920e01b584934a27b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscolum2" supported="no">
+		<description>Columbus no Tamagoyaki - Dai-2-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="columbus no tamagoyaki - dai-2-kai (japan).bs" size="1048576" crc="ec69ee76" sha1="30569601d3f15a586547b18702b5cf54981d0e7d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscolum3" supported="no">
+		<description>Columbus no Tamagoyaki - Dai-3-kai (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="columbus no tamagoyaki - dai-3-kai (japan).bs" size="1048576" crc="00d3a32b" sha1="43a29a10a21b26e495bab35000bfc695abcca83e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscuonpa" supported="no">
+		<description>Cu-On-Pa SFC (Jpn, BS, xxxx0531)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cu-on-pa sfc (japan).bs" size="1048576" crc="5f31e1d8" sha1="b09b45a7c2cb4ab50b5c364bb989e90caa036629" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdaibak" supported="no">
+		<description>Daibakushou Jinsei Gekijou (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="daibakushou jinsei gekijou (japan).bs" size="1048576" crc="93c4df65" sha1="07a873bb6753694e9914a270b760f810efc04525" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdandng" supported="no">
+		<description>Dandan Belt Conveyor - Gyuunyuu no Maki (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dandan belt conveyor - gyuunyuu no maki (japan).bs" size="1048576" crc="380c8c79" sha1="343e5607d62d7962a04c090cd003495fc344deee" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdigim1" supported="no">
+		<description>Digital Magazine Busters BS - 4-12 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digital magazine busters bs - 4-12 gou (japan).bs" size="1048576" crc="1976866a" sha1="98bd19065df8b65268e61457acb306f96b531a7e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdigim2" supported="no">
+		<description>Digital Magazine Busters BS - 5-10 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digital magazine busters bs - 5-10 gou (japan).bs" size="1048576" crc="3f3f4608" sha1="61f225571e547ca9ed6c523babe1476d5f0e3e68" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdigim3" supported="no">
+		<description>Digital Magazine Busters BS - 5-24 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digital magazine busters bs - 5-24 gou (japan).bs" size="1048576" crc="8e8f27e9" sha1="7161e77985a6c21edcf7a2ea319ef83054e9cf74" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdigim4" supported="no">
+		<description>Digital Magazine Busters BS - 8-23 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="digital magazine busters bs - 8-23 gou (japan).bs" size="1048576" crc="6f7f6c5d" sha1="9c0b854ff8f63a548d5e694461444a1eae77a418" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdorm2a" supported="no">
+		<description>Do-Re-Mi de Faa 2~! - 5-10 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="do-re-mi de faa 2~! - 5-10 gou (japan).bs" size="1048576" crc="25401316" sha1="1c25723597a55ab94cf7289cf36b6b8941a3d5ab" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdorm2b" supported="no">
+		<description>Do-Re-Mi de Faa 2~! - 5-25 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="do-re-mi de faa 2~! - 5-25 gou (japan).bs" size="1048576" crc="f8b048f5" sha1="d9af942b657a0ab2fd9979a708e10f4c3e75fcab" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdokapg" supported="no">
+		<description>Dokapon Gaiden - Honoo no Audition (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dokapon gaiden - honoo no audition (japan).bs" size="1048576" crc="09457f9e" sha1="cda1ae3c721ff0fd94f9b321becfbe90cb4c0910" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdrmrio" supported="no">
+		<description>Dr. Mario (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dr. mario (japan).bs" size="1048576" crc="6ea452a4" sha1="9cf6c9b5c6d4e7c33bf040b058c9baf760bb44e9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdslayr" supported="no">
+		<description>Dragon Slayer - Eiyuu Densetsu (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dragon slayer - eiyuu densetsu (japan).bs" size="1048576" crc="a6fc28cb" sha1="b9fc80d0e9fc92594669dbbb0e1970b40c36b55f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynamitr" supported="no">
+		<description>Dynami Tracer (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dynami tracer (japan).bs" size="1048576" crc="41dae33c" sha1="2ff4bc75b88480a35f42db0a2468eb3f6f8e53e5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsexbik1" supported="no">
+		<description>Excitebike - Bunbun Mario Battle - Stadium 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="excitebike - bunbun mario battle - stadium 1 (japan).bs" size="1048576" crc="cf37df6c" sha1="8cb5406e7c136ea8779f793f052c60cfcdfa024a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsexbik2" supported="no">
+		<description>Excitebike - Bunbun Mario Battle - Stadium 2 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="excitebike - bunbun mario battle - stadium 2 (japan).bs" size="1048576" crc="3576a0a9" sha1="127a8e792f377c368f73ae002bc81f9aa464893b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsexbik3" supported="no">
+		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (Jpn, 19980111 - 19980117)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (1998-01-11 - 1998-01-17).bs" size="1048576" crc="763c2ee4" sha1="7c0a2963d7767c254a132814eb9dcb00f148350e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsexbik3a" cloneof="bsexbik3" supported="no">
+		<description>Excitebike - Bunbun Mario Battle - Stadium 3 (Jpn, xxxx0208)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (xxxx-02-08).bs" size="1048576" crc="e5206656" sha1="23663ef5bc1b7098ab230856fa96ea18ff4ec4a7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsexbik4" supported="no">
+		<description>Excitebike - Bunbun Mario Battle - Stadium 4 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="excitebike - bunbun mario battle - stadium 4 (japan).bs" size="1048576" crc="c9a77643" sha1="27a22ed0b6219c29bcf4a5475e2156607ebf4f1d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzero" supported="no">
+		<description>F-Zero (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="f-zero (japan).bs" size="524288" crc="6ff86710" sha1="b143f71aef36cb4a5634aa4a8cca6e1938e5355d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fenek" supported="no">
+		<description>Fenek - 6 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="fenek - 6 gatsugou (japan).bs" size="524288" crc="5c26c3b2" sha1="f7e80add2fe9e6ccfda30cca64d6ed9ba14384ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfiremn" supported="no">
+		<description>The Firemen (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="firemen, the (japan).bs" size="1048576" crc="927ba7c2" sha1="90f419d52667201097edc0928f0853f55ecf83cd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud1" supported="no">
+		<description>Freud no Chousenjou - Dai-1-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-1-gou (japan).bs" size="1048576" crc="8d78d0d7" sha1="08cdc6e6915baea5f8e4f5c393798e5364d8c5df" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud2" supported="no">
+		<description>Freud no Chousenjou - Dai-2-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-2-gou (japan).bs" size="1048576" crc="c99282d6" sha1="d7da2c9c9520a5368d6d4ea2d99e645b7a0c391a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud3" supported="no">
+		<description>Freud no Chousenjou - Dai-3-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-3-gou (japan).bs" size="1048576" crc="f938ebc3" sha1="b867361b9e4655adfb7ad8853700c107de766924" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud4" supported="no">
+		<description>Freud no Chousenjou - Dai-4-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-4-gou (japan).bs" size="1048576" crc="12e3a8ee" sha1="79d600d9548e376cc29fbfb5f1216d7c68e0c013" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud5" supported="no">
+		<description>Freud no Chousenjou - Dai-5-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-5-gou (japan).bs" size="1048576" crc="4d0af6f3" sha1="6f6daf1946ec21140398b18cb1b5b320fcb558be" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfreud6" supported="no">
+		<description>Freud no Chousenjou - Dai-6-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="freud no chousenjou - dai-6-gou (japan).bs" size="1048576" crc="167f3ab1" sha1="a4f6ccffd38c02354d746503150438a5b132379e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstora1" supported="no">
+		<description>Game Tora no Taikoban - 5-17 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="game tora no taikoban - 5-17 gou (japan).bs" size="524288" crc="4cf3e14f" sha1="d9a3b68473e75d99ec84b95f421be0fefab1bfd7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstora2" supported="no">
+		<description>Game Tora no Taikoban - 5-31 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="game tora no taikoban - 5-31 gou (japan).bs" size="524288" crc="393e9715" sha1="5d374621784c4a3e57008febf59564fd352630da" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgekkct" supported="no">
+		<description>Gekkan Coin Toss - Deck 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="gekkan coin toss - deck 1 (japan).bs" size="1048576" crc="d2d7c3e5" sha1="75a9d2a75e66f73e5b25f4bed800d73f0e33f67e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golfdais" supported="no">
+		<description>Golf Daisuki! O.B. Club (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="golf daisuki! o.b. club (japan).bs" size="1048576" crc="dc00efeb" sha1="e97c6c4a5e530815cb449b7aa5a8b1d156f850b7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgoodp3" supported="no">
+		<description>GoodsPress - 3 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="goodspress - 3 gatsugou (japan).bs" size="1048576" crc="e328adee" sha1="11228f9c890f64a844a1277d5c945683f08453ac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgoodp6" supported="no">
+		<description>GoodsPress - 6 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="goodspress - 6 gatsugou (japan).bs" size="524288" crc="fba1273b" sha1="9e2620f76a2b68036140cd265c27b116daf7853a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgoodp7" supported="no">
+		<description>GoodsPress - 7 Gatsugou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="goodspress - 7 gatsugou (japan).bs" size="1048576" crc="83611a0c" sha1="ed401c2d6e77292567f9fc58570cc2ced4caf512" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgunjn" supported="no">
+		<description>Heisei Gunjin Shougi (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="heisei gunjin shougi (japan).bs" size="524288" crc="63f948db" sha1="dd3cff98cd69168f1a6c5dcef7940b6dc9172dd3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsikariy" supported="no">
+		<description>Ikari no Yousai (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ikari no yousai (japan).bs" size="1048576" crc="c69a81ea" sha1="f7123f96292398380f75b67c70c242fa58f21dd5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shubibi0" supported="no">
+		<description>Kaizou Choujin Shubibinman Zero (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kaizou chounin shubibinman zero (japan).bs" size="1048576" crc="5e5ba3f0" sha1="5b6a4d0740183703f35a349afb6088a8603d8966" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirbb" supported="no">
+		<description>Kirby no Omochabako - Baseball (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="kirby no omochabako - baseball (japan).bs" size="524288" crc="7ac28567" sha1="2e3c7ed1a590847ab6e1a0ddfd430bc7cc7d79dd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirgb" supported="no">
+		<description>Kirby no Omochabako - Guruguru Ball (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kirby no omochabako - guruguru ball (japan).bs" size="1048576" crc="8247a684" sha1="e3b4b1b05edc6c5f6ad3ce4da002aa3fd6f26a6a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirkuz" supported="no">
+		<description>Kirby no Omochabako - Hoshi Kuzushi (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kirby no omochabako - hoshi kuzushi (japan).bs" size="1048576" crc="a78abd76" sha1="e1b259a29ab756ee3f333006d6eeb4fdbeb5f814" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirpin" supported="no">
+		<description>Kirby no Omochabako - Pinball (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="kirby no omochabako - pinball (japan).bs" size="524288" crc="9d9bbd09" sha1="53faf45fd03937f663dd2e8047badb162922f896" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskodom1" supported="no">
+		<description>Kodomo Chousadan Mighty Pockets - ChoUSA 1 - Junk-ya Black no Ie (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kodomo chousadan mighty pockets - chousa 1 - junk-ya black no ie (japan).bs" size="1048576" crc="85ebb7cc" sha1="cc81070dd4c7b6a527eab5ecc65a1c1433eebe5f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskodom2" supported="no">
+		<description>Kodomo Chousadan Mighty Pockets - ChoUSA 2 - Hanzai Toshi Big Apple (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kodomo chousadan mighty pockets - chousa 2 - hanzai toshi big apple (japan).bs" size="1048576" crc="188c9acb" sha1="408ac8d9c78dad14f109562fbd3149fe0114fc57" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskodom3" supported="no">
+		<description>Kodomo Chousadan Mighty Pockets - ChoUSA 3 - Kyakusen Queen Patra no Nazo (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kodomo chousadan mighty pockets - chousa 3 - kyakusen queen patra no nazo (japan).bs" size="1048576" crc="35634c30" sha1="fc222418dba4730ef5f49a6621f9b3addff8c6ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskoiwab" supported="no">
+		<description>Koi wa Balance - Tatoeba K-kun no Tabou na Ichinichi Hen (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="koi wa balance - tatoeba k-kun no tabou na ichinichi hen (japan).bs" size="1048576" crc="d931df60" sha1="7c65ebc51b71f235710ee1935b84ea88236b8d48" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdoki" supported="no">
+		<description>Konae-chan no Dokidoki Penguin Kazoku (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="konae-chan no dokidoki penguin kazoku (japan).bs" size="262144" crc="218b11f8" sha1="6193ad723ba3d2434bfe8fc70a593d1eabe821de" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi1" supported="no">
+		<description>Let's Pachinko Nante Gindama 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="let's pachinko nante gindama 1 (japan).bs" size="1048576" crc="330aad41" sha1="3b98b182ea492ac35264776829fe773cfa8fb937" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi2" supported="no">
+		<description>Let's Pachinko Nante Gindama 2 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="let's pachinko nante gindama 2 (japan).bs" size="1048576" crc="8561ad51" sha1="f979554674df78e0ff28ca6df183dab33a1793b3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi3" supported="no">
+		<description>Let's Pachinko Nante Gindama 3 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="let's pachinko nante gindama 3 (japan).bs" size="1048576" crc="8f24b267" sha1="5f838668c7dc0092f3e6e92e9ea078c4b93fd1ab" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi4" supported="no">
+		<description>Let's Pachinko Nante Gindama 4 (Jpn, 0321)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="let's pachinko nante gindama 4 (japan).bs" size="1048576" crc="75bc56bd" sha1="82dcebfbfe6019f4dbf0fc1bebf168d3a33feb14" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bslordmn" supported="no">
+		<description>Lord Monarch (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="lord monarch (japan).bs" size="524288" crc="75e906fe" sha1="583a0bf064518a8f739653c3d09c21485dcb8c74" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmarpnt" supported="no">
+		<description>Mario Paint - BS Ban (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mario paint - bs ban (japan).bs" size="1048576" crc="4049e234" sha1="3a74179a49e433b7f743b37e84faee96399306e7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmarpny" supported="no">
+		<description>Mario Paint - Yuushou Naizou Ban (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mario paint - yuushou naizou ban (japan).bs" size="1048576" crc="91cae9e2" sha1="5e8363db63c245fd7ed6f64b1a105dc808f9ce55" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsninta2" supported="no">
+		<description>Nintama Rantarou 2 (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="nintama rantarou 2 (japan).bs" size="1048576" crc="dc9db257" sha1="ac2d779fe97cd01419df0d6ac89443a01d0e7d0f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="npm107" supported="no">
+		<description>Nintendo Power Magazine 107 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="nintendo power magazine 107 (japan).bs" size="524288" crc="1622eb2d" sha1="dd8f214872a71da328c31a967765e27ad9f4239c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspanepn" supported="no">
+		<description>Panel de Pon - Event '98 (Jpn, 0111)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="panel de pon - event '98 (japan).bs" size="1048576" crc="36b0cf6c" sha1="b59061561a3aeac13e46735582f29826e7310141" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokekame" supported="no">
+		<description>Pokekame Magazine (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pokekame magazine (japan).bs" size="1048576" crc="2a6c5ec6" sha1="35fc0d9789ef324dc27c5d041114631606862ca5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="radicald" supported="no">
+		<description>Radical Dreamers - Nusume Nai Houseki (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="radical dreamers - nusume nai houseki (japan).bs" size="1048576" crc="be3048b6" sha1="7d724ee3473d68c5fb856a0ffc9ba5d1fc17efa5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswalker" supported="no">
+		<description>Satella Walker 2 - Sate Bou o Sukuidase! (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="satella walker 2 - sate bou o sukuidase! (japan).bs" size="1048576" crc="7c8d211c" sha1="80bb866deb7141963e1ecf9b1f538ee0c28b11ed" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsshangh" supported="no">
+		<description>Shanghai - Banri no Choujou (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shanghai - banri no choujou (japan).bs" size="1048576" crc="60017697" sha1="94c365cddfa62eea1a56fb7f0dbcd2ad6812ddc8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswappr1" supported="no">
+		<description>Sousa Sentai Wappers - Mission 01 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sousa sentai wappers - mission 01 (japan).bs" size="1048576" crc="fec3d721" sha1="a96f2321a9ecf0261bd04d5aa0f15cafbe9ec30f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswappr2" supported="no">
+		<description>Sousa Sentai Wappers - Mission 02 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sousa sentai wappers - mission 02 (japan).bs" size="1048576" crc="a619c58d" sha1="067fd06286e3fd363b17f39876dc9dd53418038e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswapprs" supported="no">
+		<description>Sousa Sentai Wappers - Soushuuhen (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sousa sentai wappers - soushuuhen (japan).bs" size="1048576" crc="0b423023" sha1="9ae3ee6edea0c5b348b6195b301092da06f9b409" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steeshot" supported="no">
+		<description>Special Tee Shot (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="special tee shot (japan).bs" size="1048576" crc="2703f38e" sha1="8e7e08654a067c703c10d8a0858e2b55fac55170" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssprigg" supported="no">
+		<description>Spriggan Powered BS - Prelude (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="spriggan powered bs - prelude (japan).bs" size="1048576" crc="29b7cf34" sha1="fcd0258debc13e2651a96684ae95cf3d2c7f172f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssupedf" supported="no">
+		<description>Super E.D.F. (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super e.d.f. (japan).bs" size="1048576" crc="f6aa6c8d" sha1="bd85da4175beef68bfff4dd39e979ecb23fc5c78" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfamwar" supported="no">
+		<description>Super Famicom Wars - BS Ban - Tsukinowajima (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super famicom wars - bs ban - tsukinowajima (japan).bs" size="1048576" crc="00513e71" sha1="3cdd2685ac91be55fb16f41a671af6c81a61f26a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuprmj" supported="no">
+		<description>Super Mahjong Taikai (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="super mahjong taikai (japan).bs" size="524288" crc="8eb00b71" sha1="36f73508f4c1e6d65f9b857edff03ce11312ffb4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssnazot" supported="no">
+		<description>Super Nazo Puyo Tsuu - Rulue no Tetsuwan Hanjouki (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="す~ぱ~なぞぷよ通 ルルーの鉄腕繁 盛記" />
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super nazo puyo tsuu - rulue no tetsuwan hanjouki (japan).bs" size="1048576" crc="295e6a5f" sha1="116262e008ce5416d48a6a9ffe6d353d3659e608" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsninja" supported="no">
+		<description>Super Ninja-kun (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super ninja-kun (japan).bs" size="1048576" crc="bb06514e" sha1="fe69c4d4191387db3cc68d2492a633e3ad426bec" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstsume" supported="no">
+		<description>Super Tsumeshougi 1000 (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="super tsumeshougi 1000 (japan).bs" size="524288" crc="6ba3738c" sha1="56adc0a17c82529787c616319145fbc055d1ec5e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsvolly2" supported="no">
+		<description>Super Volley II (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super volley ii (japan).bs" size="1048576" crc="515588a0" sha1="d293af5439b0d569a75e27aa9c0dcf03e561a31b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssutt98" supported="no">
+		<description>Sutte Hakkun - 98 Event Version (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - 98 event version (japan).bs" size="1048576" crc="948b7f8e" sha1="07d341a77a21b9bdda04cb0f0d0d29b7e0efb143" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, xxxx0603)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-06-03).bs" size="1048576" crc="a387fe08" sha1="e7566cf5dd4cde20479c58e5b153507ef8c4d662" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2a" cloneof="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, xxxx1008)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-10-08).bs" size="1048576" crc="a224c713" sha1="8926559a716edffed10609dbb5355f1951a0c1e7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttev" supported="no">
+		<description>Sutte Hakkun - Event Version (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - event version (japan).bs" size="1048576" crc="4f6c48d1" sha1="415804504016ae03a3830f62e3917d1d4b918651" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tconflix" supported="no">
+		<description>Treasure Conflix (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="treasure conflix (japan).bs" size="1048576" crc="57a070e2" sha1="eaeceb99fe7caedb01c2e137669cb05aefb60944" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswaiwai" supported="no">
+		<description>Waiwai Check - 3-7 Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="waiwai check - 3-7 gou (japan).bs" size="1048576" crc="34fb38cb" sha1="a10c55aee93144449bca432cb5318d8e096118bc" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswario" supported="no">
+		<description>Wario no Mori - Futatabi (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="wario no mori - futatabi (japan).bs" size="1048576" crc="e80783e5" sha1="8bf9312013f62cf8631a80f3f532db461a5c0a14" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswizrd5" supported="no">
+		<description>Wizardry V - Saika no Chuushin (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="wizardry v - saika no chuushin (japan).bs" size="1048576" crc="49ef7aa9" sha1="9d4854c06fdfb7447496568cfbd1d7dda3183e32" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yoshi no panepon - bs ban (japan) (en,ja).bs" size="1048576" crc="7a633bc6" sha1="d3bcea66a3fd1d6518c006cd906b3b8f898a2c74" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyung1" supported="no">
+		<description>Yung Hakase no Shinsatsushitsu - Dai-1-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yung hakase no shinsatsushitsu - dai-1-gou (japan).bs" size="1048576" crc="27326da6" sha1="db12d90bdfcca54b1641d3ebd298f2ba230c74cf" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyung2" supported="no">
+		<description>Yung Hakase no Shinsatsushitsu - Dai-2-gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yung hakase no shinsatsushitsu - dai-2-gou (japan).bs" size="1048576" crc="66ea357f" sha1="b532b5bd160208e90753f2798366893a0e8b7c70" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszelda3" supported="no">
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, BS, 0528)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="zelda no densetsu - kamigami no triforce (japan).bs" size="1048576" crc="1e1cc639" sha1="5ecc217abfa1d8483002407cdaab3c7415f29c4f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszotto" supported="no">
+		<description>Zootto Mahjong! - Event Version (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="zootto mahjong! - event version (japan).bs" size="1048576" crc="7aca6cf0" sha1="2ee76761e023f0c51fbbf4797c175a7c752e788c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszottob" supported="no">
+		<description>Zootto Mahjong! - Preview Ban (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="zootto mahjong! - preview ban (japan).bs" size="1048576" crc="e8a0758d" sha1="8ec66c5dcda3392c27bc532a06d726783c3a1565" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsaklive" supported="no">
+	<!-- this game has a corrupted header, and requires to be patched in order to work -->
+		<description>AK LIVE Hit Gang (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="ak live hit gang.bs" size="524288" crc="9905d4c3" sha1="bd742cbd788439e021cd101d935451ba34a8116e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgamb19" supported="no">
+		<description>Gambler Jikochuushinha 2 - Dorapon Quest (Jpn, BS, 1219)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="gambler jiko chuushinha 2 - dorapon quest (bs) (japan) (dec 19).bs" size="1048576" crc="11b8e93a" sha1="10ed890794c969654fccc8b15e92d4cef5d13382" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgamb20" supported="no">
+		<description>Gambler Jikochuushinha 2 - Dorapon Quest (Jpn, BS, 1220)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="gambler jiko chuushinha 2 - dorapon quest (bs) (japan) (dec 20).bs" size="1048576" crc="f9e8a8ee" sha1="a4999b026cd05ae71b6f0a8ede1ce1bf86215d08" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbomb2" supported="no">
+		<description>Super Bomberman 2 (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super bomberman 2.bs" size="1048576" crc="095f2969" sha1="9fc6d3df4c35f1a1ee1e1c825ad76e07126c383a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssfpw" supported="no">
+		<description>Super Fire Pro Wrestling (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super fire pro wrestling.bs" size="1048576" crc="dfd7b14d" sha1="1ff3eb2cc71abd5a0f00f6ddae24f494273adf28" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsnazo" supported="no">
+		<description>Super Nazo Puyo - Rulue no Roux (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super nazo puyo (bs) (japan).bs" size="1048576" crc="6b36b2af" sha1="a013f8453c7dbfd228d592340c08161f019d15bd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbokud2" supported="no">
+		<description>BS Bokujou Monogatari Dai-2-wa (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs bokujo  monogatari da-2-wa (japan).bs" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbokud4" supported="no">
+		<description>BS Bokujou Monogatari Dai-4-wa (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs bokujo  monogatari dai-4-wa (japan).bs" size="1048576" crc="f384b235" sha1="6011df3c53de919fcf2e6fd104d5ea1b7a0cb3d6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsboku" supported="no">
+		<description>Bokujou Monogatari (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bokujou monogatari.bs" size="1048576" crc="e2093836" sha1="97520f8ac8cb2c5b8175e9148741d2e0b477e08e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscasino" supported="no">
+	<!-- this was dumped from a memory pack containing data for both games. split dumps are also available, but they seem to have issues -->
+		<description>Kouryaku Casino Bar Nichiyoubi (Jpn) &amp; Game Tora no Ooana Special (Jpn, 0224)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kouryaku casino bar roulette + game tora no ooana special 2-24.bs" size="1048576" crc="4b881535" sha1="ae574eae616f30accb2a000d6d480fac9845dbc2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this game has a corrupted header, and requires to be patched in order to work -->
+	<software name="bstamopc" supported="no">
+		<description>Tamori no Picross (Jpn, 0626)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tamori_no_picross_6-26.bs" size="1048576" crc="c155ecc7" sha1="30260a38b1403c117274f89373094a00cfe0e952" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstamopc1" cloneof="bstamopc" supported="no">
+		<description>Tamori no Picross (Jpn, 0613)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tamori_no_picross_6-13.bs" size="1048576" crc="bf6cab42" sha1="9573a7e1a2151b05302a9ea2e5b7f1ab1f195593" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssndlov" supported="no">
+		<description>BS Sound Journal for Lovers - Valentine Special Vol. 1 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs sound journal for lovers - valentine special vol. 1.bs" size="1048576" crc="0bb960c9" sha1="ca1020f1b2a5339669e36037a8ac3fa25701fd82" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi4a" cloneof="bspachi4" supported="no">
+		<description>Let's Pachinko Nante Gindama 4 (Jpn, 1124)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lets pachinko nante gindama 4 (bs) (11-24).bs" size="1048576" crc="aa934596" sha1="5883b8e0e3409f78a1ae1d9e471ef4678cb23b88" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspanepna" cloneof="bspanepn" supported="no">
+		<description>Panel de Pon - Event '98 (Jpn, 1228)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="panel de pon '98 event version (bs) (12-28).bs" size="1048576" crc="720a850c" sha1="cfbefc41406679c8bc906da6ed9db16f46c6beff" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszelda3a" cloneof="bszelda3" supported="no">
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, BS, 1130, Locked)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="zelda no densetsu - kamigami no triforce (bs) (11-30).bs" size="1048576" crc="97a68e79" sha1="2453d475a26077be0b4c259325e90d2aa0a5a0f8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscuonpaa" cloneof="bscuonpa" supported="no">
+		<description>Cu-On-Pa SFC (Jpn, BS, 0615)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="cu on pa (bs) (6-15).bs" size="1048576" crc="844fc3dc" sha1="f09dc86eccae64e54ab71cd051e9cdcd77edaeac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzgp2a" cloneof="bsfzgp2" supported="no">
+		<description>BS F-Zero Grand Prix 2 - Practice (Jpn, Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="zero2.bs" size="1048576" crc="3d31659d" sha1="ee3aaf2975ab383768ab88cdb7d7beddf64ddc34" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi1" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0102)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yoshi no panepon - bs ban (bs) (1-2).bs" size="1048576" crc="6775b6ca" sha1="0e13049e2f0e5fd3e65d36bdad790e1312392476" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi2" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0614)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yoshi no panepon - bs ban (bs) (6-14).bs" size="1048576" crc="2b8deb64" sha1="29cf1a5b24e949e73409c3923549f2963901c971" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi3" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0705)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yoshi no panepon - bs ban (bs) (7-5).bs" size="1048576" crc="a35f7c27" sha1="f769165fd0ff2f885580f9f61ee55e9a29b1f6ea" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2b" cloneof="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, 1019)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - bs version 2 (bs-d) (10-19).bs" size="1048576" crc="a01abfbd" sha1="cb6b47fedc1296bbae53a34a844d30c19d3ab883" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2c" cloneof="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, 1125)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sutte hakkun - bs version 2 (bs-d) (11-25).bs" size="1048576" crc="c2f2ad15" sha1="f9c3397cb9f047aa3278a6d082276ae080cdd447" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirkuza" cloneof="bskirkuz" supported="no">
+		<description>Kirby no Omochabako - Hoshi Kuzushi (Jpn, 0226)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="kirby no omochabako - hoshi kuzushi (bs) (2-26) (!).bs" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbaku" supported="no">
+		<description>Bakusho Mondai no Shirikon Chounaikai (Jpn, 0622)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bakusho mondai no shirikon chounaikai 6-22.bs" size="1048576" crc="b86e7ab1" sha1="3cfa8bc8d6ec36e46d7a434b5e5fa835c90bc4f0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyuki" supported="no">
+		<description>BS Yuuki Nae no GE-MU no Tsubo (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="bs yuuki nae no ge-mu no tsubo (japan).bs" size="524288" crc="2c889959" sha1="ce70937945e84db5d5e0cf1d9bd622d2c69adff3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsactr" supported="no">
+		<description>ActRaiser (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="actraiser (japan).bs" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspuyo" supported="no">
+		<description>Puyo Puyo Tsuu BS Ban (Jpn)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="puyob.bs" size="1048576" crc="e63ee3b1" sha1="2fa77c709294da3a0ae5a918a574b49302a0bf17" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskklown" supported="no">
+		<description>Kid Klown no Crazy Chase (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kid klown no crazy chase.bs" size="1048576" crc="cd6aabee" sha1="b4ef639f09376a7880dcec6f23a03b08c0254b86" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfami" supported="no">
+		<description>BS Famitsu Magazine Karara Ban 4/27 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="weekly famitsu express 4-27.bs" size="524288" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdoki1" cloneof="bsdoki" supported="no">
+		<description>Konae-chan no Dokidoki Penguin Kazoku (Jpn, Alt)</description>
+		<!-- same game as the other dump, but taken from a different broadcast in the same week -->
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="bs konae chan no dokidoki pengin kazoku (japan) (alt).bs" size="262144" crc="33cb8a80" sha1="9c2500e5ab9c46cd32a6366fcb3df811888191b4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsjol1" supported="no">
+		<description>Jewel Of Live (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="jewel of live (rpg maker super dante).bs" size="1048576" crc="ce6a4d7f" sha1="18b18757c79b48d1472dba53e475edae73e867ae" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsstrw12" supported="no">
+		<description>Media Strawberry Volume 12 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="media strawberry volume 12.bs" size="524288" crc="0836869e" sha1="a9c248668d9d51633a6da8a4846aea3e25c2d1a3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdormf" supported="no">
+		<description>Do-Re-Mi de Faa! Vol. 6 - 5/4 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="524288">
+				<rom name="do-re-mi de faa! vol. 6 - 5-4 (japan).bs" size="524288" crc="0849123e" sha1="13beba44f974c4b4139a6303b14c0a5239156a02" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsrg97" supported="no">
+		<description>BS Race Game 97MP (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bs race game 97mp (japan) (derby stallion 96 maybe).bs" size="1048576" crc="1c19967c" sha1="9c1dfe24be936943a4b4a7902265942b0b70bf00" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssgk4" supported="no">
+		<description>Same Game Koma Editor 4 (Jpn, Data Pack?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="same game koma editor 4 (data pack)(maybe).bs" size="1048576" crc="d8479c20" sha1="2160f0034c1474d05937d6fdb5af16f4b06bbc4e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssdgn2" cloneof="bssdgn1" supported="no">
+		<description>BS SD Gundam G-Next (Jpn, Data?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sd gundam g-next (japan) (data).bs" size="1048576" crc="a94854ad" sha1="f2ec8f76782656134804b1e97c9f186d26da5d08" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssdgn1" supported="no">
+		<description>BS SD Gundam G-Next (Jpn, Data 0316)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sd gundam g-next data (3-16) (dumped august 2010).bs" size="1048576" crc="2e2ef6c4" sha1="81d2dff2d9e248e00bc7a051e603290f56f20f91" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsrpgtsd" supported="no">
+		<description>BS RPG Tsukuru - Super Dante (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="RPGツクールスーパーダンテ" />
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rpg tsukuru - super dante.bs" size="1048576" crc="2e831a4d" sha1="1ea437e679549f76a362619657a0875d25d3a4ef" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="bsrpgt1" supported="no">
+		<description>BS RPG Tsukuru 2 Data</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="[ikari] rpg tsukuru 2 data (2011-11-17).bs" size="1048576" crc="5561afd6" sha1="f312ff25789507ebbbb6bdc1c74131f91c20145b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsrpgt2" cloneof="bsrpgt1" supported="no">
+		<description>BS RPG Tsukuru 2 Data (Overwritten Bokujo Data)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rpg tsukuru 2 data (overwritten bokujo data).bs" size="1048576" crc="80ec9cc0" sha1="7ba6b26f0ec5309ed5ee14e1188891b554ca145e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii1" supported="no">
+		<description>BS ASCII Data 1</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 1.bs" size="1048576" crc="148955f9" sha1="01fbab2a57d5e9ef9abc85202c3ef75031bd17ad" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii2" cloneof="bsascii1" supported="no">
+		<description>BS ASCII Data 2</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 2.bs" size="1048576" crc="bf7d57b0" sha1="f4064a38723bcd4999ff92c8202b3cc9ce3d8d03" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsascii3" cloneof="bsascii1" supported="no">
+		<description>BS ASCII Data 3</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="ascii data 3.bs" size="1048576" crc="2ab43134" sha1="885c80f0e8582e6ae62bcc42ec6249f50c5b56da" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmachi" supported="no">
+		<description>Machi Magazine</description>
+		<year>1995?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="machi magazine (d).bs" size="1048576" crc="0e6c76e6" sha1="ca291cb350f69660ebc054906d05408ffef75b8d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmachih" cloneof="bsmachi" supported="no">
+		<description>Machi Magazine (Hacked)</description>
+		<year>1995?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="machi magazine (header fix prepatched).bs" size="262144" crc="eda14445" sha1="f351b8593e587e7a264dd60cdf3713598289f5b5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswaiwaia" cloneof="bswaiwai" supported="no">
+		<description>WaiWai Check 3-21 Saihousou + WaiWai Kids 3-16</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="waiwai check 3-21 saihousou + waiwai kids 3-16.bs" size="1048576" crc="17239e91" sha1="fe67f40912e7c4d290eeb175a2bd2122bfa3ae8c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Find out what next BS images are... -->
+	<software name="bskan3" supported="no">
+		<description>Kanaderu Convert 3 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kandu convert3.bs" size="1048576" crc="cf34fc63" sha1="7dd73150a5426aa1a3db202b3348069e064a09ea" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskan3c" supported="no">
+		<description>Kanaderu Convert 3c (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kandu convert3c.bs" size="65536" crc="942960c2" sha1="ed482b950224dac0a0e60c267da23fbfe651da36" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskan4" supported="no">
+		<description>Kanaderu Convert 4 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kandu convert4.bs" size="1048576" crc="f4320a56" sha1="472b55f33a1765c6295466365de052caa7d870c8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskanrpg" supported="no">
+		<description>Kanaderu Convert RPG Maker Data (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kandu convert rpg maker data.bs" size="1048576" crc="654657c0" sha1="4b945ba2602791a155511bcacc1eff8c88166991" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssnt4" supported="no">
+		<description>Sound Novel Tsukuru 4 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sound novel 4.bs" size="1048576" crc="97539bca" sha1="09b7c79431a115109322242eca9ccdefb88a37a3" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssnt4h" supported="no">
+		<description>Sound Novel Tsukuru 4h (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sound novel 4h.bs" size="131072" crc="be335a19" sha1="23ccbb01a99f90527bc5c20345d1a5ea969ac044" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssbm">
+		<description>Sonic Blast Man (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sonic blastman (bs).bs" size="1048576" crc="86bb53e5" sha1="e8411f5e0ea2b2922416710c9b463023fe1e5f39" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tablgmbs">
+		<description>Table Game Daishuugou!! (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="table game daisyugo (bs).bs" size="1048576" crc="47e3047e" sha1="00ddbd9471f9b22b927a2361c672d7e4081fb69d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsshangha" cloneof="bsshangh" supported="no">
+		<description>Shanghai - Banri no Choujou (Jpn, BS, Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shanghai - banri no choujou (bs).bs" size="1048576" crc="5c95f21c" sha1="82a238519f92dc3174dd3226a1243c69d7f03528" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgalb5" supported="no">
+		<description>Gal Kan Bazooka Dai-5-Kan (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="gal kan bazooka dai-5-kan.bs" size="1048576" crc="38762b6b" sha1="382154ea2304618a2f61f57b022ec6c65617348d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssates4" supported="no">
+		<description>Satesupo DX Dai-4-Gou (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="satesupo dx dai-4-gou.bs" size="1048576" crc="8ada2ba7" sha1="6923096cc33296af8e7ce7978457e39a36035fee" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdezamn" supported="no">
+		<description>Dezaemon BSX Version - BS-X Shooting (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dezaemon bsx version - bs-x shooting.bs" size="1048576" crc="5a9be5a8" sha1="e52d59e800c17c678711a681d3308f0804c238e0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shubibi0a" cloneof="shubibi0" supported="no">
+		<description>Kaizou Choujin Shubibinman Zero (Jpn, Locked)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kaizou choujin shubibinman zero (l).bs" size="1048576" crc="26a4f6c3" sha1="dd084021a7e2afd939fee3b6426778f6e5c2f333" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbomb" supported="no">
+		<description>Super Bomberman (Jpn, BS, Locked)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super bomberman.bs" size="1048576" crc="9ea79162" sha1="1dcea52ea7e358c9d8b628b6f7f352c8e96daa61" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbtour4" supported="no">
+		<description>Bass Tournament 4 (Jpn, BS, Incomplete Data)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="bass tournament 4 (incomplete).bs" size="1048576" crc="ccefbd30" sha1="413ee71e3301a958c6998f907460ec95cd20b666" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmonop2" supported="no">
+		<description>BS Monopoly Red Cup (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="monopoly 2 bs - red cup.bs" size="1048576" crc="9b0a441c" sha1="9ee4160c3d6ffb0e5e3889dc442e9d3263a11c1e" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmonop3" supported="no">
+		<description>BS Monopoly Yellow Cup (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="monopoly 2 bs - yellow cup.bs" size="1048576" crc="ed1108b5" sha1="11616e85ec1d7b3c31272f2076e56dfc97e4f3e4" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bslemmin" supported="no">
+		<description>Lemmings (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lemmings (bs).bs" size="1048576" crc="25e19b04" sha1="16d31b379d3aa212b9b0d2235b41e85c35aad7bc" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdokap4" supported="no">
+		<description>Kessen! Dokapon Oukoku IV - Densetsu no Yuusha-tachi (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kessen! dokapon oukoku iv - densetsu no yuusha-tachi (bs).bs" size="1048576" crc="e6a2e0d8" sha1="a40d9dedeff858fca2a549fadb2cbe7f0a84fc44" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmaria" supported="no">
+		<description>Maria - Part 1 (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="maria - part 1 (bs).bs" size="1048576" crc="c406562f" sha1="52eadd827bdba497bc2b0dc10ccfec4abebc8c0f" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsssold" supported="no">
+		<description>Star Soldier - 2 Minute (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="star soldier 2mins (b).bs" size="1048576" crc="c79c1b8d" sha1="fd81383fbf4fee2cb528e2336c346112f44933c9" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsswalk2" supported="no">
+		<description>BS Satellawalker 2 Dai-ichi-wa (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="satella2_1.bs" size="1048576" crc="5ea2b6bb" sha1="3a46898cdbbb414bc6462effd4419a2a471be807" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscasin2" supported="no">
+	<!-- this was dumped from a memory pack containing data for both games. -->
+		<description>Kouryaku Casino Bar - Suiyoubi &amp; Kinyoubi (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="kouryaku casino bar double pack.bs" size="1048576" crc="390c560f" sha1="ede3dfe2d30452644c75c8648a95b539def19fd2" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- BS Unknow packs, to be sorted out once we emulate this properly! -->
+
+	<!-- This pack returns a 'Error 41' message on a real unit, and it does not work further -->
+	<software name="bsunk01" supported="no">
+		<description>BS Unknown Memory Pack 01 (Jpn)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="asdf.bs" size="1048576" crc="ff0bab5d" sha1="98106965b02c41f1be7289acb408581de3d82a52" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- These packs were released as an "Assorted set of data packs, which seem to be RPG Tsukuru and Sound Novel Tsukuru data" -->
+	<software name="bsunk02" supported="no">
+		<description>BS Unknown Memory Pack 02 (Jpn, ASCII MUSIC TOOL1995.11.02 V1.0)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="65536">
+				<rom name="ascii music tool1995.11.02 v1.0.bs" size="65536" crc="ee250acb" sha1="9cabc99c9c5bbbe192d401127ddb69dc14fcf35a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk03" supported="no">
+		<description>BS Unknown Memory Pack 03 (Jpn, KANADERU CONVERT 1)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="kanaderu convert 1.bs" size="262144" crc="0fe1b6a4" sha1="ae04f366ffa9bc5409b9231023f3049c50255a0b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk04" supported="no">
+		<description>BS Unknown Memory Pack 04 (Jpn, KANADERU CONVERT 2)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="kanaderu convert 2.bs" size="131072" crc="4a5ffa76" sha1="5a0e2b4f6dd5ccb2c4bcfa51bfacf905da0d6bd4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk05" supported="no">
+		<description>BS Unknown Memory Pack 05 (Jpn, KANADERU CONVERT 5)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="kanaderu convert 5.bs" size="262144" crc="a502aa9d" sha1="39b41cac1bd60f276cafb719939917129260a82d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk06" supported="no">
+		<description>BS Unknown Memory Pack 06 (Jpn, RPG DATA 01)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 01.bs" size="131072" crc="7c9a8066" sha1="e40b2712aae8e9a7bd5f99873ef9f3a0821e79cd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk07" supported="no">
+		<description>BS Unknown Memory Pack 07 (Jpn, RPG DATA 01 a)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 01 a.bs" size="131072" crc="dcfeef74" sha1="d9ec72de332e90fe794d9d53f5c7ece7e55ff281" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk08" supported="no">
+		<description>BS Unknown Memory Pack 08 (Jpn, RPG DATA 02)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="262144">
+				<rom name="rpg data 02.bs" size="262144" crc="0cdc896b" sha1="9242f1cd7d2b08457ad2a434180bc54ce113f4d2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk09" supported="no">
+		<description>BS Unknown Memory Pack 09 (Jpn, RPG DATA 02 b)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 02 b.bs" size="131072" crc="b5abf7d5" sha1="ba7f004a07fed15521cacb980bcdd36dae9ae21a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk10" supported="no">
+		<description>BS Unknown Memory Pack 10 (Jpn, RPG DATA 03 Judas Priest)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="rpg data 03 judas priest.bs" size="131072" crc="a00a6450" sha1="5c1dc43900c76042db10d49a1e3ae6a8dc8f7672" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk11" supported="no">
+		<description>BS Unknown Memory Pack 11 (Jpn, SOUND NOVEL 1)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 1.bs" size="131072" crc="cab837e0" sha1="2254ac8d4c919ade22eadae630b1b82c228a2c82" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk12" supported="no">
+		<description>BS Unknown Memory Pack 12 (Jpn, SOUND NOVEL 1 a)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 1 a.bs" size="131072" crc="c7657cd1" sha1="106843f2528869b75918156f5079353236e5278d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk13" supported="no">
+		<description>BS Unknown Memory Pack 13 (Jpn, SOUND NOVEL 2)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 2.bs" size="131072" crc="05f3faef" sha1="6162f262c25f3a45f07297db6eb3f08dd11ed8e1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk14" supported="no">
+		<description>BS Unknown Memory Pack 14 (Jpn, SOUND NOVEL 3)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 3.bs" size="131072" crc="c1bc6475" sha1="cb675b6f9df9917cce34ce59d2d645d48d50c188" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk15" supported="no">
+		<description>BS Unknown Memory Pack 15 (Jpn, SOUND NOVEL 3 a)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 3 a.bs" size="131072" crc="93516da4" sha1="3ba52325c030b629cd9773a707b83f515600add9" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk16" supported="no">
+		<description>BS Unknown Memory Pack 16 (Jpn, SOUND NOVEL 4)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 4.bs" size="131072" crc="4f823052" sha1="5478c8f3e84b5ee0680a99435288f1e4311982a4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk17" supported="no">
+		<description>BS Unknown Memory Pack 17 (Jpn, SOUND NOVEL 4 a)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 4 a.bs" size="131072" crc="7426f308" sha1="1254626439c10cf474a74b02d9f501a3aefb2c84" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk18" supported="no">
+		<description>BS Unknown Memory Pack 18 (Jpn, SOUND NOVEL 5)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 5.bs" size="131072" crc="3955eb83" sha1="6d785d32410ec1acc2efeffe4717e26c1221d2ed" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk19" supported="no">
+		<description>BS Unknown Memory Pack 19 (Jpn, SOUND NOVEL 6)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 6.bs" size="131072" crc="d9ee913a" sha1="ab6e28dd1e2542f974160e571abb9181e4767edc" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsunk20" supported="no">
+		<description>BS Unknown Memory Pack 20 (Jpn, SOUND NOVEL 7)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="131072">
+				<rom name="sound novel 7.bs" size="131072" crc="c7d0b4df" sha1="d426c22704f2ea96ec9ec95af72f8959e7df27ca" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This packs was dumped by ChronoMoogle and Ikari, but it does not work. Investigate if it contains corrupted or deleted data -->
+	<software name="bsunk21" supported="no">
+		<description>BS Unknown Memory Pack 21 (Jpn, ASCII MUSIC DATA, Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="unknown music data (bad maybe).bs" size="1048576" crc="f96d9d29" sha1="48980784d21f2e9568d18bb326af033fa1e33889" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This packs was dumped by Ikari and has blank data banks. -->
+	<software name="bsunk22" supported="no">
+		<description>BS Unknown Memory Pack 22 (Jpn, RPG Tsukuru Data Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="unknown - every other bank erased.bs" size="1048576" crc="5738ad34" sha1="f41ad479353dbbf7136af678faf7b0b8d96876d8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsspuyor" supported="no">
+		<description>Super Puyo Puyo Tsuu Remix (Jpn, BS)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="す~ぱ~ぷよぷよ通リミックス" />
+		<part name="cart" interface="bspack">
+
+			<feature name="slot" value="bsmempak" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super puyo puyo tsuu remix (japan) [b].bs" size="1048576" crc="5fc1fd18" sha1="a33d7dd85c0b79865c6c77a6b49694b67614488e" offset="0x000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sage2" description="Sage II Disk Images">
+	<software name="psysiv13">
+		<description>p-System IV.13</description>
+		<year>1983</year>
+		<publisher>Sage Computer</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="653153">
+				<rom name="system.imd" size="653153" crc="700e2fc1" sha1="ae841edb995cf13292bedce65d2307f58397f28f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Business"/>
+			<dataarea name="flop" size="646508">
+				<rom name="business.imd" size="646508" crc="36dd2dc9" sha1="810a8b8633369d58c355a43eaa05f1743da69296" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utility"/>
+			<dataarea name="flop" size="638331">
+				<rom name="utility.imd" size="638331" crc="351102c0" sha1="925ce1ebc306aaa6cb630b876c9f2a7c0b22a242" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Build"/>
+			<dataarea name="flop" size="610236">
+				<rom name="build.imd" size="610236" crc="69093a41" sha1="5c9a74e34eb50855e36436a8fb2eb776d26d89be" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psysiv21">
+		<description>p-System IV.21</description>
+		<year>1983</year>
+		<publisher>Stride Micro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SAGE IV.21"/>
+			<dataarea name="flop" size="487641">
+				<rom name="dk0134b.imd" size="487641" crc="3c8fb047" sha1="35fc78f7ddbd5e2d807f20302b9d958d3c7c68ba" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SGUTIL IV.21"/>
+			<dataarea name="flop" size="634300">
+				<rom name="dk0135b.imd" size="634300" crc="bb8b65de" sha1="a316e5d71417370f88cd2716266ec6926d493669" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="SGBLD IV.21"/>
+			<dataarea name="flop" size="617926">
+				<rom name="dk0136b.imd" size="617926" crc="863398ff" sha1="e8e10f3b75f0b71ba9d7efb86a9dfd4da58defa6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="SGDEV IV.21"/>
+			<dataarea name="flop" size="633255">
+				<rom name="dk0137b.imd" size="633255" crc="72949a3c" sha1="e0b47243365b361f6e2acb697d50f25ecd4da740" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm68k">
+		<description>CP/M 68K v1.1</description>
+		<year>1983</year>
+		<publisher>Stride Micro</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Release Disk (C)"/>
+			<dataarea name="flop" size="536201">
+				<rom name="master-c.imd" size="536201" crc="bf30bd39" sha1="832620f71444c24c755dba83ce675b7af87248f4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Release Disk 1&amp;2&amp;4"/>
+			<dataarea name="flop" size="611310">
+				<rom name="master-a.imd" size="611310" crc="4b197ce0" sha1="6fed9530e71535f10c51b0a0e49f4ac5cb0e3bd3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Release Disk 3&amp;5"/>
+			<dataarea name="flop" size="472315">
+				<rom name="master-b.imd" size="472315" crc="97be282a" sha1="0dd3ad00b40c1c1f57fe513140603a0f4b4cbc40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

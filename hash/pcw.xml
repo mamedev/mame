@@ -1,0 +1,1983 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pcw" description="Amstrad PCW disk images">
+
+<!--
+ Known undumped games (partial list, compiled from http://ciberia.ya.com/jevicac/ )
+
+ * 500 c.c. Championship
+ * Acheton
+ * After Shock Absorver
+ * Annals Of Rome
+ * La Aventura Espacial
+ * Avon
+ * Bobby Bearing
+ * Bridge Player
+ * Castle Blackstar
+ * Chichen Itza
+ * Classic Games 4
+ * Clock Chess ´89
+ * Corruption
+ * Countdown to Doom
+ * Crusoe
+ * Cubik-road
+ * Cutthroats
+ * Cyberbig
+ * La Diosa Cozumel
+ * Distractions
+ * Elektra Glide
+ * Fish!
+ * The Fourth Protocol
+ * Giant Killer
+ * Graham Gooch's Test Cricket
+ * Hezarin
+ * Kingdom of Hamil
+ * The Last Days Of Doom
+ * Lords of Time
+ * Mindfighter
+ * Monsters of Murdac
+ * Mr. Gas
+ * Pack Alligata
+ * Pack Erbe PCW
+ * Philosopher's Quest
+ * The Price Of Magik
+ * Red Moon
+ * Return to Doom
+ * Robot Scape
+ * The Secret Diary of Adrian Mole
+ * Silicom Dreams
+ * Sirwood
+ * Space Combat
+ * Spitfire 40
+ * SpySnatcher
+ * Star Byte
+ * Terracom
+ * The Very Big Cave Adventure
+ * Twin Disk Simulation!!
+ * The Very Big Cave Adventure
+ * Wonderland
+
+-->
+
+<!-- SYSTEM disks -->
+
+	<software name="system">
+		<description>System Disks (UK)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1A - LocoScript 1.1" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [a] loco script [maxit][samdisk][original].dsk" size="195635" crc="da5c169d" sha1="9592b6b3be8f0887d76d6f8adbea14bed2dd1f73" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 1B - C/PM Plus 1.1" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [b] cpm plus [maxit][samdisk][original].dsk" size="195635" crc="6fdf8e6e" sha1="32c08a256da984c44f8d32d31f62119f48890509" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systemf" cloneof="system">
+		<description>System Disks (Fra)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1A - LocoScript 1.21" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [1a] loco script [maxit][samdisk][original].dsk" size="195635" crc="7bcab8b0" sha1="d955816ca31ed4f1e60f27fe63f1390719bc09cc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 1B - C/PM Plus 1.4" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [1b] cpm plus [maxit][samdisk][original].dsk" size="195635" crc="21771889" sha1="f2f9dc937e975aee7eac9989308d4470800deda8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<feature name="part_id" value="Disk 2A - Utilitaires de Programmation" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [2a] utilitaires de programmation cpm plus [maxit][samdisk][original].dsk" size="195635" crc="7e85a947" sha1="f5234711ceb70a027c54746ba0a98fdd57d5971e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3">
+			<feature name="part_id" value="Disk 2B - Dr. Logo &amp; Help" />
+			<dataarea name="flop" size="195635">
+				<rom name="pcw 8256 [2b] dr. logo &amp; help. cpm plus [maxit][samdisk][original].dsk" size="195635" crc="3e0eb995" sha1="b4d23e06168a7d2ca5e201ef704b45e3a12be615" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="systems" cloneof="system">
+		<description>System Disks (Spa)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1 - LocoScript 1.11" />
+			<dataarea name="flop" size="194816">
+				<rom name="1_locoscript_1.11.dsk" size="194816" crc="eb7eb8c9" sha1="7b72a1ecd34116afac318511e73b521214d31b71" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 2 - C/PM Plus 1.2" />
+			<dataarea name="flop" size="194816">
+				<rom name="2_cpm_plus.dsk" size="194816" crc="00f580b6" sha1="1b34dbd3fdb598a1f48d3c0d5075cc9c794a5113" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<feature name="part_id" value="Disk 3 - Utilidades" />
+			<dataarea name="flop" size="194816">
+				<rom name="3_utilidades.dsk" size="194816" crc="538201b3" sha1="23cacbc81602d32267b5eb187c3b9da7be246e41" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3">
+			<feature name="part_id" value="Disk 4 - Dr. Logo y Ayuda" />
+			<dataarea name="flop" size="194816">
+				<rom name="4_dr_logo_ayuda.dsk" size="194816" crc="af9972e0" sha1="39f5c180dfb33e7f5d6d8816122daefac39b9bab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- were there more disks? were they different from the above? -->
+	<software name="systems1" cloneof="system">
+		<description>System Disks (Spa, Newer, Only disks 1 &amp; 2)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Disk 1 - LocoScript 1.21" />
+			<dataarea name="flop" size="195584">
+				<rom name="sistema1a.dsk" size="195584" crc="c241602e" sha1="cd13d32f6726876f0f8708e15b70ce07f1513c1a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Disk 2 - C/PM Plus 1.4" />
+			<dataarea name="flop" size="195584">
+				<rom name="sistema1b.dsk" size="195584" crc="fdf61fd6" sha1="1e0617db2c65c3b6bbc0b3731a78f278cd4b6dde" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmplus">
+		<description>CP/M Plus v1.4 (UK)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="199680">
+				<rom name="cpm plus 1.4e.dsk" size="199680" crc="16f38d27" sha1="973155b5bd34f761dd3a0a6226f38e597392c93d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmplusg" cloneof="cpmplus">
+		<description>CP/M Plus v1.4 (Ger)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="cpm plus 1.4d.dsk" size="194816" crc="b589de9e" sha1="87a2f78ca9803cf1c97d6f9a8bb06f38e5f8a80d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmpluss" cloneof="cpmplus">
+		<description>CP/M Plus v1.4 (Spa)</description>
+		<year>19??</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="cpm104es.dsk" size="194816" crc="bdae6e80" sha1="a0a08c7fce2c2623214f3d963bc078f301b8695c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- SYSTEM disks not working... might need more RAM (512k systems are currently broken) or some other missing features -->
+
+	<software name="loco203" supported="no">
+		<description>LocoScript v2.03 (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="locos2.dsk" size="194816" crc="c1060ab5" sha1="309cb29aea7030bfd51265b12892598aa95eb03e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco216" supported="no">
+		<description>LocoScript v2.16 (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="locos216.dsk" size="194816" crc="02ff41f4" sha1="6b959ba333361142abbc8567e50b662ca141ffab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locospel" supported="no">
+		<description>LocoSpell (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="locospel.dsk" size="194816" crc="1088cd6e" sha1="2eae49251844d3fd75e7e5ef89a09679a2da29ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco3" supported="no">
+		<description>LocoScript v3.?? (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="loco3a.dsk" size="194816" crc="c5bcba47" sha1="2ddabe837983d735cb06ccbb9b1b9d705debc409" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="loco3b.dsk" size="194816" crc="43b702b2" sha1="459d43e40763ed0a4ac86d6eb1cb85424d4f5816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco3a" cloneof="loco3" supported="no">
+		<description>LocoScript v3.?? (UK?, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3_a.dsk" size="195584" crc="2e2de806" sha1="9c1cf379f3879198f304742a792a2c9e9eca5e93" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3_b.dsk" size="195584" crc="281f13e0" sha1="675e171bf81f1a23ed1250fb5fa810f8ed6dfb2b" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3_c.dsk" size="195584" crc="702a56de" sha1="2e16a72560a92ab9ba184c54dacb8ced9af9ae32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco306" supported="no">
+		<description>LocoScript v3.06 (UK?, Disco Suelto?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3discosueltoa_v3.06_en.dsk" size="195584" crc="96d7350b" sha1="cd1b557809d8a1d14d5aaa02deba6b53b36df05d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3discosueltob_v3.06_en.dsk" size="195584" crc="2495bb2c" sha1="75cbbe872f393e58b41e9809ece086a86eb5a835" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco3up" supported="no">
+		<description>LocoScript v3.?? Upgrade? (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3upgradea.dsk" size="195584" crc="8e4a6be7" sha1="a706f4f3d6dfdcb6f0e359692156805e8702d172" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="11264">
+				<rom name="loco3upgradeb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3upgradec.dsk" size="195584" crc="acbb82a2" sha1="09f1e2f9afb202bc929db263dcff80287236d680" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco3upgraded.dsk" size="195584" crc="9bcd9089" sha1="4adc138ad941a0fc171e0d834f4c859aa8a6b14a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco406" supported="no">
+		<description>LocoScript v4.06 (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco406a.dsk" size="195584" crc="fd2790f4" sha1="5ad2ceaabf4c3c372af30d60a9093ca3c09fea43" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco406b.dsk" size="195584" crc="ff3b73d9" sha1="6978a648d11a5c0b7e81122dde8b25f87a4b5c94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco410" supported="no">
+		<description>LocoScript v4.10 (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco410a.dsk" size="195584" crc="7caf63c8" sha1="e3b0dfbdf75b7f25daccf6b1da9ec857674e078c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco410b.dsk" size="195584" crc="96d7903a" sha1="def416388c8b93895243f5c6d7df0c9bc1569082" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loco4ex" supported="no">
+		<description>LocoScript v4.?? Examples? (UK?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="loco4examplesa.dsk" size="195584" crc="a9dabd40" sha1="e06457ade8f48528876536c7cf275b6820312ca4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="11264">
+				<rom name="loco4examplesb.dsk" size="11264" crc="f0eba18a" sha1="72ad56da616a0f7f114a37e262bcf3b638e29724" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- PROGRAMS -->
+
+	<software name="deskpubl">
+		<description>The Desktop Publisher</description>
+		<year>1987</year>
+		<publisher>Database Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="199680">
+				<rom name="deskpub1.dsk" size="199680" crc="885fed2a" sha1="b0d7a5c225e7cf6ace1e10830e3888e7b59ff56d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="199680">
+				<rom name="deskpub2.dsk" size="199680" crc="b19abe58" sha1="af75addf905322fe51f8c6c8d7da9d8201e98eb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniop">
+		<description>Mini Office Professional</description>
+		<year>1987</year>
+		<publisher>Database Software</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office1.dsk" size="194816" crc="bc982763" sha1="5094297cdba91be98ba897afa2c69feda89e7ac4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office2.dsk" size="194816" crc="85ecc47f" sha1="38fda0ae21c9b213275f380edad08eb3b837b6aa" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office3.dsk" size="194816" crc="1ec40c36" sha1="4cddfa0f881c9fa3dd19b34de78382d7d212545f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniopp">
+		<description>Mini Office Professional Plus</description>
+		<year>1989</year>
+		<publisher>Database Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office1a.dsk" size="194816" crc="cf386fd1" sha1="a3f3f2e930f72979bab11ccb73258f3b6466b3df" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office1b.dsk" size="194816" crc="80f22fef" sha1="9eddd2bcf9024879e5fac303f4eadbd21482f8ce" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office2a.dsk" size="194816" crc="b5d33312" sha1="0d9a3dfe724f46000421381572b3602b4d25a959" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="office2b.dsk" size="194816" crc="a0316df6" sha1="646ba93d6b1900e2e30382ca45e28e3bc2307074" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maspaint">
+		<description>Master Paint</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="paint.dsk" size="194816" crc="bb0e657a" sha1="53401995737a467bcbd72516fdbed7f45e5b5039" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prospell">
+		<description>ProSpell v2.02</description>
+		<year>1986</year>
+		<publisher>Arnor?</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="prospel1.dsk" size="194816" crc="198aa17d" sha1="f861d3a244b3aca736e2b97530db94337c86b1db" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="prospel2.dsk" size="194816" crc="aa4a4f0a" sha1="a78502766adf9acad30f5cf7955a6559ffdb45f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supcalc2">
+		<description>SuperCalc2 v1.00 (Spa?)</description>
+		<year>1983</year>
+		<publisher>SORCIM</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="supercalc2a.dsk" size="195584" crc="159b541c" sha1="3e2f6de67fff4e85ac4504a42dc37eab160a0e8e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="supercalc2b.dsk" size="195584" crc="c2c3c0b4" sha1="afb34580aa4edca668afa9944547f1479d0d8342" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="symbos" supported="partial">
+		<description>SymbOS</description>
+		<year>2007</year>
+		<publisher>Symbiosis</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="204544">
+				<rom name="sym-pcw.dsk" size="204544" crc="4697b633" sha1="59f6d4978e860362870bc518c218ee4ae89b46c7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="204544">
+				<rom name="sym-papp.dsk" size="204544" crc="97ff055d" sha1="60dc8e8b6367f9daf1411628ea79763f882ba865" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbopas">
+		<description>Turbo Pascal v3.00A</description>
+		<year>1985</year>
+		<publisher>Borland</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="turbo_pa.dsk" size="194816" crc="b9afc2e6" sha1="f43e0f2566ed171256371459224688a285d400b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- GAMES -->
+
+	<software name="007tld">
+		<description>007 The Living Daylights (UK)</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="007_tld_pcw.dsk" size="194816" crc="c174d802" sha1="dd55a7f5bf41180b4fdb796e674acfb75cdd6909" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dcchess">
+		<description>3D Clock Chess (Spa)</description>
+		<year>1985</year>
+		<publisher>ACE Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="3dclockchess_pcw.dsk" size="194816" crc="5d8ef4e6" sha1="1e98e40b01c7a2206e86bc764ebd2aa15d23249b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ace">
+		<description>ACE</description>
+		<year>1987</year>
+		<publisher>Cascade Games</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ace_pcw.dsk" size="194816" crc="4132ae7d" sha1="1f06991a7c2730b3e7ea1c5bf8eafeeec21d7d4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nieto500">
+		<description>Angel Nieto Pole 500 (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="211712">
+				<rom name="angel_nieto_pole_500_pcw.dsk" size="211712" crc="b7fdd7e9" sha1="b204c46cb187a64899e9bacde9ce03a5826d44fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applejck" supported="partial"> <!-- game freezes at control screen? -->
+		<description>Apple Jack (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="applejack.dsk" size="194816" crc="7d408127" sha1="0e702cb61b2096f134a22e6e2b055064f1dc6e4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armagman">
+		<description>Armaggedon Man (UK)</description>
+		<year>1986</year>
+		<publisher>Martech</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="armageddon_man.dsk" size="194816" crc="4966971d" sha1="82b9508ace15730492aa481ca892e9f825156a08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballyhoo">
+		<description>Ballyhoo (UK)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ballyhoo (uk) (face a) (pcw).dsk" size="194816" crc="e03c7d40" sha1="628fbb5a1b6e49d446fe8dc5a67d003cd94d1c95" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ballyhoo (uk) (face b) (pcw).dsk" size="194816" crc="a9c5b183" sha1="dc0b27e02957cd492e0b9fc7b33a83851919471d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batman" supported="no">
+		<description>Batman (UK)</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="batman_pcw.dsk" size="194816" crc="6499c281" sha1="af82ec95e2c1222a047b11030c822b76b2c76191" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounder">
+		<description>Bounder (UK)</description>
+		<year>1985</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="bounder_pcw.dsk" size="194816" crc="5b23dcde" sha1="f363f1d59c547551cb55f8e797c817157e25494e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>Brian Clough's Football Fortunes (UK)</description>
+		<year>19??</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="footballfortunes.dsk" size="194816" crc="fb733346" sha1="53576baf6d5abcc77bbc12b45747b011bc6103e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brick">
+		<description>Brick</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="brick.dsk" size="194816" crc="622b5cfe" sha1="78887526d9080ad696c4d17c8d7dbc7558e1f4f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buran">
+		<description>Buran (Spa)</description>
+		<year>1990</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="199680">
+				<rom name="buran_pcw.dsk" size="199680" crc="c036760a" sha1="a31e465787f0d5986e582e6ae2146e8bce94f88c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="catch23">
+		<description>Catch 23 (UK)</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="catch23_pcw.dsk" size="194816" crc="63b12631" sha1="338c28352bb2dd3cfc5a0f241214a96276168ce9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clasgam1">
+		<description>Classic Games I</description>
+		<year>1986</year>
+		<publisher>Microvalue</publisher>
+		<info name="alt_title" value="Classic Collection I (Box)"/>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="classic1_pcw.dsk" size="194816" crc="0af09b22" sha1="5b47a59bd4eacfc0465f1db82e17a0d8193d8f1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clasgam2">
+		<description>Classic Games II</description>
+		<year>1987</year>
+		<publisher>Microvalue</publisher>
+		<info name="alt_title" value="Classic Collection II (Box)"/>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="classic_game2_pcw.dsk" size="194816" crc="e5d17f7b" sha1="39498910d6be4e2278b0882a6f2088bd6456baab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colos4br">
+		<description>Colossus 4 Bridge (UK)</description>
+		<year>1986</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="colos4br.dsk" size="194816" crc="c941cd4a" sha1="5ba660d3874077759b7ea221a04cef35f4f46858" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colos4ch">
+		<description>Colossus 4 Chess (UK)</description>
+		<year>1986</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="colossus4chess_pcw.dsk" size="194816" crc="6c97c0b0" sha1="ace59da84d671729b66ea09123e2dad5e9615256" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Launch DISK.COM -->
+	<software name="chec">
+		<description>The Complete Home Entertainment Centre (UK)</description>
+		<year>1990</year>
+		<publisher>CDS Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194304">
+				<rom name="home entertainment.dsk" size="194304" crc="2f2e15b1" sha1="6165686303af4553843faf1e4b87b04158f0563e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabble">
+		<description>Computer Scrabble (UK)</description>
+		<year>1986</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194560">
+				<rom name="scrabble-deluxe.dsk" size="194560" crc="191745af" sha1="28ae94e5bf1535b9fbd9e2a10119c0b7e8739859" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conecta4">
+		<description>Conecta 4 (Spa)</description>
+		<year>1990</year>
+		<publisher>Mix Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="conecta4.dsk" size="194816" crc="5e0f2eda" sha1="527cd0883945097c73b89a3972ed7c5af8d0736d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coronmag">
+		<description>La Corona Mágica (Spa)</description>
+		<year>1990</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="corona_magica_pcw.dsk" size="194816" crc="9dd2f301" sha1="a4a80b054076d2f36526641d73701e08a0ecb5dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corsar">
+		<description>Corsarios (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="corsarios.dsk" size="213760" crc="f0c4a146" sha1="bd58e9826291b25a93a5db70a7d513916d2ba8b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyrus2ch">
+		<description>Cyrus II Chess (Fra)</description>
+		<year>1986</year>
+		<publisher>Intelligent Chess Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="cyrus2chess.dsk" size="194816" crc="17b83731" sha1="13b61561223597343cc3dcc11769f0601dc99da2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deadline">
+		<description>Deadline (UK)</description>
+		<year>1982</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="deadline (uk) (pcw).dsk" size="194816" crc="71ab394c" sha1="f338b949e39022ef81ebbd6ceba2e570b6a7663f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchant">
+		<description>Enchanter (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="enchanter (uk) (pcw).dsk" size="194816" crc="2e65114f" sha1="b4e9f5c6412e40d5b2ddb1d3ece0e742d5f593c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairlig">
+		<description>Fairlight - A Prelude (UK)</description>
+		<year>1986</year>
+		<publisher>Edge Games</publisher>
+		<info name="alt_title" value="Fairlight (Box)"/>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="firlight.dsk" size="194816" crc="a7e1d630" sha1="50906d02b453c53e269765006d9f2cdfb6825588" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairlig2">
+		<description>Fairlight - A Trail of Darkness (UK)</description>
+		<year>1986</year>
+		<publisher>The Edge Software</publisher>
+		<info name="alt_title" value="Fairlight II (Box)"/>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="fairlight2.dsk" size="194816" crc="55f5a71a" sha1="a3ad5d61b9ed9884812b50d4d3bf8663e82ed25d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1">
+		<description>Formula 1 (Spa)</description>
+		<year>19??</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="f1.dsk" size="194816" crc="e911aa0f" sha1="99d5b7954f790d8a6d9cca7428a3ffadc788063c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brunobox">
+		<description>Frank Bruno's Boxing (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195072">
+				<rom name="frankbrunosboxing.dsk" size="195072" crc="fd64b4e5" sha1="7375e42260dbfc3d3661c42f06cfc623303ffa6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="granger">
+		<description>Gnome Ranger (UK)</description>
+		<year>1987</year>
+		<publisher>Level 9 Computing?</publisher> <!-- not sure if the also published it -->
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="gnome ranger - side a.dsk" size="194816" crc="ab6f9fc4" sha1="dee58071ffdcad55e876989ae3c6044c7b113c05" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="gnome ranger - side b.dsk" size="194816" crc="78d2948c" sha1="cb60320983e5293c988ad59ff8d855e947662345" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="granger1" cloneof="granger">
+		<description>Gnome Ranger (UK, Alt)</description>
+		<year>1987</year>
+		<publisher>Level 9 Computing?</publisher> <!-- not sure if the also published it -->
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="gr1.dsk" size="194816" crc="e02c187b" sha1="2e37eafc83a62a12a53ce31ac87b159d57c0d791" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="gr2.dsk" size="194816" crc="abff385d" sha1="1c6e1bb7f7d06845a79c8f51b1000cf824d47607" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- needs passwords -->
+	<software name="goldbask">
+		<description>Golden Basket (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="204032">
+				<rom name="golden_basket_pcw.dsk" size="204032" crc="df3b965d" sha1="81376b2d140f5e02f476f389c714311915df69e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gonzalez">
+		<description>Gonzalezz (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="gonzalezz.dsk" size="213760" crc="a49881bc" sha1="d058bafc9bc2c1f561e3b011a2e64a55deed985b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goody">
+		<description>Goody (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="goody_pcw.dsk" size="213760" crc="9da28d34" sha1="e1b549bf2e418ff09d0712bb98bcd8e0df412b82" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gstenis">
+		<description>Grand Slam Tenis (Spa)</description>
+		<year>1989</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="grandslam.dsk" size="194816" crc="acdd9d59" sha1="2a6bc27430ddb6bd02fc54a0101b1edc4393b5c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="got">
+		<description>The Guild of Thieves (UK)</description>
+		<year>1987</year>
+		<publisher>Magnetic Scrolls</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="got1.dsk" size="194816" crc="6262b835" sha1="24b07f2aabb97898843b1af94917426b16b4a15a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="got2.dsk" size="194816" crc="b21f8eb3" sha1="e5a7782b54eb57a5a33f65e9961f6c666f7762b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="headover">
+		<description>Head Over Heels (UK)</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="head_over_heels_pcw.dsk" size="194816" crc="51729ff1" sha1="213252e935f4c95c9a03935390f4ca8cb720f327" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atcbelle" supported="no">
+		<description>Heatrow Air Trafic Control &amp; Southern Belle (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="186624">
+				<rom name="sbelle&amp;atc.dsk" size="186624" crc="3c86860f" sha1="6423085ede42247c2101bcbedb0775093a337be7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herbert">
+		<description>Herbert (Ger, v4.0)</description>
+		<year>1989</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="herbert.dsk" size="194816" crc="744c5be9" sha1="ba6b718363274dd6d7e56f229298f2dce1c5b494" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitchhik">
+		<description>The Hitchhiker's Guide to the Galaxy (UK)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="the hithhikers guide to the galaxy (uk) (pcw).dsk" size="194816" crc="5a0e92b8" sha1="9fb16ae107e0f4df71543eac067a12a56340d371" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hollyhij">
+		<description>Hollywood Hijinx (UK)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="hollywood hijinx (uk) (pcw).dsk" size="194816" crc="075dc0d3" sha1="d1edd83e34b6df0cd56be649cb42d413ded34a30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infidel">
+		<description>Infidel (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="infidel (uk) (pcw).dsk" size="194816" crc="d6cf3ce2" sha1="a38b9264ed982d51b41dca1cc7049cf993acd13c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ingrid">
+		<description>Ingrid's Back! (UK)</description>
+		<year>1988</year>
+		<publisher>Level 9 Computing?</publisher> <!-- not sure if the also published it -->
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ingrid's back (uk) (1988) (disk 1 of 2).dsk" size="194816" crc="7d33b69a" sha1="49230a2de96ad140c97c60cc31a03c6db1a77a06" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ingrid's back (uk) (1988) (disk 2 of 2).dsk" size="194816" crc="a8c6adff" sha1="2e5f36a31a6eff7ff68d0105c28a03d7ba08133d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inhumano">
+		<description>Los Inhumanos (Spa)</description>
+		<year>1990</year>
+		<publisher>Delta Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="inhumanos_pcw.dsk" size="194816" crc="cb224a2d" sha1="9600a38f6a5e162e15069737669baa54d6cf0cd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- needs passwords -->
+	<software name="jaialai">
+		<description>Jai Alai (Spa)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="jaialai_pcw.dsk" size="213760" crc="13082730" sha1="3bfbe23517a2dc831b0b18455a37f6c1bebf3b97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeweldrk">
+		<description>Jewels Of Darkness (UK)</description>
+		<year>1986</year>
+		<publisher>Rainbird</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="jewelsdarkness.dsk" size="194816" crc="bcf47d27" sha1="cfbf69885d21d3ecdde1bdac5dce91e41c9dbb71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinxter">
+		<description>Jinxter (UK)</description>
+		<year>1987</year>
+		<publisher>Magnetic Scrolls</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="jinx1.dsk" size="194816" crc="be2d2762" sha1="87b07e9026d81deb9e8af86c8c093c5d11a44d29" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="jinx2.dsk" size="194816" crc="7eba9e2d" sha1="20b92f8038cbe5e826e81aa6a56baa03adf6d44b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="orc">
+		<description>Knight Orc (UK)</description>
+		<year>1987</year>
+		<publisher>Rainbird</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="knightorc1.dsk" size="194816" crc="d6bdb0b3" sha1="9060414a5ce7182e5c47395a7d175924ebeec714" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="knightorc2.dsk" size="194816" crc="9f5f16b4" sha1="607aae53b43fa25b7a71622fc9be875b2f92eb2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krom">
+		<description>Krom - El Guerrero Invencible (Spa)</description>
+		<year>1989</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="krom_pcw.dsk" size="194816" crc="f792f93d" sha1="9653c51015bb04dc9a6fac439fdead1501715666" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladder">
+		<description>Ladder (UK)</description>
+		<year>1982</year>
+		<publisher>Yahoo Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="ladder.dsk" size="194816" crc="38037600" sha1="277037e14fa791ab70bf83810dcfc02491d9f2d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lancelot">
+		<description>Lancelot (UK)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="lancelot - side a.dsk" size="194816" crc="9f77d0c7" sha1="00fcd843694d17a24b87746de910b7455c59795c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="lancelot - side b.dsk" size="194816" crc="73998eb5" sha1="a294d19bba726790c8b13b3f6ded3d5481cfc024" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastmiss">
+		<description>The Last Mission (Spa)</description>
+		<year>1987</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="lastmission_pcw.dsk" size="213760" crc="66c238a9" sha1="36c126d04b39019297c296fb9c1c0a96830587ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastnin2">
+		<description>Last Ninja 2 (UK)</description>
+		<year>198?</year>
+		<publisher>System 3</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="x004b.dsk" size="194816" crc="7f61a2c8" sha1="2c044934a2d8f60880a4608f5a76ac7ccf13dcb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadbg">
+		<description>Leaderboard Golf (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="golf.dsk" size="194816" crc="702d5cbf" sha1="d4939da3e2bc476d47cb85c1a809bd91daa43e07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leatherg">
+		<description>Leather Goddesses of Phobos (UK)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="leather goddesses of phobos (uk) (pcw).dsk" size="194816" crc="dd2471dc" sha1="5be1c8fc7e921c12ec6f0b54a2a62fbb8ddbe810" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livingst">
+		<description>Livingstone Supongo (Spa)</description>
+		<year>1986</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="livingstone_pcw.dsk" size="213760" crc="04600231" sha1="a738d1d8087e2c292ce1daf4f94eb7547f2eb9a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livings2">
+		<description>Livingstone II (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<info name="alt_title" value="Livingstone Supongo II (Box)"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="livingstone_supongo_2.dsk" size="213760" crc="9b77af62" sha1="17d141f9911a70131e8fc92f94f6775ba56e4d39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotr">
+		<description>Lord of the Rings (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="lord of the rings.dsk" size="194816" crc="b1878633" sha1="d73e49a0c9d622078178001fc19be0dfd8e49744" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lurkinh">
+		<description>The Lurking Horror (UK)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="the lurking horror (uk) (pcw).dsk" size="194816" crc="2c24671a" sha1="f60c8cb2967204a1f9fbf5ba80816ee86f0708d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magicmat">
+		<description>Magic Maths (UK)</description>
+		<year>19??</year>
+		<publisher>School Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195584">
+				<rom name="magic_maths_a.dsk" size="195584" crc="b594c6ab" sha1="cb635f0dfb91caf1b2a31466b708102371a9cc00" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="48128">
+				<rom name="magic_maths_b.dsk" size="48128" crc="0cb109a8" sha1="93612f59ec1b5da893c6205c3aea0dcd1f2bda8f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastmind">
+		<description>Master Mind (Spa)</description>
+		<year>1990</year>
+		<publisher>Mix Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="master.dsk" size="194816" crc="951f3d76" sha1="da639ab965aa1799b509a876d8158de7c81faffd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchday">
+		<description>Match Day II (UK)</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="matchday2_pcw.dsk" size="194816" crc="842dd97c" sha1="8a57456a4349997cb501a029959b83ba4dfd7886" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonmist">
+		<description>Moonmist (UK)</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="moonmist (uk) (pcw).dsk" size="194816" crc="5f54c679" sha1="e45dab1451c0026aa71ac8f7454074fb8456d8cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mortadel">
+		<description>Mortadelo y Filemón 2 (Spa)</description>
+		<year>1990</year>
+		<publisher>Drosoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="mortadeloydilemon2_pcw.dsk" size="194816" crc="54066390" sha1="c892ec5e3f671c83c8d48779ff3a21a9ecaa47d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mot">
+		<description>Mot (Spa)</description>
+		<year>1989</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="214528">
+				<rom name="mot_pcw.dsk" size="214528" crc="6cbaea6f" sha1="97605206e3f030f3cf0e3102ba8a6ad555adac97" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mundial">
+		<description>Mundial de Fútbol (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="mundialfutbol_pcw.dsk" size="213760" crc="0a24d456" sha1="cceaf90d88fdb61ca3d06ecdfed40c01c625ab01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutnzone">
+		<description>Mutant Zone (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="mutan_zone_pcw.dsk" size="213760" crc="0c70b458" sha1="18b219c846ef8d889e25d15059c90827b79d3a39" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mythos">
+		<description>Mythos (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<info name="alt_title" value="Mithos (Box)"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="mythos_pcw.dsk" size="213760" crc="dadb659d" sha1="f09ee1a1f0c709e1c87eeefa3bd9d1dafb40dc56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pawn" supported="partial"> <!-- does not detect change of disk? -->
+		<description>The Pawn (UK)</description>
+		<year>1986</year>
+		<publisher>Magnetic Scrolls</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="pawn1.dsk" size="194816" crc="2599a58c" sha1="855c20da52dd000d10821ce39ee6af5cbf329510" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="pawn2.dsk" size="194816" crc="5a107ff3" sha1="b3de01d66a404dd542f9f60ac14635174e8d7c0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetfa">
+		<description>Planetfall (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="planetfall (uk) (pcw).dsk" size="194816" crc="50374c32" sha1="2f6f38b5a448b5416cb0b2d4dadb75c9a4403df5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plundhrt">
+		<description>Plundered Hearts (UK)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="plundered hearts (uk) (pcw).dsk" size="194816" crc="469f1c50" sha1="ba2c6dc09689dd2f41ea17f2075912c90ff2716a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- needs passwords -->
+	<software name="polidiaz">
+		<description>Poli Díaz Boxeo (Spa)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="poli_diaz_pcw8256.dsk" size="213760" crc="0d33aa20" sha1="3134f75f127a0c061e565c8a6ad30d48eea3e94f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polidiaz9512" cloneof="polidiaz" supported="no">
+		<description>Poli Díaz Boxeo (Spa, PCW9512)</description>
+		<year>1991</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="poli_diaz_pcw9512.dsk" size="213760" crc="0236b403" sha1="2213c7f21dc2f088e85caf3a2d6a422408e4c946" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psi5" supported="no">
+		<description>PSI-5 Trading Company (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="psi.dsk" size="194816" crc="ea887052" sha1="a43cf8e89cb91327091f7ae0865f4ec1085a079f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- needs passwords -->
+	<software name="rescateg">
+		<description>Rescate en el Golfo (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="rescategolfo_pcw.dsk" size="213760" crc="c8c5b133" sha1="41c856c5c58ce181a342dc0413a68918e2430f42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon">
+		<description>Sargon (UK, v2.1)</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sargon.dsk" size="194816" crc="e0ea09ec" sha1="ecb76ebb8292d26858c865d7616f1a424d811ec0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scapegh">
+		<description>Scapeghost (UK)</description>
+		<year>1989</year>
+		<publisher>Level 9 Computing</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="scapeghost - side a.dsk" size="194816" crc="1d10fcd4" sha1="221bf55fe048ef70dfb6b0a9e3c9bda2b04ab078" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="scapeghost - side b.dsk" size="194816" crc="c464a1e9" sha1="baf17b2ebba89cbb29af430be2399c05f03d4ad3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seastalk">
+		<description>Seastalker (UK)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="seastalker (uk) (pcw).dsk" size="194816" crc="8c7178ec" sha1="17a99aa838b50c2a2a8a810d4444c13d1180ff89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirlance">
+		<description>Sir Lancelot (Spa)</description>
+		<year>1985</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sirlancelot_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sirperce">
+		<description>Sir Perceval (Spa)</description>
+		<year>1985</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sirperceval_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skywar">
+		<description>Sky War (Spa)</description>
+		<year>1988</year>
+		<publisher>OMK</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="skywar_pcw.dsk" size="194816" crc="2006c1a2" sha1="250cea71302f46b54e3fcabae8ef3afbd9f9cf04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slidpuzl">
+		<description>Sliding Puzzle (UK)</description>
+		<year>1988</year>
+		<publisher>Tyresoft Games</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="slider.dsk" size="194816" crc="8f7bd4ba" sha1="bdefd1f2a207ba9db86e3530f12036bea304770d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solnegro">
+		<description>Sol Negro (Spa)</description>
+		<year>1988</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="sol_negro_pcw.dsk" size="213760" crc="0166813e" sha1="fe14e9ae1a0a2b0b82aa98cb3ee3a151f2f2b52f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solitar">
+		<description>Solitario (Spa)</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="solitario.dsk" size="194816" crc="ea17edd0" sha1="77e4089795b06e652661ec661d814eddc2b0742c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorcerer">
+		<description>Sorcerer (UK)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sorcerer (uk) (pcw).dsk" size="194816" crc="62ab6bd5" sha1="4b6e12184e0e62cd84c41339424912b687c831df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soviet">
+		<description>Soviet (Spa)</description>
+		<year>1990</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="213760">
+				<rom name="soviet_pcw.dsk" size="213760" crc="b9580333" sha1="fd0c73ee1a37f60401a699afc14f2f0d775a76e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbrk">
+		<description>Spellbreaker (UK)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="spellbreaker (uk) (pcw).dsk" size="194816" crc="febb1ab2" sha1="9f00497fdb342ea19cee639d5d05744fadf30915" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sporttri">
+		<description>Sporting Triangles (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sportria.dsk" size="194816" crc="63139eaf" sha1="cba874600da245a2fa59d2bdd9c4884c067580e4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="sportrib.dsk" size="194816" crc="006ef0f2" sha1="25b31940180daf8a5408e09d4cd06d64a6839ffe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starx">
+		<description>Starcross (UK)</description>
+		<year>1982</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="starcross (uk) (pcw).dsk" size="194816" crc="40f59a03" sha1="df7902f308a562319254775fe4fe5f1734bfdbbb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- needs passwords -->
+	<software name="starglid">
+		<description>Starglider (UK)</description>
+		<year>1986</year>
+		<publisher>Rainbird</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="starglider_pcw.dsk" size="194816" crc="83e38c0f" sha1="ead4ae2ea6f5cad45a09acaab5a88a8d2a460260" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stationf">
+		<description>Stationfall (UK)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="stationfall (uk) (face a) (pcw).dsk" size="194816" crc="5b4059ff" sha1="dbd8faf189749b74df9252e52c2077b2a3b56267" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="stationfall (uk) (face b) (pcw).dsk" size="194816" crc="f54d34c8" sha1="60db03c720f00a8cb9d236d404bbaeb48b66051c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snooker">
+		<description>Steve Davis Snooker, Billard &amp; Pool (UK)</description>
+		<year>198?</year>
+		<publisher>CDS Software</publisher>
+		<info name="alt_title" value="Steve Davis World Snooker (Box)"/>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="199680">
+				<rom name="stevedsn.dsk" size="199680" crc="fdf054ba" sha1="ac1ee70f20af0a807b232ca110ca0d7883b300bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strikefh">
+		<description>Strike Force Harrier (UK)</description>
+		<year>1986</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="strikeforceharrier_pcw.dsk" size="194816" crc="37a6b72b" sha1="002221aec914884d32c786387f50940985f03619" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strpoker">
+		<description>Strip Poker (UK)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="poker.dsk" size="194816" crc="5db2bcd2" sha1="4a19c2224a65a7af5dbac319a267838be5920b7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suspect">
+		<description>Suspect (UK)</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="suspect (uk) (pcw).dsk" size="194816" crc="cc09cd8a" sha1="89503e30aba7c3a53e09435b19538d666d713a24" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suspend">
+		<description>Suspended (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="suspended (uk) (pcw).dsk" size="194816" crc="0b48277e" sha1="570571bd458099449adbde8fc5f8054684fdd343" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tauceti3">
+		<description>Tau Ceti III (UK)</description>
+		<year>1986</year>
+		<publisher>CRL Group</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="tauiii.dsk" size="194816" crc="aa475190" sha1="e31fc0655696b7721fce2653d4f1b79b17472b8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="templos">
+		<description>Los Templos Sagrados (Spa)</description>
+		<year>1991</year>
+		<publisher>Aventuras AD</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Cara A" />
+			<dataarea name="flop" size="194816">
+				<rom name="templos_a_pcw.dsk" size="194816" crc="8200d140" sha1="d80aa27a5b6c97b42e09de2b6554259e4e0b240d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Cara B" />
+			<dataarea name="flop" size="194816">
+				<rom name="templos_b_pcw.dsk" size="194816" crc="b5db2478" sha1="b58f37cc55c49363fde6edd425413e1d8f563dcd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris (UK)</description>
+		<year>1987</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="tetris_pcw.dsk" size="194816" crc="eb61b9cd" sha1="708bea1ab2b3deb9da9478fc46e7819578060e56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemag">
+		<description>Time And Magik (UK)</description>
+		<year>1988</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="time and magik - side a.dsk" size="194816" crc="8ba9c810" sha1="2298a68bdd7cb7b39d239519d463f8242bd611e1" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="time and magik - side b.dsk" size="194816" crc="52ffb435" sha1="afad039ffd0e8c6f36d1686dc1ad6912c73ebdac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trivial">
+		<description>Trivial Pursuit (Spa)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="triviala.dsk" size="194816" crc="7f1be30d" sha1="44ebb64ca92789acb27f65c267629c51ad66be24" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="trivialb.dsk" size="194816" crc="a7e6ca19" sha1="2ca5af2f43da1ec7e79494f37a9c4ea18b6530a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="troglo">
+		<description>Troglo (Spa)</description>
+		<year>1986</year>
+		<publisher>ACE Software</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="troglo.dsk" size="194816" crc="1e413e98" sha1="a89452cf5cc7a243216a4f34a8a2c3bf7fdbde16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tuma7">
+		<description>Tuma-7 (Spa)</description>
+		<year>1990</year>
+		<publisher>Delta Soft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="tuma7.dsk" size="194816" crc="aeeba569" sha1="672ec39ef25bea89ee627300c37d68774289fcfd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulises">
+		<description>Ulises (Spa)</description>
+		<year>1987</year>
+		<publisher>Opera Soft</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212736">
+				<rom name="ulises_pcw.dsk" size="212736" crc="c8f31a04" sha1="5e4900b63a004e29966f01bfb9136e836bad5a1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="verbiage">
+		<description>Verbiage (UK)</description>
+		<year>1989</year>
+		<publisher>Tyresoft</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="verbiage.dsk" size="194816" crc="fad5bf0b" sha1="291e8a8aec95bb4e88ee95dbb6a701e15b7e46b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wishbrin">
+		<description>Wishbringer (UK)</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="wishbringer (uk) (pcw).dsk" size="194816" crc="86f449fa" sha1="8a72fcfa2ea5c75cc2f0b1e78eb1dc4b0ddc52dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witness">
+		<description>The Witness (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="witness (uk) (pcw).dsk" size="194816" crc="a2f21a9a" sha1="8fdf1ac6cb0f8f1725522f6a76d15b31d8ea3cad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork">
+		<description>Zork I - The Great Underground Empire (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="zork i - the great underground empire (uk) (pcw).dsk" size="194816" crc="f5abbdc6" sha1="c75f0bd9656a564336853f252ff1e2df62173327" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork2">
+		<description>Zork II - The Wizard Of Frobozz (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="zork ii - the wizard of frobozz (uk) (pcw).dsk" size="194816" crc="395e85d7" sha1="8a4c3390135d2c654b5eab84b69c92b6f58ae3c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork3">
+		<description>Zork III - The Dungeon Master (UK)</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="zork iii - the dungeon master (uk) (pcw).dsk" size="194816" crc="2af75310" sha1="5b1694d5fed6c7a093e2ffd85349cbf3ccbcce14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- GAMES not working... AFAIK they might even be non-PCW disks -->
+
+	<software name="bobwinnr" supported="no">
+		<description>Bob Winner</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="178176">
+				<rom name="bob winner1.dsk" size="178176" crc="1b2badcc" sha1="283584e2d77db5d43d37ef394fb9d0a3aa2b1792" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3">
+			<dataarea name="flop" size="178688">
+				<rom name="bob winner2.dsk" size="178688" crc="eee1baa5" sha1="2ed6803eb5ab36edb7903f06334ddb34ceaae487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabble1" cloneof="scrabble" supported="no">
+		<description>Computer Scrabble (Alt?)</description>
+		<year>1986</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194560">
+				<rom name="scrabble.dsk" size="194560" crc="e9546750" sha1="fdd4142e821f577773acc43fbe314318e202badd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomahawk" supported="no">
+		<description>Tomahawk</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="188416">
+				<rom name="tomahawk.dsk" size="188416" crc="3c930315" sha1="caff058ea7586eae70a3dc2f2bc31a0bbc7ad390" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomahawk1" cloneof="tomahawk" supported="no">
+		<description>Tomahawk (Alt?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires CP/M"/>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="187136">
+				<rom name="tomahawk1.dsk" size="187136" crc="22291c7a" sha1="8f9f88e1c233d36e24a7666823eb81aab2706238" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

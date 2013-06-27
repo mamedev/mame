@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="megaduck" description="Creatronic Mega Duck cartridges">
+	<software name="aforce">
+		<description>Armour Force</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB014/MD014" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="014.bin" size="65536" crc="eca6c0ad" sha1="aa2c3774eb48df0854d4b61997653f79a810f4cc" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arczone">
+		<description>Arctic Zone</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB006/MD006" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="006.bin" size="32768" crc="f88f2d25" sha1="4f3022126f33964e0fb5505fa0caeaa13b995309" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bftale">
+		<description>Black Forest Tale</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="bftale.bin" size="65536" crc="211d268b" sha1="3d62acc2db46bb7b6a2909d640dec6ce095aeec3" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brckwall">
+		<description>The Brick Wall</description>
+		<year>1993</year>
+		<publisher>Timlex International</publisher>
+		<info name="serial" value="CB001/MD001" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="001.bin" size="32768" crc="58efe338" sha1="9b050e41b9aa18dbf5c043f19b7c945c89811cc1" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstfgtr">
+		<description>Beast Fighter</description>
+		<year>1993</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="CB021/MD021" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="021.bin" size="131072" crc="2adb7253" sha1="9ff96b40e8636fad37b1b95f83f3a9584f3dfe3e" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c5in1">
+		<description>Commin 5 in 1</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB036/MD036" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="036.bin" size="65536" crc="ff0da355" sha1="fb4ba6c9823808c2705f597294b784837342cbcb" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magictwr">
+		<description>Magical Tower</description>
+		<year>1993</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="CB029/MD029" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="029.bin" size="65536" crc="98694021" sha1="6eefbf8742eba1279f943c321b5d55e45a727a67" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="md4in1">
+		<description>Mega Duck 4 in 1 Game</description>
+		<year>1993</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="CB035/MD035" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="035.bin" size="65536" crc="8046ea70" sha1="2a1c5bea602ab27ecf680c88cfe9884186b61438" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilewndr">
+		<description>Pile Wonder</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB010/MD010" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="010.bin" size="32768" crc="d71f1770" sha1="69222a0c5c3920d0784d0e58c3407b74c1b2bfe8" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilewndra" cloneof="pilewndr">
+		<description>Pile Wonder (Alt)</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB010/MD010" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="010a.bin" size="32768" crc="61c81e06" sha1="13d8882371823e5dfb74191ef0addafc43aa1de4" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puptkngt">
+		<description>Puppet Knight</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB008/MD008" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="008.bin" size="65536" crc="35fb1616" sha1="4849CD6F881B5B78E1D3A08EDB727E79C77F9D39" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="railway">
+		<description>Railway</description>
+		<year>1993</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="CB019/MD019" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="019.bin" size="65536" crc="2bb6aeb9" sha1="f1a9a8365f1b78057ed5cc647fd68efafc0c49e8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakeroy">
+		<description>Snake Roy</description>
+		<year>1993</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="CB018/MD018" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="018.bin" size="65536" crc="315ef9f2" sha1="c76a57047f0f72252cddd7974a3b694392753469" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srider">
+		<description>Street Rider</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB002/MD002" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="002.bin" size="32768" crc="74c3377f" sha1="9b7d69f9b0a44eeaa36971aabec553ebd3bfdc0e" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treasure">
+		<description>Suleiman's Treasure</description>
+		<year>1993</year>
+		<publisher>Commin</publisher>
+		<info name="serial" value="CB005/MD005" />
+
+		<part name="cart" interface="megaduck_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="005.bin" size="65536" crc="cd2730ac" sha1="022d7e635ea64c6a525db5d31c30a7d8636f4c18" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Duck Adventure CB031/MD031 -->
+	<!-- Zipball CB037/MD037 -->
+	<!-- Dumped but image file not available -->
+	<!-- 2nd Space CB028/MD028 43272949 -->
+	<!-- Ant Soldiers CB026/MD026 4907c1d8 -->
+	<!-- Bomb Disposer CB003/MD003 cac582ad -->
+	<!-- Captain Knick Knack CB011/MD011 a17de1a3 -->
+	<!-- Magic Maze CB007/MD007 93c878be -->
+	<!-- Trap & Turn CB009/MD009 2b58d9a4 -->
+	<!-- Vex CB004/MD004 b26bb405 -->
+	<!-- Worm Visitor CB030/MD030 da4743e7 -->
+
+</softwarelist>

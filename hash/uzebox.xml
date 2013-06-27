@@ -1,0 +1,1112 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="uzebox" description="Uzebox internal EPROMs">
+	<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61020">
+				<rom name="arkanoid.bin" size="61020" crc="0c8e0bae" sha1="b96c95da0bd3c35d81d9c5368e55f1a716268a8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atomix">
+		<description>Atomix</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Martin Sustek"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="51284">
+				<rom name="atomix.bin" size="51284" crc="727e76ad" sha1="ae42ee7250f4098878689cf413b9c518208cbd9d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcdash">
+		<description>B.C. Dash</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60406">
+				<rom name="bc-dash.bin" size="60406" crc="4ebf4d1e" sha1="ed5b59c83f1791f86d006a978c9714aad2878a46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitmapd">
+		<description>BitmapDemo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="11918">
+				<rom name="bitmap-demo.bin" size="11918" crc="42ed0468" sha1="5cf2d41f1cb546328ec5c5fc9cad53f44618d627" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomberma">
+		<description>Bomberman II (WIP)</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Matias Moreno"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="39374">
+				<rom name="bomberman2-wip.bin" size="39374" crc="47ac5421" sha1="37781f1f41ac521e1de5cba328698d4d253d351f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boulderd">
+		<description>Boulderdash</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="AJX"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="59624">
+				<rom name="boulderdash.bin" size="59624" crc="77c0e8ff" sha1="a9e66aeeea1fb78dfd2860412e332bf9e3f4afdc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calc" supported="no">
+		<!-- required mouse emulation -->
+		<description>Calculator Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Bradley Boccuzzi"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="27056">
+				<rom name="calculator.bin" size="27056" crc="dec79b80" sha1="38bbc1bd1d4358c30acb0d0bedf46f2666e886b1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>chess4uzebox</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Martin Sustek"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="48632">
+				<rom name="chess4uzebox.bin" size="48632" crc="7006579a" sha1="c6ab4fca5774198f81a5bb9fe936b26278781729" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuckiee">
+		<description>ChuckieEgg</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="P Jones"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="50680">
+				<rom name="chuckie-egg.bin" size="50680" crc="306eea2a" sha1="63245f26ef838a544541d4b33a624d3cb1b10d44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claydemo">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
+		<description>Clay Demo</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Clay Cowgill"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="36356">
+				<rom name="clay-demo.bin" size="36356" crc="f8a8863b" sha1="6a774c078f53429c1ecd2f57a4867ec1943213bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctester">
+		<description>Controller Tester</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Flavio Zavan (Nebososo)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="15238">
+				<rom name="controller-tester.bin" size="15238" crc="1f5adb0b" sha1="fd5a20ddd64a236c3475e2dd69823609243e13ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corridan">
+		<description>Corrida Nebososa</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Flavio Zavan (aka Nebososo)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="58768">
+				<rom name="corrida-nebososa.bin" size="58768" crc="410ac27e" sha1="9e36c6f1c82691f0f6c305451a8b912b288c7de0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong">
+		<description>Donkey Kong</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61274">
+				<rom name="donkey-kong.bin" size="61274" crc="456df270" sha1="90dbcb474f959f3e6214d832b552b56f22dd835c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmario">
+		<description>Dr.Mario</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Codecrank"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56490">
+				<rom name="dr-mario.bin" size="56490" crc="8144b271" sha1="d4bb13f54b756e2ba9e57075aae473b72397f48f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dungeons">
+		<description>Dungeon Slash Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="David Etherton"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="17514">
+				<rom name="dungeon-slash-demo.bin" size="17514" crc="065e8fed" sha1="997df9362aaf8400f63ee2979beb6a161ff1c522" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emuze">
+		<description>Emuze EEPROM Viewer</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="28712">
+				<rom name="emuze.bin" size="28712" crc="5839a121" sha1="0f059540afb01d51a297c85a9159046a27a827c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="esdattac">
+		<description>ESD Attack</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Clay Cowgill"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55714">
+				<rom name="esd-attack.bin" size="55714" crc="50474896" sha1="a9a78dcc97b1061b05858a12d9e25e706c10becc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fliptris">
+		<description>Fliptris</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Ben Foote"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="17446">
+				<rom name="fliptris-wip.bin" size="17446" crc="65c895e2" sha1="fc4b2e163cf46140aecf235b9f392fbc57ee56fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="50476">
+				<rom name="frogger.bin" size="50476" crc="4c3036ef" sha1="2269bad0c8597430017205cfb4b74bbcf78ffb37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gorillas">
+		<description>Gorillas</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55394">
+				<rom name="gorillas.bin" size="55394" crc="7ecd7f22" sha1="a847849f885942c05e3e9e79c3188abfb4422763" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="happyeas">
+		<description>Happy Easter</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49892">
+				<rom name="happy-easter.bin" size="49892" crc="002d4f30" sha1="145241d6235a4185bf1d6d3fdcb4204b1e9140a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holidays">
+		<description>HolidaysDemo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="11428">
+				<rom name="happy-holidays.bin" size="11428" crc="f125969e" sha1="19ffc48059a2b7883cca84f3e35cef0c953d1ce9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lander">
+		<description>Lander</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="47734">
+				<rom name="lander.bin" size="47734" crc="b5630ff6" sha1="3731dd629d5044a2c6f5eb99296d5d8c42fdb3f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldrun">
+		<description>Lode Runner</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Uze"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61338">
+				<rom name="loderunner.bin" size="61338" crc="e5e47e67" sha1="b586711b151ade612d290fbb97c9288093df548d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lolo">
+		<description>Adventures of Lolo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55526">
+				<rom name="lolo-wip.bin" size="55526" crc="24cb5ed6" sha1="2b665f9fd87faee27e2988d0ce39ea2d25544f1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>The Matrix Screen Saver</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Adrastos"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="17528">
+				<rom name="matrix.bin" size="17528" crc="3f0e028c" sha1="73d2c97005871c6a80986ae08fede78291d5e5d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maze">
+		<description>The Great Maze</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Clay Cowgill"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="15788">
+				<rom name="maze.bin" size="15788" crc="5ca04165" sha1="73bcc1ff793e701bc5ff044733cdacb30771e3f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megabomb">
+		<description>Mega Bomber (WIP)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="57296">
+				<rom name="mega-bomber-wip.bin" size="57296" crc="b47c18bc" sha1="f548a50a5846865479756a6aa8dc3c34b578b46d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megasoko">
+		<description>MegaSokoban</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Martin Sustek"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="52836">
+				<rom name="mega-sokoban.bin" size="52836" crc="8aa470cb" sha1="5b35c20b7fdd36bba86be2434105cc163878ae46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megatris">
+		<description>Megatris</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61314">
+				<rom name="megatris.bin" size="61314" crc="c6c61bc0" sha1="5f1dc2449893edc60d5f0623ee300d36211b08a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="memory">
+		<description>Memory</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49450">
+				<rom name="memory.bin" size="49450" crc="3f56bb27" sha1="591c6db43d34b5833a80ea138033d8d7e7a0b1a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="video9d">
+		<description>Video Mode 9 Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="28638">
+				<rom name="mode9-demo.bin" size="28638" crc="fa83189e" sha1="48acd764f118586252c6dc43fc153a5e057ba053" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonpatr">
+		<description>Moon Patrol (WIP)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Clay Cowgill"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="44942">
+				<rom name="moon-patrol-wip.bin" size="44942" crc="6f6f5379" sha1="2c2226e91167d86a1af393c6f11e4f40aba7c98c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicd">
+		<description>Music Demo</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Uze"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="41648">
+				<rom name="music-demo.bin" size="41648" crc="5bdc07ff" sha1="0ab3860117f249b3b9f51423f20094ab7b9d8d4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjabea">
+		<description>Ninja Beatdown</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Vertig0zone"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49854">
+				<rom name="ninja-beatdown.bin" size="49854" crc="686ea6c1" sha1="8b35b32cf9647698a93f222726e5f73002535d4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac-Man</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56558">
+				<rom name="pacman-lite.bin" size="56558" crc="d45259a1" sha1="7e5d0d5d3cc009f7dda75d310641fb807ea67521" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundpt">
+		<description>Sound Patch Tool (WIP)</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="26212">
+				<rom name="patch-tool-wip.bin" size="26212" crc="3eb88442" sha1="8d016267aa5171f88f4aeba78725cf15b8fc29cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengouze">
+		<description>PengoUze</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="P Jones"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60102">
+				<rom name="pengo.bin" size="60102" crc="4b5fa36d" sha1="f6b0ecaa71adc90b87459b9d87b0cacb2d292795" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pentago">
+		<description>Pentago</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Adrastos"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="41846">
+				<rom name="pentago.bin" size="41846" crc="7eeb33b5" sha1="207cc42b717691bf7b6a90eaf6865d9786e1d767" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong">
+		<description>Pong</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="DaveyPocket"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="19888">
+				<rom name="pong.bin" size="19888" crc="915676c0" sha1="fd513d945b246c3489ee047bc3c527915ae0fcd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rcdemo">
+		<description>Ray Caster Demo</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="D3thAdd3r"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="45430">
+				<rom name="ray-caster-demo.bin" size="45430" crc="20e4a613" sha1="bc9c05c20c710b486b007d0c89aa98b6772534e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbull">
+		<description>Redbull Create Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Redbull"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="53712">
+				<rom name="redbull.bin" size="53712" crc="8b4bdcbb" sha1="f5583b3c8a437989961c04d132375822cbdde38b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rubycrus">
+		<description>Ruby Crush</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Adrastos"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61728">
+				<rom name="ruby-crush.bin" size="61728" crc="e2e08e76" sha1="3794bb154fd6986e7b571ee8418aa42b89bcb54d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcardd" supported="no">
+		<!-- required SD Card emulation -->
+		<description>SD Card Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="David Etherton"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="14732">
+				<rom name="sd-card-demo.bin" size="14732" crc="eb9b081b" sha1="9bc7e38869a7d7c2b1f3e951a8272fd0c7dba324" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simon">
+		<description>Simon</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Hartmut Wendt"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="40462">
+				<rom name="simon.bin" size="40462" crc="873761ce" sha1="995d9292e5f36199e96e313b9aa9be97e14225f4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakes">
+		<!-- this game is compatible with Uzebox revisions C1, D1 and E1 -->
+		<description>Snakes</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="DaveyPocket"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="25696">
+				<rom name="snakes.bin" size="25696" crc="62aacc4c" sha1="4b80f10d503ac3084335f114e021a7593d882fbe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokobanw">
+		<description>Sokoban World</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber (D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="61378">
+				<rom name="sokoban-world.bin" size="61378" crc="991bfef1" sha1="2ae3366f7a8ba0dc1944a8d13d91a8468a8eb25e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokoban">
+		<description>Sokoban</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber (D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="47466">
+				<rom name="sokoban.bin" size="47466" crc="bf471be3" sha1="4636397e5bc53088abc22113c6a5dba7445257b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicd">
+		<description>Sonic The Hedgehog Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lightfoot256"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="35766">
+				<rom name="sonic-wip.bin" size="35766" crc="64aaa604" sha1="08f129494d73c5fe341185b0d519f42fcf1cb683" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invaders</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Paul McPhee"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="40626">
+				<rom name="space-invaders.bin" size="40626" crc="86ac4409" sha1="dcbcd3e777056ff6be6ff10fa8a9af02f6bc1952" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smariod">
+		<description>Super Mario Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="56100">
+				<rom name="super-mario-demo.bin" size="56100" crc="2e08c16a" sha1="d42e0d40c2f05d9f6ea6fa2eb4f5e73376ad8f7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankswip">
+		<description>Tanks (WIP)</description>
+		<year>2012</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="WarWolf"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="38332">
+				<rom name="tanks-wip.bin" size="38332" crc="30520468" sha1="7234eb8eb1fcbfefefb396a9725869963c625790" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tutorial">
+		<description>Tutorial</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="12922">
+				<rom name="tutorial.bin" size="12922" crc="bd50dbf9" sha1="19928861eb5d0d7aa1c90fb6d90cc0a293a75fdd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utype">
+		<description>U-Type (WIP)</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Cosam"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55108">
+				<rom name="u-type-wip.bin" size="55108" crc="c66e66d6" sha1="f8d3c2d19670af2af768d50874c240e5309779f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzeamove">
+		<description>Uze-a-Move (WIP)</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Cosam"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60658">
+				<rom name="uze-a-move-wip.bin" size="60658" crc="647cd440" sha1="d49c8ef3d72ee029b90cfe2f6049cc56853893ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzefeud">
+		<description>Uze Feud</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="57174">
+				<rom name="uze-feud.bin" size="57174" crc="8db1f56d" sha1="99c7d850d2c22261d900bc536bb48dd8ef007127" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzesnake">
+		<description>Uze Snakes</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="52784">
+				<rom name="uze-snakes.bin" size="52784" crc="b26bf346" sha1="ad64b69eab36483d6ff165a8e955c746269a1af5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzeamp" supported="no">
+		<!-- required SD Card emulation -->
+		<description>Uzeamp</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="35306">
+				<rom name="uzeamp.bin" size="35306" crc="6e26137e" sha1="b81f8948906543579a7b0341948f68889069a0db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uzesweep">
+		<description>Uzesweeper</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Lee Weber (D3thAdd3r)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="46922">
+				<rom name="uzesweeper.bin" size="46922" crc="b434d22e" sha1="b56c70453cbd626c0b85588baa0c2a864f8b8ec2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vectord">
+		<description>Vector Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="13706">
+				<rom name="vector-demo.bin" size="13706" crc="68a5e9e2" sha1="c37d90b6b6d0de9da2ab463463fa1b82f0d482e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videod" supported="no">
+		<!-- required SD Card emulation -->
+		<description>Video Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="7402">
+				<rom name="video-demo.bin" size="7402" crc="b72256f2" sha1="d4d8a7f19a873a9553565211004648a25d870422" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="voidfigh" supported="partial">
+		<description>Void Fighter</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Jhysaun"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="49702">
+				<rom name="void-fighter-wip.bin" size="49702" crc="f2a9f770" sha1="d67c5562ddc99dc896f3c11d36ccb8cb3769b870" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wamole">
+		<description>Whack-a-Mole</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Alec Bourque (Uze)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="39322">
+				<rom name="whack-a-mole.bin" size="39322" crc="21422cdd" sha1="c90c9369a2914c937a56b27c41c365533de95c87" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldad">
+		<description>Zelda II Demo</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Blue Knight"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="37918">
+				<rom name="zelda2-wip.bin" size="37918" crc="4f153b95" sha1="fc0e205d0f4df3bebf3f81ef64956600e44b55d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombiena">
+		<description>Zombienator</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<info name="author" value="Peter Hedman (Phog)"/>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="51552">
+				<rom name="zombienator.bin" size="51552" crc="6149ad7d" sha1="9ff4a916c749cbff57cdbc2110b24267902cbdb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoida" cloneof="arkanoid">
+		<description>Arkanoid (Alt)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="58940">
+				<rom name="arkanoid (alt).bin" size="58940" crc="52661b71" sha1="8ae1c36d1f1a1934d4c970007651172ffdd99b8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitmapda" cloneof="bitmapd">
+		<description>DitmapDemo (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="13742">
+				<rom name="bitmap-demo (alt).bin" size="13742" crc="18e01286" sha1="cd01182154a63076bbcbda907f51cce9d4c8dd86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessa" cloneof="chess">
+		<description>chess4uzebox (Alt)</description>
+		<year>2011</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="48176">
+				<rom name="chess4uzebox (alt).bin" size="48176" crc="255bbf0c" sha1="065d1870dd8fef52b126e68b913dd03e7245b585" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctestera" cloneof="ctester">
+		<description>Controller Tester (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="15384">
+				<rom name="controller-tester (alt).bin" size="15384" crc="214e6617" sha1="60ed5d6d18f58eba5259cb2a143896130c4c3edb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emuzea" cloneof="emuze">
+		<description>Emuze EEPROM Viewer (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="29790">
+				<rom name="emuze (alt).bin" size="29790" crc="5687e52b" sha1="8df9a35dbe49b48fda9140256b0fb6a18b1c456f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gforce">
+		<description>G-Force WIP</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="23714">
+				<rom name="g-force-wip.bin" size="23714" crc="4122417b" sha1="cb792b6154babd05797528b9178916a30f6ff44b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loloa" cloneof="lolo">
+		<description>Adventures of Lolo (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="62144">
+				<rom name="lolo-wip (alt).bin" size="62144" crc="b31d5944" sha1="7ebc597599b5232d5db1718a14f145a34d14dd69" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazea" cloneof="maze">
+		<description>The Great Maze (Alt)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="19238">
+				<rom name="maze (alt).bin" size="19238" crc="2516adbf" sha1="fbcd91ce115f94c69adb07ea4a3e12e007990667" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megatrisa" cloneof="megatris">
+		<description>Megatris (Alt)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="60546">
+				<rom name="megatris (alt).bin" size="60546" crc="a00f3b32" sha1="edfd556e465b275aee36626bd506738f3e8f21db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moviep" supported="no">
+		<!-- required SD Card emulation -->
+		<description>Uzebox Movie Player</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="6790">
+				<rom name="movie-player.bin" size="6790" crc="87d0d3c6" sha1="0c9aa3b2ee0ed8420937f78688415baaf8d3fd3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacmana" cloneof="pacman">
+		<description>Pac-Man (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="62588">
+				<rom name="pacman (alt).bin" size="62588" crc="e07c2e87" sha1="e50327981c201012c63898e19f8825f4bfc0fe6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrolld">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
+		<description>Clay's Scroll Demo</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="33372">
+				<rom name="race-wip.bin" size="33372" crc="434e9a36" sha1="d2b07cc54b63dbd5043d59e92f7ad9b0d67cf937" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbulla" cloneof="redbull">
+		<description>Redbull Create Demo (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="65536">
+				<rom name="redbull (alt).bin" size="65536" crc="ffe9a0fa" sha1="197c5e255101c2bae0960f7e586d248d0d526095" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdcardda" cloneof="sdcardd" supported="no">
+		<!-- required SD Card emulation -->
+		<description>SD Card Demo (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="14130">
+				<rom name="sd-card-demo (alt).bin" size="14130" crc="d97ec156" sha1="3928b9c6c3f51fb0912200303cb610a28f91e950" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinva" cloneof="spaceinv">
+		<description>Space Invaders (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="40524">
+				<rom name="space-invaders (alt).bin" size="40524" crc="8ed98301" sha1="10c4a93d148163801fb75c904dab0f79ecaaf6d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprited1">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
+		<description>Sprite Demo 1</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="39130">
+				<rom name="sprite-demo1.bin" size="39130" crc="f50517b9" sha1="0d8e1f586a163ef96f16ca7a3d3cf097b5275aaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprited2">
+		<description>Sprite Demo 2</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="64922">
+				<rom name="sprite-demo2.bin" size="64922" crc="9cb17dde" sha1="f50e5ef7c116b25495304c9a039086dd12a84fc9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smarioda" cloneof="smariod">
+		<description>Super Mario Demo (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="55706">
+				<rom name="super-mario-demo (alt).bin" size="55706" crc="73acd5bf" sha1="c780457243fbd20d2dc3006a0dcbae040bad9b72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tron">
+		<description>Tron</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="18324">
+				<rom name="tron.bin" size="18324" crc="e4f01c42" sha1="f36e701acbfb6a33079171cf7618905950c01126" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videoda" cloneof="videod" supported="no">
+		<!-- required SD Card emulation -->
+		<description>Video Demo (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="7430">
+				<rom name="video-demo (alt).bin" size="7430" crc="6b8c8fae" sha1="c7bbc62fe170c5179d44993bbb0869a5ba09ae4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wamolea" cloneof="wamole">
+		<description>Whack-a-Mole (Alt)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="42422">
+				<rom name="whack-a-mole (alt).bin" size="42422" crc="32f7d6e7" sha1="76ff170ea8f1dec2c68d1b1b86742b01f3a57abf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoidb" cloneof="arkanoid">
+		<description>Arkanoid (Alt 2)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="58542">
+				<rom name="arkanoid (alt2).bin" size="58542" crc="aa90ca49" sha1="b6b3e0b841a7bdf3c7d076488e70de6e4696ff0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitmapdb" cloneof="bitmapd">
+		<description>Bitmap Demo (Alt 2)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="13904">
+				<rom name="bitmapdemo.bin" size="13904" crc="09202c5a" sha1="1e3824af445a8be6d4fab243a20700c0f112fb42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmarioa" cloneof="drmario">
+		<description>Dr.Mario (Alt)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="53388">
+				<rom name="drmario.bin" size="53388" crc="2f9e1b61" sha1="c17584862b92d2a8035af4edce171a46faf1bcc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazeb" cloneof="maze">
+		<description>The Great Maze (Alt 2)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="15456">
+				<rom name="maze (alt 2).bin" size="15456" crc="47dbed06" sha1="a39f56c9697654af3b3503dd9ddd64da572f0181" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicda">
+		<description>Music Demo (Alt)</description>
+		<year>2008</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="47016">
+				<rom name="musicdemo.bin" size="47016" crc="1a39fec9" sha1="621cf419c6af9d412b96d815ba57e722fb86eb49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprited2a" cloneof="sprited2">
+		<description>Sprite Demo 2 (Alt)</description>
+		<year>2010</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="64222">
+				<rom name="spritedemo.bin" size="64222" crc="39a75fa4" sha1="fb975e4b8e17fedf48d16734442af50ed7a0ab0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vectord2" supported="no">
+		<!-- this demo assumes that the RAM is mirrored at 0x1100-0x20ff and probably doesn't works on real HW -->
+		<description>Vector Demo 2</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="14296">
+				<rom name="vectordemo.bin" size="14296" crc="a77eb938" sha1="f1082aeffc74b230ca9724e1f4a9907371e1213f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wamoleb" cloneof="wamole" supported="no">
+		<description>Whack-a-Mole (Alt 2)</description>
+		<year>2009</year>
+		<publisher>Belogic</publisher>
+		<part name="cart" interface="uzebox">
+			<dataarea name="rom" size="40128">
+				<rom name="whack-a-mole (alt2).bin" size="40128" crc="bbd75c6e" sha1="8600b21b3b00a3759adb210435db5b3558f78f38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

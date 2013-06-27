@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="c128_cart" description="Commodore 128 cartridges">
+<!--
+
+Missing dumps:
+
+- Dead Test (Rev 781220)
+- QuickSilver 128
+- Partner 128 (Timeworks, 1985)
+- Super Snapshot
+
+-->
+	<software name="c128diag">
+		<description>C128 Diagnostic (v1.1)</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="c128diag.bin" size="0x2000" crc="584f6750" sha1="b3cfd8508b887e9c7e72ed2b0c44fe63e6b44ac4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128diaga" cloneof="c128diag">
+		<description>C128 Diagnostic</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="325099-01.u1" size="0x4000" crc="285e5bf8" sha1="a110dd331eefe251effdcfa272faf5680db51973" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128diagdcr" cloneof="c128diag">
+		<description>C128DCR Diagnostic</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x4000">
+				<rom name="325109-10.u1" size="0x4000" crc="6aed47f6" sha1="30493c1e2d3345898bd105ea9f3a03d2de1f7054" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128dg40">
+		<description>C128/40 Diagnostic (Rev 588121)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="c128diag.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comal128" supported="no">
+		<description>COMAL 80</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="c128_comal80" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="romh" size="0x20000">
+				<rom name="comal80.u1" size="0x8000" crc="65358f73" sha1="14b032b55d65b4c692ec4f0c0c5da07b28a5822d" offset="0x00000" />
+				<rom name="comal80.u2" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x08000" />
+				<rom name="comal80.u3" size="0x8000" crc="2f9da033" sha1="8dcb465cb7b32af996d43c8a15d70e35e5c7d321" offset="0x18000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach128">
+		<description>MACH 128 (v.1A)</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="mach_128_v1a.bin" size="0x2000" crc="f91ed380" sha1="6f04d73fcde8b28903075e3adcd2d7ff49d2518a" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach128_2a" cloneof="mach128">
+		<description>MACH 128 (v.2A)</description>
+		<year>1985</year>
+		<publisher>Access Software</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="mach_128_v2a.bin" size="0x2000" crc="fc60d92e" sha1="7f487134d314b4c5158954ad057e01c0da32a468" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vstar128">
+		<description>VizaStar 128: The Information Processor</description>
+		<year>1984</year>
+		<publisher>Viza</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="vizastar 128" size="0x2000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="vizastar 128.g64" size="333744" crc="f45ef840" sha1="456480c22cb9204c50d8586fe988903fefd52257" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

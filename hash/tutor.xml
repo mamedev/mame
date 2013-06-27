@@ -1,0 +1,311 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Tomy Tutor ant Pyuuta Cartridges
+Here's a list of known software packages and peripherals. There are 50 documented cartridges, counting both Japanese and American domestic releases; however, some are Japan-only, and a few are verifiably vapourware or were never otherwise released.
+
+Info Taken from: http://www.floodgap.com/retrobits/tomy/carts.html
+
+Japanese Releases - Pyuuta
+
+001E Bombman ~ ボンブマン
+002E Monster Inn ~ モンスターイン
+003E Saurusland ~ ザウルスランド
+004E Turpin ~ ターピン
+005E Frogger ~ フロッガー
+006E Scramble ~ スクランブル
+007E NightFlight ~ ナイトフライト
+008E Marine Adventure ~ マリン アドベンチャー
+009E Mission Attack ~ ミッション アタック
+010E Traffic Jam ~ トラフィック ジャム
+011E Mystery Gold ~ ミステリー ゴールド
+012E DonPan ~ ドンバン
+013E Micky Athletic Land ~ ミッキー アスレチックランド
+014E Pooyan ~ プーヤン
+015E Jungler ~ ジャングラー
+016E Guttang Gottong ~ ガッタンゴットン
+017E Maze Patrol ~ メイズ パトロール
+018E Tron ~ トロン
+019E Mr. Do! ~ Mr.DO!
+020E Bermuda Triangle ~ バミューダ・ トライアングル
+021E 4-nin Mahjan ~ 四人麻雀
+022E Triplecommand ~ トリプルコマンド
+023E SuperBike ~ スーパーバイク
+024E Rescue Copter [3D] ~ レスキュー コプター
+025E Baseball [3D] ~ ベースボール
+026E Battlefighter [3D] ~ バトルファイター
+
+0XXE GajiGoji [Unreleased] ~ カジコジ
+0XXE Jack In The Box [Unreleased] ~ ジャック・イン・ ザ・ボックス
+
+XXX  Demonstration Cartridge ~ DEMOカートリッジ
+
+
+USA Releases - Tutor
+
+8100 Cave Crawlers
+8101 Torpedo Terror
+8102 Hyperspace
+8103 Traffic Jam
+8104 Demon Diggers (Unreleased)
+8105 Bombardier (Unreleased)
+8106 Deep Six
+8107 WWII Triple Threat (Unreleased)
+8200 Pooyan
+8201 Scramble
+8202 Jungler
+8203 Loco-Motion
+8300 Type Attack (Unreleased)
+8301 Space Division (Unreleased)
+8302 Car-Azy Racer
+???? Household Management (Unreleased)
+???? Personal Finance (Unreleased)
+
+XXX  Demonstration Cartridge
+
+
+Other unreleased carts announced (and appeared in early ads)
+
+Turbo 750 (Unreleased)
+Athletic (Unreleased, possibly same as Mickey Athletic Land)
+Space Turbo (Unreleased)
+Time Pilot (Unreleased)
+Bubblegum Street (Unreleased)
+Battlefighter (Original) (Unreleased - Prototype Stage)
+3-D Shooting (Unreleased)
+3-D Maze (Unreleased)
+
+
+-->
+
+<softwarelist name="tutor" description="Tomy Tutor &amp; Pyuuta cartridges">
+
+	<software name="bombman">
+	<!-- (Japanese 001E)-->
+		<description>Bombman</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="bombman.bin" size="8192" crc="e6a7b204" sha1="e39deede7d76021e3be2cab09142af54fe97a847" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crzracer">
+	<!-- Stock No: 8302 -->
+		<description>Car-azy-racer</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="crzracer.bin" size="16384" crc="6e9b98c7" sha1="1896464c91dd7549b2b3059fde1ff987c13ad11a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crawlers">
+	<!-- Stock No: 8100, Clone of Maze Patrol (Japanese 017E)-->
+		<description>Cave Crawlers</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="crawlers.bin" size="8192" crc="f3059779" sha1="fd51c445f0356ed3796bdbbd4a7f6086d7bb5331" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepsix">
+	<!-- Stock No: 8106, Clone of Marine Adventure (Japanese 008E)-->
+		<description>Deep Six</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="deepsix.bin" size="8192" crc="f3c61b7d" sha1="efac38c955ef4c605a43a6f720e094c0fbd11cd9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+	<!-- (Japanese 005E)-->
+		<description>Frogger</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="frogger.bin" size="8192" crc="fffd897e" sha1="0778e0711e3c5a0d36b486f64bf7cc8ee8f9f8b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperspc">
+	<!-- Stock No: 8102 -->
+		<description>Hyperspace</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="hyperspc.bin" size="8192" crc="87bc1c05" sha1="4ff240e6d583c67565a4c857a40e05fe4e826a3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungler">
+	<!-- Stock No: 8202, (Japanese 015E)-->
+		<description>Jungler</description>
+		<year>1981</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="jungler.bin" size="8192" crc="ad635119" sha1="461cdca0b6e478c11dd598ccf2cbbbd5a6fe8125" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="locomotn">
+	<!-- Stock No: 8203, Clone of Guttang Gottong (Japanese 016E)-->
+		<description>Loco-motion</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="lmotion.bin" size="8192" crc="1f652f42" sha1="fa2e6129d29f9d38f1102da3678659d845daec5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="misattck">
+	<!-- (Japanese 009E)-->
+		<description>Mission Attack</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="misattck.bin" size="8192" crc="398b2321" sha1="e15d13a34b4aa0335d00c4c6bf1afda643f80905" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mnstrinn">
+	<!-- (Japanese 002E)-->
+		<description>Monster Inn</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mnstrinn.bin" size="8192" crc="2af704f8" sha1="457acdeb308f2874021741f13fc8f74d52c361af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightfli">
+	<!-- (Japanese 007E)-->
+		<description>Night Flight</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="nightfli.bin" size="8192" crc="db469444" sha1="d8b5f6888ec95b2e55ebfe8c9e0434f402cc0975" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooyan">
+	<!-- Stock No: 8200, (Japanese 014E)-->
+		<description>Pooyan</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pooyan.bin" size="8192" crc="05396699" sha1="f16f92591ac19b61707b61892d2abcedb47b0897" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saurus">
+	<!-- (Japanese 003E)-->
+		<description>Saurusland</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="saurus.bin" size="8192" crc="87085401" sha1="bb4dd5b39a9a3992f4a67bf479be4ec0693c5845" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+	<!-- Stock No: 8201, (Japanese 006E)-->
+		<description>Scramble (USA)</description>
+		<year>1981</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="scramble.bin" size="8192" crc="cc9901d1" sha1="66b573a80b47a3fb62dbfb0abe512e80b2336735" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramblej" cloneof="scramble">
+	<!-- Stock No: 8201, (Japanese 006E)-->
+		<description>Scramble (Jpn)</description>
+		<year>1981</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="scramblej.bin" size="8192" crc="bd708ab4" sha1="9029d16c123e6d35a5f3ed4fbc9eefae8948215f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="torpedo">
+	<!-- Stock No: 8101, Clone of Bermuda Triangle (Japanese 020E)-->
+		<description>Torpedo Terror</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="torpedo.bin" size="8192" crc="95577ceb" sha1="4b75c4bdd2285eff5ed0df3a951d8527270e6b96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafjam">
+	<!-- Stock No: 8103, (Japanese 010E)-->
+		<description>Traffic Jam</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="trafjam.bin" size="8192" crc="c0c78141" sha1="2ba074955a1507ca9f6cde8987695f495e81aeab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trafjama" cloneof="trafjam">
+	<!-- Stock No: 8103, (Japanese 010E)-->
+		<description>Traffic Jam (Alt)</description>
+		<year>1982</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="trafjama.bin" size="8192" crc="c970f2c3" sha1="086825470d349f3bbd598bbb8b8c9e13aa2458b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turpin">
+	<!-- (Japanese 004E)-->
+		<description>Turpin</description>
+		<year>1983</year>
+		<publisher>Tomy</publisher>
+		<part name="cart" interface="tutor_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="turpin.bin" size="8192" crc="d00210df" sha1="74b30511f899e0b060981aa68f93c511df15f3d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

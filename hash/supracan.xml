@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="supracan" description="Funtech Super A'Can cartridges">
+	<!-- F001 - 福爾摩沙大對決 (Formosa Da Dui Jue) - aka Formosa Duel -->
+
+	<software name="sangofgt">
+		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>
+		<year>1995</year>
+		<publisher>Panda Entertainment Technology</publisher>
+		<info name="serial" value="F002" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="sangofgt.bin" size="3145728" crc="a4de6dde" sha1="f4bed63775130a75eb9c50b32e0cf50d1a7b8f50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonevil" supported="no">
+		<description>The Son of Evil ~ Xie E Zhi Zi</description>
+		<year>1995</year>
+		<publisher>Funtech</publisher>
+		<info name="serial" value="F003" />
+		<info name="alt_title" value="邪惡之子" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonevil.bin" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedyd" supported="no">
+		<description>Speedy Dragon ~ Yin Su Fei Long</description>
+		<year>1995</year>
+		<publisher>AV Artisan Corp.</publisher>
+		<info name="serial" value="F004" />
+		<info name="alt_title" value="音速飛龍" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="speedydgn.bin" size="2097152" crc="f631383c" sha1="fbd62b5d287aa82ef27f400ab2a6b3da0308192a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="staiwbbl" supported="no">
+		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
+		<year>1995</year>
+		<publisher>C&amp;E Soft</publisher>
+		<info name="serial" value="F005" />
+		<info name="alt_title" value="超級中華職棒聯盟" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="16005.0" size="2097152" crc="ccf6829b" sha1="17a413803d8749fbe9643ca56d703afd64569b9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jttlaugh" supported="no">
+		<description>Journey to the Laugh ~ Xi You Ji</description>
+		<year>1995</year>
+		<publisher>Funtech</publisher>
+		<info name="serial" value="F006" />
+		<info name="alt_title" value="嘻遊記" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="jttlaugh.bin" size="2097152" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slghtsag" supported="no">
+		<description>Super Light Saga - Dragon Force ~ Chao Ji Guang Ming Zhan Shi</description>
+		<year>1996</year>
+		<publisher>Kingformation</publisher>
+		<info name="serial" value="F007" />
+		<info name="alt_title" value="超級光明戰史" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="3145728">
+				<rom name="16007.0" size="2097152" crc="56c1c3fb" sha1="249e2ad6d8d40ecd31eda5a1bd5e5d0f47174a27" offset="000000" />
+				<rom name="08007.1" size="1048576" crc="fc79f05f" sha1="7ce2e23ea3fd25764935708be4d47bf1a9843938" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopoly">
+		<description>Monopoly: Adventure in Africa ~ Fei Zhou Tan Xian Da Fu Weng</description>
+		<year>1995</year>
+		<publisher>Panda Entertainment Technology</publisher>
+		<info name="serial" value="F008" />
+		<info name="alt_title" value="非洲探險" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="08003.bin" size="1048576" crc="dc3b7b84" sha1="6dcbd7923203da7892915595d65ee668afbf0339" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="gamblord">
+		<description>Gambling Lord</description>
+		<year>1996</year>
+		<publisher>Funtech</publisher>
+		<info name="serial" value="F009" />
+		<info name="alt_title" value="賭霸 (Du Ba)" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="16006.bin" size="2097152" crc="ac4fa721" sha1="0fda223817f0b50f0ce9687076d29df3d1b86960" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="magipool">
+		<description>Magical Pool</description>
+		<year>199?</year>
+		<publisher>Funtech</publisher>
+		<info name="serial" value="F010" />
+		<info name="alt_title" value="魔棒撞球 (Mo Bang Zhuang Qiu)" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="08004.bin" size="2097152" crc="aed4e4f8" sha1="6be79db9006c46ea21f5dbe1add755ce2e413796" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boomzoo">
+		<description>Boom Zoo ~ Bao Bao Dong Wu Yuan</description>
+		<year>1996</year>
+		<publisher>Funtech</publisher>
+		<info name="serial" value="F011" />
+		<info name="alt_title" value="爆爆動物園" />
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="boomzoo.bin" size="524288" crc="6099bb44" sha1="0b5fbe2117bb77a827453c5489b3af691e5c7ade" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- F012 - Rebel Star -->
+
+	<!-- Unreleased Super A'can carts -->
+	<!-- Dinosaur Wars -->
+	<!-- City Escape -->
+	<!-- Quick Fighting Attack -->
+	<!-- Journey to the Center of the Earth -->
+
+</softwarelist>

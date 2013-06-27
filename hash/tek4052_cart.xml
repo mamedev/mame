@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tek4052_cart" description="Tektronix 4052 ROM packs">
+
+	<software name="editor">
+		<description>Editor</description>
+		<year>198?</year>
+		<publisher>Tektronix</publisher>
+		<info name="serial" value="4052R06" />
+
+		<part name="cart" interface="tek4050_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="160-1415 v2.0.u11" size="0x1000" crc="04cbc80d" sha1="7bfb80fa099a794b18a7a5d7f8c2de4b36e245ec" offset="0x0000" />
+				<rom name="160-1414 v2.0.u1" size="0x1000" crc="675da652" sha1="36a9677853e50a40195519dfdb6a3b3985438bc4" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp1">
+		<description>Signal Processing No. 1</description>
+		<year>198?</year>
+		<publisher>Tektronix</publisher>
+		<info name="serial" value="4052R07" />
+
+		<part name="cart" interface="tek4050_cart">
+			<dataarea name="rom" size="0x1000">
+				<rom name="160-1416-00 v2.0.u1" size="0x1000" crc="537acdb2" sha1="275e016eda327173095ae60ca79e72075c606954" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp2">
+		<description>Signal Processing No. 2 (FFT)</description>
+		<year>198?</year>
+		<publisher>Tektronix</publisher>
+		<info name="serial" value="4052R08" />
+
+		<part name="cart" interface="tek4050_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="160-1418 v2.0.u11" size="0x1000" crc="f1c19044" sha1="b1b86009980900f31eccf158dcc7036c7810b8f5" offset="0x0000" />
+				<rom name="160-1417 v2.0.u1" size="0x1000" crc="bee2e90f" sha1="9f1a26aa98583678047fc532f5fdb3c8a468e617" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fileman">
+		<description>File Manager</description>
+		<year>198?</year>
+		<publisher>Tektronix</publisher>
+
+		<part name="cart" interface="tek4050_cart">
+			<dataarea name="rom" size="0x3000">
+				<rom name="160-1703-00 v3.0.u13" size="0x1000" crc="991c9f5f" sha1="cce038f90edec6e551049c4411da8eeca6faeb4e" offset="0x0000" />
+				<rom name="160-1420-00 v3.0.u11" size="0x1000" crc="6545e073" sha1="63a8d774a4b6f3640a833fd8be592a1baf124f7d" offset="0x1000" />
+				<rom name="160-1419-00 v3.0.u1" size="0x1000" crc="66d9d2d5" sha1="e603ef1cacd6a20b975cf532f2e1978dcbee9789" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="da">
+		<description>D/A Converter</description>
+		<year>198?</year>
+		<publisher>Transera</publisher>
+
+		<part name="cart" interface="tek4050_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="transera.da" size="0x800" crc="1c16e4da" sha1="6d6ea0c5c68bab8e6a885b3cb05aa591f7754c56" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

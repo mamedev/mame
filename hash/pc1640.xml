@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pc1640" description="Amstrad PC1640 diskettes">
+
+	<software name="system">
+		<description>Amstrad PC1640 System Discs</description>
+		<year>1987</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47001.img" size="368640" crc="274129d5" sha1="94d225bfd8813c4434ec989f2340623d9496ba49" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47002.img" size="368640" crc="5361b69c" sha1="256214d06735b4716321aded23d759f3c0b5b56a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47003.img" size="368640" crc="8f21e56c" sha1="d4a8183cfb7ec5e361dbf549357b9df49672f7fc" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47004.img" size="368640" crc="b34d7638" sha1="1f82a0d9789db97f0ce2aa9409871957b355ff5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system_fr" cloneof="system">
+		<description>Amstrad PC1640 System Discs (Fra)</description>
+		<year>1987</year>
+		<publisher>Amstrad</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 1"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47001f.img" size="368640" crc="17fdea8d" sha1="b7c9ddb0f44ca1df582382677d5810007aa4c91a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47002f.img" size="368640" crc="1de13292" sha1="b416cbba207ef2de8b1270abc818d7675ff1f6e4" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 3"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47003f.img" size="368640" crc="a90a5bc2" sha1="51e71ef779e11738b7da0828cb6832c60d150556" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disc 4"/>
+			<dataarea name="flop" size="368640">
+				<rom name="47004f.img" size="368640" crc="0a2bbad5" sha1="4ee3bb07e4fdf12ac8e480a3abaf2e07429fac4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

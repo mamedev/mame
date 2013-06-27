@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+    Undumped:
+
+    18V401  Fun With Numbers            TV Arcade II
+            Bingo                       TV Casino
+            Math and Social Studies     TV School House I
+
+-->
+
+<softwarelist name="studio2" description="RCA Studio II cartridges">
+	<software name="spacewar">
+		<description>TV Arcade I: Spacewar</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V400" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x200">
+				<rom name="spacewar.bin" size="0x200" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>TV Arcade III: Tennis/Squash</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V402" />
+		<info name="usage" value="Press 'Clear', '1' on Keypad A, '4' on Keypad B and then '7' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x200">
+				<rom name="tennis-squash.bin" size="0x200" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>TV Arcade IV: Baseball </description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V403" />
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="baseball.bin" size="0x400" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedway">
+		<description>TV Arcade Series V: Speedway/Tag</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V404" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x200">
+				<rom name="speedway tag.bin" size="0x200" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfight">
+		<description>TV Arcade Series: Gunfighter/Moonship Battle</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V405" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compquiz">
+		<description>TV School House: Computer Quiz</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V500" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A twice" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x200">
+				<rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfun">
+		<description>TV School House II: Math Fun</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="MG-209" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A three times" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjack">
+		<description>TV Casino I: Blackjack </description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V600" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="blackjack.bin" size="0x400" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biorhyth">
+		<description>TV Mystic Series: Biorhythm</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V700" />
+		<info name="usage" value="Press 'Clear' and then '0' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom" size="0x400">
+				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

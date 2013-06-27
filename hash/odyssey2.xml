@@ -1,0 +1,1638 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+TODO:
+add first release date were applicable
+add usage for those which use 2nd joystick (<info name="usage" value="Uses the 2nd joystick" />)
+add programmers (<info name="programmer" value=""/>)(mainly Ed Averett)
+add ntsc pal compatibility (<sharedfeat name="compatibility" value="NTSC,PAL"/>)
+add rom names from pcbs (lack of)
+add serials for radiola and jopacs
+-->
+<!--
+Undumped:
+Spaans          (spanish to dutch translator)
+Crazy Horses
+
+Protos:
+Bastion         youtube.com/watch?v=cFdmgs4r7_E
+Catburglar      youtube.com/watch?v=DDsWDFxy0oE
+Himalaya        youtube.com/watch?v=L_lvOs6EnA4
+SoundTool       youtube.com/watch?v=7JYn6B7rxqw
+Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
+
+http://www.ozyr.com/rene/PICS/protos.jpg
+Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
+Back Gammon
+Freedom Fighters
+K.C.'s Crazy Chase
+Killer Bees (also 10/12/82 (silent version), and 11/12/82 builds exist)
+Power Lords
+Handicap I (?)
+Frogger
+Robot City
+Requins (Shark Hunter?)
+K.C. Munchkin!
+Pick Axe Pete
+
+Unreleased, possibly no prototypes exist:
+A Turma da Mônica [Mônica's Gang]
+Pink Panther
+Clean Up Yer Act (programmed by Robert S. Harris, never completed)
+Star Wars (GST Video)
+Moonsweeper (Imagic)
+Fathom (Imagic)
+-->
+<!--
+NOTE:
+PAL colours leave a lot to be desired
+Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS microprocessor, which gave the G7000 extra CPU and memory.
+The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
+adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
+-->
+<softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
+<!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
+
+<!-- Applications -->
+	<software name="compprog">
+		<description>Computer Programmer (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="9"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="computer programmer (europe).bin" size="2048" crc="b590cf14" sha1="913c1961dfa17b5873428f57429e3809580ff906" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compintr" cloneof="compprog">
+		<description>Computer Intro (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9406"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="computer intro (usa).bin" size="2048" crc="95efa98b" sha1="f93c448243db428a4c9e2354596844ed07bb7530" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newscast">
+		<description>Newscaster (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="A"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="newscaster (europe).bin" size="2048" crc="85dfcdd7" sha1="183b3b1b70db58cc9ada575cc324353f2e89c2ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyboard" cloneof="newscast">
+		<description>Keyboard Creations! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9433"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="keyboard creations (usa).bin" size="2048" crc="688fad11" sha1="8276ca41e571478eae2dd6add7f79bc7f8bd60de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musician">
+		<description>Musician (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="31"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="musician (europe).bin" size="4096" crc="afb23f89" sha1="7445f4df9017c4d2ea94542d0db335dc18c9d7ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typetell">
+		<description>Type &amp; Tell! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert L. Cheezem" />
+		<info name="serial" value="AC9440"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="type and tell (usa).bin" size="4096" crc="b936bd78" sha1="40458eaf84a71f509b4069775e49551ce5152697" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Educational -->
+	<software name="number">
+		<description>Playschool Maths (Euro) ~ I've Got Your Number (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9413 (USA) ~ 13 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="i've got your number (usa, europe).bin" size="2048" crc="1c8368e7" sha1="498cb0882d8a692042889e83775a83cf267a1837" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2mthecho">
+		<description>Mathematician/Echo (Euro) ~ Math-a-Magic!/Echo! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for Mathematician/Math-a-Magic, press 2 for Echo" />
+		<info name="serial" value="AJ9405 (USA) ~ 7 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="math-a-magic - echo (usa, europe).bin" size="2048" crc="dc5afaa2" sha1="4dac55de1afadc1af2ac9166d7d47c462a8e797a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2mthechf" cloneof="2mthecho">
+		<description>Mathématicien/Echo (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for Mathématicien, press 2 for Echo" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mathematicien - echo (france).bin" size="2048" crc="0c4e4b0a" sha1="d96c65670b9a3a4feedcb720807292708951fcd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morse">
+		<description>Morse (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="45"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="morse (europe).bin" size="2048" crc="2122012c" sha1="8431f56359d80ff6a67c83c50c12fa5d8bc46ff3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="morsef" cloneof="morse">
+		<description>Morse (Fra)</description>
+		<year>1983</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="morse (france).bin" size="2048" crc="510416b7" sha1="11065dfbc22dd9ed7609cbcc7f8c6d3bc5b004ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nimble">
+		<description>Nimble Numbers Ned! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert S. Harris" />
+		<info name="serial" value="AC9439"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="nimble numbers ned (usa).bin" size="4096" crc="cf2f8e7a" sha1="01dd021a1bcdafb58cb2bcca051934f05e978c53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sidspell">
+		<description>Sid the Spellbinder (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Sam Overton" />
+		<info name="serial" value="AC9438"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="sid the spellbinder (usa).bin" size="4096" crc="1b9f2f16" sha1="dfed128d213d4192313f85fe2b8716579c2fc995" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vrkrspl1">
+		<description>Verkehrsspiele 1 (Ger)</description>
+		<year>1982</year>
+		<publisher>CSV/Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="verkehrsspiele 1 (germany).bin" size="2048" crc="45e62222" sha1="e90f2a33e41d9bd4c50e96eacc483bc99e53993b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kndrvrkr" cloneof="vrkrspl1">
+		<description>Kinder im Verkehr 1 (Ger)</description>
+		<year>1982</year>
+		<publisher>CSV/Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="kinder im verkehr 1 (germany).bin" size="2048" crc="9c9dddf9" sha1="9b73685f7d2008467d4449a3bfedef6e763b5948" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vrkrspl2">
+		<description>Verkehrsspiele 2 (Ger)</description>
+		<year>1982</year>
+		<publisher>CSV/Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="verkehrsspiele 2 (germany).bin" size="2048" crc="69893f7f" sha1="0904ea45c011d12857477db04b4d1c87544f27e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+	<software name="4in1">
+		<description>4 in 1 Row (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="40"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="4 in 1 row (europe).bin" size="4096" crc="3bfef56b" sha1="e9a8996c4fb87120d8620ab8876b90ddb48335db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4en1" cloneof="4in1">
+		<description>4 en 1 Ligne (Fra)</description>
+		<year>1982</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="4 en 1 ligne (france).bin" size="4096" crc="9b5e9356" sha1="0831c3212a9e0a588a242dcd2b136e350aaceac9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alieninv">
+		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
+		<year>1980</year>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9428 (USA) ~ 22 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="alien invaders - plus! (usa, europe).bin" size="2048" crc="71ae8533" sha1="9ba0737fdee2918375725bb5230d075a2f847159" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpine">
+		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9418 (USA) ~ 25 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="alpine skiing (usa, europe).bin" size="2048" crc="4663c4b6" sha1="9e7e16744b44fa83fa14c211b2365cf04604e06e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ski" cloneof="alpine">
+		<description>Ski (Fra)</description>
+		<year>1979</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="ski (france).bin" size="2048" crc="e129490d" sha1="a6e07b727b4f48d13ce21442911995eb46b99c5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2armrsub">
+		<description>Air-Sea War/Battle (Euro) ~ Armored Encounter!/Sub Chase! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press A for Armored Encounter/Air-Sea War, press 1 for Sub Chase/Battle" />
+		<info name="serial" value="AJ9403 (USA) ~ 4 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="armored encounter - sub chase (usa, europe).bin" size="2048" crc="5ae57a8c" sha1="086a29eb625c935295157ce62ca9717dffff2af0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis">
+		<description>Atlantis (Euro, USA)</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="programmer" value="Jeff Ronnie" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (usa, europe).bin" size="4096" crc="a7344d1f" sha1="6975cf9fed3ee1a2567477921eb851a669d42446" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timelord">
+		<description>Attack of the Timelord! (USA)</description><!-- possibly also "Terrahawks (Euro)[Videopac 51]"? -->
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9445"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="attack of the timelord (usa).bin" size="4096" crc="fc5a7f08" sha1="c63ad4e9aaa903ded9fcf185caf24e76f8aaf3a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball (Euro) ~ Baseball! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AJ9408 (USA) ~ 8 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="baseball (usa, europe).bin" size="2048" crc="b07748e7" sha1="14a37a38c582d8822cb78fb0aace221a2fa9a44c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blobbers">
+		<description>Blobbers (Euro)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="56"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="blobbers (europe).bin" size="8192" crc="9d72d4e9" sha1="cae4e1f3ee090ec423aff89102f359b9e14dba41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2blckbrk">
+		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 0 then 1 for Blockout/Dam Buster, press 0 then 2 for Breakdown" />
+		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
+				</dataarea>
+		</part>
+	</software>
+
+	<software name="magique" cloneof="2blckbrk">
+		<description>Le Mûr Magique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mur magique, le (france).bin" size="2048" crc="d38153f6" sha1="ff0ebe9efc275011a0534fd98ca1f4112dae3dab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2bwlbskt">
+		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for League Night Bowling, press 2 for Tournament Play Bowling, press 3 for Basketball" />
+		<info name="serial" value="AJ9404 (USA) ~ 6 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bowling - basketball (usa, europe).bin" size="2048" crc="084ee035" sha1="2630c304b6beb0f8021578277be68e837202895d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2qllbskt" cloneof="2bwlbskt">
+		<description>Jeu de Quilles/Basketball (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for (League Night Bowling), press 2 for (Tournament Play Bowling), press 3 for Basketball" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="jeu de quilles - basketball (france).bin" size="2048" crc="a7e97958" sha1="30cbbec570fa0872c13e89ddc312b2f74e3749fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buraco">
+		<description>Buraco Negro! (Bra)</description>
+		<year>1984</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="buraco negro (brazil).bin" size="8192" crc="25874b04" sha1="8414605a62e78753e3f8474fa020035596292583" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neutron" cloneof="buraco">
+		<description>Neutron Star (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="neutron star (europe) (proto).bin" size="8192" crc="d03efa86" sha1="0a91bdb293f52ac37414a63f71d90c6338a4a91a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="casino">
+		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
+		<year>1980</year>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9426 (USA) ~ 23 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="casino slot machine (usa, europe).bin" size="2048" crc="bb6e7135" sha1="052bc62eb03e2673a802bab866dd0ab3c39fd584" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegas" cloneof="casino">
+		<description>Las Vegas (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="las vegas (france).bin" size="2048" crc="a0620082" sha1="b83463b7c40367d4310f142fa15d06d12061f3be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2bllcrss">
+		<description>Catch the Ball/Noughts and Crosses (Euro)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for Catch the Ball, press 7 for Noughts and Crosses" />
+		<info name="serial" value="19"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="catch the ball - noughts and crosses (europe).bin" size="2048" crc="a57e1724" sha1="671a43595b867b7877e723be18825e9e5d5c4ee9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2mlajogo" cloneof="2bllcrss">
+		<description>O Malabarista!/Jogo da Velha! (Bra)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for O Malabarista, press 7 for Jogo da Velha" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="o malabarista - jogo da velha (brazil).bin" size="2048" crc="e39500a6" sha1="68de402f57eb0c8afefdbc46d80d2bc5520afc68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess" supported="no"><!-- needs chess module emulation -->
+		<description>Chess (Euro)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="G7010"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="chess (europe).bin" size="2048" crc="77066338" sha1="7162359313f66fe759bdd8a34755a5f62f3cadfb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chezmxme"><!-- I know it's a clone of something... -->
+		<description>Chez Maxime (Fra)</description>
+		<year>198?</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="g7400_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="chez maxime (france).bin" size="4096" crc="0f46cf66" sha1="cd58d267fe5bab82f5dab01dbb08d5adf0053108" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chinese">
+		<description>Chinese Logic (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="17"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="chinese logic (europe).bin" size="2048" crc="11edf25b" sha1="431bd5b4ee86e62500eab263e073a585656d16c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desafio" cloneof="chinese">
+		<description>Desafio Chinês! (Bra)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="desafio chines (brazil).bin" size="2048" crc="838a2d1e" sha1="241160f0691a394afe632b5b29969dae2d8f2d34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="claypig">
+		<description>Clay Pigeon! (Bra)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="clay pigeon (brazil).bin" size="4096" crc="fd179f6d" sha1="c07c1206db8d4fb5142b38ead52082d4682d70be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comando">
+		<description>Comando Noturno! (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="comando noturno (brazil).bin" size="8192" crc="26517e77" sha1="e0aa46211967c880bf7ff39836fe5e73c0302460" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="night" cloneof="comando">
+		<description>Nightfighter (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="nightfighter (europe) (proto).bin" size="8192" crc="7be6f1ef" sha1="ec364634c2a8160da1916a43246b76d78932be1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conquest">
+		<description>Conquest of the World (Euro, USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AB9431 (USA) ~ 41 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="conquest of the world (usa, europe).bin" size="4096" crc="afc093fd" sha1="508d1475670ba561e7ddf961a4f0cf6d139d168c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmic">
+		<description>Cosmic Conflict (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="serial" value="11"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="cosmic conflict (europe).bin" size="2048" crc="f4c2075e" sha1="a22f99dcc4aba3126f5b5bbbf2a3890878ac953b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conflit" cloneof="cosmic">
+		<description>Conflit Cosmique (Can, Fra?)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="conflit cosmique (canada).bin" size="2048" crc="2f6e4b46" sha1="e54fe13ee27884524255063aa6fd69e4598a5104" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmica" cloneof="cosmic">
+		<description>Cosmic Conflict (Euro, Alt)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="cosmic conflict (europe) (alt).bin" size="2048" crc="2a5f0b2b" sha1="9f8f10c9e6e1a5e07eb5a6eee4e0fe19fcaee17f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicu" cloneof="cosmic">
+		<description>Cosmic Conflict! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="serial" value="AJ9411"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="cosmic conflict (usa).bin" size="2048" crc="c049e79e" sha1="dccbf881e21dd02cbaf15ec049e0801118fb9c96" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demon">
+		<description>Demon Attack (Euro, USA)</description>
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<info name="programmer" value="Dave Johnson" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="demon attack (usa, europe).bin" size="4096" crc="9bfc3e01" sha1="2d78ccbb56e8b43bb8101b2a1932f5e778b9dbc3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2dpthmrk" supported="partial">
+		<description>Depth Charge/Marksman (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
+		<info name="serial" value="16"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="depth charge - marksman (europe).bin" size="2048" crc="2dcb77f0" sha1="95ccda2010f756069645e50269142a063c9aabc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2bmbalvo" cloneof="2dpthmrk">
+		<description>Bombardeio Submarino!/Tiro ao Alvo! (Bra)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="bombardeio submarino - tiro ao alvo (brazil).bin" size="2048" crc="b1109a09" sha1="e15f778efeb95530f8108854b14c404cf63f213a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>Electronic Table Football (Euro) ~ Electronic Table Soccer (USA)</description>
+		<year>1980</year>
+		<publisher>Magnavox</publisher>
+		<info name="serial" value="AA9423 (USA) ~ 27 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="electronic table soccer (usa, europe).bin" size="2048" crc="89c6de2c" sha1="3a032c9be1081db58f28f906940641d74d6bae2b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>American Football (Euro) ~ Football! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9402 (USA) ~ 3 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="football (usa, europe).bin" size="2048" crc="f9084aa3" sha1="364504ffce1108bcf09a5cc784f7ea2cf141f7b8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedom">
+		<description>Freedom Fighters (Euro) ~ Freedom Fighters! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9436 (USA) ~ 39 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="freedom fighters (usa, europe).bin" size="4096" crc="54736b74" sha1="ad11f3fad2dfd3716445fef3b7d83d479edee0ed" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger (Euro)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="programmer" value="Peter Inser" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="frogger (europe).bin" size="8192" crc="d0bc4ee6" sha1="0beda7b36259b3be84d34206a77a35cd3f04892f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggerb" cloneof="frogger">
+		<description>Frogger (Bra)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="frogger (brazil).bin" size="8192" crc="a57d84f3" sha1="bedb714c88b9aa7a02da9ebcde12446ec8350d18" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golf">
+		<description>Golf (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="10"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="golf (europe).bin" size="2048" crc="14b6cc76" sha1="c2bf8d92b8827e3071d6ce4c43e34b21afc54f8d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compgolf" cloneof="golf">
+		<description>Computer Golf! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9410"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="computer golf (usa).bin" size="2048" crc="0f870806" sha1="c8736250ebf376543256d85cf853e825475e0af6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gtwallst">
+		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="the great wall street fortune hunt (usa, europe).bin" size="4096" crc="881ceae4" sha1="d54b1d5667bf90368dddab55a91955b1789f177c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wallst" cloneof="gtwallst">
+		<description>Wall Street (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="wall street (brazil).bin" size="4096" crc="228842df" sha1="af9db337a2edbb3fe79a3d50f1b4ec1b007f4a52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfight">
+		<description>Gunfighter (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="14"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="gunfighter (europe).bin" size="2048" crc="abe368bf" sha1="b5ec5ed9373372de6d70620094af06282c48968d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="showdown" cloneof="gunfight">
+		<description>Showdown in 2100 A.D. (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9416"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="showdown in 2100 a.d. (usa).bin" size="2048" crc="9487c920" sha1="7163c3e0d0e926287df670bfa5d5d5c42b5b3cf6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2hckyscr">
+		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<info name="serial" value="AK9420 (USA) ~ 36 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="hockey - soccer (usa, europe).bin" size="2048" crc="39989464" sha1="f39c9801984f97d5a685a4b7a1accd0164a49b43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2fblhcky" cloneof="2hckyscr">
+		<description>Football Electronique/Hockey Electronique (Fra)</description>
+		<year>1981</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Move joystick when game is on screen." />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="football electronique - hockey electronique (france).bin" size="2048" crc="f00f9dba" sha1="d7593ade4d60a6e314e4f18711e8ea59e3c8c3ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="interpol">
+		<description>Interpol (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>GST Video</publisher>
+		<info name="programmer" value="Mick Rouse" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="interpol (europe) (proto).bin" size="4096" crc="69d21f8f" sha1="c0b10b79461bc1939e08e4c05166126d2b8d7dda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acrobat">
+		<description>Jumping Acrobats (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jim Butler" />
+		<info name="serial" value="33"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="jumping acrobats (europe).bin" size="2048" crc="6cebab74" sha1="a44587d48e76117838cb6a4cf964321d37efcde1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acrobata" cloneof="acrobat">
+		<description>Jumping Acrobats (Euro, Alt)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jim Butler" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="jumping acrobats (europe) (alt).bin" size="2048" crc="e7b26a56" sha1="ee5c0471fc192570fe4575ca65882d3d7b85350d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ptbarnum" cloneof="acrobat">
+		<description>P.T. Barnum's Acrobats! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jim Butler" />
+		<info name="serial" value="AC9443"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="p.t. barnum's acrobats (usa).bin" size="4096" crc="874f36a4" sha1="661a73bd490cc592815f742eb33b2d3f0066be41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kckrazy">
+		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AC9442 (USA) ~ 44 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="k.c.'s krazy chase (usa, europe).bin" size="4096" crc="a6909a8b" sha1="3391e48c0048a2f588d8238bb202e2ec346a6ad4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bees">
+		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert S. Harris" />
+		<info name="serial" value="AC9447"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="killer bees (usa).bin" size="8192" crc="b096654e" sha1="b446a2730aefafe71394dbb9850d43c5cf01d367" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2lbsprmd">
+		<description>A Labyrinth Game/Supermind (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="32"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="a labyrinth game - supermind (europe).bin" size="2048" crc="d158eeba" sha1="85c567c8f38239350a5d04f8cfd9dd7872f448c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsvsblck">
+		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AJ9401 (USA) ~ 5 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="las vegas blackjack (usa, europe).bin" size="2048" crc="6f66b1f7" sha1="3e10fc687b1d07612305f680f24590f99842e62b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackjck" cloneof="lsvsblck">
+		<description>Blackjack (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="blackjack (france).bin" size="2048" crc="6381e402" sha1="9ec331ce8e50ef60de93e615c18327f08b4a24fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laser">
+		<description>Laser War (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="18"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="laser war (europe).bin" size="2048" crc="17be749b" sha1="3d188d49d4a2409f66ac86bcf58d90d35908032b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guerre" cloneof="laser">
+		<description>Guerre Lazer (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="guerre laser (france).bin" size="2048" crc="ca8ab259" sha1="12f08273e6c5e97e0a35c4033bd7527bb8a559d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="invaders" cloneof="laser">
+		<description>Invaders from Hyperspace! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9414"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="invaders from hyperspace (usa).bin" size="2048" crc="ad7a9a11" sha1="00032798bd4cc01323e663e98634b82a74b0dc53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balao">
+		<description>Balão Travesso! (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="balao travesso (brazil).bin" size="4096" crc="5b6e741a" sha1="73bf363400fece63d1a10b6b8cd9413612a1a126" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loony" cloneof="balao">
+		<description>Loony Balloon (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="loony balloon (europe) (proto).bin" size="4096" crc="ca23f40c" sha1="3cb324b047cbac8ec4381150b1c2aee98573841b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martian">
+		<description>Martian Threat (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jake Dowding?" /><!-- first prototype found was named "Jake" -->
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="martian threat (europe) (proto).bin" size="8192" crc="39e31bf0" sha1="4266ca9aa34ace118edd8153e2847cfa94a9a2f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3prspclg">
+		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
+		<year>1978</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Press 1 for Pairs 1 player, press 2 for Pairs 2 players, press 3 for Space Rendezvous, press 4 for Logic" />
+		<info name="serial" value="2"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pairs - space rendezvous - logic (europe).bin" size="2048" crc="a69c2c93" sha1="7ea8e5ff3b9f86914774de2aa6f7a4652adcf47a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3mkrbzlg" cloneof="3prspclg">
+		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
+		<year>1978</year>
+		<publisher>Magnavox</publisher>
+		<info name="usage" value="Press 1 for Matchmaker 1 player, press 2 for Matchmaker 2 players, press 3 for Buzzword, press 4 for Logix" />
+		<info name="serial" value="AJ9407"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="matchmaker - buzzword - logix (usa).bin" size="2048" crc="bbf276a0" sha1="908387d2446f4c62019017fe262b412dfa040d10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2missprg">
+		<description>Missão Impossível/Viagem Programada (Bra)</description><!-- limited release -->
+		<year>198?</year>
+		<publisher>Ectron Eletrônica Ltda.</publisher>
+		<info name="usage" value="Press 1 for Missão Impossível, press 2 for Viagem Programada" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mission impossible (brazil).bin" size="2048" crc="655fdf57" sha1="7ff030e8ba236c9f354b903b89b283886c7455d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkey">
+		<description>Monkeyshines (Euro) ~ Monkeyshines! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AB9432 (USA) ~ 37 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="monkeyshines (usa, europe).bin" size="4096" crc="fee664f3" sha1="6d6659539934255711357537d4fa6e969c3c4754" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousing">
+		<description>The Mousing Cat (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="47"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="the mousing cat (europe).bin" size="4096" crc="f390bfec" sha1="f9727e6c5a941518187c08e5f5d104460ac3b3e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chat" cloneof="mousing">
+		<description>Chat et Souris (Fra)</description>
+		<year>1983</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="chat et souris (france).bin" size="4096" crc="61a350e6" sha1="afa67f2110647753de9dfacb268d96e75d6d8657" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munchkin">
+		<description>Munchkin (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="38"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="munchkin (europe).bin" size="4096" crc="4a3e2dc8" sha1="83d06385fd74e3f7c19309e6908a975fa8856f32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kcmunch">
+		<description>K.C. Munchkin! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9435"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="k.c. munchkin (usa).bin" size="4096" crc="7108e058" sha1="d273cf993dfcbca3b65cd4959b45a3009f242bc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantom">
+		<description>Phantom House (Euro, Prototype)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="phantom house (europe)(proto).bin" size="8192" crc="313547eb" sha1="3cc218587116eb105e95ffce9eb1b5e268258d4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2wrldrsc">
+		<description>Out of this World!/Helicopter Rescue! (USA)</description>
+		<year>1979</year>
+		<publisher>Magnavox</publisher>
+		<info name="usage" value="Press 3 for Out of this World, press 1 for Helicopter Rescue" />
+		<info name="serial" value="AC9419"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="out of this world - helicopter rescue (usa).bin" size="2048" crc="0c2e4811" sha1="c6a79e721ee501d82d9a1c4f71f98bc23f1e7c7e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pachinko">
+		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AA9425 (USA) ~ 26 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pachinko (usa, europe).bin" size="2048" crc="239df97d" sha1="ffd525d5c6023409afdcdb2afbda227bc4568304" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pickaxe">
+		<description>Pickaxe Pete (Euro) ~ Pick Axe Pete! (USA)</description>
+		<year>1980</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AC9437 (USA) ~ 43 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="pick axe pete (usa, europe).bin" size="4096" crc="d62814a3" sha1="b979ed0c2b8947f764786fcf4444463b3d3ae87d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball! (USA, Prototype)</description>
+		<year>1979</year><!-- re-released at Classic Games Expo (2004 in Philidelphia) with Ralph Baer's autograph (as he was designer)  -->
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Don McGuiness"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pinball (usa) (proto).bin" size="2048" crc="6ef2471a" sha1="350a9e3f95dbf2d5e7aa1ddbd5e531300ddeeee4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="playtag">
+		<description>Plantage ~ Play Tag (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="playtag (europe) (proto).bin" size="4096" crc="a29f0fd4" sha1="759dc0efb9dbf64034d9fd78c12207206b173c0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billiard">
+		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9424 (USA) ~ 35 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="pocket billiards (usa, europe).bin" size="2048" crc="24d53e2c" sha1="8abd1057202ebac12acf3822ed4d965bba02b7de" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billamer" cloneof="billiard">
+		<description>Billard Américain (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="billiard americain (france).bin" size="2048" crc="a674ea27" sha1="283ae5fa1d6e89a5ac921c7f2e21a89a67dd138c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeye">
+		<description>Popeye (Euro)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="popeye (europe).bin" size="8192" crc="5216771a" sha1="a13e7b338ba15820949f51eb862b381ddc6870af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="popeyeb" cloneof="popeye">
+		<description>Popeye (Bra)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="popeye (brazil).bin" size="8192" crc="1b188870" sha1="d12197942a99d5902de1352bbb5475ab4396c7d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powerlrd">
+		<description>Power Lords (USA)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="usage" value="Uses the 2nd joystick" />
+		<info name="serial" value="AC9448"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="power lords (usa).bin" size="4096" crc="40ae062d" sha1="e81570282b8ade6b7c0d126c819a95c7011cd063" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbert">
+		<description>Q*bert (Euro)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="q-bert (europe).bin" size="8192" crc="202f2749" sha1="80d76d5c56fc716a8f7a55166390658c320e4c34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest">
+		<description>Quest for the Rings (Euro, USA)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AC9429 (USA) ~ 42 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="quest for the rings (usa, europe).bin" size="4096" crc="9451be1e" sha1="32759c8d502cd8b959da5f03351db7cd46c8f96a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laquete" cloneof="quest">
+		<description>La Quête des Anneux (Fra)</description>
+		<year>1982</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="la quete des anneaux (france).bin" size="4096" crc="a21da732" sha1="04543bdbea8112f7cc55caef5da9445d08d65e46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battle">
+		<description>Barão Vermelho! (Bra)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="air battle (brazil).bin" size="8192" crc="4103ee95" sha1="b6842b9264b722e2b39c8647b7963e513a0cde16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baron" cloneof="battle">
+		<description>Red Baron (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="red baron (europe) (proto).bin" size="8192" crc="1eeb88f5" sha1="50eba68915b0ccc95f07719f80d9011ca2cf67c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robot">
+		<description>Robot City (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="robot city (europe) (proto).bin" size="8192" crc="ef9e9c3b" sha1="ff92b024ef80919146e822ce947882d0744ac09f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samurai">
+		<description>Samurai (Euro)</description>
+		<year>1980</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="15"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="samurai (europe).bin" size="2048" crc="7810bad5" sha1="fd354b726bd86dcbe97bcc284cf1e09485dd81ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynasty" cloneof="samurai">
+		<description>Dynasty! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AK9421"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="dynasty (usa).bin" size="2048" crc="dc30ad3d" sha1="20c6e4035ce8dd5a8f331c18ceef1056dc9ce818" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satellit">
+		<description>Satellite Attack (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="34"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="satellite attack (europe).bin" size="2048" crc="395629e1" sha1="e0383dd98b85dc2156a859e731ff904b6ebad95b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufo" cloneof="satellit">
+		<description>UFO! (USA)</description>
+		<year>1982</year>
+		<publisher>Magnavox</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AB9430"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="ufo (usa).bin" size="2048" crc="2b1e9e19" sha1="0e819a4b0f17520da24ff79901197f5397cb9a26" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syracuse">
+		<description>Syracuse (Fra)</description>
+		<year>1981</year>
+		<publisher>Jopac</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="syracuse (france).bin" size="4096" crc="280d08f4" sha1="37aa11cbf0a32ece89d1d2c500b74660830377df" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharaohs">
+		<description>Secret of the Pharaohs (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="21"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="secret of the pharaohs (europe).bin" size="2048" crc="7394e82c" sha1="9ff434312fa9d3b7b63909a9ece01d4e3e87f3b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="farao" cloneof="pharaohs">
+		<description>O Segredo do Faraó! (Bra)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="o segredo do farao (brazil).bin" size="4096" crc="16c574c8" sha1="ba42f5e642f5dc7be231bb0e230ffa77a766c805" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shark">
+		<description>Shark Hunter (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<info name="developer" value="Graham Conduit" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="shark hunter (europe) (proto).bin" size="8192" crc="df36683f" sha1="eca31e4d8a9e198a8661f6b6e63b33c184e9b22b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3rcsocpt">
+		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="usage" value="Press 1 for Race/Speedway, press 2 for 3-lap Spin-out, press 4 for 15-lap Spin-out, press 5 for Cryptogram/Crypto-logic" />
+		<info name="serial" value="AC9400 (USA) ~ 1 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="speedway - spin-out - crypto-logic (usa, europe).bin" size="2048" crc="4eda4917" sha1="29d078f587be2afa4612800c64a5af72705e5681" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3csaucpt" cloneof="3rcsocpt">
+		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="usage" value="Press 1 for Course de Voitures, press 2 for 3-lap Autodrome, press 4 for 15-lap Autodrome, press 5 for Cryptogramme" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="course de voitures - autodrome - cryptogramme (france).bin" size="2048" crc="3b24e1ee" sha1="9e44ca9fc9e5def58c61b24274f0cbfb57d559ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spider">
+		<description>Spider-Man (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="spider-man (europe) (proto).bin" size="8192" crc="35ace4e8" sha1="4b1d675cb1fbf72ed35681e2b2e6e99fed7154cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stone">
+		<description>Stone Sling (Euro)</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert L. Cheezem" />
+		<info name="serial" value="20"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="stone sling (europe).bin" size="2048" crc="44d1a8a5" sha1="50763429d12206d7bf9fad6a6bd6076a34d54b51" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smither" cloneof="stone">
+		<description>Smithereens! (USA)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Robert L. Cheezem" />
+		<info name="serial" value="AC9441"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="smithereens (usa).bin" size="4096" crc="67069924" sha1="fc798f3cf770e8bf5f9a4064b6a4ca66e5a4eb71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbee">
+		<description>Super Bee (Euro)</description>
+		<year>1983</year>
+		<publisher>GST Video</publisher>
+		<info name="programmer" value="Mick Rouse" />
+		<info name="serial" value="50"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="super bee (europe).bin" size="4096" crc="9585d511" sha1="dfcfd9c019773e703aa130bc55f5b2f972ece8f0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbeeb" cloneof="superbee">
+		<description>Super Bee! (Bra)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="super bee (brazil).bin" size="4096" crc="02743352" sha1="98c1f3a9726fe1ba880d43f0ba004821c4cbec6c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cobra">
+		<description>Super Cobra (Euro)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="super cobra (europe).bin" size="8192" crc="95936b07" sha1="5521ff83e3be32c38205472b2df49eb507249dc2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cobrab" cloneof="cobra">
+		<description>Super Cobra (Bra)</description>
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="super cobra (brazil).bin" size="8192" crc="e58aa0ac" sha1="46716a927b902759bfe252022f84186098fb5863" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moneyrun">
+		<description>Take the Money and Run (Euro) ~ Take the Money and Run! (USA)</description>
+		<year>1978</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<info name="serial" value="AJ9412 (USA) ~ 12 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="take the money and run (usa, europe).bin" size="2048" crc="11ff50ad" sha1="8c181f4835d53a358ecb8e4385e087ee942b4b4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prendre" cloneof="moneyrun">
+		<description>Prendre l'Argent et Fuir (Fra)</description>
+		<year>1978</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="prendre l'argent et fuir (france).bin" size="2048" crc="ad89f799" sha1="2a55d179acfd9fe31b5f8f0ed0e2379b584f7c8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipper">
+		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AK9415 (USA) ~ 24 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="thunderball (usa, europe).bin" size="2048" crc="2c9d1715" sha1="d0070e12d6b0f406dab6e1fa550ab01509c9362e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipperf">
+		<description>Flipper (Fra)</description>
+		<year>1980</year>
+		<publisher>Radiola</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="billard electrique (france).bin" size="2048" crc="54bf4750" sha1="d12a242d273c4f4417806c3bcd868a9a0f553854" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtles">
+		<description>Turtles (Euro)</description>
+		<year>1982</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jim Butler" />
+		<info name="serial" value="49"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="turtles (europe).bin" size="8192" crc="1c750349" sha1="1fdca749675f62212d0b79c5f0911bcabc4e4e11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtlesu" cloneof="turtles">
+		<description>Turtles (USA)</description>
+		<year>1983</year>
+		<publisher>Philips</publisher>
+		<info name="programmer" value="Jim Butler" />
+		<info name="serial" value="AC9446"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="turtles (usa).bin" size="8192" crc="9e42e766" sha1="ee456305397ecbd54fffa0bb7a894f53976d2a7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tutank">
+		<description>Tutankham (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="tutankham (europe) (proto).bin" size="8192" crc="0b2deb61" sha1="c4985a344be7da3d78656b6473a3a1ad3ebe6497" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volley">
+		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<info name="serial" value="AA9422 (USA) ~ 28 (Euro)"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="volleyball (usa, europe).bin" size="2048" crc="d3b09fec" sha1="830c9b3628f2e9c4f8c882024dd912b9d7610765" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volleyf" cloneof="volley">
+		<description>Volleyball (Fra)</description>
+		<year>1979</year>
+		<publisher>Radiola</publisher>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="volleyball electronique (france).bin" size="2048" crc="551e38a2" sha1="9ea8d921ca03699f74e53e25b139632391838c7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlef">
+		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
+		<year>1979</year>
+		<publisher>Philips</publisher>
+		<info name="serial" value="AK9417 (USA) ~ 30 (Euro)"/>
+		<info name="programmer" value="Ed Averett" />
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="war of nerves (usa, europe).bin" size="2048" crc="58fa6766" sha1="e56b674c832e5a7cad977cc76779548fdd2f338e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- based on vic20tapes.org dumps -->
+<softwarelist name="vic1001_cass" description="Commodore VIC-1001 / VIC-20 cassettes">
+
+	<software name="3dmaze">
+		<description>3D Maze</description>
+		<year>1984</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="309826">
+				<rom name="3d maze_0013.tap" size="309826" crc="d3b47af3" sha1="8376a9da24bdf3089567978852fed544ed6d1611" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

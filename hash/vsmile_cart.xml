@@ -1,0 +1,420 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
+-->
+<softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
+
+<!--
+
+- Known V.Smile games (thanks to Team Europe)
+
+
+V.Reader:                     80-28****
+V.Smile Motion:               80-08****
+V.Smile Smartbook Software:   80-089***
+V.Smile:                      80-092***
+V.Flash (V.Smile Pro):        80-093***
+
+
+
+Language:
+********0 = US
+********1 =
+********2 = Netherlands
+********3 = UK
+********4 = Germany
+********5 = France
+********7 = Spain
+
+
+
+80-084000(US)   | Action Mania
+80-084004(GER)  | Sportskanone
+80-084005(FRA)  | Sporti Folies
+80-084020(US)   | Dora's Fix It Adventure
+80-084023(UK)   | Dora's Fix-It Adventure
+80-084025(FRA)  | Les Adventures De Dora Apprentie Mecano
+80-084024(GER)  | Doras Reparatur-Abenteuer
+80-084040(US)   | Scooby-Doo - Funland Frenzy
+80-084043(UK)   | Scooby-Doo - Funland Frenzy
+80-084045(FRA)  | Scooby-Doo - Panique A Funland
+80-084060(US)   | Thomas - Engines Working Together
+80-084063(UK)   | Thomas - Engines Working Together
+80-084064(GER)  | Thomas - Freunde halten zusammen
+80-084080(US)   | Wall-E
+80-084083(UK)   | Wall-E
+80-084084(GER)  | Wall-E
+80-084085(FRA)  | Wall-E
+80-084087(SPA)  | Wall-E
+80-084100(US)   | Wonder Pets - Save the Animals!
+80-084120(US)   | Kung Fu Panda
+80-084124(GER)  | Kung Fu Panda - Der Weg des Panda
+80-084125(FRA)  | Kung Fu Panda - La mission de Po
+80-084140(US)   | Spidey & Friends
+80-084144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-084160(US)   | Little Einsteins
+80-084164(GER)  | Kleine Einsteins
+80-084180(US)   | Mickey Mouse Clubhouse
+80-084184(GER)  | Micky Maus Wunderhaus
+80-084200(US)   | Nascar Academy - Race Car Superstar
+80-084220(US)   | Snow Park Challenge
+80-084224(GER)  | Wintersport
+80-084240(US)   | Ni Hao Kai Lan
+80-084264(GER)  | Mein erster Hund
+80-084280(US)   | Wild Waves
+80-084300(US)   | Soccer Challenge
+80-084304(GER)  | Fußball Meisterschaft
+80-084324(GER)  | TinkerBell
+80-084340(US)   | Up!
+80-084344(GER)  | Oben
+80-084360(US)   | Handy Manny
+80-084364(GER)  | Meister Manny's Werkzeugkiste
+80-084380(US)   | Winnie the Pooh - Honey Hunt
+80-084384(GER)  | Winnie Puuh - Die Honigjagd
+80-084400(US)   | Cars
+80-084404(GER)  | Cars - Vollgas in Radiator Springs
+80-084420(US)   | Toy Story 3
+80-084424(GER)  | Toy Story 3
+80-084440(USA)  | Monsters vs. Aliens
+80-084444(GER)  | Monsters vs. Aliens
+80-084484(GER)  | Küss den Frosch
+80-084500(US)   | Shrek 4
+80-084504(GER)  | Für immer Shrek
+80-084540(US)   | Super Why to the Rescue! The Beach Day Mystery
+80-084604(GER)  | Cinderella - Lernen im Märchenland
+80-084624(GER)  | Findet Nemo - Nemos Unterwasserabenteuer
+
+80-089000(US)   | Spider-Man &amp; Friends Where is Hulk?
+80-089020(US)   | Toy Story 2
+80-089040(US)   | Dora the Explorer
+
+80-090000(US)   | Up
+80-090000(GER)  | Oben
+80-090020(US)   | Handy Manny
+80-090024(GER)  | Meister Manny's Werkzeugkiste
+80-090040(US)   | Wow Wow Wubbzy
+80-090144(GER)  | Mein erster Hund
+80-090164(GER)  | Monsters vs. Aliens
+80-090183(UK)   | Wonder Pets! - Save the Animals
+80-090224(GER)  | Dolphis Wasserabenteuer
+80-090260(US)   | Disney Fairies: Tinker Bell
+
+80-092004(GER)  | Abenteuer im ABC Park
+80-092020(US)   | The Adventures of Little Red Riding Hood
+80-092024(GER)  | Entdecke die Welt von Rotkäppchen
+80-092060(US)   | Winnie The Pooh: Honey Hunt
+80-092064(GER)  | Winnie Puuh - Die Honigjagd
+80-092084(GER)  | Micky - Mickys magisches Abenteuer
+80-092100(US)   | The Lion King: Simba's Big Adventure
+80-092104(GER)  | Der König der Löwen - Simbas großes Abenteuer
+80-092120(US)   | The Little Mermaid
+80-092124(GER)  | Arielle die Meerjungfrau - Arielles aufregendes Abenteuer
+80-092127(SPA)  | La Sirenita - El Vieje Fantástico de Ariel
+80-092140(US)   | Spider-Man & Friends - Secret Missions
+80-092144(GER)  | Spider-Man & Freunde - Geheime Missionen
+80-092160(US)   | Scooby-Doo! Funland Frenzy
+80-092180(US)   | Care Bears - A Lesson in Caring
+80-092200(US)   | Aladdin - Aladdin's Wonders of the World
+80-092220(US)   | Toy Story 2
+80-092240(US)   | Cinderella - Cinderella's Magic Wishes
+80-092244(GER)  | Cinderella - Lernen im Märchenland | 2007
+80-092260(US)   | Elmo's World - Elmo's Big Discoveries
+80-092264(GER)  | Elmo's großes Abenteuer
+80-092265(FRA)  | Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo
+80-092280(US)   | Dora The Explorer
+80-092300(US)   | Bob the Builder: Bob's busy day
+80-092304(GER)  | Bob der Baumeister - Achtung Baustelle
+80-092320(US)   | The Wiggles - It's Wiggle Time!
+80-092340(US)   | Thomas The Tank: Engines Working Together
+80-092360(US)   | Zayzoo My Alien Classmate
+80-092384(GER)  | Barney - Erlebnis-Reise
+80-092400(US)   | Blue's Clues Collection Day
+80-092420(US)   | Finding Nemo
+80-092424(GER)  | Findet Nemo
+80-092440(US)   | Spongebob Squarepants: A Day In The Life of A Sponge
+80-092460(US)   | Sesame Street
+80-092480(US)   | Batman: Gotham City Rescue
+80-092500(US)   | Whiz Kid Wheels
+80-092520(US)   | Spider-Man & Friends Doc Ock's Challenge
+80-092540(US)   | Noddy
+80-092544(GER)  | Noddy
+80-092564(GER)  | 101 Dalmatiner
+80-092580(US)   | Backyardigans
+80-092600(US)   | Shrek 2
+80-092620(US)   | Lil' Bratz - Friends, Fashion and Fun
+80-092640(US)   | Superman
+80-092660(US)   | Cars: Rev It Up In Radiator Springs
+80-092662(NL)   | Cars - Spektakel in Radiator Springs
+80-092664(GER)  | Cars
+80-092820(US)   | Soccer
+80-092824(GER)  | Fußball Schule
+80-092840(US)   | Wall-E
+80-092860(US)   | Shrek the Third: Arthur's School Day Adventure
+80-092880(US)   | Ratatouille
+80-092882(NL)   | Ratatouille
+80-092884(GER)  | Ratatouille - Remys neue Rezepte
+80-092885(FRA)  | Ratatouille - Les nouvelles recettes de Rémy
+80-092900(US)   | Go Diego Go
+80-092920(US)   | Cranium - Partyland Park
+80-092960(US)   | Kung Fu Panda
+80-092980(US)   | Little Einsteins
+
+80-093000(US)   | The Crystal Ball Adventure
+80-093020(US)   | The Incredibles - Mission Incredibles
+80-093040(US)   | Spongebob - Idea Sponge
+80-093044(GER)  | SpongeBob - Ein Schwamm voller Ideen
+80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
+80-093080(US)   | Scooby-Doo! Ancient Adventure
+80-093100(US)   | Cars - In The Fast Lane
+80-093104(GER)  | Cars - Auf der Überholspur
+80-093120(US)   | Wacky Race on Jumpin' Bean Island
+80-093124(GER)  | Das verrückte Rennen auf der Hüpf-Bohnen-Insel
+80-093140(US)   | Shrek 3
+80-093144(GER)  | Shrek - Der Dritte
+80-093160(US)   | Bratz - The Secret Necklace
+80-093204(GER)  | Multisports
+
+80-280000(US)   | Animated E-Book Cartridge - Shrek's Vacation
+80-280100(US)   | Animated E-Book Cartridge - Toy Story 3
+80-280200(US)   | Animated E-Book Cartridge - Mr. Men/Little Miss
+80-280300(US)   | Animated E-Book Cartridge - Tinkerbell and The Great Fairy Rescue
+80-280400(US)   | Animated E-Book Cartridge - Scooby Doo
+80-280600(US)   | Animated E-Book Cartridge - Olivia
+80-280700(US)   | Animated E-Book Cartridge - The Little Engine That Could
+80-280900(US)   | Animated E-Book Cartridge - Dora and the Three Little Pigs
+80-281000(US)   | Animated E-Book Cartridge - Mickey Mouse Clubhouse
+80-281100(US)   | Animated E-Book Cartridge - Disney Princess
+80-281200(US)   | Animated E-Book Cartridge - Cars
+80-281300(US)   | Animated E-Book Cartridge - Sesame Street The Happy Scientists
+80-281400(US)   | Animated E-Book Cartridge - SpongeBob SquarePants Model Sponge
+80-281500(US)   | Animated E-Book Cartridge - Tangled
+80-281600(US)   | Animated E-Book Cartridge - Chuggington - Babysitter Brewster
+80-281700(US)   | Animated E-Book Cartridge - Penguins of Madagascar
+80-281800(US)   | Animated E-Book Cartridge - Kung Fu Panda 2
+80-281900(US)   | Animated E-Book Cartridge - Cars 2
+80-282000(US)   | Animated E-Book Cartridge - Winnie the Pooh
+
+-->
+
+	<software name="aladdin">
+		<description>Aladdin - Aladdins Welt der Wunder (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092204.bin" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariel">
+		<description>Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092124.bin" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobbuild">
+		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092304.bin" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderla">
+		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 0)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092244.bin" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cinderla1" cloneof="cinderla">
+		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092244-1.bin" size="8388608" crc="83b7e95c" sha1="8c29c4cc585b1c80c7294193a0dff5da76538752" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footschl">
+		<description>Fußball Schule (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092824.bin" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fred">
+		<description>Freds Zahlen Rallye (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092044.bin" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manny">
+		<description>Meister Manny's Werkzeugkiste (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="090024.bin" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstaln">
+		<description>Monsters vs Aliens (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="090164.bin" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oben">
+		<description>Oben (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="090004.bin" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratat">
+		<description>Ratatouille - Remys Neue Rezepte (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092884.bin" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek">
+		<description>Shrek - Die Geschichte des Drache (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092604.bin" size="8388608" crc="dc1ceca3" sha1="88349b556de43d78198aeb6289fa836f597f8a77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092444-1.bin" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb1" cloneof="spongeb">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092444.bin" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superman">
+		<description>Superman - Der Superheld (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092644.bin" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas">
+		<description>Thomas &amp; seine Freunde - Freunde halten zusammen (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092344.bin" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2">
+		<description>Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092224.bin" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walle">
+		<description>Wall-E (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092844.bin" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pooh">
+		<description>Winnie Puhh - Die Honigjagd (Ger)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092064.bin" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzoo">
+		<description>Zayzoo's Lernall (Germany)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="092364.bin" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

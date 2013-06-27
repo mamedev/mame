@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tdv2324" description="Tandberg TDV 2324 disk images">
+
+	<software name="basicc">
+		<description>Microsoft BASIC Compiler v5.30</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="basicc.img" size="256256" crc="15a09bf3" sha1="e47ea6c1362edebc9ee824468374deec21c3bc68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdsc">
+		<description>BDS-C-COMPILER v1.50A</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<!-- non-original disks -->
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="bdsc1.img" size="256256" crc="af9df302" sha1="55c8d79ea6e6e4caecda453dab059e3ad730c417" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="bdsc2.img" size="256256" crc="8906f2fc" sha1="21108ec4970eece3f68626d4a489824e583a8641" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortran">
+		<description>Microsoft Fortran-80 Compiler v3.43</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="fortran.img" size="256256" crc="5bb5fee0" sha1="56c242fe8fdb55a40ceba4993f5b7ae831bee175" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbasic">
+		<description>Microsoft BASIC v5.21</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="mbasic.img" size="256256" crc="33b090bb" sha1="8548eee2d6d3e3246fc93668159341ec4a20b72a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multplan">
+		<description>Multiplan 1.05</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="multiplan.img" size="256256" crc="a09fc7b8" sha1="8e4aaf2edfbe190b33f27d8b66de5561ce28cff3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tos21">
+		<description>TOS 21 v1.81</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="tos1.img" size="256256" crc="9dddec91" sha1="87be8fd481b7c4ff027221463c2193b4297a0744" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tos21a" cloneof="tos21">
+		<description>TOS 21 v1.81 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="tos11.img" size="256256" crc="fa13b53f" sha1="aac3949e40a4a594de64f264f329f2ff2f5a2f20" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

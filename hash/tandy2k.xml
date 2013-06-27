@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="tandy2k" description="Tandy 2000 disk images">
+
+	<software name="lotus123">
+		<description>Lotus 1-2-3</description>
+		<year>1983</year>
+		<publisher>Lotus</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="331572">
+				<rom name="123-sys.td0" size="331572" crc="a7cacc1e" sha1="8720bb7614821403c269012adea81f6cb6d84f7d" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533442">
+				<rom name="123_sys.td0" size="533442" crc="cc6845f9" sha1="a819783b18c35f7ad2531c108acfa0acdf3225bf" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="339830">
+				<rom name="123_tut.td0" size="339830" crc="afee1cf2" sha1="239734ff103219517630aef40a79bbfb7ae524b7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="7002701">
+		<description>7002701</description>
+		<year>1987</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="324012">
+				<rom name="7002701.td0" size="324012" crc="0fb01c13" sha1="f0ef74e6ef3927e6ef213131accb94ec73c4aa88" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211">
+		<description>MS-DOS v2.11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="360426">
+				<rom name="dos21102.td0" size="360426" crc="1b6def2a" sha1="322289ff80e767031255187dc4268dd8cf6b750f" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="479504">
+				<rom name="dos21103.td0" size="479504" crc="692fc4b3" sha1="8482f7b299f0ed9097e9361a5f8974de9bbb8b75" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multipln">
+		<description>Multiplan v1.05</description>
+		<year>198?</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="68466">
+				<rom name="mplan2.td0" size="68466" crc="0ddb4831" sha1="43966cb8f818cf1f343a874f932ee3c8e43114ae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfs">
+		<description>pfs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="153125">
+				<rom name="pfs-file.td0" size="153125" crc="95694a79" sha1="92877d1cc2053d37ac6ec3a7a0ca4b2180c7e7e4" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="152989">
+				<rom name="pfs-rept.td0" size="152989" crc="7c99d32e" sha1="afea3acb1f962f45d1c6e164982235b2700f9d01" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="153125">
+				<rom name="pfsfile1.td0" size="153125" crc="95694a79" sha1="92877d1cc2053d37ac6ec3a7a0ca4b2180c7e7e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t2kdos">
+		<description>t2kdos</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="479504">
+				<rom name="t2kdos.td0" size="479504" crc="002a5e90" sha1="e000f946f1c45cdbefe1fb96a504a4f711b12ddd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordstar">
+		<description>WordStar v3.31</description>
+		<year>1984</year>
+		<publisher>MicroPro</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="202652">
+				<rom name="wdstar1.td0" size="202652" crc="9e918646" sha1="de05c2fb50e1a12ee87a40b37954c6eabc2e21df" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="200916">
+				<rom name="wdstar2.td0" size="200916" crc="77140e37" sha1="24d84e69b2bbb7e91f26000fa36b5e77adcd0293" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="181782">
+				<rom name="wdstar3.td0" size="181782" crc="4068c73e" sha1="2dbbcef9aee6bff6d47e06416b652a97365d75d8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

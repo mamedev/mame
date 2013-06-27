@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="n64dd" description="Nintendo 64 DD disks">
+	<software name="dezaemon">
+		<description>Dezaemon DD (Jpn, Prototype Rev 199802xx)</description>
+		<year>1998</year>
+		<publisher>Athena</publisher>
+		<info name="usage" value="Requires Dezaemon 3D cart" />
+
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="64458560">
+				<rom name="dezaemon.bin" size="64458560" crc="ccb84a39" sha1="d5cc4ab1fc79e27e54a9ad08c4dee47256352006" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzerox">
+		<description>F-Zero X Expansion Kit (Jpn)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="usage" value="Requires F-Zero X cart" />
+
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="67108864">
+				<rom name="fzeroxe.bin" size="67108864" crc="a4a24ab0" sha1="c5845f582bc238e081588e172ef8ec50512e969d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- based on c64tapes.org dumps -->
+<softwarelist name="c64_cass" description="Commodore 64 cassettes">
+
+	<software name="jacknip2">
+		<description>Jack the Nipper II: In Coconut Capers</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="522098">
+				<rom name="jack the nipper ii_0373.tap" size="522098" crc="faf6a08e" sha1="677b11ef5dc04b4d20f2db62c4f284c3455888a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+  XXX
+  <software name="XXX">
+        <description>XXX</description>
+        <year>19??</year>
+        <publisher>NPO Microprocessor</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+            </dataarea>
+        </part>
+    </software>
+    XXX
+-->
+<softwarelist name="mc1502_flop" description="MC 1502 disk images">
+
+	<software name="sfdos">
+		<description>Sigma Four DOS (modified MS-DOS x.xx)</description>
+		<year>19??</year>
+		<publisher>Sigma Four</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="sigma-four-dos.ima" size="737280" sha1="d354bdcb4d5480e0cc8245a2c3c2fd61ada701ed" crc="ad8008ec" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ots">
+		<description>One Track System (alternate OS)</description>
+		<year>19??</year>
+		<publisher>MMV</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="one-track-system.ima" size="737280" sha1="d7cdb37c00580fe9b4595bac1db588687d187590" crc="33831462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

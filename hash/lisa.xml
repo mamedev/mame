@@ -1,0 +1,1022 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="lisa" description="Apple Lisa">
+
+	<software name="lofsys20">
+		<description>Lisa Office System (Ver. 2.0)</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod20d1.image" size="419284" crc="3f3abd64" sha1="4e1c714baad8cfcea2417a0b6a6285e55be38272" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod20d2.image" size="419284" crc="8ebdb0ff" sha1="68a39727fdd655bce3872ec543ea5695989d5f31" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod20d3.image" size="419284" crc="6156500b" sha1="4404fc056e6a87d2a3367d81ae740466a1886582" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod20d4.image" size="419284" crc="1af85e39" sha1="f53816e32f376e822d5b2da162b6325cf278e043" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod20d5.image" size="419284" crc="e253e375" sha1="75f9407b62f10d83b68b66dbbefec97caa7615b8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lofsys30">
+		<description>Lisa Office System 7/7 (Ver. 3.0)</description>
+		<year>1984</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod30d1.image" size="419284" crc="a90aca00" sha1="361a9b964b42bc0c06586d1f3d704391ef289ffa" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod30d2.image" size="419284" crc="c4f8c8c5" sha1="21e14547d22d67fd5fb1f42137a1dc93e5ad135b" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod30d3.image" size="419284" crc="b95498be" sha1="43521facc7d94b6d5c50cb767f5a69aa2db018d1" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod30d4.image" size="419284" crc="d7421f0f" sha1="faf4c4319eeaa6525f5d5f16e4a4e8ebd52190c2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod30d5.image" size="419284" crc="9110b43c" sha1="87c79647a3e9f978bbdd12f8bc1b2ef8eb549b80" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lofsys31">
+		<description>Lisa Office System 7/7 (Ver. 3.1)</description>
+		<year>1984</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod31d1.image" size="419284" crc="86942a3c" sha1="6c351db6548b6457e2a21ad81553996a005324da" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod31d2.image" size="419284" crc="842e1a13" sha1="5de4766fce7d677c764eb3e0fb718bd9f16f306b" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod31d3.image" size="419284" crc="ad85fa60" sha1="060ca8369aad9a37ff3d413ab6dfb6df0762873a" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod31d4.image" size="419284" crc="b0f082d3" sha1="d1b91aee753931a089b89767876d28d31b1e9486" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lod31d5.image" size="419284" crc="3adcff78" sha1="fd7c9fc82273186da7056a8182656273aa54e040" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw39upd">
+		<description>Lisa Pascal Workshop V3.9 Update</description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="upd39d1.image" size="419284" crc="97582aeb" sha1="ac1460c68f47e2c628b560a518c9679d2ba57831" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="upd39d2.image" size="419284" crc="4fa67596" sha1="c4e15a3710832939326fd098f357d18b36d8ce0b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw39upda" cloneof="lpw39upd">
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+		<description>Lisa Pascal Workshop V3.9 Update (Alt)</description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="upd39d1a.image" size="409600" crc="8c082a8f" sha1="53fb78c10a177db81a2f64eeae8a0fef8207a0d8" offset="000000" status="baddump"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="upd39d2a.image" size="409600" crc="b4ce28ad" sha1="fa7d6b88cf77f4350390260380c032bc4730e3b8" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpwsup">
+		<description>Lisa Pascal Workshop Supplement</description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpwsupd1.image" size="419284" crc="ae19cc2b" sha1="181a54cd5be5cf0b77231e3939cb0c0a21769e0f" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpwsupd2.image" size="419284" crc="d95a4b70" sha1="13fb3101895fbe32698bd1fb83542ee17cc04acd" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpwsupd3.image" size="419284" crc="a62ab1c0" sha1="f352f42db3eeda455f041e2efdaec52902676cf5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpwsupa" cloneof="lpwsup">
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+		<description>Lisa Pascal Workshop Supplement (Alt)</description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="lpwsupd1a.image" size="409600" crc="c4fe35e8" sha1="2f3a5efd3f551ea06341192082ff3efbe98acb47" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="lpwsupd2a.image" size="409600" crc="0c3769b3" sha1="26198200590f83f7d63cf0142cf6efaecb3e5cdc" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="409600">
+				<rom name="lpwsupd3a.image" size="409600" crc="0ecba7a9" sha1="9e832fb6f2ee793ecff4438094281548766e4147" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw2">
+		<description>Lisa Pascal Workshop V2</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d1.image" size="419284" crc="389c35ce" sha1="5b8554e9c4c4324fe9e45b16789fcb535a9af19f" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d2.image" size="419284" crc="8dc91845" sha1="4bc47fe4f7064ec1ef1fb18c05d0e1577054abf5" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d3.image" size="419284" crc="0c0d71e0" sha1="5bd158a6d975e6c1bddd72440b263a7fdf25f93d" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d4.image" size="419284" crc="4d980490" sha1="9c542820f9ef2f3b6ade940412d252b24c04cffa" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d5.image" size="419284" crc="4f8761bf" sha1="adb8320201c5bb24225e14fac52abce7cb5a843e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw2a" cloneof="lpw2">
+		<description>Lisa Pascal Workshop V2 (Alt)</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d1a.image" size="419284" crc="21f84408" sha1="79562da84d8733e8d95aaf5b3edec0908c2a2816" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d2a.image" size="419284" crc="a3b2911b" sha1="cf8dce79c65ee772e8f48fc49304768cbe6b2431" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d3a.image" size="419284" crc="ab776ea0" sha1="e42b2e0dc113d29c2527d12761cefa073e12e5dc" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d4a.image" size="419284" crc="6f5cb316" sha1="f636f6a0c843f71cd0c8aca552c8451668fa4501" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw3">
+		<description>Lisa Pascal Workshop V3</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d1.image" size="419284" crc="303d4863" sha1="f2e43d4df88b1504e331b1275c119bc5edb838a2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d2.image" size="419284" crc="5f781ef1" sha1="018fd0b76d7956dccba4a7f632b25c693a81cd04" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d3.image" size="419284" crc="c3eea30d" sha1="189158fa33980202bd04ba9ef701c72b4b947244" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d4.image" size="419284" crc="79e44adb" sha1="c0faf94137c8c10ebf3424efc9d9321ca3e4b4b6" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d5.image" size="419284" crc="2d1ee31d" sha1="421321bf04e018b967d1d681e12125653b2068ae" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d6.image" size="419284" crc="b3695774" sha1="9e4a7e0ea3a7de3e9f43ba9409485af23806f540" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d7.image" size="419284" crc="172c5874" sha1="4cd99601cbb8c8ee72c9b15f0fe52adebff88ae2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d8.image" size="419284" crc="bc01ba32" sha1="3cabbdacd98bb4d739718351e2a025234a5cf017" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d9.image" size="419284" crc="5e8662da" sha1="b4b7460b84f99c50d7d918ba601ceee5bfdde326" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lpw3a" cloneof="lpw3">
+		<description>Lisa Pascal Workshop V3 (Alt)</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d1a.image" size="419284" crc="e6ecd8a4" sha1="a50c964064607eb82a03c7395195876d58b16284" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d2a.image" size="419284" crc="3cebd390" sha1="86eaa29deba53bd7998e084d66a4757817a8ef35" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d3a.image" size="419284" crc="411dedbc" sha1="f64512a49c45370d1ed77c0b6deab2af10946029" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d4a.image" size="419284" crc="d0dbb8f1" sha1="7132bc1716485b8e60b407637c68c859fa5c16f0" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d5a.image" size="419284" crc="76e7ffb0" sha1="f289e7d6b24853e3b4d663598af1a865bb68d2e0" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d6a.image" size="419284" crc="533c4a2a" sha1="a9f19c63f558a3e9d7bd83fc6667792e22bba11f" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d7a.image" size="419284" crc="724813e5" sha1="d97c80c6010e0b135890667087a508cb8a8a547d" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d8a.image" size="419284" crc="289fb6d1" sha1="476da701b7c5d1b47e90e0e73a998bad5d143fcc" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw3d9a.image" size="419284" crc="4911b2b8" sha1="96461f19601bb890b5f2962be8d3bfdde8e08803" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lworkbs2">
+		<description>Lisa Workshop Basic V2</description>
+		<year>198?</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lwsb2d1.image" size="419284" crc="98ca8d18" sha1="49837e786022273cb45bb517910a584fc37b0b3a" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lwsb2d2.image" size="419284" crc="d13c7b52" sha1="a970273ba41cb7dc4b5251a023c98b758031e1a8" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lwsb2d3.image" size="419284" crc="52fefae9" sha1="1c90a1aaf65b8f663cf5d8410c460f1f0794d3b5" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lwsb2d4.image" size="419284" crc="efad9d5b" sha1="9411d2661c7466a3b708a06e2808cb266df94722" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lworkbs3">
+		<description>Lisa Workshop Basic V3</description>
+		<year>198?</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lwsb3.image" size="419284" crc="33adfca7" sha1="abfc61550a62bd1a6db2fa6f5d421b4182f33d0f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisacalc">
+		<description>LisaCalc</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="calc.image" size="419284" crc="a4bb179e" sha1="339835149e889059e153b731b9b80d44d0c37c35" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisadraw">
+		<description>LisaDraw</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="draw.image" size="419284" crc="299147e9" sha1="6129091a4c44bf9eace2fe4f109f2680339430cb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisgraph">
+		<description>LisaGraph</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="draw.image" size="419284" crc="e5c4bbce" sha1="5e8359fb6c40c8586ca619d67c6f0ed2334db3f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisguide">
+		<description>LisaGuide</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="guide.image" size="419284" crc="cb97c4a3" sha1="44d00e4521ebe35c08ac12d7bd29676ff6bbce19" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisalist">
+		<description>LisaList</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="list.image" size="419284" crc="53e861b0" sha1="1a305a23cadbfc3e550c8ce1c840d36d4bc86bcf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lofsys30a" cloneof="lofsys30">
+		<description>Lisa Office System 7/7 (Ver. 3.0, Alt)</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d1.image" size="419284" crc="cbef8a2c" sha1="75be9b950d98e06dedf3f7cca4e255485281d855" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d2.image" size="419284" crc="ba302816" sha1="2879ec2a31aaf98aa8e4eb3e3ae410e06ab8a8c2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d3.image" size="419284" crc="ee289c49" sha1="01ca849c5738ebed2642dde001a8ecd2f66801fb" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d4.image" size="419284" crc="766fe0eb" sha1="59bfcb81e0b182dab7b1b04eedd72183842f0929" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="lpw2d5.image" size="419284" crc="8f06f463" sha1="98abc9983cf3b5aafbf68122009d9ca720aeae8d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisaproj">
+		<description>LisaProject</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="project.image" size="419284" crc="42f87d70" sha1="ebb19f77df7818a171f53b94aeabe1f17d090d2f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisaterm">
+		<description>LisaTerminal</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="terminal.image" size="419284" crc="e6239450" sha1="6a4d924e5bfca7b04f86c1c5a0ed57c48464cd07" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisatest">
+		<description>LisaTest</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="testd1.image" size="419284" crc="d8e1cf3a" sha1="98e9cb05ee6556394068ccabf80dc540811cbbcb" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="testd2.image" size="419284" crc="197255c4" sha1="60e471dc442daddea57e83f63293a3e29ffb2287" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisawrit">
+		<description>LisaWrite</description>
+		<year>1983</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="writed1.image" size="419284" crc="8288aa21" sha1="3d258c8ffd780230fbb012947639fb05f5d056dc" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="writed2.image" size="419284" crc="2814fa31" sha1="3035da10a3e0e6f7cb43aee90b5efb7442164d55" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwrk3">
+		<description>Lisa Macworks XL 3.0 </description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+		<info name="finder" value="4.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="boot.image" size="419284" crc="fe6eb45b" sha1="c612c9edc6261e32d972719f0c53165591c52cf8" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="system.image" size="419284" crc="7430daed" sha1="2f0d865a0a1e4e746144965b5d4d73826ca8a88c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwrk3a" cloneof="macwrk3">
+		<description>Lisa Macworks XL 3.0 (Alt)</description>
+		<year>1985</year>
+		<publisher>Apple Computer Inc.</publisher>
+		<info name="finder" value="4.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="boot (alt).image" size="419284" crc="789a4060" sha1="9e953b6fef4c6cdabea518504885b19cf151ea79" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="system (alt).image" size="419284" crc="00104bc2" sha1="8ed6bb4e50e02fd13d73794d8c3dd886c1b4fdaf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwrkxl">
+	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MESS-->
+		<description>Lisa Macworks XL</description>
+		<year>198?</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="409684">
+				<rom name="boot.image" size="409684" crc="a922d322" sha1="4d4952673b15a4d47f8ea8c2310107a9be84be1a" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="409684">
+				<rom name="system.image" size="409684" crc="2473ff06" sha1="a7e065af2a913b508165604a25507be3280ce229" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenixos">
+		<description>Xenix OS</description>
+		<!--serial number 40239-->
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="boot.image" size="419284" crc="612b101e" sha1="3b29c08cf415557a81e7b8096672c8306c8d4bc2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd1.image" size="419284" crc="ed45d670" sha1="a80f4165262e3133526814a0981127360330fe59" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd2.image" size="419284" crc="563ded5f" sha1="e31a7d020a4cdaeeb536739eeab03244f12818bc" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd3.image" size="419284" crc="ee112a95" sha1="f8a0fa4d526b21d18c5d0039054201170dfd9f61" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd4.image" size="419284" crc="a8aa4489" sha1="f4809e62efb6948fec9a92512d9c11fa2a82fa56" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd5.image" size="419284" crc="54ac00ff" sha1="0dc73836b9b415b65d6fbaf4ca1101f023b5c666" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd6.image" size="419284" crc="952d2e57" sha1="ae7d9e04ba9f62c7786bd156758f6168575783c6" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xenixd7.image" size="419284" crc="2bf75f9c" sha1="9e85cbb616bc32d0918e34300513105f9539020f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenixdev">
+		<description>Xenix Development</description>
+		<!--Version 3.0, release 1.0-->
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd1.image" size="419284" crc="85131193" sha1="02c3c1351ac17c5bd00037d0856f3a390d0febb2" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd2.image" size="419284" crc="8877001e" sha1="b2be1f229bdf64c29b79ec0ab0160a103c679114" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd3.image" size="419284" crc="2d9bdb09" sha1="b4e9fb6d0205058b2dcd53a9cdcd0020cd8e9d82" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="xdevd4.image" size="419284" crc="a7d18794" sha1="46ee043231666f0a1b8528c56964b9311a040e68" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="larix">
+		<description>Larix V3.10</description>
+		<!--Key: HXL998659B34WFU-->
+		<year>198?</year>
+		<publisher>Microsoft/SCO</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="larixd1.image" size="419284" crc="a8040a87" sha1="19e3e3df715e6ea0ec9ac3ab91cb18896af47190" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="larixd2.image" size="419284" crc="17fe6c35" sha1="a88905d740210d765c943d1a3e90b393510134d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="migrkt">
+		<description>Migration Kit &amp; Tools</description>
+		<year>198?</year>
+		<publisher>Apple Computer Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="mgkitd1.image" size="419284" crc="0e2b87be" sha1="a00046a9592927a6e2cd9f81253f94446d4ce3a4" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="mgkitd2.image" size="419284" crc="72a8772c" sha1="cb8a606eecafde9e081be92cf3b82c22af697909" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="tools.image" size="419284" crc="f3f39f6e" sha1="9e39ca82b96da6862c3797ebba61dc888f00091c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltk3">
+		<description>Lisa Toolkit 3.0</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="release" value="19840109"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkitd1.image" size="419284" crc="d6c63821" sha1="17f517d84fae373bc7bb9457b8984488875d8fa0" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkitd2.image" size="419284" crc="cf37e262" sha1="0b927780843ef6f62b2aa48fd81e5f9f92d412d9" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkitd3.image" size="419284" crc="cb1d22c9" sha1="4058b03378711e9ee9abc2bf38d1981877abee62" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkitd4.image" size="419284" crc="cd508c8b" sha1="d52b97c3897f2cd04c515f2733095784d7f16ffb" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkitd5.image" size="419284" crc="f287fcbd" sha1="6c46fab0d7342874f24bf35e64b395fddd5b22fc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltk3src">
+		<description>Lisa Toolkit 3.0 Source</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkit source d1.image" size="419284" crc="43a6d581" sha1="353260888d7a34a7716075ce13e34212a5fe3215" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkit source d2.image" size="419284" crc="526f4956" sha1="ec4a36449328485b31c0683d77dbf769132e6e1e" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkit source d3.image" size="419284" crc="b67deee0" sha1="e6bcdc704739c6a04cce68ca2977530e385d4c52" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="toolkit source d4.image" size="419284" crc="d861701c" sha1="4c73dddc9b28402b38cbaa6e5fa3e967e1d242e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltkclas">
+		<description>Lisa Toolkit 3.0 Classes</description>
+		<!--Not 100% sure about it's name Image says: Clascal-->
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="clascal.image" size="419284" crc="821c080c" sha1="fae10f2d45efeedb1412f6928f5539c20c5568b4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cobol">
+		<description>Lisa Cobol 2.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="cobold1.image" size="419284" crc="7ad668fb" sha1="4df48ab858475dc0e536f30be725e98ec2543972" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="cobold2.image" size="419284" crc="40dccdc5" sha1="1bf64ae91c488d62bcc1b3c0ff67c61782f7cbbf" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="cobold3.image" size="419284" crc="945dd1fb" sha1="c0032b49163f18721277be8b50fc6c741116e94c" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="cobold4.image" size="419284" crc="d972949b" sha1="231dd56b72a1e785c808dd980856a33c01159983" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicpl">
+		<description>Lisa Basic Plus 2.0</description>
+		<year>1983</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="basic plus d1.image" size="419284" crc="4c6519c3" sha1="13d2fbdc91d00f456e38882cb87e8e474c5ef910" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="basic plus d2.image" size="419284" crc="22adcf9b" sha1="243896f9de5721215721826ba0ae8f024edd08eb" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="basic plus d3.image" size="419284" crc="9b799542" sha1="6b950b2d82d9ab31f2565bf0a8fa0081cf59fda9" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="basic plus d4.image" size="419284" crc="2b7a6b0b" sha1="91223eb06f7a4b1aa3479270c224ee7df7ec1a8e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quickprt">
+		<description>QuickPort V2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="quickportd1.image" size="419284" crc="a40be88c" sha1="28264098a0f935839e3331ede225f726d2005e06" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="quickportd2.image" size="419284" crc="0b0ca438" sha1="ac61264ed56ab54830c16390c6a9644f74790bd9" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="quickportd3.image" size="419284" crc="a6b88a37" sha1="51a56299be91761539e1e82d739e48d1dfc2ece3" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="quickportd4.image" size="419284" crc="2ec2d25e" sha1="5523a19389eed6c18aa0370b9f59285f34ca36e7" offset="000000" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="quickportd5.image" size="419284" crc="6d250277" sha1="0dc6a1cc2ffae44ef5c03c1851c5dd16b06f40f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burndiag">
+		<description>Lisa Burn-in Diagnostics</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="burnindia.image" size="419284" crc="36dd7516" sha1="8cdefadd225df52925f195422f712102621b3cd5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cputest2">
+		<description>Lisa Cpu Test V2.2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="cputest22.image" size="419284" crc="304c30ae" sha1="f4f2797e166a0d6189ed463fcc9435d57fc35578" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macnosy">
+		<description>Lisa Mac Nosy V2.55</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="macnosy255.image" size="419284" crc="71c4e46a" sha1="f87b94b5ef58d6db6d25cbc9e0d8d4e0c34d71ae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pertest">
+		<description>Lisa Peripherals Test</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="pertest.image" size="419284" crc="2e0e37fb" sha1="38f48fe0c8a79d4bf15c35a5ce59c0b3a19ce488" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calender">
+		<description>Lisa Calendar For Lisa Office System 7/7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="calender.image" size="419284" crc="c8e56241" sha1="bea605b6d52862da1ce1ddb4f6a12d90d3bd9143" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labellst">
+		<description>Label List For Lisa Office System 7/7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="labellst.image" size="419284" crc="68bb3cd8" sha1="5a27c58d0b8ce7285a35b65b618681b0ed2f2c29" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phonbook">
+		<description>Lisa Phone Book For Lisa Office System 7/7</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="419284">
+				<rom name="phonebook.image" size="419284" crc="442dfd78" sha1="cc237ba120f9b6e578cef2385ab830dba225ec90" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

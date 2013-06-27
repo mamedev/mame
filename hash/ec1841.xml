@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+  XXX
+    <software name="XXX">
+        <description>XXX</description>
+        <year>1988</year>
+        <publisher>MPO VT</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+            </dataarea>
+        </part>
+    </software>
+    XXX
+-->
+<softwarelist name="ec1841" description="EC 1841 disk images">
+
+	<software name="ados0105">
+		<description>Alpha-DOS 01.05 (modified MS-DOS 3.20)</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="alpha-dos-01.05.ima" size="368640" sha1="1381bc2e7098c770f7eda09a9d5ae5b3677ee650" crc="bc549e28" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ados0201">
+		<description>Alpha-DOS 02.01 (modified PC-DOS 3.30)</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="alpha-dos-02.01.ima" size="368640" sha1="26bf54aa9be870658bc97d1835b4dd2468ff9295" crc="e1bed568" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic20a">
+		<description>BASIC 2.0 for Alpha-DOS</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="basic-alpha-dos-2.0.ima" size="368640" sha1="ac5d65383ad9ee6d644151194b5c26ce12e9b134" crc="6445ce44"  offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic20m">
+		<description>BASIC 2.0 for M86</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="basic-m86-2.0.ima" size="368640" sha1="f728c15765fada4d055fdb93e86a9bcb459939c3" crc="1adb006b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>Demo disk</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="ec1841-demo.ima" size="327680" sha1="692fc2c01ba1dbceb5626cd3c593ebf8c79d62c3" crc="c273098d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tps2214">
+		<description>TPS release 2.2 changeset 14</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="ec1841-tps-2.2.14.ima" size="368640" sha1="59619972446b73184032e409a1554b6b4393c77b" crc="e6240fc2"  offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teletext">
+		<description>TELETEXT for M86</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="teletext-m86.ima" size="368640" sha1="20bbf2a079eb0c228291a3409f8fb0335593f9a6" crc="6607f99d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="textm86a">
+		<description>TEXTM86 1.1.0 for Alpha-DOS</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="textm86-alpha-dos-1.1.0.ima" size="368640" sha1="91ccc1e119444dcb7fbb42e0820075dfeb329f2a" crc="4897a0a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="textm86m">
+		<description>TEXTM86 1.1.0 for M86</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="textm86-m86-1.1.0.ima" size="368640" sha1="d977bfccd21cdd56fe145b9b2833e5b6022cefb8" crc="9f85afad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
