@@ -124,6 +124,9 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 // lua engine
 #include "luaengine.h"
 
+// gui engine
+#include "guiengine.h"
+
 // the running machine
 #include "machine.h"
 #include "driver.h"

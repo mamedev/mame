@@ -78,6 +78,7 @@ EMUOBJS = \
 	$(EMUOBJ)/emuopts.o \
 	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
+	$(EMUOBJ)/guiengine.o \
 	$(EMUOBJ)/hash.o \
 	$(EMUOBJ)/image.o \
 	$(EMUOBJ)/info.o \

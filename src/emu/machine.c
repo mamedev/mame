@@ -177,7 +177,8 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_memory(*this),
 		m_ioport(*this),
 		m_scheduler(*this),
-		m_lua_engine(*this)
+		m_lua_engine(*this),
+		m_gui_engine(*this)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&m_base_time, 0, sizeof(m_base_time));
@@ -340,6 +341,9 @@ void running_machine::start()
 
 	// initialize lua
 	m_lua_engine.initialize();
+
+	// initialize gui
+	m_gui_engine.initialize();
 
 	// disallow save state registrations starting here
 	m_save.allow_registration(false);

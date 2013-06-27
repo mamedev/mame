@@ -27,6 +27,7 @@
 
 #include <Rocket/Core.h>
 #include <Rocket/Debugger.h>
+#include <Rocket/Controls.h>
 #include <RocketInput.h>
 #include <Shell.h>
 
@@ -60,7 +61,9 @@ int main(int ROCKET_UNUSED(argc), char** ROCKET_UNUSED(argv))
 	Rocket::Core::SetSystemInterface(&system_interface);
 
 	Rocket::Core::Initialise();
-
+	// Initialise the Rocket Controls library.
+	Rocket::Controls::Initialise();
+	
 	// Create the main Rocket context and set it on the shell's input layer.
 	context = Rocket::Core::CreateContext("main", Rocket::Core::Vector2i(1024, 768));
 	if (context == NULL)

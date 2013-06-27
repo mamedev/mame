@@ -424,6 +424,7 @@ private:
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer               *m_autoboot_timer;      // autoboot timer
 	lua_engine              m_lua_engine;           // LUA engine
+	gui_engine              m_gui_engine;           // GUI engine
 };
 
 
