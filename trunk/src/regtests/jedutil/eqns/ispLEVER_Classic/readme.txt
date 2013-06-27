@@ -1,1 +1,0 @@
-These files were created with Lattice Semiconductor's ispLEVER Classic v1.6 software.

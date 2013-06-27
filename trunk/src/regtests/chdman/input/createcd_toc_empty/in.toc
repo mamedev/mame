@@ -1,8 +1,0 @@
-CD_ROM
-
-
-// Track 1
-TRACK MODE1_RAW RW_RAW
-NO COPY
-DATAFILE "data.bin" 00:08:08 // length in bytes: 1488384
-
