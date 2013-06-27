@@ -72,8 +72,8 @@ class ShellRenderInterfaceSystem : public Rocket::Core::RenderInterface
 {
 private:
 	// internal state
-	running_machine &   m_machine;                          // reference to our machine
-
+	running_machine &   m_machine;                          // reference to our machine	
+	
 public:
 	ShellRenderInterfaceSystem(running_machine &machine)
 		: m_machine(machine)
@@ -86,13 +86,26 @@ public:
 	/// Called by Rocket when it wants to render geometry that it does not wish to optimise.
 	virtual void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 	{
+
 		for (int i = 0; i < num_indices/3; i++)
-		{
-			machine().render().ui_container().add_line((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, (vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, (vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		{			
+			/*render_texture *hilight_texture = machine().render().texture_alloc();
+			rectangle myrect = ((bitmap_rgb32 *)texture)->cliprect();
+			printf("%f, %f\n",myrect.max_x * vertices[indices[i*3+0]].tex_coord[0],myrect.max_y * vertices[indices[i*3+0]].tex_coord[1]);
+			myrect.min_x = myrect.max_x * vertices[indices[i*3+0]].tex_coord[0];
+			myrect.min_y = myrect.max_y * vertices[indices[i*3+0]].tex_coord[1];
+			hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
+			*/
+			rgb_t col1 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
+			rgb_t col2 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
+			rgb_t col3 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
+			machine().render().ui_container().add_line((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, UI_LINE_WIDTH, col1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_line((vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, (vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_LINE_WIDTH, col2, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_line((vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, (vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, UI_LINE_WIDTH, col3, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			
+			//machine().render().ui_container().add_quad((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}						
+		//machine().render().texture_free(hilight_texture);
 	}
 
 	/// Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.
@@ -214,11 +227,26 @@ public:
 	/// Called by Rocket when a texture is required to be built from an internally-generated sequence of pixels.
 	virtual bool GenerateTexture(Rocket::Core::TextureHandle& texture_handle, const Rocket::Core::byte* source, const Rocket::Core::Vector2i& source_dimensions)
 	{
+		/* create a texture for hilighting items */
+		bitmap_rgb32 *hilight_bitmap = auto_bitmap_rgb32_alloc(machine(), source_dimensions.x, source_dimensions.y);
+		for (int y = 0; y < source_dimensions.y; ++y)
+		{
+			for (int x = 0; x < source_dimensions.x; ++x)
+			{
+				const Rocket::Core::byte* source_pixel = source + (source_dimensions.x * 4 * y) + (x * 4);				
+				hilight_bitmap->pix32(y, x) = MAKE_ARGB(source_pixel[3],source_pixel[0],source_pixel[1],source_pixel[2]);
+			}
+		}
+		//render_texture *hilight_texture = machine().render().texture_alloc();
+		//hilight_texture->set_bitmap(*hilight_bitmap, hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);		
+		//texture_handle = (Rocket::Core::TextureHandle)hilight_texture;
+		texture_handle = (Rocket::Core::TextureHandle)hilight_bitmap;
 		return true;
 	}
 	/// Called by Rocket when a loaded texture is no longer required.
 	virtual void ReleaseTexture(Rocket::Core::TextureHandle texture_handle)
 	{
+		//machine().render().texture_free((render_texture *)texture_handle);
 	}
 };
 
