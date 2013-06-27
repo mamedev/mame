@@ -222,6 +222,7 @@ public:
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
 	ioport_manager &ioport() { return m_ioport; }
+	gui_engine &gui() { return m_gui_engine; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }

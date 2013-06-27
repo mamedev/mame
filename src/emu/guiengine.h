@@ -59,6 +59,9 @@ public:
 	void initialize();
 	void shutdown();
 	void update();
+	
+	void loadFonts(const char* directory);
+	void loadDocument(const char *filename);
 private:
 	// internal state
 	running_machine &   m_machine;                          // reference to our machine

@@ -238,7 +238,8 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	ui_update_and_render(machine(), &machine().render().ui_container());
+	//ui_update_and_render(machine(), &machine().render().ui_container());
+	machine().gui().update();
 
 	// update the internal render debugger
 	debugint_update_during_game(machine());

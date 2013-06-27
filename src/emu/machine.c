@@ -267,6 +267,12 @@ void running_machine::start()
 	// init the osd layer
 	m_osd.init(*this);
 
+
+	// initialize gui
+	m_gui_engine.initialize();
+	m_gui_engine.loadFonts("test/");
+	m_gui_engine.loadDocument("test/demo.rml");
+
 	// create the video manager
 	m_video = auto_alloc(*this, video_manager(*this));
 	ui_init(*this);
@@ -341,9 +347,6 @@ void running_machine::start()
 
 	// initialize lua
 	m_lua_engine.initialize();
-
-	// initialize gui
-	m_gui_engine.initialize();
 
 	// disallow save state registrations starting here
 	m_save.allow_registration(false);
