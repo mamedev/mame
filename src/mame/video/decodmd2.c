@@ -51,7 +51,7 @@ READ8_MEMBER( decodmd_type2_device::busy_r )
 {
 	UINT8 ret = 0x00;
 
-	ret = (m_status & 0x03) << 3;
+	ret = (m_status & 0x0f) << 3;
 
 	if(m_busy)
 		return 0x80 | ret;
@@ -77,6 +77,11 @@ WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
 	m_ctrl = data;
 }
 
+READ8_MEMBER( decodmd_type2_device::ctrl_r )
+{
+	return m_ctrl;
+}
+
 READ8_MEMBER( decodmd_type2_device::status_r )
 {
 	return m_status;
@@ -92,13 +97,31 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type2_device::dmd_firq)
 	m_cpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
+MC6845_UPDATE_ROW( dmd_update_row )
+{
+	decodmd_type2_device *state = downcast<decodmd_type2_device *>(device->owner());
+	UINT8* RAM = state->m_ram->pointer();
+	UINT8 x,dot,intensity;
+	UINT16 addr = (ma & 0xfc00) + ((ma & 0x100)<<2) + (ra << 4);
+
+	for(x=0;x<128;x+=8)
+	{
+		for(dot=0;dot<8;dot++)
+		{
+			intensity = (RAM[addr] >> (7-dot) & 0x01) | ((RAM[addr+0x200] >> (7-dot) & 0x01) << 1);
+			bitmap.pix32(y,x+dot) = MAKE_RGB(0x3f*intensity,0x2a*intensity,0x00);
+		}
+		addr++;
+	}
+}
+
 MC6845_INTERFACE( decodmd2_6845_intf )
 {
 	NULL,                                   /* screen name */
 	false,                                  /* show border area */
-	16,                                     /* number of pixels per video memory address */
+	8,                                     /* number of pixels per video memory address */
 	NULL,                                   /* begin_update */
-	NULL,                                   /* update_row */
+	dmd_update_row,                                   /* update_row */
 	NULL,                                   /* end_update */
 	DEVCB_NULL,      /* on_de_changed */
 	DEVCB_NULL,      /* on_cur_changed */
@@ -124,7 +147,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(60))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer",decodmd_type2_device,dmd_firq,attotime::from_hz(80))
 
 	MCFG_MC6845_ADD("dmd6845",MC6845,XTAL_8MHz / 8,decodmd2_6845_intf)  // TODO: confirm clock speed
 
@@ -133,7 +156,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd2 )
 	MCFG_SCREEN_ADD("dmd",RASTER)
 	MCFG_SCREEN_SIZE(128, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type2_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("dmd6845",mc6845_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -190,26 +213,4 @@ void decodmd_type2_device::device_config_complete()
 	{
 		m_romregion = NULL;
 	}
-}
-
-UINT32 decodmd_type2_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	UINT16 addr = (START_ADDRESS & 0xfc00) | ((START_ADDRESS & 0x1ff) << 2);
-	UINT8* RAM = m_ram->pointer();
-	UINT8 x,y,dot,intensity;
-
-	for(y=0;y<bitmap.height();y++)
-	{
-		for(x=0;x<bitmap.width();x+=8)
-		{
-			for(dot=0;dot<8;dot++)
-			{
-				intensity = (RAM[addr] >> (7-dot) & 0x01) | ((RAM[addr+0x200] >> (7-dot) & 0x01) << 1);
-				bitmap.pix32(y,x+dot) = MAKE_RGB(0x3f*intensity,0x2a*intensity,0x00);
-			}
-			addr++;
-		}
-	}
-
-	return 0;
 }
