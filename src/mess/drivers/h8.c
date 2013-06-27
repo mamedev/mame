@@ -219,6 +219,7 @@ void h8_state::machine_reset()
 	m_cass_data[1] = 0;
 	m_cass_data[2] = 0;
 	m_cass_data[3] = 0;
+	m_ff_b = 1;
 }
 
 WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
@@ -242,7 +243,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	{
 		if (!state) // rising pulse to push data through flipflops
 		{
-			c = ~m_ff_b; // from /Q of 2nd flipflop
+			c = !m_ff_b; // from /Q of 2nd flipflop
 			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
 				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
