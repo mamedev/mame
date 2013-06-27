@@ -86,25 +86,11 @@ public:
 	/// Called by Rocket when it wants to render geometry that it does not wish to optimise.
 	virtual void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 	{
-		//printf("Vertex\n");
-		for (int i = 0; i < num_vertices; ++i)
-		{
-			//printf("[%d] %f,%f \n",i,vertices[i].position.x,vertices[i].position.y);
-			
-
-			//d3d9_vertices[i].colour = D3DCOLOR_RGBA(vertices[i].colour.red, vertices[i].colour.green, vertices[i].colour.blue, vertices[i].colour.alpha);
-
-			//d3d9_vertices[i].u = vertices[i].tex_coord[0];
-			//d3d9_vertices[i].v = vertices[i].tex_coord[1];
-			//container->add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		}
-		//printf("indices\n");
 		for (int i = 0; i < num_indices/3; i++)
 		{
-			//printf("[%d] %d \n",i,indices[i]);			
-			machine().render().ui_container().add_line((vertices[i*3+0].position.x+translation.x)/1024,(vertices[i*3+0].position.y+translation.y)/768, (vertices[i*3+1].position.x+translation.x)/1024,(vertices[i*3+1].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[i*3+1].position.x+translation.x)/1024,(vertices[i*3+1].position.y+translation.y)/768, (vertices[i*3+2].position.x+translation.x)/1024,(vertices[i*3+2].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[i*3+2].position.x+translation.x)/1024,(vertices[i*3+2].position.y+translation.y)/768, (vertices[i*3+0].position.x+translation.x)/1024,(vertices[i*3+0].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_line((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_line((vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, (vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_line((vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, (vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			
 		}						
 	}
