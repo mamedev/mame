@@ -267,27 +267,29 @@ void ymf271_device::calculate_step(YMF271Slot *slot)
 {
 	double st;
 
-	if (slot->waveform == 7)    // external waveform (PCM)
+	if (slot->waveform == 7)
 	{
+		// external waveform (PCM)
 		st = (double)(2 * (slot->fns | 2048)) * pow_table[slot->block] * fs_frequency[slot->fs];
 		st = st * multiple_table[slot->multiple];
 
 		// LFO phase modulation
 		st *= slot->lfo_phasemod;
 
-		st /= (double)(524288/65536);       // pre-multiply with 65536
+		st /= (double)(524288/65536); // pre-multiply with 65536
 
 		slot->step = (UINT32)st;
 	}
-	else                        // internal waveform (FM)
+	else
 	{
+		// internal waveform (FM)
 		st = (double)(2 * slot->fns) * pow_table[slot->block];
 		st = st * multiple_table[slot->multiple] * (double)(SIN_LEN);
 
 		// LFO phase modulation
 		st *= slot->lfo_phasemod;
 
-		st /= (double)(536870912/65536);    // pre-multiply with 65536
+		st /= (double)(536870912/65536); // pre-multiply with 65536
 
 		slot->step = (UINT32)st;
 	}
@@ -378,7 +380,7 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 	rate = GET_KEYSCALED_RATE(slot->relrate * 4, keycode, slot->keyscale);
 	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
 
-	slot->volume = (255-160) << ENV_VOLUME_SHIFT;       // -60db
+	slot->volume = (255-160) << ENV_VOLUME_SHIFT; // -60db
 	slot->env_state = ENV_ATTACK;
 }
 
@@ -443,6 +445,18 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 
 	for (i = 0; i < length; i++)
 	{
+		// loop
+		if ((slot->stepptr>>16) > slot->endaddr)
+		{
+			slot->stepptr = slot->stepptr - ((UINT64)slot->endaddr<<16) + ((UINT64)slot->loopaddr<<16);
+			if ((slot->stepptr>>16) > slot->endaddr)
+			{
+				// overflow
+				slot->stepptr &= 0xffff;
+				slot->stepptr |= ((UINT64)slot->loopaddr<<16);
+			}
+		}
+
 		if (slot->bits == 8)
 		{
 			// 8bit
@@ -472,14 +486,9 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 
 		*mixp++ += (sample * ch0_vol) >> 16;
 		*mixp++ += (sample * ch1_vol) >> 16;
-
+		
+		// go to next step
 		slot->stepptr += slot->step;
-		if ((slot->stepptr>>16) > slot->endaddr)
-		{
-			// kill non-frac
-			slot->stepptr &= 0xffff;
-			slot->stepptr |= (slot->loopaddr<<16);
-		}
 	}
 }
 
@@ -631,7 +640,8 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		switch (slot_group->sync)
 		{
-			case 0:     // 4 operator FM
+			// 4 operator FM
+			case 0:
 			{
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
@@ -817,7 +827,8 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				break;
 			}
 
-			case 1:     // 2x 2 operator FM
+			// 2x 2 operator FM
+			case 1:
 			{
 				for (op = 0; op < 2; op++)
 				{
@@ -871,7 +882,8 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				break;
 			}
 
-			case 2:     // 3 operator FM + PCM
+			// 3 operator FM + PCM
+			case 2:
 			{
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
@@ -967,7 +979,8 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				break;
 			}
 
-			case 3:     // PCM
+			// PCM
+			case 3:
 			{
 				update_pcm(j + (0*12), mixp, samples);
 				update_pcm(j + (1*12), mixp, samples);
@@ -992,7 +1005,7 @@ void ymf271_device::write_register(int slotnum, int reg, UINT8 data)
 
 	switch (reg)
 	{
-		case 0:
+		case 0x0:
 			slot->ext_en = (data & 0x80) ? 1 : 0;
 			slot->ext_out = (data>>3)&0xf;
 
@@ -1019,70 +1032,69 @@ void ymf271_device::write_register(int slotnum, int reg, UINT8 data)
 			}
 			break;
 
-		case 1:
+		case 0x1:
 			slot->lfoFreq = data;
 			break;
 
-		case 2:
+		case 0x2:
 			slot->lfowave = data & 3;
 			slot->pms = (data >> 3) & 0x7;
 			slot->ams = (data >> 6) & 0x3;
 			break;
 
-		case 3:
+		case 0x3:
 			slot->multiple = data & 0xf;
 			slot->detune = (data >> 4) & 0x7;
 			break;
 
-		case 4:
+		case 0x4:
 			slot->tl = data & 0x7f;
 			break;
 
-		case 5:
+		case 0x5:
 			slot->ar = data & 0x1f;
-			slot->keyscale = (data>>5)&0x7;
+			slot->keyscale = (data >> 5) & 0x7;
 			break;
 
-		case 6:
+		case 0x6:
 			slot->decay1rate = data & 0x1f;
 			break;
 
-		case 7:
+		case 0x7:
 			slot->decay2rate = data & 0x1f;
 			break;
 
-		case 8:
+		case 0x8:
 			slot->relrate = data & 0xf;
 			slot->decay1lvl = (data >> 4) & 0xf;
 			break;
 
-		case 9:
-			slot->fns &= ~0xff;
-			slot->fns |= data;
+		case 0x9:
+			// write frequency and block here
+			slot->fns = (slot->fns_hi << 8 & 0x0f00) | data;
+			slot->block = slot->fns_hi >> 4 & 0xf;
 			break;
 
-		case 10:
-			slot->fns &= ~0xff00;
-			slot->fns |= (data & 0xf)<<8;
-			slot->block = (data>>4)&0xf;
+		case 0xa:
+			slot->fns_hi = data;
 			break;
 
-		case 11:
+		case 0xb:
 			slot->waveform = data & 0x7;
 			slot->feedback = (data >> 4) & 0x7;
 			slot->accon = (data & 0x80) ? 1 : 0;
 			break;
 
-		case 12:
+		case 0xc:
 			slot->algorithm = data & 0xf;
 			break;
 
-		case 13:
+		case 0xd:
 			slot->ch0_level = data >> 4;
 			slot->ch1_level = data & 0xf;
 			break;
 
-		case 14:
+		case 0xe:
 			slot->ch2_level = data >> 4;
 			slot->ch3_level = data & 0xf;
 			break;
@@ -1124,94 +1136,95 @@ void ymf271_device::ymf271_write_fm(int bank, UINT8 address, UINT8 data)
 	int sync_mode = 0;
 	switch (m_groups[groupnum].sync)
 	{
-		case 0:     // 4 slot mode
-		{
+		// 4 slot mode
+		case 0:
 			if (bank == 0)
 				sync_mode = 1;
 			break;
-		}
-		case 1:     // 2x 2 slot mode
-		{
+
+		// 2x 2 slot mode
+		case 1:
 			if (bank == 0 || bank == 1)
 				sync_mode = 1;
 			break;
-		}
-		case 2:     // 3 slot + 1 slot mode
-		{
+
+		// 3 slot + 1 slot mode
+		case 2:
 			if (bank == 0)
 				sync_mode = 1;
 			break;
-		}
 
 		default:
 			break;
 	}
 
-	if (sync_mode && sync_reg)      // key-on slot & synced register
+	// key-on slot & synced register
+	if (sync_mode && sync_reg)
 	{
 		switch (m_groups[groupnum].sync)
 		{
-			case 0:     // 4 slot mode
-			{
+			// 4 slot mode
+			case 0:
 				write_register((12 * 0) + groupnum, reg, data);
 				write_register((12 * 1) + groupnum, reg, data);
 				write_register((12 * 2) + groupnum, reg, data);
 				write_register((12 * 3) + groupnum, reg, data);
 				break;
-			}
-			case 1:     // 2x 2 slot mode
-			{
-				if (bank == 0)       // Slot 1 - Slot 3
+
+			// 2x 2 slot mode
+			case 1:
+				if (bank == 0)
 				{
+					// Slot 1 - Slot 3
 					write_register((12 * 0) + groupnum, reg, data);
 					write_register((12 * 2) + groupnum, reg, data);
 				}
-				else                // Slot 2 - Slot 4
+				else
 				{
+					// Slot 2 - Slot 4
 					write_register((12 * 1) + groupnum, reg, data);
 					write_register((12 * 3) + groupnum, reg, data);
 				}
 				break;
-			}
-			case 2:     // 3 slot + 1 slot mode
-			{
-				// 1 slot is handled normally
+
+			// 3 slot + 1 slot mode (1 slot is handled normally)
+			case 2:
 				write_register((12 * 0) + groupnum, reg, data);
 				write_register((12 * 1) + groupnum, reg, data);
 				write_register((12 * 2) + groupnum, reg, data);
 				break;
-			}
 		}
 	}
-	else        // write register normally
+	else
 	{
+		// write register normally
 		write_register((12 * bank) + groupnum, reg, data);
 	}
 }
 
-void ymf271_device::ymf271_write_pcm(UINT8 data)
+void ymf271_device::ymf271_write_pcm(UINT8 address, UINT8 data)
 {
-	int slotnum = pcm_tab[m_pcmreg & 0xf];
+	int slotnum = pcm_tab[address & 0xf];
 	if (slotnum == -1)
 	{
-		logerror("ymf271_write_pcm invalid slot %02X %02X\n", m_pcmreg, data);
+		logerror("ymf271_write_pcm invalid slot %02X %02X\n", address, data);
 		return;
 	}
 	YMF271Slot *slot = &m_slots[slotnum];
 
-	switch (m_pcmreg >> 4 & 0xf)
+	switch (address >> 4 & 0xf)
 	{
-		case 0:
+		case 0x0:
 			slot->startaddr &= ~0xff;
 			slot->startaddr |= data;
 			break;
 
-		case 1:
+		case 0x1:
 			slot->startaddr &= ~0xff00;
 			slot->startaddr |= data<<8;
 			break;
 
-		case 2:
+		case 0x2:
 			slot->startaddr &= ~0xff0000;
 			slot->startaddr |= (data & 0x7f)<<16;
 			slot->altloop = (data & 0x80) ? 1 : 0;
@@ -1219,37 +1232,37 @@ void ymf271_device::ymf271_write_pcm(UINT8 data)
 				popmessage("ymf271 A/L, contact MAMEdev");
 			break;
 
-		case 3:
+		case 0x3:
 			slot->endaddr &= ~0xff;
 			slot->endaddr |= data;
 			break;
 
-		case 4:
+		case 0x4:
 			slot->endaddr &= ~0xff00;
 			slot->endaddr |= data<<8;
 			break;
 
-		case 5:
+		case 0x5:
 			slot->endaddr &= ~0xff0000;
 			slot->endaddr |= (data & 0x7f)<<16;
 			break;
 
-		case 6:
+		case 0x6:
 			slot->loopaddr &= ~0xff;
 			slot->loopaddr |= data;
 			break;
 
-		case 7:
+		case 0x7:
 			slot->loopaddr &= ~0xff00;
 			slot->loopaddr |= data<<8;
 			break;
 
-		case 8:
+		case 0x8:
 			slot->loopaddr &= ~0xff0000;
 			slot->loopaddr |= (data & 0x7f)<<16;
 			break;
 
-		case 9:
+		case 0x9:
 			slot->fs = data & 0x3;
 			slot->bits = (data & 0x4) ? 12 : 8;
 			slot->srcnote = (data >> 3) & 0x3;
@@ -1321,14 +1334,14 @@ UINT8 ymf271_device::ymf271_read_memory(UINT32 offset)
 		return m_ext_read_handler(offset);
 }
 
-void ymf271_device::ymf271_write_timer(UINT8 data)
+void ymf271_device::ymf271_write_timer(UINT8 address, UINT8 data)
 {
-	if ((m_timerreg & 0xf0) == 0)
+	if ((address & 0xf0) == 0)
 	{
-		int groupnum = fm_tab[m_timerreg & 0xf];
+		int groupnum = fm_tab[address & 0xf];
 		if (groupnum == -1)
 		{
-			logerror("ymf271_write_timer invalid group %02X %02X\n", m_timerreg, data);
+			logerror("ymf271_write_timer invalid group %02X %02X\n", address, data);
 			return;
 		}
 		YMF271Group *group = &m_groups[groupnum];
@@ -1338,7 +1351,7 @@ void ymf271_device::ymf271_write_timer(UINT8 data)
 	}
 	else
 	{
-		switch (m_timerreg)
+		switch (address)
 		{
 			case 0x10:
 				m_timerA = data;
@@ -1430,55 +1443,42 @@ void ymf271_device::ymf271_write_timer(UINT8 data)
 WRITE8_MEMBER( ymf271_device::write )
 {
 	m_stream->update();
+	
+	m_regs_main[offset & 0xf] = data;
 
-	switch (offset)
+	switch (offset & 0xf)
 	{
-		case 0:
-			m_reg0 = data;
-			break;
-
-		case 1:
-			ymf271_write_fm(0, m_reg0, data);
-			break;
-
-		case 2:
-			m_reg1 = data;
-			break;
-
-		case 3:
-			ymf271_write_fm(1, m_reg1, data);
-			break;
-
-		case 4:
-			m_reg2 = data;
-			break;
-
-		case 5:
-			ymf271_write_fm(2, m_reg2, data);
-			break;
-
-		case 6:
-			m_reg3 = data;
-			break;
-
-		case 7:
-			ymf271_write_fm(3, m_reg3, data);
-			break;
-
-		case 8:
-			m_pcmreg = data;
-			break;
-
-		case 9:
-			ymf271_write_pcm(data);
-			break;
-
+		case 0x0:
+		case 0x2:
+		case 0x4:
+		case 0x6:
+		case 0x8:
 		case 0xc:
-			m_timerreg = data;
+			// address regs
+			break;
+
+		case 0x1:
+			ymf271_write_fm(0, m_regs_main[0x0], data);
+			break;
+
+		case 0x3:
+			ymf271_write_fm(1, m_regs_main[0x2], data);
+			break;
+
+		case 0x5:
+			ymf271_write_fm(2, m_regs_main[0x4], data);
+			break;
+
+		case 0x7:
+			ymf271_write_fm(3, m_regs_main[0x6], data);
+			break;
+
+		case 0x9:
+			ymf271_write_pcm(m_regs_main[0x8], data);
 			break;
 
 		case 0xd:
-			ymf271_write_timer(data);
+			ymf271_write_timer(m_regs_main[0xc], data);
 			break;
 
 		default:
@@ -1488,12 +1488,16 @@ WRITE8_MEMBER( ymf271_device::write )
 
 READ8_MEMBER( ymf271_device::read )
 {
-	switch(offset)
+	switch (offset & 0xf)
 	{
-		case 0:
+		case 0x0:
 			return m_status;
+		
+		case 0x1:
+			// statusreg 2
+			return 0;
 
-		case 2:
+		case 0x2:
 		{
 			if (!m_ext_rw)
 				return 0xff;
@@ -1503,9 +1507,12 @@ READ8_MEMBER( ymf271_device::read )
 			m_ext_readlatch = ymf271_read_memory(m_ext_address);
 			return ret;
 		}
+		
+		default:
+			break;
 	}
 
-	return 0;
+	return 0xff;
 }
 
 void ymf271_device::init_tables()
@@ -1651,8 +1658,9 @@ void ymf271_device::init_state()
 		save_item(NAME(m_slots[i].decay2rate), i);
 		save_item(NAME(m_slots[i].decay1lvl), i);
 		save_item(NAME(m_slots[i].relrate), i);
-		save_item(NAME(m_slots[i].fns), i);
 		save_item(NAME(m_slots[i].block), i);
+		save_item(NAME(m_slots[i].fns_hi), i);
+		save_item(NAME(m_slots[i].fns), i);
 		save_item(NAME(m_slots[i].feedback), i);
 		save_item(NAME(m_slots[i].waveform), i);
 		save_item(NAME(m_slots[i].accon), i);
@@ -1691,17 +1699,12 @@ void ymf271_device::init_state()
 		save_item(NAME(m_groups[i].pfm), i);
 	}
 
+	save_item(NAME(m_regs_main));
 	save_item(NAME(m_timerA));
 	save_item(NAME(m_timerB));
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_status));
 	save_item(NAME(m_enable));
-	save_item(NAME(m_reg0));
-	save_item(NAME(m_reg1));
-	save_item(NAME(m_reg2));
-	save_item(NAME(m_reg3));
-	save_item(NAME(m_pcmreg));
-	save_item(NAME(m_timerreg));
 	save_item(NAME(m_ext_address));
 	save_item(NAME(m_ext_rw));
 	save_item(NAME(m_ext_readlatch));
@@ -1766,12 +1769,6 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 		m_irqstate(0),
 		m_status(0),
 		m_enable(0),
-		m_reg0(0),
-		m_reg1(0),
-		m_reg2(0),
-		m_reg3(0),
-		m_pcmreg(0),
-		m_timerreg(0),
 		m_ext_address(0),
 		m_ext_rw(0),
 		m_ext_readlatch(0),
@@ -1781,6 +1778,7 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 {
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));
+	memset(m_regs_main, 0, sizeof(m_regs_main));
 }
 
 //-------------------------------------------------

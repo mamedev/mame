@@ -53,8 +53,9 @@ private:
 		UINT8 decay1rate, decay2rate;
 		UINT8 decay1lvl;
 		UINT8 relrate;
-		UINT32 fns;
 		UINT8 block;
+		UINT8 fns_hi;
+		UINT32 fns;
 		UINT8 feedback;
 		UINT8 waveform;
 		UINT8 accon;
@@ -69,7 +70,7 @@ private:
 		UINT8 srcnote, srcb;
 
 		UINT32 step;
-		UINT32 stepptr;
+		UINT64 stepptr;
 
 		UINT8 active;
 		UINT8 bits;
@@ -110,9 +111,9 @@ private:
 	INT64 calculate_1op_fm_1(int slotnum);
 	void write_register(int slotnum, int reg, UINT8 data);
 	void ymf271_write_fm(int bank, UINT8 address, UINT8 data);
-	void ymf271_write_pcm(UINT8 data);
+	void ymf271_write_pcm(UINT8 address, UINT8 data);
+	void ymf271_write_timer(UINT8 address, UINT8 data);
 	UINT8 ymf271_read_memory(UINT32 offset);
-	void ymf271_write_timer(UINT8 data);
 	
 	// lookup tables
 	INT16 *m_lut_waves[8];
@@ -128,6 +129,8 @@ private:
 	// internal state
 	YMF271Slot m_slots[48];
 	YMF271Group m_groups[12];
+	
+	UINT8 m_regs_main[0x10];
 
 	UINT32 m_timerA;
 	UINT32 m_timerB;
@@ -135,12 +138,6 @@ private:
 	UINT8 m_status;
 	UINT8 m_enable;
 
-	UINT8 m_reg0;
-	UINT8 m_reg1;
-	UINT8 m_reg2;
-	UINT8 m_reg3;
-	UINT8 m_pcmreg;
-	UINT8 m_timerreg;
 	UINT32 m_ext_address;
 	UINT8 m_ext_rw;
 	UINT8 m_ext_readlatch;
