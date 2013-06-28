@@ -87,25 +87,27 @@ public:
 	virtual void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 	{
 
-		for (int i = 0; i < num_indices/3; i++)
+		for (int i = 0; i < num_indices/6; i++)
 		{			
-			/*render_texture *hilight_texture = machine().render().texture_alloc();
+			render_texture *hilight_texture = machine().render().texture_alloc();
+			rectangle bit = ((bitmap_rgb32 *)texture)->cliprect();
 			rectangle myrect = ((bitmap_rgb32 *)texture)->cliprect();
-			printf("%f, %f\n",myrect.max_x * vertices[indices[i*3+0]].tex_coord[0],myrect.max_y * vertices[indices[i*3+0]].tex_coord[1]);
-			myrect.min_x = myrect.max_x * vertices[indices[i*3+0]].tex_coord[0];
-			myrect.min_y = myrect.max_y * vertices[indices[i*3+0]].tex_coord[1];
+			int p1 = indices[i*6+0];
+			int p2 = indices[i*6+5];
+
+			myrect.min_x = bit.max_x * vertices[p1].tex_coord.x;
+			myrect.min_y = bit.max_y * vertices[p1].tex_coord.y;
+			myrect.max_x = bit.max_x * vertices[p2].tex_coord.x;
+			myrect.max_y = bit.max_y * vertices[p2].tex_coord.y;
+			if (myrect.min_x > myrect.max_x) { int t = myrect.max_x; myrect.max_x = myrect.min_x; myrect.min_x = t; } // this should be flipping
+			if (myrect.min_y > myrect.max_y) { int t = myrect.max_y; myrect.max_y = myrect.min_y; myrect.min_y = t; }
+
 			hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
-			*/
-			rgb_t col1 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
-			rgb_t col2 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
-			rgb_t col3 = MAKE_ARGB(vertices[i].colour.alpha, vertices[indices[i*3+0]].colour.red, vertices[indices[i*3+0]].colour.green, vertices[indices[i*3+0]].colour.blue);
-			machine().render().ui_container().add_line((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, UI_LINE_WIDTH, col1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+1]].position.y+translation.y)/768, (vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_LINE_WIDTH, col2, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			machine().render().ui_container().add_line((vertices[indices[i*3+2]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, (vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, UI_LINE_WIDTH, col3, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			
-			//machine().render().ui_container().add_quad((vertices[indices[i*3+0]].position.x+translation.x)/1024,(vertices[indices[i*3+0]].position.y+translation.y)/768, (vertices[indices[i*3+1]].position.x+translation.x)/1024,(vertices[indices[i*3+2]].position.y+translation.y)/768, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1024,(vertices[p1].position.y+translation.y)/768, (vertices[p2].position.x+translation.x)/1024,(vertices[p2].position.y+translation.y)/768, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			//machine().render().texture_free(hilight_texture);
 		}						
-		//machine().render().texture_free(hilight_texture);
+		
 	}
 
 	/// Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.
