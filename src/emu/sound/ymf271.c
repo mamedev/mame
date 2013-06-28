@@ -281,7 +281,7 @@ void ymf271_device::calculate_step(YMF271Slot *slot)
 
 		st /= (double)(524288/65536);       // pre-multiply with 65536
 
-		slot->step = (UINT64)st;
+		slot->step = (UINT32)st;
 	}
 	else                        // internal waveform (FM)
 	{
@@ -293,7 +293,7 @@ void ymf271_device::calculate_step(YMF271Slot *slot)
 
 		st /= (double)(536870912/65536);    // pre-multiply with 65536
 
-		slot->step = (UINT64)st;
+		slot->step = (UINT32)st;
 	}
 }
 
@@ -420,23 +420,23 @@ void ymf271_device::update_lfo(YMF271Slot *slot)
 	calculate_step(slot);
 }
 
-int ymf271_device::calculate_slot_volume(YMF271Slot *slot)
+INT64 ymf271_device::calculate_slot_volume(YMF271Slot *slot)
 {
-	UINT64 volume;
-	UINT64 env_volume;
-	UINT64 lfo_volume = 65536;
+	INT64 volume;
+	INT64 env_volume;
+	INT64 lfo_volume = 65536;
 
 	switch (slot->ams)
 	{
 		case 0: lfo_volume = 65536; break;  // 0dB
-		case 1: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 33124) >> 16); break;  // 5.90625dB
-		case 2: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 16742) >> 16); break;  // 11.8125dB
-		case 3: lfo_volume = 65536 - (((UINT64)slot->lfo_amplitude * 4277) >> 16); break;   // 23.625dB
+		case 1: lfo_volume = 65536 - ((slot->lfo_amplitude * 33124) >> 16); break;  // 5.90625dB
+		case 2: lfo_volume = 65536 - ((slot->lfo_amplitude * 16742) >> 16); break;  // 11.8125dB
+		case 3: lfo_volume = 65536 - ((slot->lfo_amplitude * 4277) >> 16); break;   // 23.625dB
 	}
 
-	env_volume = ((UINT64)env_volume_table[255 - (slot->volume >> ENV_VOLUME_SHIFT)] * (UINT64)lfo_volume) >> 16;
+	env_volume = (env_volume_table[255 - (slot->volume >> ENV_VOLUME_SHIFT)] * lfo_volume) >> 16;
 
-	volume = ((UINT64)env_volume * (UINT64)total_level[slot->tl]) >> 16;
+	volume = (env_volume * total_level[slot->tl]) >> 16;
 
 	return volume;
 }
@@ -444,7 +444,7 @@ int ymf271_device::calculate_slot_volume(YMF271Slot *slot)
 void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 {
 	int i;
-	int final_volume;
+	INT64 final_volume;
 	INT16 sample;
 	INT64 ch0_vol, ch1_vol; //, ch2_vol, ch3_vol;
 
@@ -481,10 +481,10 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 
 		final_volume = calculate_slot_volume(slot);
 
-		ch0_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch0_level]) >> 16;
-		ch1_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch1_level]) >> 16;
-//      ch2_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch2_level]) >> 16;
-//      ch3_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch3_level]) >> 16;
+		ch0_vol = (final_volume * channel_attenuation[slot->ch0_level]) >> 16;
+		ch1_vol = (final_volume * channel_attenuation[slot->ch1_level]) >> 16;
+//      ch2_vol = (final_volume * channel_attenuation[slot->ch2_level]) >> 16;
+//      ch3_vol = (final_volume * channel_attenuation[slot->ch3_level]) >> 16;
 
 		if (ch0_vol > 65536) ch0_vol = 65536;
 		if (ch1_vol > 65536) ch1_vol = 65536;
@@ -505,7 +505,7 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 // calculates 2 operator FM using algorithm 0
 // <--------|
 // +--[S1]--+--[S3]-->
-INT32 ymf271_device::calculate_2op_fm_0(int slotnum1, int slotnum2)
+INT64 ymf271_device::calculate_2op_fm_0(int slotnum1, int slotnum2)
 {
 	YMF271Slot *slot1 = &m_slots[slotnum1];
 	YMF271Slot *slot2 = &m_slots[slotnum2];
@@ -542,7 +542,7 @@ INT32 ymf271_device::calculate_2op_fm_0(int slotnum1, int slotnum2)
 // calculates 2 operator FM using algorithm 1
 // <-----------------|
 // +--[S1]--+--[S3]--|-->
-INT32 ymf271_device::calculate_2op_fm_1(int slotnum1, int slotnum2)
+INT64 ymf271_device::calculate_2op_fm_1(int slotnum1, int slotnum2)
 {
 	YMF271Slot *slot1 = &m_slots[slotnum1];
 	YMF271Slot *slot2 = &m_slots[slotnum2];
@@ -577,7 +577,7 @@ INT32 ymf271_device::calculate_2op_fm_1(int slotnum1, int slotnum2)
 }
 
 // calculates the output of one FM operator
-INT32 ymf271_device::calculate_1op_fm_0(int slotnum, int phase_modulation)
+INT64 ymf271_device::calculate_1op_fm_0(int slotnum, INT64 phase_modulation)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
 	INT64 env;
@@ -601,7 +601,7 @@ INT32 ymf271_device::calculate_1op_fm_0(int slotnum, int phase_modulation)
 // calculates the output of one FM operator with feedback modulation
 // <--------|
 // +--[S1]--|
-INT32 ymf271_device::calculate_1op_fm_1(int slotnum)
+INT64 ymf271_device::calculate_1op_fm_1(int slotnum)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
 	INT64 env;
@@ -1004,7 +1004,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	}
 }
 
-void ymf271_device::write_register(int slotnum, int reg, int data)
+void ymf271_device::write_register(int slotnum, int reg, UINT8 data)
 {
 	YMF271Slot *slot = &m_slots[slotnum];
 
@@ -1110,7 +1110,7 @@ void ymf271_device::write_register(int slotnum, int reg, int data)
 	}
 }
 
-void ymf271_device::ymf271_write_fm(int bank, int address, int data)
+void ymf271_device::ymf271_write_fm(int bank, UINT8 address, UINT8 data)
 {
 	int groupnum = fm_tab[address & 0xf];
 	if (groupnum == -1)
@@ -1207,7 +1207,7 @@ void ymf271_device::ymf271_write_fm(int bank, int address, int data)
 	}
 }
 
-void ymf271_device::ymf271_write_pcm(int data)
+void ymf271_device::ymf271_write_pcm(UINT8 data)
 {
 	int slotnum = pcm_tab[m_pcmreg & 0xf];
 	if (slotnum == -1)
@@ -1337,7 +1337,7 @@ UINT8 ymf271_device::ymf271_read_memory(UINT32 offset)
 		return m_ext_read_handler(offset);
 }
 
-void ymf271_device::ymf271_write_timer(int data)
+void ymf271_device::ymf271_write_timer(UINT8 data)
 {
 	if ((m_timerreg & 0xf0) == 0)
 	{
