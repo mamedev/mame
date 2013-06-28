@@ -643,7 +643,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
-			mame_printf_debug("Group %d: PFM, Sync = %d, Waveform Slot1 = %d, Slot2 = %d, Slot3 = %d, Slot4 = %d\n",
+			logerror("ymf271 Group %d: PFM, Sync = %d, Waveform Slot1 = %d, Slot2 = %d, Slot3 = %d, Slot4 = %d\n",
 				j, slot_group->sync, m_slots[j+0].waveform, m_slots[j+12].waveform, m_slots[j+24].waveform, m_slots[j+36].waveform);
 		}
 
@@ -1115,7 +1115,7 @@ void ymf271_device::ymf271_write_fm(int bank, int address, int data)
 	int groupnum = fm_tab[address & 0xf];
 	if (groupnum == -1)
 	{
-		logerror("ymf271_write_fm invalid group %02X\n", data);
+		logerror("ymf271_write_fm invalid group %02X %02X\n", address, data);
 		return;
 	}
 
@@ -1212,7 +1212,7 @@ void ymf271_device::ymf271_write_pcm(int data)
 	int slotnum = pcm_tab[m_pcmreg & 0xf];
 	if (slotnum == -1)
 	{
-		logerror("ymf271_write_pcm invalid slot %02X\n", data);
+		logerror("ymf271_write_pcm invalid slot %02X %02X\n", m_pcmreg, data);
 		return;
 	}
 	YMF271Slot *slot = &m_slots[slotnum];
@@ -1344,7 +1344,7 @@ void ymf271_device::ymf271_write_timer(int data)
 		int groupnum = fm_tab[m_timerreg & 0xf];
 		if (groupnum == -1)
 		{
-			logerror("ymf271_write_timer invalid group %02X\n", data);
+			logerror("ymf271_write_timer invalid group %02X %02X\n", m_timerreg, data);
 			return;
 		}
 		YMF271Group *group = &m_groups[groupnum];
