@@ -43,6 +43,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "osdepend.h"
+#include "png.h"
 
 
 class ShellSystemInterface : public Rocket::Core::SystemInterface
@@ -65,7 +66,6 @@ public:
 	virtual float GetElapsedTime() { return machine().time().as_double(); }
 };
 
-#define UI_LINE_WIDTH           (1.0f / 500.0f)
 #define UI_BORDER_COLOR         MAKE_ARGB(0xff,0xff,0xff,0xff)
 
 class ShellRenderInterfaceSystem : public Rocket::Core::RenderInterface
@@ -104,7 +104,7 @@ public:
 
 			hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
 			
-			machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1024,(vertices[p1].position.y+translation.y)/768, (vertices[p2].position.x+translation.x)/1024,(vertices[p2].position.y+translation.y)/768, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1280,(vertices[p1].position.y+translation.y)/960, (vertices[p2].position.x+translation.x)/1280,(vertices[p2].position.y+translation.y)/960, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			//machine().render().texture_free(hilight_texture);
 		}						
 		
@@ -159,72 +159,99 @@ public:
 	/// Called by Rocket when a texture is required by the library.
 	virtual bool LoadTexture(Rocket::Core::TextureHandle& texture_handle, Rocket::Core::Vector2i& texture_dimensions, const Rocket::Core::String& source)
 	{
+		
+		
 		emu_file file("", OPEN_FLAG_READ);
 		file_error filerr = file.open(source.CString());	
 		if(filerr != FILERR_NONE)
 		{
 			return false;
-		}
+		}		
 		
-		file.seek(0, SEEK_END);
-		size_t buffer_size = file.tell();
-		file.seek(0, SEEK_SET);
-		
-		char* buffer = new char[buffer_size];
-		file.read(buffer, buffer_size);
-		file.close();
-
-		TGAHeader header;
-		memcpy(&header, buffer, sizeof(TGAHeader));
-		
-		int color_mode = header.bitsPerPixel / 8;
-		int image_size = header.width * header.height * 4; // We always make 32bit textures 
-		
-		if (header.dataType != 2)
+		astring fname(source.CString());
+		if (fname.find(0, ".png") != -1)
 		{
-			Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24/32bit uncompressed TGAs are supported.");
-			return false;
-		}
-		
-		// Ensure we have at least 3 colors
-		if (color_mode < 3)
-		{
-			Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24 and 32bit textures are supported");
-			return false;
-		}
-		
-		const char* image_src = buffer + sizeof(TGAHeader);
-		unsigned char* image_dest = new unsigned char[image_size];
-		
-		// Targa is BGR, swap to RGB and flip Y axis
-		for (long y = 0; y < header.height; y++)
-		{
-			long read_index = y * header.width * color_mode;
-			long write_index = ((header.imageDescriptor & 32) != 0) ? read_index : (header.height - y - 1) * header.width * color_mode;
-			for (long x = 0; x < header.width; x++)
+			bitmap_argb32 bitmap;
+			png_read_bitmap(file, bitmap);				
+			bitmap_rgb32 *hilight_bitmap = auto_bitmap_rgb32_alloc(machine(), bitmap.width(), bitmap.height());
+			for (int y = 0; y < bitmap.height(); ++y)
 			{
-				image_dest[write_index] = image_src[read_index+2];
-				image_dest[write_index+1] = image_src[read_index+1];
-				image_dest[write_index+2] = image_src[read_index];
-				if (color_mode == 4)
-					image_dest[write_index+3] = image_src[read_index+3];
-				else
-					image_dest[write_index+3] = 255;
-				
-				write_index += 4;
-				read_index += color_mode;
+				for (int x = 0; x < bitmap.width(); ++x)
+				{
+					hilight_bitmap->pix32(y, x) = bitmap.pix32(y,x);
+				}
 			}
+			
+			texture_handle = (Rocket::Core::TextureHandle)hilight_bitmap;			
+			texture_dimensions.x = bitmap.width();
+			texture_dimensions.y = bitmap.height();
+			return true;
 		}
+		else 
+		{
+		
+			file.seek(0, SEEK_END);
+			size_t buffer_size = file.tell();
+			file.seek(0, SEEK_SET);
+			
+			char* buffer = new char[buffer_size];
+			file.read(buffer, buffer_size);
+			file.close();
 
-		texture_dimensions.x = header.width;
-		texture_dimensions.y = header.height;
+			TGAHeader header;
+			memcpy(&header, buffer, sizeof(TGAHeader));
+			
+			int color_mode = header.bitsPerPixel / 8;
+			int image_size = header.width * header.height * 4; // We always make 32bit textures 
+			
+			if (header.dataType != 2)
+			{
+				Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24/32bit uncompressed TGAs are supported.");
+				printf("Only 24/32bit uncompressed TGAs are supported.\n");
+				return false;
+			}
+			
+			// Ensure we have at least 3 colors
+			if (color_mode < 3)
+			{
+				Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24 and 32bit textures are supported");
+				printf("Only 24 and 32bit textures are supported\n");
+				return false;
+			}
+			
+			const char* image_src = buffer + sizeof(TGAHeader);
+			unsigned char* image_dest = new unsigned char[image_size];
+			
+			// Targa is BGR, swap to RGB and flip Y axis
+			for (long y = 0; y < header.height; y++)
+			{
+				long read_index = y * header.width * color_mode;
+				long write_index = ((header.imageDescriptor & 32) != 0) ? read_index : (header.height - y - 1) * header.width * color_mode;
+				for (long x = 0; x < header.width; x++)
+				{
+					image_dest[write_index] = image_src[read_index+2];
+					image_dest[write_index+1] = image_src[read_index+1];
+					image_dest[write_index+2] = image_src[read_index];
+					if (color_mode == 4)
+						image_dest[write_index+3] = image_src[read_index+3];
+					else
+						image_dest[write_index+3] = 255;
+					
+					write_index += 4;
+					read_index += color_mode;
+				}
+			}
+
+			texture_dimensions.x = header.width;
+			texture_dimensions.y = header.height;
+			
+			bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
+			
+			delete [] image_dest;
+			delete [] buffer;
+			return success;
+		}
 		
-		bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
-		
-		delete [] image_dest;
-		delete [] buffer;
-		
-		return success;
 	}
 	/// Called by Rocket when a texture is required to be built from an internally-generated sequence of pixels.
 	virtual bool GenerateTexture(Rocket::Core::TextureHandle& texture_handle, const Rocket::Core::byte* source, const Rocket::Core::Vector2i& source_dimensions)
@@ -297,7 +324,7 @@ void gui_engine::initialize()
 	Rocket::Controls::Initialise();
 	
 	// Create the main Rocket context and set it on the shell's input layer.
-	context = Rocket::Core::CreateContext("main", Rocket::Core::Vector2i(1024, 768));
+	context = Rocket::Core::CreateContext("main", Rocket::Core::Vector2i(1280, 960));
 	if (context == NULL)
 	{
 		Rocket::Core::Shutdown();

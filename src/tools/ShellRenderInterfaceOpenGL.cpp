@@ -27,7 +27,8 @@
 
 #include <ShellRenderInterfaceOpenGL.h>
 #include <Rocket/Core.h>
-
+#include "png.h"
+#include "corefile.h"
 #define GL_CLAMP_TO_EDGE 0x812F
 
 ShellRenderInterfaceOpenGL::ShellRenderInterfaceOpenGL()
@@ -116,72 +117,108 @@ struct TGAHeader
 // Called by Rocket when a texture is required by the library.		
 bool ShellRenderInterfaceOpenGL::LoadTexture(Rocket::Core::TextureHandle& texture_handle, Rocket::Core::Vector2i& texture_dimensions, const Rocket::Core::String& source)
 {
-	Rocket::Core::FileInterface* file_interface = Rocket::Core::GetFileInterface();
-	Rocket::Core::FileHandle file_handle = file_interface->Open(source);
-	if (!file_handle)
-	{
-		return false;
-	}
-	
-	file_interface->Seek(file_handle, 0, SEEK_END);
-	size_t buffer_size = file_interface->Tell(file_handle);
-	file_interface->Seek(file_handle, 0, SEEK_SET);
-	
-	char* buffer = new char[buffer_size];
-	file_interface->Read(buffer, buffer_size, file_handle);
-	file_interface->Close(file_handle);
-
-	TGAHeader header;
-	memcpy(&header, buffer, sizeof(TGAHeader));
-	
-	int color_mode = header.bitsPerPixel / 8;
-	int image_size = header.width * header.height * 4; // We always make 32bit textures 
-	
-	if (header.dataType != 2)
-	{
-		Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24/32bit uncompressed TGAs are supported.");
-		return false;
-	}
-	
-	// Ensure we have at least 3 colors
-	if (color_mode < 3)
-	{
-		Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24 and 32bit textures are supported");
-		return false;
-	}
-	
-	const char* image_src = buffer + sizeof(TGAHeader);
-	unsigned char* image_dest = new unsigned char[image_size];
-	
-	// Targa is BGR, swap to RGB and flip Y axis
-	for (long y = 0; y < header.height; y++)
-	{
-		long read_index = y * header.width * color_mode;
-		long write_index = ((header.imageDescriptor & 32) != 0) ? read_index : (header.height - y - 1) * header.width * color_mode;
-		for (long x = 0; x < header.width; x++)
+		
+		core_file *file = NULL;
+		file_error filerr = core_fopen(source.CString(), OPEN_FLAG_READ, &file);		
+		if(filerr != FILERR_NONE)
 		{
-			image_dest[write_index] = image_src[read_index+2];
-			image_dest[write_index+1] = image_src[read_index+1];
-			image_dest[write_index+2] = image_src[read_index];
-			if (color_mode == 4)
-				image_dest[write_index+3] = image_src[read_index+3];
-			else
-				image_dest[write_index+3] = 255;
+			return false;
+		}		
+		
+		astring fname(source.CString());
+		if (fname.find(0, ".png") != -1)
+		{
+			bitmap_argb32 bitmap;
+			png_read_bitmap(file, bitmap);				
+			int image_size = bitmap.width() * bitmap.height() * 4; // We always make 32bit textures 
+			unsigned char* image_dest = new unsigned char[image_size];
 			
-			write_index += 4;
-			read_index += color_mode;
-		}
-	}
+			// Targa is BGR, swap to RGB and flip Y axis
+			for (long y = 0; y < bitmap.height(); y++)
+			{
+				long write_index = y * bitmap.width() * 4;
+				for (long x = 0; x < bitmap.width(); x++)
+				{
+					image_dest[write_index] =   (bitmap.pix32(y,x) >> 16) & 0xff;
+					image_dest[write_index+1] = (bitmap.pix32(y,x) >> 8) & 0xff;
+					image_dest[write_index+2] = (bitmap.pix32(y,x) >> 0) & 0xff; 
+					image_dest[write_index+3] = (bitmap.pix32(y,x) >> 24) & 0xff;
+					
+					write_index += 4;
+				}
+			}
 
-	texture_dimensions.x = header.width;
-	texture_dimensions.y = header.height;
+			
+			texture_dimensions.x = bitmap.width();
+			texture_dimensions.y = bitmap.height();
+			bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
+			
+			delete [] image_dest;
+			
+			return success;
+		}
+		else 
+		{
 	
-	bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
-	
-	delete [] image_dest;
-	delete [] buffer;
-	
-	return success;
+			size_t buffer_size = core_fsize(file);
+			
+			char* buffer = new char[buffer_size];
+			core_fread(file, buffer, buffer_size);
+			core_fclose(file);
+
+			TGAHeader header;
+			memcpy(&header, buffer, sizeof(TGAHeader));
+			
+			int color_mode = header.bitsPerPixel / 8;
+			int image_size = header.width * header.height * 4; // We always make 32bit textures 
+			
+			if (header.dataType != 2)
+			{
+				Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24/32bit uncompressed TGAs are supported.");
+				printf("Only 24/32bit uncompressed TGAs are supported.\n");
+				return false;
+			}
+			
+			// Ensure we have at least 3 colors
+			if (color_mode < 3)
+			{
+				Rocket::Core::Log::Message(Rocket::Core::Log::LT_ERROR, "Only 24 and 32bit textures are supported");
+				printf("Only 24 and 32bit textures are supported\n");
+				return false;
+			}
+			
+			const char* image_src = buffer + sizeof(TGAHeader);
+			unsigned char* image_dest = new unsigned char[image_size];
+			
+			// Targa is BGR, swap to RGB and flip Y axis
+			for (long y = 0; y < header.height; y++)
+			{
+				long read_index = y * header.width * color_mode;
+				long write_index = ((header.imageDescriptor & 32) != 0) ? read_index : (header.height - y - 1) * header.width * color_mode;
+				for (long x = 0; x < header.width; x++)
+				{
+					image_dest[write_index] = image_src[read_index+2];
+					image_dest[write_index+1] = image_src[read_index+1];
+					image_dest[write_index+2] = image_src[read_index];
+					if (color_mode == 4)
+						image_dest[write_index+3] = image_src[read_index+3];
+					else
+						image_dest[write_index+3] = 255;
+					
+					write_index += 4;
+					read_index += color_mode;
+				}
+			}
+
+			texture_dimensions.x = header.width;
+			texture_dimensions.y = header.height;
+			
+			bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
+			
+			delete [] image_dest;
+			delete [] buffer;
+			return success;
+		}
 }
 
 // Called by Rocket when a texture is required to be built from an internally-generated sequence of pixels.

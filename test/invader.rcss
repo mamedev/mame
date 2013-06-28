@@ -42,7 +42,7 @@ div#title_bar div#icon
 	height: 39px;
 	
 	icon-decorator: image;
-	icon-image-src: invader.tga;
+	icon-image-src: invader.png;
 }
 
 div#title_bar span
@@ -60,9 +60,9 @@ div#title_bar span
 	outline-color: black;
 
 	background-decorator: tiled-horizontal;
-	background-left-image: invader.tga 147px 0px 229px 85px;
-	background-center-image: invader.tga stretch 229px 0px 230px 85px;
-	background-right-image: invader.tga 231px 0px 246px 85px;
+	background-left-image: invader.png 147px 0px 229px 85px;
+	background-center-image: invader.png stretch 229px 0px 230px 85px;
+	background-right-image: invader.png 231px 0px 246px 85px;
 }
 
 
@@ -73,14 +73,14 @@ div#window
 	padding: 10px 15px;
 
 	background-decorator: tiled-box;
-	background-top-left-image: invader.tga 0px 0px 133px 140px;
-	background-top-right-image: invader.tga 136px 0px 146px 140px;
-	background-top-image: invader.tga stretch 134px 0px 135px 140px;
-	background-bottom-left-image: invader.tga 0px 140px 11px 151px;
-	background-bottom-right-image: invader.tga 136px 140px 146px 151px;
-	background-bottom-image: invader.tga stretch 11px 140px 12px 151px;
-	background-left-image: invader.tga stretch 0px 139px 10px 140px;
-	background-center-image: invader.tga stretch 11px 139px 12px 140px;
+	background-top-left-image: invader.png 0px 0px 133px 140px;
+	background-top-right-image: invader.png 136px 0px 146px 140px;
+	background-top-image: invader.png stretch 134px 0px 135px 140px;
+	background-bottom-left-image: invader.png 0px 140px 11px 151px;
+	background-bottom-right-image: invader.png 136px 140px 146px 151px;
+	background-bottom-image: invader.png stretch 11px 140px 12px 151px;
+	background-left-image: invader.png stretch 0px 139px 10px 140px;
+	background-center-image: invader.png stretch 11px 139px 12px 140px;
 }
 
 div#content
@@ -149,7 +149,7 @@ input.submit
 	tab-index: auto;
 
 	background-decorator: image;
-	background-image: invader.tga 247px 0px 406px 45px;
+	background-image: invader.png 247px 0px 406px 45px;
 }
 
 button:focus,
@@ -182,8 +182,8 @@ input.text
 	padding: 10px 10px 0px;
 
 	background-decorator: tiled-horizontal;
-	background-left-image: invader.tga 162px 192px 176px 223px;
-	background-center-image: invader.tga stretch 176px 192px 177px 223px;
+	background-left-image: invader.png 162px 192px 176px 223px;
+	background-center-image: invader.png stretch 176px 192px 177px 223px;
 }
 
 input.text,
@@ -229,7 +229,7 @@ dataselect selectvalue
 	padding: 9px 10px 0px 10px;
 
 	background-decorator: image;
-	background-image: invader.tga 162px 192px 307px 229px;
+	background-image: invader.png 162px 192px 307px 229px;
 }
 
 select selectvalue:hover,
@@ -245,7 +245,7 @@ dataselect selectarrow
 	height: 37px;
 	
 	icon-decorator: image;
-	icon-image: invader.tga 307px 192px 337px 229px;
+	icon-image: invader.png 307px 192px 337px 229px;
 }
 
 select selectarrow:hover,
@@ -276,14 +276,14 @@ dataselect selectbox,
 datagrid datagridbody
 {
 	background-decorator: tiled-box;
-	background-top-left-image: invader.tga 281px 275px 292px 284px;
-	background-top-right-image: invader.tga 294px 275px 305px 284px;
-	background-top-image: invader.tga stretch 292px 275px 293px 284px;
-	background-bottom-left-image: invader.tga 281px 285px 292px 296px;
-	background-bottom-right-image: invader.tga 294px 285px 305px 296px;
-	background-bottom-image: invader.tga stretch 292px 285px 293px 296px;
-	background-left-image: invader.tga stretch 281px 283px 292px 284px;
-	background-center-image: invader.tga stretch 292px 283px 293px 284px;
+	background-top-left-image: invader.png 281px 275px 292px 284px;
+	background-top-right-image: invader.png 294px 275px 305px 284px;
+	background-top-image: invader.png stretch 292px 275px 293px 284px;
+	background-bottom-left-image: invader.png 281px 285px 292px 296px;
+	background-bottom-right-image: invader.png 294px 285px 305px 296px;
+	background-bottom-image: invader.png stretch 292px 285px 293px 296px;
+	background-left-image: invader.png stretch 281px 283px 292px 284px;
+	background-center-image: invader.png stretch 292px 283px 293px 284px;
 }
 
 select selectbox option,
@@ -320,7 +320,7 @@ input.checkbox
 input.radio
 {
 	icon-decorator: image;
-	icon-image: invader.tga 407px 0px 437px 30px;
+	icon-image: invader.png 407px 0px 437px 30px;
 }
 
 input.radio:hover
@@ -353,7 +353,7 @@ input.radio:checked:active
 input.checkbox
 {
 	icon-decorator: image;
-	icon-image: invader.tga 407px 60px 437px 90px;
+	icon-image: invader.png 407px 60px 437px 90px;
 }
 
 input.checkbox:hover
@@ -392,9 +392,9 @@ datagrid datagridheader
 	padding: 5px 10px 0px 10px;
 
 	background-decorator: tiled-horizontal;
-	background-left-image: invader.tga 127px 192px 143px 223px;
-	background-center-image: invader.tga stretch 143px 192px 145px 223px;
-	background-right-image: invader.tga 145px 192px 160px 223px;
+	background-left-image: invader.png 127px 192px 143px 223px;
+	background-center-image: invader.png stretch 143px 192px 145px 223px;
+	background-right-image: invader.png 145px 192px 160px 223px;
 }
 
 datagrid datagridbody
@@ -417,7 +417,7 @@ datagridexpand
 	width: 17px;
 	
 	icon-decorator: image;
-	icon-image: invader.tga 3px 232px 20px 249px;
+	icon-image: invader.png 3px 232px 20px 249px;
 }
 
 datagridexpand:hover
@@ -448,9 +448,9 @@ scrollbarvertical
 scrollbarvertical slidertrack
 {
 	background-decorator: tiled-vertical;
-	background-top-image: invader.tga 70px 199px 97px 201px;
-	background-center-image: invader.tga stretch 70px 201px 97px 202px;
-	background-bottom-image: invader.tga 70px 203px 97px 204px;
+	background-top-image: invader.png 70px 199px 97px 201px;
+	background-center-image: invader.png stretch 70px 201px 97px 202px;
+	background-bottom-image: invader.png 70px 203px 97px 204px;
 }
 
 scrollbarvertical sliderbar
@@ -460,9 +460,9 @@ scrollbarvertical sliderbar
 	min-height: 46px;
 
 	background-decorator: tiled-vertical;
-	background-top-image: invader.tga 56px 152px 79px 175px;
-	background-center-image: invader.tga stretch 56px 175px 79px 175px;
-	background-bottom-image: invader.tga 56px 176px 79px 198px;
+	background-top-image: invader.png 56px 152px 79px 175px;
+	background-center-image: invader.png stretch 56px 175px 79px 175px;
+	background-bottom-image: invader.png 56px 176px 79px 198px;
 }
 
 scrollbarvertical sliderbar:hover
@@ -485,7 +485,7 @@ scrollbarvertical sliderarrowdec
 	height: 24px;
 	
 	icon-decorator: image;
-	icon-image: invader.tga 0px 152px 27px 176px;
+	icon-image: invader.png 0px 152px 27px 176px;
 }
 
 scrollbarvertical sliderarrowdec:hover,
@@ -506,7 +506,7 @@ scrollbarvertical sliderarrowinc
 	height: 24px;
 	
 	icon-decorator: image;
-	icon-image: invader.tga 28px 152px 55px 176px;
+	icon-image: invader.png 28px 152px 55px 176px;
 }
 
 

@@ -9260,7 +9260,7 @@ test/Delicious-BoldItalic.otf -text
 test/Delicious-Italic.otf -text
 test/Delicious-Roman.otf -text
 test/demo.rml svneol=native#text/plain
+test/invader.png -text svneol=unset#image/png
 test/invader.rcss svneol=native#text/plain
-test/invader.tga -text
 test/rkt.rcss svneol=native#text/plain
 test/window.rml svneol=native#text/plain
