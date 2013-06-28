@@ -375,6 +375,21 @@ WRITE8_MEMBER(apollo_state::apollo_dma_2_w){
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_2_r){
+	// Nasty hack (13-06-15 - ost):
+	// MD self_test will test wrong DMA register and
+	// mem-to-mem DMA in am9517a.c is often starting much too late (for MD self_test)
+	// (8237dma.c was always fast enough to omit these problems)
+	if (offset == 8)
+	{
+		switch (space.device().safe_pcbase())
+		{
+		case 0x00102e22: // DN3000
+		case 0x01002f3c: // DN3500
+		case 0x010029a6: // DN5500
+			offset = 16;
+			break;
+		}
+	}
 	UINT8 data = get_device_dma8237_2(&space.device())->read(space, offset / 2);
 	SLOG1(("apollo_dma_2_r: reading DMA Controller 2 at offset %02x = %02x", offset/2, data));
 	return data;
@@ -495,7 +510,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 
 READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 	UINT8 data = sc499_dack_r(&space.machine());
-//  DLOG2(("dma ctape dack read %02x",data));
+    CLOG2(("dma ctape dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
 	dn3000_dma_channel1 = 1; // 1 = ctape, 2 = floppy dma channel
@@ -504,7 +519,7 @@ READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 }
 
 WRITE8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_w ) {
-//  DLOG2(("dma ctape dack write %02x", data));
+    CLOG2(("dma ctape dack write %02x", data));
 	sc499_dack_w(&space.machine(), data);
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -515,7 +530,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_w ) {
 READ8_MEMBER(apollo_state::apollo_dma8237_fdc_dack_r ) {
 	pc_fdc_at_device *fdc = space.machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
 	UINT8 data = fdc->dma_r();
-	//  DLOG2(("dma fdc dack read %02x",data));
+	CLOG2(("dma fdc dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
 	dn3000_dma_channel1 = 2; // 1 = ctape, 2 = floppy dma channel
@@ -525,7 +540,7 @@ READ8_MEMBER(apollo_state::apollo_dma8237_fdc_dack_r ) {
 
 WRITE8_MEMBER(apollo_state::apollo_dma8237_fdc_dack_w ) {
 	pc_fdc_at_device *fdc = space.machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
-	// DLOG2(("dma fdc dack write %02x", data));
+	CLOG2(("dma fdc dack write %02x", data));
 	fdc->dma_w(data);
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -535,35 +550,35 @@ WRITE8_MEMBER(apollo_state::apollo_dma8237_fdc_dack_w ) {
 
 READ8_MEMBER(apollo_state::apollo_dma8237_wdc_dack_r ) {
 	UINT8 data = 0xff; // omti8621_dack_r(device->machine);
-	//DLOG1(("dma wdc dack read %02x (not used, not emulated!)",data));
+	CLOG1(("dma wdc dack read %02x (not used, not emulated!)",data));
 	return data;
 }
 
 WRITE8_MEMBER(apollo_state::apollo_dma8237_wdc_dack_w ) {
-	//DLOG1(("dma wdc dack write %02x (not used, not emulated!)", data));
+	CLOG1(("dma wdc dack write %02x (not used, not emulated!)", data));
 //  omti8621_dack_w(machine, data);
 }
 
 WRITE_LINE_MEMBER(apollo_state::apollo_dma8237_out_eop ) {
 	pc_fdc_at_device *fdc = machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
-	//DLOG1(("dma out eop state %02x", state));
+	CLOG1(("dma out eop state %02x", state));
 	fdc->tc_w(!state);
 	sc499_set_tc_state(&machine(), state);
 }
 
 WRITE_LINE_MEMBER(apollo_state::apollo_dma_1_hrq_changed ) {
-	// DLOG2(("dma 1 hrq changed state %02x", state));
-	m_dma8237_2->dreq0_w(state);
+	CLOG2(("dma 1 hrq changed state %02x", state));
+	m_dma8237_1->dreq0_w(state);
 
 	/* Assert HLDA */
-	//m_dma8237_1->hack_w(state);
+	m_dma8237_1->hack_w(state);
 
 	// cascade mode?
 	// i8237_hlda_w(get_device_dma8237_2(device), state);
 }
 
 WRITE_LINE_MEMBER(apollo_state::apollo_dma_2_hrq_changed ) {
-	// DLOG2(("dma 2 hrq changed state %02x", state));
+	CLOG2(("dma 2 hrq changed state %02x", state));
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */

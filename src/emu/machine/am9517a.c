@@ -336,8 +336,18 @@ inline void am9517a_device::dma_advance()
 inline void am9517a_device::end_of_process()
 {
 	// terminal count
-	m_status |= 1 << m_current_channel;
-	m_request &= ~(1 << m_current_channel);
+	if (COMMAND_MEM_TO_MEM)
+	{
+		m_status |= 1 << 0;
+		m_status |= 1 << 1;
+		m_request &= ~(1 << 0);
+		m_request &= ~(1 << 1);
+	}
+	else
+	{
+		m_status |= 1 << m_current_channel;
+		m_request &= ~(1 << m_current_channel);
+	}
 
 	if (MODE_AUTOINITIALIZE)
 	{
@@ -519,6 +529,12 @@ void am9517a_device::execute_run()
 						m_state = STATE_S0;
 						break;
 					}
+					else if (COMMAND_MEM_TO_MEM && BIT(m_request, channel) && ((m_channel[channel].m_mode & 0xc0) == MODE_SINGLE))
+					{
+						m_current_channel = m_last_channel = priority[channel];
+						m_state = STATE_S0;
+						break;
+					}
 				}
 			}
 			if(m_state == STATE_SI)
@@ -633,6 +649,18 @@ void am9517a_device::execute_run()
 		case STATE_S24:
 			dma_write();
 			dma_advance();
+
+			m_current_channel = 0;
+			m_channel[m_current_channel].m_count--;
+			if (MODE_ADDRESS_DECREMENT)
+			{
+				m_channel[m_current_channel].m_address--;
+			}
+			else
+			{
+				m_channel[m_current_channel].m_address++;
+			}
+
 			break;
 		}
 
@@ -767,6 +795,10 @@ WRITE8_MEMBER( am9517a_device::write )
 				if (BIT(data, 2))
 				{
 					m_request |= (1 << (channel + 4));
+					if (COMMAND_MEM_TO_MEM)
+					{
+						m_request |= (1 << channel);
+					}
 				}
 				else
 				{
