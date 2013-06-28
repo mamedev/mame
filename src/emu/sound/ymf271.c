@@ -46,7 +46,7 @@
 static const int fm_tab[16] = { 0, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8, -1, 9, 10, 11, -1 };
 static const int pcm_tab[16] = { 0, 4, 8, -1, 12, 16, 20, -1, 24, 28, 32, -1, 36, 40, 44, -1 };
 
-static INT16 *wavetable[8];
+static INT16 wavetable[8][SIN_LEN];
 static double plfo_table[4][8][LFO_LENGTH];
 static int alfo_table[4][LFO_LENGTH];
 
@@ -1527,11 +1527,6 @@ READ8_MEMBER( ymf271_device::read )
 static void init_tables(running_machine &machine)
 {
 	int i,j;
-
-	for (i=0; i < ARRAY_LENGTH(wavetable); i++)
-	{
-		wavetable[i] = auto_alloc_array(machine, INT16, SIN_LEN);
-	}
 
 	for (i=0; i < SIN_LEN; i++)
 	{
