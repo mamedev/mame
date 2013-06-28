@@ -65,7 +65,8 @@ private:
 		UINT32 loopaddr;
 		UINT32 endaddr;
 		INT8   altloop;
-		INT8   fs, srcnote, srcb;
+		INT8   fs;
+		INT8   srcnote, srcb;
 
 		INT64 step;
 		INT64 stepptr;
@@ -138,6 +139,7 @@ private:
 
 	emu_timer *m_timA, *m_timB;
 	sound_stream *m_stream;
+	INT32 *m_mix_buffer;
 
 	devcb2_write_line m_irq_handler;
 	devcb2_read8 m_ext_read_handler;

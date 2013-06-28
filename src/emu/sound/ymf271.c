@@ -633,14 +633,13 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	int i, j;
 	int op;
 	INT32 *mixp;
-	INT32 mix[48000*2];
 
-	memset(mix, 0, sizeof(mix[0])*samples*2);
+	memset(m_mix_buffer, 0, sizeof(m_mix_buffer[0])*samples*2);
 
 	for (j = 0; j < 12; j++)
 	{
 		YMF271Group *slot_group = &m_groups[j];
-		mixp = &mix[0];
+		mixp = m_mix_buffer;
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
@@ -656,7 +655,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
 				int slot4 = j + (3*12);
-				mixp = &mix[0];
+				mixp = m_mix_buffer;
 
 				if (m_slots[slot1].active)
 				{
@@ -843,7 +842,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					int slot1 = j + ((op + 0) * 12);
 					int slot2 = j + ((op + 2) * 12);
 
-					mixp = &mix[0];
+					mixp = m_mix_buffer;
 					if (m_slots[slot1].active)
 					{
 						for (i = 0; i < samples; i++)
@@ -895,7 +894,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				int slot1 = j + (0*12);
 				int slot2 = j + (1*12);
 				int slot3 = j + (2*12);
-				mixp = &mix[0];
+				mixp = m_mix_buffer;
 
 				if (m_slots[slot1].active)
 				{
@@ -981,7 +980,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 
-				mixp = &mix[0];
+				mixp = m_mix_buffer;
 				update_pcm(j + (3*12), mixp, samples);
 				break;
 			}
@@ -997,7 +996,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		}
 	}
 
-	mixp = &mix[0];
+	mixp = m_mix_buffer;
 	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
@@ -1711,6 +1710,7 @@ void ymf271_device::device_start()
 	init_state();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
+	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
 
 	for (i = 0; i < 256; i++)
 	{

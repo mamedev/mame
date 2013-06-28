@@ -125,6 +125,7 @@ private:
 	int m_clock;
 
 	sound_stream * m_stream;
+	INT32 *m_mix_buffer;
 	devcb2_write_line m_irq_handler;
 };
 
