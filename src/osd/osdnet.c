@@ -9,7 +9,7 @@ void add_netdev(const char *name, const char *description, create_netdev func)
 	entry->id = netdev_list.count();
 	strncpy(entry->name, name, 255);
 	entry->name[255] = '\0';
-	strncpy(entry->description, description, 255);
+	strncpy(entry->description, (description != NULL) ? description : "(no name)", 255);
 	entry->description[255] = '\0';
 	entry->func = func;
 	netdev_list.append(*entry);
