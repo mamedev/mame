@@ -454,12 +454,12 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 				// overflow
 				slot->stepptr &= 0xffff;
 				slot->stepptr |= ((UINT64)slot->loopaddr<<16);
-			}
-			if ((slot->stepptr>>16) > slot->endaddr)
-			{
-				// still overflow? (triggers in rdft2, rarely)
-				slot->stepptr &= 0xffff;
-				slot->stepptr |= ((UINT64)slot->endaddr<<16);
+				if ((slot->stepptr>>16) > slot->endaddr)
+				{
+					// still overflow? (triggers in rdft2, rarely)
+					slot->stepptr &= 0xffff;
+					slot->stepptr |= ((UINT64)slot->endaddr<<16);
+				}
 			}
 		}
 
