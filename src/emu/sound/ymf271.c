@@ -624,6 +624,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		if (slot_group->pfm && slot_group->sync != 3)
 		{
+			popmessage("ymf271 PFM, contact MAMEdev");
 			logerror("ymf271 Group %d: PFM, Sync = %d, Waveform Slot1 = %d, Slot2 = %d, Slot3 = %d, Slot4 = %d\n",
 				j, slot_group->sync, m_slots[j+0].waveform, m_slots[j+12].waveform, m_slots[j+24].waveform, m_slots[j+36].waveform);
 		}
@@ -1214,6 +1215,8 @@ void ymf271_device::ymf271_write_pcm(UINT8 data)
 			slot->startaddr &= ~0xff0000;
 			slot->startaddr |= (data & 0x7f)<<16;
 			slot->altloop = (data & 0x80) ? 1 : 0;
+			if (slot->altloop)
+				popmessage("ymf271 A/L, contact MAMEdev");
 			break;
 
 		case 3:
