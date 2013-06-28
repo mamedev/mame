@@ -96,6 +96,7 @@ private:
 	};
 
 	void init_state();
+	void init_tables();
 	void calculate_step(YMF271Slot *slot);
 	void update_envelope(YMF271Slot *slot);
 	void init_envelope(YMF271Slot *slot);
@@ -112,7 +113,18 @@ private:
 	void ymf271_write_pcm(UINT8 data);
 	UINT8 ymf271_read_memory(UINT32 offset);
 	void ymf271_write_timer(UINT8 data);
-
+	
+	// lookup tables
+	INT16 *m_lut_waves[8];
+	double *m_lut_plfo[4][8];
+	int *m_lut_alfo[4];
+	double m_lut_ar[64];
+	double m_lut_dc[64];
+	double m_lut_lfo[256];
+	int m_lut_attenuation[16];
+	int m_lut_total_level[128];
+	int m_lut_env_volume[256];
+	
 	// internal state
 	YMF271Slot m_slots[48];
 	YMF271Group m_groups[12];

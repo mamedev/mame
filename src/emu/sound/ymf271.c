@@ -20,13 +20,15 @@
     - ch2/ch3 (4 speakers)
     - PFM (FM using external PCM waveform)
     - detune
-    - Acc On bit
+    - Acc On bit (some sound effects in viprp1?)
     - Is memory handling 100% correct? At the moment, seibuspi.c is the only
       hardware currently emulated that uses external handlers.
 */
 
 #include "emu.h"
 #include "ymf271.h"
+
+#define STD_CLOCK       (16934400)
 
 #define MAXOUT          (+32767)
 #define MINOUT          (-32768)
@@ -41,14 +43,6 @@
 #define PLFO_MIN        (-1.0)
 #define ALFO_MAX        (+65536)
 #define ALFO_MIN        (0)
-
-// slot mapping assists
-static const int fm_tab[16] = { 0, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8, -1, 9, 10, 11, -1 };
-static const int pcm_tab[16] = { 0, 4, 8, -1, 12, 16, 20, -1, 24, 28, 32, -1, 36, 40, 44, -1 };
-
-static INT16 wavetable[8][SIN_LEN];
-static double plfo_table[4][8][LFO_LENGTH];
-static int alfo_table[4][LFO_LENGTH];
 
 #define ENV_ATTACK      0
 #define ENV_DECAY1      1
@@ -185,6 +179,12 @@ static const int RKS_Table[32][8] =
 	{  0,  3,  7, 15, 31, 31, 31, 31 },
 };
 
+static const double multiple_table[16] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+
+static const double pow_table[16] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 0.5, 1, 2, 4, 8, 16, 32, 64 };
+
+static const double fs_frequency[4] = { 1.0/1.0, 1.0/2.0, 1.0/4.0, 1.0/8.0 };
+
 static const double channel_attenuation_table[16] =
 {
 	0.0, 2.5, 6.0, 8.5, 12.0, 14.5, 18.1, 20.6, 24.1, 26.6, 30.1, 32.6, 36.1, 96.1, 96.1, 96.1
@@ -195,10 +195,12 @@ static const int modulation_level[8] = { 16, 8, 4, 2, 1, 32, 64, 128 };
 // feedback_level * 16
 static const int feedback_level[8] = { 0, 1, 2, 4, 8, 16, 32, 64 };
 
-static int channel_attenuation[16];
-static int total_level[128];
-static int env_volume_table[256];
+// slot mapping assists
+static const int fm_tab[16] = { 0, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8, -1, 9, 10, 11, -1 };
+static const int pcm_tab[16] = { 0, 4, 8, -1, 12, 16, 20, -1, 24, 28, 32, -1, 36, 40, 44, -1 };
 
+
+/*****************************************************************************/
 
 INLINE int GET_KEYSCALED_RATE(int rate, int keycode, int keyscale)
 {
@@ -260,12 +262,6 @@ INLINE int GET_EXTERNAL_KEYCODE(int block, int fns)
 
 	return ((block & 7) * 4) + n43;
 }
-
-static const double multiple_table[16] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-
-static const double pow_table[16] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 0.5, 1, 2, 4, 8, 16, 32, 64 };
-
-static const double fs_frequency[4] = { 1.0/1.0, 1.0/2.0, 1.0/4.0, 1.0/8.0 };
 
 void ymf271_device::calculate_step(YMF271Slot *slot)
 {
@@ -356,8 +352,6 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 	int keycode, rate;
 	int decay_level = 255 - (slot->decay1lvl << 4);
 
-	double time;
-
 	if (slot->waveform != 7)
 	{
 		keycode = GET_INTERNAL_KEYCODE(slot->block, slot->fns);
@@ -370,23 +364,19 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 
 	// init attack state
 	rate = GET_KEYSCALED_RATE(slot->ar * 2, keycode, slot->keyscale);
-	time = (ARTime[rate] * 44100.0) / 1000.0;        // attack end time in samples
-	slot->env_attack_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
+	slot->env_attack_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
 
 	// init decay1 state
 	rate = GET_KEYSCALED_RATE(slot->decay1rate * 2, keycode, slot->keyscale);
-	time = (DCTime[rate] * 44100.0) / 1000.0;
-	slot->env_decay1_step = time < 0 ? 0 : (int)(((double)(255-decay_level) / time) * 65536.0);
+	slot->env_decay1_step = (rate < 4) ? 0 : (int)(((double)(255-decay_level) / m_lut_dc[rate]) * 65536.0);
 
 	// init decay2 state
 	rate = GET_KEYSCALED_RATE(slot->decay2rate * 2, keycode, slot->keyscale);
-	time = (DCTime[rate] * 44100.0) / 1000.0;
-	slot->env_decay2_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
+	slot->env_decay2_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_dc[rate]) * 65536.0);
 
 	// init release state
 	rate = GET_KEYSCALED_RATE(slot->relrate * 4, keycode, slot->keyscale);
-	time = (ARTime[rate] * 44100.0) / 1000.0;
-	slot->env_release_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
+	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
 
 	slot->volume = (255-160) << ENV_VOLUME_SHIFT;       // -60db
 	slot->env_state = ENV_ATTACK;
@@ -398,15 +388,15 @@ void ymf271_device::init_lfo(YMF271Slot *slot)
 	slot->lfo_amplitude = 0;
 	slot->lfo_phasemod = 0;
 
-	slot->lfo_step = (int)((((double)LFO_LENGTH * LFO_frequency_table[slot->lfoFreq]) / 44100.0) * 256.0);
+	slot->lfo_step = (int)((((double)LFO_LENGTH * m_lut_lfo[slot->lfoFreq]) / 44100.0) * 256.0);
 }
 
 void ymf271_device::update_lfo(YMF271Slot *slot)
 {
 	slot->lfo_phase += slot->lfo_step;
 
-	slot->lfo_amplitude = alfo_table[slot->lfowave][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
-	slot->lfo_phasemod = plfo_table[slot->lfowave][slot->pms][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
+	slot->lfo_amplitude = m_lut_alfo[slot->lfowave][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
+	slot->lfo_phasemod = m_lut_plfo[slot->lfowave][slot->pms][(slot->lfo_phase >> LFO_SHIFT) & (LFO_LENGTH-1)];
 
 	calculate_step(slot);
 }
@@ -425,9 +415,9 @@ INT64 ymf271_device::calculate_slot_volume(YMF271Slot *slot)
 		case 3: lfo_volume = 65536 - ((slot->lfo_amplitude * 4277) >> 16); break;   // 23.625dB
 	}
 
-	env_volume = (env_volume_table[255 - (slot->volume >> ENV_VOLUME_SHIFT)] * lfo_volume) >> 16;
+	env_volume = (m_lut_env_volume[255 - (slot->volume >> ENV_VOLUME_SHIFT)] * lfo_volume) >> 16;
 
-	volume = (env_volume * total_level[slot->tl]) >> 16;
+	volume = (env_volume * m_lut_total_level[slot->tl]) >> 16;
 
 	return volume;
 }
@@ -472,10 +462,10 @@ void ymf271_device::update_pcm(int slotnum, INT32 *mixp, int length)
 
 		final_volume = calculate_slot_volume(slot);
 
-		ch0_vol = (final_volume * channel_attenuation[slot->ch0_level]) >> 16;
-		ch1_vol = (final_volume * channel_attenuation[slot->ch1_level]) >> 16;
-//      ch2_vol = (final_volume * channel_attenuation[slot->ch2_level]) >> 16;
-//      ch3_vol = (final_volume * channel_attenuation[slot->ch3_level]) >> 16;
+		ch0_vol = (final_volume * m_lut_attenuation[slot->ch0_level]) >> 16;
+		ch1_vol = (final_volume * m_lut_attenuation[slot->ch1_level]) >> 16;
+//      ch2_vol = (final_volume * m_lut_attenuation[slot->ch2_level]) >> 16;
+//      ch3_vol = (final_volume * m_lut_attenuation[slot->ch3_level]) >> 16;
 
 		if (ch0_vol > 65536) ch0_vol = 65536;
 		if (ch1_vol > 65536) ch1_vol = 65536;
@@ -515,11 +505,11 @@ INT64 ymf271_device::calculate_2op_fm_0(int slotnum1, int slotnum2)
 	feedback = (slot1->feedback_modulation0 + slot1->feedback_modulation1) / 2;
 	slot1->feedback_modulation0 = slot1->feedback_modulation1;
 
-	slot1_output = wavetable[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
+	slot1_output = m_lut_waves[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
 	slot1_output = (slot1_output * env1) >> 16;
 
 	phase_mod = ((slot1_output << (SIN_BITS-2)) * modulation_level[slot2->feedback]);
-	slot2_output = wavetable[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
+	slot2_output = m_lut_waves[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
 	slot2_output = (slot2_output * env2) >> 16;
 
 	slot1->feedback_modulation1 = (((slot1_output << (SIN_BITS-2)) * feedback_level[slot1->feedback]) / 16);
@@ -552,11 +542,11 @@ INT64 ymf271_device::calculate_2op_fm_1(int slotnum1, int slotnum2)
 	feedback = (slot1->feedback_modulation0 + slot1->feedback_modulation1) / 2;
 	slot1->feedback_modulation0 = slot1->feedback_modulation1;
 
-	slot1_output = wavetable[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
+	slot1_output = m_lut_waves[slot1->waveform][((slot1->stepptr + feedback) >> 16) & SIN_MASK];
 	slot1_output = (slot1_output * env1) >> 16;
 
 	phase_mod = ((slot1_output << (SIN_BITS-2)) * modulation_level[slot2->feedback]);
-	slot2_output = wavetable[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
+	slot2_output = m_lut_waves[slot2->waveform][((slot2->stepptr + phase_mod) >> 16) & SIN_MASK];
 	slot2_output = (slot2_output * env2) >> 16;
 
 	slot1->feedback_modulation1 = (((slot2_output << (SIN_BITS-2)) * feedback_level[slot1->feedback]) / 16);
@@ -581,7 +571,7 @@ INT64 ymf271_device::calculate_1op_fm_0(int slotnum, INT64 phase_modulation)
 
 	phase_mod = ((phase_mod << (SIN_BITS-2)) * modulation_level[slot->feedback]);
 
-	slot_output = wavetable[slot->waveform][((slot->stepptr + phase_mod) >> 16) & SIN_MASK];
+	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + phase_mod) >> 16) & SIN_MASK];
 	slot->stepptr += slot->step;
 
 	slot_output = (slot_output * env) >> 16;
@@ -606,7 +596,7 @@ INT64 ymf271_device::calculate_1op_fm_1(int slotnum)
 	feedback = slot->feedback_modulation0 + slot->feedback_modulation1;
 	slot->feedback_modulation0 = slot->feedback_modulation1;
 
-	slot_output = wavetable[slot->waveform][((slot->stepptr + feedback) >> 16) & SIN_MASK];
+	slot_output = m_lut_waves[slot->waveform][((slot->stepptr + feedback) >> 16) & SIN_MASK];
 	slot_output = (slot_output * env) >> 16;
 
 	slot->feedback_modulation1 = (((slot_output << (SIN_BITS-2)) * feedback_level[slot->feedback]) / 16);
@@ -813,14 +803,14 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 								break;
 						}
 
-						*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch0_level]) +
-									(output2 * channel_attenuation[m_slots[slot2].ch0_level]) +
-									(output3 * channel_attenuation[m_slots[slot3].ch0_level]) +
-									(output4 * channel_attenuation[m_slots[slot4].ch0_level])) >> 16;
-						*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch1_level]) +
-									(output2 * channel_attenuation[m_slots[slot2].ch1_level]) +
-									(output3 * channel_attenuation[m_slots[slot3].ch1_level]) +
-									(output4 * channel_attenuation[m_slots[slot4].ch1_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch0_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch0_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch0_level]) +
+									(output4 * m_lut_attenuation[m_slots[slot4].ch0_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch1_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch1_level]) +
+									(output4 * m_lut_attenuation[m_slots[slot4].ch1_level])) >> 16;
 					}
 				}
 				break;
@@ -870,10 +860,10 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 									break;
 							}
 
-							*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch0_level]) +
-										(output2 * channel_attenuation[m_slots[slot2].ch0_level])) >> 16;
-							*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch1_level]) +
-										(output2 * channel_attenuation[m_slots[slot2].ch1_level])) >> 16;
+							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch0_level]) +
+										(output2 * m_lut_attenuation[m_slots[slot2].ch0_level])) >> 16;
+							*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
+										(output2 * m_lut_attenuation[m_slots[slot2].ch1_level])) >> 16;
 						}
 					}
 				}
@@ -962,12 +952,12 @@ void ymf271_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 								break;
 						}
 
-						*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch0_level]) +
-									(output2 * channel_attenuation[m_slots[slot2].ch0_level]) +
-									(output3 * channel_attenuation[m_slots[slot3].ch0_level])) >> 16;
-						*mixp++ += ((output1 * channel_attenuation[m_slots[slot1].ch1_level]) +
-									(output2 * channel_attenuation[m_slots[slot2].ch1_level]) +
-									(output3 * channel_attenuation[m_slots[slot3].ch1_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch0_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch0_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch0_level])) >> 16;
+						*mixp++ += ((output1 * m_lut_attenuation[m_slots[slot1].ch1_level]) +
+									(output2 * m_lut_attenuation[m_slots[slot2].ch1_level]) +
+									(output3 * m_lut_attenuation[m_slots[slot3].ch1_level])) >> 16;
 					}
 				}
 
@@ -1515,40 +1505,49 @@ READ8_MEMBER( ymf271_device::read )
 	return 0;
 }
 
-static void init_tables(running_machine &machine)
+void ymf271_device::init_tables()
 {
-	int i,j;
+	int i, j;
+	
+	for (i = 0; i < 8; i++)
+		m_lut_waves[i] = auto_alloc_array(machine(), INT16, SIN_LEN);
+	
+	for (i = 0; i < 4*8; i++)
+		m_lut_plfo[i>>3][i&7] = auto_alloc_array(machine(), double, LFO_LENGTH);
 
-	for (i=0; i < SIN_LEN; i++)
+	for (i = 0; i < 4; i++)
+		m_lut_alfo[i] = auto_alloc_array(machine(), int, LFO_LENGTH);
+
+	for (i = 0; i < SIN_LEN; i++)
 	{
 		double m = sin( ((i*2)+1) * M_PI / SIN_LEN );
 		double m2 = sin( ((i*4)+1) * M_PI / SIN_LEN );
 
 		// Waveform 0: sin(wt)    (0 <= wt <= 2PI)
-		wavetable[0][i] = (INT16)(m * MAXOUT);
+		m_lut_waves[0][i] = (INT16)(m * MAXOUT);
 
 		// Waveform 1: sin?(wt)   (0 <= wt <= PI)     -sin?(wt)  (PI <= wt <= 2PI)
-		wavetable[1][i] = (i < (SIN_LEN/2)) ? (INT16)((m * m) * MAXOUT) : (INT16)((m * m) * MINOUT);
+		m_lut_waves[1][i] = (i < (SIN_LEN/2)) ? (INT16)((m * m) * MAXOUT) : (INT16)((m * m) * MINOUT);
 
 		// Waveform 2: sin(wt)    (0 <= wt <= PI)     -sin(wt)   (PI <= wt <= 2PI)
-		wavetable[2][i] = (i < (SIN_LEN/2)) ? (INT16)(m * MAXOUT) : (INT16)(-m * MAXOUT);
+		m_lut_waves[2][i] = (i < (SIN_LEN/2)) ? (INT16)(m * MAXOUT) : (INT16)(-m * MAXOUT);
 
 		// Waveform 3: sin(wt)    (0 <= wt <= PI)     0
-		wavetable[3][i] = (i < (SIN_LEN/2)) ? (INT16)(m * MAXOUT) : 0;
+		m_lut_waves[3][i] = (i < (SIN_LEN/2)) ? (INT16)(m * MAXOUT) : 0;
 
 		// Waveform 4: sin(2wt)   (0 <= wt <= PI)     0
-		wavetable[4][i] = (i < (SIN_LEN/2)) ? (INT16)(m2 * MAXOUT) : 0;
+		m_lut_waves[4][i] = (i < (SIN_LEN/2)) ? (INT16)(m2 * MAXOUT) : 0;
 
 		// Waveform 5: |sin(2wt)| (0 <= wt <= PI)     0
-		wavetable[5][i] = (i < (SIN_LEN/2)) ? (INT16)(fabs(m2) * MAXOUT) : 0;
+		m_lut_waves[5][i] = (i < (SIN_LEN/2)) ? (INT16)(fabs(m2) * MAXOUT) : 0;
 
 		// Waveform 6:     1      (0 <= wt <= 2PI)
-		wavetable[6][i] = (INT16)(1 * MAXOUT);
+		m_lut_waves[6][i] = (INT16)(1 * MAXOUT);
 
-		wavetable[7][i] = 0;
+		m_lut_waves[7][i] = 0;
 	}
 
-	for (i=0; i < LFO_LENGTH; i++)
+	for (i = 0; i < LFO_LENGTH; i++)
 	{
 		int tri_wave;
 		double ftri_wave, fsaw_wave;
@@ -1569,30 +1568,63 @@ static void init_tables(running_machine &machine)
 			case 1: plfo[3] = PLFO_MAX - ftri_wave; break;
 			case 2: plfo[3] = 0 - ftri_wave; break;
 			case 3: plfo[3] = 0 - (PLFO_MAX - ftri_wave); break;
-			default: plfo[3]=0; assert(0); break;
+			default: plfo[3] = 0; assert(0); break;
 		}
 
-		for (j=0; j < 4; j++)
+		for (j = 0; j < 4; j++)
 		{
-			plfo_table[j][0][i] = pow(2.0, 0.0);
-			plfo_table[j][1][i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
-			plfo_table[j][2][i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
-			plfo_table[j][3][i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
-			plfo_table[j][4][i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
-			plfo_table[j][5][i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
-			plfo_table[j][6][i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
-			plfo_table[j][7][i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][0][i] = pow(2.0, 0.0);
+			m_lut_plfo[j][1][i] = pow(2.0, (3.378 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][2][i] = pow(2.0, (5.0646 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][3][i] = pow(2.0, (6.7495 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][4][i] = pow(2.0, (10.1143 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][5][i] = pow(2.0, (20.1699 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][6][i] = pow(2.0, (40.1076 * plfo[j]) / 1200.0);
+			m_lut_plfo[j][7][i] = pow(2.0, (79.307 * plfo[j]) / 1200.0);
 		}
 
 		// LFO amplitude modulation
-		alfo_table[0][i] = 0;
+		m_lut_alfo[0][i] = 0;
 
-		alfo_table[1][i] = ALFO_MAX - ((i * ALFO_MAX) / LFO_LENGTH);
+		m_lut_alfo[1][i] = ALFO_MAX - ((i * ALFO_MAX) / LFO_LENGTH);
 
-		alfo_table[2][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX : ALFO_MIN;
+		m_lut_alfo[2][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX : ALFO_MIN;
 
 		tri_wave = ((i % (LFO_LENGTH/2)) * ALFO_MAX) / (LFO_LENGTH/2);
-		alfo_table[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
+		m_lut_alfo[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
+	}
+
+	for (i = 0; i < 256; i++)
+	{
+		m_lut_env_volume[i] = (int)(65536.0 / pow(10.0, ((double)i / (256.0 / 96.0)) / 20.0));
+	}
+
+	for (i = 0; i < 16; i++)
+	{
+		m_lut_attenuation[i] = (int)(65536.0 / pow(10.0, channel_attenuation_table[i] / 20.0));
+	}
+	for (i = 0; i < 128; i++)
+	{
+		double db = 0.75 * (double)i;
+		m_lut_total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
+	}
+	
+	// timing may use a non-standard XTAL
+	double clock_correction = (double)(STD_CLOCK) / (double)(m_clock);
+	for (i = 0; i < 256; i++)
+	{
+		m_lut_lfo[i] = LFO_frequency_table[i] * clock_correction;
+	}
+
+	for (i = 0; i < 64; i++)
+	{
+		// attack/release rate in number of samples
+		m_lut_ar[i] = (ARTime[i] * clock_correction * 44100.0) / 1000.0;
+	}
+	for (i = 0; i < 64; i++)
+	{
+		// decay rate in number of samples
+		m_lut_dc[i] = (DCTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
 }
 
@@ -1678,8 +1710,6 @@ void ymf271_device::init_state()
 
 void ymf271_device::device_start()
 {
-	int i;
-
 	m_clock = clock();
 
 	m_timA = timer_alloc(0);
@@ -1692,26 +1722,11 @@ void ymf271_device::device_start()
 	m_ext_read_handler.resolve();
 	m_ext_write_handler.resolve();
 
-	init_tables(machine());
+	init_tables();
 	init_state();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
 	m_mix_buffer = auto_alloc_array(machine(), INT32, 44100*2);
-
-	for (i = 0; i < 256; i++)
-	{
-		env_volume_table[i] = (int)(65536.0 / pow(10.0, ((double)i / (256.0 / 96.0)) / 20.0));
-	}
-
-	for (i = 0; i < 16; i++)
-	{
-		channel_attenuation[i] = (int)(65536.0 / pow(10.0, channel_attenuation_table[i] / 20.0));
-	}
-	for (i = 0; i < 128; i++)
-	{
-		double db = 0.75 * (double)i;
-		total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
-	}
 }
 
 //-------------------------------------------------
