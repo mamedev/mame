@@ -86,28 +86,38 @@ public:
 	/// Called by Rocket when it wants to render geometry that it does not wish to optimise.
 	virtual void RenderGeometry(Rocket::Core::Vertex* vertices, int num_vertices, int* indices, int num_indices, Rocket::Core::TextureHandle texture, const Rocket::Core::Vector2f& translation)
 	{
+		bitmap_rgb32 *bitmap = ((bitmap_rgb32 *)texture);
+			for (int i = 0; i < num_indices/6; i++)
+			{			
+				int p1 = indices[i*6+0];
+				int p2 = indices[i*6+5];
+				if (bitmap!=0)
+				{
+					render_texture *hilight_texture = machine().render().texture_alloc();
+					rectangle bit = bitmap->cliprect();
+					rectangle myrect = bitmap->cliprect();
 
-		for (int i = 0; i < num_indices/6; i++)
-		{			
-			render_texture *hilight_texture = machine().render().texture_alloc();
-			rectangle bit = ((bitmap_rgb32 *)texture)->cliprect();
-			rectangle myrect = ((bitmap_rgb32 *)texture)->cliprect();
-			int p1 = indices[i*6+0];
-			int p2 = indices[i*6+5];
+					myrect.min_x = bit.max_x * vertices[p1].tex_coord.x;
+					myrect.min_y = bit.max_y * vertices[p1].tex_coord.y;
+					myrect.max_x = bit.max_x * vertices[p2].tex_coord.x;
+					myrect.max_y = bit.max_y * vertices[p2].tex_coord.y;
+					if (myrect.min_x > myrect.max_x) { int t = myrect.max_x; myrect.max_x = myrect.min_x; myrect.min_x = t; } // this should be flipping
+					if (myrect.min_y > myrect.max_y) { int t = myrect.max_y; myrect.max_y = myrect.min_y; myrect.min_y = t; }
 
-			myrect.min_x = bit.max_x * vertices[p1].tex_coord.x;
-			myrect.min_y = bit.max_y * vertices[p1].tex_coord.y;
-			myrect.max_x = bit.max_x * vertices[p2].tex_coord.x;
-			myrect.max_y = bit.max_y * vertices[p2].tex_coord.y;
-			if (myrect.min_x > myrect.max_x) { int t = myrect.max_x; myrect.max_x = myrect.min_x; myrect.min_x = t; } // this should be flipping
-			if (myrect.min_y > myrect.max_y) { int t = myrect.max_y; myrect.max_y = myrect.min_y; myrect.min_y = t; }
+					hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
+					rgb_t col = MAKE_ARGB(vertices[p1].colour.alpha, vertices[p1].colour.red, vertices[p1].colour.green, vertices[p1].colour.blue);
+					machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1280,(vertices[p1].position.y+translation.y)/960, (vertices[p2].position.x+translation.x)/1280,(vertices[p2].position.y+translation.y)/960, col, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					//machine().render().texture_free(hilight_texture);				
+				} else {
+					rgb_t col = MAKE_ARGB(vertices[p1].colour.alpha, vertices[p1].colour.red, vertices[p1].colour.green, vertices[p1].colour.blue);
+					int x1  = MIN(vertices[p1].position.x,vertices[p2].position.x);
+					int x2  = MAX(vertices[p1].position.x,vertices[p2].position.x);
+					int y1  = MIN(vertices[p1].position.y,vertices[p2].position.y);
+					int y2  = MAX(vertices[p1].position.y,vertices[p2].position.y);
+					machine().render().ui_container().add_quad((x1+translation.x)/1280,(y1+translation.y)/960, (x2+translation.x)/1280,(y2+translation.y)/960, col, NULL,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				}
 
-			hilight_texture->set_bitmap(*((bitmap_rgb32 *)texture), myrect, TEXFORMAT_ARGB32);		
-			
-			machine().render().ui_container().add_quad((vertices[p1].position.x+translation.x)/1280,(vertices[p1].position.y+translation.y)/960, (vertices[p2].position.x+translation.x)/1280,(vertices[p2].position.y+translation.y)/960, UI_BORDER_COLOR, hilight_texture,PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			//machine().render().texture_free(hilight_texture);
-		}						
-		
+			}						
 	}
 
 	/// Called by Rocket when it wants to compile geometry it believes will be static for the forseeable future.
@@ -160,9 +170,8 @@ public:
 	virtual bool LoadTexture(Rocket::Core::TextureHandle& texture_handle, Rocket::Core::Vector2i& texture_dimensions, const Rocket::Core::String& source)
 	{
 		
-		
-		emu_file file("", OPEN_FLAG_READ);
-		file_error filerr = file.open(source.CString());	
+		core_file *file = NULL;
+		file_error filerr = core_fopen(source.CString(), OPEN_FLAG_READ, &file);		
 		if(filerr != FILERR_NONE)
 		{
 			return false;
@@ -173,30 +182,42 @@ public:
 		{
 			bitmap_argb32 bitmap;
 			png_read_bitmap(file, bitmap);				
-			bitmap_rgb32 *hilight_bitmap = auto_bitmap_rgb32_alloc(machine(), bitmap.width(), bitmap.height());
-			for (int y = 0; y < bitmap.height(); ++y)
+			int image_size = bitmap.width() * bitmap.height() * 4; // We always make 32bit textures 
+			unsigned char* image_dest = new unsigned char[image_size];
+			
+			// Targa is BGR, swap to RGB and flip Y axis
+			for (long y = 0; y < bitmap.height(); y++)
 			{
-				for (int x = 0; x < bitmap.width(); ++x)
+				long write_index = y * bitmap.width() * 4;
+				for (long x = 0; x < bitmap.width(); x++)
 				{
-					hilight_bitmap->pix32(y, x) = bitmap.pix32(y,x);
+					image_dest[write_index] =   (bitmap.pix32(y,x) >> 16) & 0xff;
+					image_dest[write_index+1] = (bitmap.pix32(y,x) >> 8) & 0xff;
+					image_dest[write_index+2] = (bitmap.pix32(y,x) >> 0) & 0xff; 
+					image_dest[write_index+3] = (bitmap.pix32(y,x) >> 24) & 0xff;
+					
+					write_index += 4;
 				}
 			}
+
 			
-			texture_handle = (Rocket::Core::TextureHandle)hilight_bitmap;			
 			texture_dimensions.x = bitmap.width();
 			texture_dimensions.y = bitmap.height();
-			return true;
+			bool success = GenerateTexture(texture_handle, image_dest, texture_dimensions);
+			
+			delete [] image_dest;
+			
+			return success;
 		}
 		else 
 		{
 		
-			file.seek(0, SEEK_END);
-			size_t buffer_size = file.tell();
-			file.seek(0, SEEK_SET);
+			
+			size_t buffer_size = core_fsize(file);
 			
 			char* buffer = new char[buffer_size];
-			file.read(buffer, buffer_size);
-			file.close();
+			core_fread(file, buffer, buffer_size);
+			core_fclose(file);
 
 			TGAHeader header;
 			memcpy(&header, buffer, sizeof(TGAHeader));
