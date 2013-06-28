@@ -49,12 +49,6 @@ ROCKETCORE_API int StringBase<char>::FormatString(StringBase<char>::size_type ma
 // Global operators for adding C strings to strings.
 ROCKETCORE_API String operator+(const char* cstring, const String& string);
 
-// Redefine Windows APIs as their STDC counterparts.
-#ifdef ROCKET_PLATFORM_WIN32
-	#define strcasecmp stricmp
-	#define strncasecmp strnicmp
-#endif
-
 }
 }
 
