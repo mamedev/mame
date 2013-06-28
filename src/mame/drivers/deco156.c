@@ -36,7 +36,7 @@ public:
 	{ }
 
 	/* devices */
-	required_device<arm_device> m_maincpu;
+	required_device<arm_cpu_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
