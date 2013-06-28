@@ -162,7 +162,7 @@ bool TextureResource::Load(RenderInterface* render_interface) const
 			else
 			{
 				Log::Message(Log::LT_WARNING, "Failed to generate internal texture %s.", source.CString());
-				//texture_data[render_interface] = TextureData(NULL, Vector2i(0, 0));
+				texture_data[render_interface] = TextureData((TextureHandle)NULL, Vector2i(0, 0));
 
 				return false;
 			}
@@ -174,7 +174,7 @@ bool TextureResource::Load(RenderInterface* render_interface) const
 	if (!render_interface->LoadTexture(handle, dimensions, source))
 	{
 		Log::Message(Log::LT_WARNING, "Failed to load texture from %s.", source.CString());
-		//texture_data[render_interface] = TextureData(NULL, Vector2i(0, 0));
+		texture_data[render_interface] = TextureData((TextureHandle)NULL, Vector2i(0, 0));
 
 		return false;
 	}
