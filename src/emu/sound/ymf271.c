@@ -57,9 +57,9 @@ static int alfo_table[4][LFO_LENGTH];
 
 #define ENV_VOLUME_SHIFT    16
 
-#define INF     100000000.0
+#define INF     -1.0
 
-static const double ARTime[] =
+static const double ARTime[64] =
 {
 	INF,        INF,        INF,        INF,        6188.12,    4980.68,    4144.76,    3541.04,
 	3094.06,    2490.34,    2072.38,    1770.52,    1547.03,    1245.17,    1036.19,    885.26,
@@ -71,7 +71,7 @@ static const double ARTime[] =
 	0.88,       0.70,       0.57,       0.48,       0.43,       0.43,       0.43,       0.07
 };
 
-static const double DCTime[] =
+static const double DCTime[64] =
 {
 	INF,        INF,        INF,        INF,        93599.64,   74837.91,   62392.02,   53475.56,
 	46799.82,   37418.96,   31196.01,   26737.78,   23399.91,   18709.48,   15598.00,   13368.89,
@@ -354,7 +354,6 @@ void ymf271_device::update_envelope(YMF271Slot *slot)
 void ymf271_device::init_envelope(YMF271Slot *slot)
 {
 	int keycode, rate;
-	int attack_length, decay1_length, decay2_length, release_length;
 	int decay_level = 255 - (slot->decay1lvl << 4);
 
 	double time;
@@ -371,31 +370,23 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 
 	// init attack state
 	rate = GET_KEYSCALED_RATE(slot->ar * 2, keycode, slot->keyscale);
-	time = ARTime[rate];
-
-	attack_length = (UINT32)((time * 44100.0) / 1000.0);        // attack end time in samples
-	slot->env_attack_step = (int)(((double)(160-0) / (double)(attack_length)) * 65536.0);
+	time = (ARTime[rate] * 44100.0) / 1000.0;        // attack end time in samples
+	slot->env_attack_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
 
 	// init decay1 state
 	rate = GET_KEYSCALED_RATE(slot->decay1rate * 2, keycode, slot->keyscale);
-	time = DCTime[rate];
-
-	decay1_length = (UINT32)((time * 44100.0) / 1000.0);
-	slot->env_decay1_step = (int)(((double)(255-decay_level) / (double)(decay1_length)) * 65536.0);
+	time = (DCTime[rate] * 44100.0) / 1000.0;
+	slot->env_decay1_step = time < 0 ? 0 : (int)(((double)(255-decay_level) / time) * 65536.0);
 
 	// init decay2 state
 	rate = GET_KEYSCALED_RATE(slot->decay2rate * 2, keycode, slot->keyscale);
-	time = DCTime[rate];
-
-	decay2_length = (UINT32)((time * 44100.0) / 1000.0);
-	slot->env_decay2_step = (int)(((double)(255-0) / (double)(decay2_length)) * 65536.0);
+	time = (DCTime[rate] * 44100.0) / 1000.0;
+	slot->env_decay2_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
 
 	// init release state
 	rate = GET_KEYSCALED_RATE(slot->relrate * 4, keycode, slot->keyscale);
-	time = ARTime[rate];
-
-	release_length = (UINT32)((time * 44100.0) / 1000.0);
-	slot->env_release_step = (int)(((double)(255-0) / (double)(release_length)) * 65536.0);
+	time = (ARTime[rate] * 44100.0) / 1000.0;
+	slot->env_release_step = time < 0 ? 0 : (int)(((double)(255-0) / time) * 65536.0);
 
 	slot->volume = (255-160) << ENV_VOLUME_SHIFT;       // -60db
 	slot->env_state = ENV_ATTACK;
