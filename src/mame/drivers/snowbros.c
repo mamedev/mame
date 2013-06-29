@@ -1773,7 +1773,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( snowbros )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "sn6.bin",  0x00000, 0x20000, CRC(4899ddcf) SHA1(47d750d3022a80e47ffabe47566bb2556cc8d477) )
 	ROM_LOAD16_BYTE( "sn5.bin",  0x00001, 0x20000, CRC(ad310d3f) SHA1(f39295b38d99087dbb9c5b00bf9cb963337a50e2) )
 
@@ -1790,7 +1790,7 @@ ROM_START( snowbros )
 ROM_END
 
 ROM_START( snowbrosa )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "sbros-3a.5",  0x00000, 0x20000, CRC(10cb37e1) SHA1(786be4640f8df2c81a32decc189ea7657ace00c6) )
 	ROM_LOAD16_BYTE( "sbros-2a.6",  0x00001, 0x20000, CRC(ab91cc1e) SHA1(8cff61539dc7d35fcbf110d3e54fc1883e7b8509) )
 
@@ -1802,7 +1802,7 @@ ROM_START( snowbrosa )
 ROM_END
 
 ROM_START( snowbrosb )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "sbros3-a",     0x00000, 0x20000, CRC(301627d6) SHA1(0d1dc70091c87e9c27916d4232ff31b7381a64e1) )
 	ROM_LOAD16_BYTE( "sbros2-a",     0x00001, 0x20000, CRC(f6689f41) SHA1(e4fd27b930a31479c0d99e0ddd23d5db34044666) )
 
@@ -1814,7 +1814,7 @@ ROM_START( snowbrosb )
 ROM_END
 
 ROM_START( snowbrosc )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "3-a.ic5",  0x00000, 0x20000, CRC(e1bc346b) SHA1(a20c343d9ed2ad4f785d21076499008edad251f9) )
 	ROM_LOAD16_BYTE( "2-a.ic6",  0x00001, 0x20000, CRC(1be27f9d) SHA1(76dd14480b9274831e51016f7bb57459d7b15cf9) )
 
@@ -1826,7 +1826,7 @@ ROM_START( snowbrosc )
 ROM_END
 
 ROM_START( snowbrosd ) /* Korean release, but no specific "For use in Korea only..." notice screen */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "sbk_3-a.bin",   0x00000, 0x20000, CRC(97174d40) SHA1(481e8c680af8b03d4bcf97b87ca0ba5a3ffca0d7) )
 	ROM_LOAD16_BYTE( "sbk_2-a.bin",   0x00001, 0x20000, CRC(80cc80e5) SHA1(1eeca0924c93e9f0536683160e80c59871569088) )
 
@@ -1838,7 +1838,7 @@ ROM_START( snowbrosd ) /* Korean release, but no specific "For use in Korea only
 ROM_END
 
 ROM_START( snowbrosj )/* "For use in Japan only..." notice screen */
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "snowbros.3",   0x00000, 0x20000, CRC(3f504f9e) SHA1(700758b114c3fde6ea8f84222af0850dba13cd3b) )
 	ROM_LOAD16_BYTE( "snowbros.2",   0x00001, 0x20000, CRC(854b02bc) SHA1(4ad1548eef94dcb95119cb4a7dcdefa037591b5b) )
 
@@ -1851,7 +1851,7 @@ ROM_START( snowbrosj )/* "For use in Japan only..." notice screen */
 ROM_END
 
 ROM_START( wintbob )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "wb3", 0x00000, 0x10000, CRC(b9719767) SHA1(431c97d409f2a5ff7f46116a4d8907e446434431) )
 	ROM_LOAD16_BYTE( "wb1", 0x00001, 0x10000, CRC(a4488998) SHA1(4e927e31c1b865dbdba2b985c7a819a07e2e81b8) )
 
@@ -1871,7 +1871,28 @@ ROM_START( wintbob )
 	ROM_LOAD( "wb05.bin",     0x0000, 0x10000, CRC(53fe59df) SHA1(a99053e82b9fed76f744fa9f67078294641c6317) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
-	/* probably identical data to Snow Bros, in a different format */
+	ROM_LOAD16_BYTE( "wb13.bin",     0x00000, 0x10000, CRC(426921de) SHA1(5107c58e7e08d71895baa67fe260b17ebd61389c) )
+	ROM_LOAD16_BYTE( "wb06.bin",     0x00001, 0x10000, CRC(68204937) SHA1(fd2ef93df5fd8aa2d36072858dbcfce41157ef3e) )
+	ROM_LOAD16_BYTE( "wb12.bin",     0x20000, 0x10000, CRC(ef4e04c7) SHA1(17158b61b3c158e0491db9abb2e1a8c20d981d37) )
+	ROM_LOAD16_BYTE( "wb07.bin",     0x20001, 0x10000, CRC(53f40978) SHA1(058bbf3b7877f0cd320383e0386c5959e0d6589b) )
+	ROM_LOAD16_BYTE( "wb11.bin",     0x40000, 0x10000, CRC(41cb4563) SHA1(94f1d12d299ac08fc8522139e1927f0cf739be75) )
+	ROM_LOAD16_BYTE( "wb08.bin",     0x40001, 0x10000, CRC(9497b88c) SHA1(367c6106276f3816528341f11f3a97ae458d25cd) )
+	ROM_LOAD16_BYTE( "wb10.bin",     0x60000, 0x10000, CRC(5fa22b1e) SHA1(1164003d873e9738a3ca133cce689c7120061e3c) )
+	ROM_LOAD16_BYTE( "wb09.bin",     0x60001, 0x10000, CRC(9be718ca) SHA1(5c195e4f13efbdb229201d2408d018861bf389cc) )
+ROM_END
+
+
+ROM_START( snowbroswb )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "toa3.bin", 0x00000, 0x10000, CRC(55d302da) SHA1(235f1cd5adeb783f42bd7261e6f575826235c5b2) )
+	ROM_LOAD16_BYTE( "toa1.bin", 0x00001, 0x10000, CRC(3c64e145) SHA1(46c3ba17aac516fc203d2d82ed5452b8212f5edb) )
+	ROM_LOAD16_BYTE( "wb04.bin", 0x20000, 0x10000, CRC(53be758d) SHA1(56cf85ba23fe699031d73e8f367a1b8ac837d5f8) )
+	ROM_LOAD16_BYTE( "wb02.bin", 0x20001, 0x10000, CRC(fc8e292e) SHA1(857cfeb0be121e64e6117120514ae1f2ffeae4d6) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
+	ROM_LOAD( "wb05.bin",     0x0000, 0x10000, CRC(53fe59df) SHA1(a99053e82b9fed76f744fa9f67078294641c6317) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "wb13.bin",     0x00000, 0x10000, CRC(426921de) SHA1(5107c58e7e08d71895baa67fe260b17ebd61389c) )
 	ROM_LOAD16_BYTE( "wb06.bin",     0x00001, 0x10000, CRC(68204937) SHA1(fd2ef93df5fd8aa2d36072858dbcfce41157ef3e) )
 	ROM_LOAD16_BYTE( "wb12.bin",     0x20000, 0x10000, CRC(ef4e04c7) SHA1(17158b61b3c158e0491db9abb2e1a8c20d981d37) )
@@ -1885,7 +1906,7 @@ ROM_END
 /* Barko */
 
 ROM_START( honeydol )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "d-16.uh12",  0x00001, 0x20000, CRC(cee1a2e3) SHA1(6d1ff5358ec704616b724eea2ab9b60b84709eb1) )
 	ROM_LOAD16_BYTE( "d-17.ui12",  0x00000, 0x20000, CRC(cac44154) SHA1(2c30dc033001fc9303da7e117e3401bc7af16607) )
 
@@ -1947,7 +1968,7 @@ ROMs
 */
 
 ROM_START( twinadv )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "13.uh12",  0x00001, 0x20000, CRC(9f70a39b) SHA1(d49823be58b00c4c5a4f6cc4e4371531492aff1e) )
 	ROM_LOAD16_BYTE( "12.ui12",  0x00000, 0x20000, CRC(d8776495) SHA1(15b93ded80bf9f240faef2d89b6076f33f1f4ece) )
 
@@ -1966,7 +1987,7 @@ ROM_START( twinadv )
 ROM_END
 
 ROM_START( twinadvk )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) 
 	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e0bcc738) SHA1(7fc6a793fcdd80122c0ac6409ae4cac5597b7b5a) )
 	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(a3ee6451) SHA1(9c0b415a2f325513739f2047780c2a56df350aa5) )
 
@@ -2689,23 +2710,6 @@ DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
 #endif
 }
 
-// protection simulation no longer used
-#if 0
-DRIVER_INIT_MEMBER(snowbros_state,hyperpac)
-{
-	UINT16 *hyperpac_ram = m_hyperpac_ram;
-	/* simulate RAM initialization done by the protection MCU */
-	/* not verified on real hardware */
-	hyperpac_ram[0xe000/2] = 0x4ef9;
-	hyperpac_ram[0xe002/2] = 0x0000;
-	hyperpac_ram[0xe004/2] = 0x062c;
-
-	hyperpac_ram[0xe080/2] = 0xfedc;
-	hyperpac_ram[0xe082/2] = 0xba98;
-	hyperpac_ram[0xe084/2] = 0x7654;
-	hyperpac_ram[0xe086/2] = 0x3210;
-}
-#endif
 
 READ16_MEMBER(snowbros_state::_4in1_02_read)
 {
@@ -2794,6 +2798,7 @@ GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "To
 GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 )
 GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)", "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
 GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
+GAME( 1990, snowbroswb,snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg", "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", 0 ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
 GAME( 1993, finalttr, 0,        finalttr, finalttr, driver_device, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
