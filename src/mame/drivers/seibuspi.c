@@ -57,6 +57,7 @@ TODO:
   * data in transparent pen? nope
   * color bit 15? nope
 - not sure if sprite priorities are completely right
+  * parallax scrolling clouds in rdft intro (when jet flies towards screen) is wrong compared to pcb
 
 */
 
