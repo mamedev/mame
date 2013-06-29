@@ -22,11 +22,6 @@
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
 
-#define READ8(addr)         cpu_read8(addr)
-#define WRITE8(addr,data)   cpu_write8(addr,data)
-#define READ32(addr)        cpu_read32(addr)
-#define WRITE32(addr,data)  cpu_write32(addr,data)
-
 #define ARM_DEBUG_CORE 0
 #define ARM_DEBUG_COPRO 0
 
@@ -256,32 +251,22 @@ arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *
 void arm_cpu_device::cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
-	if ( m_endian == ENDIANNESS_BIG )
-		m_program->write_dword(addr&ADDRESS_MASK,data);
-	else
-		m_program->write_dword(addr&ADDRESS_MASK,data);
+	m_program->write_dword(addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 void arm_cpu_device::cpu_write8( int addr, UINT8 data )
 {
-	if ( m_endian == ENDIANNESS_BIG )
-		m_program->write_byte(addr,data);
-	else
-		m_program->write_byte(addr,data);
+	m_program->write_byte(addr,data);
 }
 
 UINT32 arm_cpu_device::cpu_read32( int addr )
 {
-	UINT32 result;
-
-	if ( m_endian == ENDIANNESS_BIG )
-		result = m_program->read_dword(addr&ADDRESS_MASK);
-	else
-		result = m_program->read_dword(addr&ADDRESS_MASK);
+	UINT32 result = m_program->read_dword(addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
-	if (addr&3) {
+	if (addr&3)
+	{
 		if (ARM_DEBUG_CORE && addr&1)
 			logerror("%08x: Unaligned byte read %08x\n",R15,addr);
 
@@ -298,10 +283,7 @@ UINT32 arm_cpu_device::cpu_read32( int addr )
 
 UINT8 arm_cpu_device::cpu_read8( int addr )
 {
-	if ( m_endian == ENDIANNESS_BIG )
-		return m_program->read_byte(addr);
-	else
-		return m_program->read_byte(addr);
+	return m_program->read_byte(addr);
 }
 
 UINT32 arm_cpu_device::GetRegister( int rIndex )
@@ -470,7 +452,8 @@ void arm_cpu_device::arm_check_irq_state()
 	    Undefined instruction
 	*/
 
-	if (m_pendingFiq && (pc&F_MASK)==0) {
+	if (m_pendingFiq && (pc&F_MASK)==0)
+	{
 		R15 = eARM_MODE_FIQ;    /* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
@@ -478,7 +461,8 @@ void arm_cpu_device::arm_check_irq_state()
 		return;
 	}
 
-	if (m_pendingIrq && (pc&I_MASK)==0) {
+	if (m_pendingIrq && (pc&I_MASK)==0)
+	{
 		R15 = eARM_MODE_IRQ;    /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );    /* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
@@ -490,7 +474,8 @@ void arm_cpu_device::arm_check_irq_state()
 
 void arm_cpu_device::execute_set_input(int irqline, int state)
 {
-	switch (irqline) {
+	switch (irqline)
+	{
 	case ARM_IRQ_LINE: /* IRQ */
 		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
 			m_pendingIrq=1;
@@ -672,13 +657,13 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 		{
 			if (ARM_DEBUG_CORE && rd == eR15)
 				logerror("read byte R15 %08x\n", R15);
-			SetRegister(rd,(UINT32) READ8(rnv) );
+			SetRegister(rd,(UINT32) cpu_read8(rnv) );
 		}
 		else
 		{
 			if (rd == eR15)
 			{
-				R15 = (READ32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
+				R15 = (cpu_read32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
 
 				/*
 				The docs are explicit in that the bottom bits should be masked off
@@ -688,14 +673,14 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 
 				In other cases, 4 is subracted from R15 here to account for pipelining.
 				*/
-				if ((READ32(rnv)&3)==0)
+				if ((cpu_read32(rnv)&3)==0)
 					R15 -= 4;
 
 				m_icount -= S_CYCLE + N_CYCLE;
 			}
 			else
 			{
-				SetRegister(rd, READ32(rnv));
+				SetRegister(rd, cpu_read32(rnv));
 			}
 		}
 	}
@@ -708,14 +693,14 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in byte mode\n");
 
-			WRITE8(rnv, (UINT8) GetRegister(rd) & 0xffu);
+			cpu_write8(rnv, (UINT8) GetRegister(rd) & 0xffu);
 		}
 		else
 		{
 			if (ARM_DEBUG_CORE && rd==eR15)
 				logerror("Wrote R15 in 32bit mode\n");
 
-			WRITE32(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
+			cpu_write32(rnv, rd == eR15 ? R15 + 8 : GetRegister(rd));
 		}
 	}
 
@@ -726,10 +711,12 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 		{
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
-			if (rd==rn) {
+			if (rd==rn)
+			{
 				SetRegister(rn,GetRegister(rd));
 			}
-			else {
+			else
+			{
 				if ((insn&INSN_SDT_W)!=0)
 				logerror("%08x:  RegisterWritebackIncrement %d %d %d\n",R15,(insn & INSN_SDT_P)!=0,(insn&INSN_SDT_W)!=0,(insn & INSN_SDT_U)!=0);
 
@@ -740,10 +727,12 @@ void arm_cpu_device::HandleMemSingle( UINT32 insn )
 		{
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
-			if (rd==rn) {
+			if (rd==rn)
+			{
 				SetRegister(rn,GetRegister(rd));
 			}
-			else {
+			else
+			{
 				SetRegister(rn,(rnv - off));
 
 				if ((insn&INSN_SDT_W)!=0)
@@ -1019,13 +1008,15 @@ int arm_cpu_device::loadInc(UINT32 pat, UINT32 rbv, UINT32 s)
 	{
 		if( (pat>>i)&1 )
 		{
-			if (i==15) {
+			if (i==15)
+			{
 				if (s) /* Pull full contents from stack */
-					SetRegister( 15, READ32(rbv+=4) );
+					SetRegister( 15, cpu_read32(rbv+=4) );
 				else /* Pull only address, preserve mode & status flags */
-					SetRegister( 15, (R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((READ32(rbv+=4))&ADDRESS_MASK) );
-			} else
-				SetRegister( i, READ32(rbv+=4) );
+					SetRegister( 15, (R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((cpu_read32(rbv+=4))&ADDRESS_MASK) );
+			}
+			else
+				SetRegister( i, cpu_read32(rbv+=4) );
 
 			result++;
 		}
@@ -1043,15 +1034,16 @@ int arm_cpu_device::loadDec(UINT32 pat, UINT32 rbv, UINT32 s, UINT32* deferredR1
 	{
 		if( (pat>>i)&1 )
 		{
-			if (i==15) {
+			if (i==15)
+			{
 				*defer=1;
 				if (s) /* Pull full contents from stack */
-					*deferredR15=READ32(rbv-=4);
+					*deferredR15=cpu_read32(rbv-=4);
 				else /* Pull only address, preserve mode & status flags */
-					*deferredR15=(R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((READ32(rbv-=4))&ADDRESS_MASK);
+					*deferredR15=(R15&PSR_MASK) | (R15&IRQ_MASK) | (R15&MODE_MASK) | ((cpu_read32(rbv-=4))&ADDRESS_MASK);
 			}
 			else
-				SetRegister( i, READ32(rbv -=4) );
+				SetRegister( i, cpu_read32(rbv -=4) );
 			result++;
 		}
 	}
@@ -1071,7 +1063,7 @@ int arm_cpu_device::storeInc(UINT32 pat, UINT32 rbv)
 			if (ARM_DEBUG_CORE && i==15) /* R15 is plus 12 from address of STM */
 				logerror("%08x: StoreInc on R15\n",R15);
 
-			WRITE32( rbv += 4, GetRegister(i) );
+			cpu_write32( rbv += 4, GetRegister(i) );
 			result++;
 		}
 	}
@@ -1091,7 +1083,7 @@ int arm_cpu_device::storeDec(UINT32 pat, UINT32 rbv)
 			if (ARM_DEBUG_CORE && i==15) /* R15 is plus 12 from address of STM */
 				logerror("%08x: StoreDec on R15\n",R15);
 
-			WRITE32( rbv -= 4, GetRegister(i) );
+			cpu_write32( rbv -= 4, GetRegister(i) );
 			result++;
 		}
 	}
@@ -1120,7 +1112,8 @@ void arm_cpu_device::HandleMemBlock( UINT32 insn )
 
 			result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
 
-			if (insn & 0x8000) {
+			if (insn & 0x8000)
+			{
 				R15-=4;
 				m_icount -= S_CYCLE + N_CYCLE;
 			}
@@ -1173,7 +1166,8 @@ void arm_cpu_device::HandleMemBlock( UINT32 insn )
 			if (defer)
 				SetRegister(15, deferredR15);
 
-			if (insn & 0x8000) {
+			if (insn & 0x8000)
+			{
 				m_icount -= S_CYCLE + N_CYCLE;
 				R15-=4;
 			}
@@ -1242,7 +1236,8 @@ UINT32 arm_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 	UINT32 rm   = GetRegister( insn & INSN_OP2_RM );
 	UINT32 t    = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
-	if ((insn & INSN_OP2_RM)==0xf) {
+	if ((insn & INSN_OP2_RM)==0xf)
+	{
 		/* If hardwired shift, then PC is 8 bytes ahead, else if register shift
 		is used, then 12 bytes - TODO?? */
 		rm+=8;
