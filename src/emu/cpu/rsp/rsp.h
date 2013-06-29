@@ -66,6 +66,10 @@ enum
 	RSP_SR,
 	RSP_NEXTPC,
 	RSP_STEPCNT,
+	RSP_V0,  RSP_V1,  RSP_V2,  RSP_V3,  RSP_V4,  RSP_V5,  RSP_V6,  RSP_V7,
+	RSP_V8,  RSP_V9,  RSP_V10, RSP_V11, RSP_V12, RSP_V13, RSP_V14, RSP_V15,
+	RSP_V16, RSP_V17, RSP_V18, RSP_V19, RSP_V20, RSP_V21, RSP_V22, RSP_V23,
+	RSP_V24, RSP_V25, RSP_V26, RSP_V27, RSP_V28, RSP_V29, RSP_V30, RSP_V31
 };
 
 
@@ -175,10 +179,13 @@ struct rsp_state
 	UINT32 step_count;
 
 	ACCUMULATOR_REG accum[8];
-	INT32 square_root_res;
-	INT32 square_root_high;
+#if USE_SIMD
+	__m128i accum_h;
+	__m128i accum_m;
+	__m128i accum_l;
+#endif
 	INT32 reciprocal_res;
-	INT32 reciprocal_high;
+	UINT32 reciprocal_high;
 	INT32 dp_allowed;
 
 	UINT32 ppc;
