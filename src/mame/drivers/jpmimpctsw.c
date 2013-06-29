@@ -7694,6 +7694,7 @@ ROM_END
 
 
 #define j6thril_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD(  "thlr-snd.bin", 0x0000, 0x020000, CRC(03771692) SHA1(2f42859d09e4354689887f1e40f9fce1eb858e3e) ) /* probably bad */ \
 	ROM_LOAD(  "thrillersnd.bin", 0x0000, 0x080000, CRC(c93bc625) SHA1(ecceddd90a721c39ef3da8cef442c0d78dacaed2) )
 ROM_START( j6thril )
