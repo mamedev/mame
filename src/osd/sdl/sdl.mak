@@ -534,8 +534,8 @@ INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
 endif
 
-INCPATH += `pkg-config --cflags fontconfig`
-LIBS += `pkg-config --libs fontconfig`
+INCPATH += `pkg-config --cflags fontconfig freetype2`
+LIBS += `pkg-config --libs fontconfig freetype2`
 
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2_ttf
