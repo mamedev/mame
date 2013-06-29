@@ -82,8 +82,8 @@ private:
 	required_ioport m_dr13;
 	required_ioport m_dr14;
 	required_ioport m_dr15;
-	required_ioport m_sw1;
-	required_ioport m_sw2;
+	optional_ioport m_kbdida;
+	optional_ioport m_kbdidb;
 
 	UINT8 m_db;
 	int m_cnt;
