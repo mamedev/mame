@@ -74,7 +74,7 @@ public:
 	microtouch_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	template<class _Object> static devcb2_base &static_set_stx_callback(device_t &device, _Object object) { return downcast<microtouch_serial_device &>(device).m_out_stx_func.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER(rx) { check_for_start(state); }
+	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 protected:
 	virtual void device_start();
 	virtual void tx(UINT8 data);

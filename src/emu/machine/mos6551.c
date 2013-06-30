@@ -354,7 +354,7 @@ void mos6551_device::set_rxc(int clock)
 
 WRITE_LINE_MEMBER( mos6551_device::rxd_w )
 {
-	check_for_start(state);
+	device_serial_interface::rx_w(state);
 }
 
 

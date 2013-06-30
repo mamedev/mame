@@ -106,8 +106,8 @@ public:
 	DECLARE_WRITE8_HANDLER(write);
 	UINT8 get_irq_vector() { return IVR; }
 
-	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->check_for_start((UINT8)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->check_for_start((UINT8)state); }
+	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((UINT8)state); }
+	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((UINT8)state); }
 
 protected:
 	// device-level overrides

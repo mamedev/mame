@@ -94,7 +94,7 @@ class serial_terminal_device :
 public:
 	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w) { m_tbit = state; check_for_start(state); }
+	DECLARE_WRITE_LINE_MEMBER(rx_w) { m_tbit = state; device_serial_interface::rx_w(state); }
 	DECLARE_READ_LINE_MEMBER(tx_r);
 	virtual void tx(UINT8 state) { rx_w(state); }
 	virtual ioport_constructor device_input_ports() const;

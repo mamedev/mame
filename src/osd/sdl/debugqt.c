@@ -242,6 +242,8 @@ void xxx_osd_interface::init_debugger()
 
 #if defined(SDLMAME_UNIX) || defined(SDLMAME_WIN32)
 extern int sdl_entered_debugger;
+#elif defined(WIN32)
+void winwindow_update_cursor_state(running_machine &machine);
 #endif
 
 void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
@@ -307,6 +309,9 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 			gather_save_configurations();
 			break;
 		}
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
+		winwindow_update_cursor_state(machine()); // make sure the cursor isn't hidden while in debugger
+#endif
 	}
 }
 
