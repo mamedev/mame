@@ -86,7 +86,6 @@
 #include "includes/decoprot.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/deco16ic.h"
 #include "video/decocomn.h"
 
 
@@ -107,15 +106,15 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_SHARE("prot16ram")
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
+	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf1_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf2_data_w)
+	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("tilegen2", deco16ic_device, pf_control_w)
+	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_device, pf1_data_w)
+	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_device, pf2_data_w)
 	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_SHARE("pf3_rowscroll")
 	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_SHARE("pf4_rowscroll")
 

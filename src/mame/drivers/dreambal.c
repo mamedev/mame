@@ -68,16 +68,16 @@ public:
 UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = generic_space();
-	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
-	deco16ic_pf_update(m_deco_tilegen1, NULL, NULL);
+	m_deco_tilegen1->pf_update(NULL, NULL);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	machine().priority_bitmap.fill(0);
 
-	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
+	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
+	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 4);
 	return 0;
 }
 
@@ -85,14 +85,14 @@ UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind1
 static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 //ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x140000, 0x1403ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 
 	AM_RANGE(0x160088, 0x160089) AM_READ_PORT("INP")
 	AM_RANGE(0x160292, 0x160293) AM_READ_PORT("SYS")

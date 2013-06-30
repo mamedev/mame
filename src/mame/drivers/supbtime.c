@@ -25,7 +25,6 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 #include "cpu/h6280/h6280.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "video/deco16ic.h"
 #include "includes/supbtime.h"
 
 /******************************************************************************/
@@ -67,9 +66,9 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll")
 ADDRESS_MAP_END
@@ -82,9 +81,9 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll") // unused
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll") // unused
 ADDRESS_MAP_END

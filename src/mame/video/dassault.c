@@ -14,7 +14,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "video/deco16ic.h"
 #include "includes/dassault.h"
 #include "video/decocomn.h"
 
@@ -76,7 +75,7 @@ void dassault_state::mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite
 UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
+	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
@@ -86,21 +85,21 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 
 	/* Update tilemaps */
 	flip_screen_set(BIT(flip, 7));
-	deco16ic_pf_update(m_deco_tilegen1, 0, m_pf2_rowscroll);
-	deco16ic_pf_update(m_deco_tilegen2, 0, m_pf4_rowscroll);
+	m_deco_tilegen1->pf_update(0, m_pf2_rowscroll);
+	m_deco_tilegen2->pf_update(0, m_pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(machine().pens[3072], cliprect);
-	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 16); // 16
+		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -109,19 +108,19 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 	else if ((priority & 3) == 1)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 16?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
-		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 64); // 64
+		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 64); // 64
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
 	}
 	else if ((priority & 3) == 3)
 	{
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0600, 0x0600,  0x400, 0xff); // 1
-		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2); // 2
+		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 2); // 2
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0400, 0x0600,  0x400, 0xff); // 8
-		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 16); // 16
+		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 16); // 16
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0200, 0x0600,  0x400, 0xff); // 32
 		mixdassaultlayer(bitmap, sprite_bitmap2, cliprect,  0x0000, 0x0000,  0x800, 0x80); // 64?
 		mixdassaultlayer(bitmap, sprite_bitmap1, cliprect,  0x0000, 0x0600,  0x400, 0xff); // 128
@@ -131,6 +130,6 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 		/* Unused */
 	}
 
-	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

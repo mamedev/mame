@@ -57,8 +57,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_deco_tilegen1;
-	required_device<device_t> m_deco_tilegen2;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen2;
 
 	required_device<eeprom_device> m_eeprom;
 
@@ -136,22 +136,22 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
-	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
+	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	machine().priority_bitmap.fill(0);
 	bitmap.fill(0x100, cliprect);
 
 	if (m_left_priority[0] == 0)
 	{
-		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
-		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 1);
+		m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 2);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else if (m_left_priority[0] == 2)
 	{
-		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 4);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram_1, 0x800);
 	}
 	else
@@ -167,22 +167,22 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
-	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
+	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	machine().priority_bitmap.fill(0);
 	bitmap.fill(0x500, cliprect);
 
 	if (m_right_priority[0] == 0)
 	{
-		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
-		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 1);
+		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
 		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else if (m_right_priority[0] == 2)
 	{
-		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
+		m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 2);
+		m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 4);
 		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else
@@ -295,14 +295,14 @@ WRITE32_MEMBER(backfire_state::backfire_spriteram2_w)
 
 static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
 	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
+	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
+	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_SHARE("paletteram")

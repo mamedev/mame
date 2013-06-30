@@ -5,6 +5,7 @@
 *************************************************************************/
 #include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 class pktgaldx_state : public driver_device
 {

@@ -20,7 +20,6 @@
 
 #include "emu.h"
 #include "includes/darkseal.h"
-#include "video/deco16ic.h"
 
 /***************************************************************************/
 
@@ -63,15 +62,15 @@ UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf1_rowscroll);
-	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf3_rowscroll);
+	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf1_rowscroll);
+	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf3_rowscroll);
 
-	deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);
-	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);
+	m_deco_tilegen2->tilemap_1_draw(bitmap, cliprect, 0, 0);
+	m_deco_tilegen2->tilemap_2_draw(bitmap, cliprect, 0, 0);
 
-	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
-	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_2_draw(bitmap, cliprect, 0, 0);
 
 	return 0;
 }

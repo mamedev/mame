@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 class supbtime_state : public driver_device
 {

@@ -26,14 +26,13 @@ PAL16R6A 11H
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
 #include "includes/dietgo.h"
-#include "video/deco16ic.h"
 #include "video/decocomn.h"
 
 static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf1_data_w)
-	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf2_data_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
+	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("tilegen1", deco16ic_device, pf1_data_w)
+	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("tilegen1", deco16ic_device, pf2_data_w)
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_SHARE("spriteram")

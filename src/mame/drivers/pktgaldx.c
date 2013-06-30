@@ -56,7 +56,6 @@ bootleg todo:
 #include "cpu/m68000/m68000.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "video/deco16ic.h"
 #include "sound/okim6295.h"
 #include "includes/pktgaldx.h"
 #include "video/decocomn.h"
@@ -73,8 +72,8 @@ WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_SHARE("pf2_rowscroll")
 
@@ -86,7 +85,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
 
-	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
 	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_SHARE("prot16ram")
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM

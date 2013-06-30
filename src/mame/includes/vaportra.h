@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "video/bufsprite.h"
+#include "video/deco16ic.h"
 
 class vaportra_state : public driver_device
 {

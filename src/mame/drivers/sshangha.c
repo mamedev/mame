@@ -51,7 +51,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/sshangha.h"
-#include "video/deco16ic.h"
 
 #define SSHANGHA_HACK   0
 
@@ -155,12 +154,12 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
@@ -187,12 +186,12 @@ static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
 	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_SHARE("sound_shared") /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
