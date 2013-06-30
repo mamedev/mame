@@ -53,8 +53,6 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER( data_write );
 
 private:
-	int sa_closed();
-
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_md00;
 	required_ioport m_md01;
@@ -69,10 +67,11 @@ private:
 	required_ioport m_md10;
 	required_ioport m_md11;
 
+	UINT8 m_bus;
 	UINT8 m_p1;
 	UINT8 m_p2;
-	UINT16 m_md;
 	int m_sense;
+	int m_q;
 };
 
 
