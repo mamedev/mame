@@ -281,6 +281,8 @@ void ibm_pc_xt_83_keyboard_device::device_start()
 	// state saving
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
+	save_item(NAME(m_md));
+	save_item(NAME(m_sense));
 }
 
 
@@ -336,6 +338,11 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 
 	m_pc_kbdc->data_write_from_kb(BIT(data, 5));
 	m_pc_kbdc->clock_write_from_kb(BIT(data, 6));
+
+	if (BIT(data, 7))
+	{
+		m_md = (m_p2 & 0xf0) << 4 | m_p1;
+	}
 }
 
 
@@ -377,13 +384,18 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 	    0       SELECT 2
 	    1       SELECT 1
 	    2       SELECT 0
-	    3       SA CLOSED, T1
+	    3       SA CLOSED
 	    4       MD08
 	    5       MD09
 	    6       MD10
 	    7       MD11
 	
 	*/
+
+	if (!BIT(m_p2, 3) && BIT(data, 3))
+	{
+		m_sense = data & 0x07;
+	}
 
 	m_p2 = data;
 }
@@ -417,20 +429,18 @@ int ibm_pc_xt_83_keyboard_device::sa_closed()
 {
 	UINT8 data = 0xff;
 
-	logerror("md %03x sense %01x\n", m_p2 << 4 | m_p1, m_p2&0x07);
+	if (BIT(m_md,  0)) data &= m_md00->read();
+	if (BIT(m_md,  1)) data &= m_md01->read();
+	if (BIT(m_md,  2)) data &= m_md02->read();
+	if (BIT(m_md,  3)) data &= m_md03->read();
+	if (BIT(m_md,  4)) data &= m_md04->read();
+	if (BIT(m_md,  5)) data &= m_md05->read();
+	if (BIT(m_md,  6)) data &= m_md06->read();
+	if (BIT(m_md,  7)) data &= m_md07->read();
+	if (BIT(m_md,  8)) data &= m_md08->read();
+	if (BIT(m_md,  9)) data &= m_md09->read();
+	if (BIT(m_md, 10)) data &= m_md10->read();
+	if (BIT(m_md, 11)) data &= m_md11->read();
 
-	if (BIT(m_p1, 0)) data &= m_md00->read();
-	if (BIT(m_p1, 1)) data &= m_md01->read();
-	if (BIT(m_p1, 2)) data &= m_md02->read();
-	if (BIT(m_p1, 3)) data &= m_md03->read();
-	if (BIT(m_p1, 4)) data &= m_md04->read();
-	if (BIT(m_p1, 5)) data &= m_md05->read();
-	if (BIT(m_p1, 6)) data &= m_md06->read();
-	if (BIT(m_p1, 7)) data &= m_md07->read();
-	if (BIT(m_p2, 4)) data &= m_md08->read();
-	if (BIT(m_p2, 5)) data &= m_md09->read();
-	if (BIT(m_p2, 6)) data &= m_md10->read();
-	if (BIT(m_p2, 7)) data &= m_md11->read();
-
-	return BIT(m_p2, 3) && BIT(data, m_p2 & 0x07);
+	return BIT(data, m_sense);
 }

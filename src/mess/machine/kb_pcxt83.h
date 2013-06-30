@@ -71,6 +71,8 @@ private:
 
 	UINT8 m_p1;
 	UINT8 m_p2;
+	UINT16 m_md;
+	int m_sense;
 };
 
 
