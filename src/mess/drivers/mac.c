@@ -299,7 +299,8 @@ WRITE8_MEMBER ( mac_state::mac_rbv_w )
 			case 0x00:
 				if (m_model == MODEL_MAC_LC)
 				{
-					m68k_set_hmmu_enable(m_maincpu, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
+					m68000_device *m68k = downcast<m68000_device *>(m_maincpu.target());
+					m68k_set_hmmu_enable(m68k, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_LC);
 				}
 				break;
 
@@ -785,7 +786,7 @@ static ADDRESS_MAP_START(quadra700_map, AS_PROGRAM, 32, mac_state )
 	AM_RANGE(0xf9800000, 0xf98001ff) AM_READWRITE(dafb_r, dafb_w)
 	AM_RANGE(0xf9800200, 0xf980023f) AM_READWRITE(dafb_dac_r, dafb_dac_w)
 ADDRESS_MAP_END
-#if 0
+
 static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB standard
 
@@ -811,7 +812,7 @@ static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END
-#endif
+
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
@@ -1570,7 +1571,6 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-#if 0
 static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	/* basic machine hardware */
@@ -1618,7 +1618,6 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 MACHINE_CONFIG_END
-#endif
 
 static MACHINE_CONFIG_START( macqd700, mac_state )
 	/* basic machine hardware */
@@ -2181,4 +2180,4 @@ COMP( 1993, maclc3,   0,        0,  maclc3,   maciici, mac_state,  maclc3,      
 COMP( 1993, maciivx,  0,        0,  maciivx,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvx", GAME_IMPERFECT_SOUND )
 COMP( 1993, maciivi,  maciivx,  0,  maciivi,  maciici, mac_state,  maciivx,   "Apple Computer", "Macintosh IIvi", GAME_IMPERFECT_SOUND )
 COMP( 1993, maclc520, 0,        0,  maclc520, maciici, mac_state,  maclc520,     "Apple Computer", "Macintosh LC 520",  GAME_NOT_WORKING )
-//COMP( 1994, pmac6100, 0,        0,  pwrmac,   macadb, mac_state,   macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1994, pmac6100, 0,        0,  pwrmac,   macadb, mac_state,   macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  GAME_NOT_WORKING | GAME_NO_SOUND )

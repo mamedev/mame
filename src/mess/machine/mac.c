@@ -1726,7 +1726,8 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 
 	if (m_model == MODEL_MAC_II)
 	{
-		m68k_set_hmmu_enable(m_maincpu, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
+		m68000_device *m68k = downcast<m68000_device *>(m_maincpu.target());
+		m68k_set_hmmu_enable(m68k, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
 	}
 }
 
@@ -1841,7 +1842,8 @@ void mac_state::machine_reset()
 	// default to 32-bit mode on LC
 	if (m_model == MODEL_MAC_LC)
 	{
-		m68k_set_hmmu_enable(m_maincpu, M68K_HMMU_DISABLE);
+		m68000_device *m68k = downcast<m68000_device *>(m_maincpu.target());
+		m68k_set_hmmu_enable(m68k, M68K_HMMU_DISABLE);
 	}
 
 	m_last_taken_interrupt = -1;
