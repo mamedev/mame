@@ -1840,16 +1840,16 @@ ROM_START( tictac )
 	ROM_LOAD( "merit.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
-	ROM_LOAD( "gen-004_01a.7", 0x08000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) ) /* Trivia catagories are: */
-	ROM_LOAD( "gen-004_02a.8", 0x18000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) ) /* General Interest, Sports, Entertainment & Sex Trivia III */
-	ROM_LOAD( "spo-004_01a.1", 0x28000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) )
-	ROM_LOAD( "spo-004_02a.2", 0x38000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) )
-	ROM_LOAD( "spo-004_03a.3", 0x48000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
-	ROM_LOAD( "ent-004_01.4",  0x58000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
-	ROM_LOAD( "ent-004_02a.5", 0x68000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
-	ROM_LOAD( "ent-004_03.6",  0x78000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
-	ROM_LOAD( "merit.pb9",     0x88000, 0x8000, CRC(9333dbca) SHA1(dd87e6f69d60580fdb6f979398edbeb1a51be355) ) // sex trivia III - Need correct rom label
-	ROM_LOAD( "merit.pba",     0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) ) // sex trivia III - Need correct rom label
+	ROM_LOAD( "spo-004_01a.1", 0x08000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) ) /* Trivia catagories are: */
+	ROM_LOAD( "spo-004_02a.2", 0x18000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) ) /* Sports, Entertainment, General Interest & Sex Trivia III */
+	ROM_LOAD( "spo-004_03a.3", 0x28000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
+	ROM_LOAD( "ent-004_01.4",  0x38000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
+	ROM_LOAD( "ent-004_02a.5", 0x48000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
+	ROM_LOAD( "ent-004_03.6",  0x58000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
+	ROM_LOAD( "gen-004_01a.7", 0x68000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) )
+	ROM_LOAD( "gen-004_02a.8", 0x78000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) )
+	ROM_LOAD( "sex-004_01a.9", 0x88000, 0x8000, CRC(9333dbca) SHA1(dd87e6f69d60580fdb6f979398edbeb1a51be355) )
+	ROM_LOAD( "sex-004_02a.a", 0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) )
 ROM_END
 
 ROM_START( tictacv )
@@ -1865,16 +1865,16 @@ ROM_START( tictacv )
 	ROM_LOAD( "ttts_u-40.u40", 0x00000, 0x2000, CRC(c7071c98) SHA1(88e1b26f198cfbbd86b492356f60fc1b81b38d97) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
-	ROM_LOAD( "gen-004_01a.7", 0x08000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) ) /* Trivia catagories are: */
-	ROM_LOAD( "gen-004_02a.8", 0x18000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) ) /* General Interest, Sports, Entertainment & Sex Trivia III */
-	ROM_LOAD( "spo-004_01a.1", 0x28000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) )
-	ROM_LOAD( "spo-004_02a.2", 0x38000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) )
-	ROM_LOAD( "spo-004_03a.3", 0x48000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
-	ROM_LOAD( "ent-004_01.4",  0x58000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
-	ROM_LOAD( "ent-004_02a.5", 0x68000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
-	ROM_LOAD( "ent-004_03.6",  0x78000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
-	ROM_LOAD( "merit.pb9",     0x88000, 0x8000, CRC(9333dbca) SHA1(dd87e6f69d60580fdb6f979398edbeb1a51be355) ) // sex trivia III - Need correct rom label
-	ROM_LOAD( "merit.pba",     0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) ) // sex trivia III - Need correct rom label
+	ROM_LOAD( "spo-004_01a.1", 0x08000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) ) /* Trivia catagories are: */
+	ROM_LOAD( "spo-004_02a.2", 0x18000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) ) /* Sports, Entertainment, General Interest & Sex Trivia III */
+	ROM_LOAD( "spo-004_03a.3", 0x28000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
+	ROM_LOAD( "ent-004_01.4",  0x38000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
+	ROM_LOAD( "ent-004_02a.5", 0x48000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
+	ROM_LOAD( "ent-004_03.6",  0x58000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
+	ROM_LOAD( "gen-004_01a.7", 0x68000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) )
+	ROM_LOAD( "gen-004_02a.8", 0x78000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) )
+	ROM_LOAD( "sex-004_01a.9", 0x88000, 0x8000, CRC(9333dbca) SHA1(dd87e6f69d60580fdb6f979398edbeb1a51be355) )
+	ROM_LOAD( "sex-004_02a.a", 0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) )
 ROM_END
 
 ROM_START( phrcraze )
