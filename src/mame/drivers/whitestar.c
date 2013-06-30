@@ -125,7 +125,7 @@ INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static const decodmd_intf decodmd_interface =
+static const decodmd_type2_intf decodmd_interface =
 {
 	":dmdcpu"  // region containing DMD ROM data
 };
