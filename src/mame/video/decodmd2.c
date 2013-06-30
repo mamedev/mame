@@ -204,9 +204,9 @@ void decodmd_type2_device::device_reset()
 void decodmd_type2_device::device_config_complete()
 {
 	// inherit a copy of the static data
-	const decodmd_intf *intf = reinterpret_cast<const decodmd_intf *>(static_config());
+	const decodmd_type2_intf *intf = reinterpret_cast<const decodmd_type2_intf *>(static_config());
 	if (intf != NULL)
-		*static_cast<decodmd_intf *>(this) = *intf;
+		*static_cast<decodmd_type2_intf *>(this) = *intf;
 
 	// or initialize to defaults if none provided
 	else
