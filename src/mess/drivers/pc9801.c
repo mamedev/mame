@@ -604,6 +604,7 @@ public:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_START(pc9801f);
 	DECLARE_MACHINE_START(pc9801rs);
+	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_START(pc9821);
 
 	DECLARE_MACHINE_RESET(pc9801_common);
@@ -2348,6 +2349,22 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pc9801bx2_io, AS_IO, 32, pc9801_state )
+	AM_IMPORT_FROM(pc9801rs_io)
+
+	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
+	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
+	AM_RANGE(0x861c, 0x861f) AM_READWRITE8(sdip_2_r,sdip_2_w,0xffffffff)
+	AM_RANGE(0x871c, 0x871f) AM_READWRITE8(sdip_3_r,sdip_3_w,0xffffffff)
+	AM_RANGE(0x881c, 0x881f) AM_READWRITE8(sdip_4_r,sdip_4_w,0xffffffff)
+	AM_RANGE(0x891c, 0x891f) AM_READWRITE8(sdip_5_r,sdip_5_w,0xffffffff)
+	AM_RANGE(0x8a1c, 0x8a1f) AM_READWRITE8(sdip_6_r,sdip_6_w,0xffffffff)
+	AM_RANGE(0x8b1c, 0x8b1f) AM_READWRITE8(sdip_7_r,sdip_7_w,0xffffffff)
+	AM_RANGE(0x8c1c, 0x8c1f) AM_READWRITE8(sdip_8_r,sdip_8_w,0xffffffff)
+	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
+	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
+	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -3425,6 +3442,14 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	m_sys_type = 0x80 >> 6;
 }
 
+MACHINE_START_MEMBER(pc9801_state,pc9801bx2)
+{
+	MACHINE_START_CALL_MEMBER(pc9801rs);
+
+	save_pointer(NAME(m_sdip), 24);
+}
+
+
 MACHINE_START_MEMBER(pc9801_state,pc9821)
 {
 	MACHINE_START_CALL_MEMBER(pc9801rs);
@@ -3719,6 +3744,15 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( pc9801bx2, pc9801rs )
+	MCFG_CPU_REPLACE("maincpu",I486,25000000)
+	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
+	MCFG_CPU_IO_MAP(pc9801bx2_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
@@ -3897,6 +3931,34 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
 	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
 	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
+
+	ROM_REGION( 0x10000, "sound_bios", 0 )
+	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+BX2/U2 - 486SX - (should be 33, but "dumper" note says it's 25 MHz)
+
+Yet another franken-dump done with a lame program, shrug
+
+*/
+
+ROM_START( pc9801bx2 )
+	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
+	ROM_LOAD( "pc98bank1.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
+	ROM_LOAD( "pc98bank2.bin",  0x00000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
+	ROM_LOAD( "pc98bank3.bin",  0x00000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
+	ROM_LOAD( "pc98bank4.bin",  0x18000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
+	ROM_LOAD( "pc98bank5.bin",  0x00000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+	ROM_LOAD( "pc98bank6.bin",  0x00000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
+	ROM_LOAD( "pc98bank7.bin",  0x00000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
 
 	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -4154,6 +4216,7 @@ COMP( 1989, pc9801rs,  0,       0,     pc9801rs, pc9801rs, pc9801_state, pc9801_
 COMP( 1985, pc9801vm,  pc9801rs,0,     pc9801rs, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801VM", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801UX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801RX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1993, pc9801bx2, pc9801rs,0,     pc9801bx2,pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801BX2/U2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
 COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
