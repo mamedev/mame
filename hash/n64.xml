@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
@@ -8872,7 +8872,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Midway</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="san francisco rush extreme racing v1.1 - usa - carrot.bin" size="8388608" crc="ba05b83f" sha1="867c475e65844a421d51af3a75414d46899b404c" offset="000000" />
+				<rom name="san francisco rush extreme racing v1.1 - usa.bin" size="8388608" crc="ba05b83f" sha1="867c475e65844a421d51af3a75414d46899b404c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
