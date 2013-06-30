@@ -299,7 +299,7 @@ static MACHINE_CONFIG_FRAGMENT( at_motherboard )
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	MCFG_MC146818_IRQ_ADD( "rtc", MC146818_STANDARD, WRITELINE(at_state, at_mc146818_irq))
 
