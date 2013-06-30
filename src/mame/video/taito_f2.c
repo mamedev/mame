@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/taito_f2.h"
 
 /************************************************************
@@ -33,9 +32,9 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 	m_hide_pixels = hide;
 	m_flip_hide_pixels = flip_hide;
 
-	m_spriteram_delayed = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spriteram_buffered = auto_alloc_array(machine(), UINT16, m_spriteram.bytes() / 2);
-	m_spritelist = auto_alloc_array(machine(), struct f2_tempsprite, 0x400);
+	m_spriteram_delayed = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spriteram_buffered = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes() / 2);
+	m_spritelist = auto_alloc_array_clear(machine(), struct f2_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
 	{
@@ -1272,9 +1271,9 @@ UINT32 taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap
 
 	taitof2_handle_sprite_buffering();
 
-	tc0480scp_tilemap_update(m_tc0480scp);
+	m_tc0480scp->tilemap_update();
 
-	priority = tc0480scp_get_bg_priority(m_tc0480scp);
+	priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -1303,11 +1302,11 @@ UINT32 taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[4], 0, 16);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], 0 ,1);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 16);
 
 	draw_sprites(bitmap, cliprect, NULL, 1);
 	return 0;
@@ -1325,9 +1324,9 @@ UINT32 taitof2_state::screen_update_taitof2_deadconx(screen_device &screen, bitm
 
 	taitof2_handle_sprite_buffering();
 
-	tc0480scp_tilemap_update(m_tc0480scp);
+	m_tc0480scp->tilemap_update();
 
-	priority = tc0480scp_get_bg_priority(m_tc0480scp);
+	priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -1351,10 +1350,10 @@ UINT32 taitof2_state::screen_update_taitof2_deadconx(screen_device &screen, bitm
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], 0 ,1);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -1377,6 +1376,6 @@ UINT32 taitof2_state::screen_update_taitof2_deadconx(screen_device &screen, bitm
 	that the FG layer is always on top of sprites.
 	*/
 
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }

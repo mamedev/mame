@@ -1,4 +1,5 @@
 #include "machine/eeprom.h"
+#include "video/taitoic.h"
 
 struct tempsprite
 {
@@ -21,6 +22,7 @@ public:
 	gunbustr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_tc0480scp(*this, "tc0480scp"),
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
 		m_eeprom(*this, "eeprom")
@@ -29,6 +31,7 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<tc0480scp_device> m_tc0480scp;
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
 	required_device<eeprom_device> m_eeprom;

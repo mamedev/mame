@@ -474,11 +474,11 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 
 
 #define TC0180VCU_MEMRW( ADDR )                                         \
-	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)    \
+	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, word_r, word_w)    \
 	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_SHARE("spriteram")   \
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM                 \
-	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)    \
-	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)        \
+	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, scroll_r, scroll_w)    \
+	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_device, ctrl_r, ctrl_w)        \
 	AM_RANGE(ADDR+0x40000, ADDR+0x7ffff) AM_READWRITE(tc0180vcu_framebuffer_word_r, tc0180vcu_framebuffer_word_w)
 
 

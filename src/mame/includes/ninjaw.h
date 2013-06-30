@@ -7,6 +7,7 @@
 #include "machine/taitoio.h"
 #include "sound/flt_vol.h"
 #include "audio/taitosnd.h"
+#include "video/taitoic.h"
 
 class ninjaw_state : public driver_device
 {
@@ -21,6 +22,9 @@ public:
 		m_tc0100scn_1(*this, "tc0100scn_1"),
 		m_tc0100scn_2(*this, "tc0100scn_2"),
 		m_tc0100scn_3(*this, "tc0100scn_3"),
+		m_tc0110pcr_1(*this, "tc0110pcr_1"),
+		m_tc0110pcr_2(*this, "tc0110pcr_2"),
+		m_tc0110pcr_3(*this, "tc0110pcr_3"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_2610_1l(*this, "2610.1.l"),
 		m_2610_1r(*this, "2610.1.r"),
@@ -43,6 +47,9 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn_1;
 	required_device<tc0100scn_device> m_tc0100scn_2;
 	required_device<tc0100scn_device> m_tc0100scn_3;
+	required_device<tc0110pcr_device> m_tc0110pcr_1;
+	required_device<tc0110pcr_device> m_tc0110pcr_2;
+	required_device<tc0110pcr_device> m_tc0110pcr_3;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<filter_volume_device> m_2610_1l;
 	required_device<filter_volume_device> m_2610_1r;

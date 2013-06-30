@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
-#include "video/decbac06.h"
 
 void pcktgal_state::palette_init()
 {
@@ -66,8 +65,8 @@ void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 UINT32 pcktgal_state::screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  flip_screen_set(machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
-	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->get_flip_state();
+	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -75,7 +74,7 @@ UINT32 pcktgal_state::screen_update_pcktgal(screen_device &screen, bitmap_ind16 
 UINT32 pcktgal_state::screen_update_pcktgalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
-	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw_bootleg(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
+	m_tilegen1->deco_bac06_pf_draw_bootleg(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }

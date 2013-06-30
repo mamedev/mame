@@ -1,4 +1,6 @@
 #include "machine/eeprom.h"
+#include "video/taitoic.h"
+
 struct tempsprite
 {
 	int gfx;
@@ -22,6 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0100scn(*this, "tc0100scn"),
+		m_tc0480scp(*this, "tc0480scp"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "ram"),
 		m_shared_ram(*this, "shared_ram"),
@@ -30,6 +33,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<tc0100scn_device> m_tc0100scn;
+	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<eeprom_device> m_eeprom;
 	optional_shared_ptr<UINT32> m_ram;
 	optional_shared_ptr<UINT32> m_shared_ram;

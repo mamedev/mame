@@ -8,6 +8,7 @@
 #include "sound/flt_vol.h"
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
+#include "video/taitoic.h"
 
 struct othunder_tempsprite
 {

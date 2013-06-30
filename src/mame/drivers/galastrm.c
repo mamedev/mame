@@ -39,7 +39,6 @@ $305.b invincibility
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
@@ -179,8 +178,8 @@ static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("snd_shared")                              /* Sound shared ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)        /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)                               /* TC0110PCR */
 	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)                              /* TC0610 */
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(galastrm_tc0610_1_w)

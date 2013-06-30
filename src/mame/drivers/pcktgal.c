@@ -18,7 +18,6 @@
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "includes/pcktgal.h"
-#include "video/decbac06.h"
 #include "machine/deco222.h"
 
 /***************************************************************************/
@@ -71,11 +70,11 @@ READ8_MEMBER(pcktgal_state::pcktgal_adpcm_reset_r)
 
 static ADDRESS_MAP_START( pcktgal_map, AS_PROGRAM, 8, pcktgal_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_r, pf_data_8bit_w)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)
+	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
+	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_r, pf_control1_8bit_w)
 
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pcktgal_sound_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pcktgal_bank_w)
@@ -246,7 +245,7 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
+	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

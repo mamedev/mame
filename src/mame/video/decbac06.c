@@ -63,22 +63,58 @@ Priority word (Midres):
 #include "emu.h"
 #include "decbac06.h"
 
+const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
+
+deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock, "deco_bac06", __FILE__),
+		m_pf_data(NULL),
+	    m_pf_rowscroll(NULL),
+		m_pf_colscroll(NULL),
+		m_tile_region(0),
+		m_gfxcolmask(0),
+		m_rambank(0),
+		m_gfxregion8x8(0),
+		m_gfxregion16x16(0),
+		m_wide(0),
+		m_bppmult(0),
+		m_bppmask(0)
+		//m_pf_control_0[8]
+		//m_pf_control_1[8]
+{ 
+}
+
+void deco_bac06_device::device_start()
+{
+	m_pf_data = auto_alloc_array_clear(machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
+	m_pf_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+	m_pf_colscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
+
+	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
+	m_gfxcolmask = 0x0f;
+
+	m_bppmult = 0x10;
+	m_bppmask = 0x0f;
+	m_rambank = 0;
+
+	save_pointer(NAME(m_pf_data), 0x4000/2);
+	save_pointer(NAME(m_pf_rowscroll), 0x2000/2);
+	save_pointer(NAME(m_pf_colscroll), 0x2000/2);
+	save_pointer(NAME(m_pf_control_0), 8);
+	save_pointer(NAME(m_pf_control_1), 8);
+
+	save_item(NAME(m_rambank));
+}
+
+void deco_bac06_device::device_reset()
+{
+}
+
 void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide)
 {
 	deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
 	dev.m_gfxregion8x8 = region8x8;
 	dev.m_gfxregion16x16 = region16x16;
 	dev.m_wide = wide;
-}
-
-const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
-
-deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock, "deco_bac06", __FILE__),
-		m_gfxregion8x8(0),
-		m_gfxregion16x16(0),
-		m_wide(0)
-{
 }
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
@@ -114,80 +150,52 @@ TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_8x8_scan)
 TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 {
 	if (m_rambank&1) tile_index+=0x1000;
-	int tile=pf_data[tile_index];
+	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 
 TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
 {
 	if (m_rambank&1) tile_index+=0x1000;
-	int tile=pf_data[tile_index];
+	int tile=m_pf_data[tile_index];
 	int colourpri=(tile>>12);
-	SET_TILE_INFO_MEMBER(tile_region,tile&0xfff,0,0);
+	SET_TILE_INFO_MEMBER(m_tile_region,tile&0xfff,0,0);
 	tileinfo.category = colourpri;
 }
 
 void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 {
-	tile_region = region8x8;
+	m_tile_region = region8x8;
 
-	pf8x8_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_8x8_scan),this), 8, 8,128, 32);
-	pf8x8_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_8x8_scan),this), 8, 8, 64, 64);
-	pf8x8_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_8x8_scan),this), 8, 8, 32,128);
+	m_pf8x8_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_8x8_scan),this), 8, 8,128, 32);
+	m_pf8x8_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_8x8_scan),this), 8, 8, 64, 64);
+	m_pf8x8_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf8x8_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_8x8_scan),this), 8, 8, 32,128);
 
-	tile_region = region16x16;
+	m_tile_region = region16x16;
 
 	if (m_wide==2)
 	{
-		pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 256, 16);
-		pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  128, 32);
-		pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  64, 64);
+		m_pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 256, 16);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  128, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  64, 64);
 	}
 	else if (m_wide==1)
 	{
-		pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 128, 16);
-		pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  64, 32);
-		pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  32, 64);
+		m_pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this), 16, 16, 128, 16);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),  16, 16,  64, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this), tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),  16, 16,  32, 64);
 	}
 	else
 	{
-		pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this),    16,16, 64, 16);
-		pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),    16,16, 32, 32);
-		pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),    16,16, 16, 64);
+		m_pf16x16_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape0_scan),this),    16,16, 64, 16);
+		m_pf16x16_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape1_scan),this),    16,16, 32, 32);
+		m_pf16x16_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(deco_bac06_device::get_pf16x16_tile_info),this),tilemap_mapper_delegate(FUNC(deco_bac06_device::tile_shape2_scan),this),    16,16, 16, 64);
 	}
 }
 
-void deco_bac06_device::device_start()
-{
-	pf_data = auto_alloc_array_clear(this->machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
-	pf_rowscroll = auto_alloc_array_clear(this->machine(), UINT16, 0x2000 / 2);
-	pf_colscroll = auto_alloc_array_clear(this->machine(), UINT16, 0x2000 / 2);
-
-	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
-	m_gfxcolmask = 0x0f;
-
-	m_bppmult = 0x10;
-	m_bppmask = 0x0f;
-	m_rambank = 0;
-
-	save_pointer(NAME(pf_data), 0x4000/2);
-	save_pointer(NAME(pf_rowscroll), 0x2000/2);
-	save_pointer(NAME(pf_colscroll), 0x2000/2);
-	save_pointer(NAME(pf_control_0), 8);
-	save_pointer(NAME(pf_control_1), 8);
-
-	save_item(NAME(m_rambank));
-}
-
-void deco_bac06_device::device_reset()
-{
-}
-
-
-void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
-								bitmap_ind16 &bitmap,
+void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 								const rectangle &cliprect,
 								tilemap_t *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
@@ -246,7 +254,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	doesn't affect any games.
 	*/
 
-	if (machine.driver_data()->flip_screen())
+	if (machine().driver_data()->flip_screen())
 		src_y = (src_bitmap.height() - 256) - scrolly;
 	else
 		src_y = scrolly;
@@ -257,7 +265,7 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 		else
 			src_x=scrollx;
 
-		if (machine.driver_data()->flip_screen())
+		if (machine().driver_data()->flip_screen())
 			src_x=(src_bitmap.width() - 256) - src_x;
 
 		for (x=0; x<=cliprect.max_x; x++) {
@@ -279,252 +287,241 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 	}
 }
 
-void deco_bac06_device::deco_bac06_pf_draw(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
+void deco_bac06_device::deco_bac06_pf_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
-	switch (pf_control_0[3]&0x3) {
+	switch (m_pf_control_0[3]&0x3) {
 		case 0: /* 4x1 */
-			if (pf_control_0[0]&0x1)
-				tm = pf8x8_tilemap[0];
+			if (m_pf_control_0[0]&0x1)
+				tm = m_pf8x8_tilemap[0];
 			else
-				tm = pf16x16_tilemap[0];
+				tm = m_pf16x16_tilemap[0];
 			break;
 
 		case 1: /* 2x2 */
 		default:
-			if (pf_control_0[0]&0x1)
-				tm = pf8x8_tilemap[1];
+			if (m_pf_control_0[0]&0x1)
+				tm = m_pf8x8_tilemap[1];
 			else
-				tm = pf16x16_tilemap[1];
+				tm = m_pf16x16_tilemap[1];
 			break;
 
 		case 2: /* 1x4 */
-			if (pf_control_0[0]&0x1)
-				tm = pf8x8_tilemap[2];
+			if (m_pf_control_0[0]&0x1)
+				tm = m_pf8x8_tilemap[2];
 			else
-				tm = pf16x16_tilemap[2];
+				tm = m_pf16x16_tilemap[2];
 			break;
 	};
 
 	if (tm)
-		custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,pf_control_0,pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
+		custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,m_pf_control_0,m_pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
 
 }
 
 // used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
-void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type)
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags, int mode, int type)
 {
 	tilemap_t* tm = 0;
-	if (!mode) tm = pf8x8_tilemap[type];
-	else tm = pf16x16_tilemap[type];
+	if (!mode) tm = m_pf8x8_tilemap[type];
+	else tm = m_pf16x16_tilemap[type];
 
-	custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,0,0,flags, 0, 0, 0, 0);
+	custom_tilemap_draw(bitmap,cliprect,tm,m_pf_rowscroll,m_pf_colscroll,0,0,flags, 0, 0, 0, 0);
 }
 
 
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
+WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 {
 	offset &= 3;
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-
-	COMBINE_DATA(&dev->pf_control_0[offset]);
+	
+	COMBINE_DATA(&m_pf_control_0[offset]);
 
 	if (offset==2)
 	{
-		int newbank = dev->pf_control_0[offset]&1;
-		if ((newbank&1) != (dev->m_rambank&1))
+		int newbank = m_pf_control_0[offset]&1;
+		if ((newbank&1) != (m_rambank&1))
 		{
 			// I don't know WHY Stadium Hero uses this as a bank but the RAM test expects it..
 			// I'm curious as to if anything else sets it tho
-			if (strcmp(dev->machine().system().name,"stadhero"))
+			if (strcmp(machine().system().name,"stadhero"))
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
-			dev->m_rambank = newbank&1;
-			dev->pf8x8_tilemap[0]->mark_all_dirty();
-			dev->pf8x8_tilemap[1]->mark_all_dirty();
-			dev->pf8x8_tilemap[2]->mark_all_dirty();
-			dev->pf16x16_tilemap[0]->mark_all_dirty();
-			dev->pf16x16_tilemap[1]->mark_all_dirty();
-			dev->pf16x16_tilemap[2]->mark_all_dirty();
+			m_rambank = newbank&1;
+			m_pf8x8_tilemap[0]->mark_all_dirty();
+			m_pf8x8_tilemap[1]->mark_all_dirty();
+			m_pf8x8_tilemap[2]->mark_all_dirty();
+			m_pf16x16_tilemap[0]->mark_all_dirty();
+			m_pf16x16_tilemap[1]->mark_all_dirty();
+			m_pf16x16_tilemap[2]->mark_all_dirty();
 		}
 	}
 }
 
-READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r )
+READ16_MEMBER( deco_bac06_device::pf_control_1_r )
 {
 	offset &= 7;
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	return dev->pf_control_1[offset];
+	return m_pf_control_1[offset];
 }
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w )
+WRITE16_MEMBER( deco_bac06_device::pf_control_1_w )
 {
 	offset &= 7;
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	COMBINE_DATA(&dev->pf_control_1[offset]);
+	COMBINE_DATA(&m_pf_control_1[offset]);
 }
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w )
+WRITE16_MEMBER( deco_bac06_device::pf_data_w )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	if (dev->m_rambank&1) offset+=0x1000;
+	if (m_rambank&1) offset+=0x1000;
 
-	COMBINE_DATA(&dev->pf_data[offset]);
-	dev->pf8x8_tilemap[0]->mark_tile_dirty(offset);
-	dev->pf8x8_tilemap[1]->mark_tile_dirty(offset);
-	dev->pf8x8_tilemap[2]->mark_tile_dirty(offset);
-	dev->pf16x16_tilemap[0]->mark_tile_dirty(offset);
-	dev->pf16x16_tilemap[1]->mark_tile_dirty(offset);
-	dev->pf16x16_tilemap[2]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf_data[offset]);
+	m_pf8x8_tilemap[0]->mark_tile_dirty(offset);
+	m_pf8x8_tilemap[1]->mark_tile_dirty(offset);
+	m_pf8x8_tilemap[2]->mark_tile_dirty(offset);
+	m_pf16x16_tilemap[0]->mark_tile_dirty(offset);
+	m_pf16x16_tilemap[1]->mark_tile_dirty(offset);
+	m_pf16x16_tilemap[2]->mark_tile_dirty(offset);
 }
 
-READ16_DEVICE_HANDLER( deco_bac06_pf_data_r )
+READ16_MEMBER( deco_bac06_device::pf_data_r )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	if (dev->m_rambank&1) offset+=0x1000;
+	if (m_rambank&1) offset+=0x1000;
 
-	return dev->pf_data[offset];
+	return m_pf_data[offset];
 }
 
-
-
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w )
+WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_data_w(device,space,offset/2,data,0x00ff);
+		pf_data_w(space,offset/2,data,0x00ff);
 	else
-		deco_bac06_pf_data_w(device,space,offset/2,data<<8,0xff00);
+		pf_data_w(space,offset/2,data<<8,0xff00);
 }
 
-READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r )
+READ8_MEMBER( deco_bac06_device::pf_data_8bit_r )
 {
 	if (offset&1) /* MSB */
-		return deco_bac06_pf_data_r(device,space,offset/2,0x00ff);
+		return pf_data_r(space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_data_r(device,space,offset/2,0xff00)>>8;
+		return pf_data_r(space,offset/2,0xff00)>>8;
 }
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w )
+WRITE16_MEMBER( deco_bac06_device::pf_rowscroll_w )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	COMBINE_DATA(&dev->pf_rowscroll[offset]);
+	COMBINE_DATA(&m_pf_rowscroll[offset]);
 }
 
-WRITE16_DEVICE_HANDLER( deco_bac06_pf_colscroll_w )
+WRITE16_MEMBER( deco_bac06_device::pf_colscroll_w )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	COMBINE_DATA(&dev->pf_colscroll[offset]);
+	COMBINE_DATA(&m_pf_colscroll[offset]);
 }
 
-READ16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_r )
+READ16_MEMBER( deco_bac06_device::pf_rowscroll_r )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	return dev->pf_rowscroll[offset];
+	return m_pf_rowscroll[offset];
 }
 
-READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r )
+READ16_MEMBER( deco_bac06_device::pf_colscroll_r )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	return dev->pf_colscroll[offset];
+	return m_pf_colscroll[offset];
 }
 
 /* used by dec8.c */
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w )
+WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff); // oscar (mirrors?)
+		pf_control_0_w(space,offset/2,data,0x00ff); // oscar (mirrors?)
 	else
-		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff);
+		pf_control_0_w(space,offset/2,data,0x00ff);
 }
 
 /* used by dec8.c */
-READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r )
+READ8_MEMBER( deco_bac06_device::pf_control1_8bit_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_control_1_r(device,space,offset/2,0x00ff);
+		return pf_control_1_r(space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_control_1_r(device,space,offset/2,0xff00)>>8;
+		return pf_control_1_r(space,offset/2,0xff00)>>8;
 }
 
 /* used by dec8.c */
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w )
+WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_w )
 {
 	if (offset<4) // these registers are 16-bit?
 	{
 		if (offset&1)
-			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
+			pf_control_1_w(space,offset/2,data,0x00ff);
 		else
-			deco_bac06_pf_control_1_w(device,space,offset/2,data<<8,0xff00);
+			pf_control_1_w(space,offset/2,data<<8,0xff00);
 	}
 	else // these registers are 8-bit and mirror? (triothep vs actfancr)
 	{
 		if (offset&1)
-			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
+			pf_control_1_w(space,offset/2,data,0x00ff);
 		else
-			deco_bac06_pf_control_1_w(device,space,offset/2,data,0x00ff);
+			pf_control_1_w(space,offset/2,data,0x00ff);
 	}
 }
 
-READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r )
+READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0x00ff);
+		return pf_rowscroll_r(space,offset/2,0x00ff);
 	else
-		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0xff00)>>8;
+		return pf_rowscroll_r(space,offset/2,0xff00)>>8;
 }
 
 
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w )
+WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_w )
 {
 	if (offset&1)
-		deco_bac06_pf_rowscroll_w(device,space,offset/2,data,0x00ff);
+		pf_rowscroll_w(space,offset/2,data,0x00ff);
 	else
-		deco_bac06_pf_rowscroll_w(device,space,offset/2,data<<8,0xff00);
+		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
 }
 
-READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r )
+READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_r )
 {
 	if (offset&1)
-		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0xff00)>>8;
+		return pf_rowscroll_r(space,offset/2,0xff00)>>8;
 	else
-		return deco_bac06_pf_rowscroll_r(device,space,offset/2,0x00ff);
+		return pf_rowscroll_r(space,offset/2,0x00ff);
 }
 
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w )
+WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_w )
 {
 	if (offset&1)
-		deco_bac06_pf_rowscroll_w(device,space,offset/2,data<<8,0xff00);
+		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
 	else
-		deco_bac06_pf_rowscroll_w(device,space,offset/2,data,0x00ff);
+		pf_rowscroll_w(space,offset/2,data,0x00ff);
 }
 
 
 
 /* used by hippodrm */
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w )
+WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_packed_w )
 {
 	if (offset&1)
-		deco_bac06_pf_control_0_w(device,space,offset/2,data<<8,0xff00);
+		pf_control_0_w(space,offset/2,data<<8,0xff00);
 	else
-		deco_bac06_pf_control_0_w(device,space,offset/2,data,0x00ff);
+		pf_control_0_w(space,offset/2,data,0x00ff);
 }
 
 /* used by hippodrm */
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w )
+WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_swap_w )
 {
-	deco_bac06_pf_control1_8bit_w(device,space, offset^1, data);
+	pf_control1_8bit_w(space, offset^1, data);
 }
 
 /* used by hippodrm */
-READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r )
+READ8_MEMBER( deco_bac06_device::pf_data_8bit_swap_r )
 {
-	return deco_bac06_pf_data_8bit_r(device,space, offset^1);
+	return pf_data_8bit_r(space, offset^1);
 }
 
 /* used by hippodrm */
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w )
+WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_swap_w )
 {
-	deco_bac06_pf_data_8bit_w(device,space, offset^1, data);
+	pf_data_8bit_w(space, offset^1, data);
 }

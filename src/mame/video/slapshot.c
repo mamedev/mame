@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/taitoic.h"
 #include "includes/slapshot.h"
 
 /**********************************************************/
@@ -493,9 +492,9 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 
 	taito_handle_sprite_buffering();
 
-	tc0480scp_tilemap_update(m_tc0480scp);
+	m_tc0480scp->tilemap_update();
 
-	priority = tc0480scp_get_bg_priority(m_tc0480scp);
+	priority = m_tc0480scp->get_bg_priority();
 
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -522,22 +521,22 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-		tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[0], 0, 1);
+		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-		tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-		tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[3]] == 0)
 #endif
-		tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+		m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -563,6 +562,6 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[4]] == 0)
 #endif
-	tc0480scp_tilemap_draw(m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	m_tc0480scp->tilemap_draw(bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }

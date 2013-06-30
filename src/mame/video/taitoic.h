@@ -9,8 +9,6 @@
 #ifndef _TAITOIC_H_
 #define _TAITOIC_H_
 
-#include "devlegcy.h"
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -69,35 +67,35 @@ struct tc0280grd_interface
 
 struct tc0480scp_interface
 {
-	int                gfxnum;
-	int                txnum;
+	int                m_gfxnum;
+	int                m_txnum;
 
-	int                pixels;
+	int                m_pixels;
 
-	int                x_offset, y_offset;
-	int                text_xoffs, text_yoffs;
-	int                flip_xoffs, flip_yoffs;
+	int                m_x_offset, m_y_offset;
+	int                m_text_xoffs, m_text_yoffs;
+	int                m_flip_xoffs, m_flip_yoffs;
 
-	int                col_base;
+	int                m_col_base;
 };
 
 
 struct tc0150rod_interface
 {
-	const char      *gfx_region;    /* gfx region for the road */
+	const char      *m_gfx_region;    /* gfx region for the road */
 };
 
 
 struct tc0110pcr_interface
 {
-	int               pal_offs;
+	int               m_pal_offs;
 };
 
 struct tc0180vcu_interface
 {
-	int            bg_color_base;
-	int            fg_color_base;
-	int            tx_color_base;
+	int            m_bg_color_base;
+	int            m_fg_color_base;
+	int            m_tx_color_base;
 };
 
 class pc080sn_device : public device_t,
@@ -411,93 +409,178 @@ private:
 
 extern const device_type TC0360PRI;
 
-class tc0480scp_device : public device_t
+class tc0480scp_device : public device_t,
+											public tc0480scp_interface
 {
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0480scp_device() { global_free(m_token); }
+	~tc0480scp_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	void tc0480scp_postload();
+	/* When writing a driver, pass zero for the text and flip offsets initially:
+	then tweak them once you have the 4 bg layer positions correct. Col_base
+	may be needed when tilemaps use a palette area from sprites. */
+
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+	DECLARE_READ16_MEMBER( ctrl_word_r );
+	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+
+	/* Functions for use with 68020 (Super-Z system) */
+	DECLARE_READ32_MEMBER( long_r );
+	DECLARE_WRITE32_MEMBER( long_w );
+	DECLARE_READ32_MEMBER( ctrl_long_r );
+	DECLARE_WRITE32_MEMBER( ctrl_long_w );
+
+	void tilemap_update();
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+
+	/* Returns the priority order of the bg tilemaps set in the internal
+	register. The order in which the four layers should be drawn is
+	returned in the lowest four nibbles  (msn = bottom layer; lsn = top) */
+	int get_bg_priority();
+
+	/* Undrfire needs to read this for a sprite/tile priority hack */
+	DECLARE_READ8_MEMBER( pri_reg_r );
+	
+	void postload();
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	UINT16           m_ctrl[0x18];
 
-	TILE_GET_INFO_MEMBER(tc0480scp_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(tc0480scp_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(tc0480scp_get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(tc0480scp_get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(tc0480scp_get_tx_tile_info);
+	UINT16 *         m_ram;
+	UINT16 *         m_bg_ram[4];
+	UINT16 *         m_tx_ram;
+	UINT16 *         m_char_ram;
+	UINT16 *         m_bgscroll_ram[4];
+	UINT16 *         m_rowzoom_ram[4];
+	UINT16 *         m_bgcolumn_ram[4];
+	int              m_bgscrollx[4];
+	int              m_bgscrolly[4];
+	int              m_pri_reg;
+
+	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
+	tilemap_t         *m_tilemap[5][2];
+	INT32           m_dblwidth;
+	int             m_x_offs;
+
+	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
+	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
+	
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	
+	void dirty_tilemaps();
+	void set_layer_ptrs();
+	void bg01_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
+	void bg23_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
 };
 
 extern const device_type TC0480SCP;
 
-class tc0150rod_device : public device_t
+class tc0150rod_device : public device_t,
+										 public tc0150rod_interface
 {
 public:
 	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0150rod_device() { global_free(m_token); }
+	~tc0150rod_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority);
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	
 private:
 	// internal state
-	void *m_token;
+	UINT16 *        m_ram;
 };
 
 extern const device_type TC0150ROD;
 
-class tc0110pcr_device : public device_t
+class tc0110pcr_device : public device_t,
+										  public tc0110pcr_interface
 {
 public:
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0110pcr_device() { global_free(m_token); }
+	~tc0110pcr_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	void tc0110pcr_restore_colors();
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w ); /* color index goes up in step of 2 */
+	DECLARE_WRITE16_MEMBER( step1_word_w );   /* color index goes up in step of 1 */
+	DECLARE_WRITE16_MEMBER( step1_rbswap_word_w );    /* swaps red and blue components */
+	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
+
+	void restore_colors();
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
-	// internal state
-	void *m_token;
+	UINT16 *     m_ram;
+	int          m_type;
+	int          m_addr;
 };
 
 extern const device_type TC0110PCR;
 
-class tc0180vcu_device : public device_t
+class tc0180vcu_device : public device_t,
+											public tc0180vcu_interface
 {
 public:
 	tc0180vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tc0180vcu_device() { global_free(m_token); }
+	~tc0180vcu_device() {}
+	
+	DECLARE_READ8_MEMBER( get_fb_page );
+	DECLARE_WRITE8_MEMBER( set_fb_page );
+	DECLARE_READ8_MEMBER( get_videoctrl );
+	DECLARE_READ16_MEMBER( ctrl_r );
+	DECLARE_WRITE16_MEMBER( ctrl_w );
+	DECLARE_READ16_MEMBER( scroll_r );
+	DECLARE_WRITE16_MEMBER( scroll_w );
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-private:
+
+	private:
 	// internal state
-	void *m_token;
+	UINT16         m_ctrl[0x10];
+
+	UINT16 *       m_ram;
+	UINT16 *       m_scrollram;
+
+	tilemap_t      *m_tilemap[3];
+
+	UINT16         m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
+	UINT8          m_framebuffer_page;
+	UINT8          m_video_control;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	
+	void video_control( UINT8 data );
 };
 
 extern const device_type TC0180VCU;
@@ -550,63 +633,4 @@ extern const device_type TC0180VCU;
 	MCFG_DEVICE_ADD(_tag, TC0180VCU, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
-
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
-
-
-/** TC0480SCP **/
-/* When writing a driver, pass zero for the text and flip offsets initially:
-   then tweak them once you have the 4 bg layer positions correct. Col_base
-   may be needed when tilemaps use a palette area from sprites. */
-
-DECLARE_READ16_DEVICE_HANDLER( tc0480scp_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0480scp_word_w );
-DECLARE_READ16_DEVICE_HANDLER( tc0480scp_ctrl_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0480scp_ctrl_word_w );
-
-/* Functions for use with 68020 (Super-Z system) */
-DECLARE_READ32_DEVICE_HANDLER( tc0480scp_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( tc0480scp_long_w );
-DECLARE_READ32_DEVICE_HANDLER( tc0480scp_ctrl_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( tc0480scp_ctrl_long_w );
-
-void tc0480scp_tilemap_update(device_t *device);
-void tc0480scp_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
-
-/* Returns the priority order of the bg tilemaps set in the internal
-   register. The order in which the four layers should be drawn is
-   returned in the lowest four nibbles  (msn = bottom layer; lsn = top) */
-int tc0480scp_get_bg_priority(device_t *device);
-
-/* Undrfire needs to read this for a sprite/tile priority hack */
-DECLARE_READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r );
-
-
-/** TC0150ROD **/
-DECLARE_READ16_DEVICE_HANDLER( tc0150rod_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0150rod_word_w );
-void tc0150rod_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs, int palette_offs, int type, int road_trans, UINT32 low_priority, UINT32 high_priority);
-
-
-/** TC0110PCR **/
-DECLARE_READ16_DEVICE_HANDLER( tc0110pcr_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_word_w ); /* color index goes up in step of 2 */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_word_w );   /* color index goes up in step of 1 */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_rbswap_word_w );    /* swaps red and blue components */
-DECLARE_WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w );  /* only 4 bits per color gun */
-
-
-/** TC0180VCU **/
-DECLARE_READ8_DEVICE_HANDLER( tc0180vcu_get_fb_page );
-DECLARE_WRITE8_DEVICE_HANDLER( tc0180vcu_set_fb_page );
-DECLARE_READ8_DEVICE_HANDLER( tc0180vcu_get_videoctrl );
-DECLARE_READ16_DEVICE_HANDLER( tc0180vcu_ctrl_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0180vcu_ctrl_w );
-DECLARE_READ16_DEVICE_HANDLER( tc0180vcu_scroll_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w );
-DECLARE_READ16_DEVICE_HANDLER( tc0180vcu_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( tc0180vcu_word_w );
-void tc0180vcu_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 #endif

@@ -29,7 +29,6 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/actfancr.h"
-#include "video/decbac06.h"
 #include "video/decmxc06.h"
 
 /******************************************************************************/
@@ -73,12 +72,12 @@ WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
 
 static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x062000, 0x063fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
+	AM_RANGE(0x062000, 0x063fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
+	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control0_8bit_w)
+	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control1_8bit_swap_w)
+	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
@@ -93,14 +92,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x044000, 0x045fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x046400, 0x0467ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
+	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control0_8bit_w)
+	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE("tilegen2", deco_bac06_device, pf_control1_8bit_swap_w)
+	AM_RANGE(0x044000, 0x045fff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
+	AM_RANGE(0x046400, 0x0467ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_rowscroll_8bit_swap_r, pf_rowscroll_8bit_swap_w)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
+	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
+	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_8bit_swap_r, pf_rowscroll_8bit_swap_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -331,9 +330,9 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 2,2,2);
+	deco_bac06_device::set_gfx_region_wide(*device,2,2,2);
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
+	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
@@ -381,9 +380,9 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
+	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
+	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);

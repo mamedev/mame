@@ -43,7 +43,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/taitoic.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
@@ -167,8 +166,8 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)                                         /* eerom etc. */
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
 	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_SHARE("paletteram")            /* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM                                                             /* network ram ?? */
 ADDRESS_MAP_END

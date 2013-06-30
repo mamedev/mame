@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "includes/stadhero.h"
-#include "video/decbac06.h"
 #include "video/decmxc06.h"
 
 /******************************************************************************/
@@ -23,8 +22,8 @@ UINT32 stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_ind1
 {
 //  machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	machine().device<deco_bac06_device>("tilegen1")->set_bppmultmask(0x8, 0x7);
-	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen1->set_bppmultmask(0x8, 0x7);
+	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	machine().device<deco_mxc06_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
 	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

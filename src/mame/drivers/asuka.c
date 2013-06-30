@@ -217,7 +217,6 @@ DIP locations verified for:
 #include "cpu/z180/z180.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
-#include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
@@ -315,7 +314,7 @@ static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
+	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_word_w)
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("DSWB")
@@ -335,7 +334,7 @@ static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP /* Mofflott init does dummy reads here */
-	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
@@ -354,7 +353,7 @@ static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)    /* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_4bpg_word_w)
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_4bpg_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -362,7 +361,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16   /* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
+	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff)   /* service mode mirror */

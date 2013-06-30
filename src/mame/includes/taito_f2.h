@@ -1,5 +1,6 @@
 #include "machine/taitoio.h"
 #include "sound/okim6295.h"
+#include "video/taitoic.h"
 
 struct f2_tempsprite
 {
@@ -29,6 +30,7 @@ public:
 			m_tc0100scn(*this, "tc0100scn"),
 			m_tc0100scn_1(*this, "tc0100scn_1"),
 			m_tc0100scn_2(*this, "tc0100scn_2"),
+			m_tc0110pcr(*this, "tc0110pcr"),
 			m_tc0360pri(*this, "tc0360pri"),
 			m_tc0280grd(*this, "tc0280grd"),
 			m_tc0430grw(*this, "tc0430grw"),
@@ -94,6 +96,7 @@ public:
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0100scn_device> m_tc0100scn_1;
 	optional_device<tc0100scn_device> m_tc0100scn_2;
+	optional_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0360pri_device> m_tc0360pri;
 	optional_device<tc0280grd_device> m_tc0280grd;
 	optional_device<tc0280grd_device> m_tc0430grw;

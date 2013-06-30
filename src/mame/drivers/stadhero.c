@@ -27,7 +27,6 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/stadhero.h"
-#include "video/decbac06.h"
 #include "video/decmxc06.h"
 
 /******************************************************************************/
@@ -72,9 +71,9 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, stadhero_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(stadhero_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)                          /* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_0_w)                          /* text layer */
+	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control_1_w)
+	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READWRITE(stadhero_control_r, stadhero_control_w)
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
@@ -241,7 +240,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device, 1,1,2);
+	deco_bac06_device::set_gfx_region_wide(*device,1,1,2);
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 2);
