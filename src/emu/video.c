@@ -262,7 +262,7 @@ void video_manager::frame_update(bool debug)
 		update_frameskip();
 
 	// update speed computations
-	if (!debug && !skipped_it)
+	if (!debug)
 		recompute_speed(current_time);
 
 	// call the end-of-frame callback
