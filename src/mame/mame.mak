@@ -1724,6 +1724,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taitopjc.o $\
 	$(DRIVERS)/taitosj.o $(MACHINE)/taitosj.o $(VIDEO)/taitosj.o \
 	$(DRIVERS)/taitotz.o \
+	$(DRIVERS)/taitotx.o \
 	$(DRIVERS)/taitowlf.o \
 	$(DRIVERS)/tnzs.o $(MACHINE)/tnzs.o $(VIDEO)/tnzs.o \
 	$(DRIVERS)/topspeed.o $(VIDEO)/topspeed.o \
@@ -1737,7 +1738,6 @@ $(MAMEOBJ)/taito.a: \
 	$(MACHINE)/taitoio.o \
 	$(VIDEO)/taitoic.o \
 	$(AUDIO)/taito_zm.o \
-	$(DRIVERS)/taito_type_x.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \
