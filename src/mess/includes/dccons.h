@@ -30,8 +30,8 @@ public:
 	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
 	READ64_MEMBER( dc_mess_gdrom_r );
 	WRITE64_MEMBER( dc_mess_gdrom_w );
-	READ64_MEMBER( dc_mess_g1_ctrl_r );
-	WRITE64_MEMBER( dc_mess_g1_ctrl_w );
+	READ32_MEMBER( dc_mess_g1_ctrl_r );
+	WRITE32_MEMBER( dc_mess_g1_ctrl_w );
 
 private:
 	UINT64 PDTRA, PCTRA;

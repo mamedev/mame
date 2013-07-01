@@ -11,6 +11,9 @@
 
     cfffee0 - stack location when bad happens
 
+	TODO:
+	- gdrom_alt_status is identical to normal status except that "but it does not clear DMA status information when it is accessed"
+
 */
 
 #include "emu.h"
@@ -266,6 +269,8 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 //      printf("ATAPI: packet write %04x\n", data);
 		atapi_data[atapi_data_ptr++] = data & 0xff;
 		atapi_data[atapi_data_ptr++] = data >> 8;
+
+		//printf("%02x %02x %d\n",data & 0xff, data >> 8,atapi_data_ptr);
 
 		if (atapi_cdata_wait)
 		{
@@ -651,32 +656,30 @@ int dc_cons_state::decode_reg32_64( UINT32 offset, UINT64 mem_mask, UINT64 *shif
 	return reg;
 }
 
-READ64_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
+READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 {
-	int reg;
-	UINT64 shift;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
-	return (UINT64)g1bus_regs[reg] << shift;
+	switch(offset)
+	{
+		case SB_GDST:
+			break;
+		case SB_GDLEND:
+			//debugger_break(machine());
+			return atapi_xferlen; // TODO: check me
+		default:
+			printf("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
+			debugger_break(machine());
+	}
+	return g1bus_regs[offset];
 }
 
-WRITE64_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
+WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat; //, old
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
-//  old = g1bus_regs[reg];
-
-	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
-	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
-	switch (reg)
+	g1bus_regs[offset] = data; // 5f7400+reg*4=dat
+//	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
+	switch (offset)
 	{
 	case SB_GDST:
-		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
+		if (data & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
 			if (g1bus_regs[SB_GDDIR] == 0)
 			{
