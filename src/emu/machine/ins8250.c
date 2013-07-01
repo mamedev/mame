@@ -190,20 +190,6 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
-void ins8250_uart_device::update_clock()
-{
-	int baud;
-	if(m_regs.dl == 0)
-	{
-		set_tra_rate(0);
-		set_rcv_rate(0);
-		return;
-	}
-	baud = clock()/(m_regs.dl*16);
-	set_tra_rate(baud);
-	set_rcv_rate(baud);
-}
-
 WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 {
 	int tmp;
@@ -214,7 +200,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & 0x80)
 			{
 				m_regs.dl = (m_regs.dl & 0xff00) | data;
-				update_clock();
+				set_rate(clock(), m_regs.dl*16);
 			}
 			else
 			{
@@ -240,7 +226,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			if (m_regs.lcr & 0x80)
 			{
 				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
-				update_clock();
+				set_rate(clock(), m_regs.dl*16);
 			}
 			else
 			{

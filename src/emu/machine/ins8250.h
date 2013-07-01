@@ -84,7 +84,6 @@ private:
 	devcb_resolved_write_line   m_out_out2_func;
 
 	void update_interrupt();
-	void update_clock();
 	void update_msr(int bit, UINT8 state);
 };
 

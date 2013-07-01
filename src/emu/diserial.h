@@ -91,12 +91,16 @@ public:
 	void receive_register_update_bit(int bit);
 	void receive_register_extract();
 
-	void set_rcv_rate(attotime baud);
-	void set_tra_rate(attotime baud);
-	void set_rcv_rate(UINT32 clock, int div);
-	void set_tra_rate(UINT32 clock, int div);
-	void set_rcv_rate(int baud);
-	void set_tra_rate(int baud);
+	void set_rcv_rate(attotime rate);
+	void set_tra_rate(attotime rate);
+	void set_rcv_rate(UINT32 clock, int div) { set_rcv_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
+	void set_tra_rate(UINT32 clock, int div) { set_tra_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
+	void set_rcv_rate(int baud) { set_rcv_rate(baud ? attotime::from_hz(baud) : attotime::never); }
+	void set_tra_rate(int baud) { set_tra_rate(baud ? attotime::from_hz(baud) : attotime::never); }
+	void set_rate(attotime rate) { set_rcv_rate(rate); set_tra_rate(rate); }
+	void set_rate(UINT32 clock, int div) { set_rcv_rate(clock, div); set_tra_rate(clock, div); }
+	void set_rate(int baud) { set_rcv_rate(baud); set_tra_rate(baud); }
+
 	void tra_clock();
 	void rcv_clock();
 

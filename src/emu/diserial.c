@@ -65,20 +65,6 @@ void device_serial_interface::interface_pre_start()
 	m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_timer), this));
 }
 
-void device_serial_interface::set_rcv_rate(int baud)
-{
-	m_rcv_rate = baud ? attotime::from_hz(baud) : attotime::never;
-	receive_register_reset();
-	m_rcv_clock->adjust(attotime::never);
-}
-
-void device_serial_interface::set_tra_rate(int baud)
-{
-	m_tra_rate = baud ? attotime::from_hz(baud) : attotime::never;
-	transmit_register_reset();
-	m_tra_clock->adjust(attotime::never);
-}
-
 void device_serial_interface::set_rcv_rate(attotime rate)
 {
 	m_rcv_rate = rate;
@@ -89,20 +75,6 @@ void device_serial_interface::set_rcv_rate(attotime rate)
 void device_serial_interface::set_tra_rate(attotime rate)
 {
 	m_tra_rate = rate;
-	transmit_register_reset();
-	m_tra_clock->adjust(attotime::never);
-}
-
-void device_serial_interface::set_rcv_rate(UINT32 clock, int div)
-{
-	m_rcv_rate = attotime::from_hz(clock) * div;
-	receive_register_reset();
-	m_rcv_clock->adjust(attotime::never);
-}
-
-void device_serial_interface::set_tra_rate(UINT32 clock, int div)
-{
-	m_tra_rate = attotime::from_hz(clock) * div;
 	transmit_register_reset();
 	m_tra_clock->adjust(attotime::never);
 }
