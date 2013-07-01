@@ -38,12 +38,12 @@
     haruaug3a, pebble, haruaug3: uses SA-1 DMA
     itoibass: boots, some missing gfx
     jikkparo: plays OK
-    jl96drem: sprites corrupt in gameplay, SA-1 DMA/character conversion?
-    jumpind: boots and runs, uses SA-1 DMA and character conversion
+    jl96drem: plays OK
+    jumpind: boots and runs, uses SA-1 normal DMA only but has corrupt gfx
     kakinoki: S-CPU crashes after pressing start
     kirby3j, kirby3: uses SA-1 DMA
     kirbysdb, kirbyss, kirbyfun, kirbysd, kirbysda: plays OK
-    marvelou: plays OK, some gfx corruption
+    marvelou: plays OK, uses SA-1 normal DMA only but has corrupt gfx 
     miniyonk: plays OK
     panicbw: plays OK
     pgaeuro, pgaeurou, pga96, pga96u, pga, pgaj: plays OK
@@ -56,7 +56,7 @@
     shinshog: plays OK
     shogisai: plays OK
     shogisa2: plays OK
-    smrpgj, smrpg: boots, can't start game (SRAM mapping?)
+    smrpgj, smrpg: needs SA-1 character conversion for level up Bonus Chance (possible to get past now)
     srobotg: some corrupt in-game GFX, may be SNES rendering errors
     sshogi3: plays OK
     taikyoid: plays OK
@@ -65,7 +65,6 @@
  might indeed exist...]
 
  ***********************************************************************************************************/
-
 
 #include "emu.h"
 #include "machine/sns_sa1.h"
@@ -142,6 +141,9 @@ void sns_sa1_device::device_reset()
 	m_vcr = 0;
 	m_scpu_sie = m_sa1_sie = 0;
 	m_scpu_flags = m_sa1_flags = 0;
+	m_dma_ctrl = 0;
+	m_dma_ccparam = 0;
+	m_dma_cnt = 0;
 
 	// sa-1 CPU starts out not running?
 	m_sa1->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -190,7 +192,7 @@ void sns_sa1_device::recalc_irqs()
 
 // handle this separately to avoid accessing recursively the regs?
 
-inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset)
+UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset)
 {
 	// handle 0xffea/0xffeb/0xffee/0xffef
 	if ((offset & 0xffffe0) == 0x00ffe0)
@@ -211,7 +213,7 @@ inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset
 		return read_h(space, (offset & 0x7fffff));
 
 	if ((offset & 0x40e000) == 0x006000)  //$00-3f|80-bf:6000-7fff
-		return read_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff));
+		return read_bwram((m_bwram_snes * 0x2000) + (offset & 0x1fff));
 
 	if ((offset & 0xf00000) == 0x400000)  //$40-4f:0000-ffff
 		return read_bwram(offset & 0xfffff);
@@ -223,6 +225,88 @@ inline UINT8 sns_sa1_device::var_length_read(address_space &space, UINT32 offset
 		return read_iram(offset);
 
 	return 0;
+}
+
+void sns_sa1_device::dma_transfer(address_space &space)
+{
+//	printf("DMA src %08x (%d), dst %08x (%d) cnt %d\n", m_src_addr, m_dma_ctrl & 3, m_dst_addr, m_dma_ctrl & 4, m_dma_cnt);
+
+	while (m_dma_cnt--) 
+	{
+		UINT8 data = 0; // open bus?
+		UINT32 dma_src = m_src_addr++;
+		UINT32 dma_dst = m_dst_addr++;
+		
+		// source and destination cannot be the same
+		// source = { 0=ROM, 1=BWRAM, 2=IRAM }
+		// destination = { 0=IRAM, 1=BWRAM }
+		if ((m_dma_ctrl & 0x03) == 1 && (m_dma_ctrl & 0x04) == 0x04) continue;
+		if ((m_dma_ctrl & 0x03) == 2 && (m_dma_ctrl & 0x04) == 0x00) continue;
+
+		switch (m_dma_ctrl & 0x03) 
+		{
+			case 0: // ROM
+				if ((dma_src & 0x408000) == 0x008000 && (dma_src & 0x800000) == 0x000000)
+				{
+					data = read_l(space, (dma_src & 0x7fffff));
+				}
+				if ((dma_src & 0x408000) == 0x008000 && (dma_src & 0x800000) == 0x800000)
+				{
+					data = read_h(space, (dma_src & 0x7fffff));
+				}
+				if ((dma_src & 0xc00000) == 0xc00000)
+				{
+					data = read_h(space, (dma_src & 0x7fffff));
+				}
+				break;
+
+			case 1: // BWRAM
+				if ((dma_src & 0x40e000) == 0x006000)
+				{
+					data = read_bwram((m_bwram_sa1 * 0x2000) + (dma_src & 0x1fff));				
+				}
+				if ((dma_src & 0xf00000) == 0x400000)
+				{
+					data = read_bwram(dma_src & 0xfffff);
+				}
+				break;
+
+			case 2: // IRAM
+				data = read_iram(dma_src);
+				break;
+		}
+		
+		switch (m_dma_ctrl & 0x04) 
+		{
+			case 0x00:	// IRAM
+				write_iram(dma_dst, data);
+				break;
+
+			case 0x04:	// BWRAM
+				if ((dma_dst & 0x40e000) == 0x006000)
+				{
+					write_bwram((m_bwram_sa1 * 0x2000) + (dma_dst & 0x1fff), data);				
+				}
+				if ((dma_dst & 0xf00000) == 0x400000)
+				{
+					write_bwram(dma_dst & 0xfffff, data);
+				}
+				break;
+		}
+	}
+	
+	m_sa1_flags |= SA1_IRQ_DMA;
+	recalc_irqs();
+}
+
+void sns_sa1_device::dma_cctype1_transfer(address_space &space)
+{
+	m_scpu_flags |= SCPU_IRQ_CHARCONV;
+	recalc_irqs();
+}
+
+void sns_sa1_device::dma_cctype2_transfer(address_space &space)
+{
 }
 
 UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
@@ -321,7 +405,7 @@ UINT8 sns_sa1_device::read_regs(address_space &space, UINT32 offset)
 	return value;
 }
 
-void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
+void sns_sa1_device::write_regs(address_space &space, UINT32 offset, UINT8 data)
 {
 	offset &= 0x1ff;    // $2200 + offset gives the reg value to compare with docs
 
@@ -544,9 +628,11 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 		case 0x030:
 			// SA-1  DCNT  00h   DMA Control (W)
 //			printf("%02x to SA-1 DMA control\n", data);
+			m_dma_ctrl = data;
 			break;
 		case 0x031:
 			// Both  CDMA  00h   Character Conversion DMA Parameters (W)
+			m_dma_ccparam = data;
 			break;
 		case 0x032:
 			// DMA Source Device Start Address Low
@@ -567,16 +653,42 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 		case 0x036:
 			// DMA Dest Device Start Address Mid
 			m_dst_addr = (m_dst_addr & 0xff00ff) | (data << 8);
-			break;
+			if (m_dma_ctrl & 0x80)
+			{
+				if (!(m_dma_ctrl & 0x20) && !(m_dma_ctrl & 0x04)) // Normal DMA to IRAM
+				{
+					dma_transfer(space);
+//					printf("SA-1: normal DMA to IRAM\n");
+				}
+
+				if (m_dma_ctrl & 0x20 && m_dma_ctrl & 0x10)	// CC DMA Type 1
+				{
+//					printf("SA-1: CC DMA type 1\n");
+					dma_cctype1_transfer(space);
+				}
+			}
+			break; 
 		case 0x037:
 			// DMA Dest Device Start Address High
 			m_dst_addr = (m_dst_addr & 0xffff00) | (data << 16);
+			if (m_dma_ctrl & 0x80)
+			{
+				if (!(m_dma_ctrl & 0x20) && m_dma_ctrl & 0x04)	// Normal DMA to BWRAM
+				{
+//					printf("SA-1: normal DMA to BWRAM\n");
+					dma_transfer(space);
+				}
+			}
 			break;
 		case 0x038:
 			// SA-1  DTC   -     DMA Terminal Counter Lsb (W)
+			m_dma_cnt &= 0xff00;
+			m_dma_cnt |= data;
 			break;
 		case 0x039:
 			// SA-1  DTC   -     DMA Terminal Counter Msb (W)
+			m_dma_cnt &= 0x00ff;
+			m_dma_cnt |= (data<<8);
 			break;
 		case 0x03f:
 			// Format for BWRAM when mapped to bitmap
@@ -600,6 +712,14 @@ void sns_sa1_device::write_regs(UINT32 offset, UINT8 data)
 		case 0x04f:
 			// Bit Map Register File (2240h..224Fh)
 			m_brf_reg[offset & 0x0f] = data;
+			if ((offset & 0x07) == 7 && m_dma_ctrl & 0x80)
+			{
+				if (m_dma_ctrl & 0x20 && !(m_dma_ctrl & 0x10))	// CC DMA Type 2
+				{
+//					printf("SA-1: CC DMA type 2\n");
+					dma_cctype2_transfer(space);
+				}
+			}			
 			break;
 		case 0x050:
 			// Math control
@@ -773,6 +893,11 @@ READ8_MEMBER(sns_sa1_device::read_l)
 {
 	int bank = 0;
 
+	if (offset == 0xffea && BIT(m_scpu_ctrl, 4)) return (m_nmi_vector >> 0) & 0xff;
+	if (offset == 0xffeb && BIT(m_scpu_ctrl, 4)) return (m_nmi_vector >> 8) & 0xff;
+	if (offset == 0xffee && BIT(m_scpu_ctrl, 6)) return (m_irq_vector >> 0) & 0xff;
+	if (offset == 0xffef && BIT(m_scpu_ctrl, 6)) return (m_irq_vector >> 8) & 0xff;
+
 	// ROM is mapped to [00-3f][8000-ffff] only here
 	if (offset < 0x200000)
 	{
@@ -868,7 +993,7 @@ WRITE8_MEMBER( sns_sa1_device::chip_write )
 	UINT16 address = offset & 0xffff;
 
 	if (offset < 0x400000 && address >= 0x2200 && address < 0x2400)
-		write_regs(address & 0x1ff, data);  // SA-1 Regs
+		write_regs(space, address & 0x1ff, data);  // SA-1 Regs
 
 	if (offset < 0x400000 && address >= 0x3000 && address < 0x3800)
 		write_iram(address & 0x7ff, data);  // Internal SA-1 RAM (2K)
@@ -932,27 +1057,27 @@ READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 		}
 		else if (address < 0x8000)
 			return read_bwram((m_bwram_sa1 * 0x2000) + (offset & 0x1fff) + (m_bwram_sa1_source * 0x100000));        // SA-1 BWRAM
-		else if (address == 0xffee)
+		else if (offset == 0xffee)
 		{
 			return m_sa1_irq & 0xff;
 		}
-		else if (address == 0xffef)
+		else if (offset == 0xffef)
 		{
 			return m_sa1_irq>>8;
 		}
-		else if (address == 0xffea)
+		else if (offset == 0xffea)
 		{
 			return m_sa1_nmi & 0xff;
 		}
-		else if (address == 0xffeb)
+		else if (offset == 0xffeb)
 		{
 			return m_sa1_nmi>>8;
 		}
-		else if (address == 0xfffc)
+		else if (offset == 0xfffc)
 		{
 			return m_sa1_reset & 0xff;
 		}
-		else if (address == 0xfffd)
+		else if (offset == 0xfffd)
 		{
 			return m_sa1_reset>>8;
 		}
@@ -979,7 +1104,7 @@ WRITE8_MEMBER( sns_sa1_device::sa1_hi_w )
 			if (address < 0x0800)
 				write_iram(offset, data);   // Internal SA-1 RAM (2K)
 			else if (address >= 0x2200 && address < 0x2400)
-				write_regs(offset & 0x1ff, data);   // SA-1 Regs
+				write_regs(space, offset & 0x1ff, data);   // SA-1 Regs
 			else if (address >= 0x3000 && address < 0x3800)
 				write_iram(offset, data);   // Internal SA-1 RAM (2K)
 		}

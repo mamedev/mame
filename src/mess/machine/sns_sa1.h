@@ -36,12 +36,15 @@ public:
 
 private:
 
-	inline UINT8 var_length_read(address_space &space, UINT32 offset);
+	UINT8 var_length_read(address_space &space, UINT32 offset);
+	void dma_transfer(address_space &space);
+	void dma_cctype1_transfer(address_space &space);
+	void dma_cctype2_transfer(address_space &space);
 
 	UINT8 read_regs(address_space &space, UINT32 offset);
 	UINT8 read_iram(UINT32 offset);
 	UINT8 read_bwram(UINT32 offset);
-	void write_regs(UINT32 offset, UINT8 data);
+	void write_regs(address_space &space, UINT32 offset, UINT8 data);
 	void write_iram(UINT32 offset, UINT8 data);
 	void write_bwram(UINT32 offset, UINT8 data);
 	void recalc_irqs();
@@ -79,8 +82,12 @@ private:
 	UINT32 m_bwpa_sa1;
 	// $2229-$222a
 	UINT8 m_iram_write_snes, m_iram_write_sa1;
+	// $2230-$2231
+	UINT8 m_dma_ctrl, m_dma_ccparam;
 	// $2232-$2237
 	UINT32 m_src_addr, m_dst_addr;
+	// $2238-$2239
+	UINT16 m_dma_cnt;
 	// $2240-$224f
 	UINT8 m_brf_reg[0x10];
 	// $2250-$2254
