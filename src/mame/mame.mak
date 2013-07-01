@@ -275,7 +275,7 @@ VIDEOS += BUFSPRITE
 #VIDEOS += CRT9021
 #VIDEOS += CRT9212
 #VIDEOS += DL1416
-#VIDEOS += DM9368
+VIDEOS += DM9368
 #VIDEOS += EF9340_1
 VIDEOS += H63484
 #VIDEOS += HD44102
@@ -2527,6 +2527,8 @@ $(DRIVERS)/sbrkout.o:   $(LAYOUT)/sbrkout.lh
 $(DRIVERS)/sderby.o:    $(LAYOUT)/sderby.lh \
 			$(LAYOUT)/spacewin.lh \
 			$(LAYOUT)/pmroulet.lh
+
+$(DRIVERS)/seabattl.o:  $(LAYOUT)/seabattl.lh
 
 $(DRIVERS)/segaorun.o:  $(LAYOUT)/outrun.lh
 
