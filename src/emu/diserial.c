@@ -95,14 +95,14 @@ void device_serial_interface::set_tra_rate(attotime rate)
 
 void device_serial_interface::set_rcv_rate(UINT32 clock, int div)
 {
-	m_rcv_rate = attotime::from_hz(clock) / div;
+	m_rcv_rate = attotime::from_hz(clock) * div;
 	receive_register_reset();
 	m_rcv_clock->adjust(attotime::never);
 }
 
 void device_serial_interface::set_tra_rate(UINT32 clock, int div)
 {
-	m_tra_rate = attotime::from_hz(clock) / div;
+	m_tra_rate = attotime::from_hz(clock) * div;
 	transmit_register_reset();
 	m_tra_clock->adjust(attotime::never);
 }
