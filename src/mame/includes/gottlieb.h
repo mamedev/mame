@@ -250,7 +250,7 @@ public:
 	{ }
 
 	// devices
-	required_device<i8088_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<pioneer_pr8210_device> m_laserdisc;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
