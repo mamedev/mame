@@ -323,35 +323,57 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
     SNAPSHOT
 ***************************************************************************/
 
+// this only works for some of the files, nothing which tries to load
+// more data from tape. todo: tapes which autorun after loading
 SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
+	void *ptr;
 	UINT8 header[18];
-	UINT16 addr;
 
-	/* get the header */
-	image.fread( &header, sizeof(header));
+	// read header
+	image.fread(&header, sizeof(header));
 
-	if (header[0] == 0xff)
+	// verify first byte
+	if (header[0] != 0xff)
 	{
-		/* long header */
-		addr = pick_integer_le(header, 16, 2);
-		void *ptr = program.get_write_ptr(addr);
-		image.fread( ptr, 599);
-		ptr = program.get_write_ptr(0xc000);
-		image.fread( ptr, snapshot_size - 599 - 18);
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, NULL);
+		return IMAGE_INIT_FAIL;
 	}
-	else
+
+	// get tape name
+	char tape_name[16];
+	memcpy(&tape_name, &header[1], 15);
+	tape_name[15] = '\0';
+	image.message("Loading '%s'", tape_name);
+
+	// start of system variables area
+	UINT16 system_variables_base = pick_integer_le(header, 16, 2);
+
+	// write system variables
+	UINT16 system_variables_size = 0;
+
+	if (system_variables_base != 0)
 	{
-		/* short header */
-		addr = pick_integer_le(header, 0, 2);
-		image.fseek(4, SEEK_SET);
-		void *ptr = program.get_write_ptr(addr);
-		image.fread( ptr, 599);
-		ptr = program.get_write_ptr(0xc000);
-		image.fread( ptr, snapshot_size - 599 - 4);
+		ptr = program.get_write_ptr(system_variables_base);
+		system_variables_size = 0xfb4b - system_variables_base;
+		image.fread(ptr, system_variables_size);
 	}
+
+	// write actual image data
+	UINT16 data_size = snapshot_size - 18 - system_variables_size;
+
+	ptr = program.get_write_ptr(0x4000);
+	image.fread(ptr, 0x4000);
+
+	// if we cross the page boundary, get a new write pointer and write the rest
+	if (data_size > 0x4000)
+	{
+		ptr = program.get_write_ptr(0x8000);
+		image.fread(ptr, 0x4000);
+	}
+
+	logerror("snapshot name = '%s', system_size = 0x%04x, data_size = 0x%04x\n", tape_name, system_variables_size, data_size);
 
 	return IMAGE_INIT_PASS;
 }
