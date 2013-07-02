@@ -13,6 +13,10 @@
 	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
+#define B_CLR 0x01
+#define B_SET 0x02
+#define B_CLK 0x04
+
 struct decodmd_type1_intf
 {
 	const char* m_romregion;  // region containing display ROM
@@ -66,12 +70,10 @@ private:
 	UINT32 m_pxdata2_latched;
 	bool m_frameswap;
 	UINT32 m_pixels[0x100];
-	bool m_busy_clr;
-	bool m_busy_set;
-	bool m_busy_clk;
+	UINT8 m_busy_lines;
 
 	void output_data();
-	void check_busy();
+	void set_busy(UINT8 input, UINT8 val);
 };
 
 extern const device_type DECODMD1;

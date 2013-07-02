@@ -28,20 +28,20 @@ READ8_MEMBER( decodmd_type1_device::busy_r )
 
 WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 {
-	if(!(m_ctrl & 0x01) && (data & 0x01))
+	if((data | m_ctrl) & 0x01)
 	{
 		m_command = m_latch;
-		m_busy = 1;
-		m_cpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
+		set_busy(B_CLK,data & 0x01);
 	}
 	if((m_ctrl & 0x02) && !(data & 0x02))
 	{
 		m_rombank1->set_entry(0);
 		m_bank = 0;
-		m_busy = 0;
+		set_busy(B_SET,0);
 		m_rowselect = 0;
 		m_blank = 0;
 		m_frameswap = false;
+		m_status = 0;
 		m_cpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 	}
 	m_ctrl = data;
@@ -54,7 +54,7 @@ READ8_MEMBER( decodmd_type1_device::ctrl_r )
 
 READ8_MEMBER( decodmd_type1_device::status_r )
 {
-	return (m_busy & 0x01) | ((m_ctrl) << 1);
+	return (m_busy & 0x01) | (m_status << 1);
 }
 
 WRITE8_MEMBER( decodmd_type1_device::status_w )
@@ -69,10 +69,10 @@ READ8_MEMBER( decodmd_type1_device::dmd_port_r )
 	if((offset & 0x84) == 0x80)
 	{
 		// IDAT (read only)
-		m_busy = 0;
-		m_ctrl &= ~0x01;
-		m_cpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		return m_latch;
+		//m_ctrl &= ~0x01;
+		set_busy(B_CLR,0);
+		set_busy(B_CLR,1);
+		return m_command;
 	}
 	return 0xff;
 }
@@ -129,8 +129,7 @@ WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
 			m_rowclock = bit;
 			break;
 		case 0xdc:  // Test
-			m_busy_set = bit;
-			//check_busy();
+			set_busy(B_SET,bit);
 			break;
 		}
 		break;
@@ -160,27 +159,23 @@ void decodmd_type1_device::output_data()
 	}
 }
 
-void decodmd_type1_device::check_busy()
+void decodmd_type1_device::set_busy(UINT8 input, UINT8 val)
 {
-	if(m_busy_clr)
-	{
+	UINT8 newval = (m_busy_lines & ~input) | (val ? input : 0);
+
+	if(~newval & m_busy_lines & B_CLR)
 		m_busy = 0;
-		m_cpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-	}
-	else if(!m_busy_set)
-	{
+	else if (~newval & m_busy_lines & B_SET)
 		m_busy = 1;
-		m_cpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
-	}
-	else
+	else if ((newval & (B_CLR|B_SET)) == (B_CLR|B_SET))
 	{
-		if(!m_busy_clk)
-		{
+		if(newval & ~m_busy_lines & B_CLK)
 			m_busy = 1;
-			m_cpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
-		}
 	}
 
+	m_busy_lines = newval;
+
+	m_cpu->set_input_line(INPUT_LINE_IRQ0,m_busy ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
@@ -190,7 +185,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 
 static ADDRESS_MAP_START( decodmd1_map, AS_PROGRAM, 8, decodmd_type1_device )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("dmdbank2") // last 16k of ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmdbank1") //AM_WRITE(status_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmdbank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("dmdram")
 ADDRESS_MAP_END
 
@@ -201,11 +196,11 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( decodmd1 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_8MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(decodmd1_map)
 	MCFG_CPU_IO_MAP(decodmd1_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer",decodmd_type1_device,dmd_nmi,attotime::from_hz(2000))  // seems a lot
 
@@ -215,7 +210,7 @@ static MACHINE_CONFIG_FRAGMENT( decodmd1 )
 	MCFG_SCREEN_SIZE(128, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device,screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
@@ -247,14 +242,17 @@ void decodmd_type1_device::device_reset()
 	m_rom = memregion(m_romregion);
 
 	memset(RAM,0,0x2000);
+	memset(m_pixels,0,0x100);
 
 	ROM = m_rom->base();
 	m_rombank1->configure_entries(0, 8, &ROM[0x0000], 0x4000);
 	m_rombank2->configure_entry(0, &ROM[0x1c000]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);
+	m_status = 0;
 	m_bank = 0;
 	m_busy = 0;
+	set_busy(B_CLR|B_SET,0);
 	m_rowselect = 0;
 	m_blank = 0;
 	m_frameswap = false;

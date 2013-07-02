@@ -403,6 +403,8 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 
 READ8_MEMBER( de_3_state::pia2c_pb_r )
 {
+	if(m_dmdtype1)
+		return m_dmdtype1->busy_r(space,offset);
 	if(m_dmdtype2)
 		return m_dmdtype2->busy_r(space,offset);
 	return 0;
@@ -491,13 +493,13 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 
 READ8_MEMBER( de_3_state::dmd_status_r )
 {
-	if(m_dmdtype2)
-	{
-		return m_dmdtype2->status_r(space,offset);
-	}
-	else if(m_dmdtype1)
+	if(m_dmdtype1)
 	{
 		return m_dmdtype1->status_r(space,offset);
+	}
+	else if(m_dmdtype2)
+	{
+		return m_dmdtype2->status_r(space,offset);
 	}
 	return 0;
 }
