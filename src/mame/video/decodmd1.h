@@ -71,6 +71,7 @@ private:
 	bool m_frameswap;
 	UINT32 m_pixels[0x100];
 	UINT8 m_busy_lines;
+	UINT32 m_prevrow;
 
 	void output_data();
 	void set_busy(UINT8 input, UINT8 val);

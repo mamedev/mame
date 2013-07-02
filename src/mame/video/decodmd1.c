@@ -153,10 +153,16 @@ void decodmd_type1_device::output_data()
 		{
 			m_pixels[ptr] = m_pxdata2_latched;
 			m_pixels[ptr+1] = m_pxdata1_latched;
+			if(m_prevrow != m_rowselect)
+			{
+				m_pixels[ptr+2] = m_pixels[ptr];
+				m_pixels[ptr+3] = m_pixels[ptr+1];
+			}
 		}
-		ptr += 2;
+		ptr += 4;
 		row >>= 1;
 	}
+	m_prevrow = m_rowselect;
 }
 
 void decodmd_type1_device::set_busy(UINT8 input, UINT8 val)
@@ -276,7 +282,8 @@ UINT32 decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 
 {
 	UINT8 ptr = 0;
 	UINT8 x,y,dot;
-	UINT32 data1,data2;
+	UINT32 data1,data2,data3,data4;
+	UINT32 col;
 
 	if(m_frameswap)
 		ptr = 0x80;
@@ -287,14 +294,30 @@ UINT32 decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 
 		{
 			data1 = m_pixels[ptr];
 			data2 = m_pixels[ptr+1];
+			data3 = m_pixels[ptr+2];
+			data4 = m_pixels[ptr+3];
 			for(dot=0;dot<64;dot+=2)
 			{
-				bitmap.pix32(y,x+dot) = (data1 & 0x01) ? MAKE_RGB(0xff,0xaa,0x00) : RGB_BLACK;
-				bitmap.pix32(y,x+dot+1) = (data2 & 0x01) ? MAKE_RGB(0xff,0xaa,0x00) : RGB_BLACK;
+				if((data1 & 0x01) != (data3 & 0x01))
+					col = MAKE_RGB(0x7f,0x55,0x00);
+				else if (data1 & 0x01) // both are the same, so either high intensity or none at all
+					col = MAKE_RGB(0xff,0xaa,0x00);
+				else
+					col = RGB_BLACK;
+				bitmap.pix32(y,x+dot) = col;
+				if((data2 & 0x01) != (data4 & 0x01))
+					col = MAKE_RGB(0x7f,0x55,0x00);
+				else if (data2 & 0x01) // both are the same, so either high intensity or none at all
+					col = MAKE_RGB(0xff,0xaa,0x00);
+				else
+					col = RGB_BLACK;
+				bitmap.pix32(y,x+dot+1) = col;
 				data1 >>= 1;
 				data2 >>= 1;
+				data3 >>= 1;
+				data4 >>= 1;
 			}
-			ptr+=2;
+			ptr+=4;
 		}
 	}
 
