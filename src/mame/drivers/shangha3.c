@@ -27,8 +27,7 @@ blocken:
 Notes:
 - a Blocken PCB shot barely shows a 48 MHz xtal, game is definitely too slow
   at 8 MHz (noticeable thru colour cycling effects)
-- A picture of an undumped full English version of Shanghai 3 clearly shows
-  a 48MHz OSC & TMP68HC000N-16 cpu plus a little blue resonator for the OKI.
+- Confirmed OSC is 48MHz and OKI resonator is 1.056MHz.
 
 ***************************************************************************/
 
@@ -593,7 +592,19 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( shangha3 ) /* PCB labeled SUN04C */
+ROM_START( shangha3 ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drugs" splash screen. Has two additional tiles sets to choose from. */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ic3.ic3",  0x0000, 0x80000, CRC(53ef4988) SHA1(63f098d95865928a553e945fe60dea79aa16c603) ) /* ST M27C4001 EPROM labeled IC3 */
+	ROM_LOAD16_BYTE( "ic2.ic2",  0x0001, 0x80000, CRC(fdea0232) SHA1(8983a646412df01b6bc66994700796e7b7fcbb61) ) /* ST M27C4001 EPROM labeled IC2 */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* samples for M6295 */
+	ROM_LOAD( "ic75.ic75", 0x0000, 0x80000, CRC(a8136d8c) SHA1(8028bda5642c2546c1ac8da78dbff4084829f03b) ) /* 27C4001 with 1st & 2nd halves == s3j_v10.ic75 */
+ROM_END
+
+ROM_START( shangha3j ) /* PCB labeled SUN04C */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s3j_v11.ic3",  0x0000, 0x40000, CRC(e98ce9c8) SHA1(359e117aebb644d7b235add7e71ed6891243d451) )
 	ROM_LOAD16_BYTE( "s3j_v11.ic2",  0x0001, 0x40000, CRC(09174620) SHA1(1d1639c07895f715facfe153fbdb6ae0f3cdd876) )
@@ -669,6 +680,7 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_do_shadows = 0;
 }
 
-GAME( 1993, shangha3, 0, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
-GAME( 1994, heberpop, 0, heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
-GAME( 1994, blocken,  0, blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", 0 )
+GAME( 1993, shangha3j, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
+GAME( 1994, heberpop,  0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
+GAME( 1994, blocken,   0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", GAME_IMPERFECT_GRAPHICS )
