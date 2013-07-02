@@ -405,38 +405,38 @@ public:
 READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122_sram_r(k037122, space, offset, mem_mask);
+	return k037122->sram_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122_sram_w(k037122, space, offset, data, mem_mask);
+	k037122->sram_w(space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(hornet_state::hornet_k037122_char_r)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122_char_r(k037122, space, offset, mem_mask);
+	return k037122->char_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122_char_w(k037122, space, offset, data, mem_mask);
+	k037122->char_w(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	return k037122_reg_r(k037122, space, offset, mem_mask);
+	return k037122->reg_r(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 {
 	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
-	k037122_reg_w(k037122, space, offset, data, mem_mask);
+	k037122->reg_w(space, offset, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_0)
@@ -454,7 +454,7 @@ UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &b
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	k037122_tile_draw(m_k037122_1, bitmap, cliprect);
+	m_k037122_1->tile_draw(bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -469,7 +469,7 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		k037122_tile_draw(m_k037122_1, bitmap, cliprect);
+		m_k037122_1->tile_draw(bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
@@ -477,7 +477,7 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		k037122_tile_draw(m_k037122_2, bitmap, cliprect);
+		m_k037122_2->tile_draw(bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);

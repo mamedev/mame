@@ -140,8 +140,8 @@ struct k001604_interface
 
 struct k037122_interface
 {
-	const char     *screen;
-	int            gfx_index;
+	const char     *m_screen_tag;
+	int            m_gfx_index;
 };
 
 class k007121_device : public device_t
@@ -562,25 +562,39 @@ private:
 
 extern const device_type K001604;
 
-class k037122_device : public device_t
+class k037122_device : public device_t,
+										public k037122_interface
 {
 public:
 	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k037122_device() { global_free(m_token); }
+	~k037122_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void tile_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	DECLARE_READ32_MEMBER( sram_r );
+	DECLARE_WRITE32_MEMBER( sram_w );
+	DECLARE_READ32_MEMBER( char_r );
+	DECLARE_WRITE32_MEMBER( char_w );
+	DECLARE_READ32_MEMBER( reg_r );
+	DECLARE_WRITE32_MEMBER( reg_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	screen_device *m_screen;
+	tilemap_t     *m_layer[2];
+	
+	UINT32 *       m_tile_ram;
+	UINT32 *       m_char_ram;
+	UINT32 *       m_reg;
 
-	TILE_GET_INFO_MEMBER(k037122_tile_info_layer0);
-	TILE_GET_INFO_MEMBER(k037122_tile_info_layer1);
+	TILE_GET_INFO_MEMBER(tile_info_layer0);
+	TILE_GET_INFO_MEMBER(tile_info_layer1);
+	void update_palette_color( UINT32 palette_base, int color );
 };
 
 extern const device_type K037122;
@@ -1144,16 +1158,6 @@ DECLARE_WRITE32_DEVICE_HANDLER( k001604_char_w );
 DECLARE_READ32_DEVICE_HANDLER( k001604_char_r );
 DECLARE_WRITE32_DEVICE_HANDLER( k001604_reg_w );
 DECLARE_READ32_DEVICE_HANDLER( k001604_reg_r );
-
-
-/**  Konami 037122  **/
-void k037122_tile_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-DECLARE_READ32_DEVICE_HANDLER( k037122_sram_r );
-DECLARE_WRITE32_DEVICE_HANDLER( k037122_sram_w );
-DECLARE_READ32_DEVICE_HANDLER( k037122_char_r );
-DECLARE_WRITE32_DEVICE_HANDLER( k037122_char_w );
-DECLARE_READ32_DEVICE_HANDLER( k037122_reg_r );
-DECLARE_WRITE32_DEVICE_HANDLER( k037122_reg_w );
 
 #define K056832_DRAW_FLAG_MIRROR      0x00800000
 
