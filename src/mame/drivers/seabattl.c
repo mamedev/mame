@@ -259,7 +259,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 	// bit 0: m.obj - pvi-bkg
 	// bit 1: pvi-bkg - src.sm.obj
 	// bit 2: m.obj - src.sm.obj
-	int colx = -1, coly = -1;
+	// TODO: are these variables needed? int colx = -1, coly = -1;
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
