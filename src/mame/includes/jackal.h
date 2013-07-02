@@ -30,7 +30,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
-	DECLARE_READ8_MEMBER(topgunbl_rotary_r);
+	DECLARE_READ8_MEMBER(jackalr_rotary_r);
 	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
 	DECLARE_READ8_MEMBER(jackal_zram_r);
 	DECLARE_READ8_MEMBER(jackal_voram_r);

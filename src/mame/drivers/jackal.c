@@ -83,7 +83,7 @@ Address          Dir Data     Description
  *
  *************************************/
 
-READ8_MEMBER(jackal_state::topgunbl_rotary_r)
+READ8_MEMBER(jackal_state::jackalr_rotary_r)
 {
 	return (1 << ioport(offset ? "DIAL1" : "DIAL0")->read_safe(0x00)) ^ 0xff;
 }
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
 	AM_RANGE(0x0012, 0x0012) AM_READ_PORT("IN2")
 	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
-	AM_RANGE(0x0014, 0x0015) AM_READ(topgunbl_rotary_r)
+	AM_RANGE(0x0014, 0x0015) AM_READ(jackalr_rotary_r)
 	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
@@ -237,16 +237,16 @@ static INPUT_PORTS_START( jackal )
 	KONAMI8_B12_UNK(2)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( topgunbl )
+static INPUT_PORTS_START( jackalr )
 	PORT_INCLUDE(jackal)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DIAL0") // player 1 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START("DIAL0") // player 1 8-way rotary control - converted in jackalr_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(8)
 
-	PORT_START("DIAL1") // player 2 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START("DIAL1") // player 2 8-way rotary control - converted in jackalr_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(8)
 INPUT_PORTS_END
 
@@ -386,7 +386,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( jackal )
+ROM_START( jackal ) /* 8-Way Joystick: You can only shoot in one direction regardless of travel - up the screen */
 	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "631_v02.15d", 0x04000, 0x8000, CRC(0b7e0584) SHA1(e4019463345a4c020d5a004c9a400aca4bdae07b) )
 	ROM_CONTINUE(            0x14000, 0x8000 )
@@ -406,7 +406,36 @@ ROM_START( jackal )
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
 ROM_END
 
-ROM_START( topgunr )
+ROM_START( jackalr ) /* Rotary Joystick: Shot direction is controlled via the rotary function of the joystick */
+	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
+	ROM_LOAD( "631_q02.15d", 0x04000, 0x8000, CRC(ed2a7d66) SHA1(3d9b31fa8b31e509880d617feb0dd4bd9790d2d5) )
+	ROM_CONTINUE(            0x14000, 0x8000 )
+	ROM_LOAD( "631_q03.16d", 0x0c000, 0x4000, CRC(b9d34836) SHA1(af23a0c844fb9e60a757511ca898d73eef4c2e51) )
+
+	ROM_REGION( 0x10000, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_LOAD( "631_q01.11d", 0x8000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "631t04.7h",  0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) ) /* Silkscreened MASK1M */
+	ROM_LOAD16_BYTE( "631t05.8h",  0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) ) /* Silkscreened MASK1M */
+	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) /* Silkscreened MASK1M */
+	ROM_LOAD16_BYTE( "631t07.13h", 0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) ) /* Silkscreened MASK1M */
+	 /* These roms are on a tiny riser board - two smaller roms instead of MASK1M roms */
+//	ROM_LOAD16_BYTE( "631_q04.7h",  0x20000, 0x10000, CRC(0) SHA1(0) )
+//	ROM_LOAD16_BYTE( "631_q05.7h",  0x00000, 0x10000, CRC(0) SHA1(0) )
+//	ROM_LOAD16_BYTE( "631_q06.8h",  0x20001, 0x10000, CRC(0) SHA1(0) )
+//	ROM_LOAD16_BYTE( "631_q07.8h",  0x00001, 0x10000, CRC(0) SHA1(0) ) /* 631 Q04 through 631 Q11 need to be redumped and verified. Should be the same data */
+//	ROM_LOAD16_BYTE( "631_q08.12h", 0x40000, 0x10000, CRC(0) SHA1(0) ) /* until then we are going to use the standard MASK1M roms - Will fixed when dumped  */
+//	ROM_LOAD16_BYTE( "631_q09.12h", 0x60000, 0x10000, CRC(0) SHA1(0) )
+//	ROM_LOAD16_BYTE( "631_q10.13h", 0x40001, 0x10000, CRC(0) SHA1(0) )
+//	ROM_LOAD16_BYTE( "631_q11.13h", 0x60001, 0x10000, CRC(0) SHA1(0) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* color lookup tables */
+	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
+	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
+ROM_END
+
+ROM_START( topgunr ) /* 8-Way Joystick:  You can only shoot in one direction regardless of travel - up the screen */
 	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "631_u02.15d", 0x04000, 0x8000, CRC(f7e28426) SHA1(db2d5f252a574b8aa4d8406a8e93b423fd2a7fef) )
 	ROM_CONTINUE(            0x14000, 0x8000 )
@@ -426,7 +455,7 @@ ROM_START( topgunr )
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
 ROM_END
 
-ROM_START( jackalj )
+ROM_START( jackalj ) /* 8-Way Joystick: You can only shoot in the direction you're traveling */
 	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "631_t02.15d", 0x04000, 0x8000, CRC(14db6b1a) SHA1(b469ea50aa94a2bda3bd0442300aa1272e5f30c4) )
 	ROM_CONTINUE(            0x14000, 0x8000 )
@@ -446,14 +475,14 @@ ROM_START( jackalj )
 	ROM_LOAD( "631r09.14h", 0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) ) /* MMI 63S141AN or compatible (silkscreened 6301) */
 ROM_END
 
-ROM_START( topgunbl )
+ROM_START( topgunbl ) /* Rotary Joystick: Shot direction is controlled via the Rotary function of the joystick */
 	ROM_REGION( 0x20000, "master", 0 )  /* Banked 64k for 1st CPU */
 	ROM_LOAD( "t-3.c5", 0x04000, 0x8000, CRC(7826ad38) SHA1(875e87867924905b9b83bc203eb7ffe81cf72233) )
-	ROM_LOAD( "t-4.c4", 0x14000, 0x8000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) )
+	ROM_LOAD( "t-4.c4", 0x14000, 0x8000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) ) /* == 2nd half of 631_q02.15d */
 	ROM_LOAD( "t-2.c6", 0x0c000, 0x4000, CRC(d53172e5) SHA1(44b7f180c17f9a121a2f06f2d3471920a8989e21) )
 
 	ROM_REGION( 0x10000, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
-	ROM_LOAD( "t-1.c14", 0x8000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) )
+	ROM_LOAD( "t-1.c14", 0x8000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) ) /* == 631_q01.11d */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	/* same data, different layout */
@@ -486,7 +515,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,   driver_device, 0, ROT90, "Konami",  "Jackal (World)", 0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,   driver_device, 0, ROT90, "Konami",  "Top Gunner (US)", 0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,   driver_device, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan)", 0 )
-GAME( 1986, topgunbl, jackal, jackal, topgunbl, driver_device, 0, ROT90, "bootleg", "Top Gunner (bootleg)", 0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)", 0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, driver_device, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)", 0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)", 0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  driver_device, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, driver_device, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)", 0 )
