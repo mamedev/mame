@@ -454,6 +454,9 @@ endif
 ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
 endif
+ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
+	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs -Wno-unused-variable
+endif
 endif
 
 #-------------------------------------------------
