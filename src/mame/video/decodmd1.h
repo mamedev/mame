@@ -69,7 +69,7 @@ private:
 	UINT32 m_pxdata1_latched;
 	UINT32 m_pxdata2_latched;
 	bool m_frameswap;
-	UINT32 m_pixels[0x100];
+	UINT32 m_pixels[0x200];
 	UINT8 m_busy_lines;
 	UINT32 m_prevrow;
 
