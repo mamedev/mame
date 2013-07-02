@@ -198,6 +198,7 @@ public:
 	int m_t1;
 	int m_t3l;
 	int m_t3h;
+	UINT8 m_numbanks;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 

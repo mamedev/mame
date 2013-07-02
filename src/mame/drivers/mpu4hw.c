@@ -468,21 +468,8 @@ MACHINE_RESET_MEMBER(mpu4_state,mpu4)
 
 
 	{
-		UINT8 *rom = memregion("maincpu")->base();
-		size_t romsize = memregion("maincpu")->bytes();
-
-		if (romsize < 0x10000)
-			fatalerror("maincpu ROM region is < 0x10000 bytes, check ROM\n");
-
-		int numbanks = romsize / 0x10000;
-
-		m_bank1->configure_entries(0, 8, &rom[0x01000], 0x10000);
-
-		// some Bwb games must default to the last bank, does anything not like this
-		// behavior?
-		// some Bwb games don't work anyway tho, they seem to dislike something else
-		// about the way the regular banking behaves, not related to the CB2 stuff
-		m_bank1->set_entry(numbanks-1);
+		if (m_numbanks)
+			m_bank1->set_entry(m_numbanks);
 
 		m_maincpu->reset();
 	}
@@ -529,7 +516,7 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 
 	// m_pageset is never even set??
 	m_pageval = (data & 0x03);
-	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 }
 
 
@@ -546,7 +533,7 @@ WRITE8_MEMBER(mpu4_state::bankset_w)
 	// m_pageset is never even set??
 
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+	m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 }
 
 
@@ -1537,7 +1524,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	{
 		//printf("pia_gb_cb2_w %d\n", state);
 		m_pageval = state;
-		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
+		m_bank1->set_entry((m_pageval + (m_pageset ? 4 : 0)) & m_numbanks);
 	}
 }
 
@@ -2649,6 +2636,19 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 		m_bwb_bank=1;
 		space.install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
 		space.install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+		UINT8 *rom = memregion("maincpu")->base();
+
+		m_numbanks = size / 0x10000;
+
+		m_bank1->configure_entries(0, m_numbanks, &rom[0x01000], 0x10000);
+
+		m_numbanks--;
+
+		// some Bwb games must default to the last bank, does anything not like this
+		// behavior?
+		// some Bwb games don't work anyway tho, they seem to dislike something else
+		// about the way the regular banking behaves, not related to the CB2 stuff
+		m_bank1->set_entry(m_numbanks);
 	}
 }
 
