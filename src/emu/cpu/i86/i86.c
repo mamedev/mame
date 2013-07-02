@@ -439,6 +439,28 @@ void i80186_cpu_device::execute_run()
 				i_outsw();
 				break;
 
+			case 0x8e: // i_mov_sregw
+				m_modrm = fetch();
+				m_src = GetRMWord();
+				CLKM(MOV_SR,MOV_SM);
+				switch (m_modrm & 0x38)
+				{
+				case 0x00:  /* mov es,ew */
+					m_sregs[ES] = m_src;
+					break;
+				case 0x10:  /* mov ss,ew */
+					m_sregs[SS] = m_src;
+					m_no_interrupt = 1;
+					break;
+				case 0x18:  /* mov ds,ew */
+					m_sregs[DS] = m_src;
+					break;
+				default:
+					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+					interrupt(6);
+				}
+				break;
+
 			case 0xc0: // i_rotshft_bd8
 				{
 					UINT8 c;
