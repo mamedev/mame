@@ -48,11 +48,11 @@
   - CPU:            1x R6502P.
   - Sound:          1x AY-3-8910.
   - Video:          1x HD46505 HD6845SP.
-  - RAM:            (unknown).
+  - RAM:            4x 6116
   - I/O             1x MC6821 PIA.
   - PRG ROMs:       6x 2764 (8Kb).
   - GFX ROMs:       1x 2732 (4Kb) for text layer.
-                    4x 2764 (8Kb) for gfx tiles.
+                    3x 2764 (8Kb) for gfx tiles.
 
   - Clock:          1x 12.4725 MHz. Crystal.
 
@@ -530,8 +530,8 @@ ROM_START( miniboy7 )
 	ROM_LOAD( "mb7_cg3.d14",    0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )  /* bitplane 3 */
 
 	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
-	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
-	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) )
+	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
+	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
 /*
@@ -555,8 +555,31 @@ ROM_START( miniboy7a )
 	ROM_LOAD( "mb72.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
 	ROM_LOAD( "mb73.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "mb7_24s10n.bin", 0x0000, 0x0100, NO_DUMP) /* PROM dump needed */
+	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
+	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
+ROM_END
+
+ROM_START( miniboy7b ) /* "Might" be the same set as miniboy7a, all roms read consistently for multiply reads */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mb7_1-11.a8",  0x4000, 0x2000, CRC(e1c0f8f2) SHA1(0790dc37374cf12313ae13adaea2c6e7338e0dbc) )
+	ROM_LOAD( "mb7_2-11.a7",  0x6000, 0x2000, CRC(596040a3) SHA1(bb68b9fd12fba09c3d7c9dec70cf4770d31f911b) )
+	ROM_LOAD( "mb7_3-11.a5",  0x8000, 0x2000, CRC(41a9816f) SHA1(9f7853498fcc6ead7cba619421a60335a48dfe57) )
+	ROM_LOAD( "mb7_4-11.a4",  0xa000, 0x2000, CRC(bafb08fa) SHA1(004e95a81c94ee40701a604cca4023e6fdece54f) )
+	ROM_LOAD( "mb7_5-11.a3",  0xc000, 0x2000, CRC(a8334503) SHA1(ab63f0f602e385445a322663e2e0d6008a25bf5c) )
+	ROM_LOAD( "mb7_6-11.a1",  0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mb7_0.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
+	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
+	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
+
+	ROM_REGION( 0x0200, "proms", 0 )    /* both bipolar PROMs are identical */
+	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
+	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
 
@@ -567,3 +590,5 @@ ROM_END
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
 GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1983, miniboy7b, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 3)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+
