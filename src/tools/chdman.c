@@ -69,6 +69,8 @@ const int MODE_NORMAL = 0;
 const int MODE_CUEBIN = 1;
 const int MODE_GDI = 2;
 
+INT32 g_finds = 0;
+
 // command modifier
 #define REQUIRED "~"
 
@@ -1967,6 +1969,9 @@ static void do_create_ld(parameters_t &params)
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_ld_compression, sizeof(compression));
 	parse_compression(params, compression);
+	// disable support for uncompressed ones until the extraction code can handle it
+	if (compression[0] == CHD_CODEC_NONE)
+		report_error(1, "Uncompressed is not supported");
 
 	// process numprocessors
 	parse_numprocessors(params);
