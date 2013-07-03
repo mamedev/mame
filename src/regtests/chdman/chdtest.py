@@ -68,12 +68,12 @@ def extractcdAndCompare(type):
 	sha1_extract_bin_2 = sha1sum(extractFileBin);
 		
 	if not sha1_extract == sha1_extract_2:
-		print "expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_extract + " found: " + sha1_extract_2
 		print d + " - SHA1 mismatch (extractcd - " + type + " - toc)"
 		failure = True
 
 	if not sha1_extract_bin == sha1_extract_bin_2:
-		print "expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_extract_bin + " found: " + sha1_extract_bin_2
 		print d + " - SHA1 mismatch (extractcd - " + type + " - bin)"
 		failure = True
 		
@@ -105,7 +105,7 @@ def extractAndCompare(command, ext):
 	sha1_extract_2 = sha1sum(extractFile);
 		
 	if not sha1_extract == sha1_extract_2:
-		print "expected: " + sha1_out + " found: " + sha1_temp
+		print "expected: " + sha1_extract + " found: " + sha1_extract_2
 		print d + " - SHA1 mismatch (" + command + " - " + ext + ")"
 		failure = True
 
@@ -209,6 +209,7 @@ for root, dirs, files in os.walk(inputPath):
 			extractAndCompare("extracthd", "raw")
 		elif command == "createld":
 			extractAndCompare("extractld", "avi")
+		# TODO: add extraction for "copy" as well
 			
 		# compare SHA1 of output files
 		sha1_out = sha1sum(outFile)
