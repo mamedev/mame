@@ -1,5 +1,6 @@
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "video/seta001.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 
@@ -26,6 +27,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu"),
+		m_seta001(*this, "spritegen"),
 		m_dac(*this, "dac"),
 		m_samples(*this, "samples") { }
 
@@ -113,6 +115,7 @@ public:
 	void mcu_handle_coins( int coin );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<seta001_device> m_seta001;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
 };

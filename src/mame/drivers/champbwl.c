@@ -156,7 +156,6 @@ Notes:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "includes/tnzs.h"
-#include "video/seta001.h"
 
 class champbwl_state : public tnzs_state
 {
@@ -208,12 +207,12 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r, seta_sound_w)
-	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
@@ -247,12 +246,12 @@ static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w) // Sound
-	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0") AM_WRITE(doraemon_outputs_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN1") AM_WRITENOP    // Ack?
 	AM_RANGE(0xf004, 0xf004) AM_WRITENOP                        // Ack?
@@ -457,10 +456,10 @@ UINT32 champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
-	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(), bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(bitmap, cliprect, 0x800, 1 );
 	return 0;
 }
 
@@ -468,7 +467,7 @@ void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		machine().device<seta001_device>("spritegen")->tnzs_eof();
+		m_seta001->tnzs_eof();
 }
 
 
@@ -516,10 +515,10 @@ UINT32 champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0x1f0, cliprect);
 
-	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x01 );
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x00, 0x10 );
+	m_seta001->set_bg_yoffsets( 0x00, 0x01 );
+	m_seta001->set_fg_yoffsets( 0x00, 0x10 );
 
-	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(), bitmap, cliprect, 0x800, 1 );
+	m_seta001->draw_sprites(bitmap, cliprect, 0x800, 1 );
 	return 0;
 }
 
@@ -527,7 +526,7 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		machine().device<seta001_device>("spritegen")->setac_eof();
+		m_seta001->setac_eof();
 }
 
 MACHINE_START_MEMBER(champbwl_state,doraemon)

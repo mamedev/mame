@@ -6,8 +6,26 @@ class seta001_device : public device_t
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
 
-	void seta001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
+	DECLARE_READ16_MEMBER( spritectrl_r16 );
+	DECLARE_WRITE16_MEMBER( spritectrl_w16 );
+	DECLARE_READ8_MEMBER( spritectrl_r8 );
+	DECLARE_WRITE8_MEMBER( spritectrl_w8 );
+
+	DECLARE_READ16_MEMBER( spriteylow_r16 );
+	DECLARE_WRITE16_MEMBER( spriteylow_w16 );
+	DECLARE_READ8_MEMBER( spriteylow_r8 );
+	DECLARE_WRITE8_MEMBER( spriteylow_w8 );
+
+	DECLARE_READ8_MEMBER( spritecodelow_r8 );
+	DECLARE_WRITE8_MEMBER( spritecodelow_w8 );
+	DECLARE_READ8_MEMBER( spritecodehigh_r8 );
+	DECLARE_WRITE8_MEMBER( spritecodehigh_w8 );
+	DECLARE_READ16_MEMBER( spritecode_r16 );
+	DECLARE_WRITE16_MEMBER( spritecode_w16 );
+	
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
 
 	void setac_eof( void );
 	void tnzs_eof( void );
@@ -52,29 +70,9 @@ protected:
 
 private:
 
-	void seta001_draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
-	void seta001_draw_foreground( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
+	void draw_foreground( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 
 };
-
-DECLARE_WRITE8_DEVICE_HANDLER( spritebgflag_w8 );
-
-
-DECLARE_READ16_DEVICE_HANDLER( spritectrl_r16 );
-DECLARE_WRITE16_DEVICE_HANDLER( spritectrl_w16 );
-DECLARE_READ8_DEVICE_HANDLER( spritectrl_r8 );
-DECLARE_WRITE8_DEVICE_HANDLER( spritectrl_w8 );
-
-DECLARE_READ16_DEVICE_HANDLER( spriteylow_r16 );
-DECLARE_WRITE16_DEVICE_HANDLER( spriteylow_w16 );
-DECLARE_READ8_DEVICE_HANDLER( spriteylow_r8 );
-DECLARE_WRITE8_DEVICE_HANDLER( spriteylow_w8 );
-
-DECLARE_READ8_DEVICE_HANDLER( spritecodelow_r8 );
-DECLARE_WRITE8_DEVICE_HANDLER( spritecodelow_w8 );
-DECLARE_READ8_DEVICE_HANDLER( spritecodehigh_r8 );
-DECLARE_WRITE8_DEVICE_HANDLER( spritecodehigh_w8 );
-DECLARE_READ16_DEVICE_HANDLER( spritecode_r16 );
-DECLARE_WRITE16_DEVICE_HANDLER( spritecode_w16 );
 
 extern const device_type SETA001_SPRITE;

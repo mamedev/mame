@@ -138,7 +138,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
-#include "video/seta001.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
 static const game_offset game_offsets[] =
@@ -474,7 +473,7 @@ VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
 	m_tilemaps_flip = 1;
 
 	// position kludges
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 }
 
 
@@ -504,8 +503,8 @@ VIDEO_START_MEMBER(seta_state,setaroul_1_layer)
 	VIDEO_START_CALL_MEMBER(seta_1_layer);
 
 	// position kludges
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
-	machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
 VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
@@ -550,11 +549,11 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_samples_bank = -1;    // set the samples bank to an out of range value at start-up
 
 	// position kludges
-	machine().device<seta001_device>("spritegen")->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
-	machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x0a, 0x0e );
+	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
+	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );
 
 	// banking
-	machine().device<seta001_device>("spritegen")->set_gfxbank_callback( setac_gfxbank_callback );
+	m_seta001->set_gfxbank_callback( setac_gfxbank_callback );
 
 }
 
@@ -830,7 +829,7 @@ UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_in
 	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
-	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(),bitmap,cliprect,0x1000, 1);
+	m_seta001->draw_sprites(bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -842,7 +841,7 @@ void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap,
 	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
 	int order   =   0;
-	int flip    =   machine().device<seta001_device>("spritegen")->is_flipped();
+	int flip    =   m_seta001->is_flipped();
 
 	const rectangle &visarea = screen.visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -952,7 +951,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if(order & 4)
 			{
@@ -972,7 +971,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 			if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 			if (layers_ctrl & 1)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)        machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
@@ -982,7 +981,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if((order & 4) && m_paletteram2 != NULL)
 			{
@@ -1036,7 +1035,7 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8) machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8) m_seta001->draw_sprites(bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 
@@ -1062,7 +1061,7 @@ void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
-		machine().device<seta001_device>("spritegen")->tnzs_eof();
+		m_seta001->tnzs_eof();
 }
 
 
