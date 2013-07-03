@@ -2235,7 +2235,7 @@ wd2795_device::wd2795_device(const machine_config &mconfig, const char *tag, dev
 const device_type WD2797 = &device_creator<wd2797_device>;
 
 wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: wd1770_device(mconfig, WD2797, "WD2797", tag, owner, clock, "wd2797", __FILE__)
+	: wd1770_device(mconfig, WD2797, "WD2797_LEGACY", tag, owner, clock, "wd2797_l", __FILE__)
 {
 }
 
@@ -2243,7 +2243,7 @@ wd2797_device::wd2797_device(const machine_config &mconfig, const char *tag, dev
 const device_type WD1770 = &device_creator<wd1770_device>;
 
 wd1770_device::wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WD1770, "WD1770", tag, owner, clock, "wd1770", __FILE__)
+	: device_t(mconfig, WD1770, "WD1770_LEGACY", tag, owner, clock, "wd1770_l", __FILE__)
 {
 	m_token = global_alloc_clear(wd1770_state);
 }
@@ -2285,7 +2285,7 @@ void wd1770_device::device_reset()
 const device_type WD1772 = &device_creator<wd1772_device>;
 
 wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: wd1770_device(mconfig, WD1772, "WD1772", tag, owner, clock, "wd1772", __FILE__)
+	: wd1770_device(mconfig, WD1772, "WD1772_LEGACY", tag, owner, clock, "wd1772_l", __FILE__)
 {
 }
 
@@ -2302,7 +2302,7 @@ void wd1772_device::device_start()
 const device_type WD1773 = &device_creator<wd1773_device>;
 
 wd1773_device::wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: wd1770_device(mconfig, WD1773, "WD1773", tag, owner, clock, "wd1773", __FILE__)
+	: wd1770_device(mconfig, WD1773, "WD1773_LEGACY", tag, owner, clock, "wd1773_l", __FILE__)
 {
 }
 
@@ -2326,6 +2326,6 @@ mb8876_device::mb8876_device(const machine_config &mconfig, const char *tag, dev
 const device_type MB8877 = &device_creator<mb8877_device>;
 
 mb8877_device::mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: wd1770_device(mconfig, MB8877, "MB8877", tag, owner, clock, "mb8877", __FILE__)
+	: wd1770_device(mconfig, MB8877, "MB8877_LEGACY", tag, owner, clock, "mb8877_l", __FILE__)
 {
 }
