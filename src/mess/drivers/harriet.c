@@ -12,28 +12,34 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-//#include "sound/ay8910.h"
+#include "machine/terminal.h"
 
 class harriet_state : public driver_device
 {
 public:
 	harriet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT8 m_teletype_data;
+	UINT8 m_teletype_status;
 
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_WRITE8_MEMBER(serial_w);
 	DECLARE_READ8_MEMBER(unk2_r);
 	DECLARE_READ8_MEMBER(unk3_r);
-	DECLARE_READ8_MEMBER(unk4_r);
+	DECLARE_READ8_MEMBER(keyboard_status_r);
+	DECLARE_WRITE8_MEMBER( kbd_put );
 
 protected:
 	// driver_device overrides
@@ -76,7 +82,7 @@ READ8_MEMBER(harriet_state::unk2_r)
 
 WRITE8_MEMBER(harriet_state::serial_w)
 {
-	printf("%c",data);
+	m_terminal->write(space, 0, data);
 }
 
 /* tested before putting data to serial port at PC=0x4c78 */
@@ -85,10 +91,15 @@ READ8_MEMBER(harriet_state::unk3_r)
 	return 0xff;//machine().rand();
 }
 
-/* 0x314c, terminal status? */
-READ8_MEMBER(harriet_state::unk4_r)
+/* 0x314c bit 7: keyboard status */
+READ8_MEMBER(harriet_state::keyboard_status_r)
 {
-	return 0;//machine().rand();
+	UINT8 res;
+
+	res = m_teletype_status | m_teletype_data;
+	m_teletype_status &= ~0x80;
+
+	return res;
 }
 
 static ADDRESS_MAP_START( harriet_map, AS_PROGRAM, 16, harriet_state )
@@ -101,9 +112,9 @@ static ADDRESS_MAP_START( harriet_map, AS_PROGRAM, 16, harriet_state )
 	AM_RANGE(0xf20024, 0xf20025) AM_READ8(unk2_r,0x00ff)
 	AM_RANGE(0xf2002c, 0xf2002d) AM_READ8(unk3_r,0x00ff)
 	AM_RANGE(0xf2002e, 0xf2002f) AM_WRITE8(serial_w,0x00ff)
-	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(unk4_r,0x00ff)
-//	AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(unk4_r,0x00ff)
-//	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(unk4_r,0x00ff)
+//	AM_RANGE(0xf4001e, 0xf4001f) AM_READ8(keyboard_status_r,0x00ff)
+//	AM_RANGE(0xf4002e, 0xf4002f) AM_READ8(keyboard_status_r,0x00ff)
+	AM_RANGE(0xf4003e, 0xf4003f) AM_READ8(keyboard_status_r,0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( harriet )
@@ -162,6 +173,16 @@ static INPUT_PORTS_START( harriet )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+WRITE8_MEMBER( harriet_state::kbd_put )
+{
+	m_teletype_data = data;
+	m_teletype_status |= 0x80;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(harriet_state, kbd_put)
+};
 
 void harriet_state::machine_start()
 {
@@ -176,6 +197,8 @@ void harriet_state::palette_init()
 {
 }
 
+
+
 static MACHINE_CONFIG_START( harriet, harriet_state )
 
 	/* basic machine hardware */
@@ -183,12 +206,7 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(harriet_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	MCFG_PALETTE_LENGTH(8)
 
