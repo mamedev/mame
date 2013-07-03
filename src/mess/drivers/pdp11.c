@@ -64,6 +64,23 @@
 
         23/02/2009 Skeleton driver.
 
+		Memory Map (converted from the annoying octal format from the manuals):
+		0x0000 - 0x00ff: irq vectors
+		0xe000: ROM
+		0xff68: "high speed reader and punch device status and buffer register"
+		0xff70 - 0xff7e: "teletype keyboard and punch device status and buffer register"
+		PDP-11 internal registers:
+		0xff80 - 0xffbf: "reserved for expansion of processor registers"
+		0xffc0: R0
+		0xffc2: R1
+		0xffc4: R2
+		0xffc6: R3
+		0xffc8: R4
+		0xffca: R5
+		0xffcc: R6 / SP
+		0xffce: R7 / PC
+		0xfffe: PSW
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -82,48 +99,60 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( term_r );
-	DECLARE_READ16_MEMBER( term_tx_status_r );
-	DECLARE_READ16_MEMBER( term_rx_status_r );
-	DECLARE_WRITE16_MEMBER( term_w );
+	DECLARE_READ16_MEMBER( teletype_ctrl_r );
+	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
-	UINT16 m_term_status;
+	UINT8 m_teletype_data;
+	UINT16 m_teletype_status;
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(UINT8 *desc, UINT8 *src, int size);
 };
 
-WRITE16_MEMBER(pdp11_state::term_w)
+READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 {
-	m_terminal->write(space, 0, data);
+	UINT16 res = 0;
+
+	switch(offset)
+	{
+		/*
+			keyboard
+			---- x--- ---- ---- busy bit
+			---- ---- x--- ---- ready bit (set on character receive, clear on buffer read)
+			---- ---- -x-- ---- irq enable
+			---- ---- ---- ---x reader enable (?)
+		*/
+		case 0: res = m_teletype_status; break; // reader status register (tks)
+		case 1: m_teletype_status &= ~0x80; res = m_teletype_data; break;// reader buffer register (tkb)
+		/*
+			printer
+			---- ---- x--- ---- ready bit
+			---- ---- -x-- ---- irq enable
+			---- ---- ---- -x-- maintenance
+		*/
+		case 2: res = 0x80; break; // punch status register (tps)
+		case 3: res = 0; break; // punch buffer register (tpb)
+	}
+
+	return res;
 }
 
-READ16_MEMBER(pdp11_state::term_r)
+WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
 {
-	m_term_status = 0x0000;
-	return m_term_data;
-}
-
-READ16_MEMBER(pdp11_state::term_tx_status_r)
-{   // always ready
-	return 0xffff;
-}
-
-READ16_MEMBER(pdp11_state::term_rx_status_r)
-{
-	return m_term_status;
+	switch(offset)
+	{
+		case 3:
+			m_terminal->write(space, 0, data);
+			break;
+	}
 }
 
 static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
-	AM_RANGE( 0xff70, 0xff71 ) AM_READ(term_rx_status_r)
-	AM_RANGE( 0xff72, 0xff73 ) AM_READ(term_r)
-	AM_RANGE( 0xff74, 0xff75 ) AM_READ(term_tx_status_r)
-	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
+	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
 
 	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
 ADDRESS_MAP_END
@@ -314,8 +343,8 @@ static const struct t11_setup mxv11_data =
 
 WRITE8_MEMBER( pdp11_state::kbd_put )
 {
-	m_term_data = data;
-	m_term_status = 0xffff;
+	m_teletype_data = data;
+	m_teletype_status |= 0x80;
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )

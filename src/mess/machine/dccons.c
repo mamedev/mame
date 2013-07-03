@@ -217,6 +217,11 @@ READ32_MEMBER(dc_cons_state::atapi_r )
 		{
 			reg = ATAPI_REG_ERROR;
 		}
+		if (reg == ATAPI_REG_CMDSTATUS)
+		{
+			dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_GDROM;
+			dc_update_interrupt_status();
+		}
 		data = atapi_regs[reg];
 
 		#if 0
@@ -382,7 +387,7 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 #if 0
 		switch( reg )
 		{
-		case ATAPI_REG_DATA:
+			case ATAPI_REG_DATA:
 			printf( "atapi_w: data=%02x\n", data );
 				break;
 			case ATAPI_REG_FEATURES:
@@ -598,6 +603,8 @@ READ64_MEMBER(dc_cons_state::dc_mess_gdrom_r )
 
 	if (offset == 3)
 	{
+		//debugger_break(machine());
+		//printf("%08x\n",atapi_regs[ATAPI_REG_CMDSTATUS]);
 		return gdrom_alt_status;
 	}
 	else if (off >= 0x20)

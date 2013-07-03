@@ -697,7 +697,7 @@ CPU_GET_INFO( mc68hc11 )
 		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Motorola MC68HC11");   break;
 		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
 		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Ville Linde"); break;
+		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Ville Linde & Angelo Salese"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
