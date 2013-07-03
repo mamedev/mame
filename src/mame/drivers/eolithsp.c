@@ -62,6 +62,7 @@ static const struct
 	{ "penfan",   0x4001FA66, -1, 240 },
 	{ "penfana",  0x4001FAb6, -1, 240 },
 	{ "candy",    0x4001990C, -1, 240 },
+	{ "hidnc2k",  0x40016824, -1, 240 },
 	/* eolith16.c */
 	{ "klondkp",  0x0001a046, -1, 240 },
 	/* vegaeo.c */

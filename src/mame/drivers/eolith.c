@@ -1524,6 +1524,10 @@ DRIVER_INIT_MEMBER(eolith_state,landbrk)
 	DRIVER_INIT_CALL(eolith);
 }
 
+
+// the protected sets all have an extra startup check (to prevent you swapping in an external ROM?)
+// currently not fully understood, and possibly not possible to make work without the MCU dump so we patch it.
+// to work with the unprotected code.
 DRIVER_INIT_MEMBER(eolith_state,landbrka)
 {
 	//it fails compares with memories:
@@ -1549,9 +1553,8 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 
 DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
 {
-// probably needs a patch like the other 2 MCU protected ones
-//	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
-
+	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
+	rombase[0x17b2c/4] = (rombase[0x17b2c/4] & 0x0000ffff) | 0x03000000; /* Change BR to NOP */
 	DRIVER_INIT_CALL(eolith);
 }
 
@@ -1592,6 +1595,7 @@ GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg, eolith_state,  eolith,   RO
 GAME( 1999, candy,     0,        eolith50, candy, eolith_state,     eolith,   ROT0, "Eolith", "Candy Candy",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, hidctch2,  0,        eolith50, hidnctch, eolith_state,  hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", GAME_IMPERFECT_SOUND )
 GAME( 1999, hidctch2a, hidctch2, eolith50, hidnctch, eolith_state,  eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", GAME_IMPERFECT_SOUND )
+GAME( 1999, hidnc2k,   0,        eolith50, hidnctch, eolith_state,  hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", GAME_IMPERFECT_SOUND )
 GAME( 1999, landbrk,   0,        eolith45, landbrk, eolith_state,   landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_IMPERFECT_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, landbrka,  landbrk,  eolith45, landbrk, eolith_state,   landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  GAME_IMPERFECT_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, nhidctch,  0,        eolith45, hidnctch, eolith_state,  eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_IMPERFECT_SOUND ) // or New Teurrin Geurim Chajgi '98
@@ -1601,5 +1605,4 @@ GAME( 2000, stealsee,  0,        eolith45, stealsee, eolith_state,  eolith,   RO
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3, eolith_state,  hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common, eolith_state,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2ba,   fort2b,   eolith50, common, eolith_state,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
-GAME( 2000, hidnc2k,   0,        eolith50, hidnctch, eolith_state,  hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
