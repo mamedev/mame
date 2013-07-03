@@ -172,14 +172,26 @@ WRITE8_MEMBER(polygonet_state::sound_comms_w)
 	switch (offset)
 	{
 		case 0:
-			// unknown
+			// unknown, writes once at boot
 			break;
 		
 		case 2:
-			soundlatch2_byte_w(space, 0, data);
+			// TODO: reset global volume
 			break;
 		
 		case 3:
+			// TODO: increase global volume
+			break;
+		
+		case 4:
+			// unknown
+			break;
+		
+		case 6:
+			soundlatch2_byte_w(space, 0, data);
+			break;
+		
+		case 7:
 			soundlatch3_byte_w(space, 0, data);
 			break;
 		
@@ -202,7 +214,7 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 	if (mem_mask == 0x0000ff00) { hi_addr++; }  /* Low byte */
 	if (mem_mask == 0xff000000) {}              /* High byte */
 
-	value = dsp56k_host_interface_read(machine().device("dsp"), hi_addr);
+	value = dsp56k_host_interface_read(m_dsp, hi_addr);
 
 	if (mem_mask == 0x0000ff00) { value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
@@ -214,7 +226,7 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 
 WRITE32_MEMBER(polygonet_state::shared_ram_write)
 {
-	COMBINE_DATA(&m_shared_ram[offset]) ;
+	COMBINE_DATA(&m_shared_ram[offset]);
 
 	if (mem_mask == 0xffff0000)
 	{
@@ -282,7 +294,7 @@ WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
 
 	logerror("write (host-side) %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
-	dsp56k_host_interface_write(machine().device("dsp"), hi_addr, hi_data);
+	dsp56k_host_interface_write(m_dsp, hi_addr, hi_data);
 }
 
 
@@ -517,7 +529,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP /* network RAM | registers? */
-	AM_RANGE(0x600004, 0x600007) AM_WRITE8(sound_comms_w, 0xffffffff)
+	AM_RANGE(0x600000, 0x600007) AM_WRITE8(sound_comms_w, 0xffffffff)
 	AM_RANGE(0x600008, 0x60000b) AM_READ8(sound_comms_r, 0xffffffff)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
