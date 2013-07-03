@@ -1346,6 +1346,7 @@ static const struct CPS1config cps1_config_table[]=
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 
 	{"3wonders",    CPS_B_21_BT1, mapper_RT24B },
+	{"3wondersb",   CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersr1",  CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",   CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },   // equivalent to RT24B

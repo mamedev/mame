@@ -6766,6 +6766,29 @@ ROM_START( 3wonders )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
 ROM_END
 
+ROM_START( 3wondersb )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "274001.4", 0x00000, 0x80000, CRC(47887cf3) SHA1(cdb2df67c99fd698845484869608bfaafa782bd6) )
+	ROM_LOAD16_BYTE( "274001.3", 0x00001, 0x80000, CRC(e79eacb3) SHA1(cb2712b4e566d7d2ab5639f2e62f6e15244a7f09) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "274001.12", 0x000000, 0x80000, CRC(47cf8dfb) SHA1(05fed8e61d8f8c0382d820e7bdef36db85ad416b) , ROM_SKIP(7) ) // == rt-5m.7a
+	ROMX_LOAD( "274001.8",  0x000001, 0x80000, CRC(3bc2ef5e) SHA1(6864838e8f116bc56e7d205674240763a55d7907) , ROM_SKIP(7) ) // == rt-5m.7a
+	ROMX_LOAD( "274001.10", 0x000002, 0x80000, CRC(a0d27605) SHA1(7f2a7d3cc8802e778a98a29a4992a223932bff2c) , ROM_SKIP(7) ) // == rt-7m.9a
+	ROMX_LOAD( "274001.6",  0x000003, 0x80000, CRC(312d790c) SHA1(8739ba0784447f4050da1e6de8e31df3537b307d) , ROM_SKIP(7) ) // == rt-7m.9a
+	ROMX_LOAD( "274001.11", 0x000004, 0x80000, CRC(8112bbb4) SHA1(5a93cee8627afeb255eec1d26ec043cd2c4d2218) , ROM_SKIP(7) ) // == rt-1m.3a
+	ROMX_LOAD( "274001.7",  0x000005, 0x80000, CRC(58307167) SHA1(e253b64e144ccf3c4a0268e4be68468f11b2b071) , ROM_SKIP(7) ) // == rt-1m.3a
+	ROMX_LOAD( "274001.9",  0x000006, 0x80000, CRC(cb73759d) SHA1(e6fa263bcd7876f83f499fb95fbbc45ebce950fe) , ROM_SKIP(7) ) // == rt-3m.5a
+	ROMX_LOAD( "274001.5",  0x000007, 0x80000, CRC(3f765ae8) SHA1(a37cccbf2212eaa38a77b2f712688ce45b17e3b5) , ROM_SKIP(7) ) // == rt-3m.5a
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "27512.2",    0x00000, 0x08000, CRC(abfca165) SHA1(428069d3bdc45775854cd0e8abe447f134fe5492) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "27020.1",    0x00000, 0x40000, CRC(3c4348cf) SHA1(cfa9fd2f9692ddfef856106de191d3bdb5289297) )
+ROM_END
+
 /* B-Board 89624B-3 */
 ROM_START( 3wondersr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -11035,6 +11058,7 @@ GAME( 1992, sf2rk,       sf2,      cps1_10MHz, sf2hack,  cps_state,   sf2hack,  
 GAME( 1991, sf2qp1,      sf2,      cps1_10MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II: The World Warrior (Quicken Pt-I, bootleg)", GAME_SUPPORTS_SAVE )     // 910214 - based on World version
 GAME( 1991, sf2thndr,    sf2,      cps1_10MHz, sf2,      cps_state,   sf2thndr, ROT0,   "bootleg", "Street Fighter II: The World Warrior (Thunder Edition, bootleg)", GAME_SUPPORTS_SAVE )  // 910214 - based on World version
 GAME( 1991, 3wonders,    0,        cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910520)", GAME_SUPPORTS_SAVE )  // "ETC"
+GAME( 1991, 3wondersb,   3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "bootleg", "Three Wonders (World 910520) (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // "ETC"
 GAME( 1991, 3wondersr1,  3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (World 910513)", GAME_SUPPORTS_SAVE )  // "ETC"
 GAME( 1991, 3wondersu,   3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Three Wonders (USA 910520)", GAME_SUPPORTS_SAVE )
 GAME( 1991, wonder3,     3wonders, cps1_10MHz, 3wonders, cps_state,   cps1,     ROT0,   "Capcom", "Wonder 3 (Japan 910520)", GAME_SUPPORTS_SAVE )
