@@ -267,7 +267,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 			{
 				m_collision |= 0x01;
 			}
-			if ( S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x)) && (m_collision_bg.pix(y,x) > 8) && (m_collision_bg.pix(y,x) < 24) && (palette_get_color(machine(), m_collision_bg.pix(y,x) != RGB_BLACK)))
+			if ( S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x)) && (m_collision_bg.pix(y,x) > 8) && (m_collision_bg.pix(y,x) < 24) && (palette_get_color(machine(), m_collision_bg.pix(y,x)) != RGB_BLACK))
 			{
 				m_collision |= 0x02;
 			}
