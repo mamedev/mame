@@ -969,6 +969,40 @@ ROM_START( hidctch2a )
 ROM_END
 
 
+ROM_START( hidnc2k )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "27c040.u43",        0x00000, 0x80000, CRC(05063136) SHA1(9c1b3066a571b1e52d57cfe790a55257b37d5b89) )
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "hc2000-0.u39", 0x0000000, 0x400000, CRC(10d4fd9a) SHA1(8ecbc0708a41d27ddd5fa1b01eed6411a4f3e6ec) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-1.u34", 0x0000002, 0x400000, CRC(6e029c0a) SHA1(e217f6269e1c2a38f414c7220005e8bb6c636c57) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-2.u40", 0x0800000, 0x400000, CRC(1dc3fb7f) SHA1(c0cc5cac0be5e4e01fa1eaa9dc30f652431263ce) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-3.u35", 0x0800002, 0x400000, CRC(665a884e) SHA1(d0b2c4a531e8f23d5e41dc49a4fb76d5bd53f2cb) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-4.u41", 0x1000000, 0x400000, CRC(242ec5b6) SHA1(e1321768086c67980dd63a84ddd1b2197bc5d53a) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-5.u36", 0x1000002, 0x400000, CRC(f9c514cd) SHA1(6dd1f269a43e9a23d1ad65c33cf437f8855287a4) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-6.u42", 0x1800000, 0x400000, CRC(8be32533) SHA1(46a84a088144f5c1eb5799b86e4f1a84d018c8f3) )
+	ROM_LOAD32_WORD_SWAP( "hc2000-7.u37", 0x1800002, 0x400000, CRC(baa9eb90) SHA1(3d449c96d50cfa1f86866d222c148572b5925853) )
+
+	ROM_REGION( 0x008000, "soundcpu", 0 ) /* AT89c52 */
+	/* PROTECTED MCU - This is the first 2K of hc2j.u111 from hidctch2a, verify against the internal dump when decapped */
+	/* we have no unprotected version of hidnc2k so this could give completely wrong results */
+	ROM_LOAD( "sound.mcu", 0x0000, 0x0800, BAD_DUMP CRC(92797034) SHA1(b600f19972986b2e09c56be0ea0c09f92a9fe422) ) /* MCU internal 2K flash */
+
+	ROM_REGION( 0x080000, "sounddata", 0 ) /* Music data */
+	ROM_LOAD( "27c4000.u108",        0x00000, 0x80000, CRC(776c7906) SHA1(9b8062c944e96f8f9905e1af87b29c80a3b25a10) )
+
+	ROM_REGION( 0x008000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
+	ROM_LOAD( "275308.u107",        0x0000, 0x8000, CRC(afd5263d) SHA1(71ace1b749d8a6b84d08b97185e7e512d04e4b8d) )
+
+	ROM_REGION( 0x1000000, "qs1000", 0 ) /* QDSP sample ROMs */
+	ROM_LOAD( "27c040.u97",  0x00000, 0x80000, CRC(0997a385) SHA1(b4c569143d08179dd84ede70c3c80d9e36648f77) )
+	ROM_LOAD( "qs1001a.u96", 0x80000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+
+	// Gradiation Gift Ver 2.0   99. 6.15 plugin sound board
+	ROM_REGION( 0x1000000, "oki", 0 ) /* QDSP sample ROMs */
+	ROM_LOAD( "27c040.u1top",  0x00000, 0x80000, CRC(d2fece37) SHA1(599908f995bfc55559cc200c07e981d49d6851ff) )
+ROM_END
+
 /*
 
 Raccoon World
@@ -1512,6 +1546,21 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 	DRIVER_INIT_CALL(eolith);
 }
 
+
+DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
+{
+// probably needs a patch like the other 2 MCU protected ones
+//	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
+
+	DRIVER_INIT_CALL(eolith);
+}
+
+
+
+
+
+
+
 DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
@@ -1552,3 +1601,5 @@ GAME( 2000, stealsee,  0,        eolith45, stealsee, eolith_state,  eolith,   RO
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3, eolith_state,  hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common, eolith_state,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2ba,   fort2b,   eolith50, common, eolith_state,    eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
+GAME( 2000, hidnc2k,   0,        eolith50, hidnctch, eolith_state,  hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
