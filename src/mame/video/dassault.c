@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "includes/dassault.h"
-#include "video/decocomn.h"
 
 /******************************************************************************/
 
@@ -76,7 +75,7 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
 	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);

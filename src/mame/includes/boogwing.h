@@ -8,6 +8,7 @@
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
+#include "video/decocomn.h"
 #include "video/decospr.h"
 
 class boogwing_state : public driver_device

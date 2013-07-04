@@ -64,7 +64,7 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
@@ -167,7 +167,7 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);

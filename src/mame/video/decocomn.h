@@ -8,8 +8,6 @@
 #ifndef __DECOCOMN_H__
 #define __DECOCOMN_H__
 
-#include "devcb.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -18,25 +16,34 @@
 
 struct decocomn_interface
 {
-	const char         *screen;
+	const char         *m_screen_tag;
 };
 
-class decocomn_device : public device_t
+class decocomn_device : public device_t,
+										public decocomn_interface
 {
 public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~decocomn_device() { global_free(m_token); }
+	~decocomn_device() {}
+	
+	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
+	DECLARE_WRITE16_MEMBER( buffered_palette_w );
+	DECLARE_WRITE16_MEMBER( palette_dma_w );
+	DECLARE_WRITE16_MEMBER( priority_w );
+	DECLARE_READ16_MEMBER( priority_r );
+	DECLARE_READ16_MEMBER( d_71_r );
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	screen_device *m_screen;
+	UINT8 *m_dirty_palette;
+	UINT16 m_priority;
 };
 
 extern const device_type DECOCOMN;
@@ -50,18 +57,5 @@ extern const device_type DECOCOMN;
 #define MCFG_DECOCOMN_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-/***************************************************************************
-    DEVICE I/O FUNCTIONS
-***************************************************************************/
-
-DECLARE_WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w );
-DECLARE_WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w );
-DECLARE_WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w );
-
-DECLARE_WRITE16_DEVICE_HANDLER( decocomn_priority_w );
-DECLARE_READ16_DEVICE_HANDLER( decocomn_priority_r );
-
-DECLARE_READ16_DEVICE_HANDLER( decocomn_71_r );
 
 #endif

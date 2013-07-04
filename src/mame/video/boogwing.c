@@ -1,7 +1,5 @@
 #include "emu.h"
 #include "includes/boogwing.h"
-#include "video/deco16ic.h"
-#include "video/decocomn.h"
 
 
 void boogwing_state::video_start()
@@ -28,7 +26,7 @@ void boogwing_state::mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	bitmap_ind8* priority_bitmap;
 
 	address_space &space = machine().driver_data()->generic_space();
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
 	sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
@@ -181,7 +179,7 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
 	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);

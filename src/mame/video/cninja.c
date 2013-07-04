@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "includes/cninja.h"
-#include "video/decocomn.h"
 
 /******************************************************************************/
 
@@ -189,7 +188,7 @@ UINT32 cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 	if (priority & 4)
@@ -246,7 +245,7 @@ UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &
 {
 	address_space &space = machine().driver_data()->generic_space();
 	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
+	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 
 	flip_screen_set(BIT(flip, 7));
