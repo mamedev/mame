@@ -2601,8 +2601,8 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(es5506_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
 

@@ -1706,7 +1706,7 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
 	MCFG_SOUND_CONFIG(es5506_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
