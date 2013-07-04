@@ -1,9 +1,9 @@
 #include "emu.h"
+#include "arm7.h"
 #include "arm7core.h"
-#include "arm7ops.h"
 #include "arm7help.h"
 
-INLINE INT64 saturate_qbit_overflow(arm_state *arm, INT64 res)
+INT64 arm7_cpu_device::saturate_qbit_overflow(INT64 res)
 {
 	if (res > 2147483647)   // INT32_MAX
 	{   // overflow high? saturate and set Q
@@ -19,11 +19,11 @@ INLINE INT64 saturate_qbit_overflow(arm_state *arm, INT64 res)
 	return res;
 }
 
-// I could prob. convert to macro, but Switchmode shouldn't occur that often in emulated code..
-void SwitchMode(arm_state *arm, int cpsr_mode_val)
+
+void arm7_cpu_device::SwitchMode(UINT32 cpsr_mode_val)
 {
-	UINT32 cspr = GET_CPSR & ~MODE_FLAG;
-	SET_CPSR(cspr | cpsr_mode_val);
+    UINT32 cspr = m_r[eCPSR] & ~MODE_FLAG;
+    set_cpsr(cspr | cpsr_mode_val);
 }
 
 
@@ -45,10 +45,10 @@ void SwitchMode(arm_state *arm, int cpsr_mode_val)
    ROR >32   = Same result as ROR n-32 until amount in range of 1-32 then follow rules
 */
 
-UINT32 decodeShift(arm_state *arm, UINT32 insn, UINT32 *pCarry)
+UINT32 arm7_cpu_device::decodeShift(UINT32 insn, UINT32 *pCarry)
 {
 	UINT32 k  = (insn & INSN_OP2_SHIFT) >> INSN_OP2_SHIFT_SHIFT;  // Bits 11-7
-	UINT32 rm = GET_REGISTER(arm, insn & INSN_OP2_RM);
+	UINT32 rm = GET_REGISTER(insn & INSN_OP2_RM);
 	UINT32 t  = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
 	if ((insn & INSN_OP2_RM) == 0xf) {
@@ -59,17 +59,17 @@ UINT32 decodeShift(arm_state *arm, UINT32 insn, UINT32 *pCarry)
 	/* All shift types ending in 1 are Rk, not #k */
 	if (t & 1)
 	{
-//      LOG(("%08x:  RegShift %02x %02x\n", R15, k >> 1, GET_REGISTER(arm, k >> 1)));
+//      LOG(("%08x:  RegShift %02x %02x\n", R15, k >> 1, GET_REGISTER(k >> 1)));
 #if ARM7_DEBUG_CORE
 			if ((insn & 0x80) == 0x80)
 				LOG(("%08x:  RegShift ERROR (p36)\n", R15));
 #endif
 
 		// see p35 for check on this
-		//k = GET_REGISTER(arm, k >> 1) & 0x1f;
+		//k = GET_REGISTER(k >> 1) & 0x1f;
 
 		// Keep only the bottom 8 bits for a Register Shift
-		k = GET_REGISTER(arm, k >> 1) & 0xff;
+		k = GET_REGISTER(k >> 1) & 0xff;
 
 		if (k == 0) /* Register shift by 0 is a no-op */
 		{
@@ -167,7 +167,7 @@ UINT32 decodeShift(arm_state *arm, UINT32 insn, UINT32 *pCarry)
 } /* decodeShift */
 
 
-static int loadInc(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
+int arm7_cpu_device::loadInc(UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 {
 	int i, result;
 	UINT32 data;
@@ -178,21 +178,21 @@ static int loadInc(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 	{
 		if ((pat >> i) & 1)
 		{
-			if (arm->pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
+			if (m_pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
 			{
 			data = READ32(rbv += 4);
 			if (i == 15) {
 				if (s) /* Pull full contents from stack */
-					SET_MODE_REGISTER(arm, mode, 15, data);
+					SET_MODE_REGISTER(mode, 15, data);
 				else /* Pull only address, preserve mode & status flags */
 					if (MODE32)
-						SET_MODE_REGISTER(arm, mode, 15, data);
+						SET_MODE_REGISTER(mode, 15, data);
 					else
 					{
-						SET_MODE_REGISTER(arm, mode, 15, (GET_MODE_REGISTER(arm, mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+						SET_MODE_REGISTER(mode, 15, (GET_MODE_REGISTER(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
 					}
 			} else
-				SET_MODE_REGISTER(arm, mode, i, data);
+				SET_MODE_REGISTER(mode, i, data);
 			}
 			result++;
 		}
@@ -200,7 +200,8 @@ static int loadInc(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 	return result;
 }
 
-static int loadDec(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
+
+int arm7_cpu_device::loadDec(UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 {
 	int i, result;
 	UINT32 data;
@@ -211,22 +212,22 @@ static int loadDec(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 	{
 		if ((pat >> i) & 1)
 		{
-			if (arm->pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
+			if (m_pendingAbtD == 0) // "Overwriting of registers stops when the abort happens."
 			{
 			data = READ32(rbv -= 4);
 			if (i == 15) {
 				if (s) /* Pull full contents from stack */
-					SET_MODE_REGISTER(arm, mode, 15, data);
+					SET_MODE_REGISTER(mode, 15, data);
 				else /* Pull only address, preserve mode & status flags */
 					if (MODE32)
-						SET_MODE_REGISTER(arm, mode, 15, data);
+						SET_MODE_REGISTER(mode, 15, data);
 					else
 					{
-						SET_MODE_REGISTER(arm, mode, 15, (GET_MODE_REGISTER(arm, mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+						SET_MODE_REGISTER(mode, 15, (GET_MODE_REGISTER(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
 					}
 			}
 			else
-				SET_MODE_REGISTER(arm, mode, i, data);
+				SET_MODE_REGISTER(mode, i, data);
 			}
 			result++;
 		}
@@ -234,7 +235,8 @@ static int loadDec(arm_state *arm, UINT32 pat, UINT32 rbv, UINT32 s, int mode)
 	return result;
 }
 
-static int storeInc(arm_state *arm, UINT32 pat, UINT32 rbv, int mode)
+
+int arm7_cpu_device::storeInc(UINT32 pat, UINT32 rbv, int mode)
 {
 	int i, result;
 
@@ -247,14 +249,15 @@ static int storeInc(arm_state *arm, UINT32 pat, UINT32 rbv, int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreInc on R15\n", R15));
 #endif
-			WRITE32(rbv += 4, GET_MODE_REGISTER(arm, mode, i));
+			WRITE32(rbv += 4, GET_MODE_REGISTER(mode, i));
 			result++;
 		}
 	}
 	return result;
 } /* storeInc */
 
-static int storeDec(arm_state *arm, UINT32 pat, UINT32 rbv, int mode)
+
+int arm7_cpu_device::storeDec(UINT32 pat, UINT32 rbv, int mode)
 {
 	int i, result;
 
@@ -267,53 +270,43 @@ static int storeDec(arm_state *arm, UINT32 pat, UINT32 rbv, int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-			WRITE32(rbv -= 4, GET_MODE_REGISTER(arm, mode, i));
+			WRITE32(rbv -= 4, GET_MODE_REGISTER(mode, i));
 			result++;
 		}
 	}
 	return result;
 } /* storeDec */
 
+
 /***************************************************************************
  *                            OPCODE HANDLING
  ***************************************************************************/
 
 // Co-Processor Data Operation
-static void HandleCoProcDO(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleCoProcDO(UINT32 insn)
 {
 	// This instruction simply instructs the co-processor to do something, no data is returned to ARM7 core
-	if (arm7_coproc_do_callback)
-		arm7_coproc_do_callback(arm->device, *arm->program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
-	else
-		LOG(("%08x: Co-Processor Data Operation executed, but no callback defined!\n", R15));
+	arm7_do_callback(*m_program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
 }
 
 // Co-Processor Register Transfer - To/From Arm to Co-Proc
-static void HandleCoProcRT(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleCoProcRT(UINT32 insn)
 {
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
 
 	// Load (MRC) data from Co-Proc to ARM7 register
 	if (insn & 0x00100000)       // Bit 20 = Load or Store
 	{
-		if (arm7_coproc_rt_r_callback)
+		UINT32 res = arm7_rt_r_callback(*m_program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
+		if (m_pendingUnd == 0)
 		{
-			UINT32 res = arm7_coproc_rt_r_callback(arm->device, *arm->program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
-			if (arm->pendingUnd == 0)
-			{
-				SET_REGISTER(arm, (insn >> 12) & 0xf, res);
-			}
+			SET_REGISTER((insn >> 12) & 0xf, res);
 		}
-		else
-			LOG(("%08x: Co-Processor Register Transfer executed, but no RT Read callback defined!\n", R15));
 	}
 	// Store (MCR) data from ARM7 to Co-Proc register
 	else
 	{
-		if (arm7_coproc_rt_w_callback)
-			arm7_coproc_rt_w_callback(arm->device, *arm->program, insn, GET_REGISTER(arm, (insn >> 12) & 0xf), 0);
-		else
-			LOG(("%08x: Co-Processor Register Transfer executed, but no RT Write callback defined!\n", R15));
+		arm7_rt_w_callback(*m_program, insn, GET_REGISTER((insn >> 12) & 0xf), 0);
 	}
 }
 
@@ -329,19 +322,13 @@ static void HandleCoProcRT(arm_state *arm, UINT32 insn)
                 but if co-proc reads multiple address, it must handle the offset adjustment itself.
 */
 // todo: test with valid instructions
-static void HandleCoProcDT(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleCoProcDT(UINT32 insn)
 {
 	UINT32 rn = (insn >> 16) & 0xf;
-	UINT32 rnv = GET_REGISTER(arm, rn);    // Get Address Value stored from Rn
+	UINT32 rnv = GET_REGISTER(rn);    // Get Address Value stored from Rn
 	UINT32 ornv = rnv;                // Keep value of Rn
 	UINT32 off = (insn & 0xff) << 2;  // Offset is << 2 according to manual
 	UINT32 *prn = &ARM7REG(rn);       // Pointer to our register, so it can be changed in the callback
-
-	// Pointers to read32/write32 functions
-	void (*write32)(arm_state *arm, UINT32 addr, UINT32 data);
-	UINT32 (*read32)(arm_state *arm, UINT32 addr);
-	write32 = PTR_WRITE32;
-	read32 = PTR_READ32;
 
 #if ARM7_DEBUG_CORE
 	if (((insn >> 16) & 0xf) == 15 && (insn & 0x200000))
@@ -361,35 +348,29 @@ static void HandleCoProcDT(arm_state *arm, UINT32 insn)
 	// Load (LDC) data from ARM7 memory to Co-Proc memory
 	if (insn & 0x00100000)
 	{
-		if (arm7_coproc_dt_r_callback)
-			arm7_coproc_dt_r_callback(arm, insn, prn, read32);
-		else
-			LOG(("%08x: Co-Processer Data Transfer executed, but no READ callback defined!\n", R15));
+		arm7_dt_r_callback(insn, prn);
 	}
 	// Store (STC) data from Co-Proc to ARM7 memory
 	else
 	{
-		if (arm7_coproc_dt_w_callback)
-			arm7_coproc_dt_w_callback(arm, insn, prn, write32);
-		else
-			LOG(("%08x: Co-Processer Data Transfer executed, but no WRITE callback defined!\n", R15));
+		arm7_dt_w_callback(insn, prn);
 	}
 
-	if (arm->pendingUnd != 0) return;
+	if (m_pendingUnd != 0) return;
 
 	// If writeback not used - ensure the original value of RN is restored in case co-proc callback changed value
 	if ((insn & 0x200000) == 0)
-		SET_REGISTER(arm, rn, ornv);
+		SET_REGISTER(rn, ornv);
 }
 
-INLINE void HandleBranch(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleBranch(UINT32 insn)
 {
 	UINT32 off = (insn & INSN_BRANCH) << 2;
 
 	/* Save PC into LR if this is a branch with link */
 	if (insn & INSN_BL)
 	{
-		SET_REGISTER(arm, 14, R15 + 4);
+		SET_REGISTER(14, R15 + 4);
 	}
 
 	/* Sign-extend the 24-bit offset in our calculations */
@@ -409,7 +390,7 @@ INLINE void HandleBranch(arm_state *arm, UINT32 insn)
 	}
 }
 
-static void HandleMemSingle(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleMemSingle(UINT32 insn)
 {
 	UINT32 rn, rnv, off, rd, rnv_old = 0;
 
@@ -417,7 +398,7 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 	if (insn & INSN_I)
 	{
 		/* Register Shift */
-		off = decodeShift(arm, insn, NULL);
+		off = decodeShift(insn, NULL);
 	}
 	else
 	{
@@ -434,22 +415,22 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 		if (insn & INSN_SDT_U)
 		{
 			if ((MODE32) || (rn != eR15))
-				rnv = (GET_REGISTER(arm, rn) + off);
+				rnv = (GET_REGISTER(rn) + off);
 			else
 				rnv = (GET_PC + off);
 		}
 		else
 		{
 			if ((MODE32) || (rn != eR15))
-				rnv = (GET_REGISTER(arm, rn) - off);
+				rnv = (GET_REGISTER(rn) - off);
 			else
 				rnv = (GET_PC - off);
 		}
 
 		if (insn & INSN_SDT_W)
 		{
-			rnv_old = GET_REGISTER(arm, rn);
-			SET_REGISTER(arm, rn, rnv);
+			rnv_old = GET_REGISTER(rn);
+			SET_REGISTER(rn, rnv);
 
 	// check writeback???
 		}
@@ -470,7 +451,7 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 		}
 		else
 		{
-			rnv = GET_REGISTER(arm, rn);
+			rnv = GET_REGISTER(rn);
 		}
 	}
 
@@ -482,15 +463,15 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 		if (insn & INSN_SDT_B)
 		{
 			UINT32 data = READ8(rnv);
-			if (arm->pendingAbtD == 0)
+			if (m_pendingAbtD == 0)
 			{
-				SET_REGISTER(arm, rd, data);
+				SET_REGISTER(rd, data);
 			}
 		}
 		else
 		{
 			UINT32 data = READ32(rnv);
-			if (arm->pendingAbtD == 0)
+			if (m_pendingAbtD == 0)
 			{
 				if (rd == eR15)
 				{
@@ -503,7 +484,7 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 				}
 				else
 				{
-					SET_REGISTER(arm, rd, data);
+					SET_REGISTER(rd, data);
 				}
 			}
 		}
@@ -518,7 +499,7 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 					LOG(("Wrote R15 in byte mode\n"));
 #endif
 
-			WRITE8(rnv, (UINT8) GET_REGISTER(arm, rd) & 0xffu);
+			WRITE8(rnv, (UINT8) GET_REGISTER(rd) & 0xffu);
 		}
 		else
 		{
@@ -527,18 +508,18 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 					LOG(("Wrote R15 in 32bit mode\n"));
 #endif
 
-			//WRITE32(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(arm, rd));
-			WRITE32(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(arm, rd)); // manual says STR rd = PC, +12
+			//WRITE32(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(rd));
+			WRITE32(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(rd)); // manual says STR rd = PC, +12
 		}
 		// Store takes only 2 N Cycles, so add + 1
 		ARM7_ICOUNT += 1;
 	}
 
-	if (arm->pendingAbtD != 0)
+	if (m_pendingAbtD != 0)
 	{
 		if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
 		{
-			SET_REGISTER(arm, rn, rnv_old);
+			SET_REGISTER(rn, rnv_old);
 		}
 	}
 	else
@@ -551,14 +532,14 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd == rn) {
-				SET_REGISTER(arm, rn, GET_REGISTER(arm, rd));
+				SET_REGISTER(rn, GET_REGISTER(rd));
 				// todo: check for offs... ?
 			}
 			else {
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackIncrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
 
-				SET_REGISTER(arm, rn, (rnv + off));
+				SET_REGISTER(rn, (rnv + off));
 			}
 		}
 		else
@@ -566,10 +547,10 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd == rn) {
-				SET_REGISTER(arm, rn, GET_REGISTER(arm, rd));
+				SET_REGISTER(rn, GET_REGISTER(rd));
 			}
 			else {
-				SET_REGISTER(arm, rn, (rnv - off));
+				SET_REGISTER(rn, (rnv - off));
 
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackDecrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
@@ -583,7 +564,7 @@ static void HandleMemSingle(arm_state *arm, UINT32 insn)
 
 } /* HandleMemSingle */
 
-static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleHalfWordDT(UINT32 insn)
 {
 	UINT32 rn, rnv, off, rd, rnv_old = 0;
 
@@ -594,7 +575,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 	}
 	else {
 		// register
-		off = GET_REGISTER(arm, insn & 0x0f);
+		off = GET_REGISTER(insn & 0x0f);
 	}
 
 	/* Calculate Rn, accounting for PC */
@@ -605,17 +586,17 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 		/* Pre-indexed addressing */
 		if (insn & INSN_SDT_U)
 		{
-			rnv = (GET_REGISTER(arm, rn) + off);
+			rnv = (GET_REGISTER(rn) + off);
 		}
 		else
 		{
-			rnv = (GET_REGISTER(arm, rn) - off);
+			rnv = (GET_REGISTER(rn) - off);
 		}
 
 		if (insn & INSN_SDT_W)
 		{
-			rnv_old = GET_REGISTER(arm, rn);
-			SET_REGISTER(arm, rn, rnv);
+			rnv_old = GET_REGISTER(rn);
+			SET_REGISTER(rn, rnv);
 
 		// check writeback???
 		}
@@ -633,7 +614,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 		}
 		else
 		{
-			rnv = GET_REGISTER(arm, rn);
+			rnv = GET_REGISTER(rn);
 		}
 	}
 
@@ -664,7 +645,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 				newval = (UINT32)(signbyte << 8)|databyte;
 			}
 
-			if (arm->pendingAbtD == 0)
+			if (m_pendingAbtD == 0)
 			{
 			// PC?
 			if (rd == eR15)
@@ -676,7 +657,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 			}
 			else
 			{
-				SET_REGISTER(arm, rd, newval);
+				SET_REGISTER(rd, newval);
 				R15 += 4;
 			}
 
@@ -692,7 +673,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 		{
 			UINT32 newval = READ16(rnv);
 
-			if (arm->pendingAbtD == 0)
+			if (m_pendingAbtD == 0)
 			{
 			if (rd == eR15)
 			{
@@ -702,7 +683,7 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 			}
 			else
 			{
-				SET_REGISTER(arm, rd, newval);
+				SET_REGISTER(rd, newval);
 				R15 += 4;
 			}
 
@@ -721,20 +702,20 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 	{
 		if ((insn & 0x60) == 0x40)  // LDRD
 	{
-		SET_REGISTER(arm, rd, READ32(rnv));
-		SET_REGISTER(arm, rd+1, READ32(rnv+4));
+		SET_REGISTER(rd, READ32(rnv));
+		SET_REGISTER(rd+1, READ32(rnv+4));
 				R15 += 4;
 	}
 		else if ((insn & 0x60) == 0x60) // STRD
 	{
-		WRITE32(rnv, GET_REGISTER(arm, rd));
-		WRITE32(rnv+4, GET_REGISTER(arm, rd+1));
+		WRITE32(rnv, GET_REGISTER(rd));
+		WRITE32(rnv+4, GET_REGISTER(rd+1));
 				R15 += 4;
 	}
 	else
 	{
-			// WRITE16(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(arm, rd));
-			WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(arm, rd)); // manual says STR RD=PC, +12 of address
+			// WRITE16(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(rd));
+			WRITE16(rnv, rd == eR15 ? R15 + 8 + 4 : GET_REGISTER(rd)); // manual says STR RD=PC, +12 of address
 
 // if R15 is not increased then e.g. "STRH R10, [R15,#$10]" will be executed over and over again
 #if 0
@@ -747,11 +728,11 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 	}
 	}
 
-	if (arm->pendingAbtD != 0)
+	if (m_pendingAbtD != 0)
 	{
 		if ((insn & INSN_SDT_P) && (insn & INSN_SDT_W))
 		{
-			SET_REGISTER(arm, rn, rnv_old);
+			SET_REGISTER(rn, rnv_old);
 		}
 	}
 	else
@@ -766,14 +747,14 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd == rn) {
-				SET_REGISTER(arm, rn, GET_REGISTER(arm, rd));
+				SET_REGISTER(rn, GET_REGISTER(rd));
 				// todo: check for offs... ?
 			}
 			else {
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackIncrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
 
-				SET_REGISTER(arm, rn, (rnv + off));
+				SET_REGISTER(rn, (rnv + off));
 			}
 		}
 		else
@@ -781,10 +762,10 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 			/* Writeback is applied in pipeline, before value is read from mem,
 			    so writeback is effectively ignored */
 			if (rd == rn) {
-				SET_REGISTER(arm, rn, GET_REGISTER(arm, rd));
+				SET_REGISTER(rn, GET_REGISTER(rd));
 			}
 			else {
-				SET_REGISTER(arm, rn, (rnv - off));
+				SET_REGISTER(rn, (rnv - off));
 
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackDecrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
@@ -796,12 +777,12 @@ static void HandleHalfWordDT(arm_state *arm, UINT32 insn)
 
 }
 
-static void HandleSwap(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleSwap(UINT32 insn)
 {
 	UINT32 rn, rm, rd, tmp;
 
-	rn = GET_REGISTER(arm, (insn >> 16) & 0xf);  // reg. w/read address
-	rm = GET_REGISTER(arm, insn & 0xf);          // reg. w/write address
+	rn = GET_REGISTER((insn >> 16) & 0xf);  // reg. w/read address
+	rm = GET_REGISTER(insn & 0xf);          // reg. w/write address
 	rd = (insn >> 12) & 0xf;                // dest reg
 
 #if ARM7_DEBUG_CORE
@@ -814,13 +795,13 @@ static void HandleSwap(arm_state *arm, UINT32 insn)
 	{
 		tmp = READ8(rn);
 		WRITE8(rn, rm);
-		SET_REGISTER(arm, rd, tmp);
+		SET_REGISTER(rd, tmp);
 	}
 	else
 	{
 		tmp = READ32(rn);
 		WRITE32(rn, rm);
-		SET_REGISTER(arm, rd, tmp);
+		SET_REGISTER(rd, tmp);
 	}
 
 	R15 += 4;
@@ -828,14 +809,14 @@ static void HandleSwap(arm_state *arm, UINT32 insn)
 	ARM7_ICOUNT -= 1;
 }
 
-static void HandlePSRTransfer(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandlePSRTransfer(UINT32 insn)
 {
 	int reg = (insn & 0x400000) ? SPSR : eCPSR; // Either CPSR or SPSR
 	UINT32 newval, val = 0;
 	int oldmode = GET_CPSR & MODE_FLAG;
 
 	// get old value of CPSR/SPSR
-	newval = GET_REGISTER(arm, reg);
+	newval = GET_REGISTER(reg);
 
 	// MSR (bit 21 set) - Copy value to CPSR/SPSR
 	if ((insn & 0x00200000))
@@ -852,7 +833,7 @@ static void HandlePSRTransfer(arm_state *arm, UINT32 insn)
 		// Value from Register
 		else
 		{
-			val = GET_REGISTER(arm, insn & 0x0f);
+			val = GET_REGISTER(insn & 0x0f);
 		}
 
 		// apply field code bits
@@ -914,21 +895,21 @@ static void HandlePSRTransfer(arm_state *arm, UINT32 insn)
 		if (reg == eCPSR)
 			SET_CPSR(newval);
 		else
-			SET_REGISTER(arm, reg, newval);
+			SET_REGISTER(reg, newval);
 
 		// Switch to new mode if changed
 		if ((newval & MODE_FLAG) != oldmode)
-			SwitchMode(arm, GET_MODE);
+			SwitchMode(GET_MODE);
 
 	}
 	// MRS (bit 21 clear) - Copy CPSR or SPSR to specified Register
 	else
 	{
-		SET_REGISTER(arm, (insn >> 12)& 0x0f, GET_REGISTER(arm, reg));
+		SET_REGISTER((insn >> 12)& 0x0f, GET_REGISTER(reg));
 	}
 }
 
-static void HandleALU(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleALU(UINT32 insn)
 {
 	UINT32 op2, sc = 0, rd, rn, opcode;
 	UINT32 by, rdn;
@@ -965,7 +946,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 	/* Op2 = Register Value */
 	else
 	{
-		op2 = decodeShift(arm, insn, (insn & INSN_S) ? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
 
 		// LD TODO sc will always be 0 if this applies
 		if (!(insn & INSN_S))
@@ -991,7 +972,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 		}
 		else
 		{
-			rn = GET_REGISTER(arm, rn);
+			rn = GET_REGISTER(rn);
 		}
 	}
 
@@ -1087,8 +1068,8 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 				if (GET_MODE != eARM7_MODE_USER)
 				{
 					// Update CPSR from SPSR
-					SET_CPSR(GET_REGISTER(arm, SPSR));
-					SwitchMode(arm, GET_MODE);
+					SET_CPSR(GET_REGISTER(SPSR));
+					SwitchMode(GET_MODE);
 				}
 
 				R15 = rd;
@@ -1100,7 +1081,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 					R15 = rd; //(R15 & 0x03FFFFFC) | (rd & 0xFC000003);
 					temp = (GET_CPSR & 0x0FFFFF20) | (rd & 0xF0000000) /* N Z C V */ | ((rd & 0x0C000000) >> (26 - 6)) /* I F */ | (rd & 0x00000003) /* M1 M0 */;
 					SET_CPSR( temp);
-					SwitchMode( arm, temp & 3);
+					SwitchMode( temp & 3);
 				}
 
 				// extra cycles (PC written)
@@ -1111,7 +1092,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 			}
 			else
 				/* S Flag is set - Write results to register & update CPSR (which was already handled using HandleALU flag macros) */
-				SET_REGISTER(arm, rdn, rd);
+				SET_REGISTER(rdn, rd);
 		}
 	}
 	// SJE: Don't think this applies any more.. (see page 44 at bottom)
@@ -1130,7 +1111,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 				R15 = (R15 & 0x03FFFFFC) | (rd & ~0x03FFFFFC);
 				temp = (GET_CPSR & 0x0FFFFF20) | (rd & 0xF0000000) /* N Z C V */ | ((rd & 0x0C000000) >> (26 - 6)) /* I F */ | (rd & 0x00000003) /* M1 M0 */;
 				SET_CPSR( temp);
-				SwitchMode( arm, temp & 3);
+				SwitchMode( temp & 3);
 			}
 
 			/* IRQ masks may have changed in this instruction */
@@ -1150,7 +1131,7 @@ static void HandleALU(arm_state *arm, UINT32 insn)
 	ARM7_ICOUNT += 2;
 }
 
-static void HandleMul(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleMul(UINT32 insn)
 {
 	UINT32 r, rm, rs;
 
@@ -1160,8 +1141,8 @@ static void HandleMul(arm_state *arm, UINT32 insn)
 	// multiply, which is controlled by the value of the multiplier operand
 	// specified by Rs.
 
-	rm = GET_REGISTER(arm, insn & INSN_MUL_RM);
-	rs = GET_REGISTER(arm, (insn & INSN_MUL_RS) >> INSN_MUL_RS_SHIFT);
+	rm = GET_REGISTER(insn & INSN_MUL_RM);
+	rs = GET_REGISTER((insn & INSN_MUL_RS) >> INSN_MUL_RS_SHIFT);
 
 	/* Do the basic multiply of Rm and Rs */
 	r = rm * rs;
@@ -1176,13 +1157,13 @@ static void HandleMul(arm_state *arm, UINT32 insn)
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
 	{
-		r += GET_REGISTER(arm, (insn & INSN_MUL_RN) >> INSN_MUL_RN_SHIFT);
+		r += GET_REGISTER((insn & INSN_MUL_RN) >> INSN_MUL_RN_SHIFT);
 		// extra cycle for MLA
 		ARM7_ICOUNT -= 1;
 	}
 
 	/* Write the result */
-	SET_REGISTER(arm, (insn & INSN_MUL_RD) >> INSN_MUL_RD_SHIFT, r);
+	SET_REGISTER((insn & INSN_MUL_RD) >> INSN_MUL_RD_SHIFT, r);
 
 	/* Set N and Z if asked */
 	if (insn & INSN_S)
@@ -1200,7 +1181,7 @@ static void HandleMul(arm_state *arm, UINT32 insn)
 }
 
 // todo: add proper cycle counts
-static void HandleSMulLong(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleSMulLong(UINT32 insn)
 {
 	INT32 rm, rs;
 	UINT32 rhi, rlo;
@@ -1210,8 +1191,8 @@ static void HandleSMulLong(arm_state *arm, UINT32 insn)
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is
 	// controlled by the value of the multiplier operand specified by Rs.
 
-	rm  = (INT32)GET_REGISTER(arm, insn & 0xf);
-	rs  = (INT32)GET_REGISTER(arm, ((insn >> 8) & 0xf));
+	rm  = (INT32)GET_REGISTER(insn & 0xf);
+	rs  = (INT32)GET_REGISTER(((insn >> 8) & 0xf));
 	rhi = (insn >> 16) & 0xf;
 	rlo = (insn >> 12) & 0xf;
 
@@ -1226,15 +1207,15 @@ static void HandleSMulLong(arm_state *arm, UINT32 insn)
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
 	{
-		INT64 acum = (INT64)((((INT64)(GET_REGISTER(arm, rhi))) << 32) | GET_REGISTER(arm, rlo));
+		INT64 acum = (INT64)((((INT64)(GET_REGISTER(rhi))) << 32) | GET_REGISTER(rlo));
 		res += acum;
 		// extra cycle for MLA
 		ARM7_ICOUNT -= 1;
 	}
 
 	/* Write the result (upper dword goes to RHi, lower to RLo) */
-	SET_REGISTER(arm, rhi, res >> 32);
-	SET_REGISTER(arm, rlo, res & 0xFFFFFFFF);
+	SET_REGISTER(rhi, res >> 32);
+	SET_REGISTER(rlo, res & 0xFFFFFFFF);
 
 	/* Set N and Z if asked */
 	if (insn & INSN_S)
@@ -1252,7 +1233,7 @@ static void HandleSMulLong(arm_state *arm, UINT32 insn)
 }
 
 // todo: add proper cycle counts
-static void HandleUMulLong(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleUMulLong(UINT32 insn)
 {
 	UINT32 rm, rs;
 	UINT32 rhi, rlo;
@@ -1262,8 +1243,8 @@ static void HandleUMulLong(arm_state *arm, UINT32 insn)
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is
 	// controlled by the value of the multiplier operand specified by Rs.
 
-	rm  = (INT32)GET_REGISTER(arm, insn & 0xf);
-	rs  = (INT32)GET_REGISTER(arm, ((insn >> 8) & 0xf));
+	rm  = (INT32)GET_REGISTER(insn & 0xf);
+	rs  = (INT32)GET_REGISTER(((insn >> 8) & 0xf));
 	rhi = (insn >> 16) & 0xf;
 	rlo = (insn >> 12) & 0xf;
 
@@ -1278,15 +1259,15 @@ static void HandleUMulLong(arm_state *arm, UINT32 insn)
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
 	{
-		UINT64 acum = (UINT64)((((UINT64)(GET_REGISTER(arm, rhi))) << 32) | GET_REGISTER(arm, rlo));
+		UINT64 acum = (UINT64)((((UINT64)(GET_REGISTER(rhi))) << 32) | GET_REGISTER(rlo));
 		res += acum;
 		// extra cycle for MLA
 		ARM7_ICOUNT -= 1;
 	}
 
 	/* Write the result (upper dword goes to RHi, lower to RLo) */
-	SET_REGISTER(arm, rhi, res >> 32);
-	SET_REGISTER(arm, rlo, res & 0xFFFFFFFF);
+	SET_REGISTER(rhi, res >> 32);
+	SET_REGISTER(rlo, res & 0xFFFFFFFF);
 
 	/* Set N and Z if asked */
 	if (insn & INSN_S)
@@ -1302,10 +1283,10 @@ static void HandleUMulLong(arm_state *arm, UINT32 insn)
 	ARM7_ICOUNT += 3;
 }
 
-static void HandleMemBlock(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::HandleMemBlock(UINT32 insn)
 {
 	UINT32 rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
-	UINT32 rbp = GET_REGISTER(arm, rb);
+	UINT32 rbp = GET_REGISTER(rb);
 	int result;
 
 #if ARM7_DEBUG_CORE
@@ -1335,16 +1316,16 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 				// !! actually switching to user mode triggers a section permission fault in Happy Fish 302-in-1 (BP C0030DF4, press F5 ~16 times) !!
 				// set to user mode - then do the transfer, and set back
 				//int curmode = GET_MODE;
-				//SwitchMode(arm, eARM7_MODE_USER);
+				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = loadInc(arm, insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
+				result = loadInc(insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
 				// todo - not sure if Writeback occurs on User registers also..
-				//SwitchMode(arm, curmode);
+				//SwitchMode(curmode);
 			}
 			else
-				result = loadInc(arm, insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
+				result = loadInc(insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
 
-			if ((insn & INSN_BDT_W) && (arm->pendingAbtD == 0))
+			if ((insn & INSN_BDT_W) && (m_pendingAbtD == 0))
 			{
 #if ARM7_DEBUG_CORE
 					if (rb == 15)
@@ -1354,20 +1335,20 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 				// GBA "V-Rally 3" expects R0 not to be overwritten with the updated base value [BP 8077B0C]
 				if (((insn >> rb) & 1) == 0)
 				{
-					SET_REGISTER(arm, rb, GET_REGISTER(arm, rb) + result * 4);
+					SET_REGISTER(rb, GET_REGISTER(rb) + result * 4);
 				}
 			}
 
 			// R15 included? (NOTE: CPSR restore must occur LAST otherwise wrong registers restored!)
-			if ((insn & 0x8000) && (arm->pendingAbtD == 0)) {
+			if ((insn & 0x8000) && (m_pendingAbtD == 0)) {
 				R15 -= 4;     // SJE: I forget why i did this?
 				// S - Flag Set? Signals transfer of current mode SPSR->CPSR
 				if (insn & INSN_BDT_S)
 				{
 					if (MODE32)
 					{
-						SET_CPSR(GET_REGISTER(arm, SPSR));
-						SwitchMode(arm, GET_MODE);
+						SET_CPSR(GET_REGISTER(SPSR));
+						SwitchMode(GET_MODE);
 					}
 					else
 					{
@@ -1375,7 +1356,7 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 //                      LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
 						temp = (GET_CPSR & 0x0FFFFF20) | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
 						SET_CPSR( temp);
-						SwitchMode(arm, temp & 3);
+						SwitchMode(temp & 3);
 					}
 				}
 				// LDM PC - takes 2 extra cycles
@@ -1395,36 +1376,36 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 			{
 				// set to user mode - then do the transfer, and set back
 				//int curmode = GET_MODE;
-				//SwitchMode(arm, eARM7_MODE_USER);
+				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = loadDec(arm, insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
+				result = loadDec(insn & 0xffff, rbp, insn & INSN_BDT_S, eARM7_MODE_USER);
 				// todo - not sure if Writeback occurs on User registers also..
-				//SwitchMode(arm, curmode);
+				//SwitchMode(curmode);
 			}
 			else
-				result = loadDec(arm, insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
+				result = loadDec(insn & 0xffff, rbp, insn & INSN_BDT_S, GET_MODE);
 
-			if ((insn & INSN_BDT_W) && (arm->pendingAbtD == 0))
+			if ((insn & INSN_BDT_W) && (m_pendingAbtD == 0))
 			{
 				if (rb == 0xf)
 					LOG(("%08x:  Illegal LDRM writeback to r15\n", R15));
 				// "A LDM will always overwrite the updated base if the base is in the list." (also for a user bank transfer?)
 				if (((insn >> rb) & 1) == 0)
 				{
-					SET_REGISTER(arm, rb, GET_REGISTER(arm, rb) - result * 4);
+					SET_REGISTER(rb, GET_REGISTER(rb) - result * 4);
 				}
 			}
 
 			// R15 included? (NOTE: CPSR restore must occur LAST otherwise wrong registers restored!)
-			if ((insn & 0x8000) && (arm->pendingAbtD == 0)) {
+			if ((insn & 0x8000) && (m_pendingAbtD == 0)) {
 				R15 -= 4;     // SJE: I forget why i did this?
 				// S - Flag Set? Signals transfer of current mode SPSR->CPSR
 				if (insn & INSN_BDT_S)
 				{
 					if (MODE32)
 					{
-						SET_CPSR(GET_REGISTER(arm, SPSR));
-						SwitchMode(arm, GET_MODE);
+						SET_CPSR(GET_REGISTER(SPSR));
+						SwitchMode(GET_MODE);
 					}
 					else
 					{
@@ -1432,7 +1413,7 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 //                      LOG(("LDM + S | R15 %08X CPSR %08X\n", R15, GET_CPSR));
 						temp = (GET_CPSR & 0x0FFFFF20) /* N Z C V I F M4 M3 M2 M1 M0 */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */ | (R15 & 0x00000003) /* M1 M0 */;
 						SET_CPSR( temp);
-						SwitchMode(arm, temp & 3);
+						SwitchMode(temp & 3);
 					}
 				}
 				// LDM PC - takes 2 extra cycles
@@ -1468,18 +1449,18 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 
 				// set to user mode - then do the transfer, and set back
 				//int curmode = GET_MODE;
-				//SwitchMode(arm, eARM7_MODE_USER);
+				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = storeInc(arm, insn & 0xffff, rbp, eARM7_MODE_USER);
+				result = storeInc(insn & 0xffff, rbp, eARM7_MODE_USER);
 				// todo - not sure if Writeback occurs on User registers also..
-				//SwitchMode(arm, curmode);
+				//SwitchMode(curmode);
 			}
 			else
-				result = storeInc(arm, insn & 0xffff, rbp, GET_MODE);
+				result = storeInc(insn & 0xffff, rbp, GET_MODE);
 
-			if ((insn & INSN_BDT_W) && (arm->pendingAbtD == 0))
+			if ((insn & INSN_BDT_W) && (m_pendingAbtD == 0))
 			{
-				SET_REGISTER(arm, rb, GET_REGISTER(arm, rb) + result * 4);
+				SET_REGISTER(rb, GET_REGISTER(rb) + result * 4);
 			}
 		}
 		else
@@ -1495,18 +1476,18 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 			{
 				// set to user mode - then do the transfer, and set back
 				//int curmode = GET_MODE;
-				//SwitchMode(arm, eARM7_MODE_USER);
+				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = storeDec(arm, insn & 0xffff, rbp, eARM7_MODE_USER);
+				result = storeDec(insn & 0xffff, rbp, eARM7_MODE_USER);
 				// todo - not sure if Writeback occurs on User registers also..
-				//SwitchMode(arm, curmode);
+				//SwitchMode(curmode);
 			}
 			else
-				result = storeDec(arm, insn & 0xffff, rbp, GET_MODE);
+				result = storeDec(insn & 0xffff, rbp, GET_MODE);
 
-			if ((insn & INSN_BDT_W) && (arm->pendingAbtD == 0))
+			if ((insn & INSN_BDT_W) && (m_pendingAbtD == 0))
 			{
-				SET_REGISTER(arm, rb, GET_REGISTER(arm, rb) - result * 4);
+				SET_REGISTER(rb, GET_REGISTER(rb) - result * 4);
 			}
 		}
 		if (insn & (1 << eR15))
@@ -1522,15 +1503,15 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 } /* HandleMemBlock */
 
 
-arm7ops_ophandler ops_handler[0x10] =
+const arm7_cpu_device::arm7ops_ophandler arm7_cpu_device::ops_handler[0x10] =
 {
-	arm7ops_0123, arm7ops_0123, arm7ops_0123, arm7ops_0123,
-	arm7ops_4567, arm7ops_4567, arm7ops_4567, arm7ops_4567,
-	arm7ops_89,   arm7ops_89,   arm7ops_ab,   arm7ops_ab,
-	arm7ops_cd,   arm7ops_cd,   arm7ops_e,    arm7ops_f,
+	&arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123, &arm7_cpu_device::arm7ops_0123,
+	&arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567, &arm7_cpu_device::arm7ops_4567,
+	&arm7_cpu_device::arm7ops_89,   &arm7_cpu_device::arm7ops_89,   &arm7_cpu_device::arm7ops_ab,   &arm7_cpu_device::arm7ops_ab,
+	&arm7_cpu_device::arm7ops_cd,   &arm7_cpu_device::arm7ops_cd,   &arm7_cpu_device::arm7ops_e,    &arm7_cpu_device::arm7ops_f,
 };
 
-const void arm7ops_0123(arm_state *arm, UINT32 insn)
+void arm7_cpu_device::arm7ops_0123(UINT32 insn)
 {
 //case 0:
 //case 1:
@@ -1539,7 +1520,7 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 	/* Branch and Exchange (BX) */
 	if ((insn & 0x0ffffff0) == 0x012fff10)     // bits 27-4 == 000100101111111111110001
 	{
-		R15 = GET_REGISTER(arm, insn & 0x0f);
+		R15 = GET_REGISTER(insn & 0x0f);
 		// If new PC address has A0 set, switch to Thumb mode
 		if (R15 & 1) {
 			SET_CPSR(GET_CPSR|T_MASK);
@@ -1551,68 +1532,68 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		UINT32 rm = insn&0xf;
 		UINT32 rd = (insn>>12)&0xf;
 
-		SET_REGISTER(arm, rd, count_leading_zeros(GET_REGISTER(arm, rm)));
+		SET_REGISTER(rd, count_leading_zeros(GET_REGISTER(rm)));
 
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000f0) == 0x01000050) // QADD - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>16)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>16)&0xf);
 		INT64 res;
 
-		res = saturate_qbit_overflow(arm, (INT64)src1 + (INT64)src2);
+		res = saturate_qbit_overflow((INT64)src1 + (INT64)src2);
 
-		SET_REGISTER(arm, (insn>>12)&0xf, (INT32)res);
+		SET_REGISTER((insn>>12)&0xf, (INT32)res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000f0) == 0x01400050) // QDADD - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>16)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>16)&0xf);
 		INT64 res;
 
 		// check if doubling operation will overflow
 		res = (INT64)src2 * 2;
-		saturate_qbit_overflow(arm, res);
+		saturate_qbit_overflow(res);
 
 		src2 *= 2;
-		res = saturate_qbit_overflow(arm, (INT64)src1 + (INT64)src2);
+		res = saturate_qbit_overflow((INT64)src1 + (INT64)src2);
 
-		SET_REGISTER(arm, (insn>>12)&0xf, (INT32)res);
+		SET_REGISTER((insn>>12)&0xf, (INT32)res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000f0) == 0x01200050) // QSUB - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>16)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>16)&0xf);
 		INT64 res;
 
-		res = saturate_qbit_overflow(arm, (INT64)src1 - (INT64)src2);
+		res = saturate_qbit_overflow((INT64)src1 - (INT64)src2);
 
-		SET_REGISTER(arm, (insn>>12)&0xf, (INT32)res);
+		SET_REGISTER((insn>>12)&0xf, (INT32)res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000f0) == 0x01600050) // QDSUB - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>16)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>16)&0xf);
 		INT64 res;
 
 		// check if doubling operation will overflow
 		res = (INT64)src2 * 2;
-		saturate_qbit_overflow(arm, res);
+		saturate_qbit_overflow(res);
 
 		src2 *= 2;
-		res = saturate_qbit_overflow(arm, (INT64)src1 - (INT64)src2);
+		res = saturate_qbit_overflow((INT64)src1 - (INT64)src2);
 
-		SET_REGISTER(arm, (insn>>12)&0xf, (INT32)res);
+		SET_REGISTER((insn>>12)&0xf, (INT32)res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff00090) == 0x01000080) // SMLAxy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
 		INT32 res1;
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
@@ -1641,32 +1622,32 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		// do the signed multiply
 		res1 = src1 * src2;
 		// and the accumulate.  NOTE: only the accumulate can cause an overflow, which is why we do it this way.
-		saturate_qbit_overflow(arm, (INT64)res1 + (INT64)GET_REGISTER(arm, (insn>>12)&0xf));
+		saturate_qbit_overflow((INT64)res1 + (INT64)GET_REGISTER((insn>>12)&0xf));
 
-		SET_REGISTER(arm, (insn>>16)&0xf, res1 + GET_REGISTER(arm, (insn>>12)&0xf));
+		SET_REGISTER((insn>>16)&0xf, res1 + GET_REGISTER((insn>>12)&0xf));
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff00090) == 0x01400080) // SMLALxy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
 		INT64 dst;
 
-		dst = (INT64)GET_REGISTER(arm, (insn>>12)&0xf);
-		dst |= (INT64)GET_REGISTER(arm, (insn>>16)&0xf)<<32;
+		dst = (INT64)GET_REGISTER((insn>>12)&0xf);
+		dst |= (INT64)GET_REGISTER((insn>>16)&0xf)<<32;
 
 		// do the multiply and accumulate
 		dst += (INT64)src1 * (INT64)src2;
 
 		// write back the result
-		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)dst);
-		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst >> 32));
+		SET_REGISTER((insn>>12)&0xf, (UINT32)dst);
+		SET_REGISTER((insn>>16)&0xf, (UINT32)(dst >> 32));
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
 		INT32 res;
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
@@ -1693,13 +1674,13 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		}
 
 		res = src1 * src2;
-		SET_REGISTER(cpustart, (insn>>16)&0xf, res);
+		SET_REGISTER((insn>>16)&0xf, res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
 		INT64 res;
 
 		if (insn & 0x40)
@@ -1715,14 +1696,14 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 
 		res = (INT64)src1 * (INT64)src2;
 		res >>= 16;
-		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		SET_REGISTER((insn>>16)&0xf, (UINT32)res);
 		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x01200080) // SMLAWy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
-		INT32 src3 = GET_REGISTER(arm, (insn>>12)&0xf);
+		INT32 src1 = GET_REGISTER(insn&0xf);
+		INT32 src2 = GET_REGISTER((insn>>8)&0xf);
+		INT32 src3 = GET_REGISTER((insn>>12)&0xf);
 		INT64 res;
 
 		if (insn & 0x40)
@@ -1740,13 +1721,13 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		res >>= 16;
 
 		// check for overflow and set the Q bit
-		saturate_qbit_overflow(arm, (INT64)src3 + res);
+		saturate_qbit_overflow((INT64)src3 + res);
 
 		// do the real accumulate
 		src3 += (INT32)res;
 
 		// write the result back
-		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		SET_REGISTER((insn>>16)&0xf, (UINT32)res);
 		R15 += 4;
 	}
 	else
@@ -1756,13 +1737,13 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		/* Half Word Data Transfer */
 		if (insn & 0x60)         // bits = 6-5 != 00
 		{
-			HandleHalfWordDT(arm, insn);
+			HandleHalfWordDT(insn);
 		}
 		else
 		/* Swap */
 		if (insn & 0x01000000)   // bit 24 = 1
 		{
-			HandleSwap(arm, insn);
+			HandleSwap(insn);
 		}
 		/* Multiply Or Multiply Long */
 		else
@@ -1772,14 +1753,14 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 			{
 				/* Signed? */
 				if (insn & 0x00400000)
-					HandleSMulLong(arm, insn);
+					HandleSMulLong(insn);
 				else
-					HandleUMulLong(arm, insn);
+					HandleUMulLong(insn);
 			}
 			/* multiply */
 			else
 			{
-				HandleMul(arm, insn);
+				HandleMul(insn);
 			}
 			R15 += 4;
 		}
@@ -1790,70 +1771,70 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		/* PSR Transfer (MRS & MSR) */
 		if (((insn & 0x00100000) == 0) && ((insn & 0x01800000) == 0x01000000)) // S bit must be clear, and bit 24,23 = 10
 		{
-			HandlePSRTransfer(arm, insn);
+			HandlePSRTransfer(insn);
 			ARM7_ICOUNT += 2;       // PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
 			R15 += 4;
 		}
 		/* Data Processing */
 		else
 		{
-			HandleALU(arm, insn);
+			HandleALU(insn);
 		}
 	}
 //  break;
 }
 
-const void arm7ops_4567(arm_state *arm, UINT32 insn) /* Data Transfer - Single Data Access */
+void arm7_cpu_device::arm7ops_4567(UINT32 insn) /* Data Transfer - Single Data Access */
 {
 //case 4:
 //case 5:
 //case 6:
 //case 7:
-	HandleMemSingle(arm, insn);
+	HandleMemSingle(insn);
 	R15 += 4;
 //  break;
 }
 
-const void arm7ops_89(arm_state *arm, UINT32 insn) /* Block Data Transfer/Access */
+void arm7_cpu_device::arm7ops_89(UINT32 insn) /* Block Data Transfer/Access */
 {
 //case 8:
 //case 9:
-	HandleMemBlock(arm, insn);
+	HandleMemBlock(insn);
 	R15 += 4;
 //  break;
 }
 
-const void arm7ops_ab(arm_state *arm, UINT32 insn) /* Branch or Branch & Link */
+void arm7_cpu_device::arm7ops_ab(UINT32 insn) /* Branch or Branch & Link */
 {
 //case 0xa:
 //case 0xb:
-	HandleBranch(arm, insn);
+	HandleBranch(insn);
 //  break;
 }
 
-const void arm7ops_cd(arm_state *arm, UINT32 insn) /* Co-Processor Data Transfer */
+void arm7_cpu_device::arm7ops_cd(UINT32 insn) /* Co-Processor Data Transfer */
 {
 //case 0xc:
 //case 0xd:
-	HandleCoProcDT(arm, insn);
+	HandleCoProcDT(insn);
 	R15 += 4;
 //  break;
 }
 
-const void arm7ops_e(arm_state *arm, UINT32 insn) /* Co-Processor Data Operation or Register Transfer */
+void arm7_cpu_device::arm7ops_e(UINT32 insn) /* Co-Processor Data Operation or Register Transfer */
 {
 //case 0xe:
 	if (insn & 0x10)
-		HandleCoProcRT(arm, insn);
+		HandleCoProcRT(insn);
 	else
-		HandleCoProcDO(arm, insn);
+		HandleCoProcDO(insn);
 	R15 += 4;
 //  break;
 }
 
-const void arm7ops_f(arm_state *arm, UINT32 insn) /* Software Interrupt */
+void arm7_cpu_device::arm7ops_f(UINT32 insn) /* Software Interrupt */
 {
-	arm->pendingSwi = 1;
+	m_pendingSwi = 1;
 	ARM7_CHECKIRQ;
 	//couldn't find any cycle counts for SWI
 //  break;

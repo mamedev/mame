@@ -95,7 +95,9 @@ $(CPUOBJ)/arm7/arm7.o:  $(CPUSRC)/arm7/arm7.c \
 						$(CPUSRC)/arm7/arm7help.h \
 						$(CPUSRC)/arm7/arm7thmb.c \
 						$(CPUSRC)/arm7/arm7ops.c \
-						$(CPUSRC)/arm7/arm7core.c
+						$(CPUSRC)/arm7/arm7core.c \
+						$(CPUSRC)/arm7/arm7drc.c \
+						$(CPUSRC)/arm7/arm7tdrc.c
 
 $(CPUOBJ)/arm7/arm7ops.o:   $(CPUSRC)/arm7/arm7ops.c \
 						$(CPUSRC)/arm7/arm7.h \

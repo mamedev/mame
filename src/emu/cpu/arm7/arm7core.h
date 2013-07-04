@@ -93,7 +93,7 @@ enum
 };
 
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE                      arm->tlbBase
+#define COPRO_TLB_BASE                      m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
@@ -117,7 +117,7 @@ enum
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
 
-#define COPRO_CTRL                          arm->control
+#define COPRO_CTRL                          m_control
 #define COPRO_CTRL_MMU_EN                   0x00000001
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
@@ -141,23 +141,14 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
-#define COPRO_DOMAIN_ACCESS_CONTROL         arm->domainAccessControl
+#define COPRO_DOMAIN_ACCESS_CONTROL         m_domainAccessControl
 
-#define COPRO_FAULT_STATUS_D                arm->faultStatus[0]
-#define COPRO_FAULT_STATUS_P                arm->faultStatus[1]
+#define COPRO_FAULT_STATUS_D                m_faultStatus[0]
+#define COPRO_FAULT_STATUS_P                m_faultStatus[1]
 
-#define COPRO_FAULT_ADDRESS                 arm->faultAddress
+#define COPRO_FAULT_ADDRESS                 m_faultAddress
 
-#define COPRO_FCSE_PID                      arm->fcsePID
-
-/* Coprocessor Registers */
-#define ARM7COPRO_REGS \
-	UINT32 control; \
-	UINT32 tlbBase; \
-	UINT32 faultStatus[2]; \
-	UINT32 faultAddress; \
-	UINT32 fcsePID; \
-	UINT32 domainAccessControl;
+#define COPRO_FCSE_PID                      m_fcsePID
 
 enum
 {
@@ -170,20 +161,6 @@ enum
 	eARM_ARCHFLAGS_MODE26   = 64,       // supports 26-bit backwards compatibility mode
 };
 
-#define ARM7CORE_REGS                   \
-	UINT32 r[NUM_REGS]; \
-	UINT32 pendingIrq;                   \
-	UINT32 pendingFiq;                   \
-	UINT32 pendingAbtD;                  \
-	UINT32 pendingAbtP;                  \
-	UINT32 pendingUnd;                   \
-	UINT32 pendingSwi;                   \
-	int icount;           \
-	endianness_t endian;                \
-	device_irq_acknowledge_callback irq_callback;       \
-	legacy_cpu_device *device;      \
-	address_space *program;         \
-	direct_read_data *direct;
 
 //#define ARM7_USE_DRC
 
@@ -197,16 +174,35 @@ struct arm7imp_state;
 /* CPU state struct */
 struct arm_state
 {
-	ARM7CORE_REGS           // these must be included in your cpu specific register implementation
-	ARM7COPRO_REGS
+	UINT32 m_r[NUM_REGS];
+	UINT32 m_pendingIrq;
+	UINT32 m_pendingFiq;
+	UINT32 m_pendingAbtD;
+	UINT32 m_pendingAbtP;
+	UINT32 m_pendingUnd;
+	UINT32 m_pendingSwi;
+	int m_icount;
+	endianness_t m_endian;
+	device_irq_acknowledge_callback m_irq_callback;
+	legacy_cpu_device *m_device;
+	address_space *m_program;
+	direct_read_data *m_direct;
 
-	UINT8 archRev;          // ARM architecture revision (3, 4, and 5 are valid)
-	UINT8 archFlags;        // architecture flags
+	/* Coprocessor Registers */
+	UINT32 m_control;
+	UINT32 m_tlbBase;
+	UINT32 m_faultStatus[2];
+	UINT32 m_faultAddress;
+	UINT32 m_fcsePID;
+	UINT32 m_domainAccessControl;
+
+	UINT8 m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
+	UINT8 m_archFlags;        // architecture flags
 
 #if ARM7_MMU_ENABLE_HACK
 	UINT32 mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
 #endif
-	arm7imp_state impstate;
+	arm7imp_state m_impstate;
 };
 
 /****************************************************************************************************
@@ -501,10 +497,10 @@ enum
 #define ROR(v, s) (LSR((v), (s)) | (LSL((v), 32u - (s))))
 
 /* Convenience Macros */
-#define R15                     ARM7REG(eR15)
+#define R15                     m_r[eR15]
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
-#define GET_CPSR                ARM7REG(eCPSR)
-#define SET_CPSR(v)             set_cpsr(arm,v)
+#define GET_CPSR                m_r[eCPSR]
+#define SET_CPSR(v)             set_cpsr(v)
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
 #define GET_MODE                (GET_CPSR & MODE_FLAG)
 #define SIGN_BIT                ((UINT32)(1 << 31))
@@ -525,23 +521,12 @@ enum
 #define ARM7_TLB_WRITE   (1 << 3)
 
 /* At one point I thought these needed to be cpu implementation specific, but they don't.. */
-#define GET_REGISTER(state, reg)       GetRegister(state, reg)
-#define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
-#define GET_MODE_REGISTER(state, mode, reg)       GetModeRegister(state, mode, reg)
-#define SET_MODE_REGISTER(state, mode, reg, val)  SetModeRegister(state, mode, reg, val)
-#define ARM7_CHECKIRQ           arm7_check_irq_state(arm)
+#define GET_REGISTER(reg)       GetRegister(reg)
+#define SET_REGISTER(reg, val)  SetRegister(reg, val)
+#define GET_MODE_REGISTER(mode, reg)       GetModeRegister(mode, reg)
+#define SET_MODE_REGISTER(mode, reg, val)  SetModeRegister(mode, reg, val)
+#define ARM7_CHECKIRQ           arm7_check_irq_state()
 
-extern write32_device_func arm7_coproc_do_callback;
-extern read32_device_func arm7_coproc_rt_r_callback;
-extern write32_device_func arm7_coproc_rt_w_callback;
-extern void arm7_dt_r_callback(arm_state *arm, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *arm, UINT32 addr));
-extern void arm7_dt_w_callback(arm_state *arm, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *arm, UINT32 addr, UINT32 data));
-
-#ifdef UNUSED_DEFINITION
-extern char *(*arm7_dasm_cop_dt_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_rt_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_do_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-#endif
 
 /* ARM flavors */
 enum arm_flavor
