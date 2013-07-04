@@ -262,7 +262,7 @@ ROM_START( trbwtchs )
 	/* bios, video bios etc. not dumped */
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
-	DISK_IMAGE( "TroubleWitches_AC_V1.00J", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
+	DISK_IMAGE( "troublewitches_ac_v1.00j", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
 ROM_END
 
 
