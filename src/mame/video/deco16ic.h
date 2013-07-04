@@ -120,7 +120,7 @@ protected:
 
 private:
 	// internal state
-	screen_device *m_screen;
+	//screen_device *m_screen;
 
 	UINT16 *m_pf1_data, *m_pf2_data;
 	UINT16 *m_pf12_control;

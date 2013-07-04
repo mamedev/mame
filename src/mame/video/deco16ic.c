@@ -168,7 +168,7 @@ const device_type DECO16IC = &device_creator<deco16ic_device>;
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO16IC, "Data East IC 55 / 56 / 74 / 141", tag, owner, clock, "deco16ic", __FILE__),
-	m_screen(NULL),
+	//m_screen(NULL),
 	m_pf1_data(NULL),
 	m_pf2_data(NULL),
 	m_pf12_control(NULL),
