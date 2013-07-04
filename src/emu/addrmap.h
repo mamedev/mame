@@ -602,7 +602,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_RAM_DEVWRITE(_tag, _class, _write) AM_READONLY AM_DEVWRITE(_tag, _class, _write)
 
 #define AM_RAM_WRITE_LEGACY(_write)         AM_READONLY AM_WRITE_LEGACY(_write)
-#define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 
 
 
