@@ -118,12 +118,37 @@ INLINE mc6843_t* get_safe_token( device_t *device )
 
 
 
+static device_t* mc6843_floppy_image ( device_t *device, UINT8 drive )
+{
+	device_t *img = floppy_get_device( device->machine(), drive );
+	if (!img && device->owner()) {
+		// For slot devices, drives are typically attached to the slot rather than the machine
+		const char *floppy_name = NULL;
+		switch (drive) {
+		case 0:
+			floppy_name = FLOPPY_0;
+			break;
+		case 1:
+			floppy_name = FLOPPY_1;
+			break;
+		case 2:
+			floppy_name = FLOPPY_2;
+			break;
+		case 3:
+			floppy_name = FLOPPY_3;
+			break;
+		}
+		img = device->owner()->subdevice(floppy_name);
+	}
+	return img;
+}
+
+
 static device_t* mc6843_floppy_image ( device_t *device )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
-	return floppy_get_device( device->machine(), mc6843->drive );
+	return mc6843_floppy_image( device, mc6843->drive );
 }
-
 
 
 void mc6843_set_drive( device_t *device, int drive )
@@ -234,9 +259,10 @@ static void mc6843_finish_SEK( device_t *device )
 	device_t* img = mc6843_floppy_image( device );
 
 	/* seek to track */
-	floppy_drive_seek( img, mc6843->GCR - mc6843->CTAR );
+	// TODO: not sure how CTAR bit 7 is handled here, but this is the safest approach for now
+	floppy_drive_seek( img, mc6843->GCR - (mc6843->CTAR & 0x7F) );
 
-	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", device->machine().time().as_double(), mc6843->CTAR, mc6843->GCR, floppy_drive_get_current_track( img ) ));
+	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", device->machine().time().as_double(), (mc6843->CTAR & 0x7F), mc6843->GCR, floppy_drive_get_current_track( img ) ));
 
 	/* update state */
 	mc6843->CTAR = mc6843->GCR;
@@ -672,7 +698,7 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 	}
 
 	case 1: /* Current-Track Address Register (CTAR) */
-		mc6843->CTAR = data & 0x7f;
+		mc6843->CTAR = data;
 		LOG(( "%f $%04x mc6843_w: set CTAR to %i %02X (actual=%i) \n",
 				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), mc6843->CTAR, data,
 				floppy_drive_get_current_track( mc6843_floppy_image( device ) ) ));
@@ -776,7 +802,7 @@ static DEVICE_RESET( mc6843 )
 	/* setup/reset floppy drive */
 	for ( i = 0; i < 4; i++ )
 	{
-		device_t * img = floppy_get_device( device->machine(), i );
+		device_t * img = mc6843_floppy_image( device, i );
 		floppy_mon_w(img, CLEAR_LINE);
 		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
 		floppy_drive_set_rpm( img, 300. );

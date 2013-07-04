@@ -1,29 +1,30 @@
 /**************************************************************************************
 
-    Basic Master Level 3 (MB-6890) (c) 1980 Hitachi
+    Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
 
     Driver by Angelo Salese, Jonathan Edwards and Christopher Edwards
 
     TODO:
     - tape support
-    - disk support in bml3b machine
+    - implement sound as a bml3bus slot device
+    - account for hardware differences between MB-6890, MB-6891 and MB-6892
+      (e.g. custom font support on the MB-6892)
 
 **************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/bml3bus.h"
 #include "video/mc6845.h"
-#include "machine/wd_fdc.h"
-#include "machine/mc6843.h"
 #include "sound/beep.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/2203intf.h"
+#include "machine/bml3mp1802.h"
+#include "machine/bml3mp1805.h"
+#include "machine/bml3kanji.h"
 
 //#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-//#include "formats/basicdsk.h"
-//#include "imagedev/floppy.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
@@ -66,26 +67,20 @@ public:
 	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_bml3bus(*this, "bml3bus"),
 		m_crtc(*this, "crtc"),
 		//m_cass(*this, "cassette"),
 		m_beep(*this, "beeper"),
-		m_ym2203(*this, "ym2203"),
-		m_wd17xx(*this, "wd17xx"),
-		m_wd17xx_0(*this, "wd17xx:0"),
-		m_wd17xx_1(*this, "wd17xx:1"),
-		m_mc6843(*this, "mc6843")
+		m_ym2203(*this, "ym2203")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<bml3bus_device> m_bml3bus;
 	required_device<mc6845_device> m_crtc;
 	//required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	optional_device<ym2203_device> m_ym2203;
-	optional_device<mb8866_t> m_wd17xx;
-	optional_device<floppy_connector> m_wd17xx_0;
-	optional_device<floppy_connector> m_wd17xx_1;
-	optional_device<mc6843_device> m_mc6843;
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bml3_keyboard_w);
@@ -93,12 +88,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_vres_reg_w);
 	DECLARE_READ8_MEMBER(bml3_vram_r);
 	DECLARE_WRITE8_MEMBER(bml3_vram_w);
-	DECLARE_READ8_MEMBER(bml3_mp1802_r);
-	DECLARE_WRITE8_MEMBER(bml3_mp1802_w);
-	DECLARE_READ8_MEMBER(bml3_mp1805_r);
-	DECLARE_WRITE8_MEMBER(bml3_mp1805_w);
-	DECLARE_READ8_MEMBER(bml3_kanji_r);
-	DECLARE_WRITE8_MEMBER(bml3_kanji_w);
 	DECLARE_READ8_MEMBER(bml3_psg_latch_r);
 	DECLARE_WRITE8_MEMBER(bml3_psg_latch_w);
 	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
@@ -110,6 +99,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
 
+	DECLARE_WRITE8_MEMBER(bml3bus_nmi_w);
+	DECLARE_WRITE8_MEMBER(bml3bus_irq_w);
+	DECLARE_WRITE8_MEMBER(bml3bus_firq_w);
 
 	DECLARE_READ_LINE_MEMBER( bml3_acia_rx_r );
 	DECLARE_WRITE_LINE_MEMBER( bml3_acia_tx_w );
@@ -140,7 +132,6 @@ public:
 	UINT8 m_psg_latch;
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT16 m_kanji_addr;
 	UINT8 *m_extram;
 	UINT8 m_firq_mask,m_firq_status;
 
@@ -157,7 +148,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
-	void bml3_wd17xx_intrq_w(bool state);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -403,61 +393,6 @@ WRITE8_MEMBER( bml3_state::bml3_vram_w )
 	vram[offset+0x4000] = m_attr_latch & 0x1F;
 }
 
-READ8_MEMBER( bml3_state::bml3_mp1802_r)
-{
-	return m_wd17xx->drq_r() ? 0x00 : 0x80;
-}
-
-WRITE8_MEMBER( bml3_state::bml3_mp1802_w)
-{
-	int drive = data & 0x03;
-	int side = BIT(data, 4);
-	int motor = BIT(data, 3);
-
-	// drive select
-	floppy_image_device *floppy = (drive == 0 ? m_wd17xx_0 : m_wd17xx_1)->get_device();
-
-	// side select
-	if(floppy) {
-		floppy->ss_w(side);
-		floppy->mon_w(!motor);
-	}
-
-	m_wd17xx->set_floppy(floppy);
-}
-
-READ8_MEMBER( bml3_state::bml3_mp1805_r )
-{
-	//logerror("FDD 0xff20 R\n");
-	return -1;
-}
-
-WRITE8_MEMBER( bml3_state::bml3_mp1805_w )
-{
-	//logerror("FDD 0xff20 W %02x\n",data);
-	// ? something here, gets 0x81 written to it if latch found at FF19, or 0x00 if not
-	// don't know which bits are what
-	//	int drive = ?;
-	//	int side = ?;
-	//	int motor = ?;
-	//	mc6843_set_drive( machine().device("mc6843"), drive );
-	//	mc6843_set_side( machine().device("mc6843"), side );
-	//	floppy_mon_w(floppy_get_device(machine(),drive), motor);
-	//	floppy_drive_set_ready_state(floppy_get_device(machine(), drive), ASSERT_LINE, 0);
-}
-
-READ8_MEMBER( bml3_state::bml3_kanji_r )
-{
-//  return m_kanji_rom[m_kanji_addr << 1 + offset];
-	return machine().rand();
-}
-
-WRITE8_MEMBER( bml3_state::bml3_kanji_w )
-{
-	m_kanji_addr &= (0xff << (offset*8));
-	m_kanji_addr |= (data << ((offset^1)*8));
-}
-
 READ8_MEMBER( bml3_state::bml3_psg_latch_r)
 {
 	return 0x7f;
@@ -547,12 +482,27 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	return res;
 }
 
+WRITE8_MEMBER(bml3_state::bml3bus_nmi_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, data);
+}
+
+WRITE8_MEMBER(bml3_state::bml3bus_irq_w)
+{
+	m_maincpu->set_input_line(M6809_IRQ_LINE, data);
+}
+
+WRITE8_MEMBER(bml3_state::bml3bus_firq_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, data);
+}
+
+
 static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
-	AM_RANGE(0xff75, 0xff76) AM_READWRITE(bml3_kanji_r,bml3_kanji_w)// kanji i/f
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
 	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
@@ -594,25 +544,24 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(bml3_e000_w)
 	AM_RANGE(0xf000, 0xfeff) AM_WRITE(bml3_f000_w)
 	AM_RANGE(0xfff0, 0xffff) AM_WRITE(bml3_fff0_w)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bml3a_mem, AS_PROGRAM, 8, bml3_state)
-	AM_IMPORT_FROM(bml3_mem)
-
-	AM_RANGE(0xff00, 0xff03) AM_DEVREADWRITE("wd17xx", mb8866_t, read, write)
-	AM_RANGE(0xff04, 0xff04) AM_READWRITE(bml3_mp1802_r,bml3_mp1802_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(bml3b_mem, AS_PROGRAM, 8, bml3_state)
-	AM_IMPORT_FROM(bml3_mem)
-
+#if 0
 	AM_RANGE(0xff00, 0xff00) AM_READWRITE(bml3_ym2203_r,bml3_ym2203_w)
-	// TODO: what's this?
-	// AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
-	AM_RANGE(0xff18, 0xff1f) AM_DEVREADWRITE_LEGACY("mc6843",mc6843_r,mc6843_w)
-	AM_RANGE(0xff20, 0xff20) AM_READWRITE(bml3_mp1805_r,bml3_mp1805_w) // FDD drive select
+	AM_RANGE(0xff02, 0xff02) AM_READWRITE(bml3_psg_latch_r,bml3_psg_latch_w) // PSG address/data select
+#endif
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(bml3mk2_mem, AS_PROGRAM, 8, bml3_state)
+	AM_IMPORT_FROM(bml3_mem)
+	// TODO: anything to add here?
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(bml3mk5_mem, AS_PROGRAM, 8, bml3_state)
+	AM_IMPORT_FROM(bml3_mem)
+	// TODO: anything to add here?
+
+ADDRESS_MAP_END
 
 /* Input ports */
 
@@ -767,12 +716,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-void bml3_state::bml3_wd17xx_intrq_w(bool state)
-{
-	if (state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
@@ -782,7 +725,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 	{
 		m_keyb_scancode = (m_keyb_scancode + 1) & 0x7F;
 		if (m_keyb_counter_operation_disabled) {
-			m_keyb_scancode &= 0xF;
+			m_keyb_scancode &= 0x7;
 		}
 
 		if (m_keyb_scancode == 0x7F)
@@ -850,11 +793,6 @@ void bml3_state::machine_start()
 	m_beep->set_frequency(1200); //guesswork
 	m_beep->set_state(0);
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
-
-	// floppy callbacks
-	if (m_wd17xx) {
-		m_wd17xx->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bml3_state::bml3_wd17xx_intrq_w), this));
-	}
 }
 
 void bml3_state::machine_reset()
@@ -872,8 +810,6 @@ void bml3_state::machine_reset()
 
 	m_firq_mask = -1; // disable firq
 }
-
-const mc6843_interface bml3_6843_if = { NULL };
 
 WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 {
@@ -1045,30 +981,20 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL  // write B
 };
 
-static const floppy_format_type bml3_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	NULL
+static const struct bml3bus_interface bml3bus_intf =
+{
+	// interrupt lines
+	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_nmi_w),
+	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_irq_w),
+	DEVCB_DRIVER_MEMBER(bml3_state,bml3bus_firq_w),
 };
 
-static SLOT_INTERFACE_START( bml3_mp1802_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+static SLOT_INTERFACE_START(bml3_cards)
+	SLOT_INTERFACE("bml3mp1802", BML3BUS_MP1802)  /* MP-1802 Floppy Controller Card */
+	SLOT_INTERFACE("bml3mp1805", BML3BUS_MP1805)  /* MP-1805 Floppy Controller Card */
+	SLOT_INTERFACE("bml3kanji",  BML3BUS_KANJI)
 SLOT_INTERFACE_END
 
-static const floppy_interface bml3_mp1805_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL
-};
-
-//static SLOT_INTERFACE_START( bml3_mp1805_floppies )
-//	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-//SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	/* basic machine hardware */
@@ -1101,7 +1027,19 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","bml3_flop")
+	/* slot devices */
+	MCFG_BML3BUS_BUS_ADD("bml3bus", "maincpu", bml3bus_intf)
+	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
+	   the MP-1805 ROM.
+	   User may want to switch this to MP-1802 (5.25" DS/DD).
+	   Note it isn't feasible to use both, as they each place boot ROM at F800.
+	 */
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl1", bml3_cards, "bml3mp1805")
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl2", bml3_cards, NULL)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl3", bml3_cards, NULL)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl4", bml3_cards, NULL)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl5", bml3_cards, NULL)
+	MCFG_BML3BUS_SLOT_ADD("bml3bus", "sl6", bml3_cards, "bml3kanji")
 
 MACHINE_CONFIG_END
 
@@ -1109,27 +1047,8 @@ static MACHINE_CONFIG_DERIVED( bml3, bml3_common )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bml3_mem)
 
-	// MCFG_MACHINE_START_OVERRIDE( bml3_state, bml3 )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( bml3a, bml3_common )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3a_mem)
-	/* floppy */
-	MCFG_MB8866x_ADD("wd17xx", CPU_CLOCK )
-	MCFG_FLOPPY_DRIVE_ADD("wd17xx:0", bml3_mp1802_floppies, "525dd", bml3_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd17xx:1", bml3_mp1802_floppies, "525dd", bml3_floppy_formats)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( bml3b, bml3_common )
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(bml3b_mem)
-	/* floppy */
-	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
-//	MCFG_FLOPPY_DRIVE_ADD("mc6843:0", bml3_mp1805_floppies, "3ssdd", bml3_floppy_formats)
-//	MCFG_FLOPPY_DRIVE_ADD("mc6843:1", bml3_mp1805_floppies, "3ssdd", bml3_floppy_formats)
-
+#if 0
+	// TODO: slot device for sound card
 	// audio
 	MCFG_SOUND_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
@@ -1137,6 +1056,21 @@ static MACHINE_CONFIG_DERIVED( bml3b, bml3_common )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+#endif
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bml3mk2, bml3_common )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(bml3mk2_mem)
+
+	// TODO: anything to add here?
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bml3mk5, bml3_common )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(bml3mk5_mem)
+
+	// TODO: anything to add here?
 MACHINE_CONFIG_END
 
 
@@ -1145,7 +1079,7 @@ MACHINE_CONFIG_END
 ROM_START( bml3 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 //  ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
-	/* Handcrafted ROMs, rom labels and contents might not match */
+	// TODO: replace with MB-6890 ROMs (these are from an MB-6892)
 	ROM_LOAD( "598 p16611.ic3", 0xa000, 0x2000, BAD_DUMP CRC(954b9bad) SHA1(047948fac6808717c60a1d0ac9205a5725362430))
 	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
 	// TODO: Replace checksums with a ROM dump without a disk controller patch (checksums here are inclusive of the MP1805 patch)
@@ -1155,12 +1089,23 @@ ROM_START( bml3 )
 	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD("kanji.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
-ROM_START( bml3a )
+ROM_START( bml3mk2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+//  ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
+	// TODO: replace with MB-6891 ROMs (these are from an MB-6892)
+	ROM_LOAD( "598 p16611.ic3", 0xa000, 0x2000, BAD_DUMP CRC(954b9bad) SHA1(047948fac6808717c60a1d0ac9205a5725362430))
+	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
+	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
+
+	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( bml3mk5 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 //  ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
 	/* Handcrafted ROMs, rom labels and contents might not match */
@@ -1169,54 +1114,15 @@ ROM_START( bml3a )
 	// TODO: Replace checksums with a ROM dump without a disk controller patch (checksums here are inclusive of the MP1805 patch)
 	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
 
-	// MP-1502 disk controller ROM, which replaces part of the system ROM
-	ROM_LOAD( "mp1802.rom", 0xf800, 0x0800, BAD_DUMP CRC(8d0dc101) SHA1(92f7d1cebecafa7472e45c4999520de5c01c6dbc))
-
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 
 	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD("kanji.rom", 0x00000, 0x20000, NO_DUMP )
-ROM_END
-
-ROM_START( bml3b )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-//  ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
-	/* Handcrafted ROMs, rom labels and contents might not match */
-	ROM_LOAD( "598 p16611.ic3", 0xa000, 0x2000, BAD_DUMP CRC(954b9bad) SHA1(047948fac6808717c60a1d0ac9205a5725362430))
-	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
-	// TODO: Replace checksums with a ROM dump without a disk controller patch (checksums here are inclusive of the MP1805 patch)
-	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
-
-	// MP-1505 disk controller ROM, which replaces part of the system ROM
-	ROM_LOAD( "mp1805.rom", 0xf800, 0x0800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD("font.rom", 0x00000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
-
-	ROM_REGION( 0x8000, "vram", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD("kanji.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
 /* Driver */
 
-/* Configurations are focussed on disk support rather than computer model.
- * The following three models were produced:
- *
- * <year> / <model> / <name>
- * 1980 / MB-6890 / Basic Master Level 3
- * 1982 / MB-6891 / Basic Master Level 3 Mark 2
- * 1983 / MB-6892 / Basic Master Level 3 Mark 5
- *
- * If it turns out that these models had different ROMs or significant base hardware changes, then a model-oriented configuration
- * set might be more appropriate.
- */
-
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                      COMPANY    FULLNAME                        FLAGS */
 COMP( 1980, bml3,   0,      0,       bml3,      bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3", GAME_NOT_WORKING)
-COMP( 1980, bml3a,  bml3,   0,       bml3a,     bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3 + MP-1502 (5.25\" disk)", 0)
-COMP( 1980, bml3b,  bml3,   0,       bml3b,     bml3,    driver_device,    0,      "Hitachi", "MB-6890 Basic Master Level 3 + MP-1505 (3\" disk) + YM-2203 (sound)", GAME_NOT_WORKING)
+COMP( 1982, bml3mk2,bml3,   0,       bml3mk2,   bml3,    driver_device,    0,      "Hitachi", "MB-6891 Basic Master Level 3 Mark 2", GAME_NOT_WORKING)
+COMP( 1983, bml3mk5,bml3,   0,       bml3mk5,   bml3,    driver_device,    0,      "Hitachi", "MB-6892 Basic Master Level 3 Mark 5", GAME_NOT_WORKING)

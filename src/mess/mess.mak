@@ -1447,6 +1447,10 @@ $(MESSOBJ)/hegener.a:           \
 $(MESSOBJ)/hitachi.a:           \
 	$(MESS_DRIVERS)/bmjr.o      \
 	$(MESS_DRIVERS)/bml3.o      \
+	$(MESS_MACHINE)/bml3bus.o   \
+	$(MESS_MACHINE)/bml3mp1802.o\
+	$(MESS_MACHINE)/bml3mp1805.o\
+	$(MESS_MACHINE)/bml3kanji.o \
 	$(MESS_DRIVERS)/b16.o       \
 
 $(MESSOBJ)/homebrew.a:          \

@@ -807,6 +807,150 @@ static const char *const vzbas[] =
 	NULL        /* 0xff */
 };
 
+static const char *const bml3bas_statements[] =
+{
+	"END",      /* 0x80 */
+	"FOR",      /* 0x81 */
+	"NEXT",     /* 0x82 */
+	"DATA",     /* 0x83 */
+	"DIM",      /* 0x84 */
+	"READ",     /* 0x85 */
+	"LET",      /* 0x86 */
+	"GO",       /* 0x87 */
+	"RUN",      /* 0x88 */
+	"IF",       /* 0x89 */
+	"RESTORE",  /* 0x8a */
+	"RETURN",   /* 0x8b */
+	"REM",      /* 0x8c */
+	"'",        /* 0x8d */
+	"STOP",     /* 0x8e */
+	"ELSE",     /* 0x8f */
+	"TRON",     /* 0x90 */
+	"TROFF",    /* 0x91 */
+	"SWAP",     /* 0x92 */
+	"DEFSTR",   /* 0x93 */
+	"DEFINT",   /* 0x94 */
+	"DEFSNG",   /* 0x95 */
+	"DEFDBL",   /* 0x96 */
+	"ON",       /* 0x97 */
+	"WAIT",     /* 0x98 */
+	"RENUM",    /* 0x99 */
+	"EDIT",     /* 0x9a */
+	"ERROR",    /* 0x9b */
+	"RESUME",   /* 0x9c */
+	"AUTO",     /* 0x9d */
+	"DELETE",   /* 0x9e */
+	"TERM",     /* 0x9f */
+	"WIDTH",    /* 0xa0 */
+	"UNLIST",   /* 0xa1 */
+	"MON",      /* 0xa2 */
+	"LOCATE",   /* 0xa3 */
+	"CLS",      /* 0xa4 */
+	"CONSOLE",  /* 0xa5 */
+	"PSET",     /* 0xa6 */
+	"PRESET",   /* 0xa7 */
+	"MOTOR",    /* 0xa8 */
+	"SKIPF",    /* 0xa9 */
+	"SAVE",     /* 0xaa */
+	"LOAD",     /* 0xab */
+	"MERGE",    /* 0xac */
+	"EXEC",     /* 0xad */
+	"OPEN",     /* 0xae */
+	"CLOSE",    /* 0xaf */
+	"FILES",    /* 0xb0 */
+	"COM",      /* 0xb1 */
+	"KEY",      /* 0xb2 */
+	"PAINT",    /* 0xb3 */
+	"BEEP",     /* 0xb4 */
+	"COLOR",    /* 0xb5 */
+	"LINE",     /* 0xb6 */
+	"DEF",      /* 0xb7 */
+	"POKE",     /* 0xb8 */
+	"PRINT",    /* 0xb9 */
+	"CONT",     /* 0xba */
+	"LIST",     /* 0xbb */
+	"CLEAR",    /* 0xbc */
+	"RANDOMIZE",/* 0xbd */
+	"WHILE",    /* 0xbe */
+	"WEND",     /* 0xbf */
+	"NEW",      /* 0xc0 */
+	"TAB(",     /* 0xc1 */
+	"TO",       /* 0xc2 */
+	"SUB",      /* 0xc3 */
+	"FN",       /* 0xc4 */
+	"SPC(",     /* 0xc5 */
+	"USING",    /* 0xc6 */
+	"USR",      /* 0xc7 */
+	"ERL",      /* 0xc8 */
+	"ERR",      /* 0xc9 */
+	"OFF",      /* 0xca */
+	"THEN",     /* 0xcb */
+	"NOT",      /* 0xcc */
+	"STEP",     /* 0xcd */
+	"+",        /* 0xce */
+	"-",        /* 0xcf */
+	"*",        /* 0xd0 */
+	"/",        /* 0xd1 */
+	"^",        /* 0xd2 */
+	"AND",      /* 0xd3 */
+	"OR",       /* 0xd4 */
+	"XOR",      /* 0xd5 */
+	"EQV",      /* 0xd6 */
+	"IMP",      /* 0xd7 */
+	"MOD",      /* 0xd8 */
+	"\\",       /* 0xd9 */
+	">",        /* 0xda */
+	"=",        /* 0xdb */
+	"<"         /* 0xdc */
+};
+
+static const char *const bml3bas_functions[] =
+{
+	"SGN",      /* 0xff80 */
+	"INT",      /* 0xff81 */
+	"ABS",      /* 0xff82 */
+	"FRE",      /* 0xff83 */
+	"POS",      /* 0xff84 */
+	"SQR",      /* 0xff85 */
+	"LOG",      /* 0xff86 */
+	"EXP",      /* 0xff87 */
+	"COS",      /* 0xff88 */
+	"SIN",      /* 0xff89 */
+	"TAN",      /* 0xff8a */
+	"ATN",      /* 0xff8b */
+	"PEEK",     /* 0xff8c */
+	"LEN",      /* 0xff8d */
+	"STR$",     /* 0xff8e */
+	"VAL",      /* 0xff8f */
+	"ASC",      /* 0xff90 */
+	"CHR$",     /* 0xff91 */
+	"CINT",     /* 0xff92 */
+	"CSNG",     /* 0xff93 */
+	"CDBL",     /* 0xff94 */
+	"FIX",      /* 0xff95 */
+	"SPACE$",   /* 0xff96 */
+	"HEX$",     /* 0xff97 */
+	"OCT$",     /* 0xff98 */
+	"LOF",      /* 0xff99 */
+	"EOF",      /* 0xff9a */
+	"PEN",      /* 0xff9b */
+	"LEFT$",    /* 0xff9c */
+	"RIGHT$",   /* 0xff9d */
+	"MID$",     /* 0xff9e */
+	"INSTR",    /* 0xff9f */
+	"SCREEN",   /* 0xffa0 */
+	"VARPTR",   /* 0xffa1 */
+	"STRING$",  /* 0xffa2 */
+	"RND",      /* 0xffa3 */
+	"INKEY$",   /* 0xffa4 */
+	"INPUT",    /* 0xffa5 */
+	"CSRLIN",   /* 0xffa6 */
+	"POINT",    /* 0xffa7 */
+	"TIME",     /* 0xffa8 */
+	"DATE"      /* 0xffa9 */
+};
+
+
 #ifdef BASIC_
 /* ----------------------------------------------------------------------- *
  * CBM machines                                                            *
@@ -2923,3 +3067,48 @@ void filter_vzbas_getinfo(UINT32 state, union filterinfo *info)
 		case FILTINFO_PTR_WRITEFILE:    info->write_file = vzbas_writefile; break;
 	}
 }
+
+
+
+/***************************************************************************
+    BML3 BASIC
+***************************************************************************/
+
+static const basictoken_tableent bml3bas_tokenents[] =
+{
+	{ 0x00, 0x80,   bml3bas_statements, ARRAY_LENGTH(bml3bas_statements) },
+	{ 0xff, 0x80,   bml3bas_functions,  ARRAY_LENGTH(bml3bas_functions) }
+};
+
+static const basictokens bml3bas_tokens =
+{
+	0x2600,
+	3,
+	TRUE,
+	bml3bas_tokenents,
+	ARRAY_LENGTH(bml3bas_tokenents)
+};
+
+static imgtoolerr_t bml3bas_readfile(imgtool_partition *partition, const char *filename,
+	const char *fork, imgtool_stream *destf)
+{
+	return basic_readfile(&bml3bas_tokens, partition, filename, fork, destf);
+}
+
+static imgtoolerr_t bml3bas_writefile(imgtool_partition *partition, const char *filename,
+	const char *fork, imgtool_stream *sourcef, option_resolution *opts)
+{
+	return basic_writefile(&bml3bas_tokens, partition, filename, fork, sourcef, opts);
+}
+
+void filter_bml3bas_getinfo(UINT32 state, union filterinfo *info)
+{
+	switch(state)
+	{
+		case FILTINFO_STR_NAME:         info->s = "bml3bas"; break;
+		case FILTINFO_STR_HUMANNAME:    info->s = "Basic Master Level 3 Tokenized Basic Files"; break;
+		case FILTINFO_PTR_READFILE:     info->read_file = bml3bas_readfile; break;
+		case FILTINFO_PTR_WRITEFILE:    info->write_file = bml3bas_writefile; break;
+	}
+}
+

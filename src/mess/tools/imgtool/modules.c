@@ -111,5 +111,6 @@ MODULE(thom_sap_basic)
 MODULE(cybiko)
 MODULE(cybikoxt)
 MODULE(psion)
+MODULE(bml3)
 
 #endif /* MODULES_RECURSIVE */
