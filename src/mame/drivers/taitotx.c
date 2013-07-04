@@ -166,15 +166,114 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( chaosbrk )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "chaosbreaker_v2_02j", 0, SHA1(8fe7bdc20a8d9e81f08cef60324ed9ac978a16e9) )
+ROM_END
+
+ROM_START( goketsuj )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
+	DISK_IMAGE( "goketsuji_v200906230", 0, SHA1(f0733fbb42994208e18c6afe67f1e9746351a3a2) )
+ROM_END
+
+ROM_START( gwinggen )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "gigawing_v2_02j", 0, SHA1(e09a2e5019111765689cb205cc94e7868c55e9ca) )
+ROM_END
+
+ROM_START( homura )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "homura_v2_04jpn", 0, SHA1(0d9d24583fa786b82bf27447408111bd4686033e) )
+ROM_END
+
 ROM_START( hotgmkmp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
 
-	DISK_REGION( "hdd" ) // Single 40GB drive
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "wdc wd400eb-11cpf0", 0, SHA1(15f8cf77b5bdc516a891022462a42521be1d7553) )
 ROM_END
 
+ROM_START( kof98um )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
 
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "kof98um_v1_00", 0, SHA1(cf21747ddcdf802d766a2bd6a3d75a965e89b2cf) )
+ROM_END
+
+ROM_START( raiden3 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "raiden3_v2_01j", 0, SHA1(60142f765a0706e938b91cc41dc14eb67bd78615) )
+ROM_END
+
+ROM_START( raiden4 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "raiden4_v1_00j", 0, SHA1(f5ad509f57067089e0217df6d05036484b06a41a) )
+ROM_END
+
+ROM_START( shikiga3 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 20GB drive
+	DISK_IMAGE( "shikigami3_v2_06jpn", 0, SHA1(4bf41ab1a3f2cd51cd2b1e6183959d2a4878449d) )
+ROM_END
+
+ROM_START( spicaadv )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
+	DISK_IMAGE( "spicaadventure_v2_03j", 0, SHA1(218ee0670a7b895f42480f0fe6719ecd4f4ba9e6) )
+ROM_END
+
+ROM_START( trbwtchs )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
+	DISK_IMAGE( "TroubleWitches_AC_V1.00J", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
+ROM_END
+
+
+GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, homura,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  GAME_NOT_WORKING | GAME_NO_SOUND )
-
+GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Seibu Kaihatsu/Moss Ltd", "Raiden III (v2.01J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Seibu Kaihatsu/Moss Ltd", "Raiden IV (v1.00J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  GAME_NOT_WORKING | GAME_NO_SOUND )

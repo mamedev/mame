@@ -2472,10 +2472,21 @@ batlgr2         // E87 (c) 2000 Taito (2.04J)
 batlgr2a        // E87 (c) 2000 Taito (2.01J)
 raizpin         // F14 (c) 2002 Taito
 
-// Taito Type-X / X+/ X2 / X Zero
-hotgmkmp		// (c) 2005 XNauts
-
 invqix          // F34 (c) 2003 Taito Corporation
+
+// Taito Type-X / X+/ X2 / X Zero
+
+chaosbrk        // (c) 2004 Taito Corporation
+gwinggen        // (c) 2004 Takumi Corporation
+homura          // (c) 2005 SKonec Entertainment
+hotgmkmp        // (c) 2005 XNauts
+raiden3         // (c) 2005 Seibu Kaihatsu/Moss Ltd
+spicaadv        // (c) 2005 Taito Corporation
+shikiga3        // (c) 2006 Alfa System/SKonec Entertainment
+raiden4         // (c) 2007 Seibu Kaihatsu/Moss Ltd
+kof98um         // (c) 2008 SNK
+trbwtchs        // (c) 2008 Adventure Planning Service/Studio SiestA
+goketsuj        // (c) 2009 Atlus
 
 // Toaplan games
 perfrman        // (c) 1985 Data East Corporation (Japan)
