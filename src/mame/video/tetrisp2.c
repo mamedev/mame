@@ -68,41 +68,27 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tetrisp2_state::tetrisp2_priority_w)
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_priority_w)
 {
-	//if (ACCESSING_BITS_8_15)
-	{
-		data |= ((data & 0xff00) >> 8);
+	if (ACCESSING_BITS_0_7)
 		m_priority[offset] = data;
-	}
+	else
+		m_priority[offset] = data >> 8;
 }
 
-
-WRITE8_MEMBER(tetrisp2_state::rockn_priority_w)
-{
-	//if (ACCESSING_BITS_8_15)
-	{
-		m_priority[offset] = data;
-	}
-}
-
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_rocknms_sub_priority[offset] = data;
-	}
-}
-
-READ16_MEMBER(tetrisp2_state::nndmseal_priority_r)
+READ16_MEMBER(tetrisp2_state::tetrisp2_priority_r)
 {
 	return m_priority[offset] | 0xff00;
 }
 
-READ8_MEMBER(tetrisp2_state::tetrisp2_priority_r)
+WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
 {
-	return m_priority[offset];
+	if (ACCESSING_BITS_0_7)
+		m_rocknms_sub_priority[offset] = data;
+	else
+		m_rocknms_sub_priority[offset] = data >> 8;
 }
+
 
 /***************************************************************************
 

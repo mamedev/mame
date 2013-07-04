@@ -3,8 +3,10 @@ class tetrisp2_state : public driver_device
 public:
 	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram2(*this, "spriteram2") ,
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
 		m_vram_fg(*this, "vram_fg"),
 		m_vram_bg(*this, "vram_bg"),
 		m_vram_rot(*this, "vram_rot"),
@@ -18,9 +20,11 @@ public:
 		m_rocknms_sub_vram_bg(*this, "sub_vram_bg"),
 		m_rocknms_sub_scroll_fg(*this, "sub_scroll_fg"),
 		m_rocknms_sub_scroll_bg(*this, "sub_scroll_bg"),
-		m_rocknms_sub_rotregs(*this, "sub_rotregs"),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_rocknms_sub_rotregs(*this, "sub_rotregs")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
 
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
@@ -80,11 +84,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tetrisp2_nvram_w);
 	DECLARE_WRITE16_MEMBER(tetrisp2_palette_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_palette_w);
-	DECLARE_WRITE8_MEMBER(tetrisp2_priority_w);
-	DECLARE_WRITE8_MEMBER(rockn_priority_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_priority_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_priority_w);
-	DECLARE_READ16_MEMBER(nndmseal_priority_r);
-	DECLARE_READ8_MEMBER(tetrisp2_priority_r);
+	DECLARE_READ16_MEMBER(tetrisp2_priority_r);
 	DECLARE_WRITE16_MEMBER(tetrisp2_vram_bg_w);
 	DECLARE_WRITE16_MEMBER(tetrisp2_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(tetrisp2_vram_rot_w);
@@ -117,8 +119,6 @@ public:
 	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
 	void init_rockn_timer();
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 };
 
 class stepstag_state : public tetrisp2_state
