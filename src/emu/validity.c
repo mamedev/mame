@@ -216,6 +216,24 @@ void validity_checker::check_all()
 	validate_core();
 	validate_inlines();
 
+	// if we had warnings or errors, output
+	if (m_errors > 0 || m_warnings > 0)
+	{
+		astring tempstr;
+		output_via_delegate(m_saved_error_output, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
+		if (m_errors > 0)
+		{
+			m_error_text.replace("\n", "\n   ");
+			output_via_delegate(m_saved_error_output, "Errors:\n   %s", m_error_text.cstr());
+		}
+		if (m_warnings > 0)
+		{
+			m_warning_text.replace("\n", "\n   ");
+			output_via_delegate(m_saved_error_output, "Warnings:\n   %s", m_warning_text.cstr());
+		}
+		output_via_delegate(m_saved_error_output, "\n");
+	}
+
 	// then iterate over all drivers and check them
 	m_drivlist.reset();
 	while (m_drivlist.next())
