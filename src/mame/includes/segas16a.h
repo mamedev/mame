@@ -64,6 +64,7 @@ public:
 			m_n7751(*this, "n7751"),
 			m_n7751_i8243(*this, "n7751_8243"),
 			m_nvram(*this, "nvram"),
+			m_segaic16vid(*this, "segaic16vid"),
 			m_sprites(*this, "sprites"),
 			m_workram(*this, "nvram"),
 			m_video_control(0),
@@ -159,6 +160,7 @@ protected:
 	optional_device<n7751_device> m_n7751;
 	optional_device<i8243_device> m_n7751_i8243;
 	required_device<nvram_device> m_nvram;
+	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<sega_sys16a_sprite_device> m_sprites;
 
 	// memory pointers

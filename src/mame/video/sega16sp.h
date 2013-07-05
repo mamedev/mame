@@ -38,7 +38,7 @@
 #pragma once
 
 #include "sprite.h"
-
+#include "segaic16.h"
 
 #ifndef __SEGA16SP_H__
 #define __SEGA16SP_H__
@@ -221,12 +221,15 @@ class sega_yboard_sprite_device : public sega_16bit_sprite_device
 public:
 	// construction/destruction
 	sega_yboard_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void set_rotate_ptr(rotate_info* segaic16_rotate) { m_segaic16_rotate = segaic16_rotate; }
 
 protected:
 	// subclass overrides
 	virtual void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
-};
 
+	rotate_info*						m_segaic16_rotate;
+};
+ 
 
 // device type definition
 extern const device_type SEGA_HANGON_SPRITES;

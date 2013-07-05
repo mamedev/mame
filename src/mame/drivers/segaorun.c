@@ -396,7 +396,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 	//  D1: (CONT) - affects sprite hardware
 	//  D0: Sound section reset (1= normal operation, 0= reset)
 
-	segaic16_set_display_enable(machine(), data & 0x20);
+	m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
 	m_adc_select = (data >> 2) & 7;
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -417,7 +417,7 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 	switch (index)
 	{
 		case 5:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::legacy_wrapper_r<segaic16_road_control_0_r>), this), write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_road_control_0_w>), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::sega_road_control_0_r), this), write16_delegate(FUNC(segaorun_state::sega_road_control_0_w), this));
 			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "roadram", write16_delegate());
 			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
 			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
@@ -436,8 +436,8 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 			break;
 
 		case 1:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_tileram_0_w>), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::legacy_wrapper<segaic16_textram_0_w>), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::sega_tileram_0_w), this));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::sega_textram_0_w), this));
 			break;
 
 		case 0:
@@ -543,7 +543,7 @@ void segaorun_state::machine_reset()
 	// reset misc components
 	if (m_custom_map != NULL)
 		m_mapper->configure_explicit(m_custom_map);
-	segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
 
 	// hook the RESET line, which resets CPU #1
 	m68k_set_reset_callback(m_maincpu, m68k_reset_callback);
@@ -747,7 +747,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			//  D7-D6: (ADC1-0)
 			//  D5: Screen display
 			m_adc_select = (data >> 6) & 3;
-			segaic16_set_display_enable(machine(), (data >> 5) & 1);
+			m_segaic16vid->segaic16_set_display_enable(machine(), (data >> 5) & 1);
 			return;
 
 		case 0x0020/2:
@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaorun_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_SHARE("cpu1rom")
 	AM_RANGE(0x060000, 0x067fff) AM_MIRROR(0x018000) AM_RAM AM_SHARE("cpu1ram")
 	AM_RANGE(0x080000, 0x080fff) AM_MIRROR(0x00f000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x090000, 0x09ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 ADDRESS_MAP_END
 
 
@@ -1090,6 +1090,8 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
+
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2120,9 +2122,9 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 		m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// point globals to allocated memory regions
-	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
+	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
+	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_adc_select));

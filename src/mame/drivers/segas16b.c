@@ -924,6 +924,10 @@ CPU  - 317-0092  |--------------------------------------------------------------
 //  requests
 //-------------------------------------------------
 
+
+
+
+
 void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
 {
 	switch (index)
@@ -937,8 +941,8 @@ void segas16b_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 in
 			break;
 
 		case 5: // 64k of tileram + 4k of textram
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas16b_state::legacy_wrapper<segaic16_tileram_0_w>), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas16b_state::legacy_wrapper<segaic16_textram_0_w>), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas16b_state::sega_tileram_0_w), this));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas16b_state::sega_textram_0_w), this));
 			break;
 
 		case 4: // 2k of spriteram
@@ -1028,7 +1032,7 @@ void segas16b_state::mapper_sound_w(UINT8 data)
 WRITE16_MEMBER( segas16b_state::rom_5704_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
+		m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
 }
 
 
@@ -1076,7 +1080,7 @@ WRITE16_MEMBER( segas16b_state::rom_5797_bank_math_w )
 
 		case 0x2000/2:
 			if (ACCESSING_BITS_0_7)
-				segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
+				m_segaic16vid->segaic16_tilemap_set_bank(machine(), 0, offset & 1, data & 7);
 			break;
 	}
 }
@@ -1149,10 +1153,10 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 			//  D1 : (Output to coin counter 2?)
 			//  D0 : Output to coin counter 1
 			//
-			segaic16_tilemap_set_flip(machine(), 0, data & 0x40);
+			m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x40);
 			m_sprites->set_flip(data & 0x40);
 			if (!m_disable_screen_blanking)
-				segaic16_set_display_enable(machine(), data & 0x20);
+				m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
 			set_led_status(machine(), 1, data & 0x08);
 			set_led_status(machine(), 0, data & 0x04);
 			coin_counter_w(machine(), 1, data & 0x02);
@@ -1314,7 +1318,7 @@ void segas16b_state::machine_reset()
 	synchronize(TID_INIT_I8751);
 
 	// reset tilemap state
-	segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
 
 	// configure sprite banks
 	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
@@ -3305,6 +3309,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segas16b_state, screen_update)
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6434,8 +6439,8 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::standard_io_w), this);
 
 	// point globals to allocated memory regions
-	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
+	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
+	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 
 	// save state
 	save_item(NAME(m_atomicp_sound_count));
@@ -6462,7 +6467,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	// configure special behaviors for the Korean boards
 	m_disable_screen_blanking = true;
 	m_atomicp_sound_divisor = 1;
-	segaic16_display_enable = 1;
+	m_segaic16vid->segaic16_display_enable = 1;
 
 	// allocate a sound timer
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
@@ -7018,8 +7023,8 @@ static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, isgsm_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) AM_REGION("bios", 0) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(standard_io_r, standard_io_w)
@@ -7155,7 +7160,7 @@ INPUT_PORTS_END
 
 void isgsm_state::machine_reset()
 {
-	segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
 
 	// configure sprite banks
 	for (int i = 0; i < 16; i++)

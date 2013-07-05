@@ -67,6 +67,7 @@ public:
 			m_cmptimer_2(*this, "cmptimer_2"),
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
+			m_segaic16vid(*this, "segaic16vid"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_tilemap_type(SEGAIC16_TILEMAP_16B),
@@ -140,9 +141,8 @@ public:
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	// wrappers for legacy functions (to be removed)
-	template<write16_space_func _Legacy>
-	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_HANDLER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
 
 protected:
 	// internal types
@@ -208,6 +208,7 @@ protected:
 	optional_device<sega_315_5250_compare_timer_device> m_cmptimer_2;
 	required_device<nvram_device> m_nvram;
 	required_device<sega_sys16b_sprite_device> m_sprites;
+	required_device<segaic16_video_device> m_segaic16vid;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

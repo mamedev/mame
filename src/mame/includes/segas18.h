@@ -60,6 +60,7 @@ public:
 			m_vdp(*this, "gen_vdp"),
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
+			m_segaic16vid(*this, "segaic16vid"),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
 			m_has_guns(false),
@@ -117,6 +118,9 @@ public:
 	template<write16_space_func _Legacy>
 	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(space, offset, data, mem_mask); }
 
+	DECLARE_WRITE16_HANDLER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
+
 protected:
 	// timer IDs
 	enum
@@ -153,6 +157,7 @@ protected:
 	required_device<sega_genesis_vdp_device> m_vdp;
 	required_device<nvram_device> m_nvram;
 	required_device<sega_sys16b_sprite_device> m_sprites;
+	required_device<segaic16_video_device> m_segaic16vid;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

@@ -479,7 +479,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 			if (((oldval ^ data) & 0x40) && !(data & 0x40))
 				machine().watchdog_reset();
 
-			segaic16_set_display_enable(machine(), data & 0x20);
+			m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x20);
 
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			if (m_soundcpu2 != NULL)
@@ -670,7 +670,7 @@ READ8_MEMBER( segaxbd_state::sound_data_r )
 
 void segaxbd_state::machine_reset()
 {
-	segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
 
 	// hook the RESET line, which resets CPU #1
 	m68k_set_reset_callback(m_maincpu, &segaxbd_state::m68k_reset_callback);
@@ -907,8 +907,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x0c0000, 0x0cffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("cmptimer_main", sega_315_5250_compare_timer_device, read, write)
@@ -926,7 +926,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x2ee000, 0x2effff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
@@ -948,7 +948,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x0ee000, 0x0effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x0ee000, 0x0effff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
 ADDRESS_MAP_END
 
@@ -1594,6 +1594,7 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
 
 	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3198,9 +3199,9 @@ DRIVER_INIT_MEMBER(segaxbd_state,generic)
 	m_iochip_custom_io_w[0][3] = iowrite_delegate(FUNC(segaxbd_state::generic_iochip0_lamps_w), this);
 
 	// point globals to allocated memory regions
-	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
+	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
+	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_timer_irq_state));

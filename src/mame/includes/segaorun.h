@@ -59,6 +59,7 @@ public:
 			m_i8255(*this, "i8255"),
 			m_nvram(*this, "nvram"),
 			m_sprites(*this, "sprites"),
+			m_segaic16vid(*this, "segaic16vid"),
 			m_workram(*this, "workram"),
 			m_custom_map(NULL),
 			m_shangon_video(false),
@@ -99,11 +100,10 @@ public:
 	UINT32 screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	// wrappers for legacy functions (to be removed)
-	template<read16_space_func _Legacy>
-	READ16_MEMBER( legacy_wrapper_r ) { return _Legacy(space, offset, mem_mask); }
-	template<write16_space_func _Legacy>
-	WRITE16_MEMBER( legacy_wrapper ) { _Legacy(space, offset, data, mem_mask); }
+	DECLARE_WRITE16_HANDLER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
+	DECLARE_READ16_HANDLER( sega_road_control_0_r ) { return m_segaic16vid->segaic16_road_control_0_r(space,offset,mem_mask); };
+	DECLARE_WRITE16_HANDLER( sega_road_control_0_w ) { m_segaic16vid->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
 protected:
 	// timer IDs
@@ -137,6 +137,7 @@ protected:
 	required_device<i8255_device> m_i8255;
 	optional_device<nvram_device> m_nvram;
 	required_device<sega_16bit_sprite_device> m_sprites;
+	required_device<segaic16_video_device> m_segaic16vid;
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;

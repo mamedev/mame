@@ -369,30 +369,35 @@ Quick review of the system16 hardware:
 
 
 
-/*************************************
- *
- *  Globals
- *
- *************************************/
+const device_type SEGAIC16VID = &device_creator<segaic16_video_device>;
 
-UINT8 segaic16_display_enable;
-UINT16 *segaic16_tileram_0;
-UINT16 *segaic16_textram_0;
-UINT16 *segaic16_roadram_0;
-UINT16 *segaic16_rotateram_0;
-
-struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
-struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
+segaic16_video_device::segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEGAIC16VID, "Sega 16-bit Video", tag, owner, clock, "segaic16_video", __FILE__)
+{
+}
 
 
+void segaic16_video_device::device_config_complete()
+{
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
+}
 
-static struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
+void segaic16_video_device::device_start()
+{
+
+}
+
+void segaic16_video_device::device_reset()
+{
+
+}
+
+
+
+
+
+
+
 
 
 
@@ -402,7 +407,7 @@ static struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
  *
  *************************************/
 
-void segaic16_set_display_enable(running_machine &machine, int enable)
+void segaic16_video_device::segaic16_set_display_enable(running_machine &machine, int enable)
 {
 	enable = (enable != 0);
 	if (segaic16_display_enable != enable)
@@ -421,7 +426,7 @@ void segaic16_set_display_enable(running_machine &machine, int enable)
  *
  *************************************/
 
-static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
+void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
 {
 	int leftmin = -1, leftmax = -1, rightmin = -1, rightmax = -1;
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
@@ -623,31 +628,31 @@ static void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilem
  *
  *******************************************************************************************/
 
-static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 12) & 1;
 }
 
 
-static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16a_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 11) & 1;
 }
 
 
-static void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
+void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 
@@ -835,7 +840,7 @@ static void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct til
  *
  *******************************************************************************************/
 
-static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
@@ -844,12 +849,12 @@ static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
 
-static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
@@ -857,12 +862,12 @@ static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
-	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
 
-static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_tile_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
@@ -871,12 +876,12 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
-	SET_TILE_INFO(0, code, color, 0);
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
 
-static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
+TILE_GET_INFO_MEMBER( segaic16_video_device::segaic16_tilemap_16b_alt_text_info )
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)param;
 	UINT16 data = info->rambase[tile_index];
@@ -884,12 +889,12 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
-	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
+	SET_TILE_INFO_MEMBER(0, bank * info->banksize + code, color, 0);
 	tileinfo.category = (data >> 15) & 1;
 }
 
 
-static void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
+void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 	UINT16 xscroll, yscroll, pages;
@@ -983,7 +988,7 @@ static void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct til
 }
 
 
-static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
+TIMER_CALLBACK_MEMBER( segaic16_video_device::segaic16_tilemap_16b_latch_values )
 {
 	struct tilemap_info *info = &bg_tilemap[param];
 	UINT16 *textram = info->textram;
@@ -998,11 +1003,11 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	info->latch_timer->adjust(machine.primary_screen->time_until_pos(261), param);
+	info->latch_timer->adjust(machine().primary_screen->time_until_pos(261), param);
 }
 
 
-static void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info)
+void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
 	info->latch_timer->adjust(machine.primary_screen->time_until_pos(261), info->index);
@@ -1016,11 +1021,11 @@ static void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_
  *
  *************************************/
 
-void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks)
+void segaic16_video_device::segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
-	tile_get_info_func get_text_info;
-	tile_get_info_func get_tile_info;
+	tilemap_get_info_delegate get_text_info;
+	tilemap_get_info_delegate get_tile_info;
 	int pagenum;
 	int i;
 
@@ -1049,8 +1054,8 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 	switch (type)
 	{
 		case SEGAIC16_TILEMAP_HANGON:
-			get_text_info = segaic16_tilemap_16a_text_info;
-			get_tile_info = segaic16_tilemap_16a_tile_info;
+			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16a_text_info),this);
+			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16a_tile_info),this);
 			info->numpages = 4;
 			info->draw_layer = segaic16_tilemap_16a_draw_layer;
 			info->reset = NULL;
@@ -1058,8 +1063,8 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 			break;
 
 		case SEGAIC16_TILEMAP_16A:
-			get_text_info = segaic16_tilemap_16a_text_info;
-			get_tile_info = segaic16_tilemap_16a_tile_info;
+			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16a_text_info),this);
+			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16a_tile_info),this);
 			info->numpages = 8;
 			info->draw_layer = segaic16_tilemap_16a_draw_layer;
 			info->reset = NULL;
@@ -1067,21 +1072,21 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 			break;
 
 		case SEGAIC16_TILEMAP_16B:
-			get_text_info = segaic16_tilemap_16b_text_info;
-			get_tile_info = segaic16_tilemap_16b_tile_info;
+			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_text_info),this);
+			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_tile_info),this);
 			info->numpages = 16;
 			info->draw_layer = segaic16_tilemap_16b_draw_layer;
 			info->reset = segaic16_tilemap_16b_reset;
-			info->latch_timer = machine.scheduler().timer_alloc(FUNC(segaic16_tilemap_16b_latch_values));
+			info->latch_timer = machine.scheduler().timer_alloc( timer_expired_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_latch_values),this) );
 			break;
 
 		case SEGAIC16_TILEMAP_16B_ALT:
-			get_text_info = segaic16_tilemap_16b_alt_text_info;
-			get_tile_info = segaic16_tilemap_16b_alt_tile_info;
+			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_alt_text_info),this);
+			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_alt_tile_info),this);
 			info->numpages = 16;
 			info->draw_layer = segaic16_tilemap_16b_draw_layer;
 			info->reset = segaic16_tilemap_16b_reset;
-			info->latch_timer = machine.scheduler().timer_alloc(FUNC(segaic16_tilemap_16b_latch_values));
+			info->latch_timer = machine.scheduler().timer_alloc( timer_expired_delegate(FUNC(segaic16_video_device::segaic16_tilemap_16b_latch_values),this) );
 			break;
 
 		default:
@@ -1089,7 +1094,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 	}
 
 	/* create the tilemap for the text layer */
-	info->textmap = tilemap_create(machine, get_text_info, TILEMAP_SCAN_ROWS,  8,8, 64,28);
+	info->textmap = &machine.tilemap().create(get_text_info, TILEMAP_SCAN_ROWS,  8,8, 64,28);
 
 	/* configure it */
 	info->textmap_info.rambase = info->textram;
@@ -1105,7 +1110,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
-		info->tilemaps[pagenum] = tilemap_create(machine, get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
+		info->tilemaps[pagenum] = &machine.tilemap().create(get_tile_info, TILEMAP_SCAN_ROWS,  8,8, 64,32);
 
 		/* configure the tilemap */
 		info->tmap_info[pagenum].rambase = info->tileram + pagenum * 64*32;
@@ -1127,7 +1132,7 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
  *
  *************************************/
 
-void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark)
+void segaic16_video_device::segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark)
 {
 	running_machine &machine = screen.machine();
 	struct tilemap_info *info = &bg_tilemap[which];
@@ -1149,7 +1154,7 @@ void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const re
  *
  *************************************/
 
-void segaic16_tilemap_reset(running_machine &machine, int which)
+void segaic16_video_device::segaic16_tilemap_reset(running_machine &machine, int which)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1165,7 +1170,7 @@ void segaic16_tilemap_reset(running_machine &machine, int which)
  *
  *************************************/
 
-void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset)
+void segaic16_video_device::segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1186,7 +1191,7 @@ void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum,
  *
  *************************************/
 
-void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
+void segaic16_video_device::segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 	int pagenum;
@@ -1211,7 +1216,7 @@ void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip)
  *
  *************************************/
 
-void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable)
+void segaic16_video_device::segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1232,7 +1237,7 @@ void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int ena
  *
  *************************************/
 
-void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable)
+void segaic16_video_device::segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1253,14 +1258,26 @@ void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int ena
  *
  *************************************/
 
-WRITE16_HANDLER( segaic16_tileram_0_w )
+READ16_MEMBER( segaic16_video_device::segaic16_tileram_0_r )
+{
+	return segaic16_tileram_0[offset];
+}
+
+
+WRITE16_MEMBER( segaic16_video_device::segaic16_tileram_0_w )
 {
 	COMBINE_DATA(&segaic16_tileram_0[offset]);
 	bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
-WRITE16_HANDLER( segaic16_textram_0_w )
+READ16_MEMBER( segaic16_video_device::segaic16_textram_0_r )
+{
+	return segaic16_textram_0[offset];
+}
+
+
+WRITE16_MEMBER( segaic16_video_device::segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
@@ -1777,7 +1794,7 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_ind16 &bitm
  *
  *************************************/
 
-void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
+void segaic16_video_device::segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
 {
 	struct road_info *info = &segaic16_road[which];
 
@@ -1830,7 +1847,7 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
  *
  *************************************/
 
-void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+void segaic16_video_device::segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	struct road_info *info = &segaic16_road[which];
 	(*info->draw)(info, bitmap, cliprect, priority);
@@ -1844,7 +1861,7 @@ void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &clipre
  *
  *************************************/
 
-READ16_HANDLER( segaic16_road_control_0_r )
+READ16_MEMBER( segaic16_video_device::segaic16_road_control_0_r )
 {
 	struct road_info *info = &segaic16_road[0];
 
@@ -1867,7 +1884,7 @@ READ16_HANDLER( segaic16_road_control_0_r )
 }
 
 
-WRITE16_HANDLER( segaic16_road_control_0_w )
+WRITE16_MEMBER( segaic16_video_device::segaic16_road_control_0_w )
 {
 	struct road_info *info = &segaic16_road[0];
 
@@ -1885,7 +1902,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
  *
  *************************************/
 
-void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase)
+void segaic16_video_device::segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase)
 {
 	struct rotate_info *info = &segaic16_rotate[which];
 
@@ -1932,7 +1949,7 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
  *
  *************************************/
 
-void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap)
+void segaic16_video_device::segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap)
 {
 	struct rotate_info *info = &segaic16_rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];
@@ -1995,7 +2012,7 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bit
  *
  *************************************/
 
-READ16_HANDLER( segaic16_rotate_control_0_r )
+READ16_MEMBER( segaic16_video_device::segaic16_rotate_control_0_r )
 {
 	struct rotate_info *info = &segaic16_rotate[0];
 

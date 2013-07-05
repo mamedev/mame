@@ -232,7 +232,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 	m_video_control = data;
 
 	// bit 7: screen flip
-	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
+	m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: set 8751 interrupt line
@@ -240,7 +240,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bit 4: enable display
-	segaic16_set_display_enable(machine(), data & 0x10);
+	m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x10);
 
 	// bits 0 & 1: update coin counters
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -269,8 +269,8 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 	//       1= sound is enabled
 	//
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+	m_segaic16vid->segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
+	m_segaic16vid->segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
 }
 
 
@@ -500,7 +500,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 
 	// enable/disable the display
 	if (data & 0x40)
-		segaic16_set_display_enable(machine(), 1);
+		m_segaic16vid->segaic16_set_display_enable(machine(), 1);
 
 	// apply an extra boost if the main CPU is just waking up
 	if ((m_mcu_control ^ data) & 0x40)
@@ -760,12 +760,12 @@ void segas16a_state::quartet_i8751_sim()
 
 	// X scroll values
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	segaic16_textram_0_w(space, 0xff8/2, m_workram[0x0d14/2], 0xffff);
-	segaic16_textram_0_w(space, 0xffa/2, m_workram[0x0d18/2], 0xffff);
+	m_segaic16vid->segaic16_textram_0_w(space, 0xff8/2, m_workram[0x0d14/2], 0xffff);
+	m_segaic16vid->segaic16_textram_0_w(space, 0xffa/2, m_workram[0x0d18/2], 0xffff);
 
 	// page values
-	segaic16_textram_0_w(space, 0xe9e/2, m_workram[0x0d1c/2], 0xffff);
-	segaic16_textram_0_w(space, 0xe9c/2, m_workram[0x0d1e/2], 0xffff);
+	m_segaic16vid->segaic16_textram_0_w(space, 0xe9e/2, m_workram[0x0d1c/2], 0xffff);
+	m_segaic16vid->segaic16_textram_0_w(space, 0xe9c/2, m_workram[0x0d1e/2], 0xffff);
 }
 
 
@@ -997,8 +997,8 @@ void segas16a_state::sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
 static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas16a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
@@ -1950,6 +1950,7 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
 
 	MCFG_SEGA_SYS16A_SPRITES_ADD("sprites")
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	MCFG_GFXDECODE(segas16a)
 	MCFG_PALETTE_LENGTH(2048*3)
@@ -3403,8 +3404,8 @@ DRIVER_INIT_MEMBER(segas16a_state,generic)
 	m_custom_io_w = write16_delegate(FUNC(segas16a_state::standard_io_w), this);
 
 	// point globals to allocated memory regions
-	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
+	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
+	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 
 	// save state
 	save_item(NAME(m_video_control));

@@ -118,14 +118,14 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 	//
 
 	// bit 7: screen flip
-	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
+	m_segaic16vid->segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
 	m_sprites->set_flip(data & 0x80);
 
 	// bit 6: shadow/highlight control
 	m_shadow = ~data & 0x40;
 
 	// bit 4: enable display
-	segaic16_set_display_enable(machine(), data & 0x10);
+	m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x10);
 
 	// bits 2 & 3: control the lamps
 	set_led_status(machine(), 1, data & 0x08);
@@ -161,8 +161,8 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bits 1 & 2: tilemap origin
-	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+	m_segaic16vid->segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
+	m_segaic16vid->segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
 
 	// bit 0: sound mute
 	machine().sound().system_enable(data & 0x01);
@@ -409,7 +409,7 @@ INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
 void segahang_state::machine_reset()
 {
 	// reset misc components
-	segaic16_tilemap_reset(machine(), 0);
+	m_segaic16vid->segaic16_tilemap_reset(machine(), 0);
 
 	// queue up a timer to either boost interleave or disable the MCU
 	synchronize(TID_INIT_I8751);
@@ -472,8 +472,8 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("subcpu", 0)
@@ -486,8 +486,8 @@ static ADDRESS_MAP_START( sharrier_map, AS_PROGRAM, 16, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_SHARE("tileram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x100000, 0x107fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_tileram_0_r, segaic16_tileram_0_w) AM_SHARE("textram")
+	AM_RANGE(0x108000, 0x108fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_textram_0_r, segaic16_textram_0_w) AM_SHARE("tileram")
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("subram")
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("sprites")
@@ -844,6 +844,8 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 
 	MCFG_I8255_ADD( "i8255_1", hangon_ppi_intf_0 )
 	MCFG_I8255_ADD( "i8255_2", hangon_ppi_intf_1 )
+
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	// video hardware
 	MCFG_GFXDECODE(segahang)
@@ -1815,9 +1817,9 @@ ROM_END
 DRIVER_INIT_MEMBER(segahang_state,generic)
 {
 	// point globals to allocated memory regions
-	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
-	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
+	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
+	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save states
 	save_item(NAME(m_adc_select));

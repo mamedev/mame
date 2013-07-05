@@ -56,6 +56,7 @@ public:
 			m_soundcpu(*this, "soundcpu"),
 			m_bsprites(*this, "bsprites"),
 			m_ysprites(*this, "ysprites"),
+			m_segaic16vid(*this, "segaic16vid"),
 			m_pdrift_bank(0),
 			m_scanline_timer(NULL),
 			m_irq2_scanline(0),
@@ -126,6 +127,7 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	required_device<sega_sys16b_sprite_device> m_bsprites;
 	required_device<sega_yboard_sprite_device> m_ysprites;
+	required_device<segaic16_video_device> m_segaic16vid;
 
 	// configuration
 	output_delegate m_output_cb1;

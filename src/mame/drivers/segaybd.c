@@ -204,7 +204,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 			//  D2 = YRES
 			//  D1-D0 = ADC0-1
 			//
-			segaic16_set_display_enable(machine(), data & 0x80);
+			m_segaic16vid->segaic16_set_display_enable(machine(), data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				machine().watchdog_reset();
 			m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16, segaybd_state )
 	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_SHARE("rotateram")
 	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_SHARE("bsprites")
 	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x198000, 0x19ffff) AM_READ_LEGACY(segaic16_rotate_control_0_r)
+	AM_RANGE(0x198000, 0x19ffff) AM_DEVREAD("segaic16vid", segaic16_video_device, segaic16_rotate_control_0_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1218,6 +1218,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 
 	MCFG_SEGA_SYS16B_SPRITES_ADD("bsprites")
 	MCFG_SEGA_YBOARD_SPRITES_ADD("ysprites")
+	MCFG_SEGAIC16VID_ADD("segaic16vid")
 
 	MCFG_PALETTE_LENGTH(8192*3)
 
@@ -2181,7 +2182,7 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 	m_scanline_timer = timer_alloc(TID_IRQ2_GEN);
 
 	// point globals to allocated memory regions
-	segaic16_rotateram_0 = reinterpret_cast<UINT16 *>(memshare("rotateram")->ptr());
+	m_segaic16vid->segaic16_rotateram_0 = reinterpret_cast<UINT16 *>(memshare("rotateram")->ptr());
 
 	// save state
 	save_item(NAME(m_pdrift_bank));

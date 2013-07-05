@@ -46,7 +46,8 @@
 void segaybd_state::video_start()
 {
 	// initialize the rotation layer
-	segaic16_rotate_init(machine(), 0, SEGAIC16_ROTATE_YBOARD, 0x000);
+	m_segaic16vid->segaic16_rotate_init(machine(), 0, SEGAIC16_ROTATE_YBOARD, 0x000);
+	m_ysprites->set_rotate_ptr(m_segaic16vid->segaic16_rotate);
 }
 
 
@@ -58,7 +59,7 @@ void segaybd_state::video_start()
 UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// if no drawing is happening, fill with black and get out
-	if (!segaic16_display_enable)
+	if (!m_segaic16vid->segaic16_display_enable)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
@@ -71,7 +72,7 @@ UINT32 segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bsprites->draw_async(cliprect);
 
 	// apply rotation
-	segaic16_rotate_draw(machine(), 0, bitmap, cliprect, m_ysprites->bitmap());
+	m_segaic16vid->segaic16_rotate_draw(machine(), 0, bitmap, cliprect, m_ysprites->bitmap());
 
 	// mix in 16B sprites
 	bitmap_ind16 &sprites = m_bsprites->bitmap();

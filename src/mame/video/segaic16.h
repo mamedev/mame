@@ -4,17 +4,13 @@
 
 ***************************************************************************/
 
+#pragma once
+#ifndef __SEGAIC16VID_H__
+#define __SEGAIC16VID_H__
+
+
 #include "devcb.h"
 
-/* globals */
-extern UINT8 segaic16_display_enable;
-extern UINT16 *segaic16_tileram_0;
-extern UINT16 *segaic16_textram_0;
-extern UINT16 *segaic16_roadram_0;
-extern UINT16 *segaic16_rotateram_0;
-
-/* misc functions */
-void segaic16_set_display_enable(running_machine &machine, int enable);
 
 /* tilemap systems */
 #define SEGAIC16_MAX_TILEMAPS       1
@@ -28,17 +24,6 @@ void segaic16_set_display_enable(running_machine &machine, int enable);
 #define SEGAIC16_TILEMAP_BACKGROUND 1
 #define SEGAIC16_TILEMAP_TEXT       2
 
-void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
-void segaic16_tilemap_reset(running_machine &machine, int which);
-void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
-void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
-void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
-void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
-void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable);
-
-DECLARE_WRITE16_HANDLER( segaic16_tileram_0_w );
-DECLARE_WRITE16_HANDLER( segaic16_textram_0_w );
-
 /* road systems */
 #define SEGAIC16_MAX_ROADS          1
 
@@ -50,19 +35,14 @@ DECLARE_WRITE16_HANDLER( segaic16_textram_0_w );
 #define SEGAIC16_ROAD_BACKGROUND    0
 #define SEGAIC16_ROAD_FOREGROUND    1
 
-void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
-void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-DECLARE_READ16_HANDLER( segaic16_road_control_0_r );
-DECLARE_WRITE16_HANDLER( segaic16_road_control_0_w );
+
 
 /* rotation systems */
 #define SEGAIC16_MAX_ROTATE         1
 
 #define SEGAIC16_ROTATE_YBOARD      0
 
-void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
-void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap);
-DECLARE_READ16_HANDLER( segaic16_rotate_control_0_r );
+
 
 /*************************************
  *
@@ -134,5 +114,78 @@ struct rotate_info
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-extern struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
-extern struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
+
+
+class segaic16_video_device : public device_t
+{
+public:
+	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~segaic16_video_device() {}
+	
+	UINT8 segaic16_display_enable;
+	UINT16 *segaic16_tileram_0;
+	UINT16 *segaic16_textram_0;
+	UINT16 *segaic16_roadram_0;
+	UINT16 *segaic16_rotateram_0;
+
+	void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable);
+	void segaic16_tilemap_set_rowscroll(running_machine &machine, int which, int enable);
+	void segaic16_tilemap_set_flip(running_machine &machine, int which, int flip);
+	void segaic16_tilemap_set_bank(running_machine &machine, int which, int banknum, int offset);
+	void segaic16_tilemap_reset(running_machine &machine, int which);
+	void segaic16_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int map, int priority, int priority_mark);
+//	void segaic16_tilemap_16b_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//	void segaic16_tilemap_16a_draw_layer(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int flags, int priority);
+//	void segaic16_draw_virtual_tilemap(running_machine &machine, struct tilemap_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority);
+//	void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_info *info);
+
+	TIMER_CALLBACK_MEMBER( segaic16_tilemap_16b_latch_values );
+
+	struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
+	struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
+	struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
+
+	void segaic16_set_display_enable(running_machine &machine, int enable);
+	void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
+	void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
+	void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
+
+	DECLARE_READ16_MEMBER( segaic16_tileram_0_r );
+	DECLARE_READ16_MEMBER( segaic16_textram_0_r );
+	DECLARE_WRITE16_MEMBER( segaic16_tileram_0_w );
+	DECLARE_WRITE16_MEMBER( segaic16_textram_0_w );
+
+	void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap);
+
+	DECLARE_READ16_MEMBER( segaic16_road_control_0_r );
+	DECLARE_WRITE16_MEMBER( segaic16_road_control_0_w );
+
+
+	DECLARE_READ16_MEMBER( segaic16_rotate_control_0_r );
+
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_tile_info );
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_text_info );
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_alt_tile_info );
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16b_alt_text_info );
+
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16a_tile_info );
+	TILE_GET_INFO_MEMBER( segaic16_tilemap_16a_text_info );
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	// internal state
+};
+
+extern const device_type SEGAIC16VID;
+
+#define MCFG_SEGAIC16VID_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0) \
+
+
+#endif
