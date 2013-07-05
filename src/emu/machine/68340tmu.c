@@ -1,13 +1,12 @@
 /* 68340 TIMER module */
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68340.h"
 
 
-
-READ32_MEMBER( m68000_base_device::m68340_internal_timer_r )
+READ32_MEMBER( m68340cpu_device::m68340_internal_timer_r )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_timer* timer = m68k->m68340TIMER;
 	assert(timer != NULL);
 
@@ -20,9 +19,9 @@ READ32_MEMBER( m68000_base_device::m68340_internal_timer_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68000_base_device::m68340_internal_timer_w )
+WRITE32_MEMBER( m68340cpu_device::m68340_internal_timer_w )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_timer* timer = m68k->m68340TIMER;
 	assert(timer != NULL);
 

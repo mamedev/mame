@@ -136,7 +136,7 @@ enum
 	CPU_TYPE_020,       // 2
 	CPU_TYPE_030,       // 3
 	CPU_TYPE_040,       // 4
-	CPU_TYPE_68340,     // 5
+	CPU_TYPE_FSCPU32,     // 5
 	CPU_TYPE_COLDFIRE,  // 6
 	NUM_CPUS
 };

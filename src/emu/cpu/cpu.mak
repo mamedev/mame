@@ -1354,10 +1354,6 @@ $(CPUOBJ)/mc68hc11/mc68hc11.o:  $(CPUSRC)/mc68hc11/mc68hc11.c \
 ifneq ($(filter M680X0,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kops.o \
-	$(CPUOBJ)/m68000/68340sim.o \
-	$(CPUOBJ)/m68000/68340dma.o \
-	$(CPUOBJ)/m68000/68340ser.o \
-	$(CPUOBJ)/m68000/68340tmu.o \
 
 DASMOBJS += $(CPUOBJ)/m68000/m68kdasm.o
 ifndef M68KMAKE
@@ -1396,12 +1392,7 @@ $(CPUOBJ)/m68000/m68kcpu.o:     $(CPUOBJ)/m68000/m68kops.c \
 
 # m68kcpu.h now includes m68kops.h; m68kops.h won't exist until m68kops.c has been made
 $(CPUSRC)/m68000/m68kcpu.h: $(CPUOBJ)/m68000/m68kops.c
-$(CPUSRC)/m68000/68340sim.c: $(CPUOBJ)/m68000/m68kops.c
 
-$(CPUSRC)/m68000/68340dma.c: $(CPUOBJ)/m68000/m68kops.c
-
-$(CPUSRC)/m68000/68340ser.c: $(CPUOBJ)/m68000/m68kops.c
-$(CPUSRC)/m68000/68340tmu.c: $(CPUOBJ)/m68000/m68kops.c
 
 
 #-------------------------------------------------

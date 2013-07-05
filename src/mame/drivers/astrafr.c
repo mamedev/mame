@@ -11,7 +11,7 @@ Platform also used by Lowen? (at least some of their sets use the same address l
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "machine/68340.h"
 
 
 
@@ -113,8 +113,8 @@ public:
 	}
 
 	// devices
-	required_device<m68000_base_device> m_maincpu;
-	optional_device<m68000_base_device> m_slavecpu;
+	required_device<m68340cpu_device> m_maincpu;
+	optional_device<m68340cpu_device> m_slavecpu;
 
 	DECLARE_DRIVER_INIT(astradec_sml);
 	DECLARE_DRIVER_INIT(astradec);

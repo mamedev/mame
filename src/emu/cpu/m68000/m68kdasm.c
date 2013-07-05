@@ -3821,7 +3821,7 @@ static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned i
 		case M68K_CPU_TYPE_68LC040:
 			g_cpu_type = TYPE_68040;
 			break;
-		case M68K_CPU_TYPE_68340:
+		case M68K_CPU_TYPE_FSCPU32:
 			g_cpu_type = TYPE_68340;
 			break;
 		case M68K_CPU_TYPE_COLDFIRE:
@@ -4018,7 +4018,7 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 		case M68K_CPU_TYPE_68020:
 		case M68K_CPU_TYPE_68030:
 		case M68K_CPU_TYPE_68EC030:
-		case M68K_CPU_TYPE_68340:
+		case M68K_CPU_TYPE_FSCPU32:
 		case M68K_CPU_TYPE_COLDFIRE:
 			if(g_instruction_table[instruction] == d68040_cinv)
 				return 0;
@@ -4101,7 +4101,7 @@ CPU_DISASSEMBLE( m68040 )
 
 CPU_DISASSEMBLE( m68340 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68340);
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( coldfire )

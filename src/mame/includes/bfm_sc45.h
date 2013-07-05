@@ -10,6 +10,7 @@
 #include "machine/68681.h"
 #include "machine/nvram.h"
 #include "machine/68307.h"
+#include "machine/68340.h"
 
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
@@ -549,7 +550,7 @@ public:
 	DECLARE_MACHINE_START(adder4);
 
 	// devices
-	required_device<m68000_base_device> m_adder4cpu;
+	required_device<m68340cpu_device> m_adder4cpu;
 };
 
 

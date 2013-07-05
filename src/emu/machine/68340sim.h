@@ -1,3 +1,6 @@
+
+#include "cpu/m68000/m68000.h"
+
 #define m68340SIM_MCR          (0x00)
 //                             (0x02)
 #define m68340SIM_SYNCR        (0x04)

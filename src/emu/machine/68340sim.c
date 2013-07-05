@@ -1,12 +1,12 @@
 /* 68340 SIM module */
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68340.h"
 
 
-READ16_MEMBER( m68000_base_device::m68340_internal_sim_r )
+READ16_MEMBER( m68340cpu_device::m68340_internal_sim_r )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -54,10 +54,10 @@ READ16_MEMBER( m68000_base_device::m68340_internal_sim_r )
 	return 0x0000;
 }
 
-READ8_MEMBER( m68000_base_device::m68340_internal_sim_ports_r )
+READ8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_r )
 {
 	offset += 0x10;
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -109,11 +109,11 @@ READ8_MEMBER( m68000_base_device::m68340_internal_sim_ports_r )
 	return 0x00;
 }
 
-READ32_MEMBER( m68000_base_device::m68340_internal_sim_cs_r )
+READ32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_r )
 {
 	offset += m68340SIM_AM_CS0>>2;
 
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -141,9 +141,9 @@ READ32_MEMBER( m68000_base_device::m68340_internal_sim_cs_r )
 	return 0x00000000;
 }
 
-WRITE16_MEMBER( m68000_base_device::m68340_internal_sim_w )
+WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -190,10 +190,10 @@ WRITE16_MEMBER( m68000_base_device::m68340_internal_sim_w )
 	}
 }
 
-WRITE8_MEMBER( m68000_base_device::m68340_internal_sim_ports_w )
+WRITE8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_w )
 {
 	offset += 0x10;
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 
@@ -243,10 +243,10 @@ WRITE8_MEMBER( m68000_base_device::m68340_internal_sim_ports_w )
 	}
 }
 
-WRITE32_MEMBER( m68000_base_device::m68340_internal_sim_cs_w )
+WRITE32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_w )
 {
 	offset += m68340SIM_AM_CS0>>2;
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
 	assert(sim != NULL);
 

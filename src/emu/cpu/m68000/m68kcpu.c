@@ -456,7 +456,7 @@ const UINT8 m68ki_exception_cycle_table[7][256] =
 			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 			4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 	},
-	{ /* 68340 */
+	{ /* CPU32 */
 			4, /*  0: Reset - Initial Stack Pointer                      */
 			4, /*  1: Reset - Initial Program Counter                    */
 			50, /*  2: Bus Error                             (unemulated) */
@@ -630,11 +630,11 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
+#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
 #define MASK_24BIT_SPACE            (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
-#define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340 )
-#define MASK_010_OR_LATER           (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_68340)
-#define MASK_020_OR_LATER           (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_68340)
+#define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
+#define MASK_010_OR_LATER           (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 )
+#define MASK_020_OR_LATER           (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
 #define MASK_030_OR_LATER           (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
 #define MASK_040_OR_LATER           (CPU_TYPE_040 | CPU_TYPE_EC040)
 
@@ -1229,30 +1229,6 @@ void m68000_base_device::init16(address_space &space)
 }
 
 
-int m68340_calc_cs(m68000_base_device *m68k, offs_t address)
-{
-	m68340_sim* sim = m68k->m68340SIM;
-
-	if ( !(sim->m_ba[0] & 1) ) return 1;
-
-	for (int i=0;i<4;i++)
-	{
-		if (sim->m_ba[i] & 1)
-		{
-			int mask = ((sim->m_am[i]&0xffffff00) | 0xff);
-			int base = sim->m_ba[i] & 0xffffff00;
-			int fcmask = (sim->m_am[i] & 0xf0);
-			int fcbase = (sim->m_ba[i] & 0xf0) & ~(sim->m_am[i] & 0xf0);
-			int fc = m68k->mmu_tmp_fc;
-
-			if ((address & ~mask) == base && ((fc << 4) & ~fcmask ) == fcbase ) return i+1;
-		}
-	}
-
-	return 0;
-}
-
-
 
 
 
@@ -1645,12 +1621,7 @@ UINT16 m68k_get_fc(m68000_base_device *device)
 }
 
 
-UINT16 m68340_get_cs(m68000_base_device *device, offs_t address)
-{
-	device->m68340_currentcs = m68340_calc_cs(device, address);
 
-	return device->m68340_currentcs;
-}
 
 /****************************************************************************
  * State definition
@@ -1703,70 +1674,6 @@ void m68000_base_device::define_state(void)
 	}
 }
 
-
-/* 68340 specifics - MOVE */
-
-READ32_MEMBER( m68000_base_device::m68340_internal_base_r )
-{
-	m68000_base_device *m68k = this;
-	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_base_r %08x, (%08x)\n", pc, offset*4,mem_mask);
-	return m68k->m68340_base;
-}
-
-WRITE32_MEMBER( m68000_base_device::m68340_internal_base_w )
-{
-	m68000_base_device *m68k = this;
-
-	int pc = space.device().safe_pc();
-	logerror("%08x m68340_internal_base_w %08x, %08x (%08x)\n", pc, offset*4,data,mem_mask);
-
-	// other conditions?
-	if (m68k->dfc==0x7)
-	{
-		// unmap old modules
-		if (m68k->m68340_base&1)
-		{
-			int base = m68k->m68340_base & 0xfffff000;
-
-			m68k->internal->unmap_readwrite(base + 0x000, base + 0x05f);
-			m68k->internal->unmap_readwrite(base + 0x600, base + 0x67f);
-			m68k->internal->unmap_readwrite(base + 0x700, base + 0x723);
-			m68k->internal->unmap_readwrite(base + 0x780, base + 0x7bf);
-
-		}
-
-		COMBINE_DATA(&m68k->m68340_base);
-		logerror("%08x m68340_internal_base_w %08x, %08x (%08x) (m68340_base write)\n", pc, offset*4,data,mem_mask);
-
-		// map new modules
-		if (m68k->m68340_base&1)
-		{
-			int base = m68k->m68340_base & 0xfffff000;
-
-			m68k->internal->install_readwrite_handler(base + 0x000, base + 0x03f, read16_delegate(FUNC(m68000_base_device::m68340_internal_sim_r),this),     write16_delegate(FUNC(m68000_base_device::m68340_internal_sim_w),this),0xffffffff);
-			m68k->internal->install_readwrite_handler(base + 0x010, base + 0x01f, read8_delegate(FUNC(m68000_base_device::m68340_internal_sim_ports_r),this),write8_delegate(FUNC(m68000_base_device::m68340_internal_sim_ports_w),this),0xffffffff);
-			m68k->internal->install_readwrite_handler(base + 0x040, base + 0x05f, read32_delegate(FUNC(m68000_base_device::m68340_internal_sim_cs_r),this),  write32_delegate(FUNC(m68000_base_device::m68340_internal_sim_cs_w),this));
-			m68k->internal->install_readwrite_handler(base + 0x600, base + 0x67f, read32_delegate(FUNC(m68000_base_device::m68340_internal_timer_r),this),   write32_delegate(FUNC(m68000_base_device::m68340_internal_timer_w),this));
-			m68k->internal->install_readwrite_handler(base + 0x700, base + 0x723, read32_delegate(FUNC(m68000_base_device::m68340_internal_serial_r),this),  write32_delegate(FUNC(m68000_base_device::m68340_internal_serial_w),this));
-			m68k->internal->install_readwrite_handler(base + 0x780, base + 0x7bf, read32_delegate(FUNC(m68000_base_device::m68340_internal_dma_r),this),     write32_delegate(FUNC(m68000_base_device::m68340_internal_dma_w),this));
-
-		}
-
-	}
-	else
-	{
-		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc, offset*4,data,mem_mask);
-	}
-
-
-
-}
-
-
-static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32, m68000_base_device )
-	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
-ADDRESS_MAP_END
 
 
 /****************
@@ -2094,12 +2001,12 @@ void m68000_base_device::init_cpu_scc68070(void)
 }
 
 
-void m68000_base_device::init_cpu_m68340(void)
+void m68000_base_device::init_cpu_fscpu32(void)
 {
 	init_cpu_common();
 
-	cpu_type         = CPU_TYPE_68340;
-//	dasm_type        = M68K_CPU_TYPE_68340;
+	cpu_type         = CPU_TYPE_FSCPU32;
+//	dasm_type        = M68K_CPU_TYPE_FSCPU32;
 
 	
 	init32(*program);
@@ -2116,20 +2023,6 @@ void m68000_base_device::init_cpu_m68340(void)
 	cyc_movem_l      = 2;
 	cyc_shift        = 0;
 	cyc_reset        = 518;
-
-	m68340SIM    = new m68340_sim();
-	m68340DMA    = new m68340_dma();
-	m68340SERIAL = new m68340_serial();
-	m68340TIMER  = new m68340_timer();
-
-	m68340SIM->reset();
-	m68340DMA->reset();
-	m68340SERIAL->reset();
-	m68340TIMER->reset();
-
-	m68340_base = 0x00000000;
-
-	internal = &this->space(AS_PROGRAM);
 
 	define_state();
 }
@@ -2240,9 +2133,9 @@ CPU_DISASSEMBLE( dasm_m68lc040 )
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68LC040);
 }
 
-CPU_DISASSEMBLE( dasm_m68340 )
+CPU_DISASSEMBLE( dasm_fscpu32 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68340);
+	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( dasm_coldfire )
@@ -2266,7 +2159,7 @@ offs_t m68ec040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 offs_t m68lc040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, buffer, pc, oprom, opram, options); };
 offs_t m68040_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, buffer, pc, oprom, opram, options); };
 offs_t scc68070_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); };
-offs_t m68340_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_m68340)(this, buffer, pc, oprom, opram, options); };
+offs_t fscpu32_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, buffer, pc, oprom, opram, options); };
 offs_t mcf5206e_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, buffer, pc, oprom, opram, options); };
 
 
@@ -2497,11 +2390,6 @@ void m68000_base_device::clear_all()
 	for (int i=0;i<M68K_IC_SIZE;i++)
 		ic_data[i] = 0;
 
-	m68340SIM = 0;
-	m68340DMA = 0;
-	m68340SERIAL = 0;
-	m68340TIMER = 0;
-	m68340_base = 0;
 	internal = 0;
 
 	instruction_hook = 0;
@@ -2585,7 +2473,7 @@ const device_type M68EC040 = &device_creator<m68ec040_device>;
 const device_type M68LC040 = &device_creator<m68lc040_device>;
 const device_type M68040 = &device_creator<m68040_device>;
 const device_type SCC68070 = &device_creator<scc68070_device>;
-const device_type M68340 = &device_creator<m68340_device>;
+const device_type FSCPU32 = &device_creator<fscpu32_device>;
 const device_type MCF5206E = &device_creator<mcf5206e_device>;
 
 m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -2802,15 +2690,23 @@ void scc68070_device::device_start()
 }
 
 
-m68340_device::m68340_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: m68000_base_device(mconfig, "M68340", tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map), "m68340", __FILE__)
+fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: m68000_base_device(mconfig, "Freescale CPU32 Core", tag, owner, clock, FSCPU32, 32,32, "fscpu32", __FILE__)
 {
 
 }
 
-void m68340_device::device_start()
+fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+										const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
+	: m68000_base_device(mconfig, name, tag, owner, clock, type, prg_data_width, prg_address_bits, internal_map, shortname, source)
 {
-	init_cpu_m68340();
+
+}
+
+
+void fscpu32_device::device_start()
+{
+	init_cpu_fscpu32();
 }
 
 

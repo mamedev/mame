@@ -5,10 +5,6 @@
 
 
 
-#include "68340sim.h"
-#include "68340dma.h"
-#include "68340ser.h"
-#include "68340tmu.h"
 
 #include "../../../lib/softfloat/milieu.h"
 #include "../../../lib/softfloat/softfloat.h"
@@ -64,7 +60,7 @@ enum
 	M68K_CPU_TYPE_68LC040,
 	M68K_CPU_TYPE_68040,
 	M68K_CPU_TYPE_SCC68070,
-	M68K_CPU_TYPE_68340,
+	M68K_CPU_TYPE_FSCPU32,
 	M68K_CPU_TYPE_COLDFIRE
 };
 
@@ -130,7 +126,6 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 class m68000_base_device;
 
 
-extern UINT16 m68340_get_cs(m68000_base_device *device, offs_t address);
 
 typedef int (*instruction_hook_t)(m68000_base_device *device, offs_t curpc);
 
@@ -361,32 +356,6 @@ public:
 	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 
 
-	int m68340_currentcs;
-
-	/* 68340 peripheral modules */
-	m68340_sim*    m68340SIM;
-	m68340_dma*    m68340DMA;
-	m68340_serial* m68340SERIAL;
-	m68340_timer*  m68340TIMER;
-
-	UINT32 m68340_base;
-
-
-
-	READ32_MEMBER( m68340_internal_base_r );
-	WRITE32_MEMBER( m68340_internal_base_w );
-	READ32_MEMBER( m68340_internal_dma_r );
-	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ32_HANDLER( m68340_internal_serial_r );
-	WRITE32_MEMBER( m68340_internal_serial_w );
-	READ16_MEMBER( m68340_internal_sim_r );
-	READ8_MEMBER( m68340_internal_sim_ports_r );
-	READ32_MEMBER( m68340_internal_sim_cs_r );
-	WRITE16_MEMBER( m68340_internal_sim_w );
-	WRITE8_MEMBER( m68340_internal_sim_ports_w );
-	WRITE32_MEMBER( m68340_internal_sim_cs_w );
-	READ32_MEMBER( m68340_internal_timer_r );
-	WRITE32_MEMBER( m68340_internal_timer_w );
 
 
 	/* 68307 / 68340 internal address map */
@@ -412,7 +381,7 @@ public:
 	void init_cpu_m68040(void);
 	void init_cpu_m68ec040(void);
 	void init_cpu_m68lc040(void);
-	void init_cpu_m68340(void);
+	void init_cpu_fscpu32(void);
 	void init_cpu_scc68070(void);
 	void init_cpu_coldfire(void);
 
@@ -746,12 +715,15 @@ protected:
 
 
 
-class m68340_device : public m68000_base_device
+class fscpu32_device : public m68000_base_device
 {
 public:
 	// construction/destruction
-	m68340_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fscpu32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
+	fscpu32_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
+
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const { return 20; };
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
@@ -805,7 +777,7 @@ extern const device_type M68EC040;
 extern const device_type M68LC040;
 extern const device_type M68040;
 extern const device_type SCC68070;
-extern const device_type M68340;
+extern const device_type FSCPU32;
 extern const device_type MCF5206E;
 
 extern void m68k_set_reset_callback(m68000_base_device *device, m68k_reset_func callback);

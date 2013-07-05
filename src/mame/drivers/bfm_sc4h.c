@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68307.h"
+#include "machine/68340.h"
 #include "includes/bfm_sc45.h"
 #include "bfm_sc4.lh"
 #include "video/awpvid.h"

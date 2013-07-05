@@ -818,6 +818,19 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/machine/68340.h,MACHINES += M68340
+#-------------------------------------------------
+
+ifneq ($(filter M68340,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/68340.o
+MACHINEOBJS += $(MACHINEOBJ)/68340sim.o
+MACHINEOBJS += $(MACHINEOBJ)/68340dma.o
+MACHINEOBJS += $(MACHINEOBJ)/68340ser.o
+MACHINEOBJS += $(MACHINEOBJ)/68340tmu.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/machine/mcf5206e.h,MACHINES += MCF5206E
 #-------------------------------------------------
 

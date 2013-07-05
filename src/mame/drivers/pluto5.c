@@ -176,7 +176,7 @@
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "machine/68340.h"
 
 class pluto5_state : public driver_device
 {
@@ -195,7 +195,7 @@ public:
 protected:
 
 	// devices
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68340cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
 	virtual void machine_start();

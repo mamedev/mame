@@ -1,12 +1,12 @@
 /* 68340 SERIAL module */
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68340.h"
 
 
-READ32_HANDLER( m68000_base_device::m68340_internal_serial_r )
+READ32_HANDLER( m68340cpu_device::m68340_internal_serial_r )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_serial* serial = m68k->m68340SERIAL;
 	assert(serial != NULL);
 
@@ -19,9 +19,9 @@ READ32_HANDLER( m68000_base_device::m68340_internal_serial_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( m68000_base_device::m68340_internal_serial_w )
+WRITE32_MEMBER( m68340cpu_device::m68340_internal_serial_w )
 {
-	m68000_base_device *m68k = this;
+	m68340cpu_device *m68k = this;
 	m68340_serial* serial = m68k->m68340SERIAL;
 	assert(serial != NULL);
 
