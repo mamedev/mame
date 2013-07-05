@@ -106,24 +106,25 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 READ32_MEMBER(kongambl_state::eeprom_r)
 {
 	//return machine().rand();
-
-	if (ACCESSING_BITS_16_23)
-		return ioport("EXT_PCB")->read() << 16; // ???
+	UINT32 retval = 0;
 
 	if (ACCESSING_BITS_24_31)
-		return ioport("IN0")->read() << 24; // bit 0 freezes the system if 1
+		retval |= ioport("IN0")->read() << 24; // bit 0 freezes the system if 1
 
-	if (ACCESSING_BITS_0_7)
-		return (ioport("SYSTEM")->read());
+	if (ACCESSING_BITS_16_23)
+		retval |= ioport("EXT_PCB")->read() << 16; // ???
 
 	if (ACCESSING_BITS_8_15)
-		return ioport("IN2")->read() << 8; // ???
+		retval |= ioport("IN2")->read() << 8; // ???
 
-	printf("%08x\n",mem_mask);
+	if (ACCESSING_BITS_0_7)
+		retval |= (ioport("SYSTEM")->read());
 
-	return 0;
+
+//	printf("%08x\n",mem_mask);
+
+	return retval;
 }
-
 WRITE32_MEMBER(kongambl_state::eeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
