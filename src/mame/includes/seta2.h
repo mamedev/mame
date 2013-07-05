@@ -1,5 +1,6 @@
 #include "sound/okim9810.h"
 #include "machine/eeprom.h"
+#include "sound/x1_010.h"
 
 class seta2_state : public driver_device
 {
@@ -12,6 +13,7 @@ public:
 		m_vregs(*this, "vregs", 0),
 		m_funcube_outputs(*this, "funcube_outputs"),
 		m_funcube_leds(*this, "funcube_leds"),
+		m_x1(*this, "x1snd"),
 		m_oki(*this, "oki"),
 		m_eeprom(*this, "eeprom"){ }
 
@@ -23,6 +25,11 @@ public:
 
 	optional_shared_ptr<UINT8> m_funcube_outputs;
 	optional_shared_ptr<UINT8> m_funcube_leds;
+	
+	optional_device<x1_010_device> m_x1;
+	optional_device<okim9810_device> m_oki;
+	optional_device<eeprom_device> m_eeprom;
+	
 	int m_xoffset;
 	int m_yoffset;
 	int m_keyboard_row;
@@ -80,6 +87,4 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void funcube_debug_outputs();
-	optional_device<okim9810_device> m_oki;
-	optional_device<eeprom_device> m_eeprom;
 };

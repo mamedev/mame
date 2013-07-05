@@ -161,8 +161,10 @@ class champbwl_state : public tnzs_state
 {
 public:
 	champbwl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_state(mconfig, type, tag) { }
+		: tnzs_state(mconfig, type, tag),
+		m_x1(*this, "x1snd") { }
 
+	required_device<x1_010_device> m_x1;
 	UINT8    m_last_trackball_val[2];
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
@@ -209,7 +211,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r, seta_sound_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", x1_010_device, read, write)
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */
@@ -248,7 +250,7 @@ static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w) // Sound
+	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE("x1snd", x1_010_device, read, write) // Sound
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   /* enable / disable background transparency */

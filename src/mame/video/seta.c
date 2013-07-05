@@ -136,7 +136,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/x1_010.h"
 #include "includes/seta.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
@@ -266,10 +265,9 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *x1_010 = machine().device("x1snd");
 				seta_coin_lockout_w (data & 0x0f);
-				if (x1_010 != NULL)
-					seta_sound_enable_w (x1_010, data & 0x20);
+				if (m_x1 != NULL)
+					m_x1->enable_w (data & 0x20);
 				coin_counter_w(machine(), 0,data & 0x01);
 				coin_counter_w(machine(), 1,data & 0x02);
 			}
