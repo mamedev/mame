@@ -8,7 +8,6 @@
 
 ****************************************************************************/
 
-#include "emu.h"
 #include "includes/mbee.h"
 #include "machine/z80bin.h"
 
@@ -101,23 +100,16 @@ const z80pio_interface mbee_z80pio_intf =
 
 *************************************************************************************/
 
-WRITE_LINE_MEMBER( mbee_state::mbee_fdc_intrq_w )
+void mbee_state::fdc_intrq_w (bool state)
 {
 	m_fdc_intrq = state ? 0x80 : 0;
 }
 
-WRITE_LINE_MEMBER( mbee_state::mbee_fdc_drq_w )
+void mbee_state::fdc_drq_w (bool state)
 {
 	m_fdc_drq = state ? 0x80 : 0;
 }
 
-const wd17xx_interface mbee_wd17xx_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mbee_state, mbee_fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(mbee_state, mbee_fdc_drq_w),
-	{FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 READ8_MEMBER( mbee_state::mbee_fdc_status_r )
 {
@@ -134,12 +126,22 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
     d2 side (1=side 1)
     d1..d0 drive select (0 to 3) */
 
-	wd17xx_set_drive(m_fdc, data & 3);
-	wd17xx_set_side(m_fdc, BIT(data, 2));
-	wd17xx_dden_w(m_fdc, !BIT(data, 3));
-		/* no idea what turns the motors on & off, guessing it could be drive select
-		commented out because it prevents 128k and 256TC from booting up */
-	//floppy_mon_w(floppy_get_device(machine(), data & 3), CLEAR_LINE); // motor on
+	floppy_image_device *floppy = NULL;
+	if ((data & 3)==0)
+		floppy = m_floppy0->get_device();
+	else
+	if ((data & 3)==1)
+		floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		floppy->ss_w(BIT(data, 2));
+	}
+
+	//m_fdc->dden_w(!BIT(data, 3)); // not sure about polarity in the new system
 }
 
 /***********************************************************
@@ -528,9 +530,16 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_reset)
 
 void mbee_state::machine_reset_common_disk()
 {
-	/* These values need to be fine tuned or the fdc repaired */
-	wd17xx_set_pause_time(m_fdc, 45);       /* default is 40 usec if not set */
-//  wd17xx_set_complete_command_delay(m_fdc, 50);   /* default is 12 usec if not set */
+	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+	if (floppy)
+	{
+		m_fdc->set_floppy(floppy);
+		//m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
+		//m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
+
+		floppy->ss_w(0);
+	}
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee)
@@ -683,6 +692,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee56)
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee64)
@@ -698,6 +709,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee64)
 	m_boot->configure_entry(1, &RAM[0x0000]);
 
 	m_size = 0xf000;
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee128)
@@ -718,6 +731,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee128)
 	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
 
 	m_size = 0x8000;
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee256)
@@ -741,6 +756,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbeett)

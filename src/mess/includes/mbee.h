@@ -7,7 +7,7 @@
 #ifndef MBEE_H_
 #define MBEE_H_
 
-#include "machine/wd17xx.h"
+#include "emu.h"
 #include "imagedev/snapquik.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
@@ -19,8 +19,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/mc146818.h"
 #include "sound/wave.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 
 
 class mbee_state : public driver_device
@@ -43,6 +42,8 @@ public:
 		m_printer(*this, "centronics"),
 		m_crtc(*this, "crtc"),
 		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
 		m_rtc(*this, "rtc"),
 		m_boot(*this, "boot"),
 		m_pak(*this, "pak"),
@@ -74,15 +75,6 @@ public:
 		m_io_x13(*this, "X13"),
 		m_io_x14(*this, "X14") { }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio;
-	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_printer;
-	required_device<mc6845_device> m_crtc;
-	optional_device<wd2793_device> m_fdc;
-	optional_device<mc146818_device> m_rtc;
 	DECLARE_WRITE8_MEMBER( mbee_04_w );
 	DECLARE_WRITE8_MEMBER( mbee_06_w );
 	DECLARE_READ8_MEMBER( mbee_07_r );
@@ -123,36 +115,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pio_ardy );
 	DECLARE_READ8_MEMBER(mbee_fdc_status_r);
 	DECLARE_WRITE8_MEMBER(mbee_fdc_motor_w);
-	DECLARE_WRITE_LINE_MEMBER(mbee_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(mbee_fdc_drq_w);
-	size_t m_size;
-	UINT8 m_clock_pulse;
-	UINT8 m_mbee256_key_available;
-	UINT8 m_fdc_intrq;
-	UINT8 m_fdc_drq;
-	UINT8 m_mbee256_was_pressed[15];
-	UINT8 m_mbee256_q[20];
-	UINT8 m_mbee256_q_pos;
-	UINT8 m_framecnt;
-	UINT8 *m_p_gfxram;
-	UINT8 *m_p_colorram;
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_attribram;
-	UINT8 m_08;
-	UINT8 m_0a;
-	UINT8 m_0b;
-	UINT8 m_1c;
-	UINT8 m_is_premium;
-	UINT8 m_sy6545_cursor[16];
-	UINT8 m_sy6545_status;
-	UINT8 m_speed;
-	UINT8 m_flash;
-	UINT16 m_cursor;
-	UINT8 m_sy6545_reg[32];
-	UINT8 m_sy6545_ind;
-	void sy6545_cursor_configure();
-	void keyboard_matrix_r(int offs);
-	void mbee_video_kbd_scan(int param);
 	DECLARE_DRIVER_INIT(mbeepc85);
 	DECLARE_DRIVER_INIT(mbee256);
 	DECLARE_DRIVER_INIT(mbee56);
@@ -182,8 +144,48 @@ public:
 	TIMER_CALLBACK_MEMBER(mbee_reset);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee_z80bin );
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_gfxram;
+	UINT8 *m_p_colorram;
+	UINT8 *m_p_attribram;
+	UINT8 m_speed;
+	UINT8 m_flash;
+	UINT8 m_framecnt;
+	UINT16 m_cursor;
+	UINT8 m_08;
+	UINT8 m_1c;
+	void mbee_video_kbd_scan(int param);
+	UINT8 m_sy6545_cursor[16];
 
-protected:
+private:
+	size_t m_size;
+	UINT8 m_clock_pulse;
+	UINT8 m_mbee256_key_available;
+	UINT8 m_fdc_intrq;
+	UINT8 m_fdc_drq;
+	UINT8 m_mbee256_was_pressed[15];
+	UINT8 m_mbee256_q[20];
+	UINT8 m_mbee256_q_pos;
+	UINT8 m_0a;
+	UINT8 m_0b;
+	UINT8 m_is_premium;
+	UINT8 m_sy6545_status;
+	UINT8 m_sy6545_reg[32];
+	UINT8 m_sy6545_ind;
+	void sy6545_cursor_configure();
+	void keyboard_matrix_r(int offs);
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
+	required_device<cassette_image_device> m_cassette;
+	required_device<wave_device> m_wave;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<centronics_device> m_printer;
+	required_device<mc6845_device> m_crtc;
+	optional_device<wd2793_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+	optional_device<mc146818_device> m_rtc;
 	required_memory_bank m_boot;
 	optional_memory_bank m_pak;
 	optional_memory_bank m_telcom;
@@ -216,12 +218,14 @@ protected:
 
 	void machine_reset_common_disk();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 };
 
 
 /*----------- defined in machine/mbee.c -----------*/
 
-extern const wd17xx_interface mbee_wd17xx_interface;
+//extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
 /*----------- defined in video/mbee.c -----------*/

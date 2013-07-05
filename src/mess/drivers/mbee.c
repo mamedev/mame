@@ -82,15 +82,48 @@
     - The Monitor program on 256TC crashes the system. This appears
       to be a MAME core bug involving the z80pio.
 
+    - The 256TC corrupts itself when a floppy disk is detected.
+
     - Disk system doesn't work because of fdc problems.
 
     - Teleterm: keyboard is problematic, and cursor doesn't show.
 
 
-***************************************************************************/
+***************************************************************************
 
-#include "emu.h"
+    Description of Disk System
+
+    - Ports 44 to 47 are for standard connection to FD2793.
+    - Port 48 is used for drive/side/density select on write,
+              and intrq/drq on read.
+      intrq and drq are OR'd together, then gated to bit 7 of the
+      data bus whenever port 48 is activated on read. There are
+      no interrupts used in the disk system.
+
+      Despite the simplicity of this design, disks have not worked
+      in the emulator for some years. Conversion to the new modern
+      implementation (2013-07-05) has not resolved the issue.
+
+      There are 3 types of microbee disks available in the wild.
+
+    - CPCEMU-format "dsk" disks, which has an already-working
+      format "dsk_dsk".
+
+    - ubee512-format disks, such as "ds80,ds82,ds84,ss80", etc.
+      These are described in "mbee_dsk", but it's not known if it
+      works as yet.
+
+    - There a "img" format for the 128k boot disk. The internal
+      layout is not known and no work has been done.
+
+
+****************************************************************************/
+
+
 #include "includes/mbee.h"
+#include "formats/dsk_dsk.h"
+#include "formats/mbee_dsk.h"
+
 
 #define XTAL_13_5MHz 13500000
 
@@ -251,7 +284,7 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 ADDRESS_MAP_END
 
@@ -263,7 +296,7 @@ static ADDRESS_MAP_START(mbee64_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_READWRITE(mbee_0b_r, mbee_0b_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee64_50_w)
 ADDRESS_MAP_END
@@ -277,7 +310,7 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
 	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x50, 0x57) AM_WRITE(mbee128_50_w)
 ADDRESS_MAP_END
@@ -297,7 +330,7 @@ static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(mbee256_18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(mbeeppc_1c_r,mbee256_1c_w)
-	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0044, 0x0047) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x0048, 0x004f) AM_MIRROR(0xff00) AM_READWRITE(mbee_fdc_status_r, mbee_fdc_motor_w)
 	AM_RANGE(0x0050, 0x0057) AM_MIRROR(0xff00) AM_WRITE(mbee256_50_w)
 	// AM_RANGE(0x0058, 0x005f) AM_MIRROR(0xff00) External options: floppy drive, hard drive and keyboard
@@ -572,7 +605,7 @@ GFXDECODE_END
 static GFXDECODE_START( mbeeppc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
-
+#if 0
 static LEGACY_FLOPPY_OPTIONS_START(mbee)
 	LEGACY_FLOPPY_OPTION(ss80, "ss80", "SS80 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -612,6 +645,17 @@ static const floppy_interface mbee_floppy_interface =
 	NULL,
 	NULL
 };
+#endif
+
+// can only specify one
+FLOPPY_FORMATS_MEMBER( mbee_state::floppy_formats )
+	FLOPPY_MBEE_FORMAT,
+	FLOPPY_DSK_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( mbee_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
 
 
 static MC6845_INTERFACE( mbee_crtc )
@@ -788,8 +832,9 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56 )
-	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
+	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee64, mbee56 )
@@ -804,8 +849,9 @@ static MACHINE_CONFIG_DERIVED( mbee128, mbeeppc )
 	MCFG_CPU_PROGRAM_MAP(mbee128_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128 )
-	MCFG_WD2793_ADD("fdc", mbee_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mbee_floppy_interface)
+	MCFG_WD2793x_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "35dd", mbee_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbee_floppies, "35dd", mbee_state::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbee256, mbee128 )
