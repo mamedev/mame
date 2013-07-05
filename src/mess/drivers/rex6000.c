@@ -578,7 +578,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	img_start = strlen((const char*)data) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
-	for (int i=0; i<image.length() - img_start ;i++)
+	for (UINT32 i=0; i<image.length() - img_start ;i++)
 		flash.write_byte(i, data[img_start + i]);
 
 	auto_free(machine(), data);

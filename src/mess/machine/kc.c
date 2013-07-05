@@ -28,21 +28,21 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 {
 	UINT8 *data;
 	struct kcc_header *header;
-	int addr;
-	int datasize;
-	int execution_address;
-	int i;
+	UINT16 addr;
+	UINT16 datasize;
+	UINT16 execution_address;
+	UINT16 i;
 
 	/* get file size */
-	datasize = image.length();
+	UINT64 size = image.length();
 
-	if (datasize != 0)
+	if (size != 0)
 	{
 		/* malloc memory for this data */
-		data = (UINT8 *)auto_alloc_array(machine(), UINT8, datasize);
+		data = (UINT8 *)auto_alloc_array(machine(), UINT8, size);
 
 		if (data != NULL)
-			image.fread( data, datasize);
+			image.fread( data, size);
 	}
 	else
 	{
@@ -54,10 +54,10 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	datasize = ((header->end_address_l & 0x0ff) | ((header->end_address_h & 0x0ff)<<8)) - addr;
 	execution_address = (header->execution_address_l & 0x0ff) | ((header->execution_address_h & 0x0ff)<<8);
 
-	if (datasize + 128 > image.length())
+	if (datasize > size - 128)
 	{
-		mame_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)image.length() - 128);
-		datasize = image.length() - 128;
+		mame_printf_info("Invalid snapshot size: expected 0x%04x, found 0x%04x\n", datasize, (UINT32)size - 128);
+		datasize = size - 128;
 	}
 
 	address_space &space = m_maincpu->space( AS_PROGRAM );

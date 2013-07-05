@@ -1854,8 +1854,8 @@ WRITE8_MEMBER( thomson_state::mo5_gatearray_w )
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 {
 	UINT8* pos = memregion("maincpu")->base() + 0x10000;
-	UINT64 size;
-	int i,j;
+	UINT64 size, i;
+	int j;
 	char name[129];
 
 	if (image.software_entry() == NULL)
@@ -1899,9 +1899,9 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	name[j] = 0;
 
 	/* sanitize name */
-	for ( i = 0; name[i]; i++)
+	for ( j = 0; name[j]; j++)
 	{
-		if ( name[i] < ' ' || name[i] >= 127 ) name[i] = '?';
+		if ( name[j] < ' ' || name[j] >= 127 ) name[j] = '?';
 	}
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
