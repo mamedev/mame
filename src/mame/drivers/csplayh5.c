@@ -31,8 +31,9 @@ class csplayh5_state : public driver_device
 public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_v9958(*this,"v9958"),
+		m_maincpu(*this, "maincpu"),
+		m_tmp68301(*this, "tmp68301"),
+		m_v9958(*this, "v9958"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2")
 		{ }
@@ -42,6 +43,7 @@ public:
 	UINT8 m_pio_latch[5];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<tmp68301_device> m_tmp68301;
 	required_device<v9958_device> m_v9958;
 	DECLARE_READ16_MEMBER(csplayh5_mux_r);
 	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
@@ -144,7 +146,7 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)  // TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 #if USE_H8
@@ -629,6 +631,8 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
+	
+	MCFG_TMP68301_ADD("tmp68301")
 
 #if USE_H8
 	MCFG_CPU_ADD("subcpu", H83002, 16000000)    /* unknown clock */

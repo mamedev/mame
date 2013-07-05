@@ -43,7 +43,6 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
 #include "includes/realbrk.h"
 #include "sound/2413intf.h"
 #include "sound/ymz280b.h"
@@ -163,7 +162,7 @@ static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x605000, 0x61ffff) AM_RAM                                         //
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)   // YMZ280
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                         // RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)  // TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
@@ -749,7 +748,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(realbrk_state::realbrk_interrupt)
 {
 	/* VBlank is connected to INT1 (external interrupts pin 1) */
-	tmp68301_external_interrupt_1(machine());
+	m_tmp68301->external_interrupt_1();
 }
 
 static MACHINE_CONFIG_START( realbrk, realbrk_state )
@@ -759,9 +758,8 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
-	MCFG_MACHINE_START( tmp68301 )
-	MCFG_MACHINE_RESET( tmp68301 )
-
+	MCFG_TMP68301_ADD("tmp68301")
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

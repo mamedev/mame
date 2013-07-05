@@ -11,29 +11,63 @@
 #include "emu.h"
 #include "machine/tmp68301.h"
 
-static UINT16 tmp68301_regs[0x400];
+const device_type TMP68301 = &device_creator<tmp68301_device>;
 
-static UINT8 tmp68301_IE[3];        // 3 External Interrupt Lines
-static emu_timer *tmp68301_timer[3];        // 3 Timers
-
-static int tmp68301_irq_vector[8];
-
-static void tmp68301_update_timer( running_machine &machine, int i );
-
-static IRQ_CALLBACK(tmp68301_irq_callback)
+tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__)	
 {
-	int vector = tmp68301_irq_vector[irqline];
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tmp68301_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tmp68301_device::device_start()
+{
+	int i;
+	for (i = 0; i < 3; i++)
+		m_tmp68301_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmp68301_device::timer_callback), this));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void tmp68301_device::device_reset()
+{
+	int i;
+
+	for (i = 0; i < 3; i++)
+		m_IE[i] = 0;
+
+	machine().firstcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback),this));	
+}
+
+
+IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
+{
+	int vector = m_irq_vector[irqline];
 //  logerror("%s: irq callback returns %04X for level %x\n",machine.describe_context(),vector,int_level);
 	return vector;
 }
 
-static TIMER_CALLBACK( tmp68301_timer_callback )
+TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 {
 	int i = param;
-	UINT16 TCR  =   tmp68301_regs[(0x200 + i * 0x20)/2];
-	UINT16 IMR  =   tmp68301_regs[0x94/2];      // Interrupt Mask Register (IMR)
-	UINT16 ICR  =   tmp68301_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
-	UINT16 IVNR =   tmp68301_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
+	UINT16 TCR  =   m_regs[(0x200 + i * 0x20)/2];
+	UINT16 IMR  =   m_regs[0x94/2];      // Interrupt Mask Register (IMR)
+	UINT16 ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
+	UINT16 IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
 //  logerror("s: callback timer %04X, j = %d\n",machine.describe_context(),i,tcount);
 
@@ -44,16 +78,16 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 		int level = ICR & 0x0007;
 
 		// Interrupt Vector Number Register (IVNR)
-		tmp68301_irq_vector[level]  =   IVNR & 0x00e0;
-		tmp68301_irq_vector[level]  +=  4+i;
+		m_irq_vector[level]  =   IVNR & 0x00e0;
+		m_irq_vector[level]  +=  4+i;
 
-		machine.firstcpu->set_input_line(level,HOLD_LINE);
+		machine().firstcpu->set_input_line(level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)   // N/1
 	{
 		// Repeat
-		tmp68301_update_timer(machine, i);
+		update_timer(i);
 	}
 	else
 	{
@@ -61,16 +95,16 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 	}
 }
 
-static void tmp68301_update_timer( running_machine &machine, int i )
+void tmp68301_device::update_timer( int i )
 {
-	UINT16 TCR  =   tmp68301_regs[(0x200 + i * 0x20)/2];
-	UINT16 MAX1 =   tmp68301_regs[(0x204 + i * 0x20)/2];
-	UINT16 MAX2 =   tmp68301_regs[(0x206 + i * 0x20)/2];
+	UINT16 TCR  =   m_regs[(0x200 + i * 0x20)/2];
+	UINT16 MAX1 =   m_regs[(0x204 + i * 0x20)/2];
+	UINT16 MAX2 =   m_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
 	attotime duration = attotime::zero;
 
-	tmp68301_timer[i]->adjust(attotime::never,i);
+	m_tmp68301_timer[i]->adjust(attotime::never,i);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )                     // MR2..1
@@ -90,79 +124,62 @@ static void tmp68301_update_timer( running_machine &machine, int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;         // P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime::from_hz(machine.firstcpu->unscaled_clock()) * ((1 << scale) * max);
+			duration = attotime::from_hz(machine().firstcpu->unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
 
-//  logerror("%s: TMP68301 Timer %d, duration %lf, max %04X\n",machine.describe_context(),i,duration,max);
+//  logerror("%s: TMP68301 Timer %d, duration %lf, max %04X\n",machine().describe_context(),i,duration,max);
 
 	if (!(TCR & 0x0002))                // CS
 	{
 		if (duration != attotime::zero)
-			tmp68301_timer[i]->adjust(duration,i);
+			m_tmp68301_timer[i]->adjust(duration,i);
 		else
-			logerror("%s: TMP68301 error, timer %d duration is 0\n",machine.describe_context(),i);
+			logerror("%s: TMP68301 error, timer %d duration is 0\n",machine().describe_context(),i);
 	}
 }
 
-MACHINE_START( tmp68301 )
-{
-	int i;
-	for (i = 0; i < 3; i++)
-		tmp68301_timer[i] = machine.scheduler().timer_alloc(FUNC(tmp68301_timer_callback));
-}
-
-MACHINE_RESET( tmp68301 )
-{
-	int i;
-
-	for (i = 0; i < 3; i++)
-		tmp68301_IE[i] = 0;
-
-	machine.firstcpu->set_irq_acknowledge_callback(tmp68301_irq_callback);
-}
-
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(running_machine &machine)
+void tmp68301_device::update_irq_state()
 {
 	int i;
 
 	/* Take care of external interrupts */
 
-	UINT16 IMR  =   tmp68301_regs[0x94/2];      // Interrupt Mask Register (IMR)
-	UINT16 IVNR =   tmp68301_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
+	UINT16 IMR  =   m_regs[0x94/2];      // Interrupt Mask Register (IMR)
+	UINT16 IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
 	for (i = 0; i < 3; i++)
 	{
-		if  (   (tmp68301_IE[i]) &&
+		if  (   (m_IE[i]) &&
 				!(IMR & (1<<i))
 			)
 		{
-			UINT16 ICR  =   tmp68301_regs[0x80/2+i];    // Interrupt Controller Register (ICR0..2)
+			UINT16 ICR  =   m_regs[0x80/2+i];    // Interrupt Controller Register (ICR0..2)
 
 			// Interrupt Controller Register (ICR0..2)
 			int level = ICR & 0x0007;
 
 			// Interrupt Vector Number Register (IVNR)
-			tmp68301_irq_vector[level]  =   IVNR & 0x00e0;
-			tmp68301_irq_vector[level]  +=  i;
+			m_irq_vector[level]  =   IVNR & 0x00e0;
+			m_irq_vector[level]  +=  i;
 
-			tmp68301_IE[i] = 0;     // Interrupts are edge triggerred
+			m_IE[i] = 0;     // Interrupts are edge triggerred
 
-			machine.firstcpu->set_input_line(level,HOLD_LINE);
+			machine().firstcpu->set_input_line(level,HOLD_LINE);
 		}
 	}
 }
 
-READ16_HANDLER( tmp68301_regs_r )
+READ16_MEMBER( tmp68301_device::regs_r )
 {
-	return tmp68301_regs[offset];
+	return m_regs[offset];
 }
 
-WRITE16_HANDLER( tmp68301_regs_w )
+WRITE16_MEMBER( tmp68301_device::regs_w )
 {
-	COMBINE_DATA(&tmp68301_regs[offset]);
+	COMBINE_DATA(&m_regs[offset]);
 
 	if (!ACCESSING_BITS_0_7)    return;
 
@@ -177,12 +194,12 @@ WRITE16_HANDLER( tmp68301_regs_w )
 		{
 			int i = ((offset*2) >> 5) & 3;
 
-			tmp68301_update_timer( space.machine(), i );
+			update_timer( i );
 		}
 		break;
 	}
 }
 
-void tmp68301_external_interrupt_0(running_machine &machine)    { tmp68301_IE[0] = 1;   update_irq_state(machine); }
-void tmp68301_external_interrupt_1(running_machine &machine)    { tmp68301_IE[1] = 1;   update_irq_state(machine); }
-void tmp68301_external_interrupt_2(running_machine &machine)    { tmp68301_IE[2] = 1;   update_irq_state(machine); }
+void tmp68301_device::external_interrupt_0()    { m_IE[0] = 1;   update_irq_state(); }
+void tmp68301_device::external_interrupt_1()    { m_IE[1] = 1;   update_irq_state(); }
+void tmp68301_device::external_interrupt_2()    { m_IE[2] = 1;   update_irq_state(); }

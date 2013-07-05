@@ -1,6 +1,7 @@
 #include "sound/okim9810.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
+#include "machine/tmp68301.h"
 
 class seta2_state : public driver_device
 {
@@ -8,6 +9,7 @@ public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this,"maincpu"),
+			m_tmp68301(*this, "tmp68301"),
 			m_nvram(*this, "nvram") ,
 		m_spriteram(*this, "spriteram", 0),
 		m_vregs(*this, "vregs", 0),
@@ -18,6 +20,7 @@ public:
 		m_eeprom(*this, "eeprom"){ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<tmp68301_device> m_tmp68301;
 	optional_shared_ptr<UINT16> m_nvram;
 
 	optional_shared_ptr<UINT16> m_spriteram;
