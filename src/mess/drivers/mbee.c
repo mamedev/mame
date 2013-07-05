@@ -647,7 +647,6 @@ static const floppy_interface mbee_floppy_interface =
 };
 #endif
 
-// can only specify one
 FLOPPY_FORMATS_MEMBER( mbee_state::floppy_formats )
 	FLOPPY_MBEE_FORMAT,
 	FLOPPY_DSK_FORMAT

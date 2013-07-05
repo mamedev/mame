@@ -225,7 +225,6 @@ private:
 
 /*----------- defined in machine/mbee.c -----------*/
 
-//extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
 /*----------- defined in video/mbee.c -----------*/
