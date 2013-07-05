@@ -1,12 +1,12 @@
 /* 68307 SIM module */
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68307.h"
 
 
-READ16_MEMBER( m68000_base_device::m68307_internal_sim_r )
+READ16_MEMBER( m68307cpu_device::m68307_internal_sim_r )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;
 	assert(sim != NULL);
 
@@ -41,9 +41,9 @@ READ16_MEMBER( m68000_base_device::m68307_internal_sim_r )
 }
 
 
-WRITE16_MEMBER( m68000_base_device::m68307_internal_sim_w )
+WRITE16_MEMBER( m68307cpu_device::m68307_internal_sim_w )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;
 	assert(sim != NULL);
 
@@ -149,7 +149,7 @@ void m68307_sim::write_paddr(UINT16 data, UINT16 mem_mask)
 }
 
 
-UINT16 m68307_sim::read_padat(m68000_base_device* m68k, address_space &space, UINT16 mem_mask)
+UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -175,7 +175,7 @@ UINT16 m68307_sim::read_padat(m68000_base_device* m68k, address_space &space, UI
 }
 
 
-void m68307_sim::write_padat(m68000_base_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
 {
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_padat);
@@ -200,7 +200,7 @@ void m68307_sim::write_pbddr(UINT16 data, UINT16 mem_mask)
 	COMBINE_DATA(&m_pbddr);
 }
 
-UINT16 m68307_sim::read_pbdat(m68000_base_device* m68k, address_space &space, UINT16 mem_mask)
+UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -226,7 +226,7 @@ UINT16 m68307_sim::read_pbdat(m68000_base_device* m68k, address_space &space, UI
 }
 
 
-void m68307_sim::write_pbdat(m68000_base_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
 {
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_pbdat);

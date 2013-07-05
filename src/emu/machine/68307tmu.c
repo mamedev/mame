@@ -2,11 +2,11 @@
 // 2x timers
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68307.h"
 
-READ16_MEMBER( m68000_base_device::m68307_internal_timer_r )
+READ16_MEMBER( m68307cpu_device::m68307_internal_timer_r )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
@@ -32,9 +32,9 @@ READ16_MEMBER( m68000_base_device::m68307_internal_timer_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( m68000_base_device::m68307_internal_timer_w )
+WRITE16_MEMBER( m68307cpu_device::m68307_internal_timer_w )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
 	assert(timer != NULL);
 
@@ -101,7 +101,7 @@ WRITE16_MEMBER( m68000_base_device::m68307_internal_timer_w )
 
 static TIMER_CALLBACK( m68307_timer0_callback )
 {
-	m68000_base_device* m68k = (m68000_base_device *)ptr;
+	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
@@ -112,7 +112,7 @@ static TIMER_CALLBACK( m68307_timer0_callback )
 
 static TIMER_CALLBACK( m68307_timer1_callback )
 {
-	m68000_base_device* m68k = (m68000_base_device *)ptr;
+	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
 	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
@@ -127,7 +127,7 @@ static TIMER_CALLBACK( m68307_wd_timer_callback )
 	printf("wd timer\n");
 }
 
-void m68307_timer::init(m68000_base_device *device)
+void m68307_timer::init(m68307cpu_device *device)
 {
 	parent = device;
 
@@ -161,7 +161,7 @@ void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
 
 void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 {
-	m68000_base_device* m68k = parent;
+	m68307cpu_device* m68k = parent;
 	m68307_single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TMR]);

@@ -4,10 +4,6 @@
 #define __M68000_H__
 
 
-#include "68307sim.h"
-#include "68307bus.h"
-#include "68307ser.h"
-#include "68307tmu.h"
 
 #include "68340sim.h"
 #include "68340dma.h"
@@ -125,17 +121,16 @@ typedef void (*m68k_cmpild_func)(device_t *device, UINT32 data, UINT8 reg);
 typedef void (*m68k_rte_func)(device_t *device);
 typedef int (*m68k_tas_func)(device_t *device);
 
-typedef UINT8 (*m68307_porta_read_callback)(address_space &space, bool dedicated, UINT8 line_mask);
-typedef void (*m68307_porta_write_callback)(address_space &space, bool dedicated, UINT8 data, UINT8 line_mask);
-typedef UINT16 (*m68307_portb_read_callback)(address_space &space, bool dedicated, UINT16 line_mask);
-typedef void (*m68307_portb_write_callback)(address_space &space, bool dedicated, UINT16 data, UINT16 line_mask);
 
 
 
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
+class m68000_base_device;
 
+
+extern UINT16 m68340_get_cs(m68000_base_device *device, offs_t address);
 
 typedef int (*instruction_hook_t)(m68000_base_device *device, offs_t curpc);
 
@@ -287,7 +282,6 @@ public:
 	public:
 		void init8(address_space &space);
 		void init16(address_space &space);
-		void init16_m68307(address_space &space);
 		void init32(address_space &space);
 		void init32mmu(address_space &space);
 		void init32hmmu(address_space &space);
@@ -306,13 +300,6 @@ public:
 		UINT16 read_immediate_16(offs_t address);
 		UINT16 simple_read_immediate_16(offs_t address);
 
-		UINT16 simple_read_immediate_16_m68307(offs_t address);
-		UINT8 read_byte_m68307(offs_t address);
-		UINT16 read_word_m68307(offs_t address);
-		UINT32 read_dword_m68307(offs_t address);
-		void write_byte_m68307(offs_t address, UINT8 data);
-		void write_word_m68307(offs_t address, UINT16 data);
-		void write_dword_m68307(offs_t address, UINT32 data);
 
 		UINT8 read_byte_32_mmu(offs_t address);
 		void write_byte_32_mmu(offs_t address, UINT8 data);
@@ -330,13 +317,15 @@ public:
 		UINT32 readlong_d32_hmmu(offs_t address);
 		void writelong_d32_hmmu(offs_t address, UINT32 data);
 
-		address_space *m_space;
-		direct_read_data *m_direct;
 //		m68000_base_device *m_cpustate;
 //	};
 
 	public:
 //	m68k_memory_interface memory;
+
+	address_space *m_space;
+	direct_read_data *m_direct;
+	
 	offs_t encrypted_start;
 	offs_t encrypted_end;
 
@@ -371,17 +360,8 @@ public:
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 
-	/* 68307 peripheral modules */
-	m68307_sim*    m68307SIM;
-	m68307_mbus*   m68307MBUS;
-	m68307_serial* m68307SERIAL;
-	m68307_timer*  m68307TIMER;
 
-	UINT16 m68307_base;
-	UINT16 m68307_scrhigh;
-	UINT16 m68307_scrlow;
-
-	int m68307_currentcs;
+	int m68340_currentcs;
 
 	/* 68340 peripheral modules */
 	m68340_sim*    m68340SIM;
@@ -392,16 +372,6 @@ public:
 	UINT32 m68340_base;
 
 
-	DECLARE_READ16_MEMBER( m68307_internal_base_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_base_w );
-	DECLARE_READ16_MEMBER( m68307_internal_timer_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_timer_w );
-	DECLARE_READ16_MEMBER( m68307_internal_sim_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_sim_w );
-	DECLARE_READ8_MEMBER( m68307_internal_serial_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_serial_w );
-	DECLARE_READ8_MEMBER( m68307_internal_mbus_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_mbus_w );
 
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
@@ -419,14 +389,8 @@ public:
 	WRITE32_MEMBER( m68340_internal_timer_w );
 
 
-	/* 68308 / 68340 internal address map */
+	/* 68307 / 68340 internal address map */
 	address_space *internal;
-
-	/* callbacks for internal ports */
-	m68307_porta_read_callback m_m68307_porta_r;
-	m68307_porta_write_callback m_m68307_porta_w;
-	m68307_portb_read_callback m_m68307_portb_r;
-	m68307_portb_write_callback m_m68307_portb_w;
 
 
 
@@ -437,7 +401,6 @@ public:
 
 	void init_cpu_common(void);
 	void init_cpu_m68000(void);
-	void init_cpu_m68307(void);
 	void init_cpu_m68008(void);
 	void init_cpu_m68010(void);
 	void init_cpu_m68020(void);
@@ -476,6 +439,11 @@ public:
 	// construction/destruction
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	m68000_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock,
+						const device_type type, UINT32 prg_data_width, UINT32 prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source);
+
+
+
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
 	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
@@ -511,25 +479,7 @@ protected:
 };
 
 
-class m68307_device : public m68000_base_device
-{
-public:
-	// construction/destruction
-	m68307_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual UINT32 disasm_min_opcode_bytes() const { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-
-	virtual UINT32 execute_min_cycles() const { return 4; };
-	virtual UINT32 execute_max_cycles() const { return 158; };
-
-	virtual UINT32 execute_default_irq_vector() const { return -1; };
-
-	// device-level overrides
-	virtual void device_start();
-protected:
-};
 
 class m68008_device : public m68000_base_device
 {
@@ -842,7 +792,6 @@ protected:
 
 extern const device_type M68000;
 extern const device_type M68301;
-extern const device_type M68307;
 extern const device_type M68008;
 extern const device_type M68008PLCC;
 extern const device_type M68010;
@@ -864,15 +813,6 @@ extern void m68k_set_cmpild_callback(m68000_base_device *device, m68k_cmpild_fun
 extern void m68k_set_rte_callback(m68000_base_device *device, m68k_rte_func callback);
 extern void m68k_set_tas_callback(m68000_base_device *device, m68k_tas_func callback);
 extern UINT16 m68k_get_fc(m68000_base_device *device);
-extern void m68307_set_port_callbacks(m68000_base_device *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w);
-extern void m68307_set_duart68681(m68000_base_device* cpudev, device_t* duart68681);
-extern UINT16 m68307_get_cs(m68000_base_device *device, offs_t address);
-extern UINT16 m68340_get_cs(m68000_base_device *device, offs_t address);
-extern void m68307_timer0_interrupt(m68000_base_device *cpudev);
-extern void m68307_timer1_interrupt(m68000_base_device *cpudev);
-extern void m68307_serial_interrupt(m68000_base_device *cpudev, int vector);
-extern void m68307_mbus_interrupt(m68000_base_device *cpudev);
-extern void m68307_licr2_interrupt(m68000_base_device *cpudev);
 extern void m68k_set_encrypted_opcode_range(m68000_base_device *device, offs_t start, offs_t end);
 extern void m68k_set_hmmu_enable(m68000_base_device *device, int enable);
 extern void m68k_set_instruction_hook(m68000_base_device *device, instruction_hook_t ihook);

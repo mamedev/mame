@@ -1,4 +1,4 @@
-#include "m68000.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
 #define m68307SER_UMR1_UMR2  (0x01)

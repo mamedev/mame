@@ -9,7 +9,7 @@
 #include "sound/ymz280b.h"
 #include "machine/68681.h"
 #include "machine/nvram.h"
-#include "cpu/m68000/m68000.h"
+#include "machine/68307.h"
 
 // common base class for things shared between sc4 and sc5
 class bfm_sc45_state : public driver_device
@@ -17,7 +17,6 @@ class bfm_sc45_state : public driver_device
 public:
 	bfm_sc45_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
 			m_duart(*this, "duart68681"),
 			m_vfd0(*this, "vfd0"),
 			m_ymz(*this, "ymz")
@@ -25,7 +24,7 @@ public:
 	}
 
 public:
-	required_device<m68000_base_device> m_maincpu;
+
 	required_device<duart68681_device> m_duart;
 	optional_device<bfm_bda_t> m_vfd0;
 	required_device<ymz280b_device> m_ymz;
@@ -50,6 +49,7 @@ class sc4_state : public bfm_sc45_state
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc45_state(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_cpuregion(*this, "maincpu"),
 			m_nvram(*this, "nvram"),
 			m_io1(*this, "IN-0"),
@@ -69,6 +69,7 @@ public:
 		m_dochk41 = false;
 	}
 
+	required_device<m68307cpu_device> m_maincpu;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;

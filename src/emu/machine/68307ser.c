@@ -10,12 +10,12 @@
 */
 
 #include "emu.h"
-#include "m68kcpu.h"
+#include "68307.h"
 
 
-READ8_MEMBER( m68000_base_device::m68307_internal_serial_r )
+READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_serial* serial = m68k->m68307SERIAL;
 	assert(serial != NULL);
 
@@ -90,9 +90,9 @@ READ8_MEMBER( m68000_base_device::m68307_internal_serial_r )
 	return 0x0000;
 }
 
-WRITE8_MEMBER( m68000_base_device::m68307_internal_serial_w )
+WRITE8_MEMBER( m68307cpu_device::m68307_internal_serial_w )
 {
-	m68000_base_device *m68k = this;
+	m68307cpu_device *m68k = this;
 	m68307_serial* serial = m68k->m68307SERIAL;
 	assert(serial != NULL);
 

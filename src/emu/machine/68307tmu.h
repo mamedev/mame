@@ -1,7 +1,7 @@
 
-#include "m68000.h"
+#include "cpu/m68000/m68000.h"
 
-class m68000_base_device;
+class m68307cpu_device;
 
 
 #define m68307TIMER_TMR (0x0)
@@ -27,13 +27,13 @@ class m68307_timer
 	m68307_single_timer singletimer[2];
 
 	emu_timer *wd_mametimer;
-	m68000_base_device *parent;
+	m68307cpu_device *parent;
 
 	void write_tmr(UINT16 data, UINT16 mem_mask, int which);
 	void write_trr(UINT16 data, UINT16 mem_mask, int which);
 	void write_ter(UINT16 data, UINT16 mem_mask, int which);
 	UINT16 read_tcn(UINT16 mem_mask, int which);
 
-	void init(m68000_base_device *device);
+	void init(m68307cpu_device *device);
 	void reset(void);
 };

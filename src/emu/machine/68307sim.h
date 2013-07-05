@@ -1,8 +1,8 @@
 /* 68307 SIM module */
 
-#include "m68000.h"
+#include "cpu/m68000/m68000.h"
 
-class m68000_base_device;
+class m68307cpu_device;
 
 
 /* ports */
@@ -53,13 +53,13 @@ class m68307_sim
 
 	void write_pacnt(UINT16 data, UINT16 mem_mask);
 	void write_paddr(UINT16 data, UINT16 mem_mask);
-	UINT16 read_padat(m68000_base_device* m68k, address_space &space, UINT16 mem_mask);
-	void write_padat(m68000_base_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
+	UINT16 read_padat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask);
+	void write_padat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
 
 	void write_pbcnt(UINT16 data, UINT16 mem_mask);
 	void write_pbddr(UINT16 data, UINT16 mem_mask);
-	UINT16 read_pbdat(m68000_base_device* m68k, address_space &space, UINT16 mem_mask);
-	void write_pbdat(m68000_base_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
+	UINT16 read_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask);
+	void write_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask);
 
 
 

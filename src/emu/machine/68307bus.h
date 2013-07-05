@@ -1,4 +1,4 @@
-#include "m68000.h"
+#include "cpu/m68000/m68000.h"
 
 #define m68307BUS_MADR (0x01)
 #define m68307BUS_MFDR (0x03)
