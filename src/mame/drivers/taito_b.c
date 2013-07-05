@@ -3082,7 +3082,7 @@ ROM_START( tetrist )
 	/* empty */
 ROM_END
 
-ROM_START( tetrista )
+ROM_START( tetrista ) // Master of Weapon conversion
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c35-04.bin", 0x000000, 0x020000, CRC(fa6e42ff) SHA1(1c586243aaf57b46338f22ae0fcdba2897ccb98a) )
 	ROM_LOAD16_BYTE( "c35-03.bin", 0x000001, 0x020000, CRC(aebd8539) SHA1(5230c0513581513ba971da55c04da8ba451a16e2) )
@@ -3095,9 +3095,9 @@ ROM_START( tetrista )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* these roms (present on the original board) are actually from from master of weapon
+	/* these roms (present on the original board) are actually from from Master of Weapon (Japan)
 	 b72-01.rom              mow-m01.rom             IDENTICAL
-	 b72-02.rom              mow-m02.rom             99.999809% (maybe one of them is bad?)
+	 b72-02.rom              mow-m02.rom             IDENTICAL
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
 	  tile 0 being solid and obscuring the bitmap (however if we load them in the correct region
 	  unwanted tiles from here are shown after gameover which is wrong)
