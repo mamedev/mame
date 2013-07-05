@@ -215,7 +215,7 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 			const UINT16* p2 = &m_helper2.pix16(y);
 			const UINT16* p3 = &m_helper3.pix16(y);
 
-			if (y % 2 != machine().primary_screen->frame_number() % 2)
+			if ((machine().primary_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
 			for (x = visarea.min_x; x <= visarea.max_x; x++)

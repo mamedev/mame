@@ -368,7 +368,7 @@ INLINE void
  )
 {
     bits64 z0, z1, z2;
-    int8 carry0, carry1;
+    uint8 carry0, carry1;
 
     z2 = a2 + b2;
     carry1 = ( z2 < a2 );
@@ -424,7 +424,7 @@ INLINE void
  )
 {
     bits64 z0, z1, z2;
-    int8 borrow0, borrow1;
+    uint8 borrow0, borrow1;
 
     z2 = a2 - b2;
     borrow1 = ( a2 < b2 );

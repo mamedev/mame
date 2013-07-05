@@ -30,7 +30,7 @@ public:
 	static const desc_e esq_10_desc[];
 
 private:
-	void find_size(io_generic *io, int &track_count, int &head_count, int &sector_count);
+	void find_size(io_generic *io, UINT8 &track_count, UINT8 &head_count, UINT8 &sector_count);
 };
 
 extern const floppy_format_type FLOPPY_ESQIMG_FORMAT;

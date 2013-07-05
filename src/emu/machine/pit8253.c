@@ -226,7 +226,7 @@ static UINT32 adjusted_count(int bcd, UINT16 val)
 void pit8253_device::decrease_counter_value(pit8253_timer *timer, UINT64 cycles)
 {
 	UINT16 value;
-	int units, tens, hundreds, thousands;
+	UINT8 units, tens, hundreds, thousands;
 
 	if (CTRL_BCD(timer->control) == 0)
 	{

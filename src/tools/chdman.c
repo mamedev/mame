@@ -400,7 +400,7 @@ public:
 	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
 	{
 		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
-		int interlace_factor = m_info.interlaced ? 2 : 1;
+		UINT8 interlace_factor = m_info.interlaced ? 2 : 1;
 		UINT32 length_remaining = length;
 
 		// iterate over frames
@@ -1497,7 +1497,7 @@ static void do_verify(parameters_t &params)
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = MIN(buffer.count(), input_chd.logical_bytes() - offset);
+		UINT32 bytes_to_read = MIN((UINT32)buffer.count(), input_chd.logical_bytes() - offset);
 		chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
@@ -2213,7 +2213,7 @@ static void do_extract_raw(parameters_t &params)
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = MIN(buffer.count(), input_end - offset);
+			UINT32 bytes_to_read = MIN((UINT32)buffer.count(), input_end - offset);
 			chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
@@ -2475,7 +2475,7 @@ static void do_extract_ld(parameters_t &params)
 			report_error(1, "Improperly formatted A/V metadata found");
 		fps_times_1million = fps * 1000000 + fpsfrac;
 	}
-	int interlace_factor = interlaced ? 2 : 1;
+	UINT8 interlace_factor = interlaced ? 2 : 1;
 
 	// determine key parameters and validate
 	max_samples_per_frame = (UINT64(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
@@ -2543,9 +2543,9 @@ static void do_extract_ld(parameters_t &params)
 
 		// iterate over frames
 		bitmap_yuy16 fullbitmap(width, height * interlace_factor);
-		for (int framenum = input_start; framenum < input_end; framenum++)
+		for (UINT64 framenum = input_start; framenum < input_end; framenum++)
 		{
-			progress(framenum == 0, "Extracting, %.1f%% complete...  \r", 100.0 * double(framenum - input_start) / double(input_end - input_start));
+			progress(framenum == input_start, "Extracting, %.1f%% complete...  \r", 100.0 * double(framenum - input_start) / double(input_end - input_start));
 
 			// set up the fake bitmap for this frame
 			avconfig.video.wrap(&fullbitmap.pix(framenum % interlace_factor), fullbitmap.width(), fullbitmap.height() / interlace_factor, fullbitmap.rowpixels() * interlace_factor);
@@ -2565,7 +2565,7 @@ static void do_extract_ld(parameters_t &params)
 			}
 
 			// write video
-			if (framenum % interlace_factor == interlace_factor - 1)
+			if ((framenum + 1) % interlace_factor == 0)
 			{
 				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
 				if (avierr != AVIERR_NONE)

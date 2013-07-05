@@ -487,7 +487,8 @@ static FLOPPY_CONSTRUCT(coco_os9_construct)
 static int coco_vdk_decode_header(floppy_image_legacy *floppy, struct basicdsk_geometry *geometry)
 {
 	UINT8 header[12];
-	int heads, tracks, sectors, sector_length, offset;
+	UINT8 heads, tracks, sectors;
+	UINT16 sector_length, offset;
 	UINT64 size;
 
 	size = floppy_image_size(floppy);
@@ -508,9 +509,9 @@ static int coco_vdk_decode_header(floppy_image_legacy *floppy, struct basicdsk_g
 	sectors = 18;
 	sector_length = 0x100;
 
-	offset = ((int) header[3]) * 0x100 + header[2];
+	offset = header[3] * 0x100 + header[2];
 
-	if (size != (heads * tracks * sectors * sector_length + offset))
+	if (size != ((UINT32) heads * tracks * sectors * sector_length + offset))
 		return -1;
 
 	if (geometry)

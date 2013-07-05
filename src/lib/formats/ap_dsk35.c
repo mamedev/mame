@@ -1259,13 +1259,13 @@ bool dc42_format::supports_save() const
 int dc42_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT8 h[0x54];
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	if(size < 0x54)
 		return 0;
 
 	io_generic_read(io, h, 0, 0x54);
-	int dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
-	int tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
+	UINT32 dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
+	UINT32 tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
 
 	return dsize > 0 && tsize >= 0 && size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0 ? 100 : 0;
 }

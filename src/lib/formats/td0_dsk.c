@@ -318,8 +318,9 @@ static floperr_t td0_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 
 int td0dsk_t::data_read(UINT8 *buf, UINT16 size)
 {
-	if (floppy_file_offset + size > io_generic_size(floppy_file) ) {
-		size = io_generic_size(floppy_file) - floppy_file_offset;
+	UINT64 image_size = io_generic_size(floppy_file);
+	if (size > image_size - floppy_file_offset) {
+		size = image_size - floppy_file_offset;
 	}
 	io_generic_read(floppy_file,buf,floppy_file_offset,size);
 	floppy_file_offset += size;

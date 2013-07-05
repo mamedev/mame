@@ -2061,7 +2061,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 			return;
 
 		cheat_map *newmap = auto_alloc_array(machine, cheat_map, cheat.length + real_length);
-		for (int item = 0; item < cheat.length; item++)
+		for (UINT64 item = 0; item < cheat.length; item++)
 			newmap[item] = cheat.cheatmap[item];
 		auto_free(machine, cheat.cheatmap);
 		cheat.cheatmap = newmap;
@@ -2373,7 +2373,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 	int cur_data_size;
 	int data_count = 0;
 	int found = 0;
-	UINT64 i, j;
+	int j;
 
 	/* validate parameters */
 	if (!debug_command_parameter_number(machine, param[0], &offset))
@@ -2391,7 +2391,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 		cur_data_size = 1;
 
 	/* parse the data parameters */
-	for (i = 2; i < params; i++)
+	for (int i = 2; i < params; i++)
 	{
 		const char *pdata = param[i];
 
@@ -2426,7 +2426,7 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now search */
-	for (i = offset; i <= endoffset; i += data_size[0])
+	for (UINT64 i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
 		int match = 1;
@@ -2469,7 +2469,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	int minbytes, maxbytes, byteswidth;
 	address_space *space;
 	FILE *f = NULL;
-	int i, j;
+	int j;
 
 	/* validate parameters */
 	if (!debug_command_parameter_number(machine, param[1], &offset))
@@ -2501,7 +2501,7 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	for (i = 0; i < length; )
+	for (UINT64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
 		char output[512], disasm[200];
@@ -2677,7 +2677,7 @@ static void execute_history(running_machine &machine, int ref, int params, const
 
 	/* loop over lines */
 	int maxbytes = debug->max_opcode_bytes();
-	for (int index = 0; index < count; index++)
+	for (int index = 0; index < (int) count; index++)
 	{
 		offs_t pc = debug->history_pc(-index);
 

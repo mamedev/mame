@@ -343,7 +343,7 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 header[0x100];
 	bool extendformat = FALSE;
 
-	int image_size = io_generic_size(io);
+	UINT64 image_size = io_generic_size(io);
 
 	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {

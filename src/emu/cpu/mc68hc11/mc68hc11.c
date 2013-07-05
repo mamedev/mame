@@ -550,13 +550,11 @@ static void check_irq_lines(hc11_state *cpustate)
 	{
 		int divider = div_tab[cpustate->pr & 3];
 		UINT64 cur_time = cpustate->device->total_cycles();
-		UINT64 add = (cur_time - cpustate->frc_base) / divider;
+		UINT32 add = (cur_time - cpustate->frc_base) / divider;
 
 		if (add > 0)
 		{
-			int i;
-
-			for(i=0;i<add;i++)
+			for(UINT32 i=0;i<add;i++)
 			{
 				cpustate->tcnt++;
 				if(cpustate->tcnt == cpustate->toc1)

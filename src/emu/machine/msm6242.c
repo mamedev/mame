@@ -251,7 +251,7 @@ void msm6242_device::update_rtc_registers()
 		return;
 
 	// ticks
-	if ((m_tick % 200) != ((delta + m_tick) % 0x200))
+	if ((m_tick % 200) != (int)((delta + m_tick) % 0x200))
 		irq(IRQ_64THSECOND);
 	delta = bump(RTC_TICKS, delta, 0, 0x8000);
 	if (delta == 0)

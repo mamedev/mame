@@ -52,8 +52,8 @@ static FLOPPY_IDENTIFY(oric_dsk_identify)
 
 	floppy_image_read(floppy, header, 0, mfm_disk_header_size);
 	if ( memcmp( header, MFM_ID, 8 ) ==0) {
-		int heads  = pick_integer_le(header, 8, 4);
-		int tracks = pick_integer_le(header, 12, 4);
+		UINT32 heads  = pick_integer_le(header, 8, 4);
+		UINT32 tracks = pick_integer_le(header, 12, 4);
 
 		if (floppy_image_size(floppy)==((tracks*heads*TRACK_SIZE_MFM)+mfm_disk_header_size)) {
 			*vote = 100;

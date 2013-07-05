@@ -26,7 +26,7 @@ public:
 	virtual bool supports_save() const;
 
 private:
-	void find_size(io_generic *io, int &track_count, int &head_count, int &sector_count);
+	void find_size(io_generic *io, UINT8 &track_count, UINT8 &head_count, UINT8 &sector_count);
 };
 
 class msa_format : public floppy_image_format_t

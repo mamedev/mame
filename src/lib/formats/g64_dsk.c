@@ -84,7 +84,7 @@ int g64_format::identify(io_generic *io, UINT32 form_factor)
 
 bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	UINT8 *img = global_alloc_array(UINT8, size);
 	io_generic_read(io, img, 0, size);
 

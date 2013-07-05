@@ -49,13 +49,13 @@ upd765_format::upd765_format(const format *_formats)
 
 int upd765_format::find_size(io_generic *io, UINT32 form_factor)
 {
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if(size == compute_track_size(f) * f.track_count * f.head_count)
+		if(size == (UINT64) compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 	}
 	return -1;

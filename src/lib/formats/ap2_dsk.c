@@ -576,8 +576,8 @@ bool a2_16sect_format::supports_save() const
 
 int a2_16sect_format::identify(io_generic *io, UINT32 form_factor)
 {
-		int size = io_generic_size(io);
-		int expected_size = 35 * 16 * 256;
+		UINT64 size = io_generic_size(io);
+		UINT32 expected_size = 35 * 16 * 256;
 		return size == expected_size;
 }
 
@@ -935,8 +935,8 @@ bool a2_rwts18_format::supports_save() const
 
 int a2_rwts18_format::identify(io_generic *io, UINT32 form_factor)
 {
-		int size = io_generic_size(io);
-		int expected_size = 35 * 16 * 256;
+		UINT64 size = io_generic_size(io);
+		UINT32 expected_size = 35 * 16 * 256;
 		return size == expected_size;
 }
 

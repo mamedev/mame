@@ -117,7 +117,7 @@ private:
 	struct player_gfx p1gfx;
 
 	UINT64 frame_cycles;
-	UINT64 paddle_cycles;
+	UINT64 paddle_start;
 
 	int horzP0;
 	int horzP1;

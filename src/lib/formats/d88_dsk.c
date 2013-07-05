@@ -444,7 +444,7 @@ const char *d88_format::extensions() const
 
 int d88_format::identify(io_generic *io, UINT32 form_factor)
 {
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	UINT8 h[32];
 
 	io_generic_read(io, h, 0, 32);

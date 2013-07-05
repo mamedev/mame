@@ -113,12 +113,12 @@ const int d64_format::speed_zone[] =
 
 int d64_format::find_size(io_generic *io, UINT32 form_factor)
 {
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	for(int i=0; formats[i].sector_count; i++) {
 		const format &f = formats[i];
-		if(size == f.sector_count*f.sector_base_size)
+		if(size == (UINT32) f.sector_count*f.sector_base_size)
 			return i;
-		if(size == (f.sector_count*f.sector_base_size) + f.sector_count)
+		if(size == (UINT32) (f.sector_count*f.sector_base_size) + f.sector_count)
 			return i;
 	}
 	return -1;
@@ -218,10 +218,10 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		return false;
 
 	const format &f = formats[type];
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	UINT8 *img;
 
-	if(size == f.sector_count*f.sector_base_size) {
+	if(size == (UINT32)f.sector_count*f.sector_base_size) {
 		img = global_alloc_array(UINT8, size + f.sector_count);
 		memset(&img[size], ERROR_00, f.sector_count);
 	}

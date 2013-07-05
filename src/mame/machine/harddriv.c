@@ -1985,11 +1985,11 @@ WRITE16_HANDLER( hdgsp_speedup2_w )
 READ16_HANDLER( rdgsp_speedup1_r )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	int result = state->m_gsp_speedup_addr[0][offset];
+	UINT16 result = state->m_gsp_speedup_addr[0][offset];
 
 	/* if this address is equal to $f000, spin until something gets written */
 	if (&space.device() == state->m_gsp && space.device().safe_pc() == state->m_gsp_speedup_pc &&
-		(result & 0xff) < space.device().state().state_int(TMS34010_A1))
+		(UINT8)result < space.device().state().state_int(TMS34010_A1))
 	{
 		state->m_gsp_speedup_count[0]++;
 		space.device().execute().spin_until_interrupt();

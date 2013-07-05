@@ -605,7 +605,7 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 	m_height = (header[8] << 8) | header[9];
 	m_scale = 1.0f / (float)m_height;
 	m_yoffs = (INT16)((header[10] << 8) | header[11]);
-	int numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
+	UINT32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
 	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
 		return false;
 

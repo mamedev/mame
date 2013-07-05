@@ -364,11 +364,11 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 
 bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	int size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	UINT8 *img = global_alloc_array(UINT8, size);
 	io_generic_read(io, img, 0, size);
 
-	int pos;
+	UINT64 pos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++);
 	pos++;
 

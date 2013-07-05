@@ -251,7 +251,7 @@ static FLOPPY_CONSTRUCT(sap_dsk_construct)
 {
 	struct FloppyCallbacks *callbacks;
 	struct sap_dsk_tag *tag;
-	int i,j;
+	int j;
 	UINT8 fmt;
 	tag = (struct sap_dsk_tag *) floppy_create_tag(floppy, sizeof(struct sap_dsk_tag));
 	if (!tag)
@@ -263,12 +263,12 @@ static FLOPPY_CONSTRUCT(sap_dsk_construct)
 
 		/* start with an empty offset table */
 		tag->tracks = 0;
-		for ( i = 0; i < 80; i++ )
+		for ( int i = 0; i < 80; i++ )
 				for ( j = 0; j < 16; j++ )
 						tag->sector_pos[i][j] = 0;
 
 		/* count tracks & fill sector offset table */
-	for ( i = 0x42; i+4 < floppy_image_size(floppy); i += tag->sector_size + 6 ) // CRC 2 bytes + 4 bytes sector header
+	for ( UINT64 i = 0x42; i+4 < floppy_image_size(floppy); i += tag->sector_size + 6 ) // CRC 2 bytes + 4 bytes sector header
 	{
 				UINT8 sector, track;
 		floppy_image_read(floppy, &track, i+2, 1);

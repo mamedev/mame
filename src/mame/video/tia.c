@@ -835,7 +835,7 @@ WRITE8_MEMBER( tia_video_device::VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_cycles = machine().firstcpu->total_cycles();
+		paddle_start = machine().firstcpu->total_cycles();
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -1588,8 +1588,8 @@ WRITE8_MEMBER( tia_video_device::GRP1_w )
 
 READ8_MEMBER( tia_video_device::INPT_r )
 {
-	UINT64 elapsed = machine().firstcpu->total_cycles() - paddle_cycles;
-	int input = TIA_INPUT_PORT_ALWAYS_ON;
+	UINT64 elapsed = machine().firstcpu->total_cycles() - paddle_start;
+	UINT16 input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( !m_read_input_port_func.isnull() )
 	{
 		input = m_read_input_port_func(offset & 3, 0xFFFF);
@@ -1600,7 +1600,8 @@ READ8_MEMBER( tia_video_device::INPT_r )
 	if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
 		return 0x00;
 
-	return elapsed > 76 * input ? 0x80 : 0x00;
+	UINT16 paddle_cycles = input * 76;
+	return elapsed > paddle_cycles ? 0x80 : 0x00;
 }
 
 

@@ -475,7 +475,7 @@ ROM_END
 
 READ32_MEMBER( beathead_state::speedup_r )
 {
-	int result = *m_speedup_data;
+	UINT32 result = *m_speedup_data;
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x006f0 && result == space.device().state().state_int(ASAP_R3))
 		space.device().execute().spin_until_interrupt();
 	return result;

@@ -17,12 +17,12 @@ public:
 		UINT32 form_factor;      // See floppy_image for possible values
 		UINT32 variant;          // See floppy_image for possible values
 
-		int sector_count;
-		int track_count;
-		int head_count;
-		int sector_base_size;
-		int gap_1;
-		int gap_2;
+		UINT16 sector_count;
+		UINT8 track_count;
+		UINT8 head_count;
+		UINT16 sector_base_size;
+		UINT8 gap_1;
+		UINT8 gap_2;
 	};
 
 	d64_format();

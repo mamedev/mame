@@ -2448,13 +2448,13 @@ INLINE void cfunc_rsp_vmacu(void *param)
 		{
 			if (ACCUM_H(i) != 0)
 			{
-				vres[i] = 0xffff;
+				vres[i] = (INT16)0xffff;
 			}
 			else
 			{
 				if ((INT16)ACCUM_M(i) < 0)
 				{
-					vres[i] = 0xffff;
+					vres[i] = (INT16)0xffff;
 				}
 				else
 				{

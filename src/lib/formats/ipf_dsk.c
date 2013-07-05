@@ -41,7 +41,7 @@ int ipf_format::identify(io_generic *io, UINT32 form_factor)
 
 bool ipf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	UINT32 size = io_generic_size(io);
+	UINT64 size = io_generic_size(io);
 	UINT8 *data = global_alloc_array(UINT8, size);
 	io_generic_read(io, data, 0, size);
 	bool res = parse(data, size, image);
