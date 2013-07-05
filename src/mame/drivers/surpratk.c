@@ -20,7 +20,7 @@ static KONAMI_SETLINES_CALLBACK( surpratk_banking );
 
 INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
@@ -34,7 +34,7 @@ READ8_MEMBER(surpratk_state::bankedram_r)
 			return m_generic_paletteram_8[offset];
 	}
 	else if (m_videobank & 0x01)
-		return k053245_r(m_k053244, space, offset);
+		return m_k053244->k053245_r(space, offset);
 	else
 		return m_ram[offset];
 }
@@ -49,7 +49,7 @@ WRITE8_MEMBER(surpratk_state::bankedram_w)
 			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
 	}
 	else if (m_videobank & 0x01)
-		k053245_w(m_k053244, space, offset, data);
+		m_k053244->k053245_w(space, offset, data);
 	else
 		m_ram[offset] = data;
 }
@@ -73,7 +73,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 }
@@ -90,12 +90,12 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f90, 0x5f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r) AM_WRITE(surpratk_5fc0_w)
 	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                 /* ROM */
 ADDRESS_MAP_END
 

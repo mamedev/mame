@@ -143,7 +143,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_eeprom_w)
 
 READ8_MEMBER(vendetta_state::vendetta_K052109_r)
 {
-	return k052109_r(m_k052109, space, offset + 0x2000);
+	return m_k052109->read(space, offset + 0x2000);
 }
 
 WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
@@ -153,8 +153,8 @@ WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
 	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
-		k052109_w(m_k052109, space, offset, data);
-	k052109_w(m_k052109, space, offset + 0x2000, data);
+		m_k052109->write(space, offset, data);
+	m_k052109->write(space, offset + 0x2000, data);
 }
 
 
@@ -172,7 +172,7 @@ void vendetta_state::vendetta_video_banking( int select )
 	else
 	{
 		space.install_readwrite_handler(m_video_banking_base + 0x2000, m_video_banking_base + 0x2fff, read8_delegate(FUNC(vendetta_state::vendetta_K052109_r),this), write8_delegate(FUNC(vendetta_state::vendetta_K052109_w),this) );
-		space.install_legacy_readwrite_handler(*m_k052109, m_video_banking_base + 0x0000, m_video_banking_base + 0x0fff, FUNC(k052109_r), FUNC(k052109_w) );
+		space.install_readwrite_handler(m_video_banking_base + 0x0000, m_video_banking_base + 0x0fff, read8_delegate(FUNC(k052109_device::read), (k052109_device*)m_k052109), write8_delegate(FUNC(k052109_device::write), (k052109_device*)m_k052109));
 	}
 }
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 	/* bit 2 = BRAMBK ?? */
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 4 = INIT ?? */
 
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")                    // 052109 (Tilemap) 0x0000-0x0fff
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank2")                    // 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)            // 052109 (Tilemap)
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)            // 052109 (Tilemap)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                    // 053248 '975r01' 1M ROM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                         // 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END

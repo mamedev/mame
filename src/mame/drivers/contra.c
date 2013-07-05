@@ -20,7 +20,6 @@ Dip locations and factory settings verified with manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/contra.h"
 
@@ -28,7 +27,7 @@ Dip locations and factory settings verified with manual
 INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 {
 	address_space &space = generic_space();
-	if (k007121_ctrlram_r(m_k007121_1, space, 7) & 0x02)
+	if (m_k007121_1->ctrlram_r(space, 7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 

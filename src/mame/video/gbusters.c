@@ -48,26 +48,26 @@ void gbusters_state::video_start()
 
 UINT32 gbusters_state::screen_update_gbusters(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	/* sprite priority 3 = disable */
 	if (m_priority)
 	{
-//      k051960_sprites_draw(m_k051960, bitmap, cliprect, 1, 1);  /* are these used? */
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 2, 2);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
+//      m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);  /* are these used? */
+		m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 2, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+		m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	}
 	else
 	{
-//      k051960_sprites_draw(m_k051960, bitmap, cliprect, 1, 1);  /* are these used? */
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 2, 2);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 0);
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
+//      m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);  /* are these used? */
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 2, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+		m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	}
 	return 0;
 }

@@ -52,14 +52,13 @@ Notes:
 #include "cpu/m6809/hd6309.h"
 #include "sound/2151intf.h"
 #include "sound/vlm5030.h"
-#include "video/konicdev.h"
 #include "includes/rockrage.h"
 #include "includes/konamipt.h"
 
 
 INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
 {
-	if (k007342_is_int_enabled(m_k007342))
+	if (m_k007342->is_int_enabled())
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -96,11 +95,11 @@ WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
 }
 
 static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)                    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)                    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)  /* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)                    /* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)                    /* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
 	AM_RANGE(0x2400, 0x247f) AM_RAM AM_SHARE("paletteram")                      /* Palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)                          /* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)                          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")

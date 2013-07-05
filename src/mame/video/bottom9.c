@@ -73,20 +73,20 @@ void bottom9_state::video_start()
 
 UINT32 bottom9_state::screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	/* note: FIX layer is not used */
 	bitmap.fill(m_layer_colorbase[1], cliprect);
 //  if (m_video_enable)
 	{
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 1, 1);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0);
 		/* note that priority 3 is opposite to the basic layer priority! */
 		/* (it IS used, but hopefully has no effect) */
-		k051960_sprites_draw(m_k051960, bitmap, cliprect, 2, 3);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, 2, 3);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
 	}
 	return 0;
 }

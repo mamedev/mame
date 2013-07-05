@@ -49,8 +49,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)   /* K051316 #0 registers */
 	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)   /* K051316 #1 registers */
 	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8_LEGACY("k051316_3", k051316_ctrl_w, 0x00ff)   /* K051316 #2 registers */
-	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8_LEGACY("k051960", k051937_r, k051937_w, 0x00ff)       /* Sprite control */
-	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8_LEGACY("k051960", k051960_r, k051960_w, 0x00ff)       /* Sprite RAM */
+	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0x00ff)       /* Sprite control */
+	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0x00ff)       /* Sprite RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )

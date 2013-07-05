@@ -61,7 +61,7 @@ UINT32 vendetta_state::screen_update_vendetta(screen_device &screen, bitmap_ind1
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -73,9 +73,9 @@ UINT32 vendetta_state::screen_update_vendetta(screen_device &screen, bitmap_ind1
 	konami_sortlayers3(layer, m_layerpri);
 
 	machine().priority_bitmap.fill(0, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 	return 0;

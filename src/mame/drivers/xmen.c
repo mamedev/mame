@@ -60,7 +60,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 		/* bit 8 = enable sprite ROM reading */
 		k053246_set_objcha_line(m_k053246, (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_lsb_r, k052109_lsb_w)
+	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD_LEGACY("k053246", k053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE_LEGACY("k052109", k052109_lsb_w) AM_SHARE("tilemapleft") */
+/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
 	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_SHARE("tilemapleft") /* left tilemap (p1,p2,p3 counters) */
 /*
     AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY

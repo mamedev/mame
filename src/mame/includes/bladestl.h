@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/upd7759.h"
+#include "video/konicdev.h"
 
 class bladestl_state : public driver_device
 {

@@ -28,42 +28,42 @@ typedef void (*k056832_callback)(running_machine &machine, int layer, int *code,
 
 struct k007342_interface
 {
-	int                gfxnum;
-	k007342_callback   callback;
+	int                m_gfxnum;
+	k007342_callback   m_callback;
 };
 
 struct k007420_interface
 {
-	int                banklimit;
-	k007420_callback   callback;
+	int                m_banklimit;
+	k007420_callback   m_callback;
 };
 
 struct k052109_interface
 {
-	const char         *gfx_memory_region;
-	int                gfx_num;
-	int                plane_order;
-	int                deinterleave;
-	k052109_callback   callback;
+	const char         *m_gfx_memory_region;
+	int                m_gfx_num;
+	int                m_plane_order;
+	int                m_deinterleave;
+	k052109_callback   m_callback;
 };
 
 struct k051960_interface
 {
-	const char         *gfx_memory_region;
-	int                gfx_num;
-	int                plane_order;
-	int                deinterleave;
-	k051960_callback   callback;
+	const char         *m_gfx_memory_region;
+	int                m_gfx_num;
+	int                m_plane_order;
+	int                m_deinterleave;
+	k051960_callback   m_callback;
 };
 
 struct k05324x_interface
 {
-	const char         *gfx_memory_region;
-	int                gfx_num;
-	int                plane_order;
-	int                dx, dy;
-	int                deinterleave;
-	k05324x_callback   callback;
+	const char         *m_gfx_memory_region;
+	int                m_gfx_num;
+	int                m_plane_order;
+	int                m_dx, m_dy;
+	int                m_deinterleave;
+	k05324x_callback   m_callback;
 };
 
 struct k053247_interface
@@ -148,30 +148,46 @@ class k007121_device : public device_t
 {
 public:
 	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k007121_device() { global_free(m_token); }
+	~k007121_device() {}
+	
+	DECLARE_READ8_MEMBER( ctrlram_r );
+	DECLARE_WRITE8_MEMBER( ctrl_w );
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/* shall we move source in the interface? */
+	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
+	void sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,	const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	UINT8    m_ctrlram[8];
+	int      m_flipscreen;
 };
 
 extern const device_type K007121;
 
-class k007342_device : public device_t
+class k007342_device : public device_t,
+										public k007342_interface
 {
 public:
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k007342_device() { global_free(m_token); }
+	~k007342_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( scroll_r );
+	DECLARE_WRITE8_MEMBER( scroll_w );
+	DECLARE_WRITE8_MEMBER( vreg_w );
+
+	void tilemap_update();
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority);
+	int is_int_enabled();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -179,23 +195,38 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT8    *m_ram;
+	UINT8    *m_scroll_ram;
+	UINT8    *m_videoram_0;
+	UINT8    *m_videoram_1;
+	UINT8    *m_colorram_0;
+	UINT8    *m_colorram_1;
 
-	TILEMAP_MAPPER_MEMBER(k007342_scan);
-	TILE_GET_INFO_MEMBER(k007342_get_tile_info0);
-	TILE_GET_INFO_MEMBER(k007342_get_tile_info1);
+	tilemap_t  *m_tilemap[2];
+	int      m_flipscreen, m_int_enabled;
+	UINT8    m_regs[8];
+	UINT16   m_scrollx[2];
+	UINT8    m_scrolly[2];
+
+	TILEMAP_MAPPER_MEMBER(scan);
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram );
 };
 
 extern const device_type K007342;
 
-class k007420_device : public device_t
+class k007420_device : public device_t,
+										public k007420_interface
 {
 public:
 	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k007420_device() { global_free(m_token); }
+	~k007420_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -203,19 +234,65 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT8        *m_ram;
+
+	int          m_flipscreen;    // current code uses the 7342 flipscreen!!
+	UINT8        m_regs[8];   // current code uses the 7342 regs!! (only [2])
 };
 
 extern const device_type K007420;
 
-class k052109_device : public device_t
+class k052109_device : public device_t,
+										public k052109_interface
 {
 public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k052109_device() { global_free(m_token); }
+	~k052109_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/*
+	You don't have to decode the graphics: the vh_start() routines will do that
+	for you, using the plane order passed.
+	Of course the ROM data must be in the correct order. This is a way to ensure
+	that the ROM test will pass.
+	The konami_rom_deinterleave() function above will do the reorganization for
+	you in most cases (but see tmnt.c for additional bit rotations or byte
+	permutations which may be required).
+	*/
+	#define NORMAL_PLANE_ORDER 0x0123
+	#define REVERSE_PLANE_ORDER 0x3210
+	#define GRADIUS3_PLANE_ORDER 0x1111
+	#define TASMAN_PLANE_ORDER 0x1616
+	
+	/*
+	The callback is passed:
+	- layer number (0 = FIX, 1 = A, 2 = B)
+	- bank (range 0-3, output of the pins CAB1 and CAB2)
+	- code (range 00-FF, output of the pins VC3-VC10)
+	NOTE: code is in the range 0000-FFFF for X-Men, which uses extra RAM
+	- color (range 00-FF, output of the pins COL0-COL7)
+	The callback must put:
+	- in code the resulting tile number
+	- in color the resulting color index
+	- if necessary, put flags and/or priority for the TileMap code in the tile_info
+	structure (e.g. TILE_FLIPX). Note that TILE_FLIPY is handled internally by the
+	chip so it must not be set by the callback.
+	*/
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );	
+	DECLARE_READ16_MEMBER( word_r );
+	DECLARE_WRITE16_MEMBER( word_w );
+	DECLARE_READ16_MEMBER( lsb_r );
+	DECLARE_WRITE16_MEMBER( lsb_w );
+	
+	void set_rmrd_line(int state);
+	int get_rmrd_line();
+	void tilemap_update();
+	int is_irq_enabled();
+	void set_layer_offsets(int layer, int dx, int dy);
+	void tilemap_mark_dirty(int tmap_num);
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -223,23 +300,79 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT8    *m_ram;
+	UINT8    *m_videoram_F;
+	UINT8    *m_videoram_A;
+	UINT8    *m_videoram_B;
+	UINT8    *m_videoram2_F;
+	UINT8    *m_videoram2_A;
+	UINT8    *m_videoram2_B;
+	UINT8    *m_colorram_F;
+	UINT8    *m_colorram_A;
+	UINT8    *m_colorram_B;
 
-	TILE_GET_INFO_MEMBER(k052109_get_tile_info0);
-	TILE_GET_INFO_MEMBER(k052109_get_tile_info1);
-	TILE_GET_INFO_MEMBER(k052109_get_tile_info2);
+	tilemap_t  *m_tilemap[3];
+	int      m_tileflip_enable;
+	UINT8    m_charrombank[4];
+	UINT8    m_charrombank_2[4];
+	UINT8    m_has_extra_video_ram;
+	INT32    m_rmrd_line;
+	UINT8    m_irq_enabled;
+	INT32    m_dx[3], m_dy[3];
+	UINT8    m_romsubbank, m_scrollctrl;
+
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	
+	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 );
+	void tileflip_reset();
 };
 
 extern const device_type K052109;
 
-class k051960_device : public device_t
+class k051960_device : public device_t,
+										public k051960_interface
 {
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k051960_device() { global_free(m_token); }
+	~k051960_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/*
+	The callback is passed:
+	- code (range 00-1FFF, output of the pins CA5-CA17)
+	- color (range 00-FF, output of the pins OC0-OC7). Note that most of the
+	  time COL7 seems to be "shadow", but not always (e.g. Aliens).
+	The callback must put:
+	- in code the resulting sprite number
+	- in color the resulting color index
+	- if necessary, in priority the priority of the sprite wrt tilemaps
+	- if necessary, alter shadow to indicate whether the sprite has shadows enabled.
+	  shadow is preloaded with color & 0x80 so it doesn't need to be changed unless
+	  the game has special treatment (Aliens)
+	*/
+
+	DECLARE_READ8_MEMBER( k051960_r );
+	DECLARE_WRITE8_MEMBER( k051960_w );
+	DECLARE_READ16_MEMBER( k051960_word_r );
+	DECLARE_WRITE16_MEMBER( k051960_word_w );
+
+	DECLARE_READ8_MEMBER( k051937_r );
+	DECLARE_WRITE8_MEMBER( k051937_w );
+	DECLARE_READ16_MEMBER( k051937_word_r );
+	DECLARE_WRITE16_MEMBER( k051937_word_w );
+
+	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int min_priority, int max_priority);
+	int k051960_is_irq_enabled();
+	int k051960_is_nmi_enabled();
+	void k051960_set_sprite_offsets(int dx, int dy);
+
+	#if 0 // to be moved in the specific drivers!
+	/* special handling for the chips sharing address space */
+	DECLARE_READ8_HANDLER( k052109_051960_r );
+	DECLARE_WRITE8_HANDLER( k052109_051960_w );
+	#endif
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -247,19 +380,48 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT8    *m_ram;
+
+	gfx_element *m_gfx;
+
+	UINT8    m_spriterombank[3];
+	int      m_dx, m_dy;
+	int      m_romoffset;
+	int      m_spriteflip, m_readroms;
+	int      m_irq_enabled, m_nmi_enabled;
+
+	int      m_k051937_counter;
+	
+	int k051960_fetchromdata( int byte );
 };
 
 extern const device_type K051960;
 
-class k05324x_device : public device_t
+class k05324x_device : public device_t,
+										public k05324x_interface
 {
 public:
 	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k05324x_device() { global_free(m_token); }
+	~k05324x_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ16_MEMBER( k053245_word_r );
+	DECLARE_WRITE16_MEMBER( k053245_word_w );
+	DECLARE_READ8_MEMBER( k053245_r );
+	DECLARE_WRITE8_MEMBER( k053245_w );
+	DECLARE_READ8_MEMBER( k053244_r );
+	DECLARE_WRITE8_MEMBER( k053244_w );
+	DECLARE_READ16_MEMBER( k053244_lsb_r );
+	DECLARE_WRITE16_MEMBER( k053244_lsb_w );
+	DECLARE_READ16_MEMBER( k053244_word_r );
+	DECLARE_WRITE16_MEMBER( k053244_word_w );
+	void k053244_bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
+	void k053245_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void k053245_sprites_draw_lethal(bitmap_ind16 &bitmap, const rectangle &cliprect); /* for lethal enforcers */
+	void k053245_clear_buffer();
+	void k053245_update_buffer();
+	void k053245_set_sprite_offs(int offsx, int offsy);
+	void k05324x_set_z_rejection(int zcode); // common to k053244/5
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -267,7 +429,17 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT16    *m_ram;
+	UINT16    *m_buffer;
+
+	gfx_element *m_gfx;
+
+	UINT8    m_regs[0x10];    // 053244
+	int      m_rombank;       // 053244
+	int      m_ramsize;
+	int      m_z_rejection;
+	
+	DECLARE_READ16_MEMBER( k053244_reg_word_r );    // OBJSET0 debug handler
 };
 
 extern const device_type K053244;
@@ -722,138 +894,6 @@ void konami_sortlayers5(int *layer, int *pri);
     DEVICE I/O FUNCTIONS
 ***************************************************************************/
 
-/**  Konami 007121  **/
-DECLARE_READ8_DEVICE_HANDLER( k007121_ctrlram_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k007121_ctrl_w );
-
-/* shall we move source in the interface? */
-/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */
-void k007121_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, colortable_t *ctable,
-							const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask );
-
-
-/**  Konami 007342  **/
-DECLARE_READ8_DEVICE_HANDLER( k007342_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k007342_w );
-DECLARE_READ8_DEVICE_HANDLER( k007342_scroll_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k007342_scroll_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k007342_vreg_w );
-
-void k007342_tilemap_update(device_t *device);
-void k007342_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, int flags, UINT32 priority);
-int k007342_is_int_enabled(device_t *device);
-
-
-/**  Konami 007420  **/
-#define K007420_SPRITERAM_SIZE 0x200
-
-DECLARE_READ8_DEVICE_HANDLER( k007420_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k007420_w );
-void k007420_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
-
-
-/**  Konami 052109  **/
-/*
-You don't have to decode the graphics: the vh_start() routines will do that
-for you, using the plane order passed.
-Of course the ROM data must be in the correct order. This is a way to ensure
-that the ROM test will pass.
-The konami_rom_deinterleave() function above will do the reorganization for
-you in most cases (but see tmnt.c for additional bit rotations or byte
-permutations which may be required).
-*/
-#define NORMAL_PLANE_ORDER 0x0123
-#define REVERSE_PLANE_ORDER 0x3210
-#define GRADIUS3_PLANE_ORDER 0x1111
-#define TASMAN_PLANE_ORDER 0x1616
-
-/*
-The callback is passed:
-- layer number (0 = FIX, 1 = A, 2 = B)
-- bank (range 0-3, output of the pins CAB1 and CAB2)
-- code (range 00-FF, output of the pins VC3-VC10)
-  NOTE: code is in the range 0000-FFFF for X-Men, which uses extra RAM
-- color (range 00-FF, output of the pins COL0-COL7)
-The callback must put:
-- in code the resulting tile number
-- in color the resulting color index
-- if necessary, put flags and/or priority for the TileMap code in the tile_info
-  structure (e.g. TILE_FLIPX). Note that TILE_FLIPY is handled internally by the
-  chip so it must not be set by the callback.
-*/
-
-DECLARE_READ8_DEVICE_HANDLER( k052109_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k052109_w );
-DECLARE_READ16_DEVICE_HANDLER( k052109_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k052109_word_w );
-DECLARE_READ16_DEVICE_HANDLER( k052109_lsb_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k052109_lsb_w );
-
-void k052109_set_rmrd_line(device_t *device, int state);
-int k052109_get_rmrd_line(device_t *device);
-void k052109_tilemap_update(device_t *device);
-int k052109_is_irq_enabled(device_t *device);
-void k052109_set_layer_offsets(device_t *device, int layer, int dx, int dy);
-void k052109_tilemap_mark_dirty(device_t *device, int tmap_num);
-void k052109_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
-
-
-/**  Konami 051960 / 051937  **/
-/*
-The callback is passed:
-- code (range 00-1FFF, output of the pins CA5-CA17)
-- color (range 00-FF, output of the pins OC0-OC7). Note that most of the
-  time COL7 seems to be "shadow", but not always (e.g. Aliens).
-The callback must put:
-- in code the resulting sprite number
-- in color the resulting color index
-- if necessary, in priority the priority of the sprite wrt tilemaps
-- if necessary, alter shadow to indicate whether the sprite has shadows enabled.
-  shadow is preloaded with color & 0x80 so it doesn't need to be changed unless
-  the game has special treatment (Aliens)
-*/
-
-DECLARE_READ8_DEVICE_HANDLER( k051960_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k051960_w );
-DECLARE_READ16_DEVICE_HANDLER( k051960_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k051960_word_w );
-
-DECLARE_READ8_DEVICE_HANDLER( k051937_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k051937_w );
-DECLARE_READ16_DEVICE_HANDLER( k051937_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k051937_word_w );
-
-void k051960_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int min_priority, int max_priority);
-int k051960_is_irq_enabled(device_t *device);
-int k051960_is_nmi_enabled(device_t *device);
-void k051960_set_sprite_offsets(device_t *device, int dx, int dy);
-
-#if 0 // to be moved in the specific drivers!
-/* special handling for the chips sharing address space */
-DECLARE_READ8_HANDLER( k052109_051960_r );
-DECLARE_WRITE8_HANDLER( k052109_051960_w );
-#endif
-
-
-/**  Konami 053244 / 053245  **/
-DECLARE_READ16_DEVICE_HANDLER( k053245_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k053245_word_w );
-DECLARE_READ8_DEVICE_HANDLER( k053245_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k053245_w );
-DECLARE_READ8_DEVICE_HANDLER( k053244_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k053244_w );
-DECLARE_READ16_DEVICE_HANDLER( k053244_lsb_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k053244_lsb_w );
-DECLARE_READ16_DEVICE_HANDLER( k053244_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k053244_word_w );
-void k053244_bankselect(device_t *device, int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-void k053245_sprites_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
-void k053245_sprites_draw_lethal(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect); /* for lethal enforcers */
-void k053245_clear_buffer(device_t *device);
-void k053245_set_sprite_offs(device_t *device, int offsx, int offsy);
-
-
-
 /**  Konami 053246 / 053247 / 055673  **/
 #define K055673_LAYOUT_GX  0
 #define K055673_LAYOUT_RNG 1
@@ -887,7 +927,6 @@ void k053247_sprites_draw(device_t *device, bitmap_rgb32 &bitmap,const rectangle
 int k053247_read_register(device_t *device, int regnum);
 void k053247_set_sprite_offs(device_t *device, int offsx, int offsy);
 void k053247_wraparound_enable(device_t *device, int status);
-void k05324x_set_z_rejection(device_t *device, int zcode); // common to k053244/5
 void k053247_set_z_rejection(device_t *device, int zcode); // common to k053246/7
 void k053247_get_ram(device_t *device, UINT16 **ram);
 int k053247_get_dx(device_t *device);
@@ -1174,7 +1213,5 @@ DECLARE_READ16_DEVICE_HANDLER( k054338_word_r );        // CLTC
 DECLARE_READ32_DEVICE_HANDLER( k056832_long_r );        // VACSET
 DECLARE_READ32_DEVICE_HANDLER( k053247_reg_long_r );    // OBJSET2
 DECLARE_READ32_DEVICE_HANDLER( k055555_long_r );        // PCU2
-
-DECLARE_READ16_DEVICE_HANDLER( k053244_reg_word_r );    // OBJSET0
 
 #endif

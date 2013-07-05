@@ -28,40 +28,40 @@
 
 READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {
-	return k052109_r(m_k052109, space, offset);
+	return m_k052109->read(space, offset);
 }
 
 WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 {
 	if (ACCESSING_BITS_0_7)
-		k052109_w(m_k052109, space, offset, data & 0xff);
+		m_k052109->write(space, offset, data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
-		k052109_w(m_k052109, space, offset, (data >> 8) & 0xff);
+		m_k052109->write(space, offset, (data >> 8) & 0xff);
 //      logerror("%06x half %04x = %04x\n",space.device().safe_pc(),offset,data);
 }
 
 READ16_MEMBER(gradius3_state::k051937_halfword_r)
 {
-	return k051937_r(m_k051960, space, offset);
+	return m_k051960->k051937_r(space, offset);
 }
 
 WRITE16_MEMBER(gradius3_state::k051937_halfword_w)
 {
 	if (ACCESSING_BITS_0_7)
-		k051937_w(m_k051960, space, offset, data & 0xff);
+		m_k051960->k051937_w(space, offset, data & 0xff);
 }
 
 READ16_MEMBER(gradius3_state::k051960_halfword_r)
 {
-	return k051960_r(m_k051960, space, offset);
+	return m_k051960->k051960_r(space, offset);
 }
 
 WRITE16_MEMBER(gradius3_state::k051960_halfword_w)
 {
 	if (ACCESSING_BITS_0_7)
-		k051960_w(m_k051960, space, offset, data & 0xff);
+		m_k051960->k051960_w(space, offset, data & 0xff);
 }
 
 WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)

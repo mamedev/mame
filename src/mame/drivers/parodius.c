@@ -21,7 +21,7 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking );
 
 INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
@@ -54,17 +54,17 @@ WRITE8_MEMBER(parodius_state::bankedram_w)
 READ8_MEMBER(parodius_state::parodius_052109_053245_r)
 {
 	if (m_videobank & 0x02)
-		return k053245_r(m_k053245, space, offset);
+		return m_k053245->k053245_r(space, offset);
 	else
-		return k052109_r(m_k052109, space, offset);
+		return m_k052109->read(space, offset);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_052109_053245_w)
 {
 	if (m_videobank & 0x02)
-		k053245_w(m_k053245, space, offset, data);
+		m_k053245->k053245_w(space, offset, data);
 	else
-		k052109_w(m_k052109, space, offset, data);
+		m_k052109->write(space, offset, data);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_videobank_w)
@@ -88,7 +88,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 }
@@ -141,14 +141,14 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3f8e, 0x3f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x3f8f, 0x3f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE_LEGACY("k053245", k053244_r, k053244_w)
+	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE("k053245", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_READ(watchdog_reset_r) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
 	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w) /* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r, parodius_052109_053245_w)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")            /* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM                 /* ROM */
 ADDRESS_MAP_END

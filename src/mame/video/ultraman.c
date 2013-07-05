@@ -123,8 +123,8 @@ UINT32 ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind1
 {
 	k051316_zoom_draw(m_k051316_3, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 0);
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, 1, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
 	return 0;
 }

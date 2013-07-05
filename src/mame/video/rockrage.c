@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/rockrage.h"
 
 void rockrage_state::palette_init()
@@ -100,12 +99,12 @@ UINT32 rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind1
 {
 	set_pens(machine());
 
-	k007342_tilemap_update(m_k007342);
+	m_k007342->tilemap_update();
 
-	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	k007420_sprites_draw(m_k007420, bitmap, cliprect, machine().gfx[1]);
-	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE, 0);
-	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 1, 0, 0);
-	k007342_tilemap_draw(m_k007342, bitmap, cliprect, 1, 1, 0);
+	m_k007342->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	m_k007420->sprites_draw(bitmap, cliprect, machine().gfx[1]);
+	m_k007342->tilemap_draw(bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE, 0);
+	m_k007342->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_k007342->tilemap_draw(bitmap, cliprect, 1, 1, 0);
 	return 0;
 }

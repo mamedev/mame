@@ -107,7 +107,7 @@ UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
-	k053245_sprites_draw_lethal(m_k053244, bitmap, cliprect);
+	m_k053244->k053245_sprites_draw_lethal(bitmap, cliprect);
 
 	// force "A" layer over top of everything
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);

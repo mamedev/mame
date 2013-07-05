@@ -87,26 +87,26 @@ void ajax_state::video_start()
 
 UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 1);
 	if (m_priority)
 	{
 		/* basic layer order is B, zoom, A, F */
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
 	}
 	else
 	{
 		/* basic layer order is B, A, zoom, F */
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
 	}
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 8);
+	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 8);
 
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
 	return 0;
 }

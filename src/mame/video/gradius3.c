@@ -77,8 +77,8 @@ void gradius3_state::video_start()
 	m_layer_colorbase[2] = 48;
 	m_sprite_colorbase = 16;
 
-	k052109_set_layer_offsets(m_k052109, 2, -2, 0);
-	k051960_set_sprite_offsets(m_k051960, 2, 0);
+	m_k052109->set_layer_offsets(2, -2, 0);
+	m_k051960->k051960_set_sprite_offsets(2, 0);
 
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
 	   from how they are connected to the CPU. */
@@ -125,25 +125,25 @@ UINT32 gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_ind1
 {
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	address_space &space = machine().driver_data()->generic_space();
-	k052109_w(m_k052109, space, 0x1d80, 0x10);
-	k052109_w(m_k052109, space, 0x1f00, 0x32);
+	m_k052109->write(space, 0x1d80, 0x10);
+	m_k052109->write(space, 0x1f00, 0x32);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	machine().priority_bitmap.fill(0, cliprect);
 	if (m_priority == 0)
 	{
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 1);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 4);
+		m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 1);
 	}
 	else
 	{
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 2);
-		k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 4);
+		m_k052109->tilemap_draw(bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
+		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 4);
 	}
 
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
 	return 0;
 }

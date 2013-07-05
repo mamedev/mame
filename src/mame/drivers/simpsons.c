@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -271,7 +271,7 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 		timer_set(attotime::from_usec(30), TIMER_DMAEND);
 	}
 
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 

@@ -123,9 +123,6 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "sound/upd7759.h"
-#include "sound/msm5205.h"
-#include "video/konicdev.h"
 #include "includes/combatsc.h"
 
 

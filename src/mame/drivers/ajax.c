@@ -26,8 +26,8 @@
 
 static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ajax_ls138_f10_r, ajax_ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
-	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE_LEGACY("k051960", k051937_r, k051937_w)                    /* sprite control registers */
-	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE_LEGACY("k051960", k051960_r, k051960_w)                    /* sprite RAM 2128SL at J7 */
+	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* sprite control registers */
+	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* sprite RAM 2128SL at J7 */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")/* palette */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                                  /* shared RAM with the 6809 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM 6264L at K10 */
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( ajax_sub_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD_LEGACY("k051316", k051316_rom_r)                /* 051316 (ROM test) */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)          /* bankswitch control */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                      /* shared RAM with the 052001 */
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)        /* video RAM + color RAM + video registers */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)        /* video RAM + color RAM + video registers */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")                            /* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM                                 /* ROM I16 */
 ADDRESS_MAP_END

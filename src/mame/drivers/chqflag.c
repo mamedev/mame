@@ -29,9 +29,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240 && k051960_is_irq_enabled(m_k051960)) // vblank irq
+	if(scanline == 240 && m_k051960->k051960_is_irq_enabled()) // vblank irq
 		m_maincpu->set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(m_k051960))) // timer irq
+	else if(((scanline % 32) == 0) && (m_k051960->k051960_is_nmi_enabled())) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -139,8 +139,8 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM                                             /* RAM */
 	AM_RANGE(0x1000, 0x17ff) AM_RAMBANK("bank1")                                /* banked RAM (RAM/051316 (chip 1)) */
 	AM_RANGE(0x1800, 0x1fff) AM_RAMBANK("bank2")                                /* palette + RAM */
-	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE_LEGACY("k051960", k051937_r, k051937_w)                    /* Sprite control registers */
-	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_r, k051960_w)                    /* Sprite RAM */
+	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* Sprite control registers */
+	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* Sprite RAM */
 	AM_RANGE(0x2800, 0x2fff) AM_READ_BANK("bank3") AM_DEVWRITE_LEGACY("k051316_2", k051316_w)       /* 051316 zoom/rotation (chip 2) */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_byte_w)                                /* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)                  /* cause interrupt on audio CPU */

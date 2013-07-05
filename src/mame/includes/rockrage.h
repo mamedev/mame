@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/konicdev.h"
+
 class rockrage_state : public driver_device
 {
 public:

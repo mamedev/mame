@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/contra.h"
 
 
@@ -77,10 +76,10 @@ void contra_state::set_pens(  )
 
 TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121_1, generic_space(), 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121_1, generic_space(), 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_1, generic_space(), 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, generic_space(), 6);
+	UINT8 ctrl_3 = m_k007121_1->ctrlram_r(generic_space(), 3);
+	UINT8 ctrl_4 = m_k007121_1->ctrlram_r(generic_space(), 4);
+	UINT8 ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
+	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
 	int attr = m_fg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -105,10 +104,10 @@ TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121_2, generic_space(), 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121_2, generic_space(), 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_2, generic_space(), 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_2, generic_space(), 6);
+	UINT8 ctrl_3 = m_k007121_2->ctrlram_r(generic_space(), 3);
+	UINT8 ctrl_4 = m_k007121_2->ctrlram_r(generic_space(), 4);
+	UINT8 ctrl_5 = m_k007121_2->ctrlram_r(generic_space(), 5);
+	UINT8 ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
 	int attr = m_bg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -134,8 +133,8 @@ TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 {
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121_1, generic_space(), 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, generic_space(), 6);
+	UINT8 ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
+	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
 	int attr = m_tx_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -230,7 +229,7 @@ WRITE8_MEMBER(contra_state::contra_text_cram_w)
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 {
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_1, space, 6);
+	UINT8 ctrl_6 = m_k007121_1->ctrlram_r(space, 6);
 
 	if (offset == 3)
 	{
@@ -249,12 +248,12 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_0_w)
 	if (offset == 7)
 		m_fg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(m_k007121_1, space, offset, data);
+	m_k007121_1->ctrl_w(space, offset, data);
 }
 
 WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 {
-	UINT8 ctrl_6 = k007121_ctrlram_r(m_k007121_2, space, 6);
+	UINT8 ctrl_6 = m_k007121_2->ctrlram_r(space, 6);
 
 	if (offset == 3)
 	{
@@ -271,7 +270,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 7)
 		m_bg_tilemap->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(m_k007121_2, space, offset, data);
+	m_k007121_2->ctrl_w(space, offset, data);
 }
 
 
@@ -284,9 +283,9 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank )
 {
-	device_t *k007121 = bank ? m_k007121_2 : m_k007121_1;
+	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
 	address_space &space = machine().driver_data()->generic_space();
-	int base_color = (k007121_ctrlram_r(k007121, space, 6) & 0x30) * 2;
+	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	const UINT8 *source;
 
 	if (bank == 0)
@@ -294,16 +293,16 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	else
 		source = m_buffered_spriteram_2;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine().gfx[bank], machine().colortable, source, base_color, 40, 0, (UINT32)-1);
+	k007121->sprites_draw(bitmap, cliprect, machine().gfx[bank], machine().colortable, source, base_color, 40, 0, (UINT32)-1);
 }
 
 UINT32 contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = machine().driver_data()->generic_space();
-	UINT8 ctrl_1_0 = k007121_ctrlram_r(m_k007121_1, space, 0);
-	UINT8 ctrl_1_2 = k007121_ctrlram_r(m_k007121_1, space, 2);
-	UINT8 ctrl_2_0 = k007121_ctrlram_r(m_k007121_2, space, 0);
-	UINT8 ctrl_2_2 = k007121_ctrlram_r(m_k007121_2, space, 2);
+	UINT8 ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
+	UINT8 ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
+	UINT8 ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);
+	UINT8 ctrl_2_2 = m_k007121_2->ctrlram_r(space, 2);
 	rectangle bg_finalclip = m_bg_clip;
 	rectangle fg_finalclip = m_fg_clip;
 	rectangle tx_finalclip = m_tx_clip;

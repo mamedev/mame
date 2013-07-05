@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/fastlane.h"
 
 
@@ -48,9 +47,9 @@ void fastlane_state::set_pens(  )
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
+	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
 	int attr = m_videoram1[tile_index];
 	int code = m_videoram1[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -76,9 +75,9 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 {
-	UINT8 ctrl_3 = k007121_ctrlram_r(m_k007121, generic_space(), 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(m_k007121, generic_space(), 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(m_k007121, generic_space(), 5);
+	UINT8 ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
+	UINT8 ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
+	UINT8 ctrl_5 = m_k007121->ctrlram_r(generic_space(), 5);
 	int attr = m_videoram2[tile_index];
 	int code = m_videoram2[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -161,14 +160,14 @@ UINT32 fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_ind1
 
 	/* set scroll registers */
 	address_space &space = machine().driver_data()->generic_space();
-	xoffs = k007121_ctrlram_r(m_k007121, space, 0);
+	xoffs = m_k007121->ctrlram_r(space, 0);
 	for (i = 0; i < 32; i++)
 		m_layer0->set_scrollx(i, m_k007121_regs[0x20 + i] + xoffs - 40);
 
-	m_layer0->set_scrolly(0, k007121_ctrlram_r(m_k007121, space, 2));
+	m_layer0->set_scrolly(0, m_k007121->ctrlram_r(space, 2));
 
 	m_layer0->draw(bitmap, finalclip0, 0, 0);
-	k007121_sprites_draw(m_k007121, bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, 0, 40, 0, (UINT32)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, machine().gfx[0], machine().colortable, m_spriteram, 0, 40, 0, (UINT32)-1);
 	m_layer1->draw(bitmap, finalclip1, 0, 0);
 	return 0;
 }

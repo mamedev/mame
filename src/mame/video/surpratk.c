@@ -56,7 +56,7 @@ UINT32 surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind1
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -69,10 +69,10 @@ UINT32 surpratk_state::screen_update_surpratk(screen_device &screen, bitmap_ind1
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
-	k053245_sprites_draw(m_k053244, bitmap, cliprect);
+	m_k053244->k053245_sprites_draw(bitmap, cliprect);
 	return 0;
 }

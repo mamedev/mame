@@ -65,6 +65,6 @@ UINT32 rollerg_state::screen_update_rollerg(screen_device &screen, bitmap_ind16 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 1);
-	k053245_sprites_draw(m_k053244, bitmap, cliprect);
+	m_k053244->k053245_sprites_draw(bitmap, cliprect);
 	return 0;
 }

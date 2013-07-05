@@ -11,7 +11,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/k051649.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/hcastle.h"
 

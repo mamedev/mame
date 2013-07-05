@@ -48,12 +48,12 @@ void simpsons_sprite_callback( running_machine &machine, int *code, int *color, 
 
 READ8_MEMBER(simpsons_state::simpsons_k052109_r)
 {
-	return k052109_r(m_k052109, space, offset + 0x2000);
+	return m_k052109->read(space, offset + 0x2000);
 }
 
 WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
 {
-	k052109_w(m_k052109, space, offset + 0x2000, data);
+	m_k052109->write(space, offset + 0x2000, data);
 }
 
 READ8_MEMBER(simpsons_state::simpsons_k053247_r)
@@ -101,7 +101,7 @@ void simpsons_state::simpsons_video_banking( int bank )
 		membank("bank5")->set_base(m_generic_paletteram_8);
 	}
 	else
-		space.install_legacy_readwrite_handler(*m_k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
+		space.install_readwrite_handler(0x0000, 0x0fff, read8_delegate(FUNC(k052109_device::read), (k052109_device*)m_k052109), write8_delegate(FUNC(k052109_device::write), (k052109_device*)m_k052109));
 
 	if (bank & 2)
 		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k053247_r),this), write8_delegate(FUNC(simpsons_state::simpsons_k053247_w),this));
@@ -127,7 +127,7 @@ UINT32 simpsons_state::screen_update_simpsons(screen_device &screen, bitmap_ind1
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -140,9 +140,9 @@ UINT32 simpsons_state::screen_update_simpsons(screen_device &screen, bitmap_ind1
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 	return 0;

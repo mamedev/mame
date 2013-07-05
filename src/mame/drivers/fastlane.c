@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/fastlane.h"
 
@@ -20,9 +19,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 	int scanline = param;
 
 	address_space &space = generic_space();
-	if(scanline == 240 && k007121_ctrlram_r(m_k007121, space, 7) & 0x02) // vblank irq
+	if(scanline == 240 && m_k007121->ctrlram_r(space, 7) & 0x02) // vblank irq
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && k007121_ctrlram_r(m_k007121, space, 7) & 0x01) // timer irq
+	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(space, 7) & 0x01) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -30,7 +29,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 WRITE8_MEMBER(fastlane_state::k007121_registers_w)
 {
 	if (offset < 8)
-		k007121_ctrl_w(m_k007121, space, offset, data);
+		m_k007121->ctrl_w(space, offset, data);
 	else    /* scroll registers */
 		m_k007121_regs[offset] = data;
 }

@@ -14,7 +14,6 @@
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/battlnts.h"
 
@@ -27,7 +26,7 @@
 
 INTERRUPT_GEN_MEMBER(battlnts_state::battlnts_interrupt)
 {
-	if (k007342_is_int_enabled(m_k007342))
+	if (m_k007342->is_int_enabled())
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -56,11 +55,11 @@ WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
  *************************************/
 
 static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)      /* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)      /* Scroll RAM */
 	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)          /* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")

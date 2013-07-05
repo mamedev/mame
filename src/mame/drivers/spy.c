@@ -27,7 +27,7 @@
 
 INTERRUPT_GEN_MEMBER(spy_state::spy_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
@@ -286,7 +286,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
 	m_video_enable = ~(data & 0x08);
@@ -345,27 +345,27 @@ WRITE8_MEMBER(spy_state::sound_bank_w)
 
 READ8_MEMBER(spy_state::k052109_051960_r)
 {
-	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
+	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(m_k051960, space, offset - 0x3800);
+			return m_k051960->k051937_r(space, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(m_k052109, space, offset);
+			return m_k052109->read(space, offset);
 		else
-			return k051960_r(m_k051960, space, offset - 0x3c00);
+			return m_k051960->k051960_r(space, offset - 0x3c00);
 	}
 	else
-		return k052109_r(m_k052109, space, offset);
+		return m_k052109->read(space, offset);
 }
 
 WRITE8_MEMBER(spy_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(m_k051960, space, offset - 0x3800, data);
+		m_k051960->k051937_w(space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(m_k052109, space, offset, data);
+		m_k052109->write(space, offset, data);
 	else
-		k051960_w(m_k051960, space, offset - 0x3c00, data);
+		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
 static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )

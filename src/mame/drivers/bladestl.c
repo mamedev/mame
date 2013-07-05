@@ -31,7 +31,6 @@
 #include "cpu/m6809/hd6309.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/bladestl.h"
 
@@ -40,7 +39,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240 && k007342_is_int_enabled(m_k007342)) // vblank-out irq
+	if(scanline == 240 && m_k007342->is_int_enabled()) // vblank-out irq
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or timer irq
@@ -116,11 +115,11 @@ WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)    /* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)    /* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)  /* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_device, read, write)    /* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_device, read, write)    /* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_device, scroll_r, scroll_w)  /* Scroll RAM */
 	AM_RANGE(0x2400, 0x245f) AM_RAM AM_SHARE("paletteram")      /* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)          /* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_device, vreg_w)          /* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")             /* DIPSW #3, coinsw, startsw */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")                 /* 1P controls */
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")                 /* 2P controls */

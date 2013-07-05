@@ -37,7 +37,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 	coin_counter_w(machine(), 1, data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	/* bit 4 = INIT (unknown) */
 	/* bit 5 = enable sprite ROM reading */
 	k053246_set_objcha_line(m_k053246, (~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);

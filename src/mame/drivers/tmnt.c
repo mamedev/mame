@@ -84,7 +84,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return k052109_word_r(m_k052109, space, offset, mem_mask);
+	return m_k052109->word_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
@@ -92,7 +92,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	k052109_word_w(m_k052109, space, offset, data, mem_mask);
+	m_k052109->word_w(space, offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
@@ -100,9 +100,9 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		k052109_w(m_k052109, space, offset, (data >> 8) & 0xff);
+		m_k052109->write(space, offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		k052109_w(m_k052109, space, offset + 0x2000, data & 0xff);
+		m_k052109->write(space, offset + 0x2000, data & 0xff);
 }
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
@@ -124,7 +124,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return k053245_word_r(m_k053245, space, offset, mem_mask);
+		return m_k053245->k053245_word_r(space, offset, mem_mask);
 	}
 }
 
@@ -135,7 +135,7 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		k053245_word_w(m_k053245, space, offset, data, mem_mask);
+		m_k053245->k053245_word_w(space, offset, data, mem_mask);
 	}
 }
 
@@ -143,7 +143,7 @@ READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 {
 	offset &= ~1;   /* handle mirror address */
 
-	return k053244_r(m_k053245, space, offset + 1) | (k053244_r(m_k053245, space, offset) << 8);
+	return m_k053245->k053244_r(space, offset + 1) | (m_k053245->k053244_r(space, offset) << 8);
 }
 
 WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
@@ -151,9 +151,9 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 	offset &= ~1;   /* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		k053244_w(m_k053245, space, offset, (data >> 8) & 0xff);
+		m_k053245->k053244_w(space, offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		k053244_w(m_k053245, space, offset + 1, data & 0xff);
+		m_k053245->k053244_w(space, offset + 1, data & 0xff);
 }
 
 INTERRUPT_GEN_MEMBER(tmnt_state::cuebrick_interrupt)
@@ -164,13 +164,13 @@ INTERRUPT_GEN_MEMBER(tmnt_state::cuebrick_interrupt)
 
 INTERRUPT_GEN_MEMBER(tmnt_state::punkshot_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		irq4_line_hold(device);
 }
 
 INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109))
+	if (m_k052109->is_irq_enabled())
 		irq5_line_hold(device);
 }
 
@@ -363,7 +363,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 			data = -space.read_word(0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
 			data += ((space.read_word(0x105cb0) +
-						256 * k052109_r(m_k052109, space, 0x1a01) + k052109_r(m_k052109, space, 0x1a00) - 6) / 8 + 12) & 0x3f;
+						256 * m_k052109->read(space, 0x1a01) + m_k052109->read(space, 0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
@@ -389,7 +389,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 			{
 				if ((space.read_word(0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					k053245_word_w(m_k053245, space, 8 * i, hardware_pri, 0x00ff);
+					m_k053245->k053245_word_w(space, 8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -507,7 +507,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -558,8 +558,8 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -580,8 +580,8 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 #endif
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -601,8 +601,8 @@ static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -620,8 +620,8 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
-	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
-	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
+	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
+	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_word_r, k051960_word_w)
 	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
 ADDRESS_MAP_END
 
@@ -655,7 +655,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 
 static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
+	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM /* main RAM */
 	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
@@ -689,7 +689,7 @@ WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 		{
 			if (k053251_get_tmap_dirty(m_k053251, 2 + i))
 			{
-				k052109_tilemap_mark_dirty(m_k052109, i);
+				m_k052109->tilemap_mark_dirty(i);
 				k053251_set_tmap_dirty(m_k053251, 2 + i, 0);
 			}
 		}
@@ -703,7 +703,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)  /* 053936? */
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
+	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
@@ -727,7 +727,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
+	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
@@ -765,7 +765,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data 
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			k053245_word_w(m_k053245, space, offs, data, 0xffff);
+			m_k053245->k053245_word_w(space, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)
@@ -1001,7 +1001,7 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("k053260", k053260_device, k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
 
@@ -1027,7 +1027,7 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("k053260", k053260_device, k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
 
@@ -1041,7 +1041,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 	AM_RANGE(0x604020, 0x60402f) AM_WRITENOP    /* written every frame */
 	AM_RANGE(0x604200, 0x604201) AM_WRITENOP    /* watchdog */
 	AM_RANGE(0x6119e2, 0x6119e3) AM_WRITENOP    /* written a lot in some test menus (PC=18204) */
@@ -1070,8 +1070,8 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
 	AM_RANGE(0x500300, 0x500301) AM_WRITENOP    /* watchdog reset? irq enable? */
 	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
-	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
+	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
+	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 

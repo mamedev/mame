@@ -79,7 +79,7 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI0);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI2);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI3);
@@ -93,9 +93,9 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 	machine().priority_bitmap.fill(0, cliprect);
 	/* note the '+1' in the background color!!! */
 	bitmap.fill(16 * bg_colorbase + 1, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
@@ -165,8 +165,8 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-	//          K052109_lsb_w
-				k052109_w(m_k052109, space, offset, m_xmen6p_tilemapright[offset] & 0x00ff);
+	//          m_k052109->lsb_w
+				m_k052109->write(space, offset, m_xmen6p_tilemapright[offset] & 0x00ff);
 			}
 
 
@@ -184,8 +184,8 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 			   */
 			for (offset = 0; offset < (0xc000 / 2); offset++)
 			{
-	//          K052109_lsb_w
-				k052109_w(m_k052109, space, offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
+	//          m_k052109->lsb_w
+				m_k052109->write(space, offset, m_xmen6p_tilemapleft[offset] & 0x00ff);
 			}
 
 
@@ -199,7 +199,7 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI0);
 		m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI2);
 
-		k052109_tilemap_update(m_k052109);
+		m_k052109->tilemap_update();
 
 		layer[0] = 0;
 		m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI3);
@@ -213,9 +213,9 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		machine().priority_bitmap.fill(0, cliprect);
 		/* note the '+1' in the background color!!! */
 		renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
-		k052109_tilemap_draw(m_k052109, *renderbitmap, cliprect, layer[0], 0, 1);
-		k052109_tilemap_draw(m_k052109, *renderbitmap, cliprect, layer[1], 0, 2);
-		k052109_tilemap_draw(m_k052109, *renderbitmap, cliprect, layer[2], 0, 4);
+		m_k052109->tilemap_draw(*renderbitmap, cliprect, layer[0], 0, 1);
+		m_k052109->tilemap_draw(*renderbitmap, cliprect, layer[1], 0, 2);
+		m_k052109->tilemap_draw(*renderbitmap, cliprect, layer[2], 0, 4);
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
 	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */

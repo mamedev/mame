@@ -14,7 +14,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
 #include "sound/2151intf.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/flkatck.h"
 

@@ -52,7 +52,7 @@ void cuebrick_tile_callback( running_machine &machine, int layer, int bank, int 
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 
-	if ((k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE) && (layer == 0))
+	if ((state->m_k052109->get_rmrd_line() == CLEAR_LINE) && (layer == 0))
 	{
 		*code |= ((*color & 0x01) << 8);
 		*color = state->m_layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
@@ -254,7 +254,7 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 
 VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 {
-	k05324x_set_z_rejection(m_k053245, 0);
+	m_k053245->k05324x_set_z_rejection(0);
 
 	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
 
@@ -330,7 +330,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 		m_irq5_mask = data & 0x20;
 
 		/* bit 7 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* other bits unused */
 	}
@@ -350,7 +350,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 		m_last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -369,7 +369,7 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 		m_last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -382,7 +382,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 7 = select char ROM bank */
 		if (m_blswhstl_rombank != ((data & 0x80) >> 7))
@@ -418,7 +418,7 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 = 53596 tile rom bank selection */
 		if (m_glfgreat_roz_rom_bank != (data & 0x20) >> 5)
@@ -455,7 +455,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 		m_dim_c = data & 0x18;
 
 		/* bit 5 selects sprite ROM for testing in TMNT2 (bits 5-7, actually, according to the schematics) */
-		k053244_bankselect(m_k053245, ((data & 0x20) >> 5) << 2);
+		m_k053245->k053244_bankselect(((data & 0x20) >> 5) << 2);
 	}
 }
 
@@ -468,7 +468,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bits 4-6 control palette dimming (DIM0-DIM2) */
 		m_dim_v = (data & 0x70) >> 4;
@@ -484,11 +484,11 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(m_k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 = sprite ROM bank */
 		m_prmrsocr_sprite_bank = (data & 0x40) >> 6;
-		k053244_bankselect(m_k053245, m_prmrsocr_sprite_bank << 2);
+		m_k053245->k053244_bankselect(m_prmrsocr_sprite_bank << 2);
 
 		/* bit 7 = 53596 region selector for ROM test */
 		m_glfgreat_roz_char_bank = (data & 0x80) >> 7;
@@ -544,26 +544,26 @@ WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 
 UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
 
 UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
+	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -576,7 +576,7 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -588,11 +588,11 @@ UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &b
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
 	machine().priority_bitmap.fill(0, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
 	return 0;
 }
 
@@ -607,7 +607,7 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -620,11 +620,11 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k053245_sprites_draw(m_k053245, bitmap, cliprect);
+	m_k053245->k053245_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
@@ -651,7 +651,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI3) + 8;   /* weird... */
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI4);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -666,7 +666,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
 
 	if (m_layerpri[0] >= 0x30 && m_layerpri[1] < 0x30)
 	{
@@ -674,7 +674,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
 
 	if (m_layerpri[1] >= 0x30 && m_layerpri[2] < 0x30)
 	{
@@ -682,7 +682,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
 	if (m_layerpri[2] >= 0x30)
 	{
@@ -690,7 +690,7 @@ UINT32 tmnt_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &b
 		m_glfgreat_pixel = bitmap.pix16(0x80, 0x105);
 	}
 
-	k053245_sprites_draw(m_k053245, bitmap, cliprect);
+	m_k053245->k053245_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
@@ -756,7 +756,7 @@ UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bi
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
 	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI3);
 
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	m_sorted_layer[0] = 0;
 	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
@@ -769,11 +769,11 @@ UINT32 tmnt_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bi
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, m_sorted_layer[2], 0, 4);
 
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
 	return 0;
 }
 
@@ -790,6 +790,6 @@ void tmnt_state::screen_eof_blswhstl(screen_device &screen, bool state)
 	// on rising edge
 	if (state)
 	{
-		k053245_clear_buffer(m_k053245);
+		m_k053245->k053245_clear_buffer();
 	}
 }

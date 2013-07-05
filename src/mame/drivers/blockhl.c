@@ -32,7 +32,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
 INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
-	if (k052109_is_irq_enabled(m_k052109) && m_rombank == 0)    /* kludge to prevent crashes */
+	if (m_k052109->is_irq_enabled() && m_rombank == 0)    /* kludge to prevent crashes */
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
@@ -61,27 +61,27 @@ WRITE8_MEMBER(blockhl_state::blockhl_sh_irqtrigger_w)
 /* special handlers to combine 052109 & 051960 */
 READ8_MEMBER(blockhl_state::k052109_051960_r)
 {
-	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
+	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(m_k051960, space, offset - 0x3800);
+			return m_k051960->k051937_r(space, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(m_k052109, space, offset);
+			return m_k052109->read(space, offset);
 		else
-			return k051960_r(m_k051960, space, offset - 0x3c00);
+			return m_k051960->k051960_r(space, offset - 0x3c00);
 	}
 	else
-		return k052109_r(m_k052109, space, offset);
+		return m_k052109->read(space, offset);
 }
 
 WRITE8_MEMBER(blockhl_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(m_k051960, space, offset - 0x3800, data);
+		m_k051960->k051937_w(space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(m_k052109, space, offset, data);
+		m_k052109->write(space, offset, data);
 	else
-		k051960_w(m_k051960, space, offset - 0x3c00, data);
+		m_k051960->k051960_w(space, offset - 0x3c00, data);
 }
 
 
@@ -311,7 +311,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 	state->m_palette_selected = ~lines & 0x20;
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_k052109->set_rmrd_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 7 used but unknown */
 

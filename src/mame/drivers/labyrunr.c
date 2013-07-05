@@ -19,14 +19,14 @@
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
 {
 	address_space &space = generic_space();
-	if (k007121_ctrlram_r(m_k007121, space, 7) & 0x02)
+	if (m_k007121->ctrlram_r(space, 7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
 	address_space &space = generic_space();
-	if (k007121_ctrlram_r(m_k007121, space, 7) & 0x01)
+	if (m_k007121->ctrlram_r(space, 7) & 0x01)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -44,7 +44,7 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 }
 
 static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
-	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE_LEGACY("k007121", k007121_ctrl_w)
+	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_device, ctrl_w)
 	AM_RANGE(0x0020, 0x005f) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_device, read_port_r, write_port_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("ym1", ym2203_device, status_port_r, control_port_w)

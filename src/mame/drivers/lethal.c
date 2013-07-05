@@ -263,7 +263,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					return k053244_r(m_k053244, space, offset - 0x40);
+					return m_k053244->k053244_r(space, offset - 0x40);
 
 				case 0x80:
 				case 0x81:
@@ -304,7 +304,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 			}
 		}
 		else if (offset < 0x1800)
-			return k053245_r(m_k053244, space, (offset - 0x0800) & 0x07ff);
+			return m_k053244->k053245_r(space, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
 			return k056832_ram_code_lo_r(m_k056832, space, offset - 0x1800);
 		else if (offset < 0x2800)
@@ -354,7 +354,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					k053244_w(m_k053244, space, offset - 0x40, data);
+					m_k053244->k053244_w(space, offset - 0x40, data);
 					break;
 
 				case 0x80:
@@ -398,7 +398,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 			}
 		}
 		else if (offset < 0x1800)
-			k053245_w(m_k053244, space, (offset - 0x0800) & 0x07ff, data);
+			m_k053244->k053245_w(space, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
 			k056832_ram_code_lo_w(m_k056832, space, offset - 0x1800, data);
 		else if (offset < 0x2800)

@@ -6,7 +6,7 @@
 static void reset_spritebank( running_machine &machine )
 {
 	asterix_state *state = machine.driver_data<asterix_state>();
-	k053244_bankselect(state->m_k053244, state->m_spritebank & 7);
+	state->m_k053244->k053244_bankselect(state->m_spritebank & 7);
 	state->m_spritebanks[0] = (state->m_spritebank << 12) & 0x7000;
 	state->m_spritebanks[1] = (state->m_spritebank <<  9) & 0x7000;
 	state->m_spritebanks[2] = (state->m_spritebank <<  6) & 0x7000;
@@ -103,7 +103,7 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
-	k053245_sprites_draw(m_k053244, bitmap, cliprect);
+	m_k053244->k053245_sprites_draw(bitmap, cliprect);
 
 	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;

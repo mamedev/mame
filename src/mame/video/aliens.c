@@ -73,15 +73,15 @@ void aliens_state::video_start()
 
 UINT32 aliens_state::screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k052109_tilemap_update(m_k052109);
+	m_k052109->tilemap_update();
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(m_layer_colorbase[1] * 16, cliprect);
 
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, 0, 1);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, 0, 2);
-	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 0, 0, 4);
+	m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 1);
+	m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 2);
+	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 4);
 
-	k051960_sprites_draw(m_k051960, bitmap, cliprect, -1, -1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, -1, -1);
 	return 0;
 }

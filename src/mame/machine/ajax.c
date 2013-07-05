@@ -180,7 +180,7 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 {
 	/* enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 5 enables 051316 wraparound */
 	k051316_wraparound_enable(m_k051316, data & 0x20);
@@ -215,6 +215,6 @@ void ajax_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(ajax_state::ajax_interrupt)
 {
-	if (k051960_is_irq_enabled(m_k051960))
+	if (m_k051960->k051960_is_irq_enabled())
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
