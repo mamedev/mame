@@ -3095,7 +3095,7 @@ ROM_START( tetrista ) // Master of Weapon conversion
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	/* these roms (present on the original board) are actually from from Master of Weapon (Japan)
+	/* these roms (present on the original board) are actually from Master of Weapon (Japan)
 	 b72-01.rom              mow-m01.rom             IDENTICAL
 	 b72-02.rom              mow-m02.rom             IDENTICAL
 	  the game doesn't use any tiles from here but the roms must be present on the board to avoid
