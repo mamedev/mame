@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "machine/68340.h"
 #include "sound/es5506.h"
 
 #include "machine/esqvfd.h"
@@ -30,7 +30,7 @@ public:
 		m_sq1vfd(*this, "sq1vfd")
 	{ }
 
-	required_device<m68340_device> m_maincpu;
+	required_device<m68340cpu_device> m_maincpu;
 	required_device<esq2x40_sq1_t> m_sq1vfd;
 
 	virtual void machine_reset();
