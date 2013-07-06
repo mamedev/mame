@@ -116,6 +116,7 @@
 #include "hsgpl.h"
 
 #define CRU_BASE 0x1B00
+#define SUPERCART_BASE 0x0800
 
 #define VERBOSE 1
 #define LOG logerror
@@ -146,6 +147,18 @@ void snug_high_speed_gpl_device::crureadz(offs_t offset, UINT8 *value)
 */
 void snug_high_speed_gpl_device::cruwrite(offs_t offset, UINT8 data)
 {
+	// SuperCart handling - see gromport.c
+	if (m_supercart_enabled && ((offset & 0xfff0)==SUPERCART_BASE))
+	{
+		if (data != 0)
+		{
+			if (VERBOSE>2) LOG("hsgpl: Supercart cru setting %04x\n", offset);
+			m_current_bank = (offset-0x0802)>>2;
+		}
+		return;
+	}
+
+	// Common CRU handling
 	if ((offset & 0xff00)==CRU_BASE)
 	{
 		int bit = (offset >> 1) & 0x0f;
@@ -185,6 +198,7 @@ void snug_high_speed_gpl_device::cruwrite(offs_t offset, UINT8 data)
 			break;
 		case 11:
 			m_supercart_enabled = data;
+			// CHECK: Do we have to reset the bank?
 			if (VERBOSE>5) LOG("hsgpl: Set supercart_enabled=%x\n", data);
 			break;
 		case 12:
