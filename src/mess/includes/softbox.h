@@ -12,6 +12,7 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/ieee488.h"
+#include "machine/imi5000h.h"
 #include "machine/serial.h"
 
 #define Z80_TAG         "z80"

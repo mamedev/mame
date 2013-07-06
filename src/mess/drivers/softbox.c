@@ -409,6 +409,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_HARDDISK_ADD("harddisk4")
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+	MCFG_IMI5000H_ADD("corvus1")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")
