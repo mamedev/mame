@@ -117,9 +117,9 @@
     317-0033  FD1089A [1] Alien Syndrome       400013 030000-ffffff
     317-0037  FD1089B [2] Alien Syndrome       400013 030000-ffffff
     317-0034  FD1089B [1] Super Hang-On        400015 030000-06ffff + 100000-2fffff + ff0000-ffffff
+    317-0086  FD1089A [2] Wonder Boy III       400043 ?
     317-0167  FD1089A [2] Aurail               400030 010000-ffffff
     317-0168  FD1089B [1] Aurail               400030 010000-ffffff
-    317-????  FD1089A [2] Wonder Boy III       400043 ?
     317-5021  FD1089B [1] Sukeban Jansi Ryuko  40004b 000000-00ffff
 
 
