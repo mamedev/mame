@@ -592,6 +592,46 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+
+/*
+
+Shanghai 3  (c)  1993 Sunsoft
+
+SUN04C
++-------------------------------------+
+|        M6295 IC75                   |
+|    1.056MHz  SW2                    |
+| VOL  YM2149F SW1                    |
+|                                     |
+|                                     |
+|J                    M M             |
+|A                    2 2             |
+|M        M                           |
+|M        1    M    +------+     IC48*|
+|A             3    |GA9201|     IC47*|
+|         M         | KA01 |     IC46*|
+|         1    M    | 0249 |     IC44*|
+|              3    +------+          |
+|    68000                        I   |
+| I I                             C   |
+| C C 48MHz                       4   |
+| 3 2                             3   |
++-------------------------------------+
+
+   CPU: TMP68HC000-16
+ Sound: YM2149F, OKI M6295
+ Video: GA9201 KA01-0249 (QFP120)
+   OSC: 48MHz, 1.056MHz (resonator)
+Memory: M1 = TMM2018AP-45 (2K x 8 SRAM)
+        M2 = LH52B256D-70LL (32K x 8 SRAM)
+        M3 = TC514280BJL-70 (256K x 4 DRAM)
+ Other: SW1 & SW2 - 8-position dipswitch
+        VOL - Volume pot
+
+* = unpopulated 32 pin rom sockets silkscreened 27C040
+
+*/
+
 ROM_START( shangha3 ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drugs" splash screen. Has two additional tiles sets to choose from. */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ic3.ic3",  0x0000, 0x80000, CRC(53ef4988) SHA1(63f098d95865928a553e945fe60dea79aa16c603) ) /* ST M27C4001 EPROM labeled IC3 */
