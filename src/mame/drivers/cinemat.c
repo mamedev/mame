@@ -142,15 +142,14 @@ WRITE8_MEMBER(cinemat_state::mux_select_w)
  *
  *************************************/
 
-static UINT8 joystick_read(device_t *device)
+READ8_MEMBER(cinemat_state::joystick_read)
 {
-	cinemat_state *state = device->machine().driver_data<cinemat_state>();
-	if (device->machine().phase() != MACHINE_PHASE_RUNNING)
+	if (machine().phase() != MACHINE_PHASE_RUNNING)
 		return 0;
 	else
 	{
-		int xval = (INT16)(device->state().state_int(CCPU_X) << 4) >> 4;
-		return (state->ioport(state->m_mux_select ? "ANALOGX" : "ANALOGY")->read_safe(0) - xval) < 0x800;
+		int xval = (INT16)(m_maincpu->state_int(CCPU_X) << 4) >> 4;
+		return (ioport(m_mux_select ? "ANALOGX" : "ANALOGY")->read_safe(0) - xval) < 0x800;
 	}
 }
 
@@ -961,26 +960,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  CPU configurations
- *
- *************************************/
-
-static const ccpu_config config_nojmi =
-{
-	joystick_read,
-	cinemat_vector_callback
-};
-
-static const ccpu_config config_jmi =
-{
-	NULL,
-	cinemat_vector_callback
-};
-
-
-
-/*************************************
- *
  *  Core machine drivers
  *
  *************************************/
@@ -989,7 +968,8 @@ static MACHINE_CONFIG_START( cinemat_nojmi_4k, cinemat_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
-	MCFG_CPU_CONFIG(config_nojmi)
+	MCFG_CCPU_VECTOR_FUNC(ccpu_vector_delegate(FUNC(cinemat_state::cinemat_vector_callback),(cinemat_state*)owner))
+	MCFG_CCPU_EXTERNAL_FUNC(READ8(cinemat_state,joystick_read))
 	MCFG_CPU_PROGRAM_MAP(program_map_4k)
 	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -1009,7 +989,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cinemat_jmi_4k, cinemat_nojmi_4k )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(config_jmi)
+	MCFG_CCPU_VECTOR_FUNC(ccpu_vector_delegate(FUNC(cinemat_state::cinemat_vector_callback),(cinemat_state*)owner))
+	MCFG_CCPU_EXTERNAL_FUNC(DEVREAD8("maincpu",ccpu_cpu_device,read_jmi))
 MACHINE_CONFIG_END
 
 

@@ -33,10 +33,9 @@ enum
  *
  *************************************/
 
-void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
+void cinemat_state::cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
-	cinemat_state *state = device->machine().driver_data<cinemat_state>();
-	const rectangle &visarea = device->machine().primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 	int intensity = 0xff;
 
 	/* adjust for slop */
@@ -50,15 +49,15 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 		intensity = 0x1ff * shift / 8;
 
 	/* move to the starting position if we're not there already */
-	if (sx != state->m_lastx || sy != state->m_lasty)
-		vector_add_point(device->machine(), sx << 16, sy << 16, 0, 0);
+	if (sx != m_lastx || sy != m_lasty)
+		vector_add_point(machine(), sx << 16, sy << 16, 0, 0);
 
 	/* draw the vector */
-	vector_add_point(device->machine(), ex << 16, ey << 16, state->m_vector_color, intensity);
+	vector_add_point(machine(), ex << 16, ey << 16, m_vector_color, intensity);
 
 	/* remember the last point */
-	state->m_lastx = ex;
-	state->m_lasty = ey;
+	m_lastx = ex;
+	m_lasty = ey;
 }
 
 
@@ -212,7 +211,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
 	SCREEN_UPDATE32_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(m_maincpu);
+	m_maincpu->wdt_timer_trigger();
 
 	return 0;
 }

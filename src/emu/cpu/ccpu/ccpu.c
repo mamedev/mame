@@ -13,87 +13,45 @@
 #include "ccpu.h"
 
 
-/***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-
-struct ccpu_state
-{
-	UINT16              PC;
-	UINT16              A;
-	UINT16              B;
-	UINT8               I;
-	UINT16              J;
-	UINT8               P;
-	UINT16              X;
-	UINT16              Y;
-	UINT16              T;
-	UINT16 *            acc;
-
-	UINT16              a0flag, ncflag, cmpacc, cmpval;
-	UINT16              miflag, nextmiflag, nextnextmiflag;
-	UINT16              drflag;
-
-	ccpu_input_func     external_input;
-	ccpu_vector_func    vector_callback;
-
-	UINT8               waiting;
-	UINT8               watchdog;
-
-	int                 icount;
-
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	address_space *io;
-};
-
-
-INLINE ccpu_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == CCPU);
-	return (ccpu_state *)downcast<legacy_cpu_device *>(device)->token();
-}
+const device_type CCPU = &device_creator<ccpu_cpu_device>;
 
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define READOP(C,a)         ((C)->direct->read_decrypted_byte(a))
+#define READOP(a)         (m_direct->read_decrypted_byte(a))
 
-#define RDMEM(C,a)          ((C)->data->read_word((a) * 2) & 0xfff)
-#define WRMEM(C,a,v)        ((C)->data->write_word((a) * 2, (v)))
+#define RDMEM(a)          (m_data->read_word((a) * 2) & 0xfff)
+#define WRMEM(a,v)        (m_data->write_word((a) * 2, (v)))
 
-#define READPORT(C,a)       ((C)->io->read_byte(a))
-#define WRITEPORT(C,a,v)    ((C)->io->write_byte((a), (v)))
+#define READPORT(a)       (m_io->read_byte(a))
+#define WRITEPORT(a,v)    (m_io->write_byte((a), (v)))
 
-#define SET_A0(C)           do { (C)->a0flag = (C)->A; } while (0)
-#define SET_CMP_VAL(C,x)    do { (C)->cmpacc = *(C)->acc; (C)->cmpval = (x) & 0xfff; } while (0)
-#define SET_NC(C,a)         do { (C)->ncflag = ~(a); } while (0)
-#define SET_MI(C,a)         do { (C)->nextnextmiflag = (a); } while (0)
+#define SET_A0           do { m_a0flag = m_A; } while (0)
+#define SET_CMP_VAL(x)    do { m_cmpacc = *m_acc; m_cmpval = (x) & 0xfff; } while (0)
+#define SET_NC(a)         do { m_ncflag = ~(a); } while (0)
+#define SET_MI(a)         do { m_nextnextmiflag = (a); } while (0)
 
-#define TEST_A0(C)          ((C)->a0flag & 1)
-#define TEST_NC(C)          (((C)->ncflag >> 12) & 1)
-#define TEST_MI(C)          (((C)->miflag >> 11) & 1)
-#define TEST_LT(C)          ((C)->cmpval < (C)->cmpacc)
-#define TEST_EQ(C)          ((C)->cmpval == (C)->cmpacc)
-#define TEST_DR(C)          ((C)->drflag != 0)
+#define TEST_A0          (m_a0flag & 1)
+#define TEST_NC          ((m_ncflag >> 12) & 1)
+#define TEST_MI          ((m_miflag >> 11) & 1)
+#define TEST_LT          (m_cmpval < m_cmpacc)
+#define TEST_EQ          (m_cmpval == m_cmpacc)
+#define TEST_DR          (m_drflag != 0)
 
-#define NEXT_ACC_A(C)       do { SET_MI(C, *(C)->acc); (C)->acc = &(C)->A; } while (0)
-#define NEXT_ACC_B(C)       do { SET_MI(C, *(C)->acc); if ((C)->acc == &(C)->A) (C)->acc = &(C)->B; else (C)->acc = &(C)->A; } while (0)
+#define NEXT_ACC_A       do { SET_MI(*m_acc); m_acc = &m_A; } while (0)
+#define NEXT_ACC_B       do { SET_MI(*m_acc); if (m_acc == &m_A) m_acc = &m_B; else m_acc = &m_A; } while (0)
 
-#define CYCLES(C,x)         do { (C)->icount -= (x); } while (0)
+#define CYCLES(x)         do { m_icount -= (x); } while (0)
 
-#define STANDARD_ACC_OP(C,resexp,cmpval) \
+#define STANDARD_ACC_OP(resexp,cmpval) \
 do { \
 	UINT16 result = resexp; \
-	SET_A0(C);                      /* set the A0 bit based on the previous 'A' value */ \
-	SET_CMP_VAL(C,cmpval);          /* set the compare values to the previous accumulator and the cmpval */ \
-	SET_NC(C,result);               /* set the NC flag based on the unmasked result */ \
-	*(C)->acc = result & 0xfff;     /* store the low 12 bits of the new value */ \
+	SET_A0;                      /* set the A0 bit based on the previous 'A' value */ \
+	SET_CMP_VAL(cmpval);          /* set the compare values to the previous accumulator and the cmpval */ \
+	SET_NC(result);               /* set the NC flag based on the unmasked result */ \
+	*m_acc = result & 0xfff;     /* store the low 12 bits of the new value */ \
 } while (0)
 
 
@@ -102,87 +60,124 @@ do { \
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static UINT8 read_jmi(device_t *device)
+ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, CCPU, "Cinematronics CPU", tag, owner, clock, "ccpu", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 15, 0)
+	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
+	, m_io_config("io", ENDIANNESS_BIG, 8, 5, 0)
+	, m_external_input(*this)
+	, m_flags(0)
+{
+}
+
+
+READ8_MEMBER( ccpu_cpu_device::read_jmi )
 {
 	/* this routine is called when there is no external input */
 	/* and the JMI jumper is present */
-	ccpu_state *cpustate = get_safe_token(device);
-	return TEST_MI(cpustate);
+	return TEST_MI;
 }
 
 
-void ccpu_wdt_timer_trigger(device_t *device)
+void ccpu_cpu_device::wdt_timer_trigger()
 {
-	ccpu_state *cpustate = get_safe_token(device);
-	cpustate->waiting = FALSE;
-	cpustate->watchdog++;
-	if (cpustate->watchdog >= 3)
-		cpustate->PC = 0;
+	m_waiting = FALSE;
+	m_watchdog++;
+	if (m_watchdog >= 3)
+		m_PC = 0;
 }
 
 
-static CPU_INIT( ccpu )
+void ccpu_cpu_device::device_start()
 {
-	const ccpu_config *configdata = (const ccpu_config *)device->static_config();
-	ccpu_state *cpustate = get_safe_token(device);
-
 	/* copy input params */
-	cpustate->external_input = configdata->external_input ? configdata->external_input : read_jmi;
-	cpustate->vector_callback = configdata->vector_callback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	m_external_input.resolve_safe(0);
+	m_vector_callback.bind_relative_to(*owner());
+	assert(!m_vector_callback.isnull());
 
-	device->save_item(NAME(cpustate->PC));
-	device->save_item(NAME(cpustate->A));
-	device->save_item(NAME(cpustate->B));
-	device->save_item(NAME(cpustate->I));
-	device->save_item(NAME(cpustate->J));
-	device->save_item(NAME(cpustate->P));
-	device->save_item(NAME(cpustate->X));
-	device->save_item(NAME(cpustate->Y));
-	device->save_item(NAME(cpustate->T));
-	device->save_item(NAME(cpustate->a0flag));
-	device->save_item(NAME(cpustate->ncflag));
-	device->save_item(NAME(cpustate->cmpacc));
-	device->save_item(NAME(cpustate->cmpval));
-	device->save_item(NAME(cpustate->miflag));
-	device->save_item(NAME(cpustate->nextmiflag));
-	device->save_item(NAME(cpustate->nextnextmiflag));
-	device->save_item(NAME(cpustate->drflag));
-	device->save_item(NAME(cpustate->waiting));
-	device->save_item(NAME(cpustate->watchdog));
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
+
+	save_item(NAME(m_PC));
+	save_item(NAME(m_A));
+	save_item(NAME(m_B));
+	save_item(NAME(m_I));
+	save_item(NAME(m_J));
+	save_item(NAME(m_P));
+	save_item(NAME(m_X));
+	save_item(NAME(m_Y));
+	save_item(NAME(m_T));
+	save_item(NAME(m_a0flag));
+	save_item(NAME(m_ncflag));
+	save_item(NAME(m_cmpacc));
+	save_item(NAME(m_cmpval));
+	save_item(NAME(m_miflag));
+	save_item(NAME(m_nextmiflag));
+	save_item(NAME(m_nextnextmiflag));
+	save_item(NAME(m_drflag));
+	save_item(NAME(m_waiting));
+	save_item(NAME(m_watchdog));
+
+	// Register state for debugger
+	state_add( CCPU_PC, "PC", m_PC).formatstr("%04X");
+	state_add( CCPU_A,  "A",  m_A).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_B,  "B",  m_B).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_I,  "I",  m_I).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_J,  "J",  m_J).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_P,  "P",  m_P).mask(0xf).formatstr("%1X");
+	state_add( CCPU_X,  "X",  m_X).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_Y,  "Y",  m_Y).mask(0xfff).formatstr("%03X");
+	state_add( CCPU_T,  "T",  m_T).mask(0xfff).formatstr("%03X");
+	state_add(STATE_GENPC, "curpc", m_PC).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
+
+	m_icountptr = &m_icount;
 }
 
 
-static CPU_RESET( ccpu )
+void ccpu_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	ccpu_state *cpustate = get_safe_token(device);
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c", 
+					TEST_A0 ? '0' : 'o',
+					TEST_NC ? 'N' : 'n',
+					TEST_LT ? 'L' : 'l',
+					TEST_EQ ? 'E' : 'e',
+					m_external_input() ? 'M' : 'm',
+					TEST_DR ? 'D' : 'd');
+			break;
+	}
+}
 
+
+void ccpu_cpu_device::device_reset()
+{
 	/* zero registers */
-	cpustate->PC = 0;
-	cpustate->A = 0;
-	cpustate->B = 0;
-	cpustate->I = 0;
-	cpustate->J = 0;
-	cpustate->P = 0;
-	cpustate->X = 0;
-	cpustate->Y = 0;
-	cpustate->T = 0;
-	cpustate->acc = &cpustate->A;
+	m_PC = 0;
+	m_A = 0;
+	m_B = 0;
+	m_I = 0;
+	m_J = 0;
+	m_P = 0;
+	m_X = 0;
+	m_Y = 0;
+	m_T = 0;
+	m_acc = &m_A;
 
 	/* zero flags */
-	cpustate->a0flag = 0;
-	cpustate->ncflag = 0;
-	cpustate->cmpacc = 0;
-	cpustate->cmpval = 1;
-	cpustate->miflag = cpustate->nextmiflag = cpustate->nextnextmiflag = 0;
-	cpustate->drflag = 0;
+	m_a0flag = 0;
+	m_ncflag = 0;
+	m_cmpacc = 0;
+	m_cmpval = 1;
+	m_miflag = m_nextmiflag = m_nextnextmiflag = 0;
+	m_drflag = 0;
 
-	cpustate->waiting = FALSE;
-	cpustate->watchdog = 0;
+	m_waiting = FALSE;
+	m_watchdog = 0;
 }
 
 
@@ -191,13 +186,11 @@ static CPU_RESET( ccpu )
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static CPU_EXECUTE( ccpu )
+void ccpu_cpu_device::execute_run()
 {
-	ccpu_state *cpustate = get_safe_token(device);
-
-	if (cpustate->waiting)
+	if (m_waiting)
 	{
-		cpustate->icount = 0;
+		m_icount = 0;
 		return;
 	}
 
@@ -207,12 +200,12 @@ static CPU_EXECUTE( ccpu )
 		UINT8 opcode;
 
 		/* update the delayed MI flag */
-		cpustate->miflag = cpustate->nextmiflag;
-		cpustate->nextmiflag = cpustate->nextnextmiflag;
+		m_miflag = m_nextmiflag;
+		m_nextmiflag = m_nextnextmiflag;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(device, cpustate->PC);
-		opcode = READOP(cpustate, cpustate->PC++);
+		debugger_instruction_hook(this, m_PC);
+		opcode = READOP(m_PC++);
 
 		switch (opcode)
 		{
@@ -222,8 +215,8 @@ static CPU_EXECUTE( ccpu )
 			case 0x08:  case 0x09:  case 0x0a:  case 0x0b:
 			case 0x0c:  case 0x0d:  case 0x0e:  case 0x0f:
 				tempval = (opcode & 0x0f) << 8;
-				STANDARD_ACC_OP(cpustate, tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				STANDARD_ACC_OP(tempval, tempval);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* INP */
@@ -231,19 +224,19 @@ static CPU_EXECUTE( ccpu )
 			case 0x14:  case 0x15:  case 0x16:  case 0x17:
 			case 0x18:  case 0x19:  case 0x1a:  case 0x1b:
 			case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:
-				if (cpustate->acc == &cpustate->A)
-					tempval = READPORT(cpustate, opcode & 0x0f) & 1;
+				if (m_acc == &m_A)
+					tempval = READPORT(opcode & 0x0f) & 1;
 				else
-					tempval = READPORT(cpustate, 16 + (opcode & 0x07)) & 1;
-				STANDARD_ACC_OP(cpustate, tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+					tempval = READPORT(16 + (opcode & 0x07)) & 1;
+				STANDARD_ACC_OP(tempval, tempval);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* A8I */
 			case 0x20:
-				tempval = READOP(cpustate, cpustate->PC++);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				tempval = READOP(m_PC++);
+				STANDARD_ACC_OP(*m_acc + tempval, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* A4I */
@@ -252,15 +245,15 @@ static CPU_EXECUTE( ccpu )
 			case 0x28:  case 0x29:  case 0x2a:  case 0x2b:
 			case 0x2c:  case 0x2d:  case 0x2e:  case 0x2f:
 				tempval = opcode & 0x0f;
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				STANDARD_ACC_OP(*m_acc + tempval, tempval);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* S8I */
 			case 0x30:
-				tempval = READOP(cpustate, cpustate->PC++);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + (tempval ^ 0xfff) + 1, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				tempval = READOP(m_PC++);
+				STANDARD_ACC_OP(*m_acc + (tempval ^ 0xfff) + 1, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* S4I */
@@ -269,8 +262,8 @@ static CPU_EXECUTE( ccpu )
 			case 0x38:  case 0x39:  case 0x3a:  case 0x3b:
 			case 0x3c:  case 0x3d:  case 0x3e:  case 0x3f:
 				tempval = opcode & 0x0f;
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + (tempval ^ 0xfff) + 1, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				STANDARD_ACC_OP(*m_acc + (tempval ^ 0xfff) + 1, tempval);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* LPAI */
@@ -278,103 +271,103 @@ static CPU_EXECUTE( ccpu )
 			case 0x44:  case 0x45:  case 0x46:  case 0x47:
 			case 0x48:  case 0x49:  case 0x4a:  case 0x4b:
 			case 0x4c:  case 0x4d:  case 0x4e:  case 0x4f:
-				tempval = READOP(cpustate, cpustate->PC++);
-				cpustate->J = (opcode & 0x0f) + (tempval & 0xf0) + ((tempval & 0x0f) << 8);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				tempval = READOP(m_PC++);
+				m_J = (opcode & 0x0f) + (tempval & 0xf0) + ((tempval & 0x0f) << 8);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* T4K */
 			case 0x50:
-				cpustate->PC = (cpustate->P << 12) + cpustate->J;
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 4);
+				m_PC = (m_P << 12) + m_J;
+				NEXT_ACC_B; CYCLES(4);
 				break;
 
 			/* JMIB/JEHB */
 			case 0x51:
-				if ((*cpustate->external_input)(device)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (m_external_input()) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JVNB */
 			case 0x52:
-				if (TEST_DR(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (TEST_DR) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JLTB */
 			case 0x53:
-				if (TEST_LT(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (TEST_LT) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JEQB */
 			case 0x54:
-				if (TEST_EQ(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (TEST_EQ) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JCZB */
 			case 0x55:
-				if (TEST_NC(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (TEST_NC) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JOSB */
 			case 0x56:
-				if (TEST_A0(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				if (TEST_A0) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* SSA */
 			case 0x57:
-				NEXT_ACC_B(cpustate); CYCLES(cpustate, 2);
+				NEXT_ACC_B; CYCLES(2);
 				break;
 
 			/* JMP */
 			case 0x58:
-				cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J;
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 4);
+				m_PC = ((m_PC - 1) & 0xf000) + m_J;
+				NEXT_ACC_A; CYCLES(4);
 				break;
 
 			/* JMI/JEH */
 			case 0x59:
-				if ((*cpustate->external_input)(device)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (m_external_input()) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* JVN */
 			case 0x5a:
-				if (TEST_DR(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (TEST_DR) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* JLT */
 			case 0x5b:
-				if (TEST_LT(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (TEST_LT) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* JEQ */
 			case 0x5c:
-				if (TEST_EQ(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (TEST_EQ) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* JCZ */
 			case 0x5d:
-				if (TEST_NC(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (TEST_NC) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* JOS */
 			case 0x5e:
-				if (TEST_A0(cpustate)) { cpustate->PC = ((cpustate->PC - 1) & 0xf000) + cpustate->J; CYCLES(cpustate, 2); }
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				if (TEST_A0) { m_PC = ((m_PC - 1) & 0xf000) + m_J; CYCLES(2); }
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* NOP */
 			case 0x5f:
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* ADD */
@@ -382,10 +375,10 @@ static CPU_EXECUTE( ccpu )
 			case 0x64:  case 0x65:  case 0x66:  case 0x67:
 			case 0x68:  case 0x69:  case 0x6a:  case 0x6b:
 			case 0x6c:  case 0x6d:  case 0x6e:  case 0x6f:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(*m_acc + tempval, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* SUB */
@@ -393,10 +386,10 @@ static CPU_EXECUTE( ccpu )
 			case 0x74:  case 0x75:  case 0x76:  case 0x77:
 			case 0x78:  case 0x79:  case 0x7a:  case 0x7b:
 			case 0x7c:  case 0x7d:  case 0x7e:  case 0x7f:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + (tempval ^ 0xfff) + 1, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(*m_acc + (tempval ^ 0xfff) + 1, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* SETP */
@@ -404,8 +397,8 @@ static CPU_EXECUTE( ccpu )
 			case 0x84:  case 0x85:  case 0x86:  case 0x87:
 			case 0x88:  case 0x89:  case 0x8a:  case 0x8b:
 			case 0x8c:  case 0x8d:  case 0x8e:  case 0x8f:
-				cpustate->P = opcode & 0x0f;
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				m_P = opcode & 0x0f;
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* OUT */
@@ -413,9 +406,9 @@ static CPU_EXECUTE( ccpu )
 			case 0x94:  case 0x95:  case 0x96:  case 0x97:
 			case 0x98:  case 0x99:  case 0x9a:  case 0x9b:
 			case 0x9c:  case 0x9d:  case 0x9e:  case 0x9f:
-				if (cpustate->acc == &cpustate->A)
-					WRITEPORT(cpustate, opcode & 0x07, ~*cpustate->acc & 1);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				if (m_acc == &m_A)
+					WRITEPORT(opcode & 0x07, ~*m_acc & 1);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* LDA */
@@ -423,10 +416,10 @@ static CPU_EXECUTE( ccpu )
 			case 0xa4:  case 0xa5:  case 0xa6:  case 0xa7:
 			case 0xa8:  case 0xa9:  case 0xaa:  case 0xab:
 			case 0xac:  case 0xad:  case 0xae:  case 0xaf:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(tempval, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* TST */
@@ -434,16 +427,16 @@ static CPU_EXECUTE( ccpu )
 			case 0xb4:  case 0xb5:  case 0xb6:  case 0xb7:
 			case 0xb8:  case 0xb9:  case 0xba:  case 0xbb:
 			case 0xbc:  case 0xbd:  case 0xbe:  case 0xbf:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				tempval = RDMEM(cpustate, cpustate->I);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				tempval = RDMEM(m_I);
 				{
-					UINT16 result = *cpustate->acc + (tempval ^ 0xfff) + 1;
-					SET_A0(cpustate);
-					SET_CMP_VAL(cpustate, tempval);
-					SET_NC(cpustate, result);
-					SET_MI(cpustate, result);
+					UINT16 result = *m_acc + (tempval ^ 0xfff) + 1;
+					SET_A0;
+					SET_CMP_VAL(tempval);
+					SET_NC(result);
+					SET_MI(result);
 				}
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* WS */
@@ -451,9 +444,9 @@ static CPU_EXECUTE( ccpu )
 			case 0xc4:  case 0xc5:  case 0xc6:  case 0xc7:
 			case 0xc8:  case 0xc9:  case 0xca:  case 0xcb:
 			case 0xcc:  case 0xcd:  case 0xce:  case 0xcf:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				cpustate->I = RDMEM(cpustate, cpustate->I) & 0xff;
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				m_I = RDMEM(m_I) & 0xff;
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* STA */
@@ -461,369 +454,236 @@ static CPU_EXECUTE( ccpu )
 			case 0xd4:  case 0xd5:  case 0xd6:  case 0xd7:
 			case 0xd8:  case 0xd9:  case 0xda:  case 0xdb:
 			case 0xdc:  case 0xdd:  case 0xde:  case 0xdf:
-				cpustate->I = (cpustate->P << 4) + (opcode & 0x0f);
-				WRMEM(cpustate, cpustate->I, *cpustate->acc);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = (m_P << 4) + (opcode & 0x0f);
+				WRMEM(m_I, *m_acc);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* DV */
 			case 0xe0:
 				{
-					INT16 stopX = (INT16)(cpustate->A << 4) >> 4;
-					INT16 stopY = (INT16)(cpustate->B << 4) >> 4;
+					INT16 stopX = (INT16)(m_A << 4) >> 4;
+					INT16 stopY = (INT16)(m_B << 4) >> 4;
 
-					stopX = ((INT16)(stopX - cpustate->X) >> cpustate->T) + cpustate->X;
-					stopY = ((INT16)(stopY - cpustate->Y) >> cpustate->T) + cpustate->Y;
+					stopX = ((INT16)(stopX - m_X) >> m_T) + m_X;
+					stopY = ((INT16)(stopY - m_Y) >> m_T) + m_Y;
 
-					(*cpustate->vector_callback)(device, cpustate->X, cpustate->Y, stopX, stopY, cpustate->T);
+					m_vector_callback(m_X, m_Y, stopX, stopY, m_T);
 
 					/* hack to make QB3 display semi-correctly during explosions */
-					cpustate->A = cpustate->X & 0xfff;
-					cpustate->B = cpustate->Y & 0xfff;
+					m_A = m_X & 0xfff;
+					m_B = m_Y & 0xfff;
 				}
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* LPAP */
 			case 0xe1:
-				cpustate->J = RDMEM(cpustate, cpustate->I);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_J = RDMEM(m_I);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* WSP */
 			case 0xf1:
-				cpustate->I = RDMEM(cpustate, cpustate->I) & 0xff;
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				m_I = RDMEM(m_I) & 0xff;
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* LKP */
 			case 0xe2:
 			case 0xf2:
-				tempval = READOP(cpustate, ((cpustate->PC - 1) & 0xf000) + *cpustate->acc);
-				STANDARD_ACC_OP(cpustate, tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 7);
-				cpustate->PC++;
+				tempval = READOP(((m_PC - 1) & 0xf000) + *m_acc);
+				STANDARD_ACC_OP(tempval, tempval);
+				NEXT_ACC_A; CYCLES(7);
+				m_PC++;
 				break;
 
 			/* MUL */
 			case 0xe3:
 			case 0xf3:
-				tempval = RDMEM(cpustate, cpustate->I);
-				SET_A0(cpustate);
-				cpustate->cmpval = tempval & 0xfff;
-				if (cpustate->acc == &cpustate->A)
+				tempval = RDMEM(m_I);
+				SET_A0;
+				m_cmpval = tempval & 0xfff;
+				if (m_acc == &m_A)
 				{
-					if (cpustate->A & 1)
+					if (m_A & 1)
 					{
 						UINT16 result;
-						cpustate->cmpacc = cpustate->B;
-						cpustate->A = (cpustate->A >> 1) | ((cpustate->B << 11) & 0x800);
-						cpustate->B = ((INT16)(cpustate->B << 4) >> 5) & 0xfff;
-						result = cpustate->B + tempval;
-						SET_NC(cpustate, result);
-						SET_MI(cpustate, result);
-						cpustate->B = result & 0xfff;
+						m_cmpacc = m_B;
+						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
+						m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+						result = m_B + tempval;
+						SET_NC(result);
+						SET_MI(result);
+						m_B = result & 0xfff;
 					}
 					else
 					{
 						UINT16 result;
-						cpustate->cmpacc = cpustate->A;
-						result = cpustate->A + tempval;
-						cpustate->A = (cpustate->A >> 1) | ((cpustate->B << 11) & 0x800);
-						cpustate->B = ((INT16)(cpustate->B << 4) >> 5) & 0xfff;
-						SET_NC(cpustate, result);
-						SET_MI(cpustate, result);
+						m_cmpacc = m_A;
+						result = m_A + tempval;
+						m_A = (m_A >> 1) | ((m_B << 11) & 0x800);
+						m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+						SET_NC(result);
+						SET_MI(result);
 					}
 				}
 				else
 				{
 					UINT16 result;
-					cpustate->cmpacc = cpustate->B;
-					cpustate->B = ((INT16)(cpustate->B << 4) >> 5) & 0xfff;
-					result = cpustate->B + tempval;
-					SET_NC(cpustate, result);
-					SET_MI(cpustate, result);
-					if (cpustate->A & 1)
-						cpustate->B = result & 0xfff;
+					m_cmpacc = m_B;
+					m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
+					result = m_B + tempval;
+					SET_NC(result);
+					SET_MI(result);
+					if (m_A & 1)
+						m_B = result & 0xfff;
 				}
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* NV */
 			case 0xe4:
 			case 0xf4:
-				cpustate->T = 0;
-				while (((cpustate->A & 0xa00) == 0x000 || (cpustate->A & 0xa00) == 0xa00) &&
-						((cpustate->B & 0xa00) == 0x000 || (cpustate->B & 0xa00) == 0xa00) &&
-						cpustate->T < 16)
+				m_T = 0;
+				while (((m_A & 0xa00) == 0x000 || (m_A & 0xa00) == 0xa00) &&
+						((m_B & 0xa00) == 0x000 || (m_B & 0xa00) == 0xa00) &&
+						m_T < 16)
 				{
-					cpustate->A = (cpustate->A << 1) & 0xfff;
-					cpustate->B = (cpustate->B << 1) & 0xfff;
-					cpustate->T++;
-					CYCLES(cpustate, 1);
+					m_A = (m_A << 1) & 0xfff;
+					m_B = (m_B << 1) & 0xfff;
+					m_T++;
+					CYCLES(1);
 				}
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* FRM */
 			case 0xe5:
 			case 0xf5:
-				cpustate->waiting = TRUE;
-				NEXT_ACC_A(cpustate);
-				cpustate->icount = -1;
+				m_waiting = TRUE;
+				NEXT_ACC_A;
+				m_icount = -1;
 
 				/* some games repeat the FRM opcode twice; it apparently does not cause
 				   a second wait, so we make sure we skip any duplicate opcode at this
 				   point */
-				if (READOP(cpustate, cpustate->PC) == opcode)
-					cpustate->PC++;
+				if (READOP(m_PC) == opcode)
+					m_PC++;
 				break;
 
 			/* STAP */
 			case 0xe6:
 			case 0xf6:
-				WRMEM(cpustate, cpustate->I, *cpustate->acc);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				WRMEM(m_I, *m_acc);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* CST */
 			case 0xf7:
-				cpustate->watchdog = 0;
+				m_watchdog = 0;
 			/* ADDP */
 			case 0xe7:
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(*m_acc + tempval, tempval);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* SUBP */
 			case 0xe8:
 			case 0xf8:
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc + (tempval ^ 0xfff) + 1, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 3);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(*m_acc + (tempval ^ 0xfff) + 1, tempval);
+				NEXT_ACC_A; CYCLES(3);
 				break;
 
 			/* ANDP */
 			case 0xe9:
 			case 0xf9:
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, *cpustate->acc & tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(*m_acc & tempval, tempval);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* LDAP */
 			case 0xea:
 			case 0xfa:
-				tempval = RDMEM(cpustate, cpustate->I);
-				STANDARD_ACC_OP(cpustate, tempval, tempval);
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 2);
+				tempval = RDMEM(m_I);
+				STANDARD_ACC_OP(tempval, tempval);
+				NEXT_ACC_A; CYCLES(2);
 				break;
 
 			/* SHR */
 			case 0xeb:
 			case 0xfb:
-				tempval = ((cpustate->acc == &cpustate->A) ? (cpustate->A >> 1) : ((INT16)(cpustate->B << 4) >> 5)) & 0xfff;
-				tempval |= (*cpustate->acc + (0xb0b | (opcode & 0xf0))) & 0x1000;
-				STANDARD_ACC_OP(cpustate, tempval, 0xb0b | (opcode & 0xf0));
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				tempval = ((m_acc == &m_A) ? (m_A >> 1) : ((INT16)(m_B << 4) >> 5)) & 0xfff;
+				tempval |= (*m_acc + (0xb0b | (opcode & 0xf0))) & 0x1000;
+				STANDARD_ACC_OP(tempval, 0xb0b | (opcode & 0xf0));
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* SHL */
 			case 0xec:
 			case 0xfc:
-				tempval = (*cpustate->acc << 1) & 0xfff;
-				tempval |= (*cpustate->acc + (0xc0c | (opcode & 0xf0))) & 0x1000;
-				STANDARD_ACC_OP(cpustate, tempval, 0xc0c | (opcode & 0xf0));
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				tempval = (*m_acc << 1) & 0xfff;
+				tempval |= (*m_acc + (0xc0c | (opcode & 0xf0))) & 0x1000;
+				STANDARD_ACC_OP(tempval, 0xc0c | (opcode & 0xf0));
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* ASR */
 			case 0xed:
 			case 0xfd:
-				tempval = ((INT16)(*cpustate->acc << 4) >> 5) & 0xfff;
-				STANDARD_ACC_OP(cpustate, tempval, 0xd0d | (opcode & 0xf0));
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				tempval = ((INT16)(*m_acc << 4) >> 5) & 0xfff;
+				STANDARD_ACC_OP(tempval, 0xd0d | (opcode & 0xf0));
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* SHRB */
 			case 0xee:
 			case 0xfe:
-				if (cpustate->acc == &cpustate->A)
+				if (m_acc == &m_A)
 				{
-					tempval = (cpustate->A >> 1) | ((cpustate->B << 11) & 0x800);
-					cpustate->B = ((INT16)(cpustate->B << 4) >> 5) & 0xfff;
+					tempval = (m_A >> 1) | ((m_B << 11) & 0x800);
+					m_B = ((INT16)(m_B << 4) >> 5) & 0xfff;
 				}
 				else
-					tempval = ((INT16)(cpustate->B << 4) >> 5) & 0xfff;
-				tempval |= (*cpustate->acc + (0xe0e | (opcode & 0xf0))) & 0x1000;
-				STANDARD_ACC_OP(cpustate, tempval, 0xe0e | (opcode & 0xf0));
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+					tempval = ((INT16)(m_B << 4) >> 5) & 0xfff;
+				tempval |= (*m_acc + (0xe0e | (opcode & 0xf0))) & 0x1000;
+				STANDARD_ACC_OP(tempval, 0xe0e | (opcode & 0xf0));
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* SHLB */
 			case 0xef:
 			case 0xff:
-				if (cpustate->acc == &cpustate->A)
+				if (m_acc == &m_A)
 				{
-					tempval = (cpustate->A << 1) & 0xfff;
-					cpustate->B = (cpustate->B << 1) & 0xfff;
+					tempval = (m_A << 1) & 0xfff;
+					m_B = (m_B << 1) & 0xfff;
 				}
 				else
-					tempval = (cpustate->B << 1) & 0xfff;
-				tempval |= (*cpustate->acc + (0xf0f | (opcode & 0xf0))) & 0x1000;
-				STANDARD_ACC_OP(cpustate, tempval, 0xf0f | (opcode & 0xf0));
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+					tempval = (m_B << 1) & 0xfff;
+				tempval |= (*m_acc + (0xf0f | (opcode & 0xf0))) & 0x1000;
+				STANDARD_ACC_OP(tempval, 0xf0f | (opcode & 0xf0));
+				NEXT_ACC_A; CYCLES(1);
 				break;
 
 			/* IV */
 			case 0xf0:
-				cpustate->X = (INT16)(cpustate->A << 4) >> 4;
-				cpustate->Y = (INT16)(cpustate->B << 4) >> 4;
-				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
+				m_X = (INT16)(m_A << 4) >> 4;
+				m_Y = (INT16)(m_B << 4) >> 4;
+				NEXT_ACC_A; CYCLES(1);
 				break;
 		}
-	} while (cpustate->icount > 0);
+	} while (m_icount > 0);
 }
 
 
-
-/***************************************************************************
-    INFORMATION SETTERS
-***************************************************************************/
-
-static CPU_SET_INFO( ccpu )
+offs_t ccpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	ccpu_state *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CCPU_PC:            cpustate->PC = info->i;                     break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:
-				cpustate->a0flag = (info->i & 0x01) ? 1 : 0;
-				cpustate->ncflag = (info->i & 0x02) ? 0x0000 : 0x1000;
-				cpustate->cmpacc = 1;
-				cpustate->cmpval = (info->i & 0x04) ? 0 : (info->i & 0x08) ? 1 : 2;
-				cpustate->miflag = (info->i & 0x10) ? 1 : 0;
-				cpustate->drflag = (info->i & 0x20) ? 1 : 0;
-				break;
-		case CPUINFO_INT_REGISTER + CCPU_A:             cpustate->A = info->i & 0xfff;              break;
-		case CPUINFO_INT_REGISTER + CCPU_B:             cpustate->B = info->i & 0xfff;              break;
-		case CPUINFO_INT_REGISTER + CCPU_I:             cpustate->I = info->i & 0xff;               break;
-		case CPUINFO_INT_REGISTER + CCPU_J:             cpustate->J = info->i & 0xfff;              break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + CCPU_P:             cpustate->P = info->i & 0x0f;               break;
-		case CPUINFO_INT_REGISTER + CCPU_X:             cpustate->X = info->i & 0xfff;              break;
-		case CPUINFO_INT_REGISTER + CCPU_Y:             cpustate->Y = info->i & 0xfff;              break;
-		case CPUINFO_INT_REGISTER + CCPU_T:             cpustate->T = info->i & 0xfff;              break;
-	}
+	extern CPU_DISASSEMBLE( ccpu );
+	return CPU_DISASSEMBLE_NAME(ccpu)(this, buffer, pc, oprom, opram, options);
 }
 
 
-
-/***************************************************************************
-    INFORMATION GETTERS
-***************************************************************************/
-
-CPU_GET_INFO( ccpu )
-{
-	ccpu_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(ccpu_state);                   break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                                    break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                                    break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                           break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                                    break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                                    break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                                    break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 3;                                    break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                                    break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 1;                                    break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 15;                          break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                           break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 16;                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = -1;                           break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 5;                            break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                            break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    /* not implemented */                           break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CCPU_PC:            info->i = cpustate->PC;                         break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:         info->i = 0;
-				if (TEST_A0(cpustate)) info->i |= 0x01;
-				if (TEST_NC(cpustate)) info->i |= 0x02;
-				if (TEST_LT(cpustate)) info->i |= 0x04;
-				if (TEST_EQ(cpustate)) info->i |= 0x08;
-				if ((*cpustate->external_input)(cpustate->device)) info->i |= 0x10;
-				if (TEST_DR(cpustate)) info->i |= 0x20;
-				break;
-		case CPUINFO_INT_REGISTER + CCPU_A:             info->i = cpustate->A;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_B:             info->i = cpustate->B;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_I:             info->i = cpustate->I;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_J:             info->i = cpustate->J;                          break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + CCPU_P:             info->i = cpustate->P;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_X:             info->i = cpustate->X;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_Y:             info->i = cpustate->Y;                          break;
-		case CPUINFO_INT_REGISTER + CCPU_T:             info->i = cpustate->T;                          break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(ccpu);        break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(ccpu);               break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(ccpu);             break;
-		case CPUINFO_FCT_EXIT:                          info->exit = NULL;                              break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(ccpu);         break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(ccpu); break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "CCPU");                        break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Cinematronics CPU");           break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                         break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                      break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Aaron Giles & Zonn Moore"); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c",
-					TEST_A0(cpustate) ? '0' : 'o',
-					TEST_NC(cpustate) ? 'N' : 'n',
-					TEST_LT(cpustate) ? 'L' : 'l',
-					TEST_EQ(cpustate) ? 'E' : 'e',
-					(*cpustate->external_input)(cpustate->device) ? 'M' : 'm',
-					TEST_DR(cpustate) ? 'D' : 'd');
-			break;
-
-		case CPUINFO_STR_REGISTER + CCPU_FLAGS:
-			sprintf(info->s, "FL:%c%c%c%c%c%c",
-					TEST_A0(cpustate) ? '0' : 'o',
-					TEST_NC(cpustate) ? 'N' : 'n',
-					TEST_LT(cpustate) ? 'L' : 'l',
-					TEST_EQ(cpustate) ? 'E' : 'e',
-					(*cpustate->external_input)(cpustate->device) ? 'M' : 'm',
-					TEST_DR(cpustate) ? 'D' : 'd');
-			break;
-
-		case CPUINFO_STR_REGISTER + CCPU_PC:            sprintf(info->s, "PC:%04X", cpustate->PC);      break;
-		case CPUINFO_STR_REGISTER + CCPU_A:             sprintf(info->s, "A:%03X",  cpustate->A);       break;
-		case CPUINFO_STR_REGISTER + CCPU_B:             sprintf(info->s, "B:%03X",  cpustate->B);       break;
-		case CPUINFO_STR_REGISTER + CCPU_I:             sprintf(info->s, "I:%03X",  cpustate->I);       break;
-		case CPUINFO_STR_REGISTER + CCPU_J:             sprintf(info->s, "J:%03X",  cpustate->J);       break;
-		case CPUINFO_STR_REGISTER + CCPU_P:             sprintf(info->s, "P:%X",    cpustate->P);       break;
-		case CPUINFO_STR_REGISTER + CCPU_X:             sprintf(info->s, "X:%03X",  cpustate->X);       break;
-		case CPUINFO_STR_REGISTER + CCPU_Y:             sprintf(info->s, "Y:%03X",  cpustate->Y);       break;
-		case CPUINFO_STR_REGISTER + CCPU_T:             sprintf(info->s, "T:%03X",  cpustate->T);       break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(CCPU, ccpu);

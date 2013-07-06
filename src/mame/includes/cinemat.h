@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cinemat_vector_control_w);
 	DECLARE_WRITE8_MEMBER(cinemat_sound_control_w);
 	DECLARE_WRITE8_MEMBER(qb3_sound_w);
+	DECLARE_READ8_MEMBER(joystick_read);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_DRIVER_INIT(speedfrk);
 	DECLARE_DRIVER_INIT(boxingb);
@@ -71,7 +72,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_portb_r);
 	DECLARE_WRITE8_MEMBER(sound_portb_w);
 	DECLARE_WRITE8_MEMBER(sound_output_w);
-	required_device<cpu_device> m_maincpu;
+	required_device<ccpu_cpu_device> m_maincpu;
+	void cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
 };
 
 /*----------- defined in audio/cinemat.c -----------*/
@@ -92,6 +94,3 @@ MACHINE_CONFIG_EXTERN( wotwc_sound );
 MACHINE_CONFIG_EXTERN( demon_sound );
 MACHINE_CONFIG_EXTERN( qb3_sound );
 
-/*----------- defined in video/cinemat.c -----------*/
-
-void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
