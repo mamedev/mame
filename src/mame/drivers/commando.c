@@ -468,11 +468,41 @@ ROM_START( commandob2 )
 	ROM_LOAD( "vtb5.6l",  0x0400, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
 	ROM_LOAD( "vtb6.6e",  0x0500, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
 
-		/* There's a 16L8A PAL (with a 74LS244P and a 74LS367AP) on a tiny sub-board between the CPU1 ROMs
+		/* There's a 16L8 PAL (with a 74LS245 and a 74LS08) on a tiny sub-board between the CPU1 ROMs
 		   and the CPU1 (a Z80 compatible NEC D780C-1). This sub-board is plugged on what seems to be
-		   a ROM socket. */
+		   a ROM socket.
+		   
+		PAL16L8 (SWELT-019A)
+
+		Pin 1  - Pin 12 of 27256 (D1) and Pin 3 of 74LS245 (A2) (Input)
+		Pin 2  - Pin 13 of 27256 (D2) and Pin 4 of 74LS245 (A3) (Input)
+		Pin 3  - Pin 15 of 27256 (D3) and Pin 5 of 74LS245 (A4) (Input)
+		Pin 4  - Pin 8 of 74LS08 (Input)
+		Pin 5  - Pin 17 of 27256 (D5) and Pin 7 of 74LS245 (A6) (Input)
+		Pin 6  - Pin 18 of 27256 (D6) and Pin 8 of 74LS245 (A7) (Input)
+		Pin 7  - Pin 19 of 27256 (D7) and Pin 9 of 74LS245 (A8) (Input)
+		Pin 8  - Pin 6 of 74LS14 (Input)
+		Pin 9  - Pin 11 of 74LS08 (Input)
+		Pin 10 - Ground
+		Pin 11 - Pin 22 of Z80 (~WD) and Pin 1 of 74LS245 (DIR) (Input)
+		Pin 12 - Pin 19 of 74LS245 (~OE) (Output)
+		Pin 13 - Pin 13 of Z80 (D7) (Input?, Output)
+		Pin 14 - Pin 10 of Z80 (D6) (Input?, Output)
+		Pin 15 - Pin 9 of Z80 (D5) (Input?, Output)
+		Pin 16 - Not Used (Input?, Output)
+		Pin 17 - Pin 8 of Z80 (D3) (Input?, Output)
+		Pin 18 - Pin 12 of Z80 (D2) (Input?, Output)
+		Pin 19 - Pin 15 of Z80 (D1) (Output)
+		Pin 20 - VCC
+
+		------------------------------------------------------------------------------
+
+		Pin 14 of Z80 (D0) to Pin 11 of 27256 (D0)
+		Pin 7 of Z80 (D4) to Pin 16 of 27256 (D4)
+		*/
+
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "commandob2_pal16l8a.bin", 0x0000, 0x0104, NO_DUMP ) /* I Didn't try to dump it... */
+	ROM_LOAD( "commandob2_pal16l8.bin", 0x000000, 0x000104, CRC(bdbcaf02) SHA1(148591f95a343c8ffa2eaa02764c91557aa523d3) )
 ROM_END
 
 ROM_START( sinvasn )
