@@ -506,15 +506,20 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 	/* adjust the width and height */
 	if (w == 0) w = 1;
 	if (h == 0) h = 1;
-	if (w == 255) w = 256;
-	if (h == 255) h = 256;
 
 	/* do the actual blit */
 	accesses = blitter_core(space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
-	/* this is just a guess */
-	estimated_clocks_at_4MHz = 20 + ((data & 4) ? 4 : 2) * accesses;
+	if(data & WMS_BLITTER_CONTROLBYTE_SLOW)
+	{
+		estimated_clocks_at_4MHz = 4 + 4 * (accesses + 2);
+	}
+	else
+	{
+		estimated_clocks_at_4MHz = 4 + 2 * (accesses + 3);
+	}
+
 	space.device().execute().adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
@@ -541,134 +546,102 @@ WRITE8_MEMBER(williams_state::williams2_blit_window_enable_w)
  *
  *************************************/
 
-inline void williams_state::blit_pixel(address_space &space, int offset, int srcdata, int data, int mask, int solid)
+inline void williams_state::blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int pix = (offset < 0xc000) ? m_videoram[offset] : space.read_byte(offset);
+	int curpix = (dstaddr < 0xc000) ? m_videoram[dstaddr] : space.read_byte(dstaddr);	//current pixel values at dest
 
-	/* handle transparency */
-	if (data & 0x08)
+	int solid = m_blitterram[1];
+	unsigned char keepmask = 0xff;			//what part of original dst byte should be kept, based on NO_EVEN and NO_ODD flags
+
+	//even pixel (D7-D4)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0xf0))	//FG only and src even pixel=0
 	{
-		if (!(srcdata & 0xf0)) mask |= 0xf0;
-		if (!(srcdata & 0x0f)) mask |= 0x0f;
+		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN)
+			keepmask &= 0x0f;
+	}
+	else
+	{
+		if(!(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_EVEN))
+			keepmask &= 0x0f;
 	}
 
-	/* handle solid versus source data */
-	pix &= mask;
-	if (data & 0x10)
-		pix |= solid & ~mask;
+	//odd pixel (D3-D0)
+	if((controlbyte & WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY) && !(srcdata & 0x0f))	//FG only and src odd pixel=0
+	{
+		if(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD)
+			keepmask &= 0xf0;
+	}
 	else
-		pix |= srcdata & ~mask;
+	{
+		if(!(controlbyte & WMS_BLITTER_CONTROLBYTE_NO_ODD))
+			keepmask &= 0xf0;
+	}		
 
-	/* if the window is enabled, only blit to videoram below the clipping address */
-	/* note that we have to allow blits to non-video RAM (e.g. tileram) because those */
-	/* are not blocked by the window enable */
-	if (!m_blitter_window_enable || offset < m_blitter_clip_address || offset >= 0xc000)
-		space.write_byte(offset, pix);
+	curpix &= keepmask;
+	if(controlbyte & WMS_BLITTER_CONTROLBYTE_SOLID)
+		curpix |= (solid & ~keepmask);
+	else
+		curpix |= (srcdata & ~keepmask);
+	
+/* if the window is enabled, only blit to videoram below the clipping address */
+/* note that we have to allow blits to non-video RAM (e.g. tileram, Sinistar $DXXX SRAM) because those */
+/* are not blocked by the window enable */
+	if (!m_blitter_window_enable || dstaddr < m_blitter_clip_address || dstaddr >= 0xc000)
+		space.write_byte(dstaddr, curpix);
 }
 
 
-int williams_state::blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data)
+int williams_state::blitter_core(address_space &space, int sstart, int dstart, int w, int h, int controlbyte)
 {
 	int source, sxadv, syadv;
 	int dest, dxadv, dyadv;
-	int i, j, solid;
+	int x, y;
 	int accesses = 0;
-	int keepmask;
 
 	/* compute how much to advance in the x and y loops */
-	sxadv = (data & 0x01) ? 0x100 : 1;
-	syadv = (data & 0x01) ? 1 : w;
-	dxadv = (data & 0x02) ? 0x100 : 1;
-	dyadv = (data & 0x02) ? 1 : w;
+	sxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 0x100 : 1;
+	syadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256) ? 1 : w;
+	dxadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 0x100 : 1;
+	dyadv = (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256) ? 1 : w;
 
-	/* determine the common mask */
-	keepmask = 0x00;
-	if (data & 0x80) keepmask |= 0xf0;
-	if (data & 0x40) keepmask |= 0x0f;
-	if (keepmask == 0xff)
-		return accesses;
+	int pixdata=0;
 
-	/* set the solid pixel value to the mask value */
-	solid = m_blitterram[1];
-
-	/* first case: no shifting */
-	if (!(data & 0x20))
+	/* loop over the height */
+	for (y = 0; y < h; y++)
 	{
-		/* loop over the height */
-		for (i = 0; i < h; i++)
+		source = sstart & 0xffff;
+		dest = dstart & 0xffff;
+			
+		/* loop over the width */
+		for (x = 0; x < w; x++) 
 		{
-			source = sstart & 0xffff;
-			dest = dstart & 0xffff;
-
-			/* loop over the width */
-			for (j = w; j > 0; j--)
+			if (!(controlbyte & WMS_BLITTER_CONTROLBYTE_SHIFT))	//no shift
 			{
-				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], data, keepmask, solid);
-				accesses += 2;
-
-				/* advance */
-				source = (source + sxadv) & 0xffff;
-				dest   = (dest + dxadv) & 0xffff;
+				blit_pixel(space, dest, m_blitter_remap[space.read_byte(source)], controlbyte);
 			}
-
-			sstart += syadv;
-
-			/* note that PlayBall! indicates the X coordinate doesn't wrap */
-			if (data & 0x02)
-				dstart = (dstart & 0xff00) | ((dstart + dyadv) & 0xff);
 			else
-				dstart += dyadv;
-		}
-	}
-
-	/* second case: shifted one pixel */
-	else
-	{
-		/* swap halves of the keep mask and the solid color */
-		keepmask = ((keepmask & 0xf0) >> 4) | ((keepmask & 0x0f) << 4);
-		solid = ((solid & 0xf0) >> 4) | ((solid & 0x0f) << 4);
-
-		/* loop over the height */
-		for (i = 0; i < h; i++)
-		{
-			int pixdata;
-
-			source = sstart & 0xffff;
-			dest = dstart & 0xffff;
-
-			/* left edge case */
-			pixdata = m_blitter_remap[space.read_byte(source)];
-			blit_pixel(space, dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
+			{	//shift one pixel right
+				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
+				blit_pixel(space, dest, (pixdata >> 4) & 0xff, controlbyte);
+			}
 			accesses += 2;
 
+			/* advance src and dst pointers */
 			source = (source + sxadv) & 0xffff;
 			dest   = (dest + dxadv) & 0xffff;
-
-			/* loop over the width */
-			for (j = w - 1; j > 0; j--)
-			{
-				pixdata = (pixdata << 8) | m_blitter_remap[space.read_byte(source)];
-				blit_pixel(space, dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
-				accesses += 2;
-
-				source = (source + sxadv) & 0xffff;
-				dest   = (dest + dxadv) & 0xffff;
-			}
-
-			/* right edge case */
-			blit_pixel(space, dest, (pixdata << 4) & 0xf0, data, keepmask | 0x0f, solid);
-			accesses++;
-
-			sstart += syadv;
-
-			/* note that PlayBall! indicates the X coordinate doesn't wrap */
-			if (data & 0x02)
-				dstart = (dstart & 0xff00) | ((dstart + dyadv) & 0xff);
-			else
-				dstart += dyadv;
 		}
-	}
 
+		/* note that PlayBall! indicates the X coordinate doesn't wrap */
+		if (controlbyte & WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256)
+			dstart = (dstart & 0xff00) | ((dstart + dyadv) & 0xff);
+		else
+			dstart += dyadv;
+
+		if (controlbyte & WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256)
+			sstart = (sstart & 0xff00) | ((sstart + syadv) & 0xff);
+		else
+			sstart += syadv;
+	}
 	return accesses;
 }

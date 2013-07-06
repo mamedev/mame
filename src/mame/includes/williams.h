@@ -22,6 +22,19 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_soundcpu_b(*this, "soundcpu_b") { }
 
+	enum
+	{
+		//controlbyte (0xCA00) bit definitions
+		WMS_BLITTER_CONTROLBYTE_NO_EVEN = 0x80,
+		WMS_BLITTER_CONTROLBYTE_NO_ODD = 0x40,
+		WMS_BLITTER_CONTROLBYTE_SHIFT = 0x20,
+		WMS_BLITTER_CONTROLBYTE_SOLID = 0x10,
+		WMS_BLITTER_CONTROLBYTE_FOREGROUND_ONLY = 0x08,
+		WMS_BLITTER_CONTROLBYTE_SLOW = 0x04, //2us blits instead of 1us
+		WMS_BLITTER_CONTROLBYTE_DST_STRIDE_256 = 0x02,
+		WMS_BLITTER_CONTROLBYTE_SRC_STRIDE_256 = 0x01
+	};
+
 	required_shared_ptr<UINT8>  m_nvram;
 	UINT8 *m_mayday_protection;
 	required_shared_ptr<UINT8> m_videoram;
@@ -134,7 +147,7 @@ public:
 	void state_save_register();
 	void create_palette_lookup();
 	void blitter_init(int blitter_config, const UINT8 *remap_prom);
-	inline void blit_pixel(address_space &space, int offset, int srcdata, int data, int mask, int solid);
+	inline void blit_pixel(address_space &space, int dstaddr, int srcdata, int controlbyte);
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 	inline void update_blaster_banking();
 	void defender_install_io_space(address_space &space);
