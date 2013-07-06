@@ -65,19 +65,19 @@ const char *mbee_format::extensions() const
 const mbee_format::format mbee_format::formats[] = {
 	{   /*  ss80 3 1/2 inch double density */
 		floppy_image::FF_35,  floppy_image::SSDD, floppy_image::MFM,
-		1500,  10, 80, 1, 512, {}, 1, {}, 100, 22, 84
+		2000,  10, 80, 1, 512, {}, 1, {}, 32, 22, 31
 	},
 	{   /*  ds40 5.25 inch double density */
 		floppy_image::FF_525,  floppy_image::DSDD, floppy_image::MFM,
-		1500,  10, 40, 2, 512, {}, 1, {}, 100, 22, 84
+		2000,  10, 40, 2, 512, {}, 1, {}, 32, 22, 31
 	},
 	{   /*  ds80 3 1/2 inch double density */
 		floppy_image::FF_35,  floppy_image::DSDD, floppy_image::MFM,
-		1500,  10, 80, 2, 512, {}, 21, {}, 100, 22, 84
+		2000,  10, 80, 2, 512, {}, 21, {}, 32, 22, 31
 	},
 	{   /*  ds82,ds84 3 1/2 inch double density */
 		floppy_image::FF_35,  floppy_image::DSDD, floppy_image::MFM,
-		1500,  10, 80, 2, 512, {}, 1, {}, 100, 22, 84
+		2000,  10, 80, 2, 512, {}, 1, {}, 32, 22, 31
 	},
 	{}
 };
