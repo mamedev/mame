@@ -202,67 +202,6 @@ static const int pcm_tab[16] = { 0, 4, 8, -1, 12, 16, 20, -1, 24, 28, 32, -1, 36
 
 /*****************************************************************************/
 
-INLINE int GET_KEYSCALED_RATE(int rate, int keycode, int keyscale)
-{
-	int newrate = rate + RKS_Table[keycode][keyscale];
-
-	if (newrate > 63)
-	{
-		newrate = 63;
-	}
-	if (newrate < 0)
-	{
-		newrate = 0;
-	}
-	return newrate;
-}
-
-INLINE int GET_INTERNAL_KEYCODE(int block, int fns)
-{
-	int n43;
-	if (fns < 0x780)
-	{
-		n43 = 0;
-	}
-	else if (fns < 0x900)
-	{
-		n43 = 1;
-	}
-	else if (fns < 0xa80)
-	{
-		n43 = 2;
-	}
-	else
-	{
-		n43 = 3;
-	}
-
-	return ((block & 7) * 4) + n43;
-}
-
-INLINE int GET_EXTERNAL_KEYCODE(int block, int fns)
-{
-	int n43;
-	if (fns < 0x100)
-	{
-		n43 = 0;
-	}
-	else if (fns < 0x300)
-	{
-		n43 = 1;
-	}
-	else if (fns < 0x500)
-	{
-		n43 = 2;
-	}
-	else
-	{
-		n43 = 3;
-	}
-
-	return ((block & 7) * 4) + n43;
-}
-
 void ymf271_device::calculate_step(YMF271Slot *slot)
 {
 	double st;
@@ -295,6 +234,17 @@ void ymf271_device::calculate_step(YMF271Slot *slot)
 	}
 }
 
+inline bool ymf271_device::check_envelope_end(YMF271Slot *slot)
+{
+	if (slot->volume <= 0)
+	{
+		slot->active = 0;
+		slot->volume = 0;
+		return true;
+	}
+	return false;
+}
+
 void ymf271_device::update_envelope(YMF271Slot *slot)
 {
 	switch (slot->env_state)
@@ -316,7 +266,7 @@ void ymf271_device::update_envelope(YMF271Slot *slot)
 			int decay_level = 255 - (slot->decay1lvl << 4);
 			slot->volume -= slot->env_decay1_step;
 
-			if ((slot->volume >> ENV_VOLUME_SHIFT) <= decay_level)
+			if (!check_envelope_end(slot) && (slot->volume >> ENV_VOLUME_SHIFT) <= decay_level)
 			{
 				slot->env_state = ENV_DECAY2;
 			}
@@ -326,27 +276,78 @@ void ymf271_device::update_envelope(YMF271Slot *slot)
 		case ENV_DECAY2:
 		{
 			slot->volume -= slot->env_decay2_step;
-
-			if (slot->volume <= 0)
-			{
-				slot->active = 0;
-				slot->volume = 0;
-			}
+			check_envelope_end(slot);
 			break;
 		}
 
 		case ENV_RELEASE:
 		{
 			slot->volume -= slot->env_release_step;
-
-			if (slot->volume <= 0)
-			{
-				slot->active = 0;
-				slot->volume = 0;
-			}
+			check_envelope_end(slot);
 			break;
 		}
 	}
+}
+
+inline int ymf271_device::get_keyscaled_rate(int rate, int keycode, int keyscale)
+{
+	int newrate = rate + RKS_Table[keycode][keyscale];
+
+	if (newrate > 63)
+	{
+		newrate = 63;
+	}
+	if (newrate < 0)
+	{
+		newrate = 0;
+	}
+	return newrate;
+}
+
+inline int ymf271_device::get_internal_keycode(int block, int fns)
+{
+	int n43;
+	if (fns < 0x780)
+	{
+		n43 = 0;
+	}
+	else if (fns < 0x900)
+	{
+		n43 = 1;
+	}
+	else if (fns < 0xa80)
+	{
+		n43 = 2;
+	}
+	else
+	{
+		n43 = 3;
+	}
+
+	return ((block & 7) * 4) + n43;
+}
+
+inline int ymf271_device::get_external_keycode(int block, int fns)
+{
+	int n43;
+	if (fns < 0x100)
+	{
+		n43 = 0;
+	}
+	else if (fns < 0x300)
+	{
+		n43 = 1;
+	}
+	else if (fns < 0x500)
+	{
+		n43 = 2;
+	}
+	else
+	{
+		n43 = 3;
+	}
+
+	return ((block & 7) * 4) + n43;
 }
 
 void ymf271_device::init_envelope(YMF271Slot *slot)
@@ -356,28 +357,28 @@ void ymf271_device::init_envelope(YMF271Slot *slot)
 
 	if (slot->waveform != 7)
 	{
-		keycode = GET_INTERNAL_KEYCODE(slot->block, slot->fns);
+		keycode = get_internal_keycode(slot->block, slot->fns);
 	}
 	else
 	{
-		keycode = GET_EXTERNAL_KEYCODE(slot->block, slot->fns & 0x7ff);
+		keycode = get_external_keycode(slot->block, slot->fns & 0x7ff);
 		/* keycode = (keycode + slot->srcb * 4 + slot->srcnote) / 2; */ // not sure
 	}
 
 	// init attack state
-	rate = GET_KEYSCALED_RATE(slot->ar * 2, keycode, slot->keyscale);
+	rate = get_keyscaled_rate(slot->ar * 2, keycode, slot->keyscale);
 	slot->env_attack_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
 
 	// init decay1 state
-	rate = GET_KEYSCALED_RATE(slot->decay1rate * 2, keycode, slot->keyscale);
+	rate = get_keyscaled_rate(slot->decay1rate * 2, keycode, slot->keyscale);
 	slot->env_decay1_step = (rate < 4) ? 0 : (int)(((double)(255-decay_level) / m_lut_dc[rate]) * 65536.0);
 
 	// init decay2 state
-	rate = GET_KEYSCALED_RATE(slot->decay2rate * 2, keycode, slot->keyscale);
+	rate = get_keyscaled_rate(slot->decay2rate * 2, keycode, slot->keyscale);
 	slot->env_decay2_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_dc[rate]) * 65536.0);
 
 	// init release state
-	rate = GET_KEYSCALED_RATE(slot->relrate * 4, keycode, slot->keyscale);
+	rate = get_keyscaled_rate(slot->relrate * 4, keycode, slot->keyscale);
 	slot->env_release_step = (rate < 4) ? 0 : (int)(((double)(255-0) / m_lut_ar[rate]) * 65536.0);
 
 	slot->volume = (255-160) << ENV_VOLUME_SHIFT; // -60db
