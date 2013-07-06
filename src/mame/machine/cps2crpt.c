@@ -846,6 +846,7 @@ static const struct game_keys keys_table[] =
 	{ "sfar3",    { 0x0f895d6e,0xc4273a1b }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfau",     { 0x25bead36,0x97cf4018 }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfza",     { 0xe43dc508,0x621b9a7f }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
+	{ "sfzar1",   { 0xe43dc508,0x621b9a7f }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzj",     { 0x8db3167a,0xc29e0f45 }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzjr1",   { 0x8db3167a,0xc29e0f45 }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzjr2",   { 0x8db3167a,0xc29e0f45 }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
