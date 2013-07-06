@@ -56,8 +56,8 @@ TODO:
   * DMA table? can't find any
   * data in transparent pen? nope
   * color bit 15? nope
-- not sure if sprite priorities are completely right
-  * parallax scrolling clouds in rdft intro (when jet flies towards screen) is wrong compared to pcb
+  * writes to $100/104/108 might be interesting...
+- not sure if layer priorities are completely right
 
 */
 
@@ -870,9 +870,15 @@ READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 
 READ8_MEMBER(seibuspi_state::spi_status_r)
 {
-	// d0: unknown status
+	// d0: unknown status, waits for it to be set, video/dma related?
 	// other bits: unused?
 	return 0x01;
+}
+
+READ8_MEMBER(seibuspi_state::spi_ds2404_unknown_r)
+{
+	// d0, d1, d2: unknown, waits for it to be cleared
+	return 0x00;
 }
 
 WRITE8_MEMBER(seibuspi_state::eeprom_w)
@@ -966,20 +972,16 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x0000054c, 0x0000054f) AM_WRITENOP // RISE10/11 sprite decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000560, 0x00000563) AM_WRITE16(sprite_dma_start_w, 0xffff0000)
 	AM_RANGE(0x00000600, 0x00000603) AM_READ8(spi_status_r, 0x000000ff)
-	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("UNKNOWN")
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP // ?
-	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
-	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
-	AM_RANGE(0x00000400, 0x000007ff) AM_UNMAP
 	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
@@ -990,6 +992,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
 	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
@@ -998,10 +1001,13 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
+	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITENOP
 	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_1w_reset_w, 0x000000ff)
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
@@ -1009,7 +1015,9 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ8(sound_fifo_status_r, 0x000000ff)
+	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
+	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
 	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
@@ -1843,6 +1851,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
+	MCFG_PALETTE_INIT(all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
@@ -1945,6 +1954,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
+	MCFG_PALETTE_INIT(all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
@@ -1999,6 +2009,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 
 	MCFG_GFXDECODE(sys386f)
 	MCFG_PALETTE_LENGTH(8192)
+	MCFG_PALETTE_INIT(all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
@@ -3687,7 +3698,7 @@ GAME( 1997, rdft2us,    rdft2,    sxx2f,   sxx2f,       seibuspi_state, rdft2,  
 
 /* SXX2G */
 GAME( 1999, rfjetsa,    rfjet,    sxx2g,   sxx2f,       seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // has 1998-99 copyright + planes unlocked
-GAME( 1999, rfjets,     rfjet,    sxx2g,   sxx2f,       seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board, earlier?)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // maybe proto? see notes at romdefs
+GAME( 1999, rfjets,     rfjet,    sxx2g,   sxx2f,       seibuspi_state, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board, test version?)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // maybe test/proto? see notes at romdefs
 
 /* SYS386I */
 GAME( 2000, rdft22kc,   rdft2,    sys386i, sys386i,     seibuspi_state, rdft2,    ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - Operation Hell Dive 2000 (China, SYS386I)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
