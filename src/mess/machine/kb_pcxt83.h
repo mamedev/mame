@@ -37,6 +37,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_WRITE8_MEMBER( bus_w );
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );

@@ -73,7 +73,7 @@ const rom_entry *ibm_pc_xt_83_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( ibm_pc_xt_83_keyboard_io, AS_IO, 8, ibm_pc_xt_83_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READNOP AM_WRITE(bus_w)
+	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
@@ -225,7 +225,7 @@ INPUT_PORTS_START( ibm_pc_xt_83_keyboard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) //3d
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) //76
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) //3b
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 INPUT_PORTS_END
 
 
@@ -315,6 +315,17 @@ WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::clock_write )
 WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::data_write )
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  bus_r -
+//-------------------------------------------------
+
+READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
+{
+	// HACK this should be handled in mcs48.c
+	return m_bus;
 }
 
 
