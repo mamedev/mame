@@ -2,6 +2,11 @@
 
     Sega Lindbergh skeleton driver
 
+	TODO:
+	- tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
+	- Apparently there's no way to avoid a dead lock at 0xfd085, perhaps
+	  tied to the aforementioned?
+
 ***************************************************************************
 
 Lindbergh
@@ -234,7 +239,7 @@ static ADDRESS_MAP_START(lindbergh_map, AS_PROGRAM, 32, lindbergh_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
-//  0xd0000 - 0xdffff tested
+//  0xd0000 - 0xdffff tested, wants 0x414d ("AM") in there
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("mb_bios", 0xf0000)
 	AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("mb_bios", 0)     /* System BIOS */
