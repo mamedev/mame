@@ -4,16 +4,17 @@
 
 *****************************************************************************************************
 
+        All input must be in upper case.
         Summary of Monitor commands:
 
-        D xxxx yyyy = dump memory to screen
-        F xxxx yyyy zz = fill memory from xxxx to yyyy-1 with zz
-        G xxxx         = execute program at xxxx
-        H xxxx yyyy aa bb...  = unknown
-        L xxxx         = edit memory (. to exit)
-        M xxxx yyyy zzzz = Move (copy) memory
-        V xxxx           = unknown
-        X n     = Select a bank (0 works, others freeze)
+        D xxxx yyyy           = dump memory to screen
+        F xxxx yyyy zz        = fill memory from xxxx to yyyy-1 with zz
+        G xxxx                = execute program at xxxx
+        H xxxx yyyy aa bb...  = Search memory for a string of bytes
+        L xxxx                = edit memory (. to exit)
+        M xxxx yyyy zzzz      = Move (copy) memory
+        V xxxx                = Ascii dump of memory to the screen (cr to continue, space to exit)
+        X n                   = Select a bank (0 works, others freeze)
 
         Note some of the commands are a bit buggy, eg F doesn't fill the last byte
 
@@ -27,7 +28,7 @@
     - honor jumper settings
     - CTC signal header
     - serial printer
-    - cassette?
+    - cassette? (no mention of it in the manuals)
 
 */
 
