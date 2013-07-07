@@ -165,30 +165,37 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 		int i;
 		for(i=0;i<m_spriteram.bytes();i+=4)
 		{
-			if(spriteram[i+3]!=0)
+			if(spriteram[i+1]&0x80)
+				continue;
+
 			{
-				int tile=0x30+((spriteram[i]>>2)&0x1f);
+				/* BCD debug code, to be removed in the end */
+				UINT8 tile_low = (spriteram[i]&0x0f);
+				UINT8 tile_high = ((spriteram[i]&0xf0)>>4);
+
+				tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
+				tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile,
+							tile_high,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2],0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile,
+							tile_high,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2],0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile,
+							tile_low,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2]+8,0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile,
+							tile_low,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2]+8,0);
