@@ -3274,6 +3274,7 @@ src/mame/drivers/lgp.c svneol=native#text/plain
 src/mame/drivers/liberate.c svneol=native#text/plain
 src/mame/drivers/liberatr.c svneol=native#text/plain
 src/mame/drivers/limenko.c svneol=native#text/plain
+src/mame/drivers/lindbergh.c svneol=native#text/plain
 src/mame/drivers/littlerb.c svneol=native#text/plain
 src/mame/drivers/lkage.c svneol=native#text/plain
 src/mame/drivers/lockon.c svneol=native#text/plain
