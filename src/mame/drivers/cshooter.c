@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 
 			rg,
 			(code & 0x1ff),
-			0x2c+(attr&0x1f), //test
+			(attr&0x07),
 			0);
 }
 
@@ -151,13 +151,13 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 void cshooter_state::video_start()
 {
 	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32, 32);
-	m_txtilemap->set_transparent_pen(3);
+	m_txtilemap->set_transparent_pen(0);
 }
 
 UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
-	m_txtilemap->mark_all_dirty();
+//	m_txtilemap->mark_all_dirty();
 
 	//sprites
 	{
@@ -173,25 +173,25 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3],spriteram[i+2],3);
+							spriteram[i+3],spriteram[i+2],0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3]+8,spriteram[i+2],3);
+							spriteram[i+3]+8,spriteram[i+2],0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3]+8,spriteram[i+2]+8,3);
+							spriteram[i+3]+8,spriteram[i+2]+8,0);
 
 				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
-							spriteram[i+3],spriteram[i+2]+8,3);
+							spriteram[i+3],spriteram[i+2]+8,0);
 			}
 		}
 	}
@@ -251,16 +251,29 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 
 WRITE8_MEMBER(cshooter_state::pal_w)
 {
+	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x100]));
+	r = m_generic_paletteram_8[offset] & 0xf;
+	g = m_generic_paletteram_8[offset+0x100] & 0xf;
+	b = m_generic_paletteram_8[offset] >> 4;
+	palette_set_color_rgb(machine(), offset, pal4bit(r),
+											 pal4bit(g),
+	                                         pal4bit(b));
 }
 
 WRITE8_MEMBER(cshooter_state::pal2_w)
 {
+	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x200]));
+
+	r = m_generic_paletteram_8[offset] & 0xf;
+	g = m_generic_paletteram_8[offset+0x200] & 0xf;
+	b = m_generic_paletteram_8[offset] >> 4;
+	palette_set_color_rgb(machine(), offset, pal4bit(r),
+											 pal4bit(g),
+	                                         pal4bit(b));
 }
 
 READ8_MEMBER(cshooter_state::pal_r)
@@ -435,8 +448,8 @@ static const gfx_layout cshooter_charlayout =
 
 
 static GFXDECODE_START( cshooter )
-	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout,   0, 64  )
-	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout,   0, 64  )
+	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout,   0xc0, 16  )
+	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout,   0xc0, 16  )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
@@ -611,7 +624,7 @@ ROM_START( cshootere )
 	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
 	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
-	ROM_REGION( 0x02000, "gfx1",  ROMREGION_INVERT )    // TX Layer
+	ROM_REGION( 0x02000, "gfx1",  0 )    // TX Layer
 	ROM_LOAD( "3.f11",  0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )    // only 1 byte difference with R3, bad dump?
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
@@ -653,7 +666,7 @@ ROM_START( airraid )
 	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
 	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
-	ROM_REGION( 0x02000, "gfx1", ROMREGION_INVERT ) // TX Layer
+	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
 	ROM_LOAD( "3.13e",  0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
