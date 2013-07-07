@@ -4,14 +4,14 @@
 
 ***************************************************************************
 
-Lindbergh 
+Lindbergh
 Sega 2005-2009
 
 This is a "PC-based" arcade system. Different configurations have different colored boxes.
-The version documented here is the red box. The PC part of it is mostly just the CPU, 
-Intel North/South-bridge chipset and AGP/PCI card slots etc. The main board is still 
-a typically custom-made Sega arcade PCB using a custom nVIDIA GeForce video card. 
-The main board also has a slot for a compact flash card. Primary storage media is DVD or HDD. 
+The version documented here is the red box. The PC part of it is mostly just the CPU,
+Intel North/South-bridge chipset and AGP/PCI card slots etc. The main board is still
+a typically custom-made Sega arcade PCB using a custom nVIDIA GeForce video card.
+The main board also has a slot for a compact flash card. Primary storage media is DVD or HDD.
 Both CF and HDD are locked and unreadable on a regular PC.
 
 The familiar PIC is still present on the back of the system and likely decrypts the HDD and/or DVD.
@@ -22,9 +22,9 @@ The box has Sega number 845-0001D-02
 
 Mainboard
 ---------
-                   
-838-14487          
-Sticker: 838-14673  
+
+838-14487
+Sticker: 838-14673
                    |----|     |-----|
                    |USB ||---||1/8  | |-------|
                    |USB ||USB||AUDIO| |SERIAL1|  SECURITY
@@ -59,8 +59,8 @@ Notes:
            CPU - Intel Celeron D 335 SL8HM 2.8GHz 256k L2 cache, 533MHz FSB
        82541PI - Intel Gigabit Ethernet Controller
        6300ESB - Intel Southbridge IC
-       JG82875 - Intel Northbridge IC 
-      ISL6556B - Intersil ISL6556B Optimized Multiphase PWM Controller with 6-Bit 
+       JG82875 - Intel Northbridge IC
+      ISL6556B - Intersil ISL6556B Optimized Multiphase PWM Controller with 6-Bit
                  DAC and Programmable Internal Temperature Compensation
       932S208DG- IDT 932S208DG Programmable PLL Clock synthesizer
         VT1616 - VIA VT1616 6-channel AC97 codec sound IC
@@ -74,19 +74,19 @@ Notes:
                  11-12 CF MASTER (SET ON)
          IDE40 - ATA133 IDE connector(s)
                  A 40GB HDD is plugged in via an 80-pin flat cable
-                 This game is 'Too Spicy'. The hard drive is a Hitachi Deskstar 
+                 This game is 'Too Spicy'. The hard drive is a Hitachi Deskstar
                  model HDS728040PLAT20. Capacity is 41GB. C/H/S 16383/16/63
-                 LBA 80,418,240 sectors. In the model number 8040 means 80GB full 
+                 LBA 80,418,240 sectors. In the model number 8040 means 80GB full
                  capacity but only 40GB is actually available
                  P/N: 0A30209 BA17730E6B
                  Serial: EETNGM0G
        CF SLOT - Accepts a compact flash card. The card is required to boot the system.
                  Revision C and E have been seen. There may be other revisions out there.
-                 Sticker: LINDBERGH 
+                 Sticker: LINDBERGH
                           MDA-C0004A
                           REV. C
-                          
-                          
+
+
 Rear Board incorporating Security Board (plugged into main board security connector)
 ---------------------------------------
 
@@ -132,7 +132,7 @@ Video Card (plugged into AGP slot)
 
 nVIDIA 180-10508-0000-A00
 Sticker: BIOS VERSION 5.73.22.55.08
-Sticker: 900-10508-2304-000 D 032 Made In China 
+Sticker: 900-10508-2304-000 D 032 Made In China
 Sticker: 600-10508-0004-000 J
 Sticker: GeForce 7600 GS 0325206031558
  |----------------------------------------|
@@ -152,7 +152,7 @@ Sticker: GeForce 7600 GS 0325206031558
 |-                        |4MJHT07B30 0607|
  |                        |-------|       |
  |    |----------|     AGP     |----------|
- |----|          |-------------|   
+ |----|          |-------------|
 Notes:
        * - These parts on the other side of the PCB
     VRAM - QIMONDA HYB18T256161AFL25 WVV10017 256Mbit x16 DDR2 SDRAM (P-TFBGA-84)
@@ -183,7 +183,7 @@ Sticker: 837-14472R91
 | ISP1106          |--------|             |
 |mUSB                            PQ070XZ1H|
 |  |--------|      PCI      |-------------|
-|--|        |---------------|                 
+|--|        |---------------|
 Notes:
       FLASH.IC6 - Spansion S29AL032D70 32Mbit flash ROM labelled 'FPR-24370B' (TSOP48)
       DS14185   - National Semiconductor DS14185 EIA/TIA-232 3 Driver x 5 Receiver (SOIC10)
@@ -219,6 +219,7 @@ Sega 2005
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "video/pc_vga.h"
+#include "machine/pci.h"
 
 class lindbergh_state : public pcat_base_state
 {
@@ -230,13 +231,20 @@ public:
 };
 
 static ADDRESS_MAP_START(lindbergh_map, AS_PROGRAM, 32, lindbergh_state)
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000c0000, 0x000cffff) AM_ROM AM_REGION("vid_bios", 0)
+//  0xd0000 - 0xdffff tested
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("mb_bios", 0xf0000)
 	AM_RANGE(0xfd000000, 0xfd3fffff) AM_ROM AM_REGION("jvs_bios", 0)    /* Hack to see the data */
-	AM_RANGE(0xfe000000, 0xfe00ffff) AM_ROM AM_REGION("vid_bios", 0)    /* Same */
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("mb_bios", 0)     /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lindbergh_io, AS_IO, 32, lindbergh_state)
+	AM_IMPORT_FROM(pcat32_io_common)
+
+	AM_RANGE(0x00e8, 0x00ef) AM_NOP
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : pcat_base_state(mconfig, type, tag)
@@ -252,19 +260,22 @@ void lindbergh_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U)
+//	MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U) /* Actually Celeron D at 2,8 GHz */
+	MCFG_CPU_ADD("maincpu", PENTIUM, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
 	MCFG_CPU_IO_MAP(lindbergh_io)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
+
+	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 MACHINE_CONFIG_END
 
 ROM_START(lindbios)
-	ROM_REGION32_LE(0x400000, "jvs_bios", 0)
+	ROM_REGION(0x400000, "jvs_bios", 0)
 	ROM_LOAD("fpr-24370b.ic6", 0x000000, 0x400000, CRC(c3b021a4) SHA1(1b6938a50fe0e4ae813864649eb103838c399ac0))
 
-	ROM_REGION32_LE(0x10000, "vid_bios", 0)
+	ROM_REGION(0x10000, "vid_bios", 0)
 	ROM_LOAD("vid_bios.u504", 0x00000, 0x10000, CRC(f78d14d7) SHA1(f129787e487984edd23bf344f2e9500c85052275))
 
 	ROM_REGION32_LE(0x100000, "mb_bios", 0)
