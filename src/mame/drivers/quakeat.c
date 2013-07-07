@@ -117,7 +117,7 @@ void quakeat_state::machine_start()
 
 static MACHINE_CONFIG_START( quake, quakeat_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 233000000) /* Pentium II, 233MHz */
+	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
 	MCFG_CPU_PROGRAM_MAP(quake_map)
 	MCFG_CPU_IO_MAP(quake_io)
 

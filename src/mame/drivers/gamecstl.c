@@ -425,7 +425,7 @@ void gamecstl_state::machine_reset()
 
 static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
+	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)
 	MCFG_CPU_IO_MAP(gamecstl_io)
 

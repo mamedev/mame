@@ -394,7 +394,7 @@ void xtom3d_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000/16)  // actually Pentium II 450
+	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000/16)  // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(xtom3d_map)
 	MCFG_CPU_IO_MAP(xtom3d_io)
 

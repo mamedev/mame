@@ -474,7 +474,7 @@ void voyager_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START( voyager, voyager_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // actually AMD Duron CPU of unknown clock
+	MCFG_CPU_ADD("maincpu", PENTIUM3, 133000000) // actually AMD Duron CPU of unknown clock
 	MCFG_CPU_PROGRAM_MAP(voyager_map)
 	MCFG_CPU_IO_MAP(voyager_io)
 

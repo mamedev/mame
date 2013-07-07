@@ -217,9 +217,9 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_MODIFY("screen")
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface, XTAL_1_8432MHz )

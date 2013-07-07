@@ -672,7 +672,7 @@ static const voodoo_config voodoo_intf =
 };
 
 static MACHINE_CONFIG_START( savquest, savquest_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000) // actually Pentium II 450
+	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)
 
