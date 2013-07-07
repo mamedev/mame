@@ -2868,6 +2868,7 @@ src/mame/drivers/carrera.c svneol=native#text/plain
 src/mame/drivers/castle.c svneol=native#text/plain
 src/mame/drivers/caswin.c svneol=native#text/plain
 src/mame/drivers/cave.c svneol=native#text/plain
+src/mame/drivers/cavepc.c svneol=native#text/plain
 src/mame/drivers/cb2001.c svneol=native#text/plain
 src/mame/drivers/cball.c svneol=native#text/plain
 src/mame/drivers/cbasebal.c svneol=native#text/plain
