@@ -252,7 +252,7 @@ void lindbergh_state::machine_reset()
 }
 
 static MACHINE_CONFIG_START(lindbergh, lindbergh_state)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000)
+	MCFG_CPU_ADD("maincpu", PENTIUM, 2800000000U)
 	MCFG_CPU_PROGRAM_MAP(lindbergh_map)
 	MCFG_CPU_IO_MAP(lindbergh_io)
 
