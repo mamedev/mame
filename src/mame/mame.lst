@@ -5773,10 +5773,11 @@ boogwinga       // MBD (c) 1992 (Asia)
 ragtime         // MBD (c) 1992 (Japan)
 ragtimea        // MBD (c) 1992 (Japan)
 dblewing        // MBE (c) 1993 Mitchell
-fghthist        // MBF (c) 1993 Data East Corporation (World)
-fghthistu       // MBF (c) 1993 Data East Corporation (US)
-fghthista       // MBF (c) 1993 Data East Corporation (US)
-fghthistj       // MBF (c) 1993 Data East Corporation (Japan)
+fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
+fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
+fghthistj       // MBF (c) 1993 Data East Corporation (Japan) DE-0380-2 PCB
+fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistja      // MBF (c) 1993 Data East Corporation (Japan) DE-0395-1 PCB
 hvysmsh         // MBG (c) 1993 Data East Corporation (World)
 hvysmsha        // MBG (c) 1993 Data East Corporation (Asia)
 hvysmshj        // MBG (c) 1993 Data East Corporation (Japan)
@@ -8656,8 +8657,8 @@ extdwnhl        // (c) 1995 Sammy Japan
 gundhara        // (c) 1995 Banpresto
 sokonuke        // (c) 1995 Sammy Industries
 zombraid        // (c) 1995 American Sammy
-zombraidp		//
-zombraidpj		//
+zombraidp       // (c) 1995 American Sammy
+zombraidpj      // (c) 1995 Sammy Industries Co.,Ltd.
 crazyfgt        // (c) 1998 Subsino
 inttoote        // (c) 1998 Coinmaster
 inttootea       // (c) 1998 Coinmaster
