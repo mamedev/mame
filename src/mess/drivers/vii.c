@@ -993,7 +993,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 
 	// for whatever reason if we copy more than this, the CPU
 	// is not happy and VSmile won't show anything... bankswitch?
-	for (int i = 0; i < 0x400000; i += 2)
+	for (int i = 0; i < 0x800000; i += 2)
 		ROM[i / 2] = pick_integer_le(CART, i, 2);
 
 	return IMAGE_INIT_PASS;
@@ -1149,7 +1149,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CARTSLOT_LOAD( vii_state, vsmile_cart )
 	MCFG_CARTSLOT_INTERFACE("vsmile_cart")
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =
