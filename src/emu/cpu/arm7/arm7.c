@@ -87,7 +87,7 @@ arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type
 
 
 arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: arm7_cpu_device(mconfig, ARM7_BE, "ARM7 (big endian)", tag, owner, clock, "arm7 be", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
+	: arm7_cpu_device(mconfig, ARM7_BE, "ARM7 (big endian)", tag, owner, clock, "arm7_be", __FILE__, 4, eARM_ARCHFLAGS_T, ENDIANNESS_BIG)
 {
 }
 
