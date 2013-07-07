@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, NULL, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
