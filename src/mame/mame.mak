@@ -1494,6 +1494,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
+	$(DRIVERS)/lindbergh.o \
 	$(MACHINE)/megadriv.o \
 	$(MACHINE)/megacd.o \
 	$(MACHINE)/megacdcd.o \
