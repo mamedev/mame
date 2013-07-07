@@ -127,21 +127,17 @@ WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
     d1..d0 drive select (0 to 3) */
 
 	floppy_image_device *floppy = NULL;
-	if ((data & 3)==0)
+	if ((data&3)==0)
 		floppy = m_floppy0->get_device();
 	else
-	if ((data & 3)==1)
+	if ((data&3)==1)
 		floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(floppy);
+	m_fdc->dden_w(!BIT(data, 3)); // /Q output of ic29
 
-	if (floppy)
-	{
-		floppy->mon_w(0);
-		floppy->ss_w(BIT(data, 2));
-	}
-
-	//m_fdc->dden_w(!BIT(data, 3)); // not sure about polarity in the new system
+	floppy->mon_w(0); // motor on
+	floppy->ss_w(BIT(data, 2)); // inverted on the board
 }
 
 /***********************************************************
@@ -530,16 +526,6 @@ TIMER_CALLBACK_MEMBER(mbee_state::mbee_reset)
 
 void mbee_state::machine_reset_common_disk()
 {
-	floppy_connector *con = machine().device<floppy_connector>("fdc:0");
-	floppy_image_device *floppy = con ? con->get_device() : 0;
-	if (floppy)
-	{
-		m_fdc->set_floppy(floppy);
-		//m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
-		//m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
-
-		floppy->ss_w(0);
-	}
 }
 
 MACHINE_RESET_MEMBER(mbee_state,mbee)
