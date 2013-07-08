@@ -293,7 +293,7 @@ static floperr_t td0_get_sector_length(floppy_image_legacy *floppy, int head, in
 static floperr_t td0_get_indexed_sector_info(floppy_image_legacy *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {
 	floperr_t retVal;
-	UINT64 offset;
+	UINT64 offset = 0;
 	UINT8 *sector_info;
 
 	retVal = get_offset(floppy, head, track, sector_index, FALSE, &offset);

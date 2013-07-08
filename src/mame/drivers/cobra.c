@@ -2834,7 +2834,7 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		UINT64 data;
+		UINT64 data = 0;
 		m_gfxfifo_out->pop(&space.device(), &data);
 
 		data &= 0xffffffff;
@@ -2843,7 +2843,7 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		UINT64 data;
+		UINT64 data = 0;
 		m_gfxfifo_out->pop(&space.device(), &data);
 
 		data &= 0xffffffff;
