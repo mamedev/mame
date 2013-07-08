@@ -277,6 +277,7 @@ void xxx_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	// Run our own QT event loop
 	while (debug_cpu_is_stopped(machine()))
 	{
+		osd_sleep(50000);
 		qApp->processEvents(QEventLoop::AllEvents, 1);
 
 		// Refresh everyone if requested
