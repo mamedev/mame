@@ -1980,7 +1980,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/astrafr.o \
-	$(DRIVERS)/astrocorp.o \
+	$(DRIVERS)/astrcorp.o \
 	$(DRIVERS)/astropc.o \
 	$(DRIVERS)/atronic.o \
 	$(DRIVERS)/attckufo.o \
