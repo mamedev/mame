@@ -817,7 +817,7 @@ static imgtoolerr_t bml3_diskimage_deletefile(imgtool_partition *partition, cons
 {
 	imgtoolerr_t err;
 	imgtool_image *image = imgtool_partition_image(partition);
-	int pos;
+	int pos = 0;
 	struct bml3_dirent ent;
 
 	err = lookup_bml3_file(image, fname, &ent, &pos);
