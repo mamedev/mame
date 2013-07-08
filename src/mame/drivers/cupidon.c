@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "machine/68340.h"
 
+// looks similar to the pluto / astra stuff in terms of accesses, but these are much bigger (video based?) roms
+// needs 68340 peripherals (irq controller + timer at least) to be fleshed out.
+
 class cupidon_state : public driver_device
 {
 public:
@@ -23,11 +26,19 @@ protected:
 	required_device<m68340cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(cupidon);
+	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
+	{
+		return -1; // or it hits an illegal opcode (sleep on the 68340?)
+	};
+
 };
 
 
 static ADDRESS_MAP_START( cupidon_map, AS_PROGRAM, 32, cupidon_state )
 	AM_RANGE(0x0000000, 0x07fffff) AM_ROM
+	AM_RANGE(0x1000000, 0x100ffff) AM_RAM
+	AM_RANGE(0x1800000,	0x1800003) AM_READ(cupidon_return_ffffffff)
+	AM_RANGE(0x2000074, 0x2000077) AM_RAM // port
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  cupidon )
@@ -45,43 +56,43 @@ MACHINE_CONFIG_END
 
 
 ROM_START( tsarevna )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ts_1_29_u2_32m.bin", 0x000000, 0x400000, CRC(e7798a5d) SHA1(5ad876a693c93df79ea5e5672c0a5f3952b2cb36) )
 	ROM_LOAD16_WORD_SWAP( "ts_1_29_u1_32m.bin", 0x400000, 0x400000, CRC(5a35ca2a) SHA1(b7beac148190b508469f832d370af082f479527c) )
 ROM_END
 
 ROM_START( tsarevnaa )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "v0131-2.bin", 0x000000, 0x400000, CRC(36349e13) SHA1(d82c93b7f19e8b75b0d56653aaaf5da44bb302f5) )
 	ROM_LOAD16_WORD_SWAP( "v0131-1.bin", 0x400000, 0x400000, CRC(f502e677) SHA1(84f89f214aeff8544d526c44634672d972714bf6) )
 ROM_END
 
 ROM_START( gangrose )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "gangv470m322sec.bin", 0x000000, 0x400000, CRC(c916a292) SHA1(ceac54b06722874f21431834403e49aa2c9c1ded) )
 ROM_END
 
 
 ROM_START( funnyfm )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ff_1_17_u2_32m.bin", 0x000000, 0x400000, CRC(cdd616a7) SHA1(69a9bd73f6f9abb306522071316e1dd770b4ac12) )
 	ROM_LOAD16_WORD_SWAP( "ff_1_17_u1_32m.bin", 0x400000, 0x400000, CRC(2073345c) SHA1(33803ebd7720c3436486a383383e99722c2554f4) )
 ROM_END
 
 ROM_START( funnyfma )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ff_1_26_u2_32m.bin", 0x000000, 0x400000, CRC(d813da5c) SHA1(ef82f2c7d0aa21921a25d08555c727a967b1a235) )
 	ROM_LOAD16_WORD_SWAP( "ff_1_26_u1_32m.bin", 0x400000, 0x400000, CRC(e3c4f483) SHA1(cc78eadadc13a8f295658b493e47eff3bf719c7e) )
 ROM_END
 
 ROM_START( funnyfmb )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "u2.bin", 0x000000, 0x400000, CRC(c8fdc338) SHA1(cd3372988c7a4b35069d6e56e786cecb32e0996e) )
 	ROM_LOAD16_WORD_SWAP( "u1.bin", 0x400000, 0x400000, CRC(ca2a5345) SHA1(be7c68fca0534b2d817ac78377f98cda2021c5fa) )
 ROM_END
 
 ROM_START( cashtrn )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "cash_train_1_10_u2_32.bin", 0x000000, 0x400000, CRC(ee81a918) SHA1(116e14e8f23517c943f8867498b6105221974ce3) )
 	ROM_LOAD16_WORD_SWAP( "cash_train_1_10_u1_32.bin", 0x400000, 0x400000, CRC(4a1704e7) SHA1(18cc87cf54277e61a37cfe9c77164bef9688acf6) )
 ROM_END
