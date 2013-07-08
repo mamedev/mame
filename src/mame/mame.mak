@@ -1552,6 +1552,7 @@ $(MAMEOBJ)/sega.a: \
 	$(AUDIO)/pulsar.o \
 	$(AUDIO)/segasnd.o \
 	$(VIDEO)/segaic16.o \
+	$(VIDEO)/segaic16_road.o \
 	$(VIDEO)/sega16sp.o \
 	$(VIDEO)/segaic24.o \
 	$(MACHINE)/gdrom.o \

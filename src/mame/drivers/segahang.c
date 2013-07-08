@@ -846,6 +846,7 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_I8255_ADD( "i8255_2", hangon_ppi_intf_1 )
 
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
 	MCFG_GFXDECODE(segahang)
@@ -1819,7 +1820,7 @@ DRIVER_INIT_MEMBER(segahang_state,generic)
 	// point globals to allocated memory regions
 	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save states
 	save_item(NAME(m_adc_select));

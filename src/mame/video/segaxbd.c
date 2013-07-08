@@ -49,7 +49,7 @@ void segaxbd_state::video_start()
 	m_segaic16vid->segaic16_tilemap_init(machine(), 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 
 	// initialize the road
-	m_segaic16vid->segaic16_road_init(machine(), 0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
+	m_segaic16road->segaic16_road_init(machine(), 0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }
 
 
@@ -74,9 +74,9 @@ UINT32 segaxbd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	machine().priority_bitmap.fill(0, cliprect);
 
 	// draw the low priority road layer
-	m_segaic16vid->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
 	if (m_road_priority == 0)
-		m_segaic16vid->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
+		m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	// draw background
 	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
@@ -88,7 +88,7 @@ UINT32 segaxbd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	// draw the high priority road
 	if (m_road_priority == 1)
-		m_segaic16vid->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
+		m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	// text layer
 	m_segaic16vid->segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);

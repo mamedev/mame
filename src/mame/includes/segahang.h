@@ -41,6 +41,7 @@
 #include "machine/i8255.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/segaic16_road.h"
 #include "video/sega16sp.h"
 
 
@@ -60,6 +61,7 @@ public:
 			m_i8255_2(*this, "i8255_2"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_segaic16road(*this, "segaic16road"),
 			m_workram(*this, "workram"),
 			m_sharrier_video(false),
 			m_adc_select(0)
@@ -122,6 +124,7 @@ protected:
 	required_device<i8255_device> m_i8255_2;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<segaic16_road_device> m_segaic16road;
 
 	// memory pointers
 	required_shared_ptr<UINT16> m_workram;

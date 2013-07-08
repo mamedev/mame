@@ -40,6 +40,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/segaic16.h"
 #include "video/segaic16.h"
+#include "video/segaic16_road.h"
 #include "video/sega16sp.h"
 
 
@@ -59,6 +60,7 @@ public:
 			m_cmptimer_1(*this, "cmptimer_main"),
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_segaic16road(*this, "segaic16road"),
 			m_gprider_hack(false),
 			m_road_priority(1),
 			m_scanline_timer(NULL),
@@ -150,6 +152,7 @@ protected:
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<segaic16_road_device> m_segaic16road;
 
 	// configuration
 	bool            m_gprider_hack;

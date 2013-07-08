@@ -926,7 +926,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x2ee000, 0x2effff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x2ee000, 0x2effff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
@@ -948,7 +948,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
 	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
 	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x0ee000, 0x0effff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x0ee000, 0x0effff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
 ADDRESS_MAP_END
 
@@ -1595,6 +1595,7 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 
 	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3201,7 +3202,7 @@ DRIVER_INIT_MEMBER(segaxbd_state,generic)
 	// point globals to allocated memory regions
 	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_timer_irq_state));

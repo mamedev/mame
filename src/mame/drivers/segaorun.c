@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaorun_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_SHARE("cpu1rom")
 	AM_RANGE(0x060000, 0x067fff) AM_MIRROR(0x018000) AM_RAM AM_SHARE("cpu1ram")
 	AM_RANGE(0x080000, 0x080fff) AM_MIRROR(0x00f000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x090000, 0x09ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
+	AM_RANGE(0x090000, 0x09ffff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
 ADDRESS_MAP_END
 
 
@@ -1092,6 +1092,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
 
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
+	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2124,7 +2125,7 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 	// point globals to allocated memory regions
 	m_segaic16vid->segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	m_segaic16vid->segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
-	m_segaic16vid->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
+	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<UINT16 *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_adc_select));

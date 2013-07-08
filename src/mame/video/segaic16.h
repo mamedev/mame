@@ -24,17 +24,6 @@
 #define SEGAIC16_TILEMAP_BACKGROUND 1
 #define SEGAIC16_TILEMAP_TEXT       2
 
-/* road systems */
-#define SEGAIC16_MAX_ROADS          1
-
-#define SEGAIC16_ROAD_HANGON        0
-#define SEGAIC16_ROAD_SHARRIER      1
-#define SEGAIC16_ROAD_OUTRUN        2
-#define SEGAIC16_ROAD_XBOARD        3
-
-#define SEGAIC16_ROAD_BACKGROUND    0
-#define SEGAIC16_ROAD_FOREGROUND    1
-
 
 
 /* rotation systems */
@@ -84,20 +73,6 @@ struct tilemap_info
 	emu_timer *     latch_timer;                    /* timer for latching 16b tilemap scroll values */
 };
 
-struct road_info
-{
-	UINT8           index;                          /* index of this structure */
-	UINT8           type;                           /* type of road system (see segaic16.h for details) */
-	UINT8           control;                        /* control register value */
-	UINT16          colorbase1;                     /* color base for road ROM data */
-	UINT16          colorbase2;                     /* color base for road background data */
-	UINT16          colorbase3;                     /* color base for sky data */
-	INT32           xoffs;                          /* X scroll offset */
-	void            (*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	UINT16 *        roadram;                        /* pointer to roadram pointer */
-	UINT16 *        buffer;                         /* buffered roadram pointer */
-	UINT8 *         gfx;                            /* expanded road graphics */
-};
 
 struct rotate_info
 {
@@ -125,7 +100,6 @@ public:
 	UINT8 segaic16_display_enable;
 	UINT16 *segaic16_tileram_0;
 	UINT16 *segaic16_textram_0;
-	UINT16 *segaic16_roadram_0;
 	UINT16 *segaic16_rotateram_0;
 
 	void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int enable);
@@ -142,12 +116,10 @@ public:
 	TIMER_CALLBACK_MEMBER( segaic16_tilemap_16b_latch_values );
 
 	struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
-	struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
 	struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 
 	void segaic16_set_display_enable(running_machine &machine, int enable);
 	void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks);
-	void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
 	void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase);
 
 	DECLARE_READ16_MEMBER( segaic16_tileram_0_r );
@@ -155,12 +127,7 @@ public:
 	DECLARE_WRITE16_MEMBER( segaic16_tileram_0_w );
 	DECLARE_WRITE16_MEMBER( segaic16_textram_0_w );
 
-	void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void segaic16_rotate_draw(running_machine &machine, int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &srcbitmap);
-
-	DECLARE_READ16_MEMBER( segaic16_road_control_0_r );
-	DECLARE_WRITE16_MEMBER( segaic16_road_control_0_w );
-
 
 	DECLARE_READ16_MEMBER( segaic16_rotate_control_0_r );
 
