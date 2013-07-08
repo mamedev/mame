@@ -37,6 +37,9 @@
  http://ikotsu.blogspot.co.uk/2010/03/deathsmiles-ii-pos-arcade-pc.html
  however this revision is using a Gigabyte motherboard instead, possibly
  different boards were used?
+ appears to be this one
+ http://www.gigabyte.com/products/product-page.aspx?pid=3016#ov
+ GA-MA78GPM-UD2H (rev. 1.0)
 
  The JVS board is said to be quite problematic, and the game will boot
  to an error screen if it isn't functioning correctly.
