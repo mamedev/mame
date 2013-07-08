@@ -1,7 +1,7 @@
 /***********************************************************************
  IGS28 + IGS025 PGM protection emulation
 
- these are simulations of the IGS 012 and 025 protection combination
+ these are simulations of the IGS 028 and 025 protection combination
  used on the following PGM games
 
  Oriental Legend Super

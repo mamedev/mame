@@ -1,6 +1,7 @@
 /***********************************************************************
- PGM IGS027A (55857G* type) ARM protection emulation
-  *guess, the part number might not be directly tied to behavior, see note below
+ PGM IGS027A ARM protection emulation
+
+ These all use the 55857G type chips
 
  these are emulation of the 'dmnfrnt' type ARM device
  used by

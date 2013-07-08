@@ -1,6 +1,5 @@
 /***********************************************************************
- PGM IGS027A (55857E* type) ARM protection simulations & emulation
-   *guess, the part number might not be directly tied to behavior, see note below
+ PGM IGS027A ARM protection simulations & emulation - type 1
 
  these are simulations of the 'kov' type ARM device
  used by
@@ -10,6 +9,8 @@
  Puzzli 2 Super (puzzli2)
  Photo Y2k2 (py2k2)
  Puzzle Star (puzlstar)
+
+ These are implemented in 55857E type chips
 
  the following appear to have the same basic behavior as the
  early '55857E' type chips, but are actually using the '55857G'

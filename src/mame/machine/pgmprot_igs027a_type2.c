@@ -1,6 +1,6 @@
 /***********************************************************************
- PGM IGS027A (55857F* type) ARM protection emulation
-  *guess, the part number might not be directly tied to behavior, see note below
+ PGM IGS027A ARM protection emulation - type 2
+
 
  these are emulation of the 'kov2' type ARM device
  used by
