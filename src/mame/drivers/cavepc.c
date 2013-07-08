@@ -9,7 +9,9 @@
  
  Deathsmiles II (c)2009
 
- It uses a ASUS M3A78-EM motherboard
+ According to 
+ http://forum.arcadeotaku.com/viewtopic.php?f=26&t=9851
+ It uses a ASUS M3A78-EM motherboard (boot screen is shown)
  http://www.asus.com/Motherboards/M3A78EM/
 
  fitted with
@@ -33,6 +35,8 @@
 
  Pictures of the hardware can be seen at
  http://ikotsu.blogspot.co.uk/2010/03/deathsmiles-ii-pos-arcade-pc.html
+ however this revision is using a Gigabyte motherboard instead, possibly
+ different boards were used?
 
  The JVS board is said to be quite problematic, and the game will boot
  to an error screen if it isn't functioning correctly.
