@@ -4433,7 +4433,7 @@ CPU_GET_INFO( pentium2 )
 		case CPUINFO_STR_NAME:                          strcpy(info->s, "Pentium II");          break;
 		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Intel Pentium II");    break;
 
-		default:                                        CPU_GET_INFO_CALL(pentium2);                break;
+		default:                                        CPU_GET_INFO_CALL(pentium);                break;
 	}
 }
 
