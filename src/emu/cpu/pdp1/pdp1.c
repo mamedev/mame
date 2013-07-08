@@ -630,7 +630,6 @@ static CPU_EXECUTE( pdp1 )
 		if (cpustate->ioh && cpustate->ios)
 		{
 			cpustate->ioh = 0;
-			cpustate->ios = 0;
 		}
 
 
@@ -645,6 +644,7 @@ static CPU_EXECUTE( pdp1 )
 				if (cpustate->read_binary_word)
 					(*cpustate->read_binary_word)(cpustate->device);        /* data will be transferred to IO register */
 				cpustate->rim_step = 1;
+				cpustate->ios = 0;
 				break;
 
 			case 1:
@@ -689,6 +689,7 @@ static CPU_EXECUTE( pdp1 )
 				if (cpustate->read_binary_word)
 					(*cpustate->read_binary_word)(cpustate->device);        /* data will be transferred to IO register */
 				cpustate->rim_step = 3;
+				cpustate->ios = 0;
 				break;
 
 			case 3:
@@ -921,7 +922,7 @@ static CPU_SET_INFO( pdp1 )
 	case CPUINFO_INT_REGISTER + PDP1_EXD:       EXD = (cpustate->extend_support && info->i) ? 1 : 0; break;
 	case CPUINFO_INT_REGISTER + PDP1_IOC:       if (LOG) logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_IOH:       if (LOG) logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_IOS:       if (LOG) logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_IOS:       cpustate->ios = info->i ? 1 : 0; break;
 	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:   pulse_start_clear(cpustate);                    break;
 	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:   cpustate->ios = 1;                          break;
 	}
@@ -1635,7 +1636,7 @@ static void execute_instruction(pdp1_state *cpustate)
 					/* ioh should be cleared at the end of the instruction cycle, and ios at the
 					start of next instruction cycle, but who cares? */
 					cpustate->ioh = 0;
-					cpustate->ios = 0;
+					//cpustate->ios = 0;
 				}
 			}
 
