@@ -2474,7 +2474,7 @@ raizpin         // F14 (c) 2002 Taito
 
 invqix          // F34 (c) 2003 Taito Corporation
 
-// Taito Type-X / X+/ X2 / X Zero
+// Taito Type X/X+
 
 chaosbrk        // (c) 2004 Taito Corporation
 gwinggen        // (c) 2004 Takumi Corporation
@@ -2487,6 +2487,14 @@ raiden4         // (c) 2007 Seibu Kaihatsu/Moss Ltd
 kof98um         // (c) 2008 SNK
 trbwtchs        // (c) 2008 Adventure Planning Service/Studio SiestA
 goketsuj        // (c) 2009 Atlus
+
+// Taito Type X2
+
+chasehq2        // (c) 2006 Taito Corporation
+samspsen        // (c) 2008 SNK Playmore
+
+// Taito Type X Zero
+// Taito Type X3
 
 // Toaplan games
 perfrman        // (c) 1985 Data East Corporation (Japan)

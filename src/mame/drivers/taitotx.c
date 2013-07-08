@@ -166,6 +166,8 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// Type X
+
 ROM_START( chaosbrk )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
@@ -265,7 +267,6 @@ ROM_START( trbwtchs )
 	DISK_IMAGE( "troublewitches_ac_v1.00j", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
 ROM_END
 
-
 GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, homura,    0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -277,3 +278,29 @@ GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0
 GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+
+// Type X2
+
+ROM_START( chasehq2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	// 2188b8d76766c34580d99bf5ab0848fc 696092ff8467034acc4b34702006b3afbcb90082 chase_hq_2_v2.0.6.jp.001
+	DISK_IMAGE( "chase_hq_2_v2.0.6.jp", 0, SHA1(900620e27c1465dff4ced4b6ae479356c9a785e0) )
+ROM_END
+
+ROM_START( samspsen )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
+	/* bios, video bios etc. not dumped */
+
+	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
+	//e19435da2cd417d1e2949d14a043d6e1 50ef9af80b11984c56e4f765a6f827fa5d22b404 samurai spirits sen.v1.00.001
+	DISK_IMAGE( "samurai spirits sen.v1.00", 0, SHA1(5c687604066301a5b7c60f7fc778f0961efce0b6) )
+ROM_END
+
+
+GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, driver_device,  0, ROT0, "SNK Playmore", "Samurai Spirits Sen (v1.00)",  GAME_NOT_WORKING | GAME_NO_SOUND )
