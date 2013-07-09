@@ -31,14 +31,19 @@ public:
 	tilemap_t *m_bg_layer;
 	tilemap_t *m_fg_layer;
 	tilemap_t *m_tx_layer;
-	int m_flipscreen;
+	UINT8 m_bg_layer_enabled;
+	UINT8 m_fg_layer_enabled;
+	UINT8 m_tx_layer_enabled;
+	UINT8 m_sp_layer_enabled;
+	UINT8 m_flipscreen;
 
-	DECLARE_READ16_MEMBER(sub_cpu_spin_r);
 	DECLARE_WRITE16_MEMBER(raiden_background_w);
 	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
 	DECLARE_WRITE16_MEMBER(raiden_text_w);
-	DECLARE_WRITE16_MEMBER(raiden_control_w);
-	DECLARE_WRITE16_MEMBER(raidenb_control_w);
+	DECLARE_WRITE8_MEMBER(raiden_control_w);
+	DECLARE_WRITE8_MEMBER(raidenb_control_w);
+	DECLARE_WRITE8_MEMBER(raidenb_layer_enable_w);
+	DECLARE_WRITE16_MEMBER(raiden_scroll_w);
 	DECLARE_DRIVER_INIT(raidenu);
 	DECLARE_DRIVER_INIT(raidenk);
 	DECLARE_DRIVER_INIT(raiden);
@@ -47,9 +52,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void video_start();
 	DECLARE_VIDEO_START(raidenb);
+	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *scrollregs);
 	UINT32 screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden_interrupt);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	void common_decrypt();
 };

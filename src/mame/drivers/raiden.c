@@ -9,9 +9,9 @@
 
     driver by Oliver Bergmann, Bryan McPhail, Randy Mongenel
 
-    The alternate hardware version is probably earlier than the main set.
-    It looks closer to Dynamite Duke (1989 game), while the main set looks
-    closer to the newer 68000 games in terms of graphics registers used, etc.
+    The alternate hardware version is probably newer than the main sets.
+    It looks closer to the newer 68000 games, while the main set looks
+    closer to Dynamite Duke (1989 game) in terms of graphics registers used, etc.
 
     As well as different graphics registers the alternate set has a
     different memory map, and different fix char layer memory layout!
@@ -52,8 +52,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raiden_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
+	AM_RANGE(0x0e004, 0x0e005) AM_WRITENOP // watchdog?
+	AM_RANGE(0x0e006, 0x0e007) AM_WRITE8(raiden_control_w, 0x00ff)
 	AM_RANGE(0x0f000, 0x0f03f) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -65,7 +66,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x07ffe, 0x07fff) AM_WRITENOP // ?
-	AM_RANGE(0x08000, 0x08001) AM_WRITENOP // ?
+	AM_RANGE(0x08000, 0x08001) AM_WRITENOP // watchdog?
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITENOP // ?
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -80,7 +81,8 @@ static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
+	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP // watchdog?
+	AM_RANGE(0x0b006, 0x0b007) AM_WRITE8(raiden_control_w, 0x00ff)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
@@ -93,7 +95,7 @@ static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITENOP // ?
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP // ?
+	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP // watchdog?
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -106,10 +108,13 @@ static ADDRESS_MAP_START( raidenb_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raidenb_control_w)
+	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP // watchdog?
+	AM_RANGE(0x0b006, 0x0b007) AM_WRITE8(raidenb_control_w, 0x00ff)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d05c, 0x0d05d) AM_WRITE8(raidenb_layer_enable_w, 0x00ff)
 	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_SHARE("scroll_ram")
+	AM_RANGE(0x0d040, 0x0d08f) AM_WRITENOP // sei_crtc is here
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -608,14 +613,14 @@ DRIVER_INIT_MEMBER(raiden_state,raidenu)
 /* Same PCB, differ by region byte(s) */
 GAME( 1990, raiden,   0,      raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 1)", 0 )
 GAME( 1990, raidena,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu", "Raiden (set 2)", 0 )
-GAME( 1990, raidenu,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US)", 0 )
+GAME( 1990, raidenu,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 1)", 0 )
 GAME( 1990, raident,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", 0 )
 
 /* Same as above, but the sound CPU code is not encrypted */
 GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", 0 )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, newer?)", 0 )
+GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", 0 )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? */
 GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", 0 )
