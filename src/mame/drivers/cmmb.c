@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
+Centipede / Millipede / Missile Command / Let's Go Bowling
 (c) 1980-2 / 2002 - Infogrames / CosmoDog
 
 preliminary driver by Angelo Salese
@@ -28,10 +28,10 @@ Probably on the CPLD (CY39100V208B) - Quoted from Cosmodog's website:
 
 ============================================================================
 
-Centipede, Millipede, Missile Command, Let's Go Bowling.
+Centipede / Millipede / Missile Command / Let's Go Bowling.
 Team Play
 
-Multipede 1.00 PCB by CosmoDog
+1.00 PCB by CosmoDog + sticker "Multipede"
 
 U1  = WDC 65C02S8P-14
 U2  = Flash ROM AT29C020 (256KB)
@@ -53,11 +53,15 @@ class cmmb_state : public driver_device
 public:
 	cmmb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+
 	UINT8 m_irq_mask;
+
 	DECLARE_READ8_MEMBER(cmmb_charram_r);
 	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
 	DECLARE_WRITE8_MEMBER(cmmb_paletteram_w);
@@ -68,7 +72,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cmmb_irq);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -83,7 +86,6 @@ UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitma
 	int count = 0x00000;
 
 	int y,x;
-
 
 	for (y=0;y<32;y++)
 	{
@@ -331,13 +333,12 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_GFXDECODE(cmmb)
 	MCFG_PALETTE_LENGTH(512)
 
-
-
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
+
 
 /***************************************************************************
 
@@ -353,4 +354,4 @@ ROM_START( cmmb162 )
 	ROM_REGION( 0x1000, "gfx", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 2002, cmmb162,  0,       cmmb,  cmmb, driver_device,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Multipede (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, cmmb162,  0,       cmmb,  cmmb, driver_device,  0, ROT270, "Cosmodog / Team Play (Licensed from Infogrames via Midway Games West)", "Centipede / Millipede / Missile Command / Let's Go Bowling (rev 1.62)", GAME_NO_SOUND|GAME_NOT_WORKING )
