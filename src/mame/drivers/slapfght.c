@@ -159,17 +159,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
   - US version
   - MCU dumped and emulated
-  - Game inputs aren't working after heliport 4 (area 35);
-    I can't tell at the moment if it's an ingame bug or not.
-    See Mantis bug ID 01785 for more details.
 
 1b) 'tigerhj'
 
   - Japan version
   - MCU dumped and emulated
-  - Game inputs aren't working after heliport 4 (area 35);
-    I can't tell at the moment if it's an ingame bug or not.
-    See Mantis bug ID 01785 for more details.
 
 1c) 'tigerhb1'
 
@@ -183,17 +177,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * hardware test is still computed at 0x109d but there is
         no delay to wait for correct value (0x83) to be returned
         (thus the need of specific read/write handlers)
-  - Game inputs aren't working after heliport 4 (area 35);
-    I can't tell at the moment if it's an ingame bug or not.
-    See Mantis bug ID 01785 for more details.
 
 1d) 'tigerhb2'
 
   - Bootleg based on 'tigerhj'
   - MCU reads/writes are patched.as well as ROM check
-  - Game inputs are still working after heliport 4 (area 35);
-    This is the ONLY set with this behaviour !
-    See Mantis bug ID 01785 for more details.
 
 1e) 'tigerhb3'
 
@@ -203,9 +191,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
     that prevents player to get any extra lives (even by collecting
     10 diamonds) when Dip Switch is set to "20k then every 80k"
     (see Mantis bug ID 00652 with Z80 explanations).
-  - Game inputs aren't working after heliport 4 (area 35);
-    I can't tell at the moment if it's an ingame bug or not.
-    See Mantis bug ID 01785 for more details.
 
 
 2) 'getstar' and clones
