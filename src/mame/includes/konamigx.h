@@ -1,5 +1,6 @@
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
+#include "video/k054156_k054157_k056832.h"
 
 class konamigx_state : public driver_device
 {

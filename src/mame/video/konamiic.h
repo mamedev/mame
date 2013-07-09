@@ -50,7 +50,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs);
 DECLARE_WRITE8_HANDLER( K053251_w );
 DECLARE_WRITE16_HANDLER( K053251_lsb_w );
 DECLARE_WRITE16_HANDLER( K053251_msb_w );
-enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
+enum { OLD_K053251_CI0=0,OLD_K053251_CI1,OLD_K053251_CI2,OLD_K053251_CI3,OLD_K053251_CI4 };
 int K053251_get_priority(int ci);
 int K053251_get_palette_index(int ci);
 void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4);
@@ -61,39 +61,6 @@ DECLARE_WRITE16_HANDLER( K054000_lsb_w );
 DECLARE_READ16_HANDLER( K054000_lsb_r );
 
 
-#define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
-
-void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
-			int (*scrolld)[4][2],
-			void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
-			int djmain_hack);
-DECLARE_READ16_HANDLER( K056832_ram_word_r );
-DECLARE_WRITE16_HANDLER( K056832_ram_word_w );
-DECLARE_READ32_HANDLER( K056832_5bpp_rom_long_r );
-DECLARE_READ32_HANDLER( K056832_6bpp_rom_long_r );
-DECLARE_READ16_HANDLER( K056832_mw_rom_word_r );
-DECLARE_WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
-DECLARE_WRITE16_HANDLER( K056832_b_word_w );
-void K056832_mark_plane_dirty(int num);
-void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-int  K056832_get_LayerAssociation(void);
-void K056832_set_LayerOffset(int layer, int offsx, int offsy);
-void K056832_set_UpdateMode(int mode);
-
-DECLARE_READ32_HANDLER( K056832_ram_long_r );
-DECLARE_WRITE32_HANDLER( K056832_ram_long_w );
-DECLARE_WRITE32_HANDLER( K056832_long_w );
-DECLARE_WRITE32_HANDLER( K056832_b_long_w );
-
-/* bit depths for the 56832 */
-#define K056832_BPP_4   0
-#define K056832_BPP_5   1
-#define K056832_BPP_6   2
-#define K056832_BPP_8   3
-#define K056832_BPP_4dj 4
-#define K056832_BPP_8LE 5
-#define K056832_BPP_8TASMAN 6
 
 void K055555_vh_start(running_machine &machine); // "PCU2"
 void K055555_write_reg(UINT8 regnum, UINT8 regdat);
