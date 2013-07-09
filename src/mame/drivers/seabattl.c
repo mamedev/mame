@@ -2,7 +2,7 @@
 
 Sea Battle by Zaccaria
 
-driver by Mariusz Wojcieszek, hap and David Haywood
+driver by Mariusz Wojcieszek, hap, Phil Bennett and David Haywood
 
 TODO: 
 - improve collision detection?
