@@ -1065,76 +1065,76 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/shark.o     \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
-	$(MESS_MACHINE)/c64exp.o    \
-	$(MESS_MACHINE)/c64user.o   \
-	$(MESS_MACHINE)/c64_4cga.o  \
-	$(MESS_MACHINE)/c64_4dxh.o  \
-	$(MESS_MACHINE)/c64_4ksa.o  \
-	$(MESS_MACHINE)/c64_4tba.o  \
-	$(MESS_MACHINE)/c64_16kb.o  \
-	$(MESS_MACHINE)/c64_bn1541.o\
-	$(MESS_MACHINE)/c64_comal80.o   \
-	$(MESS_MACHINE)/c64_cpm.o   \
-	$(MESS_MACHINE)/c64_currah_speech.o \
-	$(MESS_MACHINE)/c64_dela_ep256.o    \
-	$(MESS_MACHINE)/c64_dela_ep64.o \
-	$(MESS_MACHINE)/c64_dela_ep7x8.o    \
-	$(MESS_MACHINE)/c64_dinamic.o   \
-	$(MESS_MACHINE)/c64_dqbb.o  \
-	$(MESS_MACHINE)/c64_easy_calc_result.o  \
-	$(MESS_MACHINE)/c64_easyflash.o \
-	$(MESS_MACHINE)/c64_epyx_fast_load.o    \
-	$(MESS_MACHINE)/c64_exos.o  \
-	$(MESS_MACHINE)/c64_fcc.o   \
-	$(MESS_MACHINE)/c64_final.o \
-	$(MESS_MACHINE)/c64_final3.o\
-	$(MESS_MACHINE)/c64_fun_play.o  \
-	$(MESS_MACHINE)/c64_geocable.o  \
-	$(MESS_MACHINE)/c64_georam.o    \
-	$(MESS_MACHINE)/c64_ide64.o \
-	$(MESS_MACHINE)/c64_ieee488.o   \
-	$(MESS_MACHINE)/c64_kingsoft.o  \
-	$(MESS_MACHINE)/c64_mach5.o \
-	$(MESS_MACHINE)/c64_magic_desk.o    \
-	$(MESS_MACHINE)/c64_magic_formel.o  \
-	$(MESS_MACHINE)/c64_magic_voice.o    \
-	$(MESS_MACHINE)/c64_midi_maplin.o   \
-	$(MESS_MACHINE)/c64_midi_namesoft.o   \
-	$(MESS_MACHINE)/c64_midi_passport.o   \
-	$(MESS_MACHINE)/c64_midi_sci.o   \
-	$(MESS_MACHINE)/c64_midi_siel.o   \
-	$(MESS_MACHINE)/c64_mikro_assembler.o   \
-	$(MESS_MACHINE)/c64_multiscreen.o   \
-	$(MESS_MACHINE)/c64_neoram.o\
-	$(MESS_MACHINE)/c64_ocean.o \
-	$(MESS_MACHINE)/c64_pagefox.o   \
-	$(MESS_MACHINE)/c64_prophet64.o \
-	$(MESS_MACHINE)/c64_ps64.o  \
-	$(MESS_MACHINE)/c64_reu.o   \
-	$(MESS_MACHINE)/c64_rex.o   \
-	$(MESS_MACHINE)/c64_rex_ep256.o \
-	$(MESS_MACHINE)/c64_ross.o  \
-	$(MESS_MACHINE)/c64_sfx_sound_expander.o    \
-	$(MESS_MACHINE)/c64_silverrock.o    \
-	$(MESS_MACHINE)/c64_simons_basic.o  \
-	$(MESS_MACHINE)/c64_stardos.o   \
-	$(MESS_MACHINE)/c64_std.o   \
-	$(MESS_MACHINE)/c64_structured_basic.o  \
-	$(MESS_MACHINE)/c64_super_explode.o \
-	$(MESS_MACHINE)/c64_super_games.o   \
-	$(MESS_MACHINE)/c64_supercpu.o  \
-	$(MESS_MACHINE)/c64_sw8k.o  \
-	$(MESS_MACHINE)/c64_swiftlink.o   \
-	$(MESS_MACHINE)/c64_system3.o   \
-	$(MESS_MACHINE)/c64_tdos.o  \
-	$(MESS_MACHINE)/c64_turbo232.o  \
-	$(MESS_MACHINE)/c64_vic1011.o  \
-	$(MESS_MACHINE)/c64_vizastar.o  \
-	$(MESS_MACHINE)/c64_vw64.o  \
-	$(MESS_MACHINE)/c64_warp_speed.o    \
-	$(MESS_MACHINE)/c64_westermann.o    \
-	$(MESS_MACHINE)/c64_xl80.o  \
-	$(MESS_MACHINE)/c64_zaxxon.o\
+	$(MESS_MACHINE)/c64/exp.o   \
+	$(MESS_MACHINE)/c64/user.o  \
+	$(MESS_MACHINE)/c64/4cga.o  \
+	$(MESS_MACHINE)/c64/4dxh.o  \
+	$(MESS_MACHINE)/c64/4ksa.o  \
+	$(MESS_MACHINE)/c64/4tba.o  \
+	$(MESS_MACHINE)/c64/16kb.o  \
+	$(MESS_MACHINE)/c64/bn1541.o\
+	$(MESS_MACHINE)/c64/comal80.o   \
+	$(MESS_MACHINE)/c64/cpm.o   \
+	$(MESS_MACHINE)/c64/currah_speech.o \
+	$(MESS_MACHINE)/c64/dela_ep256.o    \
+	$(MESS_MACHINE)/c64/dela_ep64.o \
+	$(MESS_MACHINE)/c64/dela_ep7x8.o    \
+	$(MESS_MACHINE)/c64/dinamic.o   \
+	$(MESS_MACHINE)/c64/dqbb.o  \
+	$(MESS_MACHINE)/c64/easy_calc_result.o  \
+	$(MESS_MACHINE)/c64/easyflash.o \
+	$(MESS_MACHINE)/c64/epyx_fast_load.o    \
+	$(MESS_MACHINE)/c64/exos.o  \
+	$(MESS_MACHINE)/c64/fcc.o   \
+	$(MESS_MACHINE)/c64/final.o \
+	$(MESS_MACHINE)/c64/final3.o\
+	$(MESS_MACHINE)/c64/fun_play.o  \
+	$(MESS_MACHINE)/c64/geocable.o  \
+	$(MESS_MACHINE)/c64/georam.o    \
+	$(MESS_MACHINE)/c64/ide64.o \
+	$(MESS_MACHINE)/c64/ieee488.o   \
+	$(MESS_MACHINE)/c64/kingsoft.o  \
+	$(MESS_MACHINE)/c64/mach5.o \
+	$(MESS_MACHINE)/c64/magic_desk.o    \
+	$(MESS_MACHINE)/c64/magic_formel.o  \
+	$(MESS_MACHINE)/c64/magic_voice.o    \
+	$(MESS_MACHINE)/c64/midi_maplin.o   \
+	$(MESS_MACHINE)/c64/midi_namesoft.o   \
+	$(MESS_MACHINE)/c64/midi_passport.o   \
+	$(MESS_MACHINE)/c64/midi_sci.o   \
+	$(MESS_MACHINE)/c64/midi_siel.o   \
+	$(MESS_MACHINE)/c64/mikro_assembler.o   \
+	$(MESS_MACHINE)/c64/multiscreen.o   \
+	$(MESS_MACHINE)/c64/neoram.o\
+	$(MESS_MACHINE)/c64/ocean.o \
+	$(MESS_MACHINE)/c64/pagefox.o   \
+	$(MESS_MACHINE)/c64/prophet64.o \
+	$(MESS_MACHINE)/c64/ps64.o  \
+	$(MESS_MACHINE)/c64/reu.o   \
+	$(MESS_MACHINE)/c64/rex.o   \
+	$(MESS_MACHINE)/c64/rex_ep256.o \
+	$(MESS_MACHINE)/c64/ross.o  \
+	$(MESS_MACHINE)/c64/sfx_sound_expander.o    \
+	$(MESS_MACHINE)/c64/silverrock.o    \
+	$(MESS_MACHINE)/c64/simons_basic.o  \
+	$(MESS_MACHINE)/c64/stardos.o   \
+	$(MESS_MACHINE)/c64/std.o   \
+	$(MESS_MACHINE)/c64/structured_basic.o  \
+	$(MESS_MACHINE)/c64/super_explode.o \
+	$(MESS_MACHINE)/c64/super_games.o   \
+	$(MESS_MACHINE)/c64/supercpu.o  \
+	$(MESS_MACHINE)/c64/sw8k.o  \
+	$(MESS_MACHINE)/c64/swiftlink.o   \
+	$(MESS_MACHINE)/c64/system3.o   \
+	$(MESS_MACHINE)/c64/tdos.o  \
+	$(MESS_MACHINE)/c64/turbo232.o  \
+	$(MESS_MACHINE)/c64/vic1011.o  \
+	$(MESS_MACHINE)/c64/vizastar.o  \
+	$(MESS_MACHINE)/c64/vw64.o  \
+	$(MESS_MACHINE)/c64/warp_speed.o    \
+	$(MESS_MACHINE)/c64/westermann.o    \
+	$(MESS_MACHINE)/c64/xl80.o  \
+	$(MESS_MACHINE)/c64/zaxxon.o\
 	$(MESS_MACHINE)/interpod.o  \
 	$(MESS_DRIVERS)/vic10.o     \
 	$(MESS_MACHINE)/vic10exp.o  \

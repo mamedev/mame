@@ -14,7 +14,7 @@
 
 
 #include "emu.h"
-#include "machine/c64exp.h"
+#include "machine/c64/exp.h"
 
 
 

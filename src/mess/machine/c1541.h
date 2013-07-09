@@ -21,7 +21,7 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/c64_bn1541.h"
+#include "machine/c64/bn1541.h"
 #include "machine/cbmiec.h"
 #include "machine/ctronics.h"
 
