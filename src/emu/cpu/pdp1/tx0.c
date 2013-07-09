@@ -171,7 +171,6 @@ static CPU_EXECUTE( tx0_64kw )
 		if (cpustate->ioh && cpustate->ios)
 		{
 			cpustate->ioh = 0;
-			cpustate->ios = 0;
 		}
 
 
@@ -187,6 +186,7 @@ static CPU_EXECUTE( tx0_64kw )
 				if (cpustate->iface->io_handlers[io_handler_rim])
 					(*cpustate->iface->io_handlers[io_handler_rim])(device);    /* data will be transferred to AC */
 				cpustate->rim_step = 1;
+				cpustate->ios = 0;
 				break;
 
 			case 1:
@@ -221,6 +221,7 @@ static CPU_EXECUTE( tx0_64kw )
 				if (cpustate->iface->io_handlers[io_handler_rim])
 					(*cpustate->iface->io_handlers[io_handler_rim])(device);    /* data will be transferred to AC */
 				cpustate->rim_step = 3;
+				cpustate->ios = 0;
 				break;
 
 			case 3:
@@ -277,7 +278,6 @@ static CPU_EXECUTE( tx0_8kw )
 		if (cpustate->ioh && cpustate->ios)
 		{
 			cpustate->ioh = 0;
-			cpustate->ios = 0;
 		}
 
 
@@ -293,6 +293,7 @@ static CPU_EXECUTE( tx0_8kw )
 				if (cpustate->iface->io_handlers[io_handler_rim])
 					(*cpustate->iface->io_handlers[io_handler_rim])(device);    /* data will be transferred to AC */
 				cpustate->rim_step = 1;
+				cpustate->ios = 0;
 				break;
 
 			case 1:
@@ -327,6 +328,7 @@ static CPU_EXECUTE( tx0_8kw )
 				if (cpustate->iface->io_handlers[io_handler_rim])
 					(*cpustate->iface->io_handlers[io_handler_rim])(device);    /* data will be transferred to AC */
 				cpustate->rim_step = 3;
+				cpustate->ios = 0;
 				break;
 
 			case 3:
@@ -415,7 +417,7 @@ static CPU_SET_INFO( tx0 )
 	case CPUINFO_INT_REGISTER + TX0_RIM:        cpustate->rim = info->i ? 1 : 0;                    break;
 	case CPUINFO_INT_REGISTER + TX0_CYCLE:      if (LOG) logerror("tx0_set_reg to cycle counter ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + TX0_IOH:        if (LOG) logerror("tx0_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + TX0_IOS:        if (LOG) logerror("tx0_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + TX0_IOS:        cpustate->ios = info->i ? 1 : 0; break;
 	case CPUINFO_INT_REGISTER + TX0_RESET:      pulse_reset(device);                                break;
 	case CPUINFO_INT_REGISTER + TX0_IO_COMPLETE:cpustate->ios = 1;                                  break;
 	}
