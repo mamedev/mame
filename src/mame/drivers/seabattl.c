@@ -2,7 +2,7 @@
 
 Sea Battle by Zaccaria
 
-driver by Mariusz Wojcieszek and David Haywood
+driver by Mariusz Wojcieszek, hap and David Haywood
 
 TODO: 
 - improve collision detection?
@@ -682,5 +682,5 @@ ROM_START( seabattla ) // this was a very different looking PCB (bootleg called 
 	ROM_LOAD( "seawawe.ic9",     0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
 ROM_END
 
-GAME( 1980, seabattl,  0,        seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1980, seabattl,  0,        seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1980, seabattla, seabattl, seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
