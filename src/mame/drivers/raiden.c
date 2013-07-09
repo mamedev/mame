@@ -30,7 +30,20 @@
         There are also strings for Spanish, Greece, Mexico, Middle &
         South America though it's not clear if they are used.
 
-    One of the boards is SEI8904 with SEI9008 subboard.
+    Common set is main PCB and an OBJ1 daughterboard.
+    XTALs: 20MHz, 14.31818MHz, 12MHz
+    CPUs:  2 x Sony CXQ70116P-10 (NEC V30 @ 10MHz), Z80A
+    Sound: YM3812, OKI M6295
+    Custom ICs:
+    - SEI0160 QFP60 (2 on main PCB, 3 on OBJ1 PCB)
+    - SIS6091 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
+    - Altera EP910PC-40 EPLD, one next to each V30
+    - SEI0050BU DIP40
+    - SEI80BU DIP42
+    - SEI0100BU "YM3931"
+    - many CMOS Gate Arrays
+
+    One of the sets is SEI8904 with SEI9008 subboard.
 
 ***************************************************************************/
 
