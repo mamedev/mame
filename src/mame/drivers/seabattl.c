@@ -28,60 +28,6 @@ sea b screen.prg ???
 
 the sound board should be fully discrete.
 
-
-DS0     1   2   3
-PLAY TIME   ON  ON  ON  free game
-        ON  OFF ON  75 seconds
-        OFF     OFF ON  90 seconds
-        OFF ON  ON  105 seconds
-
-SHIP NUMBER ON  ON  OFF free game
-        ON  OFF OFF 3 ships
-        OFF OFF OFF 4 ships
-        OFF ON  OFF 5 ships
-    I don't forget anything, this is a copy of the manual
-    DS0-3   seem to select from time based games to ships based game.
-
-
-
-DS0     4   5   6
-COIN SLOT 2 ON  ON  ON  2 coin 1 play
-        ON  OFF ON  1 coin 1 play
-        ON  ON  OFF 1 coin 2 plays
-        ON  OFF OFF 1 coin 3 plays
-        OFF ON  ON  1 coin 4 plays
-        OFF OFF ON  1 coin 5 plays
-        OFF ON  OFF 1 coin 6 plays
-        OFF OFF OFF 1 coin 7 plays
-
-
-DS0     7   8   DS1-1
-COIN SLOT 1 ON  ON  ON  2 coin 1 play
-        ON  OFF ON  1 coin 1 play
-        ON  ON  OFF 1 coin 2 plays
-        ON  OFF OFF 1 coin 3 plays
-        OFF ON  ON  1 coin 4 plays
-        OFF OFF ON  1 coin 5 plays
-        OFF ON  OFF 1 coin 6 plays
-        OFF OFF OFF 1 coin 7 plays
-
-DS1     2
-SHIP SPEED  ON  fast
-        OFF slow
-
-
-DS1     3   4
-EXTEND PLAY OFF OFF no extended
-        ON  OFF 2000 points
-        OFF ON  3000 points
-        ON  ON  4000 points
-
-DS1     5
-GRID        ON  game
-        OFF grid
-
-DS1 6-7-8 not used
-
 */
 
 #include "emu.h"
@@ -129,18 +75,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
 	DECLARE_WRITE8_MEMBER(seabattl_colorram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_wrtc_w);
-	DECLARE_READ8_MEMBER(seabattl_redc_r);
-	DECLARE_WRITE8_MEMBER(seabattl_portd_w);
-	DECLARE_READ8_MEMBER(seabattl_portd_r);
+	DECLARE_WRITE8_MEMBER(seabattl_control_w);
+	DECLARE_READ8_MEMBER(seabattl_collision_r);
+	DECLARE_WRITE8_MEMBER(seabattl_collision_clear_w);
+	DECLARE_READ8_MEMBER(seabattl_collision_clear_r);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sound2_w);
 	DECLARE_WRITE8_MEMBER(time_display_w);
 	DECLARE_WRITE8_MEMBER(score_display_w);
 	DECLARE_WRITE8_MEMBER(score2_display_w);
-	DECLARE_READ8_HANDLER(input_1e05_r);
-	DECLARE_READ8_HANDLER(input_1e06_r);
-	DECLARE_READ8_HANDLER(input_1e07_r);
 
 	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
 
@@ -308,7 +251,6 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
-
 	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_RAM_WRITE(seabattl_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_RAM_WRITE(seabattl_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x2000) AM_RAM
@@ -316,43 +258,46 @@ static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x20f0) AM_WRITE(time_display_w)
 	AM_RANGE(0x1e01, 0x1e01) AM_MIRROR(0x20f0) AM_WRITE(score_display_w)
 	AM_RANGE(0x1e02, 0x1e02) AM_MIRROR(0x20f0) AM_READ_PORT("IN0") AM_WRITE(score2_display_w)
-	AM_RANGE(0x1e05, 0x1e05) AM_MIRROR(0x20f0) AM_READ(input_1e05_r)
-	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ(input_1e06_r) AM_WRITE(sound_w)
-	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ(input_1e07_r) AM_WRITE(sound2_w)
+	AM_RANGE(0x1e05, 0x1e05) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS2")
+	AM_RANGE(0x1e06, 0x1e06) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS1") AM_WRITE(sound_w)
+	AM_RANGE(0x1e07, 0x1e07) AM_MIRROR(0x20f0) AM_READ_PORT("DIPS0") AM_WRITE(sound2_w)
 	AM_RANGE(0x1fcc, 0x1fcc) AM_MIRROR(0x2000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1f00, 0x1fff) AM_MIRROR(0x2000) AM_DEVREADWRITE_LEGACY("s2636", s2636_work_ram_r, s2636_work_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_redc_r, seabattl_wrtc_w )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_portd_r, seabattl_portd_w )
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE( seabattl_collision_r, seabattl_control_w )
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE( seabattl_collision_clear_r, seabattl_collision_clear_w )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-READ8_HANDLER(seabattl_state::seabattl_redc_r)
+READ8_HANDLER(seabattl_state::seabattl_collision_r)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 	return m_collision;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_wrtc_w)
+WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 {
 	// bit 0: play counter
 	// bit 1: super bonus counter
-	coin_counter_w( machine(), 0, BIT(data, 2) );
+	// bit 2: coin counter
 	// bit 3: inverse image
+	// bit 4: lamp
+	// bit 5: enable wave
+	coin_counter_w( machine(), 0, BIT(data, 2) );
 	output_set_lamp_value(0, BIT(data,4) );
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_HANDLER(seabattl_state::seabattl_portd_r)
+READ8_HANDLER(seabattl_state::seabattl_collision_clear_r)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_HANDLER(seabattl_state::seabattl_portd_w )
+WRITE8_HANDLER(seabattl_state::seabattl_collision_clear_w )
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 	m_collision = 0;
@@ -404,42 +349,6 @@ WRITE8_HANDLER(seabattl_state::score2_display_w )
 	m_digit0->a_w((data >> 4) & 0x0f);
 }
 
-READ8_HANDLER(seabattl_state::input_1e05_r)
-{
-	UINT8 val = 0xf0;
-	UINT8 dsw1 = ioport("DSW1")->read();
-	val |= (BIT(dsw1,6) ? 1 : 0);
-	val |= (BIT(dsw1,5) ? 2 : 0);
-	val |= (BIT(dsw1,4) ? 4 : 0);
-	val |= (BIT(dsw1,7) ? 8 : 0);
-	return val;
-}
-
-READ8_HANDLER(seabattl_state::input_1e06_r)
-{
-	UINT8 val = 0xc0;
-	UINT8 dsw1 = ioport("DSW1")->read();
-	val |= (BIT(dsw1,1) ? 1 : 0);
-	val |= (BIT(dsw1,2) ? 2 : 0);
-	val |= (BIT(dsw1,3) ? 4 : 0);
-	val |= (BIT(dsw1,0) ? 8 : 0);
-	val |= (BIT(dsw1,6) ? 16 : 0);
-	val |= (BIT(dsw1,7) ? 32 : 0);
-	return val;
-}
-
-READ8_HANDLER(seabattl_state::input_1e07_r)
-{
-	UINT8 val = 0xc0;
-	UINT8 dsw0 = ioport("DSW0")->read();
-	val |= (BIT(dsw0,2) ? 1 : 0);
-	val |= (BIT(dsw0,1) ? 2 : 0);
-	val |= (BIT(dsw0,0) ? 4 : 0);
-	val |= (BIT(dsw0,3) ? 8 : 0);
-	val |= (BIT(dsw0,5) ? 16 : 0);
-	val |= (BIT(dsw0,4) ? 32 : 0);
-	return val;
-}
 
 static INPUT_PORTS_START( seabattl )
 	PORT_START("IN0")
@@ -455,55 +364,57 @@ static INPUT_PORTS_START( seabattl )
 	PORT_START("IN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Game_Time ) ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, "75 seconds" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x03, "90 seconds" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x01, "105 seconds" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x00)
-	PORT_DIPNAME( 0x03, 0x02, "Ships number" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x02, "3 ships" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x03, "4 ships" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x01, "5 ships" ) PORT_CONDITION("DSW0", 0x04, EQUALS, 0x04)
-	PORT_DIPNAME( 0x04, 0x00, "Game Type" )
+	PORT_START("DIPS0")
+	PORT_DIPNAME( 0x01, 0x00, "Game Type" ) PORT_DIPLOCATION("DS0:3")
 	PORT_DIPSETTING(    0x00, "Time based" )
-	PORT_DIPSETTING(    0x04, "Ships based" )
-	PORT_DIPNAME( 0x38, 0x10, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x01, "Lives based" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Game_Time ) ) PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00) PORT_DIPLOCATION("DS0:2,1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "75 seconds" )         PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x06, "90 seconds" )         PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "105 seconds" )        PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Lives ) )     PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x01) PORT_DIPLOCATION("DS0:2,1")
+	PORT_DIPSETTING(    0x02, "3" )                  PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x06, "4" )                  PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, "5" )                  PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x01)
+	PORT_DIPNAME( 0x38, 0x08, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DS0:6,5,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_7C ) ) PORT_CONDITION("DSW1", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Coin B Mode" )
-	PORT_DIPSETTING(    0x01, "Coin B Mode 2" )
-	PORT_DIPSETTING(    0x00, "Coin B Mode 1" )
-	PORT_DIPNAME( 0x02, 0x00, "Ships speed" )
-	PORT_DIPSETTING(    0x02, "Slow ships" )
-	PORT_DIPSETTING(    0x00, "Fast ships" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extend play" )
-	PORT_DIPSETTING(    0x0c, "Not extended" )
-	PORT_DIPSETTING(    0x08, "2000 points" )
-	PORT_DIPSETTING(    0x04, "3000 points" )
+	PORT_START("DIPS1")
+	PORT_DIPNAME( 0x01, 0x00, "Enemies speed" ) PORT_DIPLOCATION("DS1:2")
+	PORT_DIPSETTING(    0x01, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x06, 0x00, "Extended Play" ) PORT_DIPLOCATION("DS1:3,4")
+	PORT_DIPSETTING(    0x06, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, "2000 points" )
+	PORT_DIPSETTING(    0x02, "3000 points" )
 	PORT_DIPSETTING(    0x00, "4000 points" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Test ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0xe0, 0xe0 )
+	PORT_DIPNAME( 0x38, 0x08, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DS0:8,DS1:1,DS0:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_7C ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DIPS2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DS1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "DS1:6" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_HIGH, "DS1:5")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DS1:8" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -635,7 +546,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("s2636snd", S2636_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* discrete sound */
 MACHINE_CONFIG_END
