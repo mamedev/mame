@@ -159,7 +159,6 @@ maybe some sprite placement issues
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
@@ -205,7 +204,7 @@ WRITE8_MEMBER(lethal_state::control2_w)
 
 INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 {
-	if (k056832_is_irq_enabled(m_k056832, 0))
+	if (m_k056832->is_irq_enabled(0))
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -297,7 +296,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return k054000_r(m_k054000, space, offset - 0x80);
+					return m_k054000->read(space, offset - 0x80);
 
 				case 0xca:
 					return sound_status_r(space, 0);
@@ -306,13 +305,13 @@ READ8_MEMBER(lethal_state::le_4800_r)
 		else if (offset < 0x1800)
 			return m_k053244->k053245_r(space, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return k056832_ram_code_lo_r(m_k056832, space, offset - 0x1800);
+			return m_k056832->ram_code_lo_r(space, offset - 0x1800);
 		else if (offset < 0x2800)
-			return k056832_ram_code_hi_r(m_k056832, space, offset - 0x2000);
+			return m_k056832->ram_code_hi_r(space, offset - 0x2000);
 		else if (offset < 0x3000)
-			return k056832_ram_attr_lo_r(m_k056832, space, offset - 0x2800);
+			return m_k056832->ram_attr_lo_r(space, offset - 0x2800);
 		else // (offset < 0x3800)
-			return k056832_ram_attr_hi_r(m_k056832, space, offset - 0x3000);
+			return m_k056832->ram_attr_hi_r(space, offset - 0x3000);
 	}
 
 	return 0;
@@ -389,7 +388,7 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					k054000_w(m_k054000, space, offset - 0x80, data);
+					m_k054000->write(space, offset - 0x80, data);
 					break;
 
 				default:
@@ -400,13 +399,13 @@ WRITE8_MEMBER(lethal_state::le_4800_w)
 		else if (offset < 0x1800)
 			m_k053244->k053245_w(space, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
-			k056832_ram_code_lo_w(m_k056832, space, offset - 0x1800, data);
+			m_k056832->ram_code_lo_w(space, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			k056832_ram_code_hi_w(m_k056832, space, offset - 0x2000, data);
+			m_k056832->ram_code_hi_w(space, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			k056832_ram_attr_lo_w(m_k056832, space, offset - 0x2800, data);
+			m_k056832->ram_attr_lo_w(space, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			k056832_ram_attr_hi_w(m_k056832, space, offset - 0x3000, data);
+			m_k056832->ram_attr_hi_w(space, offset - 0x3000, data);
 	}
 }
 
@@ -454,8 +453,8 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
-	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE_LEGACY("k056832", k056832_w)
-	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE_LEGACY("k056832", k056832_b_w)
+	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_device, write)
+	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_device, b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP     // watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP

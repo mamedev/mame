@@ -46,11 +46,11 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 	#if CUSTOM_DRAW
 
 	#else
-	k056832_set_layer_association(m_k056832, 0);
-	k056832_set_layer_offs(m_k056832, 0, -2, 0);
-	k056832_set_layer_offs(m_k056832, 1,  2, 0);
-	k056832_set_layer_offs(m_k056832, 2,  4, 0);
-	k056832_set_layer_offs(m_k056832, 3,  6, 0);
+	m_k056832->set_layer_association(0);
+	m_k056832->set_layer_offs(0, -2, 0);
+	m_k056832->set_layer_offs(1,  2, 0);
+	m_k056832->set_layer_offs(2,  4, 0);
+	m_k056832->set_layer_offs(3,  6, 0);
 	#endif
 }
 
@@ -95,10 +95,10 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 3, 0, 0);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, 0, 0);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, 0, 0);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 3, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 2, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	#endif
 	return 0;
 }

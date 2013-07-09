@@ -25,7 +25,6 @@ GP1 HDD data contents:
 #include "cpu/m68000/m68000.h"
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
-#include "video/konicdev.h"
 #include "machine/nvram.h"
 #include "includes/qdrmfgp.h"
 
@@ -114,7 +113,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
 	UINT8 *mem8 = memregion("gfx1")->base();
-	int bank = k056832_word_r(m_k056832, space, 0x34/2, 0xffff);
+	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
@@ -128,33 +127,33 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 {
 	if (offset < 0x1000 / 2)
-		return k056832_ram_word_r(m_k056832, space, offset * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r(space, offset * 2 + 1, mem_mask);
 	else
-		return k056832_ram_word_r(m_k056832, space, (offset - 0x1000 / 2) * 2, mem_mask);
+		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2, mem_mask);
 }
 
 READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 {
 	if (offset < 0x1000 / 2)
-		return k056832_ram_word_r(m_k056832, space, offset * 2, mem_mask);
+		return m_k056832->ram_word_r(space, offset * 2, mem_mask);
 	else
-		return k056832_ram_word_r(m_k056832, space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 {
 	if (offset < 0x1000 / 2)
-		k056832_ram_word_w(m_k056832, space, offset * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w(space, offset * 2 + 1, data, mem_mask);
 	else
-		k056832_ram_word_w(m_k056832, space, (offset - 0x1000 / 2) * 2, data, mem_mask);
+		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 {
 	if (offset < 0x1000 / 2)
-		k056832_ram_word_w(m_k056832, space, offset * 2, data, mem_mask);
+		m_k056832->ram_word_w(space, offset * 2, data, mem_mask);
 	else
-		k056832_ram_word_w(m_k056832, space, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
 }
 
 
@@ -278,7 +277,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)                                      /* video reg */
+	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service sw */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")                                         /* inputport */
@@ -287,8 +286,8 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)                                         /* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP                                                    /* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("k054539", k054539_device, read, write, 0x00ff)        /* sound regs */
-	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)          /* vram */
-	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)          /* vram (mirror) */
+	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)          /* vram */
+	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)          /* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)                                               /* gfxrom through */
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0) /* IDE control regs */
 	AM_RANGE(0xa40000, 0xa4000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs1, write_cs1) /* IDE status control reg */
@@ -301,7 +300,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)                                      /* video reg */
+	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")                                         /* inputport */

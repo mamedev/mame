@@ -5127,172 +5127,15 @@ void k053247_set_z_rejection( device_t *device, int zcode )
 /*                                                                         */
 /***************************************************************************/
 
-struct k051316_state
-{
-	UINT8    *ram;
-
-	tilemap_t  *tmap;
-
-	int      gfxnum, wraparound, bpp;
-	int      offset[2];
-	UINT8    ctrlram[16];
-
-	k051316_callback callback;
-
-	const char *memory_region;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k051316_state *k051316_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K051316);
-
-	return (k051316_state *)downcast<k051316_device *>(device)->token();
-}
-
-INLINE const k051316_interface *k051316_get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K051316);
-	return (const k051316_interface *) device->static_config();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ8_DEVICE_HANDLER( k051316_r )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-	return k051316->ram[offset];
-}
-
-WRITE8_DEVICE_HANDLER( k051316_w )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-
-	k051316->ram[offset] = data;
-	k051316->tmap->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-READ8_DEVICE_HANDLER( k051316_rom_r )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-
-	if ((k051316->ctrlram[0x0e] & 0x01) == 0)
-	{
-		int addr = offset + (k051316->ctrlram[0x0c] << 11) + (k051316->ctrlram[0x0d] << 19);
-		if (k051316->bpp <= 4)
-			addr /= 2;
-		addr &= space.machine().root_device().memregion(k051316->memory_region)->bytes() - 1;
-
-		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
-
-		return space.machine().root_device().memregion(k051316->memory_region)->base()[addr];
-	}
-	else
-	{
-		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", space.machine().describe_context(), offset);
-		return 0;
-	}
-}
-
-WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-	k051316->ctrlram[offset] = data;
-	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
-}
-
-// a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
-void k051316_wraparound_enable( device_t *device, int status )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-	k051316->wraparound = status;
-}
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-INLINE void k051316_get_tile_info( running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index )
-{
-	k051316_state *k051316 = k051316_get_safe_token(device);
-	int code = k051316->ram[tile_index];
-	int color = k051316->ram[tile_index + 0x400];
-	int flags = 0;
-
-	k051316->callback(device->machine(), &code, &color, &flags);
-
-	SET_TILE_INFO(
-			k051316->gfxnum,
-			code,
-			color,
-			flags);
-}
-
-
-TILE_GET_INFO_MEMBER(k051316_device::k051316_get_tile_info0) { k051316_get_tile_info(machine(), this, tileinfo, tile_index); }
-
-
-void k051316_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-	UINT32 startx, starty;
-	int incxx, incxy, incyx, incyy;
-
-	startx = 256 * ((INT16)(256 * k051316->ctrlram[0x00] + k051316->ctrlram[0x01]));
-	incxx  =        (INT16)(256 * k051316->ctrlram[0x02] + k051316->ctrlram[0x03]);
-	incyx  =        (INT16)(256 * k051316->ctrlram[0x04] + k051316->ctrlram[0x05]);
-	starty = 256 * ((INT16)(256 * k051316->ctrlram[0x06] + k051316->ctrlram[0x07]));
-	incxy  =        (INT16)(256 * k051316->ctrlram[0x08] + k051316->ctrlram[0x09]);
-	incyy  =        (INT16)(256 * k051316->ctrlram[0x0a] + k051316->ctrlram[0x0b]);
-
-	startx -= (16 + k051316->offset[1]) * incyx;
-	starty -= (16 + k051316->offset[1]) * incyy;
-
-	startx -= (89 + k051316->offset[0]) * incxx;
-	starty -= (89 + k051316->offset[0]) * incxy;
-
-	k051316->tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
-			incxx << 5,incxy << 5,incyx << 5,incyy << 5,
-			k051316->wraparound,
-			flags,priority);
-
-#if 0
-	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
-			k051316->ctrlram[0x00],
-			k051316->ctrlram[0x01],
-			k051316->ctrlram[0x02],
-			k051316->ctrlram[0x03],
-			k051316->ctrlram[0x04],
-			k051316->ctrlram[0x05],
-			k051316->ctrlram[0x06],
-			k051316->ctrlram[0x07],
-			k051316->ctrlram[0x08],
-			k051316->ctrlram[0x09],
-			k051316->ctrlram[0x0a],
-			k051316->ctrlram[0x0b],
-			k051316->ctrlram[0x0c], /* bank for ROM testing */
-			k051316->ctrlram[0x0d],
-			k051316->ctrlram[0x0e], /* 0 = test ROMs */
-			k051316->ctrlram[0x0f]);
-#endif
-}
-
 const device_type K051316 = &device_creator<k051316_device>;
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock, "k051316", __FILE__)
+	: device_t(mconfig, K051316, "Konami 051316", tag, owner, clock, "k051316", __FILE__),
+	m_ram(NULL),
+	//m_tmap,
+	m_bpp(0)
+	//m_ctrlram[16]
 {
-	m_token = global_alloc_clear(k051316_state);
 }
 
 //-------------------------------------------------
@@ -5303,6 +5146,24 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 
 void k051316_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const k051316_interface *intf = reinterpret_cast<const k051316_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k051316_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+		m_gfx_memory_region_tag = "";
+		m_gfx_num = 0;
+		m_bpp = 0;
+		m_pen_is_mask = 0;
+		m_transparent_pen = 0;
+		m_wrap = 0;
+		m_xoffs = 0;
+		m_yoffs = 0;
+		m_callback = NULL;
+	}
 }
 
 //-------------------------------------------------
@@ -5311,9 +5172,6 @@ void k051316_device::device_config_complete()
 
 void k051316_device::device_start()
 {
-	k051316_state *k051316 = k051316_get_safe_token(this);
-	const k051316_interface *intf = k051316_get_interface(this);
-
 	int is_tail2nos = 0;
 	UINT32 total;
 
@@ -5370,57 +5228,50 @@ void k051316_device::device_start()
 	};
 
 	/* decode the graphics */
-	switch (intf->bpp)
+	switch (m_bpp)
 	{
 	case -4:
 		total = 0x400;
 		is_tail2nos = 1;
-		decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout_tail2nos, 4);
+		decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
-		total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / 128;
-		decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout4, 4);
+		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 128;
+		decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout4, 4);
 		break;
 
 	case 7:
-		total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / 256;
-		decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout7, 7);
+		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 256;
+		decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout7, 7);
 		break;
 
 	case 8:
-		total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / 256;
-		decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout8, 8);
+		total = machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() / 256;
+		decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region_tag)->base(), total, &charlayout8, 8);
 		break;
 
 	default:
 		fatalerror("Unsupported bpp\n");
 	}
 
-	k051316->memory_region = intf->gfx_memory_region;
-	k051316->gfxnum = intf->gfx_num;
-	k051316->bpp = is_tail2nos ? 4 : intf->bpp; // tail2nos is passed with bpp = -4 to setup the custom charlayout!
-	k051316->callback = intf->callback;
+	m_bpp = is_tail2nos ? 4 : m_bpp; // tail2nos is passed with bpp = -4 to setup the custom charlayout!
+	
+	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
-	k051316->tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k051316_device::k051316_get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
-	k051316->ram = auto_alloc_array(machine(), UINT8, 0x800);
-
-	if (!intf->pen_is_mask)
-		k051316->tmap->set_transparent_pen(intf->transparent_pen);
+	if (!m_pen_is_mask)
+		m_tmap->set_transparent_pen(m_transparent_pen);
 	else
 	{
-		k051316->tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
-		k051316->tmap->map_pens_to_layer(0, intf->transparent_pen, intf->transparent_pen, TILEMAP_PIXEL_LAYER0);
+		m_tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
+		m_tmap->map_pens_to_layer(0, m_transparent_pen, m_transparent_pen, TILEMAP_PIXEL_LAYER0);
 	}
 
-	k051316->wraparound = intf->wrap;
-	k051316->offset[0] = intf->xoffs;
-	k051316->offset[1] = intf->yoffs;
-
-	save_pointer(NAME(k051316->ram), 0x800);
-	save_item(NAME(k051316->ctrlram));
-	save_item(NAME(k051316->wraparound));
+	save_pointer(NAME(m_ram), 0x800);
+	save_item(NAME(m_ctrlram));
+	save_item(NAME(m_wrap));
 
 }
 
@@ -5430,9 +5281,124 @@ void k051316_device::device_start()
 
 void k051316_device::device_reset()
 {
-	k051316_state *k051316 = k051316_get_safe_token(this);
+	memset(m_ctrlram,  0, 0x10);
+}
 
-	memset(k051316->ctrlram,  0, 0x10);
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+READ8_MEMBER( k051316_device::read )
+{
+	return m_ram[offset];
+}
+
+WRITE8_MEMBER( k051316_device::write )
+{
+	m_ram[offset] = data;
+	m_tmap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+READ8_MEMBER( k051316_device::rom_r )
+{
+	if ((m_ctrlram[0x0e] & 0x01) == 0)
+	{
+		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
+		if (m_bpp <= 4)
+			addr /= 2;
+		addr &= space.machine().root_device().memregion(m_gfx_memory_region_tag)->bytes() - 1;
+
+		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
+
+		return space.machine().root_device().memregion(m_gfx_memory_region_tag)->base()[addr];
+	}
+	else
+	{
+		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", space.machine().describe_context(), offset);
+		return 0;
+	}
+}
+
+WRITE8_MEMBER( k051316_device::ctrl_w )
+{
+	m_ctrlram[offset] = data;
+	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
+}
+
+// a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
+void k051316_device::wraparound_enable( int status )
+{
+	m_wrap = status;
+}
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+void k051316_device::get_tile_info( tile_data &tileinfo, int tile_index )
+{
+	int code = m_ram[tile_index];
+	int color = m_ram[tile_index + 0x400];
+	int flags = 0;
+
+	m_callback(machine(), &code, &color, &flags);
+
+	SET_TILE_INFO_MEMBER(
+			m_gfx_num,
+			code,
+			color,
+			flags);
+}
+
+
+TILE_GET_INFO_MEMBER(k051316_device::get_tile_info0) { get_tile_info(tileinfo, tile_index); }
+
+
+void k051316_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+{
+	UINT32 startx, starty;
+	int incxx, incxy, incyx, incyy;
+
+	startx = 256 * ((INT16)(256 * m_ctrlram[0x00] + m_ctrlram[0x01]));
+	incxx  =        (INT16)(256 * m_ctrlram[0x02] + m_ctrlram[0x03]);
+	incyx  =        (INT16)(256 * m_ctrlram[0x04] + m_ctrlram[0x05]);
+	starty = 256 * ((INT16)(256 * m_ctrlram[0x06] + m_ctrlram[0x07]));
+	incxy  =        (INT16)(256 * m_ctrlram[0x08] + m_ctrlram[0x09]);
+	incyy  =        (INT16)(256 * m_ctrlram[0x0a] + m_ctrlram[0x0b]);
+
+	startx -= (16 + m_yoffs) * incyx;
+	starty -= (16 + m_yoffs) * incyy;
+
+	startx -= (89 + m_xoffs) * incxx;
+	starty -= (89 + m_xoffs) * incxy;
+
+	m_tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
+			incxx << 5,incxy << 5,incyx << 5,incyy << 5,
+			m_wrap,
+			flags,priority);
+
+#if 0
+	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
+			m_ctrlram[0x00],
+			m_ctrlram[0x01],
+			m_ctrlram[0x02],
+			m_ctrlram[0x03],
+			m_ctrlram[0x04],
+			m_ctrlram[0x05],
+			m_ctrlram[0x06],
+			m_ctrlram[0x07],
+			m_ctrlram[0x08],
+			m_ctrlram[0x09],
+			m_ctrlram[0x0a],
+			m_ctrlram[0x0b],
+			m_ctrlram[0x0c], /* bank for ROM testing */
+			m_ctrlram[0x0d],
+			m_ctrlram[0x0e], /* 0 = test ROMs */
+			m_ctrlram[0x0f]);
+#endif
 }
 
 
@@ -5442,72 +5408,92 @@ void k051316_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-struct k053936_state
+const device_type K053936 = &device_creator<k053936_device>;
+
+k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock, "k053936", __FILE__),
+	m_ctrl(NULL),
+	m_linectrl(NULL)
 {
-	UINT16    *ctrl;
-	UINT16    *linectrl;
-
-	int      wraparound;
-	int      offset[2];
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k053936_state *k053936_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K053936);
-
-	return (k053936_state *)downcast<k053936_device *>(device)->token();
 }
 
-INLINE const k053936_interface *k053936_get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k053936_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == K053936);
-	return (const k053936_interface *) device->static_config();
+	// inherit a copy of the static data
+	const k053936_interface *intf = reinterpret_cast<const k053936_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k053936_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+		m_wrap = 0;
+		m_xoff = 0;
+		m_yoff = 0;
+	}
 }
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053936_device::device_start()
+{
+	m_ctrl = auto_alloc_array_clear(machine(), UINT16, 0x20);
+	m_linectrl = auto_alloc_array_clear(machine(), UINT16, 0x4000);
+
+	save_pointer(NAME(m_ctrl), 0x20);
+	save_pointer(NAME(m_linectrl), 0x4000);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053936_device::device_reset()
+{
+	memset(m_ctrl, 0, 0x20);
+}
+
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_DEVICE_HANDLER( k053936_ctrl_w )
+WRITE16_MEMBER( k053936_device::ctrl_w )
 {
-	k053936_state *k053936= k053936_get_safe_token(device);
-	COMBINE_DATA(&k053936->ctrl[offset]);
+	COMBINE_DATA(&m_ctrl[offset]);
 }
 
-/* FIXME: this is probably unused... check! */
-READ16_DEVICE_HANDLER( k053936_ctrl_r )
+READ16_MEMBER( k053936_device::ctrl_r )
 {
-	k053936_state *k053936= k053936_get_safe_token(device);
-	return k053936->ctrl[offset];
+	return m_ctrl[offset];
 }
 
-WRITE16_DEVICE_HANDLER( k053936_linectrl_w )
+WRITE16_MEMBER( k053936_device::linectrl_w )
 {
-	k053936_state *k053936= k053936_get_safe_token(device);
-	COMBINE_DATA(&k053936->linectrl[offset]);
+	COMBINE_DATA(&m_linectrl[offset]);
 }
 
-READ16_DEVICE_HANDLER( k053936_linectrl_r )
+READ16_MEMBER( k053936_device::linectrl_r )
 {
-	k053936_state *k053936= k053936_get_safe_token(device);
-	return k053936->linectrl[offset];
+	return m_linectrl[offset];
 }
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
+void k053936_device::zoom_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
-	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
 		return;
 
-	if (k053936->ctrl[0x07] & 0x0040)
+	if (m_ctrl[0x07] & 0x0040)
 	{
 		UINT32 startx, starty;
 		int incxx, incxy;
@@ -5522,19 +5508,19 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 		// it's difficult to know what the output SHOULD be.  (hold W in Racin' Force
 		// to see the chip output)
 
-		if (((k053936->ctrl[0x07] & 0x0002) && k053936->ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
+		if (((m_ctrl[0x07] & 0x0002) && m_ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
 		{
-			my_clip.min_x = k053936->ctrl[0x08] + k053936->offset[0] + 2;
-			my_clip.max_x = k053936->ctrl[0x09] + k053936->offset[0] + 2 - 1;
+			my_clip.min_x = m_ctrl[0x08] + m_xoff + 2;
+			my_clip.max_x = m_ctrl[0x09] + m_xoff + 2 - 1;
 			if (my_clip.min_x < cliprect.min_x)
 				my_clip.min_x = cliprect.min_x;
 			if (my_clip.max_x > cliprect.max_x)
 				my_clip.max_x = cliprect.max_x;
 
-			y = k053936->ctrl[0x0a] + k053936->offset[1] - 2;
+			y = m_ctrl[0x0a] + m_yoff - 2;
 			if (y < cliprect.min_y)
 				y = cliprect.min_y;
-			maxy = k053936->ctrl[0x0b] + k053936->offset[1] - 2 - 1;
+			maxy = m_ctrl[0x0b] + m_yoff - 2 - 1;
 			if (maxy > cliprect.max_y)
 				maxy = cliprect.max_y;
 		}
@@ -5549,27 +5535,27 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = k053936->linectrl + 4 * ((y - k053936->offset[1]) & 0x1ff);
+			UINT16 *lineaddr = m_linectrl + 4 * ((y - m_yoff) & 0x1ff);
 
 			my_clip.min_y = my_clip.max_y = y;
 
-			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
-			starty = 256 * (INT16)(lineaddr[1] + k053936->ctrl[0x01]);
+			startx = 256 * (INT16)(lineaddr[0] + m_ctrl[0x00]);
+			starty = 256 * (INT16)(lineaddr[1] + m_ctrl[0x01]);
 			incxx  =       (INT16)(lineaddr[2]);
 			incxy  =       (INT16)(lineaddr[3]);
 
-			if (k053936->ctrl[0x06] & 0x8000)
+			if (m_ctrl[0x06] & 0x8000)
 				incxx *= 256;
 
-			if (k053936->ctrl[0x06] & 0x0080)
+			if (m_ctrl[0x06] & 0x0080)
 				incxy *= 256;
 
-			startx -= k053936->offset[0] * incxx;
-			starty -= k053936->offset[0] * incxy;
+			startx -= m_xoff * incxx;
+			starty -= m_xoff * incxy;
 
 			tmap->draw_roz(bitmap, my_clip, startx << 5,starty << 5,
 					incxx << 5,incxy << 5,0,0,
-					k053936->wraparound,
+					m_wrap,
 					flags,priority);
 
 			y++;
@@ -5580,123 +5566,58 @@ void k053936_zoom_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle 
 		UINT32 startx, starty;
 		int incxx, incxy, incyx, incyy;
 
-		startx = 256 * (INT16)(k053936->ctrl[0x00]);
-		starty = 256 * (INT16)(k053936->ctrl[0x01]);
-		incyx  =       (INT16)(k053936->ctrl[0x02]);
-		incyy  =       (INT16)(k053936->ctrl[0x03]);
-		incxx  =       (INT16)(k053936->ctrl[0x04]);
-		incxy  =       (INT16)(k053936->ctrl[0x05]);
+		startx = 256 * (INT16)(m_ctrl[0x00]);
+		starty = 256 * (INT16)(m_ctrl[0x01]);
+		incyx  =       (INT16)(m_ctrl[0x02]);
+		incyy  =       (INT16)(m_ctrl[0x03]);
+		incxx  =       (INT16)(m_ctrl[0x04]);
+		incxy  =       (INT16)(m_ctrl[0x05]);
 
-		if (k053936->ctrl[0x06] & 0x4000)
+		if (m_ctrl[0x06] & 0x4000)
 		{
 			incyx *= 256;
 			incyy *= 256;
 		}
 
-		if (k053936->ctrl[0x06] & 0x0040)
+		if (m_ctrl[0x06] & 0x0040)
 		{
 			incxx *= 256;
 			incxy *= 256;
 		}
 
-		startx -= k053936->offset[1] * incyx;
-		starty -= k053936->offset[1] * incyy;
+		startx -= m_yoff * incyx;
+		starty -= m_yoff * incyy;
 
-		startx -= k053936->offset[0] * incxx;
-		starty -= k053936->offset[0] * incxy;
+		startx -= m_xoff * incxx;
+		starty -= m_xoff * incxy;
 
 		tmap->draw_roz(bitmap, cliprect, startx << 5,starty << 5,
 				incxx << 5,incxy << 5,incyx << 5,incyy << 5,
-				k053936->wraparound,
+				m_wrap,
 				flags,priority);
 	}
 
 #if 0
 if (machine.input().code_pressed(KEYCODE_D))
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x",
-			k053936->ctrl[0x00],
-			k053936->ctrl[0x01],
-			k053936->ctrl[0x02],
-			k053936->ctrl[0x03],
-			k053936->ctrl[0x04],
-			k053936->ctrl[0x05],
-			k053936->ctrl[0x06],
-			k053936->ctrl[0x07],
-			k053936->ctrl[0x08],
-			k053936->ctrl[0x09],
-			k053936->ctrl[0x0a],
-			k053936->ctrl[0x0b],
-			k053936->ctrl[0x0c],
-			k053936->ctrl[0x0d],
-			k053936->ctrl[0x0e],
-			k053936->ctrl[0x0f]);
+			m_ctrl[0x00],
+			m_ctrl[0x01],
+			m_ctrl[0x02],
+			m_ctrl[0x03],
+			m_ctrl[0x04],
+			m_ctrl[0x05],
+			m_ctrl[0x06],
+			m_ctrl[0x07],
+			m_ctrl[0x08],
+			m_ctrl[0x09],
+			m_ctrl[0x0a],
+			m_ctrl[0x0b],
+			m_ctrl[0x0c],
+			m_ctrl[0x0d],
+			m_ctrl[0x0e],
+			m_ctrl[0x0f]);
 #endif
 }
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k053936 )
-{
-	k053936_state *k053936 = k053936_get_safe_token(device);
-	const k053936_interface *intf = k053936_get_interface(device);
-
-	k053936->ctrl = auto_alloc_array(device->machine(), UINT16, 0x20);
-	k053936->linectrl = auto_alloc_array(device->machine(), UINT16, 0x4000);
-
-	k053936->wraparound = intf->wrap;
-	k053936->offset[0] = intf->xoff;
-	k053936->offset[1] = intf->yoff;
-
-	device->save_pointer(NAME(k053936->ctrl), 0x20);
-	device->save_pointer(NAME(k053936->linectrl), 0x4000);
-}
-
-static DEVICE_RESET( k053936 )
-{
-	k053936_state *k053936 = k053936_get_safe_token(device);
-
-	memset(k053936->ctrl, 0, 0x20);
-}
-
-const device_type K053936 = &device_creator<k053936_device>;
-
-k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock, "k053936", __FILE__)
-{
-	m_token = global_alloc_clear(k053936_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053936_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k053936_device::device_start()
-{
-	DEVICE_START_NAME( k053936 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k053936_device::device_reset()
-{
-	DEVICE_RESET_NAME( k053936 )(this);
-}
-
-
 
 /***************************************************************************/
 /*                                                                         */
@@ -5893,115 +5814,11 @@ void k053251_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-struct k054000_state
-{
-	UINT8    regs[0x20];
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k054000_state *k054000_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K054000);
-
-	return (k054000_state *)downcast<k054000_device *>(device)->token();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-WRITE8_DEVICE_HANDLER( k054000_w )
-{
-	k054000_state *k054000 = k054000_get_safe_token(device);
-
-	//logerror("%04x: write %02x to 054000 address %02x\n",space.device().safe_pc(),data,offset);
-	k054000->regs[offset] = data;
-}
-
-READ8_DEVICE_HANDLER( k054000_r )
-{
-	k054000_state *k054000 = k054000_get_safe_token(device);
-	int Acx, Acy, Aax, Aay;
-	int Bcx, Bcy, Bax, Bay;
-
-	//logerror("%04x: read 054000 address %02x\n", space.device().safe_pc(), offset);
-
-	if (offset != 0x18)
-		return 0;
-
-	Acx = (k054000->regs[0x01] << 16) | (k054000->regs[0x02] << 8) | k054000->regs[0x03];
-	Acy = (k054000->regs[0x09] << 16) | (k054000->regs[0x0a] << 8) | k054000->regs[0x0b];
-
-	/* TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong. */
-	if (k054000->regs[0x04] == 0xff)
-		Acx+=3;
-	if (k054000->regs[0x0c] == 0xff)
-		Acy+=3;
-
-	Aax = k054000->regs[0x06] + 1;
-	Aay = k054000->regs[0x07] + 1;
-
-	Bcx = (k054000->regs[0x15] << 16) | (k054000->regs[0x16] << 8) | k054000->regs[0x17];
-	Bcy = (k054000->regs[0x11] << 16) | (k054000->regs[0x12] << 8) | k054000->regs[0x13];
-	Bax = k054000->regs[0x0e] + 1;
-	Bay = k054000->regs[0x0f] + 1;
-
-	if (Acx + Aax < Bcx - Bax)
-		return 1;
-
-	if (Bcx + Bax < Acx - Aax)
-		return 1;
-
-	if (Acy + Aay < Bcy - Bay)
-		return 1;
-
-	if (Bcy + Bay < Acy - Aay)
-		return 1;
-
-	return 0;
-}
-
-READ16_DEVICE_HANDLER( k054000_lsb_r )
-{
-	return k054000_r(device, space, offset);
-}
-
-WRITE16_DEVICE_HANDLER( k054000_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k054000_w(device, space, offset, data & 0xff);
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k054000 )
-{
-	k054000_state *k054000 = k054000_get_safe_token(device);
-
-	device->save_item(NAME(k054000->regs));
-}
-
-static DEVICE_RESET( k054000 )
-{
-	k054000_state *k054000 = k054000_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 0x20; i++)
-		k054000->regs[i] = 0;
-}
-
 const device_type K054000 = &device_creator<k054000_device>;
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054000, "Konami 054000", tag, owner, clock, "k054000", __FILE__)
 {
-	m_token = global_alloc_clear(k054000_state);
 }
 
 //-------------------------------------------------
@@ -6020,7 +5837,7 @@ void k054000_device::device_config_complete()
 
 void k054000_device::device_start()
 {
-	DEVICE_START_NAME( k054000 )(this);
+	save_item(NAME(m_regs));
 }
 
 //-------------------------------------------------
@@ -6029,9 +5846,74 @@ void k054000_device::device_start()
 
 void k054000_device::device_reset()
 {
-	DEVICE_RESET_NAME( k054000 )(this);
+	int i;
+
+	for (i = 0; i < 0x20; i++)
+		m_regs[i] = 0;
 }
 
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+WRITE8_MEMBER( k054000_device::write )
+{
+	//logerror("%04x: write %02x to 054000 address %02x\n",space.device().safe_pc(),data,offset);
+	m_regs[offset] = data;
+}
+
+READ8_MEMBER( k054000_device::read )
+{
+	int Acx, Acy, Aax, Aay;
+	int Bcx, Bcy, Bax, Bay;
+
+	//logerror("%04x: read 054000 address %02x\n", space.device().safe_pc(), offset);
+
+	if (offset != 0x18)
+		return 0;
+
+	Acx = (m_regs[0x01] << 16) | (m_regs[0x02] << 8) | m_regs[0x03];
+	Acy = (m_regs[0x09] << 16) | (m_regs[0x0a] << 8) | m_regs[0x0b];
+
+	/* TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong. */
+	if (m_regs[0x04] == 0xff)
+		Acx+=3;
+	if (m_regs[0x0c] == 0xff)
+		Acy+=3;
+
+	Aax = m_regs[0x06] + 1;
+	Aay = m_regs[0x07] + 1;
+
+	Bcx = (m_regs[0x15] << 16) | (m_regs[0x16] << 8) | m_regs[0x17];
+	Bcy = (m_regs[0x11] << 16) | (m_regs[0x12] << 8) | m_regs[0x13];
+	Bax = m_regs[0x0e] + 1;
+	Bay = m_regs[0x0f] + 1;
+
+	if (Acx + Aax < Bcx - Bax)
+		return 1;
+
+	if (Bcx + Bax < Acx - Aax)
+		return 1;
+
+	if (Acy + Aay < Bcy - Bay)
+		return 1;
+
+	if (Bcy + Bay < Acy - Aay)
+		return 1;
+
+	return 0;
+}
+
+READ16_MEMBER( k054000_device::lsb_r )
+{
+	return read(space, offset);
+}
+
+WRITE16_MEMBER( k054000_device::lsb_w )
+{
+	if (ACCESSING_BITS_0_7)
+		write(space, offset, data & 0xff);
+}
 
 /***************************************************************************/
 /*                                                                         */
@@ -6039,34 +5921,58 @@ void k054000_device::device_reset()
 /*                                                                         */
 /***************************************************************************/
 
-struct k051733_state
+const device_type K051733 = &device_creator<k051733_device>;
+
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051733, "Konami 051733", tag, owner, clock, "k051733", __FILE__),
+	//m_ram[0x20],
+	m_rng(0)
 {
-	UINT8    ram[0x20];
-	UINT8    rng;
-};
+}
 
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-INLINE k051733_state *k051733_get_safe_token( device_t *device )
+void k051733_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == K051733);
+}
 
-	return (k051733_state *)downcast<k051733_device *>(device)->token();
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051733_device::device_start()
+{
+	save_item(NAME(m_ram));
+	save_item(NAME(m_rng));	
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051733_device::device_reset()
+{
+	int i;
+
+	for (i = 0; i < 0x20; i++)
+		m_ram[i] = 0;
+
+	m_rng = 0;
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_DEVICE_HANDLER( k051733_w )
+WRITE8_MEMBER( k051733_device::write )
 {
-	k051733_state *k051733= k051733_get_safe_token(device);
 	//logerror("%04x: write %02x to 051733 address %02x\n", space.device().safe_pc(), data, offset);
 
-	k051733->ram[offset] = data;
+	m_ram[offset] = data;
 }
 
 
@@ -6088,19 +5994,17 @@ static int k051733_int_sqrt( UINT32 op )
 	return i;
 }
 
-READ8_DEVICE_HANDLER( k051733_r )
+READ8_MEMBER( k051733_device::read )
 {
-	k051733_state *k051733= k051733_get_safe_token(device);
+	int op1 = (m_ram[0x00] << 8) | m_ram[0x01];
+	int op2 = (m_ram[0x02] << 8) | m_ram[0x03];
+	int op3 = (m_ram[0x04] << 8) | m_ram[0x05];
 
-	int op1 = (k051733->ram[0x00] << 8) | k051733->ram[0x01];
-	int op2 = (k051733->ram[0x02] << 8) | k051733->ram[0x03];
-	int op3 = (k051733->ram[0x04] << 8) | k051733->ram[0x05];
-
-	int rad = (k051733->ram[0x06] << 8) | k051733->ram[0x07];
-	int yobj1c = (k051733->ram[0x08] << 8) | k051733->ram[0x09];
-	int xobj1c = (k051733->ram[0x0a] << 8) | k051733->ram[0x0b];
-	int yobj2c = (k051733->ram[0x0c] << 8) | k051733->ram[0x0d];
-	int xobj2c = (k051733->ram[0x0e] << 8) | k051733->ram[0x0f];
+	int rad = (m_ram[0x06] << 8) | m_ram[0x07];
+	int yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
+	int xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
+	int yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
+	int xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
 
 	switch (offset)
 	{
@@ -6134,8 +6038,8 @@ READ8_DEVICE_HANDLER( k051733_r )
 			return k051733_int_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			k051733->rng += k051733->ram[0x13];
-			return k051733->rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
+			m_rng += m_ram[0x13];
+			return m_rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
 
 		case 0x07:{ /* note: Chequered Flag definitely wants all these bits to be enabled */
 			if (xobj1c + rad < xobj2c)
@@ -6157,67 +6061,8 @@ READ8_DEVICE_HANDLER( k051733_r )
 		case 0x0f:
 			return (xobj2c - xobj1c) & 0xff;
 		default:
-			return k051733->ram[offset];
+			return m_ram[offset];
 	}
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k051733 )
-{
-	k051733_state *k051733 = k051733_get_safe_token(device);
-
-	device->save_item(NAME(k051733->ram));
-	device->save_item(NAME(k051733->rng));
-}
-
-static DEVICE_RESET( k051733 )
-{
-	k051733_state *k051733 = k051733_get_safe_token(device);
-	int i;
-
-	for (i = 0; i < 0x20; i++)
-		k051733->ram[i] = 0;
-
-	k051733->rng = 0;
-}
-
-const device_type K051733 = &device_creator<k051733_device>;
-
-k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051733, "Konami 051733", tag, owner, clock, "k051733", __FILE__)
-{
-	m_token = global_alloc_clear(k051733_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k051733_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k051733_device::device_start()
-{
-	DEVICE_START_NAME( k051733 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k051733_device::device_reset()
-{
-	DEVICE_RESET_NAME( k051733 )(this);
 }
 
 
@@ -6231,202 +6076,440 @@ void k051733_device::device_reset()
 #define K056832_PAGE_ROWS 32
 #define K056832_PAGE_HEIGHT (K056832_PAGE_ROWS*8)
 #define K056832_PAGE_WIDTH  (K056832_PAGE_COLS*8)
-#define K056832_PAGE_COUNT 16
 
-struct k056832_state
+
+
+
+const device_type K056832 = &device_creator<k056832_device>;
+
+k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock, "k056832", __FILE__),
+	//m_tilemap[K056832_PAGE_COUNT],
+	//*m_pixmap[K056832_PAGE_COUNT],
+    //m_regs[0x20],
+	//m_regsb[4],
+	m_rombase(NULL),
+	m_videoram(NULL),
+	m_num_gfx_banks(0),
+	m_cur_gfx_banks(0),
+	m_rom_half(0),
+    //m_layer_assoc_with_page[K056832_PAGE_COUNT],
+	//m_layer_offs[8][2],
+	//m_lsram_page[8][2],
+	//m_x[8],
+	//m_y[8],
+	//m_w[8],
+	//m_h[8],
+	//m_dx[8],
+	//m_dy[8],
+	//m_line_dirty[K056832_PAGE_COUNT][8],
+	//m_all_lines_dirty[K056832_PAGE_COUNT],
+	//m_page_tile_mode[K056832_PAGE_COUNT],
+	//m_last_colorbase[K056832_PAGE_COUNT],
+	//m_layer_tile_mode[8],
+	m_default_layer_association(0),
+	m_layer_association(0),
+	m_active_layer(0),
+	m_selected_page(0),
+	m_selected_page_x4096(0),
+	m_linemap_enabled(0),
+	m_use_ext_linescroll(0),
+	m_uses_tile_banks(0),
+	m_cur_tile_bank(0)
 {
-	tilemap_t   *tilemap[K056832_PAGE_COUNT];
-	bitmap_ind16  *pixmap[K056832_PAGE_COUNT];
-
-	UINT16    regs[0x20];   // 157/832 regs group 1
-	UINT16    regsb[4]; // 157/832 regs group 2, board dependent
-
-	UINT8 *   rombase;  // pointer to tile gfx data
-	UINT16 *  videoram;
-	int       num_gfx_banks;    // depends on size of graphics ROMs
-	int       cur_gfx_banks;        // cached info for K056832_regs[0x1a]
-	int       gfxnum;           // graphics element index for unpacked tiles
-	const char *memory_region;  // memory region for tile gfx data
-
-
-	// ROM readback involves reading 2 halves of a word
-	// from the same location in a row.  Reading the
-	// RAM window resets this state so you get the first half.
-	int       rom_half;
-
-
-	// locally cached values
-	int       layer_assoc_with_page[K056832_PAGE_COUNT];
-	int       layer_offs[8][2];
-	int       lsram_page[8][2];
-	INT32     x[8]; // 0..3 left
-	INT32     y[8]; // 0..3 top
-	INT32     w[8]; // 0..3 width  -> 1..4 pages
-	INT32     h[8]; // 0..3 height -> 1..4 pages
-	INT32     dx[8];    // scroll
-	INT32     dy[8];    // scroll
-	UINT32    line_dirty[K056832_PAGE_COUNT][8];
-	UINT8     all_lines_dirty[K056832_PAGE_COUNT];
-	UINT8     page_tile_mode[K056832_PAGE_COUNT];
-	int       last_colorbase[K056832_PAGE_COUNT];
-	UINT8     layer_tile_mode[8];
-	int       default_layer_association;
-	int       layer_association;
-	int       active_layer;
-	int       selected_page;
-	int       selected_page_x4096;
-	int       linemap_enabled;
-	int       use_ext_linescroll;
-	int       uses_tile_banks, cur_tile_bank;
-
-	int       djmain_hack;
-
-	k056832_callback  callback;
-
-	device_t *k055555;  /* used to choose colorbase */
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k056832_state *k056832_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K056832);
-
-	return (k056832_state *)downcast<k056832_device *>(device)->token();
 }
 
-INLINE const k056832_interface *k056832_get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k056832_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == K056832);
-	return (const k056832_interface *) device->static_config();
+	// inherit a copy of the static data
+	const k056832_interface *intf = reinterpret_cast<const k056832_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k056832_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	m_gfx_memory_region = "";
+	m_gfx_num = 0;
+	m_bpp = 0;
+	m_big = 0;
+	m_djmain_hack = 0;
+	m_deinterleave = 0;
+	m_callback = NULL;
+	m_k055555_tag = "";
+	};
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k056832_device::device_start()
+{
+/* TODO: understand which elements MUST be init here (to keep correct layer
+   associations) and which ones can can be init at RESET, if any */
+	tilemap_t *tmap;
+	int i;
+	UINT32 total;
+	static const gfx_layout charlayout8 =
+	{
+		8, 8,
+		0,
+		8,
+		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
+		8*8*8
+	};
+	static const gfx_layout charlayout8le =
+	{
+		8, 8,
+		0,
+		8,
+//      { 0, 1, 2, 3, 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8) },
+		{ 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8), 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+		8*8*4
+	};
+	static const gfx_layout charlayout6 =
+	{
+		8, 8,
+		0,
+		6,
+		{ 40, 32, 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
+		8*8*6
+	};
+	static const gfx_layout charlayout5 =
+	{
+		8, 8,
+		0,
+		5,
+		{ 32, 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
+		8*8*5
+	};
+	static const gfx_layout charlayout4 =
+	{
+		8, 8,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+		8*8*4
+	};
+	static const gfx_layout charlayout4dj =
+	{
+		8, 8,
+		0,
+		4,
+		{ 8*3,8*1,8*2,8*0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7 },
+		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
+		8*8*4
+	};
+	static const gfx_layout charlayout8_tasman =
+	{
+		8,8,
+		RGN_FRAC(1,1),
+		8,
+		{ 0,8,16,24,32,40,48,56 },
+		{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
+		8*64
+	};
+
+
+	/* handle the various graphics formats */
+	i = (m_big) ? 8 : 16;
+
+
+	/* decode the graphics */
+	switch (m_bpp)
+	{
+		case K056832_BPP_4:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 4);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout4, 4);
+			break;
+
+		case K056832_BPP_5:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 5);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout5, 4);
+			break;
+
+		case K056832_BPP_6:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 6);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout6, 4);
+			break;
+
+		case K056832_BPP_8:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8, 4);
+			break;
+
+		case K056832_BPP_8LE:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8le, 4);
+			break;
+
+		case K056832_BPP_8TASMAN:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
+			break;
+
+		case K056832_BPP_4dj:
+			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 4);
+			decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout4dj, 4);
+			break;
+
+		default:
+			fatalerror("Unsupported bpp\n");
+	}
+
+	machine().gfx[m_gfx_num]->set_granularity(16); /* override */
+
+	/* deinterleave the graphics, if needed */
+	deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
+
+	m_rombase = machine().root_device().memregion(m_gfx_memory_region)->base();
+	m_num_gfx_banks = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 0x2000;
+	
+	m_cur_gfx_banks = 0;
+	m_use_ext_linescroll = 0;
+	m_uses_tile_banks = 0;
+
+	for (i = 0; i < 4; i++)
+	{
+		m_layer_offs[i][0] = 0;
+		m_layer_offs[i][1] = 0;
+		m_lsram_page[i][0] = i;
+		m_lsram_page[i][1] = i << 11;
+		m_x[i] = 0;
+		m_y[i] = 0;
+		m_w[i] = 0;
+		m_h[i] = 0;
+		m_dx[i] = 0;
+		m_dy[i] = 0;
+		m_layer_tile_mode[i] = 1;
+	}
+
+	m_default_layer_association = 1;
+	m_active_layer = 0;
+	m_linemap_enabled = 0;
+
+	m_k055555 = machine().device(m_k055555_tag);
+
+	memset(m_line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
+
+	for (i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		m_all_lines_dirty[i] = 0;
+		m_page_tile_mode[i] = 1;
+	}
+
+	m_videoram = auto_alloc_array_clear(machine(), UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+
+	m_tilemap[0x0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x6] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x7] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x8] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x9] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xa] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xb] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xc] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xd] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xe] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xf] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+
+	for (i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		tmap = m_tilemap[i];
+
+		m_pixmap[i] = &tmap->pixmap();
+
+		tmap->set_transparent_pen(0);
+	}
+
+	memset(m_videoram, 0x00, 0x20000);
+	memset(m_regs,     0x00, sizeof(m_regs) );
+	memset(m_regsb,    0x00, sizeof(m_regsb) );
+
+	update_page_layout();
+
+	change_rambank();
+	change_rombank();
+
+	save_pointer(NAME(m_videoram), 0x10000);
+	save_item(NAME(m_regs));
+	save_item(NAME(m_regsb));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_w));
+	save_item(NAME(m_h));
+	save_item(NAME(m_dx));
+	save_item(NAME(m_dy));
+	save_item(NAME(m_layer_tile_mode));
+
+	save_item(NAME(m_default_layer_association));
+	save_item(NAME(m_active_layer));
+	save_item(NAME(m_linemap_enabled));
+	save_item(NAME(m_use_ext_linescroll));
+	save_item(NAME(m_uses_tile_banks));
+	save_item(NAME(m_cur_tile_bank));
+	save_item(NAME(m_rom_half));
+	save_item(NAME(m_all_lines_dirty));
+	save_item(NAME(m_page_tile_mode));
+
+	for (i = 0; i < 8; i++)
+	{
+		save_item(NAME(m_layer_offs[i]), i);
+		save_item(NAME(m_lsram_page[i]), i);
+	}
+
+	for (i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		save_item(NAME(m_line_dirty[i]), i);
+		save_item(NAME(m_all_lines_dirty[i]), i);
+		save_item(NAME(m_page_tile_mode[i]), i);
+		save_item(NAME(m_last_colorbase[i]), i);
+	}
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-#define k056832_mark_line_dirty(P, L) if (L < 0x100) k056832->line_dirty[P][L >> 5] |= 1 << (L & 0x1f)
-#define k056832_mark_all_lines_dirty(P) k056832->all_lines_dirty[P] = 1
+#define mark_line_dirty(P, L) if (L < 0x100) m_line_dirty[P][L >> 5] |= 1 << (L & 0x1f)
+#define mark_all_lines_dirty(P) m_all_lines_dirty[P] = 1
 
-static void k056832_mark_page_dirty( k056832_state *k056832, int page )
+void k056832_device::mark_page_dirty( int page )
 {
-	if (k056832->page_tile_mode[page])
-		k056832->tilemap[page]->mark_all_dirty();
+	if (m_page_tile_mode[page])
+		m_tilemap[page]->mark_all_dirty();
 	else
-		k056832_mark_all_lines_dirty(page);
+		mark_all_lines_dirty(page);
 }
 
-void k056832_mark_plane_dirty( device_t *device, int layer )
+void k056832_device::mark_plane_dirty( int layer )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int tilemode, i;
 
-	tilemode = k056832->layer_tile_mode[layer];
+	tilemode = m_layer_tile_mode[layer];
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
-		if (k056832->layer_assoc_with_page[i] == layer)
+		if (m_layer_assoc_with_page[i] == layer)
 		{
-			k056832->page_tile_mode[i] = tilemode;
-			k056832_mark_page_dirty(k056832, i);
+			m_page_tile_mode[i] = tilemode;
+			mark_page_dirty(i);
 		}
 	}
 }
 
-static void k056832_mark_all_tilemaps_dirty( k056832_state *k056832 )
+void k056832_device::mark_all_tilemaps_dirty( )
 {
 	int i;
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
-		if (k056832->layer_assoc_with_page[i] != -1)
+		if (m_layer_assoc_with_page[i] != -1)
 		{
-			k056832->page_tile_mode[i] = k056832->layer_tile_mode[k056832->layer_assoc_with_page[i]];
-			k056832_mark_page_dirty(k056832, i);
+			m_page_tile_mode[i] = m_layer_tile_mode[m_layer_assoc_with_page[i]];
+			mark_page_dirty(i);
 		}
 	}
 }
 
 /* moo.c needs to call this in its VIDEO_UPDATE */
-void k056832_mark_all_tmaps_dirty( device_t *device )
+void k056832_device::mark_all_tmaps_dirty( )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832_mark_all_tilemaps_dirty(k056832);
+	mark_all_tilemaps_dirty();
 }
 
-static void k056832_update_page_layout( k056832_state *k056832 )
+void k056832_device::update_page_layout( )
 {
 	int layer, rowstart, rowspan, colstart, colspan, r, c, page_idx, setlayer;
 
 	// enable layer association by default
-	k056832->layer_association = k056832->default_layer_association;
+	m_layer_association = m_default_layer_association;
 
 	// disable association if a layer grabs the entire 4x4 map (happens in Twinbee and Dadandarn)
 	for (layer = 0; layer < 4; layer++)
 	{
-		if (!k056832->y[layer] && !k056832->x[layer] && k056832->h[layer] == 3 && k056832->w[layer] == 3)
+		if (!m_y[layer] && !m_x[layer] && m_h[layer] == 3 && m_w[layer] == 3)
 		{
-			k056832->layer_association = 0;
+			m_layer_association = 0;
 			break;
 		}
 	}
 
 	// winning spike doesn't like layer association..
-	if (k056832->djmain_hack == 2)
-		k056832->layer_association = 0;
+	if (m_djmain_hack == 2)
+		m_layer_association = 0;
 
 	// disable all tilemaps
 	for (page_idx = 0; page_idx < K056832_PAGE_COUNT; page_idx++)
 	{
-		k056832->layer_assoc_with_page[page_idx] = -1;
+		m_layer_assoc_with_page[page_idx] = -1;
 	}
 
 
 	// enable associated tilemaps
 	for (layer = 0; layer < 4; layer++)
 	{
-		rowstart = k056832->y[layer];
-		colstart = k056832->x[layer];
-		rowspan  = k056832->h[layer] + 1;
-		colspan  = k056832->w[layer] + 1;
+		rowstart = m_y[layer];
+		colstart = m_x[layer];
+		rowspan  = m_h[layer] + 1;
+		colspan  = m_w[layer] + 1;
 
-		setlayer = (k056832->layer_association) ? layer : k056832->active_layer;
+		setlayer = (m_layer_association) ? layer : m_active_layer;
 
 		for (r = 0; r < rowspan; r++)
 		{
 			for (c = 0; c < colspan; c++)
 			{
 				page_idx = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-				if (!(k056832->djmain_hack==1) || k056832->layer_assoc_with_page[page_idx] == -1)
-					k056832->layer_assoc_with_page[page_idx] = setlayer;
+				if (!(m_djmain_hack==1) || m_layer_assoc_with_page[page_idx] == -1)
+					m_layer_assoc_with_page[page_idx] = setlayer;
 			}
 		}
 	}
 
 	// refresh associated tilemaps
-	k056832_mark_all_tilemaps_dirty(k056832);
+	mark_all_tilemaps_dirty();
 }
 
-int k056832_get_lookup( device_t *device, int bits )
+int k056832_device::get_lookup( int bits )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int res;
 
-	res = (k056832->regs[0x1c] >> (bits << 2)) & 0x0f;
+	res = (m_regs[0x1c] >> (bits << 2)) & 0x0f;
 
-	if (k056832->uses_tile_banks)   /* Asterix */
-		res |= k056832->cur_tile_bank << 4;
+	if (m_uses_tile_banks)   /* Asterix */
+		res |= m_cur_tile_bank << 4;
 
 	return res;
 }
 
-INLINE void k056832_get_tile_info(  running_machine &machine, device_t *device, tile_data &tileinfo, int tile_index, int pageIndex )
+void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	static const struct K056832_SHIFTMASKS
 	{
 		int flips, palm1, pals2, palm2;
@@ -6437,19 +6520,19 @@ INLINE void k056832_get_tile_info(  running_machine &machine, device_t *device, 
 	int layer, flip, fbits, attr, code, color, flags;
 	UINT16 *pMem;
 
-	pMem  = &k056832->videoram[(pageIndex << 12) + (tile_index << 1)];
+	pMem  = &m_videoram[(pageIndex << 12) + (tile_index << 1)];
 
-	if (k056832->layer_association)
+	if (m_layer_association)
 	{
-		layer = k056832->layer_assoc_with_page[pageIndex];
+		layer = m_layer_assoc_with_page[pageIndex];
 		if (layer == -1)
 			layer = 0;  // use layer 0's palette info for unmapped pages
 	}
 	else
-		layer = k056832->active_layer;
+		layer = m_active_layer;
 
-	fbits = (k056832->regs[3] >> 6) & 3;
-	flip  = (k056832->regs[1] >> (layer << 1)) & 0x3; // tile-flip override (see p.20 3.2.2 "REG2")
+	fbits = (m_regs[3] >> 6) & 3;
+	flip  = (m_regs[1] >> (layer << 1)) & 0x3; // tile-flip override (see p.20 3.2.2 "REG2")
 	smptr = &k056832_shiftmasks[fbits];
 	attr  = pMem[0];
 	code  = pMem[1];
@@ -6461,111 +6544,107 @@ INLINE void k056832_get_tile_info(  running_machine &machine, device_t *device, 
 	color = (attr & smptr->palm1) | (attr >> smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	k056832->callback(device->machine(), layer, &code, &color, &flags);
+	m_callback(machine(), layer, &code, &color, &flags);
 
-	SET_TILE_INFO(
-			k056832->gfxnum,
+	SET_TILE_INFO_MEMBER(
+			m_gfx_num,
 			code,
 			color,
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info0) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x0); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info1) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x1); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info2) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x2); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info3) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x3); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info4) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x4); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info5) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x5); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info6) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x6); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info7) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x7); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info8) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x8); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_info9) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0x9); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infoa) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xa); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infob) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xb); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infoc) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xc); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infod) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xd); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infoe) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xe); }
-TILE_GET_INFO_MEMBER(k056832_device::k056832_get_tile_infof) { k056832_get_tile_info(machine(), this, tileinfo, tile_index, 0xf); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info0) { get_tile_info(tileinfo, tile_index, 0x0); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info1) { get_tile_info(tileinfo, tile_index, 0x1); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info2) { get_tile_info(tileinfo, tile_index, 0x2); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info3) { get_tile_info(tileinfo, tile_index, 0x3); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info4) { get_tile_info(tileinfo, tile_index, 0x4); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info5) { get_tile_info(tileinfo, tile_index, 0x5); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info6) { get_tile_info(tileinfo, tile_index, 0x6); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info7) { get_tile_info(tileinfo, tile_index, 0x7); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info8) { get_tile_info(tileinfo, tile_index, 0x8); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_info9) { get_tile_info(tileinfo, tile_index, 0x9); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoa) { get_tile_info(tileinfo, tile_index, 0xa); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infob) { get_tile_info(tileinfo, tile_index, 0xb); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoc) { get_tile_info(tileinfo, tile_index, 0xc); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infod) { get_tile_info(tileinfo, tile_index, 0xd); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoe) { get_tile_info(tileinfo, tile_index, 0xe); }
+TILE_GET_INFO_MEMBER(k056832_device::get_tile_infof) { get_tile_info(tileinfo, tile_index, 0xf); }
 
-static void k056832_change_rambank( k056832_state *k056832 )
+void k056832_device::change_rambank( )
 {
 	/* ------xx page col
 	 * ---xx--- page row
 	 */
-	int bank = k056832->regs[0x19];
+	int bank = m_regs[0x19];
 
-	if (k056832->regs[0] & 0x02)    // external linescroll enable
-		k056832->selected_page = K056832_PAGE_COUNT;
+	if (m_regs[0] & 0x02)    // external linescroll enable
+		m_selected_page = K056832_PAGE_COUNT;
 	else
-		k056832->selected_page = ((bank >> 1) & 0xc) | (bank & 3);
+		m_selected_page = ((bank >> 1) & 0xc) | (bank & 3);
 
-	k056832->selected_page_x4096 = k056832->selected_page << 12;
+	m_selected_page_x4096 = m_selected_page << 12;
 
 	// refresh associated tilemaps
-	k056832_mark_all_tilemaps_dirty(k056832);
+	mark_all_tilemaps_dirty();
 }
 
-int k056832_get_current_rambank( device_t *device )
+int k056832_device::get_current_rambank( )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int bank = k056832->regs[0x19];
+	int bank = m_regs[0x19];
 
 	return ((bank >> 1) & 0xc) | (bank & 3);
 }
 
-static void k056832_change_rombank( k056832_state *k056832 )
+void k056832_device::change_rombank( )
 {
 	int bank;
 
-	if (k056832->uses_tile_banks)   /* Asterix */
-		bank = (k056832->regs[0x1a] >> 8) | (k056832->regs[0x1b] << 4) | (k056832->cur_tile_bank << 6);
+	if (m_uses_tile_banks)   /* Asterix */
+		bank = (m_regs[0x1a] >> 8) | (m_regs[0x1b] << 4) | (m_cur_tile_bank << 6);
 	else
-		bank = k056832->regs[0x1a] | (k056832->regs[0x1b] << 16);
+		bank = m_regs[0x1a] | (m_regs[0x1b] << 16);
 
-	k056832->cur_gfx_banks = bank % k056832->num_gfx_banks;
+	m_cur_gfx_banks = bank % m_num_gfx_banks;
 }
 
-void k056832_set_tile_bank( device_t *device, int bank )
+void k056832_device::set_tile_bank( int bank )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->uses_tile_banks = 1;
+	m_uses_tile_banks = 1;
 
-	if (k056832->cur_tile_bank != bank)
+	if (m_cur_tile_bank != bank)
 	{
-		k056832->cur_tile_bank = bank;
+		m_cur_tile_bank = bank;
 
-		k056832_mark_plane_dirty(device, 0);
-		k056832_mark_plane_dirty(device, 1);
-		k056832_mark_plane_dirty(device, 2);
-		k056832_mark_plane_dirty(device, 3);
+		mark_plane_dirty(0);
+		mark_plane_dirty(1);
+		mark_plane_dirty(2);
+		mark_plane_dirty(3);
 	}
 
-	k056832_change_rombank(k056832);
+	change_rombank();
 }
 
 /* call if a game uses external linescroll */
-void k056832_SetExtLinescroll( device_t *device )
+void k056832_device::SetExtLinescroll( )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->use_ext_linescroll = 1;
+	m_use_ext_linescroll = 1;
 }
 
 /* generic helper routine for ROM checksumming */
-static int k056832_rom_read_b( device_t *device, int offset, int blksize, int blksize2, int zerosec )
+int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zerosec )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT8 *rombase;
 	int base, ret;
 
-	rombase = (UINT8 *)device->machine().root_device().memregion(k056832->memory_region)->base();
+	rombase = (UINT8 *)machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	if ((k056832->rom_half) && (zerosec))
+	if ((m_rom_half) && (zerosec))
 	{
 		return 0;
 	}
 
 	// add in the bank offset
-	offset += (k056832->cur_gfx_banks * 0x2000);
+	offset += (m_cur_gfx_banks * 0x2000);
 
 	// figure out the base of the ROM block
 	base = (offset / blksize) * blksize2;
@@ -6573,25 +6652,25 @@ static int k056832_rom_read_b( device_t *device, int offset, int blksize, int bl
 	// get the starting offset of the proper word inside the block
 	base += (offset % blksize) * 2;
 
-	if (k056832->rom_half)
+	if (m_rom_half)
 	{
 		ret = rombase[base + 1];
 	}
 	else
 	{
 		ret = rombase[base];
-		k056832->rom_half = 1;
+		m_rom_half = 1;
 	}
 
 	return ret;
 }
 
-READ16_DEVICE_HANDLER( k056832_5bpp_rom_word_r )
+READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 {
 	if (mem_mask == 0xff00)
-		return k056832_rom_read_b(device, offset * 2, 4, 5, 0)<<8;
+		return rom_read_b(offset * 2, 4, 5, 0)<<8;
 	else if (mem_mask == 0x00ff)
-		return k056832_rom_read_b(device, offset * 2 + 1, 4, 5, 0)<<16;
+		return rom_read_b(offset * 2 + 1, 4, 5, 0)<<16;
 	else
 	{
 		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
@@ -6599,16 +6678,16 @@ READ16_DEVICE_HANDLER( k056832_5bpp_rom_word_r )
 	return 0;
 }
 
-READ32_DEVICE_HANDLER( k056832_5bpp_rom_long_r )
+READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
-		return k056832_rom_read_b(device, offset * 4, 4, 5, 0) << 24;
+		return rom_read_b(offset * 4, 4, 5, 0) << 24;
 	else if (mem_mask == 0x00ff0000)
-		return k056832_rom_read_b(device, offset * 4 + 1, 4, 5, 0) << 16;
+		return rom_read_b(offset * 4 + 1, 4, 5, 0) << 16;
 	else if (mem_mask == 0x0000ff00)
-		return k056832_rom_read_b(device, offset * 4 + 2, 4, 5, 0) << 8;
+		return rom_read_b(offset * 4 + 2, 4, 5, 0) << 8;
 	else if (mem_mask == 0x000000ff)
-		return k056832_rom_read_b(device, offset * 4 + 3, 4, 5, 1);
+		return rom_read_b(offset * 4 + 3, 4, 5, 1);
 	else
 	{
 		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
@@ -6616,16 +6695,16 @@ READ32_DEVICE_HANDLER( k056832_5bpp_rom_long_r )
 	return 0;
 }
 
-READ32_DEVICE_HANDLER( k056832_6bpp_rom_long_r )
+READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
-		return k056832_rom_read_b(device, offset * 4, 4, 6, 0) << 24;
+		return rom_read_b(offset * 4, 4, 6, 0) << 24;
 	else if (mem_mask == 0x00ff0000)
-		return k056832_rom_read_b(device, offset * 4 + 1, 4, 6, 0) << 16;
+		return rom_read_b(offset * 4 + 1, 4, 6, 0) << 16;
 	else if (mem_mask == 0x0000ff00)
-		return k056832_rom_read_b(device, offset * 4 + 2, 4, 6, 0) << 8;
+		return rom_read_b(offset * 4 + 2, 4, 6, 0) << 8;
 	else if (mem_mask == 0x000000ff)
-		return k056832_rom_read_b(device, offset * 4 + 3, 4, 6, 0);
+		return rom_read_b(offset * 4 + 3, 4, 6, 0);
 	else
 	{
 		//LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
@@ -6633,29 +6712,27 @@ READ32_DEVICE_HANDLER( k056832_6bpp_rom_long_r )
 	return 0;
 }
 
-READ16_DEVICE_HANDLER( k056832_rom_word_r )
+READ16_MEMBER( k056832_device::rom_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
+	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
-	if (!k056832->rombase)
-		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
+	if (!m_rombase)
+		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
+	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
 // data is arranged like this:
 // 0000 1111 22 0000 1111 22
-READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
+READ16_MEMBER( k056832_device::mw_rom_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int bank = 10240 * k056832->cur_gfx_banks;
+	int bank = 10240 * m_cur_gfx_banks;
 	int addr;
 
-	if (!k056832->rombase)
-		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
+	if (!m_rombase)
+		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	if (k056832->regsb[2] & 0x8)
+	if (m_regsb[2] & 0x8)
 	{
 		// we want only the 2s
 		int bit;
@@ -6664,7 +6741,7 @@ READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 		bit = offset % 4;
 		addr = (offset / 4) * 5;
 
-		temp = k056832->rombase[addr + 4 + bank];
+		temp = m_rombase[addr + 4 + bank];
 
 		switch (bit)
 		{
@@ -6705,197 +6782,180 @@ READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 
 		addr += bank;
 
-		return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
+		return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 	}
 
 }
 
-READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r )
+READ16_MEMBER( k056832_device::bishi_rom_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x4000 * k056832->cur_gfx_banks + offset;
+	int addr = 0x4000 * m_cur_gfx_banks + offset;
 
-	if (!k056832->rombase)
-		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
+	if (!m_rombase)
+		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
+	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_DEVICE_HANDLER( k056832_rom_word_8000_r )
+READ16_MEMBER( k056832_device::rom_word_8000_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x8000 * k056832->cur_gfx_banks + 2 * offset;
+	int addr = 0x8000 * m_cur_gfx_banks + 2 * offset;
 
-	if (!k056832->rombase)
-		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
+	if (!m_rombase)
+		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	return k056832->rombase[addr + 2] | (k056832->rombase[addr] << 8);
+	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_DEVICE_HANDLER( k056832_old_rom_word_r )
+READ16_MEMBER( k056832_device::old_rom_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
+	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
-	if (!k056832->rombase)
-		k056832->rombase = space.machine().root_device().memregion(k056832->memory_region)->base();
+	if (!m_rombase)
+		m_rombase = space.machine().root_device().memregion(m_gfx_memory_region)->base();
 
-	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
+	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
-READ32_DEVICE_HANDLER( k056832_rom_long_r )
+READ32_MEMBER( k056832_device::rom_long_r )
 {
 	offset <<= 1;
-	return (k056832_rom_word_r(device, space, offset + 1, 0xffff) | (k056832_rom_word_r(device, space, offset, 0xffff) << 16));
+	return (rom_word_r(space, offset + 1, 0xffff) | (rom_word_r(space, offset, 0xffff) << 16));
 }
 
 /* only one page is mapped to videoram at a time through a window */
-READ16_DEVICE_HANDLER( k056832_ram_word_r )
+READ16_MEMBER( k056832_device::ram_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-
 	// reading from tile RAM resets the ROM readback "half" offset
-	k056832->rom_half = 0;
+	m_rom_half = 0;
 
-	return k056832->videoram[k056832->selected_page_x4096 + offset];
+	return m_videoram[m_selected_page_x4096 + offset];
 }
 
-READ16_DEVICE_HANDLER( k056832_ram_half_word_r )
+READ16_MEMBER( k056832_device::ram_half_word_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return k056832->videoram[k056832->selected_page_x4096 + (((offset << 1) & 0xffe) | ((offset >> 11) ^ 1))];
+	return m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | ((offset >> 11) ^ 1))];
 }
 
-READ32_DEVICE_HANDLER( k056832_ram_long_r )
+READ32_MEMBER( k056832_device::ram_long_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *pMem = &k056832->videoram[k056832->selected_page_x4096 + offset * 2];
+	UINT16 *pMem = &m_videoram[m_selected_page_x4096 + offset * 2];
 
 	// reading from tile RAM resets the ROM readback "half" offset
-	k056832->rom_half = 0;
+	m_rom_half = 0;
 
 	return (pMem[0]<<16 | pMem[1]);
 }
 
-READ32_DEVICE_HANDLER( k056832_unpaged_ram_long_r )
+READ32_MEMBER( k056832_device::unpaged_ram_long_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *pMem = &k056832->videoram[offset * 2];
+	UINT16 *pMem = &m_videoram[offset * 2];
 
 	// reading from tile RAM resets the ROM readback "half" offset
-	k056832->rom_half = 0;
+	m_rom_half = 0;
 
 	return (pMem[0]<<16 | pMem[1]);
 }
 
 /* special 8-bit handlers for Lethal Enforcers */
-READ8_DEVICE_HANDLER( k056832_ram_code_lo_r )
+READ8_MEMBER( k056832_device::ram_code_lo_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2) + 1];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr & 0xff;
 }
 
-READ8_DEVICE_HANDLER( k056832_ram_code_hi_r )
+READ8_MEMBER( k056832_device::ram_code_hi_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2) + 1];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr >> 8;
 }
 
-READ8_DEVICE_HANDLER( k056832_ram_attr_lo_r )
+READ8_MEMBER( k056832_device::ram_attr_lo_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2)];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr & 0xff;
 }
 
-READ8_DEVICE_HANDLER( k056832_ram_attr_hi_r )
+READ8_MEMBER( k056832_device::ram_attr_hi_r )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2)];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr >> 8;
 }
 
-WRITE8_DEVICE_HANDLER( k056832_ram_code_lo_w )
+WRITE8_MEMBER( k056832_device::ram_code_lo_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2) + 1];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	*adr &= 0xff00;
 	*adr |= data;
 
-	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
+	if (!(m_regs[0] & 0x02)) // external linescroll enable
 	{
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE8_DEVICE_HANDLER( k056832_ram_code_hi_w )
+WRITE8_MEMBER( k056832_device::ram_code_hi_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2) + 1];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	*adr &= 0x00ff;
 	*adr |= data << 8;
 
-	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
+	if (!(m_regs[0] & 0x02)) // external linescroll enable
 	{
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE8_DEVICE_HANDLER( k056832_ram_attr_lo_w )
+WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2)];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	*adr &= 0xff00;
 	*adr |= data;
 
-	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
+	if (!(m_regs[0] & 0x02)) // external linescroll enable
 	{
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE8_DEVICE_HANDLER( k056832_ram_attr_hi_w )
+WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (offset * 2)];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	*adr &= 0x00ff;
 	*adr |= data << 8;
 
-	if (!(k056832->regs[0] & 0x02)) // external linescroll enable
+	if (!(m_regs[0] & 0x02)) // external linescroll enable
 	{
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE16_DEVICE_HANDLER( k056832_ram_word_w )
+WRITE16_MEMBER( k056832_device::ram_word_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT16 *tile_ptr;
 	UINT16 old_mask, old_data;
 
-	tile_ptr = &k056832->videoram[k056832->selected_page_x4096 + offset];
+	tile_ptr = &m_videoram[m_selected_page_x4096 + offset];
 	old_mask = ~mem_mask;
 	old_data = *tile_ptr;
 	data = (data & mem_mask) | (old_data & old_mask);
@@ -6905,17 +6965,16 @@ WRITE16_DEVICE_HANDLER( k056832_ram_word_w )
 		offset >>= 1;
 		*tile_ptr = data;
 
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w )
+WRITE16_MEMBER( k056832_device::ram_half_word_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	UINT16 *adr = &k056832->videoram[k056832->selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
+	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
 	UINT16 old = *adr;
 
 	COMBINE_DATA(adr);
@@ -6925,20 +6984,19 @@ WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w )
 
 		dofs >>= 1;
 
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(dofs);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(dofs);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, dofs);
+			mark_line_dirty(m_selected_page, dofs);
 	}
 }
 
-WRITE32_DEVICE_HANDLER( k056832_ram_long_w )
+WRITE32_MEMBER( k056832_device::ram_long_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT16 *tile_ptr;
 	UINT32 old_mask, old_data;
 
-	tile_ptr = &k056832->videoram[k056832->selected_page_x4096 + offset * 2];
+	tile_ptr = &m_videoram[m_selected_page_x4096 + offset * 2];
 	old_mask = ~mem_mask;
 	old_data = (UINT32)tile_ptr[0] << 16 | (UINT32)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
@@ -6948,20 +7006,19 @@ WRITE32_DEVICE_HANDLER( k056832_ram_long_w )
 		tile_ptr[0] = data >> 16;
 		tile_ptr[1] = data;
 
-		if (k056832->page_tile_mode[k056832->selected_page])
-			k056832->tilemap[k056832->selected_page]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			k056832_mark_line_dirty(k056832->selected_page, offset);
+			mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w )
+WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT16 *tile_ptr;
 	UINT32 old_mask, old_data;
 
-	tile_ptr = &k056832->videoram[offset * 2];
+	tile_ptr = &m_videoram[offset * 2];
 	old_mask = ~mem_mask;
 	old_data = (UINT32)tile_ptr[0] << 16 | (UINT32)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
@@ -6971,22 +7028,21 @@ WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w )
 		tile_ptr[0] = data >> 16;
 		tile_ptr[1] = data;
 
-		if (k056832->page_tile_mode[offset/0x800])
-			k056832->tilemap[offset/0x800]->mark_tile_dirty(offset&0x7ff);
+		if (m_page_tile_mode[offset/0x800])
+			m_tilemap[offset/0x800]->mark_tile_dirty(offset&0x7ff);
 		else
-			k056832_mark_line_dirty(offset/0x800, (offset&0x7ff));
+			mark_line_dirty(offset/0x800, (offset&0x7ff));
 	}
 }
 
-WRITE16_DEVICE_HANDLER( k056832_word_w )
+WRITE16_MEMBER( k056832_device::word_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	int layer, flip, mask, i;
 	UINT32 old_data, new_data;
 
-	old_data = k056832->regs[offset];
-	COMBINE_DATA(&k056832->regs[offset]);
-	new_data = k056832->regs[offset];
+	old_data = m_regs[offset];
+	COMBINE_DATA(&m_regs[offset]);
+	new_data = m_regs[offset];
 
 	if (new_data != old_data)
 	{
@@ -7005,13 +7061,13 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
 					for (i = 0; i < K056832_PAGE_COUNT; i++)
 					{
-						k056832->tilemap[i]->set_flip(flip);
+						m_tilemap[i]->set_flip(flip);
 					}
 				}
 
 				if ((new_data & 0x02) != (old_data & 0x02))
 				{
-					k056832_change_rambank(k056832);
+					change_rambank();
 				}
 			break;
 
@@ -7029,8 +7085,8 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					i = new_data & mask;
 					if (i != (old_data & mask))
 					{
-						k056832->layer_tile_mode[layer] = i;
-						k056832_mark_plane_dirty(device, layer);
+						m_layer_tile_mode[layer] = i;
+						mark_plane_dirty(layer);
 					}
 				}
 			break;
@@ -7047,12 +7103,12 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 			//case 0x0a/2: break;
 
 			case 0x32/2:
-				k056832_change_rambank(k056832);
+				change_rambank();
 			break;
 
 			case 0x34/2: /* ROM bank select for checksum */
 			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				k056832_change_rombank(k056832);
+				change_rombank();
 			break;
 
 			// extended tile address
@@ -7069,94 +7125,91 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 
 				if (offset >= 0x10/2 && offset <= 0x16/2)
 				{
-					k056832->y[layer] = (new_data & 0x18) >> 3;
-					k056832->h[layer] = (new_data & 0x3);
-					k056832->active_layer = layer;
-					k056832_update_page_layout(k056832);
+					m_y[layer] = (new_data & 0x18) >> 3;
+					m_h[layer] = (new_data & 0x3);
+					m_active_layer = layer;
+					update_page_layout();
 				} else
 
 				if (offset >= 0x18/2 && offset <= 0x1e/2)
 				{
-					k056832->x[layer] = (new_data & 0x18) >> 3;
-					k056832->w[layer] = (new_data & 0x03);
-					k056832->active_layer = layer;
-					k056832_update_page_layout(k056832);
+					m_x[layer] = (new_data & 0x18) >> 3;
+					m_w[layer] = (new_data & 0x03);
+					m_active_layer = layer;
+					update_page_layout();
 				} else
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
 				{
-					k056832->dy[layer] = (INT16)new_data;
+					m_dy[layer] = (INT16)new_data;
 				} else
 
 				if (offset >= 0x28/2 && offset <= 0x2e/2)
 				{
-					k056832->dx[layer] = (INT16)new_data;
+					m_dx[layer] = (INT16)new_data;
 				}
 			break;
 		}
 	}
 }
 
-WRITE32_DEVICE_HANDLER( k056832_long_w )
+WRITE32_MEMBER( k056832_device::long_w )
 {
 	// GX does access of all 3 widths (8/16/32) so we can't do the
 	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
 	// are used to the tilemap bank register.
 	offset <<= 1;
-	k056832_word_w(device, space, offset, data >> 16, mem_mask >> 16);
-	k056832_word_w(device, space, offset + 1, data, mem_mask);
+	word_w(space, offset, data >> 16, mem_mask >> 16);
+	word_w(space, offset + 1, data, mem_mask);
 }
 
-WRITE16_DEVICE_HANDLER( k056832_b_word_w )
+WRITE16_MEMBER( k056832_device::b_word_w )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	COMBINE_DATA(&k056832->regsb[offset]);
+	COMBINE_DATA(&m_regsb[offset]);
 }
 
-WRITE8_DEVICE_HANDLER( k056832_w )
-{
-	if (offset & 1)
-	{
-		k056832_word_w(device, space, (offset >> 1), data, 0x00ff);
-	}
-	else
-	{
-		k056832_word_w(device, space, (offset >> 1), data << 8, 0xff00);
-	}
-}
-
-WRITE8_DEVICE_HANDLER( k056832_b_w )
+WRITE8_MEMBER( k056832_device::write )
 {
 	if (offset & 1)
 	{
-		k056832_b_word_w(device, space, (offset >> 1), data, 0x00ff);
+		word_w(space, (offset >> 1), data, 0x00ff);
 	}
 	else
 	{
-		k056832_b_word_w(device, space, (offset >> 1), data<<8, 0xff00);
+		word_w(space, (offset >> 1), data << 8, 0xff00);
 	}
 }
 
-WRITE32_DEVICE_HANDLER( k056832_b_long_w )
+WRITE8_MEMBER( k056832_device::b_w )
+{
+	if (offset & 1)
+	{
+		b_word_w(space, (offset >> 1), data, 0x00ff);
+	}
+	else
+	{
+		b_word_w(space, (offset >> 1), data<<8, 0xff00);
+	}
+}
+
+WRITE32_MEMBER( k056832_device::b_long_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		k056832_b_word_w(device, space, offset << 1, data >> 16, mem_mask >> 16);
+		b_word_w(space, offset << 1, data >> 16, mem_mask >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		k056832_b_word_w(device, space, (offset << 1) + 1, data, mem_mask);
+		b_word_w(space, (offset << 1) + 1, data, mem_mask);
 	}
 }
 
 template<class _BitmapClass>
-static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int page, int flags )
+int k056832_device::update_linemap( _BitmapClass &bitmap, int page, int flags )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-
-	if (k056832->page_tile_mode[page])
+	if (m_page_tile_mode[page])
 		return(0);
-	if (!k056832->linemap_enabled)
+	if (!m_linemap_enabled)
 		return(1);
 
 	{
@@ -7166,17 +7219,17 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 		int all_dirty;
 		UINT8 *xprdata;
 
-		tmap = k056832->tilemap[page];
+		tmap = m_tilemap[page];
 		bitmap_ind8 &xprmap  = tmap->flagsmap();
 		xprdata = tmap->tile_flags();
 
-		dirty = k056832->line_dirty[page];
-		all_dirty = k056832->all_lines_dirty[page];
+		dirty = m_line_dirty[page];
+		all_dirty = m_all_lines_dirty[page];
 
 		if (all_dirty)
 		{
 			dirty[7] = dirty[6] = dirty[5] = dirty[4] = dirty[3] = dirty[2] = dirty[1] = dirty[0] = 0;
-			k056832->all_lines_dirty[page] = 0;
+			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
@@ -7220,9 +7273,9 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 				{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
 				{ xpr_ptr[count+N] = 0; }
 
-			pixmap  = k056832->pixmap[page];
+			pixmap  = m_pixmap[page];
 			pal_ptr = machine.pens;
-			src_gfx = machine.gfx[k056832->gfxnum];
+			src_gfx = machine.gfx[m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -7244,7 +7297,7 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 
 				for (count = 0; count < LINE_WIDTH; count += 8)
 				{
-					k056832_get_tile_info(device, &tileinfo, line, page);
+					get_tile_info(&tileinfo, line, page);
 					basepen = tileinfo.palette_base;
 					code_transparent = tileinfo.category;
 					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
@@ -7273,9 +7326,8 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 }
 
 template<class _BitmapClass>
-void k056832_tilemap_draw_common( device_t *device, _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_common( _BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
@@ -7289,16 +7341,16 @@ void k056832_tilemap_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
-	int rowstart = k056832->y[layer];
-	int colstart = k056832->x[layer];
-	int rowspan  = k056832->h[layer] + 1;
-	int colspan  = k056832->w[layer] + 1;
-	int dy = k056832->dy[layer];
-	int dx = k056832->dx[layer];
-	int scrollbank = ((k056832->regs[0x18] >> 1) & 0xc) | (k056832->regs[0x18] & 3);
-	int scrollmode = k056832->regs[0x05] >> (k056832->lsram_page[layer][0] << 1) & 3;
+	int rowstart = m_y[layer];
+	int colstart = m_x[layer];
+	int rowspan  = m_h[layer] + 1;
+	int colspan  = m_w[layer] + 1;
+	int dy = m_dy[layer];
+	int dx = m_dx[layer];
+	int scrollbank = ((m_regs[0x18] >> 1) & 0xc) | (m_regs[0x18] & 3);
+	int scrollmode = m_regs[0x05] >> (m_lsram_page[layer][0] << 1) & 3;
 
-	if (k056832->use_ext_linescroll)
+	if (m_use_ext_linescroll)
 	{
 		scrollbank = K056832_PAGE_COUNT;
 	}
@@ -7312,10 +7364,10 @@ void k056832_tilemap_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	cmaxy = cliprect.max_y;
 
 	// flip correction registers
-	flipy = k056832->regs[0] & 0x20;
+	flipy = m_regs[0] & 0x20;
 	if (flipy)
 	{
-		corr = k056832->regs[0x3c/2];
+		corr = m_regs[0x3c/2];
 		if (corr & 0x400)
 			corr |= 0xfffff800;
 	}
@@ -7323,30 +7375,30 @@ void k056832_tilemap_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		corr = 0;
 
 	dy += corr;
-	ay = (unsigned)(dy - k056832->layer_offs[layer][1]) % height;
+	ay = (unsigned)(dy - m_layer_offs[layer][1]) % height;
 
-	flipx = k056832->regs[0] & 0x10;
+	flipx = m_regs[0] & 0x10;
 	if (flipx)
 	{
-		corr = k056832->regs[0x3a/2];
+		corr = m_regs[0x3a/2];
 		if (corr & 0x800)
 			corr |= 0xfffff000;
 	}
 	else
 		corr = 0;
 
-	corr -= k056832->layer_offs[layer][0];
+	corr -= m_layer_offs[layer][0];
 
 	switch( scrollmode )
 	{
 		case 0: // linescroll
-			p_scroll_data = &k056832->videoram[scrollbank<<12] + (k056832->lsram_page[layer][1]>>1);
+			p_scroll_data = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
-			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
+			p_scroll_data = &m_videoram[scrollbank << 12] + (m_lsram_page[layer][1] >> 1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 16;
@@ -7364,24 +7416,24 @@ void k056832_tilemap_draw_common( device_t *device, _BitmapClass &bitmap, const 
 /*
 if (scrollmode==2)
 {
-printf("%08x    %08x    %08x\n",layer,scrollbank<<12,k056832->lsram_page[layer][1]>>1);
+printf("%08x    %08x    %08x\n",layer,scrollbank<<12,m_lsram_page[layer][1]>>1);
 printf("\n000-100:\n");
 for (int zz=0x000; zz<0x100; zz++)
-    printf("%04x    ",k056832->videoram[(scrollbank<<12)+(k056832->lsram_page[layer][1]>>1)+zz]);
+    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
 printf("\n100-200:\n");
 for (int zz=0x100; zz<0x200; zz++)
-    printf("%04x    ",k056832->videoram[(scrollbank<<12)+(k056832->lsram_page[layer][1]>>1)+zz]);
+    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
 printf("\n200-300:\n");
 for (int zz=0x200; zz<0x300; zz++)
-    printf("%04x    ",k056832->videoram[(scrollbank<<12)+(k056832->lsram_page[layer][1]>>1)+zz]);
+    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
 printf("\n300-400:\n");
 for (int zz=0x300; zz<0x400; zz++)
-    printf("%04x    ",k056832->videoram[(scrollbank<<12)+(k056832->lsram_page[layer][1]>>1)+zz]);
+    printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
 printf("\nend\n");
 }
 */
-	last_active = k056832->active_layer;
-	new_colorbase = (k056832->k055555 != NULL) ? k055555_get_palette_index(k056832->k055555, layer) : 0;
+	last_active = m_active_layer;
+	new_colorbase = (m_k055555 != NULL) ? k055555_get_palette_index(m_k055555, layer) : 0;
 
 	for (r = 0; r < rowspan; r++)
 	{
@@ -7473,37 +7525,37 @@ printf("\nend\n");
 		{
 			pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
 
-			if (k056832->layer_association)
+			if (m_layer_association)
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] != layer)
+				if (m_layer_assoc_with_page[pageIndex] != layer)
 					continue;
 			}
 			else
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] == -1)
+				if (m_layer_assoc_with_page[pageIndex] == -1)
 					continue;
 
-				k056832->active_layer = layer;
+				m_active_layer = layer;
 			}
 
-			if (k056832->k055555 != NULL)       // are we using k055555 palette?
+			if (m_k055555 != NULL)       // are we using k055555 palette?
 			{
-				if (k056832->last_colorbase[pageIndex] != new_colorbase)
+				if (m_last_colorbase[pageIndex] != new_colorbase)
 				{
-					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(k056832, pageIndex);
+					m_last_colorbase[pageIndex] = new_colorbase;
+					mark_page_dirty(pageIndex);
 				}
 			}
 			else
 			{
 				if (!pageIndex)
-					k056832->active_layer = 0;
+					m_active_layer = 0;
 			}
 
-			if (k056832_update_linemap(device, bitmap, pageIndex, flags))
+			if (update_linemap(bitmap, pageIndex, flags))
 				continue;
 
-			tmap = k056832->tilemap[pageIndex];
+			tmap = m_tilemap[pageIndex];
 
 			tmap->set_scrolly(0, ay);
 
@@ -7592,19 +7644,18 @@ printf("\nend\n");
 		} // end of column loop
 	} // end of row loop
 
-	k056832->active_layer = last_active;
+	m_active_layer = last_active;
 } // end of function
 
-void k056832_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
-{ k056832_tilemap_draw_common(device, bitmap, cliprect, layer, flags, priority); }
+void k056832_device::tilemap_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+{ tilemap_draw_common(bitmap, cliprect, layer, flags, priority); }
 
-void k056832_tilemap_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
-{ k056832_tilemap_draw_common(device, bitmap, cliprect, layer, flags, priority); }
+void k056832_device::tilemap_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+{ tilemap_draw_common(bitmap, cliprect, layer, flags, priority); }
 
 
-void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
+void k056832_device::tilemap_draw_dj( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
 	UINT32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
 	int clipw, clipx, cliph, clipy, clipmaxy;
@@ -7618,14 +7669,14 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
-	int rowstart = k056832->y[layer];
-	int colstart = k056832->x[layer];
-	int rowspan  = k056832->h[layer] + 1;
-	int colspan  = k056832->w[layer] + 1;
-	int dy = k056832->dy[layer];
-	int dx = k056832->dx[layer];
-	int scrollbank = ((k056832->regs[0x18] >> 1) & 0xc) | (k056832->regs[0x18] & 3);
-	int scrollmode = k056832->regs[0x05] >> (k056832->lsram_page[layer][0] << 1) & 3;
+	int rowstart = m_y[layer];
+	int colstart = m_x[layer];
+	int rowspan  = m_h[layer] + 1;
+	int colspan  = m_w[layer] + 1;
+	int dy = m_dy[layer];
+	int dx = m_dx[layer];
+	int scrollbank = ((m_regs[0x18] >> 1) & 0xc) | (m_regs[0x18] & 3);
+	int scrollmode = m_regs[0x05] >> (m_lsram_page[layer][0] << 1) & 3;
 	int need_wrap = -1;
 
 	height = rowspan * K056832_PAGE_HEIGHT;
@@ -7637,40 +7688,40 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 	cmaxy = cliprect.max_y;
 
 	// flip correction registers
-	flipy = k056832->regs[0] & 0x20;
+	flipy = m_regs[0] & 0x20;
 	if (flipy)
 	{
-		corr = k056832->regs[0x3c/2];
+		corr = m_regs[0x3c/2];
 		if (corr & 0x400)
 			corr |= 0xfffff800;
 	}
 	else
 		corr = 0;
 	dy += corr;
-	ay = (unsigned)(dy - k056832->layer_offs[layer][1]) % height;
+	ay = (unsigned)(dy - m_layer_offs[layer][1]) % height;
 
-	flipx = k056832->regs[0] & 0x10;
+	flipx = m_regs[0] & 0x10;
 	if (flipx)
 	{
-		corr = k056832->regs[0x3a/2];
+		corr = m_regs[0x3a/2];
 		if (corr & 0x800)
 			corr |= 0xfffff000;
 	}
 	else
 		corr = 0;
 
-	corr -= k056832->layer_offs[layer][0];
+	corr -= m_layer_offs[layer][0];
 
 	switch( scrollmode )
 	{
 		case 0: // linescroll
-			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
+			p_scroll_data = &m_videoram[scrollbank << 12] + (m_lsram_page[layer][1] >> 1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
-			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
+			p_scroll_data = &m_videoram[scrollbank << 12] + (m_lsram_page[layer][1] >> 1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 16;
@@ -7686,8 +7737,8 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 	if (flipy)
 		sdat_adv = -sdat_adv;
 
-	last_active = k056832->active_layer;
-	new_colorbase = (k056832->k055555 != NULL) ? k055555_get_palette_index(k056832->k055555, layer) : 0;
+	last_active = m_active_layer;
+	new_colorbase = (m_k055555 != NULL) ? k055555_get_palette_index(m_k055555, layer) : 0;
 
 	for (r = 0; r <= rowspan; r++)
 	{
@@ -7757,35 +7808,35 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 			else
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
 
-			if (k056832->layer_association)
+			if (m_layer_association)
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] != layer)
+				if (m_layer_assoc_with_page[pageIndex] != layer)
 					continue;
 			}
 			else
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] == -1) continue;
-				k056832->active_layer = layer;
+				if (m_layer_assoc_with_page[pageIndex] == -1) continue;
+				m_active_layer = layer;
 			}
 
-			if (k056832->k055555 != NULL)       // are we using k055555 palette?
+			if (m_k055555 != NULL)       // are we using k055555 palette?
 			{
-				if (k056832->last_colorbase[pageIndex] != new_colorbase)
+				if (m_last_colorbase[pageIndex] != new_colorbase)
 				{
-					k056832->last_colorbase[pageIndex] = new_colorbase;
-					k056832_mark_page_dirty(k056832, pageIndex);
+					m_last_colorbase[pageIndex] = new_colorbase;
+					mark_page_dirty(pageIndex);
 				}
 			}
 			else
 			{
 				if (!pageIndex)
-					k056832->active_layer = 0;
+					m_active_layer = 0;
 			}
 
-			if (k056832_update_linemap(device, bitmap, pageIndex, flags))
+			if (update_linemap(bitmap, pageIndex, flags))
 				continue;
 
-			tmap = k056832->tilemap[pageIndex];
+			tmap = m_tilemap[pageIndex];
 			tmap->set_scrolly(0, ay);
 
 			last_dx = 0x100000;
@@ -7866,341 +7917,78 @@ void k056832_tilemap_draw_dj( device_t *device, bitmap_rgb32 &bitmap, const rect
 		} // end of column loop
 	} // end of row loop
 
-	k056832->active_layer = last_active;
+	m_active_layer = last_active;
 
 } // end of function
 
 
-void k056832_set_layer_association( device_t *device, int status )
+void k056832_device::set_layer_association( int status )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->default_layer_association = status;
+	m_default_layer_association = status;
 }
 
-int k056832_get_layer_association( device_t *device )
+int k056832_device::get_layer_association( )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return(k056832->layer_association);
+	return(m_layer_association);
 }
 
-void k056832_set_layer_offs( device_t *device, int layer, int offsx, int offsy )
+void k056832_device::set_layer_offs( int layer, int offsx, int offsy )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->layer_offs[layer][0] = offsx;
-	k056832->layer_offs[layer][1] = offsy;
+	m_layer_offs[layer][0] = offsx;
+	m_layer_offs[layer][1] = offsy;
 }
 
-void k056832_set_lsram_page( device_t *device, int logical_page, int physical_page, int physical_offset )
+void k056832_device::set_lsram_page( int logical_page, int physical_page, int physical_offset )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->lsram_page[logical_page][0] = physical_page;
-	k056832->lsram_page[logical_page][1] = physical_offset;
+	m_lsram_page[logical_page][0] = physical_page;
+	m_lsram_page[logical_page][1] = physical_offset;
 }
 
-void k056832_linemap_enable( device_t *device, int enable )
+void k056832_device::linemap_enable( int enable )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->linemap_enabled = enable;
+	m_linemap_enabled = enable;
 }
 
-int k056832_is_irq_enabled( device_t *device, int irqline )
+int k056832_device::is_irq_enabled( int irqline )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return(k056832->regs[0x06/2] & (1 << irqline & 7));
+	return(m_regs[0x06/2] & (1 << irqline & 7));
 }
 
-void k056832_read_avac( device_t *device, int *mode, int *data )
+void k056832_device::read_avac( int *mode, int *data )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	*mode = k056832->regs[0x04/2] & 7;
-	*data = k056832->regs[0x38/2];
+	*mode = m_regs[0x04/2] & 7;
+	*data = m_regs[0x38/2];
 }
 
-int k056832_read_register( device_t *device, int regnum )
+int k056832_device::read_register( int regnum )
 {
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return(k056832->regs[regnum]);
+	return(m_regs[regnum]);
 }
 
-static void k056832_postload(k056832_state *k056832)
+void k056832_device::postload()
 {
-	k056832_update_page_layout(k056832);
-	k056832_change_rambank(k056832);
-	k056832_change_rombank(k056832);
+	update_page_layout();
+	change_rambank();
+	change_rombank();
 }
 
+//misc debug handlers
 
-
-const device_type K056832 = &device_creator<k056832_device>;
-
-k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K056832, "Konami 056832", tag, owner, clock, "k056832", __FILE__)
+READ32_MEMBER( k056832_device::long_r )
 {
-	m_token = global_alloc_clear(k056832_state);
+	offset <<= 1;
+	return (word_r(space, offset + 1, 0xffff) | word_r(space, offset, 0xffff) << 16);
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k056832_device::device_config_complete()
+READ16_MEMBER( k056832_device::word_r )
 {
-}
+	return (m_regs[offset]);
+}       // VACSET
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k056832_device::device_start()
+READ16_MEMBER( k056832_device::b_word_r )
 {
-/* TODO: understand which elements MUST be init here (to keep correct layer
-   associations) and which ones can can be init at RESET, if any */
-	k056832_state *k056832 = k056832_get_safe_token(this);
-	const k056832_interface *intf = k056832_get_interface(this);
-	tilemap_t *tmap;
-	int i;
-	UINT32 total;
-	static const gfx_layout charlayout8 =
-	{
-		8, 8,
-		0,
-		8,
-		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
-		8*8*8
-	};
-	static const gfx_layout charlayout8le =
-	{
-		8, 8,
-		0,
-		8,
-//      { 0, 1, 2, 3, 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8) },
-		{ 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8), 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-	static const gfx_layout charlayout6 =
-	{
-		8, 8,
-		0,
-		6,
-		{ 40, 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
-		8*8*6
-	};
-	static const gfx_layout charlayout5 =
-	{
-		8, 8,
-		0,
-		5,
-		{ 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
-		8*8*5
-	};
-	static const gfx_layout charlayout4 =
-	{
-		8, 8,
-		0,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-	static const gfx_layout charlayout4dj =
-	{
-		8, 8,
-		0,
-		4,
-		{ 8*3,8*1,8*2,8*0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
-		8*8*4
-	};
-	static const gfx_layout charlayout8_tasman =
-	{
-		8,8,
-		RGN_FRAC(1,1),
-		8,
-		{ 0,8,16,24,32,40,48,56 },
-		{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
-		8*64
-	};
-
-
-	/* handle the various graphics formats */
-	i = (intf->big) ? 8 : 16;
-
-
-	/* decode the graphics */
-	switch (intf->bpp)
-	{
-		case K056832_BPP_4:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 4);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout4, 4);
-			break;
-
-		case K056832_BPP_5:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 5);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout5, 4);
-			break;
-
-		case K056832_BPP_6:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 6);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout6, 4);
-			break;
-
-		case K056832_BPP_8:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 8);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout8, 4);
-			break;
-
-		case K056832_BPP_8LE:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 8);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout8le, 4);
-			break;
-
-		case K056832_BPP_8TASMAN:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 8);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
-			break;
-
-		case K056832_BPP_4dj:
-			total = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / (i * 4);
-			decode_gfx(machine(), intf->gfx_num, machine().root_device().memregion(intf->gfx_memory_region)->base(), total, &charlayout4dj, 4);
-			break;
-
-		default:
-			fatalerror("Unsupported bpp\n");
-	}
-
-	machine().gfx[intf->gfx_num]->set_granularity(16); /* override */
-
-	/* deinterleave the graphics, if needed */
-	deinterleave_gfx(machine(), intf->gfx_memory_region, intf->deinterleave);
-
-	k056832->memory_region = intf->gfx_memory_region;
-	k056832->gfxnum = intf->gfx_num;
-	k056832->callback = intf->callback;
-
-	k056832->rombase = machine().root_device().memregion(intf->gfx_memory_region)->base();
-	k056832->num_gfx_banks = machine().root_device().memregion(intf->gfx_memory_region)->bytes() / 0x2000;
-	k056832->djmain_hack = intf->djmain_hack;
-
-	k056832->cur_gfx_banks = 0;
-	k056832->use_ext_linescroll = 0;
-	k056832->uses_tile_banks = 0;
-
-	for (i = 0; i < 4; i++)
-	{
-		k056832->layer_offs[i][0] = 0;
-		k056832->layer_offs[i][1] = 0;
-		k056832->lsram_page[i][0] = i;
-		k056832->lsram_page[i][1] = i << 11;
-		k056832->x[i] = 0;
-		k056832->y[i] = 0;
-		k056832->w[i] = 0;
-		k056832->h[i] = 0;
-		k056832->dx[i] = 0;
-		k056832->dy[i] = 0;
-		k056832->layer_tile_mode[i] = 1;
-	}
-
-	k056832->default_layer_association = 1;
-	k056832->active_layer = 0;
-	k056832->linemap_enabled = 0;
-
-	k056832->k055555 = machine().device(intf->k055555);
-
-	memset(k056832->line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
-
-	for (i = 0; i < K056832_PAGE_COUNT; i++)
-	{
-		k056832->all_lines_dirty[i] = 0;
-		k056832->page_tile_mode[i] = 1;
-	}
-
-	k056832->videoram = auto_alloc_array(machine(), UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
-
-	k056832->tilemap[0x0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x6] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x7] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x8] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0x9] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xa] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xb] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xc] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xd] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xe] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	k056832->tilemap[0xf] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::k056832_get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-
-	for (i = 0; i < K056832_PAGE_COUNT; i++)
-	{
-		tmap = k056832->tilemap[i];
-
-		k056832->pixmap[i] = &tmap->pixmap();
-
-		tmap->set_transparent_pen(0);
-	}
-
-	memset(k056832->videoram, 0x00, 0x20000);
-	memset(k056832->regs,     0x00, sizeof(k056832->regs) );
-	memset(k056832->regsb,    0x00, sizeof(k056832->regsb) );
-
-	k056832_update_page_layout(k056832);
-
-	k056832_change_rambank(k056832);
-	k056832_change_rombank(k056832);
-
-	save_pointer(NAME(k056832->videoram), 0x10000);
-	save_item(NAME(k056832->regs));
-	save_item(NAME(k056832->regsb));
-	save_item(NAME(k056832->x));
-	save_item(NAME(k056832->y));
-	save_item(NAME(k056832->w));
-	save_item(NAME(k056832->h));
-	save_item(NAME(k056832->dx));
-	save_item(NAME(k056832->dy));
-	save_item(NAME(k056832->layer_tile_mode));
-
-	save_item(NAME(k056832->default_layer_association));
-	save_item(NAME(k056832->active_layer));
-	save_item(NAME(k056832->linemap_enabled));
-	save_item(NAME(k056832->use_ext_linescroll));
-	save_item(NAME(k056832->uses_tile_banks));
-	save_item(NAME(k056832->cur_tile_bank));
-	save_item(NAME(k056832->rom_half));
-	save_item(NAME(k056832->all_lines_dirty));
-	save_item(NAME(k056832->page_tile_mode));
-
-	for (i = 0; i < 8; i++)
-	{
-		save_item(NAME(k056832->layer_offs[i]), i);
-		save_item(NAME(k056832->lsram_page[i]), i);
-	}
-
-	for (i = 0; i < K056832_PAGE_COUNT; i++)
-	{
-		save_item(NAME(k056832->line_dirty[i]), i);
-		save_item(NAME(k056832->all_lines_dirty[i]), i);
-		save_item(NAME(k056832->page_tile_mode[i]), i);
-		save_item(NAME(k056832->last_colorbase[i]), i);
-	}
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_postload), k056832));
-}
+	return (m_regsb[offset]);
+}   // VSCCS (board dependent)
 
 
 /***************************************************************************/
@@ -10586,18 +10374,6 @@ WRITE32_MEMBER( k037122_device::reg_w )
 /*                                                                         */
 /***************************************************************************/
 
-READ16_DEVICE_HANDLER( k056832_word_r )
-{
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return (k056832->regs[offset]);
-}       // VACSET
-
-READ16_DEVICE_HANDLER( k056832_b_word_r )
-{
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	return (k056832->regsb[offset]);
-}   // VSCCS (board dependent)
-
 READ16_DEVICE_HANDLER( k053246_reg_word_r )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
@@ -10634,11 +10410,6 @@ READ16_DEVICE_HANDLER( k055555_word_r )
 	return(k055555->regs[offset] << 8);
 }   // PCU2
 
-READ32_DEVICE_HANDLER( k056832_long_r )
-{
-	offset <<= 1;
-	return (k056832_word_r(device, space, offset + 1, 0xffff) | k056832_word_r(device, space, offset, 0xffff) << 16);
-}
 
 READ32_DEVICE_HANDLER( k053247_reg_long_r )
 {

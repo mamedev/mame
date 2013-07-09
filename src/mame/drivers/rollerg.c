@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/konicdev.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
@@ -33,7 +32,7 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 	m_readzoomroms = data & 0x04;
 
 	/* bit 5 enables 051316 wraparound */
-	k051316_wraparound_enable(m_k051316, data & 0x20);
+	m_k051316->wraparound_enable(data & 0x20);
 
 	/* other bits unknown */
 }
@@ -41,9 +40,9 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
 	if (m_readzoomroms)
-		return k051316_rom_r(m_k051316, space, offset);
+		return m_k051316->rom_r(space, offset);
 	else
-		return k051316_r(m_k051316, space, offset);
+		return m_k051316->read(space, offset);
 }
 
 READ8_MEMBER(rollerg_state::rollerg_sound_r)
@@ -93,9 +92,9 @@ static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)             /* ????? */
 	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE("k053252", k053252_device, read, write)      /* 053252? */
-	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
+	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE_LEGACY("k051316", k051316_w)
+	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE("k051316", k051316_device, write)
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x3aff) AM_RAM

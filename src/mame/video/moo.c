@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/moo.h"
 
 void moo_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
@@ -43,10 +42,10 @@ VIDEO_START_MEMBER(moo_state,moo)
 	m_zmask = 0xffff;
 
 	// other than the intro showing one blank line alignment is good through the game
-	k056832_set_layer_offs(m_k056832, 0, -2 + 1, 0);
-	k056832_set_layer_offs(m_k056832, 1,  2 + 1, 0);
-	k056832_set_layer_offs(m_k056832, 2,  4 + 1, 0);
-	k056832_set_layer_offs(m_k056832, 3,  6 + 1, 0);
+	m_k056832->set_layer_offs(0, -2 + 1, 0);
+	m_k056832->set_layer_offs(1,  2 + 1, 0);
+	m_k056832->set_layer_offs(2,  4 + 1, 0);
+	m_k056832->set_layer_offs(3,  6 + 1, 0);
 }
 
 VIDEO_START_MEMBER(moo_state,bucky)
@@ -57,12 +56,12 @@ VIDEO_START_MEMBER(moo_state,bucky)
 	m_zmask = 0x00ff;
 
 	// Bucky doesn't chain tilemaps
-	k056832_set_layer_association(m_k056832, 0);
+	m_k056832->set_layer_association(0);
 
-	k056832_set_layer_offs(m_k056832, 0, -2, 0);
-	k056832_set_layer_offs(m_k056832, 1,  2, 0);
-	k056832_set_layer_offs(m_k056832, 2,  4, 0);
-	k056832_set_layer_offs(m_k056832, 3,  6, 0);
+	m_k056832->set_layer_offs(0, -2, 0);
+	m_k056832->set_layer_offs(1,  2, 0);
+	m_k056832->set_layer_offs(2,  4, 0);
+	m_k056832->set_layer_offs(3,  6, 0);
 }
 
 UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -74,7 +73,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
 	m_layer_colorbase[0] = 0x70;
 
-	if (k056832_get_layer_association(m_k056832))
+	if (m_k056832->get_layer_association())
 	{
 		for (plane = 1; plane < 4; plane++)
 		{
@@ -82,7 +81,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
-				k056832_mark_plane_dirty(m_k056832, plane);
+				m_k056832->mark_plane_dirty( plane);
 			}
 		}
 	}
@@ -98,7 +97,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 		}
 		if (dirty)
-			k056832_mark_all_tmaps_dirty(m_k056832);
+			m_k056832->mark_all_tmaps_dirty();
 	}
 
 	layers[0] = 1;
@@ -116,9 +115,9 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	machine().priority_bitmap.fill(0, cliprect);
 
 	if (m_layerpri[0] < k053251_get_priority(m_k053251, K053251_CI1))   /* bucky hides back layer behind background */
-		k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[0], 0, 1);
+		m_k056832->tilemap_draw(bitmap, cliprect, layers[0], 0, 1);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[1], 0, 2);
+	m_k056832->tilemap_draw(bitmap, cliprect, layers[1], 0, 2);
 
 	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
 	// There is probably a control bit somewhere to turn off alpha blending.
@@ -127,10 +126,10 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	alpha = (m_alpha_enabled) ? k054338_set_alpha_level(m_k054338, 1) : 255;
 
 	if (alpha > 0)
-		k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
+		m_k056832->tilemap_draw(bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
 
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

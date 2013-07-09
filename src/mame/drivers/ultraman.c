@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/ultraman.h"
@@ -43,12 +42,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff) /* K051316 #0 RAM */
-	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff) /* K051316 #1 RAM */
-	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8_LEGACY("k051316_3", k051316_r, k051316_w, 0x00ff) /* K051316 #2 RAM */
-	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)   /* K051316 #0 registers */
-	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)   /* K051316 #1 registers */
-	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8_LEGACY("k051316_3", k051316_ctrl_w, 0x00ff)   /* K051316 #2 registers */
+	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
+	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
+	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("k051316_3", k051316_device, read, write, 0x00ff) /* K051316 #2 RAM */
+	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   /* K051316 #0 registers */
+	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   /* K051316 #1 registers */
+	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8("k051316_3", k051316_device, ctrl_w, 0x00ff)   /* K051316 #2 registers */
 	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0x00ff)       /* Sprite control */
 	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0x00ff)       /* Sprite RAM */
 ADDRESS_MAP_END

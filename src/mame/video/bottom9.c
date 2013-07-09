@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/bottom9.h"
 
 
@@ -80,7 +79,7 @@ UINT32 bottom9_state::screen_update_bottom9(screen_device &screen, bitmap_ind16 
 //  if (m_video_enable)
 	{
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, 1, 1);
-		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
+		m_k051316->zoom_draw(bitmap, cliprect, 0, 0);
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, 0, 0);
 		m_k052109->tilemap_draw(bitmap, cliprect, 2, 0, 0);
 		/* note that priority 3 is opposite to the basic layer priority! */

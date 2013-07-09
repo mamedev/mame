@@ -1647,8 +1647,8 @@ static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
 //  AM_RANGE(0x300000, 0x300001) AM_READNOP                                         // Sound
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(metro_k053936_w) AM_SHARE("k053936_ram")  // 053936
-	AM_RANGE(0x500000, 0x500fff) AM_DEVWRITE_LEGACY("k053936", k053936_linectrl_w)      // 053936 line control
-	AM_RANGE(0x600000, 0x60001f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)          // 053936 control
+	AM_RANGE(0x500000, 0x500fff) AM_DEVWRITE("k053936", k053936_device, linectrl_w)      // 053936 line control
+	AM_RANGE(0x600000, 0x60001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // 053936 control
 
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("DSW0") AM_WRITENOP                   // Inputs
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW1") AM_WRITE(blzntrnd_sound_w)    //

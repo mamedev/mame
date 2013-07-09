@@ -1,4 +1,5 @@
 #include "machine/ataintf.h"
+#include "video/konicdev.h"
 
 class djmain_state : public driver_device
 {

@@ -65,7 +65,6 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -659,7 +658,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x204000, 0x207fff) AM_RAM /* main RAM */
 	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
+	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")
@@ -701,10 +700,10 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)  /* 053936? */
+	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)  /* 053936? */
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
+	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
@@ -725,10 +724,10 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
+	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
+	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
@@ -1064,7 +1063,7 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x400000, 0x400003) AM_READ8(punkshot_sound_r, 0x00ff) /* K053260 */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("k053260", k053260_device, k053260_w, 0x00ff)
-	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
+	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
 	AM_RANGE(0x500200, 0x500201) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)

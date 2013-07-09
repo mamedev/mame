@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
-#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "includes/chqflag.h"
 #include "includes/konamipt.h"
@@ -52,9 +51,9 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 		membank("bank5")->set_base(m_generic_paletteram_8);
 
 		if (m_k051316_readroms)
-			space.install_legacy_readwrite_handler(*m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w)); /* 051316 #1 (ROM test) */
+			space.install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(k051316_device::rom_r), (k051316_device*)m_k051316_1), write8_delegate(FUNC(k051316_device::write), (k051316_device*)m_k051316_1)); /* 051316 #1 (ROM test) */
 		else
-			space.install_legacy_readwrite_handler(*m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_r), FUNC(k051316_w));     /* 051316 #1 */
+			space.install_readwrite_handler(0x1000, 0x17ff, read8_delegate(FUNC(k051316_device::read), (k051316_device*)m_k051316_1), write8_delegate(FUNC(k051316_device::write), (k051316_device*)m_k051316_1));     /* 051316 #1 */
 	}
 	else
 	{
@@ -75,9 +74,9 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	m_k051316_readroms = (data & 0x10);
 
 	if (m_k051316_readroms)
-		space.install_legacy_read_handler(*m_k051316_2, 0x2800, 0x2fff, FUNC(k051316_rom_r));   /* 051316 (ROM test) */
+		space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(k051316_device::rom_r), (k051316_device*)m_k051316_2));   /* 051316 (ROM test) */
 	else
-		space.install_legacy_read_handler(*m_k051316_2, 0x2800, 0x2fff, FUNC(k051316_r));       /* 051316 */
+		space.install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(k051316_device::read), (k051316_device*)m_k051316_2));       /* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -141,7 +140,7 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAMBANK("bank2")                                /* palette + RAM */
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)                    /* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)                    /* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READ_BANK("bank3") AM_DEVWRITE_LEGACY("k051316_2", k051316_w)       /* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x2800, 0x2fff) AM_READ_BANK("bank3") AM_DEVWRITE("k051316_2", k051316_device, write)       /* 051316 zoom/rotation (chip 2) */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_byte_w)                                /* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)                  /* cause interrupt on audio CPU */
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)                     /* bankswitch control */
@@ -151,9 +150,9 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x3201, 0x3201) AM_READ_PORT("IN0")                                /* DIPSW #3, SW 4 */
 	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")                               /* DIPSW #2 */
 	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w)                         /* watchdog timer */
-	AM_RANGE(0x3400, 0x341f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)                    /* 051733 (protection) */
-	AM_RANGE(0x3500, 0x350f) AM_DEVWRITE_LEGACY("k051316_1", k051316_ctrl_w)                            /* 051316 control registers (chip 1) */
-	AM_RANGE(0x3600, 0x360f) AM_DEVWRITE_LEGACY("k051316_2", k051316_ctrl_w)                            /* 051316 control registers (chip 2) */
+	AM_RANGE(0x3400, 0x341f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                    /* 051733 (protection) */
+	AM_RANGE(0x3500, 0x350f) AM_DEVWRITE("k051316_1", k051316_device, ctrl_w)                            /* 051316 control registers (chip 1) */
+	AM_RANGE(0x3600, 0x360f) AM_DEVWRITE("k051316_2", k051316_device, ctrl_w)                            /* 051316 control registers (chip 2) */
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)                     /* select accelerator/wheel */
 	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")                                /* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READWRITE(analog_read_r, select_analog_ctrl_w)  /* accelerator/wheel */

@@ -518,7 +518,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16_LEGACY("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16("k053936", k053936_device, ctrl_r, ctrl_w, 0xffffffff)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x480003) AM_READ8(polygonet_inputs_r, 0xffffffff)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE8(polygonet_sys_w, 0xffffffff)

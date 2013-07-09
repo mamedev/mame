@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konicdev.h"
 #include "video/k053250.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
@@ -165,8 +164,8 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)          /* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITENOP //watchdog reset?
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0xff00)
-	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0xff00)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0xff00)
+	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x1d8000, 0x1d8003) AM_READ8(overdriv_1_sound_r, 0x00ff) AM_DEVWRITE8("k053260_1", k053260_device, k053260_w, 0x00ff)   /* K053260 */
 	AM_RANGE(0x1e0000, 0x1e0003) AM_READ8(overdriv_2_sound_r, 0x00ff) AM_DEVWRITE8("k053260_2", k053260_device, k053260_w, 0x00ff)   /* K053260 */
@@ -174,10 +173,10 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)  /* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0xff00)
-	AM_RANGE(0x218000, 0x218fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0xff00)
-	AM_RANGE(0x220000, 0x220fff) AM_DEVREAD8_LEGACY("k051316_1", k051316_rom_r, 0xff00)
-	AM_RANGE(0x228000, 0x228fff) AM_DEVREAD8_LEGACY("k051316_2", k051316_rom_r, 0xff00)
+	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0xff00)
+	AM_RANGE(0x218000, 0x218fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0xff00)
+	AM_RANGE(0x220000, 0x220fff) AM_DEVREAD8("k051316_1", k051316_device, rom_r, 0xff00)
+	AM_RANGE(0x228000, 0x228fff) AM_DEVREAD8("k051316_2", k051316_device, rom_r, 0xff00)
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(overdriv_cpuB_irq6_w)
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq5_w)
 ADDRESS_MAP_END

@@ -15,7 +15,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/bottom9.h"
 
@@ -57,9 +56,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return k051316_rom_r(m_k051316, space, offset);
+			return m_k051316->rom_r(space, offset);
 		else
-			return k051316_r(m_k051316, space, offset);
+			return m_k051316->read(space, offset);
 	}
 }
 
@@ -68,7 +67,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		k051316_w(m_k051316, space, offset, data);
+		m_k051316->write(space, offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
@@ -165,7 +164,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
+	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM

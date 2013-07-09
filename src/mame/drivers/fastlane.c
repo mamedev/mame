@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)                                    /* bankswitch control */
 	AM_RANGE(0x0d00, 0x0d0d) AM_READWRITE(fastlane_k1_k007232_r, fastlane_k1_k007232_w) /* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_READWRITE(fastlane_k2_k007232_r, fastlane_k2_k007232_w) /* 007232 registers (chip 2) */
-	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)                                    /* 051733 (protection) */
+	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                                    /* 051733 (protection) */
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("paletteram")                                      /* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM                                                             /* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_SHARE("videoram1")       /* Video RAM (chip 1) */

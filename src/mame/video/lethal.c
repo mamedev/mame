@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/lethal.h"
 
 void lethalen_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
@@ -50,22 +49,22 @@ void lethalen_tile_callback( running_machine &machine, int layer, int *code, int
 void lethal_state::video_start()
 {
 	// this game uses external linescroll RAM
-	k056832_SetExtLinescroll(m_k056832);
+	m_k056832->SetExtLinescroll();
 
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine().system().name, "lethalenj"))
 	{
-		k056832_set_layer_offs(m_k056832, 0, -195, 0);
-		k056832_set_layer_offs(m_k056832, 1, -193, 0);
-		k056832_set_layer_offs(m_k056832, 2, -191, 0);
-		k056832_set_layer_offs(m_k056832, 3, -189, 0);
+		m_k056832->set_layer_offs(0, -195, 0);
+		m_k056832->set_layer_offs(1, -193, 0);
+		m_k056832->set_layer_offs(2, -191, 0);
+		m_k056832->set_layer_offs(3, -189, 0);
 	}
 	else
 	{
-		k056832_set_layer_offs(m_k056832, 0, 188, 0);
-		k056832_set_layer_offs(m_k056832, 1, 190, 0);
-		k056832_set_layer_offs(m_k056832, 2, 192, 0);
-		k056832_set_layer_offs(m_k056832, 3, 194, 0);
+		m_k056832->set_layer_offs(0, 188, 0);
+		m_k056832->set_layer_offs(1, 190, 0);
+		m_k056832->set_layer_offs(2, 192, 0);
+		m_k056832->set_layer_offs(3, 194, 0);
 	}
 
 	m_layer_colorbase[0] = 0x00;
@@ -81,15 +80,15 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 		case 0: // 40c8 - PCU1 from schematics
 			m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
 			m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(m_k056832, 0);
-			k056832_mark_plane_dirty(m_k056832, 1);
+			m_k056832->mark_plane_dirty( 0);
+			m_k056832->mark_plane_dirty( 1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
 			m_layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
 			m_layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(m_k056832, 2);
-			k056832_mark_plane_dirty(m_k056832, 3);
+			m_k056832->mark_plane_dirty( 2);
+			m_k056832->mark_plane_dirty( 3);
 			break;
 
 		case 8: // 40d0 - PCU3 from schematics
@@ -103,14 +102,14 @@ UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 
 	bitmap.fill(7168, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
+	m_k056832->tilemap_draw(bitmap, cliprect, 3, K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(bitmap, cliprect, 1, K056832_DRAW_FLAG_MIRROR, 4);
 
 	m_k053244->k053245_sprites_draw_lethal(bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 0, K056832_DRAW_FLAG_MIRROR, 0);
 
 	return 0;
 }

@@ -260,7 +260,6 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "wecleman.lh"
@@ -528,10 +527,10 @@ static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x040000, 0x041fff) AM_RAM                                 // RAM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM                                 // RAM
 	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff) // Background
-	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)   // Background Ctrl
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff) // Foreground
-	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)   // Foreground Ctrl
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) // Background
+	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   // Background Ctrl
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) // Foreground
+	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   // Foreground Ctrl
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")                  // Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")   // Sprites

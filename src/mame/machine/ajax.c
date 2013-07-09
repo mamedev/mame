@@ -183,7 +183,7 @@ WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 5 enables 051316 wraparound */
-	k051316_wraparound_enable(m_k051316, data & 0x20);
+	m_k051316->wraparound_enable(data & 0x20);
 
 	/* FIRQ control */
 	m_firq_enable = data & 0x10;

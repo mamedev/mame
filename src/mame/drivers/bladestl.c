@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)               /* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)    /* bankswitch control */
-	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)    /* Protection: 051733 */
+	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE("k051733", k051733_device, read, write)    /* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP                        /* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                             /* Work RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM */

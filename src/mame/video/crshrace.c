@@ -103,7 +103,7 @@ void crshrace_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void crshrace_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_tilemap1, 0, 0, 1);
+	m_k053936->zoom_draw(bitmap, cliprect, m_tilemap1, 0, 0, 1);
 }
 
 

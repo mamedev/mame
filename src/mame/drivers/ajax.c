@@ -14,7 +14,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/konami.h"
-#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "includes/ajax.h"
 #include "includes/konamipt.h"
@@ -36,9 +35,9 @@ static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ajax_sub_map, AS_PROGRAM, 8, ajax_state )
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE_LEGACY("k051316", k051316_r, k051316_w)    /* 051316 zoom/rotation layer */
-	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)              /* 051316 control registers */
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD_LEGACY("k051316", k051316_rom_r)                /* 051316 (ROM test) */
+	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k051316", k051316_device, read, write)    /* 051316 zoom/rotation layer */
+	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)              /* 051316 control registers */
+	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("k051316", k051316_device, rom_r)                /* 051316 (ROM test) */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)          /* bankswitch control */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                      /* shared RAM with the 052001 */
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)        /* video RAM + color RAM + video registers */

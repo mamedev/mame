@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/ajax.h"
 
 
@@ -96,14 +95,14 @@ UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitma
 	if (m_priority)
 	{
 		/* basic layer order is B, zoom, A, F */
-		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
+		m_k051316->zoom_draw(bitmap, cliprect, 0, 4);
 		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
 	}
 	else
 	{
 		/* basic layer order is B, A, zoom, F */
 		m_k052109->tilemap_draw(bitmap, cliprect, 1, 0, 2);
-		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 4);
+		m_k051316->zoom_draw(bitmap, cliprect, 0, 4);
 	}
 	m_k052109->tilemap_draw(bitmap, cliprect, 0, 0, 8);
 

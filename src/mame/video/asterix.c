@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/asterix.h"
 
 
@@ -51,26 +50,26 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 	int layer[3], plane, new_colorbase;
 
 	/* Layer offsets are different if horizontally flipped */
-	if (k056832_read_register(m_k056832, 0x0) & 0x10)
+	if (m_k056832->read_register(0x0) & 0x10)
 	{
-		k056832_set_layer_offs(m_k056832, 0, 89 - 176, 0);
-		k056832_set_layer_offs(m_k056832, 1, 91 - 176, 0);
-		k056832_set_layer_offs(m_k056832, 2, 89 - 176, 0);
-		k056832_set_layer_offs(m_k056832, 3, 95 - 176, 0);
+		m_k056832->set_layer_offs(0, 89 - 176, 0);
+		m_k056832->set_layer_offs(1, 91 - 176, 0);
+		m_k056832->set_layer_offs(2, 89 - 176, 0);
+		m_k056832->set_layer_offs(3, 95 - 176, 0);
 	}
 	else
 	{
-		k056832_set_layer_offs(m_k056832, 0, 89, 0);
-		k056832_set_layer_offs(m_k056832, 1, 91, 0);
-		k056832_set_layer_offs(m_k056832, 2, 89, 0);
-		k056832_set_layer_offs(m_k056832, 3, 95, 0);
+		m_k056832->set_layer_offs(0, 89, 0);
+		m_k056832->set_layer_offs(1, 91, 0);
+		m_k056832->set_layer_offs(2, 89, 0);
+		m_k056832->set_layer_offs(3, 95, 0);
 	}
 
 
-	m_tilebanks[0] = (k056832_get_lookup(m_k056832, 0) << 10);
-	m_tilebanks[1] = (k056832_get_lookup(m_k056832, 1) << 10);
-	m_tilebanks[2] = (k056832_get_lookup(m_k056832, 2) << 10);
-	m_tilebanks[3] = (k056832_get_lookup(m_k056832, 3) << 10);
+	m_tilebanks[0] = (m_k056832->get_lookup(0) << 10);
+	m_tilebanks[1] = (m_k056832->get_lookup(1) << 10);
+	m_tilebanks[2] = (m_k056832->get_lookup(2) << 10);
+	m_tilebanks[3] = (m_k056832->get_lookup(3) << 10);
 
 	// update color info and refresh tilemaps
 	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
@@ -81,7 +80,7 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
-			k056832_mark_plane_dirty(m_k056832, plane);
+			m_k056832->mark_plane_dirty(plane);
 		}
 	}
 
@@ -97,14 +96,14 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[0], K056832_DRAW_FLAG_MIRROR, 1);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[1], K056832_DRAW_FLAG_MIRROR, 2);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[2], K056832_DRAW_FLAG_MIRROR, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
 	m_k053244->k053245_sprites_draw(bitmap, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 2, K056832_DRAW_FLAG_MIRROR, 0);
 	return 0;
 }

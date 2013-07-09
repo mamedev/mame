@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/qdrmfgp.h"
 
 
@@ -29,22 +28,22 @@ void qdrmfgp2_tile_callback(running_machine &machine, int layer, int *code, int 
 
 VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
-	k056832_set_layer_association(m_k056832, 0);
+	m_k056832->set_layer_association(0);
 
-	k056832_set_layer_offs(m_k056832, 0, 2, 0);
-	k056832_set_layer_offs(m_k056832, 1, 4, 0);
-	k056832_set_layer_offs(m_k056832, 2, 6, 0);
-	k056832_set_layer_offs(m_k056832, 3, 8, 0);
+	m_k056832->set_layer_offs(0, 2, 0);
+	m_k056832->set_layer_offs(1, 4, 0);
+	m_k056832->set_layer_offs(2, 6, 0);
+	m_k056832->set_layer_offs(3, 8, 0);
 }
 
 VIDEO_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
-	k056832_set_layer_association(m_k056832, 0);
+	m_k056832->set_layer_association(0);
 
-	k056832_set_layer_offs(m_k056832, 0, 3, 1);
-	k056832_set_layer_offs(m_k056832, 1, 5, 1);
-	k056832_set_layer_offs(m_k056832, 2, 7, 1);
-	k056832_set_layer_offs(m_k056832, 3, 9, 1);
+	m_k056832->set_layer_offs(0, 3, 1);
+	m_k056832->set_layer_offs(1, 5, 1);
+	m_k056832->set_layer_offs(2, 7, 1);
+	m_k056832->set_layer_offs(3, 9, 1);
 }
 
 /***************************************************************************
@@ -57,9 +56,9 @@ UINT32 qdrmfgp_state::screen_update_qdrmfgp(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 3, 0, 1);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 2, 0, 2);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, 0, 4);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 8);
+	m_k056832->tilemap_draw(bitmap, cliprect, 3, 0, 1);
+	m_k056832->tilemap_draw(bitmap, cliprect, 2, 0, 2);
+	m_k056832->tilemap_draw(bitmap, cliprect, 1, 0, 4);
+	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 8);
 	return 0;
 }

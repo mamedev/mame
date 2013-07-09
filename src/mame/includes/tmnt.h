@@ -3,6 +3,7 @@
 #include "sound/k007232.h"
 #include "sound/k053260.h"
 #include "sound/k054539.h"
+#include "video/konicdev.h"
 
 class tmnt_state : public driver_device
 {

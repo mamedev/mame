@@ -23,7 +23,6 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
-#include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
@@ -188,7 +187,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1fa0, 0x1fbf) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)
+	AM_RANGE(0x1fa0, 0x1fbf) AM_DEVREADWRITE("k051733", k051733_device, read, write)
 
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 

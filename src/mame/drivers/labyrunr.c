@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
-	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)
+	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE("k051733", k051733_device, read, write)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM

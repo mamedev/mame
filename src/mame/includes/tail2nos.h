@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/konicdev.h"
+
 class tail2nos_state : public driver_device
 {
 public:

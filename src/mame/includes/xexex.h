@@ -8,6 +8,7 @@
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
+#include "video/konicdev.h"
 
 class xexex_state : public driver_device
 {

@@ -9,7 +9,6 @@
 
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/dbz.h"
 
 
@@ -81,12 +80,12 @@ void dbz_state::video_start()
 	m_bg2_tilemap->set_transparent_pen(0);
 
 	if (!strcmp(machine().system().name, "dbz"))
-		k056832_set_layer_offs(m_k056832, 0, -34, -16);
+		m_k056832->set_layer_offs(0, -34, -16);
 	else
-		k056832_set_layer_offs(m_k056832, 0, -35, -16);
+		m_k056832->set_layer_offs(0, -35, -16);
 
-	k056832_set_layer_offs(m_k056832, 1, -31, -16);
-	k056832_set_layer_offs(m_k056832, 3, -31, -16); //?
+	m_k056832->set_layer_offs(1, -31, -16);
+	m_k056832->set_layer_offs(3, -31, -16); //?
 
 	k053247_set_sprite_offs(m_k053246, -87, 32);
 }
@@ -105,7 +104,7 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 		{
 			m_layer_colorbase[plane] = new_colorbase;
 			if (plane <= 3)
-				k056832_mark_plane_dirty(m_k056832, plane);
+				m_k056832->mark_plane_dirty( plane);
 			else if (plane == 4)
 				m_bg1_tilemap->mark_all_dirty();
 			else if (plane == 5)
@@ -146,11 +145,11 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 
 		if(layer[plane] == 4)
-			k053936_zoom_draw(m_k053936_2, bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
+			m_k053936_2->zoom_draw(bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
 		else if(layer[plane] == 5)
-			k053936_zoom_draw(m_k053936_1, bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
+			m_k053936_1->zoom_draw(bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
 		else
-			k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[plane], flag, pri);
+			m_k056832->tilemap_draw(bitmap, cliprect, layer[plane], flag, pri);
 	}
 
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);

@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/xexex.h"
 
 void xexex_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
@@ -38,10 +37,10 @@ void xexex_state::video_start()
 	m_cur_alpha = 0;
 
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
-	k056832_set_layer_offs(m_k056832, 0, -2, 16);
-	k056832_set_layer_offs(m_k056832, 1,  2, 16);
-	k056832_set_layer_offs(m_k056832, 2,  4, 16);
-	k056832_set_layer_offs(m_k056832, 3,  6, 16);
+	m_k056832->set_layer_offs(0, -2, 16);
+	m_k056832->set_layer_offs(1,  2, 16);
+	m_k056832->set_layer_offs(2,  4, 16);
+	m_k056832->set_layer_offs(3,  6, 16);
 }
 
 UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -60,7 +59,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
-			k056832_mark_plane_dirty(m_k056832, plane);
+			m_k056832->mark_plane_dirty( plane);
 		}
 	}
 
@@ -88,7 +87,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 		}
 		else if (!m_cur_alpha || layer[plane] != 1)
 		{
-			k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[plane], 0, 1 << plane);
+			m_k056832->tilemap_draw(bitmap, cliprect, layer[plane], 0, 1 << plane);
 		}
 	}
 
@@ -100,10 +99,10 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 
 		if (alpha > 0)
 		{
-			k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
+			m_k056832->tilemap_draw(bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
 		}
 	}
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

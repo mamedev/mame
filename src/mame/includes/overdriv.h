@@ -5,6 +5,7 @@
 *************************************************************************/
 #include "sound/k053260.h"
 #include "machine/k053252.h"
+#include "video/konicdev.h"
 
 class overdriv_state : public driver_device
 {

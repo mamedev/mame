@@ -67,7 +67,6 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "cpu/m68000/m68000.h"
 #include "machine/ataintf.h"
 #include "sound/k054539.h"
-#include "video/konicdev.h"
 #include "includes/djmain.h"
 #include "machine/idehd.h"
 
@@ -207,7 +206,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 READ32_MEMBER(djmain_state::v_rom_r)
 {
 	UINT8 *mem8 = memregion("gfx2")->base();
-	int bank = k056832_word_r(m_k056832, space, 0x34/2, 0xffff);
+	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
 
 	offset *= 2;
 
@@ -398,7 +397,7 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)       // COLOR RAM
 									AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
-	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)      // VIDEO REG (tilemap)
+	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
 	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE_LEGACY("k055555", k055555_long_w)                  // 055555: priority encoder
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00ff00)
@@ -415,11 +414,11 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x802000, 0x802fff) AM_WRITE(unknown802000_w)                  // ??
 	AM_RANGE(0x803000, 0x80309f) AM_READWRITE(obj_ctrl_r, obj_ctrl_w)           // OBJECT REGS
 	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)                     // OBJECT ROM readthrough (for POST)
-	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
+	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
 	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
 	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
 	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
-	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
+	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
 	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
 	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
 ADDRESS_MAP_END

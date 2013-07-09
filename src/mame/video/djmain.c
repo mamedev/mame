@@ -4,7 +4,6 @@
  */
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/djmain.h"
 
 #define NUM_SPRITES (0x800 / 16)
@@ -134,9 +133,9 @@ void djmain_tile_callback(running_machine& machine, int layer, int *code, int *c
 
 void djmain_state::video_start()
 {
-	k056832_set_layer_offs(m_k056832, 0, -92, -27);
-	// k056832_set_layer_offs(m_k056832, 1, -87, -27);
-	k056832_set_layer_offs(m_k056832, 1, -88, -27);
+	m_k056832->set_layer_offs(0, -92, -27);
+	// m_k056832->set_layer_offs(1, -87, -27);
+	m_k056832->set_layer_offs(1, -88, -27);
 }
 
 UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -177,7 +176,7 @@ UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &b
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				k056832_tilemap_draw_dj(m_k056832, bitmap, cliprect, layer, 0, 1 << i);
+				m_k056832->tilemap_draw_dj(bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/upd7759.h"
+#include "video/konicdev.h"
 
 class _88games_state : public driver_device
 {

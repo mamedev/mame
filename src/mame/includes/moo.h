@@ -6,6 +6,7 @@
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
+#include "video/konicdev.h"
 
 class moo_state : public driver_device
 {

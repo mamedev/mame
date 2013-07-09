@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/overdriv.h"
 
 /***************************************************************************
@@ -60,8 +59,8 @@ UINT32 overdriv_state::screen_update_overdriv(screen_device &screen, bitmap_ind1
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
-	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 1);
+	m_k051316_1->zoom_draw(bitmap, cliprect, 0, 0);
+	m_k051316_2->zoom_draw(bitmap, cliprect, 0, 1);
 
 	k053247_sprites_draw(m_k053246, bitmap,cliprect);
 	return 0;

@@ -15,7 +15,6 @@ colour, including the word "Konami"
 #include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
-#include "video/konicdev.h"
 #include "includes/konamipt.h"
 #include "includes/asterix.h"
 
@@ -48,14 +47,14 @@ WRITE16_MEMBER(asterix_state::control2_w)
 		ioport("EEPROMOUT")->write(data, 0xff);
 
 		/* bit 5 is select tile bank */
-		k056832_set_tile_bank(m_k056832, (data & 0x20) >> 5);
+		m_k056832->set_tile_bank((data & 0x20) >> 5);
 	}
 }
 
 INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 {
 	// global interrupt masking
-	if (!k056832_is_irq_enabled(m_k056832, 0))
+	if (!m_k056832->is_irq_enabled(0))
 		return;
 
 	device.execute().set_input_line(5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
@@ -186,11 +185,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
 	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x380600, 0x380601) AM_NOP                             // Watchdog
-	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)
+	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE("k056832", k056832_device, b_word_w)
 	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_half_word_r, k056832_ram_half_word_w)
-	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD_LEGACY("k056832", k056832_old_rom_word_r)   // Passthrough to tile roms
-	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("k056832", k056832_device, ram_half_word_r, ram_half_word_w)
+	AM_RANGE(0x420000, 0x421fff) AM_DEVREAD("k056832", k056832_device, old_rom_word_r)   // Passthrough to tile roms
+	AM_RANGE(0x440000, 0x44003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, asterix_state )

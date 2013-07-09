@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/gijoe.h"
 
 void gijoe_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
@@ -54,7 +53,7 @@ void gijoe_state::video_start()
 {
 	int i;
 
-	k056832_linemap_enable(m_k056832, 1);
+	m_k056832->linemap_enable(1);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -82,7 +81,7 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	int mask = 0;
 
 	// update tile offsets
-	k056832_read_avac(m_k056832, &vrc_mode, &vrc_new);
+	m_k056832->read_avac(&vrc_mode, &vrc_new);
 
 	if (vrc_mode)
 	{
@@ -117,7 +116,7 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 		if (dirty)
 		{
 			m_avac_occupancy[i] = 0;
-			k056832_mark_plane_dirty(m_k056832, i);
+			m_k056832->mark_plane_dirty( i);
 		}
 	}
 
@@ -127,19 +126,19 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	    written to the layer's X-scroll register otherwise the chip expects totally
 	    different alignment values.
 	*/
-	if (k056832_read_register(m_k056832, 0x14) == 2)
+	if (m_k056832->read_register(0x14) == 2)
 	{
-		k056832_set_layer_offs(m_k056832, 0,  2, 0);
-		k056832_set_layer_offs(m_k056832, 1,  4, 0);
-		k056832_set_layer_offs(m_k056832, 2,  6, 0); // 7?
-		k056832_set_layer_offs(m_k056832, 3,  8, 0);
+		m_k056832->set_layer_offs(0,  2, 0);
+		m_k056832->set_layer_offs(1,  4, 0);
+		m_k056832->set_layer_offs(2,  6, 0); // 7?
+		m_k056832->set_layer_offs(3,  8, 0);
 	}
 	else
 	{
-		k056832_set_layer_offs(m_k056832, 0,  0, 0);
-		k056832_set_layer_offs(m_k056832, 1,  8, 0);
-		k056832_set_layer_offs(m_k056832, 2, 14, 0);
-		k056832_set_layer_offs(m_k056832, 3, 16, 0); // smaller?
+		m_k056832->set_layer_offs(0,  0, 0);
+		m_k056832->set_layer_offs(1,  8, 0);
+		m_k056832->set_layer_offs(2, 14, 0);
+		m_k056832->set_layer_offs(3, 16, 0); // smaller?
 	}
 
 	// seems to switch the K053251 between different priority modes, detail unknown
@@ -159,10 +158,10 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[0], 0, 1);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[1], 0, 2);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[2], 0, 4);
-	k056832_tilemap_draw(m_k056832, bitmap, cliprect, layer[3], 0, 8);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[0], 0, 1);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[1], 0, 2);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
+	m_k056832->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
 
 	k053247_sprites_draw(m_k053246, bitmap, cliprect);
 	return 0;

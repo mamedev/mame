@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/konicdev.h"
+
 #define CPU_CLOCK       (XTAL_24MHz / 2)        /* 68000 clock */
 #define SOUND_CLOCK     XTAL_16_9344MHz     /* YMZ280 clock */
 

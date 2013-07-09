@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/k053260.h"
+#include "video/konicdev.h"
 
 class asterix_state : public driver_device
 {

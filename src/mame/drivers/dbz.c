@@ -56,8 +56,6 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/dbz.h"
-#include "video/konicdev.h"
-
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
@@ -107,19 +105,19 @@ WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x480000, 0x48ffff) AM_RAM
-	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  // '157 RAM is mirrored twice
-	AM_RANGE(0x492000, 0x493fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
-	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
+	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // '157 RAM is mirrored twice
+	AM_RANGE(0x492000, 0x493fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
+	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD("k056832", k056832_device, rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
 	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
-	AM_RANGE(0x4c8000, 0x4c8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)
-	AM_RANGE(0x4cc000, 0x4cc03f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
-	AM_RANGE(0x4d0000, 0x4d001f) AM_DEVWRITE_LEGACY("k053936_1", k053936_ctrl_w)
-	AM_RANGE(0x4d4000, 0x4d401f) AM_DEVWRITE_LEGACY("k053936_2", k053936_ctrl_w)
+	AM_RANGE(0x4c8000, 0x4c8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)
+	AM_RANGE(0x4cc000, 0x4cc03f) AM_DEVWRITE("k056832", k056832_device, word_w)
+	AM_RANGE(0x4d0000, 0x4d001f) AM_DEVWRITE("k053936_1", k053936_device, ctrl_w)
+	AM_RANGE(0x4d4000, 0x4d401f) AM_DEVWRITE("k053936_2", k053936_device, ctrl_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
 	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
@@ -132,8 +130,8 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_SHARE("bg2_videoram")
 	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_SHARE("bg1_videoram")
-	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE_LEGACY("k053936_1", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
-	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE_LEGACY("k053936_2", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
+	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE("k053936_1", k053936_device, linectrl_r, linectrl_w) // ?? guess, it might not be
+	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE("k053936_2", k053936_device, linectrl_r, linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x600000, 0x6fffff) AM_READNOP             // PSAC 1 ROM readback window
 	AM_RANGE(0x700000, 0x7fffff) AM_READNOP             // PSAC 2 ROM readback window
 ADDRESS_MAP_END

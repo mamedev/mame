@@ -53,7 +53,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 #include "emu.h"
 #include "includes/metro.h"
-#include "video/konicdev.h"
 
 TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 {
@@ -716,7 +715,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (m_has_zoom)
-		k053936_zoom_draw(m_k053936, bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
+		m_k053936->zoom_draw(bitmap, cliprect, m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
 		draw_layers(bitmap, cliprect, pri, layers_ctrl);

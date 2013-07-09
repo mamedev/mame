@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konicdev.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 #include "includes/tail2nos.h"
@@ -36,8 +35,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")    /* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
-	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8_LEGACY("k051316", k051316_r, k051316_w, 0x00ff)
-	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8_LEGACY("k051316", k051316_ctrl_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_device, read, write, 0x00ff)
+	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_device, ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work RAM */
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM

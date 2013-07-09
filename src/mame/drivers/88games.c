@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
-#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
@@ -35,9 +34,9 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return k051316_rom_r(m_k051316, space, offset);
+			return m_k051316->rom_r(space, offset);
 		else
-			return k051316_r(m_k051316, space, offset);
+			return m_k051316->read(space, offset);
 	}
 }
 
@@ -46,7 +45,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
-		k051316_w(m_k051316, space, offset, data);
+		m_k051316->write(space, offset, data);
 }
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
@@ -132,7 +131,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
+	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

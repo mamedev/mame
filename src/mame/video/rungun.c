@@ -102,7 +102,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_936_tilemap, 0, 0, 1);
+	m_k053936->zoom_draw(bitmap, cliprect, m_936_tilemap, 0, 0, 1);
 
 	k053247_sprites_draw(m_k055673, bitmap, cliprect);
 

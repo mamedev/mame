@@ -79,29 +79,29 @@ struct k053247_interface
 
 struct k051316_interface
 {
-	const char         *gfx_memory_region;
-	int                gfx_num;
-	int                bpp, pen_is_mask, transparent_pen;
-	int                wrap, xoffs, yoffs;
-	k051316_callback   callback;
+	const char         *m_gfx_memory_region_tag;
+	int                m_gfx_num;
+	int                m_bpp, m_pen_is_mask, m_transparent_pen;
+	int                m_wrap, m_xoffs, m_yoffs;
+	k051316_callback   m_callback;
 };
 
 struct k053936_interface
 {
-	int                wrap, xoff, yoff;
+	int                m_wrap, m_xoff, m_yoff;
 };
 
 struct k056832_interface
 {
-	const char         *gfx_memory_region;
-	int                gfx_num;
-	int                bpp;
-	int                big;
-	int                djmain_hack;
-	int                deinterleave;
-	k056832_callback   callback;
+	const char         *m_gfx_memory_region;
+	int                m_gfx_num;
+	int                m_bpp;
+	int                m_big;
+	int                m_djmain_hack;
+	int                m_deinterleave;
+	k056832_callback   m_callback;
 
-	const char         *k055555;    // tbyahhoo uses the k056832 together with a k055555
+	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
 };
 
 struct k054338_interface
@@ -486,14 +486,32 @@ private:
 
 extern const device_type K055673;
 
-class k051316_device : public device_t
+class k051316_device : public device_t,
+										public k051316_interface
 {
 public:
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k051316_device() { global_free(m_token); }
+	~k051316_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/*
+	The callback is passed:
+	- code (range 00-FF, contents of the first tilemap RAM byte)
+	- color (range 00-FF, contents of the first tilemap RAM byte). Note that bit 6
+	  seems to be hardcoded as flip X.
+	The callback must put:
+	- in code the resulting tile number
+	- in color the resulting color index
+	- if necessary, put flags for the TileMap code in the tile_info
+	  structure (e.g. TILE_FLIPX)
+	*/
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( rom_r );
+	DECLARE_WRITE8_MEMBER( ctrl_w );
+	void zoom_draw(bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
+	void wraparound_enable(int status);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -501,29 +519,42 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
-
-	TILE_GET_INFO_MEMBER(k051316_get_tile_info0);
+	UINT8    *m_ram;
+	tilemap_t  *m_tmap;
+	int      m_bpp;
+	UINT8    m_ctrlram[16];
+		
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	void get_tile_info( tile_data &tileinfo, int tile_index );
 };
 
 extern const device_type K051316;
 
-class k053936_device : public device_t
+class k053936_device : public device_t,
+										public k053936_interface
 {
 public:
 	k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k053936_device() { global_free(m_token); }
+	~k053936_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE16_MEMBER( ctrl_w );
+	DECLARE_READ16_MEMBER( ctrl_r );    
+	DECLARE_WRITE16_MEMBER( linectrl_w );
+	DECLARE_READ16_MEMBER( linectrl_r );
+	void zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
+	// void wraparound_enable(int status);   unused? // shall we merge this into the configuration intf?
+	// void set_offset(int xoffs, int yoffs); unused?   // shall we merge this into the configuration intf?
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	UINT16    *m_ctrl;
+	UINT16    *m_linectrl;
 };
 
 extern const device_type K053936;
@@ -552,18 +583,22 @@ class k054000_device : public device_t
 {
 public:
 	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k054000_device() { global_free(m_token); }
+	~k054000_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( lsb_w );
+	DECLARE_READ16_MEMBER( lsb_r );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
 	// internal state
-	void *m_token;
+	UINT8    m_regs[0x20];
 };
 
 extern const device_type K054000;
@@ -572,10 +607,11 @@ class k051733_device : public device_t
 {
 public:
 	k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k051733_device() { global_free(m_token); }
+	~k051733_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -583,43 +619,167 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	UINT8    m_ram[0x20];
+	UINT8    m_rng;
 };
 
 extern const device_type K051733;
 
-class k056832_device : public device_t
+#define K056832_PAGE_COUNT 16
+
+/* bit depths for the 56832 */
+#define K056832_BPP_4   0
+#define K056832_BPP_5   1
+#define K056832_BPP_6   2
+#define K056832_BPP_8   3
+#define K056832_BPP_4dj 4
+#define K056832_BPP_8LE 5
+#define K056832_BPP_8TASMAN 6
+
+class k056832_device : public device_t,
+										public k056832_interface
 {
 public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k056832_device() { global_free(m_token); }
+	~k056832_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void SetExtLinescroll();    /* Lethal Enforcers */
+
+	DECLARE_READ16_MEMBER( ram_word_r );
+	DECLARE_WRITE16_MEMBER( ram_word_w );
+	DECLARE_READ16_MEMBER( ram_half_word_r );
+	DECLARE_WRITE16_MEMBER( ram_half_word_w );
+	DECLARE_READ16_MEMBER( k_5bpp_rom_word_r );
+	DECLARE_READ32_MEMBER( k_5bpp_rom_long_r );
+	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
+	DECLARE_READ16_MEMBER( rom_word_r );
+	DECLARE_READ16_MEMBER( mw_rom_word_r );
+	DECLARE_READ16_MEMBER( bishi_rom_word_r );
+	DECLARE_READ16_MEMBER( old_rom_word_r );
+	DECLARE_READ16_MEMBER( rom_word_8000_r );
+	DECLARE_WRITE16_MEMBER( word_w ); // "VRAM" registers
+	DECLARE_WRITE16_MEMBER( b_word_w );
+	DECLARE_READ8_MEMBER( ram_code_lo_r );
+	DECLARE_READ8_MEMBER( ram_code_hi_r );
+	DECLARE_READ8_MEMBER( ram_attr_lo_r );
+	DECLARE_READ8_MEMBER( ram_attr_hi_r );
+	DECLARE_WRITE8_MEMBER( ram_code_lo_w );
+	DECLARE_WRITE8_MEMBER( ram_code_hi_w );
+	DECLARE_WRITE8_MEMBER( ram_attr_lo_w );
+	DECLARE_WRITE8_MEMBER( ram_attr_hi_w );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE8_MEMBER( b_w );
+	void mark_plane_dirty(int num);
+	void mark_all_tmaps_dirty();
+	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	void tilemap_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	void tilemap_draw_dj(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
+	void set_layer_association(int status);
+	int  get_layer_association();
+	void set_layer_offs(int layer, int offsx, int offsy);
+	void set_lsram_page(int logical_page, int physical_page, int physical_offset);
+	void linemap_enable(int enable);
+	int  is_irq_enabled(int irqline);
+	void read_avac(int *mode, int *data);
+	int  read_register(int regnum);
+	int get_current_rambank();
+	int get_lookup(int bits); /* Asterix */
+	void set_tile_bank(int bank); /* Asterix */
+
+	DECLARE_READ32_MEMBER( ram_long_r );
+	DECLARE_READ32_MEMBER( rom_long_r );
+	DECLARE_WRITE32_MEMBER( ram_long_w );
+	DECLARE_READ32_MEMBER( unpaged_ram_long_r );
+	DECLARE_WRITE32_MEMBER( unpaged_ram_long_w );
+	DECLARE_WRITE32_MEMBER( long_w );
+	DECLARE_WRITE32_MEMBER( b_long_w );
+	
+	DECLARE_READ16_MEMBER( word_r );        // VACSET
+	DECLARE_READ16_MEMBER( b_word_r );      // VSCCS  (board dependent)
+	DECLARE_READ32_MEMBER( long_r );        // VACSET
+
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	
 private:
 	// internal state
-	void *m_token;
+	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
+	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT];
 
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info0);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info1);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info2);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info3);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info4);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info5);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info6);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info7);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info8);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_info9);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infoa);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infob);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infoc);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infod);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infoe);
-	TILE_GET_INFO_MEMBER(k056832_get_tile_infof);
+	UINT16    m_regs[0x20];   // 157/832 regs group 1
+	UINT16    m_regsb[4]; // 157/832 regs group 2, board dependent
+
+	UINT8 *   m_rombase;  // pointer to tile gfx data
+	UINT16 *  m_videoram;
+	int       m_num_gfx_banks;    // depends on size of graphics ROMs
+	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
+
+	// ROM readback involves reading 2 halves of a word
+	// from the same location in a row.  Reading the
+	// RAM window resets this state so you get the first half.
+	int       m_rom_half;
+
+	// locally cached values
+	int       m_layer_assoc_with_page[K056832_PAGE_COUNT];
+	int       m_layer_offs[8][2];
+	int       m_lsram_page[8][2];
+	INT32     m_x[8]; // 0..3 left
+	INT32     m_y[8]; // 0..3 top
+	INT32     m_w[8]; // 0..3 width  -> 1..4 pages
+	INT32     m_h[8]; // 0..3 height -> 1..4 pages
+	INT32     m_dx[8];    // scroll
+	INT32     m_dy[8];    // scroll
+	UINT32    m_line_dirty[K056832_PAGE_COUNT][8];
+	UINT8     m_all_lines_dirty[K056832_PAGE_COUNT];
+	UINT8     m_page_tile_mode[K056832_PAGE_COUNT];
+	int       m_last_colorbase[K056832_PAGE_COUNT];
+	UINT8     m_layer_tile_mode[8];
+	int       m_default_layer_association;
+	int       m_layer_association;
+	int       m_active_layer;
+	int       m_selected_page;
+	int       m_selected_page_x4096;
+	int       m_linemap_enabled;
+	int       m_use_ext_linescroll;
+	int       m_uses_tile_banks, m_cur_tile_bank;
+
+	device_t *m_k055555;  /* used to choose colorbase */
+
+	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
+	
+	TILE_GET_INFO_MEMBER(get_tile_info0);
+	TILE_GET_INFO_MEMBER(get_tile_info1);
+	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_GET_INFO_MEMBER(get_tile_info3);
+	TILE_GET_INFO_MEMBER(get_tile_info4);
+	TILE_GET_INFO_MEMBER(get_tile_info5);
+	TILE_GET_INFO_MEMBER(get_tile_info6);
+	TILE_GET_INFO_MEMBER(get_tile_info7);
+	TILE_GET_INFO_MEMBER(get_tile_info8);
+	TILE_GET_INFO_MEMBER(get_tile_info9);
+	TILE_GET_INFO_MEMBER(get_tile_infoa);
+	TILE_GET_INFO_MEMBER(get_tile_infob);
+	TILE_GET_INFO_MEMBER(get_tile_infoc);
+	TILE_GET_INFO_MEMBER(get_tile_infod);
+	TILE_GET_INFO_MEMBER(get_tile_infoe);
+	TILE_GET_INFO_MEMBER(get_tile_infof);
+	
+	void mark_page_dirty(int page);
+	void mark_all_tilemaps_dirty();
+	void update_page_layout();
+	void change_rambank();
+	void change_rombank();
+	void postload();
+	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
+	
+	template<class _BitmapClass>
+	int update_linemap(_BitmapClass &bitmap, int page, int flags);
+	
+	template<class _BitmapClass>
+	void tilemap_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 };
 
 extern const device_type K056832;
@@ -943,37 +1103,6 @@ void k053246_set_objcha_line(device_t *device, int state);
 int k053246_is_irq_enabled(device_t *device);
 int k053246_read_register(device_t *device, int regnum);
 
-/**  Konami 051316  **/
-/*
-The callback is passed:
-- code (range 00-FF, contents of the first tilemap RAM byte)
-- color (range 00-FF, contents of the first tilemap RAM byte). Note that bit 6
-  seems to be hardcoded as flip X.
-The callback must put:
-- in code the resulting tile number
-- in color the resulting color index
-- if necessary, put flags for the TileMap code in the tile_info
-  structure (e.g. TILE_FLIPX)
-*/
-
-DECLARE_READ8_DEVICE_HANDLER( k051316_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k051316_w );
-DECLARE_READ8_DEVICE_HANDLER( k051316_rom_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k051316_ctrl_w );
-void k051316_zoom_draw(device_t *device, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
-void k051316_wraparound_enable(device_t *device, int status);
-
-
-/**  Konami 053936  **/
-DECLARE_WRITE16_DEVICE_HANDLER( k053936_ctrl_w );
-DECLARE_READ16_DEVICE_HANDLER( k053936_ctrl_r );    // FIXME: this is probably unused... to be checked!
-DECLARE_WRITE16_DEVICE_HANDLER( k053936_linectrl_w );
-DECLARE_READ16_DEVICE_HANDLER( k053936_linectrl_r );
-void k053936_zoom_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
-void k053936_wraparound_enable(device_t *device, int status);   // shall we merge this into the configuration intf?
-void k053936_set_offset(device_t *device, int xoffs, int yoffs);    // shall we merge this into the configuration intf?
-
-
 /**  Konami 053251 **/
 /*
   Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
@@ -996,79 +1125,6 @@ enum
 	K053251_CI3,
 	K053251_CI4
 };
-
-/**  Konami 054000 **/
-DECLARE_WRITE8_DEVICE_HANDLER( k054000_w );
-DECLARE_READ8_DEVICE_HANDLER( k054000_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k054000_lsb_w );
-DECLARE_READ16_DEVICE_HANDLER( k054000_lsb_r );
-
-
-/**  Konami 051733 **/
-DECLARE_WRITE8_DEVICE_HANDLER( k051733_w );
-DECLARE_READ8_DEVICE_HANDLER( k051733_r );
-
-
-/**  Konami 056832 **/
-void k056832_SetExtLinescroll(device_t *device);    /* Lethal Enforcers */
-
-DECLARE_READ16_DEVICE_HANDLER( k056832_ram_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k056832_ram_word_w );
-DECLARE_READ16_DEVICE_HANDLER( k056832_ram_half_word_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k056832_ram_half_word_w );
-DECLARE_READ16_DEVICE_HANDLER( k056832_5bpp_rom_word_r );
-DECLARE_READ32_DEVICE_HANDLER( k056832_5bpp_rom_long_r );
-DECLARE_READ32_DEVICE_HANDLER( k056832_6bpp_rom_long_r );
-DECLARE_READ16_DEVICE_HANDLER( k056832_rom_word_r );
-DECLARE_READ16_DEVICE_HANDLER( k056832_mw_rom_word_r );
-DECLARE_READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r );
-DECLARE_READ16_DEVICE_HANDLER( k056832_old_rom_word_r );
-DECLARE_READ16_DEVICE_HANDLER( k056832_rom_word_8000_r );
-DECLARE_WRITE16_DEVICE_HANDLER( k056832_word_w ); // "VRAM" registers
-DECLARE_WRITE16_DEVICE_HANDLER( k056832_b_word_w );
-DECLARE_READ8_DEVICE_HANDLER( k056832_ram_code_lo_r );
-DECLARE_READ8_DEVICE_HANDLER( k056832_ram_code_hi_r );
-DECLARE_READ8_DEVICE_HANDLER( k056832_ram_attr_lo_r );
-DECLARE_READ8_DEVICE_HANDLER( k056832_ram_attr_hi_r );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_ram_code_lo_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_ram_code_hi_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_ram_attr_lo_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_ram_attr_hi_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_w );
-DECLARE_WRITE8_DEVICE_HANDLER( k056832_b_w );
-void k056832_mark_plane_dirty(device_t *device, int num);
-void k056832_mark_all_tmaps_dirty(device_t *device);
-void k056832_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-void k056832_tilemap_draw(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-void k056832_tilemap_draw_dj(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
-void k056832_set_layer_association(device_t *device, int status);
-int  k056832_get_layer_association(device_t *device);
-void k056832_set_layer_offs(device_t *device, int layer, int offsx, int offsy);
-void k056832_set_lsram_page(device_t *device, int logical_page, int physical_page, int physical_offset);
-void k056832_linemap_enable(device_t *device, int enable);
-int  k056832_is_irq_enabled(device_t *device, int irqline);
-void k056832_read_avac(device_t *device, int *mode, int *data);
-int  k056832_read_register(device_t *device, int regnum);
-int k056832_get_current_rambank(device_t *device);
-int k056832_get_lookup(device_t *device, int bits); /* Asterix */
-void k056832_set_tile_bank(device_t *device, int bank); /* Asterix */
-
-DECLARE_READ32_DEVICE_HANDLER( k056832_ram_long_r );
-DECLARE_READ32_DEVICE_HANDLER( k056832_rom_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( k056832_ram_long_w );
-DECLARE_READ32_DEVICE_HANDLER( k056832_unpaged_ram_long_r );
-DECLARE_WRITE32_DEVICE_HANDLER( k056832_unpaged_ram_long_w );
-DECLARE_WRITE32_DEVICE_HANDLER( k056832_long_w );
-DECLARE_WRITE32_DEVICE_HANDLER( k056832_b_long_w );
-
-/* bit depths for the 56832 */
-#define K056832_BPP_4   0
-#define K056832_BPP_5   1
-#define K056832_BPP_6   2
-#define K056832_BPP_8   3
-#define K056832_BPP_4dj 4
-#define K056832_BPP_8LE 5
-#define K056832_BPP_8TASMAN 6
 
 /**  Konami 055555  **/
 void k055555_write_reg(device_t *device, UINT8 regnum, UINT8 regdat);
@@ -1201,8 +1257,6 @@ DECLARE_READ32_DEVICE_HANDLER( k001604_reg_r );
 #define K056832_DRAW_FLAG_MIRROR      0x00800000
 
 // debug handlers
-DECLARE_READ16_DEVICE_HANDLER( k056832_word_r );        // VACSET
-DECLARE_READ16_DEVICE_HANDLER( k056832_b_word_r );      // VSCCS  (board dependent)
 DECLARE_READ16_DEVICE_HANDLER( k053246_reg_word_r );    // OBJSET1
 DECLARE_READ16_DEVICE_HANDLER( k053247_reg_word_r );    // OBJSET2
 DECLARE_READ16_DEVICE_HANDLER( k053251_lsb_r );         // PCU1
@@ -1210,7 +1264,7 @@ DECLARE_READ16_DEVICE_HANDLER( k053251_msb_r );         // PCU1
 DECLARE_READ16_DEVICE_HANDLER( k055555_word_r );        // PCU2
 DECLARE_READ16_DEVICE_HANDLER( k054338_word_r );        // CLTC
 
-DECLARE_READ32_DEVICE_HANDLER( k056832_long_r );        // VACSET
+
 DECLARE_READ32_DEVICE_HANDLER( k053247_reg_long_r );    // OBJSET2
 DECLARE_READ32_DEVICE_HANDLER( k055555_long_r );        // PCU2
 

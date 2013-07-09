@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/tail2nos.h"
 
 
@@ -170,7 +169,7 @@ UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind1
 {
 	if (m_video_enable)
 	{
-		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
+		m_k051316->zoom_draw(bitmap, cliprect, 0, 0);
 		draw_sprites(bitmap, cliprect);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}

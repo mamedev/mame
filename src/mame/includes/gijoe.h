@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/k054539.h"
+#include "video/konicdev.h"
 
 class gijoe_state : public driver_device
 {

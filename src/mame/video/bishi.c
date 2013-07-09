@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
 #include "includes/bishi.h"
 
 
@@ -28,12 +27,12 @@ void bishi_state::video_start()
 {
 	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
-	k056832_set_layer_association(m_k056832, 0);
+	m_k056832->set_layer_association(0);
 
-	k056832_set_layer_offs(m_k056832, 0, -2, 0);
-	k056832_set_layer_offs(m_k056832, 1,  2, 0);
-	k056832_set_layer_offs(m_k056832, 2,  4, 0);
-	k056832_set_layer_offs(m_k056832, 3,  6, 0);
+	m_k056832->set_layer_offs(0, -2, 0);
+	m_k056832->set_layer_offs(1,  2, 0);
+	m_k056832->set_layer_offs(2,  4, 0);
+	m_k056832->set_layer_offs(3,  6, 0);
 
 	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
 	m_layer_colorbase[0] = 0x00;
@@ -66,7 +65,7 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 	{
 		if (k055555_read_register(m_k055555, K55_INPUT_ENABLES) & enables[layers[i]])
 		{
-			k056832_tilemap_draw(m_k056832, bitmap, cliprect, layers[i], 0, 1 << i);
+			m_k056832->tilemap_draw(bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
 	return 0;
