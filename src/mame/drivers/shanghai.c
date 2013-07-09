@@ -600,7 +600,7 @@ SSS8906
 |A  ROM6                      4464    4464 |
 |              ROM5           HD63484      |
 | YM3931                             898-3 |
-|                  SIS6091                 |
+|                  S1S6091                 |
 |                                          |
 |                                          |
 | PAL                                      |
@@ -625,7 +625,7 @@ Notes:
       D71011   : ? (DIP18) 710xx is series of common NEC ICs; timers, counters, parallel interface, interrupt controllers etc
       898-3    : BI 898-3-R 22  8920  (?, DIP16, tied to hd63484)
       YM3931   : Also printed 'SEI0100BU' (SDIP64)
-      SIS6091  : Custom QFP80 (Graphics controller?)
+      S1S6091  : Custom QFP80 (Graphics controller?)
       4464     : 64K x4 DRAM
       6264       8K x8 SRAM
       6116     : 2K x8 SRAM

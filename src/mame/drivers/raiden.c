@@ -36,7 +36,7 @@
     Sound: YM3812, OKI M6295
     Custom ICs:
     - SEI0160 QFP60 (2 on main PCB, 3 on OBJ1 PCB)
-    - SIS6091 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
+    - S1S6091 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
     - Altera EP910PC-40 EPLD, one next to each V30
     - SEI0050BU DIP40
     - SEI80BU DIP42
