@@ -87,8 +87,8 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
   Pit Boss Superstar (c)1990
-  Pit Boss Superstar 30 (c)1993
-  *Pit Boss Superstar III 30 (c)1993?
+  *Pit Boss Superstar 30 (c)1993
+  Pit Boss Superstar III 30 (c)1993?
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
 
@@ -766,6 +766,36 @@ static INPUT_PORTS_START(meritm_crt250)
 
 	PORT_START("DSW")   /* need for AY-8910 accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(pbss30)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Enable Casino Games" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dodgecty)
@@ -2133,7 +2163,7 @@ DRIVER_INIT_MEMBER(meritm_state,pbss30)
 		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
 
 	static const UINT8 pbss30_ds1204_nvram[16] =
-		{ 0x3e, 0x9a, 0x3c, 0x3f, 0x1d, 0x51, 0x72, 0xc9, 0x28, 0x2c, 0x1d, 0x2d, 0x0e, 0x56, 0x41, 0x00 }; // Needs to be corrected for this set!!!
+		{ 0x09, 0x2b, 0x6b, 0xf7, 0x83, 0xca, 0x8e, 0xdd, 0x1a, 0x7e, 0x76, 0x1a, 0x75, 0x5e, 0x77, 0x00 };
 
 	ds1204_init(pbss30_ds1204_key, pbss30_ds1204_nvram);
 
@@ -2279,9 +2309,9 @@ GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, driver_device, 0,
 GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
+GAME( 1993, pbss30,    0,      meritm_crt250_crt252_crt258, pbss30, meritm_state, pbss30,  ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, pbss30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state, pbss30,  ROT0, "Merit", "Pit Boss Superstar 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, meritm_state,  pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
