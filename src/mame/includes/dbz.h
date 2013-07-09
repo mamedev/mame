@@ -5,6 +5,7 @@
 *************************************************************************/
 #include "video/konicdev.h"
 #include "machine/k053252.h"
+#include "video/k054156_k054157_k056832.h"
 
 class dbz_state : public driver_device
 {

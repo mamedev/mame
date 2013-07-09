@@ -175,7 +175,7 @@ Check gticlub.c for details on the bottom board.
 #include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "video/gticlub.h"
-
+#include "video/k054156_k054157_k056832.h"
 
 class zr107_state : public driver_device
 {
