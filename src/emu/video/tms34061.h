@@ -35,17 +35,14 @@ enum
 	TMS34061_REGCOUNT
 };
 
-
-
 /* interface structure */
 struct tms34061_interface
 {
-	const char  *screen_tag;    /* the screen we are acting on */
-	UINT8       rowshift;       /* VRAM address is (row << rowshift) | col */
-	UINT32      vramsize;       /* size of video RAM */
-	void        (*interrupt)(running_machine &machine, int state);  /* interrupt gen callback */
+	const char  *m_screen_tag;    /* the screen we are acting on */
+	UINT8       m_rowshift;       /* VRAM address is (row << rowshift) | col */
+	UINT32      m_vramsize;       /* size of video RAM */
+	void        (*m_interrupt)(running_machine &machine, int state);  /* interrupt gen callback */
 };
-
 
 /* display state structure */
 struct tms34061_display
@@ -58,18 +55,62 @@ struct tms34061_display
 };
 
 
-/* starts/stops the emulator */
-void tms34061_start(running_machine &machine, const struct tms34061_interface *interface);
 
-/* reads/writes to the 34061 */
-UINT8 tms34061_r(address_space &space, int col, int row, int func);
-void tms34061_w(address_space &space, int col, int row, int func, UINT8 data);
 
-/* latch settings */
-DECLARE_READ8_HANDLER( tms34061_latch_r );
-DECLARE_WRITE8_HANDLER( tms34061_latch_w );
+// ======================> tms34061_device
 
-/* video update handling */
-void tms34061_get_display_state(struct tms34061_display *state);
+class tms34061_device :  public device_t,
+											public tms34061_interface
+{
+public:
+	// construction/destruction
+	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	/* reads/writes to the 34061 */
+	UINT8 read(address_space &space, int col, int row, int func);
+	void write(address_space &space, int col, int row, int func, UINT8 data);
+
+	/* latch settings */
+	DECLARE_READ8_MEMBER( latch_r );
+	DECLARE_WRITE8_MEMBER( latch_w );
+
+	/* video update handling */
+	void get_display_state();
+	
+	struct tms34061_display m_display;
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	
+private:
+	UINT16              m_regs[TMS34061_REGCOUNT];
+	UINT16              m_xmask;
+	UINT8               m_yshift;
+	UINT32              m_vrammask;
+	UINT8 *             m_vram;
+	UINT8 *             m_latchram;
+	UINT8               m_latchdata;
+	UINT8 *             m_shiftreg;
+	emu_timer *         m_timer;
+	screen_device *m_screen;
+	
+	void update_interrupts(void);
+	TIMER_CALLBACK_MEMBER( interrupt );
+	void register_w(address_space &space, offs_t offset, UINT8 data);
+	UINT8 register_r(address_space &space, offs_t offset);
+	void adjust_xyaddress(int offset);
+	void xypixel_w(address_space &space, int offset, UINT8 data);
+	UINT8 xypixel_r(address_space &space, int offset);
+};
+
+// device type definition
+extern const device_type TMS34061;
+
+#define MCFG_TMS34061_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TMS34061, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 #endif

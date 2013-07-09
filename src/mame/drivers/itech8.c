@@ -503,7 +503,6 @@
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "video/tms34061.h"
 #include "video/tlc34076.h"
 #include "includes/itech8.h"
 #include "sound/2203intf.h"
@@ -857,7 +856,7 @@ static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
 	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
-	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
+	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x11c0, 0x11df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
@@ -873,7 +872,7 @@ static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
 	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
-	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
+	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_DEVWRITE("tms34061", tms34061_device, latch_w)
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x01c0, 0x01df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
@@ -891,7 +890,7 @@ static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0160, 0x0160) AM_WRITE(grom_bank_w)
 	AM_RANGE(0x0180, 0x019f) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
-	AM_RANGE(0x01e0, 0x01e0) AM_WRITE_LEGACY(tms34061_latch_w)
+	AM_RANGE(0x01e0, 0x01e0) AM_DEVWRITE("tms34061", tms34061_device, latch_w)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
@@ -906,7 +905,7 @@ static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
-	AM_RANGE(0x100240, 0x100241) AM_WRITE8_LEGACY(tms34061_latch_w, 0xff00)
+	AM_RANGE(0x100240, 0x100241) AM_DEVWRITE8("tms34061", tms34061_device, latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
 	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, 0xffff)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
@@ -1645,6 +1644,29 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
 };
 
+/*************************************
+ *
+ *  TMS34061 interfacing
+ *
+ *************************************/
+
+static void generate_interrupt(running_machine &machine, int state_num)
+{
+	itech8_state *state = machine.driver_data<itech8_state>();
+	state->itech8_update_interrupts(-1, state_num, -1);
+
+	if (FULL_LOGGING && state_num) logerror("------------ DISPLAY INT (%d) --------------\n", machine.primary_screen->vpos());
+}
+
+
+static const struct tms34061_interface tms34061intf =
+{
+	"screen",               /* the screen we are acting on */
+	8,                      /* VRAM address is (row << rowshift) | col */
+	0x40000,                /* size of video RAM */
+	generate_interrupt      /* interrupt gen callback */
+};
+
 
 
 /*************************************
@@ -1674,6 +1696,8 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 263)
+	
+	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1770,6 +1794,8 @@ static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+	
+	
 MACHINE_CONFIG_END
 
 
@@ -1785,6 +1811,7 @@ static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 
 	/* palette updater */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("palette", itech8_state, grmatch_palette_update, "screen", 0, 0)
+	
 MACHINE_CONFIG_END
 
 
@@ -1797,6 +1824,7 @@ static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_itech8_2layer)
+		
 MACHINE_CONFIG_END
 
 

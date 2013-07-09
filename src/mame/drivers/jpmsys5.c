@@ -90,10 +90,10 @@ WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(space, col, row, func, data >> 8);
+		m_tms34061->write(space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(space, col | 1, row, func, data & 0xff);
+		m_tms34061->write(space, col | 1, row, func, data & 0xff);
 }
 
 READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
@@ -114,10 +114,10 @@ READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
 	}
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(space, col, row, func) << 8;
+		data |= m_tms34061->read(space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(space, col | 1, row, func);
+		data |= m_tms34061->read(space, col | 1, row, func);
 
 	return data;
 }
@@ -147,19 +147,13 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 	}
 }
 
-VIDEO_START_MEMBER(jpmsys5_state,jpmsys5v)
-{
-	tms34061_start(machine(), &tms34061intf);
-}
-
 UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	struct tms34061_display state;
+	
+	m_tms34061->get_display_state();
 
-	tms34061_get_display_state(&state);
-
-	if (state.blanked)
+	if (m_tms34061->m_display.blanked)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
@@ -167,7 +161,7 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &state.vram[(state.dispstart & 0xffff)*2 + 256 * y];
+		UINT8 *src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
 		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x +=2)
@@ -672,7 +666,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
 	MCFG_SCREEN_UPDATE_DRIVER(jpmsys5_state, screen_update_jpmsys5v)
 
-	MCFG_VIDEO_START_OVERRIDE(jpmsys5_state,jpmsys5v)
+	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	MCFG_PALETTE_LENGTH(16)
 
@@ -856,7 +850,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
-
+	
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -884,7 +878,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
-
+	
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_SPEAKER_STANDARD_MONO("mono")

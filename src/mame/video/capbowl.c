@@ -5,45 +5,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/tms34061.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/capbowl.h"
-
-
-/*************************************
- *
- *  TMS34061 interfacing
- *
- *************************************/
-
-static void generate_interrupt( running_machine &machine, int state )
-{
-	capbowl_state *driver = machine.driver_data<capbowl_state>();
-	driver->m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
-}
-
-static const struct tms34061_interface tms34061intf =
-{
-	"screen",               /* the screen we are acting on */
-	8,                      /* VRAM address is (row << rowshift) | col */
-	0x10000,                /* size of video RAM */
-	generate_interrupt      /* interrupt gen callback */
-};
-
-
-
-/*************************************
- *
- *  Video start
- *
- *************************************/
-
-void capbowl_state::video_start()
-{
-	/* initialize TMS34061 emulation */
-	tms34061_start(machine(), &tms34061intf);
-}
-
 
 
 /*************************************
@@ -63,7 +26,7 @@ WRITE8_MEMBER(capbowl_state::capbowl_tms34061_w)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(space, col, *m_rowaddress, func, data);
+	m_tms34061->write(space, col, *m_rowaddress, func, data);
 }
 
 
@@ -78,7 +41,7 @@ READ8_MEMBER(capbowl_state::capbowl_tms34061_r)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(space, col, *m_rowaddress, func);
+	return m_tms34061->read(space, col, *m_rowaddress, func);
 }
 
 
@@ -162,14 +125,13 @@ inline rgb_t capbowl_state::pen_for_pixel( UINT8 *src, UINT8 pix )
 
 UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	struct tms34061_display state;
 	int x, y;
 
 	/* first get the current display state */
-	tms34061_get_display_state(&state);
+	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (state.blanked)
+	if (m_tms34061->m_display.blanked)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
@@ -178,7 +140,7 @@ UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 
 	/* now regenerate the bitmap */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT8 *src = &state.vram[256 * y];
+		UINT8 *src = &m_tms34061->m_display.vram[256 * y];
 		UINT32 *dest = &bitmap.pix32(y);
 
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)

@@ -334,6 +334,26 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write),  /* Also a status LED. See memory map above */
 };
 
+/*************************************
+ *
+ *  TMS34061 interfacing
+ *
+ *************************************/
+
+static void generate_interrupt( running_machine &machine, int state )
+{
+	capbowl_state *driver = machine.driver_data<capbowl_state>();
+	driver->m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
+}
+
+static const struct tms34061_interface tms34061intf =
+{
+	"screen",               /* the screen we are acting on */
+	8,                      /* VRAM address is (row << rowshift) | col */
+	0x10000,                /* size of video RAM */
+	generate_interrupt      /* interrupt gen callback */
+};
+
 
 
 /*************************************
@@ -380,6 +400,8 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 244)
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update_capbowl)
+	
+	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

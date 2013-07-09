@@ -77,10 +77,13 @@ class guab_state : public driver_device
 public:
 	guab_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sn(*this, "snsnd") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_tms34061(*this, "tms34061"),
+		m_sn(*this, "snsnd") { }
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<tms34061_device> m_tms34061;
 	required_device<sn76489_device> m_sn;
 
 	struct ef9369 m_pal;
@@ -98,10 +101,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(fdc_data_callback);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -162,10 +163,10 @@ WRITE16_MEMBER(guab_state::guab_tms34061_w)
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(space, col, row, func, data >> 8);
+		m_tms34061->write(space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(space, col | 1, row, func, data & 0xff);
+		m_tms34061->write(space, col | 1, row, func, data & 0xff);
 }
 
 
@@ -182,10 +183,10 @@ READ16_MEMBER(guab_state::guab_tms34061_r)
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(space, col, row, func) << 8;
+		data |= m_tms34061->read(space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(space, col | 1, row, func);
+		data |= m_tms34061->read(space, col | 1, row, func);
 
 	return data;
 }
@@ -256,22 +257,14 @@ READ16_MEMBER(guab_state::ef9369_r)
 	}
 }
 
-
-void guab_state::video_start()
-{
-	tms34061_start(machine(), &tms34061intf);
-}
-
-
 UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
-	struct tms34061_display state;
-
-	tms34061_get_display_state(&state);
+	
+	m_tms34061->get_display_state();
 
 	/* If blanked, fill with black */
-	if (state.blanked)
+	if (m_tms34061->m_display.blanked)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 		return 0;
@@ -279,7 +272,7 @@ UINT32 guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitma
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &state.vram[256 * y];
+		UINT8 *src = &m_tms34061->m_display.vram[256 * y];
 		UINT16 *dest = &bitmap.pix16(y);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -831,7 +824,8 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
 
 	MCFG_PALETTE_LENGTH(16)
-
+	
+	MCFG_TMS34061_ADD("tms34061", tms34061intf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

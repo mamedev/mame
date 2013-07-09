@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/nvram.h"
+#include "video/tms34061.h"
 
 class capbowl_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_rowaddress(*this, "rowaddress"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_tms34061(*this, "tms34061") { }
 
 	void init_nvram(nvram_device &nvram, void *base, size_t size);
 
@@ -34,6 +36,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<tms34061_device> m_tms34061;
 	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
 	DECLARE_READ8_MEMBER(track_0_r);
 	DECLARE_READ8_MEMBER(track_1_r);
@@ -46,7 +49,6 @@ public:
 	DECLARE_DRIVER_INIT(capbowl);
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
 	UINT32 screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(capbowl_interrupt);
 	TIMER_CALLBACK_MEMBER(capbowl_update);

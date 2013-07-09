@@ -440,11 +440,8 @@ void _class :: _name(::address_map &map, device_t &device) \
 // legacy space writes
 #define AM_WRITE_LEGACY(_handler) \
 	curentry->set_handler(_handler, #_handler);
-#define AM_WRITE8_LEGACY(_handler, _unitmask) \
-	curentry->set_handler(_handler, #_handler, _unitmask);
 
-
-
+	
 // legacy space reads/writes
 #define AM_READWRITE_LEGACY(_rhandler, _whandler) \
 	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler);
