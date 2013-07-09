@@ -87,7 +87,7 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
   Pit Boss Superstar (c)1990
-  *Pit Boss Superstar 30 (c)1993 (program code 9233-xx)
+  Pit Boss Superstar 30 (c)1993
   *Pit Boss Superstar III 30 (c)1993?
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
@@ -224,19 +224,20 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
-	DECLARE_DRIVER_INIT(megat4);
-	DECLARE_DRIVER_INIT(megat4st);
-	DECLARE_DRIVER_INIT(megat3);
+	DECLARE_DRIVER_INIT(pitbossm);
+	DECLARE_DRIVER_INIT(pbss30);
+	DECLARE_DRIVER_INIT(pbst30);
 	DECLARE_DRIVER_INIT(pbst30b);
+	DECLARE_DRIVER_INIT(megat2);
+	DECLARE_DRIVER_INIT(megat3);
+	DECLARE_DRIVER_INIT(megat3te);
+	DECLARE_DRIVER_INIT(megat4);
 	DECLARE_DRIVER_INIT(megat4c);
+	DECLARE_DRIVER_INIT(megat4st);
+	DECLARE_DRIVER_INIT(megat4te);
 	DECLARE_DRIVER_INIT(megat5);
 	DECLARE_DRIVER_INIT(megat5t);
 	DECLARE_DRIVER_INIT(megat6);
-	DECLARE_DRIVER_INIT(megat4te);
-	DECLARE_DRIVER_INIT(pitbossm);
-	DECLARE_DRIVER_INIT(megat2);
-	DECLARE_DRIVER_INIT(pbst30);
-	DECLARE_DRIVER_INIT(megat3te);
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_MACHINE_START(meritm_crt250_questions);
@@ -260,7 +261,7 @@ public:
 };
 
 
-#define SYSTEM_CLK  21470000
+#define SYSTEM_CLK  XTAL_21_4772MHz
 #define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
 
 
@@ -1430,6 +1431,23 @@ ROM_START( pbst30b ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
 
+ROM_START( pbss30 ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-01 U1-RO1 C1993 MII */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9233-00-01_u9-r0",  0x00000, 0x10000, CRC(887da433) SHA1(2950803cef75e0d337fbcedaeea994ec82c9db71) ) /* 9233-00-01  072893 */
+	ROM_LOAD( "9233-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9233-00-01_u11-r0", 0x20000, 0x10000, CRC(0c02e464) SHA1(9283f324a8582ad98495e084750637e2a02a7474) )
+	ROM_LOAD( "9233-00-01_u12-r0", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) )
+	ROM_LOAD( "9233-00-01_u13-r0", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) )
+	ROM_LOAD( "9233-00-01_u14-r0", 0x50000, 0x10000, CRC(c6701f15) SHA1(d475c4490df8dfa6f2374bb70ef12c7afaecd501) )
+	ROM_LOAD( "9233-00-01_u15-r0", 0x60000, 0x10000, CRC(5810840e) SHA1(bad6457752ac212c3c11360a13a8d3473662a287) )
+
+
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
+	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9233-01_u6-r0",  0x40000, 0x40000, CRC(59c85a0a) SHA1(ef7f45c4e032d9dd14c4f5237f5b3c487be0cb2f) )
+	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
+ROM_END
+
 
 /*
     Mega Touch
@@ -2109,6 +2127,18 @@ DRIVER_INIT_MEMBER(meritm_state,pitbossm)
 
 };
 
+DRIVER_INIT_MEMBER(meritm_state,pbss30)
+{
+	static const UINT8 pbss30_ds1204_key[8] =
+		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
+
+	static const UINT8 pbss30_ds1204_nvram[16] =
+		{ 0x3e, 0x9a, 0x3c, 0x3f, 0x1d, 0x51, 0x72, 0xc9, 0x28, 0x2c, 0x1d, 0x2d, 0x0e, 0x56, 0x41, 0x00 }; // Needs to be corrected for this set!!!
+
+	ds1204_init(pbss30_ds1204_key, pbss30_ds1204_nvram);
+
+};
+
 DRIVER_INIT_MEMBER(meritm_state,pbst30)
 {
 	static const UINT8 pbst30b_ds1204_key[8] =
@@ -2251,6 +2281,7 @@ GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, driver_device, 0,
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state, pbss30,  ROT0, "Merit", "Pit Boss Superstar 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 /* CRT 250 + CRT 254 + CRT 256 */
 GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, meritm_state,  pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
