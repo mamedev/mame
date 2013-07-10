@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
 	/* determine if we are a C file */
 	ext = strrchr(argv[1], '.');
-	is_c_file = (ext && (core_stricmp(ext, ".c") == 0 || core_stricmp(ext, ".h") == 0 || core_stricmp(ext, ".cpp") == 0 || core_stricmp(ext, ".lst") == 0));
+	is_c_file = (ext && (core_stricmp(ext, ".c") == 0 || core_stricmp(ext, ".h") == 0 || core_stricmp(ext, ".cpp") == 0 || core_stricmp(ext, ".inc") == 0 || core_stricmp(ext, ".lst") == 0));
 	is_xml_file = (ext && core_stricmp(ext, ".xml") == 0);
 
 	/* rip through it */
