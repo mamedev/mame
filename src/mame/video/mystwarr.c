@@ -167,7 +167,7 @@ VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 
 	m_gametype = 0;
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -175,10 +175,10 @@ VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 
 	konamigx_mixer_init(machine(), 0);
 
-	K056832_set_LayerOffset(0, -2+2-1, 0-1);
-	K056832_set_LayerOffset(1,  0+2, 0);
-	K056832_set_LayerOffset(2,  2+2, 0);
-	K056832_set_LayerOffset(3,  3+2, 0);
+	m_k056832->altK056832_set_LayerOffset(0, -2+2-1, 0-1);
+	m_k056832->altK056832_set_LayerOffset(1,  0+2, 0);
+	m_k056832->altK056832_set_LayerOffset(2,  2+2, 0);
+	m_k056832->altK056832_set_LayerOffset(3,  3+2, 0);
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
@@ -207,7 +207,7 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 	m_gametype = 1;
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -217,10 +217,10 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 	konamigx_mixer_primode(1);
 
-	K056832_set_LayerOffset(0, -2+4, 0);
-	K056832_set_LayerOffset(1,  0+4, 0);
-	K056832_set_LayerOffset(2,  2+4, 0);
-	K056832_set_LayerOffset(3,  3+4, 0);
+	m_k056832->altK056832_set_LayerOffset(0, -2+4, 0);
+	m_k056832->altK056832_set_LayerOffset(1,  0+4, 0);
+	m_k056832->altK056832_set_LayerOffset(2,  2+4, 0);
+	m_k056832->altK056832_set_LayerOffset(3,  3+4, 0);
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
@@ -236,7 +236,7 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 
 	m_gametype = 0;
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -244,10 +244,10 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 
 	konamigx_mixer_init(machine(), 0);
 
-	K056832_set_LayerOffset(0, -2-3, 0);
-	K056832_set_LayerOffset(1,  0-3, 0);
-	K056832_set_LayerOffset(2,  2-3, 0);
-	K056832_set_LayerOffset(3,  3-3, 0);
+	m_k056832->altK056832_set_LayerOffset(0, -2-3, 0);
+	m_k056832->altK056832_set_LayerOffset(1,  0-3, 0);
+	m_k056832->altK056832_set_LayerOffset(2,  2-3, 0);
+	m_k056832->altK056832_set_LayerOffset(3,  3-3, 0);
 
 	m_cbparam = 0;
 }
@@ -259,7 +259,7 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 	K055555_vh_start(machine());
 	K054338_vh_start(machine());
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -268,10 +268,10 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 	konamigx_mixer_init(machine(), 0);
 
 	// other reference, floor at first boss
-	K056832_set_LayerOffset(0, -2+4, 0); // text
-	K056832_set_LayerOffset(1,  0+4, 0); // attract sea
-	K056832_set_LayerOffset(2,  2+4, 0); // attract red monster in background of sea
-	K056832_set_LayerOffset(3,  3+4, 0); // attract sky background to sea
+	m_k056832->altK056832_set_LayerOffset(0, -2+4, 0); // text
+	m_k056832->altK056832_set_LayerOffset(1,  0+4, 0); // attract sea
+	m_k056832->altK056832_set_LayerOffset(2,  2+4, 0); // attract red monster in background of sea
+	m_k056832->altK056832_set_LayerOffset(3,  3+4, 0); // attract sky background to sea
 }
 
 VIDEO_START_MEMBER(mystwarr_state,viostorm)
@@ -281,7 +281,7 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 	K055555_vh_start(machine());
 	K054338_vh_start(machine());
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -289,10 +289,10 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 
 	konamigx_mixer_init(machine(), 0);
 
-	K056832_set_LayerOffset(0, -2+1, 0);
-	K056832_set_LayerOffset(1,  0+1, 0);
-	K056832_set_LayerOffset(2,  2+1, 0);
-	K056832_set_LayerOffset(3,  3+1, 0);
+	m_k056832->altK056832_set_LayerOffset(0, -2+1, 0);
+	m_k056832->altK056832_set_LayerOffset(1,  0+1, 0);
+	m_k056832->altK056832_set_LayerOffset(2,  2+1, 0);
+	m_k056832->altK056832_set_LayerOffset(3,  3+1, 0);
 }
 
 VIDEO_START_MEMBER(mystwarr_state,martchmp)
@@ -302,7 +302,7 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 	K055555_vh_start(machine());
 	K054338_vh_start(machine());
 
-	K056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_decode_tiles(machine());
 
@@ -310,10 +310,10 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 
 	konamigx_mixer_init(machine(), 0);
 
-	K056832_set_LayerOffset(0, -2-4, 0);
-	K056832_set_LayerOffset(1,  0-4, 0);
-	K056832_set_LayerOffset(2,  2-4, 0);
-	K056832_set_LayerOffset(3,  3-4, 0);
+	m_k056832->altK056832_set_LayerOffset(0, -2-4, 0);
+	m_k056832->altK056832_set_LayerOffset(1,  0-4, 0);
+	m_k056832->altK056832_set_LayerOffset(2,  2-4, 0);
+	m_k056832->altK056832_set_LayerOffset(3,  3-4, 0);
 
 	K054338_invert_alpha(0);
 }
@@ -330,7 +330,7 @@ UINT32 mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb3
 	{
 		old = m_layer_colorbase[i];
 		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if( old != m_layer_colorbase[i] ) K056832_mark_plane_dirty(i);
+		if( old != m_layer_colorbase[i] ) m_k056832->altK056832_mark_plane_dirty(i);
 	}
 
 	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
@@ -347,7 +347,7 @@ UINT32 mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rgb3
 	{
 		old = m_layer_colorbase[i];
 		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if (old != m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
+		if (old != m_layer_colorbase[i]) m_k056832->altK056832_mark_plane_dirty(i);
 	}
 
 	m_sprite_colorbase = K055555_get_palette_index(4)<<4;
@@ -364,7 +364,7 @@ UINT32 mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rgb3
 	{
 		old = m_layer_colorbase[i];
 		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
-		if (old != m_layer_colorbase[i]) K056832_mark_plane_dirty(i);
+		if (old != m_layer_colorbase[i]) m_k056832->altK056832_mark_plane_dirty(i);
 	}
 
 	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
@@ -498,7 +498,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 		rozmode = GXSUB_8BPP;
 	}
 
-	if (K056832_get_LayerAssociation())
+	if (m_k056832->altK056832_get_LayerAssociation())
 	{
 		for (i=0; i<4; i++)
 		{
@@ -506,7 +506,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 			if (m_layer_colorbase[i] != newbase)
 			{
 				m_layer_colorbase[i] = newbase;
-				K056832_mark_plane_dirty(i);
+				m_k056832->altK056832_mark_plane_dirty(i);
 			}
 		}
 	}
@@ -521,7 +521,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 				dirty = 1;
 			}
 		}
-		if (dirty) K056832_MarkAllTilemapsDirty();
+		if (dirty) m_k056832->altK056832_MarkAllTilemapsDirty();
 
 	}
 

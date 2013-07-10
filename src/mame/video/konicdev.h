@@ -822,10 +822,6 @@ extern const device_type K037122;
 #define MCFG_K051733_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K051733, 0)
 
-#define MCFG_K056832_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K056832, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 #define MCFG_K055555_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K055555, 0)
 

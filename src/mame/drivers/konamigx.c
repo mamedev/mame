@@ -1150,10 +1150,10 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM // main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram") // work RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READ_LEGACY(K056832_5bpp_rom_long_r)
+	AM_RANGE(0xd00000, 0xd01fff) AM_DEVREAD("k056832", k056832_device, altK056832_5bpp_rom_long_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
-	AM_RANGE(0xd40000, 0xd4003f) AM_WRITE_LEGACY(K056832_long_w)
+	AM_RANGE(0xd40000, 0xd4003f) AM_DEVWRITE("k056832", k056832_device, altK056832_long_w)
 	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
 	AM_RANGE(0xd48000, 0xd48007) AM_WRITE_LEGACY(K053246_long_w)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE_LEGACY(K053247_reg_long_w)
@@ -1168,10 +1168,10 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd5c000, 0xd5c003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd5e000, 0xd5e003) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xd80000, 0xd8001f) AM_WRITE_LEGACY(K054338_long_w)
-	AM_RANGE(0xda0000, 0xda1fff) AM_READWRITE_LEGACY(K056832_ram_long_r, K056832_ram_long_w)
-	AM_RANGE(0xda2000, 0xda3fff) AM_READWRITE_LEGACY(K056832_ram_long_r, K056832_ram_long_w)
+	AM_RANGE(0xda0000, 0xda1fff) AM_DEVREADWRITE("k056832", k056832_device, altK056832_ram_long_r, altK056832_ram_long_w)
+	AM_RANGE(0xda2000, 0xda3fff) AM_DEVREADWRITE("k056832", k056832_device, altK056832_ram_long_r, altK056832_ram_long_w)
 #if GX_DEBUG
-	AM_RANGE(0xd40000, 0xd4003f) AM_READ_LEGACY(K056832_long_r)
+	AM_RANGE(0xd40000, 0xd4003f) AM_READ_LEGACY(altK056832_long_r)
 	AM_RANGE(0xd50000, 0xd500ff) AM_READ_LEGACY(K055555_long_r)
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_READ_LEGACY(K053247_reg_long_r)
 #endif
@@ -1791,6 +1791,8 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
 
 	MCFG_PALETTE_LENGTH(8192)
+
+	MCFG_K056832_ADD_NOINTF("k056832"/*, konamigx_k056832_intf*/)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
 
@@ -3715,6 +3717,10 @@ static const GXGameInfoT gameDefs[] =
 	{ "",         -1, -1, -1, -1 },
 };
 
+READ32_MEMBER( konamigx_state::altK056832_6bpp_rom_long_r )
+{
+	return m_k056832->altK056832_6bpp_rom_long_r(space,offset,mem_mask);
+}
 
 DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 {
@@ -3804,7 +3810,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 		break;
 
 		case BPP66:
-			m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd00000, 0xd01fff, read32_delegate(FUNC(konamigx_state::altK056832_6bpp_rom_long_r), this));
 
 		case BPP6:
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4a000, 0xd4a00f, read32_delegate(FUNC(konamigx_state::gx6bppspr_r),this));

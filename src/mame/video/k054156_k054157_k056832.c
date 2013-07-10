@@ -216,6 +216,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_uses_tile_banks(0),
 	m_cur_tile_bank(0)
 {
+
 }
 
 
@@ -252,6 +253,12 @@ void k056832_device::device_config_complete()
 
 void k056832_device::device_start()
 {
+
+	// for non-interface cases we still use the vh_start call
+	if (m_bpp == 0)
+		return;
+
+
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
 	tilemap_t *tmap;
@@ -330,6 +337,8 @@ void k056832_device::device_start()
 	};
 
 
+
+
 	/* handle the various graphics formats */
 	i = (m_big) ? 8 : 16;
 
@@ -376,6 +385,8 @@ void k056832_device::device_start()
 			fatalerror("Unsupported bpp\n");
 	}
 
+
+
 	machine().gfx[m_gfx_num]->set_granularity(16); /* override */
 
 	/* deinterleave the graphics, if needed */
@@ -417,6 +428,8 @@ void k056832_device::device_start()
 		m_page_tile_mode[i] = 1;
 	}
 
+
+
 	m_videoram = auto_alloc_array_clear(machine(), UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 
 	m_tilemap[0x0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
@@ -454,6 +467,8 @@ void k056832_device::device_start()
 	change_rambank();
 	change_rombank();
 
+
+
 	save_pointer(NAME(m_videoram), 0x10000);
 	save_item(NAME(m_regs));
 	save_item(NAME(m_regsb));
@@ -490,6 +505,7 @@ void k056832_device::device_start()
 	}
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
+
 }
 
 /*****************************************************************************
@@ -2092,7 +2108,7 @@ READ16_MEMBER( k056832_device::b_word_r )
 
 /*
 
-  some drivers still rely on this non-device implementation
+  some drivers still rely on this non-device implementation, this should be collapsed into the device.
 
 */
 
@@ -2104,175 +2120,127 @@ READ16_MEMBER( k056832_device::b_word_r )
 /*                                                                         */
 /***************************************************************************/
 
+#define altK056832_mark_line_dirty(P,L) if (L<0x100) m_line_dirty[P][L>>5] |= 1<<(L&0x1f)
+#define altK056832_mark_all_lines_dirty(P) m_all_lines_dirty[P] = 1
 
-#define K056832_PAGE_COUNT 16
-
-static tilemap_t *K056832_tilemap[K056832_PAGE_COUNT];
-static bitmap_ind16 *K056832_pixmap[K056832_PAGE_COUNT];
-
-static UINT16 K056832_regs[0x20];   // 157/832 regs group 1
-static UINT16 K056832_regsb[4]; // 157/832 regs group 2, board dependent
-
-static UINT8 *K056832_rombase;  // pointer to tile gfx data
-static UINT16 *K056832_videoram;
-static int K056832_NumGfxBanks;     // depends on size of graphics ROMs
-static int K056832_CurGfxBank;      // cached info for K056832_regs[0x1a]
-static int K056832_gfxnum;          // graphics element index for unpacked tiles
-static const char *K056832_memory_region;   // memory region for tile gfx data
-static int K056832_bpp;
-
-// ROM readback involves reading 2 halves of a word
-// from the same location in a row.  Reading the
-// RAM window resets this state so you get the first half.
-static int K056832_rom_half;
-
-// locally cached values
-static int K056832_LayerAssociatedWithPage[K056832_PAGE_COUNT];
-static int K056832_LayerOffset[8][2];
-static int K056832_LSRAMPage[8][2];
-static INT32 K056832_X[8];  // 0..3 left
-static INT32 K056832_Y[8];  // 0..3 top
-static INT32 K056832_W[8];  // 0..3 width  -> 1..4 pages
-static INT32 K056832_H[8];  // 0..3 height -> 1..4 pages
-static INT32 K056832_dx[8]; // scroll
-static INT32 K056832_dy[8]; // scroll
-static UINT32 K056832_LineDirty[K056832_PAGE_COUNT][8];
-static UINT8 K056832_AllLinesDirty[K056832_PAGE_COUNT];
-static UINT8 K056832_PageTileMode[K056832_PAGE_COUNT];
-static UINT8 K056832_LayerTileMode[8];
-static int K056832_DefaultLayerAssociation;
-static int K056832_LayerAssociation;
-static int K056832_ActiveLayer;
-static int K056832_SelectedPage;
-static int K056832_SelectedPagex4096;
-static int K056832_UpdateMode;
-static int K056832_linemap_enabled;
-static int K056832_use_ext_linescroll;
-static int K056832_uses_tile_banks, K056832_cur_tile_bank;
-
-static int K056832_djmain_hack;
-
-#define K056832_mark_line_dirty(P,L) if (L<0x100) K056832_LineDirty[P][L>>5] |= 1<<(L&0x1f)
-#define K056832_mark_all_lines_dirty(P) K056832_AllLinesDirty[P] = 1
-
-static void K056832_mark_page_dirty(int page)
+void k056832_device::altK056832_mark_page_dirty(int page)
 {
-	if (K056832_PageTileMode[page])
-		K056832_tilemap[page]->mark_all_dirty();
+	if (m_page_tile_mode[page])
+		m_tilemap[page]->mark_all_dirty();
 	else
-		K056832_mark_all_lines_dirty(page);
+		altK056832_mark_all_lines_dirty(page);
 }
 
-void K056832_mark_plane_dirty(int layer)
+void k056832_device::altK056832_mark_plane_dirty(int layer)
 {
 	int tilemode, i;
 
-	tilemode = K056832_LayerTileMode[layer];
+	tilemode = m_layer_tile_mode[layer];
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
-		if (K056832_LayerAssociatedWithPage[i] == layer)
+		if (m_layer_assoc_with_page[i] == layer)
 		{
-			K056832_PageTileMode[i] = tilemode;
-			K056832_mark_page_dirty(i);
+			m_page_tile_mode[i] = tilemode;
+			altK056832_mark_page_dirty(i);
 		}
 	}
 }
 
-void K056832_MarkAllTilemapsDirty(void)
+void k056832_device::altK056832_MarkAllTilemapsDirty(void)
 {
 	int i;
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
-		if (K056832_LayerAssociatedWithPage[i] != -1)
+		if (m_layer_assoc_with_page[i] != -1)
 		{
-			K056832_PageTileMode[i] = K056832_LayerTileMode[K056832_LayerAssociatedWithPage[i]];
-			K056832_mark_page_dirty(i);
+			m_page_tile_mode[i] = m_layer_tile_mode[m_layer_assoc_with_page[i]];
+			altK056832_mark_page_dirty(i);
 		}
 	}
 }
 
-static void K056832_UpdatePageLayout(void)
+void k056832_device::altK056832_UpdatePageLayout(void)
 {
 	int layer, rowstart, rowspan, colstart, colspan, r, c, pageIndex, setlayer;
 
 	// enable layer association by default
-	K056832_LayerAssociation = K056832_DefaultLayerAssociation;
+	m_layer_association = m_default_layer_association;
 
 	// disable association if a layer grabs the entire 4x4 map (happens in Twinbee and Dadandarn)
 	for (layer=0; layer<4; layer++)
 	{
-		if (!K056832_Y[layer] && !K056832_X[layer] && K056832_H[layer]==3 && K056832_W[layer]==3)
+		if (!m_y[layer] && !m_x[layer] && m_h[layer]==3 && m_w[layer]==3)
 		{
-			K056832_LayerAssociation = 0;
+			m_layer_association = 0;
 			break;
 		}
 	}
 
 	// winning spike and vsnet soccer don't like our layer association implementation..
-	if (K056832_djmain_hack==2)
-		K056832_LayerAssociation = 0;
+	if (altK056832_djmain_hack==2)
+		m_layer_association = 0;
 
 	// disable all tilemaps
 	for (pageIndex=0; pageIndex<K056832_PAGE_COUNT; pageIndex++)
 	{
-		K056832_LayerAssociatedWithPage[pageIndex] = -1;
+		m_layer_assoc_with_page[pageIndex] = -1;
 	}
 
 
 	// enable associated tilemaps
 	for (layer=0; layer<4; layer++)
 	{
-		rowstart = K056832_Y[layer];
-		colstart = K056832_X[layer];
-		rowspan  = K056832_H[layer]+1;
-		colspan  = K056832_W[layer]+1;
+		rowstart = m_y[layer];
+		colstart = m_x[layer];
+		rowspan  = m_h[layer]+1;
+		colspan  = m_w[layer]+1;
 
-		setlayer = (K056832_LayerAssociation) ? layer : K056832_ActiveLayer;
+		setlayer = (m_layer_association) ? layer : m_active_layer;
 
 		for (r=0; r<rowspan; r++)
 		{
 			for (c=0; c<colspan; c++)
 			{
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-if (!(K056832_djmain_hack==1) || K056832_LayerAssociatedWithPage[pageIndex] == -1) //*
-					K056832_LayerAssociatedWithPage[pageIndex] = setlayer;
+if (!(altK056832_djmain_hack==1) || m_layer_assoc_with_page[pageIndex] == -1) //*
+					m_layer_assoc_with_page[pageIndex] = setlayer;
 			}
 		}
 	}
 
 	// refresh associated tilemaps
-	K056832_MarkAllTilemapsDirty();
+	altK056832_MarkAllTilemapsDirty();
 }
 
-static void (*K056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
+static void (*altK056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-INLINE void K056832_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int pageIndex )
+void k056832_device::altK056832_get_tile_info( tile_data &tileinfo, int tile_index, int pageIndex )
 {
-	static const struct K056832_SHIFTMASKS
+	static const struct altK056832_SHIFTMASKS
 	{
 		int flips, palm1, pals2, palm2;
 	}
-	K056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
+	altK056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
 
-	const struct K056832_SHIFTMASKS *smptr;
+	const struct altK056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
 	UINT16 *pMem;
 
-	pMem  = &K056832_videoram[(pageIndex<<12)+(tile_index<<1)];
+	pMem  = &m_videoram[(pageIndex<<12)+(tile_index<<1)];
 
-	if (K056832_LayerAssociation)
+	if (m_layer_association)
 	{
-		layer = K056832_LayerAssociatedWithPage[pageIndex];
+		layer = m_layer_assoc_with_page[pageIndex];
 		if (layer == -1) layer = 0; // use layer 0's palette info for unmapped pages
 	}
 	else
-		layer = K056832_ActiveLayer;
+		layer = m_active_layer;
 
-	fbits = K056832_regs[3]>>6 & 3;
-	flip  = K056832_regs[1]>>(layer<<1) & 0x3; // tile-flip override (see p.20 3.2.2 "REG2")
-	smptr = &K056832_shiftmasks[fbits];
+	fbits = m_regs[3]>>6 & 3;
+	flip  = m_regs[1]>>(layer<<1) & 0x3; // tile-flip override (see p.20 3.2.2 "REG2")
+	smptr = &altK056832_shiftmasks[fbits];
 	attr  = pMem[0];
 	code  = pMem[1];
 
@@ -2283,80 +2251,85 @@ INLINE void K056832_get_tile_info( running_machine &machine, tile_data &tileinfo
 	color = (attr & smptr->palm1) | (attr>>smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	(*K056832_callback)(machine, layer, &code, &color, &flags);
+	(*altK056832_callback)(machine(), layer, &code, &color, &flags);
 
-	SET_TILE_INFO(K056832_gfxnum,
+	SET_TILE_INFO_MEMBER(altK056832_gfxnum,
 			code,
 			color,
 			flags);
 }
 
-static TILE_GET_INFO( K056832_get_tile_info0 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x0); }
-static TILE_GET_INFO( K056832_get_tile_info1 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x1); }
-static TILE_GET_INFO( K056832_get_tile_info2 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x2); }
-static TILE_GET_INFO( K056832_get_tile_info3 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x3); }
-static TILE_GET_INFO( K056832_get_tile_info4 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x4); }
-static TILE_GET_INFO( K056832_get_tile_info5 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x5); }
-static TILE_GET_INFO( K056832_get_tile_info6 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x6); }
-static TILE_GET_INFO( K056832_get_tile_info7 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x7); }
-static TILE_GET_INFO( K056832_get_tile_info8 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x8); }
-static TILE_GET_INFO( K056832_get_tile_info9 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x9); }
-static TILE_GET_INFO( K056832_get_tile_infoa ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xa); }
-static TILE_GET_INFO( K056832_get_tile_infob ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xb); }
-static TILE_GET_INFO( K056832_get_tile_infoc ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xc); }
-static TILE_GET_INFO( K056832_get_tile_infod ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xd); }
-static TILE_GET_INFO( K056832_get_tile_infoe ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xe); }
-static TILE_GET_INFO( K056832_get_tile_infof ) { K056832_get_tile_info(machine,tileinfo,tile_index,0xf); }
 
-static void K056832_change_rambank(void)
+	
+
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info0 ) { altK056832_get_tile_info(tileinfo,tile_index,0x0); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info1 ) { altK056832_get_tile_info(tileinfo,tile_index,0x1); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info2 ) { altK056832_get_tile_info(tileinfo,tile_index,0x2); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info3 ) { altK056832_get_tile_info(tileinfo,tile_index,0x3); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info4 ) { altK056832_get_tile_info(tileinfo,tile_index,0x4); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info5 ) { altK056832_get_tile_info(tileinfo,tile_index,0x5); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info6 ) { altK056832_get_tile_info(tileinfo,tile_index,0x6); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info7 ) { altK056832_get_tile_info(tileinfo,tile_index,0x7); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info8 ) { altK056832_get_tile_info(tileinfo,tile_index,0x8); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info9 ) { altK056832_get_tile_info(tileinfo,tile_index,0x9); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoa ) { altK056832_get_tile_info(tileinfo,tile_index,0xa); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infob ) { altK056832_get_tile_info(tileinfo,tile_index,0xb); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoc ) { altK056832_get_tile_info(tileinfo,tile_index,0xc); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infod ) { altK056832_get_tile_info(tileinfo,tile_index,0xd); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoe ) { altK056832_get_tile_info(tileinfo,tile_index,0xe); }
+TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infof ) { altK056832_get_tile_info(tileinfo,tile_index,0xf); }
+
+void k056832_device::altK056832_change_rambank(void)
 {
 	/* ------xx page col
 	 * ---xx--- page row
 	 */
-	int bank = K056832_regs[0x19];
+	int bank = m_regs[0x19];
 
-	if (K056832_regs[0] & 0x02) // external linescroll enable
+	if (m_regs[0] & 0x02) // external linescroll enable
 	{
-		K056832_SelectedPage = K056832_PAGE_COUNT;
+		m_selected_page = K056832_PAGE_COUNT;
 	}
 	else
 	{
-		K056832_SelectedPage = ((bank>>1)&0xc)|(bank&3);
+		m_selected_page = ((bank>>1)&0xc)|(bank&3);
 	}
-	K056832_SelectedPagex4096 = K056832_SelectedPage << 12;
+	m_selected_page_x4096 = m_selected_page << 12;
 
 	// refresh associated tilemaps
-	K056832_MarkAllTilemapsDirty();
+	altK056832_MarkAllTilemapsDirty();
 }
 
-static void K056832_change_rombank(void)
+void k056832_device::altK056832_change_rombank(void)
 {
 	int bank;
 
-	if (K056832_uses_tile_banks)    /* Asterix */
+	if (m_uses_tile_banks)    /* Asterix */
 	{
-		bank = (K056832_regs[0x1a] >> 8) | (K056832_regs[0x1b] << 4) | (K056832_cur_tile_bank << 6);
+		bank = (m_regs[0x1a] >> 8) | (m_regs[0x1b] << 4) | (m_cur_tile_bank << 6);
 	}
 	else
 	{
-		bank = K056832_regs[0x1a] | (K056832_regs[0x1b] << 16);
+		bank = m_regs[0x1a] | (m_regs[0x1b] << 16);
 	}
 
-	K056832_CurGfxBank = bank % K056832_NumGfxBanks;
+	m_cur_gfx_banks = bank % m_num_gfx_banks;
 }
 
-static void K056832_postload(running_machine &machine)
+
+void k056832_device::altK056832_postload()
 {
-	K056832_UpdatePageLayout();
-	K056832_change_rambank();
-	K056832_change_rombank();
+	altK056832_UpdatePageLayout();
+	altK056832_change_rambank();
+	altK056832_change_rombank();
 }
 
-void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
+void k056832_device::altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 	int (*scrolld)[4][2],
 	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 	int djmain_hack)
 {
+
 	tilemap_t *tmap;
 	int gfx_index;
 	int i;
@@ -2433,7 +2406,7 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 		8*8*4
 	};
 
-	K056832_bpp = bpp;
+	altK056832_bpp = bpp;
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -2489,114 +2462,116 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 
 	machine.gfx[gfx_index]->set_granularity(16); /* override */
 
-	K056832_memory_region = gfx_memory_region;
-	K056832_gfxnum = gfx_index;
-	K056832_callback = callback;
+	altK056832_memory_region = gfx_memory_region;
+	altK056832_gfxnum = gfx_index;
+	altK056832_callback = callback;
 
-	K056832_rombase = machine.root_device().memregion(gfx_memory_region)->base();
-	K056832_NumGfxBanks = machine.root_device().memregion(gfx_memory_region)->bytes() / 0x2000;
-	K056832_CurGfxBank = 0;
-	K056832_use_ext_linescroll = 0;
-	K056832_uses_tile_banks = 0;
+	m_rombase = machine.root_device().memregion(gfx_memory_region)->base();
+	m_num_gfx_banks = machine.root_device().memregion(gfx_memory_region)->bytes() / 0x2000;
+	m_cur_gfx_banks = 0;
+	m_use_ext_linescroll = 0;
+	m_uses_tile_banks = 0;
 
-	K056832_djmain_hack = djmain_hack;
+	altK056832_djmain_hack = djmain_hack;
 
 	for (i=0; i<4; i++)
 	{
-		K056832_LayerOffset[i][0] = 0;
-		K056832_LayerOffset[i][1] = 0;
-		K056832_LSRAMPage[i][0] = i;
-		K056832_LSRAMPage[i][1] = i << 11;
-		K056832_X[i] = 0;
-		K056832_Y[i] = 0;
-		K056832_W[i] = 0;
-		K056832_H[i] = 0;
-		K056832_dx[i] = 0;
-		K056832_dy[i] = 0;
-		K056832_LayerTileMode[i] = 1;
+		m_layer_offs[i][0] = 0;
+		m_layer_offs[i][1] = 0;
+		m_lsram_page[i][0] = i;
+		m_lsram_page[i][1] = i << 11;
+		m_x[i] = 0;
+		m_y[i] = 0;
+		m_w[i] = 0;
+		m_h[i] = 0;
+		m_dx[i] = 0;
+		m_dy[i] = 0;
+		m_layer_tile_mode[i] = 1;
 	}
 
-	K056832_DefaultLayerAssociation = 1;
-	K056832_ActiveLayer = 0;
-	K056832_UpdateMode = 0;
-	K056832_linemap_enabled = 0;
+	m_default_layer_association = 1;
+	m_active_layer = 0;
+	m_k055555_use = 0;
+	m_linemap_enabled = 0;
 
-	memset(K056832_LineDirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
+	memset(m_line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
-		K056832_AllLinesDirty[i] = 0;
-		K056832_PageTileMode[i] = 1;
+		m_all_lines_dirty[i] = 0;
+		m_page_tile_mode[i] = 1;
 	}
 
-	K056832_videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
+	m_videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
 
-	K056832_tilemap[0x0] = tilemap_create(machine, K056832_get_tile_info0, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x1] = tilemap_create(machine, K056832_get_tile_info1, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x2] = tilemap_create(machine, K056832_get_tile_info2, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x3] = tilemap_create(machine, K056832_get_tile_info3, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x4] = tilemap_create(machine, K056832_get_tile_info4, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x5] = tilemap_create(machine, K056832_get_tile_info5, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x6] = tilemap_create(machine, K056832_get_tile_info6, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x7] = tilemap_create(machine, K056832_get_tile_info7, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x8] = tilemap_create(machine, K056832_get_tile_info8, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0x9] = tilemap_create(machine, K056832_get_tile_info9, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xa] = tilemap_create(machine, K056832_get_tile_infoa, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xb] = tilemap_create(machine, K056832_get_tile_infob, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xc] = tilemap_create(machine, K056832_get_tile_infoc, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xd] = tilemap_create(machine, K056832_get_tile_infod, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xe] = tilemap_create(machine, K056832_get_tile_infoe, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	K056832_tilemap[0xf] = tilemap_create(machine, K056832_get_tile_infof, TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x8] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x9] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xa] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xb] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xc] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xd] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xe] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xf] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
-		tmap = K056832_tilemap[i];
+		tmap = m_tilemap[i];
 
-		K056832_pixmap[i] = &tmap->pixmap();
+		m_pixmap[i] = &tmap->pixmap();
 
 		tmap->set_transparent_pen(0);
 	}
 
-	memset(K056832_videoram, 0x00, 0x20000);
-	memset(K056832_regs,     0x00, sizeof(K056832_regs) );
-	memset(K056832_regsb,    0x00, sizeof(K056832_regsb) );
+	memset(m_videoram, 0x00, 0x20000);
+	memset(m_regs,     0x00, sizeof(m_regs) );
+	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
-	K056832_UpdatePageLayout();
+	altK056832_UpdatePageLayout();
 
-	K056832_change_rambank();
-	K056832_change_rombank();
+	altK056832_change_rambank();
+	altK056832_change_rombank();
 
-	machine.save().save_pointer(NAME(K056832_videoram), 0x10000);
-	machine.save().save_item(NAME(K056832_regs));
-	machine.save().save_item(NAME(K056832_regsb));
-	machine.save().save_item(NAME(K056832_X));
-	machine.save().save_item(NAME(K056832_Y));
-	machine.save().save_item(NAME(K056832_W));
-	machine.save().save_item(NAME(K056832_H));
-	machine.save().save_item(NAME(K056832_dx));
-	machine.save().save_item(NAME(K056832_dy));
-	machine.save().save_item(NAME(K056832_LayerTileMode));
+	machine.save().save_pointer(NAME(m_videoram), 0x10000);
+	machine.save().save_item(NAME(m_regs));
+	machine.save().save_item(NAME(m_regsb));
+	machine.save().save_item(NAME(m_x));
+	machine.save().save_item(NAME(m_y));
+	machine.save().save_item(NAME(m_w));
+	machine.save().save_item(NAME(m_h));
+	machine.save().save_item(NAME(m_dx));
+	machine.save().save_item(NAME(m_dy));
+	machine.save().save_item(NAME(m_layer_tile_mode));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(K056832_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(k056832_device::altK056832_postload), this));
+
+
 }
 
 
 
 /* generic helper routine for ROM checksumming */
-static int K056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec)
+int k056832_device::altK056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec)
 {
 	UINT8 *rombase;
 	int base, ret;
 
-	rombase = (UINT8 *)machine.root_device().memregion(K056832_memory_region)->base();
+	rombase = (UINT8 *)machine.root_device().memregion(altK056832_memory_region)->base();
 
-	if ((K056832_rom_half) && (zerosec))
+	if ((m_rom_half) && (zerosec))
 	{
 		return 0;
 	}
 
 	// add in the bank offset
-	offset += (K056832_CurGfxBank * 0x2000);
+	offset += (m_cur_gfx_banks * 0x2000);
 
 	// figure out the base of the ROM block
 	base = (offset / blksize) * blksize2;
@@ -2604,37 +2579,37 @@ static int K056832_rom_read_b(running_machine &machine, int offset, int blksize,
 	// get the starting offset of the proper word inside the block
 	base += (offset % blksize) * 2;
 
-	if (K056832_rom_half)
+	if (m_rom_half)
 	{
 		ret = rombase[base+1];
 	}
 	else
 	{
 		ret = rombase[base];
-		K056832_rom_half = 1;
+		m_rom_half = 1;
 	}
 
 	return ret;
 }
 
 
-READ32_HANDLER( K056832_5bpp_rom_long_r )
+READ32_MEMBER( k056832_device::altK056832_5bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4, 4, 5, 0)<<24;
+		return altK056832_rom_read_b(space.machine(), offset*4, 4, 5, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+1, 4, 5, 0)<<16;
+		return altK056832_rom_read_b(space.machine(), offset*4+1, 4, 5, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+2, 4, 5, 0)<<8;
+		return altK056832_rom_read_b(space.machine(), offset*4+2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+3, 4, 5, 1);
+		return altK056832_rom_read_b(space.machine(), offset*4+3, 4, 5, 1);
 	}
 	else
 	{
@@ -2643,23 +2618,23 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 	return 0;
 }
 
-READ32_HANDLER( K056832_6bpp_rom_long_r )
+READ32_MEMBER( k056832_device::altK056832_6bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4, 4, 6, 0)<<24;
+		return altK056832_rom_read_b(space.machine(), offset*4, 4, 6, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+1, 4, 6, 0)<<16;
+		return altK056832_rom_read_b(space.machine(), offset*4+1, 4, 6, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+2, 4, 6, 0)<<8;
+		return altK056832_rom_read_b(space.machine(), offset*4+2, 4, 6, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(space.machine(), offset*4+3, 4, 6, 0);
+		return altK056832_rom_read_b(space.machine(), offset*4+3, 4, 6, 0);
 	}
 	else
 	{
@@ -2671,17 +2646,17 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 
 // data is arranged like this:
 // 0000 1111 22 0000 1111 22
-READ16_HANDLER( K056832_mw_rom_word_r )
+READ16_MEMBER( k056832_device::altK056832_mw_rom_word_r )
 {
-	int bank = 10240*K056832_CurGfxBank;
+	int bank = 10240*m_cur_gfx_banks;
 	int addr;
 
-	if (!K056832_rombase)
+	if (!m_rombase)
 	{
-		K056832_rombase = space.machine().root_device().memregion(K056832_memory_region)->base();
+		m_rombase = space.machine().root_device().memregion(altK056832_memory_region)->base();
 	}
 
-	if (K056832_regsb[2] & 0x8)
+	if (m_regsb[2] & 0x8)
 	{
 		// we want only the 2s
 		int bit;
@@ -2690,7 +2665,7 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 		bit = offset % 4;
 		addr = (offset / 4) * 5;
 
-		temp = K056832_rombase[addr+4+bank];
+		temp = m_rombase[addr+4+bank];
 
 		switch (bit)
 		{
@@ -2731,38 +2706,38 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 
 		addr += bank;
 
-		return K056832_rombase[addr+1] | (K056832_rombase[addr] << 8);
+		return m_rombase[addr+1] | (m_rombase[addr] << 8);
 	}
 
 }
 
 
 /* only one page is mapped to videoram at a time through a window */
-READ16_HANDLER( K056832_ram_word_r )
+READ16_MEMBER( k056832_device::altK056832_ram_word_r )
 {
 	// reading from tile RAM resets the ROM readback "half" offset
-	K056832_rom_half = 0;
+	m_rom_half = 0;
 
-	return K056832_videoram[K056832_SelectedPagex4096+offset];
+	return m_videoram[m_selected_page_x4096+offset];
 }
 
 
-READ32_HANDLER( K056832_ram_long_r )
+READ32_MEMBER( k056832_device::altK056832_ram_long_r )
 {
-	UINT16 *pMem = &K056832_videoram[K056832_SelectedPagex4096+offset*2];
+	UINT16 *pMem = &m_videoram[m_selected_page_x4096+offset*2];
 
 	// reading from tile RAM resets the ROM readback "half" offset
-	K056832_rom_half = 0;
+	m_rom_half = 0;
 
 	return(pMem[0]<<16 | pMem[1]);
 }
 
-WRITE16_HANDLER( K056832_ram_word_w )
+WRITE16_MEMBER( k056832_device::altK056832_ram_word_w )
 {
 	UINT16 *tile_ptr;
 	UINT16 old_mask, old_data;
 
-	tile_ptr = &K056832_videoram[K056832_SelectedPagex4096+offset];
+	tile_ptr = &m_videoram[m_selected_page_x4096+offset];
 	old_mask = ~mem_mask;
 	old_data = *tile_ptr;
 	data = (data & mem_mask) | (old_data & old_mask);
@@ -2772,20 +2747,20 @@ WRITE16_HANDLER( K056832_ram_word_w )
 		offset >>= 1;
 		*tile_ptr = data;
 
-		if (K056832_PageTileMode[K056832_SelectedPage])
-			K056832_tilemap[K056832_SelectedPage]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			K056832_mark_line_dirty(K056832_SelectedPage, offset);
+			altK056832_mark_line_dirty(m_selected_page, offset);
 	}
 }
 
 
-WRITE32_HANDLER( K056832_ram_long_w )
+WRITE32_MEMBER( k056832_device::altK056832_ram_long_w )
 {
 	UINT16 *tile_ptr;
 	UINT32 old_mask, old_data;
 
-	tile_ptr = &K056832_videoram[K056832_SelectedPagex4096+offset*2];
+	tile_ptr = &m_videoram[m_selected_page_x4096+offset*2];
 	old_mask = ~mem_mask;
 	old_data = (UINT32)tile_ptr[0]<<16 | (UINT32)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
@@ -2795,21 +2770,21 @@ WRITE32_HANDLER( K056832_ram_long_w )
 		tile_ptr[0] = data>>16;
 		tile_ptr[1] = data;
 
-		if (K056832_PageTileMode[K056832_SelectedPage])
-			K056832_tilemap[K056832_SelectedPage]->mark_tile_dirty(offset);
+		if (m_page_tile_mode[m_selected_page])
+			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
 		else
-			K056832_mark_line_dirty(K056832_SelectedPage, offset);
+			altK056832_mark_line_dirty(m_selected_page, offset);
 	}
 }
 
-WRITE16_HANDLER( K056832_word_w )
+WRITE16_MEMBER( k056832_device::m_word_w )
 {
 	int layer, flip, mask, i;
 	UINT32 old_data, new_data;
 
-	old_data = K056832_regs[offset];
-	COMBINE_DATA(&K056832_regs[offset]);
-	new_data = K056832_regs[offset];
+	old_data = m_regs[offset];
+	COMBINE_DATA(&m_regs[offset]);
+	new_data = m_regs[offset];
 
 	if (new_data != old_data)
 	{
@@ -2828,13 +2803,13 @@ WRITE16_HANDLER( K056832_word_w )
 					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
 					for (i=0; i<K056832_PAGE_COUNT; i++)
 					{
-						K056832_tilemap[i]->set_flip(flip);
+						m_tilemap[i]->set_flip(flip);
 					}
 				}
 
 				if ((new_data & 0x02) != (old_data & 0x02))
 				{
-					K056832_change_rambank();
+					altK056832_change_rambank();
 				}
 			break;
 
@@ -2852,8 +2827,8 @@ WRITE16_HANDLER( K056832_word_w )
 					i = new_data & mask;
 					if (i != (old_data & mask))
 					{
-						K056832_LayerTileMode[layer] = i;
-						K056832_mark_plane_dirty(layer);
+						m_layer_tile_mode[layer] = i;
+						altK056832_mark_plane_dirty(layer);
 					}
 				}
 			break;
@@ -2870,12 +2845,12 @@ WRITE16_HANDLER( K056832_word_w )
 			//case 0x0a/2: break;
 
 			case 0x32/2:
-				K056832_change_rambank();
+				altK056832_change_rambank();
 			break;
 
 			case 0x34/2: /* ROM bank select for checksum */
 			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				K056832_change_rombank();
+				altK056832_change_rombank();
 			break;
 
 			// extended tile address
@@ -2892,54 +2867,54 @@ WRITE16_HANDLER( K056832_word_w )
 
 				if (offset >= 0x10/2 && offset <= 0x16/2)
 				{
-					K056832_Y[layer] = (new_data&0x18)>>3;
-					K056832_H[layer] = (new_data&0x3);
-					K056832_ActiveLayer = layer;
-					K056832_UpdatePageLayout();
+					m_y[layer] = (new_data&0x18)>>3;
+					m_h[layer] = (new_data&0x3);
+					m_active_layer = layer;
+					altK056832_UpdatePageLayout();
 				} else
 
 				if (offset >= 0x18/2 && offset <= 0x1e/2)
 				{
-					K056832_X[layer] = (new_data&0x18)>>3;
-					K056832_W[layer] = (new_data&0x03);
-					K056832_ActiveLayer = layer;
-					K056832_UpdatePageLayout();
+					m_x[layer] = (new_data&0x18)>>3;
+					m_w[layer] = (new_data&0x03);
+					m_active_layer = layer;
+					altK056832_UpdatePageLayout();
 				} else
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
 				{
-					K056832_dy[layer] = (INT16)new_data;
+					m_dy[layer] = (INT16)new_data;
 				} else
 
 				if (offset >= 0x28/2 && offset <= 0x2e/2)
 				{
-					K056832_dx[layer] = (INT16)new_data;
+					m_dx[layer] = (INT16)new_data;
 				}
 			break;
 		}
 	}
 }
 
-WRITE32_HANDLER( K056832_long_w )
+WRITE32_MEMBER( k056832_device::altK056832_long_w )
 {
 	// GX does access of all 3 widths (8/16/32) so we can't do the
 	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
 	// are used to the tilemap bank register.
 	offset <<= 1;
-	K056832_word_w(space, offset, data>>16, mem_mask >> 16);
-	K056832_word_w(space, offset+1, data, mem_mask);
+	m_word_w(space, offset, data>>16, mem_mask >> 16);
+	m_word_w(space, offset+1, data, mem_mask);
 }
 
-WRITE16_HANDLER( K056832_b_word_w )
+WRITE16_MEMBER( k056832_device::altK056832_b_word_w )
 {
-	COMBINE_DATA( &K056832_regsb[offset] );
+	COMBINE_DATA( &m_regsb[offset] );
 }
 
 
-static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
+int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
 {
-	if (K056832_PageTileMode[page]) return(0);
-	if (!K056832_linemap_enabled) return(1);
+	if (m_page_tile_mode[page]) return(0);
+	if (!m_linemap_enabled) return(1);
 
 
 	{
@@ -2949,17 +2924,17 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 		int all_dirty;
 		UINT8 *xprdata;
 
-		tmap = K056832_tilemap[page];
+		tmap = m_tilemap[page];
 		bitmap_ind8 &xprmap  = tmap->flagsmap();
 		xprdata = tmap->tile_flags();
 
-		dirty = K056832_LineDirty[page];
-		all_dirty = K056832_AllLinesDirty[page];
+		dirty = m_line_dirty[page];
+		all_dirty = m_all_lines_dirty[page];
 
 		if (all_dirty)
 		{
 			dirty[7]=dirty[6]=dirty[5]=dirty[4]=dirty[3]=dirty[2]=dirty[1]=dirty[0] = 0;
-			K056832_AllLinesDirty[page] = 0;
+			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
 			// *really ugly but it minimizes alteration to tilemap.c
@@ -3001,9 +2976,9 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 				{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
 				{ xpr_ptr[count+N] = 0; }
 
-			pixmap  = K056832_pixmap[page];
+			pixmap  = m_pixmap[page];
 			pal_ptr    = machine.pens;
-			src_gfx    = machine.gfx[K056832_gfxnum];
+			src_gfx    = machine.gfx[altK056832_gfxnum];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -3025,7 +3000,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 
 				for (count = 0; count < LINE_WIDTH; count+=8)
 				{
-					K056832_get_tile_info(machine, &tileinfo, line, page);
+					altK056832_get_tile_info(machine, &tileinfo, line, page);
 					basepen = tileinfo.palette_base;
 					code_transparent = tileinfo.category;
 					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
@@ -3053,7 +3028,7 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 	return(0);
 }
 
-void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
+void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -3070,16 +3045,16 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	UINT16 *pScrollData;
 	UINT16 ram16[2];
 
-	int rowstart = K056832_Y[layer];
-	int colstart = K056832_X[layer];
-	int rowspan  = K056832_H[layer]+1;
-	int colspan  = K056832_W[layer]+1;
-	int dy = K056832_dy[layer];
-	int dx = K056832_dx[layer];
-	int scrollbank = ((K056832_regs[0x18]>>1) & 0xc) | (K056832_regs[0x18] & 3);
-	int scrollmode = K056832_regs[0x05]>>(K056832_LSRAMPage[layer][0]<<1) & 3;
+	int rowstart = m_y[layer];
+	int colstart = m_x[layer];
+	int rowspan  = m_h[layer]+1;
+	int colspan  = m_w[layer]+1;
+	int dy = m_dy[layer];
+	int dx = m_dx[layer];
+	int scrollbank = ((m_regs[0x18]>>1) & 0xc) | (m_regs[0x18] & 3);
+	int scrollmode = m_regs[0x05]>>(m_lsram_page[layer][0]<<1) & 3;
 
-	if (K056832_use_ext_linescroll)
+	if (m_use_ext_linescroll)
 	{
 		scrollbank = K056832_PAGE_COUNT;
 	}
@@ -3093,24 +3068,24 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	cmaxy = cliprect.max_y;
 
 	// flip correction registers
-	flipy = K056832_regs[0] & 0x20;
+	flipy = m_regs[0] & 0x20;
 	if (flipy)
 	{
-		corr = K056832_regs[0x3c/2];
+		corr = m_regs[0x3c/2];
 		if (corr & 0x400)
 			corr |= 0xfffff800;
 	} else corr = 0;
 	dy += corr;
-	ay = (unsigned)(dy - K056832_LayerOffset[layer][1]) % height;
+	ay = (unsigned)(dy - m_layer_offs[layer][1]) % height;
 
-	flipx = K056832_regs[0] & 0x10;
+	flipx = m_regs[0] & 0x10;
 	if (flipx)
 	{
-		corr = K056832_regs[0x3a/2];
+		corr = m_regs[0x3a/2];
 		if (corr & 0x800)
 			corr |= 0xfffff000;
 	} else corr = 0;
-	corr -= K056832_LayerOffset[layer][0];
+	corr -= m_layer_offs[layer][0];
 
 	if (scrollmode == 0 && (flags & K056382_DRAW_FLAG_FORCE_XYSCROLL))
 	{
@@ -3121,14 +3096,14 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	switch( scrollmode )
 	{
 		case 0: // linescroll
-			pScrollData = &K056832_videoram[scrollbank<<12] + (K056832_LSRAMPage[layer][1]>>1);
+			pScrollData = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
 
-			pScrollData = &K056832_videoram[scrollbank<<12] + (K056832_LSRAMPage[layer][1]>>1);
+			pScrollData = &m_videoram[scrollbank<<12] + (m_lsram_page[layer][1]>>1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 16;
@@ -3143,8 +3118,8 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	}
 	if (flipy) sdat_adv = -sdat_adv;
 
-	last_active = K056832_ActiveLayer;
-	new_colorbase = (K056832_UpdateMode) ? K055555_get_palette_index(layer) : 0;
+	last_active = m_active_layer;
+	new_colorbase = (m_k055555_use) ? K055555_get_palette_index(layer) : 0;
 
 	for (r=0; r<rowspan; r++)
 	{
@@ -3232,30 +3207,30 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	{
 		pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
 
-		if (K056832_LayerAssociation)
+		if (m_layer_association)
 		{
-			if (K056832_LayerAssociatedWithPage[pageIndex] != layer) continue;
+			if (m_layer_assoc_with_page[pageIndex] != layer) continue;
 		}
 		else
 		{
-			if (K056832_LayerAssociatedWithPage[pageIndex] == -1) continue;
-			K056832_ActiveLayer = layer;
+			if (m_layer_assoc_with_page[pageIndex] == -1) continue;
+			m_active_layer = layer;
 		}
 
-		if (K056832_UpdateMode)
+		if (m_k055555_use)
 		{
 			if (last_colorbase[pageIndex] != new_colorbase)
 			{
 				last_colorbase[pageIndex] = new_colorbase;
-				K056832_mark_page_dirty(pageIndex);
+				altK056832_mark_page_dirty(pageIndex);
 			}
 		}
 		else
-			if (!pageIndex) K056832_ActiveLayer = 0;
+			if (!pageIndex) m_active_layer = 0;
 
-		if (K056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
+		if (altK056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
 
-		tmap = K056832_tilemap[pageIndex];
+		tmap = m_tilemap[pageIndex];
 		tmap->set_scrolly(0, ay);
 
 		last_dx = 0x100000;
@@ -3338,26 +3313,26 @@ void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	} // end of column loop
 	} // end of row loop
 
-	K056832_ActiveLayer = last_active;
+	m_active_layer = last_active;
 
 } // end of function
 
 
-int K056832_get_LayerAssociation(void)
+int k056832_device::altK056832_get_LayerAssociation(void)
 {
-	return(K056832_LayerAssociation);
+	return(m_layer_association);
 }
 
-void K056832_set_LayerOffset(int layer, int offsx, int offsy)
+void k056832_device::altK056832_set_LayerOffset(int layer, int offsx, int offsy)
 {
-	K056832_LayerOffset[layer][0] = offsx;
-	K056832_LayerOffset[layer][1] = offsy;
+	m_layer_offs[layer][0] = offsx;
+	m_layer_offs[layer][1] = offsy;
 }
 
 
-void K056832_set_UpdateMode(int mode)
+void k056832_device::altK056832_set_UpdateMode(int mode)
 {
-	K056832_UpdateMode = mode;
+	m_k055555_use = mode;
 }
 
 

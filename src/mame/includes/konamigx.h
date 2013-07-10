@@ -11,6 +11,7 @@ public:
 		m_workram(*this,"workram"),
 		m_psacram(*this,"psacram"),
 		m_subpaletteram32(*this,"subpaletteram"),
+		m_k056832(*this, "k056832"),
 		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
 		m_k053936_0_linectrl(*this,"k053936_0_line",32),
 		m_k053936_0_ctrl_16(*this,"k053936_0_ct16",16),
@@ -26,6 +27,7 @@ public:
 	optional_shared_ptr<UINT32> m_workram;
 	optional_shared_ptr<UINT32> m_psacram;
 	optional_shared_ptr<UINT32> m_subpaletteram32;
+	required_device<k056832_device> m_k056832;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
 	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl_16;
@@ -98,6 +100,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
+
+	void _gxcommoninitnosprites(running_machine &machine);
+	void _gxcommoninit(running_machine &machine);
+	DECLARE_READ32_MEMBER( altK056832_6bpp_rom_long_r );
+	void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
+					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 };
 
 

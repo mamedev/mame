@@ -8,6 +8,14 @@
 typedef void (*k056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 
+#define MCFG_K056832_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K056832, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K056832_ADD_NOINTF(_tag ) \
+	MCFG_DEVICE_ADD(_tag, K056832, 0)
+
+
 struct k056832_interface
 {
 	const char         *m_gfx_memory_region;
@@ -35,13 +43,22 @@ struct k056832_interface
 #define K056832_BPP_8TASMAN 6
 
 #define K056832_DRAW_FLAG_MIRROR      0x00800000
+#define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
+
 
 class k056832_device : public device_t,
 										public k056832_interface
 {
 public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k056832_device() {}
+	~k056832_device()
+	{
+		m_k055555_use = 0;
+		altK056832_djmain_hack= 0;
+		altK056832_gfxnum = 0;
+		altK056832_bpp = 0;
+		altK056832_memory_region = 0;
+	}
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
@@ -117,6 +134,14 @@ private:
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
+
+
+
+
+
+
+
+
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
 	// RAM window resets this state so you get the first half.
@@ -145,6 +170,19 @@ private:
 	int       m_linemap_enabled;
 	int       m_use_ext_linescroll;
 	int       m_uses_tile_banks, m_cur_tile_bank;
+
+
+
+
+
+	// todo: collapse these into above
+
+	int m_k055555_use;
+
+	int altK056832_djmain_hack;
+	int altK056832_gfxnum;          // graphics element index for unpacked tiles
+	const char *altK056832_memory_region;   // memory region for tile gfx data
+	int altK056832_bpp;
 
 	device_t *m_k055555;  /* used to choose colorbase */
 
@@ -180,6 +218,62 @@ private:
 	
 	template<class _BitmapClass>
 	void tilemap_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
+
+
+public:
+
+
+
+
+	void altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
+				int (*scrolld)[4][2],
+				void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
+				int djmain_hack);
+	DECLARE_READ16_MEMBER( altK056832_ram_word_r );
+	DECLARE_WRITE16_MEMBER( altK056832_ram_word_w );
+	DECLARE_READ32_MEMBER( altK056832_5bpp_rom_long_r );
+	DECLARE_READ32_MEMBER( altK056832_6bpp_rom_long_r );
+	DECLARE_READ16_MEMBER( altK056832_mw_rom_word_r );
+	DECLARE_WRITE16_MEMBER( m_word_w ); // "VRAM" registers
+	DECLARE_WRITE16_MEMBER( altK056832_b_word_w );
+	void altK056832_mark_plane_dirty(int num);
+	void altK056832_MarkAllTilemapsDirty(void);
+	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+	int  altK056832_get_LayerAssociation(void);
+	void altK056832_set_LayerOffset(int layer, int offsx, int offsy);
+	void altK056832_set_UpdateMode(int mode);
+
+	DECLARE_READ32_MEMBER( altK056832_ram_long_r );
+	DECLARE_WRITE32_MEMBER( altK056832_ram_long_w );
+	DECLARE_WRITE32_MEMBER( altK056832_long_w );
+	DECLARE_WRITE32_MEMBER( altK056832_b_long_w );
+
+	void altK056832_mark_page_dirty(int page);
+	void altK056832_change_rambank(void);
+	void altK056832_change_rombank(void);
+	void altK056832_UpdatePageLayout(void);
+	int altK056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec);
+	void altK056832_postload(void);
+	void altK056832_get_tile_info( tile_data &tileinfo, int tile_index, int pageIndex );
+	int altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags);
+
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info0);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info1);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info2);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info3);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info4);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info5);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info6);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info7);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info8);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_info9);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoa);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infob);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoc);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infod);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoe);
+	TILE_GET_INFO_MEMBER(altK056832_get_tile_infof);
+
 };
 
 extern const device_type K056832;
@@ -187,38 +281,7 @@ extern const device_type K056832;
 
 
 
-#define K056382_DRAW_FLAG_FORCE_XYSCROLL        0x00800000
 
-void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
-			int (*scrolld)[4][2],
-			void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
-			int djmain_hack);
-DECLARE_READ16_HANDLER( K056832_ram_word_r );
-DECLARE_WRITE16_HANDLER( K056832_ram_word_w );
-DECLARE_READ32_HANDLER( K056832_5bpp_rom_long_r );
-DECLARE_READ32_HANDLER( K056832_6bpp_rom_long_r );
-DECLARE_READ16_HANDLER( K056832_mw_rom_word_r );
-DECLARE_WRITE16_HANDLER( K056832_word_w ); // "VRAM" registers
-DECLARE_WRITE16_HANDLER( K056832_b_word_w );
-void K056832_mark_plane_dirty(int num);
-void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-int  K056832_get_LayerAssociation(void);
-void K056832_set_LayerOffset(int layer, int offsx, int offsy);
-void K056832_set_UpdateMode(int mode);
 
-DECLARE_READ32_HANDLER( K056832_ram_long_r );
-DECLARE_WRITE32_HANDLER( K056832_ram_long_w );
-DECLARE_WRITE32_HANDLER( K056832_long_w );
-DECLARE_WRITE32_HANDLER( K056832_b_long_w );
-
-/* bit depths for the 56832 */
-#define K056832_BPP_4   0
-#define K056832_BPP_5   1
-#define K056832_BPP_6   2
-#define K056832_BPP_8   3
-#define K056832_BPP_4dj 4
-#define K056832_BPP_8LE 5
-#define K056832_BPP_8TASMAN 6
 
 #endif
