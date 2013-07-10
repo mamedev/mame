@@ -5,25 +5,23 @@ Sea Battle by Zaccaria
 driver by Mariusz Wojcieszek, hap, Phil Bennett and David Haywood
 
 TODO: 
-- improve collision detection?
-- verify colors
+- improve collision detection
+- correct colors
 - video timing
 - discrete sound
-
-Memory map in pics...
 
 
 2650 + 2636
 
 sea b b_1 *.prg are 2650 progamm
 
-sea b blu.prg is blue data?
-sea b red.prg is red data?
-sea b green.prg is green data?  for video?
+sea b blu.prg is obj blue data
+sea b red.prg is obj red data
+sea b green.prg is obj green data
 
-sea b wawe.prg is sea wave data?
+sea b wawe.prg is sea wave data
 
-sea b screen.prg ???
+sea b screen.prg is tile data
 
 
 the sound board should be fully discrete.
@@ -96,6 +94,9 @@ public:
 	UINT8 m_collision;
 };
 
+
+/******************************************************************************/
+
 void seabattl_state::palette_init()
 {
 	int i;
@@ -139,26 +140,6 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 {
 	int x,y, offset;
 
-	static int s2636_enabled = 1;
-	static int mobj_enabled = 1;
-	static int tilemap_enabled = 1;
-
-	if(machine().input().code_pressed_once(KEYCODE_Q))
-	{
-		s2636_enabled ^= 1;
-		popmessage("S2636 layer %sabled", s2636_enabled ? "en" : "dis");
-	}
-	if(machine().input().code_pressed_once(KEYCODE_W))
-	{
-		mobj_enabled ^= 1;
-		popmessage("mobj layer %sabled", mobj_enabled ? "en" : "dis");
-	}
-	if(machine().input().code_pressed_once(KEYCODE_E))
-	{
-		tilemap_enabled ^= 1;
-		popmessage("mobj layer %sabled", tilemap_enabled ? "en" : "dis");
-	}
-
 	// wave
 	if ( m_waveenable )
 	{
@@ -174,38 +155,31 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	}
+
 	// bg tilemap
-	if ( tilemap_enabled )
-	{
-		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		m_bg_tilemap->draw(m_collision_bg, cliprect, 0, 0);
-	}
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(m_collision_bg, cliprect, 0, 0);
 
 	// m.obj
-	if ( mobj_enabled )
+	for ( offset = 0; offset < 256; offset++ )
 	{
-		for ( offset = 0; offset < 256; offset++ )
+		// bits 0-3: sprite num
+		// bits 4-7: x coordinate
+		if ( m_mobjram[offset] & 0xf )
 		{
-			// bits 0-3: sprite num
-			// bits 4-7: x coordinate
-			if ( m_mobjram[offset] & 0xf )
-			{
-				drawgfx_transpen(bitmap, cliprect, machine().gfx[0], (m_mobjram[offset] & 0x0f) | 0x10, 0, 0, 0, ((offset & 0x0f) << 4) - ((m_mobjram[offset] & 0xf0) >> 4), (offset & 0xf0), 0 );
-			}
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], (m_mobjram[offset] & 0x0f) | 0x10, 0, 0, 0, ((offset & 0x0f) << 4) - ((m_mobjram[offset] & 0xf0) >> 4), (offset & 0xf0), 0 );
 		}
 	}
 
-	// s2636 layer
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636"), cliprect);
-
 	// collisions
-	// bit 0: m.obj - pvi-bkg
-	// bit 1: pvi-bkg - src.sm.obj
-	// bit 2: m.obj - src.sm.obj
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636"), cliprect);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
+			// bit 0: m.obj - pvi-bkg
+			// bit 1: pvi-bkg - src.sm.obj
+			// bit 2: m.obj - src.sm.obj
 			if ( (bitmap.pix(y,x) > 0) && (bitmap.pix(y,x) < 8) && S2636_IS_PIXEL_DRAWN(s2636_0_bitmap.pix16(y, x)) )
 			{
 				m_collision |= 0x01;
@@ -221,20 +195,19 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	if ( s2636_enabled )
+	// s2636 layer
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			int pixel = s2636_0_bitmap.pix16(y, x);
+			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				int pixel = s2636_0_bitmap.pix16(y, x);
-				if (S2636_IS_PIXEL_DRAWN(pixel))
-				{
-					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
-				}
+				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -246,6 +219,9 @@ void seabattl_state::video_start()
 	machine().gfx[1]->set_colorbase(8);
 	machine().gfx[2]->set_colorbase(24);
 }
+
+
+/******************************************************************************/
 
 static ADDRESS_MAP_START( seabattl_map, AS_PROGRAM, 8, seabattl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
@@ -350,6 +326,8 @@ WRITE8_HANDLER(seabattl_state::score2_display_w )
 }
 
 
+/******************************************************************************/
+
 static INPUT_PORTS_START( seabattl )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -366,8 +344,8 @@ static INPUT_PORTS_START( seabattl )
 
 	PORT_START("DIPS0")
 	PORT_DIPNAME( 0x01, 0x00, "Game Type" ) PORT_DIPLOCATION("DS0:3")
-	PORT_DIPSETTING(    0x00, "Time based" )
-	PORT_DIPSETTING(    0x01, "Lives based" )
+	PORT_DIPSETTING(    0x00, "Time Based" )
+	PORT_DIPSETTING(    0x01, "Lives Based" )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Game_Time ) ) PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00) PORT_DIPLOCATION("DS0:2,1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x02, "75 seconds" )         PORT_CONDITION("DIPS0", 0x01, EQUALS, 0x00)
@@ -390,7 +368,7 @@ static INPUT_PORTS_START( seabattl )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DIPS1")
-	PORT_DIPNAME( 0x01, 0x00, "Enemies speed" ) PORT_DIPLOCATION("DS1:2")
+	PORT_DIPNAME( 0x01, 0x00, "Enemies Speed" ) PORT_DIPLOCATION("DS1:2")
 	PORT_DIPSETTING(    0x01, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x06, 0x00, "Extended Play" ) PORT_DIPLOCATION("DS1:3,4")
@@ -419,6 +397,9 @@ static INPUT_PORTS_START( seabattl )
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
+
+
+/******************************************************************************/
 
 void seabattl_state::machine_start()
 {
@@ -457,8 +438,8 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( seabattl )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles32x16x3_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 8, 8 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
@@ -552,46 +533,50 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 MACHINE_CONFIG_END
 
 
+
+/******************************************************************************/
+
 ROM_START( seabattl )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "sea b b_1 1.prg",      0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
-	ROM_CONTINUE(                     0x2000, 0x0400 )
-	ROM_LOAD( "sea b b_1 2.prg",      0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
-	ROM_CONTINUE(                     0x2400, 0x0400 )
-	ROM_LOAD( "sea b b_1 3.prg",      0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
-	ROM_CONTINUE(                     0x2800, 0x0400 )
-	ROM_LOAD( "sea b b_1 4.prg",      0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
-	ROM_CONTINUE(                     0x2c00, 0x0400 )
-	ROM_LOAD( "sea b b_1 5.prg",      0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
-	ROM_CONTINUE(                     0x3000, 0x0400 )
+	ROM_LOAD( "sea b b_1 1.prg",  0x0000, 0x0400, CRC(16a475c0) SHA1(5380d3be39c421227e52012d1bcf0516e99f6a3f) )
+	ROM_CONTINUE(                 0x2000, 0x0400 )
+	ROM_LOAD( "sea b b_1 2.prg",  0x0400, 0x0400, CRC(4bd73a82) SHA1(9ab4edf24fcd437ecd8e9e551ce0ed33be3bbad7) )
+	ROM_CONTINUE(                 0x2400, 0x0400 )
+	ROM_LOAD( "sea b b_1 3.prg",  0x0800, 0x0400, CRC(e251492b) SHA1(a152f9b6f189909ff478b4d95ee764f1898405b5) )
+	ROM_CONTINUE(                 0x2800, 0x0400 )
+	ROM_LOAD( "sea b b_1 4.prg",  0x0c00, 0x0400, CRC(6012b83f) SHA1(57de9e45253609b71f14fb3541760fd33647a651) )
+	ROM_CONTINUE(                 0x2c00, 0x0400 )
+	ROM_LOAD( "sea b b_1 5.prg",  0x1000, 0x0400, CRC(55c263f6) SHA1(33eba61cb8c9318cf19b771c93a14397b4ee0ace) )
+	ROM_CONTINUE(                 0x3000, 0x0400 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_LOAD( "sea b red.prg",      0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
-	ROM_LOAD( "sea b green.prg",    0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
-	ROM_LOAD( "sea b blu.prg",      0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
+	ROM_LOAD( "sea b red.prg",    0x0000, 0x0800, CRC(fe7192df) SHA1(0b262bc1ac959d8dd79d71780e16237075f4a099) )
+	ROM_LOAD( "sea b green.prg",  0x0800, 0x0800, CRC(cea4c0c9) SHA1(697c136ef363676b346692740d3c3a482dde6207) )
+	ROM_LOAD( "sea b blu.prg",    0x1000, 0x0800, CRC(cd972c4a) SHA1(fcb8149bc462912c8393431ccb792ea4b1b1109d) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "sea b screen.prg",     0x0000, 0x0800, CRC(4e98f719) SHA1(2cdbc23aed790807b2dc730258916cc32dab1a31) )
+	ROM_LOAD( "sea b screen.prg", 0x0000, 0x0800, CRC(8e4391dd) SHA1(f5698d66e5a3c46082b515ce86f9d3e96fd9ff77) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "sea b wawe.prg",     0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) )
+	ROM_LOAD( "sea b wawe.prg",   0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) )
 ROM_END
 
 ROM_START( seabattla ) // this was a very different looking PCB (bootleg called armada maybe?) most parts had been stripped
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "program roms",      0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "program roms",     0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0xc00, "gfx1", 0 ) // probably the same as above without the blank data at the start
-	ROM_LOAD( "armadared.ic26",      0x0000, 0x0400, CRC(b588f509) SHA1(073f9dc584aba1351969ef597cd80a0037938dfb) )
-	ROM_LOAD( "armadagreen.ic25",    0x0400, 0x0400, CRC(3cc861c9) SHA1(d9159ee045cc0994f468035ae28cd8b79b5985ee) )
-	ROM_LOAD( "armadablu.ic24",      0x0800, 0x0400, CRC(3689e530) SHA1(b30ab0d5ddc9b296437aa1bc2887f1416eb69f9c) )
+	ROM_LOAD( "armadared.ic26",   0x0000, 0x0400, CRC(b588f509) SHA1(073f9dc584aba1351969ef597cd80a0037938dfb) )
+	ROM_LOAD( "armadagreen.ic25", 0x0400, 0x0400, CRC(3cc861c9) SHA1(d9159ee045cc0994f468035ae28cd8b79b5985ee) )
+	ROM_LOAD( "armadablu.ic24",   0x0800, 0x0400, CRC(3689e530) SHA1(b30ab0d5ddc9b296437aa1bc2887f1416eb69f9c) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "greenobj.ic38",     0x0000, 0x0800, CRC(81a9a741) SHA1(b2725c320a232d4abf6e6fc58ccf6a5edb8dd9a0) )
+	ROM_LOAD( "greenobj.ic38",    0x0000, 0x0800, CRC(81a9a741) SHA1(b2725c320a232d4abf6e6fc58ccf6a5edb8dd9a0) )
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "seawawe.ic9",     0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
+	ROM_LOAD( "seawawe.ic9",      0x0000, 0x0800, CRC(7e356dc5) SHA1(71d34fa39ff0b7d0fa6d32ba2b9dc0006a03d1bb) ) // identical to above set
 ROM_END
 
+
 GAME( 1980, seabattl,  0,        seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1980, seabattla, seabattl, seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1980, seabattla, seabattl, seabattl, seabattl, driver_device, 0, ROT0, "Zaccaria", "Sea Battle (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING ) // incomplete dump
