@@ -3071,6 +3071,43 @@ ROM_START( gt3dl191 ) /* Version 1.91 for the 3 tier type PCB with long ROM boar
 ROM_END
 
 
+ROM_START( gt3dl19 ) /* Version 1.9 for the 3 tier type PCB with long ROM board P/N 1080 REV 5 */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "gtg3_prom0_v1.9l.prom0", 0x00000, 0x80000, CRC(b6293cf6) SHA1(96cc035b004719d3f56f08efe67216474724e83f) )
+	ROM_LOAD32_BYTE( "gtg3_prom1_v1.9l.prom1", 0x00001, 0x80000, CRC(270b7936) SHA1(a101c94535dd3713f0e4c99c1079c2471bcd08d8) )
+	ROM_LOAD32_BYTE( "gtg3_prom2_v1.9l.prom2", 0x00002, 0x80000, CRC(3f892e81) SHA1(523146aa88c3fa4b7fbbf3f8b8c106b3e9c796ab) )
+	ROM_LOAD32_BYTE( "gtg3_prom3_v1.9l.prom3", 0x00003, 0x80000, CRC(b63ef2c0) SHA1(0238aeaa97da877675c94c7ecde1f29d3c9a0251) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gtg3-snd_u23_v2.0.u23", 0x10000, 0x18000, CRC(3f69a9ea) SHA1(02610aa31f8b3422e15acd7b5e66ecfc4f53aba4) ) /* actually labeled as "GTG3-SND(U23) v2.0" */
+	ROM_CONTINUE(                      0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "gtg3_grom0_0.grm0_0", 0x000000, 0x80000, CRC(1b10379d) SHA1(b6d61771e2bc3909ea4229777867b217a3e9e580) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_1.grm0_1", 0x000001, 0x80000, CRC(3b852e1a) SHA1(4b3653d55c52fc2eb5438d1604247a8e68d569a5) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_2.grm0_2", 0x000002, 0x80000, CRC(d43ffb35) SHA1(748be07e03bbbb40cd7a725c708cacc46f33d9ca) )
+	ROM_LOAD32_BYTE( "gtg3_grom0_3.grm0_3", 0x000003, 0x80000, CRC(2d24e93e) SHA1(505272c1a509d013c2ce9fb8e8e0ac88870d74e7) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_0.grm1_0", 0x200000, 0x80000, CRC(4476b239) SHA1(71b8258ca94859eb4bdf83b855a87aff79d3df2b) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_1.grm1_1", 0x200001, 0x80000, CRC(0aadfad2) SHA1(56a283b30a13b77ec53b7ae2b4129d44b7fa25d4) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_2.grm1_2", 0x200002, 0x80000, CRC(27871980) SHA1(fe473d12cb4805e25dcac8f9ae187891936b961b) )
+	ROM_LOAD32_BYTE( "gtg3_grom1_3.grm1_3", 0x200003, 0x80000, CRC(7dbc242b) SHA1(9aa5074cad633446e0110a1a3d9c6e1f2158070a) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_0.grm2_0", 0x400000, 0x80000, CRC(15cb22bc) SHA1(571898d34099468c48aaf84a0fcc9b6eb30a8e38) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_1.grm2_1", 0x400001, 0x80000, CRC(52f3ad44) SHA1(454a29cc82b05ee24834ef617db0c96270f9400c) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_2.grm2_2", 0x400002, 0x80000, CRC(c7712125) SHA1(d3933b850617324b0c877686ec62abb52285b824) )
+	ROM_LOAD32_BYTE( "gtg3_grom2_3.grm2_3", 0x400003, 0x80000, CRC(77869bcf) SHA1(dde3b64578b79a94c7e346561a691229bbcfadac) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ensoniq_2mx16u.rom0", 0x000000, 0x200000, CRC(0814ab80) SHA1(e92525f7cf58cf480510c278fea705f67225e58f) ) /* Ensoniq 2MX16U 1350901801 at "ROM0" */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gtg3_srom1.srom1", 0x000000, 0x80000, CRC(ac669434) SHA1(6941884c553515f5bc06af772897835a44aa8e4c) )
+	ROM_LOAD16_BYTE( "gtg3_srom2.srom2", 0x200000, 0x80000, CRC(6853578e) SHA1(5033a5614da4a2fe93766bb019e1479205298f75) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gtg3_srom3.srom3", 0x000000, 0x20000, CRC(d2462965) SHA1(45d2c9aaac681315d2e5cb39be151467f278e395) )
+ROM_END
+
+
 ROM_START( gt3dv18 ) /* Version 1.8 for the 3 tier type PCB with short ROM board P/N 1069 REV 2 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtg3_prom0_v1.8.prom0", 0x00000, 0x80000, CRC(0fa53c40) SHA1(45e339dede03d749c00f9459eebb26de4965c31c) )
@@ -4477,6 +4514,7 @@ NOTE: There is an "8 Meg board" version of the P/N 1083 Rev 2 PCB, so GROM0_0 th
 GAME( 1995, gt3d,      0,        sftm,    gt3d,  itech32_state,  aama,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.93N)" , 0) /* PIC 16C54 labeled as ITGF-2 */
 GAME( 1995, gt3dl192,  gt3d,     sftm,    gt3d,  itech32_state,  gt3dl,   ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.92L)" , 0) /* PIC 16C54 labeled as ITGF-2 */
 GAME( 1995, gt3dl191,  gt3d,     sftm,    gt3d,  itech32_state,  gt3dl,   ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.91L)" , 0) /* PIC 16C54 labeled as ITGF-2 */
+GAME( 1995, gt3dl19,   gt3d,     sftm,    gt3d,  itech32_state,  gt3dl,   ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.9L)" , 0) /* PIC 16C54 labeled as ITGF-2 */
 GAME( 1995, gt3ds192,  gt3d,     sftm,    gt3d,  itech32_state,  gt3d,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.92S)" , 0) /* PIC 16C54 labeled as ITGF-1 */
 GAME( 1995, gt3dv18,   gt3d,     sftm,    gt3d,  itech32_state,  gt3d,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.8)" , 0) /* PIC 16C54 labeled as ITGF-1 */
 GAME( 1995, gt3dv17,   gt3d,     sftm,    gt3d,  itech32_state,  gt3d,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.7)" , 0) /* PIC 16C54 labeled as ITGF-1 */
