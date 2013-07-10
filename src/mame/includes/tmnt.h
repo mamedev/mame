@@ -5,6 +5,8 @@
 #include "sound/k054539.h"
 #include "video/k05324x.h"
 #include "video/konicdev.h"
+#include "video/k053936.h"
+#include "video/k054000.h"
 
 class tmnt_state : public driver_device
 {

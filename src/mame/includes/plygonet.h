@@ -1,4 +1,6 @@
 #include "machine/eeprom.h"
+#include "video/k053936.h"
+
 
 static const UINT16 dsp56k_bank00_size = 0x1000;
 static const UINT16 dsp56k_bank01_size = 0x1000;

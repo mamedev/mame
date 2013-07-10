@@ -1,6 +1,7 @@
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"
+#include "video/k053936.h"
 
 class crshrace_state : public driver_device
 {

@@ -11,6 +11,8 @@
 #include "video/konicdev.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k05324x.h"
+#include "video/k054338.h"
+
 
 class xexex_state : public driver_device
 {

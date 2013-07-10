@@ -1,5 +1,6 @@
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
+#include "video/k053936.h"
 
 class f1gp_state : public driver_device
 {

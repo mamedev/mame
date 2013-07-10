@@ -7,6 +7,7 @@
 #include "video/konicdev.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
+#include "video/k054338.h"
 
 #define CPU_CLOCK       (XTAL_24MHz / 2)        /* 68000 clock */
 #define SOUND_CLOCK     XTAL_16_9344MHz     /* YMZ280 clock */

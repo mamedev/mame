@@ -63,18 +63,8 @@ struct k051316_interface
 	k051316_callback   m_callback;
 };
 
-struct k053936_interface
-{
-	int                m_wrap, m_xoff, m_yoff;
-};
 
 
-struct k054338_interface
-{
-	const char         *m_screen_tag;
-	int                m_alpha_inv;
-	const char         *m_k055555_tag;
-};
 
 struct k001006_interface
 {
@@ -408,35 +398,6 @@ private:
 
 extern const device_type K051316;
 
-class k053936_device : public device_t,
-										public k053936_interface
-{
-public:
-	k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k053936_device() {}
-
-	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( ctrl_r );    
-	DECLARE_WRITE16_MEMBER( linectrl_w );
-	DECLARE_READ16_MEMBER( linectrl_r );
-	void zoom_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, UINT32 priority, int glfgreat_hack);
-	// void wraparound_enable(int status);   unused? // shall we merge this into the configuration intf?
-	// void set_offset(int xoffs, int yoffs); unused?   // shall we merge this into the configuration intf?
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-private:
-	// internal state
-	UINT16    *m_ctrl;
-	UINT16    *m_linectrl;
-};
-
-extern const device_type K053936;
-
 	enum
 	{
 		K053251_CI0 = 0,
@@ -487,30 +448,6 @@ private:
 
 extern const device_type K053251;
 
-class k054000_device : public device_t
-{
-public:
-	k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k054000_device() {}
-
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( lsb_w );
-	DECLARE_READ16_MEMBER( lsb_r );
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-private:
-	// internal state
-	UINT8    m_regs[0x20];
-};
-
-extern const device_type K054000;
-
 class k051733_device : public device_t
 {
 public:
@@ -534,57 +471,6 @@ private:
 extern const device_type K051733;
 
 
-
-#define K338_REG_BGC_R      0
-#define K338_REG_BGC_GB     1
-#define K338_REG_SHAD1R     2
-#define K338_REG_BRI3       11
-#define K338_REG_PBLEND     13
-#define K338_REG_CONTROL    15
-
-#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
-#define K338_CTL_MIXPRI     0x02
-#define K338_CTL_SHDPRI     0x04
-#define K338_CTL_BRTPRI     0x08
-#define K338_CTL_WAILSL     0x10
-#define K338_CTL_CLIPSL     0x20
-
-class k054338_device : public device_t,
-										public k054338_interface
-{
-public:
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k054338_device() {}
-
-	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
-	DECLARE_WRITE32_MEMBER( long_w );
-	
-	DECLARE_READ16_MEMBER( word_r );        // CLTC
-	
-	int register_r(int reg);
-	void update_all_shadows(int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
-	void fill_solid_bg(bitmap_rgb32 &bitmap);             // solid backcolor fill
-	void fill_backcolor(bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient (by using a k055555)
-	int  set_alpha_level(int pblend);                         // blend style 0-2
-	void invert_alpha(int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-	//void export_config(int **shdRGB);
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	
-private:
-	// internal state
-	UINT16    m_regs[32];
-	int       m_shd_rgb[9];
-	
-	screen_device *m_screen;
-	device_t *m_k055555;  /* used to fill BG color */
-};
-
-extern const device_type K054338;
 
 class k001006_device : public device_t
 {
@@ -742,22 +628,17 @@ extern const device_type K037122;
 	MCFG_DEVICE_ADD(_tag, K051316, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
-#define MCFG_K053936_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K053936, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
 
 #define MCFG_K053251_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K053251, 0)
 
-#define MCFG_K054000_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K054000, 0)
+
 
 #define MCFG_K051733_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K051733, 0)
 
-#define MCFG_K054338_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K054338, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
 
 #define MCFG_K001006_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K001006, 0) \

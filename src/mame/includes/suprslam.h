@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/k053936.h"
+
 class suprslam_state : public driver_device
 {
 public:
