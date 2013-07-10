@@ -103,7 +103,7 @@ public:
 
 	void _gxcommoninitnosprites(running_machine &machine);
 	void _gxcommoninit(running_machine &machine);
-	DECLARE_READ32_MEMBER( altK056832_6bpp_rom_long_r );
+	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
 	void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,

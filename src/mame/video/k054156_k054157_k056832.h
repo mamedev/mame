@@ -85,7 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( b_w );
 	void mark_plane_dirty(int num);
-	void mark_all_tmaps_dirty();
+	void mark_all_tilemaps_dirty();
 	void tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 	void tilemap_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 	void tilemap_draw_dj(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
@@ -198,7 +198,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_infof);
 	
 	void mark_page_dirty(int page);
-	void mark_all_tilemaps_dirty();
 	void update_page_layout();
 	void change_rambank();
 	void change_rombank();
@@ -223,31 +222,18 @@ public:
 				int (*scrolld)[4][2],
 				void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 				int djmain_hack);
-	DECLARE_READ16_MEMBER( altK056832_ram_word_r );
-	DECLARE_WRITE16_MEMBER( altK056832_ram_word_w );
-	DECLARE_READ32_MEMBER( altK056832_5bpp_rom_long_r );
-	DECLARE_READ32_MEMBER( altK056832_6bpp_rom_long_r );
+
 	DECLARE_READ16_MEMBER( altK056832_mw_rom_word_r );
 	DECLARE_WRITE16_MEMBER( m_word_w ); // "VRAM" registers
-	DECLARE_WRITE16_MEMBER( altK056832_b_word_w );
-	void altK056832_mark_plane_dirty(int num);
-	void altK056832_MarkAllTilemapsDirty(void);
-	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
-	int  altK056832_get_LayerAssociation(void);
-	void altK056832_set_LayerOffset(int layer, int offsx, int offsy);
-	void altK056832_set_UpdateMode(int mode);
 
-	DECLARE_READ32_MEMBER( altK056832_ram_long_r );
-	DECLARE_WRITE32_MEMBER( altK056832_ram_long_w );
+	void altK056832_set_UpdateMode(int mode); // k055555 hook
+	
 	DECLARE_WRITE32_MEMBER( altK056832_long_w );
-	DECLARE_WRITE32_MEMBER( altK056832_b_long_w );
 
-	void altK056832_mark_page_dirty(int page);
-	void altK056832_change_rambank(void);
-	void altK056832_change_rombank(void);
-	void altK056832_UpdatePageLayout(void);
-	int altK056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec);
 	void altK056832_postload(void);
+	
+	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
+private:
 	int altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags);
 
 

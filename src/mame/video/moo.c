@@ -97,7 +97,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 		}
 		if (dirty)
-			m_k056832->mark_all_tmaps_dirty();
+			m_k056832->mark_all_tilemaps_dirty();
 	}
 
 	layers[0] = 1;

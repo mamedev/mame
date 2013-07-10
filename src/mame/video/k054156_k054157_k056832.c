@@ -524,6 +524,7 @@ void k056832_device::mark_page_dirty( int page )
 		mark_all_lines_dirty(page);
 }
 
+
 void k056832_device::mark_plane_dirty( int layer )
 {
 	int tilemode, i;
@@ -540,6 +541,9 @@ void k056832_device::mark_plane_dirty( int layer )
 	}
 }
 
+
+
+
 void k056832_device::mark_all_tilemaps_dirty( )
 {
 	int i;
@@ -552,12 +556,6 @@ void k056832_device::mark_all_tilemaps_dirty( )
 			mark_page_dirty(i);
 		}
 	}
-}
-
-/* moo.c needs to call this in its VIDEO_UPDATE */
-void k056832_device::mark_all_tmaps_dirty( )
-{
-	mark_all_tilemaps_dirty();
 }
 
 void k056832_device::update_page_layout( )
@@ -612,6 +610,9 @@ void k056832_device::update_page_layout( )
 	// refresh associated tilemaps
 	mark_all_tilemaps_dirty();
 }
+
+
+
 
 int k056832_device::get_lookup( int bits )
 {
@@ -708,6 +709,10 @@ void k056832_device::change_rambank( )
 	mark_all_tilemaps_dirty();
 }
 
+
+
+
+
 int k056832_device::get_current_rambank( )
 {
 	int bank = m_regs[0x19];
@@ -726,6 +731,9 @@ void k056832_device::change_rombank( )
 
 	m_cur_gfx_banks = bank % m_num_gfx_banks;
 }
+
+
+
 
 void k056832_device::set_tile_bank( int bank )
 {
@@ -785,6 +793,7 @@ int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zeros
 	return ret;
 }
 
+
 READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 {
 	if (mem_mask == 0xff00)
@@ -831,6 +840,9 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 	}
 	return 0;
 }
+
+
+
 
 READ16_MEMBER( k056832_device::rom_word_r )
 {
@@ -956,6 +968,10 @@ READ16_MEMBER( k056832_device::ram_half_word_r )
 {
 	return m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | ((offset >> 11) ^ 1))];
 }
+
+
+
+
 
 READ32_MEMBER( k056832_device::ram_long_r )
 {
@@ -1092,6 +1108,8 @@ WRITE16_MEMBER( k056832_device::ram_word_w )
 	}
 }
 
+
+
 WRITE16_MEMBER( k056832_device::ram_half_word_w )
 {
 	UINT16 *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
@@ -1132,6 +1150,9 @@ WRITE32_MEMBER( k056832_device::ram_long_w )
 			mark_line_dirty(m_selected_page, offset);
 	}
 }
+
+
+
 
 WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 {
@@ -1273,6 +1294,125 @@ WRITE16_MEMBER( k056832_device::word_w )
 	}
 }
 
+
+WRITE16_MEMBER( k056832_device::m_word_w )
+{
+	int layer, flip, mask, i;
+	UINT32 old_data, new_data;
+
+	old_data = m_regs[offset];
+	COMBINE_DATA(&m_regs[offset]);
+	new_data = m_regs[offset];
+
+	if (new_data != old_data)
+	{
+		switch(offset)
+		{
+			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
+			 * --x- ---- screen flip y
+			 * ---x ---- screen flip x
+			 * ---- --x- external linescroll RAM page enable
+			 */
+			case 0x00/2:
+				if ((new_data & 0x30) != (old_data & 0x30))
+				{
+					flip = 0;
+					if (new_data & 0x20) flip |= TILEMAP_FLIPY;
+					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
+					for (i=0; i<K056832_PAGE_COUNT; i++)
+					{
+						m_tilemap[i]->set_flip(flip);
+					}
+				}
+
+				if ((new_data & 0x02) != (old_data & 0x02))
+				{
+					change_rambank();
+				}
+			break;
+
+			/* -------- -----xxx external irqlines enable (not used by GX)
+			 * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
+			 */
+			//case 0x06/2: break;
+
+			// -------- ----DCBA tile mode: 0=512x1, 1=8x8
+			// -------- DCBA---- synchronous scroll: 0=off, 1=on
+			case 0x08/2:
+				for (layer=0; layer<4; layer++)
+				{
+					mask = 1<<layer;
+					i = new_data & mask;
+					if (i != (old_data & mask))
+					{
+						m_layer_tile_mode[layer] = i;
+						mark_plane_dirty(layer);
+					}
+				}
+			break;
+
+			/* -------- ------xx layer A linescroll config
+			 * -------- ----xx-- layer B linescroll config
+			 * -------- --xx---- layer C linescroll config
+			 * -------- xx------ layer D linescroll config
+			 *
+			 * 0: linescroll
+			 * 2: rowscroll
+			 * 3: xy scroll
+			 */
+			//case 0x0a/2: break;
+
+			case 0x32/2:
+				change_rambank();
+			break;
+
+			case 0x34/2: /* ROM bank select for checksum */
+			case 0x36/2: /* secondary ROM bank select for use with tile banking */
+				change_rombank();
+			break;
+
+			// extended tile address
+			//case 0x38/2: break;
+
+			// 12 bit (signed) horizontal offset if global HFLIP enabled
+			//case 0x3a/2: break;
+
+			// 11 bit (signed) vertical offset if global VFLIP enabled
+			//case 0x3c/2: break;
+
+			default:
+				layer = offset & 3;
+
+				if (offset >= 0x10/2 && offset <= 0x16/2)
+				{
+					m_y[layer] = (new_data&0x18)>>3;
+					m_h[layer] = (new_data&0x3);
+					m_active_layer = layer;
+					update_page_layout();
+				} else
+
+				if (offset >= 0x18/2 && offset <= 0x1e/2)
+				{
+					m_x[layer] = (new_data&0x18)>>3;
+					m_w[layer] = (new_data&0x03);
+					m_active_layer = layer;
+					update_page_layout();
+				} else
+
+				if (offset >= 0x20/2 && offset <= 0x26/2)
+				{
+					m_dy[layer] = (INT16)new_data;
+				} else
+
+				if (offset >= 0x28/2 && offset <= 0x2e/2)
+				{
+					m_dx[layer] = (INT16)new_data;
+				}
+			break;
+		}
+	}
+}
+
 WRITE32_MEMBER( k056832_device::long_w )
 {
 	// GX does access of all 3 widths (8/16/32) so we can't do the
@@ -1283,10 +1423,24 @@ WRITE32_MEMBER( k056832_device::long_w )
 	word_w(space, offset + 1, data, mem_mask);
 }
 
+WRITE32_MEMBER( k056832_device::altK056832_long_w )
+{
+	// GX does access of all 3 widths (8/16/32) so we can't do the
+	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
+	// are used to the tilemap bank register.
+	offset <<= 1;
+	m_word_w(space, offset, data>>16, mem_mask >> 16);
+	m_word_w(space, offset+1, data, mem_mask);
+}
+
+
 WRITE16_MEMBER( k056832_device::b_word_w )
 {
 	COMBINE_DATA(&m_regsb[offset]);
 }
+
+
+
 
 WRITE8_MEMBER( k056832_device::write )
 {
@@ -2047,10 +2201,6 @@ void k056832_device::set_layer_association( int status )
 	m_default_layer_association = status;
 }
 
-int k056832_device::get_layer_association( )
-{
-	return(m_layer_association);
-}
 
 void k056832_device::set_layer_offs( int layer, int offsx, int offsy )
 {
@@ -2124,143 +2274,13 @@ READ16_MEMBER( k056832_device::b_word_r )
 /*                                                                         */
 /***************************************************************************/
 
-#define altK056832_mark_line_dirty(P,L) if (L<0x100) m_line_dirty[P][L>>5] |= 1<<(L&0x1f)
-#define altK056832_mark_all_lines_dirty(P) m_all_lines_dirty[P] = 1
-
-void k056832_device::altK056832_mark_page_dirty(int page)
-{
-	if (m_page_tile_mode[page])
-		m_tilemap[page]->mark_all_dirty();
-	else
-		altK056832_mark_all_lines_dirty(page);
-}
-
-void k056832_device::altK056832_mark_plane_dirty(int layer)
-{
-	int tilemode, i;
-
-	tilemode = m_layer_tile_mode[layer];
-
-	for (i=0; i<K056832_PAGE_COUNT; i++)
-	{
-		if (m_layer_assoc_with_page[i] == layer)
-		{
-			m_page_tile_mode[i] = tilemode;
-			altK056832_mark_page_dirty(i);
-		}
-	}
-}
-
-void k056832_device::altK056832_MarkAllTilemapsDirty(void)
-{
-	int i;
-
-	for (i=0; i<K056832_PAGE_COUNT; i++)
-	{
-		if (m_layer_assoc_with_page[i] != -1)
-		{
-			m_page_tile_mode[i] = m_layer_tile_mode[m_layer_assoc_with_page[i]];
-			altK056832_mark_page_dirty(i);
-		}
-	}
-}
-
-void k056832_device::altK056832_UpdatePageLayout(void)
-{
-	int layer, rowstart, rowspan, colstart, colspan, r, c, pageIndex, setlayer;
-
-	// enable layer association by default
-	m_layer_association = m_default_layer_association;
-
-	// disable association if a layer grabs the entire 4x4 map (happens in Twinbee and Dadandarn)
-	for (layer=0; layer<4; layer++)
-	{
-		if (!m_y[layer] && !m_x[layer] && m_h[layer]==3 && m_w[layer]==3)
-		{
-			m_layer_association = 0;
-			break;
-		}
-	}
-
-	// winning spike and vsnet soccer don't like our layer association implementation..
-	if (m_djmain_hack==2)
-		m_layer_association = 0;
-
-	// disable all tilemaps
-	for (pageIndex=0; pageIndex<K056832_PAGE_COUNT; pageIndex++)
-	{
-		m_layer_assoc_with_page[pageIndex] = -1;
-	}
-
-
-	// enable associated tilemaps
-	for (layer=0; layer<4; layer++)
-	{
-		rowstart = m_y[layer];
-		colstart = m_x[layer];
-		rowspan  = m_h[layer]+1;
-		colspan  = m_w[layer]+1;
-
-		setlayer = (m_layer_association) ? layer : m_active_layer;
-
-		for (r=0; r<rowspan; r++)
-		{
-			for (c=0; c<colspan; c++)
-			{
-				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-if (!(m_djmain_hack==1) || m_layer_assoc_with_page[pageIndex] == -1) //*
-					m_layer_assoc_with_page[pageIndex] = setlayer;
-			}
-		}
-	}
-
-	// refresh associated tilemaps
-	altK056832_MarkAllTilemapsDirty();
-}
-
-void k056832_device::altK056832_change_rambank(void)
-{
-	/* ------xx page col
-	 * ---xx--- page row
-	 */
-	int bank = m_regs[0x19];
-
-	if (m_regs[0] & 0x02) // external linescroll enable
-	{
-		m_selected_page = K056832_PAGE_COUNT;
-	}
-	else
-	{
-		m_selected_page = ((bank>>1)&0xc)|(bank&3);
-	}
-	m_selected_page_x4096 = m_selected_page << 12;
-
-	// refresh associated tilemaps
-	altK056832_MarkAllTilemapsDirty();
-}
-
-void k056832_device::altK056832_change_rombank(void)
-{
-	int bank;
-
-	if (m_uses_tile_banks)    /* Asterix */
-	{
-		bank = (m_regs[0x1a] >> 8) | (m_regs[0x1b] << 4) | (m_cur_tile_bank << 6);
-	}
-	else
-	{
-		bank = m_regs[0x1a] | (m_regs[0x1b] << 16);
-	}
-
-	m_cur_gfx_banks = bank % m_num_gfx_banks;
-}
 
 
 void k056832_device::altK056832_postload()
 {
-	altK056832_UpdatePageLayout();
-	altK056832_change_rambank();
-	altK056832_change_rombank();
+	update_page_layout();
+	change_rambank();
+	change_rombank();
 }
 
 void k056832_device::altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
@@ -2473,10 +2493,10 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
-	altK056832_UpdatePageLayout();
+	update_page_layout();
 
-	altK056832_change_rambank();
-	altK056832_change_rombank();
+	change_rambank();
+	change_rombank();
 
 	machine.save().save_pointer(NAME(m_videoram), 0x10000);
 	machine.save().save_item(NAME(m_regs));
@@ -2496,91 +2516,7 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 
 
 
-/* generic helper routine for ROM checksumming */
-int k056832_device::altK056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec)
-{
-	UINT8 *rombase;
-	int base, ret;
 
-	rombase = (UINT8 *)machine.root_device().memregion(altK056832_memory_region)->base();
-
-	if ((m_rom_half) && (zerosec))
-	{
-		return 0;
-	}
-
-	// add in the bank offset
-	offset += (m_cur_gfx_banks * 0x2000);
-
-	// figure out the base of the ROM block
-	base = (offset / blksize) * blksize2;
-
-	// get the starting offset of the proper word inside the block
-	base += (offset % blksize) * 2;
-
-	if (m_rom_half)
-	{
-		ret = rombase[base+1];
-	}
-	else
-	{
-		ret = rombase[base];
-		m_rom_half = 1;
-	}
-
-	return ret;
-}
-
-
-READ32_MEMBER( k056832_device::altK056832_5bpp_rom_long_r )
-{
-	if (mem_mask == 0xff000000)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4, 4, 5, 0)<<24;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+1, 4, 5, 0)<<16;
-	}
-	else if (mem_mask == 0x0000ff00)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+2, 4, 5, 0)<<8;
-	}
-	else if (mem_mask == 0x000000ff)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+3, 4, 5, 1);
-	}
-	else
-	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
-	}
-	return 0;
-}
-
-READ32_MEMBER( k056832_device::altK056832_6bpp_rom_long_r )
-{
-	if (mem_mask == 0xff000000)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4, 4, 6, 0)<<24;
-	}
-	else if (mem_mask == 0x00ff0000)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+1, 4, 6, 0)<<16;
-	}
-	else if (mem_mask == 0x0000ff00)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+2, 4, 6, 0)<<8;
-	}
-	else if (mem_mask == 0x000000ff)
-	{
-		return altK056832_rom_read_b(space.machine(), offset*4+3, 4, 6, 0);
-	}
-	else
-	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", space.device().safe_pc(), mem_mask));
-	}
-	return 0;
-}
 
 
 // data is arranged like this:
@@ -2651,203 +2587,11 @@ READ16_MEMBER( k056832_device::altK056832_mw_rom_word_r )
 }
 
 
-/* only one page is mapped to videoram at a time through a window */
-READ16_MEMBER( k056832_device::altK056832_ram_word_r )
-{
-	// reading from tile RAM resets the ROM readback "half" offset
-	m_rom_half = 0;
-
-	return m_videoram[m_selected_page_x4096+offset];
-}
 
 
-READ32_MEMBER( k056832_device::altK056832_ram_long_r )
-{
-	UINT16 *pMem = &m_videoram[m_selected_page_x4096+offset*2];
-
-	// reading from tile RAM resets the ROM readback "half" offset
-	m_rom_half = 0;
-
-	return(pMem[0]<<16 | pMem[1]);
-}
-
-WRITE16_MEMBER( k056832_device::altK056832_ram_word_w )
-{
-	UINT16 *tile_ptr;
-	UINT16 old_mask, old_data;
-
-	tile_ptr = &m_videoram[m_selected_page_x4096+offset];
-	old_mask = ~mem_mask;
-	old_data = *tile_ptr;
-	data = (data & mem_mask) | (old_data & old_mask);
-
-	if(data != old_data)
-	{
-		offset >>= 1;
-		*tile_ptr = data;
-
-		if (m_page_tile_mode[m_selected_page])
-			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
-		else
-			altK056832_mark_line_dirty(m_selected_page, offset);
-	}
-}
 
 
-WRITE32_MEMBER( k056832_device::altK056832_ram_long_w )
-{
-	UINT16 *tile_ptr;
-	UINT32 old_mask, old_data;
 
-	tile_ptr = &m_videoram[m_selected_page_x4096+offset*2];
-	old_mask = ~mem_mask;
-	old_data = (UINT32)tile_ptr[0]<<16 | (UINT32)tile_ptr[1];
-	data = (data & mem_mask) | (old_data & old_mask);
-
-	if (data != old_data)
-	{
-		tile_ptr[0] = data>>16;
-		tile_ptr[1] = data;
-
-		if (m_page_tile_mode[m_selected_page])
-			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
-		else
-			altK056832_mark_line_dirty(m_selected_page, offset);
-	}
-}
-
-WRITE16_MEMBER( k056832_device::m_word_w )
-{
-	int layer, flip, mask, i;
-	UINT32 old_data, new_data;
-
-	old_data = m_regs[offset];
-	COMBINE_DATA(&m_regs[offset]);
-	new_data = m_regs[offset];
-
-	if (new_data != old_data)
-	{
-		switch(offset)
-		{
-			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
-			 * --x- ---- screen flip y
-			 * ---x ---- screen flip x
-			 * ---- --x- external linescroll RAM page enable
-			 */
-			case 0x00/2:
-				if ((new_data & 0x30) != (old_data & 0x30))
-				{
-					flip = 0;
-					if (new_data & 0x20) flip |= TILEMAP_FLIPY;
-					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
-					for (i=0; i<K056832_PAGE_COUNT; i++)
-					{
-						m_tilemap[i]->set_flip(flip);
-					}
-				}
-
-				if ((new_data & 0x02) != (old_data & 0x02))
-				{
-					altK056832_change_rambank();
-				}
-			break;
-
-			/* -------- -----xxx external irqlines enable (not used by GX)
-			 * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
-			 */
-			//case 0x06/2: break;
-
-			// -------- ----DCBA tile mode: 0=512x1, 1=8x8
-			// -------- DCBA---- synchronous scroll: 0=off, 1=on
-			case 0x08/2:
-				for (layer=0; layer<4; layer++)
-				{
-					mask = 1<<layer;
-					i = new_data & mask;
-					if (i != (old_data & mask))
-					{
-						m_layer_tile_mode[layer] = i;
-						altK056832_mark_plane_dirty(layer);
-					}
-				}
-			break;
-
-			/* -------- ------xx layer A linescroll config
-			 * -------- ----xx-- layer B linescroll config
-			 * -------- --xx---- layer C linescroll config
-			 * -------- xx------ layer D linescroll config
-			 *
-			 * 0: linescroll
-			 * 2: rowscroll
-			 * 3: xy scroll
-			 */
-			//case 0x0a/2: break;
-
-			case 0x32/2:
-				altK056832_change_rambank();
-			break;
-
-			case 0x34/2: /* ROM bank select for checksum */
-			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				altK056832_change_rombank();
-			break;
-
-			// extended tile address
-			//case 0x38/2: break;
-
-			// 12 bit (signed) horizontal offset if global HFLIP enabled
-			//case 0x3a/2: break;
-
-			// 11 bit (signed) vertical offset if global VFLIP enabled
-			//case 0x3c/2: break;
-
-			default:
-				layer = offset & 3;
-
-				if (offset >= 0x10/2 && offset <= 0x16/2)
-				{
-					m_y[layer] = (new_data&0x18)>>3;
-					m_h[layer] = (new_data&0x3);
-					m_active_layer = layer;
-					altK056832_UpdatePageLayout();
-				} else
-
-				if (offset >= 0x18/2 && offset <= 0x1e/2)
-				{
-					m_x[layer] = (new_data&0x18)>>3;
-					m_w[layer] = (new_data&0x03);
-					m_active_layer = layer;
-					altK056832_UpdatePageLayout();
-				} else
-
-				if (offset >= 0x20/2 && offset <= 0x26/2)
-				{
-					m_dy[layer] = (INT16)new_data;
-				} else
-
-				if (offset >= 0x28/2 && offset <= 0x2e/2)
-				{
-					m_dx[layer] = (INT16)new_data;
-				}
-			break;
-		}
-	}
-}
-
-WRITE32_MEMBER( k056832_device::altK056832_long_w )
-{
-	// GX does access of all 3 widths (8/16/32) so we can't do the
-	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
-	// are used to the tilemap bank register.
-	offset <<= 1;
-	m_word_w(space, offset, data>>16, mem_mask >> 16);
-	m_word_w(space, offset+1, data, mem_mask);
-}
-
-WRITE16_MEMBER( k056832_device::altK056832_b_word_w )
-{
-	COMBINE_DATA( &m_regsb[offset] );
-}
 
 
 int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
@@ -3161,7 +2905,7 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 			if (last_colorbase[pageIndex] != new_colorbase)
 			{
 				last_colorbase[pageIndex] = new_colorbase;
-				altK056832_mark_page_dirty(pageIndex);
+				mark_page_dirty(pageIndex);
 			}
 		}
 		else
@@ -3257,17 +3001,10 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 } // end of function
 
 
-int k056832_device::altK056832_get_LayerAssociation(void)
+int k056832_device::get_layer_association(void)
 {
 	return(m_layer_association);
 }
-
-void k056832_device::altK056832_set_LayerOffset(int layer, int offsx, int offsy)
-{
-	m_layer_offs[layer][0] = offsx;
-	m_layer_offs[layer][1] = offsy;
-}
-
 
 void k056832_device::altK056832_set_UpdateMode(int mode)
 {
