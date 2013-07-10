@@ -5,7 +5,6 @@
  */
 
 #include "emu.h"
-#include "video/konamiic.h"
 #include "includes/konamigx.h"
 
 /***************************************************************************/

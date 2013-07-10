@@ -1,23 +1,7 @@
 
-
-/*
-  Note: K053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
-  when some palette index changes. If ALL_TILEMAPS is too expensive, use
-  K053251_set_tilemaps() to indicate which tilemap is associated with each index.
- */
-DECLARE_WRITE8_HANDLER( K053251_w );
-DECLARE_WRITE16_HANDLER( K053251_lsb_w );
-DECLARE_WRITE16_HANDLER( K053251_msb_w );
-enum { OLD_K053251_CI0=0,OLD_K053251_CI1,OLD_K053251_CI2,OLD_K053251_CI3,OLD_K053251_CI4 };
-int K053251_get_priority(int ci);
-int K053251_get_palette_index(int ci);
-void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4);
-void K053251_vh_start(running_machine &machine);
-
-
-DECLARE_WRITE16_HANDLER( K054000_lsb_w );
-DECLARE_READ16_HANDLER( K054000_lsb_r );
-
+#pragma once
+#ifndef __K054338_H__
+#define __K054338_H__
 
 /* K054338 mixer/alpha blender */
 void K054338_vh_start(running_machine &machine);
@@ -45,5 +29,7 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_WAILSL     0x10
 #define K338_CTL_CLIPSL     0x20
 
-// K053252 CRT and interrupt control unit
-DECLARE_WRITE16_HANDLER( K053252_word_w );
+#endif
+
+
+

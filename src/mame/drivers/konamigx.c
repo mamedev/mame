@@ -102,7 +102,6 @@
 #include "sound/k054539.h"
 #include "includes/konamigx.h"
 #include "machine/adc083x.h"
-#include "video/konamiic.h"
 #include "rendlay.h"
 
 #define GX_DEBUG     0

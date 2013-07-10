@@ -22,7 +22,6 @@
  */
 
 #include "emu.h"
-#include "video/konamiic.h"
 #include "video/k053250.h"
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
