@@ -88,7 +88,7 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Super Pit Boss (c)1988
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
-  Pit Boss Superstar III 30 (c)1993?
+  Pit Boss Superstar III 30 (c)1993
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
 
@@ -225,7 +225,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
 	DECLARE_DRIVER_INIT(pitbossm);
-	DECLARE_DRIVER_INIT(pbss30);
+	DECLARE_DRIVER_INIT(pbss330);
 	DECLARE_DRIVER_INIT(pbst30);
 	DECLARE_DRIVER_INIT(pbst30b);
 	DECLARE_DRIVER_INIT(megat2);
@@ -768,7 +768,7 @@ static INPUT_PORTS_START(meritm_crt250)
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(pbss30)
+static INPUT_PORTS_START(pbss330)
 	PORT_INCLUDE(meritm_crt250)
 
 	PORT_MODIFY("DSW")
@@ -1461,7 +1461,7 @@ ROM_START( pbst30b ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
 ROM_END
 
-ROM_START( pbss30 ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-01 U1-RO1 C1993 MII */
+ROM_START( pbss330 ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-01 U1-RO1 C1993 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9233-00-01_u9-r0",  0x00000, 0x10000, CRC(887da433) SHA1(2950803cef75e0d337fbcedaeea994ec82c9db71) ) /* 9233-00-01  072893 */
 	ROM_LOAD( "9233-00-01_u10-r0", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
@@ -2157,15 +2157,15 @@ DRIVER_INIT_MEMBER(meritm_state,pitbossm)
 
 };
 
-DRIVER_INIT_MEMBER(meritm_state,pbss30)
+DRIVER_INIT_MEMBER(meritm_state,pbss330)
 {
-	static const UINT8 pbss30_ds1204_key[8] =
+	static const UINT8 pbss330_ds1204_key[8] =
 		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
 
-	static const UINT8 pbss30_ds1204_nvram[16] =
+	static const UINT8 pbss330_ds1204_nvram[16] =
 		{ 0x09, 0x2b, 0x6b, 0xf7, 0x83, 0xca, 0x8e, 0xdd, 0x1a, 0x7e, 0x76, 0x1a, 0x75, 0x5e, 0x77, 0x00 };
 
-	ds1204_init(pbss30_ds1204_key, pbss30_ds1204_nvram);
+	ds1204_init(pbss330_ds1204_key, pbss330_ds1204_nvram);
 
 };
 
@@ -2309,11 +2309,11 @@ GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, driver_device, 0,
 GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
-GAME( 1993, pbss30,    0,      meritm_crt250_crt252_crt258, pbss30, meritm_state, pbss30,  ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, meritm_state, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30,  meritm_state, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30,  meritm_state, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
+GAME( 1993, pbss330,   0,         meritm_crt250_questions, pbss330,  meritm_state,  pbss330,  ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, meritm_state,  pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
