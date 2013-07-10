@@ -12,7 +12,7 @@
 ****************************************************************************
 
 
-Slip Stream (950515 HISPANIC)
+Slip Stream (Hispanic 950515)
 Sega, 1995
 
 This game runs on Sega System 32 hardware.
@@ -4459,8 +4459,8 @@ GAME( 1990, radmu,    radm,     system32,     radm, segas32_state,     radm,    
 GAMEL(1991, radr,     0,        system32,     radr, segas32_state,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS, layout_radr )
 GAMEL(1991, radru,    radr,     system32,     radr, segas32_state,     radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS, layout_radr )
 GAMEL(1991, radrj,    radr,     system32,     radr, segas32_state,     radr,     ROT0, "Sega",   "Rad Rally (Japan)", GAME_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1995, slipstrm, 0,        system32,     slipstrm, segas32_state, slipstrm, ROT0, "Capcom", "Slip Stream (950515 Brazil)", GAME_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1995, slipstrmh,slipstrm, system32,     slipstrm, segas32_state, slipstrm, ROT0, "Capcom", "Slip Stream (950515 Hispanic)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm, 0,        system32,     slipstrm, segas32_state, slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrmh,slipstrm, system32,     slipstrm, segas32_state, slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", GAME_IMPERFECT_GRAPHICS, layout_radr )
 GAME( 1992, sonic,    0,        system32,     sonic, segas32_state,    sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, sonicp,   sonic,    system32,     sonic, segas32_state,    sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spidman,  0,        system32,     spidman, segas32_state,  spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", GAME_IMPERFECT_GRAPHICS )
