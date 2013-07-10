@@ -159,7 +159,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(0, cliprect);
 	}
 
 	// background (scr.sm.obj)
