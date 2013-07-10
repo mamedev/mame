@@ -162,17 +162,18 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x300000, 0x307fff) AM_RAM // backup RAM 24H
 
-	//0x400000 0x400001 "13M" even addresses
-	//0x400002,0x400003 "13J" odd addresses
-	#if CUSTOM_DRAW
+	// override konami chips with custom areas until that code is removed
 	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("gfx1",0)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x480000, 0x48003f) AM_RAM // vregs
-	#else
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_long_r)
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
-	#endif
+
+	//0x400000 0x400001 "13M" even addresses
+	//0x400002,0x400003 "13J" odd addresses
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
+	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
+
+
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
@@ -534,13 +535,13 @@ static void kongambl_sprite_callback( running_machine &machine, int *code, int *
 {
 }
 
-#if !CUSTOM_DRAW
+
 static void kongambl_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
 }
-#endif
 
-#if CUSTOM_DRAW
+
+
 static const gfx_layout charlayout8_tasman =
 {
 	8,8,
@@ -556,7 +557,7 @@ static GFXDECODE_START( tasman )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout8_tasman, 0, 0x8000/256 )
 GFXDECODE_END
 
-#else
+
 static const k056832_interface k056832_intf =
 {
 	"gfx1", 0,
@@ -565,7 +566,7 @@ static const k056832_interface k056832_intf =
 	KONAMI_ROM_DEINTERLEAVE_NONE,
 	kongambl_tile_callback, "none"
 };
-#endif
+
 
 static const k053247_interface k053247_intf =
 {
@@ -611,11 +612,11 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
 	MCFG_K053247_ADD("k053246", k053247_intf)
-	#if CUSTOM_DRAW
+	
 	MCFG_GFXDECODE(tasman)
-	#else
+	
 	MCFG_K056832_ADD("k056832", k056832_intf)
-	#endif
+	
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END
