@@ -15,6 +15,7 @@
 #include "sound/samples.h"
 #include "includes/snk6502.h"
 #include "sound/discrete.h"
+#include "devlegcy.h"
 
 
 #ifndef M_LN2

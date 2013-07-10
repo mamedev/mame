@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "sound/upd7759.h"
 #include "includes/micro3d.h"
+#include "devlegcy.h"
 
 
 #define MM5837_CLOCK        100000

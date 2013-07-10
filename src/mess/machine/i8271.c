@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "i8271.h"
 #include "imagedev/flopdrv.h"
+#include "devlegcy.h"
 
 /* data request */
 #define I8271_FLAGS_DATA_REQUEST 0x01

@@ -3,7 +3,6 @@
 #ifndef __HC55516_H__
 #define __HC55516_H__
 
-#include "devlegcy.h"
 
 
 /* sets the digit (0 or 1) */

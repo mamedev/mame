@@ -41,7 +41,6 @@
 #ifndef TTL74148_H
 #define TTL74148_H
 
-#include "devlegcy.h"
 
 
 struct ttl74148_config

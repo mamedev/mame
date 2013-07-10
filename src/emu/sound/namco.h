@@ -3,7 +3,6 @@
 #ifndef __NAMCO_H__
 #define __NAMCO_H__
 
-#include "devlegcy.h"
 
 struct namco_interface
 {

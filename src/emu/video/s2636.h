@@ -7,7 +7,6 @@
 #ifndef __S2636_H__
 #define __S2636_H__
 
-#include "devlegcy.h"
 
 
 #define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? TRUE : FALSE)

@@ -53,6 +53,7 @@
 #include "machine/rescap.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/beezer.h"
+#include "devlegcy.h"
 
 
 

@@ -1,7 +1,6 @@
 #ifndef NAMCO52_H
 #define NAMCO52_H
 
-#include "devlegcy.h"
 #include "sound/discrete.h"
 #include "devcb.h"
 

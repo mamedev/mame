@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "okim6376.h"
+#include "devlegcy.h"
 
 #define MAX_SAMPLE_CHUNK    10000
 //#define MAX_WORDS           111

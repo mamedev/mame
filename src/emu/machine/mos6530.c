@@ -17,6 +17,7 @@ and should be verified against real hardware.
 
 #include "emu.h"
 #include "mos6530.h"
+#include "devlegcy.h"
 
 
 /***************************************************************************

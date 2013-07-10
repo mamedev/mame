@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "machine/74153.h"
+#include "devlegcy.h"
 
 
 struct ttl74153_state

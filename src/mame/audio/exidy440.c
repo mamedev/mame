@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "audio/exidy440.h"
+#include "devlegcy.h"
 
 
 #define SOUND_LOG       0

@@ -12,6 +12,7 @@
 #include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
+#include "devlegcy.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

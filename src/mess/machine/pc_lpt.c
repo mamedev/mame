@@ -8,6 +8,7 @@
 #include "pc_lpt.h"
 #include "machine/ctronics.h"
 #include "cntr_covox.h"
+#include "devlegcy.h"
 
 
 /***************************************************************************

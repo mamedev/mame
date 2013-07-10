@@ -36,7 +36,6 @@
 #ifndef TTL74153_H
 #define TTL74153_H
 
-#include "devlegcy.h"
 
 
 struct ttl74153_config

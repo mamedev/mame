@@ -47,6 +47,7 @@
 #include "emu.h"
 #include "nes_apu.h"
 #include "cpu/m6502/n2a03.h"
+#include "devlegcy.h"
 
 #include "nes_defs.h"
 

@@ -1,7 +1,6 @@
 #ifndef NAMCO62_H
 #define NAMCO62_H
 
-#include "devlegcy.h"
 
 
 struct namco_62xx_interface

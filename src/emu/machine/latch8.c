@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "sound/discrete.h"
 #include "latch8.h"
+#include "devlegcy.h"
 
 struct latch8_t
 {

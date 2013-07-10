@@ -107,6 +107,7 @@ $8000 - $ffff   ROM
 #include "sound/3526intf.h"
 #include "sound/okiadpcm.h"
 #include "includes/renegade.h"
+#include "devlegcy.h"
 
 
 /********************************************************************************************/

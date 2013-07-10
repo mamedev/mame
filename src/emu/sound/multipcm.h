@@ -3,7 +3,6 @@
 #ifndef __MULTIPCM_H__
 #define __MULTIPCM_H__
 
-#include "devlegcy.h"
 
 DECLARE_WRITE8_DEVICE_HANDLER( multipcm_w );
 DECLARE_READ8_DEVICE_HANDLER( multipcm_r );

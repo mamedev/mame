@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
+#include "devlegcy.h"
 
 
 /*************************************

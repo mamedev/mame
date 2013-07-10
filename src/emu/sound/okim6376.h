@@ -3,7 +3,6 @@
 #ifndef __OKIM6376_H__
 #define __OKIM6376_H__
 
-#include "devlegcy.h"
 
 /* an interface for the OKIM6376 and similar chips (CPU interface only) */
 

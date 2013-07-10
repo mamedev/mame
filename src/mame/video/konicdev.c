@@ -1006,6 +1006,7 @@ Registers (word-wise):
 
 #include "emu.h"
 #include "video/konicdev.h"
+#include "devlegcy.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

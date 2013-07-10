@@ -2,6 +2,7 @@
 #include "cpu/m6800/m6800.h"
 #include "sound/msm5205.h"
 #include "audio/hyprolyb.h"
+#include "devlegcy.h"
 
 struct hyprolyb_adpcm_state
 {

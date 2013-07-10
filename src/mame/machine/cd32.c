@@ -5,6 +5,7 @@
 #include "machine/i2cmem.h"
 #include "imagedev/chd_cd.h"
 #include "includes/cd32.h"
+#include "devlegcy.h"
 
 
 /*********************************************************************************

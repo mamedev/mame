@@ -1,7 +1,6 @@
 #ifndef NAMCO51_H
 #define NAMCO51_H
 
-#include "devlegcy.h"
 
 
 struct namco_51xx_interface

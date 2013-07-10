@@ -70,6 +70,7 @@
 
 #include "emu.h"
 #include "machine/mb87078.h"
+#include "devlegcy.h"
 
 struct mb87078_state
 {

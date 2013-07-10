@@ -1,7 +1,6 @@
 #ifndef NAMCO50_H
 #define NAMCO50_H
 
-#include "devlegcy.h"
 
 
 #define MCFG_NAMCO_50XX_ADD(_tag, _clock) \

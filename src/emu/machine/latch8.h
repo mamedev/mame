@@ -15,7 +15,6 @@
 #ifndef __LATCH8_H_
 #define __LATCH8_H_
 
-#include "devlegcy.h"
 
 /***************************************************************************
     TYPE DEFINITIONS

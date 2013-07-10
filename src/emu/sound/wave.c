@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "imagedev/cassette.h"
 #include "wave.h"
+#include "devlegcy.h"
 
 #define ALWAYS_PLAY_SOUND   0
 

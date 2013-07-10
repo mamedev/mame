@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "strata.h"
+#include "devlegcy.h"
 
 #define MAX_STRATA  1
 

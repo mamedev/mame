@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "sound/s2636.h"
+#include "devlegcy.h"
 
 
 struct s2636_sound

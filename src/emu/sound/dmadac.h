@@ -10,7 +10,6 @@
 #ifndef __DMADAC_H__
 #define __DMADAC_H__
 
-#include "devlegcy.h"
 
 class dmadac_sound_device : public device_t,
 									public device_sound_interface

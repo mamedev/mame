@@ -3,7 +3,6 @@
 #ifndef __WAVE_H__
 #define __WAVE_H__
 
-#include "devlegcy.h"
 
 /*****************************************************************************
  *  CassetteWave interface

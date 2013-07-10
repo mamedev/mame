@@ -1,7 +1,6 @@
 #ifndef NAMCO54_H
 #define NAMCO54_H
 
-#include "devlegcy.h"
 #include "sound/discrete.h"
 
 

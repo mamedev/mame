@@ -31,6 +31,7 @@
 
 #include "emu.h"
 #include "mc6854.h"
+#include "devlegcy.h"
 
 
 

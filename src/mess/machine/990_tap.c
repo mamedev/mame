@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "990_tap.h"
+#include "devlegcy.h"
 
 
 static void update_interrupt(device_t *device);

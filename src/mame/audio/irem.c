@@ -10,6 +10,7 @@
 #include "sound/msm5205.h"
 #include "sound/discrete.h"
 #include "audio/irem.h"
+#include "devlegcy.h"
 
 struct irem_audio_state
 {

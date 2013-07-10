@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "sound/tms36xx.h"
 #include "audio/pleiads.h"
+#include "devlegcy.h"
 
 #define VMIN    0
 #define VMAX    32767

@@ -3,7 +3,6 @@
 #ifndef __S14001A_H__
 #define __S14001A_H__
 
-#include "devlegcy.h"
 
 int s14001a_bsy_r(device_t *device);        /* read BUSY pin */
 void s14001a_reg_w(device_t *device, int data);     /* write to input latch */

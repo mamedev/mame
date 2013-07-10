@@ -57,6 +57,7 @@
 #include "emu.h"
 #include "namco51.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "devlegcy.h"
 
 
 #define VERBOSE 0

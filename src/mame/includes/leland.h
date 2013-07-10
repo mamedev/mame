@@ -4,7 +4,6 @@
 
 *************************************************************************/
 
-#include "devlegcy.h"
 #include "machine/eeprom.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000

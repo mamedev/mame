@@ -33,6 +33,7 @@
 #include "emu.h"
 #include "mc6843.h"
 #include "imagedev/flopdrv.h"
+#include "devlegcy.h"
 
 
 /******************* parameters ******************/

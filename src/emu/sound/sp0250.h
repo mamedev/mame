@@ -3,7 +3,6 @@
 #ifndef __SP0250_H__
 #define __SP0250_H__
 
-#include "devlegcy.h"
 
 struct sp0250_interface {
 	void (*drq_callback)(device_t *device, int state);

@@ -30,6 +30,7 @@
 #include "emu.h"
 #include "wavwrite.h"
 #include "sn76477.h"
+#include "devlegcy.h"
 
 
 

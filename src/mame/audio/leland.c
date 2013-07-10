@@ -83,6 +83,7 @@
 #include "includes/leland.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "devlegcy.h"
 
 
 #define OUTPUT_RATE         50000

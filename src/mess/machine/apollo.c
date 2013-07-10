@@ -43,6 +43,7 @@
 //#include "cpu/m68000/m68kcpu.h"
 
 #include "emuopts.h"
+#include "devlegcy.h"
 
 #if defined(APOLLO_FOR_LINUX)
 #include <fcntl.h>

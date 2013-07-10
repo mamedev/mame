@@ -30,6 +30,7 @@
 #include "emu.h"
 #include "scsp.h"
 #include "scspdsp.h"
+#include "devlegcy.h"
 
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)

@@ -109,6 +109,7 @@ chirp 12-..: vokume   0   : silent
 */
 #include "emu.h"
 #include "vlm5030.h"
+#include "devlegcy.h"
 
 /* interpolator per frame   */
 #define FR_SIZE 4

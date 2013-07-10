@@ -13,6 +13,7 @@
 #include "sound/hc55516.h"
 #include "sound/tms5220.h"
 #include "audio/exidy.h"
+#include "devlegcy.h"
 
 
 

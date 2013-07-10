@@ -44,6 +44,7 @@ Shisensho II                            1993  Rev 3.34 M81  Yes
 #include "emu.h"
 #include "sound/dac.h"
 #include "m72.h"
+#include "devlegcy.h"
 
 
 /*

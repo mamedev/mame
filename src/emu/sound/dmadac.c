@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "dmadac.h"
+#include "devlegcy.h"
 
 
 

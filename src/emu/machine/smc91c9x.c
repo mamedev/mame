@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "smc91c9x.h"
+#include "devlegcy.h"
 
 
 

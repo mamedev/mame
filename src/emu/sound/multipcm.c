@@ -33,6 +33,7 @@
 
 #include "emu.h"
 #include "multipcm.h"
+#include "devlegcy.h"
 
 //????
 #define MULTIPCM_CLOCKDIV       (180.0)

@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "sp0250.h"
+#include "devlegcy.h"
 
 /*
 standard external clock is 3.12MHz

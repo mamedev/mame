@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "68681.h"
+#include "devlegcy.h"
 
 #define VERBOSE 0
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)

@@ -78,6 +78,7 @@
 #include "emu.h"
 #include "video/s2636.h"
 #include "sound/s2636.h"
+#include "devlegcy.h"
 
 /*************************************
  *

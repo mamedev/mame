@@ -39,6 +39,7 @@
 #include "sound/2203intf.h"
 #include "sound/okiadpcm.h"
 #include "sound/okim6295.h"
+#include "devlegcy.h"
 
 
 /*

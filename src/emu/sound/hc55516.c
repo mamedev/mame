@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "hc55516.h"
+#include "devlegcy.h"
 
 
 /* 4x oversampling */

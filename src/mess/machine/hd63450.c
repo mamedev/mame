@@ -5,6 +5,7 @@
 */
 
 #include "hd63450.h"
+#include "devlegcy.h"
 
 struct hd63450_regs
 {  // offsets in bytes

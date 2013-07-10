@@ -133,6 +133,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "emu.h"
 #include "namco50.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "devlegcy.h"
 
 
 struct namco_50xx_state

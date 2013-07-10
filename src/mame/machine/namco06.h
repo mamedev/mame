@@ -1,7 +1,6 @@
 #ifndef NAMCO06_H
 #define NAMCO06_H
 
-#include "devlegcy.h"
 
 
 struct namco_06xx_config

@@ -5,6 +5,7 @@
 #include "cpu/m6800/m6800.h"
 #include "includes/trackfld.h"
 #include "audio/trackfld.h"
+#include "devlegcy.h"
 
 
 #define TIMER_RATE (4096/4)

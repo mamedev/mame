@@ -48,6 +48,7 @@
 #include "emu.h"
 #include "namco52.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "devlegcy.h"
 
 struct namco_52xx_state
 {

@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/buggychl.h"
+#include "devlegcy.h"
 
 struct buggychl_mcu_state
 {

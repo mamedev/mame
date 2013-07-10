@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "machine/74148.h"
+#include "devlegcy.h"
 
 
 struct ttl74148_state

@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "kr2376.h"
+#include "devlegcy.h"
 
 static const UINT8 KR2376_KEY_CODES[3][8][11] =
 {

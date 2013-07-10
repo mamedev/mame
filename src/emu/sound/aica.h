@@ -6,7 +6,6 @@
 #ifndef __AICA_H__
 #define __AICA_H__
 
-#include "devlegcy.h"
 
 struct aica_interface
 {

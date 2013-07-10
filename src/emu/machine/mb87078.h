@@ -8,7 +8,6 @@
 #ifndef __MB87078_H__
 #define __MB87078_H__
 
-#include "devlegcy.h"
 
 
 

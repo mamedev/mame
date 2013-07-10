@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "mc6846.h"
+#include "devlegcy.h"
 
 #define VERBOSE 0
 

@@ -4,7 +4,6 @@
 
 *************************************************************************/
 
-#include "devlegcy.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"

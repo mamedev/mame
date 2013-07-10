@@ -15,6 +15,7 @@
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "audio/timeplt.h"
+#include "devlegcy.h"
 
 
 #define MASTER_CLOCK         XTAL_14_31818MHz

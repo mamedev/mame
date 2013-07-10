@@ -240,6 +240,7 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 
 #include "emu.h"
 #include "s14001a.h"
+#include "devlegcy.h"
 
 struct S14001AChip
 {

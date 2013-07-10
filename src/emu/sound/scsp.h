@@ -7,7 +7,6 @@
 #ifndef __SCSP_H__
 #define __SCSP_H__
 
-#include "devlegcy.h"
 
 struct scsp_interface
 {

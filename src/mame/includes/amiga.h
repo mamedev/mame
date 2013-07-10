@@ -10,8 +10,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #ifndef __AMIGA_H__
 #define __AMIGA_H__
 
-#include "devlegcy.h"
-
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
 #include "cpu/m68000/m68000.h"

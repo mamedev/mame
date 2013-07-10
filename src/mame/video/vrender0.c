@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "vrender0.h"
+#include "devlegcy.h"
 
 /***********************************
         VRENDER ZERO

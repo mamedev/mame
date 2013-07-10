@@ -10,7 +10,6 @@
 #ifndef __KONICDEV_H__
 #define __KONICDEV_H__
 
-#include "devlegcy.h"
 #include "konami_helper.h"
 
 /***************************************************************************

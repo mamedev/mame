@@ -13,6 +13,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sp0250.h"
 #include "segasnd.h"
+#include "devlegcy.h"
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)

@@ -3,7 +3,6 @@
 #ifndef __VLM5030_H__
 #define __VLM5030_H__
 
-#include "devlegcy.h"
 
 struct vlm5030_interface
 {

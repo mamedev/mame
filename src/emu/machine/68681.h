@@ -1,8 +1,6 @@
 #ifndef _68681_H
 #define _68681_H
 
-#include "devlegcy.h"
-
 struct duart68681_config
 {
 	void (*irq_handler)(device_t *device, int state, UINT8 vector);

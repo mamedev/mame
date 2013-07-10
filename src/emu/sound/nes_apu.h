@@ -26,7 +26,6 @@
 #ifndef __NES_APU_H__
 #define __NES_APU_H__
 
-#include "devlegcy.h"
 
 
 /* AN EXPLANATION

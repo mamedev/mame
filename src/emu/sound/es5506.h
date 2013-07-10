@@ -10,7 +10,6 @@
 #ifndef __ES5506_H__
 #define __ES5506_H__
 
-#include "devlegcy.h"
 
 struct es5505_interface
 {

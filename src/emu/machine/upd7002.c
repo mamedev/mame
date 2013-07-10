@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "upd7002.h"
+#include "devlegcy.h"
 
 
 struct uPD7002_t

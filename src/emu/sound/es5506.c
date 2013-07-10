@@ -82,6 +82,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #include "emu.h"
 #include "es5506.h"
+#include "devlegcy.h"
 
 
 

@@ -86,6 +86,7 @@
 #include "machine/namco53.h"
 #include "audio/namco52.h"
 #include "audio/namco54.h"
+#include "devlegcy.h"
 
 
 #define VERBOSE 0

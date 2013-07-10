@@ -123,6 +123,7 @@
 
 #include "emu.h"
 #include "upd7759.h"
+#include "devlegcy.h"
 
 
 #define DEBUG_STATES    (0)

@@ -26,6 +26,7 @@ TODO:
 #include "sound/sn76496.h"
 #include "sound/okiadpcm.h"
 #include "includes/mjkjidai.h"
+#include "devlegcy.h"
 
 class mjkjidai_adpcm_device : public device_t,
 									public device_sound_interface

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "audio/wiping.h"
+#include "devlegcy.h"
 
 
 /* 8 voices max */

@@ -8,6 +8,7 @@
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "includes/tx1.h"
+#include "devlegcy.h"
 
 
 

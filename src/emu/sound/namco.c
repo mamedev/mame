@@ -13,6 +13,7 @@
 
 #include "emu.h"
 #include "namco.h"
+#include "devlegcy.h"
 
 
 /* 8 voices max */

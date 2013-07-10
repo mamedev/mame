@@ -155,6 +155,7 @@
 #include "formats/imageutl.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
+#include "devlegcy.h"
 
 /***************************************************************************
     CONSTANTS

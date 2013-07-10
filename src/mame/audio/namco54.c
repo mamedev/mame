@@ -50,6 +50,7 @@
 #include "emu.h"
 #include "namco54.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "devlegcy.h"
 
 struct namco_54xx_state
 {

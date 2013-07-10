@@ -17,6 +17,7 @@ static int verbose = VERBOSE;
 
 #include "machine/omti8621.h"
 #include "image.h"
+#include "devlegcy.h"
 
 #define LOG(x)  { logerror ("%s: ", cpu_context(state->device)); logerror x; logerror ("\n"); }
 #define LOG1(x) { if (verbose > 0) LOG(x)}
