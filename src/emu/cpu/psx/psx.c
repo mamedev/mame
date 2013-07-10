@@ -190,13 +190,15 @@ static const UINT32 mtc0_writemask[]=
 
 READ32_MEMBER( psxcpu_device::berr_r )
 {
-	m_berr = 1;
+	if (!space.debugger_access())
+		m_berr = 1;
 	return 0;
 }
 
 WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	m_berr = 1;
+	if (!space.debugger_access())
+		m_berr = 1;
 }
 
 READ32_MEMBER( psxcpu_device::exp_base_r )
@@ -1583,6 +1585,7 @@ void psxcpu_device::common_exception( int exception, UINT32 romOffset, UINT32 ra
 
 	m_delayr = 0;
 	m_delayv = 0;
+	m_berr = 0;
 
 	if( m_cp0r[ CP0_SR ] & SR_BEV )
 	{
@@ -1953,6 +1956,7 @@ void psxcpu_device::device_reset()
 
 	m_delayr = 0;
 	m_delayv = 0;
+	m_berr = 0;
 	m_biu = 0;
 
 	m_multiplier_operation = MULTIPLIER_OPERATION_IDLE;
@@ -2284,7 +2288,6 @@ void psxcpu_device::execute_run()
 		if (LOG_BIOSCALL) log_bioscall();
 		debugger_instruction_hook( this,  m_pc );
 
-		m_berr = 0;
 		m_op = m_direct->read_decrypted_dword( m_pc );
 
 		if( m_berr )
