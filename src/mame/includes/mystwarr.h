@@ -1,5 +1,6 @@
 #include "sound/k054539.h"
 #include "machine/k053252.h"
+#include "video/k055555.h"
 
 class mystwarr_state : public konamigx_state
 {

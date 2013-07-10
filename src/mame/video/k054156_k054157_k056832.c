@@ -166,8 +166,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
 
-#include "konicdev.h" // still needs k055555_get_palette_index
-#include "konamiic.h" //  ^^
+#include "video/k055555.h"// still needs k055555_get_palette_index
 
 /* end common functions */
 
