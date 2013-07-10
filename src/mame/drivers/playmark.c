@@ -315,9 +315,12 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3")
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2")
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1")
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_SHARE("videoram3") // 32*32?
+	AM_RANGE(0x100800, 0x103fff) AM_RAM
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_SHARE("videoram2") // 128*32?
+	AM_RANGE(0x106000, 0x107fff) AM_RAM
+	AM_RANGE(0x108000, 0x109fff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_SHARE("videoram1") // 64*64?
+	AM_RANGE(0x10a000, 0x10bfff) AM_RAM
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_SHARE("paletteram")

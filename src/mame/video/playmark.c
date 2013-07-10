@@ -227,10 +227,27 @@ VIDEO_START_MEMBER(playmark_state,luckboomh)
 
 
 
+// hard times level 2-4 (boss) needs this.. or something similar
+#define TILES_PER_PAGE_Y    (0x20)
+#define TILES_PER_PAGE_X    (0x20)
+#define PAGES_PER_TMAP_Y    (0x1)
+#define PAGES_PER_TMAP_X    (0x4)
+
+TILEMAP_MAPPER_MEMBER(playmark_state::playmark_tilemap_scan_pages)
+{
+	return  (col / TILES_PER_PAGE_X) * TILES_PER_PAGE_Y * TILES_PER_PAGE_X * PAGES_PER_TMAP_Y +
+			(col % TILES_PER_PAGE_X) +
+
+			(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_Y * TILES_PER_PAGE_X +
+			(row % TILES_PER_PAGE_Y) * TILES_PER_PAGE_X;
+}
+
+// theres enough ram for 64*128 on each tilemap..
+
 VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(playmark_state::playmark_tilemap_scan_pages),this), 16, 16, 128, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);

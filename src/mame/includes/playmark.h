@@ -95,6 +95,7 @@ public:
 	DECLARE_VIDEO_START(hotmind);
 	DECLARE_VIDEO_START(hrdtimes);
 	DECLARE_VIDEO_START(luckboomh);
+	TILEMAP_MAPPER_MEMBER(playmark_tilemap_scan_pages);
 	UINT32 screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
