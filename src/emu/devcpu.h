@@ -46,6 +46,7 @@
 #ifndef __DEVCPU_H__
 #define __DEVCPU_H__
 
+#include "devlegcy.h"
 
 //**************************************************************************
 //  CONSTANTS
