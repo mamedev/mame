@@ -111,6 +111,7 @@
 
 **************************************************************************/
 
+#include <stddef.h>
 #include "emu.h"
 #include "debugger.h"
 #include "drcuml.h"
