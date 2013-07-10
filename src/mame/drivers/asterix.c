@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x380200, 0x380203) AM_READ8(asterix_sound_r, 0x00ff) AM_DEVWRITE8("k053260", k053260_device, k053260_w, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
-	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x380500, 0x38051f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x380600, 0x380601) AM_NOP                             // Watchdog
 	AM_RANGE(0x380700, 0x380707) AM_DEVWRITE("k056832", k056832_device, b_word_w)
 	AM_RANGE(0x380800, 0x380803) AM_WRITE(protection_w)

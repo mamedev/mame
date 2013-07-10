@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0xff00)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0xff00)
-	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
+	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("k053251", k053251_device, msb_w)
 	AM_RANGE(0x1d8000, 0x1d8003) AM_READ8(overdriv_1_sound_r, 0x00ff) AM_DEVWRITE8("k053260_1", k053260_device, k053260_w, 0x00ff)   /* K053260 */
 	AM_RANGE(0x1e0000, 0x1e0003) AM_READ8(overdriv_2_sound_r, 0x00ff) AM_DEVWRITE8("k053260_2", k053260_device, k053260_w, 0x00ff)   /* K053260 */
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)

@@ -5374,159 +5374,15 @@ if (machine.input().code_pressed(KEYCODE_D))
 /*                                                                         */
 /***************************************************************************/
 
-struct k053251_state
-{
-	int      dirty_tmap[5];
-
-	UINT8    ram[16];
-	int      tilemaps_set;
-	int      palette_index[5];
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k053251_state *k053251_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K053251);
-
-	return (k053251_state *)downcast<k053251_device *>(device)->token();
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-WRITE8_DEVICE_HANDLER( k053251_w )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	int i, newind;
-
-	data &= 0x3f;
-
-	if (k053251->ram[offset] != data)
-	{
-		k053251->ram[offset] = data;
-		if (offset == 9)
-		{
-			/* palette base index */
-			for (i = 0; i < 3; i++)
-			{
-				newind = 32 * ((data >> 2 * i) & 0x03);
-				if (k053251->palette_index[i] != newind)
-				{
-					k053251->palette_index[i] = newind;
-					k053251->dirty_tmap[i] = 1;
-				}
-			}
-
-			if (!k053251->tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
-		}
-		else if (offset == 10)
-		{
-			/* palette base index */
-			for (i = 0; i < 2; i++)
-			{
-				newind = 16 * ((data >> 3 * i) & 0x07);
-				if (k053251->palette_index[3 + i] != newind)
-				{
-					k053251->palette_index[3 + i] = newind;
-					k053251->dirty_tmap[3 + i] = 1;
-				}
-			}
-
-			if (!k053251->tilemaps_set)
-				space.machine().tilemap().mark_all_dirty();
-		}
-	}
-}
-
-WRITE16_DEVICE_HANDLER( k053251_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k053251_w(device, space, offset, data & 0xff);
-}
-
-WRITE16_DEVICE_HANDLER( k053251_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		k053251_w(device, space, offset, (data >> 8) & 0xff);
-}
-
-int k053251_get_priority( device_t *device, int ci )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	return k053251->ram[ci];
-}
-
-int k053251_get_palette_index( device_t *device, int ci )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	return k053251->palette_index[ci];
-}
-
-int k053251_get_tmap_dirty( device_t *device, int tmap_num )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	assert(tmap_num < 5);
-	return k053251->dirty_tmap[tmap_num];
-}
-
-void k053251_set_tmap_dirty( device_t *device, int tmap_num, int data )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	assert(tmap_num < 5);
-	k053251->dirty_tmap[tmap_num] = data ? 1 : 0;
-}
-
-static void k053251_reset_indexes(k053251_state *k053251)
-{
-	k053251->palette_index[0] = 32 * ((k053251->ram[9] >> 0) & 0x03);
-	k053251->palette_index[1] = 32 * ((k053251->ram[9] >> 2) & 0x03);
-	k053251->palette_index[2] = 32 * ((k053251->ram[9] >> 4) & 0x03);
-	k053251->palette_index[3] = 16 * ((k053251->ram[10] >> 0) & 0x07);
-	k053251->palette_index[4] = 16 * ((k053251->ram[10] >> 3) & 0x07);
-}
-
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k053251 )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-
-	device->save_item(NAME(k053251->ram));
-	device->save_item(NAME(k053251->tilemaps_set));
-	device->save_item(NAME(k053251->dirty_tmap));
-
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(k053251_reset_indexes), k053251));
-}
-
-static DEVICE_RESET( k053251 )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	int i;
-
-	k053251->tilemaps_set = 0;
-
-	for (i = 0; i < 0x10; i++)
-		k053251->ram[i] = 0;
-
-	for (i = 0; i < 5; i++)
-		k053251->dirty_tmap[i] = 0;
-}
-
 const device_type K053251 = &device_creator<k053251_device>;
 
 k053251_device::k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053251, "Konami 053251", tag, owner, clock, "k053251", __FILE__)
+	: device_t(mconfig, K053251, "Konami 053251", tag, owner, clock, "k053251", __FILE__),
+	//m_dirty_tmap[5],
+	//m_ram[16],
+	m_tilemaps_set(0)
+	//m_palette_index[5]
 {
-	m_token = global_alloc_clear(k053251_state);
 }
 
 //-------------------------------------------------
@@ -5545,7 +5401,11 @@ void k053251_device::device_config_complete()
 
 void k053251_device::device_start()
 {
-	DEVICE_START_NAME( k053251 )(this);
+	save_item(NAME(m_ram));
+	save_item(NAME(m_tilemaps_set));
+	save_item(NAME(m_dirty_tmap));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(k053251_device::reset_indexes), this));
 }
 
 //-------------------------------------------------
@@ -5554,8 +5414,119 @@ void k053251_device::device_start()
 
 void k053251_device::device_reset()
 {
-	DEVICE_RESET_NAME( k053251 )(this);
+	int i;
+
+	m_tilemaps_set = 0;
+
+	for (i = 0; i < 0x10; i++)
+		m_ram[i] = 0;
+
+	for (i = 0; i < 5; i++)
+		m_dirty_tmap[i] = 0;
 }
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+WRITE8_MEMBER( k053251_device::write )
+{
+	int i, newind;
+
+	data &= 0x3f;
+
+	if (m_ram[offset] != data)
+	{
+		m_ram[offset] = data;
+		if (offset == 9)
+		{
+			/* palette base index */
+			for (i = 0; i < 3; i++)
+			{
+				newind = 32 * ((data >> 2 * i) & 0x03);
+				if (m_palette_index[i] != newind)
+				{
+					m_palette_index[i] = newind;
+					m_dirty_tmap[i] = 1;
+				}
+			}
+
+			if (!m_tilemaps_set)
+				space.machine().tilemap().mark_all_dirty();
+		}
+		else if (offset == 10)
+		{
+			/* palette base index */
+			for (i = 0; i < 2; i++)
+			{
+				newind = 16 * ((data >> 3 * i) & 0x07);
+				if (m_palette_index[3 + i] != newind)
+				{
+					m_palette_index[3 + i] = newind;
+					m_dirty_tmap[3 + i] = 1;
+				}
+			}
+
+			if (!m_tilemaps_set)
+				space.machine().tilemap().mark_all_dirty();
+		}
+	}
+}
+
+WRITE16_MEMBER( k053251_device::lsb_w )
+{
+	if (ACCESSING_BITS_0_7)
+		write(space, offset, data & 0xff);
+}
+
+WRITE16_MEMBER( k053251_device::msb_w )
+{
+	if (ACCESSING_BITS_8_15)
+		write(space, offset, (data >> 8) & 0xff);
+}
+
+int k053251_device::get_priority( int ci )
+{
+	return m_ram[ci];
+}
+
+int k053251_device::get_palette_index( int ci )
+{
+	return m_palette_index[ci];
+}
+
+int k053251_device::get_tmap_dirty( int tmap_num )
+{
+	assert(tmap_num < 5);
+	return m_dirty_tmap[tmap_num];
+}
+
+void k053251_device::set_tmap_dirty( int tmap_num, int data )
+{
+	assert(tmap_num < 5);
+	m_dirty_tmap[tmap_num] = data ? 1 : 0;
+}
+
+void k053251_device::reset_indexes()
+{
+	m_palette_index[0] = 32 * ((m_ram[9] >> 0) & 0x03);
+	m_palette_index[1] = 32 * ((m_ram[9] >> 2) & 0x03);
+	m_palette_index[2] = 32 * ((m_ram[9] >> 4) & 0x03);
+	m_palette_index[3] = 16 * ((m_ram[10] >> 0) & 0x07);
+	m_palette_index[4] = 16 * ((m_ram[10] >> 3) & 0x07);
+}
+
+// debug handlers
+
+READ16_MEMBER( k053251_device::lsb_r )
+{
+	return(m_ram[offset]);
+}       // PCU1
+
+READ16_MEMBER( k053251_device::msb_r )
+{
+	return(m_ram[offset] << 8);
+}       // PCU1
 
 /***************************************************************************/
 /*                                                                         */
@@ -5979,98 +5950,118 @@ void k055555_device::device_reset()
 // because the implementation is video dependant, this is just a
 // register-handling shell.
 
+const device_type K054338 = &device_creator<k054338_device>;
 
-struct k054338_state
+k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__)
+	//m_regs[32],
+	//m_shd_rgb[9],
 {
-	UINT16    regs[32];
-	int       shd_rgb[9];
-	int       alphainverted;
-
-	screen_device *screen;
-	device_t *k055555;  /* used to fill BG color */
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k054338_state *k054338_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K054338);
-
-	return (k054338_state *)downcast<k054338_device *>(device)->token();
 }
 
-INLINE const k054338_interface *k054338_get_interface( device_t *device )
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k054338_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == K054338);
-	return (const k054338_interface *) device->static_config();
+	// inherit a copy of the static data
+	const k054338_interface *intf = reinterpret_cast<const k054338_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k054338_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	m_screen_tag = "";
+	m_alpha_inv = 0;
+	m_k055555_tag = "";
+	};
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k054338_device::device_start()
+{
+	m_screen = machine().device<screen_device>(m_screen_tag);
+	m_k055555 = machine().device(m_k055555_tag);
+
+	save_item(NAME(m_regs));
+	save_item(NAME(m_shd_rgb));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k054338_device::device_reset()
+{
+	memset(m_regs, 0, sizeof(UINT16)*32);
+	memset(m_shd_rgb, 0, sizeof(int)*9);
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_DEVICE_HANDLER( k054338_word_w )
+WRITE16_MEMBER( k054338_device::word_w )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	COMBINE_DATA(k054338->regs + offset);
+	COMBINE_DATA(m_regs + offset);
 }
 
-WRITE32_DEVICE_HANDLER( k054338_long_w )
+WRITE32_MEMBER( k054338_device::long_w )
 {
 	offset <<= 1;
-	k054338_word_w(device, space, offset, data >> 16, mem_mask >> 16);
-	k054338_word_w(device, space, offset + 1, data, mem_mask);
+	word_w(space, offset, data >> 16, mem_mask >> 16);
+	word_w(space, offset + 1, data, mem_mask);
 }
 
 // returns a 16-bit '338 register
-int  k054338_register_r( device_t *device, int reg )
+int  k054338_device::register_r( int reg )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	return k054338->regs[reg];
+	return m_regs[reg];
 }
 
-void k054338_update_all_shadows( device_t *device, int rushingheroes_hack )
+void k054338_device::update_all_shadows( int rushingheroes_hack )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	running_machine &machine = device->machine();
 	int i, d;
-	int noclip = k054338->regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
+	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 
 	for (i = 0; i < 9; i++)
 	{
-		d = k054338->regs[K338_REG_SHAD1R + i] & 0x1ff;
+		d = m_regs[K338_REG_SHAD1R + i] & 0x1ff;
 		if (d >= 0x100)
 			d -= 0x200;
-		k054338->shd_rgb[i] = d;
+		m_shd_rgb[i] = d;
 	}
 
 	if (!rushingheroes_hack)
 	{
-		palette_set_shadow_dRGB32(machine, 0, k054338->shd_rgb[0], k054338->shd_rgb[1], k054338->shd_rgb[2], noclip);
-		palette_set_shadow_dRGB32(machine, 1, k054338->shd_rgb[3], k054338->shd_rgb[4], k054338->shd_rgb[5], noclip);
-		palette_set_shadow_dRGB32(machine, 2, k054338->shd_rgb[6], k054338->shd_rgb[7], k054338->shd_rgb[8], noclip);
+		palette_set_shadow_dRGB32(machine(), 0, m_shd_rgb[0], m_shd_rgb[1], m_shd_rgb[2], noclip);
+		palette_set_shadow_dRGB32(machine(), 1, m_shd_rgb[3], m_shd_rgb[4], m_shd_rgb[5], noclip);
+		palette_set_shadow_dRGB32(machine(), 2, m_shd_rgb[6], m_shd_rgb[7], m_shd_rgb[8], noclip);
 	}
 	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
 	{
-		palette_set_shadow_dRGB32(machine, 0, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine, 1, -80, -80, -80, 0);
-		palette_set_shadow_dRGB32(machine, 2, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine(), 0, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine(), 1, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine(), 2, -80, -80, -80, 0);
 	}
 }
 
 // k054338 BG color fill
-void k054338_fill_solid_bg( device_t *device, bitmap_rgb32 &bitmap )
+void k054338_device::fill_solid_bg( bitmap_rgb32 &bitmap )
 {
 	UINT32 bgcolor;
 	UINT32 *pLine;
 	int x, y;
 
-	bgcolor = (k054338_register_r(device, K338_REG_BGC_R) & 0xff) << 16;
-	bgcolor |= k054338_register_r(device, K338_REG_BGC_GB);
+	bgcolor = (register_r(K338_REG_BGC_R) & 0xff) << 16;
+	bgcolor |= register_r(K338_REG_BGC_GB);
 
 	/* and fill the screen with it */
 	for (y = 0; y < bitmap.height(); y++)
@@ -6082,14 +6073,13 @@ void k054338_fill_solid_bg( device_t *device, bitmap_rgb32 &bitmap )
 }
 
 // Unified k054338/K055555 BG color fill
-void k054338_fill_backcolor( device_t *device, bitmap_rgb32 &bitmap, int mode ) // (see p.67)
+void k054338_device::fill_backcolor( bitmap_rgb32 &bitmap, int mode ) // (see p.67)
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle &visarea = k054338->screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	clipx = visarea.min_x & ~3;
 	clipy = visarea.min_y;
@@ -6101,17 +6091,17 @@ void k054338_fill_backcolor( device_t *device, bitmap_rgb32 &bitmap, int mode ) 
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = device->machine().driver_data()->m_generic_paletteram_32;
+	pal_ptr = machine().driver_data()->m_generic_paletteram_32;
 
-	if (!mode || k054338->k055555 == NULL)
+	if (!mode || m_k055555 == NULL)
 	{
 		// single color output from CLTC
-		bgcolor = (int)(k054338->regs[K338_REG_BGC_R] & 0xff) << 16 | (int)k054338->regs[K338_REG_BGC_GB];
+		bgcolor = (int)(m_regs[K338_REG_BGC_R] & 0xff) << 16 | (int)m_regs[K338_REG_BGC_GB];
 	}
 	else
 	{
-		BGC_CBLK = k055555_read_register(k054338->k055555, 0);
-		BGC_SET  = k055555_read_register(k054338->k055555, 1);
+		BGC_CBLK = k055555_read_register(m_k055555, 0);
+		BGC_SET  = k055555_read_register(m_k055555, 1);
 
 		pal_ptr += BGC_CBLK << 9;
 
@@ -6181,9 +6171,8 @@ void k054338_fill_backcolor( device_t *device, bitmap_rgb32 &bitmap, int mode ) 
 }
 
 // addition blending unimplemented (requires major changes to drawgfx and tilemap.c)
-int k054338_set_alpha_level( device_t *device, int pblend )
+int k054338_device::set_alpha_level( int pblend )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
 	UINT16 *regs;
 	int ctrl, mixpri, mixset, mixlv;
 
@@ -6192,13 +6181,13 @@ int k054338_set_alpha_level( device_t *device, int pblend )
 		return (255);
 	}
 
-	regs   = k054338->regs;
-	ctrl   = k054338->regs[K338_REG_CONTROL];
+	regs   = m_regs;
+	ctrl   = m_regs[K338_REG_CONTROL];
 	mixpri = ctrl & K338_CTL_MIXPRI;
 	mixset = regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
 	mixlv  = mixset & 0x1f;
 
-	if (k054338->alphainverted)
+	if (m_alpha_inv)
 		mixlv = 0x1f - mixlv;
 
 	if (!(mixset & 0x20))
@@ -6229,83 +6218,26 @@ int k054338_set_alpha_level( device_t *device, int pblend )
 	return mixlv;
 }
 
-void k054338_invert_alpha( device_t *device, int invert )
+void k054338_device::invert_alpha( int invert )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	k054338->alphainverted = invert;
+	m_alpha_inv = invert;
 }
 
 
 #if 0
 // FIXME
-void k054338->export_config( device_t *device, int **shd_rgb )
+void k054338_device::export_config( int **shd_rgb )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	*shd_rgb = k054338->shd_rgb;
+	*shd_rgb = m_shd_rgb;
 }
 #endif
 
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
+// debug handler
 
-static DEVICE_START( k054338 )
+READ16_MEMBER( k054338_device::word_r )
 {
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	const k054338_interface *intf = k054338_get_interface(device);
-
-	k054338->screen = device->machine().device<screen_device>(intf->screen);
-	k054338->k055555 = device->machine().device(intf->k055555);
-
-	k054338->alphainverted = intf->alpha_inv;
-
-	device->save_item(NAME(k054338->regs));
-	device->save_item(NAME(k054338->shd_rgb));
-}
-
-static DEVICE_RESET( k054338 )
-{
-	k054338_state *k054338 = k054338_get_safe_token(device);
-
-	memset(k054338->regs, 0, sizeof(UINT16)*32);
-	memset(k054338->shd_rgb, 0, sizeof(int)*9);
-}
-
-const device_type K054338 = &device_creator<k054338_device>;
-
-k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__)
-{
-	m_token = global_alloc_clear(k054338_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k054338_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k054338_device::device_start()
-{
-	DEVICE_START_NAME( k054338 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k054338_device::device_reset()
-{
-	DEVICE_RESET_NAME( k054338 )(this);
-}
+	return(m_regs[offset]);
+}       // CLTC
 
 
 // Newer Konami devices
@@ -8209,24 +8141,6 @@ READ16_DEVICE_HANDLER( k053247_reg_word_r )
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	return(k053247->kx47_regs[offset]);
 }   // OBJSET2
-
-READ16_DEVICE_HANDLER( k054338_word_r )
-{
-	k054338_state *k054338 = k054338_get_safe_token(device);
-	return(k054338->regs[offset]);
-}       // CLTC
-
-READ16_DEVICE_HANDLER( k053251_lsb_r )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	return(k053251->ram[offset]);
-}       // PCU1
-
-READ16_DEVICE_HANDLER( k053251_msb_r )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-	return(k053251->ram[offset] << 8);
-}       // PCU1
 
 READ16_DEVICE_HANDLER( k055555_word_r )
 {

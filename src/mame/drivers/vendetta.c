@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_device, read, write)
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("k053251", k053251_device, write)
 	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE_LEGACY("k053246", k053246_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE_LEGACY("k053246", k053246_w)           // 053246 (Sprite)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)           // 053251 (Priority Encoder)
+	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_device, write)           // 053251 (Priority Encoder)
 	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE("k053252", k053252_device, read, write)              // Not Emulated (053252 ???)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)      // Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)    // EEPROM, Video banking

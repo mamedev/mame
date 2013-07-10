@@ -99,12 +99,12 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 		m_avac_bits[3] = m_avac_bits[2] = m_avac_bits[1] = m_avac_bits[0] = 0xf000;
 
 	// update color info and refresh tilemaps
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
 
 	for (i = 0; i < 4; i++)
 	{
 		dirty = 0;
-		colorbase_new = k053251_get_palette_index(m_k053251, K053251_CI[i]);
+		colorbase_new = m_k053251->get_palette_index(K053251_CI[i]);
 		if (m_layer_colorbase[i] != colorbase_new)
 		{
 			m_layer_colorbase[i] = colorbase_new;
@@ -142,16 +142,16 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// seems to switch the K053251 between different priority modes, detail unknown
-	// primode = k053251_get_priority(m_k053251, K053251_CI1);
+	// primode = m_k053251->get_priority(K053251_CI1);
 
 	layer[0] = 0;
 	m_layer_pri[0] = 0; // not sure
 	layer[1] = 1;
-	m_layer_pri[1] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layer_pri[1] = m_k053251->get_priority(K053251_CI2);
 	layer[2] = 2;
-	m_layer_pri[2] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_layer_pri[2] = m_k053251->get_priority(K053251_CI3);
 	layer[3] = 3;
-	m_layer_pri[3] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_layer_pri[3] = m_k053251->get_priority(K053251_CI4);
 
 	konami_sortlayers4(layer, m_layer_pri);
 

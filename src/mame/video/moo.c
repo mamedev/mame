@@ -70,14 +70,14 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	int layers[3];
 	int new_colorbase, plane, dirty, alpha;
 
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
 	m_layer_colorbase[0] = 0x70;
 
 	if (m_k056832->get_layer_association())
 	{
 		for (plane = 1; plane < 4; plane++)
 		{
-			new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
@@ -89,7 +89,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for (dirty = 0, plane = 1; plane < 4; plane++)
 		{
-			new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 			if (m_layer_colorbase[plane] != new_colorbase)
 			{
 				m_layer_colorbase[plane] = new_colorbase;
@@ -101,29 +101,29 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	layers[0] = 1;
-	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
 	layers[1] = 2;
-	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_layerpri[1] = m_k053251->get_priority(K053251_CI3);
 	layers[2] = 3;
-	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
 
 	konami_sortlayers3(layers, m_layerpri);
 
-	k054338_update_all_shadows(m_k054338, 0);
-	k054338_fill_backcolor(m_k054338, bitmap, 0);
+	m_k054338->update_all_shadows(0);
+	m_k054338->fill_backcolor(bitmap, 0);
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	if (m_layerpri[0] < k053251_get_priority(m_k053251, K053251_CI1))   /* bucky hides back layer behind background */
+	if (m_layerpri[0] < m_k053251->get_priority(K053251_CI1))   /* bucky hides back layer behind background */
 		m_k056832->tilemap_draw(bitmap, cliprect, layers[0], 0, 1);
 
 	m_k056832->tilemap_draw(bitmap, cliprect, layers[1], 0, 2);
 
 	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
 	// There is probably a control bit somewhere to turn off alpha blending.
-	m_alpha_enabled = k054338_register_r(m_k054338, K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
+	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
 
-	alpha = (m_alpha_enabled) ? k054338_set_alpha_level(m_k054338, 1) : 255;
+	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) : 255;
 
 	if (alpha > 0)
 		m_k056832->tilemap_draw(bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);

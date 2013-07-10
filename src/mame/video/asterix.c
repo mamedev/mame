@@ -72,11 +72,11 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 	m_tilebanks[3] = (m_k056832->get_lookup(3) << 10);
 
 	// update color info and refresh tilemaps
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
 
 	for (plane = 0; plane < 4; plane++)
 	{
-		new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
@@ -85,11 +85,11 @@ UINT32 asterix_state::screen_update_asterix(screen_device &screen, bitmap_ind16 
 	}
 
 	layer[0] = 0;
-	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI0);
+	m_layerpri[0] = m_k053251->get_priority(K053251_CI0);
 	layer[1] = 1;
-	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layerpri[1] = m_k053251->get_priority(K053251_CI2);
 	layer[2] = 3;
-	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
 
 	konami_sortlayers3(layer, m_layerpri);
 

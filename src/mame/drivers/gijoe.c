@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 #if JOE_DEBUG
 	AM_RANGE(0x110000, 0x110007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
 	AM_RANGE(0x160000, 0x160007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD_LEGACY("k053251", k053251_lsb_r)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD("k053251", k053251_device, lsb_r)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVREAD("k056832", k056832_device, word_r)
 #endif
 ADDRESS_MAP_END

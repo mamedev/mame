@@ -95,11 +95,11 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
 	int layer[5], plane, new_colorbase;
 
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
 
 	for (plane = 0; plane < 6; plane++)
 	{
-		new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
@@ -115,15 +115,15 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 	//layers priority
 
 	layer[0] = 0;
-	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_layerpri[0] = m_k053251->get_priority(K053251_CI3);
 	layer[1] = 1;
-	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_layerpri[1] = m_k053251->get_priority(K053251_CI4);
 	layer[2] = 3;
-	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI0);
+	m_layerpri[2] = m_k053251->get_priority(K053251_CI0);
 	layer[3] = 4;
-	m_layerpri[3] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layerpri[3] = m_k053251->get_priority(K053251_CI2);
 	layer[4] = 5;
-	m_layerpri[4] = k053251_get_priority(m_k053251, K053251_CI1);
+	m_layerpri[4] = m_k053251->get_priority(K053251_CI1);
 
 	konami_sortlayers5(layer, m_layerpri);
 

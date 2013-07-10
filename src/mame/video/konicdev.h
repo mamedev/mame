@@ -93,9 +93,9 @@ struct k053936_interface
 
 struct k054338_interface
 {
-	const char         *screen;
-	int                alpha_inv;
-	const char         *k055555;
+	const char         *m_screen_tag;
+	int                m_alpha_inv;
+	const char         *m_k055555_tag;
 };
 
 struct k001006_interface
@@ -546,14 +546,38 @@ private:
 
 extern const device_type K053936;
 
+	enum
+	{
+		K053251_CI0 = 0,
+		K053251_CI1,
+		K053251_CI2,
+		K053251_CI3,
+		K053251_CI4
+	};
+
 class k053251_device : public device_t
 {
 public:
 	k053251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k053251_device() { global_free(m_token); }
+	~k053251_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	/*
+	Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
+	when some palette index changes. If ALL_TILEMAPS is too expensive, use
+	k053251_set_tilemaps() to indicate which tilemap is associated with each index.
+	*/
+
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE16_MEMBER( lsb_w );
+	DECLARE_WRITE16_MEMBER( msb_w );
+	int get_priority(int ci);
+	int get_palette_index(int ci);
+	int get_tmap_dirty(int tmap_num);
+	void set_tmap_dirty(int tmap_num, int data);
+
+	DECLARE_READ16_MEMBER( lsb_r );         // PCU1
+	DECLARE_READ16_MEMBER( msb_r );         // PCU1
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -561,7 +585,13 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	int      m_dirty_tmap[5];
+
+	UINT8    m_ram[16];
+	int      m_tilemaps_set;
+	int      m_palette_index[5];
+	
+	void reset_indexes();
 };
 
 extern const device_type K053251;
@@ -633,22 +663,53 @@ private:
 
 extern const device_type K055555;
 
-class k054338_device : public device_t
+#define K338_REG_BGC_R      0
+#define K338_REG_BGC_GB     1
+#define K338_REG_SHAD1R     2
+#define K338_REG_BRI3       11
+#define K338_REG_PBLEND     13
+#define K338_REG_CONTROL    15
+
+#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
+#define K338_CTL_MIXPRI     0x02
+#define K338_CTL_SHDPRI     0x04
+#define K338_CTL_BRTPRI     0x08
+#define K338_CTL_WAILSL     0x10
+#define K338_CTL_CLIPSL     0x20
+
+class k054338_device : public device_t,
+										public k054338_interface
 {
 public:
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k054338_device() { global_free(m_token); }
+	~k054338_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
+	DECLARE_WRITE32_MEMBER( long_w );
+	
+	DECLARE_READ16_MEMBER( word_r );        // CLTC
+	
+	int register_r(int reg);
+	void update_all_shadows(int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
+	void fill_solid_bg(bitmap_rgb32 &bitmap);             // solid backcolor fill
+	void fill_backcolor(bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient (by using a k055555)
+	int  set_alpha_level(int pblend);                         // blend style 0-2
+	void invert_alpha(int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
+	//void export_config(int **shdRGB);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	
 private:
 	// internal state
-	void *m_token;
+	UINT16    m_regs[32];
+	int       m_shd_rgb[9];
+	
+	screen_device *m_screen;
+	device_t *m_k055555;  /* used to fill BG color */
 };
 
 extern const device_type K054338;
@@ -914,29 +975,6 @@ void k053246_set_objcha_line(device_t *device, int state);
 int k053246_is_irq_enabled(device_t *device);
 int k053246_read_register(device_t *device, int regnum);
 
-/**  Konami 053251 **/
-/*
-  Note: k053251_w() automatically does a ALL_TILEMAPS->mark_all_dirty()
-  when some palette index changes. If ALL_TILEMAPS is too expensive, use
-  k053251_set_tilemaps() to indicate which tilemap is associated with each index.
- */
-DECLARE_WRITE8_DEVICE_HANDLER( k053251_w );
-DECLARE_WRITE16_DEVICE_HANDLER( k053251_lsb_w );
-DECLARE_WRITE16_DEVICE_HANDLER( k053251_msb_w );
-int k053251_get_priority(device_t *device, int ci);
-int k053251_get_palette_index(device_t *device, int ci);
-int k053251_get_tmap_dirty(device_t *device, int tmap_num);
-void k053251_set_tmap_dirty(device_t *device, int tmap_num, int data);
-
-enum
-{
-	K053251_CI0 = 0,
-	K053251_CI1,
-	K053251_CI2,
-	K053251_CI3,
-	K053251_CI4
-};
-
 /**  Konami 055555  **/
 void k055555_write_reg(device_t *device, UINT8 regnum, UINT8 regdat);
 DECLARE_WRITE16_DEVICE_HANDLER( k055555_word_w );
@@ -1010,35 +1048,6 @@ int k055555_get_palette_index(device_t *device, int idx);
 #define K55_INP_SUB2          0x40
 #define K55_INP_SUB3          0x80
 
-
-/**  Konami 054338  **/
-/* mixer/alpha blender */
-
-DECLARE_WRITE16_DEVICE_HANDLER( k054338_word_w ); // "CLCT" registers
-DECLARE_WRITE32_DEVICE_HANDLER( k054338_long_w );
-int k054338_register_r(device_t *device, int reg);
-void k054338_update_all_shadows(device_t *device, int rushingheroes_hack);          // called at the beginning of SCREEN_UPDATE()
-void k054338_fill_solid_bg(device_t *device, bitmap_ind16 &bitmap);             // solid backcolor fill
-void k054338_fill_backcolor(device_t *device, bitmap_rgb32 &bitmap, int mode);  // unified fill, 0=solid, 1=gradient (by using a k055555)
-int  k054338_set_alpha_level(device_t *device, int pblend);                         // blend style 0-2
-void k054338_invert_alpha(device_t *device, int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-//void K054338_export_config(device_t *device, int **shdRGB);
-
-#define K338_REG_BGC_R      0
-#define K338_REG_BGC_GB     1
-#define K338_REG_SHAD1R     2
-#define K338_REG_BRI3       11
-#define K338_REG_PBLEND     13
-#define K338_REG_CONTROL    15
-
-#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
-#define K338_CTL_MIXPRI     0x02
-#define K338_CTL_SHDPRI     0x04
-#define K338_CTL_BRTPRI     0x08
-#define K338_CTL_WAILSL     0x10
-#define K338_CTL_CLIPSL     0x20
-
-
 /**  Konami 001006  **/
 UINT32 k001006_get_palette(device_t *device, int index);
 
@@ -1068,12 +1077,7 @@ DECLARE_READ32_DEVICE_HANDLER( k001604_reg_r );
 // debug handlers
 DECLARE_READ16_DEVICE_HANDLER( k053246_reg_word_r );    // OBJSET1
 DECLARE_READ16_DEVICE_HANDLER( k053247_reg_word_r );    // OBJSET2
-DECLARE_READ16_DEVICE_HANDLER( k053251_lsb_r );         // PCU1
-DECLARE_READ16_DEVICE_HANDLER( k053251_msb_r );         // PCU1
 DECLARE_READ16_DEVICE_HANDLER( k055555_word_r );        // PCU2
-DECLARE_READ16_DEVICE_HANDLER( k054338_word_r );        // CLTC
-
-
 DECLARE_READ32_DEVICE_HANDLER( k053247_reg_long_r );    // OBJSET2
 DECLARE_READ32_DEVICE_HANDLER( k055555_long_r );        // PCU2
 

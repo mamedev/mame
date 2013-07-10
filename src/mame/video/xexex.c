@@ -49,13 +49,13 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI0);
-	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
+	bg_colorbase = m_k053251->get_palette_index(K053251_CI1);
 	m_layer_colorbase[0] = 0x70;
 
 	for (plane = 1; plane < 4; plane++)
 	{
-		new_colorbase = k053251_get_palette_index(m_k053251, K053251_CI[plane]);
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
 		if (m_layer_colorbase[plane] != new_colorbase)
 		{
 			m_layer_colorbase[plane] = new_colorbase;
@@ -64,18 +64,18 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 	}
 
 	layer[0] = 1;
-	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
 	layer[1] = 2;
-	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_layerpri[1] = m_k053251->get_priority(K053251_CI3);
 	layer[2] = 3;
-	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
 	layer[3] = -1;
-	m_layerpri[3] = k053251_get_priority(m_k053251, K053251_CI1);
+	m_layerpri[3] = m_k053251->get_priority(K053251_CI1);
 
 	konami_sortlayers4(layer, m_layerpri);
 
-	k054338_update_all_shadows(m_k054338, 0);
-	k054338_fill_backcolor(m_k054338, bitmap, 0);
+	m_k054338->update_all_shadows(0);
+	m_k054338->fill_backcolor(bitmap, 0);
 
 	machine().priority_bitmap.fill(0, cliprect);
 
@@ -95,7 +95,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 
 	if (m_cur_alpha)
 	{
-		alpha = k054338_set_alpha_level(m_k054338, 1);
+		alpha = m_k054338->set_alpha_level(1);
 
 		if (alpha > 0)
 		{

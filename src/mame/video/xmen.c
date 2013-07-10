@@ -73,20 +73,20 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 {
 	int layer[3], bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI4);
-	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
-	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI3);
-	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI0);
-	m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI2);
+	bg_colorbase = m_k053251->get_palette_index(K053251_CI4);
+	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI3);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI0);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI2);
 
 	m_k052109->tilemap_update();
 
 	layer[0] = 0;
-	m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI3);
+	m_layerpri[0] = m_k053251->get_priority(K053251_CI3);
 	layer[1] = 1;
-	m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI0);
+	m_layerpri[1] = m_k053251->get_priority(K053251_CI0);
 	layer[2] = 2;
-	m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI2);
+	m_layerpri[2] = m_k053251->get_priority(K053251_CI2);
 
 	konami_sortlayers3(layer, m_layerpri);
 
@@ -193,20 +193,20 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		}
 
 
-		bg_colorbase = k053251_get_palette_index(m_k053251, K053251_CI4);
-		m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
-		m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI3);
-		m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI0);
-		m_layer_colorbase[2] = k053251_get_palette_index(m_k053251, K053251_CI2);
+		bg_colorbase = m_k053251->get_palette_index(K053251_CI4);
+		m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
+		m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI3);
+		m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI0);
+		m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI2);
 
 		m_k052109->tilemap_update();
 
 		layer[0] = 0;
-		m_layerpri[0] = k053251_get_priority(m_k053251, K053251_CI3);
+		m_layerpri[0] = m_k053251->get_priority(K053251_CI3);
 		layer[1] = 1;
-		m_layerpri[1] = k053251_get_priority(m_k053251, K053251_CI0);
+		m_layerpri[1] = m_k053251->get_priority(K053251_CI0);
 		layer[2] = 2;
-		m_layerpri[2] = k053251_get_priority(m_k053251, K053251_CI2);
+		m_layerpri[2] = m_k053251->get_priority(K053251_CI2);
 
 		konami_sortlayers3(layer, m_layerpri);
 

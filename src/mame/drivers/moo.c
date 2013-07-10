@@ -258,8 +258,8 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)      /* K054338 alpha blending engine */
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)      /* K054338 alpha blending engine */
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
@@ -283,8 +283,8 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD_LEGACY("k054338", k054338_word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD_LEGACY("k053251", k053251_lsb_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_device, word_r)
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_device, lsb_r)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_device, b_word_r)
 #endif
 ADDRESS_MAP_END
@@ -295,8 +295,8 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP                     /* heck if I know, but it's polled constantly */
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)       /* K054338 alpha blending engine */
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)       /* K054338 alpha blending engine */
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY                   /* CCU regs (ignored) */
 	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_WRITE(moobl_oki_bank_w)
 	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -323,8 +323,8 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)      /* K054338 alpha blending engine */
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)      /* K054338 alpha blending engine */
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                  /* CCU regs (ignored) */
 	AM_RANGE(0x0d2000, 0x0d20ff) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
@@ -348,8 +348,8 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD_LEGACY("k054338", k054338_word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD_LEGACY("k053251", k053251_lsb_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_device, word_r)
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_device, lsb_r)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_device, b_word_r)
 #endif
 ADDRESS_MAP_END
