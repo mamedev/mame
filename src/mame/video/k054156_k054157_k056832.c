@@ -214,7 +214,8 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_linemap_enabled(0),
 	m_use_ext_linescroll(0),
 	m_uses_tile_banks(0),
-	m_cur_tile_bank(0)
+	m_cur_tile_bank(0),
+	m_k055555(0)
 {
 
 }
@@ -238,7 +239,7 @@ void k056832_device::device_config_complete()
 	{
 	m_gfx_memory_region = "";
 	m_gfx_num = 0;
-	m_bpp = 0;
+	m_bpp = -1;
 	m_big = 0;
 	m_djmain_hack = 0;
 	m_deinterleave = 0;
@@ -255,7 +256,7 @@ void k056832_device::device_start()
 {
 
 	// for non-interface cases we still use the vh_start call
-	if (m_bpp == 0)
+	if (m_bpp == -1)
 		return;
 
 
@@ -669,22 +670,25 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info0) { get_tile_info(tileinfo, tile_index, 0x0); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info1) { get_tile_info(tileinfo, tile_index, 0x1); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info2) { get_tile_info(tileinfo, tile_index, 0x2); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info3) { get_tile_info(tileinfo, tile_index, 0x3); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info4) { get_tile_info(tileinfo, tile_index, 0x4); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info5) { get_tile_info(tileinfo, tile_index, 0x5); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info6) { get_tile_info(tileinfo, tile_index, 0x6); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info7) { get_tile_info(tileinfo, tile_index, 0x7); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info8) { get_tile_info(tileinfo, tile_index, 0x8); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_info9) { get_tile_info(tileinfo, tile_index, 0x9); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoa) { get_tile_info(tileinfo, tile_index, 0xa); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infob) { get_tile_info(tileinfo, tile_index, 0xb); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoc) { get_tile_info(tileinfo, tile_index, 0xc); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infod) { get_tile_info(tileinfo, tile_index, 0xd); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infoe) { get_tile_info(tileinfo, tile_index, 0xe); }
-TILE_GET_INFO_MEMBER(k056832_device::get_tile_infof) { get_tile_info(tileinfo, tile_index, 0xf); }
+	
+
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info0 ) { get_tile_info(tileinfo,tile_index,0x0); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info1 ) { get_tile_info(tileinfo,tile_index,0x1); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info2 ) { get_tile_info(tileinfo,tile_index,0x2); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info3 ) { get_tile_info(tileinfo,tile_index,0x3); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info4 ) { get_tile_info(tileinfo,tile_index,0x4); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info5 ) { get_tile_info(tileinfo,tile_index,0x5); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info6 ) { get_tile_info(tileinfo,tile_index,0x6); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info7 ) { get_tile_info(tileinfo,tile_index,0x7); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info8 ) { get_tile_info(tileinfo,tile_index,0x8); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_info9 ) { get_tile_info(tileinfo,tile_index,0x9); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoa ) { get_tile_info(tileinfo,tile_index,0xa); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infob ) { get_tile_info(tileinfo,tile_index,0xb); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoc ) { get_tile_info(tileinfo,tile_index,0xc); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infod ) { get_tile_info(tileinfo,tile_index,0xd); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoe ) { get_tile_info(tileinfo,tile_index,0xe); }
+TILE_GET_INFO_MEMBER( k056832_device::get_tile_infof ) { get_tile_info(tileinfo,tile_index,0xf); }
+
 
 void k056832_device::change_rambank( )
 {
@@ -2179,7 +2183,7 @@ void k056832_device::altK056832_UpdatePageLayout(void)
 	}
 
 	// winning spike and vsnet soccer don't like our layer association implementation..
-	if (altK056832_djmain_hack==2)
+	if (m_djmain_hack==2)
 		m_layer_association = 0;
 
 	// disable all tilemaps
@@ -2204,7 +2208,7 @@ void k056832_device::altK056832_UpdatePageLayout(void)
 			for (c=0; c<colspan; c++)
 			{
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-if (!(altK056832_djmain_hack==1) || m_layer_assoc_with_page[pageIndex] == -1) //*
+if (!(m_djmain_hack==1) || m_layer_assoc_with_page[pageIndex] == -1) //*
 					m_layer_assoc_with_page[pageIndex] = setlayer;
 			}
 		}
@@ -2213,71 +2217,6 @@ if (!(altK056832_djmain_hack==1) || m_layer_assoc_with_page[pageIndex] == -1) //
 	// refresh associated tilemaps
 	altK056832_MarkAllTilemapsDirty();
 }
-
-static void (*altK056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
-
-void k056832_device::altK056832_get_tile_info( tile_data &tileinfo, int tile_index, int pageIndex )
-{
-	static const struct altK056832_SHIFTMASKS
-	{
-		int flips, palm1, pals2, palm2;
-	}
-	altK056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
-
-	const struct altK056832_SHIFTMASKS *smptr;
-	int layer, flip, fbits, attr, code, color, flags;
-	UINT16 *pMem;
-
-	pMem  = &m_videoram[(pageIndex<<12)+(tile_index<<1)];
-
-	if (m_layer_association)
-	{
-		layer = m_layer_assoc_with_page[pageIndex];
-		if (layer == -1) layer = 0; // use layer 0's palette info for unmapped pages
-	}
-	else
-		layer = m_active_layer;
-
-	fbits = m_regs[3]>>6 & 3;
-	flip  = m_regs[1]>>(layer<<1) & 0x3; // tile-flip override (see p.20 3.2.2 "REG2")
-	smptr = &altK056832_shiftmasks[fbits];
-	attr  = pMem[0];
-	code  = pMem[1];
-
-	// normalize the flip/palette flags
-	// see the tables on pages 4 and 10 of the Pt. 2-3 "VRAM" manual
-	// for a description of these bits "FBIT0" and "FBIT1"
-	flip &= attr>>smptr->flips & 3;
-	color = (attr & smptr->palm1) | (attr>>smptr->pals2 & smptr->palm2);
-	flags = TILE_FLIPYX(flip);
-
-	(*altK056832_callback)(machine(), layer, &code, &color, &flags);
-
-	SET_TILE_INFO_MEMBER(altK056832_gfxnum,
-			code,
-			color,
-			flags);
-}
-
-
-	
-
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info0 ) { altK056832_get_tile_info(tileinfo,tile_index,0x0); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info1 ) { altK056832_get_tile_info(tileinfo,tile_index,0x1); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info2 ) { altK056832_get_tile_info(tileinfo,tile_index,0x2); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info3 ) { altK056832_get_tile_info(tileinfo,tile_index,0x3); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info4 ) { altK056832_get_tile_info(tileinfo,tile_index,0x4); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info5 ) { altK056832_get_tile_info(tileinfo,tile_index,0x5); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info6 ) { altK056832_get_tile_info(tileinfo,tile_index,0x6); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info7 ) { altK056832_get_tile_info(tileinfo,tile_index,0x7); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info8 ) { altK056832_get_tile_info(tileinfo,tile_index,0x8); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_info9 ) { altK056832_get_tile_info(tileinfo,tile_index,0x9); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoa ) { altK056832_get_tile_info(tileinfo,tile_index,0xa); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infob ) { altK056832_get_tile_info(tileinfo,tile_index,0xb); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoc ) { altK056832_get_tile_info(tileinfo,tile_index,0xc); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infod ) { altK056832_get_tile_info(tileinfo,tile_index,0xd); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infoe ) { altK056832_get_tile_info(tileinfo,tile_index,0xe); }
-TILE_GET_INFO_MEMBER( k056832_device::altK056832_get_tile_infof ) { altK056832_get_tile_info(tileinfo,tile_index,0xf); }
 
 void k056832_device::altK056832_change_rambank(void)
 {
@@ -2406,7 +2345,7 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 		8*8*4
 	};
 
-	altK056832_bpp = bpp;
+	m_bpp = bpp;
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -2463,8 +2402,8 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 	machine.gfx[gfx_index]->set_granularity(16); /* override */
 
 	altK056832_memory_region = gfx_memory_region;
-	altK056832_gfxnum = gfx_index;
-	altK056832_callback = callback;
+	m_gfx_num = gfx_index;
+	m_callback = callback;
 
 	m_rombase = machine.root_device().memregion(gfx_memory_region)->base();
 	m_num_gfx_banks = machine.root_device().memregion(gfx_memory_region)->bytes() / 0x2000;
@@ -2472,7 +2411,7 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 	m_use_ext_linescroll = 0;
 	m_uses_tile_banks = 0;
 
-	altK056832_djmain_hack = djmain_hack;
+	m_djmain_hack = djmain_hack;
 
 	for (i=0; i<4; i++)
 	{
@@ -2504,22 +2443,22 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 
 	m_videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
 
-	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x8] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x9] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xa] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xb] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xc] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xd] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xe] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xf] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::altK056832_get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x8] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x9] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xa] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xb] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xc] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xd] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xe] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xf] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
@@ -2978,7 +2917,7 @@ int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_r
 
 			pixmap  = m_pixmap[page];
 			pal_ptr    = machine.pens;
-			src_gfx    = machine.gfx[altK056832_gfxnum];
+			src_gfx    = machine.gfx[m_gfx_num];
 			src_pitch  = src_gfx->rowbytes();
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -3000,7 +2939,7 @@ int k056832_device::altK056832_update_linemap(running_machine &machine, bitmap_r
 
 				for (count = 0; count < LINE_WIDTH; count+=8)
 				{
-					altK056832_get_tile_info(machine, &tileinfo, line, page);
+					get_tile_info(machine, &tileinfo, line, page);
 					basepen = tileinfo.palette_base;
 					code_transparent = tileinfo.category;
 					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;

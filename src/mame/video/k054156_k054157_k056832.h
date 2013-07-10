@@ -54,9 +54,7 @@ public:
 	~k056832_device()
 	{
 		m_k055555_use = 0;
-		altK056832_djmain_hack= 0;
-		altK056832_gfxnum = 0;
-		altK056832_bpp = 0;
+		m_bpp = -1;
 		altK056832_memory_region = 0;
 	}
 
@@ -175,14 +173,8 @@ private:
 
 
 
-	// todo: collapse these into above
 
-	int m_k055555_use;
 
-	int altK056832_djmain_hack;
-	int altK056832_gfxnum;          // graphics element index for unpacked tiles
-	const char *altK056832_memory_region;   // memory region for tile gfx data
-	int altK056832_bpp;
 
 	device_t *m_k055555;  /* used to choose colorbase */
 
@@ -222,8 +214,10 @@ private:
 
 public:
 
+	// todo: collapse these into above
 
-
+	int m_k055555_use;
+	const char *altK056832_memory_region;   // memory region for tile gfx data
 
 	void altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 				int (*scrolld)[4][2],
@@ -254,25 +248,8 @@ public:
 	void altK056832_UpdatePageLayout(void);
 	int altK056832_rom_read_b(running_machine &machine, int offset, int blksize, int blksize2, int zerosec);
 	void altK056832_postload(void);
-	void altK056832_get_tile_info( tile_data &tileinfo, int tile_index, int pageIndex );
 	int altK056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags);
 
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info0);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info1);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info2);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info3);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info4);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info5);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info6);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info7);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info8);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_info9);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoa);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infob);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoc);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infod);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infoe);
-	TILE_GET_INFO_MEMBER(altK056832_get_tile_infof);
 
 };
 
