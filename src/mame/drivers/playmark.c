@@ -33,12 +33,6 @@ Original Bugs:
 TODO:
 - World Beach Volley sound is controlled by a pic16c57 whose ROM is missing for this game.
 
-- One stage in Hard Times has large white blocks instead of GFX in places, are they using an
-  invalid tile number that should be invisible?
-
-- In Hard Times the last boss appears on left side of screen as it scrolls into view, are we
-  missing part of the X co-ordinate?
-
 ***************************************************************************/
 
 #include "emu.h"
