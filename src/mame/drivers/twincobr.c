@@ -30,6 +30,122 @@ Supported games:
         GulfWar II (Game play very similar to Twin cobra)
 
 
+Twin Cobra / Kyukyoku Tiger
+Taito 1987
+
+PCB Layout
+----------
+
+Top board
+
+TP-011 SUB
+ |---------------|
+ |      B30-22.2B|
+ |      B30-23.3B|
+ |T.T-2 B30-24.4B|
+|-|              |
+| |         2016 |
+| |         2016 |
+| |              |
+| |              |
+|-|          6264|
+ |B30_20.12D 6264|
+ |B30_19.14D 6264|
+ |B30_18.15D 6264|
+|-B30_17.16D 6264|
+| |          2016|
+| |    B30-25.18C|
+| |              |
+| |              |
+|-|              |
+ |      2148 2148|
+ |      2148 2148|
+ |      2148 2148|
+ |---------------|
+Notes: 
+      T.T-2  - Custom chip (DIP40) marked 'TOAPLAN-02 M70H005'
+      2016   - 2kx8 SRAM (DIP24)
+      6264   - 8kx8 SRAM (DIP28)
+      2148   - 1kx4 SRAM (DIP18)
+      B30-22 \ 82S123 bipolar PROM(DIP16)
+      B30-25 /
+
+      B30-23 \
+      B30-24 / 82S129 bipolar PROM (DIP16)
+
+      B30_*  - OKI M27512 OTP EPROM (DIP28)
+
+
+Bottom board
+
+TP-011
+M6100292A
+KYUKYOKU TIGER
+860260927
+ |------------------------------------------|
+ |B30-21.25A          4016                  |
+ |                    4016      SW2         |
+ |                          T.T-2           |
+|-|                   5165      SW1        J|
+| | B30_16.20B B30_14.20C                  A|
+| |                   5165                 M|
+| | B30_15.18B B30_13.18C                  M|
+| | T.T-1             5165  T.T-2          A|
+|-|            B30_12.16C                   |
+ |                    5165                  |
+ |  T.T-1      B30_11.14C           68000-8 |
+ |                                          |
+|-|            B30_10.12C         5165 5165 |
+| | T.T-1             4016  T.T-2 B30_02.8J |
+| |                   4016        B30_04.8H |
+| | B30_07.10B B30_09.10C         B30_01.7J |
+| | B30_06.8B  B30_08.8C          B30_03.7H |
+|-|                                   7135  |
+ | TMS320C10             Z80          Y3014B|
+ | HD6845                B30_05.4F      VOL |
+ |28MHz 74LS163          4016  YM3812 MB3730|
+ |------------------------------------------|
+Notes:
+      68000  - Sygnetics SCN68000C8N64 68000 CPU. Clock 7.000MHz [28/4] (DIP64)
+      320C10 - Texas Instruments TMS320C10 microcontroller rebadged as a custom chip. Clock 14.000MHz [28/2]
+               There are two versions, Japan & World/US regions and the internal ROM is different.
+      Z80    - Zilog Z0840004PSC Z80 CPU. Clock 3.500MHz [28/8]
+      HD6845 - Hitachi HD6845SP CRT controller. Clock 3.500MHz [28/8] (DIP40)
+      YM3812 - Yamaha YM3812 FM OPLII Sound Generator. Clock 3.500MHz [28/8] (DIP24)
+      Y3014  - Yamaha YM3014 DAC (DIP8)
+      4016   - 2kx8 SRAM (DIP24)
+      5165   - 8kx8 SRAM (DIP28)
+      74LS163- Synchronous 4-Bit Binary Counter logic chip. This chip is used to divide the 28MHz clock.
+               28MHz input on pin 2, outputs: pin 11 1.75MHz, pin 12 3.5MHz, pin 13 7MHz, pin 14 14MHz
+      T.T-1  - Custom chip marked 'TOAPLAN GXL-01' (DIP40) 
+      T.T-2  - Custom chip marked 'TOAPLAN-02 M70H005' (DIP40) 
+      7135   - Intersil ICL7135 DAC (DIP8)
+      MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
+      SW1/2  - 8-position DIP switch
+      B30-21 - 82S123 bipolar PROM (DIP16)
+      B30_05 \
+      B30_06 |
+      B30_07 |    
+      B30_08 |
+      B30_09 | Hitachi HN27256 OTP EPROM (DIP28)
+      B30_10 | 
+      B30_11 |
+      B30_12 /
+      
+      B30_02 \
+      B30_04 / SGS M27256 EPROM (DIP28)
+
+      B30_01 \
+      B30_03 |
+      B30_13 |
+      B30_14 |
+      B30_15 | OKI M27512 OTP EPROM (DIP28)
+      B30_16 /
+
+      VSync  - 54.8766Hz
+      HSync  - 15.2822kHz
+
+
 Difference between Twin Cobra and Kyukyoku Tiger:
     T.C. supports two simultaneous players.
     K.T. supports two players, but only one at a time.
@@ -200,10 +316,8 @@ out:
 20        Coin counters / Coin lockouts
 
 TMS320C10 DSP: Harvard type architecture. RAM and ROM on separate data buses.
-0000-07ff ROM 16-bit opcodes (word access only). Moved to $8000-8fff for
-                 MAME compatibility. View this ROM in the debugger at $8000h
+0000-07ff ROM 16-bit opcodes (word access only).
 0000-0090 Internal RAM (words).
-
 
 in:
 01        data read from addressed 68K address space (Main RAM/Sprite RAM)
@@ -212,7 +326,6 @@ out:
 00        address of 68K to read/write to
 01        data to write to addressed 68K address space (Main RAM/Sprite RAM)
 03        bit 15 goes to BIO line of TMS320C10. BIO is a polled input line.
-
 
 MCUs used with this hardware: (TMS320C10 in custom Toaplan/Taito disguise)
 
@@ -224,7 +337,6 @@ MCU^64000    MCU^71001     MCU 71400  MCU^71900  MCU^74002       MCU^74000
 Only the first two lines of the MCU label seem to be significant;
 Flying Shark, Sky Shark and Wardner MCUs are all interchangeable.
 Demon's World also uses an MCU interchangeable with Twin Cobra.
-
 
 68K writes the following to $30000 to tell DSP to do the following:
 Twin  Kyukyoku
