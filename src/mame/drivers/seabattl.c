@@ -5,7 +5,7 @@ Sea Battle by Zaccaria
 driver by Mariusz Wojcieszek, hap, Phil Bennett and David Haywood
 
 TODO:
-- correct colors
+- correct colors (note: the flyer screenshots look faked; not a good reference)
 - should it have a horizon/sky?
 - video timing
 - video offsets
@@ -523,10 +523,6 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_CPU_IO_MAP(seabattl_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
 
-	MCFG_PALETTE_LENGTH(26)
-
-	MCFG_GFXDECODE(seabattl)
-
 	MCFG_S2636_ADD("s2636", s2636_config)
 
 	MCFG_DM9368_ADD("sc_thousand", digit_score_thousand_intf)
@@ -543,8 +539,10 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
-	
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
+
+	MCFG_GFXDECODE(seabattl)
+	MCFG_PALETTE_LENGTH(26)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
