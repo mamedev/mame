@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/k05324x.h"
+
 class surpratk_state : public driver_device
 {
 public:

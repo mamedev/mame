@@ -6,7 +6,7 @@
 #include "sound/k054539.h"
 #include "video/konicdev.h"
 #include "video/k054156_k054157_k056832.h"
-
+#include "video/k05324x.h"
 
 class lethal_state : public driver_device
 {

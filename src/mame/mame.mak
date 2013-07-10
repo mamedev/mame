@@ -1223,6 +1223,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/zr107.o \
 	$(VIDEO)/konami_helper.o \
 	$(VIDEO)/k054156_k054157_k056832.o \
+	$(VIDEO)/k05324x.o \
 	$(VIDEO)/konamiic.o $(VIDEO)/konicdev.o \
 
 $(MAMEOBJ)/maygay.a: \

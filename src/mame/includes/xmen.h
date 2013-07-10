@@ -1,4 +1,5 @@
 #include "sound/k054539.h"
+#include "video/k05324x.h"
 
 class xmen_state : public driver_device
 {

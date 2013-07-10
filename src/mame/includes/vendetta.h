@@ -5,6 +5,7 @@
 *************************************************************************/
 #include "sound/k053260.h"
 #include "machine/k053252.h"
+#include "video/k05324x.h"
 
 class vendetta_state : public driver_device
 {

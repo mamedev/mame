@@ -1,4 +1,5 @@
 #include "sound/k053260.h"
+#include "video/k05324x.h"
 
 class simpsons_state : public driver_device
 {
