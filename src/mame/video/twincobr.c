@@ -97,6 +97,8 @@ void twincobr_state::twincobr_create_tilemaps()
 
 VIDEO_START_MEMBER(twincobr_state,toaplan0)
 {
+	machine().primary_screen->register_screen_bitmap(m_temp_spritebitmap);
+
 	/* the video RAM is accessed via ports, it's not memory mapped */
 	m_txvideoram_size = 0x0800;
 	m_bgvideoram_size = 0x2000; /* banked two times 0x1000 */
@@ -342,36 +344,6 @@ WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
 
 
 
-/***************************************************************************
-    Ugly sprite hack for Wardner when hero is in shop
-***************************************************************************/
-
-void twincobr_state::wardner_sprite_priority_hack()
-{
-	if (m_fgscrollx != m_bgscrollx) {
-		UINT16 *buffered_spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->buffer());
-		if ((m_fgscrollx==0x1c9) || (m_flip_screen && (m_fgscrollx==0x17a))) { /* in the shop ? */
-			int wardner_hack = buffered_spriteram16[0x0b04/2];
-		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
-		/* sprite position 0x3900 to 0x5e00 -- hero on shop keeper (flip) */
-			if ((wardner_hack > 0x3900) && (wardner_hack < 0x8700)) {   /* hero at shop keeper ? */
-				wardner_hack = buffered_spriteram16[0x0b02/2];
-				wardner_hack |= 0x0400;         /* make hero top priority */
-				buffered_spriteram16[0x0b02/2] = wardner_hack;
-				wardner_hack = buffered_spriteram16[0x0b0a/2];
-				wardner_hack |= 0x0400;
-				buffered_spriteram16[0x0b0a/2] = wardner_hack;
-				wardner_hack = buffered_spriteram16[0x0b12/2];
-				wardner_hack |= 0x0400;
-				buffered_spriteram16[0x0b12/2] = wardner_hack;
-				wardner_hack = buffered_spriteram16[0x0b1a/2];
-				wardner_hack |= 0x0400;
-				buffered_spriteram16[0x0b1a/2] = wardner_hack;
-			}
-		}
-	}
-}
-
 
 
 void twincobr_state::twincobr_log_vram()
@@ -418,7 +390,7 @@ void twincobr_state::twincobr_log_vram()
     Sprite Handlers
 ***************************************************************************/
 
-void twincobr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void twincobr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 
@@ -442,21 +414,27 @@ void twincobr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			int sprite, color;
 
 			attribute = buffered_spriteram16[offs + 1];
-			if ((attribute & 0x0c00) == priority) { /* low priority */
-				sy = buffered_spriteram16[offs + 3] >> 7;
-				if (sy != 0x0100) {     /* sx = 0x01a0 or 0x0040*/
-					sprite = buffered_spriteram16[offs] & 0x7ff;
-					color  = attribute & 0x3f;
-					sx = buffered_spriteram16[offs + 2] >> 7;
-					flipx = attribute & 0x100;
-					if (flipx) sx -= 14;        /* should really be 15 */
-					flipy = attribute & 0x200;
-					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
-						sprite,
-						color,
-						flipx,flipy,
-						sx-32,sy-16,0);
-				}
+			int priority = (attribute & 0x0c00)>>10;
+
+			// are 0 priority really skipped, or can they still mask?
+			if (!priority) continue;
+
+			sy = buffered_spriteram16[offs + 3] >> 7;
+			if (sy != 0x0100) {     /* sx = 0x01a0 or 0x0040*/
+				sprite = buffered_spriteram16[offs] & 0x7ff;
+				color  = attribute & 0x3f;
+				color |= priority << 6; // encode colour
+
+				sx = buffered_spriteram16[offs + 2] >> 7;
+				flipx = attribute & 0x100;
+				if (flipx) sx -= 14;        /* should really be 15 */
+				flipy = attribute & 0x200;
+				drawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
+					sprite,
+					color << 4 /* << 4 because using _raw */ ,
+					flipx,flipy,
+					sx-32,sy-16,0);
+				
 			}
 		}
 	}
@@ -467,20 +445,47 @@ void twincobr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
+void twincobr_state::copy_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	int y, x;
+
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	{
+		UINT16* srcline = &m_temp_spritebitmap.pix16(y);
+		UINT16* dstline = &bitmap.pix16(y);
+
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		{
+			UINT16 pix = srcline[x];
+
+			if ( (pix>>(4+6)) == priority )
+			{
+				if (pix&0xf)
+				{
+					dstline[x] = pix & 0x3ff;
+				}
+			}
+		}
+
+	}
+}
+
 UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	twincobr_log_vram();
 
-	if (m_wardner_sprite_hack) wardner_sprite_priority_hack();
-
 	bitmap.fill(0, cliprect);
 
+	m_temp_spritebitmap.fill(0,cliprect);
+	draw_sprites(m_temp_spritebitmap,cliprect);
+
+
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(bitmap,cliprect,0x0400);
+	copy_sprites(bitmap,cliprect,1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(bitmap,cliprect,0x0800);
+	copy_sprites(bitmap,cliprect,2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(bitmap,cliprect,0x0c00);
+	copy_sprites(bitmap,cliprect,3);
 	return 0;
 }
 

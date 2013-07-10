@@ -57,6 +57,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
+	bitmap_ind16 m_temp_spritebitmap;
 
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(twincobr_dsp_r);
@@ -106,6 +107,7 @@ public:
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
 	DECLARE_MACHINE_RESET(wardner);
+	void copy_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);
@@ -114,9 +116,8 @@ public:
 	void twincobr_create_tilemaps();
 	void twincobr_display(int enable);
 	void twincobr_flipscreen(int flip);
-	void wardner_sprite_priority_hack();
 	void twincobr_log_vram();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void twincobr_dsp(int enable);
 	void toaplan0_control_w(int offset, int data);
 	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
