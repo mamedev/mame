@@ -54,8 +54,6 @@ public:
 	~k056832_device()
 	{
 		m_k055555_use = 0;
-		m_bpp = -1;
-		altK056832_memory_region = 0;
 	}
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
@@ -210,27 +208,24 @@ private:
 	template<class _BitmapClass>
 	void tilemap_draw_common(_BitmapClass &bitmap, const rectangle &cliprect, int layer, UINT32 flags, UINT32 priority);
 
+	void create_gfx(running_machine &machine, const char *gfx_memory_region, int bpp, int big);
+	void create_tilemaps(running_machine &machine);
+	void finalize_init(running_machine &machine);
+
 
 public:
 
 	// todo: collapse these into above
 
 	int m_k055555_use;
-	const char *altK056832_memory_region;   // memory region for tile gfx data
 
 	void altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 				int (*scrolld)[4][2],
 				void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 				int djmain_hack);
 
-	DECLARE_READ16_MEMBER( altK056832_mw_rom_word_r );
-	DECLARE_WRITE16_MEMBER( m_word_w ); // "VRAM" registers
-
 	void altK056832_set_UpdateMode(int mode); // k055555 hook
-	
-	DECLARE_WRITE32_MEMBER( altK056832_long_w );
 
-	void altK056832_postload(void);
 	
 	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
 private:

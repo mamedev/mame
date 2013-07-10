@@ -252,153 +252,11 @@ void k056832_device::device_config_complete()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void k056832_device::device_start()
+
+void k056832_device::create_tilemaps(running_machine &machine)
 {
-
-	// for non-interface cases we still use the vh_start call
-	if (m_bpp == -1)
-		return;
-
-
-/* TODO: understand which elements MUST be init here (to keep correct layer
-   associations) and which ones can can be init at RESET, if any */
 	tilemap_t *tmap;
 	int i;
-	UINT32 total;
-	static const gfx_layout charlayout8 =
-	{
-		8, 8,
-		0,
-		8,
-		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
-		8*8*8
-	};
-	static const gfx_layout charlayout8le =
-	{
-		8, 8,
-		0,
-		8,
-//      { 0, 1, 2, 3, 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8) },
-		{ 0+(0x200000*8), 1+(0x200000*8), 2+(0x200000*8), 3+(0x200000*8), 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-	static const gfx_layout charlayout6 =
-	{
-		8, 8,
-		0,
-		6,
-		{ 40, 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
-		8*8*6
-	};
-	static const gfx_layout charlayout5 =
-	{
-		8, 8,
-		0,
-		5,
-		{ 32, 24, 8, 16, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
-		8*8*5
-	};
-	static const gfx_layout charlayout4 =
-	{
-		8, 8,
-		0,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-		8*8*4
-	};
-	static const gfx_layout charlayout4dj =
-	{
-		8, 8,
-		0,
-		4,
-		{ 8*3,8*1,8*2,8*0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7 },
-		{ 0, 8*4, 8*4*2, 8*4*3, 8*4*4, 8*4*5, 8*4*6, 8*4*7 },
-		8*8*4
-	};
-	static const gfx_layout charlayout8_tasman =
-	{
-		8,8,
-		RGN_FRAC(1,1),
-		8,
-		{ 0,8,16,24,32,40,48,56 },
-		{ 0,1,2,3,4,5,6,7 },    // bit order probably not exact - note ramp in first 16 tiles
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
-		8*64
-	};
-
-
-
-
-	/* handle the various graphics formats */
-	i = (m_big) ? 8 : 16;
-
-
-	/* decode the graphics */
-	switch (m_bpp)
-	{
-		case K056832_BPP_4:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 4);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout4, 4);
-			break;
-
-		case K056832_BPP_5:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 5);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout5, 4);
-			break;
-
-		case K056832_BPP_6:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 6);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout6, 4);
-			break;
-
-		case K056832_BPP_8:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8, 4);
-			break;
-
-		case K056832_BPP_8LE:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8le, 4);
-			break;
-
-		case K056832_BPP_8TASMAN:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 8);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout8_tasman, 4);
-			break;
-
-		case K056832_BPP_4dj:
-			total = machine().root_device().memregion(m_gfx_memory_region)->bytes() / (i * 4);
-			konami_decode_gfx(machine(), m_gfx_num, machine().root_device().memregion(m_gfx_memory_region)->base(), total, &charlayout4dj, 4);
-			break;
-
-		default:
-			fatalerror("Unsupported bpp\n");
-	}
-
-
-
-	machine().gfx[m_gfx_num]->set_granularity(16); /* override */
-
-	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
-
-	m_rombase = machine().root_device().memregion(m_gfx_memory_region)->base();
-	m_num_gfx_banks = machine().root_device().memregion(m_gfx_memory_region)->bytes() / 0x2000;
-	
-	m_cur_gfx_banks = 0;
-	m_use_ext_linescroll = 0;
-	m_uses_tile_banks = 0;
 
 	for (i = 0; i < 4; i++)
 	{
@@ -419,7 +277,6 @@ void k056832_device::device_start()
 	m_active_layer = 0;
 	m_linemap_enabled = 0;
 
-	m_k055555 = machine().device(m_k055555_tag);
 
 	memset(m_line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
 
@@ -431,24 +288,25 @@ void k056832_device::device_start()
 
 
 
-	m_videoram = auto_alloc_array_clear(machine(), UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+	m_videoram = auto_alloc_array_clear(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
+	memset(m_videoram, 0x00, 0x20000);
 
-	m_tilemap[0x0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x4] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x5] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x6] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x7] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x8] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x9] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xa] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xb] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xc] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xd] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xe] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xf] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x8] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x9] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xa] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xb] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xc] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xd] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xe] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0xf] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -458,8 +316,13 @@ void k056832_device::device_start()
 
 		tmap->set_transparent_pen(0);
 	}
+}
 
-	memset(m_videoram, 0x00, 0x20000);
+
+void k056832_device::finalize_init(running_machine &machine)
+{
+	int i;
+
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
@@ -505,7 +368,30 @@ void k056832_device::device_start()
 		save_item(NAME(m_last_colorbase[i]), i);
 	}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
+	machine.save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
+}
+
+
+void k056832_device::device_start()
+{
+	// for non-interface cases we still use the vh_start call
+	if (m_bpp == -1)
+		return;
+
+
+	m_k055555 = machine().device(m_k055555_tag);
+
+/* TODO: understand which elements MUST be init here (to keep correct layer
+   associations) and which ones can can be init at RESET, if any */
+
+	create_gfx(machine(), m_gfx_memory_region, m_bpp, m_big);
+
+	/* deinterleave the graphics, if needed */
+	konami_deinterleave_gfx(machine(), m_gfx_memory_region, m_deinterleave);
+
+	create_tilemaps(machine());
+
+	finalize_init(machine());
 
 }
 
@@ -1295,124 +1181,6 @@ WRITE16_MEMBER( k056832_device::word_w )
 }
 
 
-WRITE16_MEMBER( k056832_device::m_word_w )
-{
-	int layer, flip, mask, i;
-	UINT32 old_data, new_data;
-
-	old_data = m_regs[offset];
-	COMBINE_DATA(&m_regs[offset]);
-	new_data = m_regs[offset];
-
-	if (new_data != old_data)
-	{
-		switch(offset)
-		{
-			/* -x-- ---- dotclock select: 0=8Mhz, 1=6Mhz (not used by GX)
-			 * --x- ---- screen flip y
-			 * ---x ---- screen flip x
-			 * ---- --x- external linescroll RAM page enable
-			 */
-			case 0x00/2:
-				if ((new_data & 0x30) != (old_data & 0x30))
-				{
-					flip = 0;
-					if (new_data & 0x20) flip |= TILEMAP_FLIPY;
-					if (new_data & 0x10) flip |= TILEMAP_FLIPX;
-					for (i=0; i<K056832_PAGE_COUNT; i++)
-					{
-						m_tilemap[i]->set_flip(flip);
-					}
-				}
-
-				if ((new_data & 0x02) != (old_data & 0x02))
-				{
-					change_rambank();
-				}
-			break;
-
-			/* -------- -----xxx external irqlines enable (not used by GX)
-			 * -------- xx------ tilemap attribute config (FBIT0 and FBIT1)
-			 */
-			//case 0x06/2: break;
-
-			// -------- ----DCBA tile mode: 0=512x1, 1=8x8
-			// -------- DCBA---- synchronous scroll: 0=off, 1=on
-			case 0x08/2:
-				for (layer=0; layer<4; layer++)
-				{
-					mask = 1<<layer;
-					i = new_data & mask;
-					if (i != (old_data & mask))
-					{
-						m_layer_tile_mode[layer] = i;
-						mark_plane_dirty(layer);
-					}
-				}
-			break;
-
-			/* -------- ------xx layer A linescroll config
-			 * -------- ----xx-- layer B linescroll config
-			 * -------- --xx---- layer C linescroll config
-			 * -------- xx------ layer D linescroll config
-			 *
-			 * 0: linescroll
-			 * 2: rowscroll
-			 * 3: xy scroll
-			 */
-			//case 0x0a/2: break;
-
-			case 0x32/2:
-				change_rambank();
-			break;
-
-			case 0x34/2: /* ROM bank select for checksum */
-			case 0x36/2: /* secondary ROM bank select for use with tile banking */
-				change_rombank();
-			break;
-
-			// extended tile address
-			//case 0x38/2: break;
-
-			// 12 bit (signed) horizontal offset if global HFLIP enabled
-			//case 0x3a/2: break;
-
-			// 11 bit (signed) vertical offset if global VFLIP enabled
-			//case 0x3c/2: break;
-
-			default:
-				layer = offset & 3;
-
-				if (offset >= 0x10/2 && offset <= 0x16/2)
-				{
-					m_y[layer] = (new_data&0x18)>>3;
-					m_h[layer] = (new_data&0x3);
-					m_active_layer = layer;
-					update_page_layout();
-				} else
-
-				if (offset >= 0x18/2 && offset <= 0x1e/2)
-				{
-					m_x[layer] = (new_data&0x18)>>3;
-					m_w[layer] = (new_data&0x03);
-					m_active_layer = layer;
-					update_page_layout();
-				} else
-
-				if (offset >= 0x20/2 && offset <= 0x26/2)
-				{
-					m_dy[layer] = (INT16)new_data;
-				} else
-
-				if (offset >= 0x28/2 && offset <= 0x2e/2)
-				{
-					m_dx[layer] = (INT16)new_data;
-				}
-			break;
-		}
-	}
-}
-
 WRITE32_MEMBER( k056832_device::long_w )
 {
 	// GX does access of all 3 widths (8/16/32) so we can't do the
@@ -1421,16 +1189,6 @@ WRITE32_MEMBER( k056832_device::long_w )
 	offset <<= 1;
 	word_w(space, offset, data >> 16, mem_mask >> 16);
 	word_w(space, offset + 1, data, mem_mask);
-}
-
-WRITE32_MEMBER( k056832_device::altK056832_long_w )
-{
-	// GX does access of all 3 widths (8/16/32) so we can't do the
-	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
-	// are used to the tilemap bank register.
-	offset <<= 1;
-	m_word_w(space, offset, data>>16, mem_mask >> 16);
-	m_word_w(space, offset+1, data, mem_mask);
 }
 
 
@@ -2275,21 +2033,8 @@ READ16_MEMBER( k056832_device::b_word_r )
 /***************************************************************************/
 
 
-
-void k056832_device::altK056832_postload()
+void k056832_device::create_gfx(running_machine &machine, const char *gfx_memory_region, int bpp, int big)
 {
-	update_page_layout();
-	change_rambank();
-	change_rombank();
-}
-
-void k056832_device::altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
-	int (*scrolld)[4][2],
-	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
-	int djmain_hack)
-{
-
-	tilemap_t *tmap;
 	int gfx_index;
 	int i;
 	UINT32 total;
@@ -2421,176 +2166,33 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 
 	machine.gfx[gfx_index]->set_granularity(16); /* override */
 
-	altK056832_memory_region = gfx_memory_region;
+	m_gfx_memory_region = gfx_memory_region;
 	m_gfx_num = gfx_index;
-	m_callback = callback;
 
 	m_rombase = machine.root_device().memregion(gfx_memory_region)->base();
 	m_num_gfx_banks = machine.root_device().memregion(gfx_memory_region)->bytes() / 0x2000;
 	m_cur_gfx_banks = 0;
 	m_use_ext_linescroll = 0;
 	m_uses_tile_banks = 0;
+}
 
+
+
+void k056832_device::altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
+	int (*scrolld)[4][2],
+	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
+	int djmain_hack)
+{
+	m_k055555_use = 0;
+	m_callback = callback;
 	m_djmain_hack = djmain_hack;
 
-	for (i=0; i<4; i++)
-	{
-		m_layer_offs[i][0] = 0;
-		m_layer_offs[i][1] = 0;
-		m_lsram_page[i][0] = i;
-		m_lsram_page[i][1] = i << 11;
-		m_x[i] = 0;
-		m_y[i] = 0;
-		m_w[i] = 0;
-		m_h[i] = 0;
-		m_dx[i] = 0;
-		m_dy[i] = 0;
-		m_layer_tile_mode[i] = 1;
-	}
+	create_gfx(machine, gfx_memory_region, bpp, big);
 
-	m_default_layer_association = 1;
-	m_active_layer = 0;
-	m_k055555_use = 0;
-	m_linemap_enabled = 0;
+	create_tilemaps(machine);
 
-	memset(m_line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
-
-	for (i=0; i<K056832_PAGE_COUNT; i++)
-	{
-		m_all_lines_dirty[i] = 0;
-		m_page_tile_mode[i] = 1;
-	}
-
-	m_videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
-
-	m_tilemap[0x0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x3] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x4] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x5] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x6] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x7] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x8] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x9] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xa] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xb] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xc] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xd] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xe] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xf] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-
-	for (i=0; i<K056832_PAGE_COUNT; i++)
-	{
-		tmap = m_tilemap[i];
-
-		m_pixmap[i] = &tmap->pixmap();
-
-		tmap->set_transparent_pen(0);
-	}
-
-	memset(m_videoram, 0x00, 0x20000);
-	memset(m_regs,     0x00, sizeof(m_regs) );
-	memset(m_regsb,    0x00, sizeof(m_regsb) );
-
-	update_page_layout();
-
-	change_rambank();
-	change_rombank();
-
-	machine.save().save_pointer(NAME(m_videoram), 0x10000);
-	machine.save().save_item(NAME(m_regs));
-	machine.save().save_item(NAME(m_regsb));
-	machine.save().save_item(NAME(m_x));
-	machine.save().save_item(NAME(m_y));
-	machine.save().save_item(NAME(m_w));
-	machine.save().save_item(NAME(m_h));
-	machine.save().save_item(NAME(m_dx));
-	machine.save().save_item(NAME(m_dy));
-	machine.save().save_item(NAME(m_layer_tile_mode));
-
-	machine.save().register_postload(save_prepost_delegate(FUNC(k056832_device::altK056832_postload), this));
-
-
+	finalize_init(machine);
 }
-
-
-
-
-
-
-// data is arranged like this:
-// 0000 1111 22 0000 1111 22
-READ16_MEMBER( k056832_device::altK056832_mw_rom_word_r )
-{
-	int bank = 10240*m_cur_gfx_banks;
-	int addr;
-
-	if (!m_rombase)
-	{
-		m_rombase = space.machine().root_device().memregion(altK056832_memory_region)->base();
-	}
-
-	if (m_regsb[2] & 0x8)
-	{
-		// we want only the 2s
-		int bit;
-		int res, temp;
-
-		bit = offset % 4;
-		addr = (offset / 4) * 5;
-
-		temp = m_rombase[addr+4+bank];
-
-		switch (bit)
-		{
-			default:
-			case 0:
-				res = (temp & 0x80) << 5;
-				res |= ((temp & 0x40) >> 2);
-				break;
-
-			case 1:
-				res = (temp & 0x20) << 7;
-				res |= (temp & 0x10);
-				break;
-
-			case 2:
-				res = (temp & 0x08) << 9;
-				res |= ((temp & 0x04) << 2);
-				break;
-
-			case 3:
-				res = (temp & 0x02) << 11;
-				res |= ((temp & 0x01) << 4);
-				break;
-		}
-
-		return res;
-	}
-	else
-	{
-		// we want only the 0s and 1s.
-
-		addr = (offset>>1) * 5;
-
-		if (offset & 1)
-		{
-			addr += 2;
-		}
-
-		addr += bank;
-
-		return m_rombase[addr+1] | (m_rombase[addr] << 8);
-	}
-
-}
-
-
-
-
-
-
 
 
 
