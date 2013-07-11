@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 
 	/* slot devices */
 	MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, 0)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl1", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl2", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
