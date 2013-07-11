@@ -389,7 +389,6 @@ private:
 	// internal state
 	UINT8    *m_ram;
 	tilemap_t  *m_tmap;
-	int      m_bpp;
 	UINT8    m_ctrlram[16];
 		
 	TILE_GET_INFO_MEMBER(get_tile_info0);
