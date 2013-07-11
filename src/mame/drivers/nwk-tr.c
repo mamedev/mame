@@ -223,7 +223,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
-#include "video/konicdev.h"
+#include "video/k001604.h"
 
 
 class nwktr_state : public driver_device

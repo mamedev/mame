@@ -12,6 +12,9 @@
 /*                                 054338                                  */
 /*                                                                         */
 /***************************************************************************/
+/* later Konami GX board replaces the 054338 with a 058144 */
+
+
 
 static UINT16 k54338_regs[32];
 static int K054338_shdRGB[9];

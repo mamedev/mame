@@ -173,9 +173,11 @@ Check gticlub.c for details on the bottom board.
 #include "machine/eeprom.h"
 #include "sound/k056800.h"
 #include "sound/k054539.h"
-#include "video/konicdev.h"
+#include "video/k001604.h"
 #include "video/gticlub.h"
 #include "video/k054156_k054157_k056832.h"
+#include "video/konami_helper.h"
+
 
 class zr107_state : public driver_device
 {

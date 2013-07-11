@@ -1238,7 +1238,10 @@ $(MAMEOBJ)/konami.a: \
 	$(VIDEO)/k054000.o \
 	$(VIDEO)/k054338.o \
 	$(VIDEO)/k053936.o \
-	$(VIDEO)/konicdev.o \
+	$(VIDEO)/k001006.o \
+	$(VIDEO)/k001005.o \
+	$(VIDEO)/k001604.o \
+
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \

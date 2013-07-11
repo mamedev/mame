@@ -204,4 +204,70 @@ Run and Gun         fails 36M (053936) 2U 2Y 5U 5Y (sprites)
 Quiz Gakumon no Susume  pass
 Dragonball Z 2      fails
 
+
+
+
+005885  (this is currently just implemented in the drivers?)
+------
+Some games use two of these in pair. Jackal even puts together the two 4bpp
+tilemaps to form a single 8bpp one.
+It manages sprites and 32x32 or 64x32 tilemap (only Double Dribble uses the
+64x32 one).
+The chip also generates clock and interrupt signals suitable for a 6809.
+It uses 0x2000 bytes of RAM for the tilemaps and sprites, and an additional
+0x100 bytes, maybe for scroll RAM and line buffers. The maximum addressable
+ROM is 0x20000 bytes (addressed 16 bits at a time). Tile and sprite data both
+come from the same ROM space. Double Dribble and Jackal have external circuitry
+to extend the limits and use separated addressing spaces for sprites and tiles.
+All games use external circuitry to reuse one or both the tile flip attributes
+as an additional address bit.
+Two 256x4 lookup PROMs are also used to increase the color combinations.
+All tilemap / sprite priority handling is done internally and the chip exports
+5 bits of color code, composed of 1 bit indicating tile or sprite, and 4 bits
+of ROM data remapped through the PROM.
+
+inputs:
+- address lines (A0-A13)
+- data lines (DB0-DB7)
+- misc interface stuff
+- data from the gfx ROMs (RDL0-RDL7, RDU0-RDU7)
+- data from the tile lookup PROMs (VCD0-VCD3)
+- data from the sprite lookup PROMs (OCD0-OCD3)
+
+outputs:
+- address lines for tilemap RAM (AX0-AX12)
+- data lines for tilemap RAM (VO0-VO7)
+- address lines for the small RAM (FA0-FA7)
+- data lines for the small RAM (FD0-FD7)
+- address lines for the gfx ROMs (R0-R15)
+- address lines for the tile lookup PROMs (VCF0-VCF3, VCB0-VCB3)
+- address lines for the sprite lookup PROMs (OCB0-OCB3, OCF0-OCF3)
+- NNMI, NIRQ, NFIR, NCPE, NCPQ, NEQ for the main CPU
+- misc interface stuff
+- color code to be output on screen (COL0-COL4)
+
+
+control registers
+000:          scroll y
+001:          scroll x (low 8 bits)
+002: -------x scroll x (high bit)
+     ----xxx- row/colscroll control
+              000 = solid scroll (finalizr, ddribble bg)
+              100 = solid scroll (jackal)
+              001 = ? (ddribble fg)
+              011 = colscroll (jackal high scores)
+              101 = rowscroll (ironhors, jackal map)
+003: ------xx high bits of the tile code
+     -----x-- unknown (finalizr)
+     ----x--- selects sprite buffer (and makes a copy to a private buffer?)
+     --x----- unknown (ironhors)
+     -x------ unknown (ironhors)
+     x------- unknown (ironhors, jackal)
+004: -------x nmi enable
+     ------x- irq enable
+     -----x-- firq enable
+     ----x--- flip screen
+
+
+
 */

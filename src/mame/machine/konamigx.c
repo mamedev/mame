@@ -13,6 +13,33 @@
 /*                                                                         */
 /***************************************************************************/
 
+/*
+
+
+K055550
+-------
+
+Protection chip which performs a memset() operation.
+
+Used in Violent Storm and Ultimate Battler to clear VRAM between scenes, among
+other things.  May also perform other functions since Violent Storm still isn't
+happy...
+
+Has word-wide registers as follows:
+
+0: Count of units to transfer.  The write here triggers the transfer.
+1-6: Unknown
+7: Destination address, MSW
+8: Destination address, LSW
+9: Unknown
+10: Size of transfer units, MSW
+11: Size of transfer units, LSW
+12: Unknown
+13: Value to fill destination region with
+14-15: Unknown
+
+*/
+
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 static UINT16 prot_data[0x20];
 
