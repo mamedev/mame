@@ -63,7 +63,7 @@ protected:
 
 private:
 	// internal state
-	screen_device *m_screen;
+	//screen_device *m_screen;
 
 	UINT16 *     m_pal_ram;
 	UINT16 *     m_unknown_ram;
