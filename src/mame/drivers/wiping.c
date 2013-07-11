@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE_LEGACY("wiping", wiping_sound_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_device, sound_w)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(sound_irq_mask_w)
