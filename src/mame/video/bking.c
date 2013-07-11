@@ -224,9 +224,6 @@ void bking_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bking_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap1);
 	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap2);
-
-	save_item(NAME(m_tmp_bitmap1));
-	save_item(NAME(m_tmp_bitmap2));
 }
 
 
@@ -253,6 +250,7 @@ UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bit
 		m_palette_bank,
 		m_crow_flip, m_crow_flip,
 		m_crow_flip ? m_xld3 - 16 : 256 - m_xld3, m_crow_flip ? m_yld3 - 16 : 256 - m_yld3, 0);
+
 	return 0;
 }
 
