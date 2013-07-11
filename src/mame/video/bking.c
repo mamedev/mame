@@ -319,7 +319,7 @@ void bking_state::screen_eof_bking(screen_device &screen, bool state)
 
 				for (x = rect.min_x; x <= rect.max_x; x++)
 				{
-					if (MASK[p0[x] & 7] && p1[x])
+					if (MASK[p0[x] & 7] && p1[x] & 1)
 					{
 						int col = (xld + x) / 8 + 1;
 						int row = (yld + y) / 8 + 0;
