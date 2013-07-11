@@ -20,7 +20,6 @@ DIP Locations verified for:
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "machine/buggychl.h"
 #include "includes/bking.h"
 
 READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
@@ -118,8 +117,8 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
-	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0x4f, 0x4f) AM_DEVREAD_LEGACY("bmcu", buggychl_mcu_status_r) AM_WRITE(unk_w)
+	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
+	AM_RANGE(0x4f, 0x4f) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r) AM_WRITE(unk_w)
 	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
 	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)

@@ -1,4 +1,6 @@
+#include "machine/buggychl.h"
 #include "sound/msm5232.h"
+
 class fortyl_state : public driver_device
 {
 public:
@@ -13,6 +15,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm") { }
 
 	/* memory pointers */
@@ -62,6 +65,11 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_mcu;
+	optional_device<buggychl_mcu_device> m_bmcu;
+	required_device<msm5232_device> m_msm;
+	
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
@@ -107,7 +115,4 @@ public:
 	void fortyl_plot_pix( int offset );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
-	required_device<msm5232_device> m_msm;
 };

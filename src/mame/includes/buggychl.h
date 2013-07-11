@@ -2,6 +2,7 @@
     buggychl
 */
 
+#include "machine/buggychl.h"
 #include "sound/msm5232.h"
 
 class buggychl_state : public driver_device
@@ -17,6 +18,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm") { }
 
 	/* memory pointers */
@@ -43,6 +45,11 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<buggychl_mcu_device> m_bmcu;
+	required_device<msm5232_device> m_msm;
+		
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
@@ -67,7 +74,4 @@ public:
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
-	required_device<msm5232_device> m_msm;
 };
