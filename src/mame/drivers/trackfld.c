@@ -423,9 +423,9 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_READ(trackfld_SN76496_r) AM_WRITE(konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_busy_r)
+	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, busy_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_w)
+	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( trackfld )

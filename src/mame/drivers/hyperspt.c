@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_w)   /* speech and output control */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
