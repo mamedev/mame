@@ -1,36 +1,176 @@
-/*
+/**********************************************************************
 
-    TODO:
+    Amstrad PC1640 Integrated Graphics Adapter emulation
 
-    - EGA
-    - CGA
-    - Plantronics
-    - Hercules
-    - MDA
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
-*/
+**********************************************************************
 
-#include "includes/pc1512.h"
+    This display controller is integrated on the PC1640 motherboard 
+    but wired to the ISA bus, and can be disabled with a DIP switch.
+
+    WD Paradise PEGA 1A 38304B 2116-002 8745AAA JAPAN (84 pin PLCC)
+
+    Single chip multimode EGA video controller with 
+	integral 6845 CRTC. Provides 100% IBM EGA, CGA, 
+	MDA, Hercules graphics and Plantronics COLORPLUS* 
+	compatibility
+
+**********************************************************************/
+
+#include "isa_pc1640_iga.h"
 
 
 
 //**************************************************************************
-//  CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define SCREEN_TAG      "screen"
+#define PEGA1A_TAG    	"ic910"
 
 
 
 //**************************************************************************
-//  VIDEO RAM ACCESS
+//  DEVICE DEFINITIONS
 //**************************************************************************
+
+const device_type ISA8_PC1640_IGA = &device_creator<isa8_pc1640_iga_device>;
+
+
+//-------------------------------------------------
+//  ROM( pc1640_iga )
+//-------------------------------------------------
+
+ROM_START( pc1640_iga )
+	ROM_REGION16_LE( 0x8000, "iga", 0)
+	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) ) // 8736 E
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *isa8_pc1640_iga_device::device_rom_region() const
+{
+	return ROM_NAME( pc1640_iga );
+}
+
+
+//-------------------------------------------------
+//  mc6845_interface crtc_intf
+//-------------------------------------------------
+
+static MC6845_UPDATE_ROW( pc1640_update_row )
+{
+}
+
+static MC6845_INTERFACE( crtc_intf )
+{
+	SCREEN_TAG,
+	false,
+	8,
+	NULL,
+	pc1640_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
+//  SCREEN_UPDATE( pc1640_iga )
+//-------------------------------------------------
+
+UINT32 isa8_pc1640_iga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  MACHINE_DRIVER( pc1640_iga )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( pc1640_iga )
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, isa8_pc1640_iga_device, screen_update)
+	MCFG_SCREEN_SIZE(80*8, 25*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*8-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_REFRESH_RATE(60)
+
+	MCFG_PALETTE_LENGTH(64)
+
+	MCFG_MC6845_ADD(PEGA1A_TAG, AMS40041, XTAL_28_63636MHz/32, crtc_intf)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa8_pc1640_iga_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( pc1640_iga );
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  isa8_pc1640_iga_device - constructor
+//-------------------------------------------------
+
+isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ISA8_PC1640_IGA, "Amstrad PC1640 IGA", tag, owner, clock, "pc1640_iga", __FILE__),
+		device_isa8_card_interface(mconfig, *this),
+		m_vdu(*this, PEGA1A_TAG),
+		m_video_ram(*this, "video_ram")
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa8_pc1640_iga_device::device_start()
+{
+	set_isa_device();
+
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "iga", "iga");
+	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, READ8_DELEGATE(isa8_pc1640_iga_device, video_ram_r), WRITE8_DELEGATE(isa8_pc1640_iga_device, video_ram_w));
+	m_isa->install_device(0x3b0, 0x3df, 0, 0, READ8_DELEGATE(isa8_pc1640_iga_device, iga_r), WRITE8_DELEGATE(isa8_pc1640_iga_device, iga_w));
+
+	// allocate memory
+	m_video_ram.allocate(0x20000);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void isa8_pc1640_iga_device::device_reset()
+{
+}
+
 
 //-------------------------------------------------
 //  video_ram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::video_ram_r )
+READ8_MEMBER( isa8_pc1640_iga_device::video_ram_r )
 {
 	UINT8 data = 0;
 
@@ -47,7 +187,7 @@ READ8_MEMBER( pc1640_state::video_ram_r )
 //  video_ram_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1640_state::video_ram_w )
+WRITE8_MEMBER( isa8_pc1640_iga_device::video_ram_w )
 {
 	if (BIT(m_egc_ctrl, 1))
 	{
@@ -60,7 +200,7 @@ WRITE8_MEMBER( pc1640_state::video_ram_w )
 //  iga_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::iga_r )
+READ8_MEMBER( isa8_pc1640_iga_device::iga_r )
 {
 	UINT8 data = 0;
 
@@ -128,7 +268,7 @@ READ8_MEMBER( pc1640_state::iga_r )
 		*/
 
 		// switch sense
-		data |= BIT(m_sw->read(), ((m_egc_ctrl >> 2) & 0x03) ^ 0x03);
+		//data |= BIT(m_sw->read(), ((m_egc_ctrl >> 2) & 0x03) ^ 0x03);
 		break;
 
 	case 0x15: // Sequencer Data Register
@@ -183,7 +323,7 @@ READ8_MEMBER( pc1640_state::iga_r )
 //  iga_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1640_state::iga_w )
+WRITE8_MEMBER( isa8_pc1640_iga_device::iga_w )
 {
 	//logerror("IGA write %03x:%02x\n", offset+0x3b0, data);
 
@@ -337,66 +477,3 @@ WRITE8_MEMBER( pc1640_state::iga_w )
 		break;
 	}
 }
-
-
-//-------------------------------------------------
-//  mc6845_interface crtc_intf
-//-------------------------------------------------
-
-static MC6845_UPDATE_ROW( pc1640_update_row )
-{
-}
-
-static MC6845_INTERFACE( crtc_intf )
-{
-	SCREEN_TAG,
-	false,
-	8,
-	NULL,
-	pc1640_update_row,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	NULL
-};
-
-
-//-------------------------------------------------
-//  VIDEO_START( pc1640 )s
-//-------------------------------------------------
-
-void pc1640_state::video_start()
-{
-	// allocate memory
-	m_video_ram.allocate(0x20000);
-}
-
-
-//-------------------------------------------------
-//  SCREEN_UPDATE( pc1640 )
-//-------------------------------------------------
-
-UINT32 pc1640_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  MACHINE_CONFIG( pc1640 )
-//-------------------------------------------------
-
-MACHINE_CONFIG_FRAGMENT( pc1640_video )
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(pc1640_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*8-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_PALETTE_LENGTH(64)
-
-	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, XTAL_28_63636MHz/32, crtc_intf)
-MACHINE_CONFIG_END

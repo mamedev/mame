@@ -804,6 +804,7 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_VIDEO)/isa_svga_tseng.o      \
 	$(MESS_VIDEO)/isa_svga_s3.o \
 	$(MESS_VIDEO)/s3virge.o \
+	$(MESS_VIDEO)/isa_pc1640_iga.o     \
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers
@@ -867,7 +868,6 @@ $(MESSOBJ)/amstrad.a:           \
 	$(MESS_DRIVERS)/pc1512.o    \
 	$(MESS_MACHINE)/pc1512kb.o  \
 	$(MESS_VIDEO)/pc1512.o      \
-	$(MESS_VIDEO)/pc1640.o      \
 	$(MESS_VIDEO)/nc.o          \
 	$(MESS_DRIVERS)/nc.o        \
 	$(MESS_MACHINE)/nc.o        \

@@ -480,7 +480,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
-	else if (addr >= 0x3b0 && addr <= 0x3df) { data = iga_r(space, addr - 0x3b0); decoded = true; }
+	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
 	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(space, offset & 0x01); decoded = true; }
 	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
@@ -556,9 +556,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1640_mem, AS_PROGRAM, 16, pc1640_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE8(video_ram_r, video_ram_w, 0xffff)
-	AM_RANGE(0xc0000, 0xc7fff) AM_ROM AM_REGION("iga", 0)
-//  AM_RANGE(0xc8000, 0xc9fff) AM_ROM AM_REGION("hdc", 0)
 	AM_RANGE(0xf0000, 0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
 
@@ -579,7 +576,6 @@ static ADDRESS_MAP_START( pc1640_io, AS_IO, 16, pc1640_state )
 	AM_RANGE(0x080, 0x083) AM_WRITE8(dma_page_w, 0xffff)
 	AM_RANGE(0x0a0, 0x0a1) AM_WRITE8(nmi_mask_w, 0xff00)
 	AM_RANGE(0x378, 0x37b) AM_WRITE8(printer_w, 0xffff)
-	AM_RANGE(0x3b0, 0x3df) AM_WRITE8(iga_w, 0xffff)
 	AM_RANGE(0x3f2, 0x3f3) AM_DEVWRITE8(PC_FDC_XT_TAG, pc_fdc_xt_device, dor_w, 0x00ff)
 	AM_RANGE(0x3f4, 0x3f5) AM_DEVWRITE8(PC_FDC_XT_TAG ":upd765", upd765_family_device, fifo_w, 0xff00)
 	AM_RANGE(0x3f8, 0x3ff) AM_DEVWRITE8(INS8250_TAG, ins8250_device, ins8250_w, 0xffff)
@@ -1039,6 +1035,10 @@ static const centronics_interface centronics_intf =
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
 
+SLOT_INTERFACE_START( pc1640_isa8_cards )
+	SLOT_INTERFACE_INTERNAL("iga", ISA8_PC1640_IGA)
+SLOT_INTERFACE_END
+
 static const isa8bus_interface isabus_intf =
 {
 	// interrupts
@@ -1276,9 +1276,6 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
 
-	// video
-	MCFG_FRAGMENT_ADD(pc1640_video)
-
 	// sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1302,6 +1299,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc_isa8_cards, "wdxt_gen", false)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa4", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa5", pc1640_isa8_cards, "iga", false)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1374,9 +1373,6 @@ ROM_START( pc1640 )
 	ROM_SYSTEM_BIOS( 2, "88xx", "Week ?/1988" )
 	ROMX_LOAD( "40044 88xx.ic132", 0x0000, 0x2000, CRC(6090f782) SHA1(e21ae524d5b4d00696d293dbd4fe4d7bca22e277), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(3) )
-
-	ROM_REGION16_LE( 0x8000, "iga", 0)
-	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) ) // 8736 E
 ROM_END
 
 

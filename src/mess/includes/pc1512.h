@@ -21,6 +21,7 @@
 #include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
+#include "video/isa_pc1640_iga.h"
 
 #define I8086_TAG       "ic120"
 #define I8087_TAG       "ic119"
@@ -35,8 +36,8 @@
 #define CENTRONICS_TAG  "centronics"
 #define SPEAKER_TAG     "speaker"
 #define ISA_BUS_TAG     "isa"
-#define SCREEN_TAG      "screen"
 #define RS232_TAG       "rs232"
+#define SCREEN_TAG      "screen"
 
 class pc1512_state : public driver_device
 {
@@ -88,7 +89,7 @@ public:
 	required_device<mc146818_device> m_rtc;
 	required_device<pc_fdc_xt_device> m_fdc;
 	required_device<ins8250_device> m_uart;
-	required_device<ams40041_device> m_vdu;
+	optional_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
@@ -229,40 +230,16 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual void video_start();
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
 	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_READ8_MEMBER( iga_r );
-	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
 
 	required_ioport m_sw;
 
-
-	// video state
 	int m_opt;
-	UINT8 m_egc_ctrl;
-	UINT8 m_emcr;           // extended mode control register
-	UINT8 m_emcrp;          // extended mode control register protection read counter
-	UINT8 m_sar;            // sequencer address register
-	UINT8 m_sdr[8];         // sequencer data registers
-	UINT8 m_gcar;           // graphics controller address register
-	UINT8 m_gcdr[16];       // graphics controller data registers
-	UINT8 m_crtcar;         // CRT controller address register
-	UINT8 m_crtcdr[32];     // CRT controller data registers
-	UINT8 m_plr;            // Plantronics mode register
 };
 
 // ---------- defined in video/pc1512.c ----------
 
 MACHINE_CONFIG_EXTERN( pc1512_video );
-
-// ---------- defined in video/pc1640.c ----------
-
-MACHINE_CONFIG_EXTERN( pc1640_video );
 
 #endif
