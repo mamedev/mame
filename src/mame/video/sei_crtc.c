@@ -15,12 +15,13 @@ D-Con
 SD Gundam Psycho Salamander no Kyoui
 (all games in legionna.c)
 (all games in raiden2.c)
+(all games in seibuspi.c)
 
 The name "Seibu CRTC" is actually an agglomerate of all the Seibu Customs that are on the
 single boards, most if not all of them are shared video chips in the aforementioned games.
 
 TODO:
-- Needs a full device rewrite
+- Needs a full device rewrite, presumably device split too (where CRTC and tilemap are on different chip emulation).
 - Dynamic Resolution Change (xx10 register?)
 - Dynamic Paging register probably incorrect,needs further investigation;
 - Merge the aforementioned games and clean-up the code in these drivers;
