@@ -2313,7 +2313,7 @@ GAME( 1988, pitboss2,  0,        meritm_crt250, meritm_crt250, driver_device, 0,
 GAME( 1988, spitboss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Super Pit Boss (9221-02A)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, 0,        meritm_crt250, meritm_crt250, meritm_state,  pitbossc, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc, pitbosss, meritm_crt250, meritm_crt250, meritm_state,  pitbossc, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 252 + CRT 258 */
 GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30,  meritm_state,  pbst30,   ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
