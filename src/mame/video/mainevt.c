@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "includes/mainevt.h"
 
 

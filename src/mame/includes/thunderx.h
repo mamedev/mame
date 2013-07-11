@@ -4,6 +4,9 @@
 
 *************************************************************************/
 #include "sound/k007232.h"
+#include "video/k052109.h"
+#include "video/k051960.h"
+#include "video/konami_helper.h"
 
 class thunderx_state : public driver_device
 {

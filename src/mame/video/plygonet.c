@@ -8,7 +8,7 @@
 */
 
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "includes/plygonet.h"
 
 /* TTL text plane */

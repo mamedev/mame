@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "video/konicdev.h"
+#include "video/k007121.h"
 
 class contra_state : public driver_device
 {

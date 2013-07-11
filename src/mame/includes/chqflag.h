@@ -4,7 +4,10 @@
 
 *************************************************************************/
 #include "sound/k007232.h"
-#include "video/konicdev.h"
+#include "video/k051960.h"
+#include "video/k051316.h"
+#include "video/k051733.h"
+#include "video/konami_helper.h"
 
 class chqflag_state : public driver_device
 {

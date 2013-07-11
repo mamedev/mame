@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "includes/tmnt.h"
 
 TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "includes/combatsc.h"
 
 PALETTE_INIT_MEMBER(combatsc_state,combatsc)

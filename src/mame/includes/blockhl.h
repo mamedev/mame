@@ -4,6 +4,10 @@
 
 *************************************************************************/
 
+#include "video/k052109.h"
+#include "video/k051960.h"
+#include "video/konami_helper.h"
+
 class blockhl_state : public driver_device
 {
 public:

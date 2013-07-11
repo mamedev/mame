@@ -4,9 +4,10 @@
 
 *************************************************************************/
 #include "sound/k053260.h"
-#include "video/konicdev.h"
+#include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k05324x.h"
+#include "video/konami_helper.h"
 
 class asterix_state : public driver_device
 {

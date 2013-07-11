@@ -129,7 +129,7 @@ Dip locations verified with Service Mode.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "video/konicdev.h"
+
 #include "includes/crshrace.h"
 
 

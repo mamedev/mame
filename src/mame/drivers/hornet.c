@@ -320,7 +320,7 @@
 #include "sound/rf5c400.h"
 #include "sound/k056800.h"
 #include "video/voodoo.h"
-#include "video/konicdev.h"
+#include "video/k037122.h"
 #include "rendlay.h"
 
 

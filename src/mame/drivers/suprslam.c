@@ -83,7 +83,7 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konicdev.h"
+
 #include "sound/2610intf.h"
 #include "video/vsystem_spr.h"
 #include "includes/suprslam.h"

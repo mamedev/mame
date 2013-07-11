@@ -1,7 +1,7 @@
 /* Super Slams - video, see notes in driver file */
 
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "vsystem_spr.h"
 #include "includes/suprslam.h"
 

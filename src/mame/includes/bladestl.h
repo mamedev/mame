@@ -4,7 +4,9 @@
 
 *************************************************************************/
 #include "sound/upd7759.h"
-#include "video/konicdev.h"
+#include "video/k007342.h"
+#include "video/k007420.h"
+#include "video/k051733.h"
 
 class bladestl_state : public driver_device
 {

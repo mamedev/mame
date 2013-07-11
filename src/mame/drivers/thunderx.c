@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-#include "video/konicdev.h"
+
 #include "sound/2151intf.h"
 #include "includes/konamipt.h"
 #include "includes/thunderx.h"

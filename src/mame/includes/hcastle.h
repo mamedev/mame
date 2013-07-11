@@ -6,7 +6,7 @@
 
 #include "video/bufsprite.h"
 #include "sound/k007232.h"
-#include "video/konicdev.h"
+#include "video/k007121.h"
 
 class hcastle_state : public driver_device
 {

@@ -105,7 +105,7 @@ driver modified by Eisuke Watanabe
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "sound/ymf278b.h"
-#include "video/konicdev.h"
+
 
 
 /***************************************************************************

@@ -10,7 +10,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/konicdev.h"
+
 #include "includes/rungun.h"
 
 /* TTL text plane stuff */

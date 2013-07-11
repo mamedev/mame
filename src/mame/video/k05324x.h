@@ -218,7 +218,25 @@ int K053246_read_register(int regnum);
 
 
 
+#define MCFG_K053244_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053244, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
+#define MCFG_K053245_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053245, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K053246_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053246, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K053247_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053247, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+	
+#define MCFG_K055673_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K055673, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 #endif

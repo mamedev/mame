@@ -5,6 +5,9 @@
 *************************************************************************/
 #include "sound/k053260.h"
 #include "video/k05324x.h"
+#include "video/k052109.h"
+#include "video/k053251.h"
+#include "video/konami_helper.h"
 
 class parodius_state : public driver_device
 {

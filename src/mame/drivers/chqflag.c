@@ -18,7 +18,6 @@
 #include "sound/2151intf.h"
 #include "includes/chqflag.h"
 #include "includes/konamipt.h"
-
 #include "chqflag.lh"
 
 

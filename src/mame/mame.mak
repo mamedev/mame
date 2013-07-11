@@ -1222,6 +1222,15 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/yiear.o $(VIDEO)/yiear.o \
 	$(DRIVERS)/zr107.o \
 	$(VIDEO)/konami_helper.o \
+	$(VIDEO)/k007121.o \
+	$(VIDEO)/k007342.o \
+	$(VIDEO)/k007420.o \
+	$(VIDEO)/k037122.o \
+	$(VIDEO)/k051316.o \
+	$(VIDEO)/k051733.o \
+	$(VIDEO)/k051960.o \
+	$(VIDEO)/k052109.o \
+	$(VIDEO)/k053251.o \
 	$(VIDEO)/k054156_k054157_k056832.o \
 	$(VIDEO)/k05324x.o \
 	$(VIDEO)/k055555.o \

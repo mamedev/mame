@@ -5,7 +5,7 @@
 *************************************************************************/
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
-#include "video/konicdev.h"
+#include "video/k007121.h"
 
 class combatsc_state : public driver_device
 {
