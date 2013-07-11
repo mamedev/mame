@@ -1602,7 +1602,7 @@ $(MAMEOBJ)/seibu.a: \
 	$(MACHINE)/seicop.o \
 	$(MACHINE)/spisprit.o \
 	$(AUDIO)/seibu.o \
-	$(VIDEO)/sei_crtc.o \
+	$(VIDEO)/seibu_crtc.o \
 
 $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/aleck64.o $(MACHINE)/n64.o $(VIDEO)/n64.o $(VIDEO)/rdpblend.o $(VIDEO)/rdpspn16.o $(VIDEO)/rdptpipe.o \

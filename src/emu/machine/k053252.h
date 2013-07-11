@@ -19,23 +19,23 @@ struct k053252_interface
 };
 
 class k053252_device : public device_t,
-										public k053252_interface
+                       public k053252_interface
 {
 public:
 	k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053252_device() {}
-	
+
 	DECLARE_READ8_MEMBER( read );  // CCU registers
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	void res_change();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	private:
 	// internal state
 	UINT8   m_regs[16];

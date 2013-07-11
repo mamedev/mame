@@ -144,7 +144,7 @@ const address_space_config *m50458_device::memory_space_config(address_spacenum 
 //**************************************************************************
 
 //-------------------------------------------------
-//  readbyte - read a byte at the given address
+//  read_word - read a word at the given address
 //-------------------------------------------------
 
 inline UINT16 m50458_device::read_word(offs_t address)
@@ -153,7 +153,7 @@ inline UINT16 m50458_device::read_word(offs_t address)
 }
 
 //-------------------------------------------------
-//  writebyte - write a byte at the given address
+//  write_word - write a word at the given address
 //-------------------------------------------------
 
 inline void m50458_device::write_word(offs_t address, UINT16 data)

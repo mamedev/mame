@@ -75,7 +75,7 @@ void k053252_device::device_config_complete()
 	const k053252_interface *intf = reinterpret_cast<const k053252_interface *>(static_config());
 	if (intf != NULL)
 			*static_cast<k053252_interface *>(this) = *intf;
-	
+
 	// or initialize to defaults if none provided
 	else
 	{
@@ -115,7 +115,7 @@ void k053252_device::device_reset()
 		m_regs[i] = 0;
 
 	m_regs[0x08] = 1; // Xexex apparently does a wrong assignment for VC (sets up the INT enable register instead)
-	
+
 	m_hc=0;
 	m_hfp=0;
 	m_hbp=0;
