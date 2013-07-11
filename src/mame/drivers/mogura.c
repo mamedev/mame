@@ -10,21 +10,20 @@ class mogura_state : public driver_device
 public:
 	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
 		m_gfxram(*this, "gfxram"),
-		m_tileram(*this, "tileram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_tileram(*this, "tileram")
+	{ }
 
-	/* memory pointers */
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
 	required_shared_ptr<UINT8> m_gfxram;
 	required_shared_ptr<UINT8> m_tileram;
 
-	/* video-related */
 	tilemap_t *m_tilemap;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	dac_device *m_dac1;
-	dac_device *m_dac2;
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
 	DECLARE_WRITE8_MEMBER(mogura_dac_w);
 	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
@@ -203,9 +202,6 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_CPU_IO_MAP(mogura_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mogura_state,  irq0_line_hold)
 
-
-	MCFG_GFXDECODE(mogura)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) // ?
@@ -214,8 +210,8 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 
+	MCFG_GFXDECODE(mogura)
 	MCFG_PALETTE_LENGTH(32)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -226,6 +222,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_DAC_ADD("dac2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
+
 
 ROM_START( mogura )
 	ROM_REGION( 0x10000, "maincpu", 0 )
