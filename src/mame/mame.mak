@@ -1232,7 +1232,8 @@ $(MAMEOBJ)/konami.a: \
 	$(VIDEO)/k052109.o \
 	$(VIDEO)/k053251.o \
 	$(VIDEO)/k054156_k054157_k056832.o \
-	$(VIDEO)/k05324x.o \
+	$(VIDEO)/k053244_k053245.o \
+	$(VIDEO)/k053246_k053247_k055673.o \
 	$(VIDEO)/k055555.o \
 	$(VIDEO)/k054000.o \
 	$(VIDEO)/k054338.o \

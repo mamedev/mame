@@ -6,7 +6,7 @@
 #include "sound/k054539.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
-#include "video/k05324x.h"
+#include "video/k053244_k053245.h"
 #include "video/k054000.h"
 
 class lethal_state : public driver_device

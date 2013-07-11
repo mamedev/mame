@@ -9,7 +9,7 @@
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
-#include "video/k05324x.h"
+#include "video/k053246_k053247_k055673.h"
 #include "video/k054338.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
