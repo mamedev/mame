@@ -54,7 +54,7 @@ Notes:
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
-//#include "includes/sei_crtc.h"
+#include "video/seibu_crtc.h"
 
 
 class goodejan_state : public driver_device
@@ -66,7 +66,6 @@ public:
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_seibucrtc_vregs(*this, "crtc_vregs"),
 		m_spriteram16(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -74,14 +73,12 @@ public:
 	required_shared_ptr<UINT16> m_sc1_vram;
 	required_shared_ptr<UINT16> m_sc2_vram;
 	required_shared_ptr<UINT16> m_sc3_vram;
-	required_shared_ptr<UINT16> m_seibucrtc_vregs;
 	required_shared_ptr<UINT16> m_spriteram16;
 	required_device<cpu_device> m_maincpu;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
-	tilemap_t *m_sc3_tilemap_0;
-	tilemap_t *m_sc3_tilemap_1;
+	tilemap_t *m_sc3_tilemap;
 	UINT16 m_mux_data;
 	UINT16 m_seibucrtc_sc0bank;
 	DECLARE_WRITE16_MEMBER(goodejan_gfxbank_w);
@@ -91,12 +88,15 @@ public:
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
 	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_vregs_w);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 	INTERRUPT_GEN_MEMBER(goodejan_irq);
+	DECLARE_WRITE16_MEMBER(layer_en_w);
+	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	UINT16 m_layer_en;
+	UINT16 m_scrollram[6];
 	void seibucrtc_sc0bank_w(UINT16 data);
 	void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start();
@@ -109,6 +109,43 @@ public:
 *
 *******************************/
 
+#define SEIBU_CRTC_ENABLE_SC0   (!(m_layer_en & 0x0001))
+#define SEIBU_CRTC_ENABLE_SC2   (!(m_layer_en & 0x0002))
+#define SEIBU_CRTC_ENABLE_SC1   (!(m_layer_en & 0x0004))
+#define SEIBU_CRTC_ENABLE_SC3   (!(m_layer_en & 0x0008))
+#define SEIBU_CRTC_ENABLE_SPR   (!(m_layer_en & 0x0010))
+
+/************************************
+* 0x20 - Screen 0 (BG) scroll x
+************************************/
+#define SEIBU_CRTC_SC0_SX   (m_scrollram[0])
+
+/************************************
+* 0x22 - Screen 0 (BG) scroll y
+************************************/
+#define SEIBU_CRTC_SC0_SY   (m_scrollram[1])
+
+/************************************
+* 0x24 - Screen 1 (FG) scroll x
+************************************/
+#define SEIBU_CRTC_SC1_SX   (m_scrollram[4])
+
+/************************************
+* 0x26 - Screen 1 (FG) scroll y
+************************************/
+#define SEIBU_CRTC_SC1_SY   (m_scrollram[5])
+
+/************************************
+* 0x28 - Screen 2 (MD) scroll x
+************************************/
+#define SEIBU_CRTC_SC2_SX   (m_scrollram[2])
+
+/************************************
+* 0x2a - Screen 2 (MD) scroll y
+************************************/
+#define SEIBU_CRTC_SC2_SY   (m_scrollram[3])
+
+#if 0
 /*******************************
 * 0x1a - Layer Dynamic Paging?
 *******************************/
@@ -165,6 +202,7 @@ public:
 ************************************/
 #define SEIBU_CRTC_FIX_SY   (m_seibucrtc_vregs[0x002e/2])
 
+#endif
 
 /*******************************
 *
@@ -193,16 +231,9 @@ WRITE16_MEMBER( goodejan_state::seibucrtc_sc1vram_w )
 WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
-	m_sc3_tilemap_0->mark_tile_dirty(offset);
-	m_sc3_tilemap_1->mark_tile_dirty(offset);
+	m_sc3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( goodejan_state::seibucrtc_vregs_w )
-{
-	COMBINE_DATA(&m_seibucrtc_vregs[offset]);
-}
-
-/* Actually external from the CRTC */
 void goodejan_state::seibucrtc_sc0bank_w(UINT16 data)
 {
 	m_seibucrtc_sc0bank = data & 1;
@@ -296,13 +327,11 @@ void goodejan_state::video_start()
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_sc2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 	m_sc1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_sc3_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
-	m_sc3_tilemap_0->set_transparent_pen(15);
-	m_sc3_tilemap_1->set_transparent_pen(15);
+	m_sc3_tilemap->set_transparent_pen(15);
 
 	m_seibucrtc_sc0bank = 0;
 }
@@ -311,14 +340,14 @@ UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(screen.machine().pens[0x7ff], cliprect); //black pen
 
-	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX + SEIBU_CRTC_FIX_SX+64) & 0x1ff );
-	m_sc0_tilemap->set_scrolly(0, (SEIBU_CRTC_SC0_SY + SEIBU_CRTC_FIX_SY+1) & 0x1ff );
-	m_sc2_tilemap->set_scrollx(0, (SEIBU_CRTC_SC2_SX + SEIBU_CRTC_FIX_SX+64) & 0x1ff );
-	m_sc2_tilemap->set_scrolly(0, (SEIBU_CRTC_SC2_SY + SEIBU_CRTC_FIX_SY+1) & 0x1ff );
-	m_sc1_tilemap->set_scrollx(0, (SEIBU_CRTC_SC1_SX + SEIBU_CRTC_FIX_SX+64) & 0x1ff );
-	m_sc1_tilemap->set_scrolly(0, (SEIBU_CRTC_SC1_SY + SEIBU_CRTC_FIX_SY+1) & 0x1ff );
-	(SEIBU_CRTC_SC3_PAGE_SEL ? m_sc3_tilemap_0 : m_sc3_tilemap_1)->set_scrollx(0, (SEIBU_CRTC_FIX_SX+64) & 0x1ff );
-	(SEIBU_CRTC_SC3_PAGE_SEL ? m_sc3_tilemap_0 : m_sc3_tilemap_1)->set_scrolly(0, (SEIBU_CRTC_FIX_SY+1) & 0x1ff );
+	m_sc0_tilemap->set_scrollx(0, (SEIBU_CRTC_SC0_SX) & 0x1ff );
+	m_sc0_tilemap->set_scrolly(0, (SEIBU_CRTC_SC0_SY) & 0x1ff );
+	m_sc2_tilemap->set_scrollx(0, (SEIBU_CRTC_SC2_SX) & 0x1ff );
+	m_sc2_tilemap->set_scrolly(0, (SEIBU_CRTC_SC2_SY) & 0x1ff );
+	m_sc1_tilemap->set_scrollx(0, (SEIBU_CRTC_SC1_SX) & 0x1ff );
+	m_sc1_tilemap->set_scrolly(0, (SEIBU_CRTC_SC1_SY) & 0x1ff );
+	m_sc3_tilemap->set_scrollx(0, (0) & 0x1ff );
+	m_sc3_tilemap->set_scrolly(0, (0) & 0x1ff );
 
 	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 2); }
@@ -326,7 +355,7 @@ UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind1
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 1); }
 	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 0); }
-	if(SEIBU_CRTC_ENABLE_SC3) { (SEIBU_CRTC_SC3_PAGE_SEL ? m_sc3_tilemap_0 : m_sc3_tilemap_1)->draw(bitmap, cliprect, 0,0); }
+	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(bitmap, cliprect, 0,0); }
 	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(screen.machine(), bitmap,cliprect, 3); }
 
 	return 0;
@@ -340,7 +369,7 @@ UINT32 goodejan_state::screen_update_goodejan(screen_device &screen, bitmap_ind1
 
 WRITE16_MEMBER(goodejan_state::goodejan_gfxbank_w)
 {
-	seibucrtc_sc0bank_w((data & 0x100)>>8);// = (data & 0x100)>>8;
+	seibucrtc_sc0bank_w((data & 0x100)>>8);
 }
 
 /* Multiplexer device for the mahjong panel */
@@ -391,12 +420,12 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_SHARE("crtc_vregs")
+	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_SHARE("crtc_vregs")
+	AM_RANGE(0x8040, 0x807f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
@@ -598,6 +627,25 @@ INTERRUPT_GEN_MEMBER(goodejan_state::goodejan_irq)
 /* vector 0x00c is just a reti */
 }
 
+WRITE16_MEMBER( goodejan_state::layer_en_w )
+{
+	m_layer_en = data;
+}
+
+WRITE16_MEMBER( goodejan_state::layer_scroll_w )
+{
+	COMBINE_DATA(&m_scrollram[offset]);
+}
+
+
+SEIBU_CRTC_INTERFACE(crtc_intf)
+{
+	"screen",
+	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_en_w),
+	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_scroll_w),
+
+};
+
 static MACHINE_CONFIG_START( goodejan, goodejan_state )
 
 	/* basic machine hardware */
@@ -617,6 +665,8 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update_goodejan)
+
+	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
 	MCFG_GFXDECODE(goodejan)
 	MCFG_PALETTE_LENGTH(0x1000)

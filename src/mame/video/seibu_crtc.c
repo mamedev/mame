@@ -117,6 +117,24 @@ List of default vregs (title screen):
 // device type definition
 const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
 
+static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
+	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
+	AM_RANGE(0x0020, 0x002b) AM_WRITE(layer_scroll_w)
+ADDRESS_MAP_END
+
+WRITE16_MEMBER( seibu_crtc_device::layer_en_w)
+{
+	if (!m_layer_en_func.isnull())
+		m_layer_en_func(0,data,mem_mask);
+}
+
+WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
+{
+	if (!m_layer_scroll_func.isnull())
+		m_layer_scroll_func(offset,data,mem_mask);
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -126,7 +144,10 @@ const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
 //-------------------------------------------------
 
 seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__)
+	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
+		device_memory_interface(mconfig, *this),
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
+
 {
 }
 
@@ -158,6 +179,7 @@ void seibu_crtc_device::device_config_complete()
 	else
 	{
 		m_screen_tag = "";
+//		memset(&m_layer_en, 0, sizeof(m_layer_en));
 	}
 }
 
@@ -168,6 +190,9 @@ void seibu_crtc_device::device_config_complete()
 void seibu_crtc_device::device_start()
 {
 	m_screen = machine().device<screen_device>(m_screen_tag);
+	m_layer_en_func.resolve(m_layer_en_cb, *this);
+	m_layer_scroll_func.resolve(m_layer_scroll_cb, *this);
+
 }
 
 
@@ -179,6 +204,15 @@ void seibu_crtc_device::device_reset()
 {
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *seibu_crtc_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
+}
 
 
 
@@ -186,6 +220,23 @@ void seibu_crtc_device::device_reset()
 //  INLINE HELPERS
 //**************************************************************************
 
+//-------------------------------------------------
+//  read_word - read a word at the given address
+//-------------------------------------------------
+
+inline UINT16 seibu_crtc_device::read_word(offs_t address)
+{
+	return space().read_word(address << 1);
+}
+
+//-------------------------------------------------
+//  write_word - write a word at the given address
+//-------------------------------------------------
+
+inline void seibu_crtc_device::write_word(offs_t address, UINT16 data)
+{
+	space().write_word(address << 1, data);
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -193,10 +244,10 @@ void seibu_crtc_device::device_reset()
 
 READ16_MEMBER( seibu_crtc_device::read )
 {
-	return 0;
+	return read_word(offset);
 }
 
 WRITE16_MEMBER( seibu_crtc_device::write )
 {
-//	...
+	write_word(offset,data);
 }

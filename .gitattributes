@@ -4480,7 +4480,6 @@ src/mame/includes/segas24.h svneol=native#text/plain
 src/mame/includes/segas32.h svneol=native#text/plain
 src/mame/includes/segaxbd.h svneol=native#text/plain
 src/mame/includes/segaybd.h svneol=native#text/plain
-src/mame/includes/sei_crtc.h svneol=native#text/plain
 src/mame/includes/seibuspi.h svneol=native#text/plain
 src/mame/includes/seicross.h svneol=native#text/plain
 src/mame/includes/senjyo.h svneol=native#text/plain
