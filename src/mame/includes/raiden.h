@@ -24,7 +24,7 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_shared_ram;
 	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_scroll_ram;
+	optional_shared_ptr<UINT16> m_scroll_ram;
 	required_shared_ptr<UINT16> m_back_data;
 	required_shared_ptr<UINT16> m_fore_data;
 
@@ -36,13 +36,15 @@ public:
 	UINT8 m_tx_layer_enabled;
 	UINT8 m_sp_layer_enabled;
 	UINT8 m_flipscreen;
+	UINT16 m_raidenb_scroll_ram[6];
 
 	DECLARE_WRITE16_MEMBER(raiden_background_w);
 	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
 	DECLARE_WRITE16_MEMBER(raiden_text_w);
 	DECLARE_WRITE8_MEMBER(raiden_control_w);
 	DECLARE_WRITE8_MEMBER(raidenb_control_w);
-	DECLARE_WRITE8_MEMBER(raidenb_layer_enable_w);
+	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
+	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
 	DECLARE_DRIVER_INIT(raidenu);
 	DECLARE_DRIVER_INIT(raidenk);
 	DECLARE_DRIVER_INIT(raiden);

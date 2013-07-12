@@ -1,7 +1,7 @@
 /*******************************************************************************
 
     Seibu Raiden hardware
-    
+
     Functions to emulate the video hardware
 
 *******************************************************************************/
@@ -62,7 +62,7 @@ WRITE8_MEMBER(raiden_state::raidenb_control_w)
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-WRITE8_MEMBER(raiden_state::raidenb_layer_enable_w)
+WRITE16_MEMBER(raiden_state::raidenb_layer_enable_w)
 {
 	// d0: back layer disable
 	// d1: fore layer disable
@@ -80,7 +80,7 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 {
 	if (!m_sp_layer_enabled)
 		return;
-	
+
 	UINT16 *sprites = m_spriteram->buffer();
 	gfx_element *gfx = machine().gfx[3];
 
@@ -107,10 +107,10 @@ void raiden_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 			Word #3 unused
 		*/
-		
+
 		if (!(sprites[offs + 0] & 0x8000))
 			continue;
-		
+
 		int priority = sprites[offs + 2] >> 14 & 0x3;
 		if ((priority & pri_mask) == 0)
 			continue;
@@ -181,13 +181,13 @@ UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &b
 	scrollregs[1] = ((m_scroll_ram[0x01] & 0xf0) << 4) | ((m_scroll_ram[0x02] & 0x7f) << 1) | ((m_scroll_ram[0x02] & 0x80) >> 7);
 	scrollregs[2] = ((m_scroll_ram[0x19] & 0xf0) << 4) | ((m_scroll_ram[0x1a] & 0x7f) << 1) | ((m_scroll_ram[0x1a] & 0x80) >> 7);
 	scrollregs[3] = ((m_scroll_ram[0x11] & 0xf0) << 4) | ((m_scroll_ram[0x12] & 0x7f) << 1) | ((m_scroll_ram[0x12] & 0x80) >> 7);
-	
+
 	return screen_update_common(screen, bitmap, cliprect, scrollregs);
 }
 
 UINT32 raiden_state::screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return screen_update_common(screen, bitmap, cliprect, m_scroll_ram);
+	return screen_update_common(screen, bitmap, cliprect, m_raidenb_scroll_ram);
 }
 
 

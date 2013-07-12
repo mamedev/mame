@@ -54,6 +54,7 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/raiden.h"
+#include "video/seibu_crtc.h"
 
 
 /******************************************************************************/
@@ -125,9 +126,7 @@ static ADDRESS_MAP_START( raidenb_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE8(raidenb_control_w, 0x00ff)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0d05c, 0x0d05d) AM_WRITE8(raidenb_layer_enable_w, 0x00ff)
-	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_SHARE("scroll_ram")
-	AM_RANGE(0x0d040, 0x0d08f) AM_WRITENOP // sei_crtc is here
+	AM_RANGE(0x0d040, 0x0d08f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -311,14 +310,28 @@ static MACHINE_CONFIG_DERIVED( raidenu, raiden )
 	MCFG_CPU_PROGRAM_MAP(raidenu_sub_map)
 MACHINE_CONFIG_END
 
+WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
+{
+	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
+}
+
+SEIBU_CRTC_INTERFACE(crtc_intf)
+{
+	"screen",
+	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_enable_w),
+	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_scroll_w),
+};
+
 static MACHINE_CONFIG_DERIVED( raidenb, raiden )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raidenb_main_map)
-	
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
+
+	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raidenb)
@@ -635,5 +648,5 @@ GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raidenk, ROT270, "
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
 GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", 0 )
 
-/* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? */
+/* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", 0 )
