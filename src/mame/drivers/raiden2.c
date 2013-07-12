@@ -140,6 +140,7 @@ Current Problem(s) - in order of priority
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
+#include "video/seibu_crtc.h"
 
 UINT16 raiden2_state::rps()
 {
@@ -1017,7 +1018,7 @@ UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_ind16 
 
 	//if (!machine().input().code_pressed(KEYCODE_S))
 	{
-		//if (!(raiden2_tilemap_enable & 0x10))
+		if (!(raiden2_tilemap_enable & 0x10))
 			draw_sprites(machine(), bitmap, cliprect, 0);
 	}
 
@@ -1425,8 +1426,9 @@ static ADDRESS_MAP_START( raiden2_cop_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
 	AM_RANGE(0x005b4, 0x005b5) AM_READ(cop_angle_r)
 
-	AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
-	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
+	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+//	AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
+//	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
 	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
@@ -1482,8 +1484,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
-	AM_RANGE(0x0062c, 0x0062d) AM_WRITE(tilemap_enable_w)
-	AM_RANGE(0x00610, 0x0061b) AM_WRITE(tile_scroll_w)
+	AM_RANGE(0x00600, 0x0064f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 //  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
 	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
@@ -1850,6 +1851,13 @@ static GFXDECODE_START( raiden2 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 128 )
 GFXDECODE_END
 
+SEIBU_CRTC_INTERFACE(crtc_intf)
+{
+	"screen",
+	DEVCB_DRIVER_MEMBER16(raiden2_state, tilemap_enable_w),
+	DEVCB_DRIVER_MEMBER16(raiden2_state, tile_scroll_w),
+};
+
 
 /* MACHINE DRIVERS */
 
@@ -1875,6 +1883,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1929,6 +1939,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_GFXDECODE(raiden2)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
