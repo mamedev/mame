@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-/*totmejan CRT is at 8000-804f,goodejan is at 8040-807f(808f but not tested)*/
+/* totmejan CRTC is at 8000-804f,goodejan is at 8000-807f */
 static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
