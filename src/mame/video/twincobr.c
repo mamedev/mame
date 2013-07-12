@@ -97,7 +97,8 @@ void twincobr_state::twincobr_create_tilemaps()
 
 VIDEO_START_MEMBER(twincobr_state,toaplan0)
 {
-	machine().primary_screen->register_screen_bitmap(m_temp_spritebitmap);
+	m_spritegen->alloc_sprite_bitmap();
+	m_spritegen->set_gfx_region(3);
 
 	/* the video RAM is accessed via ports, it's not memory mapped */
 	m_txvideoram_size = 0x0800;
@@ -131,7 +132,6 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 	save_item(NAME(m_fg_rom_bank));
 	save_item(NAME(m_bg_ram_bank));
 	save_item(NAME(m_flip_screen));
-	save_item(NAME(m_wardner_sprite_hack));
 	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_state::twincobr_restore_screen), this));
 }
 
@@ -386,106 +386,35 @@ void twincobr_state::twincobr_log_vram()
 }
 
 
-/***************************************************************************
-    Sprite Handlers
-***************************************************************************/
-
-void twincobr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
-{
-	int offs;
-
-	if (m_display_on)
-	{
-		UINT16 *buffered_spriteram16;
-		UINT32 bytes;
-		if (m_spriteram16 != NULL)
-		{
-			buffered_spriteram16 = m_spriteram16->buffer();
-			bytes = m_spriteram16->bytes();
-		}
-		else
-		{
-			buffered_spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->buffer());
-			bytes = m_spriteram8->bytes();
-		}
-		for (offs = 0;offs < bytes/2;offs += 4)
-		{
-			int attribute,sx,sy,flipx,flipy;
-			int sprite, color;
-
-			attribute = buffered_spriteram16[offs + 1];
-			int priority = (attribute & 0x0c00)>>10;
-
-			// are 0 priority really skipped, or can they still mask?
-			if (!priority) continue;
-
-			sy = buffered_spriteram16[offs + 3] >> 7;
-			if (sy != 0x0100) {     /* sx = 0x01a0 or 0x0040*/
-				sprite = buffered_spriteram16[offs] & 0x7ff;
-				color  = attribute & 0x3f;
-				color |= priority << 6; // encode colour
-
-				sx = buffered_spriteram16[offs + 2] >> 7;
-				flipx = attribute & 0x100;
-				if (flipx) sx -= 14;        /* should really be 15 */
-				flipy = attribute & 0x200;
-				drawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
-					sprite,
-					color << 4 /* << 4 because using _raw */ ,
-					flipx,flipy,
-					sx-32,sy-16,0);
-				
-			}
-		}
-	}
-}
-
-
-/***************************************************************************
-    Draw the game screen in the given bitmap_ind16.
-***************************************************************************/
-
-void twincobr_state::copy_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
-{
-	int y, x;
-
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
-	{
-		UINT16* srcline = &m_temp_spritebitmap.pix16(y);
-		UINT16* dstline = &bitmap.pix16(y);
-
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
-		{
-			UINT16 pix = srcline[x];
-
-			if ( (pix>>(4+6)) == priority )
-			{
-				if (pix&0xf)
-				{
-					dstline[x] = pix & 0x3ff;
-				}
-			}
-		}
-
-	}
-}
-
 UINT32 twincobr_state::screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	twincobr_log_vram();
 
+	UINT16 *buffered_spriteram16;
+	UINT32 bytes;
+	if (m_spriteram16 != NULL)
+	{
+		buffered_spriteram16 = m_spriteram16->buffer();
+		bytes = m_spriteram16->bytes();
+	}
+	else
+	{
+		buffered_spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->buffer());
+		bytes = m_spriteram8->bytes();
+	}
+
 	bitmap.fill(0, cliprect);
 
-	m_temp_spritebitmap.fill(0,cliprect);
-	draw_sprites(m_temp_spritebitmap,cliprect);
+	 
+	if (m_display_on) m_spritegen->draw_sprites_to_tempbitmap(cliprect, buffered_spriteram16, bytes);
 
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	copy_sprites(bitmap,cliprect,1);
+	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	copy_sprites(bitmap,cliprect,2);
+	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-	copy_sprites(bitmap,cliprect,3);
+	if (m_display_on) m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
 	return 0;
 }
 

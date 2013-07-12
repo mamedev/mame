@@ -1832,6 +1832,7 @@ $(MAMEOBJ)/toaplan.a: \
 	$(DRIVERS)/toaplan2.o $(VIDEO)/toaplan2.o $(VIDEO)/gp9001.o \
 	$(DRIVERS)/twincobr.o $(MACHINE)/twincobr.o $(VIDEO)/twincobr.o \
 	$(DRIVERS)/wardner.o \
+	$(VIDEO)/toaplan_scu.o \
 
 $(MAMEOBJ)/tong.a: \
 	$(DRIVERS)/beezer.o $(MACHINE)/beezer.o $(VIDEO)/beezer.o \

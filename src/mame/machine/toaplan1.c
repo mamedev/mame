@@ -311,7 +311,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
 }
 
 
-WRITE8_MEMBER(toaplan1_state::rallybik_coin_w)
+WRITE8_MEMBER(toaplan1_rallybik_state::rallybik_coin_w)
 {
 	switch (data) {
 		case 0x08: if (m_coin_count) { coin_counter_w(machine(), 0, 1); coin_counter_w(machine(), 0, 0); } break;

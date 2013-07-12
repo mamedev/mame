@@ -5,7 +5,7 @@
 
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
-
+#include "video/toaplan_scu.h"
 
 class twincobr_state : public driver_device
 {
@@ -17,7 +17,9 @@ public:
 		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp") { }
+		m_dsp(*this, "dsp"),
+		m_spritegen(*this, "toaplan_scu")
+	{ }
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -27,7 +29,6 @@ public:
 	int m_wardner_membank;
 	INT32 m_fg_rom_bank;
 	INT32 m_bg_ram_bank;
-	INT32 m_wardner_sprite_hack;
 	int m_intenable;
 	int m_dsp_on;
 	int m_dsp_BIO;
@@ -57,7 +58,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	bitmap_ind16 m_temp_spritebitmap;
 
 	DECLARE_WRITE16_MEMBER(twincobr_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(twincobr_dsp_r);
@@ -126,6 +126,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
+	required_device<toaplan_scu_device> m_spritegen;
+
 };
 
 

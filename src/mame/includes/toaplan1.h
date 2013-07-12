@@ -3,6 +3,7 @@
                 ------------------------------------
 ****************************************************************************/
 
+#include "video/toaplan_scu.h"
 
 class toaplan1_state : public driver_device
 {
@@ -102,12 +103,12 @@ public:
 	DECLARE_READ16_MEMBER(toaplan1_shared_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_shared_w);
 	DECLARE_WRITE16_MEMBER(toaplan1_reset_sound);
-	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
 	DECLARE_WRITE8_MEMBER(toaplan1_coin_w);
 	DECLARE_WRITE16_MEMBER(samesame_coin_w);
 	DECLARE_READ16_MEMBER(toaplan1_frame_done_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_tile_offsets_w);
-	DECLARE_WRITE16_MEMBER(rallybik_bcu_flipscreen_w);
+
+
 	DECLARE_WRITE16_MEMBER(toaplan1_bcu_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(toaplan1_fcu_flipscreen_w);
 	DECLARE_READ16_MEMBER(toaplan1_spriteram_offs_r);
@@ -124,7 +125,8 @@ public:
 	DECLARE_READ16_MEMBER(toaplan1_tileram_offs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_tileram_offs_w);
 	DECLARE_READ16_MEMBER(toaplan1_tileram16_r);
-	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
+
+
 	DECLARE_WRITE16_MEMBER(toaplan1_tileram16_w);
 	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
 	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
@@ -136,18 +138,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
 	DECLARE_MACHINE_RESET(toaplan1);
-	DECLARE_VIDEO_START(rallybik);
 	DECLARE_VIDEO_START(toaplan1);
 	DECLARE_MACHINE_RESET(zerowing);
 	DECLARE_MACHINE_RESET(demonwld);
 	DECLARE_MACHINE_RESET(vimana);
-	UINT32 screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_toaplan1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_rallybik(screen_device &screen, bool state);
+
 	void screen_eof_toaplan1(screen_device &screen, bool state);
 	void screen_eof_samesame(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
-	void rallybik_flipscreen();
+
 	void toaplan1_flipscreen();
 	void demonwld_restore_dsp();
 	void toaplan1_create_tilemaps();
@@ -158,7 +158,6 @@ public:
 	void register_common();
 	void toaplan1_log_vram();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void rallybik_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void demonwld_dsp(int enable);
 	void toaplan1_driver_savestate();
 	void demonwld_driver_savestate();
@@ -168,6 +167,28 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_dsp;
 };
+
+class toaplan1_rallybik_state : public toaplan1_state
+{
+public:
+	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
+		: toaplan1_state(mconfig, type, tag),
+		m_spritegen(*this, "toaplan_scu")
+	{
+	}
+
+	DECLARE_WRITE16_MEMBER(rallybik_bcu_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
+	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
+	DECLARE_VIDEO_START(rallybik);
+	UINT32 screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof_rallybik(screen_device &screen, bool state);
+	void rallybik_flipscreen();
+
+	required_device<toaplan_scu_device> m_spritegen;
+};
+
+
 
 
 /*----------- defined in machine/toaplan1.c -----------*/

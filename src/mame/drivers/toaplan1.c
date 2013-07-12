@@ -496,7 +496,7 @@ Vimana       55.14      ?
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( rallybik_main_map, AS_PROGRAM, 16, toaplan1_state )
+static ADDRESS_MAP_START( rallybik_main_map, AS_PROGRAM, 16, toaplan1_rallybik_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( toaplan1_sound_map, AS_PROGRAM, 8, toaplan1_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_state )
+static ADDRESS_MAP_START( rallybik_sound_io_map, AS_IO, 8, toaplan1_rallybik_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
@@ -1665,7 +1665,7 @@ WRITE_LINE_MEMBER(toaplan1_state::irqhandler)
 
 
 
-static MACHINE_CONFIG_START( rallybik, toaplan1_state )
+static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1685,13 +1685,15 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_rallybik)
-	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_rallybik)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
+	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_rallybik_state, screen_eof_rallybik)
+
+	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
 
 	MCFG_GFXDECODE(rallybik)
 	MCFG_PALETTE_LENGTH((64*16)+(64*16))
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan1_state,rallybik)
+	MCFG_VIDEO_START_OVERRIDE(toaplan1_rallybik_state,rallybik)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

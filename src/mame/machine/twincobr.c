@@ -201,8 +201,8 @@ void twincobr_state::toaplan0_control_w(int offset, int data)
 	LOG(("%s:Writing %08x to %08x.\n",machine().describe_context(),data,toaplan_port_type[m_toaplan_main_cpu] - offset));
 
 	if (m_toaplan_main_cpu == 1) {
-		if (data == 0x0c) { data = 0x1c; m_wardner_sprite_hack=0; }  /* Z80 ? */
-		if (data == 0x0d) { data = 0x1d; m_wardner_sprite_hack=1; }  /* Z80 ? */
+		if (data == 0x0c) { data = 0x1c; }  /* Z80 ? */
+		if (data == 0x0d) { data = 0x1d; }  /* Z80 ? */
 	}
 
 	switch (data) {

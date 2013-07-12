@@ -273,7 +273,7 @@ void toaplan1_state::toaplan1_set_scrolls()
 	m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 }
 
-void toaplan1_state::rallybik_flipscreen()
+void toaplan1_rallybik_state::rallybik_flipscreen()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -315,8 +315,11 @@ void toaplan1_state::register_common()
 }
 
 
-VIDEO_START_MEMBER(toaplan1_state,rallybik)
+VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 {
+	m_spritegen->alloc_sprite_bitmap();
+	m_spritegen->set_gfx_region(1);
+
 	toaplan1_create_tilemaps();
 	toaplan1_paletteram_alloc();
 	toaplan1_vram_alloc();
@@ -336,7 +339,7 @@ VIDEO_START_MEMBER(toaplan1_state,rallybik)
 
 	register_common();
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::rallybik_flipscreen), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_rallybik_state::rallybik_flipscreen), this));
 }
 
 VIDEO_START_MEMBER(toaplan1_state,toaplan1)
@@ -389,7 +392,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 	toaplan1_set_scrolls();
 }
 
-WRITE16_MEMBER(toaplan1_state::rallybik_bcu_flipscreen_w)
+WRITE16_MEMBER(toaplan1_rallybik_state::rallybik_bcu_flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
 	{
@@ -591,7 +594,7 @@ READ16_MEMBER(toaplan1_state::toaplan1_tileram16_r)
 	return video_data;
 }
 
-READ16_MEMBER(toaplan1_state::rallybik_tileram16_r)
+READ16_MEMBER(toaplan1_rallybik_state::rallybik_tileram16_r)
 {
 	UINT16 data = toaplan1_tileram16_r(space, offset, mem_mask);
 
@@ -1056,50 +1059,21 @@ void toaplan1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-void toaplan1_state::rallybik_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
-{
-	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes()/2; offs += 4)
-	{
-		int attrib, sx, sy, flipx, flipy;
-		int sprite, color;
-
-		attrib = buffered_spriteram16[offs + 1];
-		if ((attrib & 0x0c00) == priority)
-		{
-			sy = (buffered_spriteram16[offs + 3] >> 7) & 0x1ff;
-			if (sy != 0x0100)       /* sx = 0x01a0 or 0x0040*/
-			{
-				sprite = buffered_spriteram16[offs] & 0x7ff;
-				color  = attrib & 0x3f;
-				sx = (buffered_spriteram16[offs + 2] >> 7) & 0x1ff;
-				flipx = attrib & 0x100;
-				if (flipx) sx -= 15;
-				flipy = attrib & 0x200;
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
-					sprite,
-					color,
-					flipx,flipy,
-					sx-31,sy-16,0);
-			}
-		}
-	}
-}
 
 
 /***************************************************************************
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 toaplan1_rallybik_state::screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int priority;
 
 	toaplan1_log_vram();
 
 	bitmap.fill(0x120, cliprect);
+	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram,  m_spriteram.bytes());
+
 
 	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 0, 0);
 	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | 1, 0);
@@ -1110,7 +1084,12 @@ UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind1
 		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
-		rallybik_draw_sprites(bitmap,cliprect,priority << 8);
+		
+		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
+		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
+		if (priority==0x08)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
+		if (priority==0x0c)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
+		
 	}
 
 	return 0;
@@ -1147,7 +1126,7 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
     assume it happens automatically every frame, at the end of vblank
 ****************************************************************************/
 
-void toaplan1_state::screen_eof_rallybik(screen_device &screen, bool state)
+void toaplan1_rallybik_state::screen_eof_rallybik(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

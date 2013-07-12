@@ -692,6 +692,8 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, XTAL_28MHz/8, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
 
+	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
+
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram16")
 
