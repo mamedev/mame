@@ -397,35 +397,79 @@ Notes:
 
     Word 0:
                     ---x---- -------- -------- --------     1: this is the last polygon of the model
+					------x- -------- -------- --------		?
                     -------x -------- -------- --------     0: triangle, 1: quad
                     -------- -------- -----xxx xxxxxxxx     Texture number (* 0x4000 to address the texture)
 
     Word 1:
-                    ?
+                    x------- -------- -------- --------		?
+					----xx-- -------- -------- --------		?
+					-------- xxxxxxxx -------- --------		Polygon Normal X (signed 1.7 fixed point)
+					-------- -------- xxxxxxxx --------		Polygon Normal Y (signed 1.7 fixed point)
+					-------- -------- -------- xxxxxxxx		Polygon Normal Z (signed 1.7 fixed point)
 
     Word 2:
-                    ?
+                    x------- -------- -------- --------		?
+					----x--- -------- -------- --------		?
+					-----x-- -------- -------- --------		?
+					------x- -------- -------- --------		Enable environment mapping?
+					-------x -------- -------- --------		?
+					-------- xxxxxxxx -------- --------		Tangent X (signed 1.7 fixed point)
+					-------- -------- xxxxxxxx --------		Tangent Y (signed 1.7 fixed point)
+					-------- -------- -------- xxxxxxxx		Tangent Z (signed 1.7 fixed point)
 
     Word 3:
-                    ?
+                    x------- -------- -------- --------		?
+					----xx-- -------- -------- --------		Tex mode? (more than 2 bits?)
+															00: Tex 0: color, Tex 1: color with pre-lighting (used by BG2 attract mode trackpieces)
+															01: Tex 0: alpha mask?, Tex 1: inverse alpha? (used by car shadow)
+															10: Tex 0: alpha mask, Tex 1: color (additive alpha, used by headlights, etc.)
+															11: Tex 0: color, Tex 1: environment map? (used by cars)
+					-------x -------- -------- --------		?
+					-------- xxxxxxxx -------- --------		Bi-normal X (signed 1.7 fixed point)
+					-------- -------- xxxxxxxx --------		Bi-normal Y (signed 1.7 fixed point)
+					-------- -------- -------- xxxxxxxx		Bi-normal Z (signed 1.7 fixed point)
+
+					e1000096 0c43cca2 02000000 0c000000		Car model (with env map?)
+					e100009a 007f0000 000083ea 0c001784		Part with bump-mapping
+					f1000068 0c007f00 0c7f0000 0500007f		Car shadow
+					e100006a 0c00007f 0c000000 08000000		Light
+					e1000127 0c00007f 0c000000 08000000		Fireworks (alpha mask?)
+					e1000185 0cee7d03 0c000000 00000000		Trackpiece
+					f1000068 0c007f00 0c7e0000 0400007f		Car shadow (BG2 0x1f160)
+
+
+
+
+
+
+
+
+
+
+
 
     Vertex data: 3x (triangle) or 4x (quad) 4 words
     Word 0:
                     -------- -------- -------- xxxxxxxx     Texture V coordinate (0..63 with max 4x repeat)
                     -------- -------- xxxxxxxx --------     Texture U coordinate (0..63 with max 4x repeat)
                     -------- xxxxxxxx -------- --------     Usually 0x40. HUD elements set 0xff. Self-illumination?
+					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
 
     Word 1:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex X coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal X (signed 1.7 fixed point)
+					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
 
     Word 2:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex Y coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal Y (signed 1.7 fixed point)
+					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
 
     Word 3:
                     -------- -------- xxxxxxxx xxxxxxxx     Vertex Z coordinate (signed 8.8 fixed point)
                     -------- xxxxxxxx -------- --------     Normal Z (signed 1.7 fixed point)
+					xxxxxxxx -------- -------- --------		? (seen 0x00, 0x83, 0x40)
 
     3D registers
     ------------
@@ -443,14 +487,19 @@ Notes:
 
     0x00000104:
 
-    0x10000100:
+    0x10000100:		-------x xxxxxxxx -------- --------		\ Screen space light vector? (changes during camera movement)
+					-------- -------- -------x xxxxxxxx		/ (int)(N * 127.0f)
 
-    0x10000101:
+    0x10000101:		-------- -------x -------- --------		?
+					-------- -------- -------- -xxxxxxx		? (int)(N * 127.0f)
 
     0x10000102:     xxxxxxxx xxxxxxxx -------- --------     Diffuse light color (ARGB1555)
                     -------- -------- xxxxxxxx xxxxxxxx     Ambient light color (ARGB1555)
 
-    0x10000103:
+    0x10000103:		x------- -------- -------- --------		?
+					-xxxxxxx xxxxxxxx -------- --------		?
+					-------- -------- ---xxxxx --------		\ ? converted from floats to int 0..31
+					-------- -------- -------- ---xxxxx		/
 
     0x10000104:
 
@@ -461,18 +510,10 @@ Notes:
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 
 #define LOG_DISPLAY_LIST                0
+#define ENABLE_LIGHTING					1
 
 #define PPC_TLCS_COMM_TRIGGER           12345
 #define TLCS_PPC_COMM_TRIGGER           12346
-
-struct taitotz_polydata
-{
-	UINT32 texture;
-	UINT32 alpha;
-	int diffuse_r, diffuse_g, diffuse_b;
-	int ambient_r, ambient_g, ambient_b;
-	int specular_r, specular_g, specular_b;
-};
 
 struct PLANE
 {
@@ -480,6 +521,17 @@ struct PLANE
 };
 
 typedef float VECTOR3[3];
+
+struct taitotz_polydata
+{
+	UINT32 texture;
+	UINT32 alpha;
+	UINT32 flags;
+	int diffuse_r, diffuse_g, diffuse_b;
+	int ambient_r, ambient_g, ambient_b;
+	int specular_r, specular_g, specular_b;
+	VECTOR3 light;
+};
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
 {
@@ -490,14 +542,10 @@ public:
 		m_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
 		m_texture = texram;
 
-		m_light_vector[0] = 0.0f;
-		m_light_vector[1] = 0.0f;
-		m_light_vector[2] = -1.0f;
-
 		m_diffuse_intensity = 224;
 		m_ambient_intensity = 32;
 		m_specular_intensity = 256;
-		m_specular_power = 10;
+		m_specular_power = 20;
 	}
 
 	void set_fb(bitmap_rgb32 *fb) { m_fb = fb; }
@@ -529,7 +577,6 @@ private:
 	PLANE m_clip_plane[6];
 	float m_matrix[4][3];
 
-	VECTOR3 m_light_vector;
 	float m_diffuse_intensity;
 	float m_ambient_intensity;
 	float m_specular_intensity;
@@ -555,6 +602,9 @@ private:
 	UINT32 m_reg_100;
 	UINT32 m_reg_101;
 	UINT32 m_reg_102;
+
+	UINT32 m_reg_10000100;
+	UINT32 m_reg_10000101;
 };
 
 
@@ -630,6 +680,7 @@ public:
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
 	DECLARE_DRIVER_INIT(raizpin);
+	DECLARE_DRIVER_INIT(styphp);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -819,6 +870,10 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 	UINT32 *texram = &m_texture[extradata.texture * 0x1000];
 	UINT32 alpha = extradata.alpha & 0x1f;
 	UINT32 alpha_enable = extradata.alpha & 0x80;
+
+	int texmode = extradata.flags & 0x3;
+
+#if ENABLE_LIGHTING
 	int diff_r = extradata.diffuse_r;
 	int diff_g = extradata.diffuse_g;
 	int diff_b = extradata.diffuse_b;
@@ -829,11 +884,24 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 	int spec_g = extradata.specular_g;
 	int spec_b = extradata.specular_b;
 
-	// TODO: these might get swapped around, the color texture doesn't always seem to be tex0
-	int tex0_shift = 0;
-	int tex1_shift = 16;
-
 	VECTOR3 view = { -0.0f, -0.0f, -1.0f };
+
+	VECTOR3 light_vector;
+	light_vector[0] = extradata.light[0];
+	light_vector[1] = extradata.light[1];
+	light_vector[2] = extradata.light[2];
+#endif
+
+	// TODO: these might get swapped around, the color texture doesn't always seem to be tex0
+	//int tex0_shift = (extradata.flags & 1) ? 16 : 0;
+	int tex0_shift, tex1_shift;
+	switch (texmode)
+	{
+		case 0: tex0_shift = 16;  tex1_shift = 0; break;
+		case 1: tex0_shift = 16; tex1_shift = 0; break;
+		case 2: tex0_shift = 16; tex1_shift = 0;  break;
+		case 3: tex0_shift = 0;  tex1_shift = 16; break;
+	}
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -851,11 +919,18 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 			UINT32 texel0 = (texel >> tex0_shift) & 0xffff;
 			if (!(texel0 & 0x8000))
 			{
+				// extract texel0 RGB
+				int r0 = (texel0 & 0x7c00) >> 7;
+				int g0 = (texel0 & 0x03e0) >> 2;
+				int b0 = (texel0 & 0x001f) << 3;
+
+#if ENABLE_LIGHTING
+				// fetch texture1 and apply normal map
+				UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+
 				VECTOR3 normal;
 				VECTOR3 half;
 
-				// fetch texture1 and apply normal map
-				UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
 				float bumpx = dot3_tex_table[(texel1 & 0x7c00) >> 10];
 				float bumpy = dot3_tex_table[(texel1 & 0x03e0) >>  5];
 				float bumpz = dot3_tex_table[(texel1 & 0x001f)];
@@ -872,13 +947,13 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 				normal[2] *= l;
 
 				// calculate per-pixel lighting
-				float dot = dot_product_vec3(normal, m_light_vector);
+				float dot = dot_product_vec3(normal, light_vector);
 
 
 				// calculate half-angle vector for specular
-				half[0] =  m_light_vector[0] + view[0];
-				half[1] =  m_light_vector[1] + view[1];
-				half[2] =  m_light_vector[2] + view[2];
+				half[0] = light_vector[0] + view[0];
+				half[1] = light_vector[1] + view[1];
+				half[2] = light_vector[2] + view[2];
 				// normalize it
 				l = finvsqrt(half[0] * half[0] + half[1] * half[1] + half[2] * half[2]);
 				half[0] *= l;
@@ -887,41 +962,105 @@ void taitotz_renderer::draw_scanline(INT32 scanline, const extent_t &extent, con
 
 				// calculate specularity
 				int specular = (int)(pow(clamp_pos(dot_product_vec3(normal, half)), m_specular_power) * m_specular_intensity);
-
 				int intensity = (int)(dot * m_diffuse_intensity);
 
-				// extract texel RGB
-				int r = (texel0 & 0x7c00) >> 7;
-				int g = (texel0 & 0x03e0) >> 2;
-				int b = (texel0 & 0x001f) << 3;
-
 				// apply lighting
-				r = ((r * intensity * diff_r) >> 16) + ((r * amb_r) >> 8) + ((specular * spec_r) >> 8);
-				g = ((g * intensity * diff_g) >> 16) + ((g * amb_g) >> 8) + ((specular * spec_g) >> 8);
-				b = ((b * intensity * diff_b) >> 16) + ((b * amb_b) >> 8) + ((specular * spec_b) >> 8);
+				r0 = ((r0 * intensity * diff_r) >> 16) + ((r0 * amb_r) >> 8) + ((specular * spec_r) >> 8);
+				g0 = ((g0 * intensity * diff_g) >> 16) + ((g0 * amb_g) >> 8) + ((specular * spec_g) >> 8);
+				b0 = ((b0 * intensity * diff_b) >> 16) + ((b0 * amb_b) >> 8) + ((specular * spec_b) >> 8);
 
-				if (r > 255) r = 255;
-				if (g > 255) g = 255;
-				if (b > 255) b = 255;
-				if (r < 0) r = 0;
-				if (g < 0) g = 0;
-				if (b < 0) b = 0;
+				if (r0 > 255) r0 = 255;
+				if (g0 > 255) g0 = 255;
+				if (b0 > 255) b0 = 255;
+				if (r0 < 0) r0 = 0;
+				if (g0 < 0) g0 = 0;
+				if (b0 < 0) b0 = 0;
+#endif
 
-				// alpha blending
-				if (alpha_enable && alpha < 0x1f)
+				// texture alpha mask
+				if (texmode == 2)
 				{
+					// extract texel0 RGB
+					int r0 = (texel0 & 0x7c00) >> 7;
+					int g0 = (texel0 & 0x03e0) >> 2;
+					int b0 = (texel0 & 0x001f) << 3;
+
+					// fetch texture1
+					UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+
+					if (!(texel1 & 0x8000))
+					{
+						int sr = (fb[x] >> 16) & 0xff;
+						int sg = (fb[x] >>  8) & 0xff;
+						int sb = fb[x] & 0xff;
+
+						sr += r0;
+						sg += g0;
+						sb += b0;
+
+						if (sr > 255) sr = 255;
+						if (sg > 255) sg = 255;
+						if (sb > 255) sb = 255;
+
+						// write to framebuffer
+						fb[x] = 0xff000000 | (sr << 16) | (sg << 8) | sb;
+					}
+				}
+				else if (texmode == 1)
+				{
+					// TEXEL0: RGB alpha levels
+					// TEXEL1: RGB color
+
+					int r0 = (texel0 >> 10) & 0x1f;
+					int g0 = (texel0 >> 5) & 0x1f;
+					int b0 = texel0 & 0x1f;
+
+					// fetch texture1
+					UINT32 texel1 = (texel >> tex1_shift) & 0xffff;
+
+					int r1 = (texel1 & 0x7c00) >> 7;
+					int g1 = (texel1 & 0x03e0) >> 2;
+					int b1 = (texel1 & 0x001f) << 3;
+
 					int sr = (fb[x] >> 16) & 0xff;
 					int sg = (fb[x] >>  8) & 0xff;
 					int sb = fb[x] & 0xff;
-					int a = alpha + 1;
-					r = ((r * a) >> 5) + ((sr * (31 - a)) >> 5);
-					g = ((g * a) >> 5) + ((sg * (31 - a)) >> 5);
-					b = ((b * a) >> 5) + ((sb * (31 - a)) >> 5);
+
+					r0 = ((r1 * (31 - r0)) >> 5) + ((sr * r0) >> 5);
+					g0 = ((g1 * (31 - g0)) >> 5) + ((sg * g0) >> 5);
+					b0 = ((b1 * (31 - b0)) >> 5) + ((sb * b0) >> 5);
+
+					// write to framebuffer
+					fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
 				}
+				else if (texmode == 0)
+				{
+					// extract texel0 RGB
+					int r0 = (texel0 & 0x7c00) >> 7;
+					int g0 = (texel0 & 0x03e0) >> 2;
+					int b0 = (texel0 & 0x001f) << 3;
+
+					// write to framebuffer
+					fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
+				}
+				else
+				{
+					// polygon alpha blending
+					if (alpha_enable && alpha < 0x1f)
+					{
+						int sr = (fb[x] >> 16) & 0xff;
+						int sg = (fb[x] >>  8) & 0xff;
+						int sb = fb[x] & 0xff;
+						int a = alpha + 1;
+						r0 = ((r0 * a) >> 5) + ((sr * (31 - a)) >> 5);
+						g0 = ((g0 * a) >> 5) + ((sg * (31 - a)) >> 5);
+						b0 = ((b0 * a) >> 5) + ((sb * (31 - a)) >> 5);
+					}
 
 
-				// write to framebuffer
-				fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+					// write to framebuffer
+					fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
+				}
 			}
 
 			zb[x] = ooz;
@@ -1025,6 +1164,24 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 	UINT32 *src = &state->m_screen_ram[address];
 	taitotz_renderer::vertex_t v[10];
 
+
+	// fetch global light vector
+	int ilx = (m_reg_10000100 >> 16) & 0x1ff;
+	if (ilx & 0x100) ilx |= 0xfffffe00;
+	int ily = m_reg_10000100 & 0x1ff;
+	if (ily & 0x100) ily |= 0xfffffe00;
+	int ilz = m_reg_10000101 & 0x7f;
+
+	float light_x = (float)(ilx) / 127.0f;
+	float light_y = (float)(ily) / 127.0f;
+	float light_z = (float)(ilz) / 127.0f;
+
+	// normalize
+	float l = finvsqrt(light_x * light_x + light_y * light_y + light_z * light_z);
+	light_x *= l;
+	light_y *= l;
+	light_z *= l;
+
 	int end = 0;
 	int index = 0;
 	do
@@ -1042,6 +1199,16 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 			num_verts = 3;
 
 		int texture = src[index] & 0x7ff;
+		int tex_switch = (src[index+3] >> 26) & 3;
+
+		/*
+		INT8 polyinx = (src[index+1] >> 16) & 0xff;
+		INT8 polyiny = (src[index+1] >> 8) & 0xff;
+		INT8 polyinz = src[index+1] & 0xff;
+		float polynx = (float)(polyinx) / 128.0f;
+		float polyny = (float)(polyiny) / 128.0f;
+		float polynz = (float)(polyinz) / 128.0f;
+		*/
 
 		index += 4;
 
@@ -1101,6 +1268,7 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 
 		extra.texture = texture;
 		extra.alpha = alpha;
+		extra.flags = tex_switch;
 		extra.diffuse_r = m_diffuse_r;
 		extra.diffuse_g = m_diffuse_g;
 		extra.diffuse_b = m_diffuse_b;
@@ -1110,7 +1278,10 @@ void taitotz_renderer::draw_object(running_machine &machine, UINT32 address, flo
 		extra.specular_r = m_specular_r;
 		extra.specular_g = m_specular_g;
 		extra.specular_b = m_specular_b;
-
+		extra.light[0] = light_x;
+		extra.light[1] = light_y;
+		extra.light[2] = -light_z;
+	
 		for (int i=2; i < num_verts; i++)
 		{
 			render_triangle(visarea, render_delegate(FUNC(taitotz_renderer::draw_scanline), this), 6, v[0], v[i-1], v[i]);
@@ -1348,6 +1519,14 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 				{
 					m_reg_102 = word;
 				}
+				else if (addr == 0x10000100)
+				{
+					m_reg_10000100 = word;
+				}
+				else if (addr == 0x10000101)
+				{
+					m_reg_10000101 = word;
+				}
 				else if (addr == 0x10000102)
 				{
 					m_diffuse_r = ((word >> (16+10)) & 0x1f) << 3;
@@ -1376,6 +1555,23 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 
 				setup_viewport(xw, xh, vpw-xw, vph-xh, vpw, vph);
 			}
+			
+			/*
+			if (address == 0x10000100)
+			{
+				int in1 = (m_reg_10000100 >> 16) & 0x1ff;
+				if (in1 & 0x100) in1 |= 0xfffffe00;
+				int in2 = m_reg_10000100 & 0x1ff;
+				if (in2 & 0x100) in2 |= 0xfffffe00;
+				int in3 = m_reg_10000101 & 0x7f;
+
+				float n1 = (float)(in1) / 127.0f;
+				float n2 = (float)(in2) / 127.0f;
+				float n3 = (float)(in3) / 127.0f;
+
+				printf("UNK: %f, %f, %f\n", n1, n2, n3);
+			}
+			*/
 		}
 		else if (cmd == 0xffff0080)
 		{
@@ -1929,7 +2125,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-		    printf("   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+			printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
 
@@ -1972,7 +2168,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
 			if (m_io_share_ram[0xfff] == 0x0000)
 			{
-				m_maincpu->spin_until_time(attotime::from_usec(50));
+				m_maincpu->spin_until_time(attotime::from_usec(100));
 			}
 
 			machine().scheduler().trigger(TLCS_PPC_COMM_TRIGGER);
@@ -2526,6 +2722,54 @@ static INPUT_PORTS_START( pwrshovl )
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_PLAYER(4) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( styphp )
+	PORT_START("INPUTS1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x00000002, IP_ACTIVE_LOW) /* Test Button */
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )                                    // Coin
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INPUTS3")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 )                                  // Shift Down
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  // Shift Up
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON3 )                                  // View
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON4 )									// Side Brake
+	PORT_BIT( 0x000000e0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INPUTS4")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START )                                    // Start
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ANALOG1")       // Steering
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG2")       // Gas Pedal
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START("ANALOG3")       // Brake Pedal
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+INPUT_PORTS_END
 
 void taitotz_state::machine_reset()
 {
@@ -2639,6 +2883,9 @@ static const char BATLGR2A_HDD_SERIAL[] =           // "            05411645"
 static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
 
+static const char STYPHP_HDD_SERIAL[] =				// "            05872160"
+	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
+
 DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 {
 	init_taitotz_152();
@@ -2705,6 +2952,17 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	m_scr_base = 0x1c0000;
 
 	m_displist_addr = 0x33480c;
+}
+
+DRIVER_INIT_MEMBER(taitotz_state,styphp)
+{
+	init_taitotz_152();
+
+	m_hdd_serial_number = STYPHP_HDD_SERIAL;
+
+	m_scr_base = 0x1e0000;
+
+	m_displist_addr = 0x490b70;
 }
 
 
@@ -2833,10 +3091,26 @@ ROM_START( raizpin )
 	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
 ROM_END
 
+ROM_START( styphp )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "e98-01.ic14", 0x000000, 0x020000, CRC(479b37ad) SHA1(a0e59d990665244a7919a104dc4b6869ccf90be1) )
+	ROM_LOAD16_BYTE( "e98-02.ic15", 0x000001, 0x020000, CRC(d8da590f) SHA1(b33a67d81e388d7863adaf03041911c7f84d193b) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "styphp", 0, SHA1(9942b16dcb7309aedc743e3a804707f6a8d3c4b9) )
+ROM_END
+
 GAME( 1999, taitotz,  0, taitotz, taitotz, driver_device, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz,  batlgr2, taitotz_state,  batlgear, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, styphp,   taitotz, taitotz,  styphp,  taitotz_state,  styphp,   ROT0, "Taito", "Stunt Typhoon Plus", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong", GAME_NOT_WORKING | GAME_NO_SOUND )
