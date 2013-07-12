@@ -92,6 +92,19 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
 
+Custom Program Versions (Superstar 30 / Supertouch 30):
+
+PROGRAM#    Program Version      Program Differences
+---------------------------------------------------------------------------------------------
+923x-00-01  Standard Version     Includes all Options, no Restrictions
+923x-00-02  Minnesota Version    Excludes Casino Games
+923x-00-03  Louisiana Version    Excludes all Poker Games
+923x-00-04  Wisconsin Version    Game Connot End if Player Busts; 1,000 Points are Added to End of Each Hand
+923x-00-05  Montana Version      Excludes Blackjack, Dice and Photo Finish
+923x-00-06  California Version   Excludes Poker Double-up feature
+9234-00-07  New Jersey Version   Excludes Sex Trivia and includes 2-Coin Limit with Lockout Coil (Only for Supertouch 30 & Megastar)
+
+
   CRT 260:
   *Megatouch Video (c)1994?
   Megatouch II (c)1994
@@ -749,23 +762,66 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(meritm_crt250)
 	PORT_START("PIO1_PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Raise")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PIO1_PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* Used as "IPT_OTHER" in some games for Calibration / Clear High Score ect */
 
 	PORT_START("DSW")   /* need for AY-8910 accesses */
-	PORT_BIT( 0xff, 0x00, IPT_UNUSED)
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(pitboss2)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x02, 0x02, "Enable Joker Poker / Super Stud" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia Category" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(spitboss)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia & Sex Phrases" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(pitbosss)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Triva" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Categories are Lettered" )
+	PORT_DIPSETTING(    0x01, "Categories are Numbered" )
+	PORT_DIPNAME( 0x02, 0x02, "Enable Casino Games" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia Category" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dodgecty)
@@ -780,43 +836,21 @@ static INPUT_PORTS_START(dodgecty)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(pitbossm)
 	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Pass/Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Collect/Quit/Raise")
 
 	PORT_MODIFY("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:1" )                /* Unused */
 	PORT_DIPNAME( 0x02, 0x02, "Solitaire Timer Mode" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Sexy Trivia Category" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia Category" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Coin Limit" ) PORT_DIPLOCATION("SW1:4")
@@ -839,6 +873,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(pitbossa)
 	PORT_INCLUDE(pitbossm)
 
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Play")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Collect/Quit")
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "4 Coins" )
@@ -848,6 +886,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(pbss330)
 	PORT_INCLUDE(meritm_crt250)
 
+	PORT_MODIFY("PIO1_PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Clear High Score") /* In IDLE (Demo) mode */
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "In Tac Tac Triva" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Categories are Lettered" )
@@ -855,7 +896,7 @@ static INPUT_PORTS_START(pbss330)
 	PORT_DIPNAME( 0x02, 0x02, "Enable Casino Games" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Sexy Trivia & Sex Phrases" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Sex Trivia & Sex Phrases" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Coin Limit" ) PORT_DIPLOCATION("SW1:4")
@@ -878,10 +919,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(pbst30)
 	PORT_INCLUDE(pbss330)
 
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED) /* Touchscreen based, no keys used for this one. */
+
+	PORT_MODIFY("PIO1_PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Calibrate Touchsceen")
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Touch Screen Type" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "13 Inch" )
-	PORT_DIPSETTING(    0x01, "19 Inch (Inverts Screen Coordinates" )
+	PORT_DIPSETTING(    0x01, "19 Inch (Inverts Screen Coordinates)" )
 	PORT_DIPNAME( 0x20, 0x20, "Balls (Pit Pong) / Paddles (Breakin' Bricks)" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "11 Balls / 5 Paddles" )
 	PORT_DIPSETTING(    0x20, "7 Balls / 3 Paddles" )
@@ -2308,21 +2355,21 @@ DRIVER_INIT_MEMBER(meritm_state,megat6)
 }
 
 /* CRT 250 */
-GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty,      driver_device, 0, ROT0, "Merit", "Dodge City (9131-02)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, pitboss2,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss II (9221-01C)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Super Pit Boss (9221-02A)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosss,  0,        meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosssa, pitbosss, meritm_crt250, meritm_crt250, driver_device, 0, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, pitbosss, meritm_crt250, meritm_crt250, meritm_state,  pitbossc, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, dodgecty,  0,        meritm_crt250, dodgecty, driver_device, 0,        ROT0, "Merit", "Dodge City (9131-02)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,  0,        meritm_crt250, pitboss2, driver_device, 0,        ROT0, "Merit", "Pit Boss II (9221-01C)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,  0,        meritm_crt250, spitboss, driver_device, 0,        ROT0, "Merit", "Super Pit Boss (9221-02A)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,  0,        meritm_crt250, pitbosss, driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssa, pitbosss, meritm_crt250, pitbosss, driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc, pitbosss, meritm_crt250, pitbosss, meritm_state,  pitbossc, ROT0, "Merit", "Pit Boss Superstar (9221-12-01)", GAME_IMPERFECT_GRAPHICS )
 
-/* CRT 250 + CRT 252 + CRT 258 */
-GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30,  meritm_state,  pbst30,   ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30,  meritm_state,  pbst30b,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
+/* CRT 250 + CRT 252 + CRT 256 + CRT 258 */
+GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, meritm_state,  pbst30,   ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, meritm_state,  pbst30b,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + CRT 254 + CRT 256 */
-GAME( 1993, pbss330,   0,         meritm_crt250_questions, pbss330,  meritm_state,  pbss330,  ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, meritm_state,  pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state,  pbss330,  ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, meritm_state,  pitbossm, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, meritm_state, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", GAME_IMPERFECT_GRAPHICS )
