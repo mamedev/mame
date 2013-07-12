@@ -135,6 +135,7 @@ const device_type SEIBU_CRTC = &device_creator<seibu_crtc_device>;
 static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
 	AM_RANGE(0x001c, 0x001d) AM_WRITE(layer_en_w)
 	AM_RANGE(0x0020, 0x002b) AM_WRITE(layer_scroll_w)
+	AM_RANGE(0x0000, 0x004f) AM_RAM
 ADDRESS_MAP_END
 
 WRITE16_MEMBER( seibu_crtc_device::layer_en_w)
@@ -161,8 +162,7 @@ WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
 seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
-
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, NULL, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
 {
 }
 
@@ -277,3 +277,15 @@ WRITE16_MEMBER( seibu_crtc_device::write_alt )
 {
 	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }
+
+/* Good E Jang / Seibu Cup Soccer Selection XOR bit 6 of the address bus */
+READ16_MEMBER( seibu_crtc_device::read_xor )
+{
+	return read_word(offset ^ 0x20);
+}
+
+WRITE16_MEMBER( seibu_crtc_device::write_xor )
+{
+	write_word(offset ^ 0x20,data);
+}
+
