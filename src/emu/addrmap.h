@@ -598,10 +598,6 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_RAM_DEVREAD(_tag, _class, _read) AM_DEVREAD(_tag, _class, _read) AM_WRITEONLY
 #define AM_RAM_DEVWRITE(_tag, _class, _write) AM_READONLY AM_DEVWRITE(_tag, _class, _write)
 
-#define AM_RAM_WRITE_LEGACY(_write)         AM_READONLY AM_WRITE_LEGACY(_write)
-
-
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
