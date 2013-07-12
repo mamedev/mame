@@ -2984,7 +2984,7 @@ sf2             // 22/05/1991 (c) 1991 (World)
 sf2eb           // 14/02/1991 (c) 1991 (World)
 sf2ee           // 28/02/1991 (c) 1991 (World)
 sf2ebbl         // 14/02/1991 (c) 1991 (World, bootleg)
-sf2stt      // bootleg
+sf2stt          // bootleg
 sf2rk           // bootleg
 sf2ua           // 06/02/1991 (c) 1991 (USA)
 sf2ub           // 14/02/1991 (c) 1991 (USA)
@@ -3001,10 +3001,10 @@ sf2jc           // 06/03/1991 (c) 1991 (Japan)
 sf2qp1          // hack
 sf2thndr        // hack
 3wonders        // 20/05/1991 (c) 1991 (World)
-3wondersb       // 20/05/1991 (c) 1991 (World, bootleg)
 3wondersr1      // 13/05/1991 (c) 1991 (World)
 3wondersu       // 20/05/1991 (c) 1991 (USA)
 wonder3         // 20/05/1991 (c) 1991 (Japan)
+3wondersb       // bootleg
 3wondersh       // hack
 kod             // 05/08/1991 (c) 1991 (World)
 kodr1           // 11/07/1991 (c) 1991 (World)
@@ -3102,7 +3102,7 @@ megaman         // 06/10/1995 (c) 1995 (USA)
 megamana        // 06/10/1995 (c) 1995 (Asia)
 rockmanj        // 22/09/1995 (c) 1995 (Japan)
 fcrash          // bootleg of Final Fight
-ffightbl        //
+ffightbl        // bootleg
 ganbare         // 11/04/2000 (c) 2000 (Japan)
 
 // Capcom CPS2 games
@@ -3169,7 +3169,7 @@ pgear           // 24/10/1994 (c) 1994 (Japan)
 pgearr1         // 16/09/1994 (c) 1994 (Japan)
 armwara         // 20/09/1994 (c) 1994 (Asia)
 xmcota          // 31/03/1995 (c) 1994 (Euro)
-xmcotar1            // 05/01/1995 (c) 1994 (Euro)
+xmcotar1        // 05/01/1995 (c) 1994 (Euro)
 xmcotau         // 05/01/1995 (c) 1994 (USA)
 xmcotah         // 31/03/1995 (c) 1994 (Hispanic)
 xmcotahr1       // 05/01/1995 (c) 1994 (Hispanic)
