@@ -123,11 +123,11 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "includes/bloodbro.h"
+#include "video/seibu_crtc.h"
 
 
 /* Memory Maps */
-
-static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_SHARE("spriteram")
@@ -140,13 +140,23 @@ static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
+//	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
 	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
 	AM_RANGE(0x0c0100, 0x0c0101) AM_WRITENOP // ??? written once
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
+	AM_IMPORT_FROM(common_map)
+	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( skysmash_map, AS_PROGRAM, 16, bloodbro_state )
+	AM_IMPORT_FROM(common_map)
+	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
@@ -429,6 +439,23 @@ static GFXDECODE_START( weststry )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, weststry_spritelayout,   0x00*16,  0x10 )
 GFXDECODE_END
 
+WRITE16_MEMBER( bloodbro_state::layer_en_w )
+{
+	m_layer_en = data;
+}
+
+WRITE16_MEMBER( bloodbro_state::layer_scroll_w )
+{
+	COMBINE_DATA(&m_scrollram[offset]);
+}
+
+
+SEIBU_CRTC_INTERFACE(crtc_intf)
+{
+	"screen",
+	DEVCB_DRIVER_MEMBER16(bloodbro_state, layer_en_w),
+	DEVCB_DRIVER_MEMBER16(bloodbro_state, layer_scroll_w),
+};
 
 /* Machine Drivers */
 
@@ -451,9 +478,10 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_bloodbro)
 
+	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+
 	MCFG_GFXDECODE(bloodbro)
 	MCFG_PALETTE_LENGTH(2048)
-
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
@@ -475,6 +503,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
 
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(skysmash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")

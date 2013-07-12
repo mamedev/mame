@@ -45,7 +45,9 @@ public:
 
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );
+	DECLARE_WRITE16_MEMBER( write_alt );
 	DECLARE_READ16_MEMBER( read );
+	DECLARE_READ16_MEMBER( read_alt );
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 protected:

@@ -7,15 +7,15 @@ public:
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_txvideoram(*this, "txvideoram"),
-		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_txvideoram;
-	optional_shared_ptr<UINT16> m_scroll;
 
+	UINT16 m_scrollram[6];
+	UINT16 m_layer_en;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
@@ -23,6 +23,8 @@ public:
 	DECLARE_WRITE16_MEMBER(bloodbro_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(bloodbro_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(bloodbro_txvideoram_w);
+	DECLARE_WRITE16_MEMBER(layer_en_w);
+	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

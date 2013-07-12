@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(bloodbro_state::get_tx_tile_info)
 
 void bloodbro_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,32,16);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,16);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bloodbro_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
@@ -103,7 +103,7 @@ WRITE16_MEMBER(bloodbro_state::bloodbro_txvideoram_w)
     It has "big sprites" created by setting width or height >0. Tile
     numbers are read consecutively.
 
-      +0   x....... ........  sprite disabled if set
+    +0   x....... ........  sprite disabled if set
     +0   .x...... ........  Flip y (no evidence for this!!)
     +0   ..x..... ........  Flip x
     +0   ....x... ........  Priority (1=high)
@@ -225,17 +225,21 @@ void bloodbro_state::weststry_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 
 UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0,m_scroll[0x10]);    /* ? */
-	m_bg_tilemap->set_scrolly(0,m_scroll[0x11]);    /* ? */
-	m_fg_tilemap->set_scrollx(0,m_scroll[0x12]);
-	m_fg_tilemap->set_scrolly(0,m_scroll[0x13]);
+	m_bg_tilemap->set_scrollx(0,m_scrollram[0]);
+	m_bg_tilemap->set_scrolly(0,m_scrollram[1]);
+	m_fg_tilemap->set_scrollx(0,m_scrollram[2]);
+	m_fg_tilemap->set_scrolly(0,m_scrollram[3]);
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	if(!(m_layer_en & 1))
+		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	if(!(m_layer_en & 4))
+		m_fg_tilemap->draw(bitmap, cliprect, 0,1);
+	if(!(m_layer_en & 0x10))
+		bloodbro_draw_sprites(bitmap,cliprect);
+	if(!(m_layer_en & 8))
+		m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
@@ -258,16 +262,21 @@ UINT32 bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind1
 
 UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->set_scrollx(0,m_scroll[0x08]);
-	m_bg_tilemap->set_scrolly(0,m_scroll[0x09]);    /* ? */
-	m_fg_tilemap->set_scrollx(0,m_scroll[0x0a]);
-	m_fg_tilemap->set_scrolly(0,m_scroll[0x0b]);    /* ? */
+	m_bg_tilemap->set_scrollx(0,m_scrollram[0]);
+	m_bg_tilemap->set_scrolly(0,m_scrollram[1]);
+	m_fg_tilemap->set_scrollx(0,m_scrollram[2]);
+	m_fg_tilemap->set_scrolly(0,m_scrollram[3]);
 
 	machine().priority_bitmap.fill(0, cliprect);
 
-	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	if(!(m_layer_en & 1))
+		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	if(!(m_layer_en & 4))
+		m_fg_tilemap->draw(bitmap, cliprect, 0,1);
+	if(!(m_layer_en & 0x10))
+		bloodbro_draw_sprites(bitmap,cliprect);
+	if(!(m_layer_en & 8))
+		m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+
 	return 0;
 }

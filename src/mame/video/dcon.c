@@ -10,33 +10,6 @@
 
 /******************************************************************************/
 
-READ16_MEMBER(dcon_state::dcon_control_r)
-{
-	return m_enable;
-}
-
-WRITE16_MEMBER(dcon_state::dcon_control_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_enable=data;
-		if ((m_enable&4)==4)
-			m_foreground_layer->enable(0);
-		else
-			m_foreground_layer->enable(1);
-
-		if ((m_enable&2)==2)
-			m_midground_layer->enable(0);
-		else
-			m_midground_layer->enable(1);
-
-		if ((m_enable&1)==1)
-			m_background_layer->enable(0);
-		else
-			m_background_layer->enable(1);
-	}
-}
-
 WRITE16_MEMBER(dcon_state::dcon_gfxbank_w)
 {
 	if (data&1)
@@ -276,16 +249,23 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	m_foreground_layer->set_scrollx(0, m_scroll_ram[4] );
 	m_foreground_layer->set_scrolly(0, m_scroll_ram[5] );
 
-	if ((m_enable&1)!=1)
+	if (!(m_layer_en & 1))
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	m_midground_layer->draw(bitmap, cliprect, 0,1);
-	m_foreground_layer->draw(bitmap, cliprect, 0,2);
-	m_text_layer->draw(bitmap, cliprect, 0,4);
+	if (!(m_layer_en & 2))
+		m_midground_layer->draw(bitmap, cliprect, 0,1);
 
-	draw_sprites(bitmap,cliprect);
+	if (!(m_layer_en & 4))
+		m_foreground_layer->draw(bitmap, cliprect, 0,2);
+
+	if (!(m_layer_en & 8))
+		m_text_layer->draw(bitmap, cliprect, 0,4);
+
+	if (!(m_layer_en & 0x10))
+		draw_sprites(bitmap,cliprect);
+
 	return 0;
 }
 
@@ -310,15 +290,22 @@ UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &b
 	m_text_layer->set_scrollx(0, /*m_scroll_ram[6] + */ 128 );
 	m_text_layer->set_scrolly(0, /*m_scroll_ram[7] + */ 0 );
 
-	if ((m_enable&1)!=1)
+	if (!(m_layer_en & 1))
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	else
 		bitmap.fill(15, cliprect); /* Should always be black, not pen 15 */
 
-	m_midground_layer->draw(bitmap, cliprect, 0,1);
-	m_foreground_layer->draw(bitmap, cliprect, 0,2);
-	m_text_layer->draw(bitmap, cliprect, 0,4);
+	if (!(m_layer_en & 2))
+		m_midground_layer->draw(bitmap, cliprect, 0,1);
 
-	draw_sprites(bitmap,cliprect);
+	if (!(m_layer_en & 4))
+		m_foreground_layer->draw(bitmap, cliprect, 0,2);
+
+	if (!(m_layer_en & 8))
+		m_text_layer->draw(bitmap, cliprect, 0,4);
+
+	if (!(m_layer_en & 0x10))
+		draw_sprites(bitmap,cliprect);
+
 	return 0;
 }

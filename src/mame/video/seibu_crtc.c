@@ -2,9 +2,24 @@
 
 Seibu Custom "CRT Controller" emulation
 
-Template to replace "legacy" version.
-
 written by Angelo Salese
+
+used by several Seibu games:
+Raiden later rev (probably the first game to use it)
+*Sengoku Mahjong
+*Good e Jong
+*Tottemo de Jong
+*Blood Bros.
+*Sky Smasher
+*D-Con
+*SD Gundam Psycho Salamander no Kyoui
+(all games in legionna.c)
+(all games in raiden2.c)
+(all games in seibuspi.c)
+
+TODO:
+- Most registers are still a mystery;
+- Get the proper Seibu chip ID number;
 
 preliminary memory map:
 (screen 0 -> Background)
@@ -250,4 +265,15 @@ READ16_MEMBER( seibu_crtc_device::read )
 WRITE16_MEMBER( seibu_crtc_device::write )
 {
 	write_word(offset,data);
+}
+
+/* Sky Smasher / Raiden DX swaps registers [0x10] with [0x20] */
+READ16_MEMBER( seibu_crtc_device::read_alt )
+{
+	return read_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0));
+}
+
+WRITE16_MEMBER( seibu_crtc_device::write_alt )
+{
+	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }

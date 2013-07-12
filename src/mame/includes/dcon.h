@@ -8,7 +8,6 @@ public:
 		m_mid_data(*this, "mid_data"),
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
-		m_scroll_ram(*this, "scroll_ram"),
 		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_back_data;
@@ -16,7 +15,6 @@ public:
 	required_shared_ptr<UINT16> m_mid_data;
 	required_shared_ptr<UINT16> m_textram;
 	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_scroll_ram;
 	tilemap_t *m_background_layer;
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_midground_layer;
@@ -24,9 +22,11 @@ public:
 	UINT16 m_enable;
 	int m_gfx_bank_select;
 	int m_last_gfx_bank;
+	UINT16 m_scroll_ram[6];
+	DECLARE_WRITE16_MEMBER(layer_en_w);
+	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	UINT16 m_layer_en;
 
-	DECLARE_READ16_MEMBER(dcon_control_r);
-	DECLARE_WRITE16_MEMBER(dcon_control_w);
 	DECLARE_WRITE16_MEMBER(dcon_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(dcon_background_w);
 	DECLARE_WRITE16_MEMBER(dcon_foreground_w);
