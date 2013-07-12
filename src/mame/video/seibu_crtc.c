@@ -49,6 +49,7 @@ preliminary memory map:
 [0x36]: Tilemap Screen 1 base scroll Y
 [0x38]: Tilemap Screen 3 base scroll X
 [0x3a]: Tilemap Screen 3 base scroll Y
+[0x3e]: OBJ Y base
 
 ===========================================================================================
 
@@ -60,6 +61,11 @@ List of default vregs (title screen):
 8020:  0000 0000 0004 0000 0000 0000 0040 01FF
 8030:  003E 01FF 003F 01FF 0040 0001 0034 0035
 8040:  0000 A8A8 0003 1C37 0001 0000 0000 0000
+0x1ff - 0x9f = 352
+0x1ff - 0xbf = 320
+0x1ff - 0xfa = 261
+0x1ff - 0xfa = 261
+0x1ff - 0xff = 256
 
 *Tottemo E Jong
 8000:  000F 000F 009F 00BF 00FA 000F 00FA 00FF (256 x 224 -> 16 - 240 V res)
@@ -81,6 +87,11 @@ List of default vregs (title screen):
 0D060:  0000 0000 0000 0000 0000 0000 01D8 0000
 0D070:  01DA 0000 003F 01FF 00C0 0000 0034 0025
 0D080:  0000 A8A8 0003 1830 0001 0000 0000 0000
+0x1ff - 0xb2 = 333
+0x1ff - 0xd7 = 296
+0x1ff - 0xfb = 260
+0x1ff - 0xfc = 259
+0x1ff - 0xff = 256
 
 *SD Gundam Psycho Salamander no Kyoui (320 x 224 -> 0 - 224 v res)
 0C0000:  000F 0013 009F 00BF 00FA 000F 00FA 00FF
