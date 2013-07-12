@@ -2,6 +2,10 @@
 
     Video Hardware for Blood Brothers
 
+	Note:
+	- An extra layer is currently disabled via the layer enable register
+	  in Seibu CRTC device (bit 2). Is it even tied to any RAM portion?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -234,7 +238,7 @@ UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind1
 
 	if(!(m_layer_en & 1))
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	if(!(m_layer_en & 4))
+	if(!(m_layer_en & 2))
 		m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 	if(!(m_layer_en & 0x10))
 		bloodbro_draw_sprites(bitmap,cliprect);
@@ -271,7 +275,7 @@ UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind1
 
 	if(!(m_layer_en & 1))
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	if(!(m_layer_en & 4))
+	if(!(m_layer_en & 2))
 		m_fg_tilemap->draw(bitmap, cliprect, 0,1);
 	if(!(m_layer_en & 0x10))
 		bloodbro_draw_sprites(bitmap,cliprect);
