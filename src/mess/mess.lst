@@ -503,7 +503,7 @@ maclc3  // 1993 Apple Macintosh LC III
 maciivx // 1993 Apple Macintosh IIvx
 maciivi // 1993 Apple Macintosh IIvi
 maclc520    // 1993 Apple Macintosh LC 520
-pmac6100	// 1993 Apple Power Macintosh 6100
+pmac6100    // 1993 Apple Power Macintosh 6100
 
 // Atari
 a400      // 1979 Atari 400
@@ -963,6 +963,8 @@ ti99_4e   // 1980 TI-99/4 with 50Hz video
 ti99_4a   // 1981 TI-99/4A
 ti99_4ae  // 1981 TI-99/4A with 50Hz video
 ti99_4ev   // 1994 TI-99/4A with EVPC video card
+ti99_4qe   // 1983 TI-99/4QI with 50Hz video
+ti99_4qi   // 1983 TI-99/4QI
 ti99_8  // 1983 TI-99/8
 ti99_8e   // 1983 TI-99/8 with 50Hz video
 

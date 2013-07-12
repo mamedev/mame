@@ -118,12 +118,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 	DECLARE_MACHINE_START(ti99_4);
 	DECLARE_MACHINE_START(ti99_4a);
+	DECLARE_MACHINE_START(ti99_4qi);
 	DECLARE_MACHINE_RESET(ti99_4);
 	DECLARE_MACHINE_RESET(ti99_4a);
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
 	int     m_check_alphalock;
+	bool    m_qi_version;
+
 	int     m_ready_prev;       // for debugging purposes only
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
@@ -354,7 +357,9 @@ READ8_MEMBER( ti99_4x_state::cruread )
 	// Similar to the bus8z_devices, just let the gromport and the p-box
 	// decide whether they want to change the value at the CRU address
 	// Also, we translate the bit addresses to base addresses
-	m_gromport->crureadz(offset<<4, &value);
+
+	// The QI version does not propagate the CRU signals to the cartridge slot
+	if (!m_qi_version) m_gromport->crureadz(offset<<4, &value);
 	m_peribox->crureadz(offset<<4, &value);
 
 	return value;
@@ -363,7 +368,8 @@ READ8_MEMBER( ti99_4x_state::cruread )
 WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
 	if (VERBOSE>6) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
-	m_gromport->cruwrite(offset<<1, data);
+	// The QI version does not propagate the CRU signals to the cartridge slot
+	if (!m_qi_version) m_gromport->cruwrite(offset<<1, data);
 	m_peribox->cruwrite(offset<<1, data);
 }
 
@@ -866,6 +872,8 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 	m_firstjoy = 5;
 
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
+
+	m_qi_version = false;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
@@ -980,6 +988,8 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
+
+	m_qi_version = false;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
@@ -1072,6 +1082,120 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 
 MACHINE_CONFIG_END
 
+/*
+    TI-99/4QI - the final version of the TI-99/4A
+    This was a last modification of the console. One purpose was to lower
+    production costs by a redesigned board layout. The other was that TI
+    removed the ROM search for cartridges so that only cartridges with GROMs
+    could be started, effectively kicking out all third-party cartridges like
+    those from Atarisoft.
+*/
+
+MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
+{
+	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
+	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
+
+	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
+	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
+
+	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
+	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
+	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
+	m_firstjoy = 6;
+
+	m_peribox->senila(CLEAR_LINE);
+	m_peribox->senilb(CLEAR_LINE);
+	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
+
+	m_qi_version = true;
+}
+
+static MACHINE_CONFIG_START( ti99_4qi_60hz, ti99_4x_state )
+	/* CPU */
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4qi )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
+
+	/* Video hardware */
+	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
+
+	/* Main board */
+	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+
+	/* Peripheral expansion box */
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+
+	/* sound hardware */
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
+
+	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette2", default_cassette_interface )
+
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+
+	/* GROM devices */
+	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+
+	// Joystick port
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport4a_60 )
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( ti99_4qi_50hz, ti99_4x_state )
+	/* CPU */
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, ti99_cpuconf)
+
+	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4qi )
+	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
+
+	/* Video hardware */
+	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
+
+	/* Main board */
+	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_ti99_4a, 3000000)
+	MCFG_DMUX_ADD( DATAMUX_TAG, datamux_conf )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+
+	/* Software list */
+	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
+
+	/* Peripheral expansion box */
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+
+	/* sound hardware */
+	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
+
+	/* Cassette drives */
+	MCFG_SPEAKER_STANDARD_MONO("cass_out")
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette2", default_cassette_interface )
+
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
+
+	/* GROM devices */
+	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+
+	// Joystick port
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport4a_50 )
+
+MACHINE_CONFIG_END
+
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(ti99_4x_state::ti99_4ev_hblank_interrupt)
 {
@@ -1136,6 +1260,7 @@ MACHINE_CONFIG_END
 ******************************************************************************/
 #define rom_ti99_4e rom_ti99_4
 #define rom_ti99_4ae rom_ti99_4a
+#define rom_ti99_4qe rom_ti99_4qi
 
 ROM_START(ti99_4)
 	// CPU memory space
@@ -1160,6 +1285,19 @@ ROM_START(ti99_4a)
 	ROM_LOAD("994agrom.bin", 0x0000, 0x6000, CRC(af5c2449) SHA1(0c5eaad0093ed89e9562a2c0ee6a370bdc9df439)) /* system GROMs */
 ROM_END
 
+ROM_START(ti99_4qi)
+	// CPU memory space
+	ROM_REGION16_BE(0x2000, "maincpu", 0)
+	ROM_LOAD16_WORD("994qirom.bin", 0x0000, 0x2000, CRC(db8f33e5) SHA1(6541705116598ab462ea9403c00656d6353ceb85)) /* system ROMs */
+
+	// GROM memory space
+	ROM_REGION(0x10000, region_grom, 0)
+	ROM_LOAD("994qigr0.bin", 0x0000, 0x1800, CRC(8b07772d) SHA1(95dcf5b7350ade65297eadd2d680c27561cc975c)) /* system GROM 0 */
+	ROM_LOAD("994qigr1.bin", 0x2000, 0x1800, CRC(b8f367ab) SHA1(3ecead4b83ec525084c70b6123d4053f8a80e1f7)) /* system GROM 1 */
+	ROM_LOAD("994qigr2.bin", 0x4000, 0x1800, CRC(e0bb5341) SHA1(e255f0d65d69b927cecb8fcfac7a4c17d585ea96)) /* system GROM 2 */
+ROM_END
+
+
 ROM_START(ti99_4ev)
 	/*CPU memory space*/
 	ROM_REGION16_BE(0x2000, "maincpu", 0)
@@ -1175,4 +1313,6 @@ COMP( 1979, ti99_4,   0,       0,       ti99_4_60hz,  ti99_4, driver_device,   0
 COMP( 1980, ti99_4e,  ti99_4,  0,       ti99_4_50hz,  ti99_4, driver_device,  0,    "Texas Instruments", "TI99/4 Home Computer (Europe)" , 0)
 COMP( 1981, ti99_4a,  0,       0,       ti99_4a_60hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4A Home Computer (US)" , 0)
 COMP( 1981, ti99_4ae, ti99_4a, 0,       ti99_4a_50hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4A Home Computer (Europe)" , 0)
+COMP( 1983, ti99_4qe, ti99_4qi, 0,       ti99_4qi_50hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4QI Home Computer (Europe)" , 0)
+COMP( 1983, ti99_4qi, 0,        0,       ti99_4qi_60hz, ti99_4a, driver_device, 0,    "Texas Instruments", "TI99/4QI Home Computer" , 0)
 COMP( 1994, ti99_4ev, ti99_4a, 0,       ti99_4ev_60hz,ti99_4a, driver_device, 0, "Texas Instruments", "TI99/4A Home Computer with EVPC" , 0)
