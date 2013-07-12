@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
 	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
 	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(pooyan_flipscreen_w)
 ADDRESS_MAP_END

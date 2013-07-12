@@ -192,7 +192,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
-#include "audio/timeplt.h"
 #include "includes/rallyx.h"
 
 #define MASTER_CLOCK    XTAL_18_432MHz
@@ -271,7 +270,7 @@ WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 	switch (offset)
 	{
 		case 0x00:  /* SOUNDON */
-			timeplt_sh_irqtrigger_w(space,0,bit);
+			m_timeplt_audio->sh_irqtrigger_w(space,0,bit);
 			break;
 
 		case 0x01:  /* INTST */

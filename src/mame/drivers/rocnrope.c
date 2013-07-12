@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
-	AM_RANGE(0x8081, 0x8081) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
+	AM_RANGE(0x8081, 0x8081) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP    /* interrupt acknowledge??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP    /* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP    /* Coin counter 2 */

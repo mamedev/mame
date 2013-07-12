@@ -11,60 +11,48 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "sound/flt_rc.h"
 #include "audio/timeplt.h"
-#include "devlegcy.h"
 
 
 #define MASTER_CLOCK         XTAL_14_31818MHz
 
-struct timeplt_audio_state
+
+const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
+
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock, "timeplt_audio", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_last_irq_state(0)
 {
-	UINT8    m_last_irq_state;
-	cpu_device *m_soundcpu;
-
-	device_t *m_filter_0_0;
-	device_t *m_filter_0_1;
-	device_t *m_filter_0_2;
-	device_t *m_filter_1_0;
-	device_t *m_filter_1_1;
-	device_t *m_filter_1_2;
-};
-
-INLINE timeplt_audio_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == TIMEPLT_AUDIO);
-
-	return (timeplt_audio_state *)downcast<timeplt_audio_device *>(device)->token();
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-/*************************************
- *
- *  Initialization
- *
- *************************************/
-
-static DEVICE_START( timeplt_audio )
+void timeplt_audio_device::device_config_complete()
 {
-	running_machine &machine = device->machine();
-	timeplt_audio_state *state = get_safe_token(device);
-
-	state->m_soundcpu = machine.device<cpu_device>("tpsound");
-	state->m_filter_0_0 = machine.device("filter.0.0");
-	state->m_filter_0_1 = machine.device("filter.0.1");
-	state->m_filter_0_2 = machine.device("filter.0.2");
-	state->m_filter_1_0 = machine.device("filter.1.0");
-	state->m_filter_1_1 = machine.device("filter.1.1");
-	state->m_filter_1_2 = machine.device("filter.1.2");
-
-	state->m_last_irq_state = 0;
-	device->save_item(NAME(state->m_last_irq_state));
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void timeplt_audio_device::device_start()
+{
+	m_soundcpu = machine().device<cpu_device>("tpsound");
+	m_filter_0_0 = machine().device("filter.0.0");
+	m_filter_0_1 = machine().device("filter.0.1");
+	m_filter_0_2 = machine().device("filter.0.2");
+	m_filter_1_0 = machine().device("filter.1.0");
+	m_filter_1_1 = machine().device("filter.1.1");
+	m_filter_1_2 = machine().device("filter.1.2");
+
+	m_last_irq_state = 0;
+	save_item(NAME(m_last_irq_state));
+}
 
 
 /*************************************
@@ -90,16 +78,14 @@ static DEVICE_START( timeplt_audio )
 /* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-static READ8_DEVICE_HANDLER( timeplt_portB_r )
+READ8_MEMBER( timeplt_audio_device::portB_r )
 {
-	timeplt_audio_state *state = get_safe_token(device);
-
 	static const int timeplt_timer[10] =
 	{
 		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 	};
 
-	return timeplt_timer[(state->m_soundcpu->total_cycles() / 512) % 10];
+	return timeplt_timer[(m_soundcpu->total_cycles() / 512) % 10];
 }
 
 
@@ -110,7 +96,7 @@ static READ8_DEVICE_HANDLER( timeplt_portB_r )
  *
  *************************************/
 
-static void filter_w( device_t *device, int data )
+void timeplt_audio_device::filter_w( device_t *device, int data )
 {
 	int C = 0;
 
@@ -123,16 +109,14 @@ static void filter_w( device_t *device, int data )
 }
 
 
-static WRITE8_DEVICE_HANDLER( timeplt_filter_w )
+WRITE8_MEMBER( timeplt_audio_device::filter_w )
 {
-	timeplt_audio_state *state = get_safe_token(device);
-
-	filter_w(state->m_filter_1_0, (offset >>  0) & 3);
-	filter_w(state->m_filter_1_1, (offset >>  2) & 3);
-	filter_w(state->m_filter_1_2, (offset >>  4) & 3);
-	filter_w(state->m_filter_0_0, (offset >>  6) & 3);
-	filter_w(state->m_filter_0_1, (offset >>  8) & 3);
-	filter_w(state->m_filter_0_2, (offset >> 10) & 3);
+	filter_w(m_filter_1_0, (offset >>  0) & 3);
+	filter_w(m_filter_1_1, (offset >>  2) & 3);
+	filter_w(m_filter_1_2, (offset >>  4) & 3);
+	filter_w(m_filter_0_0, (offset >>  6) & 3);
+	filter_w(m_filter_0_1, (offset >>  8) & 3);
+	filter_w(m_filter_0_2, (offset >> 10) & 3);
 }
 
 
@@ -143,18 +127,15 @@ static WRITE8_DEVICE_HANDLER( timeplt_filter_w )
  *
  *************************************/
 
-WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
+WRITE8_MEMBER( timeplt_audio_device::sh_irqtrigger_w )
 {
-	device_t *audio = space.machine().device("timeplt_audio");
-	timeplt_audio_state *state = get_safe_token(audio);
-
-	if (state->m_last_irq_state == 0 && data)
+	if (m_last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		state->m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
-	state->m_last_irq_state = data;
+	m_last_irq_state = data;
 }
 
 
@@ -172,14 +153,14 @@ static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE_LEGACY("timeplt_audio", timeplt_filter_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( locomotn_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_DEVWRITE_LEGACY("timeplt_audio", timeplt_filter_w)
+	AM_RANGE(0x3000, 0x3fff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
@@ -199,7 +180,7 @@ static const ay8910_interface timeplt_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_DEVICE_HANDLER("timeplt_audio", timeplt_portB_r),
+	DEVCB_DEVICE_MEMBER("timeplt_audio", timeplt_audio_device, portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -256,38 +237,6 @@ MACHINE_CONFIG_DERIVED( locomotn_sound, timeplt_sound )
 	MCFG_CPU_MODIFY("tpsound")
 	MCFG_CPU_PROGRAM_MAP(locomotn_sound_map)
 MACHINE_CONFIG_END
-
-/*****************************************************************************
-    DEVICE DEFINITION
-*****************************************************************************/
-
-const device_type TIMEPLT_AUDIO = &device_creator<timeplt_audio_device>;
-
-timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TIMEPLT_AUDIO, "Time Pilot Audio", tag, owner, clock, "timeplt_audio", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(timeplt_audio_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void timeplt_audio_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void timeplt_audio_device::device_start()
-{
-	DEVICE_START_NAME( timeplt_audio )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
