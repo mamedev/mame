@@ -14,8 +14,8 @@ public:
 	required_shared_ptr<UINT8> m_playfield_ram;
 
 	/* video-related */
-	bitmap_ind16    m_tmp_bitmap1;
-	bitmap_ind16    m_tmp_bitmap2;
+	bitmap_ind16    m_colmap_bg;
+	bitmap_ind16    m_colmap_ball;
 	tilemap_t     *m_bg_tilemap;
 	int         m_pc3259_output[4];
 	int         m_pc3259_mask;
