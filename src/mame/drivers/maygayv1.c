@@ -219,7 +219,8 @@ public:
 	maygayv1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_upd7759(*this, "upd") { }
 
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
@@ -250,6 +251,7 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<upd7759_device> m_upd7759;
 };
 
 
@@ -747,7 +749,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 				return 0;
 		}
 
-		case 3: return upd7759_busy_r(0) ? 0 : 0x08;
+		case 3: return m_upd7759->busy_r() ? 0 : 0x08;
 	}
 	return 0;
 }
@@ -761,11 +763,11 @@ WRITE8_MEMBER(maygayv1_state::mcu_w)
 		// Bottom nibble = UPD
 		case 1:
 			m_p1 = data;
-//          upd7759_msg_w(0, data);//?
+//          m_upd7759->msg_w(data);//?
 			break;
 		case 3:
-			upd7759_reset_w (0, BIT(data, 2));
-			upd7759_start_w(0, BIT(data, 6));
+			m_upd7759->reset_w (BIT(data, 2));
+			m_upd7759->start_w(BIT(data, 6));
 
 //          if ( !BIT(m_p3, 7) && BIT(data, 7) )
 				// P1 propagates to outputs

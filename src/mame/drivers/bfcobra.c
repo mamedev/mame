@@ -1467,14 +1467,14 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 
 READ8_MEMBER(bfcobra_state::upd_r)
 {
-	return 2 | upd7759_busy_r(m_upd7759);
+	return 2 | m_upd7759->busy_r();
 }
 
 WRITE8_MEMBER(bfcobra_state::upd_w)
 {
-	upd7759_reset_w(m_upd7759, data & 0x80);
-	upd7759_port_w(m_upd7759, space, 0, data & 0x3f);
-	upd7759_start_w(m_upd7759, data & 0x40 ? 0 : 1);
+	m_upd7759->reset_w(data & 0x80);
+	m_upd7759->port_w(space, 0, data & 0x3f);
+	m_upd7759->start_w(data & 0x40 ? 0 : 1);
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )

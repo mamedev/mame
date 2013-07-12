@@ -44,7 +44,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "sound/upd7759.h"
 #include "includes/snk68.h"
 
 /******************************************************************************/
@@ -162,14 +161,14 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
 {
-	upd7759_port_w(m_upd7759, space, 0, data);
-	upd7759_start_w(m_upd7759, 0);
-	upd7759_start_w(m_upd7759, 1);
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
 {
-	upd7759_reset_w(m_upd7759, data & 0x80);
+	m_upd7759->reset_w(data & 0x80);
 }
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snk68_state )

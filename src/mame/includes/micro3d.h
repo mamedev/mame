@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "cpu/tms34010/tms34010.h"
+#include "sound/upd7759.h"
 
 
 #define HOST_MONITOR_DISPLAY        0
@@ -27,6 +28,7 @@ public:
 		m_micro3d_sprite_vram(*this, "sprite_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_upd7759(*this, "upd7759"),
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb") { }
 
@@ -130,6 +132,7 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
 	required_device<cpu_device> m_vgb;
 

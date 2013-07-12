@@ -30,7 +30,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "sound/2203intf.h"
-#include "sound/upd7759.h"
 #include "includes/konamipt.h"
 #include "includes/bladestl.h"
 
@@ -94,18 +93,18 @@ WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
 	/* bit 1, 2 unknown */
-	upd7759_set_bank_base(m_upd7759, ((data & 0x38) >> 3) * 0x20000);
+	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
 }
 
 READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
 {
-	return upd7759_busy_r(m_upd7759) ? 1 : 0;
+	return m_upd7759->busy_r() ? 1 : 0;
 }
 
 WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
 {
-	upd7759_reset_w(m_upd7759, data & 1);
-	upd7759_start_w(m_upd7759, data & 2);
+	m_upd7759->reset_w(data & 1);
+	m_upd7759->start_w(data & 2);
 }
 
 /*************************************
@@ -276,7 +275,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("upd", upd7759_port_w),
+	DEVCB_DEVICE_MEMBER("upd", upd775x_device, port_w),
 	DEVCB_DRIVER_MEMBER(bladestl_state,bladestl_port_B_w)
 };
 

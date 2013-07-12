@@ -25,7 +25,6 @@ Notes:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
-#include "sound/upd7759.h"
 #include "includes/konamipt.h"
 #include "includes/mainevt.h"
 
@@ -80,13 +79,13 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
 
 READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)
 {
-	return upd7759_busy_r(m_upd7759);
+	return m_upd7759->busy_r();
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
 {
-	upd7759_reset_w(m_upd7759, data & 2);
-	upd7759_start_w(m_upd7759, data & 1);
+	m_upd7759->reset_w(data & 2);
+	m_upd7759->start_w(data & 1);
 
 	m_sound_irq_mask = data & 4;
 }
@@ -108,7 +107,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 	m_k007232->set_bank(bank_A, bank_B);
 
 	/* bits 4-5 select the UPD7759 bank */
-	upd7759_set_bank_base(m_upd7759, ((data >> 4) & 0x03) * 0x20000);
+	m_upd7759->set_bank_base(((data >> 4) & 0x03) * 0x20000);
 }
 
 WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
@@ -201,7 +200,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mainevt_sh_busy_r)

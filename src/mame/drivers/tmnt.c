@@ -73,7 +73,6 @@ Updates:
 #include "sound/samples.h"
 #include "sound/k053260.h"
 #include "sound/k054539.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
@@ -232,7 +231,7 @@ READ8_MEMBER(tmnt_state::tmnt_sres_r)
 WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 {
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(m_upd7759, data & 2);
+	m_upd7759->reset_w(data & 2);
 
 	/* bit 2 plays the title music */
 	if (data & 0x04)
@@ -247,12 +246,12 @@ WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 
 WRITE8_MEMBER(tmnt_state::tmnt_upd_start_w)
 {
-	upd7759_start_w(m_upd7759, data & 1);
+	m_upd7759->start_w(data & 1);
 }
 
 READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
 {
-	return upd7759_busy_r(m_upd7759) ? 1 : 0;
+	return m_upd7759->busy_r() ? 1 : 0;
 }
 
 
@@ -1091,7 +1090,7 @@ static ADDRESS_MAP_START( tmnt_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tmnt_upd_start_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ(tmnt_upd_busy_r)
 ADDRESS_MAP_END
@@ -2285,8 +2284,8 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 {
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	upd7759_start_w(m_upd7759, 0);
-	upd7759_reset_w(m_upd7759, 1);
+	m_upd7759->start_w(0);
+	m_upd7759->reset_w(1);
 }
 
 static MACHINE_CONFIG_START( tmnt, tmnt_state )

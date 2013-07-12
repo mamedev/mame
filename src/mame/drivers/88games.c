@@ -8,7 +8,6 @@
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "includes/88games.h"
 
@@ -73,15 +72,15 @@ WRITE8_MEMBER(_88games_state::speech_control_w)
 	m_speech_chip = (data & 4) ? 1 : 0;
 	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
-	upd7759_reset_w(upd, data & 2);
-	upd7759_start_w(upd, data & 1);
+	upd->reset_w(data & 2);
+	upd->start_w(data & 1);
 }
 
 WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
 	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
-	upd7759_port_w(upd, space, 0, data);
+	upd->port_w(space, 0, data);
 }
 
 /* special handlers to combine 052109 & 051960 */

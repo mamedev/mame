@@ -16,10 +16,12 @@ public:
 	jpmsys5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_upd7759(*this, "upd7759"),
 		m_tms34061(*this, "tms34061"),
 		m_vfd(*this, "vfd")	{ }
 		
 	required_device<cpu_device> m_maincpu;
+	required_device<upd7759_device> m_upd7759;
 	optional_device<tms34061_device> m_tms34061;
 	optional_device<roc10937_t> m_vfd;
 	

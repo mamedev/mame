@@ -319,17 +319,17 @@ WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
 
 READ8_MEMBER(combatsc_state::combatsc_busy_r)
 {
-	return upd7759_busy_r(m_upd7759) ? 1 : 0;
+	return m_upd7759->busy_r() ? 1 : 0;
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_play_w)
 {
-	upd7759_start_w(m_upd7759, data & 2);
+	m_upd7759->start_w(data & 2);
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_voice_reset_w)
 {
-	upd7759_reset_w(m_upd7759,data & 1);
+	m_upd7759->reset_w(data & 1);
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
 
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(combatsc_play_w)                  /* upd7759 play voice */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)                  /* upd7759 voice select */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("upd", upd7759_device, port_w)                  /* upd7759 voice select */
 	AM_RANGE(0xb000, 0xb000) AM_READ(combatsc_busy_r)                   /* upd7759 busy? */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)           /* upd7759 reset? */
 

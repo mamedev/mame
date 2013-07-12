@@ -92,7 +92,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/msm5205.h"
 #include "sound/2151intf.h"
-#include "sound/upd7759.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 #include "video/segaic16.h"
@@ -454,10 +453,9 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
-	device_t *device = machine().device("7759");
 	int offs, size = memregion("soundcpu")->bytes() - 0x10000;
 
-	upd7759_reset_w(device, data & 0x40);
+	m_upd7759->reset_w(data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
 	membank("bank1")->set_base(memregion("soundcpu")->base() + offs);
 }
@@ -467,7 +465,7 @@ static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_WRITE(upd7759_bank_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("7759", upd7759_port_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("7759", upd7759_device, port_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -2030,7 +2028,7 @@ static void sound_cause_nmi( device_t *device, int chip )
 }
 
 
-const upd7759_interface sys16_upd7759_interface  =
+const upd775x_interface sys16_upd7759_interface  =
 {
 	sound_cause_nmi
 };

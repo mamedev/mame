@@ -234,14 +234,13 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 
 WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 {
-	device_t *device = machine().device("upd7759");
 	switch (offset)
 	{
 		case 0:
 		{
-			upd7759_port_w(device, space, 0, data & 0xff);
-			upd7759_start_w(device, 0);
-			upd7759_start_w(device, 1);
+			m_upd7759->port_w(space, 0, data & 0xff);
+			m_upd7759->start_w(0);
+			m_upd7759->start_w(1);
 			break;
 		}
 		case 1:
@@ -267,8 +266,8 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 		}
 		case 2:
 		{
-			upd7759_reset_w(device, ~data & 0x04);
-			upd7759_set_bank_base(device, (data & 2) ? 0x20000 : 0);
+			m_upd7759->reset_w(~data & 0x04);
+			m_upd7759->set_bank_base((data & 2) ? 0x20000 : 0);
 			break;
 		}
 		default:
@@ -281,8 +280,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 
 READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
 {
-	device_t *device = machine().device("upd7759");
-	return 0x14 | upd7759_busy_r(device);
+	return 0x14 | m_upd7759->busy_r();
 }
 
 

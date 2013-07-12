@@ -606,16 +606,16 @@ READ8_MEMBER(bfm_sc1_state::triac_r)
 #ifdef UNUSED_FUNCTION
 WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
 {
-	upd7759_start_w(device, 0);
-	upd7759_reset_w(device, data);
+	m_upd7759->start_w(0);
+	m_upd7759->reset_w(data);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
 WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
 {
-	upd7759_port_w (m_upd7759, space, 0, data&0x3F);   // setup sample
-	upd7759_start_w(m_upd7759, 0);
-	upd7759_start_w(m_upd7759, 1);         // start
+	m_upd7759->port_w (space, 0, data&0x3F);   // setup sample
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);         // start
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

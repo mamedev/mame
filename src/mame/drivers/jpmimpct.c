@@ -103,7 +103,6 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
-#include "sound/upd7759.h"
 #include "includes/jpmimpct.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
@@ -482,8 +481,8 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_set_bank_base(m_upd7759, 0x20000 * ((data >> 1) & 3));
-		upd7759_reset_w(m_upd7759, data & 0x01);
+		m_upd7759->set_bank_base(0x20000 * ((data >> 1) & 3));
+		m_upd7759->reset_w(data & 0x01);
 	}
 }
 
@@ -491,9 +490,9 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(m_upd7759, space, 0, data);
-		upd7759_start_w(m_upd7759, 0);
-		upd7759_start_w(m_upd7759, 1);
+		m_upd7759->port_w(space, 0, data);
+		m_upd7759->start_w(0);
+		m_upd7759->start_w(1);
 	}
 }
 
@@ -501,7 +500,7 @@ READ16_MEMBER(jpmimpct_state::upd7759_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return upd7759_busy_r(m_upd7759);
+		return m_upd7759->busy_r();
 	}
 
 	return 0xffff;

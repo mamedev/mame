@@ -163,9 +163,9 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(m_upd7759, space, 0, data & 0xff);
-		upd7759_start_w(m_upd7759, 0);
-		upd7759_start_w(m_upd7759, 1);
+		m_upd7759->port_w(space, 0, data & 0xff);
+		m_upd7759->start_w(0);
+		m_upd7759->start_w(1);
 	}
 }
 
@@ -325,7 +325,7 @@ READ16_MEMBER(segac2_state::io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && m_sound_banks)
-				return (ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(m_upd7759) << 6);
+				return (ioport(portnames[offset])->read() & 0xbf) | (m_upd7759->busy_r() << 6);
 			return ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
@@ -413,7 +413,7 @@ WRITE16_MEMBER(segac2_state::io_chip_w )
 			if (m_sound_banks > 1)
 			{
 				newbank = (data >> 2) & (m_sound_banks - 1);
-				upd7759_set_bank_base(m_upd7759, newbank * 0x20000);
+				m_upd7759->set_bank_base(newbank * 0x20000);
 			}
 			break;
 
@@ -421,7 +421,7 @@ WRITE16_MEMBER(segac2_state::io_chip_w )
 		case 0x1c/2:
 			if (m_sound_banks > 1)
 			{
-				upd7759_reset_w(m_upd7759, (data >> 1) & 1);
+				m_upd7759->reset_w((data >> 1) & 1);
 			}
 			break;
 	}

@@ -52,7 +52,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
-#include "sound/upd7759.h"
 #include "sound/samples.h"
 #include "includes/homerun.h"
 
@@ -71,8 +70,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != NULL)
 	{
-		upd7759_reset_w(m_d7756, ~data & 0x20);
-		upd7759_start_w(m_d7756, ~data & 0x10);
+		m_d7756->reset_w(~data & 0x20);
+		m_d7756->start_w(~data & 0x10);
 	}
 	if (m_samples != NULL)
 	{
@@ -97,7 +96,7 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != NULL)
-		upd7759_port_w(m_d7756, space, 0, data);
+		m_d7756->port_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
@@ -128,7 +127,7 @@ CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
 
 CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_d7756_busy_r)
 {
-	return upd7759_busy_r(m_d7756);
+	return m_d7756->busy_r();
 }
 
 CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)

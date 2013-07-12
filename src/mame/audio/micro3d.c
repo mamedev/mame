@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/upd7759.h"
 #include "includes/micro3d.h"
 #include "devlegcy.h"
 
@@ -376,9 +375,8 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 		}
 		case 0x03:
 		{
-			device_t *upd = machine().device("upd7759");
-			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
-			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
+			m_upd7759->set_bank_base((data & 0x4) ? 0x20000 : 0);
+			m_upd7759->reset_w((data & 0x10) ? 0 : 1);
 			break;
 		}
 	}
@@ -389,17 +387,16 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 	switch (offset)
 	{
 		case 0x01:  return (m_sound_port_latch[offset] & 0x7f) | ioport("SOUND_SW")->read();
-		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(machine().device("upd7759")) ? 0x08 : 0);
+		case 0x03:  return (m_sound_port_latch[offset] & 0xf7) | (m_upd7759->busy_r() ? 0x08 : 0);
 		default:    return 0;
 	}
 }
 
 WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
 {
-	device_t *device = machine().device("upd7759");
-	upd7759_port_w(device, space, 0, data);
-	upd7759_start_w(device, 0);
-	upd7759_start_w(device, 1);
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 

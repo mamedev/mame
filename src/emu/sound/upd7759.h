@@ -14,28 +14,26 @@
 
 #define UPD7759_STANDARD_CLOCK      XTAL_640kHz
 
-struct upd7759_interface
+struct upd775x_interface
 {
-	void (*drqcallback)(device_t *device, int param);   /* drq callback (per chip, slave mode only) */
+	void (*m_drqcallback)(device_t *device, int param);   /* drq callback (per chip, slave mode only) */
 };
 
-void upd7759_set_bank_base(device_t *device, offs_t base);
-
-void upd7759_reset_w(device_t *device, UINT8 data);
-void upd7759_start_w(device_t *device, UINT8 data);
-int upd7759_busy_r(device_t *device);
-DECLARE_WRITE8_DEVICE_HANDLER( upd7759_port_w );
-
-class upd7759_device : public device_t,
-									public device_sound_interface
+class upd775x_device : public device_t,
+									public device_sound_interface,
+									public upd775x_interface
 {
 public:
-	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~upd7759_device() { global_free(m_token); }
+	upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	~upd775x_device() {}
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void set_bank_base(offs_t base);
+
+	void reset_w(UINT8 data);
+	int busy_r();
+	DECLARE_WRITE8_MEMBER( port_w );
+	void postload();
+	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -44,22 +42,87 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-private:
+		
 	// internal state
-	void *m_token;
+	sound_stream *m_channel;                  /* stream channel for playback */
+
+	/* chip configuration */
+	UINT8       m_sample_offset_shift;        /* header sample address shift (access data > 0xffff) */
+
+	/* internal clock to output sample rate mapping */
+	UINT32      m_pos;                        /* current output sample position */
+	UINT32      m_step;                       /* step value per output sample */
+	attotime    m_clock_period;               /* clock period */
+	
+	/* I/O lines */
+	UINT8       m_fifo_in;                    /* last data written to the sound chip */
+	UINT8       m_reset;                      /* current state of the RESET line */
+	UINT8       m_start;                      /* current state of the START line */
+	UINT8       m_drq;                        /* current state of the DRQ line */
+	
+	/* internal state machine */
+	INT8        m_state;                      /* current overall chip state */
+	INT32       m_clocks_left;                /* number of clocks left in this state */
+	UINT16      m_nibbles_left;               /* number of ADPCM nibbles left to process */
+	UINT8       m_repeat_count;               /* number of repeats remaining in current repeat block */
+	INT8        m_post_drq_state;             /* state we will be in after the DRQ line is dropped */
+	INT32       m_post_drq_clocks;            /* clocks that will be left after the DRQ line is dropped */
+	UINT8       m_req_sample;                 /* requested sample number */
+	UINT8       m_last_sample;                /* last sample number available */
+	UINT8       m_block_header;               /* header byte */
+	UINT8       m_sample_rate;                /* number of UPD clocks per ADPCM nibble */
+	UINT8       m_first_valid_header;         /* did we get our first valid header yet? */
+	UINT32      m_offset;                     /* current ROM offset */
+	UINT32      m_repeat_offset;              /* current ROM repeat offset */
+
+	/* ADPCM processing */
+	INT8        m_adpcm_state;                /* ADPCM state index */
+	UINT8       m_adpcm_data;                 /* current byte of ADPCM data */
+	INT16       m_sample;                     /* current sample value */
+
+	/* ROM access */
+	UINT8 *     m_rom;                        /* pointer to ROM data or NULL for slave mode */
+	UINT8 *     m_rombase;                    /* pointer to ROM data or NULL for slave mode */
+	UINT32      m_romoffset;                  /* ROM offset to make save/restore easier */
+	UINT32      m_rommask;                    /* maximum address offset */
+	
+	void update_adpcm(int data);
+	void advance_state();
 };
 
-extern const device_type UPD7759;
+class upd7759_device : public upd775x_device
+{
+public:
+	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	enum
+		{
+			TIMER_SLAVE_UPDATE
+		};
+		
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	
+	emu_timer *m_timer;                       /* timer */
+	
+	void start_w(UINT8 data);
+};
 
-class upd7756_device : public upd7759_device
+class upd7756_device : public upd775x_device
 {
 public:
 	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// sound stream update overrides
+	virtual void device_start();
+	virtual void device_reset();
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	
+	void start_w(UINT8 data);
 };
 
+extern const device_type UPD7759;
 extern const device_type UPD7756;
 
 

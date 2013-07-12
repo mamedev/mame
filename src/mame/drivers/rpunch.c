@@ -109,7 +109,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
-#include "sound/upd7759.h"
 #include "includes/rpunch.h"
 
 
@@ -199,15 +198,15 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	upd7759_reset_w(m_upd7759, data >> 7);
+	m_upd7759->reset_w(data >> 7);
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	upd7759_port_w(m_upd7759, space, 0, data);
-	upd7759_start_w(m_upd7759, 0);
-	upd7759_start_w(m_upd7759, 1);
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
 }
 
 

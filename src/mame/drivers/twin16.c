@@ -47,7 +47,6 @@ Known Issues:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "includes/twin16.h"
 #include "includes/konamipt.h"
@@ -188,17 +187,17 @@ READ16_MEMBER(twin16_state::twin16_input_r)
 
 READ8_MEMBER(twin16_state::twin16_upd_busy_r)
 {
-	return upd7759_busy_r(m_upd7759);
+	return m_upd7759->busy_r();
 }
 
 WRITE8_MEMBER(twin16_state::twin16_upd_reset_w)
 {
-	upd7759_reset_w(m_upd7759, data & 2);
+	m_upd7759->reset_w(data & 2);
 }
 
 WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
 {
-	upd7759_start_w(m_upd7759, data & 1);
+	m_upd7759->start_w(data & 1);
 }
 
 READ16_MEMBER(twin16_state::cuebrickj_nvram_r)
@@ -225,7 +224,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(twin16_upd_start_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ(twin16_upd_busy_r) // miaj writes 0 to it
 	ADDRESS_MAP_END

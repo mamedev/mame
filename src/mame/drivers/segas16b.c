@@ -1195,8 +1195,8 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 	{
 		// it is important to write in this order: if the /START line goes low
 		// at the same time /RESET goes low, no sample should be started
-		upd7759_start_w(m_upd7759, data & 0x80);
-		upd7759_reset_w(m_upd7759, data & 0x40);
+		m_upd7759->start_w(data & 0x80);
+		m_upd7759->reset_w(data & 0x40);
 
 		// banking depends on the ROM board
 		int bankoffs = 0;
@@ -1264,7 +1264,7 @@ WRITE8_MEMBER( segas16b_state::upd7759_control_w )
 
 READ8_MEMBER( segas16b_state::upd7759_status_r )
 {
-	return upd7759_busy_r(m_upd7759) << 7;
+	return m_upd7759->busy_r() << 7;
 }
 
 
@@ -1774,7 +1774,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas16b_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -3264,7 +3264,7 @@ INPUT_PORTS_END
 //  SOUND CONFIGURATIONS
 //**************************************************************************
 
-static const upd7759_interface upd7759_config =
+static const upd775x_interface upd7759_config =
 {
 	&segas16b_state::upd7759_generate_nmi
 };
