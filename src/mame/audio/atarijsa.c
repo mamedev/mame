@@ -795,7 +795,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
@@ -840,7 +840,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
@@ -863,7 +863,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
@@ -908,7 +908,7 @@ MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa3s_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))

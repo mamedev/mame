@@ -532,8 +532,8 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 void device_execute_interface::interface_pre_start()
 {
 	// bind delegates
-	m_vblank_interrupt.bind_relative_to(device());
-	m_timed_interrupt.bind_relative_to(device());
+	m_vblank_interrupt.bind_relative_to(*device().owner());
+	m_timed_interrupt.bind_relative_to(*device().owner());
 	m_driver_irq.bind_relative_to(device());
 
 	// fill in the initial states
