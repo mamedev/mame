@@ -21,14 +21,19 @@ static int K054338_shdRGB[9];
 static int K054338_alphainverted;
 
 
+// use member once implementations are merged.
+k055555_device* temp_k055555 = 0;
+
+
 // K054338 alpha blend / final mixer (normally used with the 55555)
 // because the implementation is video dependant, this is just a
 // register-handling shell.
-void K054338_vh_start(running_machine &machine)
+void K054338_vh_start(running_machine &machine, k055555_device* k055555)
 {
 	memset(k54338_regs, 0, sizeof(UINT16)*32);
 	memset(K054338_shdRGB, 0, sizeof(int)*9);
 	K054338_alphainverted = 1;
+	temp_k055555 = k055555;
 
 	machine.save().save_item(NAME(k54338_regs));
 }
@@ -77,6 +82,8 @@ void K054338_update_all_shadows(running_machine &machine, int rushingheroes_hack
 	}
 }
 
+
+
 // Unified K054338/K055555 BG color fill
 void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int mode) // (see p.67)
 {
@@ -106,8 +113,8 @@ void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int 
 	}
 	else
 	{
-		BGC_CBLK = K055555_read_register(0);
-		BGC_SET  = K055555_read_register(1);
+		BGC_CBLK = temp_k055555->K055555_read_register(0);
+		BGC_SET  = temp_k055555->K055555_read_register(1);
 		pal_ptr += BGC_CBLK << 9;
 
 		// single color output from PCU2
@@ -264,7 +271,7 @@ void k054338_device::device_config_complete()
 void k054338_device::device_start()
 {
 	m_screen = machine().device<screen_device>(m_screen_tag);
-	m_k055555 = machine().device(m_k055555_tag);
+	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_shd_rgb));
@@ -376,8 +383,8 @@ void k054338_device::fill_backcolor( bitmap_rgb32 &bitmap, int mode ) // (see p.
 	}
 	else
 	{
-		BGC_CBLK = k055555_read_register(m_k055555, 0);
-		BGC_SET  = k055555_read_register(m_k055555, 1);
+		BGC_CBLK = m_k055555->k055555_read_register(m_k055555, 0);
+		BGC_SET  = m_k055555->k055555_read_register(m_k055555, 1);
 
 		pal_ptr += BGC_CBLK << 9;
 

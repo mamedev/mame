@@ -3,6 +3,7 @@
 #ifndef __K054338_H__
 #define __K054338_H__
 
+#include "k055555.h"
 
 #define MCFG_K054338_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K054338, 0) \
@@ -11,7 +12,7 @@
 
 
 /* K054338 mixer/alpha blender */
-void K054338_vh_start(running_machine &machine);
+void K054338_vh_start(running_machine &machine, k055555_device* k055555);
 DECLARE_WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 DECLARE_WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
@@ -77,7 +78,7 @@ private:
 	int       m_shd_rgb[9];
 	
 	screen_device *m_screen;
-	device_t *m_k055555;  /* used to fill BG color */
+	k055555_device *m_k055555;  /* used to fill BG color */
 };
 
 extern const device_type K054338;

@@ -849,7 +849,7 @@ static int vcblk[6], ocblk;
 static int vinmix, vmixon, osinmix, osmixon;
 
 
-static void konamigx_precache_registers(void)
+void konamigx_state::konamigx_precache_registers(void)
 {
 	// (see sprite color coding scheme on p.46 & 47)
 	static const int coregmasks[5] = {0xf,0xe,0xc,0x8,0x0};
@@ -875,19 +875,19 @@ static void konamigx_precache_registers(void)
 
 	K053247_coregshift = coregshifts[i];
 
-	opri     = K055555_read_register(K55_PRIINP_8);
-	oinprion = K055555_read_register(K55_OINPRI_ON);
-	vcblk[0] = K055555_read_register(K55_PALBASE_A);
-	vcblk[1] = K055555_read_register(K55_PALBASE_B);
-	vcblk[2] = K055555_read_register(K55_PALBASE_C);
-	vcblk[3] = K055555_read_register(K55_PALBASE_D);
-	vcblk[4] = K055555_read_register(K55_PALBASE_SUB1);
-	vcblk[5] = K055555_read_register(K55_PALBASE_SUB2);
-	ocblk    = K055555_read_register(K55_PALBASE_OBJ);
-	vinmix   = K055555_read_register(K55_BLEND_ENABLES);
-	vmixon   = K055555_read_register(K55_VINMIX_ON);
-	osinmix  = K055555_read_register(K55_OSBLEND_ENABLES);
-	osmixon  = K055555_read_register(K55_OSBLEND_ON);
+	opri     = m_k055555->K055555_read_register(K55_PRIINP_8);
+	oinprion = m_k055555->K055555_read_register(K55_OINPRI_ON);
+	vcblk[0] = m_k055555->K055555_read_register(K55_PALBASE_A);
+	vcblk[1] = m_k055555->K055555_read_register(K55_PALBASE_B);
+	vcblk[2] = m_k055555->K055555_read_register(K55_PALBASE_C);
+	vcblk[3] = m_k055555->K055555_read_register(K55_PALBASE_D);
+	vcblk[4] = m_k055555->K055555_read_register(K55_PALBASE_SUB1);
+	vcblk[5] = m_k055555->K055555_read_register(K55_PALBASE_SUB2);
+	ocblk    = m_k055555->K055555_read_register(K55_PALBASE_OBJ);
+	vinmix   = m_k055555->K055555_read_register(K55_BLEND_ENABLES);
+	vmixon   = m_k055555->K055555_read_register(K55_VINMIX_ON);
+	osinmix  = m_k055555->K055555_read_register(K55_OSBLEND_ENABLES);
+	osmixon  = m_k055555->K055555_read_register(K55_OSBLEND_ON);
 }
 
 INLINE int K053247GX_combine_c18(int attrib) // (see p.46)
@@ -1195,7 +1195,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	parity ^= 1;
 
 	// abort if video has been disabled
-	disp = K055555_read_register(K55_INPUT_ENABLES);
+	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 	if (!disp) return;
 	cltc_shdpri = K054338_read_register(K338_REG_CONTROL);
 
@@ -1245,22 +1245,22 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	// invert layer priority when this flag is set (not used by any GX game?)
 	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
 
-	layerpri[0] = K055555_read_register(K55_PRIINP_0);
-	layerpri[1] = K055555_read_register(K55_PRIINP_3);
-	layerpri[3] = K055555_read_register(K55_PRIINP_7);
-	layerpri[4] = K055555_read_register(K55_PRIINP_9);
-	layerpri[5] = K055555_read_register(K55_PRIINP_10);
+	layerpri[0] = m_k055555->K055555_read_register(K55_PRIINP_0);
+	layerpri[1] = m_k055555->K055555_read_register(K55_PRIINP_3);
+	layerpri[3] = m_k055555->K055555_read_register(K55_PRIINP_7);
+	layerpri[4] = m_k055555->K055555_read_register(K55_PRIINP_9);
+	layerpri[5] = m_k055555->K055555_read_register(K55_PRIINP_10);
 
 	if (gx_primode == -1)
 	{
 		// Lethal Enforcer hack (requires pixel color comparison)
-		layerpri[2] = K055555_read_register(K55_PRIINP_3) + 0x20;
+		layerpri[2] = m_k055555->K055555_read_register(K55_PRIINP_3) + 0x20;
 		shdprisel = 0x3f;
 	}
 	else
 	{
-		layerpri[2] = K055555_read_register(K55_PRIINP_6);
-		shdprisel = K055555_read_register(K55_SHD_PRI_SEL);
+		layerpri[2] = m_k055555->K055555_read_register(K55_PRIINP_6);
+		shdprisel = m_k055555->K055555_read_register(K55_SHD_PRI_SEL);
 	}
 
 	// SHDPRISEL filters shadows by different priority comparison methods (UNIMPLEMENTED, see detail on p.66)
@@ -1268,9 +1268,9 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	if (!(shdprisel & 0x0c)) shadowon[1] = 0;
 	if (!(shdprisel & 0x30)) shadowon[2] = 0;
 
-	shdpri[0]   = K055555_read_register(K55_SHAD1_PRI);
-	shdpri[1]   = K055555_read_register(K55_SHAD2_PRI);
-	shdpri[2]   = K055555_read_register(K55_SHAD3_PRI);
+	shdpri[0]   = m_k055555->K055555_read_register(K55_SHAD1_PRI);
+	shdpri[1]   = m_k055555->K055555_read_register(K55_SHAD2_PRI);
+	shdpri[2]   = m_k055555->K055555_read_register(K55_SHAD3_PRI);
 
 	spri_min = 0;
 	shadowon[2] = shadowon[1] = shadowon[0] = 0;
@@ -1286,7 +1286,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 
 		// SHDON specifies layers on which shadows can be projected (see detail on p.65 7.2.8)
-		temp = K055555_read_register(K55_SHD_ON);
+		temp = m_k055555->K055555_read_register(K55_SHD_ON);
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
@@ -2019,8 +2019,8 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 {
 	int i;
 
-	K054338_vh_start(machine);
-	K055555_vh_start(machine);
+	K054338_vh_start(machine, m_k055555);
+	m_k055555->K055555_vh_start(machine);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -2077,7 +2077,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 
 	if (!strcmp(machine().system().name,"tbyahhoo"))
 	{
-		m_k056832->altK056832_set_UpdateMode(1);
+		m_k056832->K056832_set_k055555(m_k055555);
 		gx_tilemode = 1;
 	} else
 
@@ -2134,7 +2134,7 @@ VIDEO_START_MEMBER(konamigx_state,le2)
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
 
 	gx_le2_textcolour_hack = 1; // force text layer to use the right palette
-	K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON?
+	m_k055555->K055555_write_reg(K55_INPUT_ENABLES, 1); // it doesn't turn on the video output at first for the test screens, maybe it should default to ON?
 }
 
 VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp)
@@ -2394,7 +2394,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 		unchained = m_k056832->get_layer_association();
 		for (i=0; i<4; i++)
 		{
-			newbase = K055555_get_palette_index(i)<<6;
+			newbase = m_k055555->K055555_get_palette_index(i)<<6;
 			if (layer_colorbase[i] != newbase)
 			{
 				layer_colorbase[i] = newbase;
@@ -2415,7 +2415,7 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 	if (gx_rozenable)
 	{
 		last_psac_colorbase = psac_colorbase;
-		psac_colorbase = K055555_get_palette_index(6);
+		psac_colorbase = m_k055555->K055555_get_palette_index(6);
 
 		if (psac_colorbase != last_psac_colorbase)
 		{

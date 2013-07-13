@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x4800ff) AM_WRITE_LEGACY(K055555_word_w)
+	AM_RANGE(0x480000, 0x4800ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x482000, 0x48200f) AM_READ_LEGACY(K055673_rom_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_WRITE_LEGACY(K053247_reg_word_w)
 	AM_RANGE(0x484000, 0x484007) AM_WRITE_LEGACY(K053246_word_w)
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
-	AM_RANGE(0x258000, 0x2580ff) AM_WRITE_LEGACY(K055555_word_w)
+	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
 	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
-	AM_RANGE(0x258000, 0x2580ff) AM_WRITE_LEGACY(K055555_word_w)
+	AM_RANGE(0x258000, 0x2580ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                 // main program
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")          // work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_WRITE_LEGACY(K055555_word_w)                // PCU2
+	AM_RANGE(0x400000, 0x4000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)                // PCU2
 	AM_RANGE(0x402000, 0x40200f) AM_READ_LEGACY(K055673_rom_word_r)         // sprite ROM readback
 	AM_RANGE(0x402010, 0x40201f) AM_WRITE_LEGACY(K053247_reg_word_w)            // OBJSET2
 	AM_RANGE(0x404000, 0x404007) AM_WRITE_LEGACY(K053246_word_w)                // OBJSET1
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x482000, 0x482007) AM_DEVWRITE("k056832", k056832_device,b_word_w)  // VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
-	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
+	AM_RANGE(0x488000, 0x4880ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x482000, 0x482007) AM_DEVWRITE("k056832", k056832_device,b_word_w)          // VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
 	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)
-	AM_RANGE(0x488000, 0x4880ff) AM_WRITE_LEGACY(K055555_word_w)
+	AM_RANGE(0x488000, 0x4880ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
@@ -999,6 +999,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_PALETTE_LENGTH(2048)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
+	MCFG_K055555_ADD("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 

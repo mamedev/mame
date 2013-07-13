@@ -7,12 +7,7 @@
 #define MCFG_K055555_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, K055555, 0)
 
-void K055555_vh_start(running_machine &machine); // "PCU2"
-void K055555_write_reg(UINT8 regnum, UINT8 regdat);
-DECLARE_WRITE16_HANDLER( K055555_word_w );
-DECLARE_WRITE32_HANDLER( K055555_long_w );
-int K055555_read_register(int regnum);
-int K055555_get_palette_index(int idx);
+
 
 /* K055555 registers */
 /* priority inputs */
@@ -84,33 +79,46 @@ class k055555_device : public device_t
 {
 public:
 	k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k055555_device() { global_free(m_token); }
+	~k055555_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	void k055555_write_reg(UINT8 regnum, UINT8 regdat);
+
+	
+	/**  Konami 055555  **/
+
+	DECLARE_WRITE16_MEMBER( k055555_word_w );
+	DECLARE_WRITE32_MEMBER( k055555_long_w );
+	int k055555_read_register(device_t *device, int regnum);
+	int k055555_get_palette_index(device_t *device, int idx);
+
+	// debug handlers
+	DECLARE_READ16_MEMBER( k055555_word_r );        // PCU2
+	DECLARE_READ32_MEMBER( k055555_long_r );        // PCU2
+
+
+
+	/* alt implementation to merge */
+	void K055555_vh_start(running_machine &machine); // "PCU2"
+	void K055555_write_reg(UINT8 regnum, UINT8 regdat);
+	DECLARE_WRITE16_MEMBER( K055555_word_w );
+	DECLARE_WRITE32_MEMBER( K055555_long_w );
+	int K055555_read_register(int regnum);
+	int K055555_get_palette_index(int idx);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
+	UINT8   m_regs[128];
+
 private:
-	// internal state
-	void *m_token;
+
 };
 
 extern const device_type K055555;
 
-
-/**  Konami 055555  **/
-void k055555_write_reg(device_t *device, UINT8 regnum, UINT8 regdat);
-DECLARE_WRITE16_DEVICE_HANDLER( k055555_word_w );
-DECLARE_WRITE32_DEVICE_HANDLER( k055555_long_w );
-int k055555_read_register(device_t *device, int regnum);
-int k055555_get_palette_index(device_t *device, int idx);
-
-// debug handlers
-DECLARE_READ16_DEVICE_HANDLER( k055555_word_r );        // PCU2
-DECLARE_READ32_DEVICE_HANDLER( k055555_long_r );        // PCU2
 
 #endif
 

@@ -318,17 +318,20 @@ static void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int c
 
 static void tkmmpzdm_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x0142, 0x100, 0);
+	konamigx_state* state = space.machine().driver_data<konamigx_state>();
+	state->konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x0142, 0x100, 0);
 }
 
 static void dragoonj_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x5c00, 0x100, 0);
+	konamigx_state* state = space.machine().driver_data<konamigx_state>();
+	state->konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x5c00, 0x100, 0);
 }
 
 static void sal2_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x1c8c, 0x172, 1);
+	konamigx_state* state = space.machine().driver_data<konamigx_state>();
+	state->konamigx_esc_alert(space.machine().driver_data<konamigx_state>()->m_workram, 0x1c8c, 0x172, 1);
 }
 
 static void sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
@@ -1158,7 +1161,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE_LEGACY(K053247_reg_long_w)
 	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
 	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
-	AM_RANGE(0xd50000, 0xd500ff) AM_WRITE_LEGACY(K055555_long_w)
+	AM_RANGE(0xd50000, 0xd500ff) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)
 	AM_RANGE(0xd52000, 0xd5200f) AM_WRITE(sound020_w)
 	AM_RANGE(0xd52010, 0xd5201f) AM_READ(sound020_r)
 	AM_RANGE(0xd56000, 0xd56003) AM_WRITE(eeprom_w)
@@ -1792,6 +1795,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_PALETTE_LENGTH(8192)
 
 	MCFG_K056832_ADD_NOINTF("k056832"/*, konamigx_k056832_intf*/)
+	MCFG_K055555_ADD("k055555")
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
 

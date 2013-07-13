@@ -161,8 +161,8 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 
 VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 {
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_gametype = 0;
 
@@ -201,8 +201,8 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
 
 VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 {
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_gametype = 1;
 
@@ -230,8 +230,8 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 {
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_gametype = 0;
 
@@ -255,8 +255,8 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 {
 	m_gametype = 0;
 
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
@@ -277,8 +277,8 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 {
 	m_gametype = 0;
 
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
@@ -298,8 +298,8 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 {
 	m_gametype = 0;
 
-	K055555_vh_start(machine());
-	K054338_vh_start(machine());
+	m_k055555->K055555_vh_start(machine());
+	K054338_vh_start(machine(), m_k055555);
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
@@ -328,11 +328,11 @@ UINT32 mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rgb3
 	for (i = 0; i < 4; i++)
 	{
 		old = m_layer_colorbase[i];
-		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		m_layer_colorbase[i] = m_k055555->K055555_get_palette_index(i)<<4;
 		if( old != m_layer_colorbase[i] ) m_k056832->mark_plane_dirty(i);
 	}
 
-	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
+	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<5;
 
 	konamigx_mixer(machine(), bitmap, cliprect, 0, 0, 0, 0, blendmode, 0, 0);
 	return 0;
@@ -345,11 +345,11 @@ UINT32 mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rgb3
 	for (i = 0; i < 4; i++)
 	{
 		old = m_layer_colorbase[i];
-		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		m_layer_colorbase[i] = m_k055555->K055555_get_palette_index(i)<<4;
 		if (old != m_layer_colorbase[i]) m_k056832->mark_plane_dirty(i);
 	}
 
-	m_sprite_colorbase = K055555_get_palette_index(4)<<4;
+	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<4;
 
 	konamigx_mixer(machine(), bitmap, cliprect, 0, GXSUB_K053250 | GXSUB_4BPP, 0, 0, 0, 0, 0);
 	return 0;
@@ -362,14 +362,14 @@ UINT32 mystwarr_state::screen_update_martchmp(screen_device &screen, bitmap_rgb3
 	for (i = 0; i < 4; i++)
 	{
 		old = m_layer_colorbase[i];
-		m_layer_colorbase[i] = K055555_get_palette_index(i)<<4;
+		m_layer_colorbase[i] = m_k055555->K055555_get_palette_index(i)<<4;
 		if (old != m_layer_colorbase[i]) m_k056832->mark_plane_dirty(i);
 	}
 
-	m_sprite_colorbase = K055555_get_palette_index(4)<<5;
+	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4)<<5;
 
-	m_cbparam = K055555_read_register(K55_PRIINP_8);
-	m_oinprion = K055555_read_register(K55_OINPRI_ON);
+	m_cbparam = m_k055555->K055555_read_register(K55_PRIINP_8);
+	m_oinprion = m_k055555->K055555_read_register(K55_OINPRI_ON);
 
 	// not quite right
 	blendmode = (m_oinprion==0xef && K054338_read_register(K338_REG_PBLEND)) ? ((1<<16|GXMIX_BLEND_FORCE)<<2) : 0;
@@ -488,12 +488,12 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 
 	if (m_gametype == 0)
 	{
-		m_sprite_colorbase = (K055555_get_palette_index(4)<<4)&0x7f;
+		m_sprite_colorbase = (m_k055555->K055555_get_palette_index(4)<<4)&0x7f;
 		rozmode = GXSUB_4BPP;
 	}
 	else
 	{
-		m_sprite_colorbase = (K055555_get_palette_index(4)<<3)&0x7f;
+		m_sprite_colorbase = (m_k055555->K055555_get_palette_index(4)<<3)&0x7f;
 		rozmode = GXSUB_8BPP;
 	}
 
@@ -501,7 +501,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 	{
 		for (i=0; i<4; i++)
 		{
-			newbase = K055555_get_palette_index(i)<<4;
+			newbase = m_k055555->K055555_get_palette_index(i)<<4;
 			if (m_layer_colorbase[i] != newbase)
 			{
 				m_layer_colorbase[i] = newbase;
@@ -513,7 +513,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 	{
 		for (dirty=0, i=0; i<4; i++)
 		{
-			newbase = K055555_get_palette_index(i)<<4;
+			newbase = m_k055555->K055555_get_palette_index(i)<<4;
 			if (m_layer_colorbase[i] != newbase)
 			{
 				m_layer_colorbase[i] = newbase;
@@ -525,7 +525,7 @@ UINT32 mystwarr_state::screen_update_dadandrn(screen_device &screen, bitmap_rgb3
 	}
 
 	m_last_psac_colorbase = m_sub1_colorbase;
-	m_sub1_colorbase = K055555_get_palette_index(5);
+	m_sub1_colorbase = m_k055555->K055555_get_palette_index(5);
 
 	if (m_last_psac_colorbase != m_sub1_colorbase)
 	{

@@ -166,7 +166,6 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
 
-#include "video/k055555.h"// still needs k055555_get_palette_index
 
 /* end common functions */
 
@@ -378,7 +377,8 @@ void k056832_device::device_start()
 		return;
 
 
-	m_k055555 = machine().device(m_k055555_tag);
+	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
+
 
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
@@ -1464,7 +1464,7 @@ printf("\nend\n");
 }
 */
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? k055555_get_palette_index(m_k055555, layer) : 0;
+	new_colorbase = (m_k055555 != NULL) ? m_k055555->k055555_get_palette_index(m_k055555, layer) : 0;
 
 	for (r = 0; r < rowspan; r++)
 	{
@@ -1769,7 +1769,7 @@ void k056832_device::tilemap_draw_dj( bitmap_rgb32 &bitmap, const rectangle &cli
 		sdat_adv = -sdat_adv;
 
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555 != NULL) ? k055555_get_palette_index(m_k055555, layer) : 0;
+	new_colorbase = (m_k055555 != NULL) ? m_k055555->k055555_get_palette_index(m_k055555, layer) : 0;
 
 	for (r = 0; r <= rowspan; r++)
 	{
@@ -2182,7 +2182,7 @@ void k056832_device::altK056832_vh_start(running_machine &machine, const char *g
 	void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 	int djmain_hack)
 {
-	m_k055555_use = 0;
+	m_k055555 = 0;
 	m_callback = callback;
 	m_djmain_hack = djmain_hack;
 
@@ -2403,7 +2403,7 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 	if (flipy) sdat_adv = -sdat_adv;
 
 	last_active = m_active_layer;
-	new_colorbase = (m_k055555_use) ? K055555_get_palette_index(layer) : 0;
+	new_colorbase = (m_k055555 != NULL) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
 	for (r=0; r<rowspan; r++)
 	{
@@ -2501,7 +2501,7 @@ void k056832_device::m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitm
 			m_active_layer = layer;
 		}
 
-		if (m_k055555_use)
+		if (m_k055555 != NULL)
 		{
 			if (last_colorbase[pageIndex] != new_colorbase)
 			{
@@ -2607,9 +2607,9 @@ int k056832_device::get_layer_association(void)
 	return(m_layer_association);
 }
 
-void k056832_device::altK056832_set_UpdateMode(int mode)
+void k056832_device::K056832_set_k055555(k055555_device * mode)
 {
-	m_k055555_use = mode;
+	m_k055555 = mode;
 }
 
 

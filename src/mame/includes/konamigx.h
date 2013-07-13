@@ -15,6 +15,7 @@ public:
 		m_workram(*this,"workram"),
 		m_psacram(*this,"psacram"),
 		m_subpaletteram32(*this,"subpaletteram"),
+		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
 		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
 		m_k053936_0_linectrl(*this,"k053936_0_line",32),
@@ -31,6 +32,7 @@ public:
 	optional_shared_ptr<UINT32> m_workram;
 	optional_shared_ptr<UINT32> m_psacram;
 	optional_shared_ptr<UINT32> m_subpaletteram32;
+	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
 	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
@@ -112,6 +114,10 @@ public:
 					tilemap_t *sub1, int sub1flags,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
+
+	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
+	void konamigx_precache_registers(void);
+
 };
 
 
@@ -191,6 +197,6 @@ extern int konamigx_current_frame;
 /*----------- defined in machine/konamigx.c -----------*/
 
 // K055550/K053990/ESC protection devices handlers
-void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
+
 
 void fantjour_dma_install(running_machine &machine);

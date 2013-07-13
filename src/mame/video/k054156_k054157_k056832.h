@@ -5,6 +5,9 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+#include "video/k055555.h"// still needs k055555_get_palette_index
+
+
 typedef void (*k056832_callback)(running_machine &machine, int layer, int *code, int *color, int *flags);
 
 
@@ -53,7 +56,7 @@ public:
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k056832_device()
 	{
-		m_k055555_use = 0;
+		m_k055555 = 0;
 	}
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
@@ -174,7 +177,7 @@ private:
 
 
 
-	device_t *m_k055555;  /* used to choose colorbase */
+	k055555_device *m_k055555;  /* used to choose colorbase */
 
 	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
 	
@@ -216,15 +219,12 @@ private:
 public:
 
 	// todo: collapse these into above
-
-	int m_k055555_use;
-
 	void altK056832_vh_start(running_machine &machine, const char *gfx_memory_region, int bpp, int big,
 				int (*scrolld)[4][2],
 				void (*callback)(running_machine &machine, int layer, int *code, int *color, int *flags),
 				int djmain_hack);
 
-	void altK056832_set_UpdateMode(int mode); // k055555 hook
+	void K056832_set_k055555(k055555_device* mode); // k055555 hook
 
 	
 	void m_tilemap_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, UINT32 flags, UINT32 priority);
