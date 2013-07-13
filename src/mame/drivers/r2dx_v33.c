@@ -4,9 +4,6 @@ Raiden 2 / DX V33 Version
 
 Temporary split from raiden2.c, it'll be re-merged at some point.
 
-Note:
-Please don't do any state machine refactoring of this.
-
 0x430-0x433
 1) appears to control where the first enemies turns, if clockwise or anticlockwise
 2) ...

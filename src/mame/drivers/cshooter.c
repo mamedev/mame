@@ -213,10 +213,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cshooter_state::cshooter_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+//	if(scanline == 240) // presumably a SW trap, not an irq
+//		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
-	if(scanline == 0) // vblank-in irq
+	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
@@ -270,7 +270,7 @@ WRITE8_MEMBER(cshooter_state::pal2_w)
 	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
-	
+
 	r = m_generic_paletteram_8[offset] & 0xf;
 	g = m_generic_paletteram_8[offset] >> 4;
 	b = m_generic_paletteram_8[offset+0x200] & 0xf;
