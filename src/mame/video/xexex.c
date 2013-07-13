@@ -91,7 +91,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	k053247_sprites_draw(m_k053246, bitmap, cliprect);
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 
 	if (m_cur_alpha)
 	{

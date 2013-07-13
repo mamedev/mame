@@ -77,7 +77,7 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 		m_cur_control2 = data;
 
 		/* bit 6 = enable sprite ROM reading */
-		k053246_set_objcha_line(m_k053246, (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line( (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -87,7 +87,7 @@ void gijoe_state::gijoe_objdma(  )
 
 	src_head = m_spriteram;
 	src_tail = m_spriteram + 255 * 8;
-	k053247_get_ram(m_k053246, &dst_head);
+	m_k053246->k053247_get_ram( &dst_head);
 	dst_tail = dst_head + 255 * 8;
 
 	for (; src_head <= src_tail; src_head += 8)
@@ -117,7 +117,7 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 	if (!m_k056832->is_irq_enabled(0))
 		return;
 
-	if (k053246_is_irq_enabled(m_k053246))
+	if (m_k053246->k053246_is_irq_enabled())
 	{
 		gijoe_objdma();
 
@@ -158,7 +158,7 @@ static void sound_nmi( device_t *device )
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteram")                               // Sprites
-	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)      // Graphic planes
 	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)      // Graphic planes mirror read
 	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)                               // Passthrough to tile roms
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ_PORT("START")
 	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
-	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 #if JOE_DEBUG
 	AM_RANGE(0x110000, 0x110007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
 	AM_RANGE(0x160000, 0x160007) AM_DEVREAD("k056832", k056832_device, b_word_r)

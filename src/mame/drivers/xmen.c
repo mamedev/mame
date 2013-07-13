@@ -58,7 +58,7 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = enable sprite ROM reading */
-		k053246_set_objcha_line(m_k053246, (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line( (data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 		/* bit 9 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
@@ -107,11 +107,11 @@ WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM     /* 6p - a buffer? */
 	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE_LEGACY("k053246", k053246_word_w) /* sprites */
+	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD_LEGACY("k053246", k053246_word_r) /* sprites */
+	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 /*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */

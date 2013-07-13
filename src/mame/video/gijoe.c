@@ -163,6 +163,6 @@ UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bit
 	m_k056832->tilemap_draw(bitmap, cliprect, layer[2], 0, 4);
 	m_k056832->tilemap_draw(bitmap, cliprect, layer[3], 0, 8);
 
-	k053247_sprites_draw(m_k053246, bitmap, cliprect);
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;
 }

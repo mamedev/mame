@@ -53,7 +53,7 @@ void xmen_sprite_callback( running_machine &machine, int *code, int *color, int 
 
 VIDEO_START_MEMBER(xmen_state,xmen6p)
 {
-	k053247_get_ram(m_k053246, &m_k053247_ram);
+	m_k053246->k053247_get_ram( &m_k053247_ram);
 
 	m_screen_left  = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
 	m_screen_right = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
@@ -99,7 +99,7 @@ UINT32 xmen_state::screen_update_xmen(screen_device &screen, bitmap_ind16 &bitma
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-	k053247_sprites_draw(m_k053246, bitmap, cliprect);
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;
 }
 
@@ -219,6 +219,6 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 
 	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
 	    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-		k053247_sprites_draw(m_k053246, *renderbitmap, cliprect);
+		m_k053246->k053247_sprites_draw( *renderbitmap, cliprect);
 	}
 }

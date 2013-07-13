@@ -128,7 +128,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 	if (alpha > 0)
 		m_k056832->tilemap_draw(bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
 
-	k053247_sprites_draw(m_k053246, bitmap, cliprect);
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 
 	m_k056832->tilemap_draw(bitmap, cliprect, 0, 0, 0);
 	return 0;

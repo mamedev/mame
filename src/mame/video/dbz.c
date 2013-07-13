@@ -87,7 +87,7 @@ void dbz_state::video_start()
 	m_k056832->set_layer_offs(1, -31, -16);
 	m_k056832->set_layer_offs(3, -31, -16); //?
 
-	k053247_set_sprite_offs(m_k053246, -87, 32);
+	m_k053246->k053247_set_sprite_offs( -87, 32);
 }
 
 UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -152,6 +152,6 @@ UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap,
 			m_k056832->tilemap_draw(bitmap, cliprect, layer[plane], flag, pri);
 	}
 
-	k053247_sprites_draw(m_k053246, bitmap, cliprect);
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 	return 0;
 }

@@ -104,7 +104,7 @@ UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitm
 
 	m_k053936->zoom_draw(bitmap, cliprect, m_936_tilemap, 0, 0, 1);
 
-	k053247_sprites_draw(m_k055673, bitmap, cliprect);
+	m_k055673->k053247_sprites_draw(bitmap, cliprect);
 
 	m_ttl_tilemap->mark_all_dirty();
 	m_ttl_tilemap->draw(bitmap, cliprect, 0, 0);

@@ -45,178 +45,152 @@ The sprite RAM format is very similar to the 053245.
 
 
 
-struct k053247_state
-{
-	UINT16    *ram;
-
-	gfx_element *gfx;
-
-	UINT8    kx46_regs[8];
-	UINT16   kx47_regs[16];
-	int      dx, dy, wraparound;
-	UINT8    objcha_line;
-	int      z_rejection;
-
-	k05324x_callback callback;
-
-	const char *memory_region;
-	screen_device *screen;
-};
 
 
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k053247_state *k053247_get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
-	if (device->type() == K055673) {
-		return (k053247_state *)downcast<k055673_device *>(device)->token();
-	} else {
-		return (k053247_state *)downcast<k053247_device *>(device)->token();
-	}
-}
-
-INLINE const k053247_interface *k053247_get_interface( device_t *device )
-{
-	assert(device != NULL);
-	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
-	return (const k053247_interface *) device->static_config();
-}
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
 
-void k053247_get_ram( device_t *device, UINT16 **ram )
+void k053247_device::clear_all()
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	*ram = k053247->ram;
+	m_ram = 0;
+	m_gfx = 0;
+
+	for (int i=0;i<8;i++)
+		m_kx46_regs[i] = 0;
+
+	for (int i=0;i<16;i++)
+		m_kx47_regs[i] = 0;
+
+	m_dx = m_dy = m_wraparound = 0;
+	m_objcha_line = 0;
+	m_z_rejection = 0;
+
+	m_callback = 0;
+
+	m_memory_region = 0;
+	m_screen = 0;
+
+	m_intf_screen = 0;
+	m_intf_gfx_memory_region = 0;
+	m_intf_gfx_num = 0;
+	m_intf_plane_order = 0;
+	m_intf_dx = m_intf_dy = 0;
+	m_intf_deinterleave = 0;
+	m_intf_callback = 0;
 }
 
-int k053247_get_dx( device_t *device )
+void k053247_device::k053247_get_ram( UINT16 **ram )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return k053247->dx;
+	*ram = m_ram;
 }
 
-int k053247_get_dy( device_t *device )
+int k053247_device::k053247_get_dx( void )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return k053247->dy;
+	return m_dx;
 }
 
-int k053246_read_register( device_t *device, int regnum )
+int k053247_device::k053247_get_dy( void )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->kx46_regs[regnum]);
+	return m_dy;
 }
 
-int k053247_read_register( device_t *device, int regnum )
+int k053247_device::k053246_read_register( int regnum )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->kx47_regs[regnum]);
+	return(m_kx46_regs[regnum]);
 }
 
-void k053247_set_sprite_offs( device_t *device, int offsx, int offsy )
+int k053247_device::k053247_read_register( int regnum )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	k053247->dx = offsx;
-	k053247->dy = offsy;
+	return(m_kx47_regs[regnum]);
 }
 
-void k053247_wraparound_enable( device_t *device, int status )
+void k053247_device::k053247_set_sprite_offs( int offsx, int offsy )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	k053247->wraparound = status;
+	m_dx = offsx;
+	m_dy = offsy;
 }
 
-WRITE16_DEVICE_HANDLER( k053247_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
+void k053247_device::k053247_wraparound_enable( int status )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	COMBINE_DATA(k053247->kx47_regs + offset);
+	m_wraparound = status;
 }
 
-WRITE32_DEVICE_HANDLER( k053247_reg_long_w )
+WRITE16_MEMBER( k053247_device::k053247_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
+	COMBINE_DATA(m_kx47_regs + offset);
+}
+
+WRITE32_MEMBER( k053247_device::k053247_reg_long_w )
+{
 	offset <<= 1;
-	COMBINE_DATA(k053247->kx47_regs + offset + 1);
+	COMBINE_DATA(m_kx47_regs + offset + 1);
 	mem_mask >>= 16;
 	data >>= 16;
-	COMBINE_DATA(k053247->kx47_regs + offset);
+	COMBINE_DATA(m_kx47_regs + offset);
 }
 
-READ16_DEVICE_HANDLER( k053247_word_r )
+READ16_MEMBER( k053247_device::k053247_word_r )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return k053247->ram[offset];
+	return m_ram[offset];
 }
 
-WRITE16_DEVICE_HANDLER( k053247_word_w )
+WRITE16_MEMBER( k053247_device::k053247_word_w )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	COMBINE_DATA(k053247->ram + offset);
+	COMBINE_DATA(m_ram + offset);
 }
 
-READ32_DEVICE_HANDLER( k053247_long_r )
+READ32_MEMBER( k053247_device::k053247_long_r )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return k053247->ram[offset * 2 + 1] | (k053247->ram[offset * 2] << 16);
+	return m_ram[offset * 2 + 1] | (m_ram[offset * 2] << 16);
 }
 
-WRITE32_DEVICE_HANDLER( k053247_long_w )
+WRITE32_MEMBER( k053247_device::k053247_long_w )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
 	offset <<= 1;
-	COMBINE_DATA(k053247->ram + offset + 1);
+	COMBINE_DATA(m_ram + offset + 1);
 	mem_mask >>= 16;
 	data >>= 16;
-	COMBINE_DATA(k053247->ram + offset);
+	COMBINE_DATA(m_ram + offset);
 }
 
-READ8_DEVICE_HANDLER( k053247_r )
+READ8_MEMBER( k053247_device::k053247_r )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
 	int offs = offset >> 1;
 
 	if (offset & 1)
-		return(k053247->ram[offs] & 0xff);
+		return(m_ram[offs] & 0xff);
 	else
-		return(k053247->ram[offs] >> 8);
+		return(m_ram[offs] >> 8);
 }
 
-WRITE8_DEVICE_HANDLER( k053247_w )
+WRITE8_MEMBER( k053247_device::k053247_w )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
 	int offs = offset >> 1;
 
 	if (offset & 1)
-		k053247->ram[offs] = (k053247->ram[offs] & 0xff00) | data;
+		m_ram[offs] = (m_ram[offs] & 0xff00) | data;
 	else
-		k053247->ram[offs] = (k053247->ram[offs] & 0x00ff) | (data << 8);
+		m_ram[offs] = (m_ram[offs] & 0x00ff) | (data << 8);
 }
 
 // Mystic Warriors hardware games support a non-objcha based ROM readback
 // write the address to the 246 as usual, but there's a completely separate ROM
 // window that works without needing an objcha line.
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-READ16_DEVICE_HANDLER( k055673_rom_word_r ) // 5bpp
+READ16_MEMBER( k053247_device::k055673_rom_word_r ) // 5bpp
 {
-	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(k053246->memory_region)->base();
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(k053246->memory_region)->base();
-	int size4 = (space.machine().root_device().memregion(k053246->memory_region)->bytes() / (1024 * 1024)) / 5;
+	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(m_memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
+	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
 	ROM8 += size4;
 
-	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
+	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
 
 	switch (offset)
 	{
@@ -244,13 +218,12 @@ READ16_DEVICE_HANDLER( k055673_rom_word_r ) // 5bpp
 	return 0;
 }
 
-READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
+READ16_MEMBER( k053247_device::k055673_GX6bpp_rom_word_r )
 {
-	k053247_state *k053246 = k053247_get_safe_token(device);
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(k053246->memory_region)->base();
+	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 
-	romofs = k053246->kx46_regs[6] << 16 | k053246->kx46_regs[7] << 8 | k053246->kx46_regs[4];
+	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
 
 	romofs /= 4;    // romofs increments 4 at a time
 	romofs *= 12 / 2;   // each increment of romofs = 12 new bytes (6 new words)
@@ -279,18 +252,17 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 	return 0;
 }
 
-READ8_DEVICE_HANDLER( k053246_r )
+READ8_MEMBER( k053247_device::k053246_r )
 {
-	k053247_state *k053246 = k053247_get_safe_token(device);
-	if (k053246->objcha_line == ASSERT_LINE)
+	if (m_objcha_line == ASSERT_LINE)
 	{
 		int addr;
 
-		addr = (k053246->kx46_regs[6] << 17) | (k053246->kx46_regs[7] << 9) | (k053246->kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= space.machine().root_device().memregion(k053246->memory_region)->bytes() - 1;
+		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
+		addr &= space.machine().root_device().memregion(m_memory_region)->bytes() - 1;
 //      if (VERBOSE)
 //          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
-		return space.machine().root_device().memregion(k053246->memory_region)->base()[addr];
+		return space.machine().root_device().memregion(m_memory_region)->base()[addr];
 	}
 	else
 	{
@@ -299,50 +271,47 @@ READ8_DEVICE_HANDLER( k053246_r )
 	}
 }
 
-WRITE8_DEVICE_HANDLER( k053246_w )
+WRITE8_MEMBER( k053247_device::k053246_w )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	k053247->kx46_regs[offset] = data;
+	m_kx46_regs[offset] = data;
 }
 
-READ16_DEVICE_HANDLER( k053246_word_r )
+READ16_MEMBER( k053247_device::k053246_word_r )
 {
 	offset <<= 1;
-	return k053246_r(device, space, offset + 1) | (k053246_r(device, space, offset) << 8);
+	return k053246_r( space, offset + 1) | (k053246_r( space, offset) << 8);
 }
 
-WRITE16_DEVICE_HANDLER( k053246_word_w )
+WRITE16_MEMBER( k053247_device::k053246_word_w )
 {
 	if (ACCESSING_BITS_8_15)
-		k053246_w(device, space, offset << 1,(data >> 8) & 0xff);
+		k053246_w( space, offset << 1,(data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		k053246_w(device, space, (offset << 1) + 1,data & 0xff);
+		k053246_w( space, (offset << 1) + 1,data & 0xff);
 }
 
-READ32_DEVICE_HANDLER( k053246_long_r )
+READ32_MEMBER( k053247_device::k053246_long_r )
 {
 	offset <<= 1;
-	return (k053246_word_r(device, space, offset + 1, 0xffff) | k053246_word_r(device, space, offset, 0xffff) << 16);
+	return (k053246_word_r( space, offset + 1, 0xffff) | k053246_word_r( space, offset, 0xffff) << 16);
 }
 
-WRITE32_DEVICE_HANDLER( k053246_long_w )
+WRITE32_MEMBER( k053247_device::k053246_long_w )
 {
 	offset <<= 1;
-	k053246_word_w(device, space, offset, data >> 16, mem_mask >> 16);
-	k053246_word_w(device, space, offset + 1, data, mem_mask);
+	k053246_word_w( space, offset, data >> 16, mem_mask >> 16);
+	k053246_word_w( space, offset + 1, data, mem_mask);
 }
 
-void k053246_set_objcha_line( device_t *device, int state )
+void k053247_device::k053246_set_objcha_line( int state )
 {
-	k053247_state *k053246 = k053247_get_safe_token(device);
-	k053246->objcha_line = state;
+	m_objcha_line = state;
 }
 
-int k053246_is_irq_enabled( device_t *device )
+int k053247_device::k053246_is_irq_enabled( void )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
 	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
-	return k053247->kx46_regs[5] & 0x10;
+	return m_kx46_regs[5] & 0x10;
 }
 
 /*
@@ -375,11 +344,9 @@ int k053246_is_irq_enabled( device_t *device )
  */
 
 template<class _BitmapClass>
-void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const rectangle &cliprect )
+void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect )
 {
 #define NUM_SPRITES 256
-	k053247_state *k053246 = k053247_get_safe_token(device);
-	running_machine &machine = device->machine();
 
 	/* sprites can be grouped up to 8x8. The draw order is
 	     0  1  4  5 16 17 20 21
@@ -399,12 +366,12 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	int ox, oy, color, code, size, w, h, x, y, xa, ya, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, primask;
 	int shdmask, nozoom, count, temp;
 
-	int flipscreenx = k053246->kx46_regs[5] & 0x01;
-	int flipscreeny = k053246->kx46_regs[5] & 0x02;
-	int offx = (short)((k053246->kx46_regs[0] << 8) | k053246->kx46_regs[1]);
-	int offy = (short)((k053246->kx46_regs[2] << 8) | k053246->kx46_regs[3]);
+	int flipscreenx = m_kx46_regs[5] & 0x01;
+	int flipscreeny = m_kx46_regs[5] & 0x02;
+	int offx = (short)((m_kx46_regs[0] << 8) | m_kx46_regs[1]);
+	int offy = (short)((m_kx46_regs[2] << 8) | m_kx46_regs[3]);
 
-	int screen_width = k053246->screen->width();
+	int screen_width = m_screen->width();
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
@@ -419,9 +386,9 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
-	if (machine.config().m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine().config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (machine.config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (machine().config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -455,19 +422,19 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	*/
 
 	// Prebuild a sorted table by descending Z-order.
-	zcode = k053246->z_rejection;
+	zcode = m_z_rejection;
 	offs = count = 0;
 
 	if (zcode == -1)
 	{
 		for (; offs < 0x800; offs += 8)
-			if (k053246->ram[offs] & 0x8000)
+			if (m_ram[offs] & 0x8000)
 				sortedlist[count++] = offs;
 	}
 	else
 	{
 		for (; offs < 0x800; offs += 8)
-			if ((k053246->ram[offs] & 0x8000) && ((k053246->ram[offs] & 0xff) != zcode))
+			if ((m_ram[offs] & 0x8000) && ((m_ram[offs] & 0xff) != zcode))
 				sortedlist[count++] = offs;
 	}
 
@@ -475,17 +442,17 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	count--;
 	h = count;
 
-	if (!(k053246->kx47_regs[0xc / 2] & 0x10))
+	if (!(m_kx47_regs[0xc / 2] & 0x10))
 	{
 		// sort objects in decending order(smaller z closer) when OPSET PRI is clear
 		for (y = 0; y < h; y++)
 		{
 			offs = sortedlist[y];
-			zcode = k053246->ram[offs] & 0xff;
+			zcode = m_ram[offs] & 0xff;
 			for (x = y + 1; x < w; x++)
 			{
 				temp = sortedlist[x];
-				code = k053246->ram[temp] & 0xff;
+				code = m_ram[temp] & 0xff;
 				if (zcode <= code)
 				{
 					zcode = code;
@@ -501,11 +468,11 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		for (y = 0; y < h; y++)
 		{
 			offs = sortedlist[y];
-			zcode = k053246->ram[offs] & 0xff;
+			zcode = m_ram[offs] & 0xff;
 			for (x = y + 1; x < w; x++)
 			{
 				temp = sortedlist[x];
-				code = k053246->ram[temp] & 0xff;
+				code = m_ram[temp] & 0xff;
 				if (zcode >= code)
 				{
 					zcode = code;
@@ -520,13 +487,13 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 	{
 		offs = sortedlist[count];
 
-		code = k053246->ram[offs + 1];
-		shadow = color = k053246->ram[offs + 6];
+		code = m_ram[offs + 1];
+		shadow = color = m_ram[offs + 6];
 		primask = 0;
 
-		k053246->callback(device->machine(), &code, &color, &primask);
+		m_callback(machine(), &code, &color, &primask);
 
-		temp = k053246->ram[offs];
+		temp = m_ram[offs];
 
 		size = (temp & 0x0f00) >> 8;
 		w = 1 << (size & 0x03);
@@ -544,10 +511,10 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		if (code & 0x20) ya += 4;
 		code &= ~0x3f;
 
-		oy = (short)k053246->ram[offs + 2];
-		ox = (short)k053246->ram[offs + 3];
+		oy = (short)m_ram[offs + 2];
+		ox = (short)m_ram[offs + 3];
 
-		if (k053246->wraparound)
+		if (m_wraparound)
 		{
 			offx &= 0x3ff;
 			offy &= 0x3ff;
@@ -560,7 +527,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		  <0x40 enlarge (0x20 = double size)
 		  >0x40 reduce (0x80 = half size)
 		*/
-		y = zoomy = k053246->ram[offs + 4] & 0x3ff;
+		y = zoomy = m_ram[offs + 4] & 0x3ff;
 		if (zoomy)
 			zoomy = (0x400000 + (zoomy >> 1)) / zoomy;
 		else
@@ -568,7 +535,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 
 		if (!(temp & 0x4000))
 		{
-			x = zoomx = k053246->ram[offs + 5] & 0x3ff;
+			x = zoomx = m_ram[offs + 5] & 0x3ff;
 			if (zoomx)
 				zoomx = (0x400000 + (zoomx >> 1)) / zoomx;
 			else
@@ -589,7 +556,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 //    Below 7 lines supports this 053246's(???) function.
 //    Don't rely on it, Please.  But, Escape Kids works correctly!
 // ************************************************************************************
-		if ( k053246->kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
+		if ( m_kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
 		{
 			zoomx >>= 1;        // Fix sprite width to HALF size
 			ox = (ox >> 1) + 1; // Fix sprite draw position
@@ -615,14 +582,14 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 			color = 0;
 			shadow = -1;
 			whichtable = shadowmode_table;
-			palette_set_shadow_mode(machine, 0);
+			palette_set_shadow_mode(machine(), 0);
 		}
 		else
 		{
 			if (shdmask >= 0)
 			{
 				shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
-				if (shadow &= 3) palette_set_shadow_mode(machine, (shadow - 1) & shdmask);
+				if (shadow &= 3) palette_set_shadow_mode(machine(), (shadow - 1) & shdmask);
 			}
 			else
 				shadow = 0;
@@ -642,7 +609,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		}
 
 		// apply wrapping and global offsets
-		if (k053246->wraparound)
+		if (m_wraparound)
 		{
 			ox = ( ox - offx) & 0x3ff;
 			oy = (-oy - offy) & 0x3ff;
@@ -654,8 +621,8 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 			ox =  ox - offx;
 			oy = -oy - offy;
 		}
-		ox += k053246->dx;
-		oy -= k053246->dy;
+		ox += m_dx;
+		oy -= m_dy;
 
 		// apply global and display window offsets
 
@@ -663,7 +630,7 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
-		drawmode_table[k053246->gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0; y < h; y++)
 		{
@@ -722,48 +689,48 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 
 				if (nozoom)
 				{
-					pdrawgfx_transtable(bitmap,cliprect,k053246->gfx,
+					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							machine.priority_bitmap,primask,
-							whichtable,machine.shadow_table);
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
 				}
 				else
 				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,k053246->gfx,
+					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) >> 4,(zh << 16) >> 4,
-							machine.priority_bitmap,primask,
-							whichtable,machine.shadow_table);
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
 				}
 
 				if (mirrory && h == 1)  /* Simpsons shadows */
 				{
 					if (nozoom)
 					{
-						pdrawgfx_transtable(bitmap,cliprect,k053246->gfx,
+						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
 								c,
 								color,
 								fx,!fy,
 								sx,sy,
-								machine.priority_bitmap,primask,
-								whichtable,machine.shadow_table);
+								machine().priority_bitmap,primask,
+								whichtable,machine().shadow_table);
 					}
 					else
 					{
-						pdrawgfxzoom_transtable(bitmap,cliprect,k053246->gfx,
+						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
 								c,
 								color,
 								fx,!fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
-								machine.priority_bitmap,primask,
-								whichtable,machine.shadow_table);
+								machine().priority_bitmap,primask,
+								whichtable,machine().shadow_table);
 					}
 				}
 			} // end of X loop
@@ -773,104 +740,35 @@ void k053247_sprites_draw_common( device_t *device, _BitmapClass &bitmap, const 
 #undef NUM_SPRITES
 }
 
-void k053247_sprites_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common(device, bitmap, cliprect); }
+void k053247_device::k053247_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{ k053247_sprites_draw_common( bitmap, cliprect); }
 
-void k053247_sprites_draw( device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{ k053247_sprites_draw_common(device, bitmap, cliprect); }
+void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{ k053247_sprites_draw_common( bitmap, cliprect); }
 
 
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
-static DEVICE_START( k053247 )
+
+
+
+const device_type K055673 = &device_creator<k055673_device>;
+
+k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: k053247_device(mconfig, K055673, "Konami 055673", tag, owner, clock, "k055673", __FILE__)
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	const k053247_interface *intf = k053247_get_interface(device);
-	running_machine &machine = device->machine();
-	UINT32 total;
-	static const gfx_layout spritelayout =
-	{
-		16,16,
-		0,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		128*8
-	};
-	static const gfx_layout tasman_16x16_layout =
-	{
-		16,16,
-		RGN_FRAC(1,2),
-		8,
-		{ 0,8,16,24, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24 },
-		{ 0,1,2,3,4,5,6,7, 32,33,34,35,36,37,38,39 },
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		16*64
-	};
 
-	k053247->screen = machine.device<screen_device>(intf->screen);
-
-	/* decode the graphics */
-	switch (intf->plane_order)
-	{
-	case NORMAL_PLANE_ORDER:
-		total = machine.root_device().memregion(intf->gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine, intf->gfx_num, machine.root_device().memregion(intf->gfx_memory_region)->base(), total, &spritelayout, 4);
-		break;
-
-	case TASMAN_PLANE_ORDER:
-		total = machine.root_device().memregion(intf->gfx_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine, intf->gfx_num, machine.root_device().memregion(intf->gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
-		break;
-
-	default:
-		fatalerror("Unsupported plane_order\n");
-	}
-
-	if (VERBOSE)
-	{
-		if (k053247->screen->format() == BITMAP_FORMAT_RGB32)
-		{
-			if ((machine.config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
-				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
-		}
-		else
-		{
-			if (!(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
-				popmessage("driver should use VIDEO_HAS_SHADOWS");
-		}
-	}
-
-	/* deinterleave the graphics, if needed */
-	konami_deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
-
-	k053247->dx = intf->dx;
-	k053247->dy = intf->dy;
-	k053247->memory_region = intf->gfx_memory_region;
-	k053247->gfx = machine.gfx[intf->gfx_num];
-	k053247->callback = intf->callback;
-
-	k053247->ram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
-
-	device->save_pointer(NAME(k053247->ram), 0x1000 / 2);
-	device->save_item(NAME(k053247->kx46_regs));
-	device->save_item(NAME(k053247->kx47_regs));
-	device->save_item(NAME(k053247->objcha_line));
-	device->save_item(NAME(k053247->wraparound));
-	device->save_item(NAME(k053247->z_rejection));
 }
 
-/* K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
-static DEVICE_START( k055673 )
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k055673_device::device_start()
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	const k053247_interface *intf = k053247_get_interface(device);
-	running_machine &machine = device->machine();
 	UINT32 total;
 	UINT8 *s1, *s2, *d;
 	long i;
@@ -921,21 +819,21 @@ static DEVICE_START( k055673 )
 		16*16*6
 	};
 
-	k053247->screen = machine.device<screen_device>(intf->screen);
+	m_screen = machine().device<screen_device>(m_intf_screen);
 
-	K055673_rom = (UINT16 *)machine.root_device().memregion(intf->gfx_memory_region)->base();
+	K055673_rom = (UINT16 *)machine().root_device().memregion(m_intf_gfx_memory_region)->base();
 
 	/* decode the graphics */
-	switch (intf->plane_order)  /* layout would be more correct than plane_order, but we use k053247_interface */
+	switch (m_intf_plane_order)  /* layout would be more correct than plane_order, but we use k053247_interface */
 	{
 	case K055673_LAYOUT_GX:
-		size4 = (machine.root_device().memregion(intf->gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
+		size4 = (machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
 		size4 *= 4 * 1024 * 1024;
 		/* set the # of tiles based on the 4bpp section */
-		K055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
+		K055673_rom = auto_alloc_array(machine(), UINT16, size4 * 5 / 2);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
-		s1 = machine.root_device().memregion(intf->gfx_memory_region)->base(); // 4bpp area
+		s1 = machine().root_device().memregion(m_intf_gfx_memory_region)->base(); // 4bpp area
 		s2 = s1 + (size4);   // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
@@ -947,103 +845,68 @@ static DEVICE_START( k055673 )
 		}
 
 		total = size4 / 128;
-		konami_decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout, 4);
 		break;
 
 	case K055673_LAYOUT_RNG:
-		total = machine.root_device().memregion(intf->gfx_memory_region)->bytes() / (16 * 16 / 2);
-		konami_decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
+		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 / 2);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
-		total = machine.root_device().memregion(intf->gfx_memory_region)->bytes() / (16 * 16);
-		konami_decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
+		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
-		total = machine.root_device().memregion(intf->gfx_memory_region)->bytes() / (16 * 16 * 6 / 8);
-		konami_decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
+		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 * 6 / 8);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
 
 	default:
 		fatalerror("Unsupported layout\n");
 	}
 
-	if (VERBOSE && !(machine.config().m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
-	k053247->dx = intf->dx;
-	k053247->dy = intf->dy;
-	k053247->memory_region = intf->gfx_memory_region;
-	k053247->gfx = machine.gfx[intf->gfx_num];
-	k053247->callback = intf->callback;
+	m_dx = m_intf_dx;
+	m_dy = m_intf_dy;
+	m_memory_region = m_intf_gfx_memory_region;
+	m_gfx = machine().gfx[m_intf_gfx_num];
+	m_callback = m_intf_callback;
 
-	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000 / 2);
+	m_ram = auto_alloc_array(machine(), UINT16, 0x1000 / 2);
 
-	device->save_pointer(NAME(k053247->ram), 0x800);
-	device->save_item(NAME(k053247->kx46_regs));
-	device->save_item(NAME(k053247->kx47_regs));
-	device->save_item(NAME(k053247->objcha_line));
-	device->save_item(NAME(k053247->wraparound));
-	device->save_item(NAME(k053247->z_rejection));
-}
+	save_pointer(NAME(m_ram), 0x800);
+	save_item(NAME(m_kx46_regs));
+	save_item(NAME(m_kx47_regs));
+	save_item(NAME(m_objcha_line));
+	save_item(NAME(m_wraparound));
+	save_item(NAME(m_z_rejection));
 
-static DEVICE_RESET( k053247 )
-{
-	k053247_state *k053247 = k053247_get_safe_token(device);
-
-	k053247->wraparound = 1;
-	k053247->z_rejection = -1;
-	k053247->objcha_line = CLEAR_LINE;
-
-	memset(k053247->kx46_regs, 0, 8);
-	memset(k053247->kx47_regs, 0, 32);
-}
-
-
-const device_type K055673 = &device_creator<k055673_device>;
-
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K055673, "Konami 055673", tag, owner, clock, "k055673", __FILE__)
-{
-	m_token = global_alloc_clear(k053247_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k055673_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k055673_device::device_start()
-{
-	DEVICE_START_NAME( k055673 )(this);
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void k055673_device::device_reset()
-{
-	DEVICE_RESET_NAME( k053247 )(this);
-}
+
 
 const device_type K053246 = &device_creator<k053247_device>;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053246, "Konami 053246 & 053247", tag, owner, clock, "k053247", __FILE__)
 {
-	m_token = global_alloc_clear(k053247_state);
+	clear_all();
 }
+
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+	clear_all();
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -1053,6 +916,16 @@ k053247_device::k053247_device(const machine_config &mconfig, const char *tag, d
 
 void k053247_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const k053247_interface *intf = reinterpret_cast<const k053247_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<k053247_interface *>(this) = *intf;
+	
+	// or initialize to defaults if none provided
+	else
+	{
+	}
+
 }
 
 //-------------------------------------------------
@@ -1061,7 +934,80 @@ void k053247_device::device_config_complete()
 
 void k053247_device::device_start()
 {
-	DEVICE_START_NAME( k053247 )(this);
+	UINT32 total;
+	static const gfx_layout spritelayout =
+	{
+		16,16,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		128*8
+	};
+	static const gfx_layout tasman_16x16_layout =
+	{
+		16,16,
+		RGN_FRAC(1,2),
+		8,
+		{ 0,8,16,24, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24 },
+		{ 0,1,2,3,4,5,6,7, 32,33,34,35,36,37,38,39 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		16*64
+	};
+
+	m_screen = machine().device<screen_device>(m_intf_screen);
+
+	/* decode the graphics */
+	switch (m_intf_plane_order)
+	{
+	case NORMAL_PLANE_ORDER:
+		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
+		konami_decode_gfx(machine(), m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &spritelayout, 4);
+		break;
+
+	case TASMAN_PLANE_ORDER:
+		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / 128;
+		konami_decode_gfx(machine(), m_intf_gfx_num, machine().root_device().memregion(m_intf_gfx_memory_region)->base(), total, &tasman_16x16_layout, 4);
+		break;
+
+	default:
+		fatalerror("Unsupported plane_order\n");
+	}
+
+	if (VERBOSE)
+	{
+		if (m_screen->format() == BITMAP_FORMAT_RGB32)
+		{
+			if ((machine().config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
+		}
+		else
+		{
+			if (!(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
+				popmessage("driver should use VIDEO_HAS_SHADOWS");
+		}
+	}
+
+	/* deinterleave the graphics, if needed */
+	konami_deinterleave_gfx(machine(), m_intf_gfx_memory_region, m_intf_deinterleave);
+
+	m_dx = m_intf_dx;
+	m_dy = m_intf_dy;
+	m_memory_region = m_intf_gfx_memory_region;
+	m_gfx = machine().gfx[m_intf_gfx_num];
+	m_callback = m_intf_callback;
+
+	m_ram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
+
+	save_pointer(NAME(m_ram), 0x1000 / 2);
+	save_item(NAME(m_kx46_regs));
+	save_item(NAME(m_kx47_regs));
+	save_item(NAME(m_objcha_line));
+	save_item(NAME(m_wraparound));
+	save_item(NAME(m_z_rejection));
 }
 
 //-------------------------------------------------
@@ -1070,7 +1016,12 @@ void k053247_device::device_start()
 
 void k053247_device::device_reset()
 {
-	DEVICE_RESET_NAME( k053247 )(this);
+	m_wraparound = 1;
+	m_z_rejection = -1;
+	m_objcha_line = CLEAR_LINE;
+
+	memset(m_kx46_regs, 0, 8);
+	memset(m_kx47_regs, 0, 32);
 }
 
 
@@ -1091,29 +1042,26 @@ void k053247_device::device_reset()
         0x00-0xff = zcode to ignore
 */
 
-void k053247_set_z_rejection( device_t *device, int zcode )
+void k053247_device::k053247_set_z_rejection( int zcode )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	k053247->z_rejection = zcode;
+	m_z_rejection = zcode;
 }
 
 
-READ16_DEVICE_HANDLER( k053246_reg_word_r )
+READ16_MEMBER( k053247_device::k053246_reg_word_r )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->kx46_regs[offset * 2] << 8 | k053247->kx46_regs[offset * 2 + 1]);
+	return(m_kx46_regs[offset * 2] << 8 | m_kx46_regs[offset * 2 + 1]);
 }   // OBJSET1
 
-READ16_DEVICE_HANDLER( k053247_reg_word_r )
+READ16_MEMBER( k053247_device::k053247_reg_word_r )
 {
-	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->kx47_regs[offset]);
+	return(m_kx47_regs[offset]);
 }   // OBJSET2
 
-READ32_DEVICE_HANDLER( k053247_reg_long_r )
+READ32_MEMBER( k053247_device::k053247_reg_long_r )
 {
 	offset <<= 1;
-	return (k053247_reg_word_r(device, space, offset + 1, 0xffff) | k053247_reg_word_r(device, space, offset, 0xffff) << 16);
+	return (k053247_reg_word_r( space, offset + 1, 0xffff) | k053247_reg_word_r( space, offset, 0xffff) << 16);
 }
 
 /* Old non-device code */

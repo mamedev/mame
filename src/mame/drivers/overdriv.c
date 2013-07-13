@@ -86,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
-	if (k053246_is_irq_enabled(m_k053246))
+	if (m_k053246->k053246_is_irq_enabled())
 		device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -120,7 +120,7 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		k053246_set_objcha_line(m_k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line( (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -187,10 +187,10 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE_LEGACY("k053250_1", k053250_ram_r, k053250_ram_w)
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w) /* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD("k053250_1", k053250_device, rom_r)

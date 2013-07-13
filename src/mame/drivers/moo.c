@@ -83,9 +83,9 @@ WRITE16_MEMBER(moo_state::control2_w)
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	if (data & 0x100)
-		k053246_set_objcha_line(m_k053246, ASSERT_LINE);
+		m_k053246->k053246_set_objcha_line( ASSERT_LINE);
 	else
-		k053246_set_objcha_line(m_k053246, CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line( CLEAR_LINE);
 }
 
 
@@ -93,9 +93,9 @@ void moo_state::moo_objdma()
 {
 	int num_inactive;
 	UINT16 *src, *dst;
-	int counter = k053247_get_dy(m_k053246);
+	int counter = m_k053246->k053247_get_dy();
 
-	k053247_get_ram(m_k053246, &dst);
+	m_k053246->k053247_get_ram( &dst);
 	src = m_spriteram;
 	num_inactive = counter = 256;
 
@@ -130,7 +130,7 @@ TIMER_CALLBACK_MEMBER(moo_state::dmaend_callback)
 
 INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
 {
-	if (k053246_is_irq_enabled(m_k053246))
+	if (m_k053246->k053246_is_irq_enabled())
 	{
 		moo_objdma();
 
@@ -255,9 +255,9 @@ WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)      /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
@@ -292,9 +292,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP                     /* heck if I know, but it's polled constantly */
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)       /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY                   /* CCU regs (ignored) */
@@ -321,8 +321,8 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_SHARE("spriteram")   /* Sprite RAM */
 	AM_RANGE(0x0a0000, 0x0affff) AM_RAM                         /* extra sprite RAM? */
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)      /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)

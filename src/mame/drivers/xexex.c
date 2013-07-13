@@ -123,8 +123,8 @@ void xexex_state::xexex_objdma( int limiter )
 	if (limiter && counter == m_frame)
 		return; // make sure we only do DMA transfer once per frame
 
-	k053247_get_ram(m_k053246, &dst);
-	counter = k053247_get_dy(m_k053246);
+	m_k053246->k053247_get_ram( &dst);
+	counter = m_k053246->k053247_get_dy();
 	src = m_spriteram;
 	num_inactive = counter = 256;
 
@@ -179,7 +179,7 @@ void xexex_state::parse_control2(  )
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
-	k053246_set_objcha_line(m_k053246, (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	m_k053246->k053246_set_objcha_line( (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
 	m_cur_alpha = !(m_cur_control2 & 0x200);
@@ -283,7 +283,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
 	if(scanline == 128)
 	{
-		if (k053246_is_irq_enabled(m_k053246))
+		if (m_k053246->k053246_is_irq_enabled())
 		{
 			// OBJDMA starts at the beginning of V-blank
 			xexex_objdma(0);
@@ -311,8 +311,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")           // K053247 sprite RAM
 	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)   // K053247 sprite RAM mirror read
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)              // VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)              // OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)               // Passthrough to sprite roms
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)              // OBJSET1
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)               // Passthrough to sprite roms
 	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_device, ram_r, ram_w)    // K053250 "road" RAM
 	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)              // CLTC

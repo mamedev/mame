@@ -65,7 +65,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
 	if(scanline == 256) // vblank-out irq
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 
-	if(scanline == 0 && k053246_is_irq_enabled(m_k053246)) // vblank-in irq
+	if(scanline == 0 && m_k053246->k053246_is_irq_enabled()) // vblank-in irq
 		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE); //auto-acks apparently
 }
 
@@ -83,9 +83,9 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 	COMBINE_DATA(&m_control);
 
 	if (data & 0x400)
-		k053246_set_objcha_line(m_k053246, ASSERT_LINE);
+		m_k053246->k053246_set_objcha_line( ASSERT_LINE);
 	else
-		k053246_set_objcha_line(m_k053246, CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line( CLEAR_LINE);
 
 	coin_counter_w(machine(), 0, data & 1);
 	coin_counter_w(machine(), 1, data & 2);
@@ -108,12 +108,12 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // '157 RAM is mirrored twice
 	AM_RANGE(0x492000, 0x493fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD("k056832", k056832_device, rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
-	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
+	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
 	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") // palette
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
-	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
+	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
+	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x4c8000, 0x4c8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)
 	AM_RANGE(0x4cc000, 0x4cc03f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x4d0000, 0x4d001f) AM_DEVWRITE("k053936_1", k053936_device, ctrl_w)
