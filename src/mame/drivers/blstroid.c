@@ -66,7 +66,7 @@ READ16_MEMBER(blstroid_state::inputs_r)
 	static const char *const iptnames[] = { "IN0", "IN1" };
 	int temp = ioport(iptnames[offset & 1])->read();
 
-	if (m_cpu_to_sound_ready) temp ^= 0x0040;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0040;
 	if (get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
@@ -88,10 +88,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_SHARE("priorityram")
-	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_WRITE8(sound_w, 0x00ff)
-	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
-	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL0")
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
 	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)

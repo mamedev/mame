@@ -84,6 +84,300 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
     OVERALL INIT
 ***************************************************************************/
 
+// device type definition
+const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
+
+//-------------------------------------------------
+//  atari_sound_comm_device - constructor
+//-------------------------------------------------
+
+atari_sound_comm_device::atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ATARI_SOUND_COMM, "Atari Sound Communications", tag, owner, clock, "atarscom", __FILE__),
+		m_sound_cpu_tag(NULL),
+		m_main_int_cb(*this),
+		m_sound_cpu(NULL),
+		m_main_to_sound_ready(false),
+		m_sound_to_main_ready(false),
+		m_main_to_sound_data(0),
+		m_sound_to_main_data(0),
+		m_timed_int(0),
+		m_ym2151_int(0)
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_sound_cpu: Set the tag of the
+//	sound CPU
+//-------------------------------------------------
+
+void atari_sound_comm_device::static_set_sound_cpu(device_t &device, const char *cputag)
+{
+	downcast<atari_sound_comm_device &>(device).m_sound_cpu_tag = cputag;
+}
+
+
+//-------------------------------------------------
+//  device_start: Start up the device
+//-------------------------------------------------
+
+void atari_sound_comm_device::device_start()
+{
+	// find the sound CPU
+	if (m_sound_cpu_tag == NULL)
+		throw emu_fatalerror("No sound CPU specified!");
+	m_sound_cpu = siblingdevice<m6502_device>(m_sound_cpu_tag);
+	if (m_sound_cpu == NULL)
+		throw emu_fatalerror("Sound CPU '%s' not found!", m_sound_cpu_tag);
+
+	// resolve callbacks
+	m_main_int_cb.resolve_safe();
+
+	// register for save states
+	save_item(NAME(m_main_to_sound_ready));
+	save_item(NAME(m_sound_to_main_ready));
+	save_item(NAME(m_main_to_sound_data));
+	save_item(NAME(m_sound_to_main_data));
+	save_item(NAME(m_timed_int));
+	save_item(NAME(m_ym2151_int));
+}
+
+
+//-------------------------------------------------
+//  device_reset: Handle a device reset by 
+//	clearing the interrupt lines and states
+//-------------------------------------------------
+
+void atari_sound_comm_device::device_reset()
+{
+	// reset the internal interrupts states
+	m_timed_int = m_ym2151_int = 0;
+
+	// reset the sound I/O states
+	m_main_to_sound_data = m_sound_to_main_data = 0;
+	m_main_to_sound_ready = m_sound_to_main_ready = false;
+}
+
+
+//-------------------------------------------------
+//  device_timer: Handle device-specific timer
+//	calbacks
+//-------------------------------------------------
+
+void atari_sound_comm_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TID_SOUND_RESET:
+			delayed_sound_reset(param);
+			break;
+
+		case TID_SOUND_WRITE:
+			delayed_sound_write(param);
+			break;
+
+		case TID_6502_WRITE:
+			delayed_6502_write(param);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  sound_irq_gen: Generates an IRQ signal to the
+//  6502 sound processor.
+//-------------------------------------------------
+
+INTERRUPT_GEN_MEMBER(atari_sound_comm_device::sound_irq_gen)
+{
+	m_timed_int = 1;
+	update_sound_irq();
+}
+
+
+//-------------------------------------------------
+//  sound_irq_ack_r: Resets the IRQ signal to the 
+//  6502 sound processor. Both reads and writes 
+//  can be used.
+//-------------------------------------------------
+
+READ8_MEMBER(atari_sound_comm_device::sound_irq_ack_r)
+{
+	m_timed_int = 0;
+	update_sound_irq();
+	return 0;
+}
+
+WRITE8_MEMBER(atari_sound_comm_device::sound_irq_ack_w)
+{
+	m_timed_int = 0;
+	update_sound_irq();
+}
+
+
+//-------------------------------------------------
+//  atarigen_ym2151_irq_gen: Sets the state of the 
+//  YM2151's IRQ line.
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(atari_sound_comm_device::ym2151_irq_gen)
+{
+	m_ym2151_int = state;
+	update_sound_irq();
+}
+
+
+//-------------------------------------------------
+//  sound_reset_w: Write handler which resets the
+//  sound CPU in response.
+//-------------------------------------------------
+
+WRITE16_MEMBER(atari_sound_comm_device::sound_reset_w)
+{
+	synchronize(TID_SOUND_RESET);
+}
+
+
+//-------------------------------------------------
+//  main_command_w: Handles communication from the main CPU
+//  to the sound CPU. Two versions are provided, one with the
+//  data byte in the low 8 bits, and one with the data byte in
+//  the upper 8 bits.
+//-------------------------------------------------
+
+WRITE8_MEMBER(atari_sound_comm_device::main_command_w)
+{
+	synchronize(TID_SOUND_WRITE, data);
+}
+
+
+//-------------------------------------------------
+//  main_response_r: Handles reading data communicated from the
+//  sound CPU to the main CPU. Two versions are provided, one
+//  with the data byte in the low 8 bits, and one with the data
+//  byte in the upper 8 bits.
+//-------------------------------------------------
+
+READ8_MEMBER(atari_sound_comm_device::main_response_r)
+{
+	m_sound_to_main_ready = false;
+	m_main_int_cb(CLEAR_LINE);
+	return m_sound_to_main_data;
+}
+
+
+//-------------------------------------------------
+//  sound_response_w: Handles communication from the
+//  sound CPU to the main CPU.
+//-------------------------------------------------
+
+WRITE8_MEMBER(atari_sound_comm_device::sound_response_w)
+{
+	synchronize(TID_6502_WRITE, data);
+}
+
+
+//-------------------------------------------------
+//  sound_command_r: Handles reading data
+//  communicated from the main CPU to the sound
+//  CPU.
+//-------------------------------------------------
+
+READ8_MEMBER(atari_sound_comm_device::sound_command_r)
+{
+	m_main_to_sound_ready = false;
+	m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return m_main_to_sound_data;
+}
+
+
+//-------------------------------------------------
+//  update_sound_irq: Called whenever the IRQ state 
+//  changes. An interrupt is generated if either 
+//	sound_irq_gen() was called, or if the YM2151 
+//  generated an interrupt via the 
+//  ym2151_irq_gen() callback.
+//-------------------------------------------------
+
+void atari_sound_comm_device::update_sound_irq()
+{
+	if (m_timed_int || m_ym2151_int)
+		m_sound_cpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	else
+		m_sound_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  delayed_sound_reset: Synchronizes the sound 
+//	reset command between the two CPUs.
+//-------------------------------------------------
+
+void atari_sound_comm_device::delayed_sound_reset(int param)
+{
+	// unhalt and reset the sound CPU
+	if (param == 0)
+	{
+		m_sound_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_sound_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	}
+
+	// reset the sound write state
+	m_sound_to_main_ready = false;
+	m_main_int_cb(CLEAR_LINE);
+
+	// allocate a high frequency timer until a response is generated
+	// the main CPU is *very* sensistive to the timing of the response
+	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+}
+
+
+//-------------------------------------------------
+//  delayed_sound_write: Synchronizes a data write
+//  from the main CPU to the sound CPU.
+//-------------------------------------------------
+
+void atari_sound_comm_device::delayed_sound_write(int data)
+{
+	// warn if we missed something
+	if (m_main_to_sound_ready)
+		logerror("Missed command from 68010\n");
+
+	// set up the states and signal an NMI to the sound CPU
+	m_main_to_sound_data = data;
+	m_main_to_sound_ready = true;
+	m_sound_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	// allocate a high frequency timer until a response is generated
+	// the main CPU is *very* sensistive to the timing of the response
+	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+}
+
+
+//-------------------------------------------------
+//  delayed_6502_write: Synchronizes a data write
+//  from the sound CPU to the main CPU.
+//-------------------------------------------------
+
+void atari_sound_comm_device::delayed_6502_write(int data)
+{
+	// warn if we missed something
+	if (m_sound_to_main_ready)
+		logerror("Missed result from 6502\n");
+
+	// set up the states and signal the sound interrupt to the main CPU
+	m_sound_to_main_data = data;
+	m_sound_to_main_ready = true;
+	m_main_int_cb(ASSERT_LINE);
+}
+
+
+
+
+/***************************************************************************
+    OVERALL INIT
+***************************************************************************/
+
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_earom(*this, "earom"),
@@ -95,8 +389,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_sound_int_state(0),
 		m_video_int_state(0),
 		m_eeprom_default(NULL),
-		m_cpu_to_sound_ready(0),
-		m_sound_to_cpu_ready(0),
 		m_playfield(*this, "playfield"),
 		m_playfield2(*this, "playfield2"),
 		m_playfield_upper(*this, "playfield_up"),
@@ -120,11 +412,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_slapstic_last_address(0),
 		m_slapstic_base(0),
 		m_slapstic_mirror(0),
-		m_sound_cpu(*this, "audiocpu"),
-		m_cpu_to_sound(0),
-		m_sound_to_cpu(0),
-		m_timed_int(0),
-		m_ym2151_int(0),
 		m_scanlines_per_callback(0),
 		m_actual_vc_latch0(0),
 		m_actual_vc_latch1(0),
@@ -134,19 +421,13 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_jsacpu(*this, "jsa"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_soundcomm(*this, "soundcomm")
 {
 }
 
 void atarigen_state::machine_start()
 {
-	// find the sound CPU, until JSA is moved to be independent
-	if (m_sound_cpu == NULL)
-	{
-		if (m_jsacpu != NULL)
-			m_sound_cpu.set_target(m_jsacpu);
-	}
-
 	screen_device *screen;
 	int i;
 
@@ -164,9 +445,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_scanline_int_state));
 	save_item(NAME(m_sound_int_state));
 	save_item(NAME(m_video_int_state));
-
-	save_item(NAME(m_cpu_to_sound_ready));
-	save_item(NAME(m_sound_to_cpu_ready));
 
 	save_item(NAME(m_atarivc_state.latch1));                // latch #1 value (-1 means disabled)
 	save_item(NAME(m_atarivc_state.latch2));                // latch #2 value (-1 means disabled)
@@ -187,11 +465,6 @@ void atarigen_state::machine_start()
 	save_item(NAME(m_slapstic_bank));
 	save_item(NAME(m_slapstic_last_pc));
 	save_item(NAME(m_slapstic_last_address));
-
-	save_item(NAME(m_cpu_to_sound));
-	save_item(NAME(m_sound_to_cpu));
-	save_item(NAME(m_timed_int));
-	save_item(NAME(m_ym2151_int));
 
 	save_item(NAME(m_scanlines_per_callback));
 
@@ -226,9 +499,6 @@ void atarigen_state::machine_reset()
 		slapstic_reset();
 		slapstic_update_bank(slapstic_bank());
 	}
-
-	// reset sound I/O
-	sound_io_reset();
 }
 
 
@@ -250,19 +520,6 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		case TID_ATARIVC_EOF:
 			atarivc_eof_update(timer, *reinterpret_cast<screen_device *>(ptr));
-			break;
-
-		// sound I/O
-		case TID_SOUND_RESET:
-			delayed_sound_reset(param);
-			break;
-
-		case TID_SOUND_WRITE:
-			delayed_sound_write(param);
-			break;
-
-		case TID_6502_WRITE:
-			delayed_6502_write(param);
 			break;
 
 		// unhalt the CPU that was passed as a pointer
@@ -313,6 +570,18 @@ INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
 WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
 {
 	m_scanline_int_state = 0;
+	update_interrupts();
+}
+
+
+//-------------------------------------------------
+//  sound_int_write_line: Standard write line
+//  callback for the sound interrupt
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(atarigen_state::sound_int_write_line)
+{
+	m_sound_int_state = state;
 	update_interrupts();
 }
 
@@ -538,224 +807,6 @@ READ16_MEMBER(atarigen_state::slapstic_r)
 	// then determine the new one
 	slapstic_update_bank(slapstic_tweak(space, offset));
 	return result;
-}
-
-
-
-/***************************************************************************
-    SOUND I/O
-***************************************************************************/
-
-//-------------------------------------------------
-//  sound_io_reset: Resets the state of the sound I/O.
-//-------------------------------------------------
-
-void atarigen_state::sound_io_reset()
-{
-	// reset the internal interrupts states
-	m_timed_int = m_ym2151_int = 0;
-
-	// reset the sound I/O states
-	m_cpu_to_sound = m_sound_to_cpu = 0;
-	m_cpu_to_sound_ready = m_sound_to_cpu_ready = 0;
-}
-
-
-//-------------------------------------------------
-//  m6502_irq_gen: Generates an IRQ signal to the
-//  6502 sound processor.
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER(atarigen_state::m6502_irq_gen)
-{
-	m_timed_int = 1;
-	update_m6502_irq();
-}
-
-
-//-------------------------------------------------
-//  m6502_irq_ack_r: Resets the IRQ signal to the 6502
-//  sound processor. Both reads and writes can be used.
-//-------------------------------------------------
-
-READ8_MEMBER(atarigen_state::m6502_irq_ack_r)
-{
-	m_timed_int = 0;
-	update_m6502_irq();
-	return 0;
-}
-
-WRITE8_MEMBER(atarigen_state::m6502_irq_ack_w)
-{
-	m_timed_int = 0;
-	update_m6502_irq();
-}
-
-
-//-------------------------------------------------
-//  atarigen_ym2151_irq_gen: Sets the state of the YM2151's
-//  IRQ line.
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(atarigen_state::ym2151_irq_gen)
-{
-	m_ym2151_int = state;
-	update_m6502_irq();
-}
-
-
-//-------------------------------------------------
-//  sound_reset_w: Write handler which resets the
-//  sound CPU in response.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::sound_reset_w)
-{
-	synchronize(TID_SOUND_RESET);
-}
-
-
-//-------------------------------------------------
-//  sound_cpu_reset: Resets the state of the sound
-//  CPU manually.
-//-------------------------------------------------
-
-void atarigen_state::sound_cpu_reset()
-{
-	synchronize(TID_SOUND_RESET, 1);
-}
-
-
-//-------------------------------------------------
-//  atarigen_sound_w: Handles communication from the main CPU
-//  to the sound CPU. Two versions are provided, one with the
-//  data byte in the low 8 bits, and one with the data byte in
-//  the upper 8 bits.
-//-------------------------------------------------
-
-WRITE8_MEMBER(atarigen_state::sound_w)
-{
-	synchronize(TID_SOUND_WRITE, data);
-}
-
-
-//-------------------------------------------------
-//  sound_r: Handles reading data communicated from the
-//  sound CPU to the main CPU. Two versions are provided, one
-//  with the data byte in the low 8 bits, and one with the data
-//  byte in the upper 8 bits.
-//-------------------------------------------------
-
-READ8_MEMBER(atarigen_state::sound_r)
-{
-	m_sound_to_cpu_ready = 0;
-	sound_int_ack_w(space, 0, 0);
-	return m_sound_to_cpu;
-}
-
-
-//-------------------------------------------------
-//  m6502_sound_w: Handles communication from the
-//  sound CPU to the main CPU.
-//-------------------------------------------------
-
-WRITE8_MEMBER(atarigen_state::m6502_sound_w)
-{
-	synchronize(TID_6502_WRITE, data);
-}
-
-
-//-------------------------------------------------
-//  m6502_sound_r: Handles reading data
-//  communicated from the main CPU to the sound
-//  CPU.
-//-------------------------------------------------
-
-READ8_MEMBER(atarigen_state::m6502_sound_r)
-{
-	m_cpu_to_sound_ready = 0;
-	m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_cpu_to_sound;
-}
-
-
-//-------------------------------------------------
-//  update_m6502_irq: Called whenever the IRQ state changes. An
-//  interrupt is generated if either m6502_irq_gen()
-//  was called, or if the YM2151 generated an interrupt via
-//  the atarigen_ym2151_irq_gen() callback.
-//-------------------------------------------------
-
-void atarigen_state::update_m6502_irq()
-{
-	if (m_timed_int || m_ym2151_int)
-		m_sound_cpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	else
-		m_sound_cpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
-//  delayed_sound_reset: Synchronizes the sound reset command
-//  between the two CPUs.
-//-------------------------------------------------
-
-void atarigen_state::delayed_sound_reset(int param)
-{
-	// unhalt and reset the sound CPU
-	if (param == 0)
-	{
-		m_sound_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_sound_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	}
-
-	// reset the sound write state
-	m_sound_to_cpu_ready = 0;
-	sound_int_ack_w(m_sound_cpu->space(AS_PROGRAM), 0, 0);
-
-	// allocate a high frequency timer until a response is generated
-	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
-}
-
-
-//-------------------------------------------------
-//  delayed_sound_write: Synchronizes a data write
-//  from the main CPU to the sound CPU.
-//-------------------------------------------------
-
-void atarigen_state::delayed_sound_write(int data)
-{
-	// warn if we missed something
-	if (m_cpu_to_sound_ready)
-		logerror("Missed command from 68010\n");
-
-	// set up the states and signal an NMI to the sound CPU
-	m_cpu_to_sound = data;
-	m_cpu_to_sound_ready = 1;
-	m_sound_cpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	// allocate a high frequency timer until a response is generated
-	// the main CPU is *very* sensistive to the timing of the response
-	machine().scheduler().boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
-}
-
-
-//-------------------------------------------------
-//  delayed_6502_write: Synchronizes a data write
-//  from the sound CPU to the main CPU.
-//-------------------------------------------------
-
-void atarigen_state::delayed_6502_write(int data)
-{
-	// warn if we missed something
-	if (m_sound_to_cpu_ready)
-		logerror("Missed result from 6502\n");
-
-	// set up the states and signal the sound interrupt to the main CPU
-	m_sound_to_cpu = data;
-	m_sound_to_cpu_ready = 1;
-	sound_int_gen(*m_maincpu);
 }
 
 

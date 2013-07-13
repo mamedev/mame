@@ -32,8 +32,8 @@ READ8_MEMBER(cyberbal_state::special_port3_r)
 {
 	int temp = ioport("JSAII")->read();
 	if (!(ioport("IN0")->read() & 0x8000)) temp ^= 0x80;
-	if (m_cpu_to_sound_ready) temp ^= 0x40;
-	if (m_sound_to_cpu_ready) temp ^= 0x20;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x40;
+	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x20;
 	return temp;
 }
 

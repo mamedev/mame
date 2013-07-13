@@ -209,7 +209,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 	if (diff & 0x0080)
 	{
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(newselect & 0x0080)) sound_cpu_reset();
+		if (!(newselect & 0x0080)) m_soundcomm->sound_cpu_reset();
 	}
 
 	/* if MO or playfield banks change, force a partial update */

@@ -178,7 +178,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 void atarijsa_reset(running_machine &machine)
 {
 	/* reset the sound I/O system */
-	machine.driver_data<atarigen_state>()->sound_io_reset();
+	machine.driver_data<atarigen_state>()->m_soundcomm->reset();
 
 	/* reset the static states */
 	overall_volume = 100;
@@ -213,7 +213,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x002:     /* /RDP */
-			result = atarigen->m6502_sound_r(space, offset);
+			result = atarigen->m_soundcomm->sound_command_r(space, offset);
 			break;
 
 		case 0x004:     /* /RDIO */
@@ -229,8 +229,8 @@ static READ8_HANDLER( jsa1_io_r )
 			*/
 			result = space.machine().root_device().ioport("JSAI")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
-			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_soundcomm->main_to_sound_ready()) result ^= 0x40;
+			if (atarigen->m_soundcomm->sound_to_main_ready()) result ^= 0x20;
 			if ((tms5220 != NULL) && (tms5220->readyq_r() == 0))
 				result |= 0x10;
 			else
@@ -238,7 +238,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x006:     /* /IRQACK */
-			atarigen->m6502_irq_ack_r(space, 0);
+			atarigen->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /VOICE */
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x006:     /* /IRQACK */
-			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /VOICE */
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x202:     /* /WRP */
-			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_response_w(space, offset, data);
 			break;
 
 		case 0x204:     /* WRIO */
@@ -346,7 +346,7 @@ static READ8_HANDLER( jsa2_io_r )
 			break;
 
 		case 0x002:     /* /RDP */
-			result = atarigen->m6502_sound_r(space, offset);
+			result = atarigen->m_soundcomm->sound_command_r(space, offset);
 			break;
 
 		case 0x004:     /* /RDIO */
@@ -362,12 +362,12 @@ static READ8_HANDLER( jsa2_io_r )
 			*/
 			result = space.machine().root_device().ioport("JSAII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
-			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_soundcomm->main_to_sound_ready()) result ^= 0x40;
+			if (atarigen->m_soundcomm->sound_to_main_ready()) result ^= 0x20;
 			break;
 
 		case 0x006:     /* /IRQACK */
-			atarigen->m6502_irq_ack_r(space, 0);
+			atarigen->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -393,7 +393,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x006:     /* /IRQACK */
-			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -404,7 +404,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x202:     /* /WRP */
-			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_response_w(space, offset, data);
 			break;
 
 		case 0x204:     /* /WRIO */
@@ -469,7 +469,7 @@ static READ8_HANDLER( jsa3_io_r )
 			break;
 
 		case 0x002:     /* /RDP */
-			result = atarigen->m6502_sound_r(space, offset);
+			result = atarigen->m_soundcomm->sound_command_r(space, offset);
 			break;
 
 		case 0x004:     /* /RDIO */
@@ -485,12 +485,12 @@ static READ8_HANDLER( jsa3_io_r )
 			*/
 			result = space.machine().root_device().ioport("JSAIII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
-			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_soundcomm->main_to_sound_ready()) result ^= 0x40;
+			if (atarigen->m_soundcomm->sound_to_main_ready()) result ^= 0x20;
 			break;
 
 		case 0x006:     /* /IRQACK */
-			atarigen->m6502_irq_ack_r(space, 0);
+			atarigen->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -520,7 +520,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x006:     /* /IRQACK */
-			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x202:     /* /WRP */
-			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_response_w(space, offset, data);
 			break;
 
 		case 0x204:     /* /WRIO */
@@ -603,7 +603,7 @@ static READ8_HANDLER( jsa3s_io_r )
 			break;
 
 		case 0x002:     /* /RDP */
-			result = atarigen->m6502_sound_r(space, offset);
+			result = atarigen->m_soundcomm->sound_command_r(space, offset);
 			break;
 
 		case 0x004:     /* /RDIO */
@@ -619,12 +619,12 @@ static READ8_HANDLER( jsa3s_io_r )
 			*/
 			result = space.machine().root_device().ioport("JSAIII")->read();
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
-			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_soundcomm->main_to_sound_ready()) result ^= 0x40;
+			if (atarigen->m_soundcomm->sound_to_main_ready()) result ^= 0x20;
 			break;
 
 		case 0x006:     /* /IRQACK */
-			atarigen->m6502_irq_ack_r(space, 0);
+			atarigen->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -654,7 +654,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x006:     /* /IRQACK */
-			space.machine().driver_data<atarigen_state>()->m6502_irq_ack_r(space, 0);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:     /* /WRV */
@@ -663,7 +663,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x202:     /* /WRP */
-			space.machine().driver_data<atarigen_state>()->m6502_sound_w(space, offset, data);
+			space.machine().driver_data<atarigen_state>()->m_soundcomm->sound_response_w(space, offset, data);
 			break;
 
 		case 0x204:     /* /WRIO */
@@ -795,13 +795,14 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
@@ -839,13 +840,14 @@ MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -861,13 +863,14 @@ MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
@@ -905,13 +908,14 @@ MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa3s_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "jsa", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", JSA_MASTER_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(driver_device, member_wrapper8<ym2151_ctl_w>))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)

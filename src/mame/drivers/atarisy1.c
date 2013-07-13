@@ -346,7 +346,7 @@ READ16_MEMBER(atarisy1_state::trakball_r)
 READ16_MEMBER(atarisy1_state::port4_r)
 {
 	int temp = ioport("F60000")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x0080;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0080;
 	return temp;
 }
 
@@ -362,8 +362,8 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 {
 	int temp = ioport("1820")->read();
 
-	if (m_cpu_to_sound_ready) temp ^= 0x08;
-	if (m_sound_to_cpu_ready) temp ^= 0x10;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x08;
+	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x10;
 	if (!(ioport("F60000")->read() & 0x0040)) temp ^= 0x80;
 
 	return temp;
@@ -479,9 +479,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
 	AM_RANGE(0xf60000, 0xf60003) AM_READ(port4_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE8(sound_w, 0x00ff) /* used by roadbls2 */
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ8(sound_r, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff) /* used by roadbls2 */
+	AM_RANGE(0xfc0000, 0xfc0001) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0xfe0000, 0xfe0001) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x1810, 0x1810) AM_READWRITE(m6502_sound_r, m6502_sound_w)
+	AM_RANGE(0x1810, 0x1810) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_command_r, sound_response_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
 	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
 	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
@@ -771,10 +771,11 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

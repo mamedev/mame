@@ -58,8 +58,8 @@ MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x0020;
-	if (m_sound_to_cpu_ready) temp ^= 0x0010;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0020;
+	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x0010;
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
@@ -1147,14 +1147,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE16(eeprom_enable_w, 0xffffffff)
-	AM_RANGE(0xe06000, 0xe06003) AM_WRITE8(sound_w, 0xff000000)
+	AM_RANGE(0xe06000, 0xe06003) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff000000)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE16(video_int_ack_w, 0xffffffff)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
-	AM_RANGE(0xe86000, 0xe86003) AM_READ8(sound_r, 0xff000000)
+	AM_RANGE(0xe86000, 0xe86003) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff000000)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

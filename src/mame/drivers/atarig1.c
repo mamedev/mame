@@ -86,7 +86,7 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
 READ16_MEMBER(atarig1_state::special_port0_r)
 {
 	int temp = ioport("IN0")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x1000;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x1000;
 	temp ^= 0x2000;     /* A2DOK always high for now */
 	return temp;
 }
@@ -204,13 +204,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xf90000, 0xf90001) AM_WRITE8(sound_w, 0xff00)
-	AM_RANGE(0xf98000, 0xf98001) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
+	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_WRITE(mo_control_w)
 	AM_RANGE(0xfb0000, 0xfb0001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xfd0000, 0xfd0001) AM_READ8(sound_r, 0xff00)
+	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")

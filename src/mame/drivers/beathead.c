@@ -279,8 +279,8 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 READ32_MEMBER( beathead_state::input_2_r )
 {
 	int result = ioport("IN2")->read();
-	if (m_sound_to_cpu_ready) result ^= 0x10;
-	if (m_cpu_to_sound_ready) result ^= 0x20;
+	if (m_soundcomm->sound_to_main_ready()) result ^= 0x10;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x20;
 	return result;
 }
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rom_base")
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE8(sound_r, sound_w, 0x000000ff)
+	AM_RANGE(0x41000000, 0x41000003) AM_DEVREADWRITE8("soundcomm", atari_sound_comm_device, main_response_r, main_command_w, 0x000000ff)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
 	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
 	AM_RANGE(0x41000200, 0x41000203) AM_READ_PORT("IN1")

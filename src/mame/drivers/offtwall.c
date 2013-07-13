@@ -82,7 +82,7 @@ WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
 READ16_MEMBER(offtwall_state::special_port3_r)
 {
 	int result = ioport("260010")->read();
-	if (m_cpu_to_sound_ready) result ^= 0x0020;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
 	return result;
 }
 
@@ -270,8 +270,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260020, 0x260021) AM_READ_PORT("260020")
 	AM_RANGE(0x260022, 0x260023) AM_READ_PORT("260022")
 	AM_RANGE(0x260024, 0x260025) AM_READ_PORT("260024")
-	AM_RANGE(0x260030, 0x260031) AM_READ8(sound_r, 0x00ff)
-	AM_RANGE(0x260040, 0x260041) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)

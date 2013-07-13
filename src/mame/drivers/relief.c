@@ -86,7 +86,7 @@ MACHINE_RESET_MEMBER(relief_state,relief)
 READ16_MEMBER(relief_state::special_port2_r)
 {
 	int result = ioport("260010")->read();
-	if (m_cpu_to_sound_ready) result ^= 0x0020;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
 	if (!(result & 0x0080) || get_hblank(*machine().primary_screen)) result ^= 0x0001;
 	return result;
 }

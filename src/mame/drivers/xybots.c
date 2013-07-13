@@ -57,7 +57,7 @@ READ16_MEMBER(xybots_state::special_port1_r)
 {
 	int result = ioport("FFE200")->read();
 
-	if (m_cpu_to_sound_ready) result ^= 0x0200;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0200;
 	result ^= m_h256 ^= 0x0400;
 	return result;
 }
@@ -82,14 +82,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 ADDRESS_MAP_END
 
 

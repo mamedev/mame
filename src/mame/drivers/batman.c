@@ -85,8 +85,8 @@ WRITE16_MEMBER(batman_state::batman_atarivc_w)
 READ16_MEMBER(batman_state::special_port2_r)
 {
 	int result = ioport("260010")->read();
-	if (m_sound_to_cpu_ready) result ^= 0x0010;
-	if (m_cpu_to_sound_ready) result ^= 0x0020;
+	if (m_soundcomm->sound_to_main_ready()) result ^= 0x0010;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
 	return result;
 }
 
@@ -131,8 +131,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ(special_port2_r)
-	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_READ8(sound_r, 0x00ff)
-	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)

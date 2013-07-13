@@ -91,7 +91,7 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
 READ16_MEMBER(cyberbal_state::special_port0_r)
 {
 	int temp = ioport("IN0")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x0080;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0080;
 	return temp;
 }
 
@@ -99,7 +99,7 @@ READ16_MEMBER(cyberbal_state::special_port0_r)
 READ16_MEMBER(cyberbal_state::special_port2_r)
 {
 	int temp = ioport("IN2")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x2000;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x2000;
 	return temp;
 }
 
@@ -107,7 +107,7 @@ READ16_MEMBER(cyberbal_state::special_port2_r)
 READ16_MEMBER(cyberbal_state::sound_state_r)
 {
 	int temp = 0xffff;
-	if (m_cpu_to_sound_ready) temp ^= 0xffff;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0xffff;
 	return temp;
 }
 
@@ -135,12 +135,12 @@ WRITE16_MEMBER(cyberbal_state::p2_reset_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xfc8000, 0xfcffff) AM_READ8(sound_r, 0xff00)
+	AM_RANGE(0xfc8000, 0xfcffff) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xfd2000, 0xfd3fff) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xfd2000, 0xfd3fff) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xfd4000, 0xfd5fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfd6000, 0xfd7fff) AM_WRITE(p2_reset_w)
-	AM_RANGE(0xfd8000, 0xfd9fff) AM_WRITE8(sound_w, 0xff00)
+	AM_RANGE(0xfd8000, 0xfd9fff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
@@ -196,10 +196,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cyberbal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x2800, 0x2801) AM_WRITE(sound_68k_6502_w)
-	AM_RANGE(0x2802, 0x2803) AM_READWRITE(m6502_irq_ack_r, m6502_irq_ack_w)
-	AM_RANGE(0x2804, 0x2805) AM_WRITE(m6502_sound_w)
+	AM_RANGE(0x2802, 0x2803) AM_DEVREADWRITE("soundcomm", atari_sound_comm_device, sound_irq_ack_r, sound_irq_ack_w)
+	AM_RANGE(0x2804, 0x2805) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_response_w)
 	AM_RANGE(0x2806, 0x2807) AM_WRITE(sound_bank_select_w)
-	AM_RANGE(0x2c00, 0x2c01) AM_READ(m6502_sound_r)
+	AM_RANGE(0x2c00, 0x2c01) AM_DEVREAD("soundcomm", atari_sound_comm_device, sound_command_r)
 	AM_RANGE(0x2c02, 0x2c03) AM_READ(special_port3_r)
 	AM_RANGE(0x2c04, 0x2c05) AM_READ(sound_68k_6502_r)
 	AM_RANGE(0x2c06, 0x2c07) AM_READ(sound_6502_stat_r)
@@ -237,14 +237,14 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc4000, 0xfc4003) AM_READ(special_port2_r)
-	AM_RANGE(0xfc6000, 0xfc6003) AM_READ8(sound_r, 0xff00)
+	AM_RANGE(0xfc6000, 0xfc6003) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
 	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfca000, 0xfcafff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfd0000, 0xfd0003) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xfd2000, 0xfd2003) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xfd2000, 0xfd2003) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xfd4000, 0xfd4003) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfd8000, 0xfd8003) AM_WRITE8(sound_w, 0xff00)
+	AM_RANGE(0xfd8000, 0xfd8003) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigen_state, m6502_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("^soundcomm", atari_sound_comm_device, sound_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
@@ -445,10 +445,11 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal)
 
 	/* sound hardware */
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarigen_state, sound_int_write_line))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(atarigen_state, ym2151_irq_gen))
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 

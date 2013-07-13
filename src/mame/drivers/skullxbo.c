@@ -87,7 +87,7 @@ MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
 READ16_MEMBER(skullxbo_state::special_port1_r)
 {
 	int temp = ioport("FF5802")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x0040;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0040;
 	if (get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
@@ -119,8 +119,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(skullxbo_halt_until_hblank_0_w)
 	AM_RANGE(0xff0c00, 0xff0fff) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xff1400, 0xff17ff) AM_WRITE8(sound_w, 0x00ff)
-	AM_RANGE(0xff1800, 0xff1bff) AM_WRITE(sound_reset_w)
+	AM_RANGE(0xff1400, 0xff17ff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0xff1800, 0xff1bff) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
 	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(skullxbo_playfieldlatch_w)
 	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0xff1d00, 0xff1d7f) AM_WRITE(scanline_int_ack_w)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xff5000, 0xff5001) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0xff5000, 0xff5001) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ(eeprom_r)

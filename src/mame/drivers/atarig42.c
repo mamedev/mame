@@ -67,8 +67,8 @@ MACHINE_RESET_MEMBER(atarig42_state,atarig42)
 READ16_MEMBER(atarig42_state::special_port2_r)
 {
 	int temp = ioport("IN2")->read();
-	if (m_cpu_to_sound_ready) temp ^= 0x0020;
-	if (m_sound_to_cpu_ready) temp ^= 0x0010;
+	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0020;
+	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x0010;
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return temp;
 }
@@ -338,8 +338,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00010, 0xe00011) AM_READ(special_port2_r)
 	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("JSAIII")
 	AM_RANGE(0xe00020, 0xe00027) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xe00030, 0xe00031) AM_READ8(sound_r, 0x00ff)
-	AM_RANGE(0xe00040, 0xe00041) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
 	AM_RANGE(0xe00060, 0xe00061) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)

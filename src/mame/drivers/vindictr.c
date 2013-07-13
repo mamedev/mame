@@ -56,8 +56,8 @@ MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 READ16_MEMBER(vindictr_state::port1_r)
 {
 	int result = ioport("260010")->read();
-	if (m_sound_to_cpu_ready) result ^= 0x0004;
-	if (m_cpu_to_sound_ready) result ^= 0x0008;
+	if (m_soundcomm->sound_to_main_ready()) result ^= 0x0004;
+	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0008;
 	result ^= 0x0010;
 	return result;
 }
@@ -79,12 +79,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
-	AM_RANGE(0x260030, 0x260031) AM_READ8(sound_r, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x360010, 0x360011) AM_WRITENOP
-	AM_RANGE(0x360020, 0x360021) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_WRITE8(sound_w, 0x00ff)
+	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
+	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)

@@ -40,10 +40,12 @@
 #ifndef __MACHINE_ATARIGEN__
 #define __MACHINE_ATARIGEN__
 
+#include "devcb2.h"
 #include "machine/nvram.h"
 #include "machine/er2055.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -53,6 +55,99 @@
 #define ATARI_CLOCK_20MHz   XTAL_20MHz
 #define ATARI_CLOCK_32MHz   XTAL_32MHz
 #define ATARI_CLOCK_50MHz   XTAL_50MHz
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
+	atari_sound_comm_device::static_set_sound_cpu(*device, _soundcpu); \
+	devcb = &atari_sound_comm_device::set_main_int_cb(*device, DEVCB2_##_intcb); \
+
+
+#define MCFG_ATARI_VIDEO_CONTROLLER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATARI_VIDEO_CONTROLLER, 0) \
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+
+// ======================> atari_sound_comm_device
+
+class atari_sound_comm_device :  public device_t
+{
+public:
+	// construction/destruction
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	static void static_set_sound_cpu(device_t &device, const char *cputag);
+	template<class _Object> static devcb2_base &set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
+	
+	// getters
+	bool main_to_sound_ready() const { return m_main_to_sound_ready; }
+	bool sound_to_main_ready() const { return m_sound_to_main_ready; }
+
+	// main cpu accessors
+	DECLARE_WRITE8_MEMBER(main_command_w);
+	DECLARE_READ8_MEMBER(main_response_r);
+	DECLARE_WRITE16_MEMBER(sound_reset_w);
+
+	// sound cpu accessors
+	void sound_cpu_reset() { synchronize(TID_SOUND_RESET, 1); }
+	DECLARE_WRITE8_MEMBER(sound_response_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_READ8_MEMBER(sound_irq_ack_r);
+	INTERRUPT_GEN_MEMBER(sound_irq_gen);
+
+	// additional helpers
+	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+
+protected:
+	// sound I/O helpers
+	void update_sound_irq();
+	void delayed_sound_reset(int param);
+	void delayed_sound_write(int data);
+	void delayed_6502_write(int data);
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	// timer IDs
+	enum
+	{
+		TID_SOUND_RESET,
+		TID_SOUND_WRITE,
+		TID_6502_WRITE
+	};
+
+	// configuration state
+	const char *		m_sound_cpu_tag;
+	devcb2_write_line	m_main_int_cb;
+
+	// internal state
+	m6502_device *		m_sound_cpu;
+	bool                m_main_to_sound_ready;
+	bool                m_sound_to_main_ready;
+	UINT8               m_main_to_sound_data;
+	UINT8               m_sound_to_main_data;
+	UINT8               m_timed_int;
+	UINT8               m_ym2151_int;
+};
+
+
+// device type definition
+extern const device_type ATARI_SOUND_COMM;
 
 
 
@@ -106,6 +201,7 @@ public:
 	void scanline_int_set(screen_device &screen, int scanline);
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 	INTERRUPT_GEN_MEMBER(sound_int_gen);
 	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
 	INTERRUPT_GEN_MEMBER(video_int_gen);
@@ -124,23 +220,6 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(slapstic_setdirect);
 	DECLARE_WRITE16_MEMBER(slapstic_w);
 	DECLARE_READ16_MEMBER(slapstic_r);
-
-	// sound I/O helpers
-	void sound_io_reset();
-	INTERRUPT_GEN_MEMBER(m6502_irq_gen);
-	DECLARE_READ8_MEMBER(m6502_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(m6502_irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	void sound_cpu_reset();
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(m6502_sound_w);
-	DECLARE_READ8_MEMBER(m6502_sound_r);
-	void update_m6502_irq();
-	void delayed_sound_reset(int param);
-	void delayed_sound_write(int data);
-	void delayed_6502_write(int data);
 
 	// sound helpers
 	void set_volume_by_type(int volume, device_type type);
@@ -224,9 +303,6 @@ public:
 
 	const UINT16 *      m_eeprom_default;
 
-	UINT8               m_cpu_to_sound_ready;
-	UINT8               m_sound_to_cpu_ready;
-
 	optional_shared_ptr<UINT16> m_playfield;
 	optional_shared_ptr<UINT16> m_playfield2;
 	optional_shared_ptr<UINT16> m_playfield_upper;
@@ -259,12 +335,6 @@ public:
 	offs_t                  m_slapstic_base;
 	offs_t                  m_slapstic_mirror;
 
-	optional_device<m6502_device> m_sound_cpu;
-	UINT8                   m_cpu_to_sound;
-	UINT8                   m_sound_to_cpu;
-	UINT8                   m_timed_int;
-	UINT8                   m_ym2151_int;
-
 	UINT32                  m_scanlines_per_callback;
 
 	UINT32                  m_actual_vc_latch0;
@@ -279,6 +349,8 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<m6502_device> m_jsacpu;
 	optional_device<okim6295_device> m_oki;
+	
+	optional_device<atari_sound_comm_device> m_soundcomm;
 };
 
 
