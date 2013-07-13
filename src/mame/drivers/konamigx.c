@@ -517,7 +517,7 @@ WRITE32_MEMBER(konamigx_state::control_w)
 			m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
-		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
+		m_k055673->alt_K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
 
 		konamigx_wrport2 = (data>>16)&0xff;
 	}
@@ -618,13 +618,13 @@ TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 	}
 }
 
-static void dmastart_callback(int data)
+void konamigx_state::dmastart_callback(int data)
 {
 	// raise the DMA busy flag
 	gx_rdport1_3 |= 2;
 
 	// begin transfer if DMAEN(bit4 of OBJSET1) is set (see p.48)
-	if (K053246_read_register(5) & 0x10)
+	if (m_k055673->alt_K053246_read_register(5) & 0x10)
 	{
 		// disabled by default since it doesn't work too well in MAME
 		konamigx_objdma();
@@ -907,12 +907,12 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 
 READ32_MEMBER(konamigx_state::gx5bppspr_r)
 {
-	return (K055673_rom_word_r(space, offset*2+1, 0xffff) | K055673_rom_word_r(space, offset*2, 0xffff)<<16);
+	return (m_k055673->alt_K055673_rom_word_r(space, offset*2+1, 0xffff) | m_k055673->alt_K055673_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 READ32_MEMBER(konamigx_state::gx6bppspr_r)
 {
-	return (K055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
+	return (m_k055673->alt_K055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | m_k055673->alt_K055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 READ32_MEMBER(konamigx_state::type1_roz_r1)
@@ -1153,12 +1153,12 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM // data ROM
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("workram") // work RAM
 	AM_RANGE(0xd00000, 0xd01fff) AM_DEVREAD("k056832", k056832_device, k_5bpp_rom_long_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
+	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE("k055673", k055673_device, alt_K053247_long_r, alt_K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
 	AM_RANGE(0xd40000, 0xd4003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
-	AM_RANGE(0xd48000, 0xd48007) AM_WRITE_LEGACY(K053246_long_w)
-	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE_LEGACY(K053247_reg_long_w)
+	AM_RANGE(0xd48000, 0xd48007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_long_w)
+	AM_RANGE(0xd4a010, 0xd4a01f) AM_DEVWRITE("k055673", k055673_device, alt_K053247_reg_long_w)
 	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
 	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
 	AM_RANGE(0xd50000, 0xd500ff) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)
@@ -1796,6 +1796,7 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 
 	MCFG_K056832_ADD_NOINTF("k056832"/*, konamigx_k056832_intf*/)
 	MCFG_K055555_ADD("k055555")
+	MCFG_K055673_ADD_NOINTF("k055673")
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_5bpp)
 

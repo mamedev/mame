@@ -102,6 +102,31 @@ public:
 	const char *m_memory_region;
 	screen_device *m_screen;
 
+	/* alt implementation - to be collapsed */
+	void alt_K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
+			void (*callback)(running_machine &machine, int *code,int *color,int *priority));
+	DECLARE_READ16_MEMBER( alt_K055673_rom_word_r );
+	DECLARE_READ16_MEMBER( alt_K055673_GX6bpp_rom_word_r );
+
+	DECLARE_READ16_MEMBER( alt_K053247_word_r );
+	DECLARE_WRITE16_MEMBER( alt_K053247_word_w );
+	DECLARE_READ32_MEMBER( alt_K053247_long_r );
+	DECLARE_WRITE32_MEMBER( alt_K053247_long_w );
+	DECLARE_WRITE16_MEMBER( alt_K053247_reg_word_w ); // "OBJSET2" registers
+	DECLARE_WRITE32_MEMBER( alt_K053247_reg_long_w );
+
+	int alt_K053247_read_register(int regnum);
+	void alt_K053247_set_SpriteOffset(int offsx, int offsy);
+	void alt_K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
+
+	DECLARE_WRITE8_MEMBER( alt_K053246_w );
+	DECLARE_WRITE16_MEMBER( alt_K053246_word_w );
+	DECLARE_WRITE32_MEMBER( alt_K053246_long_w );
+	void alt_K053246_set_OBJCHA_line(int state);
+	int alt_K053246_is_IRQ_enabled(void);
+	int alt_K053246_read_register(int regnum);
+
+
 	template<class _BitmapClass>
 	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
 
@@ -139,51 +164,19 @@ extern const device_type K055673;
 #define MCFG_K053246_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K053246, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K053247_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K053247, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 	
 #define MCFG_K055673_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K055673, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_K055673_ADD_NOINTF(_tag ) \
+	MCFG_DEVICE_ADD(_tag, K055673, 0) \
 
 
 
 
 /* old non-device stuff */
 
-void K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
-		void (*callback)(running_machine &machine, int *code,int *color,int *priority));
-DECLARE_READ16_HANDLER( K055673_rom_word_r );
-DECLARE_READ16_HANDLER( K055673_GX6bpp_rom_word_r );
-
-/*
-Callback procedures for non-standard shadows:
-
-1) translate shadow code to the correct 2-bit form (0=off, 1-3=style)
-2) shift shadow code left by K053247_SHDSHIFT and add the K053247_CUSTOMSHADOW flag
-3) combine the result with sprite color
-*/
-#define K053247_CUSTOMSHADOW    0x20000000
-#define K053247_SHDSHIFT        20
-
-DECLARE_READ16_HANDLER( K053247_word_r );
-DECLARE_WRITE16_HANDLER( K053247_word_w );
-DECLARE_READ32_HANDLER( K053247_long_r );
-DECLARE_WRITE32_HANDLER( K053247_long_w );
-DECLARE_WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
-DECLARE_WRITE32_HANDLER( K053247_reg_long_w );
-
-int K053247_read_register(int regnum);
-void K053247_set_SpriteOffset(int offsx, int offsy);
-void K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
-
-DECLARE_WRITE16_HANDLER( K053246_word_w );
-DECLARE_WRITE32_HANDLER( K053246_long_w );
-void K053246_set_OBJCHA_line(int state);
-int K053246_is_IRQ_enabled(void);
-int K053246_read_register(int regnum);
 
 
 

@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 	if(scanline == 248)
-		if (K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+		if (m_k055673->alt_K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 
 	if(scanline == 247)
 	{
-		if (K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
+		if (m_k055673->alt_K053246_is_IRQ_enabled()) m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 
 	if(scanline == 23)
@@ -222,7 +222,7 @@ READ16_MEMBER(mystwarr_state::K053247_scattered_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(space,offset,mem_mask);
+		return m_k055673->alt_K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -237,7 +237,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_scattered_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(space,offset,data,mem_mask);
+		m_k055673->alt_K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -248,9 +248,9 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x4800ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x482000, 0x48200f) AM_READ_LEGACY(K055673_rom_word_r)
-	AM_RANGE(0x482010, 0x48201f) AM_WRITE_LEGACY(K053247_reg_word_w)
-	AM_RANGE(0x484000, 0x484007) AM_WRITE_LEGACY(K053246_word_w)
+	AM_RANGE(0x482000, 0x48200f) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x482010, 0x48201f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)
+	AM_RANGE(0x484000, 0x484007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
 	AM_RANGE(0x48a000, 0x48a01f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x48c000, 0x48c03f) AM_DEVWRITE("k056832", k056832_device,word_w)
 	AM_RANGE(0x490000, 0x490001) AM_WRITE(mweeprom_w)
@@ -283,11 +283,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
+	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device,alt_K053247_word_r,alt_K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240007) AM_WRITE_LEGACY(K053246_word_w)
-	AM_RANGE(0x244000, 0x24400f) AM_READ_LEGACY(K055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_WRITE_LEGACY(K053247_reg_word_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x244000, 0x24400f) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE("k053250_1", k053250_device, ram_r, ram_w)
 	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE("k053250_1", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
@@ -325,11 +325,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM     // main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
+	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE("k055673", k055673_device, alt_K053247_word_r,alt_K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
-	AM_RANGE(0x240000, 0x240007) AM_WRITE_LEGACY(K053246_word_w)
-	AM_RANGE(0x244000, 0x24400f) AM_READ_LEGACY(K055673_rom_word_r)
-	AM_RANGE(0x244010, 0x24401f) AM_WRITE_LEGACY(K053247_reg_word_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x244000, 0x24400f) AM_DEVREAD("k055673", k055673_device, alt_K055673_rom_word_r)
+	AM_RANGE(0x244010, 0x24401f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)
 	AM_RANGE(0x24c000, 0x24ffff) AM_RAM     // K053250 ram
 	AM_RANGE(0x250000, 0x25000f) AM_RAM     // K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE_LEGACY(K054338_word_w)
@@ -372,7 +372,7 @@ READ16_MEMBER(mystwarr_state::K053247_martchmp_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return K053247_word_r(space,offset,mem_mask);
+		return m_k055673->alt_K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -386,7 +386,7 @@ WRITE16_MEMBER(mystwarr_state::K053247_martchmp_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		K053247_word_w(space,offset,data,mem_mask);
+		m_k055673->alt_K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -404,7 +404,7 @@ WRITE16_MEMBER(mystwarr_state::mccontrol_w)
 		// bit 1 = IRQ enable
 		// bit 2 = OBJCHA
 
-		K053246_set_OBJCHA_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+		m_k055673->alt_K053246_set_OBJCHA_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 //      if (data & 0xf8) logerror("Unk write %x to mccontrol\n", data);
 
@@ -420,9 +420,9 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("gx_workram")          // work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM                                 // data ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)                // PCU2
-	AM_RANGE(0x402000, 0x40200f) AM_READ_LEGACY(K055673_rom_word_r)         // sprite ROM readback
-	AM_RANGE(0x402010, 0x40201f) AM_WRITE_LEGACY(K053247_reg_word_w)            // OBJSET2
-	AM_RANGE(0x404000, 0x404007) AM_WRITE_LEGACY(K053246_word_w)                // OBJSET1
+	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)         // sprite ROM readback
+	AM_RANGE(0x402010, 0x40201f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)            // OBJSET2
+	AM_RANGE(0x404000, 0x404007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)                // OBJSET1
 	AM_RANGE(0x40a000, 0x40a01f) AM_WRITE_LEGACY(K054338_word_w)                // CLTC
 	AM_RANGE(0x40c000, 0x40c03f) AM_DEVWRITE("k056832", k056832_device,word_w)                // VACSET
 	AM_RANGE(0x40e000, 0x40e03f) AM_WRITE(K053990_martchmp_word_w)      // protection
@@ -462,10 +462,10 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w) // tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
+	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
 	AM_RANGE(0x440000, 0x443fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x450000, 0x45000f) AM_READ_LEGACY(K055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_WRITE_LEGACY(K053247_reg_word_w)
+	AM_RANGE(0x450000, 0x45000f) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)        // VACSET
@@ -509,10 +509,10 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x410000, 0x411fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_DEVREADWRITE("k056832", k056832_device,ram_word_r,ram_word_w)     // tilemap RAM mirror read / write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0x430000, 0x430007) AM_WRITE_LEGACY(K053246_word_w)
+	AM_RANGE(0x430000, 0x430007) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
 	AM_RANGE(0x440000, 0x441fff) AM_DEVREAD("k056832", k056832_device, mw_rom_word_r)
-	AM_RANGE(0x450000, 0x45000f) AM_READ_LEGACY(K055673_rom_word_r)
-	AM_RANGE(0x450010, 0x45001f) AM_WRITE_LEGACY(K053247_reg_word_w)
+	AM_RANGE(0x450000, 0x45000f) AM_DEVWRITE("k055673", k055673_device, alt_K053246_word_w)
+	AM_RANGE(0x450010, 0x45001f) AM_DEVWRITE("k055673", k055673_device,alt_K053247_reg_word_w)
 	AM_RANGE(0x460000, 0x46001f) AM_WRITEONLY AM_SHARE("k053936_0_ct16")
 	AM_RANGE(0x470000, 0x470fff) AM_RAM AM_SHARE("k053936_0_li16")
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device,word_w)            // VACSET
@@ -1000,6 +1000,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_PALETTE_LENGTH(2048)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
 	MCFG_K055555_ADD("k055555")
+	MCFG_K055673_ADD_NOINTF("k055673")
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,mystwarr)
 

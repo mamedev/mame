@@ -15,6 +15,7 @@ public:
 		m_workram(*this,"workram"),
 		m_psacram(*this,"psacram"),
 		m_subpaletteram32(*this,"subpaletteram"),
+		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
 		m_k056832(*this, "k056832"),
 		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
@@ -32,6 +33,7 @@ public:
 	optional_shared_ptr<UINT32> m_workram;
 	optional_shared_ptr<UINT32> m_psacram;
 	optional_shared_ptr<UINT32> m_subpaletteram32;
+	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k056832_device> m_k056832;
 	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
@@ -117,6 +119,10 @@ public:
 
 	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
+
+	void dmastart_callback(int data);
+
+	void konamigx_mixer_init(running_machine &machine, int objdma);
 
 };
 

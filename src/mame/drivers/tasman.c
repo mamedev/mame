@@ -611,8 +611,9 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	MCFG_K053247_ADD("k053246", k053247_intf)
+	MCFG_K053246_ADD("k053246", k053247_intf)
 	MCFG_K055555_ADD("k055555")
+	MCFG_K055673_ADD_NOINTF("k055673")
 
 	MCFG_GFXDECODE(tasman)
 	

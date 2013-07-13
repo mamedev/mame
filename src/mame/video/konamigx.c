@@ -856,21 +856,21 @@ void konamigx_state::konamigx_precache_registers(void)
 	static const int coregshifts[5]= {4,5,6,7,8};
 	int i;
 
-	K053246_objset1 = K053246_read_register(5);
+	K053246_objset1 = m_k055673->alt_K053246_read_register(5);
 
-	i = K053247_read_register(0x8/2);
+	i = m_k055673->alt_K053247_read_register(0x8/2);
 	K053247_vrcbk[0] = (i & 0x000f) << 14;
 	K053247_vrcbk[1] = (i & 0x0f00) << 6;
-	i = K053247_read_register(0xa/2);
+	i = m_k055673->alt_K053247_read_register(0xa/2);
 	K053247_vrcbk[2] = (i & 0x000f) << 14;
 	K053247_vrcbk[3] = (i & 0x0f00) << 6;
 
 	// COREG == OBJSET2+1C == bit8-11 of OPSET ??? (see p.50 last table, needs p.49 to confirm)
-	K053247_opset = K053247_read_register(0xc/2);
+	K053247_opset = m_k055673->alt_K053247_read_register(0xc/2);
 
 	i = K053247_opset & 7; if (i > 4) i = 4;
 
-	K053247_coreg = K053247_read_register(0xc/2)>>8 & 0xf;
+	K053247_coreg = m_k055673->alt_K053247_read_register(0xc/2)>>8 & 0xf;
 	K053247_coreg =(K053247_coreg & coregmasks[i]) << 12;
 
 	K053247_coregshift = coregshifts[i];
@@ -1130,7 +1130,7 @@ static void K053247GP_set_SpriteOffset(int offsx, int offsy)
 	K053247_dy = offsy;
 }
 
-void konamigx_mixer_init(running_machine &machine, int objdma)
+void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 {
 	gx_objdma = 0;
 	gx_primode = 0;
@@ -1139,7 +1139,7 @@ void konamigx_mixer_init(running_machine &machine, int objdma)
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
-	K053247_export_config(&K053247_ram, &K053247_gfx, &K053247_callback, &K053247_dx, &K053247_dy);
+	m_k055673->alt_K053247_export_config(&K053247_ram, &K053247_gfx, &K053247_callback, &K053247_dx, &K053247_dy);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
@@ -1223,8 +1223,8 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	flipscreeny = K053246_objset1 & 2;
 
 	// get "display window" offsets
-	offx = (K053246_read_register(0)<<8 | K053246_read_register(1)) & 0x3ff;
-	offy = (K053246_read_register(2)<<8 | K053246_read_register(3)) & 0x3ff;
+	offx = (m_k055673->alt_K053246_read_register(0)<<8 | m_k055673->alt_K053246_read_register(1)) & 0x3ff;
+	offy = (m_k055673->alt_K053246_read_register(2)<<8 | m_k055673->alt_K053246_read_register(3)) & 0x3ff;
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
 	layerid[0] = 0; layerid[1] = 1; layerid[2] = 2; layerid[3] = 3; layerid[4] = 4; layerid[5] = 5;
@@ -2055,7 +2055,7 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 void konamigx_state::_gxcommoninit(running_machine &machine)
 {
 	// (+ve values move objects to the right and -ve values move objects to the left)
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 }
@@ -2106,7 +2106,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 VIDEO_START_MEMBER(konamigx_state,winspike)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 2);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 }
@@ -2114,7 +2114,7 @@ VIDEO_START_MEMBER(konamigx_state,winspike)
 VIDEO_START_MEMBER(konamigx_state,dragoonj)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2127,7 +2127,7 @@ VIDEO_START_MEMBER(konamigx_state,dragoonj)
 VIDEO_START_MEMBER(konamigx_state,le2)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2156,7 +2156,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type3)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2195,7 +2195,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2226,7 +2226,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4_vsn)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2256,7 +2256,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4_sd2)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2290,7 +2290,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp_2)
 
 	if (!strcmp(machine().system().name,"salmndr2") || !strcmp(machine().system().name,"salmndr2a"))
 	{
-		K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
+		m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
 		_gxcommoninitnosprites(machine());
 	}
@@ -2303,7 +2303,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp_2)
 VIDEO_START_MEMBER(konamigx_state,opengolf)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2341,7 +2341,7 @@ VIDEO_START_MEMBER(konamigx_state,opengolf)
 VIDEO_START_MEMBER(konamigx_state,racinfrc)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
