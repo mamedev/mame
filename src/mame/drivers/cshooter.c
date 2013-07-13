@@ -93,17 +93,21 @@ class cshooter_state : public driver_device
 public:
 	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_txram;
-	tilemap_t *m_txtilemap;
 	optional_shared_ptr<UINT8> m_mainram;
+	optional_shared_ptr<UINT8> m_spriteram;
+
+	tilemap_t *m_txtilemap;
 	int m_coin_stat;
 	int m_counter;
-	optional_shared_ptr<UINT8> m_spriteram;
+
 	DECLARE_WRITE8_MEMBER(cshooter_txram_w);
 	DECLARE_READ8_MEMBER(cshooter_coin_r);
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
@@ -122,7 +126,6 @@ public:
 	DECLARE_MACHINE_RESET(airraid);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -130,16 +133,10 @@ TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 {
 	int code = (m_txram[tile_index*2]);
 	int attr = (m_txram[tile_index*2+1]);
-	int rg;
-	rg=0;
-	if (attr & 0x20) rg = 1;
+	int rg = (attr & 0x20) ? 1 : 0;
+	int color = attr & 7;
 
-	SET_TILE_INFO_MEMBER(
-
-			rg,
-			(code & 0x1ff),
-			(attr&0x07),
-			0);
+	SET_TILE_INFO_MEMBER(rg, code, color, 0);
 }
 
 WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
@@ -150,7 +147,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 
 void cshooter_state::video_start()
 {
-	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32, 32);
+	m_txtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cshooter_state::get_cstx_tile_info),this),TILEMAP_SCAN_ROWS, 8,8,32,32);
 	m_txtilemap->set_transparent_pen(0);
 }
 
@@ -217,10 +214,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cshooter_state::cshooter_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 
@@ -261,12 +258,11 @@ WRITE8_MEMBER(cshooter_state::pal_w)
 	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0xff;
+
 	r = m_generic_paletteram_8[offset] & 0xf;
-	g = m_generic_paletteram_8[offset+0x100] & 0xf;
-	b = m_generic_paletteram_8[offset] >> 4;
-	palette_set_color_rgb(machine(), offset, pal4bit(r),
-											 pal4bit(g),
-	                                         pal4bit(b));
+	g = m_generic_paletteram_8[offset] >> 4;
+	b = m_generic_paletteram_8[offset+0x100] & 0xf;
+	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_MEMBER(cshooter_state::pal2_w)
@@ -274,13 +270,11 @@ WRITE8_MEMBER(cshooter_state::pal2_w)
 	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
-
+	
 	r = m_generic_paletteram_8[offset] & 0xf;
-	g = m_generic_paletteram_8[offset+0x200] & 0xf;
-	b = m_generic_paletteram_8[offset] >> 4;
-	palette_set_color_rgb(machine(), offset, pal4bit(r),
-											 pal4bit(g),
-	                                         pal4bit(b));
+	g = m_generic_paletteram_8[offset] >> 4;
+	b = m_generic_paletteram_8[offset+0x200] & 0xf;
+	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_MEMBER(cshooter_state::pal_r)
@@ -321,8 +315,6 @@ WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
-//  AM_RANGE(0xb000, 0xb0ff) AM_RAM
-//  AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -436,9 +428,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( airraid )
 	PORT_INCLUDE( cshooter )
 
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -460,12 +457,16 @@ static GFXDECODE_START( cshooter )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
+
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cshooter_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,cshooter)
 
@@ -480,18 +481,20 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
 
-
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( airraid, cshooter_state )
+
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cshooter_state, cshooter_scanline, "screen", 0, 1)
 
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(cshooter_state,airraid)
 
@@ -505,7 +508,6 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x1000)
-
 
 	/* sound hardware */
 	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)
@@ -605,8 +607,9 @@ CPU: SHARP LH0080B (Z80B)
 SND: YM2151, Z80A, SEI80BU 611 787, YM3012, SEI0100BU YM3931
 RAM: TMM2015 x 7, TMM2063 x 1
 DIPs: 2 x 8 position
-OTHER: SEI0020BU TC17G008AN-0015 (x 3), SEI0050BU M  6 4 0 00, SEI10040BU TC15G008AP-0048,
-       SEI0030BU TC17G005AN-0026, SEI0060BU TC17G008AN-0024
+CMOS Gate Arrays: SEI0020BU TC17G008AN-0015 (x 3), SEI10040BU TC15G008AP-0048,
+                  SEI0030BU TC17G005AN-0026, SEI0060BU TC17G008AN-0024
+OTHER: SEI0050BU M  6 4 0 00
 XTAL: 14.318 MHz (near SEI80BU), xx.000 MHz (cant read speed, near SEI0040BU)
 
 There are 3 BIG custom black (resistor?) packs on the PCB.
@@ -737,6 +740,6 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 
 
 
-GAME( 1987, cshooter,  0,        cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter,  airraid,  airraid, cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING )
-GAME( 1987, airraid,   cshooter,  airraid,  airraid, cshooter_state, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING )
+GAME( 1987, cshooter,  0,         cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING )
+GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_NOT_WORKING )
