@@ -1290,13 +1290,11 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
-	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc_isa8_cards, "wdxt_gen", false)
+	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa2", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa3", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa4", pc_isa8_cards, NULL, false)
@@ -1308,6 +1306,36 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pc1640sd )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pc1640sd, pc1640 )
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, NULL,    pc1512_state::floppy_formats)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pc1640dd )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pc1640dd, pc1640 )
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pc1640sd )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pc1640hd20, pc1640sd )
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "wdxt_gen", false)
 MACHINE_CONFIG_END
 
 
@@ -1359,10 +1387,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( pc1640 )
+//  ROM( pc1640sd )
 //-------------------------------------------------
 
-ROM_START( pc1640 )
+ROM_START( pc1640sd )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
 	ROM_SYSTEM_BIOS( 0, "8809", "Week 9/1988" )
 	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
@@ -1375,6 +1403,9 @@ ROM_START( pc1640 )
 	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(3) )
 ROM_END
 
+#define rom_pc1640dd 	rom_pc1640sd
+#define rom_pc1640hd20 	rom_pc1640sd
+
 
 
 //**************************************************************************
@@ -1385,4 +1416,6 @@ ROM_END
 COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V1)",  GAME_SUPPORTS_SAVE )
 COMP( 1987, pc1512v2,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V2)",  GAME_SUPPORTS_SAVE )
 COMP( 1989, pc1512v3,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V3)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640sd,   0,          0,      pc1640sd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640sd,   0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640sd,   0,      pc1640hd20, pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

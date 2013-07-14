@@ -737,7 +737,9 @@ ppc640  // 1987 Amstrad PPC640
 pc1512  // 1986 Amstrad PC1512 v1 (CGA compatible)
 pc1512v2  // 1986 Amstrad PC1512 v2 (CGA compatible)
 pc1512v3  // 1986 Amstrad PC1512 v3.2 (CGA compatible)
-pc1640  // 1987 Amstrad PC1640 (EGA compatible)
+pc1640sd  // 1987 Amstrad PC1640 (EGA compatible)
+pc1640dd
+pc1640hd20
 pc2086
 pc3086
 pc2386
