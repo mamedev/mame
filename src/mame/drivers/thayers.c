@@ -782,15 +782,6 @@ void thayers_state::machine_reset()
 //  laserdisc_set_type(m_laserdisc, newtype);
 }
 
-/* COP400 Interface */
-
-static COP400_INTERFACE( thayers_cop_intf )
-{
-	COP400_CKI_DIVISOR_4, // ???
-	COP400_CKO_OSCILLATOR_OUTPUT, // ???
-	COP400_MICROBUS_DISABLED
-};
-
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( thayers, thayers_state )
@@ -801,7 +792,7 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 
 	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
 	MCFG_CPU_IO_MAP(thayers_cop_io_map)
-	MCFG_CPU_CONFIG(thayers_cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
 
 
 	MCFG_LASERDISC_PR7820_ADD("laserdisc")

@@ -119,13 +119,6 @@ static const floppy_interface lisa_floppy_interface =
 	NULL
 };
 
-static COP400_INTERFACE( cop_intf )
-{
-	COP400_CKI_DIVISOR_16, // ???
-	COP400_CKO_OSCILLATOR_OUTPUT,
-	COP400_MICROBUS_ENABLED
-};
-
 /***************************************************************************
     MACHINE DRIVER
 ***************************************************************************/
@@ -139,11 +132,11 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 
 	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
 	MCFG_CPU_IO_MAP(lisa_cop_io_map)
-	MCFG_CPU_CONFIG(cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
 
 	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
 	MCFG_CPU_IO_MAP(kb_cop_io_map)
-	MCFG_CPU_CONFIG(cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
 
 	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)

@@ -62,13 +62,6 @@ INPUT_PORTS_END
 
 /* Machine Driver */
 
-static COP400_INTERFACE( advision_cop411_interface )
-{
-	COP400_CKI_DIVISOR_4,
-	COP400_CKO_RAM_POWER_SUPPLY, // ??? or not connected
-	COP400_MICROBUS_DISABLED
-};
-
 static MACHINE_CONFIG_START( advision, advision_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_11MHz)
@@ -76,7 +69,7 @@ static MACHINE_CONFIG_START( advision, advision_state )
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
-	MCFG_CPU_CONFIG(advision_cop411_interface)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, COP400_MICROBUS_DISABLED )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */

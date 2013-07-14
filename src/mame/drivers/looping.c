@@ -622,12 +622,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static COP400_INTERFACE( looping_cop_intf )
-{
-	COP400_CKI_DIVISOR_16, // ???
-	COP400_CKO_OSCILLATOR_OUTPUT, // ???
-	COP400_MICROBUS_DISABLED
-};
 
 /*************************************
  *
@@ -651,7 +645,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_CPU_PROGRAM_MAP(looping_cop_map)
 	MCFG_CPU_DATA_MAP(looping_cop_data_map)
 	MCFG_CPU_IO_MAP(looping_cop_io_map)
-	MCFG_CPU_CONFIG(looping_cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
 
 
 	/* video hardware */

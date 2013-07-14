@@ -190,14 +190,6 @@ static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
 	DEVCB_NULL
 };
 
-/* COP400 Interface */
-
-static COP400_INTERFACE( draco_cop_intf )
-{
-	COP400_CKI_DIVISOR_16, // ???
-	COP400_CKO_OSCILLATOR_OUTPUT, // ???
-	COP400_MICROBUS_DISABLED
-};
 
 /* Memory Maps */
 
@@ -518,7 +510,7 @@ static MACHINE_CONFIG_START( draco, draco_state )
 	MCFG_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
 	MCFG_CPU_PROGRAM_MAP(draco_sound_map)
 	MCFG_CPU_IO_MAP(draco_sound_io_map)
-	MCFG_CPU_CONFIG(draco_cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
 
 	/* input/output hardware */
 	MCFG_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)  /* clock is really tied to CDP1876 CMSEL (pin 32) */

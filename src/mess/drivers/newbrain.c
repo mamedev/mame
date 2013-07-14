@@ -1337,13 +1337,6 @@ INTERRUPT_GEN_MEMBER(newbrain_state::newbrain_interrupt)
 	}
 }
 
-static COP400_INTERFACE( newbrain_cop_intf )
-{
-	COP400_CKI_DIVISOR_16, // ???
-	COP400_CKO_OSCILLATOR_OUTPUT,
-	COP400_MICROBUS_ENABLED
-};
-
 /* Machine Drivers */
 
 static const cassette_interface newbrain_cassette_interface =
@@ -1382,7 +1375,7 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 
 	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
 	MCFG_CPU_IO_MAP(newbrain_cop_io_map)
-	MCFG_CPU_CONFIG(newbrain_cop_intf)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
 
 	MCFG_GFXDECODE(newbrain)
 

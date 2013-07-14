@@ -68,6 +68,22 @@
 #include "debugger.h"
 #include "cop400.h"
 
+
+const device_type COP401 = &device_creator<cop401_cpu_device>;
+const device_type COP410 = &device_creator<cop410_cpu_device>;
+const device_type COP411 = &device_creator<cop411_cpu_device>;
+const device_type COP402 = &device_creator<cop402_cpu_device>;
+const device_type COP420 = &device_creator<cop420_cpu_device>;
+const device_type COP421 = &device_creator<cop421_cpu_device>;
+const device_type COP422 = &device_creator<cop422_cpu_device>;
+const device_type COP404 = &device_creator<cop404_cpu_device>;
+const device_type COP424 = &device_creator<cop424_cpu_device>;
+const device_type COP425 = &device_creator<cop425_cpu_device>;
+const device_type COP426 = &device_creator<cop426_cpu_device>;
+const device_type COP444 = &device_creator<cop444_cpu_device>;
+const device_type COP445 = &device_creator<cop445_cpu_device>;
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -78,149 +94,230 @@
 #define COP444_FEATURE  0x04
 #define COP440_FEATURE  0x08
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct cop400_opcode_map;
-
-struct cop400_state
-{
-	const cop400_interface *intf;
-
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	address_space *io;
-
-	UINT8 featuremask;
-
-	/* registers */
-	UINT16  pc;             /* 9/10/11-bit ROM address program counter */
-	UINT16  prevpc;         /* previous value of program counter */
-	UINT8   a;              /* 4-bit accumulator */
-	UINT8   b;              /* 5/6/7-bit RAM address register */
-	int     c;              /* 1-bit carry register */
-	UINT8   n;              /* 2-bit stack pointer (COP440 only) */
-	UINT8   en;             /* 4-bit enable register */
-	UINT8   g;              /* 4-bit general purpose I/O port */
-	UINT8   q;              /* 8-bit latch for L port */
-	UINT16  sa, sb, sc;     /* subroutine save registers (not present in COP440) */
-	UINT8   sio;            /* 4-bit shift register and counter */
-	int     skl;            /* 1-bit latch for SK output */
-	UINT8   h;              /* 4-bit general purpose I/O port (COP440 only) */
-	UINT8   r;              /* 8-bit general purpose I/O port (COP440 only) */
-	UINT8   flags;          // used for I/O only
-
-	/* counter */
-	UINT8   t;              /* 8-bit timer */
-	int     skt_latch;      /* timer overflow latch */
-
-	/* input/output ports */
-	UINT8   g_mask;         /* G port mask */
-	UINT8   d_mask;         /* D port mask */
-	UINT8   in_mask;        /* IN port mask */
-	UINT8   il;             /* IN latch */
-	UINT8   in[4];          /* IN port shift register */
-	UINT8   si;             /* serial input */
-
-	/* skipping logic */
-	int skip;               /* skip next instruction */
-	int skip_lbi;           /* skip until next non-LBI instruction */
-	int last_skip;          /* last value of skip */
-	int halt;               /* halt mode */
-	int idle;               /* idle mode */
-
-	/* microbus */
-	int microbus_int;       /* microbus interrupt */
-
-	/* execution logic */
-	int InstLen[256];       /* instruction length in bytes */
-	int LBIops[256];
-	int LBIops33[256];
-	int icount;             /* instruction counter */
-
-	const cop400_opcode_map *opcode_map;
-
-	/* timers */
-	emu_timer *serial_timer;
-	emu_timer *counter_timer;
-	emu_timer *inil_timer;
-	emu_timer *microbus_timer;
-};
-
-typedef void (*cop400_opcode_func) (cop400_state *cpustate, UINT8 opcode);
-
-struct cop400_opcode_map {
-	unsigned cycles;
-	cop400_opcode_func function;
-};
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-#define ROM(a)          cpustate->direct->read_decrypted_byte(a)
-#define RAM_R(a)        cpustate->data->read_byte(a)
-#define RAM_W(a, v)     cpustate->data->write_byte(a, v)
-#define IN(a)           cpustate->io->read_byte(a)
-#define OUT(a, v)       cpustate->io->write_byte(a, v)
+#define ROM(a)          m_direct->read_decrypted_byte(a)
+#define RAM_R(a)        m_data->read_byte(a)
+#define RAM_W(a, v)     m_data->write_byte(a, v)
+#define IN(a)           m_io->read_byte(a)
+#define OUT(a, v)       m_io->write_byte(a, v)
 
-#define IN_G()          (IN(COP400_PORT_G) & cpustate->g_mask)
+#define IN_G()          (IN(COP400_PORT_G) & m_g_mask)
 #define IN_L()          IN(COP400_PORT_L)
 #define IN_SI()         BIT(IN(COP400_PORT_SIO), 0)
 #define IN_CKO()        BIT(IN(COP400_PORT_CKO), 0)
-#define IN_IN()         (cpustate->in_mask ? IN(COP400_PORT_IN) : 0)
+#define IN_IN()         (m_in_mask ? IN(COP400_PORT_IN) : 0)
 
-#define OUT_G(v)        OUT(COP400_PORT_G, (v) & cpustate->g_mask)
+#define OUT_G(v)        OUT(COP400_PORT_G, (v) & m_g_mask)
 #define OUT_L(v)        OUT(COP400_PORT_L, (v))
-#define OUT_D(v)        OUT(COP400_PORT_D, (v) & cpustate->d_mask)
+#define OUT_D(v)        OUT(COP400_PORT_D, (v) & m_d_mask)
 #define OUT_SK(v)       OUT(COP400_PORT_SK, (v))
 #define OUT_SO(v)       OUT(COP400_PORT_SIO, (v))
 
-#define PC              cpustate->pc
-#define A               cpustate->a
-#define B               cpustate->b
-#define C               cpustate->c
-#define G               cpustate->g
-#define Q               cpustate->q
-#define H               cpustate->h
-#define R               cpustate->r
-#define EN              cpustate->en
-#define SA              cpustate->sa
-#define SB              cpustate->sb
-#define SC              cpustate->sc
-#define SIO             cpustate->sio
-#define SKL             cpustate->skl
-#define T               cpustate->t
-#define IL              cpustate->il
+#define PC              m_pc
+#define A               m_a
+#define B               m_b
+#define C               m_c
+#define G               m_g
+#define Q               m_q
+#define H               m_h
+#define R               m_r
+#define EN              m_en
+#define SA              m_sa
+#define SB              m_sb
+#define SC              m_sc
+#define SIO             m_sio
+#define SKL             m_skl
+#define T               m_t
+#define IL              m_il
+
+
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+static ADDRESS_MAP_START( program_512b, AS_PROGRAM, 8, cop400_cpu_device )
+	AM_RANGE(0x000, 0x1ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( program_1kb, AS_PROGRAM, 8, cop400_cpu_device )
+	AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, cop400_cpu_device )
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_32b, AS_DATA, 8, cop400_cpu_device )
+	AM_RANGE(0x00, 0x1f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_64b, AS_DATA, 8, cop400_cpu_device )
+	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_128b, AS_DATA, 8, cop400_cpu_device )
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+#ifdef UNUSED_CODE
+static ADDRESS_MAP_START( data_160b, AS_DATA, 8, cop400_cpu_device )
+	AM_RANGE(0x00, 0x9f) AM_RAM
+ADDRESS_MAP_END
+#endif
+
+
+cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9, 0)
+	, m_cki(COP400_CKI_DIVISOR_16)
+	, m_cko(COP400_CKO_OSCILLATOR_OUTPUT)
+	, m_microbus(COP400_MICROBUS_DISABLED)
+	, m_has_counter(has_counter)
+	, m_has_inil(has_inil)
+	, m_featuremask(featuremask)
+	, m_g_mask(g_mask)
+	, m_d_mask(d_mask)
+	, m_in_mask(in_mask)
+{
+	int i;
+
+	/* initialize instruction length array */
+	for (i=0; i<256; i++) m_InstLen[i]=1;
+	/* initialize LBI opcode array */
+	for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
+	for (i=0; i<256; i++) m_LBIops33[i] = 0;
+
+	switch (featuremask)
+	{
+		case COP410_FEATURE:
+			/* select opcode map */
+			m_opcode_map = COP410_OPCODE_MAP;
+			/* initialize instruction length array */
+			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x68] =
+			m_InstLen[0x69] = m_InstLen[0x33] = m_InstLen[0x23] = 2;
+			/* initialize LBI opcode array */
+			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
+			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
+			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
+			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
+			break;
+
+		case COP420_FEATURE:
+			/* select opcode map */
+			m_opcode_map = COP420_OPCODE_MAP;
+			/* initialize instruction length array */
+			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
+			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
+			m_InstLen[0x33] = m_InstLen[0x23] = 2;
+			/* initialize LBI opcode array */
+			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
+			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
+			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
+			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
+			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
+			break;
+
+		case COP444_FEATURE:
+			/* select opcode map */
+			m_opcode_map = COP444_OPCODE_MAP;
+			/* initialize instruction length array */
+			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
+			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
+			m_InstLen[0x33] = m_InstLen[0x23] = 2;
+			/* initialize LBI opcode array */
+			for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
+			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
+			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
+			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
+			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
+			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
+			break;
+
+		default:
+			fatalerror("No or unknown featuremask supplied\n");
+			break;
+	}
+}
+
+cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, NULL, ADDRESS_MAP_NAME(data_32b))
+{
+}
+
+cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+{
+}
+
+cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 5, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+{
+}
+
+cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP402, "COP402", tag, owner, clock, "cop402", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, NULL, ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop420_cpu_device::cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP420, "COP420", tag, owner, clock, "cop420", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop421_cpu_device::cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP421, "COP421", tag, owner, clock, "cop421", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP422, "COP422", tag, owner, clock, "cop422", __FILE__, 10, 6, COP420_FEATURE, 0xe, 0xe, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop404_cpu_device::cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP404, "COP404", tag, owner, clock, "cop404", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, NULL, ADDRESS_MAP_NAME(data_128b))
+{
+}
+
+cop424_cpu_device::cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP424, "COP424", tag, owner, clock, "cop424", __FILE__, 10, 6, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop425_cpu_device::cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP425, "COP425", tag, owner, clock, "cop425", __FILE__, 10, 6, COP444_FEATURE, 0xf, 0xf, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop426_cpu_device::cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP426, "COP426", tag, owner, clock, "cop426", __FILE__, 10, 6, COP444_FEATURE, 0xe, 0xe, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
+{
+}
+
+cop444_cpu_device::cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP444, "COP444", tag, owner, clock, "cop444", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_2kb), ADDRESS_MAP_NAME(data_128b))
+{
+}
+
+cop445_cpu_device::cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cop400_cpu_device(mconfig, COP445, "COP445", tag, owner, clock, "cop445", __FILE__, 11, 7, COP444_FEATURE, 0x7, 0x3, 0, true, false, ADDRESS_MAP_NAME(program_2kb), ADDRESS_MAP_NAME(data_128b))
+{
+}
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE cop400_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == COP401 ||
-			device->type() == COP410 ||
-			device->type() == COP411 ||
-			device->type() == COP402 ||
-			device->type() == COP420 ||
-			device->type() == COP421 ||
-			device->type() == COP422 ||
-			device->type() == COP404 ||
-			device->type() == COP424 ||
-			device->type() == COP425 ||
-			device->type() == COP426 ||
-			device->type() == COP444 ||
-			device->type() == COP445);
-	return (cop400_state *)downcast<legacy_cpu_device *>(device)->token();
-}
 
-INLINE void PUSH(cop400_state *cpustate, UINT16 data)
+void cop400_cpu_device::PUSH(UINT16 data)
 {
-	if (cpustate->featuremask != COP410_FEATURE)
+	if (m_featuremask != COP410_FEATURE)
 	{
 		SC = SB;
 	}
@@ -229,18 +326,18 @@ INLINE void PUSH(cop400_state *cpustate, UINT16 data)
 	SA = data;
 }
 
-INLINE void POP(cop400_state *cpustate)
+void cop400_cpu_device::POP()
 {
 	PC = SA;
 	SA = SB;
 
-	if (cpustate->featuremask != COP410_FEATURE)
+	if (m_featuremask != COP410_FEATURE)
 	{
 		SB = SC;
 	}
 }
 
-INLINE void WRITE_Q(cop400_state *cpustate, UINT8 data)
+void cop400_cpu_device::WRITE_Q(UINT8 data)
 {
 	Q = data;
 
@@ -250,11 +347,11 @@ INLINE void WRITE_Q(cop400_state *cpustate, UINT8 data)
 	}
 }
 
-INLINE void WRITE_G(cop400_state *cpustate, UINT8 data)
+void cop400_cpu_device::WRITE_G(UINT8 data)
 {
-	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
+	if (m_microbus == COP400_MICROBUS_ENABLED)
 	{
-		data = (data & 0x0e) | cpustate->microbus_int;
+		data = (data & 0x0e) | m_microbus_int;
 	}
 
 	G = data;
@@ -266,7 +363,8 @@ INLINE void WRITE_G(cop400_state *cpustate, UINT8 data)
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(cop400_state *cpustate, UINT8 opcode)
+#define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(UINT8 opcode)
+#define INST(mnemonic) &cop400_cpu_device::mnemonic
 
 INSTRUCTION(illegal)
 {
@@ -279,407 +377,405 @@ INSTRUCTION(illegal)
     OPCODE TABLES
 ***************************************************************************/
 
-static const cop400_opcode_map COP410_OPCODE_23_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_23_MAP[] =
 {
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, xad       },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(xad)       },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   }
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-static void cop410_op23(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop410_op23(UINT8 opcode)
 {
 	UINT8 opcode23 = ROM(PC++);
 
-	(*(COP410_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+	(this->*COP410_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
 
-static const cop400_opcode_map COP410_OPCODE_33_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_33_MAP[] =
 {
-	{1, illegal     },{1, skgbz0    },{1, illegal   },{1, skgbz2    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgbz1    },{1, illegal   },{1, skgbz3    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgz      },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, ing       },{1, illegal   },{1, illegal   },{1, illegal   },{1, inl       },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, halt        },{1, illegal   },{1, omg       },{1, illegal   },{1, camq      },{1, illegal   },{1, obd       },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(halt)        },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   }
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-static void cop410_op33(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop410_op33(UINT8 opcode)
 {
 	UINT8 opcode33 = ROM(PC++);
 
-	(*(COP410_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+	(this->*COP410_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
 
-static const cop400_opcode_map COP410_OPCODE_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_MAP[] =
 {
-	{1, clra        },{1, skmbz0    },{1, xor_      },{1, skmbz2        },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{0, illegal     },{1, skmbz1    },{0, illegal   },{1, skmbz3        },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, skc         },{1, ske       },{1, sc        },{1, cop410_op23   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, asc         },{1, add       },{1, rc        },{1, cop410_op33   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{0, INST(illegal)     },{1, INST(skmbz1)    },{0, INST(illegal)   },{1, INST(skmbz3)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop410_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop410_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 
-	{1, comp        },{0, illegal   },{1, rmb2      },{1, rmb3          },{1, nop       },{1, rmb1      },{1, smb2      },{1, smb1      },
-	{1, ret         },{1, retsk     },{0, illegal   },{1, smb3          },{1, rmb0      },{1, smb0      },{1, cba       },{1, xas       },
-	{1, cab         },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{1, aisc        },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{2, jmp         },{2, jmp       },{0, illegal   },{0, illegal       },{0, illegal   },{0, illegal   },{0, illegal   },{0, illegal   },
-	{2, jsr         },{2, jsr       },{0, illegal   },{0, illegal       },{0, illegal   },{0, illegal   },{0, illegal   },{0, illegal   },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
+	{1, INST(comp)        },{0, INST(illegal)   },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
+	{1, INST(ret)         },{1, INST(retsk)     },{0, INST(illegal)   },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
+	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{2, INST(jmp)         },{2, INST(jmp)       },{0, INST(illegal)   },{0, INST(illegal)       },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
+	{2, INST(jsr)         },{2, INST(jsr)       },{0, INST(illegal)   },{0, INST(illegal)       },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, lqid      },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, jid       }
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
 };
 
-static const cop400_opcode_map COP420_OPCODE_23_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_23_MAP[] =
 {
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   }
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-static void cop420_op23(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop420_op23(UINT8 opcode)
 {
 	UINT8 opcode23 = ROM(PC++);
 
-	(*(COP420_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+	(this->*COP420_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
 
-static const cop400_opcode_map COP420_OPCODE_33_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_33_MAP[] =
 {
-	{1, illegal     },{1, skgbz0    },{1, illegal   },{1, skgbz2    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgbz1    },{1, illegal   },{1, skgbz3    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgz      },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, inin        },{1, inil      },{1, ing       },{1, illegal   },{1, cqma      },{1, illegal   },{1, inl       },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, omg       },{1, illegal   },{1, camq      },{1, illegal   },{1, obd       },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(inin)        },{1, INST(inil)      },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(cqma)      },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(illegal)   },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, ogi         },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },
-	{1, ogi         },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
+	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   }
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-static void cop420_op33(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop420_op33(UINT8 opcode)
 {
 	UINT8 opcode33 = ROM(PC++);
 
-	(*(COP420_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+	(this->*COP420_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
 
-static const cop400_opcode_map COP420_OPCODE_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_MAP[] =
 {
-	{1, clra        },{1, skmbz0    },{1, xor_      },{1, skmbz2        },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, casc        },{1, skmbz1    },{1, xabr      },{1, skmbz3        },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, skc         },{1, ske       },{1, sc        },{1, cop420_op23   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, asc         },{1, add       },{1, rc        },{1, cop420_op33   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(casc)        },{1, INST(skmbz1)    },{1, INST(xabr)      },{1, INST(skmbz3)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop420_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop420_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 
-	{1, comp        },{1, skt       },{1, rmb2      },{1, rmb3          },{1, nop       },{1, rmb1      },{1, smb2      },{1, smb1      },
-	{1, cop420_ret  },{1, retsk     },{1, adt       },{1, smb3          },{1, rmb0      },{1, smb0      },{1, cba       },{1, xas       },
-	{1, cab         },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{1, aisc        },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{2, jmp         },{2, jmp       },{2, jmp       },{2, jmp           },{0, illegal   },{0, illegal   },{0, illegal   },{0, illegal   },
-	{2, jsr         },{2, jsr       },{2, jsr       },{2, jsr           },{0, illegal   },{0, illegal   },{0, illegal   },{0, illegal   },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
+	{1, INST(comp)        },{1, INST(skt)       },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
+	{1, INST(cop420_ret)  },{1, INST(retsk)     },{1, INST(adt)       },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
+	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{2, INST(jmp)         },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)           },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
+	{2, INST(jsr)         },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)           },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },{0, INST(illegal)   },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, lqid      },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, jid       }
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
 };
 
-static const cop400_opcode_map COP444_OPCODE_23_MAP[256] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_23_MAP[256] =
 {
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
 
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
-	{1, ldd         },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },{1, ldd       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
+	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
 
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
 
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
-	{1, xad         },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },{1, xad       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
+	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
 };
 
-static void cop444_op23(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop444_op23(UINT8 opcode)
 {
 	UINT8 opcode23 = ROM(PC++);
 
-	(*(COP444_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+	(this->*COP444_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
 
-static const cop400_opcode_map COP444_OPCODE_33_MAP[256] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_33_MAP[256] =
 {
-	{1, illegal     },{1, skgbz0    },{1, illegal   },{1, skgbz2    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgbz1    },{1, illegal   },{1, skgbz3    },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, skgz      },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, inin        },{1, inil      },{1, ing       },{1, illegal   },{1, cqma      },{1, illegal   },{1, inl       },{1, ctma      },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, it          },{1, illegal   },{1, omg       },{1, illegal   },{1, camq      },{1, illegal   },{1, obd       },{1, camt      },
+	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgbz1)    },{1, INST(illegal)   },{1, INST(skgbz3)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(skgz)      },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(inin)        },{1, INST(inil)      },{1, INST(ing)       },{1, INST(illegal)   },{1, INST(cqma)      },{1, INST(illegal)   },{1, INST(inl)       },{1, INST(ctma)      },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(it)          },{1, INST(illegal)   },{1, INST(omg)       },{1, INST(illegal)   },{1, INST(camq)      },{1, INST(illegal)   },{1, INST(obd)       },{1, INST(camt)      },
 
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, ogi         },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },
-	{1, ogi         },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },{1, ogi       },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, lei         },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },{1, lei       },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
-	{1, illegal     },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },{1, illegal   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
+	{1, INST(ogi)         },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },{1, INST(ogi)       },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(lei)         },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },{1, INST(lei)       },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
+	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 };
 
-static void cop444_op33(cop400_state *cpustate, UINT8 opcode)
+void cop400_cpu_device::cop444_op33(UINT8 opcode)
 {
 	UINT8 opcode33 = ROM(PC++);
 
-	(*(COP444_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+	(this->*COP444_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
 
-static const cop400_opcode_map COP444_OPCODE_MAP[256] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_MAP[256] =
 {
-	{1, clra        },{1, skmbz0    },{1, xor_      },{1, skmbz2        },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, casc        },{1, skmbz1    },{1, cop444_xabr},{1, skmbz3       },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, skc         },{1, ske       },{1, sc        },{1, cop444_op23   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
-	{1, asc         },{1, add       },{1, rc        },{1, cop444_op33   },{1, xis       },{1, ld        },{1, x         },{1, xds       },
-	{1, lbi         },{1, lbi       },{1, lbi       },{1, lbi           },{1, lbi       },{1, lbi       },{1, lbi       },{1, lbi       },
+	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(casc)        },{1, INST(skmbz1)    },{1, INST(cop444_xabr)},{1, INST(skmbz3)       },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(skc)         },{1, INST(ske)       },{1, INST(sc)        },{1, INST(cop444_op23)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
+	{1, INST(asc)         },{1, INST(add)       },{1, INST(rc)        },{1, INST(cop444_op33)   },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
+	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 
-	{1, comp        },{1, skt       },{1, rmb2      },{1, rmb3          },{1, nop       },{1, rmb1      },{1, smb2      },{1, smb1      },
-	{1, cop420_ret  },{1, retsk     },{1, adt       },{1, smb3          },{1, rmb0      },{1, smb0      },{1, cba       },{1, xas       },
-	{1, cab         },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{1, aisc        },{1, aisc      },{1, aisc      },{1, aisc          },{1, aisc      },{1, aisc      },{1, aisc      },{1, aisc      },
-	{2, jmp         },{2, jmp       },{2, jmp       },{2, jmp           },{2, jmp       },{2, jmp       },{2, jmp       },{2, jmp       },
-	{2, jsr         },{2, jsr       },{2, jsr       },{2, jsr           },{2, jsr       },{2, jsr       },{2, jsr       },{2, jsr       },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
-	{1, stii        },{1, stii      },{1, stii      },{1, stii          },{1, stii      },{1, stii      },{1, stii      },{1, stii      },
+	{1, INST(comp)        },{1, INST(skt)       },{1, INST(rmb2)      },{1, INST(rmb3)          },{1, INST(nop)       },{1, INST(rmb1)      },{1, INST(smb2)      },{1, INST(smb1)      },
+	{1, INST(cop420_ret)  },{1, INST(retsk)     },{1, INST(adt)       },{1, INST(smb3)          },{1, INST(rmb0)      },{1, INST(smb0)      },{1, INST(cba)       },{1, INST(xas)       },
+	{1, INST(cab)         },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{1, INST(aisc)        },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)          },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },{1, INST(aisc)      },
+	{2, INST(jmp)         },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)           },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)       },{2, INST(jmp)       },
+	{2, INST(jsr)         },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)           },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)       },{2, INST(jsr)       },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
+	{1, INST(stii)        },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)          },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },{1, INST(stii)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, lqid      },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(lqid)      },
 
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{1, jp        },
-	{1, jp          },{1, jp        },{1, jp        },{1, jp            },{1, jp        },{1, jp        },{1, jp        },{2, jid       }
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },
+	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
 };
 
 /***************************************************************************
     TIMER CALLBACKS
 ***************************************************************************/
 
-static TIMER_CALLBACK( serial_tick )
+void cop400_cpu_device::serial_tick()
 {
-	cop400_state *cpustate = (cop400_state *)ptr;
-
 	if (BIT(EN, 0))
 	{
 		/*
@@ -700,10 +796,10 @@ static TIMER_CALLBACK( serial_tick )
 
 		// serial input
 
-		cpustate->si <<= 1;
-		cpustate->si = (cpustate->si & 0x0e) | IN_SI();
+		m_si <<= 1;
+		m_si = (m_si & 0x0e) | IN_SI();
 
-		if ((cpustate->si & 0x0f) == 0x0c) // 1100
+		if ((m_si & 0x0f) == 0x0c) // 1100
 		{
 			SIO--;
 			SIO &= 0x0f;
@@ -751,27 +847,24 @@ static TIMER_CALLBACK( serial_tick )
 	}
 }
 
-static TIMER_CALLBACK( counter_tick )
+void cop400_cpu_device::counter_tick()
 {
-	cop400_state *cpustate = (cop400_state *)ptr;
-
 	T++;
 
 	if (T == 0)
 	{
-		cpustate->skt_latch = 1;
+		m_skt_latch = 1;
 
-		if (cpustate->idle)
+		if (m_idle)
 		{
-			cpustate->idle = 0;
-			cpustate->halt = 0;
+			m_idle = 0;
+			m_halt = 0;
 		}
 	}
 }
 
-static TIMER_CALLBACK( inil_tick )
+void cop400_cpu_device::inil_tick()
 {
-	cop400_state *cpustate = (cop400_state *)ptr;
 	UINT8 in;
 	int i;
 
@@ -779,18 +872,17 @@ static TIMER_CALLBACK( inil_tick )
 
 	for (i = 0; i < 4; i++)
 	{
-		cpustate->in[i] = (cpustate->in[i] << 1) | BIT(in, i);
+		m_in[i] = (m_in[i] << 1) | BIT(in, i);
 
-		if ((cpustate->in[i] & 0x07) == 0x04) // 100
+		if ((m_in[i] & 0x07) == 0x04) // 100
 		{
 			IL |= (1 << i);
 		}
 	}
 }
 
-static TIMER_CALLBACK( microbus_tick )
+void cop400_cpu_device::microbus_tick()
 {
-	cop400_state *cpustate = (cop400_state *)ptr;
 	UINT8 in;
 
 	in = IN_IN();
@@ -805,7 +897,7 @@ static TIMER_CALLBACK( microbus_tick )
 
 			OUT_L(Q);
 
-			cpustate->microbus_int = 1;
+			m_microbus_int = 1;
 		}
 		else if (!BIT(in, 3))
 		{
@@ -813,7 +905,7 @@ static TIMER_CALLBACK( microbus_tick )
 
 			Q = IN_L();
 
-			cpustate->microbus_int = 0;
+			m_microbus_int = 0;
 		}
 	}
 }
@@ -822,379 +914,268 @@ static TIMER_CALLBACK( microbus_tick )
     INITIALIZATION
 ***************************************************************************/
 
-static void define_state_table(device_t *device)
+enum {
+	TIMER_SERIAL,
+	TIMER_COUNTER,
+	TIMER_INIL,
+	TIMER_MICROBUS
+};
+
+void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	cop400_state *cpustate = get_safe_token(device);
-
-	device_state_interface *state;
-	device->interface(state);
-	state->state_add(STATE_GENPC,     "GENPC",     cpustate->pc).mask(0xfff).noshow();
-	state->state_add(STATE_GENPCBASE, "GENPCBASE", cpustate->prevpc).mask(0xfff).noshow();
-	state->state_add(STATE_GENSP,     "GENSP",     cpustate->n).mask(0x3).noshow();
-	state->state_add(STATE_GENFLAGS,  "GENFLAGS",  cpustate->flags).mask(0x3).callimport().callexport().noshow().formatstr("%2s");
-
-	state->state_add(COP400_PC,       "PC",        cpustate->pc).mask(0xfff);
-
-	if (cpustate->featuremask & (COP410_FEATURE | COP420_FEATURE | COP444_FEATURE))
+	switch (id)
 	{
-		state->state_add(COP400_SA,   "SA",        cpustate->sa).mask(0xfff);
-		state->state_add(COP400_SB,   "SB",        cpustate->sb).mask(0xfff);
-		if (cpustate->featuremask & (COP420_FEATURE | COP444_FEATURE))
-			state->state_add(COP400_SC, "SC",      cpustate->sc).mask(0xfff);
+		case TIMER_SERIAL:
+			serial_tick();
+			break;
+
+		case TIMER_COUNTER:
+			counter_tick();
+			break;
+
+		case TIMER_INIL:
+			inil_tick();
+			break;
+
+		case TIMER_MICROBUS:
+			microbus_tick();
+			break;
 	}
-	if (cpustate->featuremask & COP440_FEATURE)
-		state->state_add(COP400_N,    "N",         cpustate->n).mask(0x3);
-
-	state->state_add(COP400_A,        "A",         cpustate->a).mask(0xf);
-	state->state_add(COP400_B,        "B",         cpustate->b);
-	state->state_add(COP400_C,        "C",         cpustate->c).mask(0x1);
-
-	state->state_add(COP400_EN,       "EN",        cpustate->en).mask(0xf);
-	state->state_add(COP400_G,        "G",         cpustate->g).mask(0xf);
-	if (cpustate->featuremask & COP440_FEATURE)
-		state->state_add(COP400_H,    "H",         cpustate->h).mask(0xf);
-	state->state_add(COP400_Q,        "Q",         cpustate->q);
-	if (cpustate->featuremask & COP440_FEATURE)
-		state->state_add(COP400_R,    "R",         cpustate->r);
-
-	state->state_add(COP400_SIO,      "SIO",       cpustate->sio).mask(0xf);
-	state->state_add(COP400_SKL,      "SKL",       cpustate->skl).mask(0x1);
-
-	if (cpustate->featuremask & (COP420_FEATURE | COP444_FEATURE | COP440_FEATURE))
-		state->state_add(COP400_T,    "T",         cpustate->t);
 }
 
-static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+
+void cop400_cpu_device::device_start()
 {
-	cop400_state *cpustate = get_safe_token(device);
-
-	cpustate->intf = (cop400_interface *) device->static_config();
-
 	/* find address spaces */
 
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
-
-	/* set output pin masks */
-
-	cpustate->g_mask = g_mask;
-	cpustate->d_mask = d_mask;
-	cpustate->in_mask = in_mask;
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
 	/* allocate serial timer */
 
-	cpustate->serial_timer = device->machine().scheduler().timer_alloc(FUNC(serial_tick), cpustate);
-	cpustate->serial_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+	m_serial_timer = timer_alloc(TIMER_SERIAL);
+	m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
 
 	/* allocate counter timer */
 
-	if (has_counter)
+	m_counter_timer = NULL;
+	if (m_has_counter)
 	{
-		cpustate->counter_timer = device->machine().scheduler().timer_alloc(FUNC(counter_tick), cpustate);
-		cpustate->counter_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16 / 4));
+		m_counter_timer = timer_alloc(TIMER_COUNTER);
+		m_counter_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16 / 4));
 	}
 
 	/* allocate IN latch timer */
 
-	if (has_inil)
+	m_inil_timer = NULL;
+	if (m_has_inil)
 	{
-		cpustate->inil_timer = device->machine().scheduler().timer_alloc(FUNC(inil_tick), cpustate);
-		cpustate->inil_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+		m_inil_timer = timer_alloc(TIMER_INIL);
+		m_inil_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
 	}
 
 	/* allocate Microbus timer */
 
-	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
+	m_microbus_timer = NULL;
+	if (m_microbus == COP400_MICROBUS_ENABLED)
 	{
-		cpustate->microbus_timer = device->machine().scheduler().timer_alloc(FUNC(microbus_tick), cpustate);
-		cpustate->microbus_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock() / 16));
+		m_microbus_timer = timer_alloc(TIMER_MICROBUS);
+		m_microbus_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
 	}
 
 	/* register for state saving */
 
-	device->save_item(NAME(cpustate->pc));
-	device->save_item(NAME(cpustate->prevpc));
-	device->save_item(NAME(cpustate->n));
-	device->save_item(NAME(cpustate->sa));
-	device->save_item(NAME(cpustate->sb));
-	device->save_item(NAME(cpustate->sc));
-	device->save_item(NAME(cpustate->a));
-	device->save_item(NAME(cpustate->b));
-	device->save_item(NAME(cpustate->c));
-	device->save_item(NAME(cpustate->g));
-	device->save_item(NAME(cpustate->h));
-	device->save_item(NAME(cpustate->q));
-	device->save_item(NAME(cpustate->r));
-	device->save_item(NAME(cpustate->en));
-	device->save_item(NAME(cpustate->sio));
-	device->save_item(NAME(cpustate->skl));
-	device->save_item(NAME(cpustate->t));
-	device->save_item(NAME(cpustate->skip));
-	device->save_item(NAME(cpustate->skip_lbi));
-	device->save_item(NAME(cpustate->skt_latch));
-	device->save_item(NAME(cpustate->si));
-	device->save_item(NAME(cpustate->last_skip));
-	device->save_item(NAME(cpustate->in));
-	device->save_item(NAME(cpustate->microbus_int));
-	device->save_item(NAME(cpustate->halt));
-	device->save_item(NAME(cpustate->idle));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_prevpc));
+	save_item(NAME(m_n));
+	save_item(NAME(m_sa));
+	save_item(NAME(m_sb));
+	save_item(NAME(m_sc));
+	save_item(NAME(m_a));
+	save_item(NAME(m_b));
+	save_item(NAME(m_c));
+	save_item(NAME(m_g));
+	save_item(NAME(m_h));
+	save_item(NAME(m_q));
+	save_item(NAME(m_r));
+	save_item(NAME(m_en));
+	save_item(NAME(m_sio));
+	save_item(NAME(m_skl));
+	save_item(NAME(m_t));
+	save_item(NAME(m_skip));
+	save_item(NAME(m_skip_lbi));
+	save_item(NAME(m_skt_latch));
+	save_item(NAME(m_si));
+	save_item(NAME(m_last_skip));
+	save_item(NAME(m_in));
+	save_item(NAME(m_microbus_int));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_idle));
+
+	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_prevpc).mask(0xfff).noshow();
+	state_add(STATE_GENSP,     "GENSP",     m_n).mask(0x3).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).mask(0x3).callimport().callexport().noshow().formatstr("%3s");
+
+	state_add(COP400_PC,       "PC",        m_pc).mask(0xfff);
+
+	if (m_featuremask & (COP410_FEATURE | COP420_FEATURE | COP444_FEATURE))
+	{
+		state_add(COP400_SA,   "SA",        m_sa).mask(0xfff);
+		state_add(COP400_SB,   "SB",        m_sb).mask(0xfff);
+		if (m_featuremask & (COP420_FEATURE | COP444_FEATURE))
+		{
+			state_add(COP400_SC, "SC",      m_sc).mask(0xfff);
+		}
+	}
+	if (m_featuremask & COP440_FEATURE)
+	{
+		state_add(COP400_N,    "N",         m_n).mask(0x3);
+	}
+
+	state_add(COP400_A,        "A",         m_a).mask(0xf);
+	state_add(COP400_B,        "B",         m_b);
+	state_add(COP400_C,        "C",         m_c).mask(0x1);
+
+	state_add(COP400_EN,       "EN",        m_en).mask(0xf);
+	state_add(COP400_G,        "G",         m_g).mask(0xf);
+	if (m_featuremask & COP440_FEATURE)
+	{
+		state_add(COP400_H,    "H",         m_h).mask(0xf);
+	}
+	state_add(COP400_Q,        "Q",         m_q);
+	if (m_featuremask & COP440_FEATURE)
+	{
+		state_add(COP400_R,    "R",         m_r);
+	}
+
+	state_add(COP400_SIO,      "SIO",       m_sio).mask(0xf);
+	state_add(COP400_SKL,      "SKL",       m_skl).mask(0x1);
+
+	if (m_featuremask & (COP420_FEATURE | COP444_FEATURE | COP440_FEATURE))
+	{
+		state_add(COP400_T,    "T",         m_t);
+	}
+
+	m_icountptr = &m_icount;
+
+	m_n = 0;
+	m_q = 0;
+	m_sa = 0;
+	m_sb = 0;
+	m_sc = 0;
+	m_sio = 0;
+	m_h = 0;
+	m_r = 0;
+	m_flags = 0;
+	m_il = 0;
+	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
+	m_si = 0;
+	m_skip_lbi = 0;
+	m_last_skip = 0;
+	m_microbus_int = 0;
+	m_skip = 0;
 }
 
-static void cop410_init_opcodes(device_t *device)
-{
-	cop400_state *cpustate = get_safe_token(device);
-	int i;
-
-	/* set up the state table */
-
-	cpustate->featuremask = COP410_FEATURE;
-	define_state_table(device);
-
-	/* initialize instruction length array */
-
-	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
-
-	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x68] =
-	cpustate->InstLen[0x69] = cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
-
-	/* initialize LBI opcode array */
-
-	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
-	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
-	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
-	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
-	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
-
-	/* select opcode map */
-
-	cpustate->opcode_map = COP410_OPCODE_MAP;
-}
-
-static void cop420_init_opcodes(device_t *device)
-{
-	cop400_state *cpustate = get_safe_token(device);
-	int i;
-
-	/* set up the state table */
-
-	cpustate->featuremask = COP420_FEATURE;
-	define_state_table(device);
-
-	/* initialize instruction length array */
-
-	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
-
-	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x62] = cpustate->InstLen[0x63] =
-	cpustate->InstLen[0x68] = cpustate->InstLen[0x69] = cpustate->InstLen[0x6a] = cpustate->InstLen[0x6b] =
-	cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
-
-	/* initialize LBI opcode array */
-
-	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
-	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
-	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
-	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
-	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
-
-	for (i=0; i<256; i++) cpustate->LBIops33[i] = 0;
-	for (i=0x80; i<0xc0; i++) cpustate->LBIops33[i] = 1;
-
-	/* select opcode map */
-
-	cpustate->opcode_map = COP420_OPCODE_MAP;
-}
-
-static void cop444_init_opcodes(device_t *device)
-{
-	cop400_state *cpustate = get_safe_token(device);
-	int i;
-
-	/* set up the state table */
-
-	cpustate->featuremask = COP444_FEATURE;
-	define_state_table(device);
-
-	/* initialize instruction length array */
-
-	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
-
-	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x62] = cpustate->InstLen[0x63] =
-	cpustate->InstLen[0x68] = cpustate->InstLen[0x69] = cpustate->InstLen[0x6a] = cpustate->InstLen[0x6b] =
-	cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
-
-	/* initialize LBI opcode array */
-
-	for (i=0x00; i<0x100; i++) cpustate->LBIops[i] = 0;
-	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
-	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
-	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
-	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
-
-	for (i=0; i<256; i++) cpustate->LBIops33[i] = 0;
-	for (i=0x80; i<0xc0; i++) cpustate->LBIops33[i] = 1;
-
-	/* select opcode map */
-
-	cpustate->opcode_map = COP444_OPCODE_MAP;
-}
-
-static CPU_INIT( cop410 )
-{
-	cop410_init_opcodes(device);
-	cop400_init(device, 0xf, 0xf, 0, 0, 0);
-}
-
-static CPU_INIT( cop411 )
-{
-	cop410_init_opcodes(device);
-	cop400_init(device, 0x7, 0x3, 0, 0, 0);
-}
-
-static CPU_INIT( cop420 )
-{
-	cop420_init_opcodes(device);
-	cop400_init(device, 0xf, 0xf, 0xf, 1, 1);
-}
-
-static CPU_INIT( cop421 )
-{
-	cop420_init_opcodes(device);
-	cop400_init(device, 0xf, 0xf, 0, 1, 0);
-}
-
-static CPU_INIT( cop422 )
-{
-	cop420_init_opcodes(device);
-	cop400_init(device, 0xe, 0xe, 0, 1, 0);
-}
-
-static CPU_INIT( cop444 )
-{
-	cop444_init_opcodes(device);
-	cop400_init(device, 0xf, 0xf, 0xf, 1, 1);
-}
-
-static CPU_INIT( cop425 )
-{
-	cop444_init_opcodes(device);
-	cop400_init(device, 0xf, 0xf, 0, 1, 0);
-}
-
-static CPU_INIT( cop426 )
-{
-	cop444_init_opcodes(device);
-	cop400_init(device, 0xe, 0xe, 0xf, 1, 1);
-}
-
-static CPU_INIT( cop445 )
-{
-	cop444_init_opcodes(device);
-	cop400_init(device, 0x7, 0x3, 0, 1, 0);
-}
 
 /***************************************************************************
     RESET
 ***************************************************************************/
 
-static CPU_RESET( cop400 )
+void cop400_cpu_device::device_reset()
 {
-	cop400_state *cpustate = get_safe_token(device);
-
 	PC = 0;
 	A = 0;
 	B = 0;
 	C = 0;
 	OUT_D(0);
 	EN = 0;
-	WRITE_G(cpustate, 0);
+	WRITE_G(0);
 	SKL = 1;
 
 	T = 0;
-	cpustate->skt_latch = 1;
+	m_skt_latch = 1;
 
-	cpustate->halt = 0;
-	cpustate->idle = 0;
+	m_halt = 0;
+	m_idle = 0;
 }
 
 /***************************************************************************
     EXECUTION
 ***************************************************************************/
 
-static CPU_EXECUTE( cop400 )
+void cop400_cpu_device::execute_run()
 {
-	cop400_state *cpustate = get_safe_token(device);
-
 	UINT8 opcode;
 
 	do
 	{
-		cpustate->prevpc = PC;
+		m_prevpc = PC;
 
-		debugger_instruction_hook(device, PC);
+		debugger_instruction_hook(this, PC);
 
-		if (cpustate->intf->cko == COP400_CKO_HALT_IO_PORT)
+		if (m_cko == COP400_CKO_HALT_IO_PORT)
 		{
-			cpustate->halt = IN_CKO();
+			m_halt = IN_CKO();
 		}
 
-		if (cpustate->halt)
+		if (m_halt)
 		{
-			cpustate->icount -= 1;
+			m_icount -= 1;
 			continue;
 		}
 
 		opcode = ROM(PC);
-
-		if (cpustate->skip_lbi)
+		if (m_skip_lbi)
 		{
 			int is_lbi = 0;
 
 			if (opcode == 0x33)
 			{
-				is_lbi = cpustate->LBIops33[ROM(PC+1)];
+				is_lbi = m_LBIops33[ROM(PC+1)];
 			}
 			else
 			{
-				is_lbi = cpustate->LBIops[opcode];
+				is_lbi = m_LBIops[opcode];
 			}
 
 			if (is_lbi)
 			{
-				cpustate->icount -= cpustate->opcode_map[opcode].cycles;
+				m_icount -= m_opcode_map[opcode].cycles;
 
-				PC += cpustate->InstLen[opcode];
+				PC += m_InstLen[opcode];
 			}
 			else
 			{
-				cpustate->skip_lbi = 0;
+				m_skip_lbi = 0;
 			}
 		}
 
-		if (!cpustate->skip_lbi)
+		if (!m_skip_lbi)
 		{
-			int inst_cycles = cpustate->opcode_map[opcode].cycles;
+			int inst_cycles = m_opcode_map[opcode].cycles;
 
 			PC++;
 
-			(*(cpustate->opcode_map[opcode].function))(cpustate, opcode);
-			cpustate->icount -= inst_cycles;
+			(this->*(m_opcode_map[opcode].function))(opcode);
+			m_icount -= inst_cycles;
 
 			// check for interrupt
 
 			if (BIT(EN, 1) && BIT(IL, 1))
 			{
-				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
-				if ((function != jp) && (function != jmp) && (function != jsr))
+				if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)))
 				{
 					// store skip logic
-					cpustate->last_skip = cpustate->skip;
-					cpustate->skip = 0;
+					m_last_skip = m_skip;
+					m_skip = 0;
 
 					// push next PC
-					PUSH(cpustate, PC);
+					PUSH(PC);
 
 					// jump to interrupt service routine
 					PC = 0x0ff;
@@ -1208,501 +1189,85 @@ static CPU_EXECUTE( cop400 )
 
 			// skip next instruction?
 
-			if (cpustate->skip)
+			if (m_skip)
 			{
-				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
 				opcode = ROM(PC);
 
-				if ((function == lqid) || (function == jid))
+				if ((function == INST(lqid)) || (function == INST(jid)))
 				{
-					cpustate->icount -= 1;
+					m_icount -= 1;
 				}
 				else
 				{
-					cpustate->icount -= cpustate->opcode_map[opcode].cycles;
+					m_icount -= m_opcode_map[opcode].cycles;
 				}
 
-				PC += cpustate->InstLen[opcode];
+				PC += m_InstLen[opcode];
 
-				cpustate->skip = 0;
+				m_skip = 0;
 			}
 		}
-	} while (cpustate->icount > 0);
+	} while (m_icount > 0);
 }
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
-
-static ADDRESS_MAP_START( program_512b, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( program_1kb, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( data_32b, AS_DATA, 8, legacy_cpu_device )
-	AM_RANGE(0x00, 0x1f) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( data_64b, AS_DATA, 8, legacy_cpu_device )
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( data_128b, AS_DATA, 8, legacy_cpu_device )
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
-
-#ifdef UNUSED_CODE
-static ADDRESS_MAP_START( data_160b, AS_DATA, 8, legacy_cpu_device )
-	AM_RANGE(0x00, 0x9f) AM_RAM
-ADDRESS_MAP_END
-#endif
-
-/***************************************************************************
-    VALIDITY CHECKS
-***************************************************************************/
-
-#if 0
-static CPU_VALIDITY_CHECK( cop410 )
-{
-	int error = FALSE;
-	const cop400_interface *intf = (const cop400_interface *) config;
-
-	if ((intf == NULL) || (intf->cki <= 0))
-	{
-		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
-		error = TRUE;
-	}
-
-	return error;
-}
-
-static CPU_VALIDITY_CHECK( cop420 )
-{
-	int error = FALSE;
-	const cop400_interface *intf = (const cop400_interface *) config;
-
-	if ((intf == NULL) || (intf->cki <= 0))
-	{
-		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
-		error = TRUE;
-	}
-
-	return error;
-}
-
-static CPU_VALIDITY_CHECK( cop421 )
-{
-	int error = FALSE;
-	const cop400_interface *intf = (const cop400_interface *) config;
-
-	if ((intf == NULL) || (intf->cki <= 0) || (intf->microbus == COP400_MICROBUS_ENABLED))
-	{
-		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
-		error = TRUE;
-	}
-
-	return error;
-}
-
-static CPU_VALIDITY_CHECK( cop444 )
-{
-	int error = FALSE;
-	const cop400_interface *intf = (const cop400_interface *) config;
-
-	if ((intf == NULL) || (intf->cki <= 0))
-	{
-		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
-		error = TRUE;
-	}
-
-	return error;
-}
-#endif
 
 /***************************************************************************
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
 
-static CPU_IMPORT_STATE( cop400 )
+void cop400_cpu_device::state_import(const device_state_entry &entry)
 {
-	cop400_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			cpustate->c = (cpustate->flags >> 1) & 1;
-			cpustate->skl = (cpustate->flags >> 0) & 1;
+			m_c = (m_flags >> 1) & 1;
+			m_skl = (m_flags >> 0) & 1;
 			break;
 	}
 }
 
-static CPU_EXPORT_STATE( cop400 )
+void cop400_cpu_device::state_export(const device_state_entry &entry)
 {
-	cop400_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			cpustate->flags = (cpustate->c ? 0x02 : 0x00) |
-								(cpustate->skl ? 0x01 : 0x00);
+			m_flags = (m_c ? 0x02 : 0x00) | (m_skl ? 0x01 : 0x00);
 			break;
 	}
 }
 
-static CPU_EXPORT_STRING( cop400 )
+void cop400_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	cop400_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c",
-							cpustate->c ? 'C' : '.',
-							cpustate->skl ? 'S' : '.');
+			string.printf("%c%c%c",
+							m_c ? 'C' : '.',
+							m_skl ? 'S' : '.',
+							m_skt_latch ? 'T' : '.');
 			break;
 	}
 }
 
-static CPU_SET_INFO( cop400 )
-{
-	/* nothing to set */
-}
 
-static CPU_GET_INFO( cop400 )
+offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	cop400_interface *intf = (device->static_config() != NULL) ? (cop400_interface *)device->static_config() : NULL;
+	extern CPU_DISASSEMBLE( cop410 );
+	extern CPU_DISASSEMBLE( cop420 );
+	extern CPU_DISASSEMBLE( cop444 );
 
-	switch (state)
+	if ( m_featuremask & COP444_FEATURE )
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(cop400_state);                         break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 0;                                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = (intf != NULL) ? intf->cki : 16;              break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 2;                                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            /* set per-core */                                      break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8; /* really 4 */                             break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           /* set per-core */                                      break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 9;                                            break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(cop400);              break;
-		case CPUINFO_FCT_INIT:                          /* set per-core */                                      break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(cop400);                   break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(cop400);               break;
-		case CPUINFO_FCT_DISASSEMBLE:                   /* set per-core */                                      break;
-//      case CPUINFO_FCT_VALIDITY_CHECK:                /* set per-core */                                      break;
-		case CPUINFO_FCT_IMPORT_STATE:                  info->import_state = CPU_IMPORT_STATE_NAME(cop400);     break;
-		case CPUINFO_FCT_EXPORT_STATE:                  info->export_state = CPU_EXPORT_STATE_NAME(cop400);     break;
-		case CPUINFO_FCT_EXPORT_STRING:                 info->export_string = CPU_EXPORT_STRING_NAME(cop400);   break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;                       break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  /* set per-core */                                      break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     /* set per-core */                                      break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP400");                              break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "National Semiconductor COPS");         break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);                              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright MAME Team");                 break;
+		return CPU_DISASSEMBLE_NAME(cop444)(this, buffer, pc, oprom, opram, options);
 	}
-}
 
-/***************************************************************************
-    CPU-SPECIFIC CONTEXT ACCESS
-***************************************************************************/
-
-CPU_GET_INFO( cop410 )
-{
-	switch (state)
+	if ( m_featuremask & COP420_FEATURE )
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 9;                                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 5;                                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop410);                     break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(cop410);       break;
-//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410); break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_512b);   break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(data_32b);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP410");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop400);                              break;
+		return CPU_DISASSEMBLE_NAME(cop420)(this, buffer, pc, oprom, opram, options);
 	}
+
+	return CPU_DISASSEMBLE_NAME(cop410)(this, buffer, pc, oprom, opram, options);
 }
 
-CPU_GET_INFO( cop411 )
-{
-	// COP411 is a 20-pin package version of the COP410, missing D2/D3/G3/CKO
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop411);                     break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP411");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop410);                              break;
-	}
-}
-
-CPU_GET_INFO( cop401 )
-{
-	// COP401 is a ROMless version of the COP410
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = NULL;                             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP401");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop410);                              break;
-	}
-}
-
-CPU_GET_INFO( cop420 )
-{
-	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 10;                                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 6;                                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop420);                     break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(cop420);       break;
-//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420); break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);    break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(data_64b);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP420");                              break;
-
-		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%c%c%c",
-										cpustate->c ? 'C' : '.',
-										cpustate->skl ? 'S' : '.',
-										cpustate->skt_latch ? 'T' : '.'); break;
-
-		default:                                        CPU_GET_INFO_CALL(cop400);                              break;
-	}
-}
-
-CPU_GET_INFO( cop421 )
-{
-	// COP421 is a 24-pin package version of the COP420, lacking the IN ports
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop421);                     break;
-//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP421");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop420);                              break;
-	}
-}
-
-CPU_GET_INFO( cop422 )
-{
-	// COP422 is a 20-pin package version of the COP420, lacking G0/G1, D0/D1, and the IN ports
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop422);                     break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP422");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop421);                              break;
-	}
-}
-
-CPU_GET_INFO( cop402 )
-{
-	// COP402 is a ROMless version of the COP420
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = NULL;                             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP402");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop420);                              break;
-	}
-}
-
-CPU_GET_INFO( cop444 )
-{
-	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 11;                                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 7;                                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop444);                     break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(cop444);       break;
-//      case CPUINFO_FCT_VALIDITY_CHECK:                info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444); break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);    break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(data_128b);      break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP444");                              break;
-
-		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%c%c%c",
-										cpustate->c ? 'C' : '.',
-										cpustate->skl ? 'S' : '.',
-										cpustate->skt_latch ? 'T' : '.'); break;
-
-		default:                                        CPU_GET_INFO_CALL(cop400);                              break;
-	}
-}
-
-CPU_GET_INFO( cop445 )
-{
-	// COP445 is a 24-pin package version of the COP444, lacking the IN ports
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop445);                     break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP445");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop444);                              break;
-	}
-}
-
-CPU_GET_INFO( cop424 )
-{
-	// COP424 is functionally equivalent to COP444, with only 1K ROM and 64x4 bytes RAM
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 10;                                           break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 6;                                            break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);    break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:     info->internal_map8 = ADDRESS_MAP_NAME(data_64b);       break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP424");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop444);                              break;
-	}
-}
-
-CPU_GET_INFO( cop425 )
-{
-	// COP425 is a 24-pin package version of the COP424, lacking the IN ports
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop425);                     break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP425");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop424);                              break;
-	}
-}
-
-CPU_GET_INFO( cop426 )
-{
-	// COP426 is a 20-pin package version of the COP424, with only L0-L7, G2-G3, D2-D3 ports
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(cop426);                     break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP426");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop424);                              break;
-	}
-}
-
-CPU_GET_INFO( cop404 )
-{
-	// COP404 is a ROMless version of the COP444, which can emulate a COP410C/COP411C, COP424C/COP425C, or a COP444C/COP445C
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = NULL;                             break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "COP404");                              break;
-
-		default:                                        CPU_GET_INFO_CALL(cop444);                              break;
-	}
-}
-
-/* COP410 family */
-DEFINE_LEGACY_CPU_DEVICE(COP401, cop401);
-DEFINE_LEGACY_CPU_DEVICE(COP410, cop410);
-DEFINE_LEGACY_CPU_DEVICE(COP411, cop411);
-
-/* COP420 family */
-DEFINE_LEGACY_CPU_DEVICE(COP402, cop402);
-DEFINE_LEGACY_CPU_DEVICE(COP420, cop420);
-DEFINE_LEGACY_CPU_DEVICE(COP421, cop421);
-DEFINE_LEGACY_CPU_DEVICE(COP422, cop422);
-
-/* COP444 family */
-DEFINE_LEGACY_CPU_DEVICE(COP404, cop404);
-DEFINE_LEGACY_CPU_DEVICE(COP424, cop424);
-DEFINE_LEGACY_CPU_DEVICE(COP425, cop425);
-DEFINE_LEGACY_CPU_DEVICE(COP426, cop426);
-DEFINE_LEGACY_CPU_DEVICE(COP444, cop444);
-DEFINE_LEGACY_CPU_DEVICE(COP445, cop445);
