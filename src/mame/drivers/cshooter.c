@@ -566,6 +566,8 @@ Notes:   LB - CPU board        S-0086-002-0B
 
          The 0/1/2 bipolar PROMs are not used for colour.
 
+         However, this contradicts Guru's findings: "If I short some of the pins(of 0.bpr at 7A)
+         the sprite colors change, and the chip is connected to the color RAM."
 
 
 Brief hardware overview:
@@ -610,7 +612,7 @@ ROM_START( cshooter )
 
 	ROM_REGION( 0x320, "proms", 0 )
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
 	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
@@ -667,7 +669,7 @@ ROM_START( cshootere )
 
 	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
 	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
@@ -713,7 +715,7 @@ ROM_START( airraid )
 
 	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
 	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
