@@ -13,8 +13,75 @@
 
     - adjust mouse speed
     - RTC should not be y2k compliant
-    - V3 VDU check fails
+    - pc1512 V3 VDU check fails
+    - Amstrad SM2400 internal modem
+    - Amstrad RP4 diagnostic ISA card (PC1512)
+    - Amstrad RP5-2 diagnostic ISA card (PC1640)
 
+*/
+
+/*
+HARD DISC INSTALLATION INSTRUCTIONS
+
+Applies to both ten and twenty megabyte versions.
+
+1. Turn on machine
+2. Insert disc 1 (the red disc) and press a key.
+3. Type fdisk (RETURN)
+4. At each prompt press the RETURN key (another three times).
+5. The A> will now appear so now type format c:/s (RETURN).
+6. Now push the Y key (RETURN).
+7. The hard disc will now begin to format, if you have a 10Mb machine then it will count up to 305
+   cylinders. If you have a 20 Mb machine then 610 cylinders will be counted.
+8. Once this is done, take out disc 1 and insert disc 5 (the maroon disc).
+9. Now type config(RETURN). This procedure will copy all five discs (order 5,1,2,3,4) onto the hard disc.
+   Once finished the screen will show some information about the size of the disc and the number of files and
+   directories present.
+10. To now use the hard disc remove the floppy disc from the drive and store in a safe place with the other
+    four discs then restart the computer by pushing Alt Ctrl and Del.
+11. After a short while the AMSTRAD PC info will come up and tell you when the machine was last used
+    and then after a little longer the screen will clear and will display this message,
+
+F1=DOSPLUS.SYS
+F2=DOS.SYS
+
+Select operating system:
+
+If you choose F1 then DOS Plus and GEM will be booted, or if you press F2 then MS-DOS will be booted.
+*/
+
+/*
+HARD DISC INSTALLATION ON PC1640
+
+PC1640 hard disc comes ready installed with the necessary software. That is discs 1 to 4 that are
+supplied ready with the machine.
+
+Howevere in the case of a disc failure it may be necessary to reinstall the supplied software.
+
+This is done in the following way:
+1. Put disc one into drive A: and boot up the system
+2. Put disc four into drive A: and type CD\SUPPLEME and press return.
+3. Type HDFORMAT and press return.
+4. Answer YES to the screen prompt.
+5. When HDFORMAT is completed remove disc four and replace with disc one.
+6. Type CD\ and press return.
+7. Type FDISC and press return.
+8. Press return key every time you are asked a question.
+9. With disc one still in drive A: type FORMAT C:/S and press return.
+10. When formatting is finished replace disc one with disc four.
+11. Type CD\SUPPLEME and press return.
+12. Type CONFIG and press return.
+
+After typing CONFIG the machine will proceed to copy the four system discs to the hard disc.
+After copying each disc you will be prompted to insert the next disc.
+You do not noeed to know in which order to insert the discs because the machine will tell you which disc is
+needed next.
+
+The system is now installed and should be tested by rebooting the machine.
+
+It should be noted that if the hard disc is ok but the software has been corrupted or deleted you can
+reinstall the software without reformatting.
+This is done by following steps 11 and 12.
 */
 
 #include "includes/pc1512.h"

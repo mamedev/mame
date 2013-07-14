@@ -133,7 +133,8 @@
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="System Disc 5 (Hard Disk Utilities)"/>
 			<dataarea name="flop" size="368640">
-				<rom name="46005.img" size="368640" status="nodump" offset="0" />
+				<!-- beautifully hand-crafted from loose files with WinImage -->
+				<rom name="46005.img" size="368640" crc="96444b3d" sha1="685ab233d3efb07cb0afbcefc7e5da5423c67a6a" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
