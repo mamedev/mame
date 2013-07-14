@@ -153,7 +153,7 @@ List of default vregs (title screen):
 *Seibu SPI is a newer CRTC?
 00000400: 013F007F - hblank start(-1), hblank length(-1)
 00000404: 03DA03B5 - related to above, not sure how
-00000408: 00FC002A - vblank start, vblank length
+00000408: 00FC002A - vblank start(-1), vblank length(-1)
 0000040C: 03F303EB - related to above, not sure how
 00000410: 01FE0076
 00000414: related to decryption
