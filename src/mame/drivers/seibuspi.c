@@ -854,6 +854,18 @@ Notes:
 #include "machine/seibuspi.h"
 #include "includes/seibuspi.h"
 
+// default values written to CRTC (note: SYS386F does not have this chip)
+#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+
+#define SPI_HTOTAL   (448)
+#define SPI_HBEND    (0)
+#define SPI_HBSTART  (320)
+
+#define SPI_VTOTAL   (296)
+#define SPI_VBEND    (0)
+#define SPI_VBSTART  (240) /* actually 253, but visible area is 240 lines */
+
+
 #define ENABLE_SPEEDUP_HACKS 1 /* speed up at idle loops */
 
 
@@ -956,8 +968,8 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000414, 0x00000417) AM_WRITENOP // bg gfx decryption key, see machine/seibuspi.c
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram")
+	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w) // seibu crtc
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_SHARE("scrollram") // seibu crtc
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1844,17 +1856,12 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 	MCFG_PALETTE_INIT(all_black)
-
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1947,17 +1954,12 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	MCFG_GFXDECODE(spi)
 	MCFG_PALETTE_LENGTH(6144)
 	MCFG_PALETTE_INIT(all_black)
-
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, spi)
-	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -119,9 +119,9 @@ public:
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll);
 
 	virtual void machine_start();
+	virtual void video_start();
 	DECLARE_MACHINE_RESET(spi);
 	DECLARE_MACHINE_RESET(sxx2e);
-	DECLARE_VIDEO_START(spi);
 	DECLARE_VIDEO_START(sys386f);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

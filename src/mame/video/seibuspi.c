@@ -587,7 +587,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
 }
 
 
-VIDEO_START_MEMBER(seibuspi_state,spi)
+void seibuspi_state::video_start()
 {
 	int i;
 
