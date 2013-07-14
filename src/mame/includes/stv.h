@@ -2,6 +2,7 @@
 #include "cdrom.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/adsp2100/adsp2100.h"
 
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
@@ -637,7 +638,9 @@ class stv_state : public saturn_state
 {
 public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: saturn_state(mconfig, type, tag)
+		: saturn_state(mconfig, type, tag),
+		m_adsp(*this, "adsp"),
+		m_adsp_pram(*this, "adsp_pram")
 	{
 	}
 
@@ -710,7 +713,25 @@ public:
 
 	DECLARE_MACHINE_START(stv);
 	DECLARE_MACHINE_RESET(stv);
+
+	/* Batman Forever specifics */
+	optional_device<adsp2181_device>    m_adsp;
+	optional_shared_ptr<UINT32> m_adsp_pram;
+
+	struct
+	{
+		UINT16 bdma_internal_addr;
+		UINT16 bdma_external_addr;
+		UINT16 bdma_control;
+		UINT16 bdma_word_count;
+	} m_adsp_regs;
+
+	DECLARE_MACHINE_RESET(batmanfr);
+	DECLARE_READ16_MEMBER( adsp_control_r );
+	DECLARE_WRITE16_MEMBER( adsp_control_w );
+	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
 };
+
 
 #define MASTER_CLOCK_352 57272720
 #define MASTER_CLOCK_320 53693174

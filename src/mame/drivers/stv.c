@@ -11,18 +11,21 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/adsp2100/adsp2100.h"
+#include "machine/eeprom.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "sound/cdda.h"
+#include "sound/dmadac.h"
 #include "machine/stvprot.h"
 #include "machine/smpc.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/cartslot.h"
 #include "coreutil.h"
+
 
 #define FIRST_SPEEDUP_SLOT  (2)         // in case we remove/alter the BIOS speedups later
 
@@ -680,6 +683,9 @@ DRIVER_INIT_MEMBER(stv_state,batmanfr)
 
 	DRIVER_INIT_CALL(stv);
 
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
+	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
+
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
@@ -974,6 +980,177 @@ static MACHINE_CONFIG_START( stv, stv_state )
 	MCFG_SOUND_ADD("cdda", CDDA, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+/*
+	Batman Forever has an extra ADSP, used for sound.
+	Similar if not the same as Magic the Gathering, probably needs merging.
+*/
+
+WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
+{
+	if(ACCESSING_BITS_16_31)
+		soundlatch_word_w(space, 0, data >> 16, 0x0000ffff);
+	if(ACCESSING_BITS_0_15)
+		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
+}
+
+READ16_MEMBER( stv_state::adsp_control_r )
+{
+	UINT16 res = 0;
+
+	switch (offset)
+	{
+		case 0x4:
+			res = m_adsp_regs.bdma_word_count;
+			break;
+		/* TODO: is this location correct? */
+		case 0x5:
+			res = soundlatch_word_r(space,0);
+			break;
+		default:
+			mame_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+	}
+	return res;
+}
+
+WRITE16_MEMBER( stv_state::adsp_control_w )
+{
+	switch (offset)
+	{
+		case 0x1:
+			m_adsp_regs.bdma_internal_addr = data & 0x3fff;
+			break;
+		case 0x2:
+			m_adsp_regs.bdma_external_addr = data & 0x3fff;
+			break;
+		case 0x3:
+			m_adsp_regs.bdma_control = data & 0xff0f;
+			break;
+		case 0x4:
+		{
+			m_adsp_regs.bdma_word_count = data & 0x3fff;
+
+			if (data > 0)
+			{
+				UINT8* adsp_rom = (UINT8*)memregion("adsp")->base();
+
+				UINT32 page = (m_adsp_regs.bdma_control >> 8) & 0xff;
+				UINT32 dir = (m_adsp_regs.bdma_control >> 2) & 1;
+				UINT32 type = m_adsp_regs.bdma_control & 3;
+
+				UINT32 src_addr = (page << 14) | m_adsp_regs.bdma_external_addr;
+
+				address_space &addr_space = m_adsp->space((type == 0) ? AS_PROGRAM : AS_DATA);
+
+				if (dir == 0)
+				{
+					while (m_adsp_regs.bdma_word_count)
+					{
+						if (type == 0)
+						{
+							UINT32 src_word =(adsp_rom[src_addr + 0] << 16) |
+												(adsp_rom[src_addr + 1] << 8) |
+												(adsp_rom[src_addr + 2]);
+
+							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 4, src_word);
+
+							src_addr += 3;
+							m_adsp_regs.bdma_internal_addr ++;
+						}
+						else if (type == 1)
+						{
+							UINT32 src_word =(adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
+
+							addr_space.write_dword(m_adsp_regs.bdma_internal_addr * 2, src_word);
+
+							src_addr += 2;
+							m_adsp_regs.bdma_internal_addr ++;
+						}
+						else
+						{
+							fatalerror("Unsupported BDMA width\n");
+						}
+
+						--m_adsp_regs.bdma_word_count;
+					}
+				}
+
+				/* Update external address count and page */
+				m_adsp_regs.bdma_external_addr = src_addr & 0x3fff;
+				m_adsp_regs.bdma_control &= ~0xff00;
+				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
+
+				if (m_adsp_regs.bdma_control & 8)
+					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			}
+			break;
+		}
+		case 5:
+			mame_printf_debug("PFLAGS: %x\n", data);
+			break;
+		default:
+			mame_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+	}
+}
+
+
+static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, stv_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, stv_state )
+	ADDRESS_MAP_UNMAP_HIGH
+//  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
+	AM_RANGE(0x0400, 0x3fdf) AM_RAM
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, stv_state )
+	ADDRESS_MAP_UNMAP_HIGH
+ADDRESS_MAP_END
+
+static const adsp21xx_config adsp_config =
+{
+	NULL,                       /* callback for serial receive */
+	0,//sound_tx_callback,      /* callback for serial transmit */
+	0,//timer_enable_callback   /* callback for timer fired */
+};
+
+MACHINE_RESET_MEMBER(stv_state,batmanfr)
+{
+	MACHINE_RESET_CALL_MEMBER(stv);
+
+	UINT8 *adsp_boot = (UINT8*)memregion("adsp")->base();
+
+	/* Load 32 program words (96 bytes) via BDMA */
+	for (int i = 0; i < 32; i ++)
+	{
+		UINT32 word;
+
+		word = adsp_boot[i*3 + 0] << 16;
+		word |= adsp_boot[i*3 + 1] << 8;
+		word |= adsp_boot[i*3 + 2];
+
+		m_adsp_pram[i] = word;
+	}
+}
+
+static MACHINE_CONFIG_DERIVED( batmanfr, stv )
+	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
+	MCFG_CPU_DATA_MAP(adsp_data_map)
+	MCFG_CPU_IO_MAP(adsp_io_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(stv_state,batmanfr)
+
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 #define MCFG_STV_CARTSLOT_ADD(_tag) \
@@ -2404,7 +2581,7 @@ ROM_START( batmanfr )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
-	/* Many thanks to Runik to point this out*/
+	/* Thanks to Runik to point this out*/
 	ROM_LOAD16_BYTE( "350-mpa1.u19",    0x0000000, 0x0100000, CRC(2a5a8c3a) SHA1(374ec55a39ea909cc672e4a629422681d1f2da05) )
 	ROM_RELOAD(                         0x0200000, 0x0100000 )
 	ROM_LOAD16_BYTE( "350-mpa1.u16",    0x0000001, 0x0100000, CRC(735e23ab) SHA1(133e2284a07a611aed8ada2707248f392f4509aa) )
@@ -2417,11 +2594,10 @@ ROM_START( batmanfr )
 	ROM_LOAD16_WORD_SWAP( "gfx5.u15",   0x1800000, 0x0400000, CRC(e201f830) SHA1(5aa22fcc8f2e153d1abc3aa4050c594b3942ee67) )
 	ROM_LOAD16_WORD_SWAP( "gfx6.u18",   0x1c00000, 0x0400000, CRC(c6b381a3) SHA1(46431f1e47c084a0bf85535d35af27471653b008) )
 
-	/* it also has an extra adsp sound board, i guess this isn't tested */
-	ROM_REGION( 0x080000, "wave", 0 ) /* Wave data */
+	ROM_REGION16_LE( 0x80000, "adsp", 0 )
 	ROM_LOAD( "350snda1.u52",   0x000000, 0x080000, CRC(9027e7a0) SHA1(678df530838b078964a044ce734776f391654e6c) )
 
-	ROM_REGION( 0x800000, "adsp_code", 0 ) /* ADSP code */
+	ROM_REGION32_BE( 0x800000, "adsp_data", 0 ) /* ADSP code */
 	ROM_LOAD( "snd0.u48",   0x000000, 0x200000, CRC(02b1927c) SHA1(08b21d8b31b0f15c59fb5bb7eaf425e6fe04f7b5) )
 	ROM_LOAD( "snd1.u49",   0x200000, 0x200000, CRC(58b18eda) SHA1(7f3105fe04d9c0cdfd76e3323f623a4d0f7dad06) )
 	ROM_LOAD( "snd2.u50",   0x400000, 0x200000, CRC(51d626d6) SHA1(0e68b79dcb653dcba48121ca2d4f692f90afa85e) )
@@ -2823,7 +2999,7 @@ GAME( 1996, stvbios,   0,       stv_slot, stv, stv_state,      stv,         ROT0
 /* Playable */
 GAME( 1998, astrass,   stvbios, stv,      stv6b, stv_state,     astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, stv,      stv, stv_state,        batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, batmanfr,  stvbios, batmanfr, stv, stv_state, 		 batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, colmns97,  stvbios, stv,      stv, stv_state,        colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv, stv_state,        cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv, stv_state,        cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
