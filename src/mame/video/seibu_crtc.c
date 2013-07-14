@@ -150,6 +150,17 @@ List of default vregs (title screen):
 100630:  01DA 01FF 01D9 01FF 01D8 01FF 0034 003F
 100640:  0000 A8A8 0004 1830 0009 0000 0000 FFFF
 
+*Seibu SPI is a newer CRTC?
+00000400: 013F007F - hblank start(-1), hblank length(-1)
+00000404: 03DA03B5 - related to above, not sure how
+00000408: 00FC002A - vblank start, vblank length
+0000040C: 03F303EB - related to above, not sure how
+00000410: 01FE0076
+00000414: related to decryption
+00000418: fg layer bank, rowscroll enable, ...
+0000041C-0000043F: same as other chips (layer enable, scrollregs, base)
+00000440-0000044F: unused, not written to at all
+
 ***************************************************************************/
 
 #include "emu.h"
