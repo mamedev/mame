@@ -17,6 +17,7 @@
     - Amstrad SM2400 internal modem
     - Amstrad RP4 diagnostic ISA card (PC1512)
     - Amstrad RP5-2 diagnostic ISA card (PC1640)
+    - 40291/8908 B ROM on PC1640 HD30 controller card
 
 */
 
@@ -1469,6 +1470,7 @@ ROM_END
 
 #define rom_pc1640dd 	rom_pc1640
 #define rom_pc1640hd20 	rom_pc1640
+#define rom_pc1640hd30 	rom_pc1640
 
 
 
@@ -1484,3 +1486,4 @@ COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,  
 COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD30",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

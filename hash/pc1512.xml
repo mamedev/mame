@@ -103,28 +103,28 @@
 		<publisher>Amstrad</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disc 1"/>
+			<feature name="part_id" value="MICROSOFT MS DOS OPERATING SYSTEM - START UP &amp; UTILITIES v3.2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46001.img" size="368640" crc="d8090373" sha1="4dbe5b78196389546410ad136d815456bc4593f3" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="System Disc 2"/>
+			<feature name="part_id" value="GEM STARTUP v2.1U"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46002.img" size="368640" crc="801c6584" sha1="20e1b46eda0a24c89127e4dd6f46a203b4f3a091" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="System Disc 3"/>
+			<feature name="part_id" value="GEM DESKTOP v2.0U / Locomotive BASIC 2 v1.2"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46003.img" size="368640" crc="b8b5338b" sha1="28d6a6af565a222573c42cb615d398775c908ee2" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="System Disc 4"/>
+			<feature name="part_id" value="GEM PAINT v2.0U"/>
 			<dataarea name="flop" size="368640">
 				<rom name="46004.img" size="368640" crc="adf8c856" sha1="6de8d6f44e0e28546ed0432ed63c90e5fe6a658d" offset="0" />
 			</dataarea>
