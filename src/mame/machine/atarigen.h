@@ -94,7 +94,7 @@ public:
 	bool main_to_sound_ready() const { return m_main_to_sound_ready; }
 	bool sound_to_main_ready() const { return m_sound_to_main_ready; }
 
-	// main cpu accessors
+	// main cpu accessors (forward internally to the atari_sound_comm_device)
 	DECLARE_WRITE8_MEMBER(main_command_w);
 	DECLARE_READ8_MEMBER(main_response_r);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
@@ -347,7 +347,6 @@ public:
 	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<m6502_device> m_jsacpu;
 	optional_device<okim6295_device> m_oki;
 	
 	optional_device<atari_sound_comm_device> m_soundcomm;

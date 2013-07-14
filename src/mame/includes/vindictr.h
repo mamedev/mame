@@ -5,13 +5,16 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class vindictr_state : public atarigen_state
 {
 public:
 	vindictr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa") { }
 
+	required_device<atari_jsa_i_device> m_jsa;
 	UINT8           m_playfield_tile_bank;
 	UINT16          m_playfield_xscroll;
 	UINT16          m_playfield_yscroll;

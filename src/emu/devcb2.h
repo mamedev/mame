@@ -90,7 +90,7 @@
 #define DEVCB2_DEVWRITE64(tag, _class, _func) write64_delegate(&_class::_func, #_class "::" #_func, tag, (_class *)0)
 
 // machine config helpers to add shift, mask, or address space configuration
-#define MCFG_DEVCB_SHIFT(_shift) devcb->set_shift(_shift);
+#define MCFG_DEVCB_RSHIFT(_shift) devcb->set_rshift(_shift);
 #define MCFG_DEVCB_MASK(_mask) devcb->set_mask(_mask);
 #define MCFG_DEVCB_XOR(_xor) devcb->set_xor(_xor);
 #define MCFG_DEVCB_INVERT devcb->set_xor(~U64(0));

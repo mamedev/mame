@@ -5,14 +5,17 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class toobin_state : public atarigen_state
 {
 public:
 	toobin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa"),
 			m_interrupt_scan(*this, "interrupt_scan") { }
 
+	required_device<atari_jsa_i_device> m_jsa;
 	required_shared_ptr<UINT16> m_interrupt_scan;
 
 	double          m_brightness;

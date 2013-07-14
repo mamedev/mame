@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/atarijsa.h"
 #include "video/atarirle.h"
 #include "includes/atarigx2.h"
 
@@ -44,7 +43,6 @@ MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -58,8 +56,8 @@ MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0020;
-	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x0010;
+	if (m_jsa->main_to_sound_ready()) temp ^= 0x0020;
+	if (m_jsa->sound_to_main_ready()) temp ^= 0x0010;
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
@@ -112,7 +110,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		m_jsacpu->set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1147,14 +1145,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE16(eeprom_enable_w, 0xffffffff)
-	AM_RANGE(0xe06000, 0xe06003) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff000000)
+	AM_RANGE(0xe06000, 0xe06003) AM_DEVWRITE8("jsa", atari_jsa_iiis_device, main_command_w, 0xff000000)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE16(video_int_ack_w, 0xffffffff)
 	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)
-	AM_RANGE(0xe86000, 0xe86003) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff000000)
+	AM_RANGE(0xe86000, 0xe86003) AM_DEVREAD8("jsa", atari_jsa_iiis_device, main_response_r, 0xff000000)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1206,8 +1204,6 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
-
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
 	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1254,8 +1250,6 @@ static INPUT_PORTS_START( motofren )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
-
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
@@ -1301,8 +1295,6 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
 	PORT_BIT ( 0x00ff, 0x0010, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -1441,7 +1433,12 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_VIDEO_START_OVERRIDE(atarigx2_state,atarigx2)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_iiis_stereo)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1452,6 +1449,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( atarigx2_0x400, atarigx2 )
 	MCFG_ATARIRLE_ADD( "rle", modesc_0x400 )
 MACHINE_CONFIG_END
+
+
 
 /*************************************
  *
@@ -1466,7 +1465,7 @@ ROM_START( spclords )
 	ROM_LOAD32_BYTE( "main2rc.095",  0x000002, 0x020000, CRC(49d30630) SHA1(2d0f2abe5d17b4cf575f80687502fac33c7f3206) )
 	ROM_LOAD32_BYTE( "main3rc.095",  0x000003, 0x020000, CRC(3872424c) SHA1(db08ad9386dfe8fa4e2a83a2505118a636247279) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -1492,10 +1491,10 @@ ROM_START( spclords )
 	ROM_LOAD16_BYTE( "136095.51b", 0x500000, 0x80000, CRC(97541074) SHA1(f9f75bfc4af9587f4a9630ad93d9cd0efd89e4f4) )
 	ROM_LOAD16_BYTE( "136095.50b", 0x500001, 0x80000, CRC(a1c11ae8) SHA1(53fb2f376aae0aa346f9f911d6d8a73753c67d6e) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1512,7 +1511,7 @@ ROM_START( spclordsb )
 	ROM_LOAD32_BYTE( "136095.23b", 0x00002, 0x20000, CRC(bc64ab63) SHA1(999851a39123f6a01cb83d97ea744e12590b6e7e) )
 	ROM_LOAD32_BYTE( "136095.24b", 0x00003, 0x20000, CRC(7284a01a) SHA1(afa866c97b4c3df7fda3c196072231096beaa0db) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -1538,10 +1537,10 @@ ROM_START( spclordsb )
 	ROM_LOAD16_BYTE( "136095.51b", 0x500000, 0x80000, CRC(97541074) SHA1(f9f75bfc4af9587f4a9630ad93d9cd0efd89e4f4) )
 	ROM_LOAD16_BYTE( "136095.50b", 0x500001, 0x80000, CRC(a1c11ae8) SHA1(53fb2f376aae0aa346f9f911d6d8a73753c67d6e) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1558,7 +1557,7 @@ ROM_START( spclordsg )
 	ROM_LOAD32_BYTE( "german2.095",  0x000002, 0x020000, CRC(9527df10) SHA1(c18434c1f40fa23a6cc78df7104c7e2e6888d189) )
 	ROM_LOAD32_BYTE( "german3.095",  0x000003, 0x020000, CRC(0aaaad66) SHA1(382b859be652d7d83319907d354d294643cef2b4) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -1584,10 +1583,10 @@ ROM_START( spclordsg )
 	ROM_LOAD16_BYTE( "136095.51a", 0x500000, 0x80000, CRC(4635c534) SHA1(7261508052e3b17a552b43bc3d4ad7cd2d1f6af9) )
 	ROM_LOAD16_BYTE( "136095.50a", 0x500001, 0x80000, CRC(94bde47d) SHA1(dde8f0184a2d7e9f7eb961af2d9d016399ec18fc) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1604,7 +1603,7 @@ ROM_START( spclordsa )
 	ROM_LOAD32_BYTE( "136095.23a", 0x00002, 0x20000, CRC(20a0e443) SHA1(54597342901d6b38dddbe754f41ceeddcc4e5289) )
 	ROM_LOAD32_BYTE( "136095.24a", 0x00003, 0x20000, CRC(d3f0439c) SHA1(f9245f448b77187b4cd5d9436b5caebd2800be5d))
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136095.80a", 0x10000, 0x4000, CRC(33bc0ede) SHA1(2ee30d9125057cdfbdb83e4dbf28306c35a9c233) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -1630,10 +1629,10 @@ ROM_START( spclordsa )
 	ROM_LOAD16_BYTE( "136095.51a", 0x500000, 0x80000, CRC(4635c534) SHA1(7261508052e3b17a552b43bc3d4ad7cd2d1f6af9) )
 	ROM_LOAD16_BYTE( "136095.50a", 0x500001, 0x80000, CRC(94bde47d) SHA1(dde8f0184a2d7e9f7eb961af2d9d016399ec18fc) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1650,7 +1649,7 @@ ROM_START( motofren )
 	ROM_LOAD32_BYTE( "136094-moto2.37e", 0x000002, 0x020000, CRC(6b1c7626) SHA1(b318a5856bcbd6a8fc7eb92e4b9a576b8c16cbf3) )
 	ROM_LOAD32_BYTE( "136094-moto3.37j", 0x000003, 0x020000, CRC(44c3cd2a) SHA1(a16046586cbaa000e056115c92b5f22bf49869ad) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1678,10 +1677,10 @@ ROM_START( motofren )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1698,7 +1697,7 @@ ROM_START( motofrenmd )
 	ROM_LOAD32_BYTE( "136094-0223a.37e", 0x00002, 0x20000, CRC(cdb04a4a) SHA1(ee342bdb5654e8b841b1f60e46d1bcae7c4e5cd2) )
 	ROM_LOAD32_BYTE( "136094-0224a.37j", 0x00003, 0x20000, CRC(f3a9949f) SHA1(d3fa68fc63c505dd4c9d0e0c7f0625cc24ac9571) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080b.12c", 0x10000, 0x4000, CRC(5e542608) SHA1(8a10b5fac6ac120c7aae2edaa12413c9b8345d87) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1726,10 +1725,10 @@ ROM_START( motofrenmd )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1750,7 +1749,7 @@ ROM_START( motofrei )
 	ROM_LOAD32_BYTE( "136094-motoi2.37e",   0x000002, 0x020000, CRC(7a26217f) SHA1(1271a000e2976480a3b959609a5597498886be4f) )
 	ROM_LOAD32_BYTE( "136094-motoi3.37j",   0x000003, 0x020000, CRC(ff5ca6ad) SHA1(1e26db56940ce1db819d2179f4ce3962e0b5b732) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1778,10 +1777,10 @@ ROM_START( motofrei )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1799,7 +1798,7 @@ ROM_START( motofreg )
 	ROM_LOAD32_BYTE( "136094-motog2.37e",   0x000002, 0x020000, CRC(01400d54) SHA1(cd539497465857a804b5bc228bb0c93afd1e684e) )
 	ROM_LOAD32_BYTE( "136094-motog3.37j",   0x000003, 0x020000, CRC(c467c136) SHA1(9407bdf65ee6261e30227e6b87e2a35da8ee124e) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1827,10 +1826,10 @@ ROM_START( motofreg )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1848,7 +1847,7 @@ ROM_START( motofmdg )
 	ROM_LOAD32_BYTE( "136094-mdg2.37e", 0x000002, 0x020000, CRC(0b8bfe6e) SHA1(7220032a07928fd8a887c63ffcab4ec526733cae) )
 	ROM_LOAD32_BYTE( "136094-mdg3.37j", 0x000003, 0x020000, CRC(1dcd0d09) SHA1(0f6801694498688ed94588ac4b828ac56f3a16ec) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1876,10 +1875,10 @@ ROM_START( motofmdg )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1896,7 +1895,7 @@ ROM_START( motofrenft )
 	ROM_LOAD32_BYTE( "136094-ft2.37e", 0x000002, 0x020000, CRC(30eb94bb) SHA1(b7a2b41570d2110aaedea8a3b9d120af31671bbd) )
 	ROM_LOAD32_BYTE( "136094-ft3.37j", 0x000003, 0x020000, CRC(a92e05e3) SHA1(354b6bbb058d10c4da55cb58bf05eae83350ba08) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1924,10 +1923,10 @@ ROM_START( motofrenft )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1944,7 +1943,7 @@ ROM_START( motofrenmf )
 	ROM_LOAD32_BYTE( "136094-ftmd2.37e", 0x000002, 0x020000, CRC(769223fc) SHA1(acfafae3d81a6a3a4ff82c6381590ac31ad80f23) )
 	ROM_LOAD32_BYTE( "136094-ftmd3.37j", 0x000003, 0x020000, CRC(96382cc0) SHA1(ba2b6b105c552077767d1185886761fce3ec2885) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136094-0080a.12c", 0x10000, 0x4000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -1972,10 +1971,10 @@ ROM_START( motofrenmf )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -2035,14 +2034,14 @@ ROM_START( rrreveng )
 
 	/* all roms above are from this PCB however the sound board was missing - assumed to be the same */
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 ROM_END
 
@@ -2054,7 +2053,7 @@ ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more ro
 	ROM_LOAD32_BYTE( "rrprglh.37e", 0x00002, 0x20000, CRC(2b03a6fc) SHA1(7c95a0307b854bd37fd327ff1af1b69aa60fb2fd) )
 	ROM_LOAD32_BYTE( "rrprgll.37j", 0x00003, 0x20000, CRC(acf078da) SHA1(3506e105d3b208864ce12ab20e6250cb3a0005d6) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
@@ -2078,10 +2077,10 @@ ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more ro
 	ROM_LOAD16_BYTE( "mo4h.31t",   0x400000, 0x80000, CRC(af6a027e) SHA1(08038bddb6aa7e97f013f9d3e508f5501821e460) )
 	ROM_LOAD16_BYTE( "mo4l.31r",   0x400001, 0x80000, CRC(9ebc5369) SHA1(ffd8418b328d99aa44fb1aed1db1aa6ac715c644) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -2114,7 +2113,7 @@ ROM_START( rrrevengb )
 	ROM_LOAD32_BYTE( "rrprglh.37e", 0x00002, 0x20000, CRC(2b03a6fc) SHA1(7c95a0307b854bd37fd327ff1af1b69aa60fb2fd) )
 	ROM_LOAD32_BYTE( "rrprgll.37j", 0x00003, 0x20000, CRC(acf078da) SHA1(3506e105d3b208864ce12ab20e6250cb3a0005d6) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x10000, 0x4000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
@@ -2138,10 +2137,10 @@ ROM_START( rrrevengb )
 	ROM_LOAD16_BYTE( "rrmo4h.31t", 0x400000, 0x80000, CRC(12bf3e11) SHA1(37b1a7fe0b50202030f5c1938b95a449bbd51add) )
 	ROM_LOAD16_BYTE( "rrmo4l.31r", 0x400001, 0x80000, CRC(a80175f6) SHA1(db621902fdfa99ec532713f4314c6cbb8353a773) )
 
-	ROM_REGION( 0x80000, "adpcml", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
 
-	ROM_REGION( 0x80000, "adpcmr", 0 )
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
 	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -2176,16 +2175,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 {
-	atarijsa_init(machine(), "SERVICE", 0x0040);
-
 	m_playfield_base = 0x000;
 }
 
 
 DRIVER_INIT_MEMBER(atarigx2_state,motofren)
 {
-	atarijsa_init(machine(), "SERVICE", 0x0040);
-
 	m_playfield_base = 0x400;
 /*
 L/W=!68.A23*!E.A22*!E.A21                                       = 000x xxxx = 000000-1fffff
@@ -2218,8 +2213,6 @@ READ32_MEMBER(atarigx2_state::rrreveng_prot_r)
 
 DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
 {
-	atarijsa_init(machine(), "SERVICE", 0x0040);
-
 	m_playfield_base = 0x000;
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));

@@ -22,7 +22,6 @@
 #include "emu.h"
 #include "sound/2151intf.h"
 #include "rendlay.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/cyberbal.h"
 
@@ -77,7 +76,6 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -99,7 +97,7 @@ READ16_MEMBER(cyberbal_state::special_port0_r)
 READ16_MEMBER(cyberbal_state::special_port2_r)
 {
 	int temp = ioport("IN2")->read();
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x2000;
+	if (m_jsa->main_to_sound_ready()) temp ^= 0x2000;
 	return temp;
 }
 
@@ -107,7 +105,7 @@ READ16_MEMBER(cyberbal_state::special_port2_r)
 READ16_MEMBER(cyberbal_state::sound_state_r)
 {
 	int temp = 0xffff;
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0xffff;
+	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
 	return temp;
 }
 
@@ -237,14 +235,14 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc4000, 0xfc4003) AM_READ(special_port2_r)
-	AM_RANGE(0xfc6000, 0xfc6003) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0xff00)
+	AM_RANGE(0xfc6000, 0xfc6003) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
 	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfca000, 0xfcafff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfd0000, 0xfd0003) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xfd2000, 0xfd2003) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
+	AM_RANGE(0xfd2000, 0xfd2003) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0xfd4000, 0xfd4003) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfd8000, 0xfd8003) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
+	AM_RANGE(0xfd8000, 0xfd8003) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha_w) AM_SHARE("alpha")
@@ -299,7 +297,7 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* 2008-06 FP: I tag this as JSAII (even if it's not) to simplify cyberbal_special_port3_r */
-	PORT_START("JSAII")     /* audio board port */
+	PORT_START("jsa:JSAII")     /* audio board port */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
@@ -335,8 +333,6 @@ static INPUT_PORTS_START( cyberbal2p )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
-
-	PORT_INCLUDE( atarijsa_ii )     /* audio board port */
 INPUT_PORTS_END
 
 
@@ -486,7 +482,11 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	MCFG_VIDEO_START_OVERRIDE(cyberbal_state,cyberbal2p)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_ii_mono)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -677,7 +677,7 @@ ROM_START( cyberbal2p )
 	ROM_LOAD16_BYTE( "136071-1025.27c", 0x060000, 0x010000, CRC(95ff68c6) SHA1(43f716a4c44fe1a38fcc6e2600bac948bb603504) )
 	ROM_LOAD16_BYTE( "136071-1026.27d", 0x060001, 0x010000, CRC(f61c4898) SHA1(9e4a14eac6d197f63c3392af3d804e81c034cb09) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136071-1042.1b",  0x010000, 0x004000, CRC(e63cf125) SHA1(449880f561660ba67ac2d7f8ce6333768e0ae0be) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -705,7 +705,7 @@ ROM_START( cyberbal2p )
 	ROM_LOAD( "136071-1017.32n", 0x000000, 0x010000, CRC(a4c116f9) SHA1(fc7becef35306ef99ffbd0cd9202759352eb6cbe) )
 	ROM_LOAD( "136071-1018.32l", 0x010000, 0x010000, CRC(e25d7847) SHA1(3821c62f9bdc04eb774c2210a84e26b36f2e163d) )
 
-	ROM_REGION( 0x40000, "adpcm", 0 )   /* 256k for ADPCM samples */
+	ROM_REGION( 0x40000, "jsa:oki1", 0 )   /* 256k for ADPCM samples */
 	ROM_LOAD( "136071-1043.7k",  0x000000, 0x010000, CRC(94f24575) SHA1(b93b326e15cd328362ce409b7c0cc42b8a28c701) )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
@@ -727,7 +727,7 @@ ROM_START( cyberbal2p3 )
 	ROM_LOAD16_BYTE( "136071-1025.27c", 0x060000, 0x010000, CRC(95ff68c6) SHA1(43f716a4c44fe1a38fcc6e2600bac948bb603504) )
 	ROM_LOAD16_BYTE( "136071-1026.27d", 0x060001, 0x010000, CRC(f61c4898) SHA1(9e4a14eac6d197f63c3392af3d804e81c034cb09) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136071-1042.1b",  0x010000, 0x004000, CRC(e63cf125) SHA1(449880f561660ba67ac2d7f8ce6333768e0ae0be) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -755,7 +755,7 @@ ROM_START( cyberbal2p3 )
 	ROM_LOAD( "136071-1017.32n", 0x000000, 0x010000, CRC(a4c116f9) SHA1(fc7becef35306ef99ffbd0cd9202759352eb6cbe) )
 	ROM_LOAD( "136071-1018.32l", 0x010000, 0x010000, CRC(e25d7847) SHA1(3821c62f9bdc04eb774c2210a84e26b36f2e163d) )
 
-	ROM_REGION( 0x40000, "adpcm", 0 )   /* 256k for ADPCM samples */
+	ROM_REGION( 0x40000, "jsa:oki1", 0 )   /* 256k for ADPCM samples */
 	ROM_LOAD( "136071-1043.7k",  0x000000, 0x010000, CRC(94f24575) SHA1(b93b326e15cd328362ce409b7c0cc42b8a28c701) )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
@@ -777,7 +777,7 @@ ROM_START( cyberbal2p2 )
 	ROM_LOAD16_BYTE( "136071-1025.27c", 0x060000, 0x010000, CRC(95ff68c6) SHA1(43f716a4c44fe1a38fcc6e2600bac948bb603504) )
 	ROM_LOAD16_BYTE( "136071-1026.27d", 0x060001, 0x010000, CRC(f61c4898) SHA1(9e4a14eac6d197f63c3392af3d804e81c034cb09) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136071-1042.1b",  0x010000, 0x004000, CRC(e63cf125) SHA1(449880f561660ba67ac2d7f8ce6333768e0ae0be) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -805,7 +805,7 @@ ROM_START( cyberbal2p2 )
 	ROM_LOAD( "136071-1017.32n", 0x000000, 0x010000, CRC(a4c116f9) SHA1(fc7becef35306ef99ffbd0cd9202759352eb6cbe) )
 	ROM_LOAD( "136071-1018.32l", 0x010000, 0x010000, CRC(e25d7847) SHA1(3821c62f9bdc04eb774c2210a84e26b36f2e163d) )
 
-	ROM_REGION( 0x40000, "adpcm", 0 )   /* 256k for ADPCM samples */
+	ROM_REGION( 0x40000, "jsa:oki1", 0 )   /* 256k for ADPCM samples */
 	ROM_LOAD( "136071-1043.7k",  0x000000, 0x010000, CRC(94f24575) SHA1(b93b326e15cd328362ce409b7c0cc42b8a28c701) )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
@@ -827,7 +827,7 @@ ROM_START( cyberbal2p1 )
 	ROM_LOAD16_BYTE( "136071-1025.27c", 0x060000, 0x010000, CRC(95ff68c6) SHA1(43f716a4c44fe1a38fcc6e2600bac948bb603504) )
 	ROM_LOAD16_BYTE( "136071-1026.27d", 0x060001, 0x010000, CRC(f61c4898) SHA1(9e4a14eac6d197f63c3392af3d804e81c034cb09) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136071-1042.1b",  0x010000, 0x004000, CRC(e63cf125) SHA1(449880f561660ba67ac2d7f8ce6333768e0ae0be) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -855,7 +855,7 @@ ROM_START( cyberbal2p1 )
 	ROM_LOAD( "136071-1017.32n", 0x000000, 0x010000, CRC(a4c116f9) SHA1(fc7becef35306ef99ffbd0cd9202759352eb6cbe) )
 	ROM_LOAD( "136071-1018.32l", 0x010000, 0x010000, CRC(e25d7847) SHA1(3821c62f9bdc04eb774c2210a84e26b36f2e163d) )
 
-	ROM_REGION( 0x40000, "adpcm", 0 )   /* 256k for ADPCM samples */
+	ROM_REGION( 0x40000, "jsa:oki1", 0 )   /* 256k for ADPCM samples */
 	ROM_LOAD( "136071-1043.7k",  0x000000, 0x010000, CRC(94f24575) SHA1(b93b326e15cd328362ce409b7c0cc42b8a28c701) )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
@@ -991,7 +991,6 @@ DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
 
 DRIVER_INIT_MEMBER(cyberbal_state,cyberbal2p)
 {
-	atarijsa_init(machine(), "IN2", 0x8000);
 }
 
 

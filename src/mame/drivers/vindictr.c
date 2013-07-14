@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/vindictr.h"
 
@@ -42,7 +41,6 @@ MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -56,8 +54,8 @@ MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 READ16_MEMBER(vindictr_state::port1_r)
 {
 	int result = ioport("260010")->read();
-	if (m_soundcomm->sound_to_main_ready()) result ^= 0x0004;
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0008;
+	if (m_jsa->sound_to_main_ready()) result ^= 0x0004;
+	if (m_jsa->main_to_sound_ready()) result ^= 0x0008;
 	result ^= 0x0010;
 	return result;
 }
@@ -79,12 +77,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
-	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0x360010, 0x360011) AM_WRITENOP
-	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
-	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
+	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
@@ -134,8 +132,6 @@ static INPUT_PORTS_START( vindictr )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_i )      /* audio port */
 INPUT_PORTS_END
 
 
@@ -206,7 +202,13 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_VIDEO_START_OVERRIDE(vindictr_state,vindictr)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_i_stereo_pokey)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_DEVICE_REMOVE("jsa:tms")
 MACHINE_CONFIG_END
 
 
@@ -226,7 +228,7 @@ ROM_START( vindictr )
 	ROM_LOAD16_BYTE( "136059-5121.k1",  0x040000, 0x010000, CRC(96b150c5) SHA1(405c848f7990c981fefd355ca635bfb0ac24eb26) )
 	ROM_LOAD16_BYTE( "136059-5122.k3",  0x040001, 0x010000, CRC(6415d312) SHA1(0115e32c1c42421cb3d978cc8642f7f88d492043) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -264,7 +266,7 @@ ROM_START( vindictre )
 	ROM_LOAD16_BYTE( "136059-5721.k1",  0x040000, 0x010000, CRC(96b150c5) SHA1(405c848f7990c981fefd355ca635bfb0ac24eb26) )
 	ROM_LOAD16_BYTE( "136059-5722.k3",  0x040001, 0x010000, CRC(6415d312) SHA1(0115e32c1c42421cb3d978cc8642f7f88d492043) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -302,7 +304,7 @@ ROM_START( vindictrg )
 	ROM_LOAD16_BYTE( "136059-1221.k1",  0x040000, 0x010000, CRC(ee1b1014) SHA1(ddfe01cdec4654a42c9e49660e3532e5c865a9b7) )
 	ROM_LOAD16_BYTE( "136059-1222.k3",  0x040001, 0x010000, CRC(517b33f0) SHA1(f6430862bb00e11a68e964c89adcad1f05bc021b) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -340,7 +342,7 @@ ROM_START( vindictre4 )
 	ROM_LOAD16_BYTE( "136059-4121.k1",  0x040000, 0x010000, CRC(9a0444ee) SHA1(211be931a8b6ca42dd140baf3e165ce23f75431f) )
 	ROM_LOAD16_BYTE( "136059-4122.k3",  0x040001, 0x010000, CRC(d5022d78) SHA1(eeb6876ee6994f5736114a786c5c4ba97f26ef01) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -378,7 +380,7 @@ ROM_START( vindictr4 )
 	ROM_LOAD16_BYTE( "136059-4121.k1",  0x040000, 0x010000, CRC(9a0444ee) SHA1(211be931a8b6ca42dd140baf3e165ce23f75431f) )
 	ROM_LOAD16_BYTE( "136059-4122.k3",  0x040001, 0x010000, CRC(d5022d78) SHA1(eeb6876ee6994f5736114a786c5c4ba97f26ef01) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -416,7 +418,7 @@ ROM_START( vindictre3 )
 	ROM_LOAD16_BYTE( "136059-2121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-2122.k3",  0x040001, 0x010000, CRC(8d029a28) SHA1(a166d2a767f70050397f0f12add44ad1f5bc9fde) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -454,7 +456,7 @@ ROM_START( vindictr2 )
 	ROM_LOAD16_BYTE( "136059-2121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-2122.k3",  0x040001, 0x010000, CRC(8d029a28) SHA1(a166d2a767f70050397f0f12add44ad1f5bc9fde) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -492,7 +494,7 @@ ROM_START( vindictr1 )
 	ROM_LOAD16_BYTE( "136059-1121.k1",  0x040000, 0x010000, CRC(9b6111e0) SHA1(427197b21a5db2a06751ab281fde7a2f63818db8) )
 	ROM_LOAD16_BYTE( "136059-1122.k3",  0x040001, 0x010000, CRC(a94773f1) SHA1(2be841ab755d4ce319f3d562e9990918923384ee) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136059-1124.2k",  0x010000, 0x004000, CRC(d2212c0a) SHA1(df11fe76d74abc0cea23f18264cef4b0f33b1ffd) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -530,7 +532,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(vindictr_state,vindictr)
 {
-	atarijsa_init(machine(), "260010", 0x0002);
 }
 
 

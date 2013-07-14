@@ -173,7 +173,6 @@ void beathead_state::machine_reset()
 {
 	/* reset the common subsystems */
 	atarigen_state::machine_reset();
-	atarijsa_reset(machine());
 
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
@@ -279,8 +278,8 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 READ32_MEMBER( beathead_state::input_2_r )
 {
 	int result = ioport("IN2")->read();
-	if (m_soundcomm->sound_to_main_ready()) result ^= 0x10;
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x20;
+	if (m_jsa->sound_to_main_ready()) result ^= 0x10;
+	if (m_jsa->main_to_sound_ready()) result ^= 0x20;
 	return result;
 }
 
@@ -295,7 +294,7 @@ READ32_MEMBER( beathead_state::input_2_r )
 WRITE32_MEMBER( beathead_state::sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	m_jsacpu->set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -323,7 +322,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rom_base")
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x41000000, 0x41000003) AM_DEVREADWRITE8("soundcomm", atari_sound_comm_device, main_response_r, main_command_w, 0x000000ff)
+	AM_RANGE(0x41000000, 0x41000003) AM_DEVREADWRITE8("jsa", atari_jsa_iii_device, main_response_r, main_command_w, 0x000000ff)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
 	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
 	AM_RANGE(0x41000200, 0x41000203) AM_READ_PORT("IN1")
@@ -391,11 +390,10 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
-		PORT_MODIFY("JSAIII")
+// to do
+//	PORT_MODIFY("jsa:JSAIII")
 // coin 1+2 import from JSAIII not used - set to unused
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-
+//	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -427,7 +425,11 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 	MCFG_PALETTE_LENGTH(32768)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_iii_mono)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -439,7 +441,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( beathead )
-	ROM_REGION( 0x14000, "jsa", 0 )         /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 )         /* 64k + 16k for 6502 code */
 	ROM_LOAD( "bhsnd.bin",  0x10000, 0x4000, CRC(dfd33f02) SHA1(479a4838c89691d5a4654a4cd84b6433a9e86109) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -453,7 +455,7 @@ ROM_START( beathead )
 	ROM_LOAD32_BYTE( "bhpics2.bin", 0x200002, 0x80000, CRC(00b96481) SHA1(39daa46321c1d4f8bce8c25d0450b97f1f19dedb) )
 	ROM_LOAD32_BYTE( "bhpics3.bin", 0x200003, 0x80000, CRC(99c4f1db) SHA1(aba4440c5cdf413f970a0c65457e2d1b37caf2d6) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )       /* 1MB for ADPCM */
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )       /* 1MB for ADPCM */
 	ROM_LOAD( "bhpcm0.bin",  0x00000, 0x20000, CRC(609ca626) SHA1(9bfc913fc4c3453b132595f8553245376bce3a51) )
 	ROM_LOAD( "bhpcm1.bin",  0x20000, 0x20000, CRC(35511509) SHA1(41294b81e253db5d2f30f8589dd59729a31bb2bb) )
 	ROM_LOAD( "bhpcm2.bin",  0x40000, 0x20000, CRC(f71a840a) SHA1(09d045552704cd1434307f9a36ce03c5c06a8ff6) )
@@ -505,9 +507,6 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
 
 DRIVER_INIT_MEMBER(beathead_state,beathead)
 {
-	/* initialize the common systems */
-	atarijsa_init(machine(), "IN2", 0x0040);
-
 	/* prepare the speedups */
 	m_speedup_data = m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate(FUNC(beathead_state::speedup_r), this));
 	m_movie_speedup_data = m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000804, 0x00000807, 0, 0, read32_delegate(FUNC(beathead_state::movie_speedup_r), this));

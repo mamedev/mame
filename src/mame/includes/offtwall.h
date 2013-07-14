@@ -5,13 +5,17 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class offtwall_state : public atarigen_state
 {
 public:
 	offtwall_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa"),
 			m_bankrom_base(*this, "bankrom_base") { }
+
+	required_device<atari_jsa_iii_device> m_jsa;
 
 	UINT16 *m_bankswitch_base;
 	required_shared_ptr<UINT16> m_bankrom_base;

@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "machine/asic65.h"
-#include "audio/atarijsa.h"
 #include "video/atarirle.h"
 #include "includes/atarig42.h"
 
@@ -53,7 +52,6 @@ MACHINE_RESET_MEMBER(atarig42_state,atarig42)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -67,8 +65,8 @@ MACHINE_RESET_MEMBER(atarig42_state,atarig42)
 READ16_MEMBER(atarig42_state::special_port2_r)
 {
 	int temp = ioport("IN2")->read();
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0020;
-	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x0010;
+	if (m_jsa->main_to_sound_ready()) temp ^= 0x0020;
+	if (m_jsa->sound_to_main_ready()) temp ^= 0x0010;
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return temp;
 }
@@ -104,8 +102,9 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		m_jsacpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(data & 0x10)) atarijsa_reset(machine());
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		if (!(data & 0x10))
+			m_jsa->reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */
 
@@ -336,10 +335,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xe00010, 0xe00011) AM_READ(special_port2_r)
-	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("JSAIII")
+	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("jsa:JSAIII")
 	AM_RANGE(0xe00020, 0xe00027) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
-	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
+	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
 	AM_RANGE(0xe00060, 0xe00061) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
@@ -381,8 +380,6 @@ static INPUT_PORTS_START( roadriot )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 
 	PORT_START("A2D0")      /* analog 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -432,8 +429,6 @@ static INPUT_PORTS_START( guardian )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 
 	PORT_START("A2D0")      /* analog 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -570,7 +565,11 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_iii_mono)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
@@ -601,7 +600,7 @@ ROM_START( roadriot )
 	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -634,7 +633,7 @@ ROM_START( roadriot )
 	ROM_LOAD16_BYTE( "136089-1032.9s", 0x1c0000, 0x20000, CRC(eca3c595) SHA1(5d067b7c02675b1e6dd3c4046697a16f873f80af) )
 	ROM_LOAD16_BYTE( "136089-1031.9p", 0x1c0001, 0x20000, CRC(88acdb53) SHA1(5bf2424ee75a25248a8ce38c8605b6780da4e323) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136089-1048.19e",  0x00000, 0x20000, CRC(2db638a7) SHA1(45da8088f7439beacc3056952a4d631d9633efa7) )
 	ROM_LOAD( "136089-1049.17e",  0x20000, 0x20000, CRC(e1dd7f9e) SHA1(6b9a240aa84d210d3052daab6ea26f9cd0e62dc1) )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
@@ -659,7 +658,7 @@ ROM_START( roadrioto )
 	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
@@ -692,7 +691,7 @@ ROM_START( roadrioto )
 	ROM_LOAD16_BYTE( "136089-1032.9s", 0x1c0000, 0x20000, CRC(eca3c595) SHA1(5d067b7c02675b1e6dd3c4046697a16f873f80af) )
 	ROM_LOAD16_BYTE( "136089-1031.9p", 0x1c0001, 0x20000, CRC(88acdb53) SHA1(5bf2424ee75a25248a8ce38c8605b6780da4e323) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136089-1048.19e",  0x00000, 0x20000, CRC(2db638a7) SHA1(45da8088f7439beacc3056952a4d631d9633efa7) )
 	ROM_LOAD( "136089-1049.17e",  0x20000, 0x20000, CRC(e1dd7f9e) SHA1(6b9a240aa84d210d3052daab6ea26f9cd0e62dc1) )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
@@ -718,7 +717,7 @@ ROM_START( guardian )
 	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, NO_DUMP )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136092-0080-snd.12c", 0x10000, 0x4000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
 	ROM_CONTINUE(             0x04000, 0xc000 )
 
@@ -744,7 +743,7 @@ ROM_START( guardian )
 	ROM_LOAD16_BYTE( "136092-0067a.9s", 0x500000, 0x80000, CRC(15845fba) SHA1(f7b670a8d48a5e9c261150914a06ef9a938a84e7) )
 	ROM_LOAD16_BYTE( "136092-0066a.9p", 0x500001, 0x80000, CRC(7130c575) SHA1(b3ea109981a1e5c631705b23dfad4a3a3daf7734) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
 	ROM_LOAD( "136092-0010-snd",  0x00000, 0x80000, CRC(bca27f40) SHA1(91a41eac116eb7d9a790abc590eb06328726d1c2) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
@@ -777,8 +776,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 {
-	atarijsa_init(machine(), "IN2", 0x0040);
-
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
@@ -811,8 +808,6 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 
 DRIVER_INIT_MEMBER(atarig42_state,guardian)
 {
-	atarijsa_init(machine(), "IN2", 0x0040);
-
 	m_playfield_base = 0x000;
 
 	/* it looks like they jsr to $80000 as some kind of protection */

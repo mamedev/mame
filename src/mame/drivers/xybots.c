@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/xybots.h"
 
@@ -42,7 +41,6 @@ void xybots_state::update_interrupts()
 MACHINE_RESET_MEMBER(xybots_state,xybots)
 {
 	atarigen_state::machine_reset();
-	atarijsa_reset(machine());
 }
 
 
@@ -57,7 +55,7 @@ READ16_MEMBER(xybots_state::special_port1_r)
 {
 	int result = ioport("FFE200")->read();
 
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0200;
+	if (m_jsa->main_to_sound_ready()) result ^= 0x0200;
 	result ^= m_h256 ^= 0x0400;
 	return result;
 }
@@ -82,14 +80,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0xffe100, 0xffe1ff) AM_MIRROR(0x7f8000) AM_READ_PORT("FFE100")
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
+	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 ADDRESS_MAP_END
 
 
@@ -127,11 +125,11 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_INCLUDE( atarijsa_i )      /* audio port */
 	/* Xybots uses a swapped version */
-	PORT_MODIFY("JSAI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+// todo:
+//	PORT_MODIFY("jsa:JSAI")
+//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 
@@ -204,7 +202,14 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_VIDEO_START_OVERRIDE(xybots_state,xybots)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_i_stereo_swapped)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_DEVICE_REMOVE("jsa:pokey")
+	MCFG_DEVICE_REMOVE("jsa:tms")
 MACHINE_CONFIG_END
 
 
@@ -222,7 +227,7 @@ ROM_START( xybots )
 	ROM_LOAD16_BYTE( "136054-2114.17b", 0x020000, 0x008000, CRC(d31890cb) SHA1(b58722a4dcc79e97484c2f5e35b8dbf8c3520bd9) )
 	ROM_LOAD16_BYTE( "136054-2115.19b", 0x020001, 0x008000, CRC(750ab1b0) SHA1(0638de738bd804bde4b93cd23190ee0465887cf8) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -253,7 +258,7 @@ ROM_START( xybotsg )
 	ROM_LOAD16_BYTE( "136054-3214.17b", 0x020000, 0x008000, CRC(4ad35093) SHA1(6d2d82fb481c68819ec6c87d483eed17d4ae5d1a) )
 	ROM_LOAD16_BYTE( "136054-3215.19b", 0x020001, 0x008000, CRC(3a2afbaf) SHA1(61b88d15d95681eb24559d0696203cd4ee63d11f) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -284,7 +289,7 @@ ROM_START( xybotsf )
 	ROM_LOAD16_BYTE( "136054-3614.17b", 0x020000, 0x008000, CRC(7385e0b6) SHA1(98a69901069872b14413c1bfe48783fdb43c1c37) )
 	ROM_LOAD16_BYTE( "136054-3615.19b", 0x020001, 0x008000, CRC(8e37b812) SHA1(40f973a49c4b40f3a5d982d332995e792f718dcc) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -315,7 +320,7 @@ ROM_START( xybots1 )
 	ROM_LOAD16_BYTE( "136054-1114.17b", 0x020000, 0x008000, CRC(7444f88f) SHA1(e2a27754a57a809398ee639fe5d0920b564d4c0b) )
 	ROM_LOAD16_BYTE( "136054-1115.19b", 0x020001, 0x008000, CRC(848d072d) SHA1(c4d1181f0227200e60d99a99c1a83897275b055f) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136054-1116.2k",  0x010000, 0x004000, CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -346,7 +351,7 @@ ROM_START( xybots0 )
 	ROM_LOAD16_BYTE( "136054-0114.17b", 0x020000, 0x008000, CRC(18b875f7) SHA1(aa78553bd3556d0b209513ba80b782cfb0e3bb8b) )
 	ROM_LOAD16_BYTE( "136054-0115.19b", 0x020001, 0x008000, CRC(7f116360) SHA1(d12c339ce973bd74be4a4ac9e9d293f6a6e358d6) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136054-0116.2k",  0x010000, 0x004000, BAD_DUMP CRC(3b9f155d) SHA1(7080681a7eab282023034379825ca88adc6b300f) ) // not dumped from this pcb, rom taken from another set instead
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -381,7 +386,6 @@ DRIVER_INIT_MEMBER(xybots_state,xybots)
 {
 	m_h256 = 0x0400;
 	slapstic_configure(*m_maincpu, 0x008000, 0, 107);
-	atarijsa_init(machine(), "FFE200", 0x0100);
 }
 
 

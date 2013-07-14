@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class blstroid_state : public atarigen_state
 {
@@ -17,8 +18,10 @@ public:
 
 	blstroid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa"),
 			m_priorityram(*this, "priorityram") { }
 
+	required_device<atari_jsa_i_device> m_jsa;
 	required_shared_ptr<UINT16> m_priorityram;
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);

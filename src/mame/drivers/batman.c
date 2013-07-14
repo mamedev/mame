@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/batman.h"
 
@@ -52,7 +51,6 @@ MACHINE_RESET_MEMBER(batman_state,batman)
 	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -85,8 +83,8 @@ WRITE16_MEMBER(batman_state::batman_atarivc_w)
 READ16_MEMBER(batman_state::special_port2_r)
 {
 	int result = ioport("260010")->read();
-	if (m_soundcomm->sound_to_main_ready()) result ^= 0x0010;
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
+	if (m_jsa->sound_to_main_ready()) result ^= 0x0010;
+	if (m_jsa->main_to_sound_ready()) result ^= 0x0020;
 	return result;
 }
 
@@ -98,9 +96,9 @@ WRITE16_MEMBER(batman_state::latch_w)
 
 	/* bit 4 is connected to the /RESET pin on the 6502 */
 	if (m_latch_data & 0x0010)
-		m_jsacpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		m_jsacpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* alpha bank is selected by the upper 4 bits */
 	if ((oldword ^ m_latch_data) & 0x7000)
@@ -131,8 +129,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x11ff8c) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_MIRROR(0x11ff8c) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_MIRROR(0x11ff8e) AM_READ(special_port2_r)
-	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
-	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_MIRROR(0x11ff8e) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
+	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
@@ -176,8 +174,6 @@ static INPUT_PORTS_START( batman )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )   /* Output buffer full (@260040) */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 INPUT_PORTS_END
 
 
@@ -250,7 +246,11 @@ static MACHINE_CONFIG_START( batman, batman_state )
 	MCFG_VIDEO_START_OVERRIDE(batman_state,batman)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_iii_mono)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -270,7 +270,7 @@ ROM_START( batman )
 	ROM_LOAD16_BYTE( "136085-2034.9r",   0x80000, 0x20000, CRC(05388c62) SHA1(de037203d94e72e2922c89256da080ae023ca0e7) )
 	ROM_LOAD16_BYTE( "136085-2035.5r",   0x80001, 0x20000, CRC(e77c92dd) SHA1(6d475092f7628114960d26b8ec1c5eae5e61ce25) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "136085-1040.12c",  0x10000, 0x4000, CRC(080db83c) SHA1(ec084b7c1dc5878acd6d081e2e8b8d1e8b3d8a45) )
 	ROM_CONTINUE(                 0x04000, 0xc000 )
 
@@ -297,7 +297,7 @@ ROM_START( batman )
 	ROM_LOAD( "136085-1021.15c",  0x0c0000, 0x20000, CRC(9c8ef9ba) SHA1(c2540adfc227a654a3f91e2cfdcd98b3a04ae4fb) )
 	ROM_LOAD( "136085-1025.16c",  0x0e0000, 0x20000, CRC(5d30bcd1) SHA1(817e225511ab98e7575ee512d659c51fcb7716dc) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )   /* 1MB for ADPCM */
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )   /* 1MB for ADPCM */
 	ROM_LOAD( "136085-1041.19e",  0x00000, 0x20000, CRC(d97d5dbb) SHA1(7609841c773e3d1ae5a21da81e3387260fd8da41) )
 	ROM_LOAD( "136085-1042.17e",  0x20000, 0x20000, CRC(8c496986) SHA1(07c84c68885e2ab3e81ee92942d6a0f29e4dffa8) )
 	ROM_LOAD( "136085-1043.15e",  0x40000, 0x20000, CRC(51812d3b) SHA1(6748fecef753179a9257c0da5a7b7c9648437208) )
@@ -321,21 +321,8 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-DRIVER_INIT_MEMBER(batman_state,batman)
-{
-	atarijsa_init(machine(), "260010", 0x0040);
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman_state, batman, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )
+GAME( 1991, batman, 0, batman, batman, driver_device, 0, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )

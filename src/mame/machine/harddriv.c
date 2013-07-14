@@ -12,7 +12,6 @@
 #include "sound/dac.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
-#include "audio/atarijsa.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
 
@@ -72,10 +71,6 @@ MACHINE_RESET_MEMBER(harddriv_state,harddriv)
 	if (m_adsp != NULL) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	if (m_dsp32 != NULL) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	if (m_sounddsp != NULL) m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
-	/* if we found a 6502, reset the JSA board */
-	if (m_jsacpu != NULL)
-		atarijsa_reset(machine());
 
 	m_last_gsp_shiftreg = 0;
 
@@ -327,8 +322,8 @@ READ16_HANDLER( hd68k_adc12_r )
 READ16_HANDLER( hd68k_sound_reset_r )
 {
 	harddriv_state *state = space.machine().driver_data<harddriv_state>();
-	if (state->m_jsacpu != NULL)
-		atarijsa_reset(space.machine());
+	if (state->m_jsa != NULL)
+		state->m_jsa->reset();
 	return ~0;
 }
 

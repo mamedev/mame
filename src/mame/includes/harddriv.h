@@ -9,6 +9,7 @@
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/dsp32/dsp32.h"
+#include "audio/atarijsa.h"
 #include "sound/dac.h"
 #include "machine/atarigen.h"
 #include "machine/n68681.h"
@@ -33,6 +34,7 @@ public:
 			m_ds3xdsp(*this, "ds3xdsp"),
 			m_ds3dac1(*this, "ds3dac1"),
 			m_ds3dac2(*this, "ds3dac2"),
+			m_jsa(*this, "jsa"),
 			m_msp_ram(*this, "msp_ram"),
 			m_adsp_data_memory(*this, "adsp_data"),
 			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
@@ -62,6 +64,7 @@ public:
 	optional_device<adsp2105_device> m_ds3xdsp;
 	optional_device<dac_device> m_ds3dac1;
 	optional_device<dac_device> m_ds3dac2;
+	optional_device<atari_jsa_base_device> m_jsa;
 
 	UINT8                   m_hd34010_host_access;
 	UINT8                   m_dsk_pio_access;

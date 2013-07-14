@@ -5,16 +5,20 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class atarigx2_state : public atarigen_state
 {
 public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa"),
 			m_mo_command(*this, "mo_command"),
 			m_protection_base(*this, "protection_base") { }
 
 	UINT16          m_playfield_base;
+
+	required_device<atari_jsa_iiis_device> m_jsa;
 
 	required_shared_ptr<UINT32> m_mo_command;
 	required_shared_ptr<UINT32> m_protection_base;

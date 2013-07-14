@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 #include "cpu/m68000/m68000.h"
 
 class atarig1_state : public atarigen_state
@@ -13,9 +14,11 @@ public:
 	atarig1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_jsa(*this, "jsa"),
 			m_mo_command(*this, "mo_command") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<atari_jsa_ii_device> m_jsa;
 
 	bool            m_is_pitfight;
 

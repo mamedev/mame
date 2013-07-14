@@ -45,6 +45,7 @@ public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_jsa(*this, "jsa"),
 			m_nvram(*this, "nvram"),
 			m_videoram(*this, "videoram"),
 			m_paletteram(*this, "paletteram"),
@@ -60,6 +61,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<asap_device> m_maincpu;
+	required_device<atari_jsa_iii_device> m_jsa;
 
 	required_shared_ptr<UINT32> m_nvram;
 

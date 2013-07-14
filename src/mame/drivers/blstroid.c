@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/blstroid.h"
 
@@ -50,7 +49,6 @@ MACHINE_RESET_MEMBER(blstroid_state,blstroid)
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
-	atarijsa_reset(machine());
 }
 
 
@@ -66,7 +64,7 @@ READ16_MEMBER(blstroid_state::inputs_r)
 	static const char *const iptnames[] = { "IN0", "IN1" };
 	int temp = ioport(iptnames[offset & 1])->read();
 
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0040;
+	if (m_jsa->main_to_sound_ready()) temp ^= 0x0040;
 	if (get_hblank(*machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
@@ -88,10 +86,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_SHARE("priorityram")
-	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
-	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
+	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
+	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
-	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
+	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL0")
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
 	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
@@ -140,8 +138,6 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_i )      /* audio port */
 INPUT_PORTS_END
 
 
@@ -214,7 +210,14 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_i_stereo)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DEVICE_REMOVE("jsa:pokey")
+	MCFG_DEVICE_REMOVE("jsa:tms")
 MACHINE_CONFIG_END
 
 
@@ -232,7 +235,7 @@ ROM_START( blstroid )
 	ROM_LOAD16_BYTE( "136057-4124.4c",  0x020000, 0x010000, CRC(fd2365df) SHA1(63ed3f9a92fed985f9ddb93687f11a24c8309f56) )
 	ROM_LOAD16_BYTE( "136057-4122.4b",  0x020001, 0x010000, CRC(c364706e) SHA1(e03cd60d139000607d83240b0b48865eafb1188b) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136057-1135.2k",  0x010000, 0x004000, CRC(baa8b5fe) SHA1(4af1f9bec3ffa856016a89bc20041d572305ba3a) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -269,7 +272,7 @@ ROM_START( blstroid3 )
 	ROM_LOAD16_BYTE( "136057-3124.4c",  0x020000, 0x010000, CRC(a9140c31) SHA1(02518bf998c0c74dff66f3192dcb1f91b1812cf8) )
 	ROM_LOAD16_BYTE( "136057-3122.4b",  0x020001, 0x010000, CRC(137fbb17) SHA1(3dda03ecdb2dc9a9cd78aeaa502497662496a26d) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136057-1135.2k",  0x010000, 0x004000, CRC(baa8b5fe) SHA1(4af1f9bec3ffa856016a89bc20041d572305ba3a) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -306,7 +309,7 @@ ROM_START( blstroid2 )
 	ROM_LOAD16_BYTE( "136057-2124.4c",  0x020000, 0x010000, CRC(d0fa38fe) SHA1(8aeae50dff6bcd14ac5faf10f15724b7f7430f5c) )
 	ROM_LOAD16_BYTE( "136057-2122.4b",  0x020001, 0x010000, CRC(744bf921) SHA1(bb9118bfc04745df2eb78e1d1e70f7fc2e0509d4) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136057-1135.2k",  0x010000, 0x004000, CRC(baa8b5fe) SHA1(4af1f9bec3ffa856016a89bc20041d572305ba3a) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -343,7 +346,7 @@ ROM_START( blstroidg )
 	ROM_LOAD16_BYTE( "136057-2224.4c",  0x020000, 0x010000, CRC(849249d4) SHA1(61d6eaff7df54f0353639e192eb6074a80916e29) )
 	ROM_LOAD16_BYTE( "136057-2222.4b",  0x020001, 0x010000, CRC(bdeaba0d) SHA1(f479514b5d9543f9e12aa1ac48e20bf054cb18d0) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136057-1135.2k",  0x010000, 0x004000, CRC(baa8b5fe) SHA1(4af1f9bec3ffa856016a89bc20041d572305ba3a) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -380,7 +383,7 @@ ROM_START( blstroidh )
 	ROM_LOAD16_BYTE( "eheadh1.c5",  0x20000, 0x10000, CRC(0b7a3cb6) SHA1(7dc585ff536055e85b0849aa075f2fdab34a8e1c) )
 	ROM_LOAD16_BYTE( "eheadl1.b5",  0x20001, 0x10000, CRC(43971694) SHA1(a39a8da244645bb56081fd71609a33d8b7d78478) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136057-1135.2k",  0x010000, 0x004000, CRC(baa8b5fe) SHA1(4af1f9bec3ffa856016a89bc20041d572305ba3a) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
@@ -419,7 +422,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(blstroid_state,blstroid)
 {
-	atarijsa_init(machine(), "IN0", 0x80);
 }
 
 

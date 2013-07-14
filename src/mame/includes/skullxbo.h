@@ -5,14 +5,17 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class skullxbo_state : public atarigen_state
 {
 public:
 	skullxbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa"),
 			m_scanline_timer(*this, "scan_timer") { }
 
+	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<timer_device> m_scanline_timer;
 
 	virtual void update_interrupts();

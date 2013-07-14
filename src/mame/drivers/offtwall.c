@@ -19,7 +19,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "includes/offtwall.h"
 
@@ -49,7 +48,6 @@ MACHINE_RESET_MEMBER(offtwall_state,offtwall)
 {
 	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 1);
-	atarijsa_reset(machine());
 }
 
 
@@ -82,7 +80,7 @@ WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
 READ16_MEMBER(offtwall_state::special_port3_r)
 {
 	int result = ioport("260010")->read();
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
+	if (m_jsa->main_to_sound_ready()) result ^= 0x0020;
 	return result;
 }
 
@@ -93,8 +91,9 @@ WRITE16_MEMBER(offtwall_state::io_latch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		m_jsacpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(data & 0x10)) atarijsa_reset(machine());
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		if (!(data & 0x10))
+			m_jsa->reset();
 	}
 
 	logerror("sound control = %04X\n", data);
@@ -270,8 +269,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x260020, 0x260021) AM_READ_PORT("260020")
 	AM_RANGE(0x260022, 0x260023) AM_READ_PORT("260022")
 	AM_RANGE(0x260024, 0x260025) AM_READ_PORT("260024")
-	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
-	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
+	AM_RANGE(0x260030, 0x260031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
+	AM_RANGE(0x260040, 0x260041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_WRITE(io_latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
@@ -351,8 +350,6 @@ static INPUT_PORTS_START( offtwall )
 	PORT_START("260024")
 	PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( atarijsa_iii )        /* audio board port */
 INPUT_PORTS_END
 
 
@@ -410,7 +407,12 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_VIDEO_START_OVERRIDE(offtwall_state,offtwall)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(jsa_iii_mono_noadpcm)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(atarigen_state, sound_int_write_line))
+	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_REMOVE("jsa:oki1")
 MACHINE_CONFIG_END
 
 
@@ -426,7 +428,7 @@ ROM_START( offtwall )
 	ROM_LOAD16_BYTE( "otw2012.bin", 0x00000, 0x20000, CRC(d08d81eb) SHA1(5a72aa2e4fc6455b94aa59a7719d0ddc8bcc80f2) )
 	ROM_LOAD16_BYTE( "otw2013.bin", 0x00001, 0x20000, CRC(61c2553d) SHA1(343d39f9b75fd236e9769ec21ab65310f85e31ca) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "otw1020.bin", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
@@ -448,7 +450,7 @@ ROM_START( offtwallc )
 	ROM_LOAD16_BYTE( "090-2612.rom", 0x00000, 0x20000, CRC(fc891a3f) SHA1(027815a20fbc6c0c9242768581b97362b39941c2) )
 	ROM_LOAD16_BYTE( "090-2613.rom", 0x00001, 0x20000, CRC(805d79d4) SHA1(943ec9f408ba875bdf1794ce7d24803043480401) )
 
-	ROM_REGION( 0x14000, "jsa", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "otw1020.bin", 0x10000, 0x4000, CRC(488112a5) SHA1(55e84855daacfa303d1031de8c9adb992a846e21) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
@@ -474,8 +476,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 {
-	atarijsa_init(machine(), "260010", 0x0040);
-
 	/* install son-of-slapstic workarounds */
 	m_spritecache_count = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
 	m_bankswitch_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
@@ -485,8 +485,6 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 
 DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
 {
-	atarijsa_init(machine(), "260010", 0x0040);
-
 	/* install son-of-slapstic workarounds */
 	m_spritecache_count = m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
 	m_bankswitch_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));

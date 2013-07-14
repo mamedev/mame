@@ -80,9 +80,9 @@ inline const atarigen_screen_timer *get_screen_timer(screen_device &screen)
 
 
 
-/***************************************************************************
-    OVERALL INIT
-***************************************************************************/
+//**************************************************************************
+//  SOUND COMMUNICATIONS DEVICE
+//**************************************************************************
 
 // device type definition
 const device_type ATARI_SOUND_COMM = &device_creator<atari_sound_comm_device>;
@@ -420,7 +420,6 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_playfield2_latch(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_jsacpu(*this, "jsa"),
 		m_oki(*this, "oki"),
 		m_soundcomm(*this, "soundcomm")
 {

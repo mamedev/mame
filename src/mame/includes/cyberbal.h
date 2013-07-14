@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
@@ -20,6 +21,7 @@ public:
 			m_daccpu(*this, "dac"),
 			m_dac1(*this, "dac1"),
 			m_dac2(*this, "dac2"),
+			m_jsa(*this, "jsa"),
 			m_paletteram_0(*this, "paletteram_0"),
 			m_paletteram_1(*this, "paletteram_1") { }
 
@@ -29,6 +31,7 @@ public:
 	optional_device<cpu_device> m_daccpu;
 	optional_device<dac_device> m_dac1;
 	optional_device<dac_device> m_dac2;
+	optional_device<atari_jsa_ii_device> m_jsa;
 	optional_shared_ptr<UINT16> m_paletteram_0;
 	optional_shared_ptr<UINT16> m_paletteram_1;
 	UINT16          m_current_slip[2];

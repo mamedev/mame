@@ -5,12 +5,16 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "audio/atarijsa.h"
 
 class batman_state : public atarigen_state
 {
 public:
 	batman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+			m_jsa(*this, "jsa") { }
+
+	required_device<atari_jsa_iii_device> m_jsa;
 
 	UINT16          m_latch_data;
 
