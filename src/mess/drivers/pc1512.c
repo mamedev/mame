@@ -1059,8 +1059,8 @@ FLOPPY_FORMATS_MEMBER( pc1512_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ibmpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+static SLOT_INTERFACE_START( pc1512_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tandon TM65-2L
 SLOT_INTERFACE_END
 
 
@@ -1245,10 +1245,10 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
 
 	// ISA8 bus
@@ -1264,6 +1264,26 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512")
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pc1512dd )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pc1512dd, pc1512 )
+	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc1512_floppies, "525dd", false)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( pc1512hd )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pc1512hd, pc1512 )
+	MCFG_DEVICE_MODIFY("isa1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "wdxt_gen", false)
 MACHINE_CONFIG_END
 
 
@@ -1288,6 +1308,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_MC146818_IRQ_ADD(MC146818_TAG, MC146818_STANDARD, DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
@@ -1310,30 +1332,20 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640sd )
-//-------------------------------------------------
-
-static MACHINE_CONFIG_DERIVED( pc1640sd, pc1640 )
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, NULL,    pc1512_state::floppy_formats)
-MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG( pc1640dd )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pc1640dd, pc1640 )
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", ibmpc_floppies, "525dd", pc1512_state::floppy_formats)
+	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
+	MCFG_DEVICE_SLOT_INTERFACE(pc1512_floppies, "525dd", false)
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640sd )
+//  MACHINE_CONFIG( pc1640hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1640hd20, pc1640sd )
+static MACHINE_CONFIG_DERIVED( pc1640hd, pc1640 )
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "wdxt_gen", false)
 MACHINE_CONFIG_END
@@ -1350,47 +1362,32 @@ MACHINE_CONFIG_END
 
 ROM_START( pc1512 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247) )
-	ROM_LOAD16_BYTE( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482) )
+	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
+	ROMX_LOAD( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
+	ROMX_LOAD( "40044v2.ic132", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "40043v2.ic129", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v3", "Version 3" )
+	ROMX_LOAD( "40044-2.ic132", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "40043-2.ic129", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda), ROM_SKIP(1) | ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
-	ROM_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7) )
+	ROMX_LOAD( "40045.ic127", 0x0000, 0x2000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7), ROM_BIOS(1) )
+	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(2) )
+	ROMX_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd), ROM_BIOS(3) )
 ROM_END
 
-
-//-------------------------------------------------
-//  ROM( pc1512v2 )
-//-------------------------------------------------
-
-ROM_START( pc1512v2 )
-	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40044v2.ic132", 0x0000, 0x2000, CRC(1aec54fa) SHA1(b12fd73cfc35a240ed6da4dcc4b6c9910be611e0) )
-	ROM_LOAD16_BYTE( "40043v2.ic129", 0x0001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb) )
-
-	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
-	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
-ROM_END
+#define rom_pc1512dd 	rom_pc1512
+#define rom_pc1512hd10 	rom_pc1512
+#define rom_pc1512hd20 	rom_pc1512
 
 
 //-------------------------------------------------
-//  ROM( pc1512v3 )
+//  ROM( pc1640 )
 //-------------------------------------------------
 
-ROM_START( pc1512v3 )
-	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_LOAD16_BYTE( "40044-2.ic132", 0x0000, 0x2000, CRC(ea527e6e) SHA1(b77fa44767a71a0b321a88bb0a394f1125b7c220) )
-	ROM_LOAD16_BYTE( "40043-2.ic129", 0x0001, 0x2000, CRC(532c3854) SHA1(18a17b710f9eb079d9d7216d07807030f904ceda) )
-
-	ROM_REGION( 0x2000, AMS40041_TAG, 0 )
-	ROM_LOAD( "40078.ic127", 0x0000, 0x2000, CRC(ae9c0d04) SHA1(bc8dc4dcedeea5bc1c04986b1f105ad93cb2ebcd) )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( pc1640sd )
-//-------------------------------------------------
-
-ROM_START( pc1640sd )
+ROM_START( pc1640 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
 	ROM_SYSTEM_BIOS( 0, "8809", "Week 9/1988" )
 	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
@@ -1403,8 +1400,8 @@ ROM_START( pc1640sd )
 	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(3) )
 ROM_END
 
-#define rom_pc1640dd 	rom_pc1640sd
-#define rom_pc1640hd20 	rom_pc1640sd
+#define rom_pc1640dd 	rom_pc1640
+#define rom_pc1640hd20 	rom_pc1640
 
 
 
@@ -1413,9 +1410,10 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V1)",  GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1512v2,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V2)",  GAME_SUPPORTS_SAVE )
-COMP( 1989, pc1512v3,   pc1512,     0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 (V3)",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640sd,   0,          0,      pc1640sd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640sd,   0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640sd,   0,      pc1640hd20, pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 SD",    GAME_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 DD",    GAME_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD10",  GAME_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD20",  GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

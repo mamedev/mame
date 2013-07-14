@@ -734,10 +734,11 @@ pc200    // 1988 Sinclair PC200
 pc20      // 1988 Amstrad PC20
 ppc512  // 1987 Amstrad PPC512
 ppc640  // 1987 Amstrad PPC640
-pc1512  // 1986 Amstrad PC1512 v1 (CGA compatible)
-pc1512v2  // 1986 Amstrad PC1512 v2 (CGA compatible)
-pc1512v3  // 1986 Amstrad PC1512 v3.2 (CGA compatible)
-pc1640sd  // 1987 Amstrad PC1640 (EGA compatible)
+pc1512
+pc1512dd
+pc1512hd10
+pc1512hd20
+pc1640
 pc1640dd
 pc1640hd20
 pc2086
