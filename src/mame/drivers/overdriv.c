@@ -12,7 +12,7 @@
       and the coin A setting isn't shown. It's OK with 1 IRQ5 per frame.
     - Some flickering sprites, this might be an interrupt/timing issue
     - The screen is cluttered with sprites which aren't supposed to be visible,
-      increasing the coordinate mask in K053247_sprites_draw() from 0x3ff to 0xfff
+      increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
       fixes this but breaks other games (e.g. Vendetta).
     - The "Continue?" sprites are not visible until you press start
     - priorities

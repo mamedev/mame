@@ -16,7 +16,7 @@ Moo:
    enable/disable bit in Moo. (intro gfx missing and fog blocking view)
  - Enemies coming out of the jail cells in the last stage have wrong priority.
    Could be tile priority or the typical "small Z, big pri" sprite masking
-   trick currently not supported by K053247_sprites_draw().
+   trick currently not supported by k053247_sprites_draw().
 
 Moo (bootleg):
  - No sprites appear, and the game never enables '246 interrupts.  Of course,
@@ -189,7 +189,7 @@ WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(moo_state::K053247_scattered_word_r)
+READ16_MEMBER(moo_state::k053247_scattered_word_r)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -200,7 +200,7 @@ READ16_MEMBER(moo_state::K053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(moo_state::K053247_scattered_word_w)
+WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
 {
 	if (offset & 0x0078)
 		COMBINE_DATA(m_spriteram + offset);

@@ -170,7 +170,7 @@ VIDEO_START_MEMBER(mystwarr_state,gaiapols)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
 	konamigx_mixer_init(machine(), 0);
 
@@ -210,7 +210,7 @@ VIDEO_START_MEMBER(mystwarr_state,dadandrn)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 0, -42, -22, gaiapols_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -42, -22, gaiapols_sprite_callback);
 
 	konamigx_mixer_init(machine(), 0);
 
@@ -239,7 +239,7 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 0, -48, -24, mystwarr_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -48, -24, mystwarr_sprite_callback);
 
 	konamigx_mixer_init(machine(), 0);
 
@@ -262,7 +262,7 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 1, -51, -22, metamrph_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -51, -22, metamrph_sprite_callback);
 
 	konamigx_mixer_init(machine(), 0);
 
@@ -284,7 +284,7 @@ VIDEO_START_MEMBER(mystwarr_state,viostorm)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 1, -62, -23, metamrph_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -62, -23, metamrph_sprite_callback);
 
 	konamigx_mixer_init(machine(), 0);
 
@@ -305,7 +305,7 @@ VIDEO_START_MEMBER(mystwarr_state,martchmp)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", 0, -58, -23, martchmp_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 0, -58, -23, martchmp_sprite_callback);
 
 	konamigx_mixer_init(machine(), 0);
 

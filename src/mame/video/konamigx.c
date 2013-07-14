@@ -841,9 +841,9 @@ UINT8  konamigx_wrport1_0, konamigx_wrport1_1;
 UINT16 konamigx_wrport2;
 
 // frequently used registers
-static int K053246_objset1;
-static int K053247_vrcbk[4];
-static int K053247_coreg, K053247_coregshift, K053247_opset;
+static int k053246_objset1;
+static int k053247_vrcbk[4];
+static int k053247_coreg, k053247_coregshift, k053247_opset;
 static int opri, oinprion;
 static int vcblk[6], ocblk;
 static int vinmix, vmixon, osinmix, osmixon;
@@ -856,24 +856,24 @@ void konamigx_state::konamigx_precache_registers(void)
 	static const int coregshifts[5]= {4,5,6,7,8};
 	int i;
 
-	K053246_objset1 = m_k055673->alt_K053246_read_register(5);
+	k053246_objset1 = m_k055673->k053246_read_register(5);
 
-	i = m_k055673->alt_K053247_read_register(0x8/2);
-	K053247_vrcbk[0] = (i & 0x000f) << 14;
-	K053247_vrcbk[1] = (i & 0x0f00) << 6;
-	i = m_k055673->alt_K053247_read_register(0xa/2);
-	K053247_vrcbk[2] = (i & 0x000f) << 14;
-	K053247_vrcbk[3] = (i & 0x0f00) << 6;
+	i = m_k055673->k053247_read_register(0x8/2);
+	k053247_vrcbk[0] = (i & 0x000f) << 14;
+	k053247_vrcbk[1] = (i & 0x0f00) << 6;
+	i = m_k055673->k053247_read_register(0xa/2);
+	k053247_vrcbk[2] = (i & 0x000f) << 14;
+	k053247_vrcbk[3] = (i & 0x0f00) << 6;
 
 	// COREG == OBJSET2+1C == bit8-11 of OPSET ??? (see p.50 last table, needs p.49 to confirm)
-	K053247_opset = m_k055673->alt_K053247_read_register(0xc/2);
+	k053247_opset = m_k055673->k053247_read_register(0xc/2);
 
-	i = K053247_opset & 7; if (i > 4) i = 4;
+	i = k053247_opset & 7; if (i > 4) i = 4;
 
-	K053247_coreg = m_k055673->alt_K053247_read_register(0xc/2)>>8 & 0xf;
-	K053247_coreg =(K053247_coreg & coregmasks[i]) << 12;
+	k053247_coreg = m_k055673->k053247_read_register(0xc/2)>>8 & 0xf;
+	k053247_coreg =(k053247_coreg & coregmasks[i]) << 12;
 
-	K053247_coregshift = coregshifts[i];
+	k053247_coregshift = coregshifts[i];
 
 	opri     = m_k055555->K055555_read_register(K55_PRIINP_8);
 	oinprion = m_k055555->K055555_read_register(K55_OINPRI_ON);
@@ -894,7 +894,7 @@ INLINE int K053247GX_combine_c18(int attrib) // (see p.46)
 {
 	int c18;
 
-	c18 = (attrib & 0xff)<<K053247_coregshift | K053247_coreg;
+	c18 = (attrib & 0xff)<<k053247_coregshift | k053247_coreg;
 
 	if (konamigx_wrport2 & 4) c18 &= 0x3fff; else
 	if (!(konamigx_wrport2 & 8)) c18 = (c18 & 0x3fff) | (attrib<<6 & 0xc000);
@@ -911,7 +911,7 @@ INLINE int K055555GX_decode_objcolor(int c18) // (see p.59 7.2.2)
 	c18  &= opon;
 	ocb  &=~opon;
 
-	return((ocb | c18) >> K053247_coregshift);
+	return((ocb | c18) >> k053247_coregshift);
 }
 
 INLINE int K055555GX_decode_inpri(int c18) // (see p.59 7.2.2)
@@ -930,7 +930,7 @@ static void konamigx_type2_sprite_callback(running_machine &machine, int *code, 
 	int num = *code;
 	int c18 = *color;
 
-	*code = K053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = k053247_vrcbk[num>>14] | (num & 0x3fff);
 	c18 = K053247GX_combine_c18(c18);
 	*color = K055555GX_decode_objcolor(c18);
 	*priority = K055555GX_decode_inpri(c18);
@@ -941,7 +941,7 @@ static void konamigx_dragoonj_sprite_callback(running_machine &machine, int *cod
 	int num, op, pri, c18;
 
 	num = *code;
-	*code = K053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = k053247_vrcbk[num>>14] | (num & 0x3fff);
 
 	c18  = pri = *color;
 	op   = opri;
@@ -959,7 +959,7 @@ static void konamigx_salmndr2_sprite_callback(running_machine &machine, int *cod
 	int num, op, pri, c18;
 
 	num = *code;
-	*code = K053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = k053247_vrcbk[num>>14] | (num & 0x3fff);
 
 	c18  = pri = *color;
 	op   = opri;
@@ -977,7 +977,7 @@ static void konamigx_le2_sprite_callback(running_machine &machine, int *code, in
 	int num, op, pri;
 
 	num = *code;
-	*code = K053247_vrcbk[num>>14] | (num & 0x3fff);
+	*code = k053247_vrcbk[num>>14] | (num & 0x3fff);
 
 	pri = *color;
 	*color &= 0x1f;
@@ -1048,7 +1048,7 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 	else
 	{
 		// layer 0 is the sprite layer with different attributes decode; detail on p.49 (missing)
-		emx   = 0; // K053247_read_register(??)>>? & 3;
+		emx   = 0; // k053247_read_register(??)>>? & 3;
 		osmx &= oson;
 		emx  &=~oson;
 		emx  |= osmx;
@@ -1116,18 +1116,18 @@ static UINT16 *gx_spriteram;
 static int gx_objdma, gx_primode;
 
 // mirrored K053247 and K054338 settings
-UINT16 *K053247_ram;
-static gfx_element *K053247_gfx;
-static void (*K053247_callback)(running_machine &machine, int *code,int *color,int *priority);
-static int K053247_dx, K053247_dy;
+UINT16 *k053247_ram;
+static gfx_element *k053247_gfx;
+static void (*k053247_callback)(running_machine &machine, int *code,int *color,int *priority);
+static int k053247_dx, k053247_dy;
 
 static int *K054338_shdRGB;
 
 
 static void K053247GP_set_SpriteOffset(int offsx, int offsy)
 {
-	K053247_dx = offsx;
-	K053247_dy = offsy;
+	k053247_dx = offsx;
+	k053247_dy = offsy;
 }
 
 void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
@@ -1139,7 +1139,7 @@ void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
-	m_k055673->alt_K053247_export_config(&K053247_ram, &K053247_gfx, &K053247_callback, &K053247_dx, &K053247_dy);
+	m_k055673->alt_k053247_export_config(&k053247_ram, &k053247_gfx, &k053247_callback, &k053247_dx, &k053247_dy);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
@@ -1148,7 +1148,7 @@ void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 		gx_objdma = 1;
 	}
 	else
-		gx_spriteram = K053247_ram;
+		gx_spriteram = k053247_ram;
 
 	palette_set_shadow_dRGB32(machine, 3,-80,-80,-80, 0);
 	K054338_invert_alpha(1);
@@ -1161,7 +1161,7 @@ void konamigx_mixer_primode(int mode)
 
 void konamigx_objdma(void)
 {
-	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
+	if (gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
 }
 
 void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
@@ -1219,17 +1219,17 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	konamigx_precache_registers();
 
 	// init OBJSET1 parameters (see p.47 6.2)
-	flipscreenx = K053246_objset1 & 1;
-	flipscreeny = K053246_objset1 & 2;
+	flipscreenx = k053246_objset1 & 1;
+	flipscreeny = k053246_objset1 & 2;
 
 	// get "display window" offsets
-	offx = (m_k055673->alt_K053246_read_register(0)<<8 | m_k055673->alt_K053246_read_register(1)) & 0x3ff;
-	offy = (m_k055673->alt_K053246_read_register(2)<<8 | m_k055673->alt_K053246_read_register(3)) & 0x3ff;
+	offx = (m_k055673->k053246_read_register(0)<<8 | m_k055673->k053246_read_register(1)) & 0x3ff;
+	offy = (m_k055673->k053246_read_register(2)<<8 | m_k055673->k053246_read_register(3)) & 0x3ff;
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
 	layerid[0] = 0; layerid[1] = 1; layerid[2] = 2; layerid[3] = 3; layerid[4] = 4; layerid[5] = 5;
 
-	if (K053247_opset & 0x40)
+	if (k053247_opset & 0x40)
 	{
 		wrapsize = 512;
 		xwraplim = 512 - 64;
@@ -1360,13 +1360,13 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		zcode = gx_spriteram[offs] & 0xff;
 
 		// invert z-order when opset_pri is set (see p.51 OPSET PRI)
-		if (K053247_opset & 0x10) zcode = 0xff - zcode;
+		if (k053247_opset & 0x10) zcode = 0xff - zcode;
 
 		code  = gx_spriteram[offs+1];
 		color = k = gx_spriteram[offs+6];
 		l     = gx_spriteram[offs+7];
 
-		(*K053247_callback)(machine, &code, &color, &pri);
+		(*k053247_callback)(machine, &code, &color, &pri);
 
 		/*
 		    shadow = shadow code
@@ -1390,7 +1390,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 			shadow = k>>10 & 3;
 			if (shadow) // object has shadow?
 			{
-				if (shadow != 1 || K053246_objset1 & 0x20)
+				if (shadow != 1 || k053246_objset1 & 0x20)
 				{
 					shadow--;
 					temp1 = 1; // add solid
@@ -1425,7 +1425,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 			if (temp3)
 			{
 				// determine shadow priority
-				spri = (K053247_opset & 0x20) ? pri : shdpri[shadow]; // (see p.51 OPSET SDSEL)
+				spri = (k053247_opset & 0x20) ? pri : shdpri[shadow]; // (see p.51 OPSET SDSEL)
 			}
 		}
 
@@ -1719,7 +1719,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		mirrory = temp & 0x8000;
 
 		// for Escape Kids (GX975)
-		if ( K053246_objset1 & 8 ) // Check only "Bit #3 is '1'?"
+		if ( k053246_objset1 & 8 ) // Check only "Bit #3 is '1'?"
 		{
 			zoomx = zoomx>>1; // Fix sprite width to HALF size
 			ox = (ox>>1) + 1; // Fix sprite draw position
@@ -1733,8 +1733,8 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		// apply wrapping and global offsets
 		temp = wrapsize-1;
 
-		ox += K053247_dx;
-		oy -= K053247_dy;
+		ox += k053247_dx;
+		oy -= k053247_dy;
 		ox = ( ox - offx) & temp;
 		oy = (-oy - offy) & temp;
 		if (ox >= xwraplim) ox -= wrapsize;
@@ -1805,7 +1805,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 				if (nozoom) { scaley = scalex = 0x10000; } else { scalex = zw << 12; scaley = zh << 12; };
 
 				zdrawgfxzoom32GP(
-						bitmap, cliprect, K053247_gfx,
+						bitmap, cliprect, k053247_gfx,
 						temp,
 						color,
 						temp1,temp2,
@@ -2055,7 +2055,7 @@ void konamigx_state::_gxcommoninitnosprites(running_machine &machine)
 void konamigx_state::_gxcommoninit(running_machine &machine)
 {
 	// (+ve values move objects to the right and -ve values move objects to the left)
-	m_k055673->alt_K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 }
@@ -2106,7 +2106,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 VIDEO_START_MEMBER(konamigx_state,winspike)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 2);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 }
@@ -2114,7 +2114,7 @@ VIDEO_START_MEMBER(konamigx_state,winspike)
 VIDEO_START_MEMBER(konamigx_state,dragoonj)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2127,7 +2127,7 @@ VIDEO_START_MEMBER(konamigx_state,dragoonj)
 VIDEO_START_MEMBER(konamigx_state,le2)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2156,7 +2156,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type3)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2195,7 +2195,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2226,7 +2226,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4_vsn)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2256,7 +2256,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_type4_sd2)
 	int height = machine().primary_screen->height();
 
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
 
 	dualscreen_left_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
 	dualscreen_right_tempbitmap = auto_bitmap_rgb32_alloc(machine(), width, height);
@@ -2290,7 +2290,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp_2)
 
 	if (!strcmp(machine().system().name,"salmndr2") || !strcmp(machine().system().name,"salmndr2a"))
 	{
-		m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
+		m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
 		_gxcommoninitnosprites(machine());
 	}
@@ -2303,7 +2303,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp_2)
 VIDEO_START_MEMBER(konamigx_state,opengolf)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 
@@ -2341,7 +2341,7 @@ VIDEO_START_MEMBER(konamigx_state,opengolf)
 VIDEO_START_MEMBER(konamigx_state,racinfrc)
 {
 	m_k056832->altK056832_vh_start(machine(), "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
-	m_k055673->alt_K055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine());
 

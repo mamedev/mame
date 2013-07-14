@@ -88,7 +88,7 @@ static const eeprom_interface eeprom_intf =
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053247. */
-READ16_MEMBER(xexex_state::K053247_scattered_word_r)
+READ16_MEMBER(xexex_state::k053247_scattered_word_r)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -99,7 +99,7 @@ READ16_MEMBER(xexex_state::K053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(xexex_state::K053247_scattered_word_w)
+WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
 {
 	if (offset & 0x0031)
 		COMBINE_DATA(m_spriteram + offset);

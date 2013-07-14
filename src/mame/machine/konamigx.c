@@ -295,7 +295,7 @@ static const UINT8 ptable[7][8] =
 	if (mode == 0)
 	{
 		src = srcbase + srcoffs;
-		dst = K053247_ram;
+		dst = k053247_ram;
 		data1 = count<<2;
 		data2 = count<<3;
 		src += data1; dst += data2; i = -data1; j = -data2;
@@ -396,7 +396,7 @@ if((data1=obj[0])&0x80000000)\
 		zcode = ztable[i];
 		pcode = ptable[i];
 
-		dst = K053247_ram;
+		dst = k053247_ram;
 		j = 256;
 
 		// decode Vic-Viper

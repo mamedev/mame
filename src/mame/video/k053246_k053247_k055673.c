@@ -777,7 +777,7 @@ void k055673_device::device_start()
 	UINT32 total;
 	UINT8 *s1, *s2, *d;
 	long i;
-	UINT16 *K055673_rom;
+	UINT16 *k055673_rom;
 	int size4;
 
 	static const gfx_layout spritelayout =  /* System GX sprite layout */
@@ -826,7 +826,7 @@ void k055673_device::device_start()
 
 	m_screen = machine().device<screen_device>(m_intf_screen);
 
-	K055673_rom = (UINT16 *)machine().root_device().memregion(m_intf_gfx_memory_region)->base();
+	k055673_rom = (UINT16 *)machine().root_device().memregion(m_intf_gfx_memory_region)->base();
 
 	/* decode the graphics */
 	switch (m_intf_plane_order)  /* layout would be more correct than plane_order, but we use k053247_interface */
@@ -835,8 +835,8 @@ void k055673_device::device_start()
 		size4 = (machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
 		size4 *= 4 * 1024 * 1024;
 		/* set the # of tiles based on the 4bpp section */
-		K055673_rom = auto_alloc_array(machine(), UINT16, size4 * 5 / 2);
-		d = (UINT8 *)K055673_rom;
+		k055673_rom = auto_alloc_array(machine(), UINT16, size4 * 5 / 2);
+		d = (UINT8 *)k055673_rom;
 		// now combine the graphics together to form 5bpp
 		s1 = machine().root_device().memregion(m_intf_gfx_memory_region)->base(); // 4bpp area
 		s2 = s1 + (size4);   // 1bpp area
@@ -850,22 +850,22 @@ void k055673_device::device_start()
 		}
 
 		total = size4 / 128;
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout, 4);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout, 4);
 		break;
 
 	case K055673_LAYOUT_RNG:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 / 2);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 * 6 / 8);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
+		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout4, 4);
 		break;
 
 	default:
@@ -1069,27 +1069,16 @@ READ32_MEMBER( k053247_device::k053247_reg_long_r )
 	return (k053247_reg_word_r( space, offset + 1, 0xffff) | k053247_reg_word_r( space, offset, 0xffff) << 16);
 }
 
-/* Old non-device code */
-
-
-static void decode_gfx(running_machine &machine, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
-{
-	gfx_layout gl;
-
-	memcpy(&gl, layout, sizeof(gl));
-	gl.total = total;
-	machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, gl, data, machine.total_colors() >> bpp, 0));
-}
-
 
 /***************************************************************************/
 /*                                                                         */
 /*                                 053246/053247                           */
+/* stuff GX still relies on                                                */
 /*                                                                         */
 /***************************************************************************/
 
 
-void k053247_device::alt_K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy)
+void k053247_device::alt_k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy)
 {
 	if(ram)
 		*ram = m_ram;
@@ -1103,12 +1092,8 @@ void k053247_device::alt_K053247_export_config(UINT16 **ram, gfx_element **gfx, 
 		*dy = m_dy;
 }
 
-int k053247_device::alt_K053246_read_register(int regnum) { return(m_kx46_regs[regnum]); }
-int k053247_device::alt_K053247_read_register(int regnum) { return(m_kx47_regs[regnum]); }
-
-
 /* alt_K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
-void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(running_machine &machine, int *code,int *color,int *priority))
+void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int layout, int dx, int dy, void (*callback)(running_machine &machine, int *code,int *color,int *priority))
 {
 	int gfx_index;
 	UINT32 total;
@@ -1158,7 +1143,7 @@ void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *
 	};
 	UINT8 *s1, *s2, *d;
 	long i;
-	UINT16 *alt_K055673_rom;
+	UINT16 *alt_k055673_rom;
 	int size4;
 
 	/* find first empty slot to decode gfx */
@@ -1167,7 +1152,7 @@ void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	alt_K055673_rom = (UINT16 *)machine.root_device().memregion(gfx_memory_region)->base();
+	alt_k055673_rom = (UINT16 *)machine.root_device().memregion(gfx_memory_region)->base();
 
 	/* decode the graphics */
 	switch(layout)
@@ -1176,8 +1161,8 @@ void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *
 		size4 = (machine.root_device().memregion(gfx_memory_region)->bytes()/(1024*1024))/5;
 		size4 *= 4*1024*1024;
 		/* set the # of tiles based on the 4bpp section */
-		alt_K055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
-		d = (UINT8 *)alt_K055673_rom;
+		alt_k055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
+		d = (UINT8 *)alt_k055673_rom;
 		// now combine the graphics together to form 5bpp
 		s1 = machine.root_device().memregion(gfx_memory_region)->base(); // 4bpp area
 		s2 = s1 + (size4);   // 1bpp area
@@ -1191,22 +1176,22 @@ void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *
 		}
 
 		total = size4 / 128;
-		decode_gfx(machine, gfx_index, (UINT8 *)alt_K055673_rom, total, &spritelayout, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 4);
 		break;
 
 	case K055673_LAYOUT_RNG:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16/2);
-		decode_gfx(machine, gfx_index, (UINT8 *)alt_K055673_rom, total, &spritelayout2, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16);
-		decode_gfx(machine, gfx_index, (UINT8 *)alt_K055673_rom, total, &spritelayout3, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = machine.root_device().memregion(gfx_memory_region)->bytes() / (16*16*6/8);
-		decode_gfx(machine, gfx_index, (UINT8 *)alt_K055673_rom, total, &spritelayout4, 4);
+		konami_decode_gfx(machine, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 4);
 		break;
 
 	default:
@@ -1236,150 +1221,6 @@ void k053247_device::alt_K055673_vh_start(running_machine &machine, const char *
 	machine.save().save_item(NAME(m_objcha_line));
 }
 
-WRITE16_MEMBER( k053247_device::alt_K053247_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
-{
-	COMBINE_DATA(m_kx47_regs + offset);
-}
 
-WRITE32_MEMBER( k053247_device::alt_K053247_reg_long_w )
-{
-	offset <<= 1;
-	COMBINE_DATA(m_kx47_regs + offset + 1);
-	mem_mask >>= 16;
-	data >>= 16;
-	COMBINE_DATA(m_kx47_regs + offset);
-}
-
-READ16_MEMBER( k053247_device::alt_K053247_word_r )
-{
-	return m_ram[offset];
-}
-
-WRITE16_MEMBER( k053247_device::alt_K053247_word_w )
-{
-	COMBINE_DATA(m_ram + offset);
-}
-
-READ32_MEMBER( k053247_device::alt_K053247_long_r )
-{
-	return m_ram[offset*2+1] | (m_ram[offset*2]<<16);
-}
-
-WRITE32_MEMBER( k053247_device::alt_K053247_long_w )
-{
-	offset <<= 1;
-	COMBINE_DATA(m_ram + offset + 1);
-	mem_mask >>= 16;
-	data >>= 16;
-	COMBINE_DATA(m_ram + offset);
-}
-
-// Mystic Warriors hardware games support a non-OBJCHA based ROM readback
-// write the address to the 246 as usual, but there's a completely separate ROM
-// window that works without needing an OBJCHA line.
-// in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
-READ16_MEMBER( k053247_device::alt_K055673_rom_word_r )    // 5bpp
-{
-	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(m_memory_region)->base();
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
-	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes()/(1024*1024))/5;
-	int romofs;
-
-	size4 *= 4*1024*1024;   // get offset to 5th bit
-	ROM8 += size4;
-
-	romofs = m_kx46_regs[6]<<16 | m_kx46_regs[7]<<8 | m_kx46_regs[4];
-
-	switch (offset)
-	{
-		case 0: // 20k / 36u
-			return ROM[romofs+2];
-		case 1: // 17k / 36y
-			return ROM[romofs+3];
-		case 2: // 10k / 32y
-		case 3:
-			romofs /= 2;
-			return ROM8[romofs+1];
-		case 4: // 22k / 34u
-			return ROM[romofs];
-		case 5: // 19k / 34y
-			return ROM[romofs+1];
-		case 6: // 12k / 29y
-		case 7:
-			romofs /= 2;
-			return ROM8[romofs];
-		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
-			break;
-	}
-
-	return 0;
-}
-
-READ16_MEMBER( k053247_device::alt_K055673_GX6bpp_rom_word_r )
-{
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
-	int romofs;
-
-	romofs = m_kx46_regs[6]<<16 | m_kx46_regs[7]<<8 | m_kx46_regs[4];
-
-	romofs /= 4;    // romofs increments 4 at a time
-	romofs *= 12/2; // each increment of romofs = 12 new bytes (6 new words)
-
-	switch (offset)
-	{
-		case 0:
-			return ROM[romofs+3];
-		case 1:
-			return ROM[romofs+4];
-		case 2:
-		case 3:
-			return ROM[romofs+5];
-		case 4:
-			return ROM[romofs];
-		case 5:
-			return ROM[romofs+1];
-		case 6:
-		case 7:
-			return ROM[romofs+2];
-		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, space.device().safe_pc()));
-			break;
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER( k053247_device::alt_K053246_w )
-{
-	m_kx46_regs[offset] = data;
-}
-
-
-WRITE16_MEMBER( k053247_device::alt_K053246_word_w )
-{
-	if (ACCESSING_BITS_8_15)
-		alt_K053246_w(space, offset<<1,(data >> 8) & 0xff, (mem_mask >> 8) & 0xff);
-	if (ACCESSING_BITS_0_7)
-		alt_K053246_w(space, (offset<<1) + 1,data & 0xff, mem_mask & 0xff);
-}
-
-WRITE32_MEMBER( k053247_device::alt_K053246_long_w )
-{
-	offset <<= 1;
-	alt_K053246_word_w(space, offset, data>>16, mem_mask >> 16);
-	alt_K053246_word_w(space, offset+1, data, mem_mask);
-}
-
-void k053247_device::alt_K053246_set_OBJCHA_line(int state)
-{
-	m_objcha_line = state;
-}
-
-int k053247_device::alt_K053246_is_IRQ_enabled(void)
-{
-	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
-	return m_kx46_regs[5] & 0x10;
-}
 
 

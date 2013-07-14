@@ -49,10 +49,10 @@ public:
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_READ16_MEMBER(sound_status_msb_r);
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
-	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
-	DECLARE_READ16_MEMBER(K053247_martchmp_word_r);
-	DECLARE_WRITE16_MEMBER(K053247_martchmp_word_w);
+	DECLARE_READ16_MEMBER(k053247_scattered_word_r);
+	DECLARE_WRITE16_MEMBER(k053247_scattered_word_w);
+	DECLARE_READ16_MEMBER(k053247_martchmp_word_r);
+	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

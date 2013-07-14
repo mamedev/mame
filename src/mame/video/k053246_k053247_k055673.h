@@ -103,28 +103,11 @@ public:
 	screen_device *m_screen;
 
 	/* alt implementation - to be collapsed */
-	void alt_K055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
+	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 			void (*callback)(running_machine &machine, int *code,int *color,int *priority));
-	DECLARE_READ16_MEMBER( alt_K055673_rom_word_r );
-	DECLARE_READ16_MEMBER( alt_K055673_GX6bpp_rom_word_r );
 
-	DECLARE_READ16_MEMBER( alt_K053247_word_r );
-	DECLARE_WRITE16_MEMBER( alt_K053247_word_w );
-	DECLARE_READ32_MEMBER( alt_K053247_long_r );
-	DECLARE_WRITE32_MEMBER( alt_K053247_long_w );
-	DECLARE_WRITE16_MEMBER( alt_K053247_reg_word_w ); // "OBJSET2" registers
-	DECLARE_WRITE32_MEMBER( alt_K053247_reg_long_w );
+	void alt_k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
 
-	int alt_K053247_read_register(int regnum);
-	void alt_K053247_set_SpriteOffset(int offsx, int offsy);
-	void alt_K053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
-
-	DECLARE_WRITE8_MEMBER( alt_K053246_w );
-	DECLARE_WRITE16_MEMBER( alt_K053246_word_w );
-	DECLARE_WRITE32_MEMBER( alt_K053246_long_w );
-	void alt_K053246_set_OBJCHA_line(int state);
-	int alt_K053246_is_IRQ_enabled(void);
-	int alt_K053246_read_register(int regnum);
 
 
 	template<class _BitmapClass>
@@ -142,7 +125,6 @@ private:
 
 extern const device_type K053246;
 
-#define K053247 K053246
 class k055673_device : public k053247_device
 {
 public:

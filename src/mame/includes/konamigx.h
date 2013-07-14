@@ -195,7 +195,7 @@ void konamigx_mixer_primode(int mode);
 
 
 void konamigx_objdma(void);
-extern UINT16 *K053247_ram;
+extern UINT16 *k053247_ram;
 
 extern int konamigx_current_frame;
 
