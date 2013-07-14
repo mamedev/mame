@@ -122,6 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(cshooter);
 	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
 	virtual void video_start();
+	virtual void palette_init();
 	DECLARE_MACHINE_RESET(cshooter);
 	DECLARE_MACHINE_RESET(airraid);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -129,12 +130,29 @@ public:
 };
 
 
+void cshooter_state::palette_init()
+{
+	const UINT8 *color_prom = memregion("proms")->base();
+	int i;
+
+	// allocate the colortable
+	machine().colortable = colortable_alloc(machine(), 0x100);
+
+	// text uses colors 0xc0-0xdf
+	for (i = 0; i < 0x40; i++)
+		colortable_entry_set_value(machine().colortable, i, (color_prom[i] & 0x1f) | 0xc0);
+
+	// rest is still unknown..
+	for (i = 0x40; i < 0x100; i++)
+		colortable_entry_set_value(machine().colortable, i, color_prom[i]);
+}
+
 TILE_GET_INFO_MEMBER(cshooter_state::get_cstx_tile_info)
 {
 	int code = (m_txram[tile_index*2]);
 	int attr = (m_txram[tile_index*2+1]);
 	int rg = (attr & 0x20) ? 1 : 0;
-	int color = attr & 7;
+	int color = attr & 0xf;
 
 	SET_TILE_INFO_MEMBER(rg, code, color, 0);
 }
@@ -153,8 +171,7 @@ void cshooter_state::video_start()
 
 UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0/*get_black_pen(screen.screen.machine(, cliprect))*/);
-//	m_txtilemap->mark_all_dirty();
+	bitmap.fill(0x80, cliprect); // temp
 
 	//sprites
 	{
@@ -200,7 +217,6 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	m_txtilemap->mark_all_dirty();
 	m_txtilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -259,14 +275,18 @@ WRITE8_MEMBER(cshooter_state::pal_w)
 	m_generic_paletteram_8[offset]=data;
 	offset&=0xff;
 
-	r = m_generic_paletteram_8[offset] & 0xf;
-	g = m_generic_paletteram_8[offset] >> 4;
+	g = m_generic_paletteram_8[offset] & 0xf;
+	r = m_generic_paletteram_8[offset] >> 4;
 	b = m_generic_paletteram_8[offset+0x100] & 0xf;
-	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	
+	rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+	colortable_palette_set_color(machine().colortable, offset, color);
 }
 
 WRITE8_MEMBER(cshooter_state::pal2_w)
 {
+	if (offset&0x100) return;
+	
 	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
@@ -274,7 +294,9 @@ WRITE8_MEMBER(cshooter_state::pal2_w)
 	r = m_generic_paletteram_8[offset] & 0xf;
 	g = m_generic_paletteram_8[offset] >> 4;
 	b = m_generic_paletteram_8[offset+0x200] & 0xf;
-	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+
+	rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+	colortable_palette_set_color(machine().colortable, offset, color);
 }
 
 READ8_MEMBER(cshooter_state::pal_r)
@@ -452,8 +474,8 @@ static const gfx_layout cshooter_charlayout =
 
 
 static GFXDECODE_START( cshooter )
-	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout,   0xc0, 16  )
-	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout,   0xc0, 16  )
+	GFXDECODE_ENTRY( "gfx1", 0,     cshooter_charlayout, 0, 16  )
+	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout, 0, 16  )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
@@ -479,7 +501,7 @@ static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
 
 	MCFG_GFXDECODE(cshooter)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */
 	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
@@ -507,7 +529,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
 
 	MCFG_GFXDECODE(cshooter)
-	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x100)
 
 	/* sound hardware */
 	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)
@@ -523,18 +545,17 @@ Cross Shooter by TAITO (1987)
 malcor
 
 
-
-
 Location    Type     File ID   Checksum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 LB 4U       27256      R1        C2F0   [  main program  ]
-LB 2U       27512      R2        74EA   [  program/GFX   ]
-TB 11A      2764       R3        DFA7   [     fix?       ]
+LB 2U       27512      R2        74EA   [    tilemaps    ]
+TB 11A      2764       R3        DFA7   [      fix       ]
 LB 5C       27256      R4        D7B8   [ sound program  ]
-LB 7A       82S123     0.BPR     00A1   [   forgrounds   ]
+LB 7A       82S123     0.BPR     00A1   [  foregrounds   ]
 LB 9S       82S129     1.BPR     0194   [ motion objects ]
 TB 4E       82S129     2.BPR     00DC   [ motion objects ]
-LB J3       68705
+TB 16A      63S281     x         x      [     clut       ] NOTE: dumped much later
+LB 3J       68705
 
 
 Notes:   LB - CPU board        S-0086-002-0B
@@ -543,7 +564,7 @@ Notes:   LB - CPU board        S-0086-002-0B
          The PCB looks like a prototype, due to the modifications
          to the PCB. The game is probably licensed from Seibu.
 
-         The bipolar PROMs are not used for colour.
+         The 0/1/2 bipolar PROMs are not used for colour.
 
 
 
@@ -553,10 +574,10 @@ Brief hardware overview:
 Main processor  - Z80 6MHz
                 - 68705
 
-GFX             - custom TC15G008AP-0048  SEI0040BU
-            3 x - custom TC17G008AN-0015  SEI0020BU
-                - custom TC17G005AN-0028  SEI0030BU
-            3 x - custom SIPs. No ID, unusually large.
+GFX             - custom TC15G008AP-0048  SEI0040BU    - Toshiba CMOS Gate Array
+            3 x - custom TC17G008AN-0015  SEI0020BU    - Toshiba CMOS Gate Array
+                - custom TC17G005AN-0028  SEI0030BU    - Toshiba CMOS Gate Array
+            3 x - custom SIPs. No ID, unusually large. - covered in epoxy, probably sprite/tile gfx data is in here
 
 Sound processor - Z80 6MHz (5.897MHz)
             2 x - YM2203C
@@ -567,32 +588,33 @@ data in the custom SIPs. I am not sure though.
 
 */
 
-
 ROM_START( cshooter )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
-	ROM_LOAD( "r1",  0x00000, 0x08000, CRC(fbe8c518) SHA1(bff8319f4892e6d06f1c7a679f67dc8407279cfa) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU
+	ROM_LOAD( "r1.4u",   0x00000, 0x08000, CRC(fbe8c518) SHA1(bff8319f4892e6d06f1c7a679f67dc8407279cfa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
-	ROM_LOAD( "r4",  0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_LOAD( "r4.5c",   0x00000, 0x08000, CRC(84fed017) SHA1(9a564c9379eb48569cfba48562889277991864d8) )
 
 	// not hooked up yet (Taito version has this instead of encryption!
-	ROM_REGION( 0x0800, "cpu2", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "crshooter.3j",    0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
+	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller */
+	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )    // TX Layer
-	ROM_LOAD( "r3",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )   // only 1 byte difference with 3.f11, bad dump?
+	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
+	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )   // only 1 byte difference with 3.f11, bad dump?
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )   // Sprites & Backgrounds ?
-	ROM_LOAD( "r2",  0x00000, 0x10000, CRC(5ddf9f4e) SHA1(69e4d422ca272bf2e9f00edbe7d23760485fdfe6) )
+	ROM_REGION( 0x10000, "user1", 0 ) // Tilemaps
+	ROM_LOAD( "r2.2u",   0x00000, 0x10000, CRC(5ddf9f4e) SHA1(69e4d422ca272bf2e9f00edbe7d23760485fdfe6) )
 
-	ROM_REGION( 0x220, "proms", 0 )
-	ROM_LOAD( "0.bpr", 0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) )   /* priority? (not used) */
-	ROM_LOAD( "1.bpr", 0x0020, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) )   /* timing? (not used) */
-	ROM_LOAD( "2.bpr", 0x0120, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )   /* timing? (not used) */
+	ROM_REGION( 0x320, "proms", 0 )
+	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
+
 
 /*
 
@@ -612,7 +634,7 @@ CMOS Gate Arrays: SEI0020BU TC17G008AN-0015 (x 3), SEI10040BU TC15G008AP-0048,
 OTHER: SEI0050BU M  6 4 0 00
 XTAL: 14.318 MHz (near SEI80BU), xx.000 MHz (cant read speed, near SEI0040BU)
 
-There are 3 BIG custom black (resistor?) packs on the PCB.
+There are 3 BIG custom black packs on the PCB.
 
 ROMS:
 Note, all ROMs have official sticker, "(C) SEIBU KAIHATSU INC." and a number.
@@ -627,23 +649,27 @@ Note, all ROMs have official sticker, "(C) SEIBU KAIHATSU INC." and a number.
 */
 
 ROM_START( cshootere )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
-	ROM_LOAD( "1.k19",  0x00000, 0x08000, CRC(71418952) SHA1(9745ca006576381c9e9595d8e42ab276bab80a41) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU
+	ROM_LOAD( "1.k19",   0x00000, 0x08000, CRC(71418952) SHA1(9745ca006576381c9e9595d8e42ab276bab80a41) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
-	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
-	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
-	ROM_REGION( 0x02000, "gfx1",  0 )    // TX Layer
-	ROM_LOAD( "3.f11",  0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )    // only 1 byte difference with R3, bad dump?
+	ROM_REGION( 0x02000, "gfx1",  0 ) // TX Layer
+	ROM_LOAD( "3.f11",   0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )    // only 1 byte difference with R3, bad dump?
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )   // Sprites & Backgrounds ?
-	ROM_LOAD( "2.k20",  0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
+	ROM_REGION( 0x10000, "user1", 0 ) // Tilemaps
+	ROM_LOAD( "2.k20",   0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
+	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
+	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
 
 /*
@@ -669,23 +695,27 @@ SEI0030BU          SEI0060BU                             sw1 xx xxxxx
 */
 
 ROM_START( airraid )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU?
-	ROM_LOAD( "1.16j",  0x00000, 0x08000, CRC(7ac2cedf) SHA1(272831f51a2731e067b5aec6dba6bddd3c5350c9) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU
+	ROM_LOAD( "1.16j",   0x00000, 0x08000, CRC(7ac2cedf) SHA1(272831f51a2731e067b5aec6dba6bddd3c5350c9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sub/Sound CPU?
-	ROM_LOAD( "5.6f",  0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
-	ROM_LOAD( "4.7f",  0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
-	ROM_LOAD( "3.13e",  0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
+	ROM_LOAD( "3.13e",   0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin",    0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user1", 0 )   // bg maps
-	ROM_LOAD( "2.19j",  0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
+	ROM_REGION( 0x10000, "user1", 0 ) // bg maps
+	ROM_LOAD( "2.19j",   0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASEFF )
+	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
+	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
+	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // priority? (not used)
+	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
 
 
