@@ -732,6 +732,166 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		);
 }
 
+void konamigx_state::gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code)
+{
+	int temp1,temp2,temp3,temp4;
+	int i = code<<1;
+	int j = mixerflags>>i & 3;
+	int k = 0;
+
+	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	if (disp & (1<<code))
+	{
+		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
+		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>(i+16); temp3 = 3; }
+		else
+		{
+			temp1 = vinmix;
+			temp2 = vinmix>>i & 3;
+			temp3 = vmixon>>i & 3;
+		}
+
+		/* blend layer only when:
+			1) vinmix != 0xff
+			2) its internal mix code is set
+			3) all mix code bits are internal(overriden until tile blending has been implemented)
+			4) 0 > alpha < 255;
+		*/
+		if (temp1!=0xff && temp2 /*&& temp3==3*/)
+		{
+			temp4 = K054338_set_alpha_level(temp2);
+
+			if (temp4 <= 0) return;
+			if (temp4 < 255) k = TILEMAP_DRAW_ALPHA(temp4);
+		}
+
+		if (mixerflags & 1<<(code+12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+
+		m_k056832->m_tilemap_draw(machine, bitmap, cliprect, code, k, 0);
+	}
+}
+
+void konamigx_state::gx_draw_basic_extended_tilemaps_1(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs)
+{
+	int temp1,temp2,temp3,temp4;
+	int i = code<<1;
+	int j = mixerflags>>i & 3;
+	int k = 0;
+	static int parity = 0;
+	parity ^= 1;
+
+	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	if ((disp & K55_INP_SUB1) || (rushingheroes_hack))
+	{
+		int alpha = 255;
+
+		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
+		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>24; temp3 = 3; }
+		else
+		{
+			temp1 = osinmix;
+			temp2 = osinmix>>2 & 3;
+			temp3 = osmixon>>2 & 3;
+		}
+
+		if (temp1!=0xff && temp2 /*&& temp3==3*/)
+		{
+			alpha = temp4 = K054338_set_alpha_level(temp2);
+
+			if (temp4 <= 0) return;
+			if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
+		}
+
+		int l = sub1flags & 0xf;
+
+		if (offs == -2)
+		{
+			int pixeldouble_output = 0;
+			const rectangle &visarea = machine.primary_screen->visible_area();
+			int width = visarea.width();
+
+			if (width>512) // vsnetscr case
+				pixeldouble_output = 1;
+
+			K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl);
+		}
+		else
+		{
+			machine.device<k053250_device>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
+		}
+	}
+}
+
+void konamigx_state::gx_draw_basic_extended_tilemaps_2(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs)
+{
+	int temp1,temp2,temp3,temp4;
+	int i = code<<1;
+	int j = mixerflags>>i & 3;
+//	int k = 0;
+//	static int parity = 0;
+//	parity ^= 1;
+
+	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	if (disp & K55_INP_SUB2)
+	{
+		//int alpha = 255;
+		if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
+		if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>26; temp3 = 3; }
+		else
+		{
+			temp1 = osinmix;
+			temp2 = osinmix>>4 & 3;
+			temp3 = osmixon>>4 & 3;
+		}
+
+		if (temp1!=0xff && temp2 /*&& temp3==3*/)
+		{
+			//alpha = 
+			temp4 = K054338_set_alpha_level(temp2);
+
+			if (temp4 <= 0) return;
+			//if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
+		}
+
+		int l = sub2flags & 0xf;
+
+		if (offs == -3)
+		{
+			if (extra_bitmap) // soccer superstars roz layer
+			{
+				int xx,yy;
+				int width = machine.primary_screen->width();
+				int height = machine.primary_screen->height();
+				const pen_t *paldata = machine.pens;
+
+				// the output size of the roz layer has to be doubled horizontally
+				// so that it aligns with the sprites and normal tilemaps.  This appears
+				// to be done as a post-processing / mixing step effect
+				//
+				// - todo, use the pixeldouble_output I just added for vsnet instead?
+				for (yy=0;yy<height;yy++)
+				{
+					UINT16* src = &extra_bitmap->pix16(yy);
+					UINT32* dst = &bitmap.pix32(yy);
+					int shiftpos = 0;
+					for (xx=0;xx<width;xx+=2)
+					{
+						UINT16 dat = src[(((xx/2)+shiftpos))%width];
+						if (dat&0xff)
+							dst[xx+1] = dst[xx] = paldata[dat];
+					}
+				}
+			}
+			else
+			{
+			//	int pixeldouble_output = 0;
+			//	K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
+			}
+		}
+		else
+			machine.device<k053250_device>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
+	}
+}
 
 void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					tilemap_t *sub1, int sub1flags,
@@ -745,12 +905,8 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 					int nobj
 					)
 {
-	static int parity = 0;
-	parity ^= 1;
 
 
-	int order, offs, code, color, zcode, pri = 0, alpha, drawmode;
-	int temp1, temp2, temp3, temp4;
 
 
 	// traverse draw list
@@ -760,184 +916,64 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 	for (int count=0; count<nobj; count++)
 	{
 		struct GX_OBJ *objptr = objpool + objbuf[count];
-		order  = objptr->order;
-		offs   = objptr->offs;
-		code   = objptr->code;
-		color  = objptr->color;
+		int order  = objptr->order;
+		int offs   = objptr->offs;
+		int code   = objptr->code;
+		int color  = objptr->color;
 
+		/* entries >=0 in our list are sprites */
 		if (offs >= 0)
 		{
 			if (!(disp & K55_INP_OBJ)) continue;
+
+			int drawmode = order>>4 & 0xf;
+
+			int	alpha = 255;
+			int pri = 0;
+			int zcode = -1; // negative zcode values turn off z-buffering
+
+			if (drawmode & 2)
+			{
+				alpha = color>>K055555_MIXSHIFT & 3;
+				if (alpha) alpha = K054338_set_alpha_level(alpha);
+				if (alpha <= 0) continue;
+			}
+			color &= K055555_COLORMASK;
+
+			if (drawmode >= 4) palette_set_shadow_mode(machine, order & 0x0f);
+
+			if (!(mixerflags & GXMIX_NOZBUF))
+			{
+				zcode = order>>16 & 0xff;
+				pri = order>>24 & 0xff;
+			}
+
+
+			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth, offx, offy,
+													color, alpha, drawmode, zcode, pri );
 		}
+		/* the rest are tilemaps of various kinda */
 		else
 		{
-			int i = code<<1;
-			int j = mixerflags>>i & 3;
-			int k = 0;
-
+	
 			switch (offs)
 			{
 				case -1:
-				if (disp & (1<<code))
-				{
-					if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-					if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>(i+16); temp3 = 3; }
-					else
-					{
-						temp1 = vinmix;
-						temp2 = vinmix>>i & 3;
-						temp3 = vmixon>>i & 3;
-					}
-
-					/* blend layer only when:
-					    1) vinmix != 0xff
-					    2) its internal mix code is set
-					    3) all mix code bits are internal(overriden until tile blending has been implemented)
-					    4) 0 > alpha < 255;
-					*/
-					if (temp1!=0xff && temp2 /*&& temp3==3*/)
-					{
-						temp4 = K054338_set_alpha_level(temp2);
-
-						if (temp4 <= 0) continue;
-						if (temp4 < 255) k = TILEMAP_DRAW_ALPHA(temp4);
-					}
-
-					if (mixerflags & 1<<(code+12)) k |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
-
-					m_k056832->m_tilemap_draw(machine, bitmap, cliprect, code, k, 0);
-				}
-				continue;
+					gx_draw_basic_tilemaps(machine, bitmap, cliprect, mixerflags, code);
+					continue;
 				case -2:
 				case -4:
-				if ((disp & K55_INP_SUB1) || (rushingheroes_hack))
-				{
-					int alpha = 255;
-
-					if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-					if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>24; temp3 = 3; }
-					else
-					{
-						temp1 = osinmix;
-						temp2 = osinmix>>2 & 3;
-						temp3 = osmixon>>2 & 3;
-					}
-
-					if (temp1!=0xff && temp2 /*&& temp3==3*/)
-					{
-						alpha = temp4 = K054338_set_alpha_level(temp2);
-
-						if (temp4 <= 0) continue;
-						if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
-					}
-
-					int l = sub1flags & 0xf;
-
-					if (offs == -2)
-					{
-						int pixeldouble_output = 0;
-						const rectangle &visarea = machine.primary_screen->visible_area();
-						int width = visarea.width();
-
-						if (width>512) // vsnetscr case
-							pixeldouble_output = 1;
-
-						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl);
-					}
-					else
-					{
-						machine.device<k053250_device>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
-					}
-				}
+					gx_draw_basic_extended_tilemaps_1(machine, bitmap, cliprect, mixerflags, code, sub1, sub1flags, rushingheroes_hack, offs);
 				continue;
 				case -3:
 				case -5:
-				if (disp & K55_INP_SUB2)
-				{
-					//int alpha = 255;
-					if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
-					if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>26; temp3 = 3; }
-					else
-					{
-						temp1 = osinmix;
-						temp2 = osinmix>>4 & 3;
-						temp3 = osmixon>>4 & 3;
-					}
-
-					if (temp1!=0xff && temp2 /*&& temp3==3*/)
-					{
-						alpha = temp4 = K054338_set_alpha_level(temp2);
-
-						if (temp4 <= 0) continue;
-						if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
-					}
-
-					int l = sub2flags & 0xf;
-
-					if (offs == -3)
-					{
-						if (extra_bitmap) // soccer superstars roz layer
-						{
-							int xx,yy;
-							int width = machine.primary_screen->width();
-							int height = machine.primary_screen->height();
-							const pen_t *paldata = machine.pens;
-
-							// the output size of the roz layer has to be doubled horizontally
-							// so that it aligns with the sprites and normal tilemaps.  This appears
-							// to be done as a post-processing / mixing step effect
-							//
-							// - todo, use the pixeldouble_output I just added for vsnet instead?
-							for (yy=0;yy<height;yy++)
-							{
-								UINT16* src = &extra_bitmap->pix16(yy);
-								UINT32* dst = &bitmap.pix32(yy);
-								int shiftpos = 0;
-								for (xx=0;xx<width;xx+=2)
-								{
-									UINT16 dat = src[(((xx/2)+shiftpos))%width];
-									if (dat&0xff)
-										dst[xx+1] = dst[xx] = paldata[dat];
-								}
-							}
-						}
-						else
-						{
-						//	int pixeldouble_output = 0;
-						//	K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha, pixeldouble_output);
-						}
-					}
-					else
-						machine.device<k053250_device>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
-				}
+					gx_draw_basic_extended_tilemaps_2(machine, bitmap, cliprect, mixerflags, code, sub2, sub2flags, extra_bitmap, offs);
 				continue;
 			}
 			continue;
 		}
 
-		drawmode = order>>4 & 0xf;
-
-		alpha = 255;
-		if (drawmode & 2)
-		{
-			alpha = color>>K055555_MIXSHIFT & 3;
-			if (alpha) alpha = K054338_set_alpha_level(alpha);
-			if (alpha <= 0) continue;
-		}
-		color &= K055555_COLORMASK;
-
-		if (drawmode >= 4) palette_set_shadow_mode(machine, order & 0x0f);
-
-		if (!(mixerflags & GXMIX_NOZBUF))
-		{
-			zcode = order>>16 & 0xff;
-			pri = order>>24 & 0xff;
-		}
-		else
-			zcode = -1; // negative zcode values turn off z-buffering
-
-		m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth, offx, offy,
-												color, alpha, drawmode, zcode, pri );
+	
 
 	}
 }

@@ -124,6 +124,10 @@ public:
 						);
 
 
+	void gx_draw_basic_tilemaps(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code);
+	void gx_draw_basic_extended_tilemaps_1(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
+	void gx_draw_basic_extended_tilemaps_2(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
+
 	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
