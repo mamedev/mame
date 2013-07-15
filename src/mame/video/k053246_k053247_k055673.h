@@ -132,7 +132,7 @@ public:
 
 
 	void k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int offx, int offy,
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int screenwidth, int offx, int offy,
 		int color, int alpha, int drawmode, int zcode, int pri );
 
 protected:

@@ -402,10 +402,10 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
-	int flipscreenx, flipscreeny, offx, offy;
+	int offx, offy;
 
 	struct GX_OBJ *objpool, *objptr;
-	int wrapsize, xwraplim, ywraplim, cltc_shdpri, /*prflp,*/ disp;
+	int cltc_shdpri, /*prflp,*/ disp;
 
 	// buffer can move when it's resized, so refresh the pointer
 	gx_objzbuf = &machine.priority_bitmap.pix8(0);
@@ -442,10 +442,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	// cache global parameters
 	konamigx_precache_registers();
 
-	// init OBJSET1 parameters (see p.47 6.2)
-	flipscreenx = k053246_objset1 & 1;
-	flipscreeny = k053246_objset1 & 2;
-
 	// get "display window" offsets
 	offx = (m_k055673->k053246_read_register(0)<<8 | m_k055673->k053246_read_register(1)) & 0x3ff;
 	offy = (m_k055673->k053246_read_register(2)<<8 | m_k055673->k053246_read_register(3)) & 0x3ff;
@@ -453,18 +449,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
 	layerid[0] = 0; layerid[1] = 1; layerid[2] = 2; layerid[3] = 3; layerid[4] = 4; layerid[5] = 5;
 
-	if (k053247_opset & 0x40)
-	{
-		wrapsize = 512;
-		xwraplim = 512 - 64;
-		ywraplim = 512 - 128;
-	}
-	else
-	{
-		wrapsize  = 1024;
-		xwraplim  = 1024 - 384;
-		ywraplim  = 1024 - 512;
-	}
 
 	// invert layer priority when this flag is set (not used by any GX game?)
 	//prflp = K055555_read_register(K55_CONTROL) & K55_CTL_FLIPPRI;
@@ -741,7 +725,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 
 	konamigx_mixer_draw(machine,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
-		flipscreenx, flipscreeny, offx, offy, wrapsize, xwraplim, ywraplim,
+		offx, offy,
 		objpool,
 		objbuf,
 		nobj
@@ -755,7 +739,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 					
 					/* passed from above function */
-					int flipscreenx, int flipscreeny, int offx, int offy, int wrapsize, int xwraplim, int ywraplim,
+					int offx, int offy,
 					struct GX_OBJ *objpool,
 					int *objbuf,
 					int nobj
@@ -952,7 +936,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 		else
 			zcode = -1; // negative zcode values turn off z-buffering
 
-		m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, flipscreenx, flipscreeny, screenwidth, wrapsize, xwraplim, ywraplim, offx, offy,
+		m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth, offx, offy,
 												color, alpha, drawmode, zcode, pri );
 
 	}

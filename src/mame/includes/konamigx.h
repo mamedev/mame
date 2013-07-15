@@ -117,7 +117,7 @@ public:
 						tilemap_t *sub1, int sub1flags,
 						tilemap_t *sub2, int sub2flags,
 						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
-						int flipscreenx, int flipscreeny, int offx, int offy, int wrapsize, int xwraplim, int ywraplim,
+						int offx, int offy, 
 						struct GX_OBJ *objpool,
 						int *objbuf,
 						int nobj

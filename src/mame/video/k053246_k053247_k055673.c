@@ -1211,14 +1211,15 @@ void k053247_device::zdrawgfxzoom32GP(
 
 
 void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int offx, int offy,
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int screenwidth, int offx, int offy,
 		int color, int alpha, int drawmode, int zcode, int pri )
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 	int xa,ya,ox,oy,zw,zh,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
 	int temp, temp1, temp2, temp3, temp4;
-
+	int flipscreenx = m_kx46_regs[5] & 0x01;
+	int flipscreeny = m_kx46_regs[5] & 0x02;
 
 	xa = ya = 0;
 	if (code & 0x01) xa += 1;
@@ -1267,6 +1268,22 @@ void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, co
 
 	if (flipscreenx) { ox = -ox; if (!mirrorx) flipx = !flipx; }
 	if (flipscreeny) { oy = -oy; if (!mirrory) flipy = !flipy; }
+
+	int k053247_opset = k053247_read_register(0xc/2);
+	int wrapsize, xwraplim, ywraplim;
+	if (k053247_opset & 0x40)
+	{
+		wrapsize = 512;
+		xwraplim = 512 - 64;
+		ywraplim = 512 - 128;
+	}
+	else
+	{
+		wrapsize  = 1024;
+		xwraplim  = 1024 - 384;
+		ywraplim  = 1024 - 512;
+	}
+
 
 	// apply wrapping and global offsets
 	temp = wrapsize-1;
