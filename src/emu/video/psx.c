@@ -7,7 +7,6 @@
 
 #include "emu.h"
 #include "video/psx.h"
-#include "drivlgcy.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -3779,13 +3778,13 @@ void psxgpu_device::lightgun_set( int n_x, int n_y )
 	n_lightgun_y = n_y;
 }
 
-PALETTE_INIT( psx )
+PALETTE_INIT_MEMBER( psxgpu_device, psx )
 {
 	UINT32 n_colour;
 
 	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
 	{
-		palette_set_color_rgb( machine, n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
+		palette_set_color_rgb( machine(), n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
 	}
 }
 
@@ -3799,12 +3798,7 @@ MACHINE_CONFIG_FRAGMENT( psxgpu )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
 	MCFG_PALETTE_LENGTH( 65536 )
-	{
-		device_t *original_owner = owner;
-		owner = owner->owner();
-		MCFG_PALETTE_INIT(psx)
-		owner = original_owner;
-	}
+	MCFG_PALETTE_INIT_OVERRIDE(psxgpu_device, psx)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

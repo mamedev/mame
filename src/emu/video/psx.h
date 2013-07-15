@@ -201,11 +201,13 @@ public:
 	void lightgun_set( int, int );
 	int vramSize;
 	void vblank(screen_device &screen, bool vblank_state);
+	DECLARE_PALETTE_INIT( psx );
 
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+private:
 	void updatevisiblearea();
 	void decode_tpage( UINT32 tpage );
 	void FlatPolygon( int n_points );
