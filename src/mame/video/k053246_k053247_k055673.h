@@ -27,6 +27,18 @@ Callback procedures for non-standard shadows:
 #define K053247_CUSTOMSHADOW    0x20000000
 #define K053247_SHDSHIFT        20
 
+#ifdef GX_DEBUG
+	#define GX_ZBUFW     512
+	#define GX_ZBUFH     384
+	#define GX_ZPAGESIZE 0x300000
+	#define GX_ZBUFSIZE  0x600000
+#else
+	#define GX_ZBUFW     576
+	#define GX_ZBUFH     224
+	#define GX_ZPAGESIZE (GX_ZBUFW*GX_ZBUFH)
+	#define GX_ZBUFSIZE  ((GX_ZBUFW*GX_ZBUFH)*2)
+#endif
+
 
 struct k053247_interface
 {
@@ -112,6 +124,11 @@ public:
 
 	template<class _BitmapClass>
 	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
+
+
+	void k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int k053247_dx, int k053247_dy, int offx, int offy,
+		gfx_element* k053247_gfx, int color, int alpha, int drawmode, int zcode, int pri );
 
 protected:
 	// device-level overrides
