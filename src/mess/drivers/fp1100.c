@@ -218,7 +218,7 @@ static ADDRESS_MAP_START(fp1100_io, AS_IO, 8, fp1100_state )
 	AM_RANGE(0xff00, 0xff00) AM_READ(slot_id_r) AM_WRITE(slot_bank_w)
 	AM_RANGE(0xff80, 0xff80) AM_READ(sub_to_main_r) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xffa0, 0xffa0) AM_WRITE(main_bank_w)
-	AM_RANGE(0xffc0, 0xffc0) AM_READ(unk_r) AM_WRITE(main_to_sub_w)
+	AM_RANGE(0xffc0, 0xffc0) AM_READ(sub_to_main_r) AM_WRITE(main_to_sub_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER( fp1100_state::fp1100_vram_r )
@@ -274,32 +274,26 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( fp1100 )
-	/* TODO: All of those have unknown meaning */
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "DSW" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Text width" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "40 chars/line" )
+	PORT_DIPSETTING(    0x00, "80 chars/line" )
+	PORT_DIPNAME( 0x02, 0x02, "Screen Mode" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Screen 0" )
+	PORT_DIPSETTING(    0x00, "Screen 1" )
+	PORT_DIPNAME( 0x04, 0x00, "FP Mode" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "FP-1000" )
+	PORT_DIPSETTING(    0x00, "FP-1100" )
+	PORT_DIPNAME( 0x08, 0x08, "CMT Baud Rate" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "1,200 Baud" )
+	PORT_DIPSETTING(    0x00, "300 Baud" )
+	PORT_DIPNAME( 0x10, 0x00, "Printer Type" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "<undefined>" )
+	PORT_DIPSETTING(    0x00, "FP-1012PR" )
+	PORT_DIPNAME( 0x20, 0x20, "Keyboard Type" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "Off (Fixed)" )
+	PORT_DIPSETTING(    0x00, "<undefined>" )
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SLOTS")
 	PORT_CONFNAME( 0x0003, 0x0002, "Slot #0" )
@@ -403,18 +397,19 @@ INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf0);
 }
 
+#define MAIN_CLOCK 3993600
+
 static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) //unknown clock
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(fp1100_map)
 	MCFG_CPU_IO_MAP(fp1100_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fp1100_state, fp1100_vblank_irq)
 
-	MCFG_CPU_ADD( "sub", UPD7801, XTAL_4MHz ) //unknown clock
+	MCFG_CPU_ADD( "sub", UPD7801, MAIN_CLOCK/2 )
 	MCFG_CPU_PROGRAM_MAP( fp1100_slave_map )
 	MCFG_CPU_IO_MAP( fp1100_slave_io )
 	MCFG_CPU_CONFIG( fp1100_slave_cpu_config )
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -427,7 +422,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_GFXDECODE(fp1100)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, XTAL_4MHz/2, mc6845_intf)   /* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */
 MACHINE_CONFIG_END
 
 /* ROM definition */

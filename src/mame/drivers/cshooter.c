@@ -278,7 +278,7 @@ WRITE8_MEMBER(cshooter_state::pal_w)
 	g = m_generic_paletteram_8[offset] & 0xf;
 	r = m_generic_paletteram_8[offset] >> 4;
 	b = m_generic_paletteram_8[offset+0x100] & 0xf;
-	
+
 	rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
 	colortable_palette_set_color(machine().colortable, offset, color);
 }
@@ -286,7 +286,7 @@ WRITE8_MEMBER(cshooter_state::pal_w)
 WRITE8_MEMBER(cshooter_state::pal2_w)
 {
 	if (offset&0x100) return;
-	
+
 	int r,g,b;
 	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
