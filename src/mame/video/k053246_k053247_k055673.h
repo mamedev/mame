@@ -118,17 +118,22 @@ public:
 	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 			void (*callback)(running_machine &machine, int *code,int *color,int *priority));
 
-	void alt_k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy);
+	void alt_k053247_export_config(void (**callback)(running_machine &, int *, int *, int *));
 
 
 
 	template<class _BitmapClass>
 	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
 
+	void zdrawgfxzoom32GP(
+			bitmap_rgb32 &bitmap, const rectangle &cliprect,
+			UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf);
+
 
 	void k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int k053247_dx, int k053247_dy, int offx, int offy,
-		gfx_element* k053247_gfx, int color, int alpha, int drawmode, int zcode, int pri );
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int offx, int offy,
+		int color, int alpha, int drawmode, int zcode, int pri );
 
 protected:
 	// device-level overrides

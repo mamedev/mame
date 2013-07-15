@@ -262,6 +262,10 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 
 void konamigx_state::konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
 {
+	UINT16* k053247_ram;
+	m_k055673->k053247_get_ram(&k053247_ram);
+
+
 // hand-filled but should be close
 static const UINT8 ztable[7][8] =
 {

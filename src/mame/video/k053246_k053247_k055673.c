@@ -765,8 +765,8 @@ void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle
 */
 
 
-INLINE void zdrawgfxzoom32GP(
-		bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx,
+void k053247_device::zdrawgfxzoom32GP(
+		bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf)
 {
@@ -805,7 +805,7 @@ INLINE void zdrawgfxzoom32GP(
 	if (!scalex || !scaley) return;
 
 	// find shadow pens and cull invisible shadows
-	granularity = shdpen = gfx->granularity();
+	granularity = shdpen = m_gfx->granularity();
 	shdpen--;
 
 	if (zcode >= 0)
@@ -829,10 +829,10 @@ INLINE void zdrawgfxzoom32GP(
 	src_pitch = 16;
 	src_fw    = 16;
 	src_fh    = 16;
-	src_base  = gfx->get_data(code % gfx->elements());
+	src_base  = m_gfx->get_data(code % m_gfx->elements());
 
-	pal_base  = gfx->machine().pens + gfx->colorbase() + (color % gfx->colors()) * granularity;
-	shd_base  = gfx->machine().shadow_table;
+	pal_base  = m_gfx->machine().pens + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+	shd_base  = m_gfx->machine().shadow_table;
 
 	dst_ptr   = &bitmap.pix32(0);
 	dst_pitch = bitmap.rowpixels();
@@ -1211,8 +1211,8 @@ INLINE void zdrawgfxzoom32GP(
 
 
 void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int k053247_dx, int k053247_dy, int offx, int offy,
-		gfx_element* k053247_gfx, int color, int alpha, int drawmode, int zcode, int pri )
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int flipscreenx, int flipscreeny, int screenwidth, int wrapsize, int xwraplim, int ywraplim, int offx, int offy,
+		int color, int alpha, int drawmode, int zcode, int pri )
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -1271,8 +1271,8 @@ void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, co
 	// apply wrapping and global offsets
 	temp = wrapsize-1;
 
-	ox += k053247_dx;
-	oy -= k053247_dy;
+	ox += m_dx;
+	oy -= m_dy;
 	ox = ( ox - offx) & temp;
 	oy = (-oy - offy) & temp;
 	if (ox >= xwraplim) ox -= wrapsize;
@@ -1343,7 +1343,7 @@ void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, co
 			if (nozoom) { scaley = scalex = 0x10000; } else { scalex = zw << 12; scaley = zh << 12; };
 
 			zdrawgfxzoom32GP(
-					bitmap, cliprect, k053247_gfx,
+					bitmap, cliprect, 
 					temp,
 					color,
 					temp1,temp2,
@@ -1686,18 +1686,10 @@ READ32_MEMBER( k053247_device::k053247_reg_long_r )
 /***************************************************************************/
 
 
-void k053247_device::alt_k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(running_machine &, int *, int *, int *), int *dx, int *dy)
+void k053247_device::alt_k053247_export_config(void (**callback)(running_machine &, int *, int *, int *))
 {
-	if(ram)
-		*ram = m_ram;
-	if(gfx)
-		*gfx = m_gfx;
 	if(callback)
 		*callback = m_callback;
-	if(dx)
-		*dx = m_dx;
-	if(dy)
-		*dy = m_dy;
 }
 
 /* alt_K055673 used with the 54246 in PreGX/Run and Gun/System GX games */

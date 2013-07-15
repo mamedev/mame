@@ -130,6 +130,8 @@ public:
 	void dmastart_callback(int data);
 
 	void konamigx_mixer_init(running_machine &machine, int objdma);
+	void konamigx_objdma(void);
+
 
 };
 
@@ -194,8 +196,8 @@ void konamigx_mixer_init(running_machine &machine, int objdma);
 void konamigx_mixer_primode(int mode);
 
 
-void konamigx_objdma(void);
-extern UINT16 *k053247_ram;
+
+
 
 extern int konamigx_current_frame;
 

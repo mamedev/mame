@@ -351,19 +351,11 @@ static UINT16 *gx_spriteram;
 static int gx_objdma, gx_primode;
 
 // mirrored K053247 and K054338 settings
-UINT16 *k053247_ram;
-static gfx_element *k053247_gfx;
 static void (*k053247_callback)(running_machine &machine, int *code,int *color,int *priority);
-static int k053247_dx, k053247_dy;
+
 
 static int *K054338_shdRGB;
 
-
-static void K053247GP_set_SpriteOffset(int offsx, int offsy)
-{
-	k053247_dx = offsx;
-	k053247_dy = offsy;
-}
 
 void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 {
@@ -374,7 +366,7 @@ void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
 	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
-	m_k055673->alt_k053247_export_config(&k053247_ram, &k053247_gfx, &k053247_callback, &k053247_dx, &k053247_dy);
+	m_k055673->alt_k053247_export_config(&k053247_callback);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
@@ -383,7 +375,7 @@ void konamigx_state::konamigx_mixer_init(running_machine &machine, int objdma)
 		gx_objdma = 1;
 	}
 	else
-		gx_spriteram = k053247_ram;
+		m_k055673->k053247_get_ram(&gx_spriteram);
 
 	palette_set_shadow_dRGB32(machine, 3,-80,-80,-80, 0);
 	K054338_invert_alpha(1);
@@ -394,8 +386,11 @@ void konamigx_mixer_primode(int mode)
 	gx_primode = mode;
 }
 
-void konamigx_objdma(void)
+void konamigx_state::konamigx_objdma(void)
 {
+	UINT16* k053247_ram;
+	m_k055673->k053247_get_ram(&k053247_ram);
+
 	if (gx_objdma && gx_spriteram && k053247_ram) memcpy(gx_spriteram, k053247_ram, 0x1000);
 }
 
@@ -957,8 +952,8 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 		else
 			zcode = -1; // negative zcode values turn off z-buffering
 
-		m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, flipscreenx, flipscreeny, screenwidth, wrapsize, xwraplim, ywraplim, k053247_dx, k053247_dy, offx, offy,
-												k053247_gfx, color, alpha, drawmode, zcode, pri );
+		m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, flipscreenx, flipscreeny, screenwidth, wrapsize, xwraplim, ywraplim, offx, offy,
+												color, alpha, drawmode, zcode, pri );
 
 	}
 }
@@ -1227,7 +1222,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 
 	if (!strcmp(machine().system().name,"puzldama"))
 	{
-		K053247GP_set_SpriteOffset(-46, -23);
+		m_k055673->k053247_set_sprite_offs(-46, -23);
 		konamigx_mixer_primode(5);
 	} else
 
@@ -1238,12 +1233,12 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_5bpp)
 
 	if (!strcmp(machine().system().name,"gokuparo") || !strcmp(machine().system().name,"fantjour") || !strcmp(machine().system().name,"fantjoura"))
 	{
-		K053247GP_set_SpriteOffset(-46, -23);
+		m_k055673->k053247_set_sprite_offs(-46, -23);
 	} else
 
 	if (!strcmp(machine().system().name,"sexyparo") || !strcmp(machine().system().name,"sexyparoa"))
 	{
-		K053247GP_set_SpriteOffset(-42, -23);
+		m_k055673->k053247_set_sprite_offs(-42, -23);
 	}
 }
 
@@ -1289,7 +1284,7 @@ VIDEO_START_MEMBER(konamigx_state,konamigx_6bpp)
 
 	if (!strcmp(machine().system().name,"tokkae") || !strcmp(machine().system().name,"tkmmpzdm"))
 	{
-		K053247GP_set_SpriteOffset(-46, -23);
+		m_k055673->k053247_set_sprite_offs(-46, -23);
 		konamigx_mixer_primode(5);
 	}
 }
