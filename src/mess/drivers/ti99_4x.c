@@ -54,6 +54,8 @@
 #include "machine/ti99/joyport.h"
 #include "machine/ti99/peribox.h"
 
+#include "drivlgcy.h"
+
 #define LOG logerror
 #define VERBOSE 1
 

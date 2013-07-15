@@ -232,6 +232,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "video/voodoo.h"
 #include "video/gticlub.h"
 #include "video/k001604.h"
+#include "drivlgcy.h"
 
 #include "rendlay.h"
 

@@ -42,6 +42,7 @@ Dip locations and factory settings verified with US manual
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "includes/deadang.h"
+#include "drivlgcy.h"
 
 /* Read/Write Handlers */
 

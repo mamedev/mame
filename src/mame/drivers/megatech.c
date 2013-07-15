@@ -77,6 +77,8 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "includes/megadriv.h"
 #include "imagedev/cartslot.h"
 
+#include "drivlgcy.h"
+
 #define MASTER_CLOCK        53693100
 
 /* not currently used */

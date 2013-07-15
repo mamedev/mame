@@ -79,6 +79,7 @@
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
 #include "video/cgapal.h"
+#include "drivlgcy.h"
 
 #define VERBOSE_CGA 0       /* CGA (Color Graphics Adapter) */
 

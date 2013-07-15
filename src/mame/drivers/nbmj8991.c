@@ -36,6 +36,7 @@ Notes:
 #include "sound/dac.h"
 #include "includes/nbmj8991.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 WRITE8_MEMBER(nbmj8991_state::nbmj8991_soundbank_w)

@@ -13,6 +13,7 @@
 #include "includes/pc1350.h"
 #include "includes/pc1403.h"
 #include "machine/ram.h"
+#include "drivlgcy.h"
 
 /* pc1430 no peek poke operations! */
 

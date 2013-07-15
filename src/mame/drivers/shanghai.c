@@ -26,6 +26,7 @@ displayed.
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
+#include "drivlgcy.h"
 
 
 class shanghai_state : public driver_device

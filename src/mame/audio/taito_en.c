@@ -13,6 +13,7 @@
 #include "machine/mb87078.h"
 #include "sound/es5506.h"
 #include "taito_en.h"
+#include "drivlgcy.h"
 
 
 /*************************************

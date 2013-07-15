@@ -306,6 +306,7 @@ covert megatech / megaplay drivers to use new code etc. etc.
 #include "machine/segacrp2.h"
 #include "video/315_5124.h"
 #include "includes/segaipt.h"
+#include "drivlgcy.h"
 
 
 class systeme_state : public driver_device

@@ -17,6 +17,7 @@
 #define VERBOSE 0
 
 #include "includes/apollo.h"
+#include "drivlgcy.h"
 
 #include "apollo.lh"
 #include "apollo_15i.lh"

@@ -25,6 +25,7 @@
 #include "sound/c6280.h"
 #include "sound/okim6295.h"
 #include "machine/msm6242.h"
+#include "drivlgcy.h"
 
 
 class ggconnie_state : public pce_common_state

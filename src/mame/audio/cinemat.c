@@ -24,6 +24,7 @@
 #include "includes/cinemat.h"
 #include "sound/samples.h"
 #include "sound/ay8910.h"
+#include "drivlgcy.h"
 
 
 /*************************************

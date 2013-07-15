@@ -55,6 +55,7 @@ Notes:
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "video/seibu_crtc.h"
+#include "drivlgcy.h"
 
 
 class goodejan_state : public driver_device

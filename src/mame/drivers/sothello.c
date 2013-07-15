@@ -40,6 +40,7 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
+#include "drivlgcy.h"
 
 
 class sothello_state : public driver_device

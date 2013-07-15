@@ -51,6 +51,7 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "sound/msm5205.h"
 #include "audio/seibu.h"
 #include "includes/cabal.h"
+#include "drivlgcy.h"
 
 MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 {

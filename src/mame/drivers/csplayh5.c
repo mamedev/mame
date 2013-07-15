@@ -24,6 +24,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
 #include "cpu/h83002/h8.h"
+#include "drivlgcy.h"
 
 
 class csplayh5_state : public driver_device

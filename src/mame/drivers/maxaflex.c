@@ -18,6 +18,7 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "video/gtia.h"
+#include "drivlgcy.h"
 
 #include "maxaflex.lh"
 

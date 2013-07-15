@@ -76,6 +76,7 @@
 #include "imagedev/serial.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
+#include "drivlgcy.h"
 
 
 /**************************** common *******************************/

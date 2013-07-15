@@ -5,6 +5,7 @@
 #include "sound/discrete.h"
 
 #include "includes/mario.h"
+#include "drivlgcy.h"
 
 /****************************************************************
  *

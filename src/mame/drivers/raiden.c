@@ -55,6 +55,7 @@
 #include "sound/okim6295.h"
 #include "includes/raiden.h"
 #include "video/seibu_crtc.h"
+#include "drivlgcy.h"
 
 
 /******************************************************************************/

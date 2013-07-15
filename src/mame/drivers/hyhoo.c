@@ -28,6 +28,7 @@ Memo:
 #include "sound/dac.h"
 #include "includes/hyhoo.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 DRIVER_INIT_MEMBER(hyhoo_state,hyhoo)

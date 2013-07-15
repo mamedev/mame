@@ -57,6 +57,7 @@ RSSENGO2.72   chr.
 #include "sound/3812intf.h"
 #include "video/seibu_crtc.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 class sengokmj_state : public driver_device

@@ -16,6 +16,7 @@
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "includes/redalert.h"
+#include "drivlgcy.h"
 
 
 

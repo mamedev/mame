@@ -185,6 +185,7 @@ I can't tell ATM if units are seconds (even if values in tables seem very relate
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "machine/i8155.h"
+#include "drivlgcy.h"
 
 
 class tourvision_state : public pce_common_state

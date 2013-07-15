@@ -37,6 +37,7 @@
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "sound/okim6295.h"
+#include "drivlgcy.h"
 
 
 /******************************************************************************/

@@ -47,6 +47,8 @@ TODO:
 #include "imagedev/flopdrv.h"
 #include "machine/990_dk.h"
 
+#include "drivlgcy.h"
+
 
 class ti990_4_state : public driver_device
 {

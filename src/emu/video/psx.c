@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "video/psx.h"
+#include "drivlgcy.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

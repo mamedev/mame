@@ -31,6 +31,7 @@ $c088-$c095 player tiles
 #include "sound/msm5205.h"
 #include "video/resnet.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 

@@ -27,6 +27,7 @@ Memo:
 #include "sound/dac.h"
 #include "includes/pastelg.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 #define SIGNED_DAC  0       // 0:unsigned DAC, 1:signed DAC

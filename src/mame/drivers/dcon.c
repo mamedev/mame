@@ -18,6 +18,7 @@
 #include "audio/seibu.h"
 #include "includes/dcon.h"
 #include "video/seibu_crtc.h"
+#include "drivlgcy.h"
 
 /***************************************************************************/
 

@@ -196,6 +196,7 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 #include "kas89.lh"
 
 

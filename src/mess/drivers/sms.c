@@ -220,6 +220,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "imagedev/cartslot.h"
 #include "includes/sms.h"
 #include "machine/sega8_rom.h"
+#include "drivlgcy.h"
 
 #include "sms1.lh"
 

@@ -321,6 +321,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
 #include "includes/cchip.h"
+#include "drivlgcy.h"
 
 class taitox_state : public seta_state
 {

@@ -213,6 +213,8 @@
 
 #include "machine/ti99/joyport.h"
 
+#include "drivlgcy.h"
+
 #define VERBOSE 1
 #define LOG logerror
 

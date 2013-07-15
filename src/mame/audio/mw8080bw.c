@@ -9,6 +9,7 @@
 #include "sound/sn76477.h"
 #include "sound/discrete.h"
 #include "includes/mw8080bw.h"
+#include "drivlgcy.h"
 
 
 /*************************************

@@ -15,6 +15,7 @@
 #include "machine/nvram.h"
 #include "sound/s14001a.h"
 #include "video/resnet.h"
+#include "drivlgcy.h"
 
 
 class berzerk_state : public driver_device

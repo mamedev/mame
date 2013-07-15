@@ -11,6 +11,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
+#include "drivlgcy.h"
 
 
 class tourtabl_state : public driver_device

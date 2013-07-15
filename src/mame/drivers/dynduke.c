@@ -69,6 +69,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/dynduke.h"
+#include "drivlgcy.h"
 
 /* Memory Maps */
 

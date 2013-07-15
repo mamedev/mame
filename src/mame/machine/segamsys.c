@@ -15,6 +15,7 @@
 #include "machine/mc8123.h"
 #include "machine/segacrpt.h"
 #include "includes/segamsys.h"
+#include "drivlgcy.h"
 
 
 //static UINT8* sms_rom;

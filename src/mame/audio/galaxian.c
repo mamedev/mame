@@ -23,6 +23,7 @@ TODO:
 #include "emu.h"
 #include "sound/discrete.h"
 #include "audio/galaxian.h"
+#include "drivlgcy.h"
 
 /*************************************
  *

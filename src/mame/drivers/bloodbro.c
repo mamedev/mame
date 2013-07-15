@@ -124,6 +124,7 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 #include "sound/3812intf.h"
 #include "includes/bloodbro.h"
 #include "video/seibu_crtc.h"
+#include "drivlgcy.h"
 
 
 /* Memory Maps */

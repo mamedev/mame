@@ -100,6 +100,7 @@ Optional (on expansion card) (Viper)
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
+#include "drivlgcy.h"
 
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"

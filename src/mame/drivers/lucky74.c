@@ -790,6 +790,7 @@
 #include "machine/nvram.h"
 #include "lucky74.lh"
 #include "includes/lucky74.h"
+#include "drivlgcy.h"
 
 
 /*****************************

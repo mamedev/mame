@@ -191,6 +191,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "includes/asteroid.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
+#include "drivlgcy.h"
 
 #include "astdelux.lh"
 

@@ -56,6 +56,7 @@ YM2203C
 #include "video/v9938.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "drivlgcy.h"
 
 
 class sfkick_state : public driver_device

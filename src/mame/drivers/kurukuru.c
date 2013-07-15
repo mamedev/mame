@@ -198,6 +198,7 @@
 #include "video/v9938.h"
 #include "machine/ticket.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 class kurukuru_state : public driver_device
 {

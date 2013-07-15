@@ -176,6 +176,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 struct ds1204_t

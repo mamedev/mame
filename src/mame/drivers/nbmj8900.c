@@ -30,6 +30,7 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
 #include "includes/nbmj8900.h"
+#include "drivlgcy.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)

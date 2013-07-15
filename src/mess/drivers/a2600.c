@@ -19,6 +19,7 @@ TODO:
 #include "video/tia.h"
 #include "machine/vcsctrl.h"
 #include "hashfile.h"
+#include "drivlgcy.h"
 
 #define CONTROL1_TAG    "joyport1"
 #define CONTROL2_TAG    "joyport2"

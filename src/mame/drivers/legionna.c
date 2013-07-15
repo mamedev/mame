@@ -75,6 +75,7 @@ Preliminary COP MCU memory map
 #include "cpu/m68000/m68000.h"
 #include "machine/seicop.h"
 #include "includes/legionna.h"
+#include "drivlgcy.h"
 
 /*****************************************************************************/
 

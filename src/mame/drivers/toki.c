@@ -42,6 +42,7 @@ for now. Even at 12 this slowdown still happens a little.
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 #include "includes/toki.h"
+#include "drivlgcy.h"
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {

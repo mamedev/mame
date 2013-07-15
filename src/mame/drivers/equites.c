@@ -372,6 +372,7 @@ D                                                                               
 #include "sound/samples.h"
 #include "machine/nvram.h"
 #include "includes/equites.h"
+#include "drivlgcy.h"
 
 #define HVOLTAGE_DEBUG  0
 #define EASY_TEST_MODE  0

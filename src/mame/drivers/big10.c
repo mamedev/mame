@@ -61,6 +61,7 @@
 #include "sound/ay8910.h"
 #include "video/v9938.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 class big10_state : public driver_device

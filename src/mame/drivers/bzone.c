@@ -211,6 +211,7 @@
 #include "machine/atari_vg.h"
 #include "includes/bzone.h"
 #include "sound/pokey.h"
+#include "drivlgcy.h"
 
 #include "bzone.lh"
 #include "redbaron.lh"

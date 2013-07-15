@@ -63,6 +63,7 @@ the main program is 9th October 1990.
 #include "sound/hc55516.h"
 #include "sound/speaker.h"
 #include "video/pc_cga.h"
+#include "drivlgcy.h"
 
 
 class pcxt_state : public driver_device

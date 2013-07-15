@@ -40,6 +40,7 @@ TODO:
 #include "nbmj8688.lh"
 #include "includes/nbmj8688.h"
 #include "machine/nvram.h"
+#include "drivlgcy.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8688_state,mjsikaku)

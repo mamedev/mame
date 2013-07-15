@@ -34,6 +34,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
+#include "drivlgcy.h"
 
 
 class tomcat_state : public driver_device

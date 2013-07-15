@@ -16,6 +16,7 @@
 #include "sound/tms36xx.h"
 #include "sound/dac.h"
 #include "devlegcy.h"
+#include "drivlgcy.h"
 
 
 

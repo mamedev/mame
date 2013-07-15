@@ -10,6 +10,7 @@
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
 #include "video/cgapal.h"
+#include "drivlgcy.h"
 
 
 #define CGA_MONITOR     (space.machine().root_device().ioport("VIDEO")->read() & 0x1C)

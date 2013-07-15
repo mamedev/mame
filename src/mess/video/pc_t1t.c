@@ -13,6 +13,7 @@
 #include "video/mc6845.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "drivlgcy.h"
 
 /***************************************************************************
 

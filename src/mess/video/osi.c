@@ -1,4 +1,5 @@
 #include "includes/osi.h"
+#include "drivlgcy.h"
 
 /* Palette Initialization */
 

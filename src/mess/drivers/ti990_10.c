@@ -75,6 +75,7 @@ TODO :
 #include "machine/990_hd.h"
 #include "machine/990_tap.h"
 #include "video/911_vdt.h"
+#include "drivlgcy.h"
 
 
 class ti990_10_state : public driver_device

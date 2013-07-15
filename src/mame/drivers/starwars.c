@@ -31,6 +31,7 @@
 #include "machine/x2212.h"
 #include "includes/starwars.h"
 #include "includes/slapstic.h"
+#include "drivlgcy.h"
 
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)

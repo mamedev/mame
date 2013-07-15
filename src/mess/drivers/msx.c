@@ -325,6 +325,7 @@ PCB Layouts missing
 
 
 #include "includes/msx.h"
+#include "drivlgcy.h"
 
 static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE(msx_page0_w)

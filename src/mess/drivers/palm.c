@@ -16,6 +16,7 @@
 #include "sound/dac.h"
 #include "debugger.h"
 #include "rendlay.h"
+#include "drivlgcy.h"
 
 #define MC68328_TAG "dragonball"
 

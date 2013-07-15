@@ -370,6 +370,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "sound/dac.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
+#include "drivlgcy.h"
 
 
 /*************************************
