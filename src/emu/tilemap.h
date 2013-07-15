@@ -641,8 +641,8 @@ public:
 	// tilemap creation
 	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
 	tilemap_t &create(tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows);
-	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
-	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows); // legacy
+	tilemap_t &create(tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows); // legacy
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
