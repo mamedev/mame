@@ -250,24 +250,24 @@ void sega8_cart_slot_device::set_lphaser_xoffset( UINT8 *rom, int size )
 		{ 0x54, 0x4d, 0x52, 0x20, 0x53, 0x45, 0x47, 0x41, 0xff, 0xff, 0x9f, 0x74, 0x34, 0x70, 0x00, 0x40 },
 	};
 
-	int xoff = 51;
+	int xoff = 44;
 
 	if (size >= 0x8000)
 	{
 		if (!memcmp(&rom[0x7ff0], signatures[0], 16) || !memcmp(&rom[0x7ff0], signatures[1], 16))
-			xoff = 41;
+			xoff = 34;
 
 		if (!memcmp(&rom[0x7ff0], signatures[2], 16))
-			xoff = 50;
+			xoff = 44;
 
 		if (!memcmp(&rom[0x7ff0], signatures[3], 16))
-			xoff = 48;
+			xoff = 40;
 
 		if (!memcmp(&rom[0x7ff0], signatures[4], 16))
-			xoff = 45;
+			xoff = 38;
 
 		if (!memcmp(&rom[0x7ff0], signatures[5], 16))
-			xoff = 54;
+			xoff = 47;
 
 	}
 

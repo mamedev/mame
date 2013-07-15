@@ -117,9 +117,9 @@ void sms_rapid_fire_device::peripheral_w(UINT8 data)
 //  machine configurations
 //-------------------------------------------------
 
-WRITE16_MEMBER( sms_rapid_fire_device::th_pin_w )
+WRITE_LINE_MEMBER( sms_rapid_fire_device::th_pin_w )
 {
-	m_port->th_pin_w(data);
+	m_port->th_pin_w(state);
 }
 
 
@@ -131,7 +131,7 @@ READ32_MEMBER( sms_rapid_fire_device::pixel_r )
 
 static MACHINE_CONFIG_FRAGMENT( rfire_slot )
 	MCFG_SMS_CONTROL_PORT_ADD("ctrl", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITE16(sms_rapid_fire_device, th_pin_w))
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_rapid_fire_device, th_pin_w))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_rapid_fire_device, pixel_r))
 MACHINE_CONFIG_END
 

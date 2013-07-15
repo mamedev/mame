@@ -98,9 +98,9 @@ void sms_control_port_device::port_w( UINT8 data )
 }
 
 
-void sms_control_port_device::th_pin_w(UINT16 data)
+void sms_control_port_device::th_pin_w(int state)
 {
-	m_th_pin_handler(data);
+	m_th_pin_handler(state);
 }
 
 UINT32 sms_control_port_device::pixel_r()

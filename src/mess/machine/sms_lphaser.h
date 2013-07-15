@@ -49,6 +49,7 @@ private:
 	required_ioport m_lphaser_x;
 	required_ioport m_lphaser_y;
 
+	int m_last_state;
 	screen_device *m_screen;
 	emu_timer *m_lphaser_timer;
 	static const device_timer_id TIMER_LPHASER = 0;

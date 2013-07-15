@@ -106,6 +106,8 @@ public:
 	UINT8 m_has_fm;
 
 	// Data needed for Light Phaser
+	UINT8 m_ctrl1_th_state;
+	UINT8 m_ctrl2_th_state;
 	UINT8 m_ctrl1_th_latch;
 	UINT8 m_ctrl2_th_latch;
 	int m_lphaser_x_offs;   /* Needed to 'calibrate' lphaser; set at cart loading */
@@ -160,14 +162,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_READ32_MEMBER(sms_pixel_color);
-	DECLARE_WRITE16_MEMBER(sms_ctrl1_th_input);
-	DECLARE_WRITE16_MEMBER(sms_ctrl2_th_input);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
+	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 
 protected:
 	void setup_bios();
 	void setup_rom();
 	void setup_sms_cart();
-	void lphaser_hcount_latch(int hpos);
+	void lphaser_hcount_latch();
 	void sms_get_inputs(address_space &space);
 };
 

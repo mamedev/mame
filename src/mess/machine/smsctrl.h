@@ -74,7 +74,7 @@ public:
 	UINT8 port_r();
 	void port_w( UINT8 data );
 
-	void th_pin_w(UINT16 data);
+	void th_pin_w(int state);
 	UINT32 pixel_r();
 
 //protected:
@@ -84,7 +84,7 @@ public:
 	device_sms_control_port_interface *m_device;
 
 private:
-	devcb2_write16 m_th_pin_handler;
+	devcb2_write_line m_th_pin_handler;
 	devcb2_read32 m_pixel_handler;
 };
 
