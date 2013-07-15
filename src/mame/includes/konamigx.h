@@ -112,10 +112,17 @@ public:
 	void _gxcommoninitnosprites(running_machine &machine);
 	void _gxcommoninit(running_machine &machine);
 	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-					tilemap_t *sub1, int sub1flags,
-					tilemap_t *sub2, int sub2flags,
-					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
+	void konamigx_mixer     (running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
+	void konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+						tilemap_t *sub1, int sub1flags,
+						tilemap_t *sub2, int sub2flags,
+						int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
+						int flipscreenx, int flipscreeny, int offx, int offy, int wrapsize, int xwraplim, int ywraplim,
+						struct GX_OBJ *objpool,
+						int *objbuf,
+						int nobj
+						);
+
 
 	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);

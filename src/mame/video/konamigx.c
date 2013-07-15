@@ -876,19 +876,13 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
-	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
-	static int parity = 0;
 
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
+	int flipscreenx, flipscreeny, offx, offy;
 
 	struct GX_OBJ *objpool, *objptr;
 	int wrapsize, xwraplim, ywraplim, cltc_shdpri, /*prflp,*/ disp;
-	int xa,ya,ox,oy,zw,zh,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
-	int screenwidth, flipscreenx, flipscreeny, offx, offy;
-	int nobj, i, j, k, l, temp, temp1, temp2, temp3, temp4, count;
-	int order, offs, code, color, zcode, pri = 0, spri, spri_min, shdprisel, shadow, alpha, drawmode;
 
 	// buffer can move when it's resized, so refresh the pointer
 	gx_objzbuf = &machine.priority_bitmap.pix8(0);
@@ -899,7 +893,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 	// clear screen with backcolor and update flicker pulse
 	K054338_fill_backcolor(machine, bitmap, konamigx_wrport1_0 & 0x20);
-	parity ^= 1;
+
 
 	// abort if video has been disabled
 	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
@@ -958,6 +952,8 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	layerpri[4] = m_k055555->K055555_read_register(K55_PRIINP_9);
 	layerpri[5] = m_k055555->K055555_read_register(K55_PRIINP_10);
 
+	int shdprisel;
+
 	if (gx_primode == -1)
 	{
 		// Lethal Enforcer hack (requires pixel color comparison)
@@ -979,11 +975,14 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	shdpri[1]   = m_k055555->K055555_read_register(K55_SHAD2_PRI);
 	shdpri[2]   = m_k055555->K055555_read_register(K55_SHAD3_PRI);
 
-	spri_min = 0;
+	int spri_min = 0;
+
 	shadowon[2] = shadowon[1] = shadowon[0] = 0;
 
+	int k = 0;
 	if (!(mixerflags & GXMIX_NOSHADOW))
 	{
+		int i,j;
 		// only enable shadows beyond a +/-7 RGB threshold
 		for (j=0,i=0; i<3; j+=3,i++)
 		{
@@ -993,7 +992,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 
 		// SHDON specifies layers on which shadows can be projected (see detail on p.65 7.2.8)
-		temp = m_k055555->K055555_read_register(K55_SHD_ON);
+		int temp = m_k055555->K055555_read_register(K55_SHD_ON);
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
@@ -1001,12 +1000,12 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	}
 
 	// pre-sort layers
-	for (j=0; j<5; j++)
+	for (int j=0; j<5; j++)
 	{
-		temp1 = layerpri[j];
-		for (i=j+1; i<6; i++)
+		int temp1 = layerpri[j];
+		for (int i=j+1; i<6; i++)
 		{
-			temp2 = layerpri[i];
+			int temp2 = layerpri[i];
 			if ((UINT32)temp1 <= (UINT32)temp2)
 			{
 				layerpri[i] = temp1; layerpri[j] = temp1 = temp2;
@@ -1017,11 +1016,13 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 	// build object database and create indices
 	objptr = objpool;
-	nobj = 0;
+	int nobj = 0;
 
-	for (i=5; i>=0; i--)
+	for (int i=5; i>=0; i--)
 	{
-		code = layerid[i];
+		int offs;
+
+		int code = layerid[i];
 		switch (code)
 		{
 			/*
@@ -1058,19 +1059,22 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 	}
 
-	i = j = 0xff;
+//	i = j = 0xff;
+	int l = 0;
 
-	for (offs=0; offs<0x800; offs+=8)
+	for (int offs=0; offs<0x800; offs+=8)
 	{
+		int pri = 0;
+
 		if (!(gx_spriteram[offs] & 0x8000)) continue;
 
-		zcode = gx_spriteram[offs] & 0xff;
+		int zcode = gx_spriteram[offs] & 0xff;
 
 		// invert z-order when opset_pri is set (see p.51 OPSET PRI)
 		if (k053247_opset & 0x10) zcode = 0xff - zcode;
 
-		code  = gx_spriteram[offs+1];
-		color = k = gx_spriteram[offs+6];
+		int code  = gx_spriteram[offs+1];
+		int color = k = gx_spriteram[offs+6];
 		l     = gx_spriteram[offs+7];
 
 		(*k053247_callback)(machine, &code, &color, &pri);
@@ -1083,7 +1087,12 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		    temp3  = add shadow object
 		    temp4  = shadow pens draw mode
 		*/
-		temp4 = temp3 = temp2 = temp1 = spri = shadow = 0;
+		int temp4 = 0;
+		int temp3 = 0;
+		int temp2 = 0;
+		int temp1 = 0;
+		int spri = 0;
+		int shadow = 0;
 
 		if (color & K055555_FULLSHADOW)
 		{
@@ -1165,7 +1174,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		if (temp1)
 		{
 			// add objects with solid or alpha pens
-			order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
+			int order = pri<<24 | zcode<<16 | offs<<(8-3) | temp2<<4;
 			objptr->order = order;
 			objptr->offs  = offs;
 			objptr->code  = code;
@@ -1179,7 +1188,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		if (temp3 && !(color & K055555_SKIPSHADOW) && !(mixerflags & GXMIX_NOSHADOW))
 		{
 			// add objects with shadows if enabled
-			order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
+			int order = spri<<24 | zcode<<16 | offs<<(8-3) | temp4<<4 | shadow;
 			objptr->order = order;
 			objptr->offs  = offs;
 			objptr->code  = code;
@@ -1195,24 +1204,58 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 	k = nobj;
 	l = nobj - 1;
 
-	for (j=0; j<l; j++)
+	for (int j=0; j<l; j++)
 	{
-		temp1 = objbuf[j];
-		temp2 = objpool[temp1].order;
-		for (i=j+1; i<k; i++)
+		int temp1 = objbuf[j];
+		int temp2 = objpool[temp1].order;
+		for (int i=j+1; i<k; i++)
 		{
-			temp3 = objbuf[i];
-			temp4 = objpool[temp3].order;
+			int temp3 = objbuf[i];
+			int temp4 = objpool[temp3].order;
 			if ((UINT32)temp2 <= (UINT32)temp4) { temp2 = temp4; objbuf[i] = temp1; objbuf[j] = temp1 = temp3; }
 		}
 	}
 
-	// traverse draw list
-	screenwidth = machine.primary_screen->width();
 
-	for (count=0; count<nobj; count++)
+	konamigx_mixer_draw(machine,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
+		flipscreenx, flipscreeny, offx, offy, wrapsize, xwraplim, ywraplim,
+		objpool,
+		objbuf,
+		nobj
+		);
+}
+
+
+void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
+					tilemap_t *sub1, int sub1flags,
+					tilemap_t *sub2, int sub2flags,
+					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
+					
+					/* passed from above function */
+					int flipscreenx, int flipscreeny, int offx, int offy, int wrapsize, int xwraplim, int ywraplim,
+					struct GX_OBJ *objpool,
+					int *objbuf,
+					int nobj
+					)
+{
+	static int parity = 0;
+	parity ^= 1;
+
+
+	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+	int xa,ya,ox,oy,zw,zh,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
+	int temp, temp1, temp2, temp3, temp4;
+	int order, offs, code, color, zcode, pri = 0, alpha, drawmode;
+
+
+	// traverse draw list
+	int screenwidth = machine.primary_screen->width();
+	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+
+	for (int count=0; count<nobj; count++)
 	{
-		objptr = objpool + objbuf[count];
+		struct GX_OBJ *objptr = objpool + objbuf[count];
 		order  = objptr->order;
 		offs   = objptr->offs;
 		code   = objptr->code;
@@ -1224,9 +1267,9 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 		else
 		{
-			i = code<<1;
-			j = mixerflags>>i & 3;
-			k = 0;
+			int i = code<<1;
+			int j = mixerflags>>i & 3;
+			int k = 0;
 
 			switch (offs)
 			{
@@ -1284,7 +1327,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 						if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
 					}
 
-					l = sub1flags & 0xf;
+					int l = sub1flags & 0xf;
 
 					if (offs == -2)
 					{
@@ -1325,7 +1368,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 						if (temp4 < 255) k = (j == GXMIX_BLEND_FAST) ? ~parity : 1;
 					}
 
-					l = sub2flags & 0xf;
+					int l = sub2flags & 0xf;
 
 					if (offs == -3)
 					{
@@ -1449,19 +1492,19 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 
 		temp = temp4>>8 & 0x0f;
-		k = 1 << (temp & 3);
-		l = 1 << (temp>>2 & 3);
+		int k = 1 << (temp & 3);
+		int l = 1 << (temp>>2 & 3);
 
 		ox -= (zoomx * k) >> 13;
 		oy -= (zoomy * l) >> 13;
 
 		// substitutes: i=x, j=y, k=w, l=h, temp=code, temp1=fx, temp2=fy, temp3=sx, temp4=sy;
-		for (j=0; j<l; j++)
+		for (int j=0; j<l; j++)
 		{
 			temp4 = oy + ((zoomy * j + (1<<11)) >> 12);
 			zh = (oy + ((zoomy * (j+1) + (1<<11)) >> 12)) - temp4;
 
-			for (i=0; i<k; i++)
+			for (int i=0; i<k; i++)
 			{
 				temp3 = ox + ((zoomx * i + (1<<11)) >> 12);
 				zw = (ox + ((zoomx * (i+1) + (1<<11)) >> 12)) - temp3;
@@ -1522,9 +1565,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 		}
 	}
 }
-
-
-
 
 
 /* Run and Gun 2 / Rushing Heroes */
