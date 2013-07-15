@@ -16,6 +16,7 @@ todo:
 
 #include "emu.h"
 #include "v9938.h"
+#include "drivlgcy.h"
 
 #define VERBOSE 0
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)

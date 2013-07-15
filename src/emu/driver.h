@@ -83,18 +83,15 @@
 //  OTHER MACROS
 //**************************************************************************
 
-// macros to wrap legacy callbacks
 #define MACHINE_START_NAME(name)    machine_start_##name
-#define MACHINE_START(name)         void MACHINE_START_NAME(name)(running_machine &machine)
-#define MACHINE_START_CALL(name)    MACHINE_START_NAME(name)(machine)
+#define MACHINE_START(name)         void MACHINE_START_NAME(name)(running_machine &machine) // legacy
 #define MACHINE_START_CALL_MEMBER(name) MACHINE_START_NAME(name)()
 #define MACHINE_START_CALL_LEGACY(name) MACHINE_START_NAME(name)(machine())
 #define DECLARE_MACHINE_START(name) void MACHINE_START_NAME(name)()
 #define MACHINE_START_MEMBER(cls,name) void cls::MACHINE_START_NAME(name)()
 
 #define MACHINE_RESET_NAME(name)    machine_reset_##name
-#define MACHINE_RESET(name)         void MACHINE_RESET_NAME(name)(running_machine &machine)
-#define MACHINE_RESET_CALL(name)    MACHINE_RESET_NAME(name)(machine)
+#define MACHINE_RESET(name)         void MACHINE_RESET_NAME(name)(running_machine &machine) // legacy
 #define MACHINE_RESET_CALL_MEMBER(name) MACHINE_RESET_NAME(name)()
 #define MACHINE_RESET_CALL_LEGACY(name) MACHINE_RESET_NAME(name)(machine())
 #define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
@@ -109,23 +106,20 @@
 #define SOUND_RESET_CALL(name)      SOUND_RESET_NAME(name)(machine)
 
 #define PALETTE_INIT_NAME(name)     palette_init_##name
-#define PALETTE_INIT(name)          void PALETTE_INIT_NAME(name)(running_machine &machine)
-#define PALETTE_INIT_CALL(name)     PALETTE_INIT_NAME(name)(machine)
+#define PALETTE_INIT(name)          void PALETTE_INIT_NAME(name)(running_machine &machine) // legacy
 #define PALETTE_INIT_CALL_MEMBER(name)      PALETTE_INIT_NAME(name)()
 #define DECLARE_PALETTE_INIT(name)  void PALETTE_INIT_NAME(name)()
 #define PALETTE_INIT_MEMBER(cls,name) void cls::PALETTE_INIT_NAME(name)()
 
 #define VIDEO_START_NAME(name)      video_start_##name
-#define VIDEO_START(name)           void VIDEO_START_NAME(name)(running_machine &machine)
-#define VIDEO_START_CALL(name)      VIDEO_START_NAME(name)(machine)
+#define VIDEO_START(name)           void VIDEO_START_NAME(name)(running_machine &machine) // legacy
 #define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
 #define VIDEO_START_CALL_LEGACY(name)       VIDEO_START_NAME(name)(machine())
 #define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)()
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
 
 #define VIDEO_RESET_NAME(name)      video_reset_##name
-#define VIDEO_RESET(name)           void VIDEO_RESET_NAME(name)(running_machine &machine)
-#define VIDEO_RESET_CALL(name)      VIDEO_RESET_NAME(name)(machine)
+#define VIDEO_RESET(name)           void VIDEO_RESET_NAME(name)(running_machine &machine) // legacy
 #define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
 #define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
 #define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()

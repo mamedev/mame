@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "avgdvg.h"
 #include "video/vector.h"
+#include "drivlgcy.h"
 
 
 /*************************************
