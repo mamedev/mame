@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 
 	MCFG_GFXDECODE(citycon)
 	MCFG_PALETTE_LENGTH(640+1024)   /* 640 real palette + 1024 virtual palette */
-	MCFG_PALETTE_INIT(all_black) /* guess */
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black) /* guess */
 
 
 	/* sound hardware */

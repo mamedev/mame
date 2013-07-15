@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( hp9k, hp9k_state )
 
 	MCFG_GFXDECODE(hp9k)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_MC6845_ADD( "mc6845", MC6845, XTAL_16MHz / 16, hp9k_mc6845_intf )
 MACHINE_CONFIG_END

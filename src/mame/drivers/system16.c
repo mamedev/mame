@@ -2158,7 +2158,7 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
 
-	MCFG_PALETTE_INIT( all_black )
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 MACHINE_CONFIG_END
 

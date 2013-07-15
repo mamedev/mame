@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( circus, circus_state )
 	MCFG_GFXDECODE(circus)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_GFXDECODE(robotbwl)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	MCFG_GFXDECODE(circus)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -400,7 +400,7 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	MCFG_GFXDECODE(circus)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

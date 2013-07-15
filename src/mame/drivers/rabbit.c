@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
 
 	MCFG_PALETTE_LENGTH(0x4000)
-	MCFG_PALETTE_INIT( all_black )
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 
 	/* sound hardware */

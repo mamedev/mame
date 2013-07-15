@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 	MCFG_GFXDECODE(ec65)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
 
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( ec65k, ec65_state )
 
 	MCFG_GFXDECODE(ec65)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz / 8, ec65_crtc6845_interface)
 

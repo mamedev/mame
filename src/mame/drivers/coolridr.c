@@ -3621,7 +3621,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 	MCFG_PALETTE_LENGTH(0x10000)
-	MCFG_PALETTE_INIT( RRRRR_GGGGG_BBBBB )
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

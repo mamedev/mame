@@ -35,17 +35,6 @@ extern const gfx_layout gfx_16x16x4_planar;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* ----- generic palette init routines ----- */
-
-PALETTE_INIT( all_black );
-PALETTE_INIT( black_and_white );
-PALETTE_INIT( monochrome_amber );
-PALETTE_INIT( monochrome_green );
-PALETTE_INIT( RRRR_GGGG_BBBB );
-PALETTE_INIT( RRRRR_GGGGG_BBBBB );
-PALETTE_INIT( BBBBB_GGGGG_RRRRR );
-PALETTE_INIT( RRRRR_GGGGGG_BBBBB );
-
 extern const rgb_t RGB_MONOCHROME_WHITE[];
 extern const rgb_t RGB_MONOCHROME_WHITE_HIGHLIGHT[];
 extern const rgb_t RGB_MONOCHROME_AMBER[];

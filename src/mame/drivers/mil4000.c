@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update_mil4000)
 
 	MCFG_PALETTE_LENGTH(0x800)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_GFXDECODE(mil4000)
 

@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_GFXDECODE(pyl601)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

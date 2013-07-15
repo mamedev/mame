@@ -737,7 +737,7 @@ static MACHINE_CONFIG_DERIVED( funland, fashiong )
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
 	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fstation, fashiong )

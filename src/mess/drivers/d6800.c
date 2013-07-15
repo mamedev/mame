@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SCREEN_UPDATE_DRIVER(d6800_state, screen_update_d6800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

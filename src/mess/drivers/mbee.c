@@ -738,7 +738,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 
 	MCFG_GFXDECODE(mbee)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_amber) // usually sold with amber or green monitor
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber) // usually sold with amber or green monitor
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbee)
 

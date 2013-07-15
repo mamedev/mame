@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_GFXDECODE(llc1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_GFXDECODE(llc2)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

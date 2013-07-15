@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( formatz, aeroboto_state )
 
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

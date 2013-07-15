@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_GFXDECODE(perfrman)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,perfrman)
 
 	/* sound hardware */
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */
@@ -850,7 +850,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_GFXDECODE(slapfght)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
 	/* sound hardware */

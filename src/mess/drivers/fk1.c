@@ -469,7 +469,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	MCFG_PIT8253_ADD( "pit8253", fk1_pit8253_intf )
 	MCFG_I8255_ADD( "ppi8255_1", fk1_ppi8255_interface_1 )

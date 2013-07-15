@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_VIDEO_START_OVERRIDE(sapi1_state,sapi1)
 
@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( sapi3, sapi1_state )
 	//MCFG_VIDEO_START_OVERRIDE(sapi1_state,sapizps3)
 	//MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapizps3)
 	//MCFG_PALETTE_LENGTH(2)
-	//MCFG_PALETTE_INIT(black_and_white)
+	//MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	MCFG_GFXDECODE(holeland)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
 	/* sound hardware */
@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( crzrally, holeland_state )
 	MCFG_GFXDECODE(crzrally)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 
 	/* sound hardware */

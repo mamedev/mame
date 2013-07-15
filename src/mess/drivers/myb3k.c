@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
 	MCFG_GFXDECODE(myb3k)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */

@@ -401,6 +401,16 @@ public:
 	// general fatal error handlers
 	DECLARE_READ8_MEMBER( fatal_generic_read );
 	DECLARE_WRITE8_MEMBER( fatal_generic_write );
+	
+	// generic palette init routines
+	DECLARE_PALETTE_INIT( all_black );
+	DECLARE_PALETTE_INIT( black_and_white );
+	DECLARE_PALETTE_INIT( monochrome_amber );
+	DECLARE_PALETTE_INIT( monochrome_green );
+	DECLARE_PALETTE_INIT( RRRR_GGGG_BBBB );
+	DECLARE_PALETTE_INIT( RRRRR_GGGGG_BBBBB );
+	DECLARE_PALETTE_INIT( BBBBB_GGGGG_RRRRR );
+	DECLARE_PALETTE_INIT( RRRRR_GGGGGG_BBBBB );
 
 protected:
 	// helpers called at startup

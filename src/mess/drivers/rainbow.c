@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_GFXDECODE(rainbow)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )

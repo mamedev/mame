@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 
 	MCFG_GFXDECODE(poly88)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	/* audio hardware */

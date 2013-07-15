@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_GFXDECODE(sol20)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

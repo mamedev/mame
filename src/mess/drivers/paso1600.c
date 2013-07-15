@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_GFXDECODE(paso1600)
 	MCFG_PALETTE_LENGTH(8)
-//  MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */

@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 
 	MCFG_GFXDECODE(legionna)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1107,7 +1107,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 
 	MCFG_GFXDECODE(heatbrl)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
@@ -1137,7 +1137,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 
 	MCFG_GFXDECODE(heatbrl)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
@@ -1166,7 +1166,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 
 	MCFG_GFXDECODE(heatbrl)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
@@ -1195,7 +1195,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 
 	MCFG_GFXDECODE(grainbow)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 
 	MCFG_GFXDECODE(cupsoc)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 
@@ -1263,7 +1263,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 
 	MCFG_GFXDECODE(heatbrl_csb)
 	MCFG_PALETTE_LENGTH(128*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 

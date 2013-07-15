@@ -1222,7 +1222,7 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 	MCFG_GFXDECODE(arkanoid)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
@@ -1255,7 +1255,7 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_GFXDECODE(hexa)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */
@@ -1300,7 +1300,7 @@ static MACHINE_CONFIG_START( brixian, arkanoid_state )
 	MCFG_GFXDECODE(arkanoid)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
 	/* sound hardware */

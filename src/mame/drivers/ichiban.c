@@ -130,7 +130,7 @@ static MACHINE_CONFIG_START( ichibanjyan, ichibanjyan_state )
 
 	MCFG_GFXDECODE(ichibanjyan)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_PALETTE_LENGTH(512)
 
 	/* sound hardware */

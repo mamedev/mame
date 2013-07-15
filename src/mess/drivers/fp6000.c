@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_PALETTE_LENGTH(8)
-//  MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_GFXDECODE(fp6000)
 
 MACHINE_CONFIG_END

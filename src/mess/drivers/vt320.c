@@ -94,7 +94,7 @@ static MACHINE_CONFIG_START( vt320, vt320_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vt320_state, screen_update_vt320)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

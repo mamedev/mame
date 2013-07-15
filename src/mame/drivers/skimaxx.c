@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 
 //  MCFG_GFXDECODE( skimaxx )
 
-	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(32768)
 
 	/* sound hardware */

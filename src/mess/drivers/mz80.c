@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_GFXDECODE(mz80k)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

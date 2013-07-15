@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 
 	MCFG_GFXDECODE(apple1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	MCFG_PIA6821_ADD( "pia", apple1_pia0 )

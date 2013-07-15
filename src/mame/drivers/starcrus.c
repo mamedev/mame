@@ -153,7 +153,7 @@ static MACHINE_CONFIG_START( starcrus, starcrus_state )
 	MCFG_GFXDECODE(starcrus)
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

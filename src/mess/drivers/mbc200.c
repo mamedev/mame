@@ -271,7 +271,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
 	MCFG_GFXDECODE(mbc200)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	MCFG_MC6845_ADD("crtc", H46505, XTAL_8MHz / 4, mbc200_crtc) // HD46505SP

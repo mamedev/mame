@@ -87,7 +87,7 @@ static MACHINE_CONFIG_START( unistar, unistar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(unistar_state, screen_update_unistar)
 	MCFG_GFXDECODE(unistar)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 MACHINE_CONFIG_END
 
 /* ROM definition */

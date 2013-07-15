@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* RAM configurations */
 	MCFG_RAM_ADD(RAM_TAG)

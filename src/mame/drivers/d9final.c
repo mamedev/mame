@@ -299,7 +299,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 
 	MCFG_GFXDECODE(d9final)
 	MCFG_PALETTE_LENGTH(0x400)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

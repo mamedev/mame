@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

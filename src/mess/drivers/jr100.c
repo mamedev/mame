@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 
 	MCFG_GFXDECODE(jr100)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)

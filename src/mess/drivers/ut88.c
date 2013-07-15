@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_GFXDECODE( ut88 )
 
 	/* audio hardware */

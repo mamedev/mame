@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_GFXDECODE(mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.

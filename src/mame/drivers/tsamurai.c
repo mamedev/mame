@@ -699,7 +699,7 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */
@@ -739,7 +739,7 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* sound hardware */
@@ -783,7 +783,7 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_GFXDECODE(tsamurai)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* sound hardware */

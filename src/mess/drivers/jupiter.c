@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_SCREEN_SIZE(512, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)

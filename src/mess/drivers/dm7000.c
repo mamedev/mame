@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 

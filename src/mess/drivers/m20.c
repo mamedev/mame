@@ -985,7 +985,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(m20_state, screen_update_m20)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
 	MCFG_FD1797x_ADD("fd1797", 1000000)

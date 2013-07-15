@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_SCREEN_VBLANK_DRIVER(psattack_state, screen_eof_psattack)
 
 
-	MCFG_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRRR_GGGGGG_BBBBB)
 	MCFG_PALETTE_LENGTH(65536)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

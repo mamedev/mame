@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)
-//  MCFG_PALETTE_INIT(black_and_white)
+//  MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

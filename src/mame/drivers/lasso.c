@@ -592,7 +592,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	/* video hardware */
 	MCFG_GFXDECODE(pinbo)
 	MCFG_PALETTE_LENGTH(256)
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)

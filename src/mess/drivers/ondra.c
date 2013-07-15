@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	// sound hardware

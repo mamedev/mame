@@ -67,7 +67,7 @@ static MACHINE_CONFIG_START( dms5000, dms5000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dms5000_state, screen_update_dms5000)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 MACHINE_CONFIG_END
 
 /* ROM definition */

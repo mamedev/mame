@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_swyft)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 MACHINE_CONFIG_END

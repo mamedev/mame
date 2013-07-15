@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( h89, h89_state )
 	MCFG_SCREEN_UPDATE_STATIC(h89)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 #endif
 
 	MCFG_INS8250_ADD( "ins8250", h89_ins8250_interface, XTAL_1_8432MHz )

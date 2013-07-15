@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sbrkout_state, screen_update_sbrkout)
 
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

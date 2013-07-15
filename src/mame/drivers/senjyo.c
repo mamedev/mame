@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 
 	MCFG_GFXDECODE(senjyo)
 	MCFG_PALETTE_LENGTH(512+2)  /* 512 real palette + 2 for the radar */
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

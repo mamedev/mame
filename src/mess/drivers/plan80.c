@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( plan80, plan80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_GFXDECODE(plan80)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 MACHINE_CONFIG_END
 
 /* ROM definition */

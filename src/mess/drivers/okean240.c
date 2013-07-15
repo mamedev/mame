@@ -485,7 +485,7 @@ static MACHINE_CONFIG_START( okean240t, okean240_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_SCREEN_UPDATE_DRIVER(okean240_state, screen_update_okean240)
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

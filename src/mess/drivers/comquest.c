@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 
 	MCFG_GFXDECODE( comquest )
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	/* sound hardware */

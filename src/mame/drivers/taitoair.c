@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	MCFG_GFXDECODE(airsys)
 	MCFG_PALETTE_LENGTH(512*16+512*16)
-	MCFG_PALETTE_INIT(all_black)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, all_black)
 
 	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
 

@@ -117,7 +117,7 @@ static MACHINE_CONFIG_START( ax20, ax20_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_GFXDECODE(ax20)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	/* Devices */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ax20_floppy_interface)

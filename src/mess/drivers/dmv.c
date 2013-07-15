@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 
 	MCFG_GFXDECODE(dmv)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices

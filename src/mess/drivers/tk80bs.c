@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_VIDEO_START_OVERRIDE(tk80bs_state,tk80bs)
 	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_GFXDECODE(tk80bs)
 
 	/* Devices */

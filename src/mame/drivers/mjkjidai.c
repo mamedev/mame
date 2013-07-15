@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	MCFG_GFXDECODE(mjkjidai)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

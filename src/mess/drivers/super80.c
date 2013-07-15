@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	MCFG_GFXDECODE(super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )

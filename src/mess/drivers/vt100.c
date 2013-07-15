@@ -446,7 +446,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	MCFG_GFXDECODE(vt100)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_green)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 

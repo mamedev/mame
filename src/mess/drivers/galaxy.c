@@ -200,7 +200,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 
 	MCFG_GFXDECODE(galaxy)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT( black_and_white )
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	/* snapshot */
@@ -236,7 +236,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT( black_and_white )
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	/* snapshot */

@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 
 	MCFG_GFXDECODE(nascom1)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	MCFG_AY31015_ADD( "hd6402", nascom1_ay31015_config )
 

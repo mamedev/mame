@@ -3864,7 +3864,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_GFXDECODE(ikari)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
@@ -3920,7 +3920,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_GFXDECODE(gwar)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
@@ -4024,7 +4024,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_GFXDECODE(tdfever)
 	MCFG_PALETTE_LENGTH(0x400)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */

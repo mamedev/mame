@@ -635,7 +635,7 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_GFXDECODE(lsasquad)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_GFXDECODE(lsasquad)
 	MCFG_PALETTE_LENGTH(512)
 
-	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, RRRR_GGGG_BBBB)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
 
 	/* sound hardware */

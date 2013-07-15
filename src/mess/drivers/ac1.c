@@ -139,7 +139,7 @@ static MACHINE_CONFIG_START( ac1, ac1_state )
 	MCFG_GFXDECODE( ac1 )
 
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
