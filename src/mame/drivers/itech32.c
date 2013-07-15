@@ -8,7 +8,7 @@
 
     Games supported:
         * Time Killers (3 sets)
-        * Bloodstorm (4 sets)
+        * Bloodstorm (5 sets)
         * Hard Yardage (2 sets)
         * Pairs (4 sets)
         * Pairs Redemption (Child's version of pairs)
@@ -16,7 +16,7 @@
         * World Class Bowling (12 sets)
         * Street Fighter: The Movie (4 sets)
         * Shuffleshot (3 sets)
-        * Golden Tee 3D Golf (11 sets)
+        * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
         * Golden Tee Golf '98 (5 sets)
         * Golden Tee Golf '99 (4 Sets)
@@ -55,8 +55,7 @@
 
     There are at least 3 different revisions of the sound board for the 3-tier Golden Tee boards
         P/N 1066 Rev 2: Ensoniq sample 2M 1350901601, sound CPU code is V1.0 to V1.2
-        P/N 1078 Rev 1: Ensoniq sample 2MX16U 1350901801, sound CPU code is V2.0 to V2.2, this
-            is the same sample rom IT used on the 3-tier World Class Bowling for SROM 0.
+        P/N 1078 Rev 1: Ensoniq sample 2MX16U 1350901801, sound CPU code is V2.0 to V2.2
         P/N 1078 Rev 1: This revision dropped the Ensoniq samples and converted to the samples
             currently used on the single PCB format.  Roms are identified by the use of "NR"
             on the label and the sound code is labeled "GTG3_NR(U23)"
@@ -4375,7 +4374,7 @@ DRIVER_INIT_MEMBER(itech32_state,gt3dl)
 {
 	/*
 	    This is the 3 tier PCB with the long ROM board:
-	    Known GT versions on this board:  GT3D v1.92L & v1.91L
+	    Known GT versions on this board:  GT3D v1.9L, v1.91L & v1.92L
 
 	    Player 1 trackball read through 200003
 	    Player 2 trackball read through 200002
