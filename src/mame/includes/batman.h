@@ -23,7 +23,6 @@ public:
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_READ16_MEMBER(batman_atarivc_r);
 	DECLARE_WRITE16_MEMBER(batman_atarivc_w);
-	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
 	DECLARE_DRIVER_INIT(batman);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);

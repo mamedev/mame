@@ -173,22 +173,6 @@ MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
 
 /*************************************
  *
- *  Controller reads
- *
- *************************************/
-
-READ16_MEMBER(gauntlet_state::port4_r)
-{
-	int temp = ioport("803008")->read();
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0020;
-	if (m_soundcomm->sound_to_main_ready()) temp ^= 0x0010;
-	return temp;
-}
-
-
-
-/*************************************
- *
  *  Sound reset
  *
  *************************************/
@@ -307,7 +291,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
 	AM_RANGE(0x803006, 0x803007) AM_MIRROR(0x2fcef0) AM_READ_PORT("803006")
-	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ(port4_r)
+	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ_PORT("803008")
 	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_DEVREAD8("soundcomm", atari_sound_comm_device, main_response_r, 0x00ff)
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_DEVWRITE("soundcomm", atari_sound_comm_device, sound_reset_w)
@@ -401,7 +385,8 @@ static INPUT_PORTS_START( gauntlet )
 	PORT_START("803008")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -448,7 +433,8 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_START("803008")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 

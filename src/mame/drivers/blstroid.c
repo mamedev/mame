@@ -55,24 +55,6 @@ MACHINE_RESET_MEMBER(blstroid_state,blstroid)
 
 /*************************************
  *
- *  I/O read dispatch
- *
- *************************************/
-
-READ16_MEMBER(blstroid_state::inputs_r)
-{
-	static const char *const iptnames[] = { "IN0", "IN1" };
-	int temp = ioport(iptnames[offset & 1])->read();
-
-	if (m_jsa->main_to_sound_ready()) temp ^= 0x0040;
-	if (get_hblank(*machine().primary_screen)) temp ^= 0x0010;
-	return temp;
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -92,7 +74,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blstroid_state )
 	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL0")
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
-	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
+	AM_RANGE(0xff9c00, 0xff9c01) AM_MIRROR(0x7f83fc) AM_READ_PORT("IN0")
+	AM_RANGE(0xff9c02, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(playfield_w) AM_SHARE("playfield")
@@ -122,9 +105,9 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -133,9 +116,9 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

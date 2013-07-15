@@ -77,14 +77,6 @@ WRITE16_MEMBER(offtwall_state::offtwall_atarivc_w)
  *
  *************************************/
 
-READ16_MEMBER(offtwall_state::special_port3_r)
-{
-	int result = ioport("260010")->read();
-	if (m_jsa->main_to_sound_ready()) result ^= 0x0020;
-	return result;
-}
-
-
 WRITE16_MEMBER(offtwall_state::io_latch_w)
 {
 	/* lower byte */
@@ -264,7 +256,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
-	AM_RANGE(0x260010, 0x260011) AM_READ(special_port3_r)
+	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
 	AM_RANGE(0x260012, 0x260013) AM_READ_PORT("260012")
 	AM_RANGE(0x260020, 0x260021) AM_READ_PORT("260020")
 	AM_RANGE(0x260022, 0x260023) AM_READ_PORT("260022")
@@ -331,7 +323,7 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a454 */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested at a466 */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested before writing to 260040 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  /* tested before writing to 260040 */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

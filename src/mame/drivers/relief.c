@@ -86,7 +86,6 @@ MACHINE_RESET_MEMBER(relief_state,relief)
 READ16_MEMBER(relief_state::special_port2_r)
 {
 	int result = ioport("260010")->read();
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x0020;
 	if (!(result & 0x0080) || get_hblank(*machine().primary_screen)) result ^= 0x0001;
 	return result;
 }
@@ -222,7 +221,7 @@ static INPUT_PORTS_START( relief )
 
 	PORT_START("260010")    /* 260010 */
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )   /* tested before writing to 260040 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

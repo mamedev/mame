@@ -77,6 +77,12 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+#define PORT_ATARI_COMM_SOUND_TO_MAIN_READY(_tag) \
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, sound_to_main_ready)
+
+#define PORT_ATARI_COMM_MAIN_TO_SOUND_READY(_tag) \
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, main_to_sound_ready)
+
 
 // ======================> atari_sound_comm_device
 
@@ -91,8 +97,8 @@ public:
 	template<class _Object> static devcb2_base &set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
 	
 	// getters
-	bool main_to_sound_ready() const { return m_main_to_sound_ready; }
-	bool sound_to_main_ready() const { return m_sound_to_main_ready; }
+	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
+	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
 	DECLARE_WRITE8_MEMBER(main_command_w);

@@ -86,22 +86,6 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal2p)
  *
  *************************************/
 
-READ16_MEMBER(cyberbal_state::special_port0_r)
-{
-	int temp = ioport("IN0")->read();
-	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0080;
-	return temp;
-}
-
-
-READ16_MEMBER(cyberbal_state::special_port2_r)
-{
-	int temp = ioport("IN2")->read();
-	if (m_jsa->main_to_sound_ready()) temp ^= 0x2000;
-	return temp;
-}
-
-
 READ16_MEMBER(cyberbal_state::sound_state_r)
 {
 	int temp = 0xffff;
@@ -139,7 +123,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfd4000, 0xfd5fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfd6000, 0xfd7fff) AM_WRITE(p2_reset_w)
 	AM_RANGE(0xfd8000, 0xfd9fff) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0xff00)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
@@ -166,7 +150,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
@@ -234,7 +218,7 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
-	AM_RANGE(0xfc4000, 0xfc4003) AM_READ(special_port2_r)
+	AM_RANGE(0xfc4000, 0xfc4003) AM_READ_PORT("IN2")
 	AM_RANGE(0xfc6000, 0xfc6003) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
 	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfca000, 0xfcafff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
@@ -266,7 +250,8 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
@@ -330,7 +315,7 @@ static INPUT_PORTS_START( cyberbal2p )
 
 	PORT_START("IN2")       /* fc4000 */
 	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END

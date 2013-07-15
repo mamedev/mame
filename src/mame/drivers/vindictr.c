@@ -54,8 +54,6 @@ MACHINE_RESET_MEMBER(vindictr_state,vindictr)
 READ16_MEMBER(vindictr_state::port1_r)
 {
 	int result = ioport("260010")->read();
-	if (m_jsa->sound_to_main_ready()) result ^= 0x0004;
-	if (m_jsa->main_to_sound_ready()) result ^= 0x0008;
 	result ^= 0x0010;
 	return result;
 }
@@ -114,8 +112,8 @@ static INPUT_PORTS_START( vindictr )
 	PORT_START("260010")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)

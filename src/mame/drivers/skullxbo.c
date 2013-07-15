@@ -78,22 +78,6 @@ MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
 
 /*************************************
  *
- *  I/O read dispatch.
- *
- *************************************/
-
-READ16_MEMBER(skullxbo_state::special_port1_r)
-{
-	int temp = ioport("FF5802")->read();
-	if (m_jsa->main_to_sound_ready()) temp ^= 0x0040;
-	if (get_hblank(*machine().primary_screen)) temp ^= 0x0010;
-	return temp;
-}
-
-
-
-/*************************************
- *
  *  Who knows what this is?
  *
  *************************************/
@@ -133,7 +117,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, skullxbo_state )
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff5000, 0xff5001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0x00ff)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
-	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
+	AM_RANGE(0xff5802, 0xff5803) AM_READ_PORT("FF5802")
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ(eeprom_r)
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(playfield_latched_lsb_w) AM_SHARE("playfield")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(playfield_upper_w) AM_SHARE("playfield_up")
@@ -165,9 +149,9 @@ static INPUT_PORTS_START( skullxbo )
 
 	PORT_START("FF5802")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )  /* HBLANK */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )   /* /AUDBUSY */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  /* /AUDBUSY */
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)

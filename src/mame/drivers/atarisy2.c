@@ -335,12 +335,7 @@ void atarisy2_state::device_post_load()
 
 READ16_MEMBER(atarisy2_state::switch_r)
 {
-	int result = ioport("1800")->read() | (ioport("1801")->read() << 8);
-
-	if (m_soundcomm->main_to_sound_ready()) result ^= 0x20;
-	if (m_soundcomm->sound_to_main_ready()) result ^= 0x10;
-
-	return result;
+	return ioport("1800")->read() | (ioport("1801")->read() << 8);
 }
 
 
@@ -348,8 +343,6 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 {
 	int result = ioport("1840")->read();
 
-	if (m_soundcomm->main_to_sound_ready()) result |= 0x01;
-	if (m_soundcomm->sound_to_main_ready()) result |= 0x02;
 	if ((m_has_tms5220) && (machine().device<tms5220_device>("tms")->readyq_r() == 0))
 		result &= ~0x04;
 	if (!(ioport("1801")->read() & 0x80)) result |= 0x10;
@@ -830,8 +823,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( paperboy )
 	PORT_START("1840")  /*(sound) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
@@ -844,8 +837,8 @@ static INPUT_PORTS_START( paperboy )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 

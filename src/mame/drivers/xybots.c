@@ -54,8 +54,6 @@ MACHINE_RESET_MEMBER(xybots_state,xybots)
 READ16_MEMBER(xybots_state::special_port1_r)
 {
 	int result = ioport("FFE200")->read();
-
-	if (m_jsa->main_to_sound_ready()) result ^= 0x0200;
 	result ^= m_h256 ^= 0x0400;
 	return result;
 }
@@ -120,7 +118,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_START("FFE200")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )   /* /AUDBUSY */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")   /* /AUDBUSY */
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )  /* 256H */
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )

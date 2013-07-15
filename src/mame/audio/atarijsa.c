@@ -275,9 +275,9 @@ INPUT_PORTS_START( jsa_i_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    // speech chip ready
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )     // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_ii_ioports )
@@ -287,9 +287,9 @@ INPUT_PORTS_START( jsa_ii_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )     // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jsa_iii_ioports )
@@ -298,10 +298,10 @@ INPUT_PORTS_START( jsa_iii_ioports )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )    // self test
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )    // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )    // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )    // self test
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_jsa_base_device, main_test_read_line) // self test
 INPUT_PORTS_END
 
 
@@ -406,6 +406,17 @@ WRITE8_MEMBER( atari_jsa_base_device::ym2151_port_w )
 	m_ym2151_ct1 = (data >> 0) & 1;
 	m_ym2151_ct2 = (data >> 1) & 1;
 	update_all_volumes();
+}
+
+
+//-------------------------------------------------
+//  main_test_read_line: Return the state of the
+//	main's test line, provided by a callback
+//-------------------------------------------------
+
+READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
+{
+	return !m_test_read_cb();
 }
 
 
@@ -674,10 +685,6 @@ READ8_MEMBER( atari_jsa_i_device::rdio_r )
 	UINT8 result = ioport("JSAI")->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
-	if (m_soundcomm->main_to_sound_ready())
-		result ^= 0x40;
-	if (m_soundcomm->sound_to_main_ready())
-		result ^= 0x20;
 	if (m_tms5220 != NULL && m_tms5220->readyq_r() == 0)
 		result |= 0x10;
 	else
@@ -888,10 +895,6 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 	UINT8 result = ioport("JSAII")->read();
 	if (!m_test_read_cb())
 		result ^= 0x80;
-	if (m_soundcomm->main_to_sound_ready()) 
-		result ^= 0x40;
-	if (m_soundcomm->sound_to_main_ready()) 
-		result ^= 0x20;
 	
 	return result;
 }
@@ -960,10 +963,6 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 	UINT8 result = ioport("JSAIII")->read();
 	if (!m_test_read_cb())
 		result ^= 0x90;
-	if (m_soundcomm->main_to_sound_ready())
-		result ^= 0x40;
-	if (m_soundcomm->sound_to_main_ready())
-		result ^= 0x20;
 	return result;
 }
 

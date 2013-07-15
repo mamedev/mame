@@ -271,22 +271,6 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 
 /*************************************
  *
- *  Input handling
- *
- *************************************/
-
-READ32_MEMBER( beathead_state::input_2_r )
-{
-	int result = ioport("IN2")->read();
-	if (m_jsa->sound_to_main_ready()) result ^= 0x10;
-	if (m_jsa->main_to_sound_ready()) result ^= 0x20;
-	return result;
-}
-
-
-
-/*************************************
- *
  *  Sound communication
  *
  *************************************/
@@ -329,7 +313,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x41000204, 0x41000207) AM_READ_PORT("IN0")
 	AM_RANGE(0x41000208, 0x4100020f) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x41000220, 0x41000227) AM_WRITE(coin_count_w)
-	AM_RANGE(0x41000300, 0x41000303) AM_READ(input_2_r)
+	AM_RANGE(0x41000300, 0x41000303) AM_READ_PORT("IN2")
 	AM_RANGE(0x41000304, 0x41000307) AM_READ_PORT("IN3")
 	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_SHARE("palette_select")
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
@@ -379,8 +363,8 @@ static INPUT_PORTS_START( beathead )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 

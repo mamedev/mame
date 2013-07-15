@@ -785,17 +785,6 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 
 //-------------------------------------------------
-//  vblank_port_read - custom port handler to
-//  return a VBLANK state
-//-------------------------------------------------
-
-int screen_device::vblank_port_read()
-{
-	return vblank() ? -1 : 0;
-}
-
-
-//-------------------------------------------------
 //  vblank_begin - call any external callbacks to
 //  signal the VBLANK period has begun
 //-------------------------------------------------

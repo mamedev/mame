@@ -26,7 +26,6 @@ public:
 	virtual void update_interrupts();
 	DECLARE_READ16_MEMBER(offtwall_atarivc_r);
 	DECLARE_WRITE16_MEMBER(offtwall_atarivc_w);
-	DECLARE_READ16_MEMBER(special_port3_r);
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_READ16_MEMBER(bankswitch_r);
 	DECLARE_READ16_MEMBER(bankrom_r);

@@ -88,6 +88,18 @@ extern const device_type ATARI_JSA_IIIS;
 
 
 //**************************************************************************
+//  I/O PORT BIT HELPERS
+//**************************************************************************
+
+#define PORT_ATARI_JSA_SOUND_TO_MAIN_READY(_tag) \
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, sound_to_main_ready)
+
+#define PORT_ATARI_JSA_MAIN_TO_SOUND_READY(_tag) \
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, main_to_sound_ready)
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -107,8 +119,8 @@ public:
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
-	bool main_to_sound_ready() const { return m_soundcomm->main_to_sound_ready(); }
-	bool sound_to_main_ready() const { return m_soundcomm->sound_to_main_ready(); }
+	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_soundcomm->main_to_sound_ready(); }
+	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
 	DECLARE_WRITE8_MEMBER(main_command_w);
@@ -116,10 +128,11 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( ym2151_port_w );
+	DECLARE_WRITE8_MEMBER(ym2151_port_w);
+	DECLARE_READ_LINE_MEMBER(main_test_read_line);
 
 	// I/O lines
-	DECLARE_WRITE_LINE_MEMBER( main_int_write_line );
+	DECLARE_WRITE_LINE_MEMBER(main_int_write_line);
 
 protected:
 	// device-level overrides

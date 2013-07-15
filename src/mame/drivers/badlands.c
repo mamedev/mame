@@ -300,8 +300,6 @@ READ8_MEMBER(badlands_state::audio_io_r)
 			*/
 			result = ioport("AUDIO")->read();
 			if (!(ioport("FE4000")->read() & 0x0080)) result ^= 0x90;
-			if (m_soundcomm->main_to_sound_ready()) result ^= 0x40;
-			if (m_soundcomm->sound_to_main_ready()) result ^= 0x20;
 			result ^= 0x10;
 			break;
 
@@ -435,8 +433,8 @@ static INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* response buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* command buffer full */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")   /* response buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")    /* command buffer full */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
 
 	PORT_START("PEDALS")    /* fake for pedals */

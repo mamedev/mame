@@ -72,22 +72,6 @@ WRITE16_MEMBER(toobin_state::interrupt_scan_w)
 
 /*************************************
  *
- *  I/O read dispatch
- *
- *************************************/
-
-READ16_MEMBER(toobin_state::special_port1_r)
-{
-	int result = ioport("FF9000")->read();
-	if (get_hblank(*machine().primary_screen)) result ^= 0x8000;
-	if (m_jsa->main_to_sound_ready()) result ^= 0x2000;
-	return result;
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -112,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(toobin_xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(toobin_yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
-	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ(special_port1_r)
+	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
 	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffffff) AM_MIRROR(0x450000) AM_RAM
@@ -145,9 +129,9 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_HBLANK("screen")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 INPUT_PORTS_END
 
 
