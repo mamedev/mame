@@ -129,13 +129,6 @@ public:
 
 /*----------- defined in video/konamigx.c -----------*/
 
-// 2nd-Tier GX/MW Hardware Functions
-
-void K053936GP_set_offset(int chip, int xoffs, int yoffs);
-void K053936GP_clip_enable(int chip, int status);
-void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy);
-
-
 
 // 1st-Tier GX/MW Variables and Functions
 extern UINT8  konamigx_wrport1_0, konamigx_wrport1_1;
