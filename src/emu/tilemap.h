@@ -693,21 +693,6 @@ private:
 
 
 //**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-
-// ----- tilemap creation and configuration -----
-
-// create a new tilemap; note that tilemaps are tracked by the core so there is no dispose
-inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
-{ return &machine.tilemap().create(tilemap_get_info_delegate(tile_get_info, "", &machine), tilemap_mapper_delegate(mapper, "", &machine), tilewidth, tileheight, cols, rows); }
-
-inline tilemap_t *tilemap_create(running_machine &machine, tile_get_info_func tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows)
-{ return &machine.tilemap().create(tilemap_get_info_delegate(tile_get_info, "", &machine), mapper, tilewidth, tileheight, cols, rows); }
-
-
-//**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
 

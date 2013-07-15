@@ -31,6 +31,7 @@
 
 #include "emu.h"
 #include "video/ygv608.h"
+#include "tilelgcy.h"
 
 #define _ENABLE_SPRITES
 #define _ENABLE_SCROLLX

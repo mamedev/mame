@@ -95,6 +95,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"
 #include "rendlay.h"
+#include "tilelgcy.h"
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1

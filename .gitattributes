@@ -1791,6 +1791,7 @@ src/emu/speaker.c svneol=native#text/plain
 src/emu/speaker.h svneol=native#text/plain
 src/emu/sprite.c svneol=native#text/plain
 src/emu/sprite.h svneol=native#text/plain
+src/emu/tilelgcy.h svneol=native#text/plain
 src/emu/tilemap.c svneol=native#text/plain
 src/emu/tilemap.h svneol=native#text/plain
 src/emu/timer.c svneol=native#text/plain
