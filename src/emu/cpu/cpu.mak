@@ -1993,6 +1993,22 @@ $(CPUOBJ)/tms32051/tms32051.o:  $(CPUSRC)/tms32051/tms32051.c \
 
 
 #-------------------------------------------------
+# Texas Instruments TMS3208x DSP
+#@src/emu/cpu/tms32082/tms32082.h,CPUS += TMS32082_MP
+#-------------------------------------------------
+
+ifneq ($(filter TMS32082,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tms32082
+CPUOBJS += $(CPUOBJ)/tms32082/tms32082.o
+DASMOBJS += $(CPUOBJ)/tms32082/dis32082.o
+endif
+
+$(CPUOBJ)/tms32082/tms32082.o:  $(CPUSRC)/tms32082/tms32082.c \
+								$(CPUSRC)/tms32082/tms32082.h
+
+
+
+#-------------------------------------------------
 # Texas Instruments TMS57002 DSP
 #@src/emu/cpu/tms57002/tms57002.h,CPUS += TMS57002
 #-------------------------------------------------
