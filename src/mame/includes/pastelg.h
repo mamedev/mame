@@ -44,7 +44,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
-	DECLARE_DRIVER_INIT(pastelg);
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

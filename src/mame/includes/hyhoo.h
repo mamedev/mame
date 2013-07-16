@@ -32,8 +32,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-	DECLARE_DRIVER_INIT(hyhoo2);
-	DECLARE_DRIVER_INIT(hyhoo);
 	virtual void video_start();
 	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();

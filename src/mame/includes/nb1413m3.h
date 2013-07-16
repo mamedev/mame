@@ -118,12 +118,21 @@ enum {
 	NB1413M3_PAIRSTEN
 };
 
+#define MCFG_NB1413M3_TYPE(_type) \
+	nb1413m3_device::set_type(*device, _type);
+
+// TODO: Move this to m_nb1413m3_type
+extern int nb1413m3_type;
+
 class nb1413m3_device : public device_t
 {
 public:
 	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nb1413m3_device() {}
-	
+
+	// (static) configuration helpers
+	static void set_type(device_t &device, int type) { downcast<nb1413m3_device &>(device).m_nb1413m3_type = type; nb1413m3_type = type; }
+
 	DECLARE_WRITE8_MEMBER( nmi_clock_w );
 	DECLARE_READ8_MEMBER( sndrom_r );
 	DECLARE_WRITE8_MEMBER( sndrombank1_w );
@@ -169,6 +178,7 @@ private:
 	int m_gfxradr_h;
 	int m_gfxrombank;
 	int m_outcoin_enable;
+	int m_nb1413m3_type;
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
@@ -178,8 +188,6 @@ private:
 INPUT_PORTS_EXTERN( nbmjcontrols );
 INPUT_PORTS_EXTERN( nbhf1_ctrl );
 INPUT_PORTS_EXTERN( nbhf2_ctrl );
-
-extern int nb1413m3_type;
 
 extern const device_type NB1413M3;
 

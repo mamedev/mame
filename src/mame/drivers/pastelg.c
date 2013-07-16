@@ -37,11 +37,6 @@ Memo:
 
 
 
-DRIVER_INIT_MEMBER(pastelg_state,pastelg)
-{
-	nb1413m3_type = NB1413M3_PASTELG;
-}
-
 READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
 	UINT8 *ROM = memregion("voice")->base();
@@ -417,6 +412,8 @@ static MACHINE_CONFIG_START( pastelg, pastelg_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
 	MCFG_NB1413M3_ADD("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_PASTELG )
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -568,6 +565,6 @@ ROM_END
 
 
 
-GAME( 1985, pastelg, 0,   pastelg, pastelg, pastelg_state, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
-GAME( 1985, 3ds,     0,   threeds, threeds, pastelg_state, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )
-GAME( 1985, galds,   3ds, threeds, galds, pastelg_state,   pastelg, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", 0 )
+GAME( 1985, pastelg, 0,   pastelg, pastelg, driver_device, 0, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
+GAME( 1985, 3ds,     0,   threeds, threeds, driver_device, 0, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )
+GAME( 1985, galds,   3ds, threeds, galds,   driver_device, 0, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", 0 )

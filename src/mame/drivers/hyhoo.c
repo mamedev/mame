@@ -29,17 +29,6 @@ Memo:
 #include "machine/nvram.h"
 
 
-DRIVER_INIT_MEMBER(hyhoo_state,hyhoo)
-{
-	nb1413m3_type = NB1413M3_HYHOO;
-}
-
-DRIVER_INIT_MEMBER(hyhoo_state,hyhoo2)
-{
-	nb1413m3_type = NB1413M3_HYHOO2;
-}
-
-
 static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8, hyhoo_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
@@ -261,6 +250,7 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyhoo_state, screen_update_hyhoo)
 	
 	MCFG_NB1413M3_ADD("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO )
 
 
 	/* sound hardware */
@@ -271,6 +261,12 @@ static MACHINE_CONFIG_START( hyhoo, hyhoo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( hyhoo2, hyhoo )
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO2 )
 MACHINE_CONFIG_END
 
 
@@ -317,5 +313,5 @@ ROM_START( hyhoo2 )
 ROM_END
 
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo, hyhoo_state,  hyhoo,  ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", 0 )
-GAME( 1987, hyhoo2, 0, hyhoo,  hyhoo2, hyhoo_state, hyhoo2, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", 0 )
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", 0 )
+GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, driver_device, 0, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", 0 )

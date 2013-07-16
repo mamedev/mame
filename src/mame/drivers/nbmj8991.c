@@ -66,59 +66,12 @@ void nbmj8991_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,pstadium)
-{
-	nb1413m3_type = NB1413M3_PSTADIUM;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,triplew1)
-{
-	nb1413m3_type = NB1413M3_TRIPLEW1;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,triplew2)
-{
-	nb1413m3_type = NB1413M3_TRIPLEW2;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,ntopstar)
-{
-	nb1413m3_type = NB1413M3_NTOPSTAR;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,mjlstory)
-{
-	nb1413m3_type = NB1413M3_MJLSTORY;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,vanilla)
-{
-	nb1413m3_type = NB1413M3_VANILLA;
-}
-
 DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
-
-	nb1413m3_type = NB1413M3_FINALBNY;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,qmhayaku)
-{
-	nb1413m3_type = NB1413M3_QMHAYAKU;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,galkoku)
-{
-	nb1413m3_type = NB1413M3_GALKOKU;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,hyouban)
-{
-	nb1413m3_type = NB1413M3_HYOUBAN;
 }
 
 DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
@@ -129,7 +82,6 @@ DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
-	nb1413m3_type = NB1413M3_GALKAIKA;
 }
 
 DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
@@ -140,7 +92,6 @@ DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
-	nb1413m3_type = NB1413M3_TOKYOGAL;
 }
 
 DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
@@ -151,32 +102,6 @@ DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
-	nb1413m3_type = NB1413M3_TOKIMBSJ;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,mcontest)
-{
-	nb1413m3_type = NB1413M3_MCONTEST;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,uchuuai)
-{
-	nb1413m3_type = NB1413M3_UCHUUAI;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,mjgottub)
-{
-	nb1413m3_type = NB1413M3_MJGOTTUB;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,av2mj1bb)
-{
-	nb1413m3_type = NB1413M3_AV2MJ1BB;
-}
-
-DRIVER_INIT_MEMBER(nbmj8991_state,av2mj2rg)
-{
-	nb1413m3_type = NB1413M3_AV2MJ2RG;
 }
 
 
@@ -1554,6 +1479,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( galkoku, nbmjdrv1 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_GALKOKU )
 MACHINE_CONFIG_END
 
 
@@ -1562,6 +1489,9 @@ static MACHINE_CONFIG_DERIVED( galkaika, nbmjdrv1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galkaika_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_GALKAIKA )
 MACHINE_CONFIG_END
 
 
@@ -1570,6 +1500,9 @@ static MACHINE_CONFIG_DERIVED( tokyogal, nbmjdrv1 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tokyogal_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_TOKYOGAL )
 MACHINE_CONFIG_END
 
 
@@ -1579,6 +1512,9 @@ static MACHINE_CONFIG_DERIVED( tokimbsj, nbmjdrv1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galkaika_map)
 
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_TOKIMBSJ )
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1586,12 +1522,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcontest, nbmjdrv1 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_MCONTEST )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( uchuuai, nbmjdrv1 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_UCHUUAI )
 MACHINE_CONFIG_END
 
 
@@ -1601,6 +1541,9 @@ static MACHINE_CONFIG_DERIVED( hyouban, nbmjdrv3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hyouban_io_map)
 
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_HYOUBAN )
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1608,6 +1551,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pstadium, nbmjdrv2 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_PSTADIUM )
 MACHINE_CONFIG_END
 
 
@@ -1616,6 +1561,9 @@ static MACHINE_CONFIG_DERIVED( triplew1, nbmjdrv2 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(triplew1_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_TRIPLEW1 )
 MACHINE_CONFIG_END
 
 
@@ -1624,12 +1572,17 @@ static MACHINE_CONFIG_DERIVED( triplew2, nbmjdrv2 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(triplew2_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_TRIPLEW2 )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ntopstar, nbmjdrv2 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_NTOPSTAR )
 MACHINE_CONFIG_END
 
 
@@ -1638,18 +1591,26 @@ static MACHINE_CONFIG_DERIVED( mjlstory, nbmjdrv2 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjlstory_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_MJLSTORY )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( vanilla, nbmjdrv2 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_VANILLA )
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( finalbny, nbmjdrv2 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_FINALBNY )
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1657,6 +1618,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( qmhayaku, nbmjdrv2 )
 
 	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_QMHAYAKU )
 MACHINE_CONFIG_END
 
 
@@ -1665,6 +1628,9 @@ static MACHINE_CONFIG_DERIVED( mjgottub, nbmjdrv2 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(triplew1_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_MJGOTTUB )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -1676,6 +1642,9 @@ static MACHINE_CONFIG_DERIVED( av2mj1bb, nbmjdrv2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(av2mj1bb_map)
 	MCFG_CPU_IO_MAP(av2mj1bb_io_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_AV2MJ1BB )
 MACHINE_CONFIG_END
 
 
@@ -1685,6 +1654,9 @@ static MACHINE_CONFIG_DERIVED( av2mj2rg, nbmjdrv2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(av2mj2rg_map)
 	MCFG_CPU_IO_MAP(av2mj1bb_io_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_AV2MJ2RG )
 MACHINE_CONFIG_END
 
 
@@ -2182,21 +2154,21 @@ ROM_START( av2mj2rg )
 ROM_END
 
 
-GAME( 1989, galkoku,  0,        galkoku,  galkoku, nbmj8991_state,  galkoku,  ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan)", 0 )
-GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban, nbmj8991_state,  hyouban,  ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume [BET] (Japan)", 0 )
+GAME( 1989, galkoku,  0,        galkoku,  galkoku,  driver_device,  0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan)", 0 )
+GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban,  driver_device,  0,        ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume [BET] (Japan)", 0 )
 GAME( 1989, galkaika, 0,        galkaika, galkaika, nbmj8991_state, galkaika, ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kaika (Japan)", 0 )
 GAME( 1989, tokyogal, 0,        tokyogal, tokyogal, nbmj8991_state, tokyogal, ROT180, "Nichibutsu", "Tokyo Gal Zukan (Japan)", 0 )
 GAME( 1989, tokimbsj, tokyogal, tokimbsj, tokimbsj, nbmj8991_state, tokimbsj, ROT180, "Nichibutsu", "Tokimeki Bishoujo [BET] (Japan)", 0 )
-GAME( 1989, mcontest, 0,        mcontest, mcontest, nbmj8991_state, mcontest, ROT180, "Nichibutsu", "Miss Mahjong Contest (Japan)", 0 )
-GAME( 1989, uchuuai,  0,        uchuuai,  uchuuai, nbmj8991_state,  uchuuai,  ROT180, "Nichibutsu", "Mahjong Uchuu yori Ai wo komete (Japan)", 0 )
-GAME( 1989, triplew1, 0,        triplew1, triplew1, nbmj8991_state, triplew1, ROT180, "Nichibutsu", "Mahjong Triple Wars (Japan)", 0 )
-GAME( 1990, pstadium, 0,        pstadium, pstadium, nbmj8991_state, pstadium, ROT180, "Nichibutsu", "Mahjong Panic Stadium (Japan)", 0 )
-GAME( 1990, triplew2, 0,        triplew2, triplew1, nbmj8991_state, triplew2, ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", 0 )
-GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, nbmj8991_state, ntopstar, ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", 0 )
-GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, nbmj8991_state, mjlstory, ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", 0 )
-GAME( 1991, vanilla,  0,        vanilla,  vanilla, nbmj8991_state,  vanilla,  ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", 0 )
+GAME( 1989, mcontest, 0,        mcontest, mcontest, driver_device,  0,        ROT180, "Nichibutsu", "Miss Mahjong Contest (Japan)", 0 )
+GAME( 1989, uchuuai,  0,        uchuuai,  uchuuai,  driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Uchuu yori Ai wo komete (Japan)", 0 )
+GAME( 1989, triplew1, 0,        triplew1, triplew1, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Triple Wars (Japan)", 0 )
+GAME( 1990, pstadium, 0,        pstadium, pstadium, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Panic Stadium (Japan)", 0 )
+GAME( 1990, triplew2, 0,        triplew2, triplew1, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", 0 )
+GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", 0 )
+GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", 0 )
+GAME( 1991, vanilla,  0,        vanilla,  vanilla,  driver_device,  0,        ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", 0 )
 GAME( 1991, finalbny, vanilla,  finalbny, finalbny, nbmj8991_state, finalbny, ROT180, "Nichibutsu", "Mahjong Final Bunny [BET] (Japan)", 0 )
-GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, nbmj8991_state, qmhayaku, ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", 0 )
-GAME( 1991, mjgottub, 0,        mjgottub, mjgottub, nbmj8991_state, mjgottub, ROT180, "Nichibutsu", "Medal Mahjong Gottsu ee-kanji [BET] (Japan)", 0 )
-GAME( 1991, av2mj1bb, 0,        av2mj1bb, av2mj1bb, nbmj8991_state, av2mj1bb, ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.1 Bay Bridge no Seijo (Japan)", GAME_NOT_WORKING )
-GAME( 1991, av2mj2rg, 0,        av2mj2rg, av2mj2rg, nbmj8991_state, av2mj2rg, ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.2 Rouge no Kaori (Japan)", GAME_NOT_WORKING )
+GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, driver_device,  0,        ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", 0 )
+GAME( 1991, mjgottub, 0,        mjgottub, mjgottub, driver_device,  0,        ROT180, "Nichibutsu", "Medal Mahjong Gottsu ee-kanji [BET] (Japan)", 0 )
+GAME( 1991, av2mj1bb, 0,        av2mj1bb, av2mj1bb, driver_device,  0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.1 Bay Bridge no Seijo (Japan)", GAME_NOT_WORKING )
+GAME( 1991, av2mj2rg, 0,        av2mj2rg, av2mj2rg, driver_device,  0,        ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.2 Rouge no Kaori (Japan)", GAME_NOT_WORKING )

@@ -61,6 +61,7 @@ void nb1413m3_device::device_start()
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nb1413m3_device::timer_callback), this));
 	
 	save_item(NAME(nb1413m3_type));
+	save_item(NAME(m_nb1413m3_type));
 	save_item(NAME(m_sndrombank1));
 	save_item(NAME(m_sndrombank2));
 	save_item(NAME(m_busyctr));

@@ -58,8 +58,6 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 	ROM[0x025c] = 0x00;
 	ROM[0x025d] = 0x00;
 #endif
-
-	nb1413m3_type = NB1413M3_OHPAIPEE;
 }
 
 DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
@@ -88,8 +86,6 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 //  ROM[0x025c] = 0x00;
 //  ROM[0x025d] = 0x00;
 #endif
-
-	nb1413m3_type = NB1413M3_TOGENKYO;
 }
 
 
@@ -310,6 +306,7 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_OHPAIPEE )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -336,6 +333,9 @@ static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
+
+	MCFG_DEVICE_MODIFY("nb1413m3")
+	MCFG_NB1413M3_TYPE( NB1413M3_TOGENKYO )
 MACHINE_CONFIG_END
 
 
