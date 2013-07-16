@@ -135,6 +135,14 @@ public:
 		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,
 		int color, int alpha, int drawmode, int zcode, int pri );
 
+	template<class _BitmapClass>
+	void k053247_draw_single_sprite( _BitmapClass &bitmap, const rectangle &cliprect,
+		int code, int offs,
+		int color,
+		/* bits only the non-gx implementation relies on */
+		int primask, int shadow, UINT8* drawmode_table, UINT8* shadowmode_table, int shdmask
+		);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

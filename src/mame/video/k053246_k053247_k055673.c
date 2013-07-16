@@ -348,33 +348,18 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 {
 #define NUM_SPRITES 256
 
-	/* sprites can be grouped up to 8x8. The draw order is
-	     0  1  4  5 16 17 20 21
-	     2  3  6  7 18 19 22 23
-	     8  9 12 13 24 25 28 29
-	    10 11 14 15 26 27 30 31
-	    32 33 36 37 48 49 52 53
-	    34 35 38 39 50 51 54 55
-	    40 41 44 45 56 57 60 61
-	    42 43 46 47 58 59 62 63
-	*/
-	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+
+	int code, color, x, y, shadow, shdmask, count, temp, primask;
 
 	int sortedlist[NUM_SPRITES];
 	int offs,zcode;
-	int ox, oy, color, code, size, w, h, x, y, xa, ya, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, primask;
-	int shdmask, nozoom, count, temp;
+	 
 
-	int flipscreenx = m_kx46_regs[5] & 0x01;
-	int flipscreeny = m_kx46_regs[5] & 0x02;
-	int offx = (short)((m_kx46_regs[0] << 8) | m_kx46_regs[1]);
-	int offy = (short)((m_kx46_regs[2] << 8) | m_kx46_regs[3]);
 
-	int screen_width = m_screen->width();
+
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
-	UINT8 *whichtable;
+
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
@@ -438,9 +423,9 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 				sortedlist[count++] = offs;
 	}
 
-	w = count;
+	int w = count;
 	count--;
-	h = count;
+	int h = count;
 
 	if (!(m_kx47_regs[0xc / 2] & 0x10))
 	{
@@ -493,248 +478,10 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 		m_callback(machine(), &code, &color, &primask);
 
-		temp = m_ram[offs];
-
-		size = (temp & 0x0f00) >> 8;
-		w = 1 << (size & 0x03);
-		h = 1 << ((size >> 2) & 0x03);
-
-		/* the sprite can start at any point in the 8x8 grid. We have to */
-		/* adjust the offsets to draw it correctly. Simpsons does this all the time. */
-		xa = 0;
-		ya = 0;
-		if (code & 0x01) xa += 1;
-		if (code & 0x02) ya += 1;
-		if (code & 0x04) xa += 2;
-		if (code & 0x08) ya += 2;
-		if (code & 0x10) xa += 4;
-		if (code & 0x20) ya += 4;
-		code &= ~0x3f;
-
-		oy = (short)m_ram[offs + 2];
-		ox = (short)m_ram[offs + 3];
-
-		if (m_wraparound)
-		{
-			offx &= 0x3ff;
-			offy &= 0x3ff;
-			oy &= 0x3ff;
-			ox &= 0x3ff;
-		}
-
-		/* zoom control:
-		   0x40 = normal scale
-		  <0x40 enlarge (0x20 = double size)
-		  >0x40 reduce (0x80 = half size)
-		*/
-		y = zoomy = m_ram[offs + 4] & 0x3ff;
-		if (zoomy)
-			zoomy = (0x400000 + (zoomy >> 1)) / zoomy;
-		else
-			zoomy = 0x800000;
-
-		if (!(temp & 0x4000))
-		{
-			x = zoomx = m_ram[offs + 5] & 0x3ff;
-			if (zoomx)
-				zoomx = (0x400000 + (zoomx >> 1)) / zoomx;
-			else
-				zoomx = 0x800000;
-		}
-		else
-		{
-			zoomx = zoomy;
-			x = y;
-		}
-
-// ************************************************************************************
-//  for Escape Kids (GX975)
-// ************************************************************************************
-//    Escape Kids use 053246 #5 register's UNKNOWN Bit #5, #3 and #2.
-//    Bit #5, #3, #2 always set "1".
-//    Maybe, Bit #5 or #3 or #2 or combination means "FIX SPRITE WIDTH TO HALF" ?????
-//    Below 7 lines supports this 053246's(???) function.
-//    Don't rely on it, Please.  But, Escape Kids works correctly!
-// ************************************************************************************
-		if ( m_kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
-		{
-			zoomx >>= 1;        // Fix sprite width to HALF size
-			ox = (ox >> 1) + 1; // Fix sprite draw position
-			if (flipscreenx)
-				ox += screen_width;
-			nozoom = 0;
-		}
-		else
-			nozoom = (x == 0x40 && y == 0x40);
-
-		flipx = temp & 0x1000;
-		flipy = temp & 0x2000;
-		mirrorx = shadow & 0x4000;
-		if (mirrorx)
-			flipx = 0; // documented and confirmed
-		mirrory = shadow & 0x8000;
-
-		whichtable = drawmode_table;
-		if (color == -1)
-		{
-			// drop the entire sprite to shadow unconditionally
-			if (shdmask < 0) continue;
-			color = 0;
-			shadow = -1;
-			whichtable = shadowmode_table;
-			palette_set_shadow_mode(machine(), 0);
-		}
-		else
-		{
-			if (shdmask >= 0)
-			{
-				shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
-				if (shadow &= 3) palette_set_shadow_mode(machine(), (shadow - 1) & shdmask);
-			}
-			else
-				shadow = 0;
-		}
-
-		color &= 0xffff; // strip attribute flags
-
-		if (flipscreenx)
-		{
-			ox = -ox;
-			if (!mirrorx) flipx = !flipx;
-		}
-		if (flipscreeny)
-		{
-			oy = -oy;
-			if (!mirrory) flipy = !flipy;
-		}
-
-		// apply wrapping and global offsets
-		if (m_wraparound)
-		{
-			ox = ( ox - offx) & 0x3ff;
-			oy = (-oy - offy) & 0x3ff;
-			if (ox >= 0x300) ox -= 0x400;
-			if (oy >= 0x280) oy -= 0x400;
-		}
-		else
-		{
-			ox =  ox - offx;
-			oy = -oy - offy;
-		}
-		ox += m_dx;
-		oy -= m_dy;
-
-		// apply global and display window offsets
-
-		/* the coordinates given are for the *center* of the sprite */
-		ox -= (zoomx * w) >> 13;
-		oy -= (zoomy * h) >> 13;
-
-		drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-
-		for (y = 0; y < h; y++)
-		{
-			int sx, sy, zw, zh;
-
-			sy = oy + ((zoomy * y + (1 << 11)) >> 12);
-			zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
-
-			for (x = 0; x < w; x++)
-			{
-				int c, fx, fy;
-
-				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
-				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
-				c = code;
-				if (mirrorx)
-				{
-					if ((flipx == 0) ^ ((x << 1) < w))
-					{
-						/* mirror left/right */
-						c += xoffset[(w - 1 - x + xa) & 7];
-						fx = 1;
-					}
-					else
-					{
-						c += xoffset[(x + xa) & 7];
-						fx = 0;
-					}
-				}
-				else
-				{
-					if (flipx) c += xoffset[(w - 1 - x + xa) & 7];
-					else c += xoffset[(x + xa) & 7];
-					fx = flipx;
-				}
-				if (mirrory)
-				{
-					if ((flipy == 0) ^ ((y<<1) >= h))
-					{
-						/* mirror top/bottom */
-						c += yoffset[(h - 1 - y + ya) & 7];
-						fy = 1;
-					}
-					else
-					{
-						c += yoffset[(y + ya) & 7];
-						fy = 0;
-					}
-				}
-				else
-				{
-					if (flipy) c += yoffset[(h - 1 - y + ya) & 7];
-					else c += yoffset[(y + ya) & 7];
-					fy = flipy;
-				}
-
-				if (nozoom)
-				{
-					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							machine().priority_bitmap,primask,
-							whichtable,machine().shadow_table);
-				}
-				else
-				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							(zw << 16) >> 4,(zh << 16) >> 4,
-							machine().priority_bitmap,primask,
-							whichtable,machine().shadow_table);
-				}
-
-				if (mirrory && h == 1)  /* Simpsons shadows */
-				{
-					if (nozoom)
-					{
-						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
-								c,
-								color,
-								fx,!fy,
-								sx,sy,
-								machine().priority_bitmap,primask,
-								whichtable,machine().shadow_table);
-					}
-					else
-					{
-						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
-								c,
-								color,
-								fx,!fy,
-								sx,sy,
-								(zw << 16) >> 4,(zh << 16) >> 4,
-								machine().priority_bitmap,primask,
-								whichtable,machine().shadow_table);
-					}
-				}
-			} // end of X loop
-		} // end of Y loop
+		k053247_draw_single_sprite( bitmap, cliprect,
+									code, offs,
+									color,
+									primask, shadow, drawmode_table, shadowmode_table, shdmask);
 
 	} // end of sprite-list loop
 #undef NUM_SPRITES
@@ -1377,6 +1124,281 @@ void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, co
 					);
 		}
 	}
+}
+
+template<class _BitmapClass>
+void k053247_device::k053247_draw_single_sprite( _BitmapClass &bitmap, const rectangle &cliprect,
+												 int code, int offs,
+												 int color,
+												 /* bits only the non-gx implementation relies on */
+												 int primask, int shadow, UINT8* drawmode_table, UINT8* shadowmode_table, int shdmask
+												 )
+{
+	/* sprites can be grouped up to 8x8. The draw order is
+	     0  1  4  5 16 17 20 21
+	     2  3  6  7 18 19 22 23
+	     8  9 12 13 24 25 28 29
+	    10 11 14 15 26 27 30 31
+	    32 33 36 37 48 49 52 53
+	    34 35 38 39 50 51 54 55
+	    40 41 44 45 56 57 60 61
+	    42 43 46 47 58 59 62 63
+	*/
+	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+	int flipscreenx = m_kx46_regs[5] & 0x01;
+	int flipscreeny = m_kx46_regs[5] & 0x02;
+	int offx = (short)((m_kx46_regs[0] << 8) | m_kx46_regs[1]);
+	int offy = (short)((m_kx46_regs[2] << 8) | m_kx46_regs[3]);
+	int screen_width = m_screen->width();
+	UINT8 *whichtable;
+	int x,y;
+
+	int ox, oy, size, w, h, xa, ya, flipx, flipy, mirrorx, mirrory, zoomx, zoomy, nozoom;
+
+
+	int temp = m_ram[offs];
+
+	size = (temp & 0x0f00) >> 8;
+	w = 1 << (size & 0x03);
+	h = 1 << ((size >> 2) & 0x03);
+
+	/* the sprite can start at any point in the 8x8 grid. We have to */
+	/* adjust the offsets to draw it correctly. Simpsons does this all the time. */
+	xa = 0;
+	ya = 0;
+	if (code & 0x01) xa += 1;
+	if (code & 0x02) ya += 1;
+	if (code & 0x04) xa += 2;
+	if (code & 0x08) ya += 2;
+	if (code & 0x10) xa += 4;
+	if (code & 0x20) ya += 4;
+	code &= ~0x3f;
+
+	oy = (short)m_ram[offs + 2];
+	ox = (short)m_ram[offs + 3];
+
+	if (m_wraparound)
+	{
+		offx &= 0x3ff;
+		offy &= 0x3ff;
+		oy &= 0x3ff;
+		ox &= 0x3ff;
+	}
+
+	/* zoom control:
+		0x40 = normal scale
+		<0x40 enlarge (0x20 = double size)
+		>0x40 reduce (0x80 = half size)
+	*/
+	y = zoomy = m_ram[offs + 4] & 0x3ff;
+	if (zoomy)
+		zoomy = (0x400000 + (zoomy >> 1)) / zoomy;
+	else
+		zoomy = 0x800000;
+
+	if (!(temp & 0x4000))
+	{
+		x = zoomx = m_ram[offs + 5] & 0x3ff;
+		if (zoomx)
+			zoomx = (0x400000 + (zoomx >> 1)) / zoomx;
+		else
+			zoomx = 0x800000;
+	}
+	else
+	{
+		zoomx = zoomy;
+		x = y;
+	}
+
+// ************************************************************************************
+//  for Escape Kids (GX975)
+// ************************************************************************************
+//    Escape Kids use 053246 #5 register's UNKNOWN Bit #5, #3 and #2.
+//    Bit #5, #3, #2 always set "1".
+//    Maybe, Bit #5 or #3 or #2 or combination means "FIX SPRITE WIDTH TO HALF" ?????
+//    Below 7 lines supports this 053246's(???) function.
+//    Don't rely on it, Please.  But, Escape Kids works correctly!
+// ************************************************************************************
+	if ( m_kx46_regs[5] & 0x08 ) // Check only "Bit #3 is '1'?" (NOTE: good guess)
+	{
+		zoomx >>= 1;        // Fix sprite width to HALF size
+		ox = (ox >> 1) + 1; // Fix sprite draw position
+		if (flipscreenx)
+			ox += screen_width;
+		nozoom = 0;
+	}
+	else
+		nozoom = (x == 0x40 && y == 0x40);
+
+	flipx = temp & 0x1000;
+	flipy = temp & 0x2000;
+	mirrorx = shadow & 0x4000;
+	if (mirrorx)
+		flipx = 0; // documented and confirmed
+	mirrory = shadow & 0x8000;
+
+	whichtable = drawmode_table;
+	if (color == -1)
+	{
+		// drop the entire sprite to shadow unconditionally
+		if (shdmask < 0) return;
+		color = 0;
+		shadow = -1;
+		whichtable = shadowmode_table;
+		palette_set_shadow_mode(machine(), 0);
+	}
+	else
+	{
+		if (shdmask >= 0)
+		{
+			shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
+			if (shadow &= 3) palette_set_shadow_mode(machine(), (shadow - 1) & shdmask);
+		}
+		else
+			shadow = 0;
+	}
+
+	color &= 0xffff; // strip attribute flags
+
+	if (flipscreenx)
+	{
+		ox = -ox;
+		if (!mirrorx) flipx = !flipx;
+	}
+	if (flipscreeny)
+	{
+		oy = -oy;
+		if (!mirrory) flipy = !flipy;
+	}
+
+	// apply wrapping and global offsets
+	if (m_wraparound)
+	{
+		ox = ( ox - offx) & 0x3ff;
+		oy = (-oy - offy) & 0x3ff;
+		if (ox >= 0x300) ox -= 0x400;
+		if (oy >= 0x280) oy -= 0x400;
+	}
+	else
+	{
+		ox =  ox - offx;
+		oy = -oy - offy;
+	}
+	ox += m_dx;
+	oy -= m_dy;
+
+	// apply global and display window offsets
+
+	/* the coordinates given are for the *center* of the sprite */
+	ox -= (zoomx * w) >> 13;
+	oy -= (zoomy * h) >> 13;
+
+	drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
+	for (y = 0; y < h; y++)
+	{
+		int sx, sy, zw, zh;
+
+		sy = oy + ((zoomy * y + (1 << 11)) >> 12);
+		zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
+
+		for (x = 0; x < w; x++)
+		{
+			int c, fx, fy;
+
+			sx = ox + ((zoomx * x + (1 << 11)) >> 12);
+			zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
+			c = code;
+			if (mirrorx)
+			{
+				if ((flipx == 0) ^ ((x << 1) < w))
+				{
+					/* mirror left/right */
+					c += xoffset[(w - 1 - x + xa) & 7];
+					fx = 1;
+				}
+				else
+				{
+					c += xoffset[(x + xa) & 7];
+					fx = 0;
+				}
+			}
+			else
+			{
+				if (flipx) c += xoffset[(w - 1 - x + xa) & 7];
+				else c += xoffset[(x + xa) & 7];
+				fx = flipx;
+			}
+			if (mirrory)
+			{
+				if ((flipy == 0) ^ ((y<<1) >= h))
+				{
+					/* mirror top/bottom */
+					c += yoffset[(h - 1 - y + ya) & 7];
+					fy = 1;
+				}
+				else
+				{
+					c += yoffset[(y + ya) & 7];
+					fy = 0;
+				}
+			}
+			else
+			{
+				if (flipy) c += yoffset[(h - 1 - y + ya) & 7];
+				else c += yoffset[(y + ya) & 7];
+				fy = flipy;
+			}
+
+			if (nozoom)
+			{
+				pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+						c,
+						color,
+						fx,fy,
+						sx,sy,
+						machine().priority_bitmap,primask,
+						whichtable,machine().shadow_table);
+			}
+			else
+			{
+				pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+						c,
+						color,
+						fx,fy,
+						sx,sy,
+						(zw << 16) >> 4,(zh << 16) >> 4,
+						machine().priority_bitmap,primask,
+						whichtable,machine().shadow_table);
+			}
+
+			if (mirrory && h == 1)  /* Simpsons shadows */
+			{
+				if (nozoom)
+				{
+					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+							c,
+							color,
+							fx,!fy,
+							sx,sy,
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
+				}
+				else
+				{
+					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+							c,
+							color,
+							fx,!fy,
+							sx,sy,
+							(zw << 16) >> 4,(zh << 16) >> 4,
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
+				}
+			}
+		} // end of X loop
+	} // end of Y loop
 }
 
 /*****************************************************************************
