@@ -6,52 +6,45 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/ay8910.h"
-#include "sound/msm5205.h"
 #include "sound/discrete.h"
 #include "audio/irem.h"
-#include "devlegcy.h"
 
-struct irem_audio_state
+
+const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
+
+irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock, "irem_audio", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_port1(0),
+		m_port2(0)
 {
-	UINT8                m_port1;
-	UINT8                m_port2;
-
-	ay8910_device *m_ay1;
-	ay8910_device *m_ay2;
-	msm5205_device *m_adpcm1;
-	msm5205_device *m_adpcm2;
-};
-
-INLINE irem_audio_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == IREM_AUDIO);
-
-	return (irem_audio_state *)downcast<irem_audio_device *>(device)->token();
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-
-/*************************************
- *
- *  Sound board initialization
- *
- *************************************/
-
-static DEVICE_START( irem_audio )
+void irem_audio_device::device_config_complete()
 {
-	irem_audio_state *state = get_safe_token(device);
-	running_machine &machine = device->machine();
-
-	state->m_adpcm1 = machine.device<msm5205_device>("msm1");
-	state->m_adpcm2 = machine.device<msm5205_device>("msm2");
-	state->m_ay1 = machine.device<ay8910_device>("ay1");
-	state->m_ay2 = machine.device<ay8910_device>("ay2");
-
-	device->save_item(NAME(state->m_port1));
-	device->save_item(NAME(state->m_port2));
 }
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void irem_audio_device::device_start()
+{
+	m_adpcm1 = machine().device<msm5205_device>("msm1");
+	m_adpcm2 = machine().device<msm5205_device>("msm2");
+	m_ay1 = machine().device<ay8910_device>("ay1");
+	m_ay2 = machine().device<ay8910_device>("ay2");
+
+	save_item(NAME(m_port1));
+	save_item(NAME(m_port2));
+}
+
 
 
 
@@ -62,7 +55,7 @@ static DEVICE_START( irem_audio )
  *
  *************************************/
 
-WRITE8_HANDLER( irem_sound_cmd_w )
+WRITE8_MEMBER( irem_audio_device::cmd_w )
 {
 	driver_device *drvstate = space.machine().driver_data<driver_device>();
 	if ((data & 0x80) == 0)
@@ -79,40 +72,36 @@ WRITE8_HANDLER( irem_sound_cmd_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( m6803_port1_w )
+WRITE8_MEMBER( irem_audio_device::m6803_port1_w )
 {
-	irem_audio_state *state = get_safe_token(device);
-
-	state->m_port1 = data;
+	m_port1 = data;
 }
 
 
-static WRITE8_DEVICE_HANDLER( m6803_port2_w )
+WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
 {
-	irem_audio_state *state = get_safe_token(device);
-
 	/* write latch */
-	if ((state->m_port2 & 0x01) && !(data & 0x01))
+	if ((m_port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
-		if (state->m_port2 & 0x04)
+		if (m_port2 & 0x04)
 		{
 			/* PSG 0 or 1? */
-			if (state->m_port2 & 0x08)
-				state->m_ay1->address_w(space, 0, state->m_port1);
-			if (state->m_port2 & 0x10)
-				state->m_ay2->address_w(space, 0, state->m_port1);
+			if (m_port2 & 0x08)
+				m_ay1->address_w(space, 0, m_port1);
+			if (m_port2 & 0x10)
+				m_ay2->address_w(space, 0, m_port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
-			if (state->m_port2 & 0x08)
-				state->m_ay1->data_w(space, 0, state->m_port1);
-			if (state->m_port2 & 0x10)
-				state->m_ay2->data_w(space, 0, state->m_port1);
+			if (m_port2 & 0x08)
+				m_ay1->data_w(space, 0, m_port1);
+			if (m_port2 & 0x10)
+				m_ay2->data_w(space, 0, m_port1);
 		}
 	}
-	state->m_port2 = data;
+	m_port2 = data;
 }
 
 
@@ -123,20 +112,18 @@ static WRITE8_DEVICE_HANDLER( m6803_port2_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( m6803_port1_r )
+READ8_MEMBER( irem_audio_device::m6803_port1_r )
 {
-	irem_audio_state *state = get_safe_token(device);
-
 	/* PSG 0 or 1? */
-	if (state->m_port2 & 0x08)
-		return state->m_ay1->data_r(space, 0);
-	if (state->m_port2 & 0x10)
-		return state->m_ay2->data_r(space, 0);
+	if (m_port2 & 0x08)
+		return m_ay1->data_r(space, 0);
+	if (m_port2 & 0x10)
+		return m_ay2->data_r(space, 0);
 	return 0xff;
 }
 
 
-static READ8_DEVICE_HANDLER( m6803_port2_r )
+READ8_MEMBER( irem_audio_device::m6803_port2_r )
 {
 	return 0;
 }
@@ -149,23 +136,21 @@ static READ8_DEVICE_HANDLER( m6803_port2_r )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
+WRITE8_MEMBER( irem_audio_device::ay8910_0_portb_w )
 {
-	irem_audio_state *state = get_safe_token(device);
-
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
-	state->m_adpcm1->playmode_w((data >> 2) & 7);
-	if (state->m_adpcm2 != NULL)
-		state->m_adpcm2->playmode_w(((data >> 2) & 4) | 3); /* always in slave mode */
+	m_adpcm1->playmode_w((data >> 2) & 7);
+	if (m_adpcm2 != NULL)
+		m_adpcm2->playmode_w(((data >> 2) & 4) | 3); /* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
-	state->m_adpcm1->reset_w(data & 1);
-	if (state->m_adpcm2 != NULL)
-		state->m_adpcm2->reset_w(data & 2);
+	m_adpcm1->reset_w(data & 1);
+	if (m_adpcm2 != NULL)
+		m_adpcm2->reset_w(data & 2);
 }
 
 
-static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
+WRITE8_MEMBER( irem_audio_device::ay8910_1_porta_w )
 {
 #ifdef MAME_DEBUG
 	if (data & 0x0f) popmessage("analog sound %x",data&0x0f);
@@ -180,33 +165,29 @@ static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_irq_ack_w )
+WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
 {
 	space.machine().device("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
-static WRITE8_DEVICE_HANDLER( m52_adpcm_w )
+WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 {
-	irem_audio_state *state = get_safe_token(device);
-
 	if (offset & 1)
 	{
-		state->m_adpcm1->data_w(data);
+		m_adpcm1->data_w(data);
 	}
 	if (offset & 2)
 	{
-		if (state->m_adpcm2 != NULL)
-			state->m_adpcm2->data_w(data);
+		if (m_adpcm2 != NULL)
+			m_adpcm2->data_w(data);
 	}
 }
 
 
-static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
+WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
 {
-	irem_audio_state *state = get_safe_token(device);
-
-	msm5205_device *adpcm = (offset & 1) ? state->m_adpcm2 : state->m_adpcm1;
+	msm5205_device *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
 	if (adpcm != NULL)
 		adpcm->data_w(data);
 }
@@ -219,17 +200,15 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(device_t *device,int st)
+void irem_audio_device::adpcm_int(int st)
 {
-	msm5205_device *adpcm2 = device->machine().device<msm5205_device>("msm2");
-
-	device->machine().device("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("iremsound")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (adpcm2 != NULL)
+	if (m_adpcm2 != NULL)
 	{
-		adpcm2->vclk_w(1);
-		adpcm2->vclk_w(0);
+		m_adpcm2->vclk_w(1);
+		m_adpcm2->vclk_w(0);
 	}
 }
 
@@ -254,7 +233,7 @@ static const ay8910_interface irem_ay8910_interface_1 =
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("irem_audio", ay8910_0_portb_w)
+	DEVCB_DEVICE_MEMBER("irem_audio", irem_audio_device, ay8910_0_portb_w)
 };
 
 static const ay8910_interface irem_ay8910_interface_2 =
@@ -263,13 +242,13 @@ static const ay8910_interface irem_ay8910_interface_2 =
 	{470, 0, 0},
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay8910_1_porta_w),
+	DEVCB_DEVICE_MEMBER("irem_audio", irem_audio_device, ay8910_1_porta_w),
 	DEVCB_NULL
 };
 
 static const msm5205_interface irem_msm5205_interface_1 =
 {
-	DEVCB_LINE(adpcm_int),          /* interrupt function */
+	DEVCB_DEVICE_LINE_MEMBER("irem_audio", irem_audio_device, adpcm_int),          /* interrupt function */
 	MSM5205_S96_4B      /* default to 4KHz, but can be changed at run time */
 };
 
@@ -380,29 +359,29 @@ DISCRETE_SOUND_END
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
 static ADDRESS_MAP_START( m52_small_sound_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE_LEGACY("irem_audio", m52_adpcm_w)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE_LEGACY(sound_irq_ack_w)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE("irem_audio", irem_audio_device, m52_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m52_large_sound_map, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE_LEGACY("irem_audio", m52_adpcm_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE_LEGACY(sound_irq_ack_w)
+	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE("irem_audio", irem_audio_device, m52_adpcm_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /* complete address map verified from Kid Niki schematics */
 static ADDRESS_MAP_START( m62_sound_map, AS_PROGRAM, 8, driver_device )
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE_LEGACY(sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE_LEGACY("irem_audio", m62_adpcm_w)
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", irem_audio_device, sound_irq_ack_w)
+	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", irem_audio_device, m62_adpcm_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( irem_sound_portmap, AS_IO, 8, driver_device )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE_LEGACY("irem_audio", m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE_LEGACY("irem_audio", m6803_port2_r, m6803_port2_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE("irem_audio", irem_audio_device, m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE("irem_audio", irem_audio_device, m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 
@@ -486,40 +465,10 @@ MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 	MCFG_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_CONFIG_END
 
-const device_type IREM_AUDIO = &device_creator<irem_audio_device>;
-
-irem_audio_device::irem_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IREM_AUDIO, "Irem Audio", tag, owner, clock, "irem_audio", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(irem_audio_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void irem_audio_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void irem_audio_device::device_start()
-{
-	DEVICE_START_NAME( irem_audio )(this);
-}
-
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
 void irem_audio_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

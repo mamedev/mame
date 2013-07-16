@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kungfum_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battroad_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun2_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun3_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun4_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -298,7 +298,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kidniki_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( youjyudn_io_map, AS_IO, 8, m62_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
