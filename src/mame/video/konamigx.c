@@ -402,7 +402,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
-	int offx, offy;
 
 	struct GX_OBJ *objpool, *objptr;
 	int cltc_shdpri, /*prflp,*/ disp;
@@ -441,10 +440,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 	// cache global parameters
 	konamigx_precache_registers();
-
-	// get "display window" offsets
-	offx = (m_k055673->k053246_read_register(0)<<8 | m_k055673->k053246_read_register(1)) & 0x3ff;
-	offy = (m_k055673->k053246_read_register(2)<<8 | m_k055673->k053246_read_register(3)) & 0x3ff;
 
 	// init OBJSET2 and mixer parameters (see p.51 and chapter 7)
 	layerid[0] = 0; layerid[1] = 1; layerid[2] = 2; layerid[3] = 3; layerid[4] = 4; layerid[5] = 5;
@@ -725,7 +720,6 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 
 
 	konamigx_mixer_draw(machine,bitmap,cliprect,sub1,sub1flags,sub2,sub2flags,mixerflags,extra_bitmap,rushingheroes_hack,
-		offx, offy,
 		objpool,
 		objbuf,
 		nobj
@@ -899,7 +893,6 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 					
 					/* passed from above function */
-					int offx, int offy,
 					struct GX_OBJ *objpool,
 					int *objbuf,
 					int nobj
@@ -949,7 +942,7 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 			}
 
 
-			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth, offx, offy,
+			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth,
 													color, alpha, drawmode, zcode, pri );
 		}
 		/* the rest are tilemaps of various kinda */
