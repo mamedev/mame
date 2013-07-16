@@ -48,7 +48,6 @@ TODO:
 #include "sound/3812intf.h"
 #include "includes/nbmj8891.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
