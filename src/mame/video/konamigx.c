@@ -76,7 +76,6 @@ UINT8  konamigx_wrport1_0, konamigx_wrport1_1;
 UINT16 konamigx_wrport2;
 
 // frequently used registers
-static int k053246_objset1;
 static int k053247_vrcbk[4];
 static int k053247_coreg, k053247_coregshift, k053247_opset;
 static int opri, oinprion;
@@ -90,8 +89,6 @@ void konamigx_state::konamigx_precache_registers(void)
 	static const int coregmasks[5] = {0xf,0xe,0xc,0x8,0x0};
 	static const int coregshifts[5]= {4,5,6,7,8};
 	int i;
-
-	k053246_objset1 = m_k055673->k053246_read_register(5);
 
 	i = m_k055673->k053247_read_register(0x8/2);
 	k053247_vrcbk[0] = (i & 0x000f) << 14;
@@ -608,6 +605,7 @@ void konamigx_state::konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitm
 			shadow = k>>10 & 3;
 			if (shadow) // object has shadow?
 			{
+				int k053246_objset1 = m_k055673->k053246_read_register(5);
 				if (shadow != 1 || k053246_objset1 & 0x20)
 				{
 					shadow--;
@@ -903,7 +901,6 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 
 
 	// traverse draw list
-	int screenwidth = machine.primary_screen->width();
 	int	disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	for (int count=0; count<nobj; count++)
@@ -942,8 +939,8 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 			}
 
 
-			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs, k053246_objset1, screenwidth,
-													color, alpha, drawmode, zcode, pri );
+			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect, gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs,
+				color, alpha, drawmode, zcode, pri );
 		}
 		/* the rest are tilemaps of various kinda */
 		else

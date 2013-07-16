@@ -1211,7 +1211,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 
 void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,  int k053246_objset1, int screenwidth,
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,
 		int color, int alpha, int drawmode, int zcode, int pri )
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
@@ -1257,9 +1257,12 @@ void k053247_device::k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, co
 	if (mirrorx) flipx = 0; // only applies to x mirror, proven
 	mirrory = temp & 0x8000;
 
+	int objset1 = k053246_read_register(5);
 	// for Escape Kids (GX975)
-	if ( k053246_objset1 & 8 ) // Check only "Bit #3 is '1'?"
+	if ( objset1 & 8 ) // Check only "Bit #3 is '1'?"
 	{
+		int screenwidth = machine().primary_screen->width();
+
 		zoomx = zoomx>>1; // Fix sprite width to HALF size
 		ox = (ox>>1) + 1; // Fix sprite draw position
 
