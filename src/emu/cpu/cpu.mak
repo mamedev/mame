@@ -1999,11 +1999,12 @@ $(CPUOBJ)/tms32051/tms32051.o:  $(CPUSRC)/tms32051/tms32051.c \
 
 ifneq ($(filter TMS32082,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms32082
-CPUOBJS += $(CPUOBJ)/tms32082/tms32082.o
+CPUOBJS += $(CPUOBJ)/tms32082/tms32082.o $(CPUOBJ)/tms32082/mp_ops.o
 DASMOBJS += $(CPUOBJ)/tms32082/dis32082.o
 endif
 
 $(CPUOBJ)/tms32082/tms32082.o:  $(CPUSRC)/tms32082/tms32082.c \
+								$(CPUSRC)/tms32082/mp_ops.c \
 								$(CPUSRC)/tms32082/tms32082.h
 
 

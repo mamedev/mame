@@ -86,10 +86,17 @@ protected:
 	UINT32 m_fetchpc;
 	UINT32 m_reg[32];
 	UINT64 m_acc[4];
+	UINT32 m_ir;
 
 	int m_icount;
 
 	address_space *m_program;
+	direct_read_data* m_direct;
+
+	UINT32 fetch();
+	void execute();
+	void execute_short_imm();
+	void execute_reg_long_imm();
 };
 
 extern const device_type TMS32082_MP;

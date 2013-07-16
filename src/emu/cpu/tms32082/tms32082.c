@@ -81,6 +81,9 @@ void tms32082_mp_device::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_pc).noshow();
 
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+
 	m_icountptr = &m_icount;
 }
 
@@ -110,11 +113,25 @@ void tms32082_mp_device::device_reset()
 	m_acc[3] = 0;
 }
 
+UINT32 tms32082_mp_device::fetch()
+{
+	UINT32 w = m_direct->read_decrypted_dword(m_fetchpc);
+	m_fetchpc += 4;
+	return w;
+}
+
 void tms32082_mp_device::execute_run()
 {
-	m_pc = m_fetchpc;
-	debugger_instruction_hook(this, m_pc);
+	while (m_icount > 0)
+	{
+		m_pc = m_fetchpc;
+		debugger_instruction_hook(this, m_pc);
 
-	m_icount = 0;
+		m_ir = fetch();
+		execute();
+
+		m_icount--;
+	};
+
 	return;
 }

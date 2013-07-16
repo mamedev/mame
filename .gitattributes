@@ -876,6 +876,7 @@ src/emu/cpu/tms32051/dis32051.c svneol=native#text/plain
 src/emu/cpu/tms32051/tms32051.c svneol=native#text/plain
 src/emu/cpu/tms32051/tms32051.h svneol=native#text/plain
 src/emu/cpu/tms32082/dis32082.c svneol=native#text/plain
+src/emu/cpu/tms32082/mp_ops.c svneol=native#text/plain
 src/emu/cpu/tms32082/tms32082.c svneol=native#text/plain
 src/emu/cpu/tms32082/tms32082.h svneol=native#text/plain
 src/emu/cpu/tms34010/34010dsm.c svneol=native#text/plain
