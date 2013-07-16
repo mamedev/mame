@@ -90,7 +90,7 @@ READ8_MEMBER(leland_state::cerberus_dial_1_r)
 
 READ8_MEMBER(leland_state::cerberus_dial_2_r)
 {
-	int original = ioport("IN0")->read();
+	int original = ioport("IN2")->read();
 	int modified = dial_compute_value(ioport("AN1")->read(), 1);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
