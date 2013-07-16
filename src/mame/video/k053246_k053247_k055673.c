@@ -1178,6 +1178,9 @@ void k053247_device::k053247_draw_single_sprite( _BitmapClass &bitmap, const rec
 	oy = (short)m_ram[offs + 2];
 	ox = (short)m_ram[offs + 3];
 
+
+
+
 	if (m_wraparound)
 	{
 		offx &= 0x3ff;
@@ -1428,122 +1431,9 @@ void k055673_device::device_start()
 	if (m_intf_gfx_num == -1)
 		return;
 
-	UINT32 total;
-	UINT8 *s1, *s2, *d;
-	long i;
-	UINT16 *k055673_rom;
-	int size4;
-
-	static const gfx_layout spritelayout =  /* System GX sprite layout */
-	{
-		16,16,
-		0,
-		5,
-		{ 32, 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 46, 47 },
-		{ 0, 10*8, 10*8*2, 10*8*3, 10*8*4, 10*8*5, 10*8*6, 10*8*7, 10*8*8,
-			10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
-		16*16*5
-	};
-	static const gfx_layout spritelayout2 = /* Run and Gun sprite layout */
-	{
-		16,16,
-		0,
-		4,
-		{ 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 32, 33, 34, 35, 36, 37, 38, 39 },
-		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
-		16*16*4
-	};
-	static const gfx_layout spritelayout3 = /* Lethal Enforcers II sprite layout */
-	{
-		16,16,
-		0,
-		8,
-		{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
-		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
-		{ 128*0, 128*1, 128*2,  128*3,  128*4,  128*5,  128*6,  128*7,
-			128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
-		128*16
-	};
-	static const gfx_layout spritelayout4 = /* System GX 6bpp sprite layout */
-	{
-		16,16,
-		0,
-		6,
-		{ 40, 32, 24, 16, 8, 0 },
-		{ 0, 1, 2, 3, 4, 5, 6, 7, 48, 49, 50, 51, 52, 53, 54, 55 },
-		{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7, 12*8*8,
-			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-		16*16*6
-	};
+	alt_k055673_vh_start(machine(), m_intf_gfx_memory_region, m_intf_plane_order, m_intf_dx, m_intf_dy, m_intf_callback);
 
 	m_screen = machine().device<screen_device>(m_intf_screen);
-
-	k055673_rom = (UINT16 *)machine().root_device().memregion(m_intf_gfx_memory_region)->base();
-
-	/* decode the graphics */
-	switch (m_intf_plane_order)  /* layout would be more correct than plane_order, but we use k053247_interface */
-	{
-	case K055673_LAYOUT_GX:
-		size4 = (machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (1024 * 1024)) / 5;
-		size4 *= 4 * 1024 * 1024;
-		/* set the # of tiles based on the 4bpp section */
-		k055673_rom = auto_alloc_array(machine(), UINT16, size4 * 5 / 2);
-		d = (UINT8 *)k055673_rom;
-		// now combine the graphics together to form 5bpp
-		s1 = machine().root_device().memregion(m_intf_gfx_memory_region)->base(); // 4bpp area
-		s2 = s1 + (size4);   // 1bpp area
-		for (i = 0; i < size4; i+= 4)
-		{
-			*d++ = *s1++;
-			*d++ = *s1++;
-			*d++ = *s1++;
-			*d++ = *s1++;
-			*d++ = *s2++;
-		}
-
-		total = size4 / 128;
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout, 4);
-		break;
-
-	case K055673_LAYOUT_RNG:
-		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 / 2);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout2, 4);
-		break;
-
-	case K055673_LAYOUT_LE2:
-		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout3, 4);
-		break;
-
-	case K055673_LAYOUT_GX6:
-		total = machine().root_device().memregion(m_intf_gfx_memory_region)->bytes() / (16 * 16 * 6 / 8);
-		konami_decode_gfx(machine(), m_intf_gfx_num, (UINT8 *)k055673_rom, total, &spritelayout4, 4);
-		break;
-
-	default:
-		fatalerror("Unsupported layout\n");
-	}
-
-	if (VERBOSE && !(machine().config().m_video_attributes & VIDEO_HAS_SHADOWS))
-		popmessage("driver should use VIDEO_HAS_SHADOWS");
-
-	m_dx = m_intf_dx;
-	m_dy = m_intf_dy;
-	m_memory_region = m_intf_gfx_memory_region;
-	m_gfx = machine().gfx[m_intf_gfx_num];
-	m_callback = m_intf_callback;
-
-	m_ram = auto_alloc_array(machine(), UINT16, 0x1000 / 2);
-
-	save_pointer(NAME(m_ram), 0x800);
-	save_item(NAME(m_kx46_regs));
-	save_item(NAME(m_kx47_regs));
-	save_item(NAME(m_objcha_line));
-	save_item(NAME(m_wraparound));
-	save_item(NAME(m_z_rejection));
-
 }
 
 //-------------------------------------------------
@@ -1856,6 +1746,7 @@ void k053247_device::alt_k055673_vh_start(running_machine &machine, const char *
 	m_callback = callback;
 	m_objcha_line = CLEAR_LINE;
 	m_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
+	m_screen = machine.primary_screen;
 
 	memset(m_ram,  0, 0x1000);
 	memset(m_kx46_regs, 0, 8);
