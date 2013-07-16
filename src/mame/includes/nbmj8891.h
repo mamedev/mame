@@ -1,3 +1,5 @@
+#include "includes/nb1413m3.h"
+
 class nbmj8891_state : public driver_device
 {
 public:
@@ -8,8 +10,12 @@ public:
 
 	nbmj8891_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_nb1413m3(*this, "nb1413m3")	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<nb1413m3_device> m_nb1413m3;
+	
 	int m_scrolly;
 	int m_blitter_destx;
 	int m_blitter_desty;
@@ -52,6 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj8891_scrolly_w);
 	DECLARE_WRITE8_MEMBER(nbmj8891_vramsel_w);
 	DECLARE_WRITE8_MEMBER(nbmj8891_romsel_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
 	DECLARE_DRIVER_INIT(pairsten);
 	DECLARE_DRIVER_INIT(scandalm);
 	DECLARE_DRIVER_INIT(mmaiko);
@@ -84,7 +92,6 @@ public:
 	void update_pixel0(int x, int y);
 	void update_pixel1(int x, int y);
 	void nbmj8891_gfxdraw();
-	required_device<cpu_device> m_maincpu;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

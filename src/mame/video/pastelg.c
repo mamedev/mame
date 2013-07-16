@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1413m3.h"
 #include "includes/pastelg.h"
 
 /******************************************************************************
@@ -105,7 +104,7 @@ WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 6);
 	m_palbank = ((data & 0x10) >> 4);
-	nb1413m3_sndrombank1_w(space, 0, data);
+	m_nb1413m3->sndrombank1_w(space, 0, data);
 
 	if ((m_gfxrom << 16) > (gfxlen - 1))
 	{
@@ -148,7 +147,7 @@ void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		nb1413m3_busyflag = 1;
+		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in pastelg_state::device_timer");
@@ -172,7 +171,7 @@ void pastelg_state::pastelg_gfxdraw()
 	int count;
 	UINT8 color;
 
-	nb1413m3_busyctr = 0;
+	m_nb1413m3->m_busyctr = 0;
 
 	startx = m_blitter_destx + m_blitter_sizex;
 	starty = m_blitter_desty + m_blitter_sizey;
@@ -268,15 +267,15 @@ void pastelg_state::pastelg_gfxdraw()
 				}
 			}
 
-			nb1413m3_busyctr++;
+			m_nb1413m3->m_busyctr++;
 			x += incx;
 		}
 
 		y += incy;
 	}
 
-	nb1413m3_busyflag = 0;
-	timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
+	m_nb1413m3->m_busyflag = 0;
+	timer_set(attotime::from_hz(400000) * m_nb1413m3->m_busyctr, TIMER_BLITTER);
 }
 
 /******************************************************************************

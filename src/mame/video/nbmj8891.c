@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1413m3.h"
 #include "includes/nbmj8891.h"
 
 
@@ -240,7 +239,7 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_scrolly_w)
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_vramsel_w)
 {
 	/* protection - not sure about this */
-	nb1413m3_sndromrgntag = (data & 0x20) ? "protection" : "voice";
+	m_nb1413m3->m_sndromrgntag = (data & 0x20) ? "protection" : "voice";
 
 	m_vram = data;
 }
@@ -309,7 +308,7 @@ void nbmj8891_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		nb1413m3_busyflag = 1;
+		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in nbmj8891_state::device_timer");
@@ -330,7 +329,7 @@ void nbmj8891_state::nbmj8891_gfxdraw()
 	UINT8 color, color1, color2;
 	int gfxaddr, gfxlen;
 
-	nb1413m3_busyctr = 0;
+	m_nb1413m3->m_busyctr = 0;
 
 	startx = m_blitter_destx + m_blitter_sizex;
 	starty = m_blitter_desty + m_blitter_sizey;
@@ -467,12 +466,12 @@ void nbmj8891_state::nbmj8891_gfxdraw()
 				}
 			}
 
-			nb1413m3_busyctr++;
+			m_nb1413m3->m_busyctr++;
 		}
 	}
 
-	nb1413m3_busyflag = 0;
-	timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
+	m_nb1413m3->m_busyflag = 0;
+	timer_set(attotime::from_hz(400000) * m_nb1413m3->m_busyctr, TIMER_BLITTER);
 }
 
 /******************************************************************************

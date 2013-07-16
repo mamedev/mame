@@ -1,11 +1,18 @@
+#include "includes/nb1413m3.h"
+
 class nbmj8991_state : public driver_device
 {
 public:
 	nbmj8991_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_nb1413m3(*this, "nb1413m3")	{ }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<nb1413m3_device> m_nb1413m3;
+	
 	int m_scrollx;
 	int m_scrolly;
 	int m_blitter_destx;
@@ -33,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nbmj8991_blitter_w);
 	DECLARE_READ8_MEMBER(nbmj8991_clut_r);
 	DECLARE_WRITE8_MEMBER(nbmj8991_clut_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_DRIVER_INIT(triplew1);
 	DECLARE_DRIVER_INIT(mjlstory);
 	DECLARE_DRIVER_INIT(mjgottub);
@@ -59,6 +67,4 @@ public:
 	void nbmj8991_vramflip();
 	void update_pixel(int x, int y);
 	void nbmj8991_gfxdraw();
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
 };

@@ -1,3 +1,5 @@
+#include "includes/nb1413m3.h"
+
 class nbmj8900_state : public driver_device
 {
 public:
@@ -8,7 +10,11 @@ public:
 
 	nbmj8900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_nb1413m3(*this, "nb1413m3")	{ }
+		
+	required_device<cpu_device> m_maincpu;
+	required_device<nb1413m3_device> m_nb1413m3;
 
 	int m_scrolly;
 	int m_blitter_destx;
@@ -55,8 +61,7 @@ public:
 	void update_pixel0(int x, int y);
 	void update_pixel1(int x, int y);
 	void nbmj8900_gfxdraw();
-	required_device<cpu_device> m_maincpu;
-
+	
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

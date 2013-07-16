@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1413m3.h"
 #include "includes/hyhoo.h"
 
 
@@ -16,9 +15,9 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 	switch (offset)
 	{
 		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
-					nb1413m3_gfxradr_l_w(space, 0, data); break;
+					m_nb1413m3->gfxradr_l_w(space, 0, data); break;
 		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
-					nb1413m3_gfxradr_h_w(space, 0, data); break;
+					m_nb1413m3->gfxradr_h_w(space, 0, data); break;
 		case 0x02:  m_blitter_destx = data; break;
 		case 0x03:  m_blitter_desty = data; break;
 		case 0x04:  m_blitter_sizex = data; break;
@@ -41,7 +40,7 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	m_highcolorflag = data;
-	nb1413m3_gfxrombank_w(space, 0, data);
+	m_nb1413m3->gfxrombank_w(space, 0, data);
 
 	if ((0x20000 * m_gfxrom) > (gfxlen - 1))
 	{
@@ -57,7 +56,7 @@ void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	switch (id)
 	{
 	case TIMER_BLITTER:
-		nb1413m3_busyflag = 1;
+		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in hyhoo_state::device_timer");
@@ -79,9 +78,9 @@ void hyhoo_state::hyhoo_gfxdraw()
 	int r, g, b;
 	pen_t pen;
 
-	nb1413m3_busyctr = 0;
+	m_nb1413m3->m_busyctr = 0;
 
-	m_gfxrom |= ((nb1413m3_sndrombank1 & 0x02) << 3);
+	m_gfxrom |= ((m_nb1413m3->m_sndrombank1 & 0x02) << 3);
 
 	startx = m_blitter_destx + m_blitter_sizex;
 	starty = m_blitter_desty + m_blitter_sizey;
@@ -215,12 +214,12 @@ void hyhoo_state::hyhoo_gfxdraw()
 				}
 			}
 
-			nb1413m3_busyctr++;
+			m_nb1413m3->m_busyctr++;
 		}
 	}
 
-	nb1413m3_busyflag = 0;
-	timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, TIMER_BLITTER);
+	m_nb1413m3->m_busyflag = 0;
+	timer_set(attotime::from_hz(400000) * m_nb1413m3->m_busyctr, TIMER_BLITTER);
 }
 
 

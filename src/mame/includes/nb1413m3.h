@@ -6,6 +6,14 @@
 
 ******************************************************************************/
 
+#define NB1413M3_VCR_NOP        0x00
+#define NB1413M3_VCR_POWER      0x01
+#define NB1413M3_VCR_STOP       0x02
+#define NB1413M3_VCR_REWIND     0x04
+#define NB1413M3_VCR_PLAY       0x08
+#define NB1413M3_VCR_FFORWARD   0x10
+#define NB1413M3_VCR_PAUSE      0x20
+
 enum {
 	NB1413M3_NONE = 0,
 	// unknown
@@ -110,41 +118,61 @@ enum {
 	NB1413M3_PAIRSTEN
 };
 
-#define NB1413M3_VCR_NOP        0x00
-#define NB1413M3_VCR_POWER      0x01
-#define NB1413M3_VCR_STOP       0x02
-#define NB1413M3_VCR_REWIND     0x04
-#define NB1413M3_VCR_PLAY       0x08
-#define NB1413M3_VCR_FFORWARD   0x10
-#define NB1413M3_VCR_PAUSE      0x20
+class nb1413m3_device : public device_t
+{
+public:
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~nb1413m3_device() {}
+	
+	DECLARE_WRITE8_MEMBER( nmi_clock_w );
+	DECLARE_READ8_MEMBER( sndrom_r );
+	DECLARE_WRITE8_MEMBER( sndrombank1_w );
+	DECLARE_WRITE8_MEMBER( sndrombank2_w );
+	DECLARE_READ8_MEMBER( gfxrom_r );
+	DECLARE_WRITE8_MEMBER( gfxrombank_w );
+	DECLARE_WRITE8_MEMBER( gfxradr_l_w );
+	DECLARE_WRITE8_MEMBER( gfxradr_h_w );
+	DECLARE_WRITE8_MEMBER( inputportsel_w );
+	DECLARE_READ8_MEMBER( inputport0_r );
+	DECLARE_READ8_MEMBER( inputport1_r );
+	DECLARE_READ8_MEMBER( inputport2_r );
+	DECLARE_READ8_MEMBER( inputport3_r );
+	DECLARE_READ8_MEMBER( dipsw1_r );
+	DECLARE_READ8_MEMBER( dipsw2_r );
+	DECLARE_READ8_MEMBER( dipsw3_l_r );
+	DECLARE_READ8_MEMBER( dipsw3_h_r );
+	DECLARE_WRITE8_MEMBER( outcoin_w );
+	DECLARE_WRITE8_MEMBER( vcrctrl_w );
+	
+	const char * m_sndromrgntag;
+	int m_sndrombank1;
+	int m_sndrombank2;
+	int m_busyctr;
+	int m_busyflag;
+	int m_outcoin_flag;
+	int m_inputport;
+	
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	
+private:
 
+	int m_74ls193_counter;
+	int m_nmi_count;          // for debug
+	int m_nmi_clock;
+	int m_nmi_enable;
+	int m_counter;
+	int m_gfxradr_l;
+	int m_gfxradr_h;
+	int m_gfxrombank;
+	int m_outcoin_enable;
 
-/*----------- defined in machine/nb1413m3.c -----------*/
+	TIMER_CALLBACK_MEMBER( timer_callback );
 
-MACHINE_START( nb1413m3 );
-MACHINE_RESET( nb1413m3 );
-DECLARE_WRITE8_HANDLER( nb1413m3_nmi_clock_w );
-INTERRUPT_GEN( nb1413m3_interrupt );
-DECLARE_READ8_HANDLER( nb1413m3_sndrom_r );
-DECLARE_WRITE8_HANDLER( nb1413m3_sndrombank1_w );
-DECLARE_WRITE8_HANDLER( nb1413m3_sndrombank2_w );
-DECLARE_READ8_HANDLER( nb1413m3_gfxrom_r );
-DECLARE_WRITE8_HANDLER( nb1413m3_gfxrombank_w );
-DECLARE_WRITE8_HANDLER( nb1413m3_gfxradr_l_w );
-DECLARE_WRITE8_HANDLER( nb1413m3_gfxradr_h_w );
-DECLARE_WRITE8_HANDLER( nb1413m3_inputportsel_w );
-DECLARE_READ8_HANDLER( nb1413m3_inputport0_r );
-DECLARE_READ8_HANDLER( nb1413m3_inputport1_r );
-DECLARE_READ8_HANDLER( nb1413m3_inputport2_r );
-DECLARE_READ8_HANDLER( nb1413m3_inputport3_r );
-DECLARE_READ8_HANDLER( nb1413m3_dipsw1_r );
-DECLARE_READ8_HANDLER( nb1413m3_dipsw2_r );
-DECLARE_READ8_HANDLER( nb1413m3_dipsw3_l_r );
-DECLARE_READ8_HANDLER( nb1413m3_dipsw3_h_r );
-DECLARE_WRITE8_HANDLER( nb1413m3_outcoin_w );
-DECLARE_WRITE8_HANDLER( nb1413m3_vcrctrl_w );
-CUSTOM_INPUT( nb1413m3_busyflag_r );
-CUSTOM_INPUT( nb1413m3_outcoin_flag_r );
+};
 
 /* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/
 INPUT_PORTS_EXTERN( nbmjcontrols );
@@ -152,9 +180,9 @@ INPUT_PORTS_EXTERN( nbhf1_ctrl );
 INPUT_PORTS_EXTERN( nbhf2_ctrl );
 
 extern int nb1413m3_type;
-extern const char * nb1413m3_sndromrgntag;
-extern int nb1413m3_sndrombank1;
-extern int nb1413m3_sndrombank2;
-extern int nb1413m3_busyctr;
-extern int nb1413m3_busyflag;
-extern int nb1413m3_inputport;
+
+extern const device_type NB1413M3;
+
+
+#define MCFG_NB1413M3_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NB1413M3, 0)

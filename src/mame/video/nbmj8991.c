@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/nb1413m3.h"
 #include "includes/nbmj8991.h"
 
 /******************************************************************************
@@ -166,7 +165,7 @@ void nbmj8991_state::update_pixel(int x, int y)
 
 TIMER_CALLBACK_MEMBER(nbmj8991_state::blitter_timer_callback)
 {
-	nb1413m3_busyflag = 1;
+	m_nb1413m3->m_busyflag = 1;
 }
 
 void nbmj8991_state::nbmj8991_gfxdraw()
@@ -183,7 +182,7 @@ void nbmj8991_state::nbmj8991_gfxdraw()
 	UINT8 color, color1, color2;
 	int gfxaddr, gfxlen;
 
-	nb1413m3_busyctr = 0;
+	m_nb1413m3->m_busyctr = 0;
 
 	if (m_blitter_direction_x)
 	{
@@ -266,12 +265,12 @@ void nbmj8991_state::nbmj8991_gfxdraw()
 				update_pixel(dx2, dy);
 			}
 
-			nb1413m3_busyctr++;
+			m_nb1413m3->m_busyctr++;
 		}
 	}
 
-	nb1413m3_busyflag = 0;
-	machine().scheduler().timer_set(attotime::from_nsec(1650) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8991_state::blitter_timer_callback),this));
+	m_nb1413m3->m_busyflag = 0;
+	machine().scheduler().timer_set(attotime::from_nsec(1650) * m_nb1413m3->m_busyctr, timer_expired_delegate(FUNC(nbmj8991_state::blitter_timer_callback),this));
 }
 
 /******************************************************************************
@@ -344,7 +343,7 @@ UINT32 nbmj8991_state::screen_update_nbmj8991_type2(screen_device &screen, bitma
 				update_pixel(x, y);
 	}
 
-	if (nb1413m3_inputport & 0x20)
+	if (m_nb1413m3->m_inputport & 0x20)
 	{
 		int scrollx, scrolly;
 

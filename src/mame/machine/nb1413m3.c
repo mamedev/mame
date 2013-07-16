@@ -17,92 +17,135 @@ Memo:
 
 #define NB1413M3_DEBUG  0
 
-
-int nb1413m3_type;
-const char * nb1413m3_sndromrgntag;
-int nb1413m3_sndrombank1;
-int nb1413m3_sndrombank2;
-int nb1413m3_busyctr;
-int nb1413m3_busyflag;
-int nb1413m3_inputport;
-
-static int nb1413m3_74ls193_counter;
-static int nb1413m3_nmi_count;          // for debug
-static int nb1413m3_nmi_clock;
-static int nb1413m3_nmi_enable;
-static int nb1413m3_counter;
-static int nb1413m3_gfxradr_l;
-static int nb1413m3_gfxradr_h;
-static int nb1413m3_gfxrombank;
-static int nb1413m3_outcoin_enable;
-static int nb1413m3_outcoin_flag;
-
-
 #define NB1413M3_TIMER_BASE 20000000
 
-/* TODO: is all of this actually programmable? */
-static TIMER_CALLBACK( nb1413m3_timer_callback )
+const device_type NB1413M3 = &device_creator<nb1413m3_device>;
+
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NB1413M3, "Nichibutsu NB1413M3", tag, owner, clock, "nb1413m3", __FILE__),
+	m_sndromrgntag("voice"),
+	m_sndrombank1(0),
+	m_sndrombank2(0),
+	m_busyctr(0),
+	m_busyflag(1),
+	m_outcoin_flag(1),
+	m_inputport(0xff),
+	m_74ls193_counter(0),
+	m_nmi_count(0),
+	m_nmi_clock(0),
+	m_nmi_enable(0),
+	m_counter(0),
+	m_gfxradr_l(0),
+	m_gfxradr_h(0),
+	m_gfxrombank(0),
+	m_outcoin_enable(0)
 {
-	machine.scheduler().timer_set(attotime::from_hz(NB1413M3_TIMER_BASE) * 256, FUNC(nb1413m3_timer_callback));
+}
 
-	nb1413m3_74ls193_counter++;
-	nb1413m3_74ls193_counter &= 0x0f;
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-	if (nb1413m3_74ls193_counter == 0x0f)
+void nb1413m3_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nb1413m3_device::device_start()
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nb1413m3_device::timer_callback), this));
+	
+	save_item(NAME(nb1413m3_type));
+	save_item(NAME(m_sndrombank1));
+	save_item(NAME(m_sndrombank2));
+	save_item(NAME(m_busyctr));
+	save_item(NAME(m_busyflag));
+	save_item(NAME(m_inputport));
+	save_item(NAME(m_74ls193_counter));
+	save_item(NAME(m_nmi_count));
+	save_item(NAME(m_nmi_clock));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_counter));
+	save_item(NAME(m_gfxradr_l));
+	save_item(NAME(m_gfxradr_h));
+	save_item(NAME(m_gfxrombank));
+	save_item(NAME(m_outcoin_enable));
+	save_item(NAME(m_outcoin_flag));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific startup
+//-------------------------------------------------
+
+void nb1413m3_device::device_reset()
+{
+	m_nmi_clock = 0;
+	m_nmi_enable = 0;
+	m_nmi_count = 0;
+	m_74ls193_counter = 0;
+	m_counter = 0;
+	m_sndromrgntag = "voice";
+	m_sndrombank1 = 0;
+	m_sndrombank2 = 0;
+	m_busyctr = 0;
+	m_busyflag = 1;
+	m_gfxradr_l = 0;
+	m_gfxradr_h = 0;
+	m_gfxrombank = 0;
+	m_inputport = 0xff;
+	m_outcoin_flag = 1;
+}
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+int nb1413m3_type;
+
+/* TODO: is all of this actually programmable? */
+TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
+{
+	machine().scheduler().timer_set(attotime::from_hz(NB1413M3_TIMER_BASE) * 256, timer_expired_delegate(FUNC(nb1413m3_device::timer_callback), this));
+
+	m_74ls193_counter++;
+	m_74ls193_counter &= 0x0f;
+
+	if (m_74ls193_counter == 0x0f)
 	{
-		if (nb1413m3_nmi_enable)
+		if (m_nmi_enable)
 		{
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			nb1413m3_nmi_count++;
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_nmi_count++;
 		}
 
 		switch (nb1413m3_type)
 		{
 			case NB1413M3_TAIWANMB:
-				nb1413m3_74ls193_counter = 0x05;
+				m_74ls193_counter = 0x05;
 				break;
 			case NB1413M3_OMOTESND:
-				nb1413m3_74ls193_counter = 0x05;
+				m_74ls193_counter = 0x05;
 				break;
 			case NB1413M3_PASTELG:
-				nb1413m3_74ls193_counter = 0x02;
+				m_74ls193_counter = 0x02;
 				break;
 			case NB1413M3_HYHOO:
 			case NB1413M3_HYHOO2:
-				nb1413m3_74ls193_counter = 0x05;
+				m_74ls193_counter = 0x05;
 				break;
 		}
 	}
 }
 
-MACHINE_START( nb1413m3 )
-{
-	machine.scheduler().synchronize(FUNC(nb1413m3_timer_callback));
-}
 
-MACHINE_RESET( nb1413m3 )
+WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
 {
-	nb1413m3_nmi_clock = 0;
-	nb1413m3_nmi_enable = 0;
-	nb1413m3_nmi_count = 0;
-	nb1413m3_74ls193_counter = 0;
-	nb1413m3_counter = 0;
-	nb1413m3_sndromrgntag = "voice";
-	nb1413m3_sndrombank1 = 0;
-	nb1413m3_sndrombank2 = 0;
-	nb1413m3_busyctr = 0;
-	nb1413m3_busyflag = 1;
-	nb1413m3_gfxradr_l = 0;
-	nb1413m3_gfxradr_h = 0;
-	nb1413m3_gfxrombank = 0;
-	nb1413m3_inputport = 0xff;
-	nb1413m3_outcoin_flag = 1;
-}
-
-
-WRITE8_HANDLER( nb1413m3_nmi_clock_w )
-{
-	nb1413m3_nmi_clock = data;
+	m_nmi_clock = data;
 
 	switch (nb1413m3_type)
 	{
@@ -130,34 +173,24 @@ WRITE8_HANDLER( nb1413m3_nmi_clock_w )
 		case NB1413M3_MMSIKAKU:
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
-			nb1413m3_nmi_clock -= 1;
+			m_nmi_clock -= 1;
 			break;
 #if 1
 		case NB1413M3_NIGHTLOV:
-			nb1413m3_nmi_enable = ((data & 0x08) >> 3);
-			nb1413m3_nmi_enable |= ((data & 0x01) ^ 0x01);
-			nb1413m3_nmi_clock -= 1;
+			m_nmi_enable = ((data & 0x08) >> 3);
+			m_nmi_enable |= ((data & 0x01) ^ 0x01);
+			m_nmi_clock -= 1;
 
-			nb1413m3_sndrombank1 = 1;
+			m_sndrombank1 = 1;
 			break;
 #endif
 	}
 
-	nb1413m3_74ls193_counter = ((nb1413m3_nmi_clock & 0xf0) >> 4);
+	m_74ls193_counter = ((m_nmi_clock & 0xf0) >> 4);
 
 }
 
-INTERRUPT_GEN( nb1413m3_interrupt )
-{
-	device->execute().set_input_line(0, HOLD_LINE);
-
-#if NB1413M3_DEBUG
-	popmessage("NMI SW:%01X CLOCK:%02X COUNT:%02X", nb1413m3_nmi_enable, nb1413m3_nmi_clock, nb1413m3_nmi_count);
-	nb1413m3_nmi_count = 0;
-#endif
-}
-
-READ8_HANDLER( nb1413m3_sndrom_r )
+READ8_MEMBER( nb1413m3_device::sndrom_r )
 {
 	int rombank;
 
@@ -177,11 +210,11 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_MMSIKAKU:
 		case NB1413M3_KORINAI:
 		case NB1413M3_KORINAIM:
-			rombank = (nb1413m3_sndrombank2 << 1) + (nb1413m3_sndrombank1 & 0x01);
+			rombank = (m_sndrombank2 << 1) + (m_sndrombank1 & 0x01);
 			break;
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
-			rombank = (nb1413m3_sndrombank1 & 0x01);
+			rombank = (m_sndrombank1 & 0x01);
 			break;
 		case NB1413M3_APPAREL:      // no samples
 		case NB1413M3_NIGHTLOV:     // 0-1
@@ -202,7 +235,7 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_MJCAMERA:     // 0 + 4-5 for protection
 		case NB1413M3_IDHIMITU:     // 0 + 4-5 for protection
 		case NB1413M3_KANATUEN:     // 0 + 6 for protection
-			rombank = nb1413m3_sndrombank1;
+			rombank = m_sndrombank1;
 			break;
 		case NB1413M3_TAIWANMB:
 		case NB1413M3_OMOTESND:
@@ -211,7 +244,7 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_MJFOCUSM:
 		case NB1413M3_BANANADR:
 			offset = (((offset & 0x7f00) >> 8) | ((offset & 0x0080) >> 0) | ((offset & 0x007f) << 8));
-			rombank = (nb1413m3_sndrombank1 >> 1);
+			rombank = (m_sndrombank1 >> 1);
 			break;
 		case NB1413M3_MMCAMERA:
 		case NB1413M3_MSJIKEN:
@@ -241,18 +274,18 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
 		default:
-			rombank = (nb1413m3_sndrombank1 >> 1);
+			rombank = (m_sndrombank1 >> 1);
 			break;
 	}
 
 	offset += 0x08000 * rombank;
 
 #if NB1413M3_DEBUG
-	popmessage("Sound ROM %02X:%05X [B1:%02X B2:%02X]", rombank, offset, nb1413m3_sndrombank1, nb1413m3_sndrombank2);
+	popmessage("Sound ROM %02X:%05X [B1:%02X B2:%02X]", rombank, offset, m_sndrombank1, m_sndrombank2);
 #endif
 
-	if (offset < space.machine().root_device().memregion(nb1413m3_sndromrgntag)->bytes())
-		return space.machine().root_device().memregion(nb1413m3_sndromrgntag)->base()[offset];
+	if (offset < space.machine().root_device().memregion(m_sndromrgntag)->bytes())
+		return space.machine().root_device().memregion(m_sndromrgntag)->base()[offset];
 	else
 	{
 		popmessage("read past sound ROM length (%05x[%02X])",offset, rombank);
@@ -260,75 +293,59 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 	}
 }
 
-WRITE8_HANDLER( nb1413m3_sndrombank1_w )
+WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
 {
 	// if (data & 0x02) coin counter ?
-	nb1413m3_outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
-	nb1413m3_nmi_enable = ((data & 0x20) >> 5);
-	nb1413m3_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
+	outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
+	m_nmi_enable = ((data & 0x20) >> 5);
+	m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
 
-WRITE8_HANDLER( nb1413m3_sndrombank2_w )
+WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
 {
-	nb1413m3_sndrombank2 = (data & 0x03);
+	m_sndrombank2 = (data & 0x03);
 }
 
-READ8_HANDLER( nb1413m3_gfxrom_r )
+READ8_MEMBER( nb1413m3_device::gfxrom_r )
 {
 	UINT8 *GFXROM = space.machine().root_device().memregion("gfx1")->base();
 
-	return GFXROM[(0x20000 * (nb1413m3_gfxrombank | ((nb1413m3_sndrombank1 & 0x02) << 3))) + ((0x0200 * nb1413m3_gfxradr_h) + (0x0002 * nb1413m3_gfxradr_l)) + (offset & 0x01)];
+	return GFXROM[(0x20000 * (m_gfxrombank | ((m_sndrombank1 & 0x02) << 3))) + ((0x0200 * m_gfxradr_h) + (0x0002 * m_gfxradr_l)) + (offset & 0x01)];
 }
 
-WRITE8_HANDLER( nb1413m3_gfxrombank_w )
+WRITE8_MEMBER( nb1413m3_device::gfxrombank_w )
 {
-	nb1413m3_gfxrombank = (((data & 0xc0) >> 4) + (data & 0x03));
+	m_gfxrombank = (((data & 0xc0) >> 4) + (data & 0x03));
 }
 
-WRITE8_HANDLER( nb1413m3_gfxradr_l_w )
+WRITE8_MEMBER( nb1413m3_device::gfxradr_l_w )
 {
-	nb1413m3_gfxradr_l = data;
+	m_gfxradr_l = data;
 }
 
-WRITE8_HANDLER( nb1413m3_gfxradr_h_w )
+WRITE8_MEMBER( nb1413m3_device::gfxradr_h_w )
 {
-	nb1413m3_gfxradr_h = data;
+	m_gfxradr_h = data;
 }
 
-WRITE8_HANDLER( nb1413m3_inputportsel_w )
+WRITE8_MEMBER( nb1413m3_device::inputportsel_w )
 {
-	nb1413m3_inputport = data;
+	m_inputport = data;
 }
 
-CUSTOM_INPUT( nb1413m3_busyflag_r )
+READ8_MEMBER( nb1413m3_device::inputport0_r )
 {
-	return nb1413m3_busyflag & 0x01;
+	return ((space.machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((m_outcoin_flag & 0x01) << 1));
 }
 
-
-/* 2008-08 FP:
- * In ALL games (but pastelg, hyhoo & hyhoo2) nb1413m3_outcoin_flag is read at inputport0.
- * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
- * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
- * or should they only check the flag at inputport3? */
-CUSTOM_INPUT( nb1413m3_outcoin_flag_r )
-{
-	return nb1413m3_outcoin_flag & 0x01;
-}
-
-READ8_HANDLER( nb1413m3_inputport0_r )
-{
-	return ((space.machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
-}
-
-READ8_HANDLER( nb1413m3_inputport1_r )
+READ8_MEMBER( nb1413m3_device::inputport1_r )
 {
 	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
+			switch ((m_inputport ^ 0xff) & 0x07)
 			{
 				case 0x01:  return root.ioport("IN0")->read();
 				case 0x02:  return root.ioport("IN1")->read();
@@ -340,7 +357,7 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		case NB1413M3_TELMAHJN:
 			if (root.ioport("DSWA")->read() & 0x80)
 			{
-				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
+				switch ((m_inputport ^ 0xff) & 0x1f)
 				{
 					case 0x01:  return root.ioport("KEY0")->read();
 					case 0x02:  return root.ioport("KEY1")->read();
@@ -359,7 +376,7 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		case NB1413M3_TOGENKYO:
 			return root.ioport("P1")->read();
 		default:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
+			switch ((m_inputport ^ 0xff) & 0x1f)
 			{
 				case 0x01:  return root.ioport("KEY0")->read();
 				case 0x02:  return root.ioport("KEY1")->read();
@@ -373,14 +390,14 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 	}
 }
 
-READ8_HANDLER( nb1413m3_inputport2_r )
+READ8_MEMBER( nb1413m3_device::inputport2_r )
 {
 	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
+			switch ((m_inputport ^ 0xff) & 0x07)
 			{
 				case 0x01:  return 0xff;
 				case 0x02:  return 0xff;
@@ -392,7 +409,7 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		case NB1413M3_TELMAHJN:
 			if (root.ioport("DSWA")->read() & 0x80)
 			{
-				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
+				switch ((m_inputport ^ 0xff) & 0x1f)
 				{
 					case 0x01:  return root.ioport("KEY5")->read();
 					case 0x02:  return root.ioport("KEY6")->read();
@@ -411,7 +428,7 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		case NB1413M3_TOGENKYO:
 			return root.ioport("P2")->read();
 		default:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
+			switch ((m_inputport ^ 0xff) & 0x1f)
 			{
 				case 0x01:  return root.ioport("KEY5")->read();
 				case 0x02:  return root.ioport("KEY6")->read();
@@ -425,7 +442,7 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 	}
 }
 
-READ8_HANDLER( nb1413m3_inputport3_r )
+READ8_MEMBER( nb1413m3_device::inputport3_r )
 {
 	switch (nb1413m3_type)
 	{
@@ -442,13 +459,13 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 		case NB1413M3_BANANADR:
 		case NB1413M3_FINALBNY:
 		case NB1413M3_MMSIKAKU:
-			return ((nb1413m3_outcoin_flag & 0x01) << 1);
+			return ((m_outcoin_flag & 0x01) << 1);
 		default:
 			return 0xff;
 	}
 }
 
-READ8_HANDLER( nb1413m3_dipsw1_r )
+READ8_MEMBER( nb1413m3_device::dipsw1_r )
 {
 	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
@@ -492,7 +509,7 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 	}
 }
 
-READ8_HANDLER( nb1413m3_dipsw2_r )
+READ8_MEMBER( nb1413m3_device::dipsw2_r )
 {
 	device_t &root = space.machine().root_device();
 	switch (nb1413m3_type)
@@ -536,21 +553,21 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 	}
 }
 
-READ8_HANDLER( nb1413m3_dipsw3_l_r )
+READ8_MEMBER( nb1413m3_device::dipsw3_l_r )
 {
 	return ((space.machine().root_device().ioport("DSWC")->read() & 0xf0) >> 4);
 }
 
-READ8_HANDLER( nb1413m3_dipsw3_h_r )
+READ8_MEMBER( nb1413m3_device::dipsw3_h_r )
 {
 	return ((space.machine().root_device().ioport("DSWC")->read() & 0x0f) >> 0);
 }
 
-WRITE8_HANDLER( nb1413m3_outcoin_w )
+WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 {
 	static int counter = 0;
 
-	nb1413m3_outcoin_enable = (data & 0x04) >> 2;
+	m_outcoin_enable = (data & 0x04) >> 2;
 
 	switch (nb1413m3_type)
 	{
@@ -571,11 +588,11 @@ WRITE8_HANDLER( nb1413m3_outcoin_w )
 		case NB1413M3_FINALBNY:
 		case NB1413M3_LOVEHOUS:
 		case NB1413M3_MMAIKO:
-			if (nb1413m3_outcoin_enable)
+			if (m_outcoin_enable)
 			{
 				if (counter++ == 2)
 				{
-					nb1413m3_outcoin_flag ^= 1;
+					m_outcoin_flag ^= 1;
 					counter = 0;
 				}
 			}
@@ -584,10 +601,10 @@ WRITE8_HANDLER( nb1413m3_outcoin_w )
 			break;
 	}
 
-	set_led_status(space.machine(), 2, nb1413m3_outcoin_flag);      // out coin
+	set_led_status(space.machine(), 2, m_outcoin_flag);      // out coin
 }
 
-WRITE8_HANDLER( nb1413m3_vcrctrl_w )
+WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
 {
 	if (data & 0x08)
 	{
