@@ -30,6 +30,7 @@
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
 #include "includes/micro3d.h"
+#include "scrlegcy.h"
 
 
 /*************************************

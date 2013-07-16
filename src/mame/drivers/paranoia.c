@@ -42,6 +42,7 @@ HuC6280A (Hudson)
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 class paranoia_state : public pce_common_state

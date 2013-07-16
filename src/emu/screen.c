@@ -210,7 +210,7 @@ void screen_device::static_set_default_position(device_t &device, double xscale,
 
 
 //-------------------------------------------------
-//  static_set_screen_update - set the legacy
+//  static_set_screen_update - set the legacy(?)
 //  screen update callback in the device
 //  configuration
 //-------------------------------------------------

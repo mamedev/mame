@@ -20,6 +20,7 @@
 #include "includes/aztarac.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "scrlegcy.h"
 
 
 

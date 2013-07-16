@@ -80,6 +80,7 @@
 #include "video/mc6845.h"
 #include "video/cgapal.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 #define VERBOSE_CGA 0       /* CGA (Color Graphics Adapter) */
 

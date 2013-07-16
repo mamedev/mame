@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/btoads.h"
+#include "scrlegcy.h"
 
 
 #define CPU_CLOCK           XTAL_64MHz

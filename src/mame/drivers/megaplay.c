@@ -55,6 +55,7 @@ Bugs:
 
 #include "includes/megadriv.h"
 #include "includes/segamsys.h"
+#include "scrlegcy.h"
 
 #define MASTER_CLOCK        53693100
 

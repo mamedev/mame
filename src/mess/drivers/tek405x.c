@@ -24,6 +24,7 @@
 
 
 #include "includes/tek405x.h"
+#include "scrlegcy.h"
 
 
 

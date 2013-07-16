@@ -329,6 +329,7 @@ Notes:
 #include "sound/dac.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
+#include "scrlegcy.h"
 
 
 /*************************************

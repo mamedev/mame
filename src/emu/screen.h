@@ -356,12 +356,9 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 #define SCREEN_UPDATE_NAME(name)        screen_update_##name
 #define SCREEN_UPDATE_IND16(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 #define SCREEN_UPDATE_RGB32(name)       UINT32 SCREEN_UPDATE_NAME(name)(device_t *, screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-#define SCREEN_UPDATE16_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
-#define SCREEN_UPDATE32_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
 
 #define SCREEN_VBLANK_NAME(name)        screen_vblank_##name
 #define SCREEN_VBLANK(name)             void SCREEN_VBLANK_NAME(name)(device_t *, screen_device &screen, bool vblank_on)
-#define SCREEN_VBLANK_CALL(name)        SCREEN_VBLANK_NAME(name)(NULL, screen, vblank_on)
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -384,16 +381,12 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy);
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
 	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs);
-#define MCFG_SCREEN_UPDATE_STATIC(_func) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_SCREEN_VBLANK_NONE() \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate());
-#define MCFG_SCREEN_VBLANK_STATIC(_func) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&screen_vblank_##_func, "screen_vblank_" #_func));
 #define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
 	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
@@ -410,16 +403,6 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 //  screen_update_delegate based on the input
 //  function type
 //-------------------------------------------------
-
-inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (*callback)(device_t *, screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-{
-	return screen_update_ind16_delegate(callback, name);
-}
-
-inline screen_update_rgb32_delegate screen_update_delegate_smart(UINT32 (*callback)(device_t *, screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
-{
-	return screen_update_rgb32_delegate(callback, name);
-}
 
 template<class _FunctionClass>
 inline screen_update_ind16_delegate screen_update_delegate_smart(UINT32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)

@@ -67,6 +67,7 @@
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
 #include "includes/exterm.h"
+#include "scrlegcy.h"
 
 
 

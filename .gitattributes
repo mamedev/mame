@@ -1530,6 +1530,7 @@ src/emu/schedule.c svneol=native#text/plain
 src/emu/schedule.h svneol=native#text/plain
 src/emu/screen.c svneol=native#text/plain
 src/emu/screen.h svneol=native#text/plain
+src/emu/scrlegcy.h svneol=native#text/plain
 src/emu/softlist.c svneol=native#text/plain
 src/emu/softlist.h svneol=native#text/plain
 src/emu/sound.c svneol=native#text/plain

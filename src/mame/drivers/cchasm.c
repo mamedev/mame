@@ -23,6 +23,7 @@
 #include "machine/z80ctc.h"
 #include "includes/cchasm.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
 

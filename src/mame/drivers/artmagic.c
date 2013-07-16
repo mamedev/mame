@@ -30,6 +30,7 @@
 #include "includes/artmagic.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "scrlegcy.h"
 
 
 #define MASTER_CLOCK_40MHz      (XTAL_40MHz)

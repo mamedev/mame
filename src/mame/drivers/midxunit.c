@@ -86,6 +86,7 @@ There's a separate sound board also, but it wasn't available so is not documente
 #include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midxunit.h"
+#include "scrlegcy.h"
 
 
 #define PIXEL_CLOCK     (8000000)

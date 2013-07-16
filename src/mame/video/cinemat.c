@@ -8,6 +8,7 @@
 #include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
 #include "includes/cinemat.h"
+#include "scrlegcy.h"
 
 
 /*************************************

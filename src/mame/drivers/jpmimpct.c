@@ -111,6 +111,7 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/i8255.h"
+#include "scrlegcy.h"
 
 /*************************************
  *

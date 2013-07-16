@@ -101,6 +101,7 @@ Optional (on expansion card) (Viper)
 #include "machine/nvram.h"
 #include "machine/bfm_comn.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"

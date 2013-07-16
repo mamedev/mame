@@ -18,6 +18,7 @@
 
 #include "includes/apollo.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 #include "apollo.lh"
 #include "apollo_15i.lh"

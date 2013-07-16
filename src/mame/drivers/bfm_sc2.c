@@ -172,6 +172,7 @@ Adder hardware:
 #include "drwho.lh"
 #include "machine/bfm_comn.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 class bfm_sc2_state : public driver_device

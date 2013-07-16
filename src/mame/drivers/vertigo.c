@@ -19,6 +19,7 @@
 #include "audio/exidy440.h"
 #include "includes/vertigo.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 

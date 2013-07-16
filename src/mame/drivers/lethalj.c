@@ -143,6 +143,7 @@ Pin #11(+) | | R               |
 #include "includes/lethalj.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "scrlegcy.h"
 
 
 #define MASTER_CLOCK            XTAL_40MHz

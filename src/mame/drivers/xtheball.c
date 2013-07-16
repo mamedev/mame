@@ -12,6 +12,7 @@
 #include "machine/ticket.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "scrlegcy.h"
 
 
 class xtheball_state : public driver_device

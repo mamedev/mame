@@ -91,6 +91,7 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
+#include "scrlegcy.h"
 
 
 #define PIXEL_CLOCK     (8000000)

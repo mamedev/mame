@@ -31,6 +31,7 @@
 #include "sound/dac.h"
 #include "machine/nvram.h"
 #include "includes/coolpool.h"
+#include "scrlegcy.h"
 
 
 

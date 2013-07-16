@@ -98,6 +98,7 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "video/vdc.h"
 #include "sound/discrete.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 class uapce_state : public pce_common_state

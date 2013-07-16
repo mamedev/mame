@@ -22,6 +22,7 @@
 #include "sound/pokey.h"
 #include "video/gtia.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 class bartop52_state : public driver_device

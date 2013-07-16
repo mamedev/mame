@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "video/vector.h"
 #include "includes/segag80v.h"
+#include "scrlegcy.h"
 
 #define VECTOR_CLOCK        15468480            /* master clock */
 #define U34_CLOCK           (VECTOR_CLOCK/3)    /* clock for interrupt chain */

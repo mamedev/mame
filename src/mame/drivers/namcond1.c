@@ -74,6 +74,7 @@ Notes:
 #include "sound/c352.h"
 #include "machine/at28c16.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 /*************************************************************/
 

@@ -38,6 +38,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
+#include "scrlegcy.h"
 
 
 class skimaxx_state : public driver_device

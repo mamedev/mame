@@ -281,6 +281,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 #include "drivlgcy.h"
+#include "scrlegcy.h"
 
 
 class tempest_state : public driver_device

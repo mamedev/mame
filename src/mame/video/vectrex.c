@@ -3,6 +3,7 @@
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "cpu/m6809/m6809.h"
+#include "scrlegcy.h"
 
 
 #define ANALOG_DELAY 7800

@@ -24,6 +24,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "machine/nvram.h"
 #include "includes/midtunit.h"
+#include "scrlegcy.h"
 
 
 #define CPU_CLOCK       (50000000)
