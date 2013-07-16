@@ -1,5 +1,7 @@
 /* */
 
+/* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */
+
 #pragma once
 #ifndef __K05324x_H__
 #define __K05324x_H__
@@ -78,7 +80,6 @@ public:
 	void k053247_sprites_draw( bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	int k053247_read_register( int regnum);
 	void k053247_set_sprite_offs( int offsx, int offsy);
-	void k053247_wraparound_enable( int status);
 	void k053247_set_z_rejection( int zcode); // common to k053246/7
 	void k053247_get_ram( UINT16 **ram);
 	int k053247_get_dx( void );
@@ -105,7 +106,7 @@ public:
 
 	UINT8    m_kx46_regs[8];
 	UINT16   m_kx47_regs[16];
-	int      m_dx, m_dy, m_wraparound;
+	int      m_dx, m_dy;
 	UINT8    m_objcha_line;
 	int      m_z_rejection;
 
@@ -120,18 +121,194 @@ public:
 
 	void alt_k053247_export_config(void (**callback)(running_machine &, int *, int *, int *));
 
+	void zdrawgfxzoom32GP(
+		bitmap_rgb32 &bitmap, const rectangle &cliprect,
+		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf);
 
-
-	template<class _BitmapClass>
-	inline void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
-
-	inline void zdrawgfxzoom32GP(
-			bitmap_rgb32 &bitmap, const rectangle &cliprect,
+	void zdrawgfxzoom32GP(
+			bitmap_ind16 &bitmap, const rectangle &cliprect,
 			UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf);
 
+	template<class _BitmapClass>
+	inline void k053247_draw_single_sprite_gxcore(_BitmapClass &bitmap , rectangle const &cliprect,
+		unsigned char*gx_objzbuf, unsigned char*gx_shdzbuf, int code, unsigned short*gx_spriteram, int offs,
+		int color, int alpha, int drawmode, int zcode, int pri, 
+		int primask, int shadow, unsigned char*drawmode_table, unsigned char*shadowmode_table, int shdmask)
+	{
+		int xa,ya,ox,oy,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
+		int temp, temp4;
+		int flipscreenx = m_kx46_regs[5] & 0x01;
+		int flipscreeny = m_kx46_regs[5] & 0x02;
 
-	inline void k053247_draw_yxloop_gx( bitmap_rgb32 &bitmap, const rectangle &cliprect,
+		xa = ya = 0;
+		if (code & 0x01) xa += 1;
+		if (code & 0x02) ya += 1;
+		if (code & 0x04) xa += 2;
+		if (code & 0x08) ya += 2;
+		if (code & 0x10) xa += 4;
+		if (code & 0x20) ya += 4;
+		code &= ~0x3f;
+
+		temp4 = gx_spriteram[offs];
+
+		// mask off the upper 6 bits of coordinate and zoom registers
+		oy = gx_spriteram[offs+2] & 0x3ff;
+		ox = gx_spriteram[offs+3] & 0x3ff;
+
+		scaley = zoomy = gx_spriteram[offs+4] & 0x3ff;
+		if (zoomy) zoomy = (0x400000+(zoomy>>1)) / zoomy;
+		else zoomy = 0x800000;
+		if (!(temp4 & 0x4000))
+		{
+			scalex = zoomx = gx_spriteram[offs+5] & 0x3ff;
+			if (zoomx) zoomx = (0x400000+(zoomx>>1)) / zoomx;
+			else zoomx = 0x800000;
+		}
+		else { zoomx = zoomy; scalex = scaley; }
+
+		nozoom = (scalex == 0x40 && scaley == 0x40);
+
+		flipx = temp4 & 0x1000;
+		flipy = temp4 & 0x2000;
+
+		temp = gx_spriteram[offs+6];
+		mirrorx = temp & 0x4000;
+		if (mirrorx) flipx = 0; // only applies to x mirror, proven
+		mirrory = temp & 0x8000;
+
+		int objset1 = k053246_read_register(5);
+		// for Escape Kids (GX975)
+		if ( objset1 & 8 ) // Check only "Bit #3 is '1'?"
+		{
+			int screenwidth = machine().primary_screen->width();
+
+			zoomx = zoomx>>1; // Fix sprite width to HALF size
+			ox = (ox>>1) + 1; // Fix sprite draw position
+
+			if (flipscreenx) ox += screenwidth;
+			nozoom = 0;
+		}
+
+		if (flipscreenx) { ox = -ox; if (!mirrorx) flipx = !flipx; }
+		if (flipscreeny) { oy = -oy; if (!mirrory) flipy = !flipy; }
+
+		int k053247_opset = k053247_read_register(0xc/2);
+		int wrapsize, xwraplim, ywraplim;
+		if (k053247_opset & 0x40)
+		{
+			wrapsize = 512;
+			xwraplim = 512 - 64;
+			ywraplim = 512 - 128;
+		}
+		else
+		{
+			wrapsize  = 1024;
+			xwraplim  = 1024 - 384;
+			ywraplim  = 1024 - 512;
+		}
+
+
+		// get "display window" offsets
+		int offx = (short)((m_kx46_regs[0] << 8) | m_kx46_regs[1]);
+		int offy = (short)((m_kx46_regs[2] << 8) | m_kx46_regs[3]);
+
+
+		// apply wrapping and global offsets
+		temp = wrapsize-1;
+
+		if (gx_objzbuf && gx_shdzbuf) // our GX drivers assume the offsets are applied here, where is the best place, figure it out and make consistent
+		{
+			ox += m_dx;
+			oy -= m_dy;
+		}
+
+		ox = ( ox - offx) & temp;
+		oy = (-oy - offy) & temp;
+		if (ox >= xwraplim) ox -= wrapsize;
+		if (oy >= ywraplim) oy -= wrapsize;
+
+
+		temp = temp4>>8 & 0x0f;
+		int width = 1 << (temp & 3);
+		int height = 1 << (temp>>2 & 3);
+
+		if (!(gx_objzbuf && gx_shdzbuf)) // the non-GX ones assume the offsets are applied here
+		{
+			ox += m_dx;
+			oy -= m_dy;
+		}
+
+		ox -= (zoomx * width) >> 13;
+		oy -= (zoomy * height) >> 13;
+
+		if (gx_objzbuf && gx_shdzbuf) /* GX case, custom draw function */
+		{
+		
+			k053247_draw_yxloop_gx( bitmap, cliprect,
+				code,
+				color, 
+				height, width,
+				zoomx, zoomy, flipx, flipy,
+				ox, oy,
+				xa, ya,
+				mirrorx, mirrory,
+				nozoom,
+				pri,
+				zcode, alpha, drawmode,
+				gx_objzbuf, gx_shdzbuf
+				);
+			
+		}
+		else /* non-GX case, MAME draw functions */
+		{
+			UINT8* whichtable = drawmode_table;
+			if (color == -1)
+			{
+				// drop the entire sprite to shadow unconditionally
+				if (shdmask < 0) return;
+				color = 0;
+				shadow = -1;
+				whichtable = shadowmode_table;
+				palette_set_shadow_mode(machine(), 0);
+			}
+			else
+			{
+				if (shdmask >= 0)
+				{
+					shadow = (color & K053247_CUSTOMSHADOW) ? (color >> K053247_SHDSHIFT) : (shadow >> 10);
+					if (shadow &= 3) palette_set_shadow_mode(machine(), (shadow - 1) & shdmask);
+				}
+				else
+					shadow = 0;
+			}
+
+			color &= 0xffff; // strip attribute flags
+
+			drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		
+			k053247_draw_loop( bitmap, cliprect,
+				code,
+				color,
+   				height, width,
+				zoomx, zoomy, flipx, flipy,
+				ox, oy,
+				xa, ya,
+				mirrorx, mirrory,
+				nozoom,
+				primask,
+				whichtable
+				);
+
+			
+		}
+	}
+
+
+
+	template<class _BitmapClass>
+	void k053247_draw_yxloop_gx( _BitmapClass &bitmap, const rectangle &cliprect,
 		int code,
 		int color,
 		int height, int width,
@@ -144,10 +321,85 @@ public:
 		int pri,
 		int zcode, int alpha, int drawmode, 
 		UINT8* gx_objzbuf, UINT8* gx_shdzbuf
-		);
+		)
+	{
+		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+		int zw,zh;
+		int  temp1, temp2, temp3, temp4;
+		int temp;
+
+		// substitutes: temp=code, temp1=fx, temp2=fy, temp3=sx, temp4=sy;
+		for (int y=0; y<height; y++)
+		{
+			temp4 = oy + ((zoomy * y + (1<<11)) >> 12);
+			zh = (oy + ((zoomy * (y+1) + (1<<11)) >> 12)) - temp4;
+
+			for (int x=0; x<width; x++)
+			{
+				temp3 = ox + ((zoomx * x + (1<<11)) >> 12);
+				zw = (ox + ((zoomx * (x+1) + (1<<11)) >> 12)) - temp3;
+				temp = code;
+
+				if (mirrorx)
+				{
+					if ((!flipx)^((x<<1)<width))
+					{
+						/* mirror left/right */
+						temp += xoffset[(width-1-x+xa)&7];
+						temp1 = 1;
+					}
+					else
+					{
+						temp += xoffset[(x+xa)&7];
+						temp1 = 0;
+					}
+				}
+				else
+				{
+					if (flipx) temp += xoffset[(width-1-x+xa)&7];
+					else temp += xoffset[(x+xa)&7];
+					temp1 = flipx;
+				}
+
+				if (mirrory)
+				{
+					if ((!flipy)^((y<<1)>=height))
+					{
+						/* mirror top/bottom */
+						temp += yoffset[(height-1-y+ya)&7];
+						temp2 = 1;
+					}
+					else
+					{
+						temp += yoffset[(y+ya)&7];
+						temp2 = 0;
+					}
+				}
+				else
+				{
+					if (flipy) temp += yoffset[(height-1-y+ya)&7];
+					else temp += yoffset[(y+ya)&7];
+					temp2 = flipy;
+				}
+
+				if (nozoom) { zw = zh = 0x10; }
+
+				zdrawgfxzoom32GP(
+						bitmap, cliprect, 
+						temp,
+						color,
+						temp1,temp2,
+						temp3,temp4,
+						zw << 12, zh << 12, alpha, drawmode, zcode, pri,
+						gx_objzbuf, gx_shdzbuf
+						);
+			}
+		}
+	}
 
 	template<class _BitmapClass>
-	inline void k053247_draw_loop( _BitmapClass &bitmap, const rectangle &cliprect,
+	void k053247_draw_loop( _BitmapClass &bitmap, const rectangle &cliprect,
 		int code,
 		int color,
    		int height, int width,
@@ -159,19 +411,122 @@ public:
 		/* non-gx specifics */
 		int primask,
 		UINT8* whichtable 
-		);
+		)
+	{
+		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 
-	void k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,
-		int color, int alpha, int drawmode, int zcode, int pri );
+
+		for (int y = 0; y < height; y++)
+		{
+			int sx, sy, zw, zh;
+
+			sy = oy + ((zoomy * y + (1 << 11)) >> 12);
+			zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
+
+			for (int x = 0; x < width; x++)
+			{
+				int c, fx, fy;
+
+				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
+				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
+				c = code;
+				if (mirrorx)
+				{
+					if ((flipx == 0) ^ ((x << 1) < width))
+					{
+						/* mirror left/right */
+						c += xoffset[(width - 1 - x + xa) & 7];
+						fx = 1;
+					}
+					else
+					{
+						c += xoffset[(x + xa) & 7];
+						fx = 0;
+					}
+				}
+				else
+				{
+					if (flipx) c += xoffset[(width - 1 - x + xa) & 7];
+					else c += xoffset[(x + xa) & 7];
+					fx = flipx;
+				}
+				if (mirrory)
+				{
+					if ((flipy == 0) ^ ((y<<1) >= height))
+					{
+						/* mirror top/bottom */
+						c += yoffset[(height - 1 - y + ya) & 7];
+						fy = 1;
+					}
+					else
+					{
+						c += yoffset[(y + ya) & 7];
+						fy = 0;
+					}
+				}
+				else
+				{
+					if (flipy) c += yoffset[(height - 1 - y + ya) & 7];
+					else c += yoffset[(y + ya) & 7];
+					fy = flipy;
+				}
+
+				if (nozoom)
+				{
+					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+							c,
+							color,
+							fx,fy,
+							sx,sy,
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
+				}
+				else
+				{
+					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+							c,
+							color,
+							fx,fy,
+							sx,sy,
+							(zw << 16) >> 4,(zh << 16) >> 4,
+							machine().priority_bitmap,primask,
+							whichtable,machine().shadow_table);
+				}
+
+				if (mirrory && height == 1)  /* Simpsons shadows */
+				{
+					if (nozoom)
+					{
+						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+								c,
+								color,
+								fx,!fy,
+								sx,sy,
+								machine().priority_bitmap,primask,
+								whichtable,machine().shadow_table);
+					}
+					else
+					{
+						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+								c,
+								color,
+								fx,!fy,
+								sx,sy,
+								(zw << 16) >> 4,(zh << 16) >> 4,
+								machine().priority_bitmap,primask,
+								whichtable,machine().shadow_table);
+					}
+				}
+			} // end of X loop
+		} // end of Y loop
+	}
+
+
 
 	template<class _BitmapClass>
-	inline void k053247_draw_single_sprite( _BitmapClass &bitmap, const rectangle &cliprect,
-		int code, int offs,
-		int color,
-		/* bits only the non-gx implementation relies on */
-		int primask, int shadow, UINT8* drawmode_table, UINT8* shadowmode_table, int shdmask
-		);
+	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
+
 
 protected:
 	// device-level overrides

@@ -943,7 +943,10 @@ void konamigx_state::konamigx_mixer_draw(running_machine &machine, bitmap_rgb32 
 
 			m_k055673->k053247_draw_single_sprite_gxcore( bitmap, cliprect,
 				gx_objzbuf, gx_shdzbuf, code, gx_spriteram, offs,
-				color, alpha, drawmode, zcode, pri );
+				color, alpha, drawmode, zcode, pri,
+				/* non-gx only */
+				0,0,NULL,NULL,0
+				);
 		}
 		/* the rest are tilemaps of various kinda */
 		else
