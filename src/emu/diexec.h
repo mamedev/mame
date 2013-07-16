@@ -140,11 +140,11 @@ class screen_device;
 
 // interrupt callback for VBLANK and timed interrupts
 typedef device_delegate<void (device_t &)> device_interrupt_delegate;
-typedef void (*device_interrupt_func)(device_t *device);
+typedef void (*device_interrupt_func)(device_t *device); // legacy
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
 typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
-typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
+typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum); // legacy
 
 
 
@@ -174,9 +174,9 @@ public:
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
-	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0);
+	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0); // legacy
 	static void static_set_vblank_int(device_t &device, device_interrupt_delegate function, const char *tag, int rate = 0);
-	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate);
+	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate); // legacy
 	static void static_set_periodic_int(device_t &device, device_interrupt_delegate function, attotime rate);
 
 	// execution management
@@ -191,7 +191,7 @@ public:
 	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
 	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
 	int input_state(int linenum) { return m_input[linenum].m_curstate; }
-	void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback);
+	void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback); // legacy
 	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback);
 
 	// suspend/resume
