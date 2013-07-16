@@ -123,20 +123,50 @@ public:
 
 
 	template<class _BitmapClass>
-	void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
+	inline void k053247_sprites_draw_common( _BitmapClass &bitmap, const rectangle &cliprect );
 
-	void zdrawgfxzoom32GP(
+	inline void zdrawgfxzoom32GP(
 			bitmap_rgb32 &bitmap, const rectangle &cliprect,
 			UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf);
 
+
+	inline void k053247_draw_yxloop_gx( bitmap_rgb32 &bitmap, const rectangle &cliprect,
+		int code,
+		int color,
+		int height, int width,
+		int zoomx, int zoomy, int flipx, int flipy,
+		int ox, int oy,
+		int xa, int ya,
+		int mirrorx, int mirrory,
+		int nozoom,
+		/* gx specifics */
+		int pri,
+		int zcode, int alpha, int drawmode, 
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf
+		);
+
+	template<class _BitmapClass>
+	inline void k053247_draw_loop( _BitmapClass &bitmap, const rectangle &cliprect,
+		int code,
+		int color,
+   		int height, int width,
+		int zoomx, int zoomy, int flipx, int flipy,
+		int ox, int oy,
+		int xa, int ya,
+		int mirrorx, int mirrory,
+		int nozoom,
+		/* non-gx specifics */
+		int primask,
+		UINT8* whichtable 
+		);
 
 	void k053247_draw_single_sprite_gxcore( bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		UINT8* gx_objzbuf, UINT8* gx_shdzbuf, int code, UINT16 *gx_spriteram, int offs,
 		int color, int alpha, int drawmode, int zcode, int pri );
 
 	template<class _BitmapClass>
-	void k053247_draw_single_sprite( _BitmapClass &bitmap, const rectangle &cliprect,
+	inline void k053247_draw_single_sprite( _BitmapClass &bitmap, const rectangle &cliprect,
 		int code, int offs,
 		int color,
 		/* bits only the non-gx implementation relies on */
