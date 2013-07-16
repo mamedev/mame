@@ -24,31 +24,6 @@
     - irq sources and communications;
     - unimplemented instruction PER triggered
 
-unimplemented instruction: PER
-'sub' (00C0): unmapped i/o memory write to 00 = 00 & FF
-'sub' (00C8): unmapped i/o memory read from 02 & FF
-'sub' (03CF): unmapped i/o memory write to 00 = 00 & FF
-'sub' (010E): unmapped i/o memory write to 00 = 40 & FF
-'sub' (0113): unmapped i/o memory read from 02 & FF
-'sub' (0116): unmapped i/o memory read from 02 & FF
-'sub' (03CF): unmapped i/o memory write to 00 = 40 & FF
-'sub' (06A6): unmapped program memory write to F000 = 00 & FF
-'sub' (06B7): unmapped i/o memory write to 00 = 40 & FF
-'sub' (FF93): unmapped program memory write to F000 = F8 & FF
-'sub' (FFB1): unmapped i/o memory write to 00 = 40 & FF
-'sub' (FF8F): unmapped i/o memory write to 00 = 60 & FF
-'sub' (FF93): unmapped program memory write to F000 = 80 & FF
-'sub' (FFB1): unmapped i/o memory write to 00 = 40 & FF
-'sub' (06E4): unmapped i/o memory write to 00 = 47 & FF
-'sub' (06EA): unmapped program memory write to F000 = 70 & FF
-
-2011-09-18 Video (bitmapped) added. Notes:
-- The colour planes are a guess (r,g,b might need swapping around)
-- In "irq_mask_w" is a read of e800. Without this, no videoram writes occur.
-- In "fp1100_vram_w" the data is inverted. Without it, a flashing cursor can be seen.
-- The text mode is also present at 9000-97FF of the maincpu (not bitmapped).
-- The display should keep scrolling, but it seems to crash after the first
-  scroll (as can be seen in the 9000-97FF area).
 
 ****************************************************************************/
 
@@ -65,22 +40,12 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_subcpu(*this, "sub"),
-	//m_cass(*this, "cassette"),
-	//m_wave(*this, WAVE_TAG),
-	//m_speaker(*this, "speaker"),
-	//m_printer(*this, "centronics"),
 	m_crtc(*this, "crtc"),
-	//m_fdc(*this, "fdc"),
 	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	//required_device<cassette_image_device> m_cass;
-	//required_device<> m_wave;
-	//required_device<> m_speaker;
-	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	//required_device<> m_fdc;
 	DECLARE_READ8_MEMBER(fp1100_mem_r);
 	DECLARE_WRITE8_MEMBER(fp1100_mem_w);
 	DECLARE_WRITE8_MEMBER(main_bank_w);
@@ -124,26 +89,6 @@ void fp1100_state::video_start()
 
 static MC6845_UPDATE_ROW( fp1100_update_row )
 {
-	fp1100_state *state = device->machine().driver_data<fp1100_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 r,g,b,col,i;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
-
-	for (x = 0; x < x_count; x++)
-	{
-		mem = (((ma+x)<<3) + ra) & 0x3fff;
-		b = state->m_p_videoram[mem];
-		r = state->m_p_videoram[mem+0x4000];
-		g = state->m_p_videoram[mem+0x8000];
-
-		for (i = 0; i < 8; i++)
-		{
-			col = BIT(r, i) + (BIT(g, i) << 1) + (BIT(b, i) << 2);
-			if (x == cursor_x) col ^= 7;
-			*p++ = palette[col];
-		}
-	}
 }
 
 READ8_MEMBER( fp1100_state::fp1100_mem_r )
@@ -173,10 +118,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	//  m_subcpu->set_input_line(UPD7810_INTF2, HOLD_LINE);
 
 	irq_mask = data;
-	///printf("%02x\n",data);
-	// FIXME - the below 2 lines are needed, otherwise nothing ever gets written to videoram
-	address_space &mem = m_subcpu->space(AS_PROGRAM);
-	data = mem.read_byte(0xe800);
+	printf("%02x\n",data);
 }
 
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
@@ -369,7 +311,7 @@ static const gfx_layout fp1100_chars_8x8 =
 };
 
 static GFXDECODE_START( fp1100 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )
+	//GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )
 GFXDECODE_END
 
 static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
@@ -434,9 +376,6 @@ ROM_START( fp1100 )
 	ROM_LOAD( "sub1.rom", 0x0000, 0x1000, CRC(8feda489) SHA1(917d5b398b9e7b9a6bfa5e2f88c5b99923c3c2a3))
 	ROM_LOAD( "sub2.rom", 0x1000, 0x1000, CRC(359f007e) SHA1(0188d5a7b859075cb156ee55318611bd004128d7))
 	ROM_LOAD( "sub3.rom", 0x2000, 0xf80, BAD_DUMP CRC(fb2b577a) SHA1(a9ae6b03e06ea2f5db30dfd51ebf5aede01d9672))
-
-	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_COPY( "sub_ipl", 0x2400, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
 ROM_END
