@@ -48,6 +48,7 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "includes/seicross.h"
+#include "mcfglgcy.h"
 
 static NVRAM_HANDLER( seicross )
 {

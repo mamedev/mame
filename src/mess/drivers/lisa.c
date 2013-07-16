@@ -18,6 +18,7 @@
 #include "formats/ap_dsk35.h"
 #include "machine/6522via.h"
 #include "sound/speaker.h"
+#include "mcfglgcy.h"
 
 
 /***************************************************************************

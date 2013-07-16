@@ -190,6 +190,7 @@ TI-86 ports:
 #include "imagedev/snapquik.h"
 #include "machine/nvram.h"
 #include "includes/ti85.h"
+#include "mcfglgcy.h"
 
 /* port i/o functions */
 

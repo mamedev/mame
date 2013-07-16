@@ -114,6 +114,7 @@
 #include "emu.h"
 #include "includes/micronic.h"
 #include "rendlay.h"
+#include "mcfglgcy.h"
 
 READ8_MEMBER( micronic_state::keypad_r )
 {

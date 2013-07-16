@@ -28,6 +28,7 @@
 
 
 #include "includes/x07.h"
+#include "mcfglgcy.h"
 
 /***************************************************************************
     T6834 IMPLEMENTATION

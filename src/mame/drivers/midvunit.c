@@ -33,6 +33,7 @@ Known to exist but not dumped:
 #include "machine/midwayic.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
+#include "mcfglgcy.h"
 
 
 #define CPU_CLOCK       50000000

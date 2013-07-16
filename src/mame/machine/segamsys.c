@@ -17,6 +17,7 @@
 #include "includes/segamsys.h"
 #include "drivlgcy.h"
 #include "scrlegcy.h"
+#include "mcfglgcy.h"
 
 
 //static UINT8* sms_rom;

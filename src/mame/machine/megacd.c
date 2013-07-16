@@ -2,6 +2,7 @@
 #include "includes/megadriv.h"
 #include "megacd.lh"
 #include "sound/rf5c68.h"
+#include "mcfglgcy.h"
 
 
 /* Callback when the genesis enters interrupt code */

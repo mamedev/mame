@@ -136,6 +136,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "sound/ay8910.h"
 #include "machine/msm6242.h"
 #include "machine/microtch.h"
+#include "mcfglgcy.h"
 
 
 /***************************************************************************

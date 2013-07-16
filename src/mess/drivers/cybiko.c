@@ -18,6 +18,7 @@ ToDo:
 
 #include "includes/cybiko.h"
 #include "rendlay.h"
+#include "mcfglgcy.h"
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |

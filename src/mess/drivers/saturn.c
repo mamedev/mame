@@ -74,6 +74,8 @@ TODO:
 #include "machine/sat_dram.h"
 #include "machine/sat_bram.h"
 
+#include "mcfglgcy.h"
+
 
 class sat_console_state : public saturn_state
 {

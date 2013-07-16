@@ -151,6 +151,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "imagedev/cartslot.h"
+#include "mcfglgcy.h"
 #include "neogeo.lh"
 
 

@@ -96,6 +96,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "imagedev/chd_cd.h"
 #include "cpu/arm/arm.h"
 #include "cpu/arm7/arm7.h"
+#include "mcfglgcy.h"
 
 
 

@@ -20,6 +20,7 @@
 #include "machine/mc146818.h"
 #include "machine/nscsi_hd.h"
 #include "sound/dac.h"
+#include "mcfglgcy.h"
 
 
 /*************************************

@@ -233,14 +233,6 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MCFG_WATCHDOG_TIME_INIT(_time) \
 	config.m_watchdog_time = _time;
 
-// core functions
-#define MCFG_NVRAM_HANDLER(_func) \
-	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func);
-#define MCFG_MEMCARD_HANDLER(_func) \
-	config.m_memcard_handler = MEMCARD_HANDLER_NAME(_func);
-#define MCFG_NVRAM_HANDLER_CLEAR() \
-	config.m_nvram_handler = NULL;
-
 // core video parameters
 #define MCFG_VIDEO_ATTRIBUTES(_flags) \
 	config.m_video_attributes = _flags;

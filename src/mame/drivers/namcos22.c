@@ -1139,6 +1139,7 @@
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/m37710/m37710.h"
 #include "sound/c352.h"
+#include "mcfglgcy.h"
 
 #define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
 

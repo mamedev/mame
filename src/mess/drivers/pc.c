@@ -103,6 +103,8 @@ video HW too.
 #include "machine/ram.h"
 #include "machine/pc_keyboards.h"
 
+#include "mcfglgcy.h"
+
 
 static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH

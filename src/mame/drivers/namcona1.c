@@ -163,6 +163,7 @@ Notes:
 #include "includes/namcona1.h"
 #include "sound/c140.h"
 #include "cpu/m37710/m37710.h"
+#include "mcfglgcy.h"
 
 
 /*************************************************************************/

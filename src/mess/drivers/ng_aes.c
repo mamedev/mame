@@ -59,6 +59,7 @@
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 #include "machine/megacdcd.h"
+#include "mcfglgcy.h"
 
 
 extern const char layout_neogeo[];

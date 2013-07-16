@@ -275,6 +275,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "includes/namcoic.h"
 #include "sound/c352.h"
 #include "cpu/m37710/m37710.h"
+#include "mcfglgcy.h"
 
 #define NB1_NVMEM_SIZE (0x800)
 
