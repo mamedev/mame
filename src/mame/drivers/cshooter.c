@@ -113,9 +113,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
 	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(pal_w);
-	DECLARE_WRITE8_MEMBER(pal2_w);
-	DECLARE_READ8_MEMBER(pal_r);
 	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
 	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 	DECLARE_DRIVER_INIT(cshootere);
@@ -125,7 +122,9 @@ public:
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(cshooter);
 	DECLARE_MACHINE_RESET(airraid);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
 };
 
@@ -169,53 +168,64 @@ void cshooter_state::video_start()
 	m_txtilemap->set_transparent_pen(0);
 }
 
+void cshooter_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = m_spriteram.bytes() - 4; i >= 0 ; i -= 4)
+	{
+		if (m_spriteram[i+1]&0x80)
+			continue;
+
+		/* BCD debug code, to be removed in the end */
+		UINT8 tile_low = (m_spriteram[i]&0x0f);
+		UINT8 tile_high = ((m_spriteram[i]&0xf0)>>4);
+
+		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
+		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
+
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2],0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2],0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low, m_spriteram[i+1], 0, 0, m_spriteram[i+3]+8,m_spriteram[i+2]+8,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low, m_spriteram[i+1], 0, 0, m_spriteram[i+3],m_spriteram[i+2]+8,0);
+	}
+}
+
 UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// set palette
+	for (int i = 0; i < 0x100; i++)
+	{
+		int r = m_generic_paletteram_8[i] >> 4;
+		int g = m_generic_paletteram_8[i] & 0xf;
+		int b = m_generic_paletteram2_8[i] & 0xf;
+
+		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+		colortable_palette_set_color(machine().colortable, i, color);
+	}
+	
 	bitmap.fill(0x80, cliprect); // temp
 
-	//sprites
+	//draw_sprites(bitmap, cliprect);
+
+	m_txtilemap->draw(bitmap, cliprect, 0,0);
+	return 0;
+}
+
+UINT32 cshooter_state::screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// set palette (compared to cshooter, r and g are swapped)
+	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 *spriteram = m_spriteram;
-		int i;
-		for(i=0;i<m_spriteram.bytes();i+=4)
-		{
-			if(spriteram[i+1]&0x80)
-				continue;
+		int r = m_generic_paletteram_8[i] & 0xf;
+		int g = m_generic_paletteram_8[i] >> 4;
+		int b = m_generic_paletteram2_8[i] & 0xf;
 
-			{
-				/* BCD debug code, to be removed in the end */
-				UINT8 tile_low = (spriteram[i]&0x0f);
-				UINT8 tile_high = ((spriteram[i]&0xf0)>>4);
-
-				tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
-				tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
-
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile_high,
-							spriteram[i+1],
-							0, 0,
-							spriteram[i+3],spriteram[i+2],0);
-
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile_high,
-							spriteram[i+1],
-							0, 0,
-							spriteram[i+3]+8,spriteram[i+2],0);
-
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile_low,
-							spriteram[i+1],
-							0, 0,
-							spriteram[i+3]+8,spriteram[i+2]+8,0);
-
-				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
-							tile_low,
-							spriteram[i+1],
-							0, 0,
-							spriteram[i+3],spriteram[i+2]+8,0);
-			}
-		}
+		rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
+		colortable_palette_set_color(machine().colortable, i, color);
 	}
+	
+	bitmap.fill(0x80, cliprect); // temp
+
+	draw_sprites(bitmap, cliprect);
 
 	m_txtilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -223,7 +233,6 @@ UINT32 cshooter_state::screen_update_cshooter(screen_device &screen, bitmap_ind1
 
 
 /* main cpu */
-
 
 TIMER_DEVICE_CALLBACK_MEMBER(cshooter_state::cshooter_scanline)
 {
@@ -269,46 +278,12 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 }
 
 
-WRITE8_MEMBER(cshooter_state::pal_w)
-{
-	int r,g,b;
-	m_generic_paletteram_8[offset]=data;
-	offset&=0xff;
-
-	g = m_generic_paletteram_8[offset] & 0xf;
-	r = m_generic_paletteram_8[offset] >> 4;
-	b = m_generic_paletteram_8[offset+0x100] & 0xf;
-
-	rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-	colortable_palette_set_color(machine().colortable, offset, color);
-}
-
-WRITE8_MEMBER(cshooter_state::pal2_w)
-{
-	if (offset&0x100) return;
-
-	int r,g,b;
-	m_generic_paletteram_8[offset]=data;
-	offset&=0x1ff;
-
-	r = m_generic_paletteram_8[offset] & 0xf;
-	g = m_generic_paletteram_8[offset] >> 4;
-	b = m_generic_paletteram_8[offset+0x200] & 0xf;
-
-	rgb_t color = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-	colortable_palette_set_color(machine().colortable, offset, color);
-}
-
-READ8_MEMBER(cshooter_state::pal_r)
-{
-	return m_generic_paletteram_8[offset];
-}
-
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY            // sound related ?
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_SHARE("paletteram")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_SHARE("paletteram2")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
@@ -347,7 +322,8 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP            // see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0xda00, 0xdaff) AM_RAM AM_SHARE("paletteram2")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
@@ -526,7 +502,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_cshooter)
+	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_airraid)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_PALETTE_LENGTH(0x100)
@@ -602,19 +578,23 @@ ROM_START( cshooter )
 	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
-	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )   // only 1 byte difference with 3.f11, bad dump?
+	ROM_LOAD( "r3.11a",  0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x20000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "graphics.14c", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "graphics.16c", 0x10000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "graphics.1a", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // Tilemaps
 	ROM_LOAD( "r2.2u",   0x00000, 0x10000, CRC(5ddf9f4e) SHA1(69e4d422ca272bf2e9f00edbe7d23760485fdfe6) )
 
 	ROM_REGION( 0x320, "proms", 0 )
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
-	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
+	ROM_LOAD( "82s123.7a",  0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
+	ROM_LOAD( "82s129.9s",  0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "82s129.4e",  0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
 
 
@@ -659,19 +639,23 @@ ROM_START( cshootere )
 	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
 	ROM_REGION( 0x02000, "gfx1",  0 ) // TX Layer
-	ROM_LOAD( "3.f11",   0x00000, 0x02000, CRC(704c26d7) SHA1(e5964f409cbc2c4752e3969f3e84ace08d5ad9cb) )    // only 1 byte difference with R3, bad dump?
+	ROM_LOAD( "3.f11",   0x00000, 0x02000, CRC(67b50a47) SHA1(b1f4aefc9437edbeefba5371149cc08c0b55c741) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x20000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "graphics1.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "graphics2.bin", 0x10000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "graphics3.bin", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // Tilemaps
 	ROM_LOAD( "2.k20",   0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
 	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
-	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
+	ROM_LOAD( "82s123.7a",  0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
+	ROM_LOAD( "82s129.9s",  0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "82s129.4e",  0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
 
 /*
@@ -707,17 +691,21 @@ ROM_START( airraid )
 	ROM_REGION( 0x02000, "gfx1", 0 ) // TX Layer
 	ROM_LOAD( "3.13e",   0x00000, 0x02000, CRC(672ec0e8) SHA1(a11cd90d6494251ceee3bc7c72f4e7b1580b77e2) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "gfx.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION( 0x20000, "gfx2", 0 ) // tiles
+	ROM_LOAD( "graphics1.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "graphics2.bin", 0x10000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // sprites
+	ROM_LOAD( "graphics3.bin", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x10000, "user1", 0 ) // bg maps
 	ROM_LOAD( "2.19j",   0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
 	ROM_REGION( 0x320, "proms", 0 ) // taken from parent set
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "0.7a",       0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
-	ROM_LOAD( "1.9s",       0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "2.4e",       0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
+	ROM_LOAD( "82s123.7a",  0x0100, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
+	ROM_LOAD( "82s129.9s",  0x0120, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "82s129.4e",  0x0220, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 ROM_END
 
 
@@ -772,6 +760,6 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 
 
 
-GAME( 1987, cshooter,  0,         cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING )
-GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_NOT_WORKING )
+GAME( 1987, cshooter,  0,         cshooter, cshooter, cshooter_state, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1987, airraid,   cshooter,  airraid,  airraid,  cshooter_state, cshootere, ROT270, "Seibu Kaihatsu", "Air Raid (encrypted)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
