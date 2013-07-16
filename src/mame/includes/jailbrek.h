@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/vlm5030.h"
+
 #define MASTER_CLOCK        XTAL_18_432MHz
 #define VOICE_CLOCK         XTAL_3_579545MHz
 
@@ -17,7 +19,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scroll_x(*this, "scroll_x"),
 		m_scroll_dir(*this, "scroll_dir"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -25,6 +28,10 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scroll_x;
 	required_shared_ptr<UINT8> m_scroll_dir;
+	
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<vlm5030_device> m_vlm;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap;
@@ -47,5 +54,4 @@ public:
 	INTERRUPT_GEN_MEMBER(jb_interrupt);
 	INTERRUPT_GEN_MEMBER(jb_interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
 };

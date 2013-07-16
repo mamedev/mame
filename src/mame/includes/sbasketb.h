@@ -1,5 +1,6 @@
 
 #include "sound/sn76496.h"
+#include "sound/vlm5030.h"
 
 class sbasketb_state : public driver_device
 {
@@ -12,9 +13,10 @@ public:
 		m_palettebank(*this, "palettebank"),
 		m_spriteram_select(*this, "spriteramsel"),
 		m_scroll(*this, "scroll"),
-		m_sn(*this, "snsnd"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_sn(*this, "snsnd"),
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -23,7 +25,12 @@ public:
 	required_shared_ptr<UINT8> m_palettebank;
 	required_shared_ptr<UINT8> m_spriteram_select;
 	required_shared_ptr<UINT8> m_scroll;
-	optional_device<sn76489_device> m_sn;
+	
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<sn76489_device> m_sn;
+	required_device<vlm5030_device> m_vlm;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -46,6 +53,4 @@ public:
 	UINT32 screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 };

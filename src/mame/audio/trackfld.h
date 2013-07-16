@@ -32,7 +32,7 @@ private:
 	int      m_last_irq;
 
 	cpu_device *m_audiocpu;
-	device_t *m_vlm;
+	vlm5030_device *m_vlm;
 };
 
 extern const device_type TRACKFLD_AUDIO;

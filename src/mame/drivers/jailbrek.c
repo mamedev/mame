@@ -87,7 +87,6 @@ Notes:
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
-#include "sound/vlm5030.h"
 #include "includes/konamipt.h"
 #include "includes/jailbrek.h"
 
@@ -114,16 +113,14 @@ INTERRUPT_GEN_MEMBER(jailbrek_state::jb_interrupt_nmi)
 
 READ8_MEMBER(jailbrek_state::jailbrek_speech_r)
 {
-	device_t *device = machine().device("vlm");
-	return (vlm5030_bsy(device) ? 1 : 0);
+	return (m_vlm->bsy() ? 1 : 0);
 }
 
 WRITE8_MEMBER(jailbrek_state::jailbrek_speech_w)
 {
-	device_t *device = machine().device("vlm");
 	/* bit 0 could be latch direction like in yiear */
-	vlm5030_st(device, (data >> 1) & 1);
-	vlm5030_rst(device, (data >> 2) & 1);
+	m_vlm->st((data >> 1) & 1);
+	m_vlm->rst((data >> 2) & 1);
 }
 
 static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
@@ -146,7 +143,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(jailbrek_speech_w) /* speech pins */
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
 	AM_RANGE(0x6000, 0x6000) AM_READ(jailbrek_speech_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

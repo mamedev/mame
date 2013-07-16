@@ -112,7 +112,6 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
-#include "sound/vlm5030.h"
 #include "sound/nes_apu.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
@@ -122,25 +121,22 @@ DIP locations verified for:
 CUSTOM_INPUT_MEMBER(punchout_state::punchout_vlm5030_busy_r)
 {
 	/* bit 4 of DSW1 is busy pin level */
-	return (vlm5030_bsy(machine().device("vlm"))) ? 0x00 : 0x01;
+	return (m_vlm->bsy()) ? 0x00 : 0x01;
 }
 
 WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
 {
-	device_t *device = machine().device("vlm");
-	vlm5030_rst( device, data & 0x01 );
+	m_vlm->rst( data & 0x01 );
 }
 
 WRITE8_MEMBER(punchout_state::punchout_speech_st_w)
 {
-	device_t *device = machine().device("vlm");
-	vlm5030_st( device, data & 0x01 );
+	m_vlm->st( data & 0x01 );
 }
 
 WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
 {
-	device_t *device = machine().device("vlm");
-	vlm5030_vcu( device, data & 0x01 );
+	m_vlm->vcu( data & 0x01 );
 }
 
 WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
@@ -354,7 +350,7 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x00, 0x01) AM_WRITENOP    /* the 2A03 #1 is not present */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)  /* VLM5030 */
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)  /* VLM5030 */
 //  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
 //  AM_RANGE(0x06, 0x06) AM_WRITENOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)

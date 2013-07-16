@@ -97,7 +97,6 @@ Sound: VLM5030 at 7B
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
-#include "sound/vlm5030.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
 #include "includes/yiear.h"
@@ -106,8 +105,7 @@ Sound: VLM5030 at 7B
 
 READ8_MEMBER(yiear_state::yiear_speech_r)
 {
-	device_t *device = machine().device("vlm");
-	if (vlm5030_bsy(device))
+	if (m_vlm->bsy())
 		return 1;
 	else
 		return 0;
@@ -115,10 +113,9 @@ READ8_MEMBER(yiear_state::yiear_speech_r)
 
 WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
 {
-	device_t *device = machine().device("vlm");
 	/* bit 0 is latch direction */
-	vlm5030_st(device, (data >> 1) & 1);
-	vlm5030_rst(device, (data >> 2) & 1);
+	m_vlm->st((data >> 1) & 1);
+	m_vlm->rst((data >> 2) & 1);
 }
 
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
@@ -141,7 +138,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0x4900, 0x4900) AM_WRITE(konami_SN76496_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(yiear_VLM5030_control_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x4c00, 0x4c00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x4d00, 0x4d00) AM_READ_PORT("DSW3")
 	AM_RANGE(0x4e00, 0x4e00) AM_READ_PORT("SYSTEM")

@@ -1,5 +1,6 @@
 #include "sound/k007232.h"
 #include "sound/k005289.h"
+#include "sound/vlm5030.h"
 
 class nemesis_state : public driver_device
 {
@@ -18,10 +19,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_k007232(*this, "k007232"),
 		m_k005289(*this, "k005289"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_charram;
@@ -36,8 +38,6 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT8> m_gx400_shared_ram;
-	optional_device<k007232_device> m_k007232;
-	optional_device<k005289_device> m_k005289;
 
 	/* video-related */
 	tilemap_t *m_background;
@@ -60,7 +60,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_vlm;
+	optional_device<k007232_device> m_k007232;
+	optional_device<k005289_device> m_k005289;
+	optional_device<vlm5030_device> m_vlm;
 	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);

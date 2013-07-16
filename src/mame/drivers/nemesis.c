@@ -52,8 +52,6 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "sound/ay8910.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
-#include "sound/vlm5030.h"
-#include "sound/k005289.h"
 #include "sound/k051649.h"
 #include "includes/nemesis.h"
 #include "includes/konamipt.h"
@@ -216,19 +214,16 @@ WRITE16_MEMBER(nemesis_state::nemesis_soundlatch_word_w)
 
 WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
 {
-	device_t *device = machine().device("vlm");
-
 	/* the voice data is not in a rom but in sound RAM at $8000 */
-	vlm5030_set_rom(device, m_gx400_shared_ram + 0x4000);
-	vlm5030_st(device, 1);
-	vlm5030_st(device, 0);
+	m_vlm->set_rom(m_gx400_shared_ram + 0x4000);
+	m_vlm->st(1);
+	m_vlm->st(0);
 }
 
 WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
 {
-	device_t *device = machine().device("vlm");
-	vlm5030_st(device, 1);
-	vlm5030_st(device, 0);
+	m_vlm->st(1);
+	m_vlm->st(0);
 }
 
 READ8_MEMBER(nemesis_state::nemesis_portA_r)
@@ -243,7 +238,7 @@ READ8_MEMBER(nemesis_state::nemesis_portA_r)
 
 	res |= 0xd0;
 
-	if (m_vlm != NULL && vlm5030_bsy(m_vlm))
+	if (m_vlm != NULL && m_vlm->bsy())
 		res |= 0x20;
 
 	return res;
@@ -412,7 +407,7 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x4000, 0x87ff) AM_RAM AM_SHARE("gx400_shared")
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k005289", k005289_device, k005289_pitch_A_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("k005289", k005289_device, k005289_pitch_B_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("k005289", k005289_device, k005289_keylatch_A_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("k005289", k005289_device, k005289_keylatch_B_w)
@@ -542,7 +537,7 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(salamand_speech_start_w)
 ADDRESS_MAP_END
@@ -1504,8 +1499,6 @@ static const k007232_interface k007232_config =
 
 void nemesis_state::machine_start()
 {
-	m_vlm = machine().device("vlm");
-
 	save_item(NAME(m_irq_on));
 	save_item(NAME(m_irq1_on));
 	save_item(NAME(m_irq2_on));

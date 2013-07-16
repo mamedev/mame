@@ -1,5 +1,6 @@
 
 #include "sound/sn76496.h"
+#include "sound/vlm5030.h"
 
 class hyperspt_state : public driver_device
 {
@@ -11,7 +12,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_sn(*this, "snsnd"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -19,6 +21,9 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	optional_device<sn76496_device> m_sn;
+	required_device<cpu_device> m_maincpu;
+	optional_device<vlm5030_device> m_vlm;
+	
 	UINT8 *  m_scroll2;
 	UINT8 *  m_spriteram2;
 
@@ -45,5 +50,4 @@ public:
 	UINT32 screen_update_hyperspt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
 };

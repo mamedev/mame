@@ -51,7 +51,6 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "sound/2151intf.h"
-#include "sound/vlm5030.h"
 #include "includes/rockrage.h"
 #include "includes/konamipt.h"
 
@@ -82,16 +81,14 @@ WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
 
 READ8_MEMBER(rockrage_state::rockrage_VLM5030_busy_r)
 {
-	device_t *device = machine().device("vlm");
-	return (vlm5030_bsy(device) ? 1 : 0);
+	return (m_vlm->bsy() ? 1 : 0);
 }
 
 WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
 {
-	device_t *device = machine().device("vlm");
 	/* bit2 = data bus enable */
-	vlm5030_rst(device, (data >> 1) & 0x01);
-	vlm5030_st(device, (data >> 0) & 0x01);
+	m_vlm->rst((data >> 1) & 0x01);
+	m_vlm->st((data >> 0) & 0x01);
 }
 
 static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
@@ -115,7 +112,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)              /* VLM5030 */
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r */

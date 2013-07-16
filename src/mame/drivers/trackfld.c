@@ -183,8 +183,6 @@ MAIN BOARD:
 #include "cpu/m6800/m6800.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/sn76496.h"
-#include "sound/vlm5030.h"
 #include "sound/dac.h"
 #include "audio/trackfld.h"
 #include "audio/hyprolyb.h"
@@ -256,8 +254,7 @@ WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
 
 READ8_MEMBER(trackfld_state::trackfld_speech_r)
 {
-	device_t *device = machine().device("vlm");
-	if (vlm5030_bsy(device))
+	if (m_vlm->bsy())
 		return 1;
 	else
 		return 0;
@@ -265,10 +262,9 @@ READ8_MEMBER(trackfld_state::trackfld_speech_r)
 
 WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
 {
-	device_t *device = machine().device("vlm");
 	/* bit 0 is latch direction */
-	vlm5030_st(device, (data >> 1) & 1);
-	vlm5030_rst(device, (data >> 2) & 1);
+	m_vlm->st((data >> 1) & 1);
+	m_vlm->rst((data >> 2) & 1);
 }
 
 
@@ -276,7 +272,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ(trackfld_speech_r) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(konami_SN76496_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(trackfld_VLM5030_control_w)
-	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
+	AM_RANGE(0x0003, 0x0003) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)       /* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)  /* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* 26 */ /* cause interrupt on audio CPU */
@@ -411,7 +407,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP           /* watch dog ?; reaktor reads here */
 	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("trackfld_audio", trackfld_audio_device, trackfld_speech_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_MASK(0x0380) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, trackfld_sound_w)
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
+	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )

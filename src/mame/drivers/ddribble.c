@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-#include "sound/vlm5030.h"
 #include "sound/flt_rc.h"
 #include "includes/konamipt.h"
 #include "includes/ddribble.h"
@@ -69,33 +68,31 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 
 READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 {
-//  device_t *device = machine().device("vlm");
 	return machine().rand(); /* patch */
 	/* FIXME: remove ? */
 #if 0
-	if (vlm5030_bsy(device)) return 1;
+	if (m_vlm->bsy()) return 1;
 	else return 0;
 #endif
 }
 
 WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 {
-	device_t *device = machine().device("vlm");
 	UINT8 *SPEECH_ROM = memregion("vlm")->base();
 
 	/* b7 : vlm data bus OE   */
 
 	/* b6 : VLM5030-RST       */
-	vlm5030_rst(device, data & 0x40 ? 1 : 0);
+	m_vlm->rst(data & 0x40 ? 1 : 0);
 
 	/* b5 : VLM5030-ST        */
-	vlm5030_st(device, data & 0x20 ? 1 : 0);
+	m_vlm->st(data & 0x20 ? 1 : 0);
 
 	/* b4 : VLM5300-VCU       */
-	vlm5030_vcu(device, data & 0x10 ? 1 : 0);
+	m_vlm->vcu(data & 0x10 ? 1 : 0);
 
 	/* b3 : ROM bank select   */
-	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
+	m_vlm->set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 
 	/* b2 : SSG-C rc filter enable */
 	dynamic_cast<filter_rc_device*>(m_filter3)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
@@ -139,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("snd_sharedram")       /* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)    /* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)          /* Speech data */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_device, data_w)          /* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                     /* ROM */
 ADDRESS_MAP_END
 

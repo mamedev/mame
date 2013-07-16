@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "sound/sn76496.h"
+#include "sound/vlm5030.h"
 
 class trackfld_state : public driver_device
 {
@@ -17,8 +18,9 @@ public:
 		m_scroll2(*this, "scroll2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu"),
 		m_sn(*this, "snsnd"),
-		m_maincpu(*this, "maincpu") { }
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram2;
@@ -27,7 +29,11 @@ public:
 	required_shared_ptr<UINT8> m_scroll2;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
+	
+	/* devices */
+	required_device<cpu_device> m_maincpu;
 	optional_device<sn76496_device> m_sn;
+	optional_device<vlm5030_device> m_vlm;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -70,5 +76,4 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
 };

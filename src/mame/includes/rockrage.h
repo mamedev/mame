@@ -4,6 +4,7 @@
 
 *************************************************************************/
 
+#include "sound/vlm5030.h"
 #include "video/k007342.h"
 #include "video/k007420.h"
 
@@ -13,10 +14,11 @@ public:
 	rockrage_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
-		m_maincpu(*this, "maincpu") { }
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -26,9 +28,11 @@ public:
 	int        m_vreg;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007342_device> m_k007342;
 	required_device<k007420_device> m_k007420;
+	required_device<vlm5030_device> m_vlm;
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
@@ -39,7 +43,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);
-	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/rockrage.c -----------*/

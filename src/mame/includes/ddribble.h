@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/vlm5030.h"
+
 class ddribble_state : public driver_device
 {
 public:
@@ -16,7 +18,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_snd_sharedram(*this, "snd_sharedram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -41,6 +44,9 @@ public:
 	device_t *m_filter1;
 	device_t *m_filter2;
 	device_t *m_filter3;
+	required_device<cpu_device> m_maincpu;
+	required_device<vlm5030_device> m_vlm;
+	
 	DECLARE_WRITE8_MEMBER(ddribble_bankswitch_w);
 	DECLARE_READ8_MEMBER(ddribble_sharedram_r);
 	DECLARE_WRITE8_MEMBER(ddribble_sharedram_w);
@@ -65,5 +71,4 @@ public:
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
 	void set_pens(  );
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen );
-	required_device<cpu_device> m_maincpu;
 };

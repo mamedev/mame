@@ -1,4 +1,5 @@
 #include "sound/sn76496.h"
+#include "sound/vlm5030.h"
 
 class yiear_state : public driver_device
 {
@@ -8,14 +9,19 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
 		m_sn(*this, "snsnd"),
-		m_maincpu(*this, "maincpu") { }
+		m_vlm(*this, "vlm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_videoram;
-	optional_device<sn76489a_device> m_sn;
+	
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<sn76489a_device> m_sn;
+	required_device<vlm5030_device> m_vlm;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -39,5 +45,4 @@ public:
 	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
 };

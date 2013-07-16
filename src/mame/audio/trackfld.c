@@ -36,7 +36,7 @@ void trackfld_audio_device::device_config_complete()
 void trackfld_audio_device::device_start()
 {
 	m_audiocpu =machine().device<cpu_device>("audiocpu");
-	m_vlm = machine().device("vlm");
+	m_vlm = machine().device<vlm5030_device>("vlm");
 
 	/* sound */
 	save_item(NAME(m_last_addr));
@@ -73,7 +73,7 @@ READ8_MEMBER( trackfld_audio_device::trackfld_sh_timer_r )
 
 READ8_MEMBER( trackfld_audio_device::trackfld_speech_r )
 {
-	return vlm5030_bsy(m_vlm) ? 0x10 : 0;
+	return m_vlm->bsy() ? 0x10 : 0;
 }
 
 WRITE8_MEMBER( trackfld_audio_device::trackfld_sound_w )
@@ -86,11 +86,11 @@ WRITE8_MEMBER( trackfld_audio_device::trackfld_sound_w )
 
 	/* A8 VLM5030 ST pin */
 	if (changes & 0x100)
-		vlm5030_st(m_vlm, offset & 0x100);
+		m_vlm->st(offset & 0x100);
 
 	/* A9 VLM5030 RST pin */
 	if (changes & 0x200)
-		vlm5030_rst(m_vlm, offset & 0x200);
+		m_vlm->rst(offset & 0x200);
 
 	m_last_addr = offset;
 }
@@ -100,7 +100,7 @@ READ8_MEMBER( trackfld_audio_device::hyperspt_sh_timer_r )
 	UINT32 clock = m_audiocpu->total_cycles() / TIMER_RATE;
 
 	if (m_vlm != NULL)
-		return (clock & 0x3) | (vlm5030_bsy(m_vlm) ? 0x04 : 0);
+		return (clock & 0x3) | (m_vlm->bsy() ? 0x04 : 0);
 	else
 		return (clock & 0x3);
 }
@@ -118,11 +118,11 @@ WRITE8_MEMBER( trackfld_audio_device::hyperspt_sound_w )
 
 	/* A4 VLM5030 ST pin */
 	if (changes & 0x10)
-		vlm5030_st(m_vlm, offset & 0x10);
+		m_vlm->st(offset & 0x10);
 
 	/* A5 VLM5030 RST pin */
 	if( changes & 0x20 )
-		vlm5030_rst(m_vlm, offset & 0x20);
+		m_vlm->rst(offset & 0x20);
 
 	m_last_addr = offset;
 }
