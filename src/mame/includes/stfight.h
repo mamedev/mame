@@ -56,6 +56,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_cshooter_tx_tile_info);
+	DECLARE_READ8_MEMBER(cshooter_mcu_unk1_r);
 	DECLARE_VIDEO_START(stfight);
 	DECLARE_VIDEO_START(cshooter);
 	virtual void machine_reset();

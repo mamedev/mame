@@ -82,7 +82,10 @@ DRIVER_INIT_MEMBER(stfight_state,stfight)
 
 DRIVER_INIT_MEMBER(stfight_state,cshooter)
 {
-	// ...
+	UINT8 *rom = memregion("maincpu")->base();
+
+	/* patch out initial coin mech check for now */
+	rom[0x5068] = 0xc9; /* ret z -> ret*/
 }
 
 void stfight_state::machine_reset()
@@ -107,7 +110,7 @@ WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
 	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
 
-	membank("bank1")->set_base(&ROM2[data<<14] );
+	membank("bank1")->set_base(&ROM2[0x4000*((data>>4)&3)] );
 }
 
 /*
@@ -182,6 +185,11 @@ WRITE8_MEMBER(stfight_state::stfight_coin_w)
 	// interrogate coin mech
 	m_coin_mech_query_active = 1;
 	m_coin_mech_query = data;
+}
+
+READ8_MEMBER(stfight_state::cshooter_mcu_unk1_r)
+{
+	return 0xff; // hack so it boots
 }
 
 /*

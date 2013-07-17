@@ -230,6 +230,7 @@ DONE? (check on real board)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "includes/stfight.h"
@@ -258,9 +259,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
 /*	TODO: Main to MCU ports reads at 0x0004 - 0x0007 (yeah, in ROM area!) */
+	AM_RANGE(0x0007, 0x0007) AM_READ(cshooter_mcu_unk1_r)
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
+	AM_RANGE(0xd809, 0xd809) AM_WRITE(stfight_bank_w)
 	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
@@ -271,6 +274,18 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cshooter_mcu_map, AS_PROGRAM, 8, stfight_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+//	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
+//	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
+//	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
+//	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddr_a_w)
+//	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddr_b_w)
+//	AM_RANGE(0x000a, 0x000a) AM_WRITENOP
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -551,6 +566,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
+
+	MCFG_CPU_ADD("mcu", M68705, 3000000)   /* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
@@ -974,4 +992,5 @@ GAME( 1986, empcityj, empcity, stfight, stfight, stfight_state, stfight, ROT0,  
 GAME( 1986, empcityi, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)", 0 )
 GAME( 1986, stfight,  empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)", 0 )
 GAME( 1986, stfighta, empcity, stfight, stfight, stfight_state, stfight, ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)", 0 )
-GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_NO_SOUND )
+/* Cross Shooter runs on a slightly modified version of Empire City, with M68705 MCU, a different text tilemap and gfx blobs (see also airraid.c) */
+GAME( 1987, cshooter,  0,      cshooter,cshooter, stfight_state, cshooter,ROT270,"Seibu Kaihatsu (Taito license)",           "Cross Shooter (not encrypted)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
