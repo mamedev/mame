@@ -108,7 +108,7 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 		// clip scanline tail
 		if ((end_pixel -= dst_max) > 0) dst_length -= end_pixel;
 
-		// reject zero-length scanlines
+		// reject 0-length scanlines
 		if (dst_length <= 0) return;
 
 		// calculate zoom factor
@@ -182,7 +182,7 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 	src_wrapmask = (clipmask) ? ~0 : wrapmask;
 
 	pal_base = palette;
-	dst_offset = -dst_offset; // negate target offset in order to terminated draw loop at zero condition
+	dst_offset = -dst_offset; // negate target offset in order to terminated draw loop at 0 condition
 
 	if (pri)
 	{
@@ -242,7 +242,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	int dst_maxy  = cliprect.max_y;
 
 	int orientation  = 0;   // orientation defaults to no swapping and no flipping
-	int dst_height   = 512; // virtual bitmap height defaults to five hundred and twelve pixels
+	int dst_height   = 512; // virtual bitmap height defaults to 512 pixels
 	int linedata_adv = 4;   // line info packets are four words(eight bytes) apart
 
 	// switch X and Y parameters when the first bit of the control register is cleared
@@ -260,30 +260,30 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 			// Xexex: L6 galaxies
 			// Metam: L4 forest, L5 arena, L6 tower interior, final boss
 
-			// crop source offset between zero and two hundred and fifty-five inclusive,
-			// and set virtual bitmap height to two hundred and fifty-six pixels
+			// crop source offset between 0 and 255 inclusive,
+			// and set virtual bitmap height to 256 pixels
 			src_wrapmask = src_clipmask = 0xff;
 			dst_height = 0x100;
 		break;
 		case 1 :
 			// Xexex: prologue, L7 nebulae
 
-			// the source offset is cropped to zero and five hundred and eleven inclusive
+			// the source offset is cropped to 0 and 511 inclusive
 			src_wrapmask = src_clipmask = 0x1ff;
 		break;
 		case 4 :
 			// Xexex: L1 sky and boss, L3 planet, L5 poly-face, L7 battle ship patches
 			// Metam: L1 summoning circle, L3 caves, L6 gargoyle towers
 
-			// crop source offset between zero and two hundred and fifty-five inclusive,
-			// and allow source offset to wrap back at 500 hexadecimal to minus 300 hexadecimal
+			// crop source offset between 0 and 255 inclusive,
+			// and allow source offset to wrap back at 0x500 to -0x300
 			src_wrapmask = src_clipmask = 0xff;
 			wrap500 = true;
 		break;
 //      case 2 : // Xexex: title
 //      case 7 : // Xexex: L4 organic stage
 		default:
-			// crop source offset between zero and one thousand and eleven inclusive,
+			// crop source offset between 0 and 1023 inclusive,
 			// keep other dimensions to their defaults
 			src_wrapmask = src_clipmask = 0x3ff;
 		break;
@@ -367,14 +367,14 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 		if (color == 0xffff) continue;              // reject scanline if color code equals minus one
 
 		offset   = line_ram[linedata_offs + 1];     // get first pixel offset in ROM
-		if (!(color & 0xff) && !offset) continue;   // reject scanline if both color and pixel offset are zero
+		if (!(color & 0xff) && !offset) continue;   // reject scanline if both color and pixel offset are 0
 
 		// calculate physical palette location
 		// there can be thirty-two color codes and each code represents sixteen pens
 		pal_ptr = pal_base + ((color & 0x1f) << 4);
 
 		// calculate physical pixel location
-		// each offset unit represents two hundred and fifty six pixels and should wrap at ROM boundary for safety
+		// each offset unit represents 256 pixels and should wrap at ROM boundary for safety
 		pix_ptr = unpacked + ((offset << 8) % unpacked_size);
 
 		// get scanline zoom factor
@@ -411,7 +411,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 			    src_clipmask : source offset clip mask; source pixels with offsets beyond the scope of this mask will not be drawn
 			    src_wrapmask : source offset wrap mask; wraps source offset around, no effect when src_clipmask is set
 			    orientation  : flags indicating whether scanlines should be drawn horizontally, vertically, forward or backward
-			    priority     : value to be written to the priority bitmap, no effect when equals zero
+			    priority     : value to be written to the priority bitmap, no effect when equals 0
 			*/
 			pdraw_scanline32(bitmap, pal_ptr, pix_ptr, cliprect,
 				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, machine().priority_bitmap, (UINT8)priority);
