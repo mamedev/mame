@@ -220,8 +220,6 @@ conventional RAM. See the memory map for sprite data format.
 TODO:
 - MCU is identical between Empire City and Cross Shooter, I guess it's coinage
   related.
-- Cross Shooter has serious issues with firing rate, especially noticeable
-  when some bosses appears. irq related?
 - palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
@@ -570,10 +568,17 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cshooter, stfight )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", Z80, 6000000)   /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("mcu", M68705, 3000000)   /* 3 MHz */
+	MCFG_CPU_REPLACE("audiocpu", Z80, 6000000)  /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_CPU_ADD("mcu", M68705, 6000000)   /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
 
 	MCFG_SCREEN_MODIFY("screen")
