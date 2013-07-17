@@ -264,6 +264,7 @@ static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_text_w) AM_SHARE("tx_vram")
 	AM_RANGE(0xd809, 0xd809) AM_WRITE(stfight_bank_w)
+	AM_RANGE(0xd818, 0xd818) AM_WRITE(cshooter_mcu_w)
 	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
@@ -278,12 +279,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cshooter_mcu_map, AS_PROGRAM, 8, stfight_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-//	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
-//	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
-//	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
-//	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddr_a_w)
-//	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddr_b_w)
-//	AM_RANGE(0x000a, 0x000a) AM_WRITENOP
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(cshooter_68705_port_a_r,cshooter_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(cshooter_68705_port_b_r,cshooter_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cshooter_68705_port_c_r,cshooter_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(cshooter_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(cshooter_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(cshooter_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

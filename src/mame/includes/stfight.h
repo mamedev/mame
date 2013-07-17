@@ -16,6 +16,7 @@ public:
 		m_vh_latch_ram(*this, "vh_latch_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_msm(*this, "msm") { }
 
 	optional_shared_ptr<UINT8> m_text_char_ram;
@@ -23,6 +24,9 @@ public:
 	optional_shared_ptr<UINT8> m_tx_vram;
 	required_shared_ptr<UINT8> m_vh_latch_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_mcu;
+	required_device<msm5205_device> m_msm;
 	UINT8 *m_decrypt;
 	int m_adpcm_data_offs;
 	int m_adpcm_data_end;
@@ -67,8 +71,28 @@ public:
 	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
+
+	/*
+		Cross Shooter MCU specifics
+	*/
+
+	DECLARE_READ8_MEMBER(cshooter_68705_port_a_r);
+	DECLARE_READ8_MEMBER(cshooter_68705_port_b_r);
+	DECLARE_READ8_MEMBER(cshooter_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(cshooter_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(cshooter_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(cshooter_68705_port_c_w);
+
+	DECLARE_WRITE8_MEMBER(cshooter_68705_ddr_a_w);
+	DECLARE_WRITE8_MEMBER(cshooter_68705_ddr_b_w);
+	DECLARE_WRITE8_MEMBER(cshooter_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(cshooter_mcu_w);
+
+	UINT8 m_portA_out, m_portA_in;
+	UINT8 m_portB_out, m_portB_in;
+	UINT8 m_portC_out, m_portC_in;
+	UINT8 m_ddrA, m_ddrB, m_ddrC;
+	UINT8 m_from_main, m_main_sent;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

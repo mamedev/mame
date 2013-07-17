@@ -123,7 +123,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_STFIGHT_INTERRUPT_1:
 		// Do a RST08
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in stfight_state::device_timer");
@@ -133,7 +133,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
 	// Do a RST10
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 	timer_set(attotime::from_hz(120), TIMER_STFIGHT_INTERRUPT_1);
 }
 
@@ -262,4 +262,101 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
 	m_fm_data &= 0x7f;
 
 	return( data );
+}
+
+/*
+ * Cross Shooter MCU communications
+ *
+ * TODO: everything, especially MCU to main comms
+ */
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_a_w)
+{
+	m_ddrA = data;
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_b_w)
+{
+	m_ddrB = data;
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_ddr_c_w)
+{
+	m_ddrC = data;
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_mcu_w)
+{
+	m_mcu->set_input_line(0, HOLD_LINE);
+	m_from_main = data;
+	m_main_sent = 1;
+
+}
+
+READ8_MEMBER(stfight_state::cshooter_68705_port_a_r)
+{
+	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_port_a_w)
+{
+	m_portA_out = data;
+}
+
+READ8_MEMBER(stfight_state::cshooter_68705_port_b_r)
+{
+	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_port_b_w)
+{
+	if ((m_ddrB & 0x01) && (data & 0x01) && (~m_portB_out & 0x01))
+	{
+		printf("bit 0\n");
+	}
+	if ((m_ddrB & 0x02) && (data & 0x02) && (~m_portB_out & 0x02))
+	{
+		printf("bit 1\n");
+	}
+	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
+	{
+		printf("bit 2\n");
+	}
+	if ((m_ddrB & 0x08) && (data & 0x08) && (~m_portB_out & 0x08))
+	{
+		printf("bit 3\n");
+	}
+	if ((m_ddrB & 0x10) && (data & 0x10) && (~m_portB_out & 0x10))
+	{
+		printf("bit 4\n");
+	}
+	if ((m_ddrB & 0x20) && (data & 0x20) && (~m_portB_out & 0x20))
+	{
+		m_portA_in = m_from_main;
+
+		//if (m_main_sent)
+		//	m_mcu->set_input_line(0, CLEAR_LINE);
+
+		m_main_sent = 0;
+	}
+	if ((m_ddrB & 0x40) && (data & 0x40) && (~m_portB_out & 0x40))
+	{
+		printf("bit 6\n");
+	}
+	if ((m_ddrB & 0x80) && (data & 0x80) && (~m_portB_out & 0x80))
+	{
+		printf("bit 7\n");
+	}
+
+	m_portB_out = data;
+}
+
+READ8_MEMBER(stfight_state::cshooter_68705_port_c_r)
+{
+	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+}
+
+WRITE8_MEMBER(stfight_state::cshooter_68705_port_c_w)
+{
+	m_portC_out = data;
 }
