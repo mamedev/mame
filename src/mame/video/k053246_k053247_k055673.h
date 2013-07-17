@@ -243,7 +243,7 @@ public:
 		ox -= (zoomx * width) >> 13;
 		oy -= (zoomy * height) >> 13;
 
-		if (gx_objzbuf && gx_shdzbuf) /* GX case, custom draw function */
+		if (gx_objzbuf && gx_shdzbuf) /* GX  */
 		{
 		
 			k053247_draw_yxloop_gx( bitmap, cliprect,
@@ -257,11 +257,12 @@ public:
 				nozoom,
 				pri,
 				zcode, alpha, drawmode,
-				gx_objzbuf, gx_shdzbuf
+				gx_objzbuf, gx_shdzbuf,
+				0,0
 				);
 			
 		}
-		else /* non-GX case, MAME draw functions */
+		else /* non-GX */
 		{
 			UINT8* whichtable = drawmode_table;
 			if (color == -1)
@@ -288,18 +289,20 @@ public:
 
 			drawmode_table[m_gfx->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 		
-			k053247_draw_loop( bitmap, cliprect,
+			k053247_draw_yxloop_gx( bitmap, cliprect,
 				code,
-				color,
-   				height, width,
+				color, 
+				height, width,
 				zoomx, zoomy, flipx, flipy,
 				ox, oy,
 				xa, ya,
 				mirrorx, mirrory,
 				nozoom,
-				primask,
-				whichtable
-				);
+				0,
+				0, 0, 0,
+				0, 0,
+				primask,whichtable
+				);	
 
 			
 		}
@@ -320,46 +323,48 @@ public:
 		/* gx specifics */
 		int pri,
 		int zcode, int alpha, int drawmode, 
-		UINT8* gx_objzbuf, UINT8* gx_shdzbuf
+		UINT8* gx_objzbuf, UINT8* gx_shdzbuf,
+		/* non-gx specifics */
+		int primask,
+		UINT8* whichtable
 		)
 	{
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		int zw,zh;
-		int  temp1, temp2, temp3, temp4;
-		int temp;
+		int  fx, fy, sx, sy;
+		int tempcode;
 
-		// substitutes: temp=code, temp1=fx, temp2=fy, temp3=sx, temp4=sy;
 		for (int y=0; y<height; y++)
 		{
-			temp4 = oy + ((zoomy * y + (1<<11)) >> 12);
-			zh = (oy + ((zoomy * (y+1) + (1<<11)) >> 12)) - temp4;
+			sy = oy + ((zoomy * y + (1<<11)) >> 12);
+			zh = (oy + ((zoomy * (y+1) + (1<<11)) >> 12)) - sy;
 
 			for (int x=0; x<width; x++)
 			{
-				temp3 = ox + ((zoomx * x + (1<<11)) >> 12);
-				zw = (ox + ((zoomx * (x+1) + (1<<11)) >> 12)) - temp3;
-				temp = code;
+				sx = ox + ((zoomx * x + (1<<11)) >> 12);
+				zw = (ox + ((zoomx * (x+1) + (1<<11)) >> 12)) - sx;
+				tempcode = code;
 
 				if (mirrorx)
 				{
 					if ((!flipx)^((x<<1)<width))
 					{
 						/* mirror left/right */
-						temp += xoffset[(width-1-x+xa)&7];
-						temp1 = 1;
+						tempcode += xoffset[(width-1-x+xa)&7];
+						fx = 1;
 					}
 					else
 					{
-						temp += xoffset[(x+xa)&7];
-						temp1 = 0;
+						tempcode += xoffset[(x+xa)&7];
+						fx = 0;
 					}
 				}
 				else
 				{
-					if (flipx) temp += xoffset[(width-1-x+xa)&7];
-					else temp += xoffset[(x+xa)&7];
-					temp1 = flipx;
+					if (flipx) tempcode += xoffset[(width-1-x+xa)&7];
+					else tempcode += xoffset[(x+xa)&7];
+					fx = flipx;
 				}
 
 				if (mirrory)
@@ -367,141 +372,45 @@ public:
 					if ((!flipy)^((y<<1)>=height))
 					{
 						/* mirror top/bottom */
-						temp += yoffset[(height-1-y+ya)&7];
-						temp2 = 1;
-					}
-					else
-					{
-						temp += yoffset[(y+ya)&7];
-						temp2 = 0;
-					}
-				}
-				else
-				{
-					if (flipy) temp += yoffset[(height-1-y+ya)&7];
-					else temp += yoffset[(y+ya)&7];
-					temp2 = flipy;
-				}
-
-				if (nozoom) { zw = zh = 0x10; }
-
-				zdrawgfxzoom32GP(
-						bitmap, cliprect, 
-						temp,
-						color,
-						temp1,temp2,
-						temp3,temp4,
-						zw << 12, zh << 12, alpha, drawmode, zcode, pri,
-						gx_objzbuf, gx_shdzbuf
-						);
-			}
-		}
-	}
-
-	template<class _BitmapClass>
-	void k053247_draw_loop( _BitmapClass &bitmap, const rectangle &cliprect,
-		int code,
-		int color,
-   		int height, int width,
-		int zoomx, int zoomy, int flipx, int flipy,
-		int ox, int oy,
-		int xa, int ya,
-		int mirrorx, int mirrory,
-		int nozoom,
-		/* non-gx specifics */
-		int primask,
-		UINT8* whichtable 
-		)
-	{
-		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
-
-
-		for (int y = 0; y < height; y++)
-		{
-			int sx, sy, zw, zh;
-
-			sy = oy + ((zoomy * y + (1 << 11)) >> 12);
-			zh = (oy + ((zoomy * (y + 1) + (1 << 11)) >> 12)) - sy;
-
-			for (int x = 0; x < width; x++)
-			{
-				int c, fx, fy;
-
-				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
-				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
-				c = code;
-				if (mirrorx)
-				{
-					if ((flipx == 0) ^ ((x << 1) < width))
-					{
-						/* mirror left/right */
-						c += xoffset[(width - 1 - x + xa) & 7];
-						fx = 1;
-					}
-					else
-					{
-						c += xoffset[(x + xa) & 7];
-						fx = 0;
-					}
-				}
-				else
-				{
-					if (flipx) c += xoffset[(width - 1 - x + xa) & 7];
-					else c += xoffset[(x + xa) & 7];
-					fx = flipx;
-				}
-				if (mirrory)
-				{
-					if ((flipy == 0) ^ ((y<<1) >= height))
-					{
-						/* mirror top/bottom */
-						c += yoffset[(height - 1 - y + ya) & 7];
+						tempcode += yoffset[(height-1-y+ya)&7];
 						fy = 1;
 					}
 					else
 					{
-						c += yoffset[(y + ya) & 7];
+						tempcode += yoffset[(y+ya)&7];
 						fy = 0;
 					}
 				}
 				else
 				{
-					if (flipy) c += yoffset[(height - 1 - y + ya) & 7];
-					else c += yoffset[(y + ya) & 7];
+					if (flipy) tempcode += yoffset[(height-1-y+ya)&7];
+					else tempcode += yoffset[(y+ya)&7];
 					fy = flipy;
 				}
 
-				if (nozoom)
+				if (gx_objzbuf && gx_shdzbuf) /* GX uses a custom draw function */
 				{
-					pdrawgfx_transtable(bitmap,cliprect,m_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							machine().priority_bitmap,primask,
-							whichtable,machine().shadow_table);
-				}
-				else
-				{
-					pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
-							c,
-							color,
-							fx,fy,
-							sx,sy,
-							(zw << 16) >> 4,(zh << 16) >> 4,
-							machine().priority_bitmap,primask,
-							whichtable,machine().shadow_table);
-				}
+					if (nozoom) { zw = zh = 0x10; }
 
-				if (mirrory && height == 1)  /* Simpsons shadows */
+					zdrawgfxzoom32GP(
+							bitmap, cliprect, 
+							tempcode,
+							color,
+							fx,fy,
+							sx,sy,
+							zw << 12, zh << 12, alpha, drawmode, zcode, pri,
+							gx_objzbuf, gx_shdzbuf
+							);
+
+				}
+				else /* Non-GX using regular pdrawgfx */
 				{
 					if (nozoom)
 					{
 						pdrawgfx_transtable(bitmap,cliprect,m_gfx,
-								c,
+								tempcode,
 								color,
-								fx,!fy,
+								fx,fy,
 								sx,sy,
 								machine().priority_bitmap,primask,
 								whichtable,machine().shadow_table);
@@ -509,18 +418,45 @@ public:
 					else
 					{
 						pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
-								c,
+								tempcode,
 								color,
-								fx,!fy,
+								fx,fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
 								machine().priority_bitmap,primask,
 								whichtable,machine().shadow_table);
 					}
+
+					if (mirrory && height == 1)  /* Simpsons shadows */
+					{
+						if (nozoom)
+						{
+							pdrawgfx_transtable(bitmap,cliprect,m_gfx,
+									tempcode,
+									color,
+									fx,!fy,
+									sx,sy,
+									machine().priority_bitmap,primask,
+									whichtable,machine().shadow_table);
+						}
+						else
+						{
+							pdrawgfxzoom_transtable(bitmap,cliprect,m_gfx,
+									tempcode,
+									color,
+									fx,!fy,
+									sx,sy,
+									(zw << 16) >> 4,(zh << 16) >> 4,
+									machine().priority_bitmap,primask,
+									whichtable,machine().shadow_table);
+						}
+					}
 				}
 			} // end of X loop
 		} // end of Y loop
 	}
+
+
 
 
 
