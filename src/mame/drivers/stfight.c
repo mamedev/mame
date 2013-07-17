@@ -220,6 +220,8 @@ conventional RAM. See the memory map for sprite data format.
 TODO:
 - MCU is identical between Empire City and Cross Shooter, I guess it's coinage
   related.
+- Cross Shooter has serious issues with firing rate, especially noticeable
+  when some bosses appears. irq related?
 - palette is incorporated - fix!!!
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
@@ -573,6 +575,9 @@ static MACHINE_CONFIG_DERIVED( cshooter, stfight )
 
 	MCFG_CPU_ADD("mcu", M68705, 3000000)   /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(cshooter_mcu_map)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(stfight_state, screen_update_cshooter)
 
 	MCFG_GFXDECODE(cshooter)
 	MCFG_VIDEO_START_OVERRIDE(stfight_state,cshooter)
@@ -985,8 +990,8 @@ ROM_START( cshooter )
 
 	ROM_REGION( 0x820, "proms", 0 )
 	ROM_LOAD( "63s281.16a", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
-	ROM_LOAD( "82s129.9s",  0x0100, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "82s129.4e",  0x0200, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
+	ROM_LOAD( "82s129.9s",  0x0500, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "82s129.4e",  0x0600, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
 	ROM_LOAD( "82s123.7a",  0x0800, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // sprite color related? (not used)
 ROM_END
 

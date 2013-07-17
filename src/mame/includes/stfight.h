@@ -66,10 +66,12 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 	DECLARE_WRITE8_MEMBER(stfight_adpcm_control_w);
 	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cshooter_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
 	/*

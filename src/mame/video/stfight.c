@@ -335,3 +335,48 @@ UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
+
+void stfight_state::cshooter_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int i = m_sprite_ram.bytes() - 4; i >= 0 ; i -= 4)
+	{
+		if (m_sprite_ram[i+1]&0x80)
+			continue;
+
+		int attr = m_sprite_ram[i+1];
+		int flipx = attr & 0x10;
+		int color = attr & 0x0f;
+		int pri = (attr & 0x20) >> 5;
+
+		/* BCD debug code, to be removed in the end */
+		UINT8 tile_low = (m_sprite_ram[i]&0x0f);
+		UINT8 tile_high = ((m_sprite_ram[i]&0xf0)>>4);
+
+		tile_low += (tile_low > 0x9) ? 0x37 : 0x30;
+		tile_high += (tile_high > 0x9) ? 0x37 : 0x30;
+
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2],machine().priority_bitmap,pri ? 0x02 : 0,0x00);
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_high << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2],machine().priority_bitmap,pri ? 0x02 : 0,0x00);
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, color, flipx, 0, m_sprite_ram[i+3]+8,m_sprite_ram[i+2]+8,machine().priority_bitmap,pri ? 0x02 : 0,0x00);
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0], tile_low << 1, color, flipx, 0, m_sprite_ram[i+3],m_sprite_ram[i+2]+8,machine().priority_bitmap,pri ? 0x02 : 0,0x00);
+	}
+}
+
+UINT32 stfight_state::screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	set_pens();
+
+	machine().priority_bitmap.fill(0, cliprect);
+
+	bitmap.fill(0, cliprect);   /* in case m_bg_tilemap is disabled */
+	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
+	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
+
+	/* Draw sprites (may be obscured by foreground layer) */
+//	if (m_vh_latch_ram[0x07] & 0x40)
+		cshooter_draw_sprites(bitmap,cliprect);
+
+	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
+	return 0;
+}
+
